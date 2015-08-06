@@ -1,0 +1,45 @@
+/* general table */
+.sat-table {
+   border-spacing: 0px;
+   border-collapse: collapse;
+}
+
+/* general td */
+.sat-table td {
+   border:solid black 1px;
+   padding: 5px;
+}
+
+/* td of tables with multiple columns */
+.sat-table-center td {
+   text-align:center;
+   vertical-align:top
+}
+
+.sat-choiceArea {
+   padding:5px;
+}
+
+.sat-choiceArea td {
+   padding:0px;
+   border: 0px;
+}
+
+.sat-choiceArea-selected {
+   border: 3px solid black;
+}
+
+.sat-ul-button {
+   margin: 0;
+   padding: 0;
+   border: 0;
+}
+
+.sat-button {
+   list-style: none;
+   margin-left: 15px;
+}
+
+.sat-button-selected {
+   list-style: disc;
+}

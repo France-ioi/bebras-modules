@@ -1,0 +1,99 @@
+* {
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -khtml-user-select: none;
+  font-family: arial;
+}
+
+.touch {
+  -ms-touch-action: none;
+}
+
+#task h1 {
+   display:none;
+}
+
+a {
+   color: #4D87CE;
+   font-weight: bold;
+   text-decoration: none;
+}
+
+.selectable, input, textarea {
+  -moz-user-select: text;
+  -webkit-user-select: auto !important;
+  -o-user-select: text;
+  user-select: text;
+  -khtml-user-select: text;
+}
+
+.borders, .borders td {
+	border: solid black 1px;
+}
+
+.question h1 {
+   display: none;
+}
+
+body {
+   width: 770px;
+}
+
+#success {
+   font-weight: bold;
+   color: blue;
+}
+
+#error {
+   font-weight: bold;
+   color: red;
+}
+
+button, input[type=button] {
+   font-size: 16px;
+}
+
+#solution {
+   display: none;
+}
+
+.tabs-menu {
+    list-style: none;
+    padding: 0;
+    height: 40px;
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+}
+
+.tabs-menu li {
+    height: 40px;
+    line-height: 20px;
+    float: left;
+	padding-right: 10px;
+    margin-right: 10px;
+    background-color: #ddd;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+}
+
+.tabs-menu li.current {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+}
+
+.tabs-menu li a {
+    padding: 10px;
+    color: #fff;
+    text-decoration: none; 
+}
+
+.tabs-menu .current a {
+    color: #000;
+}
+
+.easy, .medium, .hard {
+   display:none
+}
