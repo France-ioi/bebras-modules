@@ -159,6 +159,24 @@ $(document).ready(function() {
          }
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
+            if (task.printViewChooser) {
+               task.getViews(function(views){
+                  if ($("#choose-view").length == 0)
+                     $(document.body).prepend('<div id="choose-view"></div>');
+                  $("#choose-view").html("");
+                  for (var view in views)
+                  {
+                     function handler(v) {
+                        return function() {
+                           var tmp = {};
+                           tmp[v] = true;
+                           task.showViews(tmp, function(){});
+                        }
+                     }
+                     $("#choose-view").append($("<button>" + view + "</button>").click(handler(view)));
+                  }
+               });
+            }
             task.showViews(shownViews, function() {
                platform.trigger('showViews', [{"task": true}]);
             });
