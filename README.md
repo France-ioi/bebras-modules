@@ -8,3 +8,8 @@ This would be usually considered bad (or outdated) practice, but it addresses a 
 
 - find a better solution?
 - use proper name for task-pr and platform-pr
+- make a small .html requiring all modules, to give an example of IDs for all
+- package syntaxHighlighter 3.0.9
+- package json3
+- package recent versions of jquery and jquery-ui
+- package minify versions of custom js (integrationAPI, etc.)
