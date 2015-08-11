@@ -157,6 +157,13 @@ $(document).ready(function() {
          if (json.fullFeedback) {
             loadedViews.grader = true;
          }
+         var showViewsHandlerFactory = function (view) {
+            return function() {
+               var tmp = {};
+               tmp[view] = true;
+               task.showViews(tmp, function(){});
+            }
+         }
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
             if (task.printViewChooser) {
@@ -166,14 +173,7 @@ $(document).ready(function() {
                   $("#choose-view").html("");
                   for (var view in views)
                   {
-                     function handler(v) {
-                        return function() {
-                           var tmp = {};
-                           tmp[v] = true;
-                           task.showViews(tmp, function(){});
-                        }
-                     }
-                     $("#choose-view").append($("<button>" + view + "</button>").click(handler(view)));
+                     $("#choose-view").append($("<button>" + view + "</button>").click(showViewsHandlerFactory(view)));
                   }
                });
             }
