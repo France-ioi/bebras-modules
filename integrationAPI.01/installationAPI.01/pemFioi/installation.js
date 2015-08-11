@@ -2,6 +2,9 @@
 // its html at load, and we want to return unmodified html in getTaskResources.
 var taskHtmlPreloaded = false;
 $(document).ready(function() {
+   if (typeof PEMInstallationAPIObject === 'undefined') {
+      window.PEMInstallationAPIObject = json;
+   }
    PEMInstallationAPIObject['task'] = [{ type: 'html', content: $('#task').html() }];
    PEMInstallationAPIObject['solution'] = [{ type: 'html', content: $('#solution').html() }];
    taskHtmlPreloaded = true;
