@@ -2,39 +2,38 @@
 
 'use strict';
 
-// requires jQuery, and in the global scope:
-//   - a task object
-//   - a PEMInstallationAPIObject or json object
+// requires jQuery, and a task object in the global scope.
 
 // this should be called before the task loads, because the task can modify
 // its html at load, and we want to return unmodified html in getTaskResources.
-var taskHtmlPreloaded = false;
+var res = {};
 $(document).ready(function() {
-   if (typeof PEMInstallationAPIObject === 'undefined') {
-      window.PEMInstallationAPIObject = json;
-   }
-   PEMInstallationAPIObject.task = [{ type: 'html', content: $('#task').html() }];
-   PEMInstallationAPIObject.solution = [{ type: 'html', content: $('#solution').html() }];
-   taskHtmlPreloaded = true;
+   res.task = [{ type: 'html', content: $('#task').html() }];
+   res.solution = [{ type: 'html', content: $('#solution').html() }];
 });
 
-task.getTaskResources = function(callback)
+var taskResourcesLoaded = false;
+
+task.getResources = function(callback)
 {
-   PEMInstallationAPIObject.task = ('task' in PEMInstallationAPIObject) ? PEMInstallationAPIObject.task : [];
-   PEMInstallationAPIObject.solution = ('solution' in PEMInstallationAPIObject) ? PEMInstallationAPIObject.solution : [];
-   PEMInstallationAPIObject.grader = [];
-   PEMInstallationAPIObject.task_modules = [];
-   PEMInstallationAPIObject.solution_modules = [];
-   PEMInstallationAPIObject.grader_modules = [];
-   PEMInstallationAPIObject.hints = [];
-   PEMInstallationAPIObject.proxy = [];
-   PEMInstallationAPIObject.proxy_modules = [];
-   PEMInstallationAPIObject.display = [];
-   PEMInstallationAPIObject.display_modules = [];
-   PEMInstallationAPIObject.sat = [];
-   PEMInstallationAPIObject.sat_modules = [];
-   if (!PEMInstallationAPIObject.title) {
-      PEMInstallationAPIObject.title = $('title').text();
+   if (taskResourcesLoaded) {
+      return res;
+   }
+   res.task = ('task' in res) ? res.task : [{ type: 'html', content: $('#task').html() }];
+   res.solution = ('solution' in res) ? res.solution : [{ type: 'html', content: $('#solution').html() }];
+   res.grader = [];
+   res.task_modules = [];
+   res.solution_modules = [];
+   res.grader_modules = [];
+   res.hints = [];
+   res.proxy = [];
+   res.proxy_modules = [];
+   res.display = [];
+   res.display_modules = [];
+   res.sat = [];
+   res.sat_modules = [];
+   if (!res.title) {
+      res.title = $('title').text();
    }
    
    // Resources
@@ -45,44 +44,44 @@ task.getTaskResources = function(callback)
          return;
       }
       if ($(this).hasClass('solution') && $(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.solution_modules;
+         curDest = res.solution_modules;
       }
       else if ($(this).hasClass('solution')) {
-         curDest = PEMInstallationAPIObject.solution;
+         curDest = res.solution;
       }
       else if ($(this).hasClass('grader') && $(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.grader_modules;
+         curDest = res.grader_modules;
       }
       else if ($(this).hasClass('grader')) {
-         curDest = PEMInstallationAPIObject.grader;
+         curDest = res.grader;
       }
-      else if ($(this).hasClass('hints')) {
-         PEMInstallationAPIObject.hints.push([{ type: 'html', content: $(this).html() }]);
+      else if ($(this).hasClass('hint')) {
+         res.hints.push([{ type: 'html', content: $(this).html() }]);
          return;
       }
       else if ($(this).hasClass('proxy') && $(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.proxy_modules;
+         curDest = res.proxy_modules;
       }
       else if ($(this).hasClass('proxy')) {
-         curDest = PEMInstallationAPIObject.proxy;
+         curDest = res.proxy;
       }
       else if ($(this).hasClass('stdButtonsAndMessages') && $(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.display_modules;
+         curDest = res.display_modules;
       }
       else if ($(this).hasClass('stdButtonsAndMessages')) {
-         curDest = PEMInstallationAPIObject.display;
+         curDest = res.display;
       }
       else if ($(this).hasClass('stdAnswerTypes') && $(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.sat_modules;
+         curDest = res.sat_modules;
       }
       else if ($(this).hasClass('stdAnswerTypes')) {
-         curDest = PEMInstallationAPIObject.sat;
+         curDest = res.sat;
       }
       else if ($(this).hasClass('module')) {
-         curDest = PEMInstallationAPIObject.task_modules;
+         curDest = res.task_modules;
       }
       else {
-         curDest = PEMInstallationAPIObject.task;
+         curDest = res.task;
       }
       
       if ($(this).is('script')) {
@@ -103,18 +102,6 @@ task.getTaskResources = function(callback)
       }
    });
 
-   // Number of hints
-   var nbHints = PEMInstallationAPIObject.hints.length;
-   if (nbHints) {
-      PEMInstallationAPIObject.nbHints = nbHints;
-   }
-
-   // Contents
-   if ( ! taskHtmlPreloaded) {
-      PEMInstallationAPIObject.task.push({ type: 'html', content: $('#task').html() });
-      PEMInstallationAPIObject.solution.push({ type: 'html', content: $('#solution').html() });
-   }
-   
    // Images
    var images = [];
    var image = '';
@@ -123,35 +110,31 @@ task.getTaskResources = function(callback)
       if (src) {
          image = src.toString();
          if ($.inArray(image, images) === -1) {
-            PEMInstallationAPIObject.task.push({ type: 'image', url: image });
+            res.task.push({ type: 'image', url: image });
             images.push(image);
          }
       }
    });
-   fillImages($('#task').html(), images, PEMInstallationAPIObject.task);
+   fillImages($('#task').html(), images, res.task);
    $('script').each(function() {
       if ($(this).hasClass('remove') || $(this).attr('src') || $(this).attr('href')) {
          return;
       }
-      fillImages($(this).html(), images, PEMInstallationAPIObject.task);
+      fillImages($(this).html(), images, res.task);
    });
    $('#solution img').each(function() {
       image = $(this).attr('src').toString();
       if ($.inArray(image, images) === -1) {
-         PEMInstallationAPIObject.solution.push({ type: 'image', url: image });
+         res.solution.push({ type: 'image', url: image });
          images.push(image);
       }
    });
-   fillImages($('#solution').html(), images, PEMInstallationAPIObject.solution);
-   if (typeof callback != 'undefined') {
-      callback(PEMInstallationAPIObject);
-   }
-   else {
-      return PEMInstallationAPIObject;
-   }
+   fillImages($('#solution').html(), images, res.solution);
+   taskResourcesLoaded = true;
+   callback(res);
 };
 
-function fillImages(text, images, PEMInstallationAPIObject) {
+function fillImages(text, images, res) {
    var extensions = ["png", "jpg", "gif"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
@@ -166,7 +149,7 @@ function fillImages(text, images, PEMInstallationAPIObject) {
             continue;
          }
          if ($.inArray(image, images) === -1) {
-            PEMInstallationAPIObject.push({ type: 'image', url: image });
+            res.push({ type: 'image', url: image });
             images.push(image);
          }
       }

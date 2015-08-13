@@ -31,7 +31,7 @@ task.getViews = function(callback) {
     var views = {
         task: {},
         solution: {},
-        hint : {requires: "task"},
+        hints : {requires: "task"},
         forum : {requires: "task"},
         editor : {requires: "task"}
     };

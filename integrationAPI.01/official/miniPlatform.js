@@ -1,4 +1,5 @@
-"use strict";
+(function() {
+'use strict';
 
 /* 
  * Implementation of a small platform for standalone tasks, mostly for
@@ -19,6 +20,8 @@ function inIframe () {
    }
 }
 
+var taskMetaData;
+
 // important for tracker.js
 var compiledTask = true;
 
@@ -33,9 +36,8 @@ var miniPlatformShowSolution = function() {
 };
 
 var miniPlatformPreviewGrade = function(answer) {
-   var json = task.getMetaData();
    var minScore = -3;
-   if (json.fullFeedback) {
+   if (taskMetaData.fullFeedback) {
       minScore = 0;
    }
    var maxScore = 6;
@@ -50,8 +52,8 @@ var miniPlatformPreviewGrade = function(answer) {
       $("#previewScoreMessage").html("<b>Votre score : " + score + "/" + maxScore + "</b><br/>Vous pouvez maintenant lire la solution en bas de la page.");
    };
    // acceptedAnswers is not documented, but necessary for old Bebras tasks
-   if (json.acceptedAnswers && json.acceptedAnswers[0]) {
-      if ($.inArray("" + answer, json.acceptedAnswers) > -1) {
+   if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
+      if ($.inArray("" + answer, taskMetaData.acceptedAnswers) > -1) {
          score = maxScore;
       }
       else {
@@ -120,9 +122,8 @@ $(document).ready(function() {
          } catch(exception) {
             alert("Error: invalid options");
          }
-         var json = task.getMetaData();
          var minScore = -3;
-         if (json.fullFeedback) {
+         if (taskMetaData.fullFeedback) {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue) {
@@ -155,7 +156,7 @@ $(document).ready(function() {
             $("#task h1").show();
          }
 
-         if (json.fullFeedback) {
+         if (taskMetaData.fullFeedback) {
             loadedViews.grader = true;
          }
          var showViewsHandlerFactory = function (view) {
@@ -183,6 +184,14 @@ $(document).ready(function() {
             });
          });
       };
-      setTimeout(platformLoad, 0);
+      function getMetaDataAndLoad() {
+         task.getMetaData(function(metaData) {
+            taskMetaData = metaData;
+            platformLoad();
+         });
+      }
+      setTimeout(getMetaDataAndLoad, 0);
    }
 });
+
+})();
