@@ -33,7 +33,9 @@ task.getTaskResources = function(callback)
    PEMInstallationAPIObject.display_modules = [];
    PEMInstallationAPIObject.sat = [];
    PEMInstallationAPIObject.sat_modules = [];
-   PEMInstallationAPIObject.title = $('title').text();
+   if (!PEMInstallationAPIObject.title) {
+      PEMInstallationAPIObject.title = $('title').text();
+   }
    
    // Resources
    var curDest = 'task';
@@ -100,7 +102,13 @@ task.getTaskResources = function(callback)
          curDest.push({ type: curType, content: $(this).html() });
       }
    });
-   
+
+   // Number of hints
+   var nbHints = PEMInstallationAPIObject.hints.length;
+   if (nbHints) {
+      PEMInstallationAPIObject.nbHints = nbHints;
+   }
+
    // Contents
    if ( ! taskHtmlPreloaded) {
       PEMInstallationAPIObject.task.push({ type: 'html', content: $('#task').html() });
