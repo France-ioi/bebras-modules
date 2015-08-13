@@ -1,3 +1,11 @@
+(function() {
+
+'use strict';
+
+// requires jQuery, and in the global scope:
+//   - a task object
+//   - a PEMInstallationAPIObject or json object
+
 // this should be called before the task loads, because the task can modify
 // its html at load, and we want to return unmodified html in getTaskResources.
 var taskHtmlPreloaded = false;
@@ -5,130 +13,135 @@ $(document).ready(function() {
    if (typeof PEMInstallationAPIObject === 'undefined') {
       window.PEMInstallationAPIObject = json;
    }
-   PEMInstallationAPIObject['task'] = [{ type: 'html', content: $('#task').html() }];
-   PEMInstallationAPIObject['solution'] = [{ type: 'html', content: $('#solution').html() }];
+   PEMInstallationAPIObject.task = [{ type: 'html', content: $('#task').html() }];
+   PEMInstallationAPIObject.solution = [{ type: 'html', content: $('#solution').html() }];
    taskHtmlPreloaded = true;
 });
 
-// function to be provided by task, here in the global scope
-function getTaskResources(callback)
+task.getTaskResources = function(callback)
 {
-   PEMInstallationAPIObject['task'] = ('task' in PEMInstallationAPIObject) ? PEMInstallationAPIObject['task'] : new Array();
-   PEMInstallationAPIObject['solution'] = ('solution' in PEMInstallationAPIObject) ? PEMInstallationAPIObject['solution'] : new Array();
-   PEMInstallationAPIObject['grader'] = new Array();
-   PEMInstallationAPIObject['task_modules'] = new Array();
-   PEMInstallationAPIObject['solution_modules'] = new Array();
-   PEMInstallationAPIObject['grader_modules'] = new Array();
-   PEMInstallationAPIObject['proxy'] = new Array();
-   PEMInstallationAPIObject['proxy_modules'] = new Array();
-   PEMInstallationAPIObject['display'] = new Array();
-   PEMInstallationAPIObject['display_modules'] = new Array();
-   PEMInstallationAPIObject['sat'] = new Array();
-   PEMInstallationAPIObject['sat_modules'] = new Array();
-   PEMInstallationAPIObject['title'] = $('title').text();
+   PEMInstallationAPIObject.task = ('task' in PEMInstallationAPIObject) ? PEMInstallationAPIObject.task : [];
+   PEMInstallationAPIObject.solution = ('solution' in PEMInstallationAPIObject) ? PEMInstallationAPIObject.solution : [];
+   PEMInstallationAPIObject.grader = [];
+   PEMInstallationAPIObject.task_modules = [];
+   PEMInstallationAPIObject.solution_modules = [];
+   PEMInstallationAPIObject.grader_modules = [];
+   PEMInstallationAPIObject.hints = [];
+   PEMInstallationAPIObject.proxy = [];
+   PEMInstallationAPIObject.proxy_modules = [];
+   PEMInstallationAPIObject.display = [];
+   PEMInstallationAPIObject.display_modules = [];
+   PEMInstallationAPIObject.sat = [];
+   PEMInstallationAPIObject.sat_modules = [];
+   PEMInstallationAPIObject.title = $('title').text();
    
    // Resources
    var curDest = 'task';
    var curType = 'javascript';
-   $('script, style, link').each(function(index, element) {
-      if (!$(this).hasClass('remove')) {
-         if ($(this).hasClass('solution') && $(this).hasClass('module')) {
-            curDest = 'solution_modules';
-         }
-         else if ($(this).hasClass('solution')) {
-            curDest = 'solution';
-         }
-         else if ($(this).hasClass('grader') && $(this).hasClass('module')) {
-            curDest = 'grader_modules';
-         }
-         else if ($(this).hasClass('grader')) {
-            curDest = 'grader';
-         }
-         else if ($(this).hasClass('proxy') && $(this).hasClass('module')) {
-            curDest = 'proxy_modules';
-         }
-         else if ($(this).hasClass('proxy')) {
-            curDest = 'proxy';
-         }
-         else if ($(this).hasClass('stdButtonsAndMessages') && $(this).hasClass('module')) {
-            curDest = 'display_modules';
-         }
-         else if ($(this).hasClass('stdButtonsAndMessages')) {
-            curDest = 'display';
-         }
-         else if ($(this).hasClass('stdAnswerTypes') && $(this).hasClass('module')) {
-            curDest = 'sat_modules';
-         }
-         else if ($(this).hasClass('stdAnswerTypes')) {
-            curDest = 'sat';
-         }
-         else if ($(this).hasClass('module')) {
-            curDest = 'task_modules';
-         }
-         else {
-            curDest = 'task';
-         }
-         
-         if ($(this).is('script')) {
-            curType = 'javascript';
-         }
-         else if ($(this).is('style') || $(this).is('link')) {
-            curType = 'css';
-         }
-         
-         if ($(this).attr('src')) {
-            PEMInstallationAPIObject[curDest].push({ type: curType, url: $(this).attr('src'), id: $(this).attr('id') });
-         }
-         else if ($(this).attr('href')) {
-            PEMInstallationAPIObject[curDest].push({ type: curType, url: $(this).attr('href'), id: $(this).attr('id') });
-         }
-         else {
-            PEMInstallationAPIObject[curDest].push({ type: curType, content: $(this).html() });
-         }
+   $('script, style, link').each(function() {
+      if ($(this).hasClass('remove')) {
+         return;
+      }
+      if ($(this).hasClass('solution') && $(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.solution_modules;
+      }
+      else if ($(this).hasClass('solution')) {
+         curDest = PEMInstallationAPIObject.solution;
+      }
+      else if ($(this).hasClass('grader') && $(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.grader_modules;
+      }
+      else if ($(this).hasClass('grader')) {
+         curDest = PEMInstallationAPIObject.grader;
+      }
+      else if ($(this).hasClass('hints')) {
+         PEMInstallationAPIObject.hints.push([{ type: 'html', content: $(this).html() }]);
+         return;
+      }
+      else if ($(this).hasClass('proxy') && $(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.proxy_modules;
+      }
+      else if ($(this).hasClass('proxy')) {
+         curDest = PEMInstallationAPIObject.proxy;
+      }
+      else if ($(this).hasClass('stdButtonsAndMessages') && $(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.display_modules;
+      }
+      else if ($(this).hasClass('stdButtonsAndMessages')) {
+         curDest = PEMInstallationAPIObject.display;
+      }
+      else if ($(this).hasClass('stdAnswerTypes') && $(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.sat_modules;
+      }
+      else if ($(this).hasClass('stdAnswerTypes')) {
+         curDest = PEMInstallationAPIObject.sat;
+      }
+      else if ($(this).hasClass('module')) {
+         curDest = PEMInstallationAPIObject.task_modules;
+      }
+      else {
+         curDest = PEMInstallationAPIObject.task;
+      }
+      
+      if ($(this).is('script')) {
+         curType = 'javascript';
+      }
+      else if ($(this).is('style') || $(this).is('link')) {
+         curType = 'css';
+      }
+      
+      if ($(this).attr('src')) {
+         curDest.push({ type: curType, url: $(this).attr('src'), id: $(this).attr('id') });
+      }
+      else if ($(this).attr('href')) {
+         curDest.push({ type: curType, url: $(this).attr('href'), id: $(this).attr('id') });
+      }
+      else {
+         curDest.push({ type: curType, content: $(this).html() });
       }
    });
    
    // Contents
    if ( ! taskHtmlPreloaded) {
-      PEMInstallationAPIObject['task'].push({ type: 'html', content: $('#task').html() });
-      PEMInstallationAPIObject['solution'].push({ type: 'html', content: $('#solution').html() });
+      PEMInstallationAPIObject.task.push({ type: 'html', content: $('#task').html() });
+      PEMInstallationAPIObject.solution.push({ type: 'html', content: $('#solution').html() });
    }
    
    // Images
-   var images = new Array();
+   var images = [];
    var image = '';
-   $('#task img').each(function(index, element) {
+   $('#task img').each(function() {
       var src = $(this).attr('src');
-      if (src != undefined) {
+      if (src) {
          image = src.toString();
          if ($.inArray(image, images) === -1) {
-            PEMInstallationAPIObject['task'].push({ type: 'image', url: image });
+            PEMInstallationAPIObject.task.push({ type: 'image', url: image });
             images.push(image);
          }
       }
    });
-   fillImages($('#task').html(), images, PEMInstallationAPIObject['task']);
-   $('script').each(function(index, element) {
+   fillImages($('#task').html(), images, PEMInstallationAPIObject.task);
+   $('script').each(function() {
       if ($(this).hasClass('remove') || $(this).attr('src') || $(this).attr('href')) {
          return;
       }
-      fillImages($(this).html(), images, PEMInstallationAPIObject['task']);
+      fillImages($(this).html(), images, PEMInstallationAPIObject.task);
    });
-   $('#solution img').each(function(index, element) {
+   $('#solution img').each(function() {
       image = $(this).attr('src').toString();
       if ($.inArray(image, images) === -1) {
-         PEMInstallationAPIObject['solution'].push({ type: 'image', url: image });
+         PEMInstallationAPIObject.solution.push({ type: 'image', url: image });
          images.push(image);
       }
    });
-   fillImages($('#solution').html(), images, PEMInstallationAPIObject['solution']);
+   fillImages($('#solution').html(), images, PEMInstallationAPIObject.solution);
    if (typeof callback != 'undefined') {
       callback(PEMInstallationAPIObject);
    }
    else {
       return PEMInstallationAPIObject;
    }
-}
+};
 
 function fillImages(text, images, PEMInstallationAPIObject) {
    var extensions = ["png", "jpg", "gif"];
@@ -137,7 +150,7 @@ function fillImages(text, images, PEMInstallationAPIObject) {
       var regexp = new RegExp("[\'\"]([^\"\']*." + ext + ")[\'\"]", "g");
       while (true) {
          var match = regexp.exec(text);
-         if (match == null) {
+         if (!match) {
             break;
          }
          var image = match[1];
@@ -151,3 +164,5 @@ function fillImages(text, images, PEMInstallationAPIObject) {
       }
    }
 }
+
+})();
