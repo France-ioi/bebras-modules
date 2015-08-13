@@ -8,7 +8,7 @@
  *   - jQuery
  *   - a Platform class creating a simple platform (present in the standard
  *     implementation of the integration API
- *   - getTaskResources(), as documented in the task installation API
+ *   - task.getMetaData(), as documented in the PEM
  */
 
 function inIframe () {
@@ -33,7 +33,7 @@ var miniPlatformShowSolution = function() {
 };
 
 var miniPlatformPreviewGrade = function(answer) {
-   var json = getTaskResources();
+   var json = task.getMetaData();
    var minScore = -3;
    if (json.fullFeedback) {
       minScore = 0;
@@ -49,6 +49,7 @@ var miniPlatformPreviewGrade = function(answer) {
       $("#previewScorePopup").show();
       $("#previewScoreMessage").html("<b>Votre score : " + score + "/" + maxScore + "</b><br/>Vous pouvez maintenant lire la solution en bas de la page.");
    };
+   // acceptedAnswers is not documented, but necessary for old Bebras tasks
    if (json.acceptedAnswers && json.acceptedAnswers[0]) {
       if ($.inArray("" + answer, json.acceptedAnswers) > -1) {
          score = maxScore;
@@ -119,7 +120,7 @@ $(document).ready(function() {
          } catch(exception) {
             alert("Error: invalid options");
          }
-         var json = getTaskResources();
+         var json = task.getMetaData();
          var minScore = -3;
          if (json.fullFeedback) {
             minScore = 0;
