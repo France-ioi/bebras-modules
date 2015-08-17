@@ -135,7 +135,7 @@ task.getResources = function(callback)
 };
 
 // alias for old code, TODO: remove
-windows.getTaskResources = task.getResources;
+window.getTaskResources = task.getResources;
 
 function fillImages(text, images, res) {
    var extensions = ["png", "jpg", "gif"];
