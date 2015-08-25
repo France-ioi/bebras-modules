@@ -145,7 +145,7 @@ $(document).ready(function() {
             }
             return taskOptions[optionName];
          };
-         var loadedViews = {'task': true, 'solution': true};
+         var loadedViews = {'task': true, 'solution': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
          var shownViews = {'task': true};
 
          // TODO: modifs ARTHUR à relire
@@ -168,17 +168,17 @@ $(document).ready(function() {
          }
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
-            if (task.printViewChooser) {
-               task.getViews(function(views){
-                  if ($("#choose-view").length == 0)
-                     $(document.body).prepend('<div id="choose-view"></div>');
-                  $("#choose-view").html("");
-                  for (var view in views)
-                  {
-                     $("#choose-view").append($("<button>" + view + "</button>").click(showViewsHandlerFactory(view)));
+            task.getViews(function(views){
+               if ($("#choose-view").length == 0)
+                  $(document.body).prepend('<div id="choose-view"></div>');
+               $("#choose-view").html("");
+               for (var viewName in views)
+               {
+                  if (!views[viewName].requires) {
+                     $("#choose-view").append($('<button id="choose-view-'+viewName+'">' + viewName + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
-               });
-            }
+               }
+            });
             task.showViews(shownViews, function() {
                platform.trigger('showViews', [{"task": true}]);
             });
