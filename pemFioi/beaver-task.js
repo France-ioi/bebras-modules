@@ -69,10 +69,10 @@ task.getMetaData = function(callback) {
    } else {
       callback({nbHints:0});
    }
-}
+};
 
 task.reloadAnswer = function(strAnswer, callback) {
-   if (strAnswer == "") {
+   if (!strAnswer) {
       task.reloadAnswerObject(task.getDefaultAnswerObject());
    } else {
       task.reloadAnswerObject(JSON.parse(strAnswer));
@@ -87,7 +87,7 @@ task.reloadState = function(state, callback) {
    } else {
       callback();
    }
-}
+};
 
 task.getAnswer = function(callback) {
    var answerObj = task.getAnswerObject();
@@ -137,7 +137,7 @@ var DelayedExec = {
       }, delay);
    },
    clearTimeout: function(name) {
-      if (DelayedExec.timeouts[name] != undefined) {
+      if (DelayedExec.timeouts[name]) {
          clearTimeout(DelayedExec.timeouts[name]);
          delete DelayedExec.timeouts[name];
       }
@@ -147,7 +147,7 @@ var DelayedExec = {
       DelayedExec.intervals[name] = setInterval(callback, period);
    },
    clearInterval: function(name) {
-      if (DelayedExec.intervals[name] != undefined) {
+      if (DelayedExec.intervals[name]) {
          clearInterval(DelayedExec.intervals[name]);
          delete DelayedExec[name];
       }
@@ -159,7 +159,7 @@ var DelayedExec = {
       });
    },
    stopAnimateRaphael: function(name) {
-      if (DelayedExec.animations[name] != undefined) {
+      if (DelayedExec.animations[name]) {
          DelayedExec.animations[name].stop();
          delete DelayedExec.animations[name];
       }
@@ -169,13 +169,13 @@ var DelayedExec = {
          clearTimeout(DelayedExec.timeouts[name]);
          delete DelayedExec.timeouts[name];
       }
-      for(var name in DelayedExec.intervals) {
+      for(name in DelayedExec.intervals) {
          clearInterval(DelayedExec.intervals[name]);
          delete DelayedExec.intervals[name];
       }
-      for(var name in DelayedExec.animations) {
+      for(name in DelayedExec.animations) {
          DelayedExec.animations[name].stop();
          delete DelayedExec.animations[name];
       }      
    }
-}
+};
