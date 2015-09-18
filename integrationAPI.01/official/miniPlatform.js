@@ -110,6 +110,12 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
+      var getMetaDataAndLoad = function() {
+         task.getMetaData(function(metaData) {
+            taskMetaData = metaData;
+            platformLoad();
+         });
+      };
       var platformLoad = function() {
          platform.validate = miniPlatformValidate;
          platform.updateHeight = function(height) {};
@@ -149,7 +155,7 @@ $(document).ready(function() {
          var shownViews = {'task': true};
 
          // TODO: modifs ARTHUR à relire
-         if (taskOptions.showSolutionOnLoad == true) {
+         if (taskOptions.showSolutionOnLoad === true) {
             shownViews.solution = true;
          }
          if (!taskOptions.hideTitle) {
@@ -164,12 +170,12 @@ $(document).ready(function() {
                var tmp = {};
                tmp[view] = true;
                task.showViews(tmp, function(){});
-            }
-         }
+            };
+         };
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
             task.getViews(function(views){
-               if ($("#choose-view").length == 0)
+               if ($("#choose-view").length === 0)
                   $(document.body).prepend('<div id="choose-view"></div>');
                $("#choose-view").html("");
                for (var viewName in views)
@@ -184,12 +190,6 @@ $(document).ready(function() {
             });
          });
       };
-      function getMetaDataAndLoad() {
-         task.getMetaData(function(metaData) {
-            taskMetaData = metaData;
-            platformLoad();
-         });
-      }
       setTimeout(getMetaDataAndLoad, 0);
    }
 });
