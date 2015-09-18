@@ -1,4 +1,5 @@
-"use strict";
+(function() {
+'use strict';
 
 /* 
  * Implementation of a small platform for standalone tasks, mostly for
@@ -8,7 +9,7 @@
  *   - jQuery
  *   - a Platform class creating a simple platform (present in the standard
  *     implementation of the integration API
- *   - getTaskResources(), as documented in the task installation API
+ *   - task.getMetaData(), as documented in the PEM
  */
 
 function inIframe () {
@@ -18,6 +19,8 @@ function inIframe () {
       return false;
    }
 }
+
+var taskMetaData;
 
 // important for tracker.js
 var compiledTask = true;
@@ -33,9 +36,8 @@ var miniPlatformShowSolution = function() {
 };
 
 var miniPlatformPreviewGrade = function(answer) {
-   var json = getTaskResources();
    var minScore = -3;
-   if (json.fullFeedback) {
+   if (taskMetaData.fullFeedback) {
       minScore = 0;
    }
    var maxScore = 6;
@@ -49,8 +51,9 @@ var miniPlatformPreviewGrade = function(answer) {
       $("#previewScorePopup").show();
       $("#previewScoreMessage").html("<b>Votre score : " + score + "/" + maxScore + "</b><br/>Vous pouvez maintenant lire la solution en bas de la page.");
    };
-   if (json.acceptedAnswers && json.acceptedAnswers[0]) {
-      if ($.inArray("" + answer, json.acceptedAnswers) > -1) {
+   // acceptedAnswers is not documented, but necessary for old Bebras tasks
+   if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
+      if ($.inArray("" + answer, taskMetaData.acceptedAnswers) > -1) {
          score = maxScore;
       }
       else {
@@ -119,9 +122,8 @@ $(document).ready(function() {
          } catch(exception) {
             alert("Error: invalid options");
          }
-         var json = getTaskResources();
          var minScore = -3;
-         if (json.fullFeedback) {
+         if (taskMetaData.fullFeedback) {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue) {
@@ -143,7 +145,7 @@ $(document).ready(function() {
             }
             return taskOptions[optionName];
          };
-         var loadedViews = {'task': true, 'solution': true};
+         var loadedViews = {'task': true, 'solution': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
          var shownViews = {'task': true};
 
          // TODO: modifs ARTHUR à relire
@@ -154,7 +156,7 @@ $(document).ready(function() {
             $("#task h1").show();
          }
 
-         if (json.fullFeedback) {
+         if (taskMetaData.fullFeedback) {
             loadedViews.grader = true;
          }
          var showViewsHandlerFactory = function (view) {
@@ -166,22 +168,30 @@ $(document).ready(function() {
          }
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
-            if (task.printViewChooser) {
-               task.getViews(function(views){
-                  if ($("#choose-view").length == 0)
-                     $(document.body).prepend('<div id="choose-view"></div>');
-                  $("#choose-view").html("");
-                  for (var view in views)
-                  {
-                     $("#choose-view").append($("<button>" + view + "</button>").click(showViewsHandlerFactory(view)));
+            task.getViews(function(views){
+               if ($("#choose-view").length == 0)
+                  $(document.body).prepend('<div id="choose-view"></div>');
+               $("#choose-view").html("");
+               for (var viewName in views)
+               {
+                  if (!views[viewName].requires) {
+                     $("#choose-view").append($('<button id="choose-view-'+viewName+'">' + viewName + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
-               });
-            }
+               }
+            });
             task.showViews(shownViews, function() {
                platform.trigger('showViews', [{"task": true}]);
             });
          });
       };
-      setTimeout(platformLoad, 0);
+      function getMetaDataAndLoad() {
+         task.getMetaData(function(metaData) {
+            taskMetaData = metaData;
+            platformLoad();
+         });
+      }
+      setTimeout(getMetaDataAndLoad, 0);
    }
 });
+
+})();
