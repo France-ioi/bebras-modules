@@ -28,10 +28,10 @@ var displayHelper = {
    levelsScores: {easy: 0, medium: 0, hard: 0},
    prevLevelsScores: {easy: 0, medium: 0, hard: 0},
    taskLevel: "",
-   /* *********************************************
+   /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
-   
+
    load: function(views) {
       displayHelper.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
       displayHelper.taskParams = platform.getTaskParams();
@@ -54,7 +54,7 @@ var displayHelper = {
    },
 
    getLevelsMaxScores: function() {
-      var taskParams = platform.getTaskParams();;
+      var taskParams = platform.getTaskParams();
       var maxScore = taskParams.maxScore;
       return {
          easy: Math.round(maxScore / 2),
@@ -67,24 +67,57 @@ var displayHelper = {
       return { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
 
+
+   putStars: function(parents, displayWidth, strokeColor = 'black', fillColor = 'black', clipWidth = 1) {
+      for (var curStar in parents) {
+         var rsr = Raphael(parents[curStar], displayWidth * clipWidth, displayWidth * .95);
+         // A star in a frame of size (100, 95)
+         var starPath = rsr.path('m46.761-11.28 9.767 34.594 35.919-1.401-29.883 19.979 12.432 33.727-28.235-22.246-28.235 ' + 
+            '22.246 12.432-33.727-29.883-19.979 35.919 1.401z')
+            .attr({
+               fill: fillColor,
+               stroke: strokeColor,
+               'stroke-width': 2.5,
+            }).transform('t3.2389 15.734');
+         var scaleFactor = displayWidth / 200;
+         console.log(scaleFactor);
+         starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',5,8');
+      }
+   },
+
    setupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
       displayHelper.hasLevels = true;
+      displayHelper.pointsAsStars = true; // Must be set in the platform task params
       var maxScores = displayHelper.getLevelsMaxScores();
       var tabsHtml = "<ul class='tabs-menu'>\n";
       var levelsNames = displayHelper.getLevelsNames();
+      var starContainers = [];
       for (var curLevel in levelsNames) {
-         tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-            "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-              "Version " + levelsNames[curLevel] + "<br/>" +
-              "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
-            "</div></a></li>\n";
+         if (displayHelper.pointsAsStars) {
+            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
+               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
+                  "Version ";
+            for (var curStar = 0; curStar < maxScores[curLevel]; curStar += 10) {
+               var starContainer = 'tabScore_' + curLevel + '_' + curStar;
+               tabsHtml += '<span id="' + starContainer + '"></span>';
+               starContainers.push(starContainer);
+            }
+            tabsHtml += "</div></a></li>\n";
+         } else {
+            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
+               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
+                  "Version " + levelsNames[curLevel] + "<br/>" +
+                  "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
+               "</div></a></li>\n";
+         }
       }
       tabsHtml += "</ul>";
       var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
          "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
       $("#tabsContainer").before(scoreHtml + tabsHtml);
+      displayHelper.putStars(starContainers, 20);
       $(".tabs-menu a").click(function(event) {
          event.preventDefault();
          var newLevel = $(this).attr("href").split("#")[1];
