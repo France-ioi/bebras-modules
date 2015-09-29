@@ -67,57 +67,83 @@ var displayHelper = {
       return { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
 
-
-   putStars: function(parents, displayWidth, strokeColor = 'black', fillColor = 'black', clipWidth = 1) {
+   putStars: function(parents, displayWidth, strokeColor, fillColor, clipWidth) {
+      if (!strokeColor) strokeColor = 'black';
+      if (!fillColor) fillColor = 'white';
+      if (!clipWidth) clipWidth = 1;
+      var scaleFactor = displayWidth / 100;
       for (var curStar in parents) {
          var rsr = Raphael(parents[curStar], displayWidth * clipWidth, displayWidth * .95);
          // A star in a frame of size (100, 95)
-         var starPath = rsr.path('m46.761-11.28 9.767 34.594 35.919-1.401-29.883 19.979 12.432 33.727-28.235-22.246-28.235 ' + 
-            '22.246 12.432-33.727-29.883-19.979 35.919 1.401z')
+         var starPath = rsr.path('M 49.999998,9.7729864 58.691536,40.557777 90.655429,39.311043 64.062901,57.090119 ' +
+            '75.125989,87.103375 49.999998,67.306924 24.874007,87.103375 35.937097,57.090119 9.3445705,39.311043 ' +
+            '41.308462,40.557777 Z')
             .attr({
                fill: fillColor,
                stroke: strokeColor,
-               'stroke-width': 2.5,
+               'stroke-width': 5 * scaleFactor,
             }).transform('t3.2389 15.734');
-         var scaleFactor = displayWidth / 200;
-         console.log(scaleFactor);
-         starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',5,8');
+         starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',0,0');
       }
    },
 
+   /*setupLevels: function(initLevel) {
+      task.reloadStateObject(task.getDefaultStateObject(), true);
+      task.reloadAnswerObject(task.getDefaultAnswerObject());
+      displayHelper.hasLevels = true;
+      displayHelper.pointsAsStars = false; // TODO: set this in the platform task params
+      var maxScores = displayHelper.getLevelsMaxScores();
+      var levelsNames = displayHelper.getLevelsNames();
+      var starContainers = [];
+      var tabsClasses = 'tabs-menu';
+      if (displayHelper.pointsAsStars) {
+         tabsClasses += ' stars';
+      }
+      var tabsMenu = $('<ul/>', { 'class': tabsClasses });
+      for (var curLevel in levelsNames) {
+         if (displayHelper.pointsAsStars) {
+            var tabLink = $('<a/>', { href: curLevel, html: 'Version ' });
+            tabsMenu.append($('<li/>', { id: 'tab-' + curLevel }).append(tabLink));
+            for (var curStar = 0; curStar < maxScores[curLevel]; curStar += 10) {
+               var starContainer = 'tabScore_' + curLevel + '_' + curStar;
+               tabLink.append($('<span/>', { id: 'tabScore_' + curLevel + '_' + curStar }));
+               starContainers.push(starContainer);
+            }
+         } else {
+            tabsMenu.append($('<li/>', { id: 'tab-' + curLevel }).append(
+               $('<a/>', { href: curLevel, html: 'Version ' + levelsNames[curLevel] + '<br/>' +
+                  'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + maxScores[curLevel] })));
+         }
+      }
+      var scoreFrame = $('<div/>', { style: 'float: right; margin-top: -15px; text-align: center; font-weight: bold;' }).append(
+         $('<p/>', { html: 'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)' }));
+      $('#tabsContainer').prepend(scoreFrame).prepend(tabsMenu);
+      displayHelper.putStars(starContainers, 18);
+      $('.tabs-menu a').click(function(event) {
+         event.preventDefault();
+         var newLevel = $(this).attr('href').split('#')[1];
+         displayHelper.setLevel(newLevel);
+      });
+      displayHelper.setLevel(initLevel);
+   },*/
    setupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
       displayHelper.hasLevels = true;
-      displayHelper.pointsAsStars = true; // Must be set in the platform task params
       var maxScores = displayHelper.getLevelsMaxScores();
       var tabsHtml = "<ul class='tabs-menu'>\n";
       var levelsNames = displayHelper.getLevelsNames();
-      var starContainers = [];
       for (var curLevel in levelsNames) {
-         if (displayHelper.pointsAsStars) {
-            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-                  "Version ";
-            for (var curStar = 0; curStar < maxScores[curLevel]; curStar += 10) {
-               var starContainer = 'tabScore_' + curLevel + '_' + curStar;
-               tabsHtml += '<span id="' + starContainer + '"></span>';
-               starContainers.push(starContainer);
-            }
-            tabsHtml += "</div></a></li>\n";
-         } else {
-            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-                  "Version " + levelsNames[curLevel] + "<br/>" +
-                  "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
-               "</div></a></li>\n";
-         }
+         tabsHtml += "   <li class='tab-" + curLevel + "'>" +
+            "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
+              "Version " + levelsNames[curLevel] + "<br/>" +
+              "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
+            "</div></a></li>\n";
       }
       tabsHtml += "</ul>";
       var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
          "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
       $("#tabsContainer").before(scoreHtml + tabsHtml);
-      displayHelper.putStars(starContainers, 20);
       $(".tabs-menu a").click(function(event) {
          event.preventDefault();
          var newLevel = $(this).attr("href").split("#")[1];
@@ -125,7 +151,7 @@ var displayHelper = {
       });
       displayHelper.setLevel(initLevel);
    },
-   
+
    setLevel: function(newLevel) {
       if (displayHelper.taskLevel == newLevel) {
          return;
@@ -140,7 +166,7 @@ var displayHelper = {
       state.level = newLevel;
       task.reloadStateObject(state, true);
       task.reloadAnswerObject(answer);
-      
+
       displayHelper.taskLevel = newLevel;
       displayHelper.validate("stay");
       displayHelper.stopShowingResult();
@@ -204,7 +230,7 @@ var displayHelper = {
       displayHelper.stoppedShowingResult = true;
       displayHelper.updateMessages();
    },
-   /* ********************
+   /**********************
     * Internal functions *
     **********************/
 
@@ -376,11 +402,11 @@ var displayHelper = {
             }
          } else {
             if (displayHelper.prevSavedScore != displayHelper.submittedScore) {
-               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score serait ";
+               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score serait";
             } else if (displayHelper.submittedAnswer != displayHelper.savedAnswer) {
-               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score resterait le même ";
+               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score resterait le même";
             } else {
-               scoreDiffMsg = "Votre score est de ";
+               scoreDiffMsg = "Votre score est de";
             }
          }
       }
@@ -391,7 +417,6 @@ var displayHelper = {
       }
       return savedMessage;
    },
-
 
    getFullFeedbackWithLevelsSavedMessage: function(taskMode) {
       var maxScoreLevel = displayHelper.getLevelsMaxScores()[displayHelper.taskLevel];

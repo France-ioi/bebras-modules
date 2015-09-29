@@ -1,18 +1,18 @@
 * {
-  -moz-user-select: -moz-none;
-  -webkit-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-  -khtml-user-select: none;
-  font-family: arial;
+   -moz-user-select: -moz-none;
+   -webkit-user-select: none;
+   -o-user-select: none;
+   user-select: none;
+   -khtml-user-select: none;
+   font-family: Arial, sans-serif;
 }
 
 .touch {
-  -ms-touch-action: none;
+   -ms-touch-action: none;
 }
 
 #task h1 {
-   display:none;
+   display: none;
 }
 
 a {
@@ -22,15 +22,15 @@ a {
 }
 
 .selectable, input, textarea {
-  -moz-user-select: text;
-  -webkit-user-select: auto !important;
-  -o-user-select: text;
-  user-select: text;
-  -khtml-user-select: text;
+   -moz-user-select: text;
+   -webkit-user-select: auto !important;
+   -o-user-select: text;
+   -khtml-user-select: text;
+   user-select: text;
 }
 
 .borders, .borders td {
-	border: solid black 1px;
+	border: 1px solid black;
 }
 
 .question h1 {
@@ -45,7 +45,6 @@ body {
    font-weight: bold;
    color: blue;
 }
-
 #error {
    font-weight: bold;
    color: red;
@@ -60,40 +59,48 @@ button, input[type=button] {
 }
 
 .tabs-menu {
-    list-style: none;
-    padding: 0;
-    height: 40px;
-    width: 100%;
-    border-bottom: 1px solid #ddd;
+   list-style: none;
+   padding: 0;
+   width: 100%;
+   border-bottom: 2px solid #ccc;
 }
-
 .tabs-menu li {
-    height: 40px;
-    line-height: 20px;
-    float: left;
-	padding-right: 10px;
-    margin-right: 10px;
-    background-color: #ddd;
-    border-top: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
+   display: inline-block;
+   min-width: 150px;
+   margin-right: 10px;
+   background: #ccc;
+   border: 2px solid #ccc;
+   border-bottom: 0;
+   text-align: center;
 }
-
 .tabs-menu li.current {
-    background-color: #fff;
-    border-bottom: 1px solid #fff;
+   margin-bottom: -2px;
+   padding-bottom: 2px;
+   background-color: #fff;
 }
-
 .tabs-menu li a {
-    padding: 10px;
-    color: #fff;
-    text-decoration: none; 
+   display: block;
+   padding: 4px;
+   color: #fff;
+   text-decoration: none; 
 }
-
-.tabs-menu .current a {
-    color: #000;
+.tabs-menu li.current a {
+   color: #000;
+}
+.tabs-menu li a:focus {
+   outline: none;
+}
+.tabs-menu li a:active {
+   background: #ddf;
+}
+.tabs-menu.stars li a {
+   padding: 8px;
+   font-size: 1.1em;
+}
+.tabs-menu.stars span > * {
+   vertical-align: bottom;
 }
 
 .easy, .medium, .hard {
-   display:none
+   display: none;
 }
