@@ -65,7 +65,7 @@ var displayHelper = {
       if (taskParams.unlockedLevels !== undefined) {
          this.unlockedLevels = taskParams.unlockedLevels; // TODO: set this in the platform task params
       } else {
-         this.unlockedLevels = 3;
+         this.unlockedLevels = 2;
       }
 
       var maxScore = taskParams.maxScore;
@@ -77,45 +77,48 @@ var displayHelper = {
       this.levelsNames = { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
    setupLevelsTabs: function() {
-      var maxScores = this.levelsMaxScores;
-      var starContainers = [];
-      var tabsClasses = 'tabs-menu';
       if (this.pointsAsStars) {
-         tabsClasses += ' stars';
-      }
-      var tabsHTML = '<ul class="' + tabsClasses + '">';
-      var levelNum = 0;
-      for (var curLevel in this.levelsNames) {
-         var levelStatus = 'locked';
-         if (levelNum < this.unlockedLevels) {
-            levelStatus = 'open';
-         }
-         tabsHTML += '<li class="tab-' + curLevel + ' ' + levelStatus + '-level">' +
-            '<a href="#' + curLevel + '">Version ';
-         if (this.pointsAsStars) {
+         var starContainers = [];
+         var tabsHTML = '<ul class="tabs-menu stars">';
+         var levelNum = 0;
+         for (var curLevel in this.levelsNames) {
+            var levelStatus = 'locked';
+            if (levelNum < this.unlockedLevels) {
+               levelStatus = 'open';
+            }
+            tabsHTML += '<li class="tab-' + curLevel + ' ' + levelStatus + '-level">' +
+               '<a href="#' + curLevel + '">Version ';
+            var starPoints = this.levelsMaxScores.hard / 4;
             var curStar = 0;
-            for (var curScore = 0; curScore < maxScores[curLevel]; curScore += maxScores.hard / 4) {
+            for (var curScore = 0; curScore < this.levelsMaxScores[curLevel]; curScore += starPoints) {
                var starID = 'tabScore_' + curLevel + '_' + curStar;
                tabsHTML += '<span id="' + starID + '" class="star-container"></span>';
                starContainers.push(starID);
                curStar++;
             }
-         } else {
-            tabsHTML += this.levelsNames[curLevel] + '<br/>' +
-               'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + maxScores[curLevel];
+            tabsHTML += '</a></li>';
+            levelNum++;
          }
-         tabsHTML += '</a></li>';
-         levelNum++;
-      }
-      tabsHTML += '</ul>';
-      if (!this.pointsAsStars) {
-         var scoreHTML = '<div class="best_score">' +
-            'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)</div>';
-         $('#tabsContainer').append(scoreHTML);
-      }
-      $('#tabsContainer').append(tabsHTML);
-      if (this.pointsAsStars) {
+         tabsHTML += '</ul>';
+         $('#tabsContainer').append(tabsHTML);
          this.setStars(starContainers);
+      } else {
+         var tabsHTML = '<ul class="tabs-menu">';
+         var levelNum = 0;
+         for (var curLevel in this.levelsNames) {
+            var levelStatus = 'locked';
+            if (levelNum < this.unlockedLevels) {
+               levelStatus = 'open';
+            }
+            tabsHTML += '<li class="tab-' + curLevel + ' ' + levelStatus + '-level">' +
+               '<a href="#' + curLevel + '">Version ' + this.levelsNames[curLevel] + '<br/>' +
+                  'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + this.levelsMaxScores[curLevel] + '</a></li>';
+            levelNum++;
+         }
+         tabsHTML += '</ul>';
+         var scoreHTML = '<div class="best_score">' +
+            'Score : <span id="best_score">0</span> sur ' + this.levelsMaxScores.hard + '<br/>(meilleur des trois versions)</div>';
+         $('#tabsContainer').append(scoreHTML).append(tabsHTML);
       }
    },
    setupLevels: function(initLevel) {
@@ -268,6 +271,38 @@ var displayHelper = {
       }
    },
 
+   updateScoreDisplays: function(gradedLevel) {
+      var scores = this.levelsScores;
+      var maxScores = this.levelsMaxScores;
+      if (this.pointsAsStars) {
+         var starPoints = maxScores.hard / 4;
+         var curStar = 0;
+         var starScore = 0;
+         while (starScore + starPoints < scores[gradedLevel]) {
+            this.editStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
+            curStar++;
+            starScore += starPoints;
+         }
+         this.editStar('tabScore_' + gradedLevel + '_' + curStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
+      } else {
+         $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
+         $('#best_score').html(this.graderScore);
+      }
+      if (maxScores[gradedLevel] == scores[gradedLevel]) {
+         for (var curLevel in this.levelsNames) {
+            if (curLevel == gradedLevel) break;
+            $('.tab-' + curLevel).removeClass('open-level').addClass('useless-level');
+            var curStar = 0;
+            for (var curScore = 0; curScore < this.levelsMaxScores[curLevel]; curScore += starPoints) {
+               this.editStar('tabScore_' + curLevel + '_' + curStar + '_special',
+                  undefined, this.starColors.useless, 'black');
+               this.editStar('tabScore_' + curLevel + '_' + curStar + '_full', undefined, this.starColors.fullBeaten);
+               curStar++;
+            }
+            
+         }
+      }
+   },
    updateScoreOneLevel: function(answer, gradedLevel) {
       var that = this;
       grader.gradeTask(answer, null, function(score, message) {
@@ -302,35 +337,12 @@ var displayHelper = {
             that.graderMessage = '';
          }
          if (that.hasLevels) {
-            var scores = that.levelsScores;
-            var maxScores = that.levelsMaxScores;
-            if (that.pointsAsStars) {
-               var starPoints = maxScores.hard / 4;
-               var curStar = 0;
-               var starScore = 0;
-               while (starScore + starPoints < scores[gradedLevel]) {
-                  that.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
-                  curStar++;
-                  starScore += starPoints;
-               }
-               that.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full',
-                  (scores[gradedLevel] - starScore) / starPoints);
-            } else {
-               $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
-            }
-            if (maxScores[gradedLevel] == scores[gradedLevel]) {
-               for (var curLevel in that.levelsNames) {
-                  if (curLevel == gradedLevel) break;
-                  $('.tab-' + curLevel).removeClass('open-level').addClass('useless-level');
-               }
-               $('#best_score').html(that.graderScore);
-            }
+            that.updateScoreDisplays(gradedLevel);
          }
          that.refreshMessages = true;
          that.checkAnswerChanged();
       }, gradedLevel);
    },
-
    updateScore: function(answer, allLevels) {
       // TODO: cleaner!
       if (allLevels) {
@@ -630,9 +642,16 @@ var displayHelper = {
    },
 
    // Sets and manages scoring stars
-   putStar: function(parent, displayWidth, strokeColor, fillColor) {
+   starColors: {
+      empty: 'white',
+      full: '#ffc90e',
+      fullBeaten: '#ff6008',
+      locked: '#bbb',
+      useless: '#22a'
+   },
+   putStar: function(parent, displayWidth, fillColor, strokeColor) {
+      if (fillColor === undefined) fillColor = this.starColors.empty;
       if (strokeColor === undefined) strokeColor = 'black';
-      if (fillColor === undefined) fillColor = 'white';
       var scaleFactor = displayWidth / 100;
 
       var starCanvas = Raphael(parent, displayWidth, displayWidth * .95);
@@ -650,13 +669,26 @@ var displayHelper = {
       parentElement.starWidth = displayWidth;
       parentElement.starCanvas = starCanvas;
    },
-   resizeStar: function(parent, clipWidth) {
-      if (clipWidth == 0) {
-         $('#' + parent).removeClass('shown-star');
-      } else {
-         var parentElement = document.getElementById(parent);
-         parentElement.starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
-         $('#' + parent).addClass('shown-star');
+   editStar: function(parent, clipWidth, fillColor, strokeColor) {
+      var parentElement = document.getElementById(parent);
+      var starCanvas = parentElement.starCanvas;
+      if (clipWidth !== undefined) {
+         if (clipWidth == 0) {
+            $('#' + parent).removeClass('shown-star');
+         } else {
+            starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
+            $('#' + parent).addClass('shown-star');
+         }
+      }
+      if (fillColor !== undefined) {
+         starCanvas.forEach(function(starPath) {
+            starPath.attr('fill', fillColor);
+         });
+      }
+      if (strokeColor !== undefined) {
+         starCanvas.forEach(function(starPath) {
+            starPath.attr('stroke', strokeColor);
+         });
       }
    },
    setStars: function(parents, starWidth) {
@@ -664,15 +696,12 @@ var displayHelper = {
       for (var curParent in parents) {
          var parentId = parents[curParent];
          $('#' + parentId).html(
-            '<span id="' + parentId + '_locked" class="locked-star"></span>' +
-            '<span id="' + parentId + '_useless" class="useless-star"></span>' +
+            '<span id="' + parentId + '_special" class="special-star"></span>' +
             '<span id="' + parentId + '_empty" class="empty-star"></span>' +
             '<span id="' + parentId + '_full" class="full-star"></span>');
-         $('#' + parentId + '_full').addClass('hidden-star');
-         this.putStar(parentId + '_locked', starWidth, '#888', '#888');
-         this.putStar(parentId + '_useless', starWidth, 'black', '#22a');
+         this.putStar(parentId + '_special', starWidth, this.starColors.locked, this.starColors.locked);
          this.putStar(parentId + '_empty', starWidth);
-         this.putStar(parentId + '_full', starWidth, 'black', '#ffc90e');
+         this.putStar(parentId + '_full', starWidth, this.starColors.full);
       }
    }
 };

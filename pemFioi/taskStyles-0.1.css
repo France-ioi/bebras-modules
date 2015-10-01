@@ -65,10 +65,13 @@ button, input[type=button] {
    display: inline-block;
    min-width: 150px;
    margin-right: 10px;
-   background: #ccc;
+   background: #ddd;
    border: 2px solid #aaa;
    border-bottom: 0;
    text-align: center;
+}
+.tabs-menu li.locked-level {
+   background: #666;
 }
 .tabs-menu li.current {
    margin-bottom: -2px;
@@ -78,17 +81,17 @@ button, input[type=button] {
 .tabs-menu li a {
    display: block;
    padding: 4px;
-   color: #fff;
+   color: #000;
    text-decoration: none; 
 }
-.tabs-menu li.current a {
-   color: #000;
+.tabs-menu li.locked-level a {
+   color: #bbb;
 }
 .tabs-menu li a:focus {
    outline: none;
 }
 .tabs-menu li:not(.current) a:active {
-   background: #88d;
+   background: #c8c8d8;
 }
 .tabs-menu.stars li a {
    padding: 8px;
@@ -107,8 +110,8 @@ button, input[type=button] {
    left: 0;
    visibility: hidden;
 }
-.locked-level span.locked-star,
-.useless-level span.useless-star,
+.locked-level span.special-star,
+.useless-level span.special-star,
 .open-level span.empty-star,
 span.full-star.shown-star {
    visibility: visible;
