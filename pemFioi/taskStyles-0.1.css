@@ -93,6 +93,9 @@ button, input[type=button] {
 .tabs-menu li:not(.current) a:active {
    background: #c8c8d8;
 }
+.tabs-menu li.locked-level a:active {
+   background: #7c6862;
+}
 .tabs-menu.stars li a {
    padding: 8px;
    font-size: 1.1em;
