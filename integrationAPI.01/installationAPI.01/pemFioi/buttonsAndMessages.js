@@ -84,8 +84,13 @@ var displayHelper = {
          tabsClasses += ' stars';
       }
       var tabsHTML = '<ul class="' + tabsClasses + '">';
+      var levelNum = 0;
       for (var curLevel in this.levelsNames) {
-         tabsHTML += '<li class="tab-' + curLevel + ' open-level">' +
+         var levelStatus = 'locked';
+         if (levelNum < this.unlockedLevels) {
+            levelStatus = 'open';
+         }
+         tabsHTML += '<li class="tab-' + curLevel + ' ' + levelStatus + '-level">' +
             '<a href="#' + curLevel + '">Version ';
          if (this.pointsAsStars) {
             var curStar = 0;
@@ -100,11 +105,11 @@ var displayHelper = {
                'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + maxScores[curLevel];
          }
          tabsHTML += '</a></li>';
+         levelNum++;
       }
       tabsHTML += '</ul>';
       var scoreHTML = '<div class="best_score">' +
-         'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)' +
-      '</div>';
+         'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)</div>';
       $('#tabsContainer').before(scoreHTML + tabsHTML);
       this.setStars(starContainers);
    },
@@ -134,6 +139,12 @@ var displayHelper = {
       if (this.taskLevel == newLevel) {
          return;
       }
+      var levelNum = ['easy', 'medium', 'hard'].indexOf(newLevel);
+      if (levelNum >= this.unlockedLevels) {
+         alert("Cette version est actuellement verrouillée. Résolvez d'abord la précédente !");
+         return;
+      }
+
       $('.tab-easy, .tab-medium, .tab-hard').removeClass('current');
       $('.tab-' + newLevel).addClass('current');
       $('.easy, .medium, .hard').hide();
@@ -163,20 +174,21 @@ var displayHelper = {
             }
          }
       } catch (err) {}
-      // end of fix
+
       this.views = views;
       this.hasSolution = (typeof views.solution !== 'undefined');
       if (this.hasSolution && this.graderScore) {
          this.prevSavedScore = this.graderScore;
       }
-      displayHelper.checkAnswerInterval = setInterval(
+      var that = this;
+      this.checkAnswerInterval = setInterval(
          function() {
-             displayHelper.checkAnswerChanged();
+             that.checkAnswerChanged();
          }, 1000);
       task.getAnswer(function(answer) {
-         displayHelper.defaultAnswer = answer;
-         displayHelper.refreshMessages = true;
-         displayHelper.checkAnswerChanged();
+         that.defaultAnswer = answer;
+         that.refreshMessages = true;
+         that.checkAnswerChanged();
       });
    },
 
@@ -211,12 +223,13 @@ var displayHelper = {
    restartAll: function() {
       this.stopShowingResult();
       if (!this.hasLevels) {
-         task.reloadAnswer("", function() {})
+         task.reloadAnswer('', function() {})
       } else {
          task.getAnswer(function(strAnswer) {
             var answer = $.parseJSON(strAnswer);
             var defaultAnswer = task.getDefaultAnswerObject();
-            answer[displayHelper.taskLevel] = defaultAnswer[displayHelper.taskLevel];
+            var level = displayHelper.taskLevel;
+            answer[level] = defaultAnswer[level];
             task.reloadAnswer(JSON.stringify(answer), function() {});
          });
       }
@@ -251,66 +264,67 @@ var displayHelper = {
    },
 
    updateScoreOneLevel: function(answer, gradedLevel) {
+      var that = this;
       grader.gradeTask(answer, null, function(score, message) {
          score = +score;
-         displayHelper.submittedScore = score;
-         if (displayHelper.hasSolution) {
-            displayHelper.graderScore = score;
-            displayHelper.levelsScores[gradedLevel] = score;
+         that.submittedScore = score;
+         if (that.hasSolution) {
+            that.graderScore = score;
+            that.levelsScores[gradedLevel] = score;
          } else {
-            if (score > displayHelper.graderScore) {
-               displayHelper.graderScore = score;
+            if (score > that.graderScore) {
+               that.graderScore = score;
             }
-            if (displayHelper.hasLevels) {
-               if (score > displayHelper.levelsScores[gradedLevel]) {
-                  displayHelper.levelsScores[gradedLevel] = score;
-                  if (displayHelper.savedAnswer == "") {
-                     displayHelper.savedAnswer = answer;
+            if (that.hasLevels) {
+               if (score > that.levelsScores[gradedLevel]) {
+                  that.levelsScores[gradedLevel] = score;
+                  if (that.savedAnswer == '') {
+                     that.savedAnswer = answer;
                   } else {
-                     var savedAnswerObj = $.parseJSON(displayHelper.savedAnswer);
+                     var savedAnswerObj = $.parseJSON(that.savedAnswer);
                      var answerObj = $.parseJSON(answer);
                      savedAnswerObj[gradedLevel] = answerObj[gradedLevel];
-                     displayHelper.savedAnswer = JSON.stringify(savedAnswerObj);
+                     that.savedAnswer = JSON.stringify(savedAnswerObj);
                   }
                }
             } else {
-               if (score > displayHelper.graderScore) {
-                  displayHelper.savedAnswer = answer;
+               if (score > that.graderScore) {
+                  that.savedAnswer = answer;
                }
             }
          }
          if (message !== undefined) {
-            displayHelper.graderMessage = message;
+            that.graderMessage = message;
          } else {
-            displayHelper.graderMessage = "";
+            that.graderMessage = '';
          }
-         if (displayHelper.hasLevels) {
-            var scores = displayHelper.levelsScores;
-            var maxScores = displayHelper.levelsMaxScores;
-            if (displayHelper.pointsAsStars) {
+         if (that.hasLevels) {
+            var scores = that.levelsScores;
+            var maxScores = that.levelsMaxScores;
+            if (that.pointsAsStars) {
                var starPoints = maxScores.hard / 4;
                var curStar = 0;
                var starScore = 0;
                while (starScore + starPoints < scores[gradedLevel]) {
-                  displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
+                  that.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
                   curStar++;
                   starScore += starPoints;
                }
-               displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full',
+               that.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full',
                   (scores[gradedLevel] - starScore) / starPoints);
             } else {
-               $("#tabScore_" + gradedLevel).html(scores[gradedLevel]);
+               $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
             }
             if (maxScores[gradedLevel] == scores[gradedLevel]) {
-               for (var curLevel in displayHelper.levelsNames) {
+               for (var curLevel in that.levelsNames) {
                   if (curLevel == gradedLevel) break;
                   $('.tab-' + curLevel).removeClass('open-level').addClass('useless-level');
                }
             }
-            $("#best_score").html(displayHelper.graderScore);
+            $('#best_score').html(that.graderScore);
          }
-         displayHelper.refreshMessages = true;
-         displayHelper.checkAnswerChanged();
+         that.refreshMessages = true;
+         that.checkAnswerChanged();
       }, gradedLevel);
    },
 
@@ -327,11 +341,12 @@ var displayHelper = {
 
    // does task have unsaved answers?
    hasNonSavedAnswer: function(callback) {
-      if (! task) {
+      if (!task) {
          return false;
       }
+      var that = this;
       task.getAnswer(function(curAnswer) {
-         if (curAnswer != displayHelper.prevAnswer) {
+         if (curAnswer != that.prevAnswer) {
             try {
                if (self != top && parent.Tracker) {
                   var data = {dataType: "nonSavedAnswer", teamID: parent.teamID, questionKey: parent.currentQuestionKey, answer: curAnswer};
@@ -340,16 +355,16 @@ var displayHelper = {
                   parent.Tracker.trackData(data);
                }
             } catch (e) {}
-            displayHelper.prevAnswer = curAnswer;
+            that.prevAnswer = curAnswer;
          }
-         if (curAnswer != displayHelper.submittedAnswer) {
-            displayHelper.submittedAnswer = "";
-            displayHelper.refreshMessages = true;
+         if (curAnswer != that.submittedAnswer) {
+            that.submittedAnswer = "";
+            that.refreshMessages = true;
          }
-         if ((curAnswer == displayHelper.defaultAnswer) && (displayHelper.savedAnswer === "")) {
+         if ((curAnswer == that.defaultAnswer) && (that.savedAnswer === '')) {
             callback(false);
          } else {
-            callback(curAnswer != displayHelper.submittedAnswer);
+            callback(curAnswer != that.submittedAnswer);
          }
       });
    },
@@ -361,23 +376,24 @@ var displayHelper = {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
          return;
       }
+      var that = this;
       this.hasNonSavedAnswer(function(hasNonSavedAnswer) {
-         if (displayHelper.submittedAnswer !== "") {
-            displayHelper.refreshMessages = true;
+         if (that.submittedAnswer !== "") {
+            that.refreshMessages = true;
          }
          if (hasNonSavedAnswer) {
-            if (!displayHelper.hasAnswerChanged) {
-               displayHelper.refreshMessages = true;
-               displayHelper.hasAnswerChanged = true;
+            if (!that.hasAnswerChanged) {
+               that.refreshMessages = true;
+               that.hasAnswerChanged = true;
             }
          } else {
-            if (displayHelper.hasAnswerChanged) {
-               displayHelper.refreshMessages = true;
-               displayHelper.hasAnswerChanged = false;
+            if (that.hasAnswerChanged) {
+               that.refreshMessages = true;
+               that.hasAnswerChanged = false;
             }
          }
-         if (displayHelper.refreshMessages) {
-            displayHelper.updateMessages();
+         if (that.refreshMessages) {
+            that.updateMessages();
          }
       });
    },
