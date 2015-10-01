@@ -4,21 +4,26 @@
    -o-user-select: none;
    user-select: none;
    -khtml-user-select: none;
-   font-family: Arial, sans-serif;
 }
 
 .touch {
    -ms-touch-action: none;
 }
 
-#task h1 {
-   display: none;
+body {
+   width: 770px;
+   font-family: Arial, sans-serif;
+   font-size: 16px;
 }
 
 a {
    color: #4D87CE;
    font-weight: bold;
    text-decoration: none;
+}
+
+button, input[type=button] {
+   font-size: 16px;
 }
 
 .selectable, input, textarea {
@@ -33,50 +38,42 @@ a {
 	border: 1px solid black;
 }
 
-.question h1 {
+#task h1,
+.question h1,
+#solution {
    display: none;
 }
 
-body {
-   width: 770px;
-}
-
-#success {
+#success,
+#error {
    font-weight: bold;
+}
+#success {
    color: blue;
 }
 #error {
-   font-weight: bold;
    color: red;
-}
-
-button, input[type=button] {
-   font-size: 16px;
-}
-
-#solution {
-   display: none;
 }
 
 .tabs-menu {
    list-style: none;
    padding: 0;
    width: 100%;
-   border-bottom: 2px solid #ccc;
+   border-bottom: 2px solid #aaa;
 }
 .tabs-menu li {
    display: inline-block;
    min-width: 150px;
    margin-right: 10px;
    background: #ccc;
-   border: 2px solid #ccc;
+   border: 2px solid #aaa;
    border-bottom: 0;
    text-align: center;
 }
 .tabs-menu li.current {
    margin-bottom: -2px;
    padding-bottom: 2px;
-   background-color: #fff;
+   background: #fff;
 }
 .tabs-menu li a {
    display: block;
@@ -90,15 +87,34 @@ button, input[type=button] {
 .tabs-menu li a:focus {
    outline: none;
 }
-.tabs-menu li a:active {
-   background: #ddf;
+.tabs-menu li:not(.current) a:active {
+   background: #88d;
 }
 .tabs-menu.stars li a {
    padding: 8px;
    font-size: 1.1em;
 }
-.tabs-menu.stars span > * {
-   vertical-align: bottom;
+
+.star-container {
+   position: relative;
+   display: inline-block;
+   width: 18px;
+   height: 18px;
+   vertical-align: middle;
+}
+.star-container > span.hidden {
+   visibility: hidden;
+}
+.star-container > span {
+   position: absolute;
+   left: 0;
+   z-index: 1;
+}
+
+.best_score {
+   float: right; 
+   text-align: center;
+   font-weight: bold;
 }
 
 .easy, .medium, .hard {

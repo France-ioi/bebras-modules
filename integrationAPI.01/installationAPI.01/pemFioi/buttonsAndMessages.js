@@ -10,7 +10,7 @@
 
 var displayHelper = {
    loaded: true,
-   checkAnswerInteral: null,
+   checkAnswerInterval: null,
    prevAnswer: "",
    readOnly: false,
    savedAnswer: "",
@@ -27,133 +27,111 @@ var displayHelper = {
    hasLevels: false,
    levelsScores: {easy: 0, medium: 0, hard: 0},
    prevLevelsScores: {easy: 0, medium: 0, hard: 0},
-   taskLevel: "",
+   taskLevel: '',
+
    /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
-
    load: function(views) {
-      displayHelper.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      displayHelper.taskParams = platform.getTaskParams();
-      displayHelper.readOnly = (displayHelper.taskParams.readonly == true || displayHelper.taskParams.readOnly == 'true');
-      displayHelper.graderScore = +displayHelper.taskParams.noScore;
-      displayHelper.savedAnswer = "";
-      var addTaskHtml = "<center>";
+      this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
+      this.taskParams = platform.getTaskParams();
+      this.readOnly = (this.taskParams.readonly == true || this.taskParams.readOnly == 'true');
+      this.graderScore = +this.taskParams.noScore;
+      this.savedAnswer = '';
+      var addTaskHtml = '<div style="text-align: center;">';
       // place button placement at the end of html if they don't already exist
-      if ($("#displayHelper_validate").length === 0) {
-         addTaskHtml += "<span id='displayHelper_validate'></span>";
+      if ($('#displayHelper_validate').length === 0) {
+         addTaskHtml += '<span id="displayHelper_validate"></span>';
       }
       if ($("#displayHelper_cancel").length === 0) {
-         addTaskHtml += "<span id='displayHelper_cancel'></span>";
+         addTaskHtml += '<span id="displayHelper_cancel"></span>';
       }
       if ($("#displayHelper_saved").length === 0) {
-         addTaskHtml += "<span id='displayHelper_saved'></span>";
+         addTaskHtml += '<span id="displayHelper_saved"></span>';
       }
-      addTaskHtml += "</center>";
-      $(displayHelper.taskSelector).append(addTaskHtml);
+      addTaskHtml += '</div>';
+      $(this.taskSelector).append(addTaskHtml);
    },
 
-   getLevelsMaxScores: function() {
+   setupParams: function() {
       var taskParams = platform.getTaskParams();
+
+      this.hasLevels = true;
+      if (taskParams.pointsAsStars !== undefined) {
+         this.pointsAsStars = taskParams.pointsAsStars;
+      } else {
+         this.pointsAsStars = true; // TODO: set this in the platform task params
+      }
+      if (taskParams.unlockedLevels !== undefined) {
+         this.unlockedLevels = taskParams.unlockedLevels; // TODO: set this in the platform task params
+      } else {
+         this.unlockedLevels = 3;
+      }
+
       var maxScore = taskParams.maxScore;
-      return {
+      this.levelsMaxScores = {
          easy: Math.round(maxScore / 2),
          medium: Math.round(3 * maxScore / 4),
          hard: maxScore
       };
+      this.levelsNames = { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
-
-   getLevelsNames: function() {
-      return { easy: "facile", medium: "moyenne", hard: "difficile" };
-   },
-
-   putStars: function(parents, displayWidth, strokeColor, fillColor, clipWidth) {
-      if (!strokeColor) strokeColor = 'black';
-      if (!fillColor) fillColor = 'white';
-      if (!clipWidth) clipWidth = 1;
-      var scaleFactor = displayWidth / 100;
-      for (var curStar in parents) {
-         var rsr = Raphael(parents[curStar], displayWidth * clipWidth, displayWidth * .95);
-         // A star in a frame of size (100, 95)
-         var starPath = rsr.path('M 49.999998,9.7729864 58.691536,40.557777 90.655429,39.311043 64.062901,57.090119 ' +
-            '75.125989,87.103375 49.999998,67.306924 24.874007,87.103375 35.937097,57.090119 9.3445705,39.311043 ' +
-            '41.308462,40.557777 Z')
-            .attr({
-               fill: fillColor,
-               stroke: strokeColor,
-               'stroke-width': 5 * scaleFactor,
-            }).transform('t3.2389 15.734');
-         starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',0,0');
-      }
-   },
-
-   /*setupLevels: function(initLevel) {
-      task.reloadStateObject(task.getDefaultStateObject(), true);
-      task.reloadAnswerObject(task.getDefaultAnswerObject());
-      displayHelper.hasLevels = true;
-      displayHelper.pointsAsStars = false; // TODO: set this in the platform task params
-      var maxScores = displayHelper.getLevelsMaxScores();
-      var levelsNames = displayHelper.getLevelsNames();
+   setupContent: function() {
+      var maxScores = this.levelsMaxScores;
       var starContainers = [];
       var tabsClasses = 'tabs-menu';
-      if (displayHelper.pointsAsStars) {
+      if (this.pointsAsStars) {
          tabsClasses += ' stars';
       }
-      var tabsMenu = $('<ul/>', { 'class': tabsClasses });
-      for (var curLevel in levelsNames) {
-         if (displayHelper.pointsAsStars) {
-            var tabLink = $('<a/>', { href: curLevel, html: 'Version ' });
-            tabsMenu.append($('<li/>', { id: 'tab-' + curLevel }).append(tabLink));
-            for (var curStar = 0; curStar < maxScores[curLevel]; curStar += 10) {
-               var starContainer = 'tabScore_' + curLevel + '_' + curStar;
-               tabLink.append($('<span/>', { id: 'tabScore_' + curLevel + '_' + curStar }));
-               starContainers.push(starContainer);
+      var tabsHTML = '<ul class="' + tabsClasses + '">';
+      for (var curLevel in this.levelsNames) {
+         tabsHTML += '<li class="tab-' + curLevel + '">' +
+            '<a href="#' + curLevel + '">Version ';
+         if (this.pointsAsStars) {
+            var curStar = 0;
+            for (var curScore = 0; curScore < maxScores[curLevel]; curScore += maxScores.hard / 4) {
+               var starID = 'tabScore_' + curLevel + '_' + curStar;
+               tabsHTML += '<span id="' + starID + '" class="star-container"></span>';
+               starContainers.push(starID);
+               curStar++;
             }
          } else {
-            tabsMenu.append($('<li/>', { id: 'tab-' + curLevel }).append(
-               $('<a/>', { href: curLevel, html: 'Version ' + levelsNames[curLevel] + '<br/>' +
-                  'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + maxScores[curLevel] })));
+            tabsHTML += this.levelsNames[curLevel] + '<br/>' +
+               'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + maxScores[curLevel];
          }
+         tabsHTML += '</a></li>';
       }
-      var scoreFrame = $('<div/>', { style: 'float: right; margin-top: -15px; text-align: center; font-weight: bold;' }).append(
-         $('<p/>', { html: 'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)' }));
-      $('#tabsContainer').prepend(scoreFrame).prepend(tabsMenu);
-      displayHelper.putStars(starContainers, 18);
+      tabsHTML += '</ul>';
+      var scoreHTML = '<div class="best_score">' +
+         'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)' +
+      '</div>';
+      $('#tabsContainer').before(scoreHTML + tabsHTML);
+      this.setStars(starContainers);
+   },
+   setupLevels: function(initLevel) {
+      task.reloadStateObject(task.getDefaultStateObject(), true);
+      task.reloadAnswerObject(task.getDefaultAnswerObject());
+
+      this.setupParams();
+      this.setupContent();
+
       $('.tabs-menu a').click(function(event) {
          event.preventDefault();
          var newLevel = $(this).attr('href').split('#')[1];
          displayHelper.setLevel(newLevel);
       });
-      displayHelper.setLevel(initLevel);
-   },*/
-   setupLevels: function(initLevel) {
-      task.reloadStateObject(task.getDefaultStateObject(), true);
-      task.reloadAnswerObject(task.getDefaultAnswerObject());
-      displayHelper.hasLevels = true;
-      var maxScores = displayHelper.getLevelsMaxScores();
-      var tabsHtml = "<ul class='tabs-menu'>\n";
-      var levelsNames = displayHelper.getLevelsNames();
-      for (var curLevel in levelsNames) {
-         tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-            "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-              "Version " + levelsNames[curLevel] + "<br/>" +
-              "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
-            "</div></a></li>\n";
-      }
-      tabsHtml += "</ul>";
-      var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
-         "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
-      $("#tabsContainer").before(scoreHtml + tabsHtml);
-      $(".tabs-menu a").click(function(event) {
-         event.preventDefault();
-         var newLevel = $(this).attr("href").split("#")[1];
-         displayHelper.setLevel(newLevel);
-      });
-      displayHelper.setLevel(initLevel);
+      this.setLevel(initLevel);
+   },
+
+   getLevelsMaxScores: function() {
+      return this.levelsMaxScores;
+   },
+   getLevelsNames: function() {
+      return this.levelsNames;
    },
 
    setLevel: function(newLevel) {
-      if (displayHelper.taskLevel == newLevel) {
+      if (this.taskLevel == newLevel) {
          return;
       }
       $(".tab-easy, .tab-medium, .tab-hard").removeClass("current");
@@ -167,9 +145,9 @@ var displayHelper = {
       task.reloadStateObject(state, true);
       task.reloadAnswerObject(answer);
 
-      displayHelper.taskLevel = newLevel;
-      displayHelper.validate("stay");
-      displayHelper.stopShowingResult();
+      this.taskLevel = newLevel;
+      this.validate("stay");
+      this.stopShowingResult();
    },
 
    // Function to call at the beginning of task loading, before any html has
@@ -184,20 +162,17 @@ var displayHelper = {
                selection.removeAllRanges();
             }
          }
-      } catch (err) { }
+      } catch (err) {}
       // end of fix
-      displayHelper.views = views;
-      displayHelper.hasSolution = (typeof views.solution !== 'undefined');
-      if (displayHelper.hasSolution && displayHelper.graderScore) {
-         displayHelper.prevSavedScore = displayHelper.graderScore;
+      this.views = views;
+      this.hasSolution = (typeof views.solution !== 'undefined');
+      if (this.hasSolution && this.graderScore) {
+         this.prevSavedScore = this.graderScore;
       }
       displayHelper.checkAnswerInterval = setInterval(
-         (function(self) {
-         return function() {
-             self.checkAnswerChanged();
-         }
-         })(this)
-      , 1000);
+         function() {
+             displayHelper.checkAnswerChanged();
+         }, 1000);
       task.getAnswer(function(answer) {
          displayHelper.defaultAnswer = answer;
          displayHelper.refreshMessages = true;
@@ -205,7 +180,6 @@ var displayHelper = {
       });
    },
 
-   // function called at task unload
    unload: function() {
       this.loaded = false;
       this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
@@ -219,24 +193,24 @@ var displayHelper = {
       if (this.showScore) {
          this.updateScore(strAnswer, true);
       }
-      displayHelper.checkAnswerChanged(); // necessary?
+      this.checkAnswerChanged(); // necessary?
    },
 
    reloadState: function(state) {
-      displayHelper.checkAnswerChanged(); // necessary?
+      this.checkAnswerChanged(); // necessary?
    },
 
    stopShowingResult: function() {
-      displayHelper.stoppedShowingResult = true;
-      displayHelper.updateMessages();
+      this.stoppedShowingResult = true;
+      this.updateMessages();
    },
+
    /**********************
     * Internal functions *
     **********************/
-
    restartAll: function() {
-      displayHelper.stopShowingResult();
-      if (!displayHelper.hasLevels) {
+      this.stopShowingResult();
+      if (!this.hasLevels) {
          task.reloadAnswer("", function() {})
       } else {
          task.getAnswer(function(strAnswer) {
@@ -249,29 +223,29 @@ var displayHelper = {
    },
 
    validate: function(mode) {
-      displayHelper.stoppedShowingResult = false;
-      if (mode == "cancel") {
-         displayHelper.savedAnswer = "";
-         task.reloadAnswer("", function() {
-            displayHelper.checkAnswerChanged();
+      this.stoppedShowingResult = false;
+      var that = this;
+      if (mode == 'cancel') {
+         this.savedAnswer = '';
+         task.reloadAnswer('', function() {
+            that.checkAnswerChanged();
          });
       } else {
-         var that = this;
          task.getAnswer(function(answer) {
-            if (!displayHelper.hasSolution) {
+            if (!that.hasSolution) {
                that.prevSavedScore = that.graderScore;
-               if (displayHelper.hasLevels) {
-                  that.prevLevelsScores[displayHelper.taskLevel] = that.levelsScores[displayHelper.taskLevel];
+               if (that.hasLevels) {
+                  that.prevLevelsScores[that.taskLevel] = that.levelsScores[that.taskLevel];
                }
             }
             that.submittedAnswer = answer;
-            if (displayHelper.showScore) {
+            if (that.showScore) {
                that.updateScore(answer, false);
             } else {
                that.savedAnswer = answer;
             }
-            displayHelper.refreshMessages = true;
-            displayHelper.checkAnswerChanged();
+            that.refreshMessages = true;
+            that.checkAnswerChanged();
          });
       }
    },
@@ -311,7 +285,21 @@ var displayHelper = {
             displayHelper.graderMessage = "";
          }
          if (displayHelper.hasLevels) {
-            $("#tabScore_" + gradedLevel).html(displayHelper.levelsScores[gradedLevel]);
+            if (displayHelper.pointsAsStars) {
+               var maxScores = displayHelper.levelsMaxScores;
+               var starPoints = maxScores.hard / 4;
+               var curStar = 0;
+               var starScore = 0;
+               while (starScore + starPoints < displayHelper.levelsScores[gradedLevel]) {
+                  displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
+                  curStar++;
+                  starScore += starPoints;
+               }
+               displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full',
+                  (displayHelper.levelsScores[gradedLevel] - starScore) / starPoints);
+            } else {
+               $("#tabScore_" + gradedLevel).html(displayHelper.levelsScores[gradedLevel]);
+            }
             $("#best_score").html(displayHelper.graderScore);
          }
          displayHelper.refreshMessages = true;
@@ -320,13 +308,14 @@ var displayHelper = {
    },
 
    updateScore: function(answer, allLevels) {
-      // TODO : moins bourrin !
+      // TODO: cleaner!
       if (allLevels) {
-         for (var curLevel in {"easy": true, "medium": true, "hard": true}) {
-            displayHelper.updateScoreOneLevel(answer, curLevel);
+         for (var curLevel in this.levelsNames) {
+            this.updateScoreOneLevel(answer, curLevel);
          }
+      } else {
+         this.updateScoreOneLevel(answer, this.taskLevel);
       }
-      displayHelper.updateScoreOneLevel(answer, displayHelper.taskLevel);
    },
 
    // does task have unsaved answers?
@@ -365,7 +354,7 @@ var displayHelper = {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
          return;
       }
-      displayHelper.hasNonSavedAnswer(function(hasNonSavedAnswer) {
+      this.hasNonSavedAnswer(function(hasNonSavedAnswer) {
          if (displayHelper.submittedAnswer !== "") {
             displayHelper.refreshMessages = true;
          }
@@ -388,71 +377,71 @@ var displayHelper = {
 
    getFullFeedbackSavedMessage: function(taskMode) {
       var scoreDiffMsg = "Score ";
-      var showRetreiveAnswer = false;
-      if ((displayHelper.submittedAnswer !== "") && (displayHelper.prevSavedScore !== undefined)) {
-         if (!displayHelper.hasSolution) {
-            if (displayHelper.prevSavedScore < displayHelper.submittedScore) {
+      var showretrieveAnswer = false;
+      if ((this.submittedAnswer !== "") && (this.prevSavedScore !== undefined)) {
+         if (!this.hasSolution) {
+            if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = "Votre score est maintenant ";
-            } else if (displayHelper.prevSavedScore > displayHelper.submittedScore) { 
+            } else if (this.prevSavedScore > this.submittedScore) { 
                scoreDiffMsg = "C'est moins bien qu'avant, votre score reste ";
-               showRetreiveAnswer = true;
+               showretrieveAnswer = true;
             }
             else {
                scoreDiffMsg = "Votre score reste le même ";
             }
          } else {
-            if (displayHelper.prevSavedScore != displayHelper.submittedScore) {
-               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score serait";
-            } else if (displayHelper.submittedAnswer != displayHelper.savedAnswer) {
-               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + displayHelper.prevSavedScore + ". Avec cette réponse, votre score resterait le même";
+            if (this.prevSavedScore != this.submittedScore) {
+               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + this.prevSavedScore + ". Avec cette réponse, votre score serait";
+            } else if (this.submittedAnswer != this.savedAnswer) {
+               scoreDiffMsg = "Le concours étant terminé, votre réponse n'est pas enregistrée et votre score reste de " + this.prevSavedScore + ". Avec cette réponse, votre score resterait le même";
             } else {
                scoreDiffMsg = "Votre score est de";
             }
          }
       }
-      var savedMessage = scoreDiffMsg + " : " + displayHelper.graderScore + " sur " + displayHelper.taskParams.maxScore + ".";
-      if ((displayHelper.hasSolution && displayHelper.savedAnswer != displayHelper.prevAnswer) ||
-         ((displayHelper.graderScore > 0) && ((taskMode == "saved_changed") || showRetreiveAnswer))) {
-          savedMessage += " <a href=\"#\" onclick='displayHelper.retreiveAnswer();return false;'>Rechargez la réponse validée.</a>";
+      var savedMessage = scoreDiffMsg + " : " + this.graderScore + " sur " + this.taskParams.maxScore + ".";
+      if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
+         ((this.graderScore > 0) && ((taskMode == "saved_changed") || showretrieveAnswer))) {
+          savedMessage += " <a href=\"#\" onclick='displayHelper.retrieveAnswer(); return false;'>Rechargez la réponse validée.</a>";
       }
       return savedMessage;
    },
 
    getFullFeedbackWithLevelsSavedMessage: function(taskMode) {
-      var maxScoreLevel = displayHelper.getLevelsMaxScores()[displayHelper.taskLevel];
-      var showRetreiveAnswer = false;
+      var maxScoreLevel = this.levelsMaxScores[this.taskLevel];
+      var showretrieveAnswer = false;
       var message = "";
-      if (displayHelper.submittedAnswer === "") {
-         if (displayHelper.levelsScores[displayHelper.taskLevel] > 0) {
-            showRetreiveAnswer = true;
+      if (this.submittedAnswer === "") {
+         if (this.levelsScores[this.taskLevel] > 0) {
+            showretrieveAnswer = true;
          } else {
             message += "Vous n'avez pas encore obtenu de points sur cette version.";
          }
       } else {
          var plural = "";
-         if (displayHelper.submittedScore > 1) {
+         if (this.submittedScore > 1) {
             plural = "s";
          }
-         message = "Score de votre réponse : " + displayHelper.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
-         if (displayHelper.hasSolution) {
-            message += "Le concours est terminé, votre réponse n'est pas enregistrée.";
-            if (displayHelper.prevSavedScore !== undefined) {
-               showRetreiveAnswer = true;
+         message = "Score de votre réponse : " + this.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
+         if (this.hasSolution) {
+            message += "Le concours est terminé : votre réponse n'est pas enregistrée.";
+            if (this.prevSavedScore !== undefined) {
+               showretrieveAnswer = true;
             }
          } else {
-            var prevScore = displayHelper.prevLevelsScores[displayHelper.taskLevel];
-            if (displayHelper.prevSavedScore !== undefined) {
-               if (displayHelper.submittedScore > prevScore) {
-                  if (displayHelper.submittedScore < maxScoreLevel) {
+            var prevScore = this.prevLevelsScores[this.taskLevel];
+            if (this.prevSavedScore !== undefined) {
+               if (this.submittedScore > prevScore) {
+                  if (this.submittedScore < maxScoreLevel) {
                      message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
-                  } else if (displayHelper.taskLevel == "hard") {
+                  } else if (this.taskLevel == "hard") {
                      message += "C'est le meilleur score possible sur ce sujet, félicitations !";
                   } else {
                      message += "Pour obtenir plus de points, passez à une version plus difficile.";
                   }
-               } else if (displayHelper.submittedScore < prevScore) { 
+               } else if (this.submittedScore < prevScore) { 
                   message += "Vous aviez fait mieux avant.";
-                  showRetreiveAnswer = true;
+                  showretrieveAnswer = true;
                }
                else {
                   message += "Votre score reste le même.";
@@ -460,8 +449,8 @@ var displayHelper = {
             }
          }
       }
-      if (showRetreiveAnswer) {
-         message += " <a href=\"#\" onclick='displayHelper.retreiveAnswer();return false;'>" + 
+      if (showretrieveAnswer) {
+         message += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' + 
             "Rechargez votre meilleure réponse.</a>";
       }
       return message;
@@ -469,110 +458,115 @@ var displayHelper = {
 
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
       switch (taskMode) {
-         case "saved_unchanged":
+         case 'saved_unchanged':
             var color = "red";
-            if (displayHelper.submittedScore == displayHelper.taskParams.maxScore) {
+            if (this.submittedScore == this.taskParams.maxScore) {
                color = "green";
-            } else if (displayHelper.submittedScore > 0) {
+            } else if (this.submittedScore > 0) {
                color = "#FF8C00";
             }
-            if (displayHelper.graderMessage !== "") {
-               if (!displayHelper.stoppedShowingResult) {
-                  return "<br><span style='display:inline-block;margin-bottom:0.2em;font-weight:bold;color:" + color + "'>" + displayHelper.graderMessage + "</span>";
-               } else if (!this.hideValidateButton && !displayHelper.hasSolution) {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+            if (this.graderMessage !== "") {
+               if (!this.stoppedShowingResult) {
+                  return '<br/><span style="display: inline-block; margin-bottom: .2em; font-weight: bold; color: ' + color + '">' +
+                     this.graderMessage + '</span>';
+               } else if (!this.hideValidateButton && !this.hasSolution) {
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
                }
             }
             break;
-         case "unsaved_unchanged":
-         case "unsaved_changed":
+         case 'unsaved_unchanged':
+         case 'unsaved_changed':
             if (!this.hideValidateButton) {
-               if (displayHelper.hasSolution) {
-                  return "<input type='button' value='Évaluer cette réponse' onclick='displayHelper.validate(\"test\")' "+disabledStr+"></input>";
+               if (this.hasSolution) {
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' + disabledStr + "/>";
                } else {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' + disabledStr+"/>";
                }
             }
             break;
-         case "saved_changed":
+         case 'saved_changed':
             if (!this.hideValidateButton) {
-               if (displayHelper.hasSolution) {
-                  return "<input type='button' value='Évaluer cette réponse' onclick='displayHelper.validate(\"test\")' "+disabledStr+"></input>";
+               if (this.hasSolution) {
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' + disabledStr + '/>';
                } else {
-                  return "<input type='button' value='Valider votre nouvelle réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
                }
             }
             break;
       }
-      return "";
+      return '';
    },
 
    lastSentHeight: null,
    updateMessages: function() {
-      displayHelper.refreshMessages = false;
+      this.refreshMessages = false;
       var suffix, prefix; 
-      if (displayHelper.hasAnswerChanged) {
-         suffix = "changed";
+      if (this.hasAnswerChanged) {
+         suffix = 'changed';
       } else {
-         suffix = "unchanged";
+         suffix = 'unchanged';
       }
-      if ((displayHelper.savedAnswer !== "") && (displayHelper.savedAnswer != displayHelper.defaultAnswer)) {
-         prefix = "saved";
+      if ((this.savedAnswer !== '') && (this.savedAnswer != this.defaultAnswer)) {
+         prefix = 'saved';
       } else {
-         prefix = "unsaved";
+         prefix = 'unsaved';
       }
-      if ((displayHelper.submittedAnswer !== "") && (displayHelper.submittedAnswer != displayHelper.savedAnswer)) {
-         prefix = "saved"; // equivalent, should be named differently
-         suffix = "unchanged";
+      if ((this.submittedAnswer !== '') && (this.submittedAnswer != this.savedAnswer)) {
+         prefix = 'saved'; // equivalent, should be named differently
+         suffix = 'unchanged';
       }
-      var taskMode = prefix + "_" + suffix;
+      var taskMode = prefix + '_' + suffix;
       var messages = {
-         validate: "",
-         cancel: "",
-         saved: ""
+         validate: '',
+         cancel: '',
+         saved: ''
       };
-      var disabledStr = displayHelper.readOnly ? 'disabled' : '';
+      var disabledStr = this.readOnly ? 'disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            messages.cancel = "<div style='margin-top: 5px'><input type='button' value='Effacer votre réponse actuelle' onclick='displayHelper.restartAll()' "+disabledStr+"></input></div>";
+            messages.cancel = '<div style="margin-top: 5px;">' +
+               '<input type="button" value="Effacer votre réponse actuelle" onclick="displayHelper.restartAll();" ' + disabledStr + '/></div>';
          }
-         messages.validate = displayHelper.getFullFeedbackValidateMessage(taskMode, disabledStr);
-         if (displayHelper.hasLevels) {
-            messages.saved = displayHelper.getFullFeedbackWithLevelsSavedMessage(taskMode);
+         messages.validate = this.getFullFeedbackValidateMessage(taskMode, disabledStr);
+         if (this.hasLevels) {
+            messages.saved = this.getFullFeedbackWithLevelsSavedMessage(taskMode);
          } else {
-            messages.saved = displayHelper.getFullFeedbackSavedMessage(taskMode);
+            messages.saved = this.getFullFeedbackSavedMessage(taskMode);
          }
-         messages.saved = "<span style='margin-top: 5px; display: inline-block'>" + messages.saved + "</span>";
+         messages.saved = '<span style="margin-top: 5px; display: inline-block;">' + messages.saved + '</span>';
       } else {
          switch (taskMode) {
             case "unsaved_unchanged":
             case "unsaved_changed":
-               if (!displayHelper.hasSolution) {
-                  messages.validate = "<input type='button' value='Enregistrer votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+               if (!this.hasSolution) {
+                  messages.validate = '<input type="button" value="Enregistrer votre réponse" onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
                }
                break;
             case "saved_unchanged":
-               if (!displayHelper.hasSolution) {
-                  messages.saved = "Votre réponse a été enregistrée, vous pouvez la modifier ou bien <a href=\"#\" onclick=\"platform.validate('cancel');return false\" "+disabledStr+">l'annuler</a> et recommencer.";
+               if (!this.hasSolution) {
+                  messages.saved = "Votre réponse a été enregistrée. Vous pouvez la modifier, ou bien " +
+                     '<a href="#" onclick="platform.validate(\'cancel\'); return false;" ' + disabledStr + ">l'annuler</a> et recommencer.";
                } else {
-                  messages.saved = "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez <a href=\"#\" onclick=\"displayHelper.validate('cancel');return false\" "+disabledStr+">recharger la réponse que vous avez soumise</a>.";
+                  messages.saved = "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez " +
+                     '<a href="#" onclick="displayHelper.validate(\'cancel\'); return false;" ' + disabledStr + ">recharger la réponse que vous avez soumise</a>.";
                }
                break;
             case "saved_changed":
-               messages.saved = "<br><b style='color:red'>Attention: une réponse différente est enregistrée</b>, vous pouvez <a href='#' onclick='displayHelper.retreiveAnswer();return false;'>la recharger</a>.";
+               messages.saved = '<br/><b style="color: red;">Attention : une réponse différente est enregistrée.</b> ' +
+                  'Vous pouvez <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">la recharger</a>.';
                if (!this.hideValidateButton) {
-                  messages.validate = "<input type='button' value='Enregistrer cette nouvelle réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  messages.validate = '<input type="button" value="Enregistrer cette nouvelle réponse" onclick="platform.validate(\'done\')" ' + disabledStr + "/>";
                }
                break;
          }
       }
-      for(var type in messages) {
-         if ((typeof displayHelper.previousMessages[type] === 'undefined') || (displayHelper.previousMessages[type] !== messages[type])) {
-            $("#displayHelper_" + type).html(messages[type]);
-            displayHelper.previousMessages[type] = messages[type];
+      for (var type in messages) {
+         if ((typeof this.previousMessages[type] === 'undefined') || (this.previousMessages[type] !== messages[type])) {
+            $('#displayHelper_' + type).html(messages[type]);
+            this.previousMessages[type] = messages[type];
          }
       }
-      var height = $("body").height();
+      var height = $('body').height();
       if (height != this.lastSentHeight) {
          this.lastSentHeight = height;
          platform.updateHeight(height);
@@ -580,21 +574,22 @@ var displayHelper = {
    },
 
    // loads previously saved answer
-   retreiveAnswer: function() {
-      var retreivedAnswer;
-      if (displayHelper.hasLevels) {
-         var retreivedAnswerObj = task.getAnswerObject();
-         var savedAnswerObj = $.parseJSON(displayHelper.savedAnswer);
-         retreivedAnswerObj[displayHelper.taskLevel] = savedAnswerObj[displayHelper.taskLevel];
-         retreivedAnswer = JSON.stringify(retreivedAnswerObj);
+   retrieveAnswer: function() {
+      var retrievedAnswer;
+      if (this.hasLevels) {
+         var retrievedAnswerObj = task.getAnswerObject();
+         var savedAnswerObj = $.parseJSON(this.savedAnswer);
+         retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
+         retrievedAnswer = JSON.stringify(retrievedAnswerObj);
       } else {
-         retreivedAnswer = displayHelper.savedAnswer;
+         retrievedAnswer = this.savedAnswer;
       }
-      task.reloadAnswer(retreivedAnswer, function() {
-         displayHelper.submittedAnswer = displayHelper.savedAnswer;
-         displayHelper.updateScore(displayHelper.savedAnswer, false);
-         displayHelper.refreshMessages = true;
-         displayHelper.checkAnswerChanged();
+      var that = displayHelper;
+      task.reloadAnswer(retrievedAnswer, function() {
+         that.submittedAnswer = that.savedAnswer;
+         that.updateScore(that.savedAnswer, false);
+         that.refreshMessages = true;
+         that.checkAnswerChanged();
       });
    },
 
@@ -605,8 +600,59 @@ var displayHelper = {
             bestLevel = curLevel;
          }
       }
-      var levelsNames = displayHelper.getLevelsNames();
-      callback(scores[bestLevel], messages[bestLevel] + " (version " + levelsNames[bestLevel] + ")");
+      callback(scores[bestLevel], messages[bestLevel] + " (version " + this.levelsNames[bestLevel] + ")");
+   },
+
+   // Sets and manages scoring stars
+   putStar: function(parent, displayWidth, strokeColor, fillColor, clipWidth) {
+      if (strokeColor === undefined) strokeColor = 'black';
+      if (fillColor === undefined) fillColor = 'white';
+      if (clipWidth === undefined) clipWidth = 1;
+
+      var scaleFactor = displayWidth / 100;
+      if (clipWidth == 0) {
+         $('#' + parent).addClass('hidden');
+         clipWidth = 1;
+      }
+
+      var starCanvas = Raphael(parent, displayWidth * clipWidth, displayWidth * .95);
+      // A star in a frame of size (100, 95)
+      var starPath = starCanvas.path('m46.761-0.11711 15.374 26.313 29.776 6.49-20.274 22.753 3.029 ' +
+         '30.325-27.905-12.251-27.904 12.251 3.028-30.325-20.274-22.753 29.776-6.49z')
+      .attr({
+         fill: fillColor,
+         stroke: strokeColor,
+         'stroke-width': 5 * scaleFactor,
+      }).transform('t3.2389 15.734');
+      starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',0,0');
+
+      var parentElement = document.getElementById(parent);
+      parentElement.starWidth = displayWidth;
+      parentElement.starCanvas = starCanvas;
+   },
+   resizeStar: function(parent, clipWidth) {
+      if (clipWidth == 0) {
+         $('#' + parent).addClass('hidden');
+      } else {
+         var parentElement = document.getElementById(parent);
+         parentElement.starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
+         $('#' + parent).removeClass('hidden');
+      }
+   },
+   setStars: function(parents, starWidth) {
+      if (starWidth === undefined) starWidth = 18;
+      for (var curParent in parents) {
+         var parentId = parents[curParent];
+         $('#' + parentId).html(
+            '<span id="' + parentId + '_empty"></span>' +
+            '<span id="' + parentId + '_full"></span>' +
+            '<span id="' + parentId + '_gray"></span>' +
+            '<span id="' + parentId + '_useless"></span>');
+         this.putStar(parentId + '_empty', starWidth);
+         this.putStar(parentId + '_full', starWidth, 'black', '#ffc90e', 0);
+         this.putStar(parentId + '_gray', starWidth, '#888', '#888', 0);
+         this.putStar(parentId + '_useless', starWidth, 'black', '#008', 0);
+      }
    }
 };
 
