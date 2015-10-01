@@ -102,12 +102,18 @@ button, input[type=button] {
    height: 18px;
    vertical-align: middle;
 }
-.star-container > span.hidden {
-   visibility: hidden;
-}
 .star-container > span {
    position: absolute;
    left: 0;
+   visibility: hidden;
+}
+.locked-level span.locked-star,
+.useless-level span.useless-star,
+.open-level span.empty-star,
+span.full-star.shown-star {
+   visibility: visible;
+}
+span.full-star {
    z-index: 1;
 }
 

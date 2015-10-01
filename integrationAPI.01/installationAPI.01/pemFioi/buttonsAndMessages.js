@@ -85,7 +85,7 @@ var displayHelper = {
       }
       var tabsHTML = '<ul class="' + tabsClasses + '">';
       for (var curLevel in this.levelsNames) {
-         tabsHTML += '<li class="tab-' + curLevel + '">' +
+         tabsHTML += '<li class="tab-' + curLevel + ' open-level">' +
             '<a href="#' + curLevel + '">Version ';
          if (this.pointsAsStars) {
             var curStar = 0;
@@ -134,10 +134,10 @@ var displayHelper = {
       if (this.taskLevel == newLevel) {
          return;
       }
-      $(".tab-easy, .tab-medium, .tab-hard").removeClass("current");
-      $(".tab-" + newLevel).addClass("current");
-      $(".easy, .medium, .hard").hide();
-      $("." + newLevel).show();
+      $('.tab-easy, .tab-medium, .tab-hard').removeClass('current');
+      $('.tab-' + newLevel).addClass('current');
+      $('.easy, .medium, .hard').hide();
+      $('.' + newLevel).show();
 
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
@@ -285,20 +285,27 @@ var displayHelper = {
             displayHelper.graderMessage = "";
          }
          if (displayHelper.hasLevels) {
+            var scores = displayHelper.levelsScores;
+            var maxScores = displayHelper.levelsMaxScores;
             if (displayHelper.pointsAsStars) {
-               var maxScores = displayHelper.levelsMaxScores;
                var starPoints = maxScores.hard / 4;
                var curStar = 0;
                var starScore = 0;
-               while (starScore + starPoints < displayHelper.levelsScores[gradedLevel]) {
+               while (starScore + starPoints < scores[gradedLevel]) {
                   displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
                   curStar++;
                   starScore += starPoints;
                }
                displayHelper.resizeStar('tabScore_' + gradedLevel + '_' + curStar + '_full',
-                  (displayHelper.levelsScores[gradedLevel] - starScore) / starPoints);
+                  (scores[gradedLevel] - starScore) / starPoints);
             } else {
-               $("#tabScore_" + gradedLevel).html(displayHelper.levelsScores[gradedLevel]);
+               $("#tabScore_" + gradedLevel).html(scores[gradedLevel]);
+            }
+            if (maxScores[gradedLevel] == scores[gradedLevel]) {
+               for (var curLevel in displayHelper.levelsNames) {
+                  if (curLevel == gradedLevel) break;
+                  $('.tab-' + curLevel).removeClass('open-level').addClass('useless-level');
+               }
             }
             $("#best_score").html(displayHelper.graderScore);
          }
@@ -604,18 +611,12 @@ var displayHelper = {
    },
 
    // Sets and manages scoring stars
-   putStar: function(parent, displayWidth, strokeColor, fillColor, clipWidth) {
+   putStar: function(parent, displayWidth, strokeColor, fillColor) {
       if (strokeColor === undefined) strokeColor = 'black';
       if (fillColor === undefined) fillColor = 'white';
-      if (clipWidth === undefined) clipWidth = 1;
-
       var scaleFactor = displayWidth / 100;
-      if (clipWidth == 0) {
-         $('#' + parent).addClass('hidden');
-         clipWidth = 1;
-      }
 
-      var starCanvas = Raphael(parent, displayWidth * clipWidth, displayWidth * .95);
+      var starCanvas = Raphael(parent, displayWidth, displayWidth * .95);
       // A star in a frame of size (100, 95)
       var starPath = starCanvas.path('m46.761-0.11711 15.374 26.313 29.776 6.49-20.274 22.753 3.029 ' +
          '30.325-27.905-12.251-27.904 12.251 3.028-30.325-20.274-22.753 29.776-6.49z')
@@ -632,11 +633,11 @@ var displayHelper = {
    },
    resizeStar: function(parent, clipWidth) {
       if (clipWidth == 0) {
-         $('#' + parent).addClass('hidden');
+         $('#' + parent).removeClass('shown-star');
       } else {
          var parentElement = document.getElementById(parent);
          parentElement.starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
-         $('#' + parent).removeClass('hidden');
+         $('#' + parent).addClass('shown-star');
       }
    },
    setStars: function(parents, starWidth) {
@@ -644,14 +645,15 @@ var displayHelper = {
       for (var curParent in parents) {
          var parentId = parents[curParent];
          $('#' + parentId).html(
-            '<span id="' + parentId + '_empty"></span>' +
-            '<span id="' + parentId + '_full"></span>' +
-            '<span id="' + parentId + '_gray"></span>' +
-            '<span id="' + parentId + '_useless"></span>');
+            '<span id="' + parentId + '_locked" class="locked-star"></span>' +
+            '<span id="' + parentId + '_useless" class="useless-star"></span>' +
+            '<span id="' + parentId + '_empty" class="empty-star"></span>' +
+            '<span id="' + parentId + '_full" class="full-star"></span>');
+         $('#' + parentId + '_full').addClass('hidden-star');
+         this.putStar(parentId + '_locked', starWidth, '#888', '#888');
+         this.putStar(parentId + '_useless', starWidth, 'black', '#22a');
          this.putStar(parentId + '_empty', starWidth);
-         this.putStar(parentId + '_full', starWidth, 'black', '#ffc90e', 0);
-         this.putStar(parentId + '_gray', starWidth, '#888', '#888', 0);
-         this.putStar(parentId + '_useless', starWidth, 'black', '#008', 0);
+         this.putStar(parentId + '_full', starWidth, 'black', '#ffc90e');
       }
    }
 };
