@@ -76,7 +76,7 @@ var displayHelper = {
       };
       this.levelsNames = { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
-   setupContent: function() {
+   setupLevelsTabs: function() {
       var maxScores = this.levelsMaxScores;
       var starContainers = [];
       var tabsClasses = 'tabs-menu';
@@ -108,17 +108,22 @@ var displayHelper = {
          levelNum++;
       }
       tabsHTML += '</ul>';
-      var scoreHTML = '<div class="best_score">' +
-         'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)</div>';
-      $('#tabsContainer').before(scoreHTML + tabsHTML);
-      this.setStars(starContainers);
+      if (!this.pointsAsStars) {
+         var scoreHTML = '<div class="best_score">' +
+            'Score : <span id="best_score">0</span> sur ' + maxScores.hard + '<br/>(meilleur des trois versions)</div>';
+         $('#tabsContainer').append(scoreHTML);
+      }
+      $('#tabsContainer').append(tabsHTML);
+      if (this.pointsAsStars) {
+         this.setStars(starContainers);
+      }
    },
    setupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
 
       this.setupParams();
-      this.setupContent();
+      this.setupLevelsTabs();
 
       $('.tabs-menu a').click(function(event) {
          event.preventDefault();
@@ -287,10 +292,8 @@ var displayHelper = {
                      that.savedAnswer = JSON.stringify(savedAnswerObj);
                   }
                }
-            } else {
-               if (score > that.graderScore) {
-                  that.savedAnswer = answer;
-               }
+            } else if (score > that.graderScore) {
+               that.savedAnswer = answer;
             }
          }
          if (message !== undefined) {
@@ -320,8 +323,8 @@ var displayHelper = {
                   if (curLevel == gradedLevel) break;
                   $('.tab-' + curLevel).removeClass('open-level').addClass('useless-level');
                }
+               $('#best_score').html(that.graderScore);
             }
-            $('#best_score').html(that.graderScore);
          }
          that.refreshMessages = true;
          that.checkAnswerChanged();
