@@ -11,22 +11,28 @@
 var displayHelper = {
    loaded: true,
    checkAnswerInterval: null,
-   prevAnswer: "",
+   prevAnswer: '',
    readOnly: false,
-   savedAnswer: "",
-   submittedAnswer: "",
+   savedAnswer: '',
+   submittedAnswer: '',
    submittedScore: 0,
    hasAnswerChanged: true,
-   taskSelector: "#task",
+   taskSelector: '#task',
    hideValidateButton: false,
    hideRestartButton: false,
    showScore: false,
    refreshMessages: true,
    stoppedShowingResult: false,
    previousMessages: {},
+
    hasLevels: false,
-   levelsScores: {easy: 0, medium: 0, hard: 0},
-   prevLevelsScores: {easy: 0, medium: 0, hard: 0},
+   pointsAsStars: false,
+   unlockedLevels: 3,
+   levelsScores: { easy: 0, medium: 0, hard: 0 },
+   prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
+   levels: ['easy', 'medium', 'hard'],
+   levelsNames: { easy: "facile", medium: "moyenne", hard: "difficile" },
+   onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
 
    /***********************************************
@@ -43,10 +49,10 @@ var displayHelper = {
       if ($('#displayHelper_validate').length === 0) {
          addTaskHtml += '<div id="displayHelper_validate"></div>';
       }
-      if ($("#displayHelper_cancel").length === 0) {
+      if ($('#displayHelper_cancel').length === 0) {
          addTaskHtml += '<div id="displayHelper_cancel"></div>';
       }
-      if ($("#displayHelper_saved").length === 0) {
+      if ($('#displayHelper_saved').length === 0) {
          addTaskHtml += '<div id="displayHelper_saved"></div>';
       }
       addTaskHtml += '</div>';
@@ -61,7 +67,6 @@ var displayHelper = {
       if (taskParams.pointsAsStars !== undefined) {
          this.pointsAsStars = taskParams.pointsAsStars;
       }
-      this.unlockedLevels = 2;
       if (taskParams.unlockedLevels !== undefined) {
          this.unlockedLevels = taskParams.unlockedLevels;
       }
@@ -75,52 +80,46 @@ var displayHelper = {
          medium: Math.round(3 * maxScore / 4),
          hard: maxScore
       };
-      this.levels = ['easy', 'medium', 'hard'];
-      this.levelsNames = { easy: "facile", medium: "moyenne", hard: "difficile" };
    },
    setupLevelsTabs: function() {
-      if (this.pointsAsStars) {
-         var starContainers = [];
-         var tabsHTML = '<ul id="tabsMenu" class="stars">';
-         var levelNum = 0;
-         for (var curLevel in this.levelsNames) {
-            var levelStatus = 'locked';
-            if (levelNum < this.unlockedLevels) {
-               levelStatus = 'open';
-            }
-            tabsHTML += '<li class="tab_' + curLevel + ' ' + levelStatus + '_level">' +
-               '<a href="#' + curLevel + '">Version ';
-            var starPoints = this.levelsMaxScores.hard / 4;
+      var maxScores = this.levelsMaxScores;
+      if (!this.pointsAsStars) {
+         var scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
+         $('#tabsContainer').append(scoreHTML);
+      }
+      var starContainers = [];
+      var tabsHTML = '<ul id="tabsMenu">';
+      for (var curLevel in this.levelsNames) {
+         tabsHTML += '<li id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
+         if (this.pointsAsStars) {
+            var starPoints = maxScores.hard / 4;
             var curStar = 0;
-            for (var curScore = 0; curScore < this.levelsMaxScores[curLevel]; curScore += starPoints) {
-               var starID = 'tabScore_' + curLevel + '_' + curStar;
-               tabsHTML += '<span id="' + starID + '" class="star_container"></span>';
+            tabsHTML += 'Version ';
+            for (var curScore = 0; curScore < maxScores[curLevel]; curScore += starPoints) {
+               var starID = 'tabScore_' + curLevel + curStar;
+               tabsHTML += '<span id="' + starID + '" class="starContainer"></span>';
                starContainers.push(starID);
                curStar++;
             }
-            tabsHTML += '</a></li>';
-            levelNum++;
+         } else {
+            tabsHTML += this.onlyLevelsNames[curLevel] + ' — ' +
+               '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
          }
-         tabsHTML += '</ul>';
-         $('#tabsContainer').append(tabsHTML);
+         tabsHTML += '</a></li>';
+      }
+      tabsHTML += '</ul>';
+      $('#tabsContainer').append(tabsHTML);
+      if (this.pointsAsStars) {
+         $('#tabsMenu').addClass('stars');
          this.setStars(starContainers);
-      } else {
-         var tabsHTML = '<ul id="tabsMenu">';
-         var levelNum = 0;
-         for (var curLevel in this.levelsNames) {
-            var levelStatus = 'locked';
-            if (levelNum < this.unlockedLevels) {
-               levelStatus = 'open';
-            }
-            tabsHTML += '<li class="tab_' + curLevel + ' ' + levelStatus + '_level">' +
-               '<a href="#' + curLevel + '">Version ' + this.levelsNames[curLevel] + '<br/>' +
-                  'Points : <span id="tabScore_' + curLevel + '">0</span> sur ' + this.levelsMaxScores[curLevel] + '</a></li>';
-            levelNum++;
+      }
+      var levelNum = 0;
+      for (var curLevel in this.levelsNames) {
+         if (levelNum >= this.unlockedLevels) {
+            $('#tab_' + curLevel).addClass('lockedLevel');
+            this.changeStarsColors(curLevel, 'empty', this.starColors.locked, this.starColors.locked);
          }
-         tabsHTML += '</ul>';
-         var scoreHTML = '<div class="best_score">' +
-            'Score : <span id="best_score">0</span> sur ' + this.levelsMaxScores.hard + '<br/>(meilleur des trois versions)</div>';
-         $('#tabsContainer').append(scoreHTML).append(tabsHTML);
+         levelNum++;
       }
    },
    setupLevels: function(initLevel) {
@@ -155,9 +154,11 @@ var displayHelper = {
          return;
       }
 
-      $('.tab_easy, .tab_medium, .tab_hard').removeClass('current');
-      $('.tab_' + newLevel).addClass('current');
-      $('.easy, .medium, .hard').hide();
+      for (var curLevel in this.levelsNames) {
+         $('#tab_' + curLevel).removeClass('current');
+         $('.' + curLevel).hide();
+      }
+      $('#tab_' + newLevel).addClass('current');
       $('.' + newLevel).show();
 
       var answer = task.getAnswerObject();
@@ -167,7 +168,7 @@ var displayHelper = {
       task.reloadAnswerObject(answer);
 
       this.taskLevel = newLevel;
-      this.validate("stay");
+      this.validate('stay');
       this.stopShowingResult();
    },
 
@@ -281,25 +282,26 @@ var displayHelper = {
          var curStar = 0;
          var starScore = 0;
          while (starScore + starPoints < scores[gradedLevel]) {
-            this.editStar('tabScore_' + gradedLevel + '_' + curStar + '_full', 1);
+            this.editStar('tabScore_' + gradedLevel + curStar + '_full', 1);
             curStar++;
             starScore += starPoints;
          }
-         this.editStar('tabScore_' + gradedLevel + '_' + curStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
+         this.editStar('tabScore_' + gradedLevel + curStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
-         $('#best_score').html(this.graderScore);
+         $('#bestScore').html(this.graderScore);
       }
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
          for (var curLevel in this.levelsNames) {
             if (curLevel == gradedLevel) break;
-            $('.tab_' + curLevel).removeClass('open_level').addClass('useless_level');
-            this.changeStarsColors(curLevel, 'special', this.starColors.useless, 'black');
-            this.changeStarsColors(curLevel, 'full', this.starColors.fullBeaten, 'black');
+            this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.useless);
+            this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.useless);
          }
          var unlockedLevel = this.levels.indexOf(gradedLevel) + 1;
          if (unlockedLevel < this.levels.length && unlockedLevel >= this.unlockedLevels) {
-            $('.tab_' + this.levels[unlockedLevel]).removeClass('locked_level').addClass('open_level');
+            var curLevel = this.levels[unlockedLevel];
+            $('#tab_' + curLevel).removeClass('lockedLevel');
+            this.changeStarsColors(curLevel, 'empty', this.starColors.empty, 'black');
             this.unlockedLevels++;
          }
       }
@@ -415,15 +417,15 @@ var displayHelper = {
    },
 
    getFullFeedbackSavedMessage: function(taskMode) {
-      var scoreDiffMsg = "Score ";
-      var showretrieveAnswer = false;
+      var scoreDiffMsg = "Score";
+      var showRetrieveAnswer = false;
       if ((this.submittedAnswer !== '') && (this.prevSavedScore !== undefined)) {
          if (!this.hasSolution) {
             if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = "Votre score est maintenant";
             } else if (this.prevSavedScore > this.submittedScore) { 
                scoreDiffMsg = "C'est moins bien qu'avant ; votre score reste";
-               showretrieveAnswer = true;
+               showRetrieveAnswer = true;
             }
             else {
                scoreDiffMsg = "Votre score reste le même";
@@ -440,21 +442,20 @@ var displayHelper = {
             }
          }
       }
-      scoreDiffMsg += " : " + this.graderScore + " sur " + this.taskParams.maxScore + ".";
+      scoreDiffMsg += " : " + this.graderScore + " sur " + this.taskParams.maxScore + ".";
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
-         ((this.graderScore > 0) && ((taskMode == "saved_changed") || showretrieveAnswer))) {
-          scoreDiffMsg += " <a href=\"#\" onclick='displayHelper.retrieveAnswer(); return false;'>Rechargez la réponse validée.</a>";
+         ((this.graderScore > 0) && ((taskMode == 'saved_changed') || showRetrieveAnswer))) {
+          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez la réponse validée.</a>';
       }
       return scoreDiffMsg;
    },
-
    getFullFeedbackWithLevelsSavedMessage: function(taskMode) {
       var maxScoreLevel = this.levelsMaxScores[this.taskLevel];
-      var showretrieveAnswer = false;
+      var showRetrieveAnswer = false;
       var message = "";
-      if (this.submittedAnswer === "") {
+      if (this.submittedAnswer === '') {
          if (this.levelsScores[this.taskLevel] > 0) {
-            showretrieveAnswer = true;
+            showRetrieveAnswer = true;
          } else {
             message += "Vous n'avez pas encore obtenu de points sur cette version.";
          }
@@ -463,11 +464,11 @@ var displayHelper = {
          if (this.submittedScore > 1) {
             plural = "s";
          }
-         message = "Score de votre réponse : " + this.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
+         message = "Score obtenu : " + this.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
          if (this.hasSolution) {
             message += "Le concours est terminé : votre réponse n'est pas enregistrée.";
             if (this.prevSavedScore !== undefined) {
-               showretrieveAnswer = true;
+               showRetrieveAnswer = true;
             }
          } else {
             var prevScore = this.prevLevelsScores[this.taskLevel];
@@ -482,7 +483,7 @@ var displayHelper = {
                   }
                } else if (this.submittedScore < prevScore) { 
                   message += "Vous aviez fait mieux avant.";
-                  showretrieveAnswer = true;
+                  showRetrieveAnswer = true;
                }
                else {
                   message += "Votre score reste le même.";
@@ -490,13 +491,11 @@ var displayHelper = {
             }
          }
       }
-      if (showretrieveAnswer) {
-         message += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' + 
-            "Rechargez votre meilleure réponse.</a>";
+      if (showRetrieveAnswer) {
+         message += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez votre meilleure réponse.</a>';
       }
       return message;
    },
-
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
       switch (taskMode) {
          case 'saved_unchanged':
@@ -648,11 +647,13 @@ var displayHelper = {
    starColors: {
       empty: 'white',
       full: '#ffc90e',
-      fullBeaten: '#ff6008',
+      emptyUseless: '#ced',
+      fullUseless: '#fba',
       locked: '#bbb',
-      useless: '#22a'
+      useless: '#666'
    },
    putStar: function(parent, displayWidth, fillColor, strokeColor) {
+      if (!this.pointsAsStars) return;
       if (fillColor === undefined) fillColor = this.starColors.empty;
       if (strokeColor === undefined) strokeColor = 'black';
       var scaleFactor = displayWidth / 100;
@@ -673,27 +674,27 @@ var displayHelper = {
       parentElement.starCanvas = starCanvas;
    },
    setStars: function(parents, starWidth) {
+      if (!this.pointsAsStars) return;
       if (starWidth === undefined) starWidth = 18;
       for (var curParent in parents) {
          var parentId = parents[curParent];
          $('#' + parentId).html(
-            '<span id="' + parentId + '_special" class="special_star"></span>' +
-            '<span id="' + parentId + '_empty" class="empty_star"></span>' +
-            '<span id="' + parentId + '_full" class="full_star"></span>');
-         this.putStar(parentId + '_special', starWidth, this.starColors.locked, this.starColors.locked);
+            '<span id="' + parentId + '_empty" class="emptyStar"></span>' +
+            '<span id="' + parentId + '_full" class="fullStar hiddenStar"></span>');
          this.putStar(parentId + '_empty', starWidth);
          this.putStar(parentId + '_full', starWidth, this.starColors.full);
       }
    },
    editStar: function(parent, clipWidth, fillColor, strokeColor) {
+      if (!this.pointsAsStars) return;
       var parentElement = document.getElementById(parent);
       var starCanvas = parentElement.starCanvas;
       if (clipWidth !== undefined) {
          if (clipWidth == 0) {
-            $('#' + parent).removeClass('shown_star');
+            $('#' + parent).addClass('hiddenStar');
          } else {
             starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
-            $('#' + parent).addClass('shown_star');
+            $('#' + parent).removeClass('hiddenStar');
          }
       }
       if (fillColor !== undefined) {
@@ -708,11 +709,12 @@ var displayHelper = {
       }
    },
    changeStarsColors: function(level, suffix, fillColor, strokeColor) {
+      if (!this.pointsAsStars) return;
       var maxScores = this.levelsMaxScores;
       var starPoints = maxScores.hard / 4;
       var curStar = 0;
       for (var curScore = 0; curScore < maxScores[level]; curScore += starPoints) {
-         this.editStar('tabScore_' + level + '_' + curStar + '_' + suffix, undefined, fillColor, strokeColor);
+         this.editStar('tabScore_' + level + curStar + '_' + suffix, undefined, fillColor, strokeColor);
          curStar++;
       }
    }

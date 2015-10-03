@@ -22,7 +22,7 @@ a {
    text-decoration: none;
 }
 
-button, input[type=button] {
+button, input[type="button"] {
    font-size: 16px;
 }
 
@@ -74,7 +74,7 @@ button, input[type=button] {
    border-bottom: 0;
    text-align: center;
 }
-#tabsMenu li.locked_level {
+#tabsMenu li.lockedLevel {
    background: #666;
 }
 #tabsMenu li.current {
@@ -84,11 +84,12 @@ button, input[type=button] {
 }
 #tabsMenu li a {
    display: block;
-   padding: 4px;
+   padding: 8px;
    color: #000;
    text-decoration: none; 
+   font-size: 1.1em;
 }
-#tabsMenu li.locked_level a {
+#tabsMenu li.lockedLevel a {
    color: #bbb;
 }
 #tabsMenu li a:focus {
@@ -97,39 +98,32 @@ button, input[type=button] {
 #tabsMenu li:not(.current) a:active {
    background: #c8c8d8;
 }
-#tabsMenu li.locked_level a:active {
-   background: #7c6862;
-}
-#tabsMenu.stars li a {
-   padding: 8px;
-   font-size: 1.1em;
+#tabsMenu li.lockedLevel a:active {
+   background: #746c66;
 }
 
-.star_container {
+.starContainer {
    position: relative;
    display: inline-block;
    width: 18px;
    height: 18px;
    vertical-align: middle;
 }
-.star_container > span {
+.starContainer > span {
    position: absolute;
    left: 0;
+}
+span.hiddenStar {
    visibility: hidden;
 }
-.locked_level span.special_star,
-.useless_level span.special_star,
-.open_level span.empty_star,
-span.full_star.shown_star {
-   visibility: visible;
-}
-span.full_star {
+span.fullStar {
    z-index: 1;
 }
 
-.best_score {
+.bestScore {
    float: right; 
-   text-align: center;
+}
+#bestScore {
    font-weight: bold;
 }
 
