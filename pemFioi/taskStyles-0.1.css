@@ -23,6 +23,7 @@ a {
 }
 
 button, input[type="button"] {
+   line-height: 1.2;
    font-size: 16px;
 }
 

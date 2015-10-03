@@ -262,11 +262,12 @@ var displayHelper = {
                   that.prevLevelsScores[that.taskLevel] = that.levelsScores[that.taskLevel];
                }
             }
-            that.submittedAnswer = answer;
+            var strAnswer = JSON.stringify(answer);
+            that.submittedAnswer = strAnswer;
             if (that.showScore) {
                that.updateScore(answer, false);
             } else {
-               that.savedAnswer = answer;
+               that.savedAnswer = strAnswer;
             }
             that.refreshMessages = true;
             that.checkAnswerChanged();
@@ -367,7 +368,9 @@ var displayHelper = {
          if (curAnswer != that.prevAnswer) {
             try {
                if (self != top && parent.Tracker) {
-                  var data = {dataType: "nonSavedAnswer", teamID: parent.teamID, questionKey: parent.currentQuestionKey, answer: curAnswer};
+                  var data = {
+                     dataType: 'nonSavedAnswer', teamID: parent.teamID, questionKey: parent.currentQuestionKey, answer: curAnswer
+                  };
                   // call TrackData, only when loaded in an iframe
                   // this is not yet document in the API, but should be soonish
                   parent.Tracker.trackData(data);
@@ -376,10 +379,10 @@ var displayHelper = {
             that.prevAnswer = curAnswer;
          }
          if (curAnswer != that.submittedAnswer) {
-            that.submittedAnswer = "";
+            that.submittedAnswer = '';
             that.refreshMessages = true;
          }
-         if ((curAnswer == that.defaultAnswer) && (that.savedAnswer === '')) {
+         if (curAnswer == that.defaultAnswer && that.savedAnswer === '') {
             callback(false);
          } else {
             callback(curAnswer != that.submittedAnswer);
@@ -419,7 +422,7 @@ var displayHelper = {
    getFullFeedbackSavedMessage: function(taskMode) {
       var scoreDiffMsg = "Score";
       var showRetrieveAnswer = false;
-      if ((this.submittedAnswer !== '') && (this.prevSavedScore !== undefined)) {
+      if (this.submittedAnswer !== '' && this.prevSavedScore !== undefined) {
          if (!this.hasSolution) {
             if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = "Votre score est maintenant";
@@ -444,7 +447,7 @@ var displayHelper = {
       }
       scoreDiffMsg += " : " + this.graderScore + " sur " + this.taskParams.maxScore + ".";
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
-         ((this.graderScore > 0) && ((taskMode == 'saved_changed') || showRetrieveAnswer))) {
+          (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
           scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez la réponse validée.</a>';
       }
       return scoreDiffMsg;
@@ -510,7 +513,8 @@ var displayHelper = {
                   return '<br/><span style="display: inline-block; margin-bottom: .2em; font-weight: bold; color: ' + color + '">' +
                      this.graderMessage + '</span>';
                } else if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' +
+                     disabledStr + '/>';
                }
             }
             break;
@@ -518,18 +522,22 @@ var displayHelper = {
          case 'unsaved_changed':
             if (!this.hideValidateButton) {
                if (this.hasSolution) {
-                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' + disabledStr + "/>";
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' +
+                     disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' + disabledStr+"/>";
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' +
+                     disabledStr + '/>';
                }
             }
             break;
          case 'saved_changed':
             if (!this.hideValidateButton) {
                if (this.hasSolution) {
-                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' + disabledStr + '/>';
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' +
+                     disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
+                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\')" ' +
+                     disabledStr + '/>';
                }
             }
             break;
