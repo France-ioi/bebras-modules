@@ -81,7 +81,7 @@ button, input[type="button"] {
 #tabsMenu li.current {
    margin-bottom: -2px;
    padding-bottom: 2px;
-   background: #fff;
+   background: white;
 }
 #tabsMenu li a {
    display: block;
@@ -121,11 +121,41 @@ span.fullStar {
    z-index: 1;
 }
 
+#tabsContainer {
+   position: relative;
+}
 .bestScore {
-   float: right; 
+   position: absolute;
+   right: 0;
+   top: .3em;
+   font-size: 1.2em;
 }
 #bestScore {
    font-weight: bold;
+}
+
+#tabMessage {
+   margin: .5em 0;
+   overflow: auto;
+}
+#tabMessage.floatingMessage {
+   padding: .5em;
+   border: 1px solid black;
+}
+#tabMessage img {
+   float: left;
+   margin-right: .4em;
+   max-width: 60px;
+}
+#tabMessage span {
+   float: left;
+   margin-top: -4px;
+   margin-right: .2em;
+   font-size: 3em;
+}
+#tabMessage button {
+   display: block;
+   margin-top: .5em;
 }
 
 .easy, .medium, .hard {

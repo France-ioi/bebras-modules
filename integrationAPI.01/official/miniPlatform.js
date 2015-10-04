@@ -1,4 +1,3 @@
-(function() {
 'use strict';
 
 /* 
@@ -12,7 +11,7 @@
  *   - task.getMetaData(), as documented in the PEM
  */
 
-function inIframe () {
+function inIframe() {
    try {
       return window.self !== window.top;
    } catch (e) {
@@ -25,7 +24,7 @@ var taskMetaData;
 // important for tracker.js
 var compiledTask = true;
 
-var miniPlatformShowSolution = function() {
+function miniPlatformShowSolution() {
    $("#toremove").hide();
    task.getAnswer(function(answer) {
       task.showViews({"task": true, "solution": true}, function() {
@@ -33,9 +32,9 @@ var miniPlatformShowSolution = function() {
          platform.trigger('showViews', [{"task": true, "solution": true}]);
       });
    });
-};
+}
 
-var miniPlatformPreviewGrade = function(answer) {
+function miniPlatformPreviewGrade(answer) {
    var minScore = -3;
    if (taskMetaData.fullFeedback) {
       minScore = 0;
@@ -63,11 +62,11 @@ var miniPlatformPreviewGrade = function(answer) {
    } else {
       score = grader.gradeTask(answer, null, showGrade);
    }
-};
+}
 
 var alreadyStayed = false;
 
-var miniPlatformValidate = function(mode) {
+function miniPlatformValidate(mode) {
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);
@@ -83,7 +82,7 @@ var miniPlatformValidate = function(mode) {
       $("#task").append("<center id='toremove'><br/><input type='button' value='Voir la solution' onclick='miniPlatformShowSolution()'></input></center>");
    }
    platform.trigger('validate', [mode]);
-};
+}
 
 function getUrlParameter(sParam)
 {
@@ -193,5 +192,3 @@ $(document).ready(function() {
       setTimeout(getMetaDataAndLoad, 0);
    }
 });
-
-})();
