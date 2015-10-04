@@ -63,7 +63,7 @@ var displayHelper = {
       var taskParams = platform.getTaskParams();
 
       this.hasLevels = true;
-      this.pointsAsStars = true;
+      this.pointsAsStars = false;
       if (taskParams.pointsAsStars !== undefined) {
          this.pointsAsStars = taskParams.pointsAsStars;
       }
@@ -168,7 +168,7 @@ var displayHelper = {
       task.reloadAnswerObject(answer);
 
       this.taskLevel = newLevel;
-      this.validate('stay');
+      //this.validate('stay');
       this.stopShowingResult();
    },
 
@@ -262,12 +262,11 @@ var displayHelper = {
                   that.prevLevelsScores[that.taskLevel] = that.levelsScores[that.taskLevel];
                }
             }
-            var strAnswer = JSON.stringify(answer);
-            that.submittedAnswer = strAnswer;
+            that.submittedAnswer = answer;
             if (that.showScore) {
                that.updateScore(answer, false);
             } else {
-               that.savedAnswer = strAnswer;
+               that.savedAnswer = answer;
             }
             that.refreshMessages = true;
             that.checkAnswerChanged();
@@ -338,7 +337,7 @@ var displayHelper = {
          if (message !== undefined) {
             that.graderMessage = message;
          } else {
-            that.graderMessage = '';
+            that.graderMessage = "";
          }
          if (that.hasLevels) {
             that.updateScoreDisplays(gradedLevel);
@@ -402,16 +401,12 @@ var displayHelper = {
          if (that.submittedAnswer !== '') {
             that.refreshMessages = true;
          }
-         if (hasNonSavedAnswer) {
-            if (!that.hasAnswerChanged) {
-               that.refreshMessages = true;
-               that.hasAnswerChanged = true;
-            }
-         } else {
-            if (that.hasAnswerChanged) {
-               that.refreshMessages = true;
-               that.hasAnswerChanged = false;
-            }
+         if (hasNonSavedAnswer && !that.hasAnswerChanged) {
+            that.refreshMessages = true;
+            that.hasAnswerChanged = true;
+         } else if (!hasNonSavedAnswer && that.hasAnswerChanged) {
+            that.refreshMessages = true;
+            that.hasAnswerChanged = false;
          }
          if (that.refreshMessages) {
             that.updateMessages();
@@ -456,7 +451,18 @@ var displayHelper = {
       var maxScoreLevel = this.levelsMaxScores[this.taskLevel];
       var showRetrieveAnswer = false;
       var message = "";
-      if (this.submittedAnswer === '') {
+      var curAnswer = this.submittedAnswer;
+      var answerExists = false;
+      if (curAnswer != '') {
+         if (typeof curAnswer == 'string') {
+            curAnswer = JSON.parse(curAnswer);
+         }
+         for (var key in curAnswer[this.taskLevel]) {
+            answerExists = true;
+            break;
+         }
+      }
+      if (!answerExists) {
          if (this.levelsScores[this.taskLevel] > 0) {
             showRetrieveAnswer = true;
          } else {
@@ -502,18 +508,18 @@ var displayHelper = {
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
       switch (taskMode) {
          case 'saved_unchanged':
-            var color = "red";
+            var color = 'red';
             if (this.submittedScore == this.taskParams.maxScore) {
-               color = "green";
+               color = 'green';
             } else if (this.submittedScore > 0) {
-               color = "#FF8C00";
+               color = '#ff8c00';
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<br/><span style="display: inline-block; margin-bottom: .2em; font-weight: bold; color: ' + color + '">' +
-                     this.graderMessage + '</span>';
+                  return '<br/><span style="display: inline-block; margin-bottom: .2em; color: ' +
+                     color + '; font-weight: bold;">' + this.graderMessage + '</span>';
                } else if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' +
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\');" ' +
                      disabledStr + '/>';
                }
             }
@@ -522,10 +528,10 @@ var displayHelper = {
          case 'unsaved_changed':
             if (!this.hideValidateButton) {
                if (this.hasSolution) {
-                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' +
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\')" ' +
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\');" ' +
                      disabledStr + '/>';
                }
             }
@@ -533,10 +539,10 @@ var displayHelper = {
          case 'saved_changed':
             if (!this.hideValidateButton) {
                if (this.hasSolution) {
-                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\')" ' +
+                  return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\')" ' +
+                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\');" ' +
                      disabledStr + '/>';
                }
             }
