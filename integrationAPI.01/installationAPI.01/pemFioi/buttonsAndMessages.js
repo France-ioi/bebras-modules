@@ -28,6 +28,7 @@ var displayHelper = {
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 3,
+   neverHadHard: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -82,6 +83,10 @@ var displayHelper = {
       }
       if (taskParams.unlockedLevels !== undefined) {
          this.unlockedLevels = taskParams.unlockedLevels;
+      }
+      this.neverHadHard = true; // TODO: remove (set for testing)
+      if (taskParams.neverHadHard !== undefined) {
+         this.neverHadHard = taskParams.neverHadHard;
       }
 
       var maxScore = 40;
@@ -145,8 +150,7 @@ var displayHelper = {
       if (this.taskLevel == newLevel) {
          return;
       }
-      var levelNum = this.levels.indexOf(newLevel);
-      if (levelNum >= this.unlockedLevels) {
+      if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
          this.showTabMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
          return;
       }
@@ -167,18 +171,32 @@ var displayHelper = {
       this.taskLevel = newLevel;
       this.validate('stay');
       this.stopShowingResult();
+
+      if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
+         this.showTabMessage("Vous avez déjà résolu une version plus difficile ; " +
+            "résoudre celle-ci ne vous rapportera pas de point. Poursuivez donc avec d'autres questions !", true,
+            "Je veux quand même voir cette question");
+      } else if (newLevel == 'hard' && this.neverHadHard) {
+         this.showTabMessage("Résoudre une version difficile peut vous prendre beaucoup de temps ; " +
+            "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
+            "J'y prendrai garde");
+         this.neverHadHard = false;
+      }
    },
-   showTabMessage: function(message, fullTab) {
+   showTabMessage: function(message, fullTab, buttonText) {
       if (fullTab) {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#tabMessage').removeClass('floatingMessage');
       } else {
          $('#tabMessage').addClass('floatingMessage');
       }
+      if (!buttonText) {
+         buttonText = "D'accord !";
+      }
       $('#tabMessage').html('<img src="http://concours.castor-informatique.fr/images/castor_small.png"/>' +
          '<span>{</span>' + message + '<br/>' +
-         '<button onclick="$(\'#tabMessage\').hide(); $(\'#displayHelperAnswering\').hide(); $(\'#taskContent\').show();">' +
-         "D'accord !</button>").show();
+         '<button onclick="$(\'#tabMessage\').hide(); $(\'#displayHelperAnswering, #taskContent\').show();">' + buttonText +
+         '</button>').show();
    },
 
    // Function to call at the beginning of task loading, before any html has
@@ -268,18 +286,18 @@ var displayHelper = {
             that.checkAnswerChanged();
          });
       } else {
-         task.getAnswer(function(answer) {
+         task.getAnswer(function(strAnswer) {
             if (!that.hasSolution) {
                that.prevSavedScore = that.graderScore;
                if (that.hasLevels) {
                   that.prevLevelsScores[that.taskLevel] = that.levelsScores[that.taskLevel];
                }
             }
-            that.submittedAnswer = answer;
+            that.submittedAnswer = strAnswer;
             if (that.showScore) {
-               that.updateScore(answer, false);
+               that.updateScore(strAnswer, false);
             } else {
-               that.savedAnswer = answer;
+               that.savedAnswer = strAnswer;
             }
             that.refreshMessages = true;
             that.checkAnswerChanged();
@@ -357,6 +375,7 @@ var displayHelper = {
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
          for (var curLevel in this.levelsNames) {
             if (curLevel == gradedLevel) break;
+            $('#tab_' + curLevel).addClass('uselessLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.useless);
             this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.useless);
          }
@@ -467,9 +486,7 @@ var displayHelper = {
       var curAnswer = this.submittedAnswer;
       var answerExists = false;
       if (curAnswer != '') {
-         if (typeof curAnswer == 'string') {
-            curAnswer = JSON.parse(curAnswer);
-         }
+         curAnswer = $.parseJSON(curAnswer);
          answerExists = !$.isEmptyObject(curAnswer);
       }
       if (!answerExists) {
