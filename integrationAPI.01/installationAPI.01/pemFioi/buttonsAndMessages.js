@@ -24,11 +24,12 @@ var displayHelper = {
    refreshMessages: true,
    stoppedShowingResult: false,
    previousMessages: {},
+   tabMessageShown: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 3,
-   neverHadHard: false,
+   neverHadHard: true, // TODO: false as default
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -84,7 +85,6 @@ var displayHelper = {
       if (taskParams.unlockedLevels !== undefined) {
          this.unlockedLevels = taskParams.unlockedLevels;
       }
-      this.neverHadHard = true; // TODO: remove (set for testing)
       if (taskParams.neverHadHard !== undefined) {
          this.neverHadHard = taskParams.neverHadHard;
       }
@@ -149,6 +149,10 @@ var displayHelper = {
    setLevel: function(newLevel) {
       if (this.taskLevel == newLevel) {
          return;
+      } else if (this.tabMessageShown) {
+         $('#tabMessage').hide();
+         $('#displayHelperAnswering, #taskContent').show();
+         this.tabMessageShown = false;
       }
       if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
          this.showTabMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
@@ -175,15 +179,17 @@ var displayHelper = {
       if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
          this.showTabMessage("Vous avez déjà résolu une version plus difficile ; " +
             "résoudre celle-ci ne vous rapportera pas de point. Poursuivez donc avec d'autres questions !", true,
-            "Je veux quand même voir cette question");
+            "Je veux quand même voir cette version");
       } else if (newLevel == 'hard' && this.neverHadHard) {
-         this.showTabMessage("Résoudre une version difficile peut vous prendre beaucoup de temps ; " +
+         this.showTabMessage("Résoudre une version à 4 étoiles peut vous prendre beaucoup de temps ; " +
             "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
-            "J'y prendrai garde");
-         this.neverHadHard = false;
+            "J'y prendrai garde", function() {
+               displayHelper.neverHadHard = false;
+            }
+         );
       }
    },
-   showTabMessage: function(message, fullTab, buttonText) {
+   showTabMessage: function(message, fullTab, buttonText, agreeFunc) {
       if (fullTab) {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#tabMessage').removeClass('floatingMessage');
@@ -194,9 +200,16 @@ var displayHelper = {
          buttonText = "D'accord !";
       }
       $('#tabMessage').html('<img src="http://concours.castor-informatique.fr/images/castor_small.png"/>' +
-         '<span>{</span>' + message + '<br/>' +
-         '<button onclick="$(\'#tabMessage\').hide(); $(\'#displayHelperAnswering, #taskContent\').show();">' + buttonText +
-         '</button>').show();
+         '<span>{</span>' + message + '<br/><button>' + buttonText + '</button>').show();
+      $('#tabMessage button').click(function() {
+         $('#tabMessage').hide();
+         $('#displayHelperAnswering, #taskContent').show();
+         displayHelper.tabMessageShown = false;
+         if (agreeFunc) {
+            agreeFunc();
+         }
+      });
+      this.tabMessageShown = true;
    },
 
    // Function to call at the beginning of task loading, before any html has
