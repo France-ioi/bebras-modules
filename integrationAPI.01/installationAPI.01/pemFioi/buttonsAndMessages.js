@@ -312,9 +312,9 @@ var displayHelper = {
             that.checkAnswerChanged();
          });
       } else if (mode == 'stay') {
-         task.reloadAnswer('', function() {
-            that.checkAnswerChanged();
-         });
+         this.submittedScore = this.levelsScores[this.taskLevel];
+         this.refreshMessages = true;
+         this.checkAnswerChanged();
       } else {
          task.getAnswer(function(strAnswer) {
             if (!that.hasSolution) {
@@ -470,7 +470,7 @@ var displayHelper = {
    },
 
    // Checks task.getAnswer() against previously recorded result, and calls
-   // displayHelper.displayMessage() accordingly.
+   // displayHelper.updateMessages() accordingly.
    checkAnswerChanged: function() {
       if (!this.loaded) {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
