@@ -135,27 +135,23 @@ span.fullStar {
 }
 
 #tabMessage {
+   display: none;
    margin: .5em 0;
-   overflow: auto;
 }
 #tabMessage.floatingMessage {
-   padding: .5em;
-   border: 1px solid black;
+   padding-bottom: .5em;
+   border-bottom: 1px solid black;
 }
-#tabMessage img {
-   float: left;
-   margin-right: .4em;
-   max-width: 60px;
-}
-#tabMessage span {
-   float: left;
-   margin-top: -4px;
-   margin-right: .2em;
-   font-size: 3em;
+#tabMessage > div {
+   padding: 12px 10px 12px 115px;
+   width: 475px;
+   height: 76px;
+   background: url('../img/castor-bulle.png') no-repeat;
 }
 #tabMessage button {
    display: block;
    margin-top: .5em;
+   margin-left: 150px;
 }
 
 .easy, .medium, .hard {

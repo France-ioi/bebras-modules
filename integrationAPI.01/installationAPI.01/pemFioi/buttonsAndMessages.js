@@ -28,8 +28,8 @@ var displayHelper = {
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
-   unlockedLevels: 3,
-   neverHadHard: false,
+   unlockedLevels: 2,
+   neverHadHard: true,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -216,8 +216,7 @@ var displayHelper = {
       if (!buttonText) {
          buttonText = "D'accord !";
       }
-      $('#tabMessage').html('<img src="http://concours.castor-informatique.fr/images/castor_small.png"/>' +
-         '<span>{</span>' + message + '<br/><button>' + buttonText + '</button>').show();
+      $('#tabMessage').html('<div>' + message + '</div><button>' + buttonText + '</button>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
