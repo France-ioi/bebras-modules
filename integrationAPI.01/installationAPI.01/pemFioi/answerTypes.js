@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 /* 
  *
  * This file contains the code needed for tasks using only simple answer
@@ -21,13 +21,13 @@
 
 var stdAnsTypes = {
    strings : { // TODO: translations !
-      "value_not_integer": "Attention : la valeur saisie n'est pas un entier",
-      "cancel_saved_answer": "Annuler la réponse enregistrée",
-      "answer_saved": "Votre réponse a été enregistrée"
+      'value_not_integer': "Attention : la valeur saisie n'est pas un entier",
+      'cancel_saved_answer': "Annuler la réponse enregistrée",
+      'answer_saved': "Votre réponse a été enregistrée"
    },
    randomSeed: 0,
    currentAnswer: null,
-   answersSelector: "#answers",
+   answersSelector: '#answers',
    lastSentHeight: null,
    updateHeight: function(height) {
       if (stdAnsTypes.lastSentHeight != height) {
@@ -39,11 +39,11 @@ var stdAnsTypes = {
    /* When an aswer is selected, style modifications only */
    highlightAnswer: function(answer) {
       for (var choice = 1; choice <= 10; choice++) { // TODO: real value !
-         $("#choice_" + choice + " .sat-choiceArea").removeClass("sat-choiceArea-selected");
-         $("#answerButton_" + choice).removeClass("sat-button-selected");
+         $('#choice_' + choice + ' .sat-choiceArea').removeClass('sat-choiceArea-selected');
+         $('#answerButton_' + choice).removeClass('sat-button-selected');
       }
-      $("#answerButton_" + answer).addClass("sat-button-selected");
-      $("#choice_" + answer + " .sat-choiceArea").addClass("sat-choiceArea-selected");
+      $('#answerButton_' + answer).addClass('sat-button-selected');
+      $('#choice_' + answer + ' .sat-choiceArea').addClass('sat-choiceArea-selected');
    },
    
    choiceButton: function(iButton, iChoice, buttonValue) {
@@ -51,24 +51,24 @@ var stdAnsTypes = {
       if (buttonValue === undefined) {
          buttonValue = choicesNames[iButton];
       }
-      return "<ul class='sat-ul-button'><li class='sat-button' id='answerButton_" + (iChoice + 1) + "'>" +
-         "<input class='answerButton' type='button' value='" + buttonValue + "' " +
-            "onclick=\"stdAnsTypes.selectAnswer(" + (iChoice + 1) + ")\" /></li></ul>";
+      return '<ul class="sat-ul-button"><li class="sat-button" id="answerButton_' + (iChoice + 1) + '">' +
+         '<input class="answerButton" type="button" value="' + buttonValue + '" ' +
+            'onclick="stdAnsTypes.selectAnswer(\'' + (iChoice + 1) + '\')" /></li></ul>';
    },
    
    choiceCheckbox: function(iChoice, name) {
-      var id = "answerCheckbox_" + (iChoice + 1);
-      return "<label><input type='checkbox' id='" + id + "' onclick='if (typeof Tracker !== \"undefined\") {Tracker.trackCheckbox(\"" + id + "\");}'/>" + name + '</label>';
+      var id = 'answerCheckbox_' + (iChoice + 1);
+      return '<label><input type="checkbox" id="' + id + '" onclick="if (typeof Tracker !== \'undefined\') {Tracker.trackCheckbox(\'' + id + '\');}"/>' + name + '</label>';
    },
    
    getAnswerCheckboxes: function(nbChoices) {
-      var answer = "";
+      var answer = '';
       for (var iChoice = 0; iChoice < nbChoices; iChoice++) {
-         var id = "answerCheckbox_" + (iChoice + 1);
-         if ($("#" + id).is(':checked')) {
-            answer += "1";
+         var id = 'answerCheckbox_' + (iChoice + 1);
+         if ($('#' + id).is(':checked')) {
+            answer += '1';
          } else {
-            answer += "0";
+            answer += '0';
          }
       }
       return answer;
@@ -76,15 +76,15 @@ var stdAnsTypes = {
    
    selectCheckboxes: function(answer) {
       var iChoice = 0;
-      while(true) {
-         var id = "answerCheckbox_" + (iChoice + 1);
-         if ($("#" + id).length === 0) {
+      while (true) {
+         var id = 'answerCheckbox_' + (iChoice + 1);
+         if ($('#' + id).length === 0) {
             break;
          }
-         $("#" + id).attr('checked', false);
+         $('#' + id).attr('checked', false);
          if (answer.length > iChoice) {
-            if (answer.charAt(iChoice) === "1") {
-               $("#" + id).attr('checked', true);
+            if (answer.charAt(iChoice) === '1') {
+               $('#' + id).attr('checked', true);
             }
          }
          iChoice++;
@@ -103,56 +103,56 @@ var stdAnsTypes = {
 
    loadTaskMultipleChoices: function(nbColumns, choices, asButtonValues, answersSelector, preventShuffle) {
       this.answersSelector = answersSelector;
-      if (asButtonValues != "checkboxes") {
+      if (asButtonValues != 'checkboxes') {
          displayHelper.hideValidateButton = true;
       }
       var oneColumn = (nbColumns == 1);
       var oneRow = (nbColumns == choices.length);
-      var mainTableClasses = "sat-table";
-      if (!oneColumn && (asButtonValues != "checkboxes")) {
-         mainTableClasses += " sat-table-center";
+      var mainTableClasses = 'sat-table';
+      if (!oneColumn && (asButtonValues != 'checkboxes')) {
+         mainTableClasses += ' sat-table-center';
       }
-      var html= "<center><table class='" + mainTableClasses + "'>";
+      var html= '<center><table class="' + mainTableClasses + '">';
       var shuffledOrder = stdAnsTypes.getShuffledChoicesOrder(choices.length, preventShuffle);
       for (var iChoice = 0; iChoice < choices.length; iChoice++) {
          var posChoice = shuffledOrder[iChoice];
          var buttonValue = undefined;
-         if (asButtonValues == "asButtons") {
+         if (asButtonValues == 'asButtons') {
             buttonValue = choices[posChoice];
          }
          if (iChoice % nbColumns === 0) {
-            html += "<tr>";
+            html += '<tr>';
          }
-         if (oneColumn || (asButtonValues == "checkboxes")) {
-            html += "<td>";
+         if (oneColumn || (asButtonValues == 'checkboxes')) {
+            html += '<td>';
          } else {
-            html += "<td id='choice_" + (posChoice + 1) + "'><center>";
+            html += '<td id="choice_' + (posChoice + 1) + '"><center>';
          }
-         if (asButtonValues == "checkboxes") {
+         if (asButtonValues == 'checkboxes') {
             html += stdAnsTypes.choiceCheckbox(posChoice, choices[posChoice]);
          } else {
             html += stdAnsTypes.choiceButton(iChoice, posChoice, buttonValue);
             if (oneColumn) {
-               html += "</td><td id='choice_" + (posChoice + 1) + "'>";
+               html += '</td><td id="choice_' + (posChoice + 1) + '">';
             }
-            if (asButtonValues !== "asButtons") {
+            if (asButtonValues !== 'asButtons') {
                if (!oneColumn) {
-                  html += "<br/>";
+                  html += '<br/>';
                }
-               html += "<div class='sat-choiceArea'>" + choices[posChoice] + "</div>";
+               html += '<div class="sat-choiceArea">' + choices[posChoice] + '</div>';
             }
          }
-         if (oneColumn || (asButtonValues == "checkboxes")) {
-            html += "</td>";
+         if (oneColumn || (asButtonValues == 'checkboxes')) {
+            html += '</td>';
          } else {
-            html += "</center></td>";
+            html += '</center></td>';
          }
          if (iChoice % nbColumns === nbColumns - 1) {
-            html += "</tr>";
+            html += '</tr>';
          }
       }
-      html += "</table></center>";
-      if (asButtonValues == "checkboxes") {
+      html += '</table></center>';
+      if (asButtonValues == 'checkboxes') {
          task.getAnswer = function(callback) {
             callback(stdAnsTypes.getAnswerCheckboxes(choices.length));
          };
@@ -189,10 +189,10 @@ var stdAnsTypes = {
          callback();
       };
       task.getAnswer = function(callback) {
-         callback($("#input_answer").val());
+         callback($('#input_answer').val());
       };
       task.reloadAnswer = function(strAnswer, callback) {
-         $("#input_answer").val(strAnswer);
+         $('#input_answer').val(strAnswer);
          stdAnsTypes.checkType();
          stdAnsTypes.showAnswerSelected(strAnswer);
          callback();
@@ -203,35 +203,35 @@ var stdAnsTypes = {
       num_rows = (typeof num_rows !== 'undefined' && num_rows > 0) ? num_rows : 1;
       this.answersSelector = answersSelector;
       stdAnsTypes.checkType = function() {
-         $("#error").html("");
+         $('#error').html('');
          // TODO: check float, string, and length
-         if (inputType === "integer") {
+         if (inputType === 'integer') {
             task.getAnswer(function(strAnswer) {
-               if ((strAnswer !== "") && (!stdAnsTypes.isInteger($.trim(strAnswer)))) {
-                  $("#error").html(stdAnsTypes.strings.value_not_integer);
+               if ((strAnswer !== '') && (!stdAnsTypes.isInteger($.trim(strAnswer)))) {
+                  $('#error').html(stdAnsTypes.strings.value_not_integer);
                }
             });
          }
       }
-      var html = "";
+      var html = '';
       if (num_rows == 1) {
-         html = "<center>Votre réponse : <input type='text' id='input_answer' style='text-align:center'/><div id='error'></div></center>";
+         html = '<center>Votre réponse : <input type="text" id="input_answer" style="text-align:center"/><div id="error"></div></center>';
       } else {
-         html = "<center><textarea id='input_answer' rows='"+num_rows+"' cols='80' style='text-align:center'></textarea><div id='error'></div></center>";
+         html = '<center><textarea id="input_answer" rows="'+num_rows+'" cols="80" style="text-align:center"></textarea><div id="error"></div></center>';
       }
       $(this.answersSelector).html(html);
-      $("#input_answer").on("keyup", stdAnsTypes.checkType);
+      $('#input_answer').on('keyup', stdAnsTypes.checkType);
    },
    
    showAnswerSelected: function(answer) {
       stdAnsTypes.highlightAnswer(answer);
-      $("#input").val(answer);
-      if (answer === "") {
-         $("#divCancelAnswer").hide();
+      $('#input').val(answer);
+      if (answer === '') {
+         $('#divCancelAnswer').hide();
       } else {
-         $("#divCancelAnswer").show();
+         $('#divCancelAnswer').show();
          if (stdAnsTypes.isPreviewMode()) {
-            // TODO : should be done by load if mode == "solution"
+            // TODO : should be done by load if mode == 'solution'
             stdAnsTypes.loadSolutionChoices();
          }
       }
@@ -239,8 +239,8 @@ var stdAnsTypes = {
    
    loadSolutionChoices: function() {
       for (var iChoice = 0; iChoice < 10; iChoice++) {
-         $(".choice_" + (iChoice + 1))
-             .html($("#answerButton_" + (iChoice + 1) + " input").val());
+         $('.choice_' + (iChoice + 1))
+             .html($('#answerButton_' + (iChoice + 1) + ' input').val());
       }
    },
    

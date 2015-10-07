@@ -131,9 +131,9 @@ var displayHelper = {
       $('#tabsContainer').append(tabsHTML);
       this.setStars(starContainers);
 
-      for (var levelNum in this.levels) {
-         var curLevel = this.levels[levelNum];
-         if (levelNum >= this.unlockedLevels) {
+      for (var iLevel in this.levels) {
+         var curLevel = this.levels[iLevel];
+         if (iLevel >= this.unlockedLevels) {
             $('#tab_' + curLevel).addClass('lockedLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.locked, this.starColors.locked);
          }
@@ -417,8 +417,8 @@ var displayHelper = {
       if (scores[gradedLevel] == this.graderScore) {
          // Marks the level with most points
          var levelSelected = false;
-         for (var levelNum = this.levels.length - 1; levelNum >= 0; levelNum--) {
-            var curLevel = this.levels[levelNum];
+         for (var iLevel = this.levels.length - 1; iLevel >= 0; iLevel--) {
+            var curLevel = this.levels[iLevel];
             if (!levelSelected && scores[curLevel] == this.graderScore) {
                this.changeStarsColors(curLevel, 'full', this.starColors.full, 'black');
                levelSelected = true;
@@ -645,11 +645,7 @@ var displayHelper = {
          suffix = 'unchanged';
       }
       var taskMode = prefix + '_' + suffix;
-      var messages = {
-         validate: '',
-         cancel: '',
-         saved: ''
-      };
+      var messages = { validate: '', cancel: '', saved: '' };
       var disabledStr = this.readOnly ? 'disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
