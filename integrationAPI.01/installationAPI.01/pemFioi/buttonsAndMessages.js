@@ -29,7 +29,7 @@ var displayHelper = {
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 3,
-   neverHadHard: true, // TODO: false as default
+   neverHadHard: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -46,8 +46,9 @@ var displayHelper = {
       this.readOnly = (this.taskParams.readonly == true || this.taskParams.readOnly == 'true');
       this.graderScore = +this.taskParams.noScore;
       this.savedAnswer = '';
+
       var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
-      // place button placement at the end of html if they don't already exist
+      // Place button placement at the end of html if they don't already exist
       if ($('#displayHelper_validate').length === 0) {
          addTaskHtml += '<div id="displayHelper_validate"></div>';
       }
@@ -105,6 +106,7 @@ var displayHelper = {
          var scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
          $('#tabsContainer').append(scoreHTML);
       }
+
       var starContainers = [];
       var tabsHTML = '<ul id="tabsMenu">';
       for (var curLevel in this.levelsNames) {
@@ -128,20 +130,23 @@ var displayHelper = {
       tabsHTML += '</ul>';
       $('#tabsContainer').append(tabsHTML);
       this.setStars(starContainers);
-      var levelNum = 0;
-      for (var curLevel in this.levelsNames) {
+
+      for (var levelNum in this.levels) {
+         var curLevel = this.levels[levelNum];
          if (levelNum >= this.unlockedLevels) {
             $('#tab_' + curLevel).addClass('lockedLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.locked, this.starColors.locked);
          }
-         levelNum++;
       }
+
       $('#tabsContainer').after('<div id="tabMessage"></div>');
    },
 
+   // Deprecated: use directly levelsMaxScores instead
    getLevelsMaxScores: function() {
       return this.levelsMaxScores;
    },
+   // Deprecated: use directly levelsNames instead
    getLevelsNames: function() {
       return this.levelsNames;
    },
@@ -190,7 +195,9 @@ var displayHelper = {
                "peut vous en rapporter. Passez à la suite !", true, buttonText);
          }
       } else if (newLevel == 'hard' && this.neverHadHard) {
-         this.showTabMessage("Résoudre une version à 4 étoiles peut vous prendre beaucoup de temps ; " +
+         var versionName = this.levelsNames[newLevel];
+         if (this.pointsAsStars) versionName = "à 4 étoiles";
+         this.showTabMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
             "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
             "J'y prendrai garde", function() {
                displayHelper.neverHadHard = false;
@@ -205,6 +212,7 @@ var displayHelper = {
       } else {
          $('#tabMessage').addClass('floatingMessage');
       }
+
       if (!buttonText) {
          buttonText = "D'accord !";
       }
@@ -225,7 +233,7 @@ var displayHelper = {
    // been modified. It places the markers where the buttons will appear, if the
    // markers are not present already.
    showViews: function(views) {
-      // fix for an old version of firefox in which selection was stuck
+      // Fix for an old version of Firefox in which selection was stuck
       try {
          if (document.getSelection) {
             var selection = document.getSelection();
@@ -394,6 +402,7 @@ var displayHelper = {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
       }
+
       var gradedLevelNum = this.levels.indexOf(gradedLevel);
       // Possibly unlocking a level
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
@@ -414,7 +423,7 @@ var displayHelper = {
                this.changeStarsColors(curLevel, 'full', this.starColors.full, 'black');
                levelSelected = true;
             } else {
-               this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.useless);
+               this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.uselessBorder);
             }
          }
          // Marks levels that can't earn points as useless
@@ -422,13 +431,13 @@ var displayHelper = {
             if (maxScores[curLevel] > this.graderScore) {
                break;
             }
-            this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.useless);
+            this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.uselessBorder);
             $('#tab_' + curLevel).addClass('uselessLevel');
          }
       }
    },
 
-   // does task have unsaved answers?
+   // Does task have unsaved answers?
    hasNonSavedAnswer: function(callback) {
       if (!task) {
          return false;
@@ -460,7 +469,7 @@ var displayHelper = {
       });
    },
 
-   // checks task.getAnswer() against previously recorded result, and calls
+   // Checks task.getAnswer() against previously recorded result, and calls
    // displayHelper.displayMessage() accordingly.
    checkAnswerChanged: function() {
       if (!this.loaded) {
@@ -735,7 +744,7 @@ var displayHelper = {
       emptyUseless: '#ced',
       fullUseless: '#fba',
       locked: '#bbb',
-      useless: '#666'
+      uselessBorder: '#666'
    },
    setStars: function(parents, starWidth) {
       if (!this.pointsAsStars) return;
