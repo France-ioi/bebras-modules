@@ -177,9 +177,18 @@ var displayHelper = {
       this.stopShowingResult();
 
       if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
-         this.showTabMessage("Vous avez déjà résolu une version plus difficile ; " +
-            "résoudre celle-ci ne vous rapportera pas de point. Poursuivez donc avec d'autres questions !", true,
-            "Je veux quand même voir cette version");
+         var buttonText = "Je veux quand même voir cette version";
+         if (this.levelsScores[newLevel] == this.levelsMaxScores[newLevel]) {
+            if (newLevel == 'hard') {
+               this.showTabMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
+            } else {
+               this.showTabMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer à une autre question " +
+                  "ou essayer de résoudre une version plus difficile.", true, buttonText);
+            }
+         } else {
+            this.showTabMessage("Vous avez déjà au moins autant de points à la question que cette version " +
+               "peut vous en rapporter. Passez à la suite !", true, buttonText);
+         }
       } else if (newLevel == 'hard' && this.neverHadHard) {
          this.showTabMessage("Résoudre une version à 4 étoiles peut vous prendre beaucoup de temps ; " +
             "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
@@ -385,19 +394,36 @@ var displayHelper = {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
       }
+      var gradedLevelNum = this.levels.indexOf(gradedLevel);
+      // Possibly unlocking a level
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
-         for (var curLevel in this.levelsNames) {
-            if (curLevel == gradedLevel) break;
-            $('#tab_' + curLevel).addClass('uselessLevel');
-            this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.useless);
-            this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.useless);
-         }
-         var unlockedLevel = this.levels.indexOf(gradedLevel) + 1;
+         var unlockedLevel = gradedLevelNum + 1;
          if (unlockedLevel < this.levels.length && unlockedLevel >= this.unlockedLevels) {
             var curLevel = this.levels[unlockedLevel];
             $('#tab_' + curLevel).removeClass('lockedLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.empty, 'black');
             this.unlockedLevels++;
+         }
+      }
+      if (scores[gradedLevel] == this.graderScore) {
+         // Marks the level with most points
+         var levelSelected = false;
+         for (var levelNum = this.levels.length - 1; levelNum >= 0; levelNum--) {
+            var curLevel = this.levels[levelNum];
+            if (!levelSelected && scores[curLevel] == this.graderScore) {
+               this.changeStarsColors(curLevel, 'full', this.starColors.full, 'black');
+               levelSelected = true;
+            } else {
+               this.changeStarsColors(curLevel, 'full', this.starColors.fullUseless, this.starColors.useless);
+            }
+         }
+         // Marks levels that can't earn points as useless
+         for (var curLevel in this.levelsNames) {
+            if (maxScores[curLevel] > this.graderScore) {
+               break;
+            }
+            this.changeStarsColors(curLevel, 'empty', this.starColors.emptyUseless, this.starColors.useless);
+            $('#tab_' + curLevel).addClass('uselessLevel');
          }
       }
    },
