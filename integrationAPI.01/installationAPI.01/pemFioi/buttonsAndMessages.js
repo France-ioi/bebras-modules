@@ -127,7 +127,7 @@ var displayHelper = {
          }
          tabsHTML += '</a></li>';
       }
-      tabsHTML += '</ul>';
+      tabsHTML += '</ul><div></div>';
       $('#tabsContainer').append(tabsHTML);
       this.setStars(starContainers);
 
@@ -452,7 +452,7 @@ var displayHelper = {
                   var data = {
                      dataType: 'nonSavedAnswer', teamID: parent.teamID, questionKey: parent.currentQuestionKey, answer: curAnswer
                   };
-                  // call TrackData, only when loaded in an iframe
+                  // Call TrackData, only when loaded in an iframe
                   // this is not yet document in the API, but should be soonish
                   parent.Tracker.trackData(data);
                }
@@ -793,7 +793,7 @@ var displayHelper = {
       .attr({
          fill: fillColor,
          stroke: strokeColor,
-         'stroke-width': 5 * scaleFactor,
+         'stroke-width': 5 * scaleFactor
       }).transform('t3.2389 15.734');
       starPath.transform('s' + scaleFactor + ',' + scaleFactor + ',0,0');
 
