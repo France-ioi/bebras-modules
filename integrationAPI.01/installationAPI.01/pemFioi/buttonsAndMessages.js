@@ -181,28 +181,30 @@ var displayHelper = {
       this.validate('stay');
       this.stopShowingResult();
 
-      if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
-         var buttonText = "Je veux quand même voir cette version";
-         if (this.levelsScores[newLevel] == this.levelsMaxScores[newLevel]) {
-            if (newLevel == 'hard') {
-               this.showTabMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
+      if (!this.hasSolution) {
+         if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
+            var buttonText = "Je veux quand même voir cette version";
+            if (this.levelsScores[newLevel] == this.levelsMaxScores[newLevel]) {
+               if (newLevel == 'hard') {
+                  this.showTabMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
+               } else {
+                  this.showTabMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer " +
+                     "à une autre question ou essayer de résoudre une version plus difficile.", true, buttonText);
+               }
             } else {
-               this.showTabMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer à une autre question " +
-                  "ou essayer de résoudre une version plus difficile.", true, buttonText);
+               this.showTabMessage("Vous avez déjà au moins autant de points à la question que cette version " +
+                  "peut vous en rapporter. Passez à la suite !", true, buttonText);
             }
-         } else {
-            this.showTabMessage("Vous avez déjà au moins autant de points à la question que cette version " +
-               "peut vous en rapporter. Passez à la suite !", true, buttonText);
+         } else if (newLevel == 'hard' && this.neverHadHard) {
+            var versionName = this.levelsNames[newLevel];
+            if (this.pointsAsStars) versionName = "à 4 étoiles";
+            this.showTabMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
+               "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
+               "J'y prendrai garde", function() {
+                  displayHelper.neverHadHard = false;
+               }
+            );
          }
-      } else if (newLevel == 'hard' && this.neverHadHard) {
-         var versionName = this.levelsNames[newLevel];
-         if (this.pointsAsStars) versionName = "à 4 étoiles";
-         this.showTabMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
-            "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
-            "J'y prendrai garde", function() {
-               displayHelper.neverHadHard = false;
-            }
-         );
       }
    },
    showTabMessage: function(message, fullTab, buttonText, agreeFunc) {
