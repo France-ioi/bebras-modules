@@ -28,8 +28,8 @@ var displayHelper = {
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
-   unlockedLevels: 2,
-   neverHadHard: true,
+   unlockedLevels: 3,
+   neverHadHard: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -113,13 +113,13 @@ var displayHelper = {
          tabsHTML += '<li id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
             var starPoints = maxScores.hard / 4;
-            var curStar = 0;
+            var iStar = 0;
             tabsHTML += "Version ";
             for (var curScore = 0; curScore < maxScores[curLevel]; curScore += starPoints) {
-               var starID = 'tabScore_' + curLevel + curStar;
+               var starID = 'tabScore_' + curLevel + iStar;
                tabsHTML += '<span id="' + starID + '" class="starContainer"></span>';
                starContainers.push(starID);
-               curStar++;
+               iStar++;
             }
          } else {
             tabsHTML += this.onlyLevelsNames[curLevel] + ' — ' +
@@ -216,7 +216,8 @@ var displayHelper = {
       if (!buttonText) {
          buttonText = "D'accord !";
       }
-      $('#tabMessage').html('<div>' + message + '</div><button>' + buttonText + '</button>').show();
+      $('#tabMessage').html('<div><img src="../../modules/img/castor.png"/><img src="../../modules/img/fleche-bulle.png"/>' +
+         '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
@@ -389,14 +390,14 @@ var displayHelper = {
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          var starPoints = maxScores.hard / 4;
-         var curStar = 0;
+         var iStar = 0;
          var starScore = 0;
          while (starScore + starPoints < scores[gradedLevel]) {
-            this.editStar('tabScore_' + gradedLevel + curStar + '_full', 1);
-            curStar++;
+            this.editStar('tabScore_' + gradedLevel + iStar + '_full', 1);
+            iStar++;
             starScore += starPoints;
          }
-         this.editStar('tabScore_' + gradedLevel + curStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
+         this.editStar('tabScore_' + gradedLevel + iStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
@@ -547,7 +548,8 @@ var displayHelper = {
          if (this.submittedScore > 1) {
             plural = "s";
          }
-         message = "Score obtenu : " + this.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
+         message = 'Score obtenu : <span id="answerScore">' + this.submittedScore + " point"  + plural +
+            " sur " + maxScoreLevel + ".</span><br/>";
          if (this.hasSolution) {
             message += "Le concours est terminé : votre réponse n'est pas enregistrée.";
             if (this.prevSavedScore !== undefined) {
@@ -695,6 +697,29 @@ var displayHelper = {
             this.previousMessages[type] = messages[type];
          }
       }
+      if (this.pointsAsStars && $('#answerScore').length) {
+         var starContainers = [];
+         var starsHTML = '';
+         var starPoints = this.levelsMaxScores.hard / 4;
+         var iStar = 0;
+         for (var curScore = 0; curScore < this.levelsMaxScores[this.taskLevel]; curScore += starPoints) {
+            var starID = 'answerScore' + iStar;
+            starsHTML += '<span id="' + starID + '" class="starContainer"></span>';
+            starContainers.push(starID);
+            iStar++;
+         }
+         $('#answerScore').html(starsHTML);
+         this.setStars(starContainers, 20);
+
+         iStar = 0;
+         var starScore = 0;
+         while (starScore + starPoints < this.levelsScores[this.taskLevel]) {
+            this.editStar('answerScore' + iStar + '_full', 1);
+            iStar++;
+            starScore += starPoints;
+         }
+         this.editStar('answerScore' + iStar + '_full', (this.levelsScores[this.taskLevel] - starScore) / starPoints);
+      }
       var height = $('body').height();
       if (height != this.lastSentHeight) {
          this.lastSentHeight = height;
@@ -778,10 +803,10 @@ var displayHelper = {
       if (!this.pointsAsStars) return;
       var maxScores = this.levelsMaxScores;
       var starPoints = maxScores.hard / 4;
-      var curStar = 0;
+      var iStar = 0;
       for (var curScore = 0; curScore < maxScores[level]; curScore += starPoints) {
-         this.editStar('tabScore_' + level + curStar + '_' + suffix, undefined, fillColor, strokeColor);
-         curStar++;
+         this.editStar('tabScore_' + level + iStar + '_' + suffix, undefined, fillColor, strokeColor);
+         iStar++;
       }
    },
    editStar: function(parent, clipWidth, fillColor, strokeColor) {

@@ -110,9 +110,14 @@ button, input[type="button"] {
    height: 18px;
    vertical-align: middle;
 }
+#answerScore .starContainer {
+   width: 20px;
+   height: 20px;
+}
 .starContainer > span {
    position: absolute;
    left: 0;
+   top: 0;
 }
 span.hiddenStar {
    visibility: hidden;
@@ -139,14 +144,39 @@ span.fullStar {
    margin: .5em 0;
 }
 #tabMessage.floatingMessage {
-   padding-bottom: .5em;
-   border-bottom: 1px solid black;
+   position: fixed;
+   z-index: 101;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   left: 0;
+   background: rgba(0, 0, 0, .7);
 }
-#tabMessage > div {
-   padding: 12px 10px 12px 115px;
-   width: 475px;
-   height: 76px;
-   background: url('../img/castor-bulle.png') no-repeat;
+#tabMessage.floatingMessage > div {
+   padding: 8px;
+   max-width: 500px;
+   margin: 10% auto;
+   border: 2px solid black;
+   background: white;
+}
+#tabMessage > div > img {
+   float: left;
+}
+#tabMessage > div > img:first-child {
+   width: 65px;
+}
+#tabMessage > div > img + img {
+   position: relative;
+   z-index: 100;
+   padding-top: 20px;
+   padding-left: 4px;
+}
+#tabMessage > div > div {
+   margin-left: 92px;
+   padding: 8px;
+   max-width: 500px;
+   border: 2px solid black;
+   border-radius: 8px;
 }
 #tabMessage button {
    display: block;
