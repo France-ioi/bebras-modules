@@ -405,7 +405,7 @@ var displayHelper = {
          $('#bestScore').html(this.graderScore);
       }
 
-      var gradedLevelNum = this.levels.indexOf(gradedLevel);
+      var gradedLevelNum = $.inArray(gradedLevel, this.levels);
       // Possibly unlocking a level
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
          var unlockedLevel = gradedLevelNum + 1;
