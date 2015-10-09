@@ -112,7 +112,7 @@ $(document).ready(function() {
        if(location.protocol !== 'file:') {
          hasPlatform = true;
        }
-   };
+   }
    if (!hasPlatform) {
       var platformLoad = function(task) {
          platform.validate = miniPlatformValidate;
