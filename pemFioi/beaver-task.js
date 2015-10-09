@@ -45,7 +45,7 @@ task.updateToken = function(token, callback) {
 };
 
 task.getHeight = function(callback) {
-   callback(parseInt($("body").outerHeight(true)));
+   callback(parseInt($("html").outerHeight(true)));
 };
 
 task.unload = function(callback) {
