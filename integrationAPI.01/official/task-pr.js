@@ -49,7 +49,7 @@ var TaskProxyManager = {
    getUrl: function(taskUrl, sToken, sPlatform, prefix) {
       return taskUrl+'?sToken='+encodeURIComponent(sToken)+'&sPlatform='+encodeURIComponent(sPlatform);
    }
-}
+};
 
 TaskProxyManager.getGraderProxy = TaskProxyManager.getTaskProxy;
 
@@ -65,7 +65,7 @@ var taskCaller = function(task, request, content) {
             content = [content];
          }
          var functionsToTrigger = {load: true, unload:true, reloadAnswer:true, showViews: true, reloadState: true};
-         if (functionsToTrigger[request] != undefined) {
+         if (functionsToTrigger[request]) {
             var askedCallback = content[content.length - 1];
             if (typeof askedCallback === 'function') {
                var newCallback = function() {
@@ -81,7 +81,7 @@ var taskCaller = function(task, request, content) {
       //   console.error("Task "+task.Id+" doesn't implement "+request);
       //}
    }
-}
+};
 
 /*
  * Task object, created from an iframe DOM element
@@ -90,7 +90,7 @@ function Task(iframe) {
    this.iframe = iframe;
    this.iframe_loaded = false;
    this.distantTask = null;
-   this.Id = iframe.attr('id')
+   this.Id = iframe.attr('id');
    this.elementsLoaded = false;
    this.platform = null;
    this.setPlatform = function(platform) {
@@ -98,14 +98,14 @@ function Task(iframe) {
       if (this.iframe_loaded) {
          this.distantPlatform.setPlatform(platform);
       }
-   }
+   };
    var that = this;
    // checking if task is already available
    if (that.iframe[0].contentWindow.task) {
       that.iframe_loaded = true;
       that.distantTask = that.iframe[0].contentWindow.task;
       that.distantPlatform = that.iframe[0].contentWindow.platform;
-      if (that.platform != null) {
+      if (that.platform) {
          that.distantPlatform.setPlatform(that.platform);
       }
    } else {
@@ -113,7 +113,7 @@ function Task(iframe) {
          that.iframe_loaded = true;
          that.distantTask = that.iframe[0].contentWindow.task;
          that.distantPlatform = that.iframe[0].contentWindow.platform;
-         if (that.platform != null) {
+         if (that.platform) {
             that.distantPlatform.setPlatform(that.platform);
          }
       });
@@ -122,66 +122,66 @@ function Task(iframe) {
 
 Task.prototype.getSourceId = function() {
    return this.Id;
-}
+};
 
 Task.prototype.getTargetUrl = function() {
    return this.iframe.attr('src');
-}
+};
 
 Task.prototype.getTarget = function() {
    return this.iframe[0].contentWindow;
-}
+};
 
 Task.prototype.getDomain = function() {
    var url = this.getTargetUrl();
    return url.substr(0, url.indexOf('/', 7));
-}
+};
 
 /**
  * Task API functions
  */
-Task.prototype.load = function(views, callback) {
-    return taskCaller(this, 'load', [views, callback]);
+Task.prototype.load = function(views, success, error) {
+    return taskCaller(this, 'load', [views, success, error]);
 };
-Task.prototype.unload = function(callback) {
-    return taskCaller(this, 'unload', [callback]);
+Task.prototype.unload = function(success, error) {
+    return taskCaller(this, 'unload', [success, error]);
 };
-Task.prototype.getHeight = function(callback) {
-    return taskCaller(this, 'getHeight', [callback]);
+Task.prototype.getHeight = function(success, error) {
+    return taskCaller(this, 'getHeight', [success, error]);
 };
-Task.prototype.updateToken = function(token, callback) {
-    return taskCaller(this, 'updateToken', [token, callback]);
+Task.prototype.updateToken = function(token, success, error) {
+    return taskCaller(this, 'updateToken', [token, success, error]);
 };
-Task.prototype.getAnswer = function(callback) {
-    return taskCaller(this, 'getAnswer', [callback]);
+Task.prototype.getAnswer = function(success, error) {
+    return taskCaller(this, 'getAnswer', [success, error]);
 };
-Task.prototype.reloadAnswer = function(answer, callback) {
-    return taskCaller(this, 'reloadAnswer', [answer, callback]);
+Task.prototype.reloadAnswer = function(answer, success, error) {
+    return taskCaller(this, 'reloadAnswer', [answer, success, error]);
 };
-Task.prototype.getState = function(callback) {
-    return taskCaller(this, 'getState', [callback]);
+Task.prototype.getState = function(success, error) {
+    return taskCaller(this, 'getState', [success, error]);
 };
-Task.prototype.reloadState = function(state, callback) {
-    return taskCaller(this, 'reloadState', [state, callback]);
+Task.prototype.reloadState = function(state, success, error) {
+    return taskCaller(this, 'reloadState', [state, success, error]);
 };
-Task.prototype.displayMessage = function(type, html, isOptional) {
-    return taskCaller(this, 'displayMessage', [type, html, isOptional]);
+Task.prototype.getViews = function(success, error) {
+    return taskCaller(this, 'getViews', [success, error]);
 };
-Task.prototype.getViews = function(callback) {
-    return taskCaller(this, 'getViews', [callback]);
+Task.prototype.getMetaData = function(success, error) {
+    return taskCaller(this, 'getMetaData', [success, error]);
 };
-Task.prototype.getMetaData = function(callback) {
-    return taskCaller(this, 'getMetaData', [callback]);
+Task.prototype.showViews = function(views, success, error) {
+    return taskCaller(this, 'showViews', [views, success, error]);
 };
-Task.prototype.showViews = function(views, callback) {
-    return taskCaller(this, 'showViews', [views, callback]);
+Task.prototype.gradeAnswer = function(answer, answerToken, success, error) {
+    return taskCaller(this, 'gradeAnswer', [answer, answerToken, success, error]);
 };
-Task.prototype.gradeAnswer = function(randomSeed, answer, minScore, maxScore) {
-    return taskCaller(this, 'gradeAnswer', [randomSeed, answer, minScore, maxScore]);
+Task.prototype.getResources = function(success, error) {
+    return taskCaller(this, 'gradeResources', [success, error]);
 };
 // for grader.gradeTask
-Task.prototype.gradeTask = function(randomSeed, answer, minScore, maxScore) {
-    return taskCaller(this, 'gradeAnswer', [randomSeed, answer, minScore, maxScore]);
+Task.prototype.gradeTask = function(answer, answerToken, success, error) {
+    return taskCaller(this, 'gradeTask', [answer, answerToken, success, error]);
 };
 
 /*
@@ -190,7 +190,7 @@ Task.prototype.gradeTask = function(randomSeed, answer, minScore, maxScore) {
 
 function Platform(task) {
    this.task = task;
-};
+}
 Platform.prototype.getTask = function() {
    return this.task;
 };
@@ -214,7 +214,7 @@ Platform.prototype.getTaskParams = function(key, defaultValue) {
       }
    }
    return res;
-}
+};
 
 Platform.prototype.openUrl = function(url) {
    // TODO

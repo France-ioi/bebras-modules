@@ -248,8 +248,18 @@ Task.prototype.showViews = function(views, success, error) {
 
 Task.prototype.gradeAnswer = function(answer, answerToken, success, error) {
    if (!error) error = function(errMsg) {console.error(errMsg)};
-   this.chan.call({method: "grader.gradeTask",
+   this.chan.call({method: "task.gradeAnswer",
       params: [answer, answerToken],
+      error: error,
+      success: success,
+      timeout: 30000
+   });
+};
+
+Task.prototype.getResources = function(success, error) {
+   if (!error) error = function(errMsg) {console.error(errMsg)};
+   this.chan.call({method: "task.getResources",
+      params: [],
       error: error,
       success: success,
       timeout: 30000
