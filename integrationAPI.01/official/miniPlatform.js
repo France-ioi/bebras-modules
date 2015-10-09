@@ -25,7 +25,7 @@ var taskMetaData;
 // important for tracker.js
 var compiledTask = true;
 
-var miniPlatformShowSolution = function() {
+window.miniPlatformShowSolution = function() {
    $("#toremove").hide();
    task.getAnswer(function(answer) {
       task.showViews({"task": true, "solution": true}, function() {
@@ -84,7 +84,9 @@ var miniPlatformValidate = function(mode, success, error) {
       $("#task").append("<center id='toremove'><br/><input type='button' value='Voir la solution' onclick='miniPlatformShowSolution()'></input></center>");
    }
    platform.trigger('validate', [mode]);
-   success();
+   if (success) {
+      success();
+   }
 };
 
 function getUrlParameter(sParam)
@@ -102,7 +104,6 @@ function getUrlParameter(sParam)
 }
 
 $(document).ready(function() {
-   console.error('document ready');
    var hasPlatform = false;
    try {
        hasPlatform = (inIframe() && (typeof parent.TaskProxyManager !== 'undefined') && (typeof parent.generating == 'undefined' || parent.generating === true));
@@ -111,11 +112,11 @@ $(document).ready(function() {
        if(location.protocol !== 'file:') {
          hasPlatform = true;
        }
-   }
+   };
    if (!hasPlatform) {
-      var platformLoad = function() {
+      var platformLoad = function(task) {
          platform.validate = miniPlatformValidate;
-         platform.updateHeight = function(height,success,error) {success();};
+         platform.updateHeight = function(height,success,error) {if (success) {success();}};
          var taskOptions = {};
          try {
             var strOptions = getUrlParameter("options");
@@ -140,13 +141,15 @@ $(document).ready(function() {
                   res = (typeof defaultValue !== 'undefined') ? defaultValue : null; 
                }
             }
-            success(res);
+            if (success) {
+               success(res);
+            } else {
+               return res;
+            }
          };
          platform.askHint = function(hintToken, success, error) {
-            console.error('askHint miniplatform');
             $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
-               console.error(postRes);
-               success();
+               if (success) {success();}
             }, 'json');
          };
          var loadedViews = {'task': true, 'solution': true, 'hints': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
@@ -188,7 +191,6 @@ $(document).ready(function() {
                for (var viewName in views)
                {
                   if (!views[viewName].requires) {
-                     console.error(viewName);
                      $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + frenchName[viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
                }
@@ -202,17 +204,21 @@ $(document).ready(function() {
             });
          });
       };
-      var getMetaDataAndLoad = function() {
+      var getMetaDataAndLoad = function(task) {
          task.getMetaData(function(metaData) {
             taskMetaData = metaData;
-            platformLoad();
+            platformLoad(task);
          });
-      }
-      var oldInit = platform.initWithTask;
-      platform.initWithTask = function(task) {
-         oldInit(task);
-         getMetaDataAndLoad();
       };
+      if (window.platform.task) {
+         getMetaDataAndLoad(window.platform.task);
+      } else {
+         var oldInit = platform.initWithTask;
+         platform.initWithTask = function(task) {
+            oldInit(task);
+            getMetaDataAndLoad(task);
+         };
+      }
    }
 });
 
