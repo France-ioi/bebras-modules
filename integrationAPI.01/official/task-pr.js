@@ -23,23 +23,35 @@
 
 var TaskProxyManager = {
    tasks: {},
-   platforms: {}, 
-   getTaskProxy: function(idFrame, force) {
+   platforms: {},
+   getTaskProxy: function(idFrame, callback, force) {
       if (!force && TaskProxyManager.tasks[idFrame]) {
-         return TaskProxyManager.tasks[idFrame];
+         callback(TaskProxyManager.tasks[idFrame]);
       } else {
+         if (force) {
+            TaskProxyManager.deleteTaskProxy(idFrame);
+         }
          $('#'+idFrame).each(function() {
             var curTask = new Task($(this));
             TaskProxyManager.tasks[idFrame] = curTask;
          });
-         return TaskProxyManager.tasks[idFrame];
+         callback(TaskProxyManager.tasks[idFrame]);
       }
    },
    setPlatform: function(task, platform) {
       TaskProxyManager.platforms[task.Id] = platform;
       TaskProxyManager.tasks[task.Id].setPlatform(platform);
+   },
+   deleteTaskProxy: function(idFrame) {
+      delete(TaskProxyManager.tasks[idFrame]);
+      delete(TaskProxyManager.platforms[idFrame]);
+   },
+   getUrl: function(taskUrl, sToken, sPlatform, prefix) {
+      return taskUrl+'?sToken='+encodeURIComponent(sToken)+'&sPlatform='+encodeURIComponent(sPlatform);
    }
 }
+
+TaskProxyManager.getGraderProxy = TaskProxyManager.getTaskProxy;
 
 var taskCaller = function(task, request, content) {
    // TODO: handle case where iframe_loaded is false and caller expects a result...
@@ -164,8 +176,12 @@ Task.prototype.getMetaData = function(callback) {
 Task.prototype.showViews = function(views, callback) {
     return taskCaller(this, 'showViews', [views, callback]);
 };
+Task.prototype.gradeAnswer = function(randomSeed, answer, minScore, maxScore) {
+    return taskCaller(this, 'gradeAnswer', [randomSeed, answer, minScore, maxScore]);
+};
+// for grader.gradeTask
 Task.prototype.gradeTask = function(randomSeed, answer, minScore, maxScore) {
-    return taskCaller(this, 'randomSeed', [randomSeed, answer, minScore, maxScore]);
+    return taskCaller(this, 'gradeAnswer', [randomSeed, answer, minScore, maxScore]);
 };
 
 /*
