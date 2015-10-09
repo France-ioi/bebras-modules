@@ -87,7 +87,7 @@ var displayHelper = {
       $("#tabsContainer").before(scoreHtml + tabsHtml);
       $(".tabs-menu a").click(function(event) {
          event.preventDefault();
-         var newLevel = $(this).attr("href").substring(1);
+         var newLevel = $(this).attr("href").split("#")[1];
          displayHelper.setLevel(newLevel);
       });
       displayHelper.setLevel(initLevel);
