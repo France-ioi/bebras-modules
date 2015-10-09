@@ -60,6 +60,12 @@ var displayHelper = {
       }
       addTaskHtml += '</div>';
       $(this.taskSelector).append(addTaskHtml);
+
+      this.taskDelayWarningTimeout = setTimeout(function() {
+         displayHelper.popupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question ! " +
+            "Il est peut-être temps de passer à une autre !", false, "En effet");
+         displayHelper.taskDelayWarningTimeout = null;
+      }, 300 * 1000);
    },
 
    setupLevels: function(initLevel) {
@@ -160,7 +166,7 @@ var displayHelper = {
          this.tabMessageShown = false;
       }
       if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
-         this.showTabMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
+         this.popupMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
          return;
       }
 
@@ -186,19 +192,19 @@ var displayHelper = {
             var buttonText = "Je veux quand même voir cette version";
             if (this.levelsScores[newLevel] == this.levelsMaxScores[newLevel]) {
                if (newLevel == 'hard') {
-                  this.showTabMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
+                  this.popupMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
                } else {
-                  this.showTabMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer " +
+                  this.popupMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer " +
                      "à une autre question ou essayer de résoudre une version plus difficile.", true, buttonText);
                }
             } else {
-               this.showTabMessage("Vous avez déjà au moins autant de points à la question que cette version " +
+               this.popupMessage("Vous avez déjà au moins autant de points à la question que cette version " +
                   "peut vous en rapporter. Passez à la suite !", true, buttonText);
             }
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
-            this.showTabMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
+            this.popupMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
                "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
                "J'y prendrai garde", function() {
                   displayHelper.neverHadHard = false;
@@ -207,7 +213,7 @@ var displayHelper = {
          }
       }
    },
-   showTabMessage: function(message, fullTab, buttonText, agreeFunc) {
+   popupMessage: function(message, fullTab, buttonText, agreeFunc) {
       if (fullTab) {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#tabMessage').removeClass('floatingMessage');
@@ -216,7 +222,7 @@ var displayHelper = {
       }
 
       if (!buttonText) {
-         buttonText = "D'accord !";
+         buttonText = "D'accord";
       }
       $('#tabMessage').html('<div><img src="../../modules/img/castor.png"/><img src="../../modules/img/fleche-bulle.png"/>' +
          '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
@@ -264,6 +270,9 @@ var displayHelper = {
 
    unload: function() {
       this.loaded = false;
+      if (this.taskDelayWarningTimeout) {
+         this.taskDelayWarningTimeout = clearTimeout(this.taskDelayWarningTimeout);
+      }
       this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
       return true;
    },

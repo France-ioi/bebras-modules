@@ -197,3 +197,7 @@ span.fullStar {
 .easy, .medium, .hard {
    display: none;
 }
+
+#displayHelper_saved {
+   margin: .6em;
+}
