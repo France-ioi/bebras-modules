@@ -11,6 +11,10 @@
   -ms-touch-action: none;
 }
 
+#task {
+   padding-bottom: 400px; /* to have some room for the keyboard on android tablets */
+}
+
 #task h1 {
    display:none;
 }
