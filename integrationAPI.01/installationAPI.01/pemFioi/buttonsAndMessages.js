@@ -422,7 +422,7 @@ var displayHelper = {
                if (!displayHelper.stoppedShowingResult) {
                   return "<br><span style='display:inline-block;margin-bottom:0.2em;font-weight:bold;color:" + color + "'>" + displayHelper.graderMessage + "</span>";
                } else if (!this.hideValidateButton && !displayHelper.hasSolution) {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input><br/><br/>";
+                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
                }
             }
             break;
@@ -476,7 +476,7 @@ var displayHelper = {
       var disabledStr = displayHelper.readOnly ? 'disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            messages.cancel = "<div style='margin-top: 5px'><input type='button' value='Effacer votre réponse actuelle' onclick='displayHelper.restartAll()' "+disabledStr+"></input></div>";
+            messages.cancel = "<div style='margin-top: 25px'><input type='button' value='Effacer votre réponse actuelle' onclick='displayHelper.restartAll()' "+disabledStr+"></input></div>";
          }
          messages.validate = displayHelper.getFullFeedbackValidateMessage(taskMode, disabledStr);
          if (displayHelper.hasLevels) {
