@@ -205,7 +205,7 @@ Platform.prototype.showView = function(views) {};
 Platform.prototype.askHint = function(platformToken) {};
 Platform.prototype.updateHeight = function(height) {this.task.iframe.height(parseInt(height)+40);};
 Platform.prototype.getTaskParams = function(key, defaultValue) {
-   var res = {minScore: -3, maxScore: 6, randomSeed: 0, noScore: 0, readOnly: false};
+   var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false};
    if (typeof key !== 'undefined') {
       if (key !== 'options' && key in res) {
          return this.taskParams[key];

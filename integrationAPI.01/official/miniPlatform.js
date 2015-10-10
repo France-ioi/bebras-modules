@@ -131,7 +131,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 6, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 10, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
             if (typeof key !== 'undefined') {
                if (key !== 'options' && key in res) {
                   res = res[key];
