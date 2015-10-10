@@ -422,7 +422,7 @@ var displayHelper = {
                if (!displayHelper.stoppedShowingResult) {
                   return "<br><span style='display:inline-block;margin-bottom:0.2em;font-weight:bold;color:" + color + "'>" + displayHelper.graderMessage + "</span>";
                } else if (!this.hideValidateButton && !displayHelper.hasSolution) {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input><br/><br/>";
                }
             }
             break;
