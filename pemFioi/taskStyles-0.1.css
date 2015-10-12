@@ -74,19 +74,19 @@ button, input[type="button"] {
    z-index: -1;
    bottom: 0;
    width: 100%;
-   border-bottom: 2px solid #aaa;
+   border-bottom: 2px solid #8d9daa;
 }
 #tabsMenu li {
    float: left;
    min-width: 150px;
    margin-right: 10px;
-   background: #ddd;
-   border: 2px solid #aaa;
+   background: #d5e4ef;
+   border: 2px solid #8d9daa;
    border-bottom: 0;
    text-align: center;
 }
 #tabsMenu li.lockedLevel {
-   background: #666;
+   background: #5a6069;
 }
 #tabsMenu li.current {
    padding-bottom: 2px;
@@ -100,16 +100,16 @@ button, input[type="button"] {
    font-size: 1.1em;
 }
 #tabsMenu li.lockedLevel a {
-   color: #bbb;
+   color: #ddd;
 }
 #tabsMenu li a:focus {
    outline: none;
 }
 #tabsMenu li:not(.current) a:active {
-   background: #c8c8d8;
+   background: #c4d3de;
 }
 #tabsMenu li.lockedLevel a:active {
-   background: #746c66;
+   background: #6c7787;
 }
 
 .starContainer {
@@ -150,10 +150,10 @@ span.fullStar {
 
 #tabMessage {
    display: none;
-   margin: .5em 0;
 }
 #tabMessage > div {
    position: relative;
+   margin: .5em 0;
    padding: 8px;
 }
 #tabMessage.floatingMessage {

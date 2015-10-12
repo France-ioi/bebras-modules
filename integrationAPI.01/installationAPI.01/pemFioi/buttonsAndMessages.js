@@ -773,8 +773,8 @@ var displayHelper = {
       full: '#ffc90e',
       emptyUseless: '#ced',
       fullUseless: '#fba',
-      locked: '#bbb',
-      uselessBorder: '#666'
+      uselessBorder: '#666',
+      locked: '#ddd'
    },
    setStars: function(parents, starWidth) {
       if (!this.pointsAsStars) return;
