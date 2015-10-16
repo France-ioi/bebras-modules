@@ -132,7 +132,7 @@ $(document).ready(function() {
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
             var res = {'minScore': minScore, 'maxScore': 10, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
-            if (typeof key !== 'undefined') {
+            if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
                } else if (res.options && key in res.options) {
@@ -154,7 +154,6 @@ $(document).ready(function() {
          };
          var loadedViews = {'task': true, 'solution': true, 'hints': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
          var shownViews = {'task': true};
-
          // TODO: modifs ARTHUR à relire
          if (taskOptions.showSolutionOnLoad) {
             shownViews.solution = true;
@@ -210,9 +209,12 @@ $(document).ready(function() {
             platformLoad(task);
          });
       };
-      if (window.platform.task) {
-         getMetaDataAndLoad(window.platform.task);
+      if (window.platform.task || platform.initFailed) {
+         // case everything went fine with task loading, or task loading failed
+         // (due to missing jschannel and file:// protocol...
+         getMetaDataAndLoad(window.task ? window.task : window.platform.task);
       } else {
+         // task is not loaded yet
          var oldInit = platform.initWithTask;
          platform.initWithTask = function(task) {
             oldInit(task);
