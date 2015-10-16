@@ -42,6 +42,7 @@ if (!isCrossDomain()) {
    platform = {
       registered_objects: [],
       parent_platform: null,
+      initFailed: false,
       setPlatform: function(platformArg) {
          platform.parent_platform = platformArg;
       },
@@ -101,7 +102,13 @@ if (!isCrossDomain()) {
    };
    platform = {};
    platform.ready = false;
+   platform.initFailed = false;
    platform.initWithTask = function(task) {
+      if (typeof Channel === 'undefined') {
+         platform.initFailed = true;
+         console.error('cannot init task if jschannel is not present');
+         return;
+      }
       var gradeAnswer = function(params, success, error) {
          if (typeof task.gradeAnswer === 'function') {
             task.gradeAnswer(params[0], params[1], success, error);
@@ -110,7 +117,7 @@ if (!isCrossDomain()) {
          }
       };
       var channelId = getUrlParameterByName('channelId');
-      var chan = Channel.build({window: window.parent, origin: "*", scope: channelId});
+      var chan = Channel.build({window: window.parent, origin: "*", scope: channelId, onReady: function() {platform.ready = true;}});
       platform.chan = chan;
       platform.task = task;
       platform.channelId = channelId;
@@ -125,16 +132,16 @@ if (!isCrossDomain()) {
       chan.bind('task.getAnswer', function(trans) {task.getAnswer(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getState', function(trans) {task.getState(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getResources', function(trans) {task.getResources(trans.complete, trans.error);trans.delayReturn(true);});
+      chan.bind('task.getResources', function(trans) {task.getResources(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.reloadState', function(trans, state) {task.reloadState(state, callAndTrigger(trans.complete, 'reloadState'), trans.error);trans.delayReturn(true);});
       chan.bind('grader.gradeTask', function(trans, params) {gradeAnswer(params, trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.gradeAnswer', function(trans, params) {gradeAnswer(params, trans.complete, trans.error);trans.delayReturn(true);});
-      platform.ready = true;
    };
 
    platform.registered_objects = [];
    platform.trigger = function(event, content) {
       for (var i = 0; i < platform.registered_objects.length; i++) {
-         object = platform.registered_objects[i];
+         var object = platform.registered_objects[i];
          if (typeof (object[event]) != "undefined") {
             object[event].apply(object, content);
          }
@@ -209,12 +216,5 @@ if (!isCrossDomain()) {
 }
 
 window.platform = platform;
-
-$('document').ready(function() {
-   // if task is ready, use it, otherwise wait for initWithTask call
-   if (!platform.ready && typeof window.task === 'object' && typeof window.task.load === 'function') {
-      platform.initWithTask(window.task);
-   }
-});
 
 }());
