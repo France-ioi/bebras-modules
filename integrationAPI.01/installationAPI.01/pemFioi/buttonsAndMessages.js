@@ -34,33 +34,36 @@ var displayHelper = {
    
    load: function(views) {
       displayHelper.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      displayHelper.taskParams = platform.getTaskParams();
-      displayHelper.readOnly = (displayHelper.taskParams.readonly == true || displayHelper.taskParams.readOnly == 'true');
-      displayHelper.graderScore = +displayHelper.taskParams.noScore;
-      displayHelper.savedAnswer = "";
-      var addTaskHtml = "<center>";
-      // place button placement at the end of html if they don't already exist
-      if ($("#displayHelper_validate").length === 0) {
-         addTaskHtml += "<span id='displayHelper_validate'></span>";
-      }
-      if ($("#displayHelper_cancel").length === 0) {
-         addTaskHtml += "<span id='displayHelper_cancel'></span>";
-      }
-      if ($("#displayHelper_saved").length === 0) {
-         addTaskHtml += "<span id='displayHelper_saved'></span>";
-      }
-      addTaskHtml += "</center>";
-      $(displayHelper.taskSelector).append(addTaskHtml);
+      platform.getTaskParams(null, null, function(taskParams) {
+         displayHelper.taskParams = taskParams;
+         displayHelper.readOnly = (displayHelper.taskParams.readonly == true || displayHelper.taskParams.readOnly == 'true');
+         displayHelper.graderScore = +displayHelper.taskParams.noScore;
+         displayHelper.savedAnswer = "";
+         var addTaskHtml = "<center>";
+         // place button placement at the end of html if they don't already exist
+         if ($("#displayHelper_validate").length === 0) {
+            addTaskHtml += "<span id='displayHelper_validate'></span>";
+         }
+         if ($("#displayHelper_cancel").length === 0) {
+            addTaskHtml += "<span id='displayHelper_cancel'></span>";
+         }
+         if ($("#displayHelper_saved").length === 0) {
+            addTaskHtml += "<span id='displayHelper_saved'></span>";
+         }
+         addTaskHtml += "</center>";
+         $(displayHelper.taskSelector).append(addTaskHtml);
+      });
    },
 
-   getLevelsMaxScores: function() {
-      var taskParams = platform.getTaskParams();;
-      var maxScore = taskParams.maxScore;
-      return {
-         easy: Math.round(maxScore / 2),
-         medium: Math.round(3 * maxScore / 4),
-         hard: maxScore
-      };
+   getLevelsMaxScores: function(callback) {
+      platform.getTaskParams(null, null, function(taskParams) {
+         var maxScore = taskParams.maxScore;
+         callback({
+            easy: Math.round(maxScore / 2),
+            medium: Math.round(3 * maxScore / 4),
+            hard: maxScore
+         });
+      });
    },
 
    getLevelsNames: function() {
@@ -71,26 +74,27 @@ var displayHelper = {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
       displayHelper.hasLevels = true;
-      var maxScores = displayHelper.getLevelsMaxScores();
       var tabsHtml = "<ul class='tabs-menu'>\n";
       var levelsNames = displayHelper.getLevelsNames();
-      for (var curLevel in levelsNames) {
-         tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-            "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-              "Version " + levelsNames[curLevel] + "<br/>" +
-              "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
-            "</div></a></li>\n";
-      }
-      tabsHtml += "</ul>";
-      var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
-         "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
-      $("#tabsContainer").before(scoreHtml + tabsHtml);
-      $(".tabs-menu a").click(function(event) {
-         event.preventDefault();
-         var newLevel = $(this).attr("href").split("#")[1];
-         displayHelper.setLevel(newLevel);
+      displayHelper.getLevelsMaxScores(function(maxScores) {
+         for (var curLevel in levelsNames) {
+            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
+               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
+                 "Version " + levelsNames[curLevel] + "<br/>" +
+                 "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
+               "</div></a></li>\n";
+         }
+         tabsHtml += "</ul>";
+         var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
+            "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
+         $("#tabsContainer").before(scoreHtml + tabsHtml);
+         $(".tabs-menu a").click(function(event) {
+            event.preventDefault();
+            var newLevel = $(this).attr("href").split("#")[1];
+            displayHelper.setLevel(newLevel);
+         });
+         displayHelper.setLevel(initLevel);
       });
-      displayHelper.setLevel(initLevel);
    },
    
    setLevel: function(newLevel) {
@@ -351,7 +355,7 @@ var displayHelper = {
             }
          }
       }
-      var savedMessage = scoreDiffMsg + " : " + displayHelper.graderScore + " sur " + displayHelper.taskParams.maxScore + ".";
+      var savedMessage = scoreDiffMsg + " : " + displayHelper.graderScore + " sur " + (displayHelper.taskParams ? displayHelper.taskParams.maxScore : '?') + ".";
       if ((displayHelper.hasSolution && displayHelper.savedAnswer != displayHelper.prevAnswer) ||
          ((displayHelper.graderScore > 0) && ((taskMode == "saved_changed") || showRetreiveAnswer))) {
           savedMessage += " <a href=\"#\" onclick='displayHelper.retreiveAnswer();return false;'>Rechargez la réponse validée.</a>";
@@ -360,8 +364,7 @@ var displayHelper = {
    },
 
 
-   getFullFeedbackWithLevelsSavedMessage: function(taskMode) {
-      var maxScoreLevel = displayHelper.getLevelsMaxScores()[displayHelper.taskLevel];
+   getFullFeedbackWithLevelsSavedMessage: function(taskMode, callback) {
       var showRetreiveAnswer = false;
       var message = "";
       if (displayHelper.submittedAnswer === "") {
@@ -375,38 +378,41 @@ var displayHelper = {
          if (displayHelper.submittedScore > 1) {
             plural = "s";
          }
-         message = "Score de votre réponse : " + displayHelper.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
-         if (displayHelper.hasSolution) {
-            message += "Le concours est terminé, votre réponse n'est pas enregistrée.";
-            if (displayHelper.prevSavedScore !== undefined) {
-               showRetreiveAnswer = true;
-            }
-         } else {
-            var prevScore = displayHelper.prevLevelsScores[displayHelper.taskLevel];
-            if (displayHelper.prevSavedScore !== undefined) {
-               if (displayHelper.submittedScore > prevScore) {
-                  if (displayHelper.submittedScore < maxScoreLevel) {
-                     message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
-                  } else if (displayHelper.taskLevel == "hard") {
-                     message += "C'est le meilleur score possible sur ce sujet, félicitations !";
-                  } else {
-                     message += "Pour obtenir plus de points, passez à une version plus difficile.";
-                  }
-               } else if (displayHelper.submittedScore < prevScore) { 
-                  message += "Vous aviez fait mieux avant.";
+         var maxScoreLevel = displayHelper.getLevelsMaxScores(function(maxScoreLevels) {
+            var maxScoreLevel = maxScoreLevels[displayHelper.taskLevel];
+            message = "Score de votre réponse : " + displayHelper.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
+            if (displayHelper.hasSolution) {
+               message += "Le concours est terminé, votre réponse n'est pas enregistrée.";
+               if (displayHelper.prevSavedScore !== undefined) {
                   showRetreiveAnswer = true;
                }
-               else {
-                  message += "Votre score reste le même.";
+            } else {
+               var prevScore = displayHelper.prevLevelsScores[displayHelper.taskLevel];
+               if (displayHelper.prevSavedScore !== undefined) {
+                  if (displayHelper.submittedScore > prevScore) {
+                     if (displayHelper.submittedScore < maxScoreLevel) {
+                        message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
+                     } else if (displayHelper.taskLevel == "hard") {
+                        message += "C'est le meilleur score possible sur ce sujet, félicitations !";
+                     } else {
+                        message += "Pour obtenir plus de points, passez à une version plus difficile.";
+                     }
+                  } else if (displayHelper.submittedScore < prevScore) { 
+                     message += "Vous aviez fait mieux avant.";
+                     showRetreiveAnswer = true;
+                  }
+                  else {
+                     message += "Votre score reste le même.";
+                  }
                }
             }
-         }
+         });
       }
       if (showRetreiveAnswer) {
          message += " <a href=\"#\" onclick='displayHelper.retreiveAnswer();return false;'>" + 
             "Rechargez votre meilleure réponse.</a>";
       }
-      return message;
+      callback(message);
    },
 
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
@@ -422,7 +428,7 @@ var displayHelper = {
                if (!displayHelper.stoppedShowingResult) {
                   return "<br><span style='display:inline-block;margin-bottom:0.2em;font-weight:bold;color:" + color + "'>" + displayHelper.graderMessage + "</span>";
                } else if (!this.hideValidateButton && !displayHelper.hasSolution) {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\", function() {})' "+disabledStr+"></input>";
                }
             }
             break;
@@ -432,7 +438,7 @@ var displayHelper = {
                if (displayHelper.hasSolution) {
                   return "<input type='button' value='Évaluer cette réponse' onclick='displayHelper.validate(\"test\")' "+disabledStr+"></input>";
                } else {
-                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return "<input type='button' value='Valider votre réponse' onclick='platform.validate(\"done\", function() {})' "+disabledStr+"></input>";
                }
             }
             break;
@@ -441,7 +447,7 @@ var displayHelper = {
                if (displayHelper.hasSolution) {
                   return "<input type='button' value='Évaluer cette réponse' onclick='displayHelper.validate(\"test\")' "+disabledStr+"></input>";
                } else {
-                  return "<input type='button' value='Valider votre nouvelle réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  return "<input type='button' value='Valider votre nouvelle réponse' onclick='platform.validate(\"done\", function() {})' "+disabledStr+"></input>";
                }
             }
             break;
@@ -480,7 +486,8 @@ var displayHelper = {
          }
          messages.validate = displayHelper.getFullFeedbackValidateMessage(taskMode, disabledStr);
          if (displayHelper.hasLevels) {
-            messages.saved = displayHelper.getFullFeedbackWithLevelsSavedMessage(taskMode);
+            // TODO: this will not work with a cross-domain platform!
+            displayHelper.getFullFeedbackWithLevelsSavedMessage(taskMode, function(message) {messages.saved = message;});
          } else {
             messages.saved = displayHelper.getFullFeedbackSavedMessage(taskMode);
          }
@@ -490,12 +497,12 @@ var displayHelper = {
             case "unsaved_unchanged":
             case "unsaved_changed":
                if (!displayHelper.hasSolution) {
-                  messages.validate = "<input type='button' value='Enregistrer votre réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  messages.validate = "<input type='button' value='Enregistrer votre réponse' onclick='platform.validate(\"done\", function() {})' "+disabledStr+"></input>";
                }
                break;
             case "saved_unchanged":
                if (!displayHelper.hasSolution) {
-                  messages.saved = "Votre réponse a été enregistrée, vous pouvez la modifier ou bien <a href=\"#\" onclick=\"platform.validate('cancel');return false\" "+disabledStr+">l'annuler</a> et recommencer.";
+                  messages.saved = "Votre réponse a été enregistrée, vous pouvez la modifier ou bien <a href=\"#\" onclick=\"platform.validate('cancel', function() {});return false\" "+disabledStr+">l'annuler</a> et recommencer.";
                } else {
                   messages.saved = "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez <a href=\"#\" onclick=\"displayHelper.validate('cancel');return false\" "+disabledStr+">recharger la réponse que vous avez soumise</a>.";
                }
@@ -503,7 +510,7 @@ var displayHelper = {
             case "saved_changed":
                messages.saved = "<br><b style='color:red'>Attention: une réponse différente est enregistrée</b>, vous pouvez <a href='#' onclick='displayHelper.retreiveAnswer();return false;'>la recharger</a>.";
                if (!this.hideValidateButton) {
-                  messages.validate = "<input type='button' value='Enregistrer cette nouvelle réponse' onclick='platform.validate(\"done\")' "+disabledStr+"></input>";
+                  messages.validate = "<input type='button' value='Enregistrer cette nouvelle réponse' onclick='platform.validate(\"done\", function() {})' "+disabledStr+"></input>";
                }
                break;
          }
@@ -517,7 +524,7 @@ var displayHelper = {
       var height = $("body").height();
       if (height != this.lastSentHeight) {
          this.lastSentHeight = height;
-         platform.updateHeight(height);
+         platform.updateHeight(height, function() {});
       }
    },
 
