@@ -86,7 +86,6 @@ function Task(iframe, callback) {
       origin: "*",
       scope: getUrlParameterByName('channelId', iframe[0].src),
       onReady: function() {
-         console.error("channel is ready!");
          callback();
       }
    });
