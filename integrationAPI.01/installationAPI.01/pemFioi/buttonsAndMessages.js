@@ -55,15 +55,13 @@ var displayHelper = {
       });
    },
 
-   getLevelsMaxScores: function(callback) {
-      platform.getTaskParams(null, null, function(taskParams) {
-         var maxScore = taskParams.maxScore;
-         callback({
-            easy: Math.round(maxScore / 2),
-            medium: Math.round(3 * maxScore / 4),
-            hard: maxScore
-         });
-      });
+   getLevelsMaxScores: function() {
+      var maxScore = displayHelper.taskParams.maxScore;
+      return {
+         easy: Math.round(maxScore / 2),
+         medium: Math.round(3 * maxScore / 4),
+         hard: maxScore
+      };
    },
 
    getLevelsNames: function() {
@@ -71,30 +69,46 @@ var displayHelper = {
    },
 
    setupLevels: function(initLevel) {
+      if (!initLevel) {
+         if (!displayHelper.taskParams) {
+            platform.getTaskParams(null, null, function(taskParams) {
+               displayHelper.taskParams = taskParams;
+               initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
+               displayHelper.doSetupLevels(initLevel);
+            });
+         } else {
+            initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
+            displayHelper.doSetupLevels(initLevel);
+         }
+      } else {
+         displayHelper.doSetupLevels(initLevel);
+      }
+   },
+
+   doSetupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
       displayHelper.hasLevels = true;
       var tabsHtml = "<ul class='tabs-menu'>\n";
       var levelsNames = displayHelper.getLevelsNames();
-      displayHelper.getLevelsMaxScores(function(maxScores) {
-         for (var curLevel in levelsNames) {
-            tabsHtml += "   <li class='tab-" + curLevel + "'>" +
-               "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
-                 "Version " + levelsNames[curLevel] + "<br/>" +
-                 "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
-               "</div></a></li>\n";
-         }
-         tabsHtml += "</ul>";
-         var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
-            "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
-         $("#tabsContainer").before(scoreHtml + tabsHtml);
-         $(".tabs-menu a").click(function(event) {
-            event.preventDefault();
-            var newLevel = $(this).attr("href").split("#")[1];
-            displayHelper.setLevel(newLevel);
-         });
-         displayHelper.setLevel(initLevel);
+      var maxScores = displayHelper.getLevelsMaxScores();
+      for (var curLevel in levelsNames) {
+         tabsHtml += "   <li class='tab-" + curLevel + "'>" +
+            "<a href='#"  + curLevel + "'><div style='display:inline-block;text-align:center'>" +
+              "Version " + levelsNames[curLevel] + "<br/>" +
+              "<span id='tabScore_" + curLevel + "'>0</span> points sur " + maxScores[curLevel] +
+            "</div></a></li>\n";
+      }
+      tabsHtml += "</ul>";
+      var scoreHtml = "<div style='float:right;margin-top:-15px;text-align:center;font-weight:bold'>" + 
+         "<p>Score : <span id='best_score'>0</span> points sur " + maxScores.hard + "<br/>(meilleur des trois versions)</p></div>";
+      $("#tabsContainer").before(scoreHtml + tabsHtml);
+      $(".tabs-menu a").click(function(event) {
+         event.preventDefault();
+         var newLevel = $(this).attr("href").split("#")[1];
+         displayHelper.setLevel(newLevel);
       });
+      displayHelper.setLevel(initLevel);
    },
    
    setLevel: function(newLevel) {
@@ -378,35 +392,33 @@ var displayHelper = {
          if (displayHelper.submittedScore > 1) {
             plural = "s";
          }
-         var maxScoreLevel = displayHelper.getLevelsMaxScores(function(maxScoreLevels) {
-            var maxScoreLevel = maxScoreLevels[displayHelper.taskLevel];
-            message = "Score de votre réponse : " + displayHelper.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
-            if (displayHelper.hasSolution) {
-               message += "Le concours est terminé, votre réponse n'est pas enregistrée.";
-               if (displayHelper.prevSavedScore !== undefined) {
+         var maxScoreLevel = displayHelper.getLevelsMaxScores()[displayHelper.taskLevel];
+         message = "Score de votre réponse : " + displayHelper.submittedScore + " point"  + plural + " sur " + maxScoreLevel + ".<br/>";
+         if (displayHelper.hasSolution) {
+            message += "Le concours est terminé, votre réponse n'est pas enregistrée.";
+            if (displayHelper.prevSavedScore !== undefined) {
+               showRetreiveAnswer = true;
+            }
+         } else {
+            var prevScore = displayHelper.prevLevelsScores[displayHelper.taskLevel];
+            if (displayHelper.prevSavedScore !== undefined) {
+               if (displayHelper.submittedScore > prevScore) {
+                  if (displayHelper.submittedScore < maxScoreLevel) {
+                     message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
+                  } else if (displayHelper.taskLevel == "hard") {
+                     message += "C'est le meilleur score possible sur ce sujet, félicitations !";
+                  } else {
+                     message += "Pour obtenir plus de points, passez à une version plus difficile.";
+                  }
+               } else if (displayHelper.submittedScore < prevScore) { 
+                  message += "Vous aviez fait mieux avant.";
                   showRetreiveAnswer = true;
                }
-            } else {
-               var prevScore = displayHelper.prevLevelsScores[displayHelper.taskLevel];
-               if (displayHelper.prevSavedScore !== undefined) {
-                  if (displayHelper.submittedScore > prevScore) {
-                     if (displayHelper.submittedScore < maxScoreLevel) {
-                        message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
-                     } else if (displayHelper.taskLevel == "hard") {
-                        message += "C'est le meilleur score possible sur ce sujet, félicitations !";
-                     } else {
-                        message += "Pour obtenir plus de points, passez à une version plus difficile.";
-                     }
-                  } else if (displayHelper.submittedScore < prevScore) { 
-                     message += "Vous aviez fait mieux avant.";
-                     showRetreiveAnswer = true;
-                  }
-                  else {
-                     message += "Votre score reste le même.";
-                  }
+               else {
+                  message += "Votre score reste le même.";
                }
             }
-         });
+         }
       }
       if (showRetreiveAnswer) {
          message += " <a href=\"#\" onclick='displayHelper.retreiveAnswer();return false;'>" + 
