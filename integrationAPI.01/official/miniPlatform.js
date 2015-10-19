@@ -1,3 +1,4 @@
+(function() {
 'use strict';
 
 /* 
@@ -24,7 +25,7 @@ var taskMetaData;
 // important for tracker.js
 var compiledTask = true;
 
-function miniPlatformShowSolution() {
+window.miniPlatformShowSolution = function() {
    $("#toremove").hide();
    task.getAnswer(function(answer) {
       task.showViews({"task": true, "solution": true}, function() {
@@ -66,11 +67,12 @@ function miniPlatformPreviewGrade(answer) {
 
 var alreadyStayed = false;
 
-function miniPlatformValidate(mode) {
+var miniPlatformValidate = function(mode, success, error) {
+   $.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);
-         return true;
+         success();
       } else {
          alreadyStayed = true;
       }
@@ -82,7 +84,10 @@ function miniPlatformValidate(mode) {
       $("#task").append("<center id='toremove'><br/><input type='button' value='Voir la solution' onclick='miniPlatformShowSolution()'></input></center>");
    }
    platform.trigger('validate', [mode]);
-}
+   if (success) {
+      success();
+   }
+};
 
 function getUrlParameter(sParam)
 {
@@ -109,15 +114,9 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
-      var getMetaDataAndLoad = function() {
-         task.getMetaData(function(metaData) {
-            taskMetaData = metaData;
-            platformLoad();
-         });
-      };
-      var platformLoad = function() {
+      var platformLoad = function(task) {
          platform.validate = miniPlatformValidate;
-         platform.updateHeight = function(height) {};
+         platform.updateHeight = function(height,success,error) {if (success) {success();}};
          var taskOptions = {};
          try {
             var strOptions = getUrlParameter("options");
@@ -131,30 +130,32 @@ $(document).ready(function() {
          if (taskMetaData.fullFeedback) {
             minScore = 0;
          }
-         platform.getTaskParams = function(key, defaultValue) {
-            var res = {'minScore': minScore, 'maxScore': 6, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
-            if (typeof key !== 'undefined') {
+         platform.getTaskParams = function(key, defaultValue, success, error) {
+            var res = {'minScore': minScore, 'maxScore': 10, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
+            if (key) {
                if (key !== 'options' && key in res) {
-                  return res[key];
+                  res = res[key];
+               } else if (res.options && key in res.options) {
+                  res = res.options[key];
+               } else {
+                  res = (typeof defaultValue !== 'undefined') ? defaultValue : null; 
                }
-               if (res.options && key in res.options) {
-                  return res.options[key];
-               }
-               return (typeof defaultValue !== 'undefined') ? defaultValue : null; 
             }
-            return res;
-         };
-         platform.getTaskOption = function(optionName, defaultValue) {
-            if ((taskOptions === null) || (taskOptions[optionName] === undefined)) {
-               return defaultValue;
+            if (success) {
+               success(res);
+            } else {
+               return res;
             }
-            return taskOptions[optionName];
          };
-         var loadedViews = {'task': true, 'solution': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
+         platform.askHint = function(hintToken, success, error) {
+            $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
+               if (success) {success();}
+            }, 'json');
+         };
+         var loadedViews = {'task': true, 'solution': true, 'hints': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
          var shownViews = {'task': true};
-
          // TODO: modifs ARTHUR à relire
-         if (taskOptions.showSolutionOnLoad === true) {
+         if (taskOptions.showSolutionOnLoad) {
             shownViews.solution = true;
          }
          if (!taskOptions.hideTitle) {
@@ -169,26 +170,58 @@ $(document).ready(function() {
                var tmp = {};
                tmp[view] = true;
                task.showViews(tmp, function(){});
+               $('.choose-view-button').removeClass('btn-info');
+               $('#choose-view-'+view).addClass('btn-info');
             };
+         };
+         var frenchName = {
+            'task': 'Exercice',
+            'submission': 'Soumission',
+            'solution': 'Solution',
+            'editor': 'Résoudre',
+            'hints': 'Conseils'
          };
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
             task.getViews(function(views){
-               if ($("#choose-view").length === 0)
+               if (! $("#choose-view").length)
                   $(document.body).prepend('<div id="choose-view"></div>');
                $("#choose-view").html("");
                for (var viewName in views)
                {
                   if (!views[viewName].requires) {
-                     $("#choose-view").append($('<button id="choose-view-'+viewName+'">' + viewName + '</button>').click(showViewsHandlerFactory(viewName)));
+                     $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + frenchName[viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
                }
             });
             task.showViews(shownViews, function() {
+               $('.choose-view-button').removeClass('btn-info');
+               $.each(shownViews, function(viewName) {
+                  $('#choose-view-'+viewName).addClass('btn-info');
+               });
                platform.trigger('showViews', [{"task": true}]);
             });
          });
       };
-      setTimeout(getMetaDataAndLoad, 0);
+      var getMetaDataAndLoad = function(task) {
+         task.getMetaData(function(metaData) {
+            taskMetaData = metaData;
+            platformLoad(task);
+         });
+      };
+      if (window.platform.task || platform.initFailed) {
+         // case everything went fine with task loading, or task loading failed
+         // (due to missing jschannel and file:// protocol...
+         getMetaDataAndLoad(window.task ? window.task : window.platform.task);
+      } else {
+         // task is not loaded yet
+         var oldInit = platform.initWithTask;
+         platform.initWithTask = function(task) {
+            oldInit(task);
+            getMetaDataAndLoad(task);
+         };
+      }
    }
 });
+
+})();

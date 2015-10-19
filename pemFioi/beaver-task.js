@@ -40,12 +40,11 @@ task.getViews = function(callback) {
 };
 
 task.updateToken = function(token, callback) {
-   //console.warning("sorry, token system not available for this task");
    callback();
 };
 
 task.getHeight = function(callback) {
-   callback(parseInt($("body").outerHeight(true)));
+   callback(parseInt($("html").outerHeight(true)));
 };
 
 task.unload = function(callback) {
@@ -96,34 +95,39 @@ task.getAnswer = function(callback) {
 
 var grader = grader ? grader : {
    acceptedAnswers : null,
-   getAcceptedAnswers: function() {
+   getAcceptedAnswers: function(callback) {
       if (grader.acceptedAnswers) {
-         return grader.acceptedAnswers;
+         callback(grader.acceptedAnswers);
       }
       if (json && json.acceptedAnswers) {
-         return json.acceptedAnswers;
+         callback(json.acceptedAnswers);
       }
       if (typeof getTaskResources === 'function') {
-         var json = getTaskResources();
-         if (json && json.acceptedAnswers) {
-            return json.acceptedAnswers;
-         }
+         getTaskResources(function(json) {
+            if (json && json.acceptedAnswers) {
+               callback(json.acceptedAnswers);
+            }
+         });
       }
    },
    gradeTask: function (answer, answerToken, callback) {
-      var acceptedAnswers = grader.getAcceptedAnswers();
-      var taskParams = platform.getTaskParams();
-      var score = taskParams.noScore;
-      if (acceptedAnswers && acceptedAnswers[0]) {
-         if ($.inArray("" + answer, acceptedAnswers) > -1) {
-            score = taskParams.maxScore;
-         } else {
-            score = taskParams.minScore;
-         }
-      }
-      callback(score, "");
+      grader.getAcceptedAnswers(function(acceptedAnswers) {
+         platform.getTaskParams(null, null, function (taskParams) {
+            var score = taskParams.noScore;
+            if (acceptedAnswers && acceptedAnswers[0]) {
+               if ($.inArray("" + answer, acceptedAnswers) > -1) {
+                  score = taskParams.maxScore;
+               } else {
+                  score = taskParams.minScore;
+               }
+            }
+            callback(score, "");
+         });
+      });
    }
 };
+
+task.gradeAnswer = grader.gradeTask;
 
 var DelayedExec = {
    timeouts: {},
@@ -176,6 +180,10 @@ var DelayedExec = {
       for(name in DelayedExec.animations) {
          DelayedExec.animations[name].stop();
          delete DelayedExec.animations[name];
-      }      
+      }
    }
 };
+
+$('document').ready(function() {
+   platform.initWithTask(window.task);
+});

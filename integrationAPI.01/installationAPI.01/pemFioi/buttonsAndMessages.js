@@ -41,34 +41,55 @@ var displayHelper = {
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
+      var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      this.taskParams = platform.getTaskParams();
-      this.readOnly = (this.taskParams.readonly == true || this.taskParams.readOnly == 'true');
-      this.graderScore = +this.taskParams.noScore;
-      this.savedAnswer = '';
+      platform.getTaskParams(null, null, function(taskParams) {
+         self.taskParams = taskParams;
+         self.readOnly = (self.taskParams.readonly == true || self.taskParams.readOnly == 'true');
+         self.graderScore = +self.taskParams.noScore;
+         self.savedAnswer = '';
 
-      var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
-      // Place button placement at the end of html if they don't already exist
-      if ($('#displayHelper_validate').length === 0) {
-         addTaskHtml += '<div id="displayHelper_validate"></div>';
-      }
-      if ($('#displayHelper_cancel').length === 0) {
-         addTaskHtml += '<div id="displayHelper_cancel"></div>';
-      }
-      if ($('#displayHelper_saved').length === 0) {
-         addTaskHtml += '<div id="displayHelper_saved"></div>';
-      }
-      addTaskHtml += '</div>';
-      $(this.taskSelector).append(addTaskHtml);
+         var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
+         // Place button placement at the end of html if they don't already exist
+         if ($('#displayHelper_validate').length === 0) {
+            addTaskHtml += '<div id="displayHelper_validate"></div>';
+         }
+         if ($('#displayHelper_cancel').length === 0) {
+            addTaskHtml += '<div id="displayHelper_cancel"></div>';
+         }
+         if ($('#displayHelper_saved').length === 0) {
+            addTaskHtml += '<div id="displayHelper_saved"></div>';
+         }
+         addTaskHtml += '</div>';
+         $(self.taskSelector).append(addTaskHtml);
 
-      this.taskDelayWarningTimeout = setTimeout(function() {
-         displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question ! " +
-            "Il est peut-être temps de passer à une autre !", false, "En effet");
-         displayHelper.taskDelayWarningTimeout = null;
-      }, 300 * 1000);
+         self.taskDelayWarningTimeout = setTimeout(function() {
+            displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question ! " +
+               "Il est peut-être temps de passer à une autre !", false, "En effet");
+            displayHelper.taskDelayWarningTimeout = null;
+         }, 300 * 1000);
+      });
    },
 
    setupLevels: function(initLevel) {
+      if (!initLevel) {
+         if (!displayHelper.taskParams) {
+            var self = this;
+            platform.getTaskParams(null, null, function(taskParams) {
+               self.taskParams = taskParams;
+               initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
+               self.doSetupLevels(initLevel);
+            });
+         } else {
+            initLevel = this.taskParams.options.difficulty ? this.taskParams.options.difficulty : "easy";
+            this.doSetupLevels(initLevel);
+         }
+      } else {
+         this.doSetupLevels(initLevel);
+      }
+   },
+
+   doSetupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
 
@@ -82,8 +103,9 @@ var displayHelper = {
       });
       this.setLevel(initLevel);
    },
+
    setupParams: function() {
-      var taskParams = platform.getTaskParams();
+      var taskParams = displayHelper.taskParams;
 
       this.hasLevels = true;
       if (taskParams.pointsAsStars !== undefined) {
@@ -605,7 +627,7 @@ var displayHelper = {
                   return '<br/><span style="display: inline-block; margin-bottom: .2em; color: ' +
                      color + '; font-weight: bold;">' + this.graderMessage + '</span>';
                } else if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\');" ' +
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -617,7 +639,7 @@ var displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\');" ' +
+                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -628,7 +650,7 @@ var displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\');" ' +
+                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -677,13 +699,13 @@ var displayHelper = {
             case 'unsaved_changed':
                if (!this.hasSolution) {
                   messages.validate = '<input type="button" value="Enregistrer votre réponse" ' +
-                     'onclick="platform.validate(\'done\')" ' + disabledStr + '/>';
+                     'onclick="platform.validate(\'done\', function(){})" ' + disabledStr + '/>';
                }
                break;
             case 'saved_unchanged':
                if (!this.hasSolution) {
                   messages.saved = "Votre réponse a été enregistrée. Vous pouvez la modifier, ou bien " +
-                     '<a href="#" onclick="platform.validate(\'cancel\'); return false;" ' + disabledStr +
+                     '<a href="#" onclick="platform.validate(\'cancel\', function(){}); return false;" ' + disabledStr +
                      ">l'annuler</a> et recommencer.";
                } else {
                   messages.saved = "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez " +
@@ -696,7 +718,7 @@ var displayHelper = {
                   'Vous pouvez <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">la recharger</a>.';
                if (!this.hideValidateButton) {
                   messages.validate = '<input type="button" value="Enregistrer cette nouvelle réponse" ' +
-                     'onclick="platform.validate(\'done\')" ' + disabledStr + "/>";
+                     'onclick="platform.validate(\'done\', function(){})" ' + disabledStr + "/>";
                }
                break;
          }
@@ -733,7 +755,7 @@ var displayHelper = {
       var height = $('body').height();
       if (height != this.lastSentHeight) {
          this.lastSentHeight = height;
-         platform.updateHeight(height);
+         platform.updateHeight(height, function(){});
       }
    },
 

@@ -43,6 +43,10 @@ button, input[type="button"] {
    text-align: center;
 }
 
+#task {
+   padding-bottom: 400px; /* to have some room for the keyboard on android tablets */
+}
+
 #task h1,
 .question h1,
 #solution {

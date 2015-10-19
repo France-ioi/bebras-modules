@@ -32,7 +32,7 @@ var stdAnsTypes = {
    updateHeight: function(height) {
       if (stdAnsTypes.lastSentHeight != height) {
          stdAnsTypes.lastSentHeight = height;
-         platform.updateHeight(height);
+         platform.updateHeight(height, function() {});
       }
    },
 
@@ -93,11 +93,12 @@ var stdAnsTypes = {
    
    genTaskMultipleChoices: function(nbColumns, choices, asButtonValues, answersSelector, preventShuffle) {
       task.load = function(views, callback) {
-         var taskParams = platform.getTaskParams();
-         stdAnsTypes.randomSeed = taskParams.randomSeed;
-         stdAnsTypes.currentAnswer = '';
-         stdAnsTypes.loadTaskMultipleChoices(nbColumns, choices, asButtonValues, answersSelector, preventShuffle);
-         callback();
+         platform.getTaskParams(null, null, function (taskParams) {
+            stdAnsTypes.randomSeed = taskParams.randomSeed;
+            stdAnsTypes.currentAnswer = '';
+            stdAnsTypes.loadTaskMultipleChoices(nbColumns, choices, asButtonValues, answersSelector, preventShuffle);
+            callback();
+         });
       };
    },
 
@@ -182,11 +183,12 @@ var stdAnsTypes = {
 
    genTaskFreeInput: function(inputType, answersSelector, max_length, num_rows) {
       task.load = function(views, callback) {
-         var taskParams = platform.getTaskParams();
-         stdAnsTypes.randomSeed = taskParams.randomSeed;
-         stdAnsTypes.currentAnswer = '';
-         stdAnsTypes.loadTaskFreeInput(inputType, answersSelector, max_length, num_rows);
-         callback();
+         platform.getTaskParams(null, null, function (taskParams) {
+            stdAnsTypes.randomSeed = taskParams.randomSeed;
+            stdAnsTypes.currentAnswer = '';
+            stdAnsTypes.loadTaskFreeInput(inputType, answersSelector, max_length, num_rows);
+            callback();
+         });
       };
       task.getAnswer = function(callback) {
          callback($('#input_answer').val());
@@ -249,9 +251,9 @@ var stdAnsTypes = {
       stdAnsTypes.currentAnswer = answer;
       stdAnsTypes.showAnswerSelected(answer);
       if (prevAnswer === '') {
-         platform.validate('next');
+         platform.validate('next', function() {});
       } else {
-         platform.validate('stay');
+         platform.validate('stay', function() {});
       }
       task.getHeight(this.updateHeight);
    },
