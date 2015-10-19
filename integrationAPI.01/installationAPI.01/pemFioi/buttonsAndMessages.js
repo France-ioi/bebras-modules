@@ -1,3 +1,5 @@
+(function() {
+
 'use strict';
 
 /*
@@ -8,7 +10,7 @@
  * See documentation for more information.
  */
 
-var displayHelper = {
+window.displayHelper = {
    loaded: true,
    checkAnswerInterval: null,
    prevAnswer: '',
@@ -43,9 +45,9 @@ var displayHelper = {
    load: function(views) {
       var self = this;
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
-      platform.getTaskParams(null, null, function(taskParams) {
+      window.platform.getTaskParams(null, null, function(taskParams) {
          self.taskParams = taskParams;
-         self.readOnly = (self.taskParams.readonly == true || self.taskParams.readOnly == 'true');
+         self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
 
@@ -75,7 +77,7 @@ var displayHelper = {
       if (!initLevel) {
          if (!displayHelper.taskParams) {
             var self = this;
-            platform.getTaskParams(null, null, function(taskParams) {
+            window.platform.getTaskParams(null, null, function(taskParams) {
                self.taskParams = taskParams;
                initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
                self.doSetupLevels(initLevel);
@@ -137,7 +139,8 @@ var displayHelper = {
 
       var starContainers = [];
       var tabsHTML = '<ul id="tabsMenu">';
-      for (var curLevel in this.levelsNames) {
+      var curLevel;
+      for (curLevel in this.levelsNames) {
          tabsHTML += '<li id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
             var starPoints = maxScores.hard / 4;
@@ -160,7 +163,7 @@ var displayHelper = {
       this.setStars(starContainers);
 
       for (var iLevel in this.levels) {
-         var curLevel = this.levels[iLevel];
+         curLevel = this.levels[iLevel];
          if (iLevel >= this.unlockedLevels) {
             $('#tab_' + curLevel).addClass('lockedLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.locked, this.starColors.locked);
@@ -324,7 +327,7 @@ var displayHelper = {
    restartAll: function() {
       this.stopShowingResult();
       if (!this.hasLevels) {
-         task.reloadAnswer('', function() {})
+         task.reloadAnswer('', function() {});
       } else {
          task.getAnswer(function(strAnswer) {
             var answer = $.parseJSON(strAnswer);
@@ -392,7 +395,7 @@ var displayHelper = {
             if (that.hasLevels) {
                if (score > that.levelsScores[gradedLevel]) {
                   that.levelsScores[gradedLevel] = score;
-                  if (that.savedAnswer == '') {
+                  if (that.savedAnswer === '') {
                      that.savedAnswer = answer;
                   } else {
                      var savedAnswerObj = $.parseJSON(that.savedAnswer);
@@ -436,11 +439,12 @@ var displayHelper = {
       }
 
       var gradedLevelNum = $.inArray(gradedLevel, this.levels);
+      var curLevel;
       // Possibly unlocking a level
       if (maxScores[gradedLevel] == scores[gradedLevel]) {
          var unlockedLevel = gradedLevelNum + 1;
          if (unlockedLevel < this.levels.length && unlockedLevel >= this.unlockedLevels) {
-            var curLevel = this.levels[unlockedLevel];
+            curLevel = this.levels[unlockedLevel];
             $('#tab_' + curLevel).removeClass('lockedLevel');
             this.changeStarsColors(curLevel, 'empty', this.starColors.empty, 'black');
             this.unlockedLevels++;
@@ -450,7 +454,7 @@ var displayHelper = {
          // Marks the level with most points
          var levelSelected = false;
          for (var iLevel = this.levels.length - 1; iLevel >= 0; iLevel--) {
-            var curLevel = this.levels[iLevel];
+            curLevel = this.levels[iLevel];
             if (!levelSelected && scores[curLevel] == this.graderScore) {
                this.changeStarsColors(curLevel, 'full', this.starColors.full, 'black');
                levelSelected = true;
@@ -459,7 +463,7 @@ var displayHelper = {
             }
          }
          // Marks levels that can't earn points as useless
-         for (var curLevel in this.levelsNames) {
+         for (curLevel in this.levelsNames) {
             if (maxScores[curLevel] > this.graderScore) {
                break;
             }
@@ -565,7 +569,7 @@ var displayHelper = {
       var message = "";
       var curAnswer = this.submittedAnswer;
       var answerExists = false;
-      if (curAnswer != '') {
+      if (curAnswer !== '') {
          curAnswer = $.parseJSON(curAnswer);
          answerExists = !$.isEmptyObject(curAnswer);
       }
@@ -755,7 +759,7 @@ var displayHelper = {
       var height = $('body').height();
       if (height != this.lastSentHeight) {
          this.lastSentHeight = height;
-         platform.updateHeight(height, function(){});
+         window.platform.updateHeight(height, function(){});
       }
    },
 
@@ -816,7 +820,7 @@ var displayHelper = {
       if (strokeColor === undefined) strokeColor = 'black';
       var scaleFactor = displayWidth / 100;
 
-      var starCanvas = Raphael(parent, displayWidth, displayWidth * .95);
+      var starCanvas = new Raphael(parent, displayWidth, displayWidth * 0.95);
       // A star in a frame of size (100, 95)
       var starPath = starCanvas.path('m46.761-0.11711 15.374 26.313 29.776 6.49-20.274 22.753 3.029 ' +
          '30.325-27.905-12.251-27.904 12.251 3.028-30.325-20.274-22.753 29.776-6.49z')
@@ -846,10 +850,10 @@ var displayHelper = {
       var parentElement = document.getElementById(parent);
       var starCanvas = parentElement.starCanvas;
       if (clipWidth !== undefined) {
-         if (clipWidth == 0) {
+         if (clipWidth === 0) {
             $('#' + parent).addClass('hiddenStar');
          } else {
-            starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * .95);
+            starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * 0.95);
             $('#' + parent).removeClass('hiddenStar');
          }
       }
@@ -866,4 +870,6 @@ var displayHelper = {
    }
 };
 
-platform.subscribe(displayHelper);
+window.platform.subscribe(displayHelper);
+
+})();
