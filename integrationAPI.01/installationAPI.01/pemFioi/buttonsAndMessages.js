@@ -66,7 +66,7 @@ window.displayHelper = {
          $(self.taskSelector).append(addTaskHtml);
 
          self.taskDelayWarningTimeout = setTimeout(function() {
-            displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question ! " +
+            displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
                "Il est peut-être temps de passer à une autre !", false, "En effet");
             displayHelper.taskDelayWarningTimeout = null;
          }, 300 * 1000);
@@ -75,7 +75,7 @@ window.displayHelper = {
 
    setupLevels: function(initLevel) {
       if (!initLevel) {
-         if (!displayHelper.taskParams) {
+         if (!this.taskParams) {
             var self = this;
             window.platform.getTaskParams(null, null, function(taskParams) {
                self.taskParams = taskParams;
@@ -107,7 +107,7 @@ window.displayHelper = {
    },
 
    setupParams: function() {
-      var taskParams = displayHelper.taskParams;
+      var taskParams = this.taskParams;
 
       this.hasLevels = true;
       if (taskParams.pointsAsStars !== undefined) {
@@ -232,7 +232,7 @@ window.displayHelper = {
             this.showPopupMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
                "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
                "J'y prendrai garde", function() {
-                  displayHelper.neverHadHard = false;
+                  this.neverHadHard = false;
                }
             );
          }
@@ -281,15 +281,15 @@ window.displayHelper = {
       if (this.hasSolution && this.graderScore) {
          this.prevSavedScore = this.graderScore;
       }
-      var that = this;
+      var self = this;
       this.checkAnswerInterval = setInterval(
          function() {
-             that.checkAnswerChanged();
+             self.checkAnswerChanged();
          }, 1000);
       task.getAnswer(function(answer) {
-         that.defaultAnswer = answer;
-         that.refreshMessages = true;
-         that.checkAnswerChanged();
+         self.defaultAnswer = answer;
+         self.refreshMessages = true;
+         self.checkAnswerChanged();
       });
    },
 
@@ -341,11 +341,11 @@ window.displayHelper = {
 
    validate: function(mode) {
       this.stoppedShowingResult = false;
-      var that = this;
+      var self = this;
       if (mode == 'cancel') {
          this.savedAnswer = '';
          task.reloadAnswer('', function() {
-            that.checkAnswerChanged();
+            self.checkAnswerChanged();
          });
       } else if (mode == 'stay') {
          this.submittedScore = this.levelsScores[this.taskLevel];
@@ -353,20 +353,20 @@ window.displayHelper = {
          this.checkAnswerChanged();
       } else {
          task.getAnswer(function(strAnswer) {
-            if (!that.hasSolution) {
-               that.prevSavedScore = that.graderScore;
-               if (that.hasLevels) {
-                  that.prevLevelsScores[that.taskLevel] = that.levelsScores[that.taskLevel];
+            if (!self.hasSolution) {
+               self.prevSavedScore = self.graderScore;
+               if (self.hasLevels) {
+                  self.prevLevelsScores[self.taskLevel] = self.levelsScores[self.taskLevel];
                }
             }
-            that.submittedAnswer = strAnswer;
-            if (that.showScore) {
-               that.updateScore(strAnswer, false);
+            self.submittedAnswer = strAnswer;
+            if (self.showScore) {
+               self.updateScore(strAnswer, false);
             } else {
-               that.savedAnswer = strAnswer;
+               self.savedAnswer = strAnswer;
             }
-            that.refreshMessages = true;
-            that.checkAnswerChanged();
+            self.refreshMessages = true;
+            self.checkAnswerChanged();
          });
       }
    },
@@ -381,43 +381,43 @@ window.displayHelper = {
       }
    },
    updateScoreOneLevel: function(answer, gradedLevel) {
-      var that = this;
+      var self = this;
       grader.gradeTask(answer, null, function(score, message) {
          score = +score;
-         that.submittedScore = score;
-         if (that.hasSolution) {
-            that.graderScore = score;
-            that.levelsScores[gradedLevel] = score;
+         self.submittedScore = score;
+         if (self.hasSolution) {
+            self.graderScore = score;
+            self.levelsScores[gradedLevel] = score;
          } else {
-            if (score > that.graderScore) {
-               that.graderScore = score;
+            if (score > self.graderScore) {
+               self.graderScore = score;
             }
-            if (that.hasLevels) {
-               if (score > that.levelsScores[gradedLevel]) {
-                  that.levelsScores[gradedLevel] = score;
-                  if (that.savedAnswer === '') {
-                     that.savedAnswer = answer;
+            if (self.hasLevels) {
+               if (score > self.levelsScores[gradedLevel]) {
+                  self.levelsScores[gradedLevel] = score;
+                  if (self.savedAnswer === '') {
+                     self.savedAnswer = answer;
                   } else {
-                     var savedAnswerObj = $.parseJSON(that.savedAnswer);
+                     var savedAnswerObj = $.parseJSON(self.savedAnswer);
                      var answerObj = $.parseJSON(answer);
                      savedAnswerObj[gradedLevel] = answerObj[gradedLevel];
-                     that.savedAnswer = JSON.stringify(savedAnswerObj);
+                     self.savedAnswer = JSON.stringify(savedAnswerObj);
                   }
                }
-            } else if (score > that.graderScore) {
-               that.savedAnswer = answer;
+            } else if (score > self.graderScore) {
+               self.savedAnswer = answer;
             }
          }
          if (message !== undefined) {
-            that.graderMessage = message;
+            self.graderMessage = message;
          } else {
-            that.graderMessage = "";
+            self.graderMessage = "";
          }
-         if (that.hasLevels) {
-            that.updateScoreDisplays(gradedLevel);
+         if (self.hasLevels) {
+            self.updateScoreDisplays(gradedLevel);
          }
-         that.refreshMessages = true;
-         that.checkAnswerChanged();
+         self.refreshMessages = true;
+         self.checkAnswerChanged();
       }, gradedLevel);
    },
    updateScoreDisplays: function(gradedLevel) {
@@ -478,9 +478,9 @@ window.displayHelper = {
       if (!task) {
          return false;
       }
-      var that = this;
+      var self = this;
       task.getAnswer(function(curAnswer) {
-         if (curAnswer != that.prevAnswer) {
+         if (curAnswer != self.prevAnswer) {
             try {
                if (self != top && parent.Tracker) {
                   var data = {
@@ -491,16 +491,16 @@ window.displayHelper = {
                   parent.Tracker.trackData(data);
                }
             } catch (e) {}
-            that.prevAnswer = curAnswer;
+            self.prevAnswer = curAnswer;
          }
-         if (curAnswer != that.submittedAnswer) {
-            that.submittedAnswer = '';
-            that.refreshMessages = true;
+         if (curAnswer != self.submittedAnswer) {
+            self.submittedAnswer = '';
+            self.refreshMessages = true;
          }
-         if (curAnswer == that.defaultAnswer && that.savedAnswer === '') {
+         if (curAnswer == self.defaultAnswer && self.savedAnswer === '') {
             callback(false);
          } else {
-            callback(curAnswer != that.submittedAnswer);
+            callback(curAnswer != self.submittedAnswer);
          }
       });
    },
@@ -512,20 +512,20 @@ window.displayHelper = {
          this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
          return;
       }
-      var that = this;
+      var self = this;
       this.hasNonSavedAnswer(function(hasNonSavedAnswer) {
-         if (that.submittedAnswer !== '') {
-            that.refreshMessages = true;
+         if (self.submittedAnswer !== '') {
+            self.refreshMessages = true;
          }
-         if (hasNonSavedAnswer && !that.hasAnswerChanged) {
-            that.refreshMessages = true;
-            that.hasAnswerChanged = true;
-         } else if (!hasNonSavedAnswer && that.hasAnswerChanged) {
-            that.refreshMessages = true;
-            that.hasAnswerChanged = false;
+         if (hasNonSavedAnswer && !self.hasAnswerChanged) {
+            self.refreshMessages = true;
+            self.hasAnswerChanged = true;
+         } else if (!hasNonSavedAnswer && self.hasAnswerChanged) {
+            self.refreshMessages = true;
+            self.hasAnswerChanged = false;
          }
-         if (that.refreshMessages) {
-            that.updateMessages();
+         if (self.refreshMessages) {
+            self.updateMessages();
          }
       });
    },
@@ -598,7 +598,7 @@ window.displayHelper = {
                   if (this.submittedScore < maxScoreLevel) {
                      message += "Essayez de faire encore mieux, ou passez à une version plus difficile.";
                   } else if (this.taskLevel == "hard") {
-                     message += "C'est le meilleur score possible sur ce sujet ; félicitations !";
+                     message += "C'est le meilleur score possible sur ce sujet ; félicitations !";
                   } else {
                      message += "Pour obtenir plus de points, passez à une version plus difficile.";
                   }
@@ -763,7 +763,7 @@ window.displayHelper = {
       }
    },
 
-   // loads previously saved answer
+   // Loads previously saved answer
    retrieveAnswer: function() {
       var retrievedAnswer;
       if (this.hasLevels) {
@@ -774,12 +774,12 @@ window.displayHelper = {
       } else {
          retrievedAnswer = this.savedAnswer;
       }
-      var that = displayHelper;
+      var self = displayHelper;
       task.reloadAnswer(retrievedAnswer, function() {
-         that.submittedAnswer = that.savedAnswer;
-         that.updateScore(that.savedAnswer, false);
-         that.refreshMessages = true;
-         that.checkAnswerChanged();
+         self.submittedAnswer = self.savedAnswer;
+         self.updateScore(self.savedAnswer, false);
+         self.refreshMessages = true;
+         self.checkAnswerChanged();
       });
    },
 
