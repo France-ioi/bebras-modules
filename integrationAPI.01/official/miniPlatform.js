@@ -40,7 +40,7 @@ function miniPlatformPreviewGrade(answer) {
    if (taskMetaData.fullFeedback) {
       minScore = 0;
    }
-   var maxScore = 40;
+   var maxScore = 20;
    var score;
    var showGrade = function(score) {
       if ($("#previewScorePopup").length === 0) {
@@ -131,7 +131,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 20, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
