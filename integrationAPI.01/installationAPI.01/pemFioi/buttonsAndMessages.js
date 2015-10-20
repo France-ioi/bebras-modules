@@ -125,8 +125,8 @@ window.displayHelper = {
          maxScore = taskParams.maxScore;
       }
       this.levelsMaxScores = {
-         easy: Math.round(maxScore / 2),
-         medium: Math.round(3 * maxScore / 4),
+         easy: (this.pointsAsStars ? maxScore / 2 : Math.round(maxScore / 2)),
+         medium: (this.pointsAsStars ? maxScore * 3 / 4 : Math.round(maxScore * 3 / 4)),
          hard: maxScore
       };
    },
