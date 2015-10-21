@@ -347,10 +347,6 @@ window.displayHelper = {
          task.reloadAnswer('', function() {
             self.checkAnswerChanged();
          });
-      } else if (mode == 'stay') {
-         this.submittedScore = this.levelsScores[this.taskLevel];
-         this.refreshMessages = true;
-         this.checkAnswerChanged();
       } else {
          task.getAnswer(function(strAnswer) {
             if (!self.hasSolution) {
