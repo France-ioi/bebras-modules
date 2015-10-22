@@ -209,7 +209,9 @@ window.displayHelper = {
       task.reloadAnswerObject(answer);
 
       this.taskLevel = newLevel;
-      this.validate('stay');
+      this.submittedScore = this.levelsScores[this.taskLevel];
+      this.refreshMessages = true;
+      this.checkAnswerChanged();
       this.stopShowingResult();
 
       if (!this.hasSolution) {
