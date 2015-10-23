@@ -69,7 +69,7 @@ window.displayHelper = {
             displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
                "Il est peut-être temps de passer à une autre !", false, "En effet");
             displayHelper.taskDelayWarningTimeout = null;
-         }, 300 * 1000);
+         }, 5 * 60 * 1000);
       });
    },
 
@@ -797,7 +797,7 @@ window.displayHelper = {
       full: '#ffc90e',
       emptyUseless: '#ced',
       fullUseless: '#fba',
-      uselessBorder: '#666',
+      uselessBorder: '#666', 
       locked: '#ddd'
    },
    setStars: function(parents, starWidth) {

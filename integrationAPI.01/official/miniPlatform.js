@@ -189,13 +189,14 @@ $(document).ready(function() {
                $("#choose-view").html("");
                for (var viewName in views)
                {
+                  break; // ARTHUR TEMPORARY
                   if (!views[viewName].requires) {
                      $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + frenchName[viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
                }
             });
             task.showViews(shownViews, function() {
-               $('.choose-view-button').removeClass('btn-info');
+                 $('.choose-view-button').removeClass('btn-info');
                $.each(shownViews, function(viewName) {
                   $('#choose-view-'+viewName).addClass('btn-info');
                });
