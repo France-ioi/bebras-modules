@@ -189,7 +189,6 @@ $(document).ready(function() {
                $("#choose-view").html("");
                for (var viewName in views)
                {
-                  break; // ARTHUR TEMPORARY
                   if (!views[viewName].requires) {
                      $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + frenchName[viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
