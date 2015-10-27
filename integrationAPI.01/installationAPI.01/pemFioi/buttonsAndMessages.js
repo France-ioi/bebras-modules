@@ -32,6 +32,7 @@ window.displayHelper = {
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 3,
    neverHadHard: false,
+   showMultiversionNotice: true, // TODO: false as default
    levelsScores: { easy: 0, medium: 0, hard: 0 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
@@ -64,12 +65,20 @@ window.displayHelper = {
          }
          addTaskHtml += '</div>';
          $(self.taskSelector).append(addTaskHtml);
+         if (self.tabMessageShown) {
+            $('#displayHelperAnswering').hide();
+         }
 
-         self.taskDelayWarningTimeout = setTimeout(function() {
-            displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
-               "Il est peut-être temps de passer à une autre !", false, "En effet");
-            displayHelper.taskDelayWarningTimeout = null;
-         }, 5 * 60 * 1000);
+         var taskDelayWarning = function() {
+            if (self.tabMessageShown) {
+               self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
+            } else {
+               self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
+                  "Il est peut-être temps de passer à une autre !", false, "En effet");
+               self.taskDelayWarningTimeout = null;
+            }
+         };
+         self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5 * 60 * 1000);
       });
    },
    setupLevels: function(initLevel) {
@@ -102,8 +111,12 @@ window.displayHelper = {
          displayHelper.setLevel(newLevel);
       });
       this.setLevel(initLevel);
-   },
 
+      if (this.unlockedLevels > 1 && this.showMultiversionNotice) {
+         this.showPopupMessage("Notez que pour cette question, " +
+            "vous pouvez résoudre directement une version plus difficile que celle-ci.", true, "Montrez-moi cette version");
+      }
+   },
    setupParams: function() {
       var taskParams = this.taskParams;
 
@@ -116,6 +129,9 @@ window.displayHelper = {
       }
       if (taskParams.neverHadHard !== undefined) {
          this.neverHadHard = taskParams.neverHadHard;
+      }
+      if (taskParams.showMultiversionNotice !== undefined) {
+         this.showMultiversionNotice = taskParams.showMultiversionNotice;
       }
 
       var maxScore = 40;
