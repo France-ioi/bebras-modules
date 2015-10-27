@@ -129,6 +129,11 @@ button, input[type="button"] {
    height: 18px;
    vertical-align: middle;
 }
+h1 .starContainer {
+   width: 22px;
+   height: 22px;
+   vertical-align: top;
+}
 #answerScore .starContainer {
    width: 20px;
    height: 20px;
@@ -143,6 +148,12 @@ span.hiddenStar {
 }
 span.fullStar {
    z-index: 1;
+}
+
+h1 span {
+   display: inline-block;
+   width: .8em;
+   height: .8em;
 }
 
 #tabsContainer {

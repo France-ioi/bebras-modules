@@ -72,7 +72,6 @@ window.displayHelper = {
          }, 5 * 60 * 1000);
       });
    },
-
    setupLevels: function(initLevel) {
       if (!initLevel) {
          if (!this.taskParams) {
@@ -90,7 +89,6 @@ window.displayHelper = {
          this.doSetupLevels(initLevel);
       }
    },
-
    doSetupLevels: function(initLevel) {
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
@@ -132,26 +130,23 @@ window.displayHelper = {
    },
    setupLevelsTabs: function() {
       var maxScores = this.levelsMaxScores;
-      if (!this.pointsAsStars) {
+      if (this.pointsAsStars) {
+         var titleStarContainers = [];
+         var scoreHTML = '<span></span>' + this.genStarContainers(titleStarContainers, maxScores.hard, 'titleStar');
+         $('#task > h1').append(scoreHTML);
+         this.setStars(titleStarContainers, 22);
+      } else {
          var scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
          $('#tabsContainer').append(scoreHTML);
       }
 
-      var starContainers = [];
+      var tabsStarContainers = [];
       var tabsHTML = '<ul id="tabsMenu">';
       var curLevel;
       for (curLevel in this.levelsNames) {
          tabsHTML += '<li id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
-            var starPoints = maxScores.hard / 4;
-            var iStar = 0;
-            tabsHTML += "Version ";
-            for (var curScore = 0; curScore < maxScores[curLevel]; curScore += starPoints) {
-               var starID = 'tabScore_' + curLevel + iStar;
-               tabsHTML += '<span id="' + starID + '" class="starContainer"></span>';
-               starContainers.push(starID);
-               iStar++;
-            }
+            tabsHTML += "Version " + this.genStarContainers(tabsStarContainers, maxScores[curLevel], 'tabScore_' + curLevel);
          } else {
             tabsHTML += this.onlyLevelsNames[curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
@@ -160,7 +155,7 @@ window.displayHelper = {
       }
       tabsHTML += '</ul><div></div>';
       $('#tabsContainer').append(tabsHTML);
-      this.setStars(starContainers);
+      this.setStars(tabsStarContainers);
 
       for (var iLevel in this.levels) {
          curLevel = this.levels[iLevel];
@@ -215,19 +210,9 @@ window.displayHelper = {
       this.stopShowingResult();
 
       if (!this.hasSolution) {
-         if ($('#tab_' + newLevel).hasClass('uselessLevel')) {
-            var buttonText = "Je veux quand même voir cette version";
-            if (this.levelsScores[newLevel] == this.levelsMaxScores[newLevel]) {
-               if (newLevel == 'hard') {
-                  this.showPopupMessage("Vous avez déjà tous les points à cette question. Passez à une autre !", true, buttonText);
-               } else {
-                  this.showPopupMessage("Vous avez déjà résolu cette version de la question. Vous pouvez passer " +
-                     "à une autre question ou essayer de résoudre une version plus difficile.", true, buttonText);
-               }
-            } else {
-               this.showPopupMessage("Vous avez déjà au moins autant de points à la question que cette version " +
-                  "peut vous en rapporter. Passez à la suite !", true, buttonText);
-            }
+         if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
+            this.showPopupMessage("Attention : vous avez déjà au moins autant de points à la question que cette version " +
+               "peut vous en rapporter. Cette version ne vous rapportera donc aucun point.", false);
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
@@ -431,6 +416,13 @@ window.displayHelper = {
             starScore += starPoints;
          }
          this.editStar('tabScore_' + gradedLevel + iStar + '_full', (scores[gradedLevel] - starScore) / starPoints);
+         iStar = starScore = 0;
+         while (starScore + starPoints < this.graderScore) {
+            this.editStar('titleStar' + iStar + '_full', 1);
+            iStar++;
+            starScore += starPoints;
+         }
+         this.editStar('titleStar'  + iStar + '_full', (this.graderScore - starScore) / starPoints);
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
@@ -733,20 +725,13 @@ window.displayHelper = {
       }
       if (this.pointsAsStars && $('#answerScore').length) {
          var starContainers = [];
-         var starsHTML = '';
-         var starPoints = this.levelsMaxScores.hard / 4;
-         var iStar = 0;
-         for (var curScore = 0; curScore < this.levelsMaxScores[this.taskLevel]; curScore += starPoints) {
-            var starID = 'answerScore' + iStar;
-            starsHTML += '<span id="' + starID + '" class="starContainer"></span>';
-            starContainers.push(starID);
-            iStar++;
-         }
+         var starsHTML = this.genStarContainers(starContainers, this.levelsMaxScores[this.taskLevel], 'answerScore');
          $('#answerScore').html(starsHTML);
          this.setStars(starContainers, 20);
 
-         iStar = 0;
+         var starPoints = this.levelsMaxScores.hard / 4;
          var starScore = 0;
+         var iStar = 0;
          while (starScore + starPoints < this.levelsScores[this.taskLevel]) {
             this.editStar('answerScore' + iStar + '_full', 1);
             iStar++;
@@ -796,7 +781,7 @@ window.displayHelper = {
       empty: 'white',
       full: '#ffc90e',
       emptyUseless: '#ced',
-      fullUseless: '#fba',
+      fullUseless: '#ffc90e',
       uselessBorder: '#666',
       locked: '#ddd'
    },
@@ -865,6 +850,18 @@ window.displayHelper = {
             starPath.attr('stroke', strokeColor);
          });
       }
+   },
+   genStarContainers: function(idList, maxScore, prefix) {
+      var resultHTML = '';
+      var starPoints = this.levelsMaxScores.hard / 4;
+      var iStar = 0;
+      for (var curScore = 0; curScore < maxScore; curScore += starPoints) {
+         var starID = prefix + iStar;
+         resultHTML += '<span id="' + starID + '" class="starContainer"></span>';
+         idList.push(starID);
+         iStar++;
+      }
+      return resultHTML;
    }
 };
 
