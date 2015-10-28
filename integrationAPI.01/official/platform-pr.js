@@ -84,9 +84,19 @@ if (!isCrossDomain()) {
       openUrl: function(url, success, error) {
          return platform.parent_platform.openUrl(url, success, error);
       },
+      initCallback: function(callback) {
+         this.initCallbackFun = callback;
+         if (platform.initDone) {
+            callback();
+         }
+      },
       initWithTask: function(task) {
          platform.task = task;
          window.task = task;
+         platform.initDone = true;
+         if (platform.initCallbackFun) {
+            platform.initCallbackFun();
+         }
       }
    };
 
