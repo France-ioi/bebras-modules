@@ -68,7 +68,7 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
-   $.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
+   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);
