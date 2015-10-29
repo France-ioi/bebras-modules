@@ -11,7 +11,7 @@
  */
 
 window.displayHelper = {
-   loaded: true,
+   loaded: false,
    checkAnswerInterval: null,
    prevAnswer: '',
    readOnly: false,
@@ -64,6 +64,7 @@ window.displayHelper = {
          }
          addTaskHtml += '</div>';
          $(self.taskSelector).append(addTaskHtml);
+         self.loaded= true;
 
          self.taskDelayWarningTimeout = setTimeout(function() {
             displayHelper.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
@@ -251,7 +252,9 @@ window.displayHelper = {
       if (!buttonText) {
          buttonText = "D'accord";
       }
-      $('#tabMessage').html('<div><img src="../../modules/img/castor.png"/><img src="../../modules/img/fleche-bulle.png"/>' +
+      // hack: when in the context of the platform, we need to change the path
+      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath+'images/' : '../../modules/img/';
+      $('#tabMessage').html('<div><img src="'+imgPath+'castor.png"><img src="'+imgPath+'fleche-bulle.png">' +
          '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
