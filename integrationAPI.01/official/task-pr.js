@@ -12,7 +12,7 @@
  * 'task_id' here refers to the "id" attribute of the iframe in which a task is
  * loaded.
  *
- * It depends on jQuery.
+ * It depends on jQuery and jschannel.
  *
  * Currently, if you do not use the callback system, you have to make sure
  * iframe is ready before calling functions returning a result. 
@@ -31,18 +31,14 @@ var TaskProxyManager = {
          if (force) {
             TaskProxyManager.deleteTaskProxy(idFrame);
          }
-         setTimeout(function() {
-            $('#'+idFrame).each(function() {
-               TaskProxyManager.tasks[idFrame] = new Task($(this), function() {
-                  setTimeout(function() {
-                     if (idFrame in TaskProxyManager.platforms) {
-                        TaskProxyManager.tasks[idFrame].setPlatform(TaskProxyManager.platforms[idFrame]);
-                     }
-                     callback(TaskProxyManager.tasks[idFrame]);
-                  }, 0);
-               });
-            });
-         }, 0);
+         $('#'+idFrame).each(function() {
+            TaskProxyManager.tasks[idFrame] = new Task($(this), function() {setTimeout(function() {
+               if (idFrame in TaskProxyManager.platforms) {
+                  TaskProxyManager.tasks[idFrame].setPlatform(TaskProxyManager.platforms[idFrame]);
+               }
+               callback(TaskProxyManager.tasks[idFrame]);
+            });});
+         });
       }
    },
    setPlatform: function(task, platform) {
@@ -73,20 +69,21 @@ var taskCaller = function(task, request, content) {
          }
          var functionsToTrigger = {load: true, unload:true, reloadAnswer:true, showViews: true, reloadState: true};
          if (functionsToTrigger[request]) {
-            var askedCallback = content[content.length - 1];
-            if (typeof askedCallback === 'function') {
+            var askedCallbackIdx = (typeof content[content.length - 2] === 'function') ? content.length - 2 : content.length - 1;
+            if (typeof content[askedCallbackIdx] === 'function') {
+               var oldCallback = content[askedCallbackIdx];
                var newCallback = function() {
                   task.distantPlatform.trigger(request, content);
-                  askedCallback();
+                  oldCallback();
                };
-               content[content.length -1] = newCallback;
+               content[askedCallbackIdx] = newCallback;
             }
          }
          var res = task.distantTask[request].apply(task.distantTask, content);
          return res;
-      }// else {
-      //   console.error("Task "+task.Id+" doesn't implement "+request);
-      //}
+      } else if (task.distantTask) {
+         console.error("Task "+task.Id+" doesn't implement "+request);
+      }
    }
 };
 
@@ -114,16 +111,18 @@ function Task(iframe, callback) {
       that.iframe_loaded = true;
       that.distantTask = that.iframe[0].contentWindow.task;
       that.distantPlatform = that.iframe[0].contentWindow.platform;
+      that.iframe[0].contentWindow.platform.parentLoadedFlag = true;
       if (that.platform) {
          that.distantPlatform.setPlatform(that.platform);
       }
       callback();    
    }
    // checking if platform is already available
-   if (that.iframe[0].contentWindow.platform) {
+   var iframeDoc = that.iframe[0].contentDocument || that.iframe[0].contentWindow.document;
+   if (iframeDoc && iframeDoc.readyState  == 'complete' && that.iframe[0].contentWindow.platform && !that.iframe[0].contentWindow.platform.parentLoadedFlag) {
       that.iframe[0].contentWindow.platform.initCallback(that.iframeLoaded);
    } else {
-      this.iframe.load(function() {
+      $(that.iframe).on("load", function() {
          that.iframe[0].contentWindow.platform.initCallback(that.iframeLoaded);        
       });
    }

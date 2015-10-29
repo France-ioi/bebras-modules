@@ -142,7 +142,6 @@ if (!isCrossDomain()) {
       chan.bind('task.getAnswer', function(trans) {task.getAnswer(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getState', function(trans) {task.getState(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getResources', function(trans) {task.getResources(trans.complete, trans.error);trans.delayReturn(true);});
-      chan.bind('task.getResources', function(trans) {task.getResources(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.reloadState', function(trans, state) {task.reloadState(state, callAndTrigger(trans.complete, 'reloadState'), trans.error);trans.delayReturn(true);});
       chan.bind('grader.gradeTask', function(trans, params) {gradeAnswer(params, trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.gradeAnswer', function(trans, params) {gradeAnswer(params, trans.complete, trans.error);trans.delayReturn(true);});
