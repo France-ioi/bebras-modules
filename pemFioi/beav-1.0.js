@@ -151,7 +151,7 @@ Beav.Matrix.init = function(nbRows, nbCols, initFct) {
    for (var x = 0; x < nbRows; x++) {
       var t = [];
       for (var y = 0; y < nbCols; y++) {
-         t.push(initFct(x,y));
+         t.push(initFct(x, y));
       }
       m.push(t);
    }
@@ -174,7 +174,7 @@ Beav.Matrix.copy = function(m) {
 };
 
 Beav.Matrix.make = function(nbRows, nbCols, v) {
-   return Beav.Matrix.init(nbRows, nbCols, function(x,y) { return v; });
+   return Beav.Matrix.init(nbRows, nbCols, function() { return v; });
 };
 
 Beav.Matrix.forEach = function(m, iterFct) {
@@ -189,13 +189,83 @@ Beav.Matrix.filterCount = function(m, selectFct) {
    var count = 0;
    for (var x = 0; x < m.length; x++) {
       for (var y = 0; y < m[x].length; y++) {
-         if (selectFct(m[x][y],x,y)) {
+         if (selectFct(m[x][y], x, y)) {
             count++;
          }
       }
    }
    return count;
 };
+
+
+/**********************************************************************************/
+/* Matrix3D */
+
+Beav.Matrix3D = new Object();
+
+Beav.Matrix3D.init = function(nbX, nbY, nbZ, initFct) {
+   var m = [];
+   for (var x = 0; x < nbX; x++) {
+      var t = [];
+      for (var y = 0; y < nbY; y++) {
+         var r = [];
+         for (var z = 0; z < nbZ; z++) {
+            r.push(initFct(x, y, z));   
+         }
+         t.push(r);
+      }
+      m.push(t);
+   }
+   return m;                  
+};
+
+Beav.Matrix3D.map = function(m, mapFct) {
+   var r = [];
+   for (var x = 0; x < m.length; x++) {
+      r[x] = [];
+      for (var y = 0; y < m[x].length; y++) {
+         r[x][y] = [];
+         for (var z = 0; z < m[x][y].length; z++) {
+            r[x][y][z] = mapFct(m[x][y][z], x, y, z, m);
+         }
+      }
+   }
+   return r;                  
+};
+
+Beav.Matrix3D.copy = function(m) {
+   return Beav.Matrix3D.map(m, function(v) { return v; });
+};
+
+Beav.Matrix3D.make = function(nbX, nbY, nbZ, v) {
+   return Beav.Matrix3D.init(nbX, nbY, nbZ, function() { return v; });
+};
+
+Beav.Matrix3D.forEach = function(m, iterFct) {
+   for (var x = 0; x < m.length; x++) {
+      for (var y = 0; y < m[x].length; y++) {
+         for (var z = 0; z < m[x][y].length; z++) {
+            iterFct(m[x][y][z], x, y, z, m);
+         }
+      }
+   }
+};
+
+Beav.Matrix3D.filterCount = function(m, selectFct) {
+   var count = 0;
+   for (var x = 0; x < m.length; x++) {
+      for (var y = 0; y < m[x].length; y++) {
+         for (var z = 0; z < m[x][y].length; z++) {
+            if (selectFct(m[x][y][z], x, y, z)) {
+               count++;
+            }
+         }
+      }
+   }
+   return count;
+};
+
+
 
 
 /**********************************************************************************/
