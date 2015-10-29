@@ -31,11 +31,18 @@ var TaskProxyManager = {
          if (force) {
             TaskProxyManager.deleteTaskProxy(idFrame);
          }
-         $('#'+idFrame).each(function() {
-            var curTask = new Task($(this));
-            TaskProxyManager.tasks[idFrame] = curTask;
-         });
-         callback(TaskProxyManager.tasks[idFrame]);
+         setTimeout(function() {
+            $('#'+idFrame).each(function() {
+               TaskProxyManager.tasks[idFrame] = new Task($(this), function() {
+                  setTimeout(function() {
+                     if (idFrame in TaskProxyManager.platforms) {
+                        TaskProxyManager.tasks[idFrame].setPlatform(TaskProxyManager.platforms[idFrame]);
+                     }
+                     callback(TaskProxyManager.tasks[idFrame]);
+                  }, 0);
+               });
+            });
+         }, 0);
       }
    },
    setPlatform: function(task, platform) {
@@ -58,7 +65,7 @@ var taskCaller = function(task, request, content) {
    if (!task.iframe_loaded) {
       setTimeout(function() {
          taskCaller(task, request, content);
-      }, 250);
+      }, 100);
    } else {
       if (task.distantTask && typeof task.distantTask[request] === 'function') {
          if (typeof content === 'string' || (typeof content === 'object' && Object.prototype.toString.call(content) !== '[object Array]')) {
@@ -86,36 +93,38 @@ var taskCaller = function(task, request, content) {
 /*
  * Task object, created from an iframe DOM element
  */
-function Task(iframe) {
+function Task(iframe, callback) {
    this.iframe = iframe;
    this.iframe_loaded = false;
    this.distantTask = null;
    this.Id = iframe.attr('id');
    this.elementsLoaded = false;
    this.platform = null;
+   var that = this;
    this.setPlatform = function(platform) {
       this.platform = platform;
       if (this.iframe_loaded) {
          this.distantPlatform.setPlatform(platform);
       }
    };
-   var that = this;
-   // checking if task is already available
-   if (that.iframe[0].contentWindow.task) {
+   this.iframeLoaded = function() {
+      if (that.iframe_loaded) {
+         return;
+      }
       that.iframe_loaded = true;
       that.distantTask = that.iframe[0].contentWindow.task;
       that.distantPlatform = that.iframe[0].contentWindow.platform;
       if (that.platform) {
          that.distantPlatform.setPlatform(that.platform);
       }
+      callback();    
+   }
+   // checking if platform is already available
+   if (that.iframe[0].contentWindow.platform) {
+      that.iframe[0].contentWindow.platform.initCallback(that.iframeLoaded);
    } else {
       this.iframe.load(function() {
-         that.iframe_loaded = true;
-         that.distantTask = that.iframe[0].contentWindow.task;
-         that.distantPlatform = that.iframe[0].contentWindow.platform;
-         if (that.platform) {
-            that.distantPlatform.setPlatform(that.platform);
-         }
+         that.iframe[0].contentWindow.platform.initCallback(that.iframeLoaded);        
       });
    }
 }
@@ -177,7 +186,7 @@ Task.prototype.gradeAnswer = function(answer, answerToken, success, error) {
     return taskCaller(this, 'gradeAnswer', [answer, answerToken, success, error]);
 };
 Task.prototype.getResources = function(success, error) {
-    return taskCaller(this, 'gradeResources', [success, error]);
+    return taskCaller(this, 'getResources', [success, error]);
 };
 // for grader.gradeTask
 Task.prototype.gradeTask = function(answer, answerToken, success, error) {
@@ -204,16 +213,18 @@ Platform.prototype.validate = function(mode) {};
 Platform.prototype.showView = function(views) {};
 Platform.prototype.askHint = function(platformToken) {};
 Platform.prototype.updateHeight = function(height) {this.task.iframe.height(parseInt(height)+40);};
-Platform.prototype.getTaskParams = function(key, defaultValue) {
-   var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false};
-   if (typeof key !== 'undefined') {
+Platform.prototype.getTaskParams = function(key, defaultValue, success, error) {
+   var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false, options: {}};
+   if (key) {
       if (key !== 'options' && key in res) {
-         return this.taskParams[key];
+         res = res[key];
+      } else if (res.options && key in res.options) {
+         res = res.options[key];
       } else {
-         return (typeof defaultValue !== 'undefined') ? defaultValue : null; 
+         res = (typeof defaultValue !== 'undefined') ? defaultValue : null;
       }
    }
-   return res;
+   success(res);
 };
 
 Platform.prototype.openUrl = function(url) {

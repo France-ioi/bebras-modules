@@ -14,7 +14,8 @@ function implementGetResources(task) {
    task.getResources = function(callback)
    {
       if (taskResourcesLoaded) {
-         return res;
+         callback(res);
+         return;
       }
       res.task = ('task' in res) ? res.task : [{ type: 'html', content: $('#task').html() }];
       res.solution = ('solution' in res) ? res.solution : [{ type: 'html', content: $('#solution').html() }];
@@ -131,6 +132,15 @@ function implementGetResources(task) {
       callback(res);
    };
 }
+
+function declareResource(type, resource) {
+   if (!res[type]) {
+      res[type] = [];
+   }
+   res[type].push(resource);
+}
+
+window.declareTaskResource = declareResource;
 
 $(document).ready(function() {
    res.task = [{ type: 'html', content: $('#task').html() }];

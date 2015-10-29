@@ -68,7 +68,7 @@ function miniPlatformPreviewGrade(answer) {
 var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
-   $.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
+   //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);
@@ -185,7 +185,7 @@ $(document).ready(function() {
             platform.trigger('load', [loadedViews]);
             task.getViews(function(views){
                if (! $("#choose-view").length)
-                  $(document.body).prepend('<div id="choose-view"></div>');
+                  $(document.body).append('<div id="choose-view"></div>');
                $("#choose-view").html("");
                for (var viewName in views)
                {
@@ -195,7 +195,7 @@ $(document).ready(function() {
                }
             });
             task.showViews(shownViews, function() {
-               $('.choose-view-button').removeClass('btn-info');
+                 $('.choose-view-button').removeClass('btn-info');
                $.each(shownViews, function(viewName) {
                   $('#choose-view-'+viewName).addClass('btn-info');
                });

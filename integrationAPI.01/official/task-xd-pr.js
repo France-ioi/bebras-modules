@@ -261,7 +261,7 @@ Task.prototype.getResources = function(success, error) {
       params: [],
       error: error,
       success: success,
-      timeout: 30000
+      timeout: 2000
    });
 };
 
@@ -291,12 +291,14 @@ Platform.prototype.askHint = function(platformToken, success, error) {error('pla
 Platform.prototype.updateHeight = function(height, success, error) {this.task.iframe.height(parseInt(height)+40);success();};
 Platform.prototype.openUrl = function(url) {error('platform.openUrl is not defined!');};
 Platform.prototype.getTaskParams = function(key, defaultValue, success, error) {
-   var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false};
-   if (typeof key !== 'undefined') {
+   var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false, options: {}};
+   if (key) {
       if (key !== 'options' && key in res) {
-         return this.taskParams[key];
+         res = res[key];
+      } else if (res.options && key in res.options) {
+         res = res.options[key];
       } else {
-         return (typeof defaultValue !== 'undefined') ? defaultValue : null;
+         res = (typeof defaultValue !== 'undefined') ? defaultValue : null;
       }
    }
    success(res);

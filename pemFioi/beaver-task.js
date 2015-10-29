@@ -110,7 +110,7 @@ var grader = grader ? grader : {
          });
       }
    },
-   gradeTask: function (answer, answerToken, callback) {
+   gradeTask: function (answer, answerToken, success, error) {
       grader.getAcceptedAnswers(function(acceptedAnswers) {
          platform.getTaskParams(null, null, function (taskParams) {
             var score = taskParams.noScore;
@@ -121,13 +121,15 @@ var grader = grader ? grader : {
                   score = taskParams.minScore;
                }
             }
-            callback(score, "");
+            success(score, "");
          });
       });
    }
 };
 
-task.gradeAnswer = grader.gradeTask;
+task.gradeAnswer = function(answer, answerToken, success, error) {
+   grader.gradeTask(answer, answerToken, success, error);
+};
 
 var DelayedExec = {
    timeouts: {},

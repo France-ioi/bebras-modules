@@ -51,6 +51,8 @@ button, input[type="button"] {
 .question h1,
 #solution {
    display: none;
+   margin-bottom: 0.4em;
+   margin-top: 0.4em;
 }
 
 #success,
@@ -69,6 +71,7 @@ button, input[type="button"] {
 }
 #tabsMenu {
    margin: 0;
+   margin-left: 100px;
    padding: 0;
    list-style: none;
    overflow: hidden;
@@ -83,14 +86,17 @@ button, input[type="button"] {
 #tabsMenu li {
    float: left;
    min-width: 150px;
+   margin-left: 20px;
    margin-right: 10px;
-   background: #d5e4ef;
+   background: #88BB88; /* #d5e4ef; */
    border: 2px solid #8d9daa;
    border-bottom: 0;
    text-align: center;
+   border-top-left-radius: 6px;
+   border-top-right-radius: 6px;
 }
 #tabsMenu li.lockedLevel {
-   background: #5a6069;
+   background: #404040 /* #5a6069; */
 }
 #tabsMenu li.current {
    padding-bottom: 2px;
@@ -123,6 +129,11 @@ button, input[type="button"] {
    height: 18px;
    vertical-align: middle;
 }
+h1 .starContainer {
+   width: 22px;
+   height: 22px;
+   vertical-align: top;
+}
 #answerScore .starContainer {
    width: 20px;
    height: 20px;
@@ -137,6 +148,12 @@ span.hiddenStar {
 }
 span.fullStar {
    z-index: 1;
+}
+
+h1 span {
+   display: inline-block;
+   width: .8em;
+   height: .8em;
 }
 
 #tabsContainer {
@@ -167,9 +184,10 @@ span.fullStar {
    right: 0;
    bottom: 0;
    left: 0;
-   background: rgba(0, 0, 0, .7);
+   background: rgba(0, 0, 0, .5);
 }
 #tabMessage.floatingMessage > div {
+   min-height: 100px;
    max-width: 500px;
    margin: 10% auto;
    border: 2px solid black;
@@ -177,7 +195,8 @@ span.fullStar {
 }
 #tabMessage > div > img:first-child {
    float: left;
-   width: 65px;
+   padding-top: 10px;
+   width: 90px; /*65px;*/
 }
 #tabMessage > div > img + img {
    position: absolute;
