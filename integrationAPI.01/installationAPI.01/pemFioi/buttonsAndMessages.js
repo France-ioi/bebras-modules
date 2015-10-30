@@ -149,14 +149,15 @@ window.displayHelper = {
       };
    },
    setupLevelsTabs: function() {
+      var scoreHTML;
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          var titleStarContainers = [];
-         var scoreHTML = '<span></span>' + this.genStarContainers(titleStarContainers, maxScores.hard, 'titleStar');
+         scoreHTML = '<span></span>' + this.genStarContainers(titleStarContainers, maxScores.hard, 'titleStar');
          $('#task > h1').append(scoreHTML);
          this.setStars(titleStarContainers, 22);
       } else {
-         var scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
+         scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
          $('#tabsContainer').append(scoreHTML);
       }
 
@@ -321,7 +322,7 @@ window.displayHelper = {
       this.checkAnswerChanged(); // necessary?
    },
 
-   reloadState: function(state) {
+   reloadState: function() {
       this.checkAnswerChanged(); // necessary?
    },
 
@@ -575,7 +576,7 @@ window.displayHelper = {
       }
       return scoreDiffMsg;
    },
-   getFullFeedbackWithLevelsSavedMessage: function(taskMode) {
+   getFullFeedbackWithLevelsSavedMessage: function() {
       var maxScoreLevel = this.levelsMaxScores[this.taskLevel];
       var showRetrieveAnswer = false;
       var message = "";
