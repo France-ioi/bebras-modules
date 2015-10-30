@@ -54,11 +54,14 @@ window.displayHelper = {
 
          var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placement at the end of html if they don't already exist
+         if ($('#displayHelper_graderMessage').length === 0) {
+            addTaskHtml += '<div id="displayHelper_graderMessage"></div>';
+         }
          if ($('#displayHelper_validate').length === 0) {
-            addTaskHtml += '<div id="displayHelper_validate"></div>';
+            addTaskHtml += '<div id="displayHelper_validate" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
          }
          if ($('#displayHelper_cancel').length === 0) {
-            addTaskHtml += '<div id="displayHelper_cancel"></div>';
+            addTaskHtml += '<div id="displayHelper_cancel" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
          }
          if ($('#displayHelper_saved').length === 0) {
             addTaskHtml += '<div id="displayHelper_saved"></div>';
@@ -626,7 +629,7 @@ window.displayHelper = {
       }
       return message;
    },
-   getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
+   getFullFeedbackGraderMessage: function(taskMode) {
       switch (taskMode) {
          case 'saved_unchanged':
             var color = 'red';
@@ -637,10 +640,21 @@ window.displayHelper = {
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<br/><span style="display: inline-block; margin-bottom: .2em; color: ' +
+                  return '<span style="display: inline-block; margin-bottom: .2em; color: ' +
                      color + '; font-weight: bold;">' + this.graderMessage + '</span>';
-               } else if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\', function(){});" ' +
+               } 
+            }
+            break;
+      }
+      return '';
+   },
+   // TODO: rename function below to getFullFeedbackValidate, assuming it is not called from outside this file
+   getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
+      switch (taskMode) {
+         case 'saved_unchanged':
+            if (this.graderMessage !== "") {
+               if (!this.hideValidateButton && !this.hasSolution) {
+                  return '<input type="button" style="width: 9em" value="Valider"  onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -652,7 +666,7 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre réponse" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" style="width: 9em" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -663,7 +677,8 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="Valider votre nouvelle réponse" onclick="platform.validate(\'done\', function(){});" ' +
+                  // was:  Valider votre nouvelle réponse
+                  return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -691,14 +706,15 @@ window.displayHelper = {
          suffix = 'unchanged';
       }
       var taskMode = prefix + '_' + suffix;
-      var messages = { validate: '', cancel: '', saved: '' };
+      var messages = { graderMessage: '', validate: '', cancel: '', saved: '' };
       var disabledStr = this.readOnly ? 'disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
             messages.cancel = '<div style="margin-top: 5px;">' +
-               '<input type="button" value="Effacer votre réponse actuelle" onclick="displayHelper.restartAll();" ' +
+               '<input type="button" style="width: 9em" value="Recommencer" onclick="displayHelper.restartAll();" ' +
                disabledStr + '/></div>';
          }
+         messages.graderMessage = this.getFullFeedbackGraderMessage(taskMode);
          messages.validate = this.getFullFeedbackValidateMessage(taskMode, disabledStr);
          if (this.hasLevels) {
             messages.saved = this.getFullFeedbackWithLevelsSavedMessage(taskMode);
