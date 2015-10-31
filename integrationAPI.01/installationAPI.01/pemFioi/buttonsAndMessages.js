@@ -54,12 +54,13 @@ window.displayHelper = {
 
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
-         $.each(['graderMessage', 'validate', 'cancel', 'saved'], function(index, value) {
-            var id = 'displayHelper_' + value;
-            if ($('#' + id).length === 0) {
-               addTaskHTML += '<div id="' + id + '"></div>';
+         var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+         for (var iPlacement in placementNames) {
+            var placement = 'displayHelper_' + placementNames[iPlacement];
+            if ($('#' + placement).length === 0) {
+               addTaskHTML += '<div id="' + placement + '"></div>';
             }
-         });
+         }
          addTaskHTML += '</div>';
          $(self.taskSelector).append(addTaskHTML);
          self.loaded= true;
@@ -119,23 +120,15 @@ window.displayHelper = {
       var taskParams = this.taskParams;
 
       this.hasLevels = true;
-      if (taskParams.pointsAsStars !== undefined) {
-         this.pointsAsStars = taskParams.pointsAsStars;
-      }
-      if (taskParams.unlockedLevels !== undefined) {
-         this.unlockedLevels = taskParams.unlockedLevels;
-      }
-      if (taskParams.neverHadHard !== undefined) {
-         this.neverHadHard = taskParams.neverHadHard;
-      }
-      if (taskParams.showMultiversionNotice !== undefined) {
-         this.showMultiversionNotice = taskParams.showMultiversionNotice;
+      var paramNames = ['pointsAsStars', 'unlockedLevels', 'neverHadHard', 'showMultiversionNotice'];
+      for (var iParam in paramNames) {
+         var param = paramNames[iParam];
+         if (taskParams[param] !== undefined) {
+            this[param] = taskParams[param];
+         }
       }
 
-      var maxScore = 40;
-      if (taskParams.maxScore !== undefined) {
-         maxScore = taskParams.maxScore;
-      }
+      var maxScore = taskParams.maxScore !== undefined ? taskParams.maxScore : 40;
       this.levelsMaxScores = {
          easy: (this.pointsAsStars ? maxScore / 2 : Math.round(maxScore / 2)),
          medium: (this.pointsAsStars ? maxScore * 3 / 4 : Math.round(maxScore * 3 / 4)),
@@ -226,8 +219,8 @@ window.displayHelper = {
 
       if (!this.hasSolution) {
          if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
-            this.showPopupMessage("Attention : vous avez déjà au moins autant de points à la question que cette version " +
-               "peut vous en rapporter. Cette version ne vous rapportera donc aucun point.", false);
+            this.showPopupMessage("Attention : vous avez déjà résolu une version plus difficile. " +
+               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", false);
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
