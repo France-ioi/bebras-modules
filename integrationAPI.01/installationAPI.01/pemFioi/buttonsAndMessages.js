@@ -628,8 +628,7 @@ window.displayHelper = {
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<span style="display: inline-block; margin-bottom: .2em; color: ' +
-                     color + '; font-weight: bold;">' + this.graderMessage + '</span>';
+                  return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
                } 
             }
             break;
