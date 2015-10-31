@@ -221,6 +221,17 @@ h1 span {
    display: none;
 }
 
+#displayHelperAnswering {
+   margin-top: 15px;
+}
+#displayHelper_validate,
+#displayHelper_cancel {
+   display: inline-block;
+}
+#displayHelper_validate > *,
+#displayHelper_cancel > * {
+   margin: 0 10px;
+}
 #displayHelper_saved {
    margin: .6em;
 }

@@ -26,7 +26,7 @@ window.displayHelper = {
    refreshMessages: true,
    stoppedShowingResult: false,
    previousMessages: {},
-   tabMessageShown: false,
+   popupMessageShown: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -52,29 +52,23 @@ window.displayHelper = {
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
 
-         var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
-         // Place button placement at the end of html if they don't already exist
-         if ($('#displayHelper_graderMessage').length === 0) {
-            addTaskHtml += '<div id="displayHelper_graderMessage"></div>';
-         }
-         if ($('#displayHelper_validate').length === 0) {
-            addTaskHtml += '<div id="displayHelper_validate" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
-         }
-         if ($('#displayHelper_cancel').length === 0) {
-            addTaskHtml += '<div id="displayHelper_cancel" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
-         }
-         if ($('#displayHelper_saved').length === 0) {
-            addTaskHtml += '<div id="displayHelper_saved"></div>';
-         }
-         addTaskHtml += '</div>';
-         $(self.taskSelector).append(addTaskHtml);
+         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+         // Place button placements at the end of HTML if they don't already exist
+         $.each(['graderMessage', 'validate', 'cancel', 'saved'], function(index, value) {
+            var id = 'displayHelper_' + value;
+            if ($('#' + id).length === 0) {
+               addTaskHTML += '<div id="' + id + '"></div>';
+            }
+         });
+         addTaskHTML += '</div>';
+         $(self.taskSelector).append(addTaskHTML);
          self.loaded= true;
-         if (self.tabMessageShown) {
+         if (self.popupMessageShown) {
             $('#displayHelperAnswering').hide();
          }
 
          var taskDelayWarning = function() {
-            if (self.tabMessageShown) {
+            if (self.popupMessageShown) {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
                self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
@@ -201,10 +195,10 @@ window.displayHelper = {
    setLevel: function(newLevel) {
       if (this.taskLevel == newLevel) {
          return;
-      } else if (this.tabMessageShown) {
+      } else if (this.popupMessageShown) {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
-         this.tabMessageShown = false;
+         this.popupMessageShown = false;
       }
       if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
          this.showPopupMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
@@ -257,19 +251,19 @@ window.displayHelper = {
       if (!buttonText) {
          buttonText = "D'accord";
       }
-      // hack: when in the context of the platform, we need to change the path
-      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath+'images/' : '../../modules/img/';
-      $('#tabMessage').html('<div><img src="'+imgPath+'castor.png"><img src="'+imgPath+'fleche-bulle.png">' +
+      // Hack: when in the context of the platform, we need to change the path
+      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
+      $('#tabMessage').html('<div><img src="' + imgPath + 'castor.png"><img src="' + imgPath + 'fleche-bulle.png">' +
          '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
-         displayHelper.tabMessageShown = false;
+         displayHelper.popupMessageShown = false;
          if (agreeFunc) {
             agreeFunc();
          }
       });
-      this.tabMessageShown = true;
+      this.popupMessageShown = true;
    },
 
    // Function to call at the beginning of task loading, before any html has
