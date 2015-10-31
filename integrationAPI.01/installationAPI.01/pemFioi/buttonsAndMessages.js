@@ -142,7 +142,7 @@ window.displayHelper = {
          var titleStarContainers = [];
          scoreHTML = '<span></span>' + this.genStarContainers(titleStarContainers, maxScores.hard, 'titleStar');
          $('#task > h1').append(scoreHTML);
-         this.setStars(titleStarContainers, 22);
+         this.setStars(titleStarContainers, 24);
       } else {
          scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
          $('#tabsContainer').append(scoreHTML);
@@ -642,7 +642,7 @@ window.displayHelper = {
          case 'saved_unchanged':
             if (this.graderMessage !== "") {
                if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" style="width: 9em" value="Valider"  onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -654,7 +654,7 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" style="width: 9em" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -665,7 +665,7 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  // was:  Valider votre nouvelle réponse
+                  // was: “Valider votre nouvelle réponse”
                   return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
@@ -684,22 +684,21 @@ window.displayHelper = {
       } else {
          suffix = 'unchanged';
       }
-      if ((this.savedAnswer !== '') && (this.savedAnswer != this.defaultAnswer)) {
+      if (this.savedAnswer !== '' && this.savedAnswer != this.defaultAnswer) {
          prefix = 'saved';
       } else {
          prefix = 'unsaved';
       }
-      if ((this.submittedAnswer !== '') && (this.submittedAnswer != this.savedAnswer)) {
+      if (this.submittedAnswer !== '' && this.submittedAnswer != this.savedAnswer) {
          prefix = 'saved'; // equivalent, should be named differently
          suffix = 'unchanged';
       }
       var taskMode = prefix + '_' + suffix;
       var messages = { graderMessage: '', validate: '', cancel: '', saved: '' };
-      var disabledStr = this.readOnly ? 'disabled' : '';
+      var disabledStr = this.readOnly ? ' disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            messages.cancel = '<div style="margin-top: 5px;">' +
-               '<input type="button" style="width: 9em" value="Recommencer" onclick="displayHelper.restartAll();" ' +
+            messages.cancel = '<input type="button" value="Recommencer" onclick="displayHelper.restartAll();"' +
                disabledStr + '/></div>';
          }
          messages.graderMessage = this.getFullFeedbackGraderMessage(taskMode);
@@ -709,7 +708,6 @@ window.displayHelper = {
          } else {
             messages.saved = this.getFullFeedbackSavedMessage(taskMode);
          }
-         messages.saved = '<span style="margin-top: 5px; display: inline-block;">' + messages.saved + '</span>';
       } else {
          switch (taskMode) {
             case 'unsaved_unchanged':

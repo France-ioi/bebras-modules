@@ -130,8 +130,8 @@ button, input[type="button"] {
    vertical-align: middle;
 }
 h1 .starContainer {
-   width: 22px;
-   height: 22px;
+   width: 24px;
+   height: 24px;
    vertical-align: top;
 }
 #answerScore .starContainer {
@@ -195,26 +195,26 @@ h1 span {
 }
 #tabMessage > div > img:first-child {
    float: left;
-   padding-top: 10px;
-   width: 90px; /*65px;*/
+   width: 90px;
 }
 #tabMessage > div > img + img {
    position: absolute;
    z-index: 1;
-   left: 77px;
+   left: 100px;
    top: 16px;
 }
 #tabMessage > div > div {
-   margin-left: 92px;
+   margin-left: 115px;
    padding: 8px;
    max-width: 500px;
    border: 2px solid black;
    border-radius: 8px;
+   text-align: justify;
 }
 #tabMessage button {
    display: block;
-   margin-top: .5em;
-   margin-left: 150px;
+   margin-top: 1em;
+   margin-left: 200px;
 }
 
 .easy, .medium, .hard {
@@ -228,9 +228,10 @@ h1 span {
 #displayHelper_cancel {
    display: inline-block;
 }
-#displayHelper_validate > *,
-#displayHelper_cancel > * {
+#displayHelper_validate > [value="Valider"],
+#displayHelper_cancel > [value="Recommencer"] {
    margin: 0 10px;
+   width: 9em;
 }
 #displayHelper_saved {
    margin: .6em;
