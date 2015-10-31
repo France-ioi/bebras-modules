@@ -801,8 +801,8 @@ window.displayHelper = {
       empty: 'white',
       full: '#ffc90e',
       emptyUseless: '#ced',
-      fullUseless: '#ffc90e',
-      uselessBorder: '#666',
+      fullUseless: '#ffbc08',
+      uselessBorder: '#444',
       locked: '#ddd'
    },
    setStars: function(parents, starWidth) {
