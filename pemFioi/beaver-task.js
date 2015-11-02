@@ -58,8 +58,8 @@ task.getState = function(callback) {
    var res = {};
    task.getAnswer(function(displayedAnswer) {
       res.displayedAnswer = displayedAnswer;
+      callback(JSON.stringify(res));
    });
-   callback(JSON.stringify(res));
 };
 
 task.getMetaData = function(callback) {
