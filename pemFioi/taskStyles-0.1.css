@@ -69,23 +69,20 @@ button, input[type="button"] {
 }
 
 #tabsContainer {
+   position: relative;
    border-bottom: 2px solid #8d9daa;
 }
 #tabsMenu {
-   margin: 0;
-   margin-left: 100px;
-   padding: 0;
+   text-align: center;
 }
 #tabsMenu .li {
    display: inline-block;
    min-width: 150px;
-   margin-left: 20px;
-   margin-right: 10px;
+   margin: 0 20px;
    background: #88BB88;
    border: 2px solid #8d9daa;
    border-bottom: 0;
-   border-top-left-radius: 6px;
-   border-top-right-radius: 6px;
+   border-radius: 6px 6px 0 0;
    text-align: center;
 }
 #tabsMenu .li.lockedLevel {

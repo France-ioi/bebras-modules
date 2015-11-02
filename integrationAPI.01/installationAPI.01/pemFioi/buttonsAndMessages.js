@@ -30,7 +30,7 @@ window.displayHelper = {
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
-   unlockedLevels: 1,
+   unlockedLevels: 3,
    neverHadHard: false,
    showMultiversionNotice: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
