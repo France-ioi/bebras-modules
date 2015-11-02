@@ -83,7 +83,6 @@ window.displayHelper = {
       });
    },
    unload: function() {
-      this.init();
       if (this.taskDelayWarningTimeout) {
          this.taskDelayWarningTimeout = clearTimeout(this.taskDelayWarningTimeout);
       }
