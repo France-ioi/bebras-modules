@@ -40,37 +40,11 @@ window.displayHelper = {
    onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
 
-   init: function() {
-      this.loaded = false;
-      this.prevAnswer= '';
-      this.readOnly= false;
-      this.savedAnswer= '';
-      this.submittedAnswer= '';
-      this.submittedScore= 0;
-      this.hasAnswerChanged= true;
-      this.hideValidateButton= false;
-      this.hideRestartButton= false;
-      this.showScore= false;
-      this.refreshMessages= true;
-      this.stoppedShowingResult= false;
-      this.previousMessages= {};
-      this.popupMessageShown= false;
-      this.hasLevels= false;
-      this.pointsAsStars= true; // TODO: false as default
-      this.unlockedLevels= 3;
-      this.neverHadHard= false;
-      this.showMultiversionNotice= false;
-      this.levelsScores= { easy: 0, medium: 0, hard: 0 };
-      this.prevLevelsScores= { easy: 0, medium: 0, hard: 0 };
-      this.taskLevel= '';
-   },
-
    /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
       var self = this;
-      this.init();
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
       window.platform.getTaskParams(null, null, function(taskParams) {
          self.taskParams = taskParams;
@@ -115,6 +89,28 @@ window.displayHelper = {
       }
       clearInterval(this.checkAnswerInterval);
       this.checkAnswerInterval = null;
+      this.loaded = false;
+      this.prevAnswer= '';
+      this.readOnly= false;
+      this.savedAnswer= '';
+      this.submittedAnswer= '';
+      this.submittedScore= 0;
+      this.hasAnswerChanged= true;
+      this.hideValidateButton= false;
+      this.hideRestartButton= false;
+      this.showScore= false;
+      this.refreshMessages= true;
+      this.stoppedShowingResult= false;
+      this.previousMessages= {};
+      this.popupMessageShown= false;
+      this.hasLevels= false;
+      this.pointsAsStars= true; // TODO: false as default
+      this.unlockedLevels= 3;
+      this.neverHadHard= false;
+      this.showMultiversionNotice= false;
+      this.levelsScores= { easy: 0, medium: 0, hard: 0 };
+      this.prevLevelsScores= { easy: 0, medium: 0, hard: 0 };
+      this.taskLevel= '';
       return true;
    },
 
