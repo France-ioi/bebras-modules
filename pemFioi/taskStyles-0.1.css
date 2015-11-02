@@ -85,8 +85,8 @@ button, input[type="button"] {
    width: 100%;
    border-bottom: 2px solid #8d9daa;
 }
-#tabsMenu li {
-   float: left;
+#tabsMenu .li {
+   display: inline-block;
    min-width: 150px;
    margin-left: 20px;
    margin-right: 10px;
@@ -97,30 +97,30 @@ button, input[type="button"] {
    border-top-left-radius: 6px;
    border-top-right-radius: 6px;
 }
-#tabsMenu li.lockedLevel {
+#tabsMenu .li.lockedLevel {
    background: #404040 /* #5a6069; */
 }
-#tabsMenu li.current {
+#tabsMenu .li.current {
    padding-bottom: 2px;
    background: white;
 }
-#tabsMenu li a {
+#tabsMenu .li a {
    display: block;
    padding: 8px;
    color: #000;
    text-decoration: none; 
    font-size: 1.1em;
 }
-#tabsMenu li.lockedLevel a {
+#tabsMenu .li.lockedLevel a {
    color: #ddd;
 }
-#tabsMenu li a:focus {
+#tabsMenu .li a:focus {
    outline: none;
 }
-#tabsMenu li:not(.current) a:active {
+#tabsMenu .li:not(.current) a:active {
    background: #c4d3de;
 }
-#tabsMenu li.lockedLevel a:active {
+#tabsMenu .li.lockedLevel a:active {
    background: #6c7787;
 }
 
@@ -140,13 +140,10 @@ h1 .starContainer {
    width: 20px;
    height: 20px;
 }
-.starContainer > span {
+span.emptyStar, span.fullStar {
    position: absolute;
    left: 0;
    top: 0;
-}
-span.hiddenStar {
-   visibility: hidden;
 }
 span.fullStar {
    z-index: 1;

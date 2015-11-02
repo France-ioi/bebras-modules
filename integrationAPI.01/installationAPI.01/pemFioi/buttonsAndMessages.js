@@ -137,9 +137,9 @@ window.displayHelper = {
       this.setupParams();
       if (!document.getElementById('tabMessage')) {
          this.setupLevelsTabs();
-         $('#tabsMenu a').on('click', function(event) {
+         $('#tabsMenu .li').on('click', function(event) {
             event.preventDefault();
-            var newLevel = $(this).attr('href').split('#')[1];
+            var newLevel = $(this).children().attr('href').split('#')[1];
             displayHelper.setLevel(newLevel);
          });
       }
@@ -184,21 +184,24 @@ window.displayHelper = {
       }
 
       var tabsStarContainers = [];
-      var tabsHTML = '<ul id="tabsMenu">';
+      var tabsHTML = '<div id="tabsMenu">';
       var curLevel;
       for (curLevel in this.levelsNames) {
-         tabsHTML += '<li id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
+         tabsHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
             tabsHTML += "Version " + this.genStarContainers(tabsStarContainers, maxScores[curLevel], 'tabScore_' + curLevel);
          } else {
             tabsHTML += this.onlyLevelsNames[curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
          }
-         tabsHTML += '</a></li>';
+         tabsHTML += '</a></span>';
       }
-      tabsHTML += '</ul><div></div>';
+      tabsHTML += '</div><div></div>';
       $('#tabsContainer').append(tabsHTML);
-      this.setStars(tabsStarContainers);
+      var that = this;
+      setTimeout(function() {
+         that.setStars(tabsStarContainers, 20);
+      }, 100);
 
       for (var iLevel in this.levels) {
          curLevel = this.levels[iLevel];
@@ -840,7 +843,7 @@ window.displayHelper = {
          var parentId = parents[curParent];
          $('#' + parentId).html(
             '<span id="' + parentId + '_empty" class="emptyStar"></span>' +
-            '<span id="' + parentId + '_full" class="fullStar hiddenStar"></span>');
+            '<span id="' + parentId + '_full" class="fullStar" style="display:none"></span>'); 
          this.putStar(parentId + '_empty', starWidth);
          this.putStar(parentId + '_full', starWidth, this.starColors.full);
       }
@@ -882,10 +885,10 @@ window.displayHelper = {
       var starCanvas = parentElement.starCanvas;
       if (clipWidth !== undefined) {
          if (clipWidth === 0) {
-            $('#' + parent).addClass('hiddenStar');
+            $('#' + parent).hide();
          } else {
             starCanvas.setSize(parentElement.starWidth * clipWidth, parentElement.starWidth * 0.95);
-            $('#' + parent).removeClass('hiddenStar');
+            $('#' + parent).show();
          }
       }
       if (fillColor !== undefined) {
