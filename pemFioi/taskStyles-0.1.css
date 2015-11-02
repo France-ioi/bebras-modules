@@ -69,28 +69,19 @@ button, input[type="button"] {
 }
 
 #tabsContainer {
-   position: relative;
+   border-bottom: 2px solid #8d9daa;
 }
 #tabsMenu {
    margin: 0;
    margin-left: 100px;
    padding: 0;
-   list-style: none;
-   overflow: hidden;
-}
-#tabsMenu + div {
-   position: absolute;
-   z-index: -1;
-   bottom: 0;
-   width: 100%;
-   border-bottom: 2px solid #8d9daa;
 }
 #tabsMenu .li {
    display: inline-block;
    min-width: 150px;
    margin-left: 20px;
    margin-right: 10px;
-   background: #88BB88; /* #d5e4ef; */
+   background: #88BB88;
    border: 2px solid #8d9daa;
    border-bottom: 0;
    text-align: center;
@@ -98,9 +89,10 @@ button, input[type="button"] {
    border-top-right-radius: 6px;
 }
 #tabsMenu .li.lockedLevel {
-   background: #404040 /* #5a6069; */
+   background: #404040;
 }
 #tabsMenu .li.current {
+   margin-bottom: -2px;
    padding-bottom: 2px;
    background: white;
 }
@@ -140,7 +132,8 @@ h1 .starContainer {
    width: 20px;
    height: 20px;
 }
-span.emptyStar, span.fullStar {
+span.emptyStar,
+span.fullStar {
    position: absolute;
    left: 0;
    top: 0;
@@ -171,7 +164,7 @@ h1 span {
 #tabMessage {
    display: none;
 }
-#tabMessage > div {
+#tabMessage .container {
    position: relative;
    margin: .5em 0;
    padding: 8px;
@@ -185,24 +178,24 @@ h1 span {
    left: 0;
    background: rgba(0, 0, 0, .5);
 }
-#tabMessage.floatingMessage > div {
+#tabMessage.floatingMessage .container {
    min-height: 100px;
    max-width: 500px;
    margin: 10% auto;
    border: 2px solid black;
    background: white;
 }
-#tabMessage > div > img:first-child {
+#tabMessage img.beaver {
    float: left;
    width: 90px;
 }
-#tabMessage > div > img + img {
+#tabMessage img.messageArrow {
    position: absolute;
    z-index: 1;
    left: 100px;
    top: 16px;
 }
-#tabMessage > div > div {
+#tabMessage div.message {
    margin-left: 115px;
    padding: 8px;
    max-width: 500px;
@@ -216,7 +209,9 @@ h1 span {
    margin-left: 200px;
 }
 
-.easy, .medium, .hard {
+.easy,
+.medium,
+.hard {
    display: none;
 }
 

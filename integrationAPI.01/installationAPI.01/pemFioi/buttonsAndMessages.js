@@ -196,11 +196,11 @@ window.displayHelper = {
          }
          tabsHTML += '</a></span>';
       }
-      tabsHTML += '</div><div></div>';
+      tabsHTML += '</div>';
       $('#tabsContainer').append(tabsHTML);
       var that = this;
       setTimeout(function() {
-         that.setStars(tabsStarContainers, 20);
+         that.setStars(tabsStarContainers);
       }, 100);
 
       for (var iLevel in this.levels) {
@@ -284,8 +284,9 @@ window.displayHelper = {
       }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
-      $('#tabMessage').html('<div><img src="' + imgPath + 'castor.png"><img src="' + imgPath + 'fleche-bulle.png">' +
-         '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
+      $('#tabMessage').html('<div class="container"><img class="beaver" src="' + imgPath + 'castor.png"/>' +
+         '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
+         '<div class="message">' + message + '</div><button>' + buttonText + '</button></div>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
@@ -818,7 +819,7 @@ window.displayHelper = {
    },
 
    sendBestScore: function(callback, scores, messages) {
-      var bestLevel = "easy";
+      var bestLevel = 'easy';
       for (var curLevel in scores) {
          if (scores[bestLevel] <= scores[curLevel]) {
             bestLevel = curLevel;
@@ -843,7 +844,7 @@ window.displayHelper = {
          var parentId = parents[curParent];
          $('#' + parentId).html(
             '<span id="' + parentId + '_empty" class="emptyStar"></span>' +
-            '<span id="' + parentId + '_full" class="fullStar" style="display:none"></span>'); 
+            '<span id="' + parentId + '_full" class="fullStar" style="display: none;"></span>'); 
          this.putStar(parentId + '_empty', starWidth);
          this.putStar(parentId + '_full', starWidth, this.starColors.full);
       }
