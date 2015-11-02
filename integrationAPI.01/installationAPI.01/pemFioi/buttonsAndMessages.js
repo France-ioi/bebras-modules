@@ -40,11 +40,37 @@ window.displayHelper = {
    onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
 
+   init: function() {
+      this.loaded = false;
+      this.prevAnswer= '';
+      this.readOnly= false;
+      this.savedAnswer= '';
+      this.submittedAnswer= '';
+      this.submittedScore= 0;
+      this.hasAnswerChanged= true;
+      this.hideValidateButton= false;
+      this.hideRestartButton= false;
+      this.showScore= false;
+      this.refreshMessages= true;
+      this.stoppedShowingResult= false;
+      this.previousMessages= {};
+      this.tabMessageShown= false;
+      this.hasLevels= false;
+      this.pointsAsStars= true; // TODO: false as default
+      this.unlockedLevels= 3;
+      this.neverHadHard= false;
+      this.showMultiversionNotice= false;
+      this.levelsScores= { easy: 0, medium: 0, hard: 0 };
+      this.prevLevelsScores= { easy: 0, medium: 0, hard: 0 };
+      this.taskLevel= '';
+   },
+
    /***********************************************
     * Initialization functions called by the task *
     ***********************************************/
    load: function(views) {
       var self = this;
+      this.init();
       this.showScore = (typeof views.grader !== 'undefined' && views.grader === true);
       window.platform.getTaskParams(null, null, function(taskParams) {
          self.taskParams = taskParams;
@@ -85,6 +111,16 @@ window.displayHelper = {
          self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5 * 60 * 1000);
       });
    },
+   unload: function() {
+      this.init();
+      if (this.taskDelayWarningTimeout) {
+         this.taskDelayWarningTimeout = clearTimeout(this.taskDelayWarningTimeout);
+      }
+      clearInterval(this.checkAnswerInterval);
+      this.checkAnswerInterval = null;
+      return true;
+   },
+
    setupLevels: function(initLevel) {
       if (!initLevel) {
          if (!this.taskParams) {
@@ -294,22 +330,13 @@ window.displayHelper = {
       var self = this;
       this.checkAnswerInterval = setInterval(
          function() {
-             self.checkAnswerChanged();
+            self.checkAnswerChanged();
          }, 1000);
       task.getAnswer(function(answer) {
          self.defaultAnswer = answer;
          self.refreshMessages = true;
          self.checkAnswerChanged();
       });
-   },
-
-   unload: function() {
-      this.loaded = false;
-      if (this.taskDelayWarningTimeout) {
-         this.taskDelayWarningTimeout = clearTimeout(this.taskDelayWarningTimeout);
-      }
-      this.checkAnswerInterval = clearInterval(this.checkAnswerInterval);
-      return true;
    },
 
    reloadAnswer: function(strAnswer) {
@@ -690,6 +717,7 @@ window.displayHelper = {
 
    lastSentHeight: null,
    updateMessages: function() {
+      var self = this;
       this.refreshMessages = false;
       var suffix, prefix; 
       if (this.hasAnswerChanged) {
@@ -775,11 +803,12 @@ window.displayHelper = {
          }
          this.editStar('answerScore' + iStar + '_full', (this.levelsScores[this.taskLevel] - starScore) / starPoints);
       }
-      var height = $('body').height();
-      if (height != this.lastSentHeight) {
-         this.lastSentHeight = height;
-         window.platform.updateHeight(height, function(){});
-      }
+      window.task.getHeight(function(height) {
+         if (height != self.lastSentHeight) {
+            self.lastSentHeight = height;
+            window.platform.updateHeight(height, function(){});
+         }
+      });
    },
 
    // Loads previously saved answer
