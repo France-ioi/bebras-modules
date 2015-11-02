@@ -88,7 +88,9 @@ window.displayHelper = {
             }
          }
          addTaskHTML += '</div>';
-         $(self.taskSelector).append(addTaskHTML);
+         if (!document.getElementById('displayHelperAnswering')) {
+            $(self.taskSelector).append(addTaskHTML);   
+         }
          self.loaded= true;
          if (self.popupMessageShown) {
             $('#displayHelperAnswering').hide();
@@ -138,13 +140,15 @@ window.displayHelper = {
       task.reloadAnswerObject(task.getDefaultAnswerObject());
 
       this.setupParams();
-      this.setupLevelsTabs();
+      if (!document.getElementById('tabMessage')) {
+         this.setupLevelsTabs();
+         $('#tabsMenu a').on('click', function(event) {
+            event.preventDefault();
+            var newLevel = $(this).attr('href').split('#')[1];
+            displayHelper.setLevel(newLevel);
+         });
+      }
 
-      $('#tabsMenu a').click(function(event) {
-         event.preventDefault();
-         var newLevel = $(this).attr('href').split('#')[1];
-         displayHelper.setLevel(newLevel);
-      });
       this.setLevel(initLevel);
 
       if (this.unlockedLevels > 1 && this.showMultiversionNotice) {
