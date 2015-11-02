@@ -84,9 +84,9 @@ button, input[type="button"] {
    background: #88BB88;
    border: 2px solid #8d9daa;
    border-bottom: 0;
-   text-align: center;
    border-top-left-radius: 6px;
    border-top-right-radius: 6px;
+   text-align: center;
 }
 #tabsMenu .li.lockedLevel {
    background: #404040;
@@ -95,6 +95,11 @@ button, input[type="button"] {
    margin-bottom: -2px;
    padding-bottom: 2px;
    background: white;
+}
+#tabsMenu .li.current.lockedLevel {
+   padding-bottom: 1px;
+   border-bottom: 1px solid #c0c0c0;
+   background: #606060;
 }
 #tabsMenu .li a {
    display: block;
@@ -165,11 +170,9 @@ h1 span {
    display: none;
 }
 #popupMessage .container {
+   position: relative;
    margin: .5em 0;
    padding: 8px;
-}
-#popupMessage .subcontainer {
-   position: relative;
 }
 #popupMessage.floatingMessage {
    position: fixed;
@@ -195,8 +198,8 @@ h1 span {
 #popupMessage img.messageArrow {
    position: absolute;
    z-index: 1;
-   left: 92px;
-   top: 8px;
+   left: 100px;
+   top: 16px;
 }
 #popupMessage div.message {
    margin-left: 115px;

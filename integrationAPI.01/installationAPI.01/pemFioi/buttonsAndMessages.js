@@ -30,7 +30,7 @@ window.displayHelper = {
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
-   unlockedLevels: 3,
+   unlockedLevels: 1,
    neverHadHard: false,
    showMultiversionNotice: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
@@ -75,7 +75,7 @@ window.displayHelper = {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
                self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
-                  "Il est peut-être temps de passer à une autre !", false, "En effet");
+                  "Il est peut-être temps de passer à une autre !", 'blanket', "En effet");
                self.taskDelayWarningTimeout = null;
             }
          };
@@ -89,27 +89,27 @@ window.displayHelper = {
       clearInterval(this.checkAnswerInterval);
       this.checkAnswerInterval = null;
       this.loaded = false;
-      this.prevAnswer= '';
-      this.readOnly= false;
-      this.savedAnswer= '';
-      this.submittedAnswer= '';
-      this.submittedScore= 0;
-      this.hasAnswerChanged= true;
-      this.hideValidateButton= false;
-      this.hideRestartButton= false;
-      this.showScore= false;
-      this.refreshMessages= true;
-      this.stoppedShowingResult= false;
-      this.previousMessages= {};
-      this.popupMessageShown= false;
-      this.hasLevels= false;
-      this.pointsAsStars= true; // TODO: false as default
-      this.unlockedLevels= 3;
-      this.neverHadHard= false;
-      this.showMultiversionNotice= false;
-      this.levelsScores= { easy: 0, medium: 0, hard: 0 };
-      this.prevLevelsScores= { easy: 0, medium: 0, hard: 0 };
-      this.taskLevel= '';
+      this.prevAnswer = '';
+      this.readOnly = false;
+      this.savedAnswer = '';
+      this.submittedAnswer = '';
+      this.submittedScore = 0;
+      this.hasAnswerChanged = true;
+      this.hideValidateButton = false;
+      this.hideRestartButton = false;
+      this.showScore = false;
+      this.refreshMessages = true;
+      this.stoppedShowingResult = false;
+      this.previousMessages = {};
+      this.popupMessageShown = false;
+      this.hasLevels = false;
+      this.pointsAsStars = true; // TODO: false as default
+      this.unlockedLevels = 3;
+      this.neverHadHard = false;
+      this.showMultiversionNotice = false;
+      this.levelsScores = { easy: 0, medium: 0, hard: 0 };
+      this.prevLevelsScores = { easy: 0, medium: 0, hard: 0 };
+      this.taskLevel = '';
       return true;
    },
 
@@ -148,7 +148,7 @@ window.displayHelper = {
 
       if (this.unlockedLevels > 1 && this.showMultiversionNotice) {
          this.showPopupMessage("Notez que pour cette question, " +
-            "vous pouvez résoudre directement une version plus difficile que celle-ci.", true, "Montrez-moi cette version");
+            "vous pouvez résoudre directement une version plus difficile que celle-ci.", 'blanket', "Montrez-moi cette version");
       }
    },
    setupParams: function() {
@@ -198,18 +198,18 @@ window.displayHelper = {
       }
       tabsHTML += '</div>';
       $('#tabsContainer').append(tabsHTML);
-      var that = this;
-      setTimeout(function() {
-         that.setStars(tabsStarContainers);
-      }, 100);
 
-      for (var iLevel in this.levels) {
-         curLevel = this.levels[iLevel];
-         if (iLevel >= this.unlockedLevels) {
-            $('#tab_' + curLevel).addClass('lockedLevel');
-            this.changeStarsColors(curLevel, 'empty', this.starColors.locked, this.starColors.locked);
+      var self = this;
+      setTimeout(function() {
+         self.setStars(tabsStarContainers);
+         for (var iLevel in self.levels) {
+            curLevel = self.levels[iLevel];
+            if (iLevel >= self.unlockedLevels) {
+               $('#tab_' + curLevel).addClass('lockedLevel');
+               self.changeStarsColors(curLevel, 'empty', self.starColors.locked, self.starColors.locked);
+            }
          }
-      }
+      }, 100);
 
       $('#tabsContainer').after('<div id="popupMessage"></div>');
    },
@@ -231,10 +231,6 @@ window.displayHelper = {
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
       }
-      if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
-         this.showPopupMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
-         return;
-      }
 
       for (var curLevel in this.levelsNames) {
          $('#tab_' + curLevel).removeClass('current');
@@ -255,15 +251,17 @@ window.displayHelper = {
       this.checkAnswerChanged();
       this.stopShowingResult();
 
-      if (!this.hasSolution) {
+      if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
+         this.showPopupMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", 'lock');
+      } else if (!this.hasSolution) {
          if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
             this.showPopupMessage("Attention : vous avez déjà résolu une version plus difficile. " +
-               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", false);
+               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", 'tab', "Montrez-la-moi quand même");
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
             this.showPopupMessage("Résoudre une version " + versionName + " peut vous prendre beaucoup de temps ; " +
-               "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", true,
+               "songez en priorité à répondre aux questions en version facile pour gagner des points rapidement.", 'tab',
                "J'y prendrai garde", function() {
                   this.neverHadHard = false;
                }
@@ -271,8 +269,8 @@ window.displayHelper = {
          }
       }
    },
-   showPopupMessage: function(message, fullTab, buttonText, agreeFunc) {
-      if (fullTab) {
+   showPopupMessage: function(message, mode, buttonText, agreeFunc) {
+      if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
       } else {
@@ -284,10 +282,11 @@ window.displayHelper = {
       }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
-      $('#popupMessage').html('<div class="container"><div class="subcontainer">' +
+      var buttonHTML = mode == 'lock' ? '' : '<button>' + (buttonText || "D'accord") + '</button>';
+      $('#popupMessage').html('<div class="container">' +
          '<img class="beaver" src="' + imgPath + 'castor.png"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
-         '<div class="message">' + message + '</div><button>' + buttonText + '</button></div></div>').show();
+         '<div class="message">' + message + '</div>' + buttonHTML + '</div>').show();
       $('#popupMessage button').click(function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
