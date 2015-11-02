@@ -161,42 +161,44 @@ h1 span {
    font-weight: bold;
 }
 
-#tabMessage {
+#popupMessage {
    display: none;
 }
-#tabMessage .container {
-   position: relative;
+#popupMessage .container {
    margin: .5em 0;
    padding: 8px;
 }
-#tabMessage.floatingMessage {
+#popupMessage .subcontainer {
+   position: relative;
+}
+#popupMessage.floatingMessage {
    position: fixed;
-   z-index: 101;
+   z-index: 100;
    top: 0;
    right: 0;
    bottom: 0;
    left: 0;
-   background: gray;
+   background-color: gray;
    background: rgba(0, 0, 0, .5);
 }
-#tabMessage.floatingMessage .container {
+#popupMessage.floatingMessage .container {
    min-height: 100px;
    max-width: 500px;
    margin: 10% auto;
    border: 2px solid black;
    background: white;
 }
-#tabMessage img.beaver {
+#popupMessage img.beaver {
    position: absolute;
    width: 90px;
 }
-#tabMessage img.messageArrow {
+#popupMessage img.messageArrow {
    position: absolute;
    z-index: 1;
-   left: 100px;
-   top: 16px;
+   left: 92px;
+   top: 8px;
 }
-#tabMessage div.message {
+#popupMessage div.message {
    margin-left: 115px;
    padding: 8px;
    max-width: 500px;
@@ -204,7 +206,7 @@ h1 span {
    border-radius: 8px;
    text-align: justify;
 }
-#tabMessage button {
+#popupMessage button {
    display: block;
    margin-top: 1em;
    margin-left: 200px;

@@ -135,7 +135,7 @@ window.displayHelper = {
       task.reloadAnswerObject(task.getDefaultAnswerObject());
 
       this.setupParams();
-      if (!document.getElementById('tabMessage')) {
+      if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
          $('#tabsMenu .li').on('click', function(event) {
             event.preventDefault();
@@ -211,7 +211,7 @@ window.displayHelper = {
          }
       }
 
-      $('#tabsContainer').after('<div id="tabMessage"></div>');
+      $('#tabsContainer').after('<div id="popupMessage"></div>');
    },
 
    // Deprecated: use directly levelsMaxScores instead
@@ -227,7 +227,7 @@ window.displayHelper = {
       if (this.taskLevel == newLevel) {
          return;
       } else if (this.popupMessageShown) {
-         $('#tabMessage').hide();
+         $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
       }
@@ -274,9 +274,9 @@ window.displayHelper = {
    showPopupMessage: function(message, fullTab, buttonText, agreeFunc) {
       if (fullTab) {
          $('#taskContent, #displayHelperAnswering').hide();
-         $('#tabMessage').removeClass('floatingMessage');
+         $('#popupMessage').removeClass('floatingMessage');
       } else {
-         $('#tabMessage').addClass('floatingMessage');
+         $('#popupMessage').addClass('floatingMessage');
       }
 
       if (!buttonText) {
@@ -284,11 +284,12 @@ window.displayHelper = {
       }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
-      $('#tabMessage').html('<div class="container"><img class="beaver" src="' + imgPath + 'castor.png"/>' +
+      $('#popupMessage').html('<div class="container"><div class="subcontainer">' +
+         '<img class="beaver" src="' + imgPath + 'castor.png"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
-         '<div class="message">' + message + '</div><button>' + buttonText + '</button></div>').show();
-      $('#tabMessage button').click(function() {
-         $('#tabMessage').hide();
+         '<div class="message">' + message + '</div><button>' + buttonText + '</button></div></div>').show();
+      $('#popupMessage button').click(function() {
+         $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
          if (agreeFunc) {
