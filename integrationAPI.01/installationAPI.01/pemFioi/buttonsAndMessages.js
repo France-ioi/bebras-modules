@@ -26,7 +26,7 @@ window.displayHelper = {
    refreshMessages: true,
    stoppedShowingResult: false,
    previousMessages: {},
-   tabMessageShown: false,
+   popupMessageShown: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -78,29 +78,24 @@ window.displayHelper = {
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
 
-         var addTaskHtml = '<div id="displayHelperAnswering" class="contentCentered">';
-         // Place button placement at the end of html if they don't already exist
-         if ($('#displayHelper_graderMessage').length === 0) {
-            addTaskHtml += '<div id="displayHelper_graderMessage"></div>';
+         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
+         // Place button placements at the end of HTML if they don't already exist
+         var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+         for (var iPlacement in placementNames) {
+            var placement = 'displayHelper_' + placementNames[iPlacement];
+            if ($('#' + placement).length === 0) {
+               addTaskHTML += '<div id="' + placement + '"></div>';
+            }
          }
-         if ($('#displayHelper_validate').length === 0) {
-            addTaskHtml += '<div id="displayHelper_validate" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
-         }
-         if ($('#displayHelper_cancel').length === 0) {
-            addTaskHtml += '<div id="displayHelper_cancel" style="display:inline-block; margin-left: 10px; margin-right: 10px"></div>';
-         }
-         if ($('#displayHelper_saved').length === 0) {
-            addTaskHtml += '<div id="displayHelper_saved"></div>';
-         }
-         addTaskHtml += '</div>';
-         $(self.taskSelector).append(addTaskHtml);
+         addTaskHTML += '</div>';
+         $(self.taskSelector).append(addTaskHTML);
          self.loaded= true;
-         if (self.tabMessageShown) {
+         if (self.popupMessageShown) {
             $('#displayHelperAnswering').hide();
          }
 
          var taskDelayWarning = function() {
-            if (self.tabMessageShown) {
+            if (self.popupMessageShown) {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
                self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
@@ -161,23 +156,15 @@ window.displayHelper = {
       var taskParams = this.taskParams;
 
       this.hasLevels = true;
-      if (taskParams.pointsAsStars !== undefined) {
-         this.pointsAsStars = taskParams.pointsAsStars;
-      }
-      if (taskParams.unlockedLevels !== undefined) {
-         this.unlockedLevels = taskParams.unlockedLevels;
-      }
-      if (taskParams.neverHadHard !== undefined) {
-         this.neverHadHard = taskParams.neverHadHard;
-      }
-      if (taskParams.showMultiversionNotice !== undefined) {
-         this.showMultiversionNotice = taskParams.showMultiversionNotice;
+      var paramNames = ['pointsAsStars', 'unlockedLevels', 'neverHadHard', 'showMultiversionNotice'];
+      for (var iParam in paramNames) {
+         var param = paramNames[iParam];
+         if (taskParams[param] !== undefined) {
+            this[param] = taskParams[param];
+         }
       }
 
-      var maxScore = 40;
-      if (taskParams.maxScore !== undefined) {
-         maxScore = taskParams.maxScore;
-      }
+      var maxScore = taskParams.maxScore !== undefined ? taskParams.maxScore : 40;
       this.levelsMaxScores = {
          easy: (this.pointsAsStars ? maxScore / 2 : Math.round(maxScore / 2)),
          medium: (this.pointsAsStars ? maxScore * 3 / 4 : Math.round(maxScore * 3 / 4)),
@@ -191,7 +178,7 @@ window.displayHelper = {
          var titleStarContainers = [];
          scoreHTML = '<span></span>' + this.genStarContainers(titleStarContainers, maxScores.hard, 'titleStar');
          $('#task > h1').append(scoreHTML);
-         this.setStars(titleStarContainers, 22);
+         this.setStars(titleStarContainers, 24);
       } else {
          scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
          $('#tabsContainer').append(scoreHTML);
@@ -237,10 +224,10 @@ window.displayHelper = {
    setLevel: function(newLevel) {
       if (this.taskLevel == newLevel) {
          return;
-      } else if (this.tabMessageShown) {
+      } else if (this.popupMessageShown) {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
-         this.tabMessageShown = false;
+         this.popupMessageShown = false;
       }
       if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
          this.showPopupMessage("Cette version est verrouillée. Résolvez la précédente pour y accéder !", false);
@@ -268,8 +255,8 @@ window.displayHelper = {
 
       if (!this.hasSolution) {
          if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
-            this.showPopupMessage("Attention : vous avez déjà au moins autant de points à la question que cette version " +
-               "peut vous en rapporter. Cette version ne vous rapportera donc aucun point.", false);
+            this.showPopupMessage("Attention : vous avez déjà résolu une version plus difficile. " +
+               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", false);
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
@@ -293,19 +280,19 @@ window.displayHelper = {
       if (!buttonText) {
          buttonText = "D'accord";
       }
-      // hack: when in the context of the platform, we need to change the path
-      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath+'images/' : '../../modules/img/';
-      $('#tabMessage').html('<div><img src="'+imgPath+'castor.png"><img src="'+imgPath+'fleche-bulle.png">' +
+      // Hack: when in the context of the platform, we need to change the path
+      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
+      $('#tabMessage').html('<div><img src="' + imgPath + 'castor.png"><img src="' + imgPath + 'fleche-bulle.png">' +
          '<div>' + message + '</div><button>' + buttonText + '</button></div>').show();
       $('#tabMessage button').click(function() {
          $('#tabMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
-         displayHelper.tabMessageShown = false;
+         displayHelper.popupMessageShown = false;
          if (agreeFunc) {
             agreeFunc();
          }
       });
-      this.tabMessageShown = true;
+      this.popupMessageShown = true;
    },
 
    // Function to call at the beginning of task loading, before any html has
@@ -668,8 +655,7 @@ window.displayHelper = {
             }
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
-                  return '<span style="display: inline-block; margin-bottom: .2em; color: ' +
-                     color + '; font-weight: bold;">' + this.graderMessage + '</span>';
+                  return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
                } 
             }
             break;
@@ -682,7 +668,7 @@ window.displayHelper = {
          case 'saved_unchanged':
             if (this.graderMessage !== "") {
                if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" style="width: 9em" value="Valider"  onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -694,7 +680,7 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" style="width: 9em" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
             }
@@ -705,7 +691,7 @@ window.displayHelper = {
                   return '<input type="button" value="Évaluer cette réponse" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  // was:  Valider votre nouvelle réponse
+                  // was: “Valider votre nouvelle réponse”
                   return '<input type="button" value="Valider" onclick="platform.validate(\'done\', function(){});" ' +
                      disabledStr + '/>';
                }
@@ -725,22 +711,21 @@ window.displayHelper = {
       } else {
          suffix = 'unchanged';
       }
-      if ((this.savedAnswer !== '') && (this.savedAnswer != this.defaultAnswer)) {
+      if (this.savedAnswer !== '' && this.savedAnswer != this.defaultAnswer) {
          prefix = 'saved';
       } else {
          prefix = 'unsaved';
       }
-      if ((this.submittedAnswer !== '') && (this.submittedAnswer != this.savedAnswer)) {
+      if (this.submittedAnswer !== '' && this.submittedAnswer != this.savedAnswer) {
          prefix = 'saved'; // equivalent, should be named differently
          suffix = 'unchanged';
       }
       var taskMode = prefix + '_' + suffix;
       var messages = { graderMessage: '', validate: '', cancel: '', saved: '' };
-      var disabledStr = this.readOnly ? 'disabled' : '';
+      var disabledStr = this.readOnly ? ' disabled' : '';
       if (this.showScore) {
          if (!this.hideRestartButton) {
-            messages.cancel = '<div style="margin-top: 5px;">' +
-               '<input type="button" style="width: 9em" value="Recommencer" onclick="displayHelper.restartAll();" ' +
+            messages.cancel = '<input type="button" value="Recommencer" onclick="displayHelper.restartAll();"' +
                disabledStr + '/></div>';
          }
          messages.graderMessage = this.getFullFeedbackGraderMessage(taskMode);
@@ -750,7 +735,6 @@ window.displayHelper = {
          } else {
             messages.saved = this.getFullFeedbackSavedMessage(taskMode);
          }
-         messages.saved = '<span style="margin-top: 5px; display: inline-block;">' + messages.saved + '</span>';
       } else {
          switch (taskMode) {
             case 'unsaved_unchanged':
@@ -846,8 +830,8 @@ window.displayHelper = {
       empty: 'white',
       full: '#ffc90e',
       emptyUseless: '#ced',
-      fullUseless: '#ffc90e',
-      uselessBorder: '#666',
+      fullUseless: '#ffbc08',
+      uselessBorder: '#444',
       locked: '#ddd'
    },
    setStars: function(parents, starWidth) {
