@@ -178,7 +178,6 @@ h1 span {
    right: 0;
    bottom: 0;
    left: 0;
-   background-color: gray;
    background: rgba(0, 0, 0, .5);
 }
 #popupMessage.floatingMessage .container {
