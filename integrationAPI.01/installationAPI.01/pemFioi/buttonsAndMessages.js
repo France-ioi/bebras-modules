@@ -875,8 +875,9 @@ window.displayHelper = {
       var starPoints = maxScores.hard / 4;
       var iStar = 0;
       var curScore = 0;
+      var starPath;
       while (curScore + starPoints <= points) {
-         var starPath = document.getElementById(prefix + iStar)['fullStar'];
+         starPath = document.getElementById(prefix + iStar).fullStar;
          starPath.attr('opacity', 1);
          starPath.attr('clip-rect', '');
          iStar++;
@@ -884,7 +885,7 @@ window.displayHelper = {
       }
       if (points > curScore) {
          var parentElement = document.getElementById(prefix + iStar);
-         var starPath = parentElement['fullStar'];
+         starPath = parentElement.fullStar;
          starPath.attr('opacity', 1);
          starPath.attr('clip-rect', '0 0 ' + (parentElement.starWidth * (points - curScore) / starPoints) +
             ' ' + (parentElement.starWidth * 0.95));
