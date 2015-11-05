@@ -34,7 +34,7 @@ window.displayHelper = {
    neverHadHard: false,
    showMultiversionNotice: false,
    levelsScores: { easy: 0, medium: 0, hard: 0 },
-   levelsRanks: { easy: 0, medium: 1, hard: 2},
+   levelsRanks: { easy: 0, medium: 1, hard: 2 },
    prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
    levels: ['easy', 'medium', 'hard'],
    levelsNames: { easy: "facile", medium: "moyenne", hard: "difficile" },
@@ -181,7 +181,7 @@ window.displayHelper = {
          var titleStarContainers = [];
          scoreHTML = '<span></span><span id="titleStars"></span>';
          $('#task > h1').append(scoreHTML);
-         drawStars("titleStars", 4, 24, 0, "normal");
+         drawStars('titleStars', 4, 24, 0, 'normal');
       } else {
          // Disabled: doesn't work with new tabs layout.
          //scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
@@ -194,7 +194,7 @@ window.displayHelper = {
       for (curLevel in this.levelsNames) {
          tabsHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
-            tabsHTML += "Version <span id='stars_" + this.levelsRanks[curLevel] + "'></span>"
+            tabsHTML += 'Version <span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
          } else {
             tabsHTML += this.onlyLevelsNames[curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
@@ -217,18 +217,18 @@ window.displayHelper = {
 
       $('#tabsContainer').after('<div id="popupMessage"></div>');
    },
-   
+
    updateStarsAtLevel(level) {
       var rate = this.levelsScores[level] / this.levelsMaxScores[level];
       var iLevel = this.levelsRanks[level];
-      var mode = "normal";
+      var mode = 'normal';
       if (iLevel >= this.unlockedLevels) {
-         mode = "locked";
+         mode = 'locked';
       }
       if (this.graderScore > this.levelsMaxScores[level]) {
-         mode = "useless";
+         mode = 'useless';
       }
-      drawStars("stars_" + iLevel, iLevel + 2, 20, rate, mode);
+      drawStars('stars_' + iLevel, iLevel + 2, 18, rate, mode);
    },
 
    // Deprecated: use directly levelsMaxScores instead
@@ -465,7 +465,7 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          this.updateStarsAtLevel(gradedLevel);
-         drawStars("titleStars", 4, 24, this.graderScore / maxScores.hard, "normal");
+         drawStars('titleStars', 4, 24, this.graderScore / maxScores.hard, 'normal');
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
@@ -757,7 +757,7 @@ window.displayHelper = {
                   'Vous pouvez <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">la recharger</a>.';
                if (!this.hideValidateButton) {
                   messages.validate = '<input type="button" value="Enregistrer cette nouvelle réponse" ' +
-                     'onclick="platform.validate(\'done\', function(){})" ' + disabledStr + "/>";
+                     'onclick="platform.validate(\'done\', function(){})" ' + disabledStr + '/>';
                }
                break;
          }
@@ -769,7 +769,8 @@ window.displayHelper = {
          }
       }
       if (this.pointsAsStars && $('#answerScore').length) {
-         drawStars("answerScore", this.levelsRanks[this.taskLevel] + 2, 20, this.levelsScores[this.taskLevel] / this.levelsMaxScores[this.taskLevel], "normal")
+         drawStars('answerScore', this.levelsRanks[this.taskLevel] + 2, 20,
+            this.levelsScores[this.taskLevel] / this.levelsMaxScores[this.taskLevel], 'normal');
       }
       window.task.getHeight(function(height) {
          if (height != self.lastSentHeight) {
@@ -811,16 +812,17 @@ window.displayHelper = {
 };
 
 
-var drawStars = function(id, nbStars, starWidth, rate, mode) {
-   console.log("drawStars " + id + " " + nbStars + ", " + starWidth + ", " + rate + ", " + mode);
-   var clipPath = function(coords, xClip) {
+function drawStars(id, nbStars, starWidth, rate, mode) {
+   $('#' + id).addClass('stars');
+
+   function clipPath(coords, xClip) {
       var result = [[coords[0][0], coords[0][1]]];
       var clipped = false;
-      for (var iCoord = 1; iCoord < coords.length; iCoord++) {
+      for (var iCoord = 1; iCoord <= coords.length; iCoord++) {
          var x1 = coords[iCoord - 1][0];
          var y1 = coords[iCoord - 1][1];
-         var x2 = coords[iCoord][0];
-         var y2 = coords[iCoord][1];
+         var x2 = coords[iCoord % coords.length][0];
+         var y2 = coords[iCoord % coords.length][1];
          if (x2 > xClip) {
             if (!clipped) {
                result.push([xClip, y1 + (y2 - y1) * (xClip - x1) / (x2 - x1)]);
@@ -834,10 +836,11 @@ var drawStars = function(id, nbStars, starWidth, rate, mode) {
             result.push([x2, y2]);
          }
       }
+      result.pop();
       return result;
    }
 
-   var pathFromCoords = function(coords) {
+   function pathFromCoords(coords) {
       var result = 'm' + coords[0][0] + ',' + coords[0][1];
       for (var iCoord = 1; iCoord < coords.length; iCoord++) {
          var x1 = coords[iCoord - 1][0];
@@ -852,13 +855,13 @@ var drawStars = function(id, nbStars, starWidth, rate, mode) {
 
    var fillColors = { normal: 'white', locked: '#ddd', useless: '#ced' };
    var strokeColors = { normal: 'black', locked: '#ddd', useless: '#444' };
-   var starCoords = [[25,60], [5,37], [35,30], [50,5], [65,30], [95,37], [75,60], [78,90], [50,77], [22,90]];
+   var starCoords = [[25, 60], [5, 37], [35, 30], [50, 5], [65, 30], [95, 37], [75, 60], [78, 90], [50, 77], [22, 90]];
    var fullStarCoords = [
-      [[5,37], [35,30], [50,5], [65,30], [95,37], [75,60], [25,60], [5,37]],
-      [[22,90], [50,77], [78,90], [75,60], [25,60], [22,90]]
+      [[5, 37], [35, 30], [50, 5], [65, 30], [95, 37], [75, 60], [25, 60]],
+      [[22, 90], [50, 77], [78, 90], [75, 60], [25, 60]]
    ];
 
-   $("#" + id).html("");
+   $('#' + id).html('');
    var paper = new Raphael(id, starWidth * nbStars, starWidth * 0.95);
    for (var iStar = 0; iStar < nbStars; iStar++) {
       var scaleFactor = starWidth / 100;
@@ -886,7 +889,6 @@ var drawStars = function(id, nbStars, starWidth, rate, mode) {
          stroke: strokeColors[mode],
          'stroke-width': 5 * scaleFactor
       }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
-
    }
 }
 
@@ -894,4 +896,3 @@ var drawStars = function(id, nbStars, starWidth, rate, mode) {
 window.platform.subscribe(displayHelper);
 
 })();
-

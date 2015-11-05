@@ -118,36 +118,16 @@ button, input[type="button"] {
    background: #6c7787;
 }
 
-.starContainer {
-   position: relative;
-   display: inline-block;
-   width: 18px;
-   height: 18px;
-   vertical-align: middle;
-}
-h1 .starContainer {
-   width: 24px;
-   height: 24px;
-   vertical-align: top;
-}
-#answerScore .starContainer {
-   width: 20px;
-   height: 20px;
-}
-span.emptyStar,
-span.fullStar {
-   position: absolute;
-   left: 0;
-   top: 0;
-}
-span.fullStar {
-   z-index: 1;
-}
-
 h1 span {
    display: inline-block;
    width: .8em;
    height: .8em;
+}
+h1 .stars {
+   vertical-align: baseline;
+}
+.stars {
+   vertical-align: middle;
 }
 
 #tabsContainer {
