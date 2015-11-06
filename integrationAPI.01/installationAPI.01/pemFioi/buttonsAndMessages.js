@@ -812,6 +812,11 @@ window.displayHelper = {
 };
 
 
+/*
+   draw nbStars stars of width starWidth in element of id id
+   fills rate% of them in yellow from the left
+   mode is "norma", "locked" or "useless"
+*/
 function drawStars(id, nbStars, starWidth, rate, mode) {
    $('#' + id).addClass('stars');
 
