@@ -218,7 +218,7 @@ window.displayHelper = {
       $('#tabsContainer').after('<div id="popupMessage"></div>');
    },
 
-   updateStarsAtLevel(level) {
+   updateStarsAtLevel: function(level) {
       var rate = this.levelsScores[level] / this.levelsMaxScores[level];
       var iLevel = this.levelsRanks[level];
       var mode = 'normal';
