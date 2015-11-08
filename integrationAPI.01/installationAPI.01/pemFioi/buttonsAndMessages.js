@@ -422,6 +422,7 @@ window.displayHelper = {
    },
    updateScoreOneLevel: function(answer, gradedLevel) {
       var self = this;
+      this.graderMessage = "Évaluation en cours";
       grader.gradeTask(answer, null, function(score, message) {
          score = +score;
          self.submittedScore = score;
