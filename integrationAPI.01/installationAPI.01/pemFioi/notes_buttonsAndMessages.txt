@@ -1,0 +1,106 @@
+Fonctions à bien comprendre / clarifier pour ce qui concerne l'affichage des scores / messages :
+
+checkAnswerChanged: appelée régulièrement pour savoir s'il faut modifier le message pke l'utilisateur a changé la réponse
+restartAll: appelée quand on clique sur le bouton recommencer
+validate: appelée par la plateforme suite à platform.validate, ou quand on valide alors que la correction est visible
+updateScore: recalcule et affiche les scores pour une réponse, et pour le niveau en cours ou bien tous les niveaux
+updateScoreOneLevel: idem mais pour un niveau donné (c'est là qu'on appelle gradeTask côté sujet)
+updateScoreDisplays: met à jour l'affichage des scores dans les onglets (et en bas de la tâche ?)
+hasNonSavedAnswer: est-ce qu'on a une réponse autre que la réponse par défaut initiale, qui n'a pas encore été soumise ?
+retreiveAnswer (to fix)
+reloadAnswer
+reloadState
+
+
+- pourquoi on passe par la plateforme pour valider une réponse ? Est-ce que buttonsAndMessages ne devrait pas s'occuper de déterminer si la nouvelle réponse a un score meilleur que la réponse précédente, et ne la transmettre à la plateforme que si c'est mieux ? => Pas forcément, car on pourrait considérer que la plateforme veut enregistrer toutes les tentatives. C'est à elle de décider.
+
+
+Étude de l'état des variables :
+
+- savedAnswer:
+   - remis à '' quand d'un cancel (plus utilisé sur les nouveaux sujets)
+   - si on valide :
+	- enregistré si pas fullFeedback (showScore)
+	- sinon
+		- si pas de niveaux: enregistré si score meilleur qu'avant => sauf que non en pratique car bug !
+		- si niveaux: on enregistre le score du level en cours si meilleur qu'avant
+   - remis à la valeur fournie si on appelle reloadAnswer (un peu surprenant. et si on avait une réponse meilleure ?)
+=> Correspond à la meilleure réponse, celle que l'on fournit à la plateforme.
+
+- sumbittedAnswer:
+   - remis à la valeur fournie si on appelle reloadAnswer
+   - remis à la valeur de savedAnswer si on appelle retreivedAnswer
+   - mis à la valeur fournie quand on appelle validate
+   - remis à '' dès que la réponse en cours est différente de cette réponse.
+=> Correspond à la réponse dont le score doit être affiché, s'il y en a une (réponse validée et pas modifiée depuis)
+
+- graderScore :
+   - initialisé à "noScore" dans load
+   - si solution, mis à la valeur fournie par le grader dans updateScoreOneLevel
+   - mis à la nouvelle valeur si meilleure, lors de gradeTask, appelé par updateScoreOneLevel
+=> Correspond au score de la meilleure réponse (pour le niveau en cours)
+   Question: est-ce que c'est mis à jour quand on change de niveau ?
+
+- levelsScore :
+   - si solution, valeur pour le niveau actuel mise à jour comme graderScore
+   - mis à la nouvelle valeur si meilleure (pour le niveau actuel), lors de gradeTask
+=> Correspond au score de la meilleure réponse pour chaque niveau
+
+- prevLevelsScores
+   - quand on vient de valider, mis à la valeur actuelle de levelsScores (pour le level en cours) 
+=> Correspond au meilleur score qu'on avait juste avant de valider (avec levels)
+
+- prevSavedScore
+   - dans showView, si on montre la solution et que graderScore est défini, on le met à cette valeur.
+   - quand on vient de valider, mis à la valeur actuel de graderScore
+=> Correspond au meilleur score qu'on avait juste avant de valider (sans levels)
+
+- prevAnswer
+   - remis à la valeur fournie en cas de reloadAnswer
+   - mis à la valeur actuelle de answer à chaque appel à hasNonSavedAnswer
+=> Correspond juste à la réponse la dernière fois qu'on a regardé. 
+
+- defaultAnswer
+   - mis à la réponse actuelle fournie par getAnswer lors de l'appel à showViews (fait après le load donc après le getDefaultAnswerObject si niveaux
+=> Correspond à la valeur de getAnswer() tant qu'on n'a rien changé
+
+- hasAnswerChanged
+   - vrai initialement
+   - mis à true dans checkAnswerChanged si hasNonSavedAnswer indique true
+   - mis à false dans checkAnswerChanged si hasNonSavedAnswer indique vrai
+=> Stocke simplement le fait que la réponse vient de changer par rapport à la dernière fois qu'on a regardé
+
+- refreshMessages
+   - mis à true lors de showView
+   - mis à true lors de l'appel à retreiveAnswer
+   - mis à true lors de l'appel à setLevel
+   - mis à true dans checkAnswerChanged si submittedAnswer n'est pas vide
+   - mis à true si on vient de changer hasAnswerChanged
+   - mis à false quand on appelle updateMessages
+=> Indique s'il est nécessaire de mettre à jour les messages.
+
+- stoppedShowingResult
+   - mis à true quand on appelle stopShowingResult()
+   - mis à false quand on appelle validate
+=> Indique s'il est toujours nécessaire de laisser le résultat affiché en bas du sujet
+
+
+- previousMessages
+    - mis à la valeur des messages juste après leur affichage dans updateMessages
+=> Permet juste de savoir s'il est utile de réafficher les messages (pour éviter le clignotement)
+
+
+- submittedScore
+    - mis au meilleur score pour le level quand on change de level
+    - mis au nouveau score quand on vient d'appeler le grader
+=> Correspond au score de la solution que l'on vient de valider, ou de la meilleure solution si on vient de changer de level.
+
+Réflexions :
+
+- bug à corriger au niveau de savedAnswer dans le cas où on a pas de levels
+- vérifier si refreshMessages est mis à true trop souvent
+- désactiver previousMessages si on peut faire sans avec refreshMessages mieux géré ?
+- vérifier pourquoi submittedAnswer semble rester plus longtemps que le cycle en cours
+- 
+
+
