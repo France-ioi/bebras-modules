@@ -445,7 +445,7 @@ window.displayHelper = {
                      self.savedAnswer = JSON.stringify(savedAnswerObj);
                   }
                }
-            } else if (score > self.graderScore) {
+            } else if (score > self.graderScore) { // This test can never be true !!
                self.savedAnswer = answer;
             }
          }
