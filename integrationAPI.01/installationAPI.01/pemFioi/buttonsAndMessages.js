@@ -430,12 +430,10 @@ window.displayHelper = {
             self.graderScore = score;
             self.levelsScores[gradedLevel] = score;
          } else {
-            if (score > self.graderScore) {
-               self.graderScore = score;
-            }
             if (self.hasLevels) {
                if (score > self.levelsScores[gradedLevel]) {
                   self.levelsScores[gradedLevel] = score;
+                  self.graderScore = score;
                   if (self.savedAnswer === '') {
                      self.savedAnswer = answer;
                   } else {
@@ -445,8 +443,9 @@ window.displayHelper = {
                      self.savedAnswer = JSON.stringify(savedAnswerObj);
                   }
                }
-            } else if (score > self.graderScore) { // This test can never be true !!
+            } else if (score > self.graderScore) {
                self.savedAnswer = answer;
+               self.graderScore = score;
             }
          }
          if (message !== undefined) {

@@ -22,7 +22,7 @@ reloadState
    - si on valide :
 	- enregistré si pas fullFeedback (showScore)
 	- sinon
-		- si pas de niveaux: enregistré si score meilleur qu'avant => sauf que non en pratique car bug !
+		- si pas de niveaux: enregistré si score meilleur qu'avant
 		- si niveaux: on enregistre le score du level en cours si meilleur qu'avant
    - remis à la valeur fournie si on appelle reloadAnswer (un peu surprenant. et si on avait une réponse meilleure ?)
 => Correspond à la meilleure réponse, celle que l'on fournit à la plateforme.
@@ -97,7 +97,6 @@ reloadState
 
 Réflexions :
 
-- bug à corriger au niveau de savedAnswer dans le cas où on a pas de levels
 - vérifier si refreshMessages est mis à true trop souvent
 - désactiver previousMessages si on peut faire sans avec refreshMessages mieux géré ?
 - vérifier pourquoi submittedAnswer semble rester plus longtemps que le cycle en cours
