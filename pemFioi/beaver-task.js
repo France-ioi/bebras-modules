@@ -1,5 +1,3 @@
-'use strict';
-
 /* 
  * This file is to be included by beaver contest tasks, it defines a basic
  * implementation of the main functions of the task object, as well as a grader.
@@ -98,16 +96,22 @@ var grader = grader ? grader : {
    getAcceptedAnswers: function(callback) {
       if (grader.acceptedAnswers) {
          callback(grader.acceptedAnswers);
+         return;
       }
-      if (json && json.acceptedAnswers) {
+      if (typeof json !== 'undefined' && json.acceptedAnswers) {
          callback(json.acceptedAnswers);
+         return;
       }
       if (typeof getTaskResources === 'function') {
          getTaskResources(function(json) {
             if (json && json.acceptedAnswers) {
                callback(json.acceptedAnswers);
+            } else {
+               callback(null);
             }
          });
+      } else {
+         callback(null);
       }
    },
    gradeTask: function (answer, answerToken, success, error) {
