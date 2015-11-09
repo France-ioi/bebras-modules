@@ -298,7 +298,7 @@ window.displayHelper = {
          buttonText = "D'accord";
       }
       // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.sAssetsStaticPath ? window.sAssetsStaticPath + 'images/' : '../../modules/img/';
+      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
       var buttonHTML = mode == 'lock' ? '' : '<button>' + (buttonText || "D'accord") + '</button>';
       $('#popupMessage').html('<div class="container">' +
          '<img class="beaver" src="' + imgPath + 'castor.png"/>' +
