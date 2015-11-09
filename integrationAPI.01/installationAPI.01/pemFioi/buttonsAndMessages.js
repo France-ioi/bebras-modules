@@ -422,6 +422,7 @@ window.displayHelper = {
    },
    updateScoreOneLevel: function(answer, gradedLevel) {
       var self = this;
+      this.graderMessage = "Évaluation en cours";
       grader.gradeTask(answer, null, function(score, message) {
          score = +score;
          self.submittedScore = score;
@@ -812,6 +813,11 @@ window.displayHelper = {
 };
 
 
+/*
+   draw nbStars stars of width starWidth in element of id id
+   fills rate% of them in yellow from the left
+   mode is "norma", "locked" or "useless"
+*/
 function drawStars(id, nbStars, starWidth, rate, mode) {
    $('#' + id).addClass('stars');
 
