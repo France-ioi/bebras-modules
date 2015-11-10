@@ -58,7 +58,7 @@ window.displayHelper = {
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
-         for (var iPlacement in placementNames) {
+         for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
             var placement = 'displayHelper_' + placementNames[iPlacement];
             if ($('#' + placement).length === 0) {
                addTaskHTML += '<div id="' + placement + '"></div>';
@@ -165,7 +165,7 @@ window.displayHelper = {
 
       this.hasLevels = true;
       var paramNames = ['pointsAsStars', 'unlockedLevels', 'neverHadHard', 'showMultiversionNotice'];
-      for (var iParam in paramNames) {
+      for (var iParam = 0; iParam < paramNames.length; iParam++) {
          var param = paramNames[iParam];
          if (taskParams[param] !== undefined) {
             this[param] = taskParams[param];
@@ -211,7 +211,7 @@ window.displayHelper = {
 
       var self = this;
       setTimeout(function() {
-         for (var iLevel in self.levels) {
+         for (var iLevel = 0; iLevel < self.levels.length; iLevel++) {
             curLevel = self.levels[iLevel];
             if (iLevel >= self.unlockedLevels) {
                $('#tab_' + curLevel).addClass('lockedLevel');
@@ -933,7 +933,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
       if (xClip > 0) {
-         for (var iPiece in fullStarCoords) {
+         for (var iPiece = 0; iPiece < fullStarCoords.length; iPiece++) {
             var coords = clipPath(fullStarCoords[iPiece], xClip);
             var star = paper.path(pathFromCoords(coords)).attr({
                fill: '#ffc90e',
