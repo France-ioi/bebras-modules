@@ -538,9 +538,6 @@ window.displayHelper = {
       }
       var self = this;
       this.hasNonSavedAnswer(function(hasNonSavedAnswer) {
-         if (self.submittedAnswer !== '') {
-            self.refreshMessages = true;
-         }
          if (hasNonSavedAnswer && !self.hasAnswerChanged) {
             self.refreshMessages = true;
             self.hasAnswerChanged = true;

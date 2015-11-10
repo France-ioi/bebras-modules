@@ -97,9 +97,6 @@ reloadState
 
 Réflexions :
 
-- vérifier si refreshMessages est mis à true trop souvent
 - désactiver previousMessages si on peut faire sans avec refreshMessages mieux géré ?
-- vérifier pourquoi submittedAnswer semble rester plus longtemps que le cycle en cours
-- 
 
 
