@@ -37,10 +37,7 @@ function ElementModer(defaultMode) {
          return;
       }
       for(var name in this.modes[mode]) {
-         try {
-            this.elements[name].attr(this.modes[mode][name]);
-         } catch (e) {
-         }
+         this.elements[name].attr(this.modes[mode][name]);
       }
    };
 }
