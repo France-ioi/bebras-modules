@@ -12,6 +12,7 @@
 
 window.displayHelper = {
    loaded: false,
+   timeLoaded: 0,
    checkAnswerInterval: null,
    prevAnswer: '',
    readOnly: false,
@@ -40,6 +41,7 @@ window.displayHelper = {
    levelsNames: { easy: "facile", medium: "moyenne", hard: "difficile" },
    onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
+   reloadingAnswer: false,
 
    /***********************************************
     * Initialization functions called by the task *
@@ -66,7 +68,8 @@ window.displayHelper = {
          if (!document.getElementById('displayHelperAnswering')) {
             $(self.taskSelector).append(addTaskHTML);   
          }
-         self.loaded= true;
+         self.loaded = true;
+         self.timeLoaded = new Date().getTime();
          if (self.popupMessageShown) {
             $('#displayHelperAnswering').hide();
          }
@@ -132,8 +135,10 @@ window.displayHelper = {
       }
    },
    doSetupLevels: function(initLevel) {
+      this.reloadingAnswer = true;
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
+      this.reloadingAnswer = false;
 
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
@@ -259,10 +264,13 @@ window.displayHelper = {
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;
+      this.taskLevel = newLevel;
+
+      this.reloadingAnswer = true;
       task.reloadStateObject(state, true);
       task.reloadAnswerObject(answer);
+      this.reloadingAnswer = false;
 
-      this.taskLevel = newLevel;
       this.submittedScore = this.levelsScores[this.taskLevel];
       this.refreshMessages = true;
       this.checkAnswerChanged();
@@ -347,6 +355,7 @@ window.displayHelper = {
    },
 
    reloadAnswer: function(strAnswer) {
+      this.reloadingAnswer = true;
       this.savedAnswer = strAnswer;
       this.prevAnswer = strAnswer;
       this.submittedAnswer = strAnswer;
@@ -354,6 +363,7 @@ window.displayHelper = {
          this.updateScore(strAnswer, true);
       }
       this.checkAnswerChanged(); // necessary?
+      this.reloadingAnswer = false;
    },
 
    reloadState: function() {
@@ -495,6 +505,40 @@ window.displayHelper = {
             $('#tab_' + curLevel).addClass('uselessLevel');
          }
       }
+      if (this.reloadingAnswer) {
+         return;
+      }
+      var actionNext = "stay";
+      // Display popup to indicate what to do next
+      var fullMessage = this.graderMessage;
+      if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+         var curTime = new Date().getTime();
+         var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
+         fullMessage += "<br/><br/>";
+         if (gradedLevel == "hard") {
+            actionNext = "nextTask";
+            fullMessage += "Vous avez entièrement résolu cette question, passez à une autre question.";
+         } else {
+            if ((gradedLevel == "medium") && (secondsSinceLoaded < 120)) {
+               actionNext = "hard";
+               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+            } else if ((gradedLevel == "easy") && (secondsSinceLoaded < 60)) {
+               actionNext = "medium";
+               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+            } else {
+               actionNext = "nextTask";
+               fullMessage += "Passez à une autre question. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.";
+            }
+         }
+      }
+      var self = this;
+      this.showPopupMessage(fullMessage, 'blanket', "D'accord",
+         function() {
+            if ((actionNext == "medium") || (actionNext == "hard")) {
+               self.setLevel(actionNext);
+            }
+         }
+      );
    },
 
    // Does task have unsaved answers?
@@ -789,11 +833,13 @@ window.displayHelper = {
          retrievedAnswer = this.savedAnswer;
       }
       var self = displayHelper;
+      this.reloadingAnswer = true;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
          self.updateScore(self.savedAnswer, false);
          self.refreshMessages = true;
          self.checkAnswerChanged();
+         self.reloadingAnswer = false;
       });
    },
 
