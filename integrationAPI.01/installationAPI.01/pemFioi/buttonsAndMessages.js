@@ -510,7 +510,7 @@ window.displayHelper = {
       }
       var curTime = new Date().getTime();
       var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
-      if (secondsSinceLoaded < 10) {
+      if (secondsSinceLoaded < 2) {
          // TODO: make unnecessary.
          // the platform calls reloadAnswer when loading the task, and some taks
          // call platform.validate from reloadAnswer.
