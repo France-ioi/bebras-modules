@@ -508,12 +508,19 @@ window.displayHelper = {
       if (this.reloadingAnswer) {
          return;
       }
+      var curTime = new Date().getTime();
+      var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
+      if (secondsSinceLoaded < 10) {
+         // TODO: make unnecessary.
+         // the platform calls reloadAnswer when loading the task, and some taks
+         // call platform.validate from reloadAnswer.
+         // this avoids displaying a popup at that time.
+         return;
+      }
       var actionNext = "stay";
       // Display popup to indicate what to do next
       var fullMessage = this.graderMessage;
       if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
-         var curTime = new Date().getTime();
-         var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
          fullMessage += "<br/><br/>";
          if (gradedLevel == "hard") {
             actionNext = "nextTask";
@@ -536,6 +543,8 @@ window.displayHelper = {
          function() {
             if ((actionNext == "medium") || (actionNext == "hard")) {
                self.setLevel(actionNext);
+            } else if (actionNext == "nextTask") {
+               platform.validate("nextImmediate");
             }
          }
       );
