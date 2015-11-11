@@ -149,13 +149,14 @@ h1 .stars {
    padding: 8px;
 }
 #popupMessage.floatingMessage {
-   position: fixed;
+   position: absolute;
    z-index: 100;
    top: 0;
-   right: 0;
-   bottom: 0;
    left: 0;
-   background: rgba(0, 0, 0, .5);
+   height: 100%;
+   width: 100%;
+   background-color: gray;
+   background: rgba(0, 0, 0, .6);
 }
 #popupMessage.floatingMessage .container {
    min-height: 100px;
