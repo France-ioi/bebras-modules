@@ -188,7 +188,7 @@ $(document).ready(function() {
             platform.trigger('load', [loadedViews]);
             task.getViews(function(views){
                if (! $("#choose-view").length)
-                  $(document.body).append('<div id="choose-view"></div>');
+                  $(document.body).append('<div id="choose-view" style="margin-top:8em"></div>');
                $("#choose-view").html("");
                for (var viewName in views)
                {
