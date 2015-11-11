@@ -28,6 +28,8 @@ window.displayHelper = {
    stoppedShowingResult: false,
    previousMessages: {},
    popupMessageShown: false,
+   thresholdEasy: 60,
+   thresholdMedium: 120,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -526,10 +528,10 @@ window.displayHelper = {
             actionNext = "nextTask";
             fullMessage += "Vous avez entièrement résolu cette question, passez à une autre question.";
          } else {
-            if ((gradedLevel == "medium") && (secondsSinceLoaded < 120)) {
+            if ((gradedLevel == "medium") && (secondsSinceLoaded < this.thresholdMedium)) {
                actionNext = "hard";
                fullMessage += "Nous vous proposons d'essayer la version suivante.";
-            } else if ((gradedLevel == "easy") && (secondsSinceLoaded < 60)) {
+            } else if ((gradedLevel == "easy") && (secondsSinceLoaded < this.thresholdEasy)) {
                actionNext = "medium";
                fullMessage += "Nous vous proposons d'essayer la version suivante.";
             } else {
