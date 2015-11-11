@@ -78,8 +78,8 @@ window.displayHelper = {
             if (self.popupMessageShown) {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
-               self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
-                  "Il est peut-être temps de passer à une autre !", 'blanket', "En effet");
+               self.showPopupMessage("<p>Attention, cela fait plus de 5 minutes que vous êtes sur cette question.</p>" +
+                  "<p>Vous devriez sans doute changer de sujet.</p><p>Cliquez sur le bouton en haut à droite.</p>", 'blanket', "D'accord");
                self.taskDelayWarningTimeout = null;
             }
          };
