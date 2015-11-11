@@ -193,3 +193,24 @@ var DelayedExec = {
 $('document').ready(function() {
    platform.initWithTask(window.task);
 });
+
+
+// TEMPORARY: will be merged with the tools dealing with levels
+
+// - maxScores should bind "easy", "medium" and "hard" to increasing values
+// - level should be one of these keys
+// - relativeScore should be a value between 0 and 1
+// The output is a score, that is interpolated at the right level.
+// except if the score is zero, in which case no points are given
+function levelScoreInterpolate(maxScores, level, relativeScore) {
+  if (relativeScore == 0.0) {
+    return 0;
+  }
+  if (level == "easy") {
+     return Math.round(relativeScore * maxScores["easy"]);
+  } else if (level == "medium") {
+     return Math.round(maxScores["easy"] + relativeScore * (maxScores["medium"] - maxScores["easy"]));
+  } else if (level == "hard") {
+     return Math.round(maxScores["medium"] + relativeScore * (maxScores["hard"] - maxScores["medium"]));
+  }
+}

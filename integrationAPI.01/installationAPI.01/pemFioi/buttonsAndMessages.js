@@ -12,6 +12,7 @@
 
 window.displayHelper = {
    loaded: false,
+   timeLoaded: 0,
    checkAnswerInterval: null,
    prevAnswer: '',
    readOnly: false,
@@ -40,6 +41,7 @@ window.displayHelper = {
    levelsNames: { easy: "facile", medium: "moyenne", hard: "difficile" },
    onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
+   reloadingAnswer: false,
 
    /***********************************************
     * Initialization functions called by the task *
@@ -56,7 +58,7 @@ window.displayHelper = {
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
-         for (var iPlacement in placementNames) {
+         for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
             var placement = 'displayHelper_' + placementNames[iPlacement];
             if ($('#' + placement).length === 0) {
                addTaskHTML += '<div id="' + placement + '"></div>';
@@ -66,7 +68,8 @@ window.displayHelper = {
          if (!document.getElementById('displayHelperAnswering')) {
             $(self.taskSelector).append(addTaskHTML);   
          }
-         self.loaded= true;
+         self.loaded = true;
+         self.timeLoaded = new Date().getTime();
          if (self.popupMessageShown) {
             $('#displayHelperAnswering').hide();
          }
@@ -75,8 +78,8 @@ window.displayHelper = {
             if (self.popupMessageShown) {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
-               self.showPopupMessage("Attention, cela fait 5 minutes que vous êtes sur cette question. " +
-                  "Il est peut-être temps de passer à une autre !", 'blanket', "En effet");
+               self.showPopupMessage("<p>Attention, cela fait plus de 5 minutes que vous êtes sur cette question.</p>" +
+                  "<p>Vous devriez sans doute changer de sujet.</p><p>Cliquez sur le bouton en haut à droite.</p>", 'blanket', "D'accord");
                self.taskDelayWarningTimeout = null;
             }
          };
@@ -132,8 +135,10 @@ window.displayHelper = {
       }
    },
    doSetupLevels: function(initLevel) {
+      this.reloadingAnswer = true;
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
+      this.reloadingAnswer = false;
 
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
@@ -160,7 +165,7 @@ window.displayHelper = {
 
       this.hasLevels = true;
       var paramNames = ['pointsAsStars', 'unlockedLevels', 'neverHadHard', 'showMultiversionNotice'];
-      for (var iParam in paramNames) {
+      for (var iParam = 0; iParam < paramNames.length; iParam++) {
          var param = paramNames[iParam];
          if (taskParams[param] !== undefined) {
             this[param] = taskParams[param];
@@ -206,7 +211,7 @@ window.displayHelper = {
 
       var self = this;
       setTimeout(function() {
-         for (var iLevel in self.levels) {
+         for (var iLevel = 0; iLevel < self.levels.length; iLevel++) {
             curLevel = self.levels[iLevel];
             if (iLevel >= self.unlockedLevels) {
                $('#tab_' + curLevel).addClass('lockedLevel');
@@ -259,10 +264,13 @@ window.displayHelper = {
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;
+      this.taskLevel = newLevel;
+
+      this.reloadingAnswer = true;
       task.reloadStateObject(state, true);
       task.reloadAnswerObject(answer);
+      this.reloadingAnswer = false;
 
-      this.taskLevel = newLevel;
       this.submittedScore = this.levelsScores[this.taskLevel];
       this.refreshMessages = true;
       this.checkAnswerChanged();
@@ -347,6 +355,7 @@ window.displayHelper = {
    },
 
    reloadAnswer: function(strAnswer) {
+      this.reloadingAnswer = true;
       this.savedAnswer = strAnswer;
       this.prevAnswer = strAnswer;
       this.submittedAnswer = strAnswer;
@@ -354,6 +363,7 @@ window.displayHelper = {
          this.updateScore(strAnswer, true);
       }
       this.checkAnswerChanged(); // necessary?
+      this.reloadingAnswer = false;
    },
 
    reloadState: function() {
@@ -430,12 +440,10 @@ window.displayHelper = {
             self.graderScore = score;
             self.levelsScores[gradedLevel] = score;
          } else {
-            if (score > self.graderScore) {
-               self.graderScore = score;
-            }
             if (self.hasLevels) {
                if (score > self.levelsScores[gradedLevel]) {
                   self.levelsScores[gradedLevel] = score;
+                  self.graderScore = score;
                   if (self.savedAnswer === '') {
                      self.savedAnswer = answer;
                   } else {
@@ -447,6 +455,7 @@ window.displayHelper = {
                }
             } else if (score > self.graderScore) {
                self.savedAnswer = answer;
+               self.graderScore = score;
             }
          }
          if (message !== undefined) {
@@ -496,6 +505,49 @@ window.displayHelper = {
             $('#tab_' + curLevel).addClass('uselessLevel');
          }
       }
+      if (this.reloadingAnswer) {
+         return;
+      }
+      var curTime = new Date().getTime();
+      var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
+      if (secondsSinceLoaded < 2) {
+         // TODO: make unnecessary.
+         // the platform calls reloadAnswer when loading the task, and some taks
+         // call platform.validate from reloadAnswer.
+         // this avoids displaying a popup at that time.
+         return;
+      }
+      var actionNext = "stay";
+      // Display popup to indicate what to do next
+      var fullMessage = this.graderMessage;
+      if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+         fullMessage += "<br/><br/>";
+         if (gradedLevel == "hard") {
+            actionNext = "nextTask";
+            fullMessage += "Vous avez entièrement résolu cette question, passez à une autre question.";
+         } else {
+            if ((gradedLevel == "medium") && (secondsSinceLoaded < 120)) {
+               actionNext = "hard";
+               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+            } else if ((gradedLevel == "easy") && (secondsSinceLoaded < 60)) {
+               actionNext = "medium";
+               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+            } else {
+               actionNext = "nextTask";
+               fullMessage += "Passez à une autre question. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.";
+            }
+         }
+      }
+      var self = this;
+      this.showPopupMessage(fullMessage, 'blanket', "D'accord",
+         function() {
+            if ((actionNext == "medium") || (actionNext == "hard")) {
+               self.setLevel(actionNext);
+            } else if (actionNext == "nextTask") {
+               platform.validate("nextImmediate");
+            }
+         }
+      );
    },
 
    // Does task have unsaved answers?
@@ -539,9 +591,6 @@ window.displayHelper = {
       }
       var self = this;
       this.hasNonSavedAnswer(function(hasNonSavedAnswer) {
-         if (self.submittedAnswer !== '') {
-            self.refreshMessages = true;
-         }
          if (hasNonSavedAnswer && !self.hasAnswerChanged) {
             self.refreshMessages = true;
             self.hasAnswerChanged = true;
@@ -793,11 +842,13 @@ window.displayHelper = {
          retrievedAnswer = this.savedAnswer;
       }
       var self = displayHelper;
+      this.reloadingAnswer = true;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
          self.updateScore(self.savedAnswer, false);
          self.refreshMessages = true;
          self.checkAnswerChanged();
+         self.reloadingAnswer = false;
       });
    },
 
@@ -882,7 +933,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
       if (xClip > 0) {
-         for (var iPiece in fullStarCoords) {
+         for (var iPiece = 0; iPiece < fullStarCoords.length; iPiece++) {
             var coords = clipPath(fullStarCoords[iPiece], xClip);
             var star = paper.path(pathFromCoords(coords)).attr({
                fill: '#ffc90e',

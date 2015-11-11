@@ -69,6 +69,9 @@ var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
    //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
+   if (mode == 'nextImmediate') {
+      return;
+   }
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);

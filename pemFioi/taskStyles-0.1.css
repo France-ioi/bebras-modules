@@ -43,9 +43,6 @@ button, input[type="button"] {
    text-align: center;
 }
 
-#task {
-   padding-bottom: 400px; /* to have some room for the keyboard on android tablets */
-}
 #task h1,
 .question h1,
 #solution {
@@ -77,7 +74,7 @@ button, input[type="button"] {
 }
 #tabsMenu .li {
    display: inline-block;
-   min-width: 150px;
+   width: 165px;
    margin: 0 20px;
    background: #88BB88;
    border: 2px solid #8d9daa;
@@ -152,18 +149,19 @@ h1 .stars {
    padding: 8px;
 }
 #popupMessage.floatingMessage {
-   position: fixed;
+   position: absolute;
    z-index: 100;
    top: 0;
-   right: 0;
-   bottom: 0;
    left: 0;
-   background: rgba(0, 0, 0, .5);
+   height: 100%;
+   width: 100%;
+   background-color: gray;
+   background: rgba(0, 0, 0, .6);
 }
 #popupMessage.floatingMessage .container {
    min-height: 100px;
-   max-width: 500px;
-   margin: 10% auto;
+   max-width: 600px;
+   margin: 400px auto;
    border: 2px solid black;
    background: white;
 }
