@@ -43,7 +43,6 @@ window.displayHelper = {
    levelsNames: { easy: "facile", medium: "moyenne", hard: "difficile" },
    onlyLevelsNames: { easy: "Facile", medium: "Moyen", hard: "Difficile" },
    taskLevel: '',
-   reloadingAnswer: false,
 
    /***********************************************
     * Initialization functions called by the task *
@@ -137,10 +136,8 @@ window.displayHelper = {
       }
    },
    doSetupLevels: function(initLevel) {
-      this.reloadingAnswer = true;
       task.reloadStateObject(task.getDefaultStateObject(), true);
       task.reloadAnswerObject(task.getDefaultAnswerObject());
-      this.reloadingAnswer = false;
 
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
@@ -268,10 +265,8 @@ window.displayHelper = {
       state.level = newLevel;
       this.taskLevel = newLevel;
 
-      this.reloadingAnswer = true;
       task.reloadStateObject(state, true);
       task.reloadAnswerObject(answer);
-      this.reloadingAnswer = false;
 
       this.submittedScore = this.levelsScores[this.taskLevel];
       this.refreshMessages = true;
@@ -366,7 +361,6 @@ window.displayHelper = {
    },
 
    reloadAnswer: function(strAnswer) {
-      this.reloadingAnswer = true;
       this.savedAnswer = strAnswer;
       this.prevAnswer = strAnswer;
       this.submittedAnswer = strAnswer;
@@ -374,7 +368,6 @@ window.displayHelper = {
          this.updateScore(strAnswer, true);
       }
       this.checkAnswerChanged(); // necessary?
-      this.reloadingAnswer = false;
    },
 
    reloadState: function() {
@@ -437,15 +430,25 @@ window.displayHelper = {
    },
 
    updateScore: function(answer, allLevels) {
+      var self = this;
+      function refresh() {
+         self.refreshMessages = true;
+         self.checkAnswerChanged();
+      }
       if (allLevels) {
-         for (var curLevel in this.levelsNames) {
-            this.updateScoreOneLevel(answer, curLevel);
-         }
+         // TODO: make sure the grader doesn't evaluate each level at each call (most do right now!)
+         self.updateScoreOneLevel(answer, "easy", function() {
+            self.updateScoreOneLevel(answer, "medium", function() {
+               self.updateScoreOneLevel(answer, "hard", refresh);
+            });
+         });
       } else {
-         this.updateScoreOneLevel(answer, this.taskLevel);
+         this.updateScoreOneLevel(answer, this.taskLevel, function() {
+            self.showValidatePopup(self.taskLevel);
+         });
       }
    },
-   updateScoreOneLevel: function(answer, gradedLevel) {
+   updateScoreOneLevel: function(answer, gradedLevel, callback) {
       var self = this;
       this.graderMessage = "Évaluation en cours";
       grader.gradeTask(answer, null, function(score, message) {
@@ -478,11 +481,11 @@ window.displayHelper = {
          } else {
             self.graderMessage = "";
          }
+         // TODO : should not be called from here, might update the display of a level not currently opened!
          if (self.hasLevels) {
             self.updateScoreDisplays(gradedLevel);
          }
-         self.refreshMessages = true;
-         self.checkAnswerChanged();
+         callback();
       }, gradedLevel);
    },
    updateScoreDisplays: function(gradedLevel) {
@@ -520,21 +523,14 @@ window.displayHelper = {
             $('#tab_' + curLevel).addClass('uselessLevel');
          }
       }
-      if (this.reloadingAnswer) {
-         return;
-      }
+   },
+   showValidatePopup: function(gradedLevel) {
       var curTime = new Date().getTime();
       var secondsSinceLoaded = (curTime - this.timeLoaded) / 1000;
-      if (secondsSinceLoaded < 2) {
-         // TODO: make unnecessary.
-         // the platform calls reloadAnswer when loading the task, and some taks
-         // call platform.validate from reloadAnswer.
-         // this avoids displaying a popup at that time.
-         return;
-      }
       var actionNext = "stay";
       // Display popup to indicate what to do next
       var fullMessage = this.graderMessage;
+      var maxScores = this.levelsMaxScores;
       if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
          fullMessage += "<br/><br/>";
          if (gradedLevel == "hard") {
@@ -857,13 +853,9 @@ window.displayHelper = {
          retrievedAnswer = this.savedAnswer;
       }
       var self = displayHelper;
-      this.reloadingAnswer = true;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
          self.updateScore(self.savedAnswer, false);
-         self.refreshMessages = true;
-         self.checkAnswerChanged();
-         self.reloadingAnswer = false;
       });
    },
 
