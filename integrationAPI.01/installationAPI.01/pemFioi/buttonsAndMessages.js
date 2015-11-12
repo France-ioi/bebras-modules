@@ -296,7 +296,7 @@ window.displayHelper = {
          }
       }
    },
-   showPopupMessage: function(message, mode, buttonText, agreeFunc) {
+   showPopupMessage: function(message, mode, buttonTextYes, agreeFunc, buttonTextNo) {
       if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
@@ -304,23 +304,32 @@ window.displayHelper = {
          $('#popupMessage').addClass('floatingMessage');
       }
 
-      if (!buttonText) {
-         buttonText = "D'accord";
+      if (!buttonTextYes) {
+         buttonTextYes = "D'accord";
       }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
-      var buttonHTML = mode == 'lock' ? '' : '<button>' + (buttonText || "D'accord") + '</button>';
+      var buttonYes = mode == 'lock' ? '' : '<button class="buttonYes">' + (buttonTextYes || "D'accord") + '</button>';
+      var buttonNo = '<button class="buttonNo" style="padding-left:10px">' + (buttonTextNo || "Annuler") + '</button>';
+      if (buttonTextNo == undefined) {
+         buttonNo = '';
+      }
       $('#popupMessage').html('<div class="container">' +
          '<img class="beaver" src="' + imgPath + 'castor.png"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
-         '<div class="message">' + message + '</div>' + buttonHTML + '</div>').show();
-      $('#popupMessage button').click(function() {
+         '<div class="message">' + message + '</div>' + buttonYes + buttonNo + '</div>').show();
+      $('#popupMessage .buttonYes').click(function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
          if (agreeFunc) {
             agreeFunc();
          }
+      });
+      $('#popupMessage .buttonNo').click(function() {
+         $('#popupMessage').hide();
+         $('#displayHelperAnswering, #taskContent').show();
+         displayHelper.popupMessageShown = false;
       });
       this.popupMessageShown = true;
    },
@@ -381,18 +390,22 @@ window.displayHelper = {
     * Internal functions *
     **********************/
    restartAll: function() {
-      this.stopShowingResult();
-      if (!this.hasLevels) {
-         task.reloadAnswer('', function() {});
-      } else {
-         task.getAnswer(function(strAnswer) {
-            var answer = $.parseJSON(strAnswer);
-            var defaultAnswer = task.getDefaultAnswerObject();
-            var level = displayHelper.taskLevel;
-            answer[level] = defaultAnswer[level];
-            task.reloadAnswer(JSON.stringify(answer), function() {});
-         });
+      var that = this;
+      function confirmRestartAll() {
+         that.stopShowingResult();
+         if (!that.hasLevels) {
+            task.reloadAnswer('', function() {});
+         } else {
+            task.getAnswer(function(strAnswer) {
+               var answer = $.parseJSON(strAnswer);
+               var defaultAnswer = task.getDefaultAnswerObject();
+               var level = displayHelper.taskLevel;
+               answer[level] = defaultAnswer[level];
+               task.reloadAnswer(JSON.stringify(answer), function() {});
+            });
+         }
       }
+      this.showPopupMessage("Êtres-vous certain de vouloir recommencer cette version ?", 'blanket', "Oui", confirmRestartAll, "Non");
    },
 
    validate: function(mode) {
