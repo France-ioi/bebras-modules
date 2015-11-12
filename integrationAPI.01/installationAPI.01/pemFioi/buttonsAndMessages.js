@@ -398,7 +398,7 @@ window.displayHelper = {
             });
          }
       }
-      this.showPopupMessage("Êtres-vous certain de vouloir recommencer cette version ?", 'blanket', "Oui", confirmRestartAll, "Non");
+      this.showPopupMessage("Êtes-vous certain de vouloir recommencer cette version ?", 'blanket', "Oui", confirmRestartAll, "Non");
    },
 
    validate: function(mode) {
