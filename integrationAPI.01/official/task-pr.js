@@ -42,10 +42,15 @@ function taskCaller(task, request, content, error) {
             oldCallback(arguments[0], arguments[1], arguments[3]);
          };
          content[askedCallbackIdx] = newCallback;
-         try {
+         if (typeof window.taskPrNoCatch !== 'undefined') {
             task.distantTask[request].apply(task.distantTask, content);
-         } catch (e) {
-            error(e);
+         } else {
+            try {
+               task.distantTask[request].apply(task.distantTask, content);
+            } catch (e) {
+               window.clearTimeout(timeout);
+               error(e);
+            }
          }
       } else if (task.distantTask) {
          error("Task "+task.Id+" doesn't implement "+request);
