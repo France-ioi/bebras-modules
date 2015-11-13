@@ -22,12 +22,15 @@ a {
    text-decoration: none;
 }
 
-button, input[type="button"] {
+button,
+input[type="button"] {
    line-height: 1.2;
    font-size: 16px;
 }
 
-.selectable, input, textarea {
+.selectable,
+input,
+textarea {
    -moz-user-select: text;
    -webkit-user-select: auto !important;
    -o-user-select: text;
@@ -161,7 +164,7 @@ h1 .stars {
 #popupMessage.floatingMessage .container {
    min-height: 100px;
    max-width: 600px;
-   margin: 400px auto;
+   margin: 360px auto;
    border: 2px solid black;
    background: white;
 }
@@ -175,13 +178,19 @@ h1 .stars {
    left: 100px;
    top: 16px;
 }
-#popupMessage div.message {
+#popupMessage .message {
    margin-left: 115px;
    padding: 8px;
    max-width: 500px;
    border: 2px solid black;
    border-radius: 8px;
    text-align: justify;
+}
+#popupMessage p {
+   margin: .5em 0 0;
+}
+#popupMessage p:first-child {
+   margin-top: 0;
 }
 #popupMessage button {
    margin-top: 1em;
