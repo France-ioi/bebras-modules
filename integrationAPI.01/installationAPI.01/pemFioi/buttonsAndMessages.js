@@ -444,7 +444,9 @@ window.displayHelper = {
          });
       } else {
          this.updateScoreOneLevel(answer, this.taskLevel, function() {
-            self.showValidatePopup(self.taskLevel);
+            if (self.hasLevels) {
+               self.showValidatePopup(self.taskLevel);
+            }
          });
       }
    },
