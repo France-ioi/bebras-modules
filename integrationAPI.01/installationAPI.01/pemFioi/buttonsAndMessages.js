@@ -539,18 +539,18 @@ window.displayHelper = {
          } else {
             if ((gradedLevel == "medium") && (secondsSinceLoaded < this.thresholdMedium)) {
                actionNext = "hard";
-               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+               fullMessage += "Nous vous proposons d'essayer la version 4 étoiles.";
             } else if ((gradedLevel == "easy") && (secondsSinceLoaded < this.thresholdEasy)) {
                actionNext = "medium";
-               fullMessage += "Nous vous proposons d'essayer la version suivante.";
+               fullMessage += "Nous vous proposons d'essayer la version 3 étoiles.";
             } else {
                actionNext = "nextTask";
-               fullMessage += "Passez à une autre question. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.";
+               fullMessage += "Nous vous proposons de passer au sujet suivant. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.";
             }
          }
       }
       var self = this;
-      this.showPopupMessage(fullMessage, 'blanket', "D'accord",
+      this.showPopupMessage(fullMessage, 'blanket', "Passer à la suite",
          function() {
             if ((actionNext == "medium") || (actionNext == "hard")) {
                self.setLevel(actionNext);
