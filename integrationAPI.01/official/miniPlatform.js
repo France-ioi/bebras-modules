@@ -75,7 +75,9 @@ var miniPlatformValidate = function(mode, success, error) {
    if (mode == 'stay') {
       if (alreadyStayed) {
          platform.trigger('validate', [mode]);
-         success();
+         if (success) {
+            success();
+         }
       } else {
          alreadyStayed = true;
       }
