@@ -533,7 +533,9 @@ window.displayHelper = {
       // Display popup to indicate what to do next
       var fullMessage = this.graderMessage;
       var maxScores = this.levelsMaxScores;
+      var buttonText = "D'accord";
       if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+         buttonText = "Passer à la suite";
          fullMessage += "<br/><br/>";
          if (gradedLevel == "hard") {
             actionNext = "nextTask";
@@ -552,7 +554,7 @@ window.displayHelper = {
          }
       }
       var self = this;
-      this.showPopupMessage(fullMessage, 'blanket', "Passer à la suite",
+      this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
             if ((actionNext == "medium") || (actionNext == "hard")) {
                self.setLevel(actionNext);
