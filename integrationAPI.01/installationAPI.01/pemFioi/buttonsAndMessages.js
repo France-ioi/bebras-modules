@@ -560,6 +560,8 @@ window.displayHelper = {
       var self = this;
       this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
+            // TODO: replace with something compatible with the API.
+            $(parent.document).scrollTop(0);
             if ((actionNext == "medium") || (actionNext == "hard")) {
                self.setLevel(actionNext);
             } else if (actionNext == "nextTask") {
