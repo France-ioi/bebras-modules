@@ -81,7 +81,7 @@ window.displayHelper = {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
                self.showPopupMessage("<p>Attention, cela fait plus de 5 minutes que vous êtes sur cette question.</p>" +
-                  "<p>Vous devriez sans doute changer de sujet, en cliquant sur le bouton tout en haut à droite.</p>", 'blanket', "D'accord");
+                  "<p>Vous devriez sans doute changer de sujet, en cliquant sur le bouton tout en haut à droite.</p>", 'blanket', "D'accord", null, null, "warning");
                self.taskDelayWarningTimeout = null;
             }
          };
@@ -292,14 +292,20 @@ window.displayHelper = {
          }
       }
    },
-   getAvatar: function() {
+   getAvatar: function(mood) {
       if (displayHelper.avatarType == "beaver") {
          return "castor.png";
       } else {
-         return "laptop_success.png";
+         if (mood == "success") {
+            return "laptop_success.png";
+         } else if (mood == "warning") {
+            return "laptop_warning.png";
+         }{
+            return "laptop_error.png";
+         }
       }
    },
-   showPopupMessage: function(message, mode, buttonTextYes, agreeFunc, buttonTextNo) {
+   showPopupMessage: function(message, mode, buttonTextYes, agreeFunc, buttonTextNo, avatarMood) {
       if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
@@ -318,7 +324,7 @@ window.displayHelper = {
          buttonNo = '';
       }
       $('#popupMessage').html('<div class="container">' +
-         '<img class="beaver" src="' + imgPath + this.getAvatar() + '"/>' +
+         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>' + buttonYes + buttonNo + '</div>').show();
       $('#popupMessage .buttonYes').click(function() {
@@ -546,7 +552,9 @@ window.displayHelper = {
       var fullMessage = this.graderMessage;
       var maxScores = this.levelsMaxScores;
       var buttonText = "D'accord";
+      var avatarMood = "error";
       if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+         avatarMood = "success";
          buttonText = "Passer à la suite";
          fullMessage += "<br/><br/>";
          if (gradedLevel == "hard") {
@@ -575,7 +583,9 @@ window.displayHelper = {
             } else if (actionNext == "nextTask") {
                platform.validate("nextImmediate");
             }
-         }
+         },
+         null,
+         avatarMood
       );
    },
 
