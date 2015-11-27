@@ -30,6 +30,7 @@ window.displayHelper = {
    popupMessageShown: false,
    thresholdEasy: 60,
    thresholdMedium: 120,
+   avatarType: "beaver",
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -291,6 +292,13 @@ window.displayHelper = {
          }
       }
    },
+   getAvatar: function() {
+      if (displayHelper.avatarType == "beaver") {
+         return "castor.png";
+      } else {
+         return "laptop_success.png";
+      }
+   },
    showPopupMessage: function(message, mode, buttonTextYes, agreeFunc, buttonTextNo) {
       if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
@@ -310,7 +318,7 @@ window.displayHelper = {
          buttonNo = '';
       }
       $('#popupMessage').html('<div class="container">' +
-         '<img class="beaver" src="' + imgPath + 'castor.png"/>' +
+         '<img class="beaver" src="' + imgPath + this.getAvatar() + '"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>' + buttonYes + buttonNo + '</div>').show();
       $('#popupMessage .buttonYes').click(function() {
