@@ -279,7 +279,7 @@ window.displayHelper = {
       } else if (!this.hasSolution) {
          if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
             this.showPopupMessage("Attention : vous avez déjà résolu une version plus difficile. " +
-               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", 'tab', "Montrez-la-moi quand même");
+               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", 'tab', "Montrez-la-moi quand même", null, null, "warning");
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
