@@ -341,6 +341,7 @@ window.displayHelper = {
          displayHelper.popupMessageShown = false;
       });
       this.popupMessageShown = true;
+      $(parent.document).scrollTop(0);
    },
 
    // Function to call at the beginning of task loading, before any html has
