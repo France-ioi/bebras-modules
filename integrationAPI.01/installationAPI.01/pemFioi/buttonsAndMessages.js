@@ -954,6 +954,10 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       [[22, 90], [50, 77], [78, 90], [75, 60], [25, 60]]
    ];
 
+   
+   if ($('#' + id).length == 0) {
+      return;
+   }
    $('#' + id).html('');
    var paper = new Raphael(id, starWidth * nbStars, starWidth * 0.95);
    for (var iStar = 0; iStar < nbStars; iStar++) {
