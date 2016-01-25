@@ -282,6 +282,26 @@ Beav.Dom.showOrHide = function(e, visible) {
 
 
 /**********************************************************************************/
+/* HTML */
+
+Beav.Html = new Object();
+
+// Escape the html characters in a string
+Beav.Html.escape = function(stringToEncode) {
+   var entityMap = {
+      "&": "&amp;", 
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;' };
+   return String(stringToEncode).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+   }); 
+};
+
+
+/**********************************************************************************/
 /* Raphael */
 
 Beav.Raphael = new Object();
