@@ -267,6 +267,48 @@ Beav.Matrix3D.filterCount = function(m, selectFct) {
 
 
 
+/**********************************************************************************/
+/* Exception */
+
+/* Mechanism for having user exceptions that cannot be confused 
+   with JavaScript builtin exceptions. 
+
+   To throw the exception myExn, do:
+
+      Beav.Exception.throw(myExn);         
+
+   To catch only user exceptions, do:
+
+      try {
+         ...
+      } catch (exn) {
+         var myExn = Beav.Exception.extract(exn);
+         ...
+      }
+
+    In this case, the exception is automatically re-thrown
+    if it is not a user exception.
+
+*/
+
+Beav.Exception = {};
+
+Beav.Exception.constructor = function(arg) {
+   this.contents = arg;
+};
+
+Beav.Exception.throw = function(arg) {
+   throw new Beav.Exception.constructor(arg);
+};
+
+Beav.Exception.extract = function(exn) {
+   if (exn instanceof Beav.Exception.constructor) {
+      return exn.contents;
+   } else {
+      throw exn;
+   }
+};
+
 
 /**********************************************************************************/
 /* Dom */
