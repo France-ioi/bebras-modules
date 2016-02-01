@@ -30,6 +30,7 @@ window.displayHelper = {
    popupMessageShown: false,
    thresholdEasy: 60,
    thresholdMedium: 120,
+   timeoutMinutes: 5,
    avatarType: "beaver",
 
    hasLevels: false,
@@ -80,12 +81,12 @@ window.displayHelper = {
             if (self.popupMessageShown) {
                self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5000);
             } else {
-               self.showPopupMessage("<p>Attention, cela fait plus de 5 minutes que vous êtes sur cette question.</p>" +
+               self.showPopupMessage("<p>Attention, cela fait plus de " + self.timeoutMinutes + " minutes que vous êtes sur cette question.</p>" +
                   "<p>Vous devriez sans doute changer de sujet, en cliquant sur le bouton tout en haut à droite.</p>", 'blanket', "D'accord", null, null, "warning");
                self.taskDelayWarningTimeout = null;
             }
          };
-         self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, 5 * 60 * 1000);
+         self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
       });
    },
    unload: function() {
