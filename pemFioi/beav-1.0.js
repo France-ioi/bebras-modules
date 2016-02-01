@@ -290,7 +290,7 @@ Beav.Matrix3D.filterCount = function(m, selectFct) {
     if it is not a user exception.
 
 */
-
+/*
 Beav.Exception = {};
 
 Beav.Exception.constructor = function(arg) {
@@ -308,7 +308,7 @@ Beav.Exception.extract = function(exn) {
       throw exn;
    }
 };
-
+*/
 
 /**********************************************************************************/
 /* Dom */
