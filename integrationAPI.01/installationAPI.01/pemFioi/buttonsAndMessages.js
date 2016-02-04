@@ -280,7 +280,8 @@ window.displayHelper = {
       } else if (!this.hasSolution) {
          if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
             this.showPopupMessage("Attention : vous avez déjà résolu une version plus difficile. " +
-               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", 'tab', "Montrez-la-moi quand même", null, null, "warning");
+               "Vous ne pourrez pas gagner de points supplémentaires avec cette version.", 'tab', "Montrez-moi-la quand même",
+               null, null, "warning");
          } else if (newLevel == 'hard' && this.neverHadHard) {
             var versionName = this.levelsNames[newLevel];
             if (this.pointsAsStars) versionName = "à 4 étoiles";
@@ -306,7 +307,7 @@ window.displayHelper = {
          }
       }
    },
-   showPopupMessage: function(message, mode, buttonTextYes, agreeFunc, buttonTextNo, avatarMood) {
+   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
       if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
@@ -314,14 +315,14 @@ window.displayHelper = {
          $('#popupMessage').addClass('floatingMessage');
       }
 
-      if (!buttonTextYes) {
-         buttonTextYes = "D'accord";
+      if (!yesButtonText) {
+         yesButtonText = "D'accord";
       }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
-      var buttonYes = mode == 'lock' ? '' : '<button class="buttonYes">' + (buttonTextYes || "D'accord") + '</button>';
-      var buttonNo = '<button class="buttonNo" style="padding-left:10px">' + (buttonTextNo || "Annuler") + '</button>';
-      if (buttonTextNo == undefined) {
+      var buttonYes = mode == 'lock' ? '' : '<button class="buttonYes">' + (yesButtonText || "D'accord") + '</button>';
+      var buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + (noButtonText || "Annuler") + '</button>';
+      if (noButtonText == undefined) {
          buttonNo = '';
       }
       $('#popupMessage').html('<div class="container">' +
