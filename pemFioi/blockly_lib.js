@@ -30,6 +30,7 @@ var blocklyHelper = {
    player: 0,
    actionDelay: 0,
    workspace: null,
+   stopPrograms: false,
 
    load: function() {
       workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox')});
@@ -37,15 +38,12 @@ var blocklyHelper = {
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
       blocklyHelper.addExtraBlocks();
 
-      blocklyHelper.setPlayer(1);
-      var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-      Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(xml));
-      blocklyHelper.savePrograms();
-
-      blocklyHelper.setPlayer(0);
-      var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-      Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(xml));
-      blocklyHelper.savePrograms();
+      for (var iPlayer = this.nbRobots - 1; iPlayer >= 0; iPlayer--) {
+         blocklyHelper.setPlayer(iPlayer);
+         var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+         Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(xml));
+         blocklyHelper.savePrograms();
+      }
    },
 
    waitDelay: function(callback, value) {
@@ -55,10 +53,15 @@ var blocklyHelper = {
       }
       
       var that = this;
-      setTimeout(function() {
+      if (this.actionDelay > 0) {
+         setTimeout(function() {
+            callback(primitive);
+            that.runSyncBlock();
+         }, this.actionDelay);
+      } else {
          callback(primitive);
          that.runSyncBlock();
-      }, this.actionDelay);
+      }
    },
 
    noDelay: function(callback, value) {
@@ -67,10 +70,8 @@ var blocklyHelper = {
          primitive = this.myInterpreters[this.curRobot].createPrimitive(value);
       }
       var that = this;
-      setTimeout(function() {
-         callback(primitive);
-         that.runSyncBlock();
-      }, 0);
+      callback(primitive);
+      that.runSyncBlock();
    },
 
    initInterpreter: function(interpreter, scope) {
@@ -128,8 +129,23 @@ var blocklyHelper = {
       this.createSelection(id, start, end);
    },
 
+   stop: function() {
+      for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
+         if (this.isRunning[iInterpreter]) {
+            this.toStop[iInterpreter] = true;
+         }
+      }
+      task.reset(true);
+   },
+
    runSyncBlock: function() {
       var maxIter = 1000;
+/*      if (turn > 90) {
+         task.program_end(function() {
+            that.stop();
+         });
+         return;
+      }*/
       try {
          for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
             this.curRobot = iInterpreter;
@@ -174,7 +190,7 @@ var blocklyHelper = {
       }
       this.myInterpreters = [];
       this.programEnded = [false, false];
-      task.reset();
+      task.reset(true);
       this.savePrograms();
       for (var iRobot = 0; iRobot < this.nbRobots; iRobot++) {
          var language = this.languages[iRobot];
@@ -197,9 +213,15 @@ var blocklyHelper = {
    },
 
    changePlayer: function() {
+      this.loadPlayer($("#selectPlayer").val());
+   },
+
+   loadPlayer: function(player) {
       this.savePrograms();
-      this.player = $("#selectPlayer").val();
-      $(".robot0, .robot1").hide();
+      this.player = player;
+      for (var iRobot = 0; iRobot < this.nbRobots; iRobot++) {
+         $(".robot" + iRobot).hide();
+      }
       $(".robot" + this.player).show();
 
       $(".language_blockly, .language_javascript").hide();
@@ -232,7 +254,6 @@ var blocklyHelper = {
       var comments = [];
       for (var b = 0; b < blocks.length; b++) {
          var block = blocks[b];
-         //console.log(block.type);
          var blockCode = languageObj.blockToCode(block);
          if (["procedures_defnoreturn", "procedures_defreturn"].indexOf(block.type) > -1) {
             // For function blocks, the code is stored in languageObj.definitions_
@@ -242,11 +263,11 @@ var blocklyHelper = {
             }
          }
       }
-      /*
+
       for (var def in languageObj.definitions_) {
          code.push(languageObj.definitions_[def]);
       }
-      */
+
       var code = code.join("\n");
       code += comments.join("\n");
       return code;
@@ -269,14 +290,14 @@ var blocklyHelper = {
    },
 
    changeLanguage: function() {
-      var player = $("#selectPlayer").val();
-      this.languages[player] = $("#selectLanguage").val();
-      this.changePlayer();
+      this.languages[this.player] = $("#selectLanguage").val();
+      this.loadPlayer(this.player);
    },
 
    importFromBlockly: function() {
-       var player = $("#selectPlayer").val();
-       this.programs[player].javascript = this.getCode(workspace, "javascript");//Blockly.JavaScript.workspaceToCode(workspace);
+       //var player = $("#selectPlayer").val();
+       var player = 0;
+       this.programs[player].javascript = this.getCode(workspace, "javascript");
        $("#program").val(this.programs[player].javascript);
    },
 
@@ -305,7 +326,7 @@ var blocklyHelper = {
                that.languages[that.player] = "javascript";
             }
             that.loadPrograms();
-            that.changePlayer();
+            that.loadPlayer(that.player);
          }
 
          reader.readAsText(file);  
@@ -383,7 +404,7 @@ var blocklyHelper = {
          }
          if (type == 0) {
             return code + "(" + params + ")\n";
-         } else if (type == 1){
+         } else if (type == 1) {
             return [code + "(" + params + ")", Blockly.Python.ORDER_NONE];
          }
       };
@@ -584,7 +605,7 @@ var blocklyHelper = {
         var condition = Blockly.Python.valueToCode(block, 'IF',  Blockly.Python.ORDER_NONE) || 'false';
         var stmtIf = Blockly.Python.statementToCode(block, 'DO');
         var stmtElse = Blockly.Python.statementToCode(block, 'ELSE');
-        var code = "if (" + condition + "):\n" + stmtIf + "else\n" + stmtElse + "\n";
+        var code = "if (" + condition + "):\n" + stmtIf + "else:\n" + stmtElse + "\n";
         return code;
       };
 
