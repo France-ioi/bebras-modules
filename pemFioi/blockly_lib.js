@@ -33,7 +33,7 @@ var blocklyHelper = {
    stopPrograms: false,
 
    load: function() {
-      workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox')});
+      workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "../../modules/ext/blockly/"});
       Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
       blocklyHelper.addExtraBlocks();
@@ -54,7 +54,7 @@ var blocklyHelper = {
       
       var that = this;
       if (this.actionDelay > 0) {
-         setTimeout(function() {
+         DelayedExec.setTimeout("wait" + this.curRobt, function() {
             callback(primitive);
             that.runSyncBlock();
          }, this.actionDelay);
@@ -172,6 +172,9 @@ var blocklyHelper = {
       }
    },
 
+   runPrograms: function(programs) {
+   },
+
    run: function() {
       var nbRunning = 0;
       for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
@@ -183,16 +186,17 @@ var blocklyHelper = {
       if (nbRunning > 0) {
          var that = this;
          console.log("waiting for " + nbRunning + " programs to stop");
-         setTimeout(function() {
+         DelayedExec.setTimeout("run", function() {
             that.run()
          }, 1000);
          return;
       }
       this.myInterpreters = [];
-      this.programEnded = [false, false];
+      this.programEnded = [];
       task.reset(true);
       this.savePrograms();
       for (var iRobot = 0; iRobot < this.nbRobots; iRobot++) {
+         this.programEnded[iRobot] = false;
          var language = this.languages[iRobot];
          if (language == "blockly") {
             language = "blocklyJS";
