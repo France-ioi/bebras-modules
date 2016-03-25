@@ -33,7 +33,7 @@ var blocklyHelper = {
    stopPrograms: false,
 
    load: function() {
-      workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "../../modules/ext/blockly/"});
+      workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
       Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
       blocklyHelper.addExtraBlocks();
