@@ -13,75 +13,37 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+function resetFormElement(e) {
+  e.wrap('<form>').closest('form').get(0).reset();
+  e.unwrap();
+
+  // Prevent form submission
+  e.stopPropagation();
+  e.preventDefault();
+}
+
 var blocklyHelper = {
    textFile: null,
    extended: false,
-   programs: [
-      {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""},
-      {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""}
-   ],
-   languages: ["blockly", "blockly"],
-   myInterpreters: [],
-   isRunning: [],
-   toStop: [],
-   programEnded: [false, false],
-   curRobot: 0,
-   nbRobots: 0,
+   programs: [],
+   languages: [],
    player: 0,
-   actionDelay: 0,
    workspace: null,
-   stopPrograms: false,
 
    load: function() {
-      workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
+      this.workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
       Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
       blocklyHelper.addExtraBlocks();
 
-      for (var iPlayer = this.nbRobots - 1; iPlayer >= 0; iPlayer--) {
+      for (var iPlayer = this.mainContext.nbRobots - 1; iPlayer >= 0; iPlayer--) {
+         this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
+         this.languages[iPlayer] = "blockly";
          blocklyHelper.setPlayer(iPlayer);
          var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-         Blockly.Xml.domToWorkspace(workspace, Blockly.Xml.textToDom(xml));
+         Blockly.Xml.domToWorkspace(this.workspace, Blockly.Xml.textToDom(xml));
          blocklyHelper.savePrograms();
       }
-   },
-
-   waitDelay: function(callback, value) {
-      var primitive = undefined;
-      if (value != undefined) {
-         primitive = this.myInterpreters[this.curRobot].createPrimitive(value);
-      }
-      
-      var that = this;
-      if (this.actionDelay > 0) {
-         DelayedExec.setTimeout("wait" + this.curRobt, function() {
-            callback(primitive);
-            that.runSyncBlock();
-         }, this.actionDelay);
-      } else {
-         callback(primitive);
-         that.runSyncBlock();
-      }
-   },
-
-   noDelay: function(callback, value) {
-      var primitive = undefined;
-      if (value != undefined) {
-         primitive = this.myInterpreters[this.curRobot].createPrimitive(value);
-      }
-      var that = this;
-      callback(primitive);
-      that.runSyncBlock();
-   },
-
-   initInterpreter: function(interpreter, scope) {
-      for (var objectName in blocklyHelper.generators) {
-         for (var iGen = 0; iGen < blocklyHelper.generators[objectName].length; iGen++) {
-            var generator = blocklyHelper.generators[objectName][iGen];
-            interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
-         }
-      }
-      interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(task.program_end));
    },
 
    initXML: function() {
@@ -129,86 +91,6 @@ var blocklyHelper = {
       this.createSelection(id, start, end);
    },
 
-   stop: function() {
-      for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
-         if (this.isRunning[iInterpreter]) {
-            this.toStop[iInterpreter] = true;
-         }
-      }
-      task.reset(true);
-   },
-
-   runSyncBlock: function() {
-      var maxIter = 1000;
-/*      if (turn > 90) {
-         task.program_end(function() {
-            that.stop();
-         });
-         return;
-      }*/
-      try {
-         for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
-            this.curRobot = iInterpreter;
-            var interpreter = this.myInterpreters[iInterpreter];
-            var iter = 0;
-            while (iter < maxIter) {
-               if (!interpreter.step() || this.toStop[iInterpreter]) {
-                  this.isRunning[iInterpreter] = false;;
-                  break;
-               }
-               if (interpreter.paused_) {
-                  break;
-               }
-               iter++;
-            }
-            if (iter == maxIter) {
-               this.isRunning[iInterpreter] = false;;
-               throw "Trop d'itérations avant une action !";
-            }
-         }
-      } catch (e) {
-         console.log(e);
-         $("#errors").html(e);
-      }
-   },
-
-   runPrograms: function(programs) {
-   },
-
-   run: function() {
-      var nbRunning = 0;
-      for (var iInterpreter = 0; iInterpreter < this.myInterpreters.length; iInterpreter++) {
-         if (this.isRunning[iInterpreter]) {
-            this.toStop[iInterpreter] = true;
-            nbRunning++;
-         }
-      }
-      if (nbRunning > 0) {
-         var that = this;
-         console.log("waiting for " + nbRunning + " programs to stop");
-         DelayedExec.setTimeout("run", function() {
-            that.run()
-         }, 1000);
-         return;
-      }
-      this.myInterpreters = [];
-      this.programEnded = [];
-      task.reset(true);
-      this.savePrograms();
-      for (var iRobot = 0; iRobot < this.nbRobots; iRobot++) {
-         this.programEnded[iRobot] = false;
-         var language = this.languages[iRobot];
-         if (language == "blockly") {
-            language = "blocklyJS";
-         }
-         var code = this.getBlocklyLibCode(this.generators) + this.programs[iRobot][language] + "program_end()";
-         this.myInterpreters.push(new Interpreter(code, this.initInterpreter));
-         this.isRunning[iRobot] = true;
-         this.toStop[iRobot] = false;
-      }
-      this.runSyncBlock();
-   },
-
    setPlayer: function(newPlayer) {
       this.player = newPlayer;
       $("#selectPlayer").val(this.player);
@@ -223,7 +105,7 @@ var blocklyHelper = {
    loadPlayer: function(player) {
       this.savePrograms();
       this.player = player;
-      for (var iRobot = 0; iRobot < this.nbRobots; iRobot++) {
+      for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
          $(".robot" + iRobot).hide();
       }
       $(".robot" + this.player).show();
@@ -243,8 +125,8 @@ var blocklyHelper = {
    },
 
 
-   getCode: function(workspace, language) {
-      blocks = workspace.getTopBlocks(true);
+   getCode: function(language) {
+      blocks = this.workspace.getTopBlocks(true);
       var languageObj = null;
       if (language == "javascript") {
          languageObj = Blockly.JavaScript;
@@ -252,7 +134,7 @@ var blocklyHelper = {
       if (language == "python") {
          languageObj = Blockly.Python;
       }
-      languageObj.init(workspace);
+      languageObj.init(this.workspace);
 
       var code = [];
       var comments = [];
@@ -280,17 +162,17 @@ var blocklyHelper = {
    savePrograms: function() {
       this.programs[this.player].javascript = $("#program").val();
 
-      var xml = Blockly.Xml.workspaceToDom(workspace);
+      var xml = Blockly.Xml.workspaceToDom(this.workspace);
       this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
-      this.programs[this.player].blocklyJS = this.getCode(workspace, "javascript");
-      this.programs[this.player].blocklyPython = this.getCode(workspace, "python");
+      this.programs[this.player].blocklyJS = this.getCode("javascript");
+      this.programs[this.player].blocklyPython = this.getCode("python");
    },
 
    loadPrograms: function() {
       $("#program").val(this.programs[this.player].javascript);
       var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
-      workspace.clear();
-      Blockly.Xml.domToWorkspace(workspace, xml);
+      this.workspace.clear();
+      Blockly.Xml.domToWorkspace(this.workspace, xml);
    },
 
    changeLanguage: function() {
@@ -301,7 +183,7 @@ var blocklyHelper = {
    importFromBlockly: function() {
        //var player = $("#selectPlayer").val();
        var player = 0;
-       this.programs[player].javascript = this.getCode(workspace, "javascript");
+       this.programs[player].javascript = this.getCode("javascript");
        $("#program").val(this.programs[player].javascript);
    },
 
@@ -333,7 +215,7 @@ var blocklyHelper = {
             that.loadPlayer(that.player);
          }
 
-         reader.readAsText(file);  
+         reader.readAsText(file);
       } else {
          $("#errors").html("Type de fichier non reconnu");
       }
@@ -632,6 +514,143 @@ var blocklyHelper = {
       Blockly.Python['robot_start'] = function(block) {
         return "";
       };
+   },
+
+   run: function() {
+      var nbRunning = this.mainContext.runner.nbRunning();
+      if (nbRunning > 0) {
+         console.log("waiting for " + nbRunning + " programs to stop");
+         this.mainContext.runner.stop();
+         DelayedExec.setTimeout("run", function() {
+            blocklyHelper.run()
+         }, 1000);
+         return;
+      }
+      this.savePrograms();
+      var codes = [];
+      for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
+         var language = this.languages[iRobot];
+         if (language == "blockly") {
+            language = "blocklyJS";
+         }
+         codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
+      }
+      this.mainContext.runner.runCodes(codes);
+   },
+
+   getFullCode(code) {
+      return this.getBlocklyLibCode(this.generators) + code + "program_end()";
    }
 }
 
+function initBlocklyRunner(context, messageCallback) {
+   init(context, [], [], [], false, {});
+
+   function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
+      context.runner = runner;
+      context.programEnded = [];
+      runner.waitDelay = function(callback, value) {
+         var primitive = undefined;
+         if (value != undefined) {
+            primitive = interpreters[context.curRobot].createPrimitive(value);
+         }
+         
+         if ((context.actionDelay > 0) || (Math.random() < 0.1)) {
+            DelayedExec.setTimeout("wait" + context.curRobot, function() {
+               callback(primitive);
+               runner.runSyncBlock();
+            }, context.actionDelay);
+         } else {
+            callback(primitive);
+            runner.runSyncBlock();
+         }
+      };
+
+      runner.noDelay = function(callback, value) {
+         var primitive = undefined;
+         if (value != undefined) {
+            primitive = interpreters[context.curRobot].createPrimitive(value);
+         }
+         callback(primitive);
+         runner.runSyncBlock();
+      };
+
+      runner.initInterpreter = function(interpreter, scope) {
+         for (var objectName in context.generators) {
+            for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
+               var generator = context.generators[objectName][iGen];
+               interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
+            }
+         }
+         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
+      };
+
+      runner.stop = function() {
+         for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+            if (isRunning[iInterpreter]) {
+               toStop[iInterpreter] = true;
+            }
+         }
+         context.reset();
+      };
+
+      runner.runSyncBlock = function() {
+         var maxIter = 1000;
+   /*      if (turn > 90) {
+            task.program_end(function() {
+               that.stop();
+            });
+            return;
+         }*/
+         try {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               context.curRobot = iInterpreter;
+               var interpreter = interpreters[iInterpreter];
+               var iter = 0;
+               while (iter < maxIter) {
+                  if (!interpreter.step() || toStop[iInterpreter]) {
+                     isRunning[iInterpreter] = false;;
+                     break;
+                  }
+                  if (interpreter.paused_) {
+                     break;
+                  }
+                  iter++;
+               }
+               if (iter == maxIter) {
+                  isRunning[iInterpreter] = false;;
+                  throw "Trop d'itérations avant une action !";
+               }
+            }
+         } catch (e) {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               isRunning[iInterpreter] = false;
+            }
+            messageCallback(e);
+         }
+      };
+
+      runner.runCodes = function(codes) {
+         interpreters = [];
+         context.programEnded = [];
+         context.reset();
+         for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
+            context.programEnded[iInterpreter] = false;
+            interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
+            isRunning[iInterpreter] = true;
+            toStop[iInterpreter] = false;
+         }
+         runner.runSyncBlock();
+      };
+
+      runner.nbRunning = function() {
+         var nbRunning = 0;
+         for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+            if (isRunning[iInterpreter]) {
+               nbRunning++;
+            }
+         }
+         return nbRunning;
+      };
+   }
+}
