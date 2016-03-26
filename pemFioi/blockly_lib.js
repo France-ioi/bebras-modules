@@ -521,7 +521,7 @@ var blocklyHelper = {
       if (nbRunning > 0) {
          console.log("waiting for " + nbRunning + " programs to stop");
          this.mainContext.runner.stop();
-         DelayedExec.setTimeout("run", function() {
+         DelayedExec.setTimeout("run" + Math.random(), function() {
             blocklyHelper.run()
          }, 1000);
          return;
@@ -556,7 +556,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
          
          if ((context.actionDelay > 0) || (Math.random() < 0.1)) {
-            DelayedExec.setTimeout("wait" + context.curRobot, function() {
+            DelayedExec.setTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
                callback(primitive);
                runner.runSyncBlock();
             }, context.actionDelay);
