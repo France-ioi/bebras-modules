@@ -46,6 +46,11 @@ var blocklyHelper = {
       }
    },
 
+   unload: function() {
+      var ws = Blockly.getMainWorkspace('blocklyDiv');
+      ws.dispose();
+   },
+
    initXML: function() {
       var categories = ["actions", "sensors", "debug"];
       for (var iCategory = 0; iCategory < categories.length; iCategory++) {
