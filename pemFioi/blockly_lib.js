@@ -49,6 +49,7 @@ var blocklyHelper = {
    unload: function() {
       var ws = Blockly.getMainWorkspace('blocklyDiv');
       ws.dispose();
+      document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
       delete Blockly;
       $(".blocklyWidgetDiv").remove();
       $(".blocklyTooltipDiv").remove();
