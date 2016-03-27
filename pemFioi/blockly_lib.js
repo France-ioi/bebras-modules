@@ -18,8 +18,8 @@ function resetFormElement(e) {
   e.unwrap();
 
   // Prevent form submission
-  e.stopPropagation();
-  e.preventDefault();
+  //e.stopPropagation();
+  //e.preventDefault();
 }
 
 var blocklyHelper = {
