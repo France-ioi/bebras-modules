@@ -484,7 +484,7 @@ var blocklyHelper = {
         var stmtIf = Blockly.JavaScript.statementToCode(block, 'DO');
         var stmtElse = Blockly.JavaScript.statementToCode(block, 'ELSE');
         var code = "if (" + condition + ") {\n" + stmtIf + "} else {\n" + stmtElse + "}\n";
-        return [code, Blockly.JavaScript.ORDER_FUNCTION_CALL];
+        return code;
       };
 
       Blockly.Python['controls_if_else'] = function(block) {
