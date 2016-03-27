@@ -50,6 +50,8 @@ var blocklyHelper = {
       var ws = Blockly.getMainWorkspace('blocklyDiv');
       ws.dispose();
       delete Blockly;
+      $(".blocklyWidgetDiv").remove();
+      $(".blocklyTooltipDiv").remove();
    },
 
    initXML: function() {
