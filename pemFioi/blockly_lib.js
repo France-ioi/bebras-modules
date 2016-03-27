@@ -528,7 +528,6 @@ var blocklyHelper = {
    run: function() {
       var nbRunning = this.mainContext.runner.nbRunning();
       if (nbRunning > 0) {
-         console.log("waiting for " + nbRunning + " programs to stop");
          this.mainContext.runner.stop();
          DelayedExec.setTimeout("run" + Math.random(), function() {
             blocklyHelper.run()
