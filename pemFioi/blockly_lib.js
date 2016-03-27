@@ -49,6 +49,7 @@ var blocklyHelper = {
    unload: function() {
       var ws = Blockly.getMainWorkspace('blocklyDiv');
       ws.dispose();
+      delete Blockly;
    },
 
    initXML: function() {
