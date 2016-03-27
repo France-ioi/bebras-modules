@@ -113,7 +113,7 @@ var blocklyHelper = {
       $(".language_blockly, .language_javascript").hide();
       $(".language_" + this.languages[this.player]).show();
       
-      var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv, .blocklyTooltipDiv");
+      var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv");
       $("#selectLanguage").val(this.languages[this.player]);
       if (this.languages[this.player] == "blockly") {
          blocklyElems.show();
