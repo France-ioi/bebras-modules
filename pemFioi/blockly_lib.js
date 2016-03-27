@@ -546,7 +546,7 @@ var blocklyHelper = {
       this.mainContext.runner.runCodes(codes);
    },
 
-   getFullCode(code) {
+   getFullCode: function(code) {
       return this.getBlocklyLibCode(this.generators) + code + "program_end()";
    }
 }
