@@ -29,6 +29,7 @@ var blocklyHelper = {
    languages: [],
    player: 0,
    workspace: null,
+   prevWidth: 0,
 
    load: function() {
       this.workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
@@ -265,13 +266,18 @@ var blocklyHelper = {
       var panelWidth = 500;
       if (this.languages[this.player] == "blockly") {
          panelWidth = $("#blocklyDiv").width();
-         Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
-         Blockly.fireUiEvent(window, 'resize');
       } else {
          panelWidth = $("#program").width() + 20;
       }
-      $("#taskIntro").css("width", panelWidth);
-      $("#grid").css("left", panelWidth + 20 + "px");
+      if (panelWidth != this.prevWidth) {
+         $("#taskIntro").css("width", panelWidth);
+         $("#grid").css("left", panelWidth + 20 + "px");
+         if (this.languages[this.player] == "blockly") {
+            Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+            Blockly.fireUiEvent(window, 'resize');
+         }
+      }
+      this.prevWidth = panelWidth;
    },
 
    createGenerator: function(label, code, type, nbParams) {
@@ -639,6 +645,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runCodes = function(codes) {
+         //DelayedExec.stopAll(); pb: it would top existing graders
          interpreters = [];
          context.programEnded = [];
          context.reset();
