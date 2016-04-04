@@ -247,10 +247,20 @@ Task.prototype.showViews = function(views, success, error) {
 
 Task.prototype.gradeAnswer = function(answer, answerToken, success, error) {
    if (!error) error = function(errMsg) {console.error(errMsg)};
+   var newSuccess = function(successMonoArg) {
+      if (successMonoArg instanceof Array) {
+         var argzero = successMonoArg[0];
+         var argone  = (successMonoArg.length > 1) ? successMonoArg[1] : null;
+         var argtwo  = (successMonoArg.length > 2) ? successMonoArg[2] : null;
+         success(argzero, argone, argtwo);
+      } else {
+         success(successMonoArg);
+      }
+   };
    this.chan.call({method: "task.gradeAnswer",
       params: [answer, answerToken],
       error: error,
-      success: success,
+      success: newSuccess,
       timeout: 30000
    });
 };

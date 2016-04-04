@@ -123,10 +123,13 @@ if (!isCrossDomain()) {
          return;
       }
       var gradeAnswer = function(params, success, error) {
+         var newSuccess = function(score, message, scoreToken) {
+            success([score, message, scoreToken]);
+         };
          if (typeof task.gradeAnswer === 'function') {
-            task.gradeAnswer(params[0], params[1], success, error);
+            task.gradeAnswer(params[0], params[1], newSuccess, error);
          } else {
-            window.grader.gradeTask(params[0], params[1], success, error);
+            window.grader.gradeTask(params[0], params[1], newSuccess, error);
          }
       };
       var channelId = getUrlParameterByName('channelId');
