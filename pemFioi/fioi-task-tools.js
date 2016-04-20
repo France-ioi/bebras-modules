@@ -178,7 +178,6 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
       }
    }
    fillSamples(FIOITaskMetaData.taskSamples, 'task');
-   fillSamples(FIOITaskMetaData.graderSamples, 'grader');
    fillSources(FIOITaskMetaData.taskSources, 'task');
    fillSources(FIOITaskMetaData.solutionSources, 'solution');
    for (var hintNum in FIOITaskMetaData.hintsSources) {
