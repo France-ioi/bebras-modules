@@ -16,7 +16,7 @@ requirejs.config({
     "fioi-task-tools": "../../fioi-task-tools",
     "taskController": taskPlatformPath+"/taskController",
     "pem-api": taskPlatformPath+"/pem-api",
-    "limitsController": taskPlatformPath+"/limits/controller",
+    "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsController": taskPlatformPath+"/hints/controller",
     "showSource": taskPlatformPath+"/showSource",
   },
@@ -30,12 +30,12 @@ requirejs.config({
     "platform-pr": {"deps": ["jquery", "jschannel"]},
     "taskController": {"deps": ["angular-ui-ace", 'lodash']},
     "pem-api": {"deps": ["platform-pr","angular-ui-ace", 'lodash']},
-    "limitsController": {"deps": ["angular-ui-ace", 'lodash']},
+    "limitsDirective": {"deps": ["angular-ui-ace", 'lodash']},
     "hintsController": {"deps": ["angular-ui-ace", 'lodash']},
     "showSource": {"deps": ["angular-ui-ace", 'lodash']},
     "miniPlatform": {"deps": ["platform-pr"]},
     "installation": {"deps": ["platform-pr"]},
-    "fioi-task-tools": {"deps": ["platform-pr", "models", "modelsManager", 'jquery', 'installation', 'taskController','limitsController', 'pem-api', 'hintsController', 'showSource']},
+    "fioi-task-tools": {"deps": ["platform-pr", "models", "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsController', 'showSource']},
   }
 });
 require([
