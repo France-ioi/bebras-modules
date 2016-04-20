@@ -10,7 +10,7 @@ var res = {};
 
 var taskResourcesLoaded = false;
 
-function implementGetResources(task) {
+window.implementGetResources = function(task) {
    task.getResources = function(callback)
    {
       if (taskResourcesLoaded) {
@@ -142,15 +142,19 @@ function declareResource(type, resource) {
 
 window.declareTaskResource = declareResource;
 
+var resourcesObjectForRegistration = {};
+
 $(document).ready(function() {
    if (typeof json !== 'undefined') {
       res = json;
    }
    res.task = [{ type: 'html', content: $('#task').html() }];
    res.solution = [{ type: 'html', content: $('#solution').html() }];
-   implementGetResources(window.task);
-   // alias for old code, TODO: remove
-   window.getTaskResources = task.getResources;
+   if (window.task) {
+      window.implementGetResources(window.task);
+      // alias for old code, TODO: remove
+      window.getTaskResources = task.getResources;
+   }
 });
 
 
