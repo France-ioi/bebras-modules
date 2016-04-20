@@ -1,0 +1,46 @@
+requirejs.config({
+  "paths": {
+    "ace": modulesPath+"/ext/ace/ace",
+    "angular": modulesPath+"/ext/angular/angular.min",
+    "angular-ui-bootstrap-tpls": modulesPath+"/ext/angular-ui-bootstrap/ui-bootstrap-tpls-1.3.1.min",
+    "angular-ui-ace": modulesPath+"/ext/angular-ui-ace/ui-ace",
+    "fioi-editor2": modulesPath+"/ext/fioi-editor2/fioi-editor2.min",
+    "jquery": modulesPath+"/ext/jquery/2.1/jquery.min",
+    "lodash": modulesPath+"/ext/lodash/lodash.min",
+    "platform-pr": modulesPath+"/integrationAPI.01/official/platform-pr",
+    "installation": modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation",
+    "miniPlatform": modulesPath+"/integrationAPI.01/official/miniPlatform",
+    "models": taskPlatformPath+"/shared/models",
+    "modelsManager": modulesPath+"/pemFioi/modelsManager",
+    "jschannel": modulesPath+"/ext/jschannel/jschannel",
+    "fioi-task-tools": "../../fioi-task-tools",
+    "taskController": taskPlatformPath+"/taskController",
+    "pem-api": taskPlatformPath+"/pem-api",
+    "limitsController": taskPlatformPath+"/limits/controller",
+    "hintsController": taskPlatformPath+"/hints/controller",
+    "showSource": taskPlatformPath+"/showSource",
+  },
+  "shim": {
+    "jquery": {"exports": "$"},
+    "lodash": {"exports": "_"},
+    "models": {"exports": "models"},
+    "angular": {"exports": "angular"},
+    "angular-ui-bootstrap-tpls": {"deps": ["angular"]},
+    "angular-ui-ace": {"deps": ["angular", "ace"]},
+    "platform-pr": {"deps": ["jquery", "jschannel"]},
+    "taskController": {"deps": ["angular-ui-ace", 'lodash']},
+    "pem-api": {"deps": ["platform-pr","angular-ui-ace", 'lodash']},
+    "limitsController": {"deps": ["angular-ui-ace", 'lodash']},
+    "hintsController": {"deps": ["angular-ui-ace", 'lodash']},
+    "showSource": {"deps": ["angular-ui-ace", 'lodash']},
+    "miniPlatform": {"deps": ["platform-pr"]},
+    "installation": {"deps": ["platform-pr"]},
+    "fioi-task-tools": {"deps": ["platform-pr", "models", "modelsManager", 'jquery', 'installation', 'taskController','limitsController', 'pem-api', 'hintsController', 'showSource']},
+  }
+});
+require([
+  'angular', 'angular-ui-bootstrap-tpls', 'angular-ui-ace',
+  'fioi-editor2', 'jquery', 'lodash',
+  'jschannel', 'platform-pr',
+  'miniPlatform', 'fioi-task-tools'
+]);
