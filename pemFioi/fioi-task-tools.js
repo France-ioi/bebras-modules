@@ -120,11 +120,11 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
       for (var i = 0; i < samples.length; i++) {
          if (!urlMode) {
             waiting += 2;
-            $.get("tests/" + samples[i] + ".in")
+            $.get("tests/files/" + samples[i] + ".in")
                .done(sampleDone(samples[i], type, 'in'))
                .fail(fetchFail("test/" + samples[i] + ".in"))
                .always(fetchAlways);
-            $.get("tests/" + samples[i] + ".out")
+            $.get("tests/files/" + samples[i] + ".out")
                .done(sampleDone(samples[i], type, 'out'))
                .fail(fetchFail("test/" + samples[i] + ".out"))
                .always(fetchAlways);
@@ -132,8 +132,8 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
             PEMInstallationAPIObject[type].push({
                type: 'sample',
                name: samples[i],
-               inUrl: "test/" + samples[i] + ".in",
-               outUrl: "test/" + samples[i] + ".out"
+               inUrl: "test/files/" + samples[i] + ".in",
+               outUrl: "test/files/" + samples[i] + ".out"
             });
          }
       }
