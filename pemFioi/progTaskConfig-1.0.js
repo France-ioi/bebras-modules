@@ -19,6 +19,7 @@ requirejs.config({
     "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsController": taskPlatformPath+"/hints/controller",
     "showSource": taskPlatformPath+"/showSource",
+    "showSample": taskPlatformPath+"/samples/directive",
   },
   "shim": {
     "jquery": {"exports": "$"},
@@ -29,13 +30,14 @@ requirejs.config({
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "platform-pr": {"deps": ["jquery", "jschannel"]},
     "taskController": {"deps": ["angular-ui-ace", 'lodash']},
-    "pem-api": {"deps": ["platform-pr","angular-ui-ace", 'lodash']},
-    "limitsDirective": {"deps": ["angular-ui-ace", 'lodash']},
-    "hintsController": {"deps": ["angular-ui-ace", 'lodash']},
-    "showSource": {"deps": ["angular-ui-ace", 'lodash']},
+    "pem-api": {"deps": ["taskController", "platform-pr","angular-ui-ace", 'lodash']},
+    "limitsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
+    "hintsController": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
+    "showSource": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
+    "showSample": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "miniPlatform": {"deps": ["platform-pr"]},
     "installation": {"deps": ["platform-pr"]},
-    "fioi-task-tools": {"deps": ["platform-pr", "models", "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsController', 'showSource']},
+    "fioi-task-tools": {"deps": ["platform-pr", "models", 'showSample', "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsController', 'showSource']},
   }
 });
 require([

@@ -503,33 +503,21 @@ function saveSourceCodes(resources, metadata, taskId) {
    }
 }
 
-function saveSamples(resources, taskId) {
-   var idRes, resource, taskTest;
+function saveSamples(resources, metadata, taskId) {
+   var idRes, resource, taskTest, iRank;
+   iRank = 0;
    for (idRes = 0; idRes < resources.task.length; idRes++) {
       resource = resources.task[idRes];
       if (resource.type == 'sample' && resource.name) {
          taskTest = ModelsManager.createRecord('tm_tasks_tests');
          taskTest.idTask = taskId;
+         taskTest.iRank = iRank;
          taskTest.sGroupType = 'Example';
          taskTest.sName = resource.name;
          taskTest.sInput = resource.inContent;
          taskTest.sOutput = resource.outContent;
          ModelsManager.insertRecord("tm_tasks_tests", taskTest);
-      }
-   }
-   if (!resources.grader) {
-      return;
-   }
-   for (idRes = 0; idRes < resources.grader.length; idRes++) {
-      resource = resources.grader[idRes];
-      if (resource.type == 'sample' && resource.name) {
-         taskTest = ModelsManager.createRecord('tm_tasks_tests');
-         taskTest.idTask = taskId;
-         taskTest.sGroupType = 'Evaluation';
-         taskTest.sName = resource.name;
-         taskTest.sInput = resource.inContent;
-         taskTest.sOutput = resource.outContent;
-         ModelsManager.insertRecord("tm_tasks_tests", taskTest);
+         iRank += 1;
       }
    }
 }
