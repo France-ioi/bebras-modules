@@ -546,7 +546,7 @@ function insertResourcesInModel(resources, metadata) {
    saveLimits(resources, metadata, taskId);
 }
 
-var htmlstr = '<div id="task"><h1 ng-bind-html="taskTitle"></h1><div dynamic-compile="taskContent"></div></div><div id="editor"><div id="sourcesEditor"><div fioi-editor2="{tabset: \'sources\'}"></div></div><div id="testsEditor" ng-if="tm_task.bUserTests"><div fioi-editor2="{tabset:\'tests\'}"></div></div></div><div id="solution" dynamic-compile="solutionContent"></div><div id="hints"><div ng-include="\'../../modules-task-platform/hints/hints.html\'" ng-controller="hintsController" ng-if="tm_task && tm_task.nbHintsTotal"></div></div>';
+var htmlstr = '<div id="task"><h1 ng-bind-html="taskTitle"></h1><div dynamic-compile="taskContent"></div></div><div id="editor"><div id="sourcesEditor"><div fioi-editor2="{tabset: \'sources\'}"></div></div><div id="testsEditor" ng-if="tm_task.bUserTests"><div fioi-editor2="{tabset:\'tests\'}"></div></div></div><div id="solution" dynamic-compile="solutionContent"></div><div id="hints"><div task-hints ng-if="tm_task && tm_task.nbHintsTotal"></div></div>';
 
 var task = {};
 
