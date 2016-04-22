@@ -23,7 +23,12 @@ window.implementGetResources = function(task) {
       res.task_modules = [];
       res.solution_modules = [];
       res.grader_modules = [];
-      res.hints = [];
+      if (!'hints' in res) {
+         $('.hint').each(function(index) {
+            res.hints[res.hints.length] = [{type: 'html', content: $(this).html() }];
+            $(this).attr('hint-Num', res.hints.length-1);
+         });
+      }
       res.proxy = [];
       res.proxy_modules = [];
       res.display = [];
@@ -128,6 +133,17 @@ window.implementGetResources = function(task) {
          }
       });
       fillImages($('#solution').html(), images, res.solution);
+      $('.hint').each(function() {
+         var hintnum = $(this).attr('hint-num');
+         $('[hint-num='+hintnum+'] img').each(function() {
+            image = $(this).attr('src').toString();
+            if ($.inArray(image, images) === -1) {
+               res.hints[hintnum].push({ type: 'image', url: image });
+               images.push(image);
+            }
+         });
+         fillImages($(this).html(), images, res.hints[hintnum]);
+      });
       taskResourcesLoaded = true;
       callback(res);
    };
@@ -148,6 +164,11 @@ $(document).ready(function() {
    if (typeof json !== 'undefined') {
       res = json;
    }
+   res.hints = [];
+   $('.hint').each(function(index) {
+      res.hints[res.hints.length] = [{type: 'html', content: $(this).html() }];
+      $(this).attr('hint-num', res.hints.length-1);
+   });
    res.task = [{ type: 'html', content: $('#task').html() }];
    res.solution = [{ type: 'html', content: $('#solution').html() }];
    if (window.task) {

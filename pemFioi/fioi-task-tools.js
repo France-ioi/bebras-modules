@@ -571,10 +571,6 @@ task.load = function (views, callback) {// TODO: handle views
       urlMode = false; // we can use ajax
    }
    var currentLang = 'cpp'; // TODO: fetch through platform.getTaskParams
-   // we cheat a little bit:
-   $('.hint').each(function(index) {
-      $(this).addClass('hint-'+index);
-   });
    window.implementGetResources(task);
    task.getResources(function (PEMInstallationAPIObject) {
       fillResources(FIOITaskMetaData, PEMInstallationAPIObject,
