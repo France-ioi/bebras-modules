@@ -134,9 +134,24 @@ var blocklyHelper = {
       this.loadPrograms();
    },
 
+   getCodeFromXml: function(xmlText, language) {
+      try {
+        var xml = Blockly.Xml.textToDom(xmlText)
+      } catch (e) {
+        alert(e);
+        return;
+      }
+      var tmpWorkspace = new Blockly.Workspace();
+      Blockly.Xml.domToWorkspace(tmpWorkspace, xml);
+      return this.getCode(language, tmpWorkspace);
+   },
 
-   getCode: function(language) {
-      blocks = this.workspace.getTopBlocks(true);
+
+   getCode: function(language, codeWorkspace) {
+      if (codeWorkspace == undefined) {
+         codeWorkspace = this.workspace;
+      }
+      blocks = codeWorkspace.getTopBlocks(true);
       var languageObj = null;
       if (language == "javascript") {
          languageObj = Blockly.JavaScript;
@@ -144,7 +159,7 @@ var blocklyHelper = {
       if (language == "python") {
          languageObj = Blockly.Python;
       }
-      languageObj.init(this.workspace);
+      languageObj.init(codeWorkspace);
 
       var code = [];
       var comments = [];
