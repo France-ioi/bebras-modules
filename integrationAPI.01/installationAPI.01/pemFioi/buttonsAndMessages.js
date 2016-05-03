@@ -86,7 +86,9 @@ window.displayHelper = {
                self.taskDelayWarningTimeout = null;
             }
          };
-         self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
+         if (self.timeoutMinutes > 0) {
+            self.taskDelayWarningTimeout = setTimeout(taskDelayWarning, self.timeoutMinutes * 60 * 1000);
+         }
       });
    },
    unload: function() {
