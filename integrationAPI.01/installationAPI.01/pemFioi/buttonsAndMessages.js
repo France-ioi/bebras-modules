@@ -345,7 +345,10 @@ window.displayHelper = {
          displayHelper.popupMessageShown = false;
       });
       this.popupMessageShown = true;
-      $(parent.document).scrollTop(0);
+      try {
+         $(parent.document).scrollTop(0);
+      } catch (e) {
+      }
    },
 
    // Function to call at the beginning of task loading, before any html has
@@ -582,7 +585,10 @@ window.displayHelper = {
       this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
             // TODO: replace with something compatible with the API.
-            $(parent.document).scrollTop(0);
+            try {
+               $(parent.document).scrollTop(0);
+            } catch (e) {
+            }
             if ((actionNext == "medium") || (actionNext == "hard")) {
                self.setLevel(actionNext);
             } else if (actionNext == "nextTask") {
