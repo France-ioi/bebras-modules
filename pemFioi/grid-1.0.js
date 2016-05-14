@@ -59,21 +59,15 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    var internalClickHandler = function(event) {
       var that = event.data.thisGrid;
       var paperPosition = that.getPaperMouse(event);
-      var paperX = paperPosition.left;
-      var paperY = paperPosition.top;
-
-      if (paperX < that.gridLeft || paperX >= that.gridRight) {
+      
+      var gridPos = that.paperPosToGridPos(paperPosition);
+      if(!gridPos) {
          return;
       }
-      if (paperY < that.gridTop || paperY >= that.gridBottom) {
-         return;
-      }
-      var row = Math.floor((paperY - that.gridTop) / that.cellHeight);
-      var col = Math.floor((paperX - that.gridLeft) / that.cellWidth);
 
-      event.data.row = row;
-      event.data.col = col;
-      event.data.cell = that.table[row][col];
+      event.data.row = gridPos.row;
+      event.data.col = gridPos.col;
+      event.data.cell = that.table[gridPos.row][gridPos.col];
       that.clickHandler(event);
    };
 
@@ -104,6 +98,19 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       return {
          x: this.gridLeft + col * cellWidth,
          y: this.gridTop + row * cellHeight };
+   };
+   
+   this.paperPosToGridPos = function(paperPosition) {
+      if (paperPosition.left < this.gridLeft || paperPosition.left >= this.gridRight) {
+         return null;
+      }
+      if (paperPosition.top < this.gridTop || paperPosition.top >= this.gridBottom) {
+         return null;
+      }
+      return {
+         row: Math.floor((paperPosition.top - this.gridTop) / this.cellHeight),
+         col: Math.floor((paperPosition.left - this.gridLeft) / this.cellWidth)
+      };
    };
 
    this.getCellCenter = function(row, col) {
@@ -160,6 +167,61 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this.getPaper = function() {
       return this.paper;
    };
+   
+   this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr) {
+      var self = this;
+      var anchorGridPos;
+      var anchorPaperPos;
+      var currentPaperPos;
+      var currentGridPos;
+      function dragStart(x, y, event) {
+         anchorPaperPos = self.getPaperMouse(event);
+         currentPaperPos = self.getPaperMouse(event);
+         anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
+         currentGridPos = self.paperPosToGridPos(anchorPaperPos);
+         this.dragSelection = paper.rect().attr(selectionBoxAttr);
+         if(onStart) {
+            onStart(x, y, event, anchorPaperPos, anchorGridPos);
+         }
+         if(onSelectionChange) {
+            onSelectionChange(0, 0, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+         }
+      }
+      function dragEnd(event) {
+         this.dragSelection.remove();
+         if(onUp) {
+            onUp(event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+         }
+      }
+      function dragMove(dx, dy, x, y, event) {
+         currentPaperPos.left = Math.min(self.gridRight - 1, Math.max(self.gridLeft, anchorPaperPos.left + dx));
+         currentPaperPos.top = Math.min(self.gridBottom - 1, Math.max(self.gridTop, anchorPaperPos.top + dy));
+         var newGridPos = self.paperPosToGridPos(currentPaperPos);
+         this.dragSelection.attr({
+            x: Math.min(anchorPaperPos.left, currentPaperPos.left),
+            y: Math.min(anchorPaperPos.top, currentPaperPos.top),
+            width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
+            height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
+         });
+         if(onMove) {
+            onMove(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+         }
+         if(onSelectionChange && newGridPos) {
+            if(newGridPos.col != currentGridPos.col || newGridPos.row != currentGridPos.row) {
+               onSelectionChange(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, newGridPos);
+            }
+         }
+         if(newGridPos) {
+            currentGridPos = newGridPos;
+         }
+      }
+      
+      this.overlay = this.paper.rect(this.gridLeft, this.gridTop, this.gridRight - this.gridLeft, this.gridBottom - this.gridTop).attr({
+         fill: "green",
+         opacity: 0
+      });
+      this.overlay.drag(dragMove, dragStart, dragEnd);
+   };
 
    this.remove = function() {
       var iRow, iCol;
@@ -177,6 +239,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          this.paperCols[iCol].remove();
       }
 
+      if(this.overlay) {
+         this.overlay.remove();
+      }
+      
       this.element.unbind("click", internalClickHandler);
    };
 
