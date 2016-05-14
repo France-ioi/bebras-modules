@@ -70,10 +70,8 @@ var grader = grader ? grader : {};
 function initWrapper(initTaskFor, levels, defaultLevel) {
    
    // Create a taskFor instance, possibly operating on an existing object.
-   function createTask(taskFor) {
-      if(taskFor === null || taskFor === undefined) {
-         taskFor = {};
-      }
+   function createTask() {
+      var taskFor = {};
       taskFor.delayFactory = new DelayFactory();
       taskFor.raphaelFactory = new RaphaelFactory();
       
@@ -104,14 +102,6 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
       }
    }
    
-   // Destroy and create a taskFor instance.
-   function recreateTask(taskFor, callback) {
-      destroyTask(taskFor, function() {
-         createTask(taskFor);
-         callback();
-      });
-   }
-   
    // Invoke a function for each level, and wait for callback.
    // When done, invoke finalCallback (optional).
    function callbackLoop(array, itemCallback, finalCallback) {
@@ -132,7 +122,7 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
    }
    
    // Main taskFor instance, for user display.
-   var mainTask = createTask();
+   var mainTask;
    
    // The state of the task, including current level and levelState for each level.
    var state = null;
@@ -141,6 +131,7 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
    var gradingTasks = {};
    
    task.load = function(views, callback) {
+      mainTask = createTask();
       if(levels) {
          // TODO okay to assume default level is the first level, if not supplied?
          if(defaultLevel === null || defaultLevel === undefined) {
@@ -211,7 +202,8 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             levelAnswer = mainTask.getDefaultAnswerObject();
             state.levelAnswers[level] = levelAnswer;
          }
-         recreateTask(mainTask, function() {
+         destroyTask(mainTask, function() {
+            mainTask = createTask();
             mainTask.loadLevel(level, state.levelStates[level]);
             mainTask.reloadAnswerObject(levelAnswer);
             mainTask.resetDisplay();
@@ -239,7 +231,8 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
          state = newState;
          var level = state.level;
          var levelState = state.levelStates[level];
-         recreateTask(mainTask, function() {
+         destroyTask(mainTask, function() {
+            mainTask = createTask();
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(state.levelAnswers[level]);
             callback();
