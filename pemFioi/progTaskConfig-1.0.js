@@ -14,6 +14,7 @@ requirejs.config({
     "modelsManager": modulesPath+"/pemFioi/modelsManager-1.0",
     "jschannel": modulesPath+"/ext/jschannel/jschannel",
     "fioi-task-tools": modulesPath+"/pemFioi/fioi-task-tools",
+    "installationToModel": modulesPath+"/pemFioi/installationToModel-1.0",
     "taskController": taskPlatformPath+"/taskController",
     "pem-api": taskPlatformPath+"/pem-api",
     "limitsDirective": taskPlatformPath+"/limits/directive",
@@ -24,6 +25,7 @@ requirejs.config({
   "shim": {
     "jquery": {"exports": "$"},
     "lodash": {"exports": "_"},
+    "installationToModel": {"exports": "insertResourcesInModel", "deps": ["modelsManager", "models"]},
     "models": {"exports": "models"},
     "angular": {"exports": "angular"},
     "angular-ui-bootstrap-tpls": {"deps": ["angular"]},
@@ -37,7 +39,7 @@ requirejs.config({
     "showSample": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "miniPlatform": {"deps": ["platform-pr"]},
     "installation": {"deps": ["platform-pr"]},
-    "fioi-task-tools": {"deps": ["platform-pr", "models", 'showSample', "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsDirective', 'showSource']},
+    "fioi-task-tools": {"deps": ["platform-pr", "models", 'installationToModel', 'showSample', "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsDirective', 'showSource']},
   }
 });
 require([
