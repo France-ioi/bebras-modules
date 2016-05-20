@@ -411,7 +411,7 @@ window.displayHelper = {
       var tabsStarContainers = [];
       var tabsHTML = '<div id="tabsMenu">';
       var curLevel;
-      for (curLevel in this.levelsNames) {
+      for (curLevel in this.levelsRanks) {
          tabsHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
             tabsHTML += this.strings.version + ' <span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
@@ -755,7 +755,7 @@ window.displayHelper = {
       }
       if (scores[gradedLevel] == this.graderScore) {
          // Marks levels that can't earn points as useless
-         for (curLevel in this.levelsNames) {
+         for (curLevel in this.levelsRanks) {
             if (maxScores[curLevel] > this.graderScore) {
                break;
             }
