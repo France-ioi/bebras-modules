@@ -250,16 +250,15 @@ window.displayHelper = {
       }
    },
 
-   /***********************************************
-    * Initialization functions called by the task *
-    ***********************************************/
-
    initLanguage: function() {
       if (window.stringsLanguage == undefined) {
          window.stringsLanguage = 'fr';
       }
       this.strings = this.languageStrings[window.stringsLanguage];
    },
+   /***********************************************
+    * Initialization functions called by the task *
+    ***********************************************/
    load: function(views) {
       this.initLanguage();
       var self = this;
@@ -887,10 +886,10 @@ window.displayHelper = {
             }
          }
       }
-      scoreDiffMsg += " " + this.graderScore + " sur " + this.taskParams.maxScore + ".";
+      scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
-          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' + this.strings.reloadValidAnswer + '</a>';
+          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez la réponse validée.</a>';
       }
       return scoreDiffMsg;
    },
@@ -1063,7 +1062,7 @@ window.displayHelper = {
             case 'saved_changed':
                messages.saved = "<br/><b style='color: red;'>" + this.strings.warningDifferentAnswerSaved + "</b> " +
                   this.formatTranslation(this.strings.youMay, ["<a href='#' onclick='displayHelper.retrieveAnswer(); return false;'>" + this.strings.reloadIt + "</a>"]);
-                  if (!this.hideValidateButton) {
+               if (!this.hideValidateButton) {
                   messages.validate = "<input type='button' value='" + this.strings.saveThisNewAnswer + "' onclick=\"platform.validate('done', function(){})\" " + disabledStr + "/>";
                }
                break;
