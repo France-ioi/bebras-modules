@@ -1015,6 +1015,7 @@ window.displayHelper = {
 
    lastSentHeight: null,
    updateMessages: function() {
+      this.initLanguage();
       var self = this;
       this.refreshMessages = false;
       var suffix, prefix; 
