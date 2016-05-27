@@ -7,7 +7,7 @@ function saveTask(resources, metadata) {
    task.nbHintsTotal = resources.hints ? resources.hints.length : 0;
    task.sTextId = metadata.id;
    task.sSupportedLangProg = metadata.supportedLanguages ? metadata.supportedLanguages.join(',') : '*';
-   task.sEvalResultOutputScript = metadata.evalOutputScipt ? metadata.evalOutputScipt : '';
+   task.sEvalResultOutputScript = metadata.evalOutputScript ? metadata.evalOutputScript : '';
    task.bUserTests = metadata.hasUserTests;
    ModelsManager.insertRecord("tm_tasks", task);
    return task.ID;
