@@ -280,9 +280,9 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
 
    task.unload = function(callback) {
       var instances = [];
-      for(var iLevel in graders) {
-         for(var iSeed in graders[iLevel]) {
-            instances.push(graders[iLevel][iSeed]);
+      for(var iLevel in gradingTasks) {
+         for(var iSeed in gradingTasks[iLevel]) {
+            instances.push(gradingTasks[iLevel][iSeed]);
          }
       }
       instances.push(mainTask);
