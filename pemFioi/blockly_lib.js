@@ -30,8 +30,79 @@ var blocklyHelper = {
    player: 0,
    workspace: null,
    prevWidth: 0,
+   languageStrings: {
+      fr: {
+         actions: "Actions",
+         sensors: "Capteurs",
+         debug: "Débuggage",
+         logic: "Logique",
+         loops: "Boucles",
+         math: "Maths",
+         text: "Texte",
+         variables: "Variables",
+         functions: "Fonctions",
+         invalidContent: "Contenu invalide",
+         unknownFileType: "Type de fichier non reconnu",
+         download: "télécharger",
+         smallestOfTwoNumbers: "Plus petit des deux nombres",
+         greatestOfTwoNumbers: "Plus grand des deux nombres",
+         programOfRobot: "Programme du robot",
+         tooManyIterations: "Trop d'itérations avant une action !",
+         if: "si",
+         do: "faire",
+         else: "sinon"
+      },
+      en: {
+         actions: "Actions",
+         sensors: "Sensors",
+         debug: "Debug",
+         logic: "Logic",
+         loops: "Loops",
+         math: "Math",
+         text: "Text",
+         variables: "Variables",
+         functions: "Functions",
+         invalidContent: "Invalid content",
+         unknownFileType: "Unrecognized file type",
+         download: "download",
+         smallestOfTwoNumbers: "Smallest of the two numbers",
+         greatestOfTwoNumbers: "Greatest of the two numbers",
+         programOfRobot: "Robot's program",
+         tooManyIterations: "Too many iterations before an action!",
+         if: "if",
+         do: "do",
+         else: "else"
+      },
+      de: {
+         actions: "Actions",
+         sensors: "Capteurs",
+         debug: "Débuggage",
+         logic: "Logique",
+         loops: "Boucles",
+         math: "Maths",
+         text: "Texte",
+         variables: "Variables",
+         functions: "Fonctions",
+         invalidContent: "Contenu invalide",
+         unknownFileType: "Type de fichier non reconnu",
+         download: "télécharger",
+         smallestOfTwoNumbers: "Plus petit des deux nombres",
+         greatestOfTwoNumbers: "Plus grand des deux nombres",
+         programOfRobot: "Programme du robot",
+         tooManyIterations: "Trop d'itérations avant une action !",
+         if: "si",
+         do: "faire",
+         else: "sinon"
+      }
+   },
 
-   load: function() {
+   load: function(language) {
+      if (language == undefined) {
+         language = "fr";
+      }
+      this.strings = this.languageStrings[language];
+      var xml = this.getToolboxXml();
+      document.getElementById('toolbox').innerHTML = xml;
       this.workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
       Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
@@ -229,7 +300,7 @@ var blocklyHelper = {
                   var xml = Blockly.Xml.textToDom(code);
                   that.programs[that.player].blockly = code;
                } catch(e) {
-                  $("#errors").html("Contenu invalide");
+                  $("#errors").html(blocklyHelper.strings.invalidContent);
                }
                that.languages[that.player] = "blockly";
             } else {
@@ -242,7 +313,7 @@ var blocklyHelper = {
 
          reader.readAsText(file);
       } else {
-         $("#errors").html("Type de fichier non reconnu");
+         $("#errors").html(blocklyHelper.strings.unknownFileType);
       }
    },
 
@@ -260,7 +331,7 @@ var blocklyHelper = {
       this.textFile = window.URL.createObjectURL(data);
 
       // returns a URL you can use as a href
-      $("#saveUrl").html(" <a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>télécharger</a>");
+      $("#saveUrl").html(" <a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>" + blocklyHelper.strings.download + "</a>");
       return this.textFile;
    },
 
@@ -392,6 +463,135 @@ var blocklyHelper = {
       strCode += "Math['min'] = function(a, b) { if (a > b) return b; return a; };\n";
       return strCode;
    },
+
+   getToolboxXml: function() {
+      var blocksByCategory = {
+      }
+      for (var objectName in this.generators) {
+         for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
+            var generator = this.generators[objectName][iGen];
+            if (blocksByCategory[generator.category] == undefined) {
+               blocksByCategory[generator.category] = [];
+            }
+            blocksByCategory[generator.category].push(objectName + "_" + generator.labelEn + "__");
+         }
+      }
+      xml = "";
+      for (var category in blocksByCategory) {
+         xml += "<category name='" + blocklyHelper.strings[category] + "' colour='210'>";
+         var blocks = blocksByCategory[category];
+         for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+            xml += "<block type='" + blocks[iBlock] + "'></block>";
+         }
+         xml += "</category>";
+      }
+      xml +=
+"                <category name='" + blocklyHelper.strings.logic + "' colour='65'>" +
+"                  <block type='controls_if' colour='65'></block>" +
+"                  <block type='controls_if_else' colour='65'></block>" +
+"                  <block type='logic_compare'></block>" +
+"                  <block type='logic_operation'></block>" +
+"                  <block type='logic_negate'></block>" +
+"                  <block type='logic_boolean'></block>" +
+"                </category>" +
+"                <category name='" + blocklyHelper.strings.loops + "' colour='120'>" +
+"                  <block type='controls_repeat'></block>" +
+"                  <block type='controls_whileUntil'></block>" +
+"                  <block type='controls_for'>" +
+"                    <value name='FROM'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                    <value name='TO'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>10</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                    <value name='BY'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='controls_flow_statements'></block>" +
+"                </category>" +
+"                <category name='" + blocklyHelper.strings.math + "' colour='230'>" +
+"                  <block type='math_number' gap='32'></block>" +
+"                  <block type='math_arithmetic'>" +
+"                    <value name='A'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                    <value name='B'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_number_property'>" +
+"                    <value name='NUMBER_TO_CHECK'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>0</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_change'>" +
+"                    <value name='DELTA'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_round'>" +
+"                    <value name='NUM'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>3.1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_extra_single'>" +
+"                    <value name='NUM'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>3.1</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_extra_double'>" +
+"                    <value name='A'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='A'>2</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                    <value name='B'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='B'>2</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                  <block type='math_modulo'>" +
+"                    <value name='DIVIDEND'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>64</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                    <value name='DIVISOR'>" +
+"                      <shadow type='math_number'>" +
+"                        <field name='NUM'>10</field>" +
+"                      </shadow>" +
+"                    </value>" +
+"                  </block>" +
+"                </category>" +
+"                <category name='" + blocklyHelper.strings.text + "' colour='210'>" +
+"                  <block type='text'></block>" +
+"                  <block type='text_join'></block>" +
+"                  <block type='text_append'></block>" +
+"                </category>" +
+"                <category name='" + blocklyHelper.strings.variables + "' colour='330' custom='VARIABLE'></category>" +
+"                <category name='" + blocklyHelper.strings.functions + "' colour='290' custom='PROCEDURE'></category>";
+      return xml;
+   },
    
    addExtraBlocks: function() {
       Blockly.Blocks['math_extra_single'] = {
@@ -452,8 +652,8 @@ var blocklyHelper = {
           this.setTooltip(function() {
             var mode = thisBlock.getFieldValue('OP');
             var TOOLTIPS = {
-              'MIN': "Plus petit des deux nombres",
-              'MAX': "Plus grand des deux nombres"
+              'MIN': blocklyHelper.strings.smallestOfTwoNumbers,
+              'MAX': blocklyHelper.strings.greatestOfTwoNumbers
             };
             return TOOLTIPS[mode];
           });
@@ -493,12 +693,12 @@ var blocklyHelper = {
         init: function() {
           this.appendValueInput("IF")
               .setCheck("Boolean")
-              .appendField("si");
+              .appendField(blocklyHelper.strings.if);
           this.appendDummyInput()
-              .appendField("faire");
+              .appendField(blocklyHelper.strings.do);
           this.appendStatementInput("DO");
           this.appendDummyInput()
-              .appendField("sinon");
+              .appendField(blocklyHelper.strings.else);
           this.appendStatementInput("ELSE");
           this.setInputsInline(false);
           this.setPreviousStatement(true);
@@ -529,7 +729,7 @@ var blocklyHelper = {
       Blockly.Blocks['robot_start'] = {
         init: function() {
           this.appendDummyInput()
-              .appendField("Programme du robot");
+              .appendField(blocklyHelper.strings.programOfRobot);
           this.setNextStatement(true);
           this.setColour(210);
           this.setTooltip('');
@@ -576,22 +776,15 @@ function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
 
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
-      context.runner = runner;
-      context.programEnded = [];
-      runner.waitDelay = function(callback, value) {
-         var primitive = undefined;
-         if (value != undefined) {
-            primitive = interpreters[context.curRobot].createPrimitive(value);
-         }
-         
-         if ((context.actionDelay > 0) || (Math.random() < 0.1)) {
+      runner.waitDelay = function(callback, value, delay) {
+         if (delay > 0) {
             DelayedExec.setTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
-               callback(primitive);
-               runner.runSyncBlock();
-            }, context.actionDelay);
+                  runner.noDelay(callback, value);
+               },
+               delay
+            );
          } else {
-            callback(primitive);
-            runner.runSyncBlock();
+            runner.noDelay(callback, value);
          }
       };
 
@@ -600,8 +793,15 @@ function initBlocklyRunner(context, messageCallback) {
          if (value != undefined) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
          }
-         callback(primitive);
-         runner.runSyncBlock();
+         if (Math.random() < 0.1) {
+            DelayedExec.setTimeout("wait_" + Math.random(), function() {
+               callback(primitive);
+               runner.runSyncBlock();
+            }, 0);
+         } else {
+            callback(primitive);
+            runner.runSyncBlock();
+         }
       };
 
       runner.initInterpreter = function(interpreter, scope) {
@@ -648,7 +848,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
                if (iter == maxIter) {
                   isRunning[iInterpreter] = false;;
-                  throw "Trop d'itérations avant une action !";
+                  throw blocklyHelper.strings.tooManyIterations;
                }
             }
          } catch (e) {
@@ -682,5 +882,9 @@ function initBlocklyRunner(context, messageCallback) {
          }
          return nbRunning;
       };
+
+      context.runner = runner;
+      context.callCallback = runner.noDelay;
+      context.programEnded = [];
    }
 }
