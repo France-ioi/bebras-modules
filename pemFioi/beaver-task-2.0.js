@@ -70,7 +70,7 @@ var grader = grader ? grader : {};
 function initWrapper(initTaskFor, levels, defaultLevel) {
    
    // Create a taskFor instance, possibly operating on an existing object.
-   function createTask() {
+   function createTask(displayFlag) {
       var taskFor = {};
       taskFor.delayFactory = new DelayFactory();
       taskFor.raphaelFactory = new RaphaelFactory();
@@ -78,6 +78,8 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
       // Simulation factory needs a specific corresponding delay factory.
       // TODO should it expect something else? taskFor? A list of factories?
       taskFor.simulationFactory = new SimulationFactory(taskFor.delayFactory);
+      
+      taskFor.display = displayFlag;
       initTaskFor(taskFor);
       return taskFor;
    }
@@ -131,7 +133,8 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
    var gradingTasks = {};
    
    task.load = function(views, callback) {
-      mainTask = createTask();
+      mainTask = createTask(true);
+      task.displayedSubTask = mainTask;
       if(levels) {
          // TODO okay to assume default level is the first level, if not supplied?
          if(defaultLevel === null || defaultLevel === undefined) {
@@ -203,10 +206,13 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             state.levelAnswers[level] = levelAnswer;
          }
          destroyTask(mainTask, function() {
-            mainTask = createTask();
+            mainTask = createTask(true);
+            task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, state.levelStates[level]);
             mainTask.reloadAnswerObject(levelAnswer);
-            mainTask.resetDisplay();
+            if(mainTask.resetDisplay) {
+               mainTask.resetDisplay();
+            }
             callback();
          });
       }
@@ -232,7 +238,8 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
-            mainTask = createTask();
+            mainTask = createTask(true);
+            task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(state.levelAnswers[level]);
             callback();
@@ -288,7 +295,10 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
       instances.push(mainTask);
       callbackLoop(instances, function(taskFor, loopCallback) {
          destroyTask(mainTask, loopCallback);
-      }, callback);
+      }, function() {
+         task.displayedSubTask = null;
+         callback();
+      });
    };
    
    function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
@@ -297,7 +307,7 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
          gradingTasks[level] = {};
       }
       if(!gradingTasks[level][seed]) {
-         var gradingTask = createTask();
+         var gradingTask = createTask(false);
          gradingTask.loadLevel(level);
          gradingTasks[level][seed] = gradingTask;
       }
