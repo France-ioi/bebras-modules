@@ -1070,7 +1070,7 @@ window.displayHelper = {
          }
       }
       for (var type in messages) {
-         if ((typeof this.previousMessages[type] === 'undefined') || (this.previousMessages[type] !== messages[type])) {
+         if (this.loaded && (typeof this.previousMessages[type] === 'undefined' || this.previousMessages[type] !== messages[type])) {
             $('#displayHelper_' + type).html(messages[type]);
             this.previousMessages[type] = messages[type];
          }
