@@ -79,7 +79,7 @@ task.reloadAnswer = function(strAnswer, callback) {
 
 task.reloadState = function(state, callback) {
    var stateObject = JSON.parse(state);
-   if (typeof stateObject.displayedAnswer !== 'undefined') {
+   if (stateObject && typeof stateObject.displayedAnswer !== 'undefined') {
       task.reloadAnswer(stateObject.displayedAnswer, callback);
    } else {
       callback();
