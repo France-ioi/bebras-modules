@@ -138,6 +138,80 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
          }
       }
    }
+
+   // from https://gist.github.com/HaNdTriX/7704632
+   function ImgSrcToDataUrl(src, success, fail) {
+     var img = new Image();
+     img.crossOrigin = 'Anonymous';
+     var callbackCalled = false;
+     img.onload = function() {
+       var canvas = document.createElement('CANVAS');
+       var ctx = canvas.getContext('2d');
+       var dataURL;
+       canvas.height = this.height;
+       canvas.width = this.width;
+       ctx.drawImage(this, 0, 0);
+       dataURL = canvas.toDataURL();
+       success(dataURL);
+       callbackCalled = true;
+       canvas = null;
+     };
+     img.src = src;
+     if (img.complete || img.complete === undefined) {
+       img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+       img.src = src;
+     }
+     setTimeout(function() {
+      if (!callbackCalled) {
+         fail();
+      }
+     }, 1000);
+   }
+
+   function imageDone(resource) {
+      return function(content) {
+         resource.content = content;
+         fetchAlways();
+      };
+   }
+
+   function imageFailed(resource) {
+      return function(content) {
+         fetchFail(resource.url);
+         fetchAlways();
+      };
+   }
+
+   function fillImages(resources) {
+      for (var i = 0; i < resources.length; i++) {
+         var resource = resources[i];
+         console.error(resource);
+         console.error(i);
+         if (resource.type == 'image') {
+            waiting += 1;
+            ImgSrcToDataUrl(resource.url, imageDone(resource), imageFailed(resource));
+         }
+      }
+   }
+
+   function fillAnimation() {
+      for (var i = 0; i < PEMInstallationAPIObject.task.length; i++) {
+         var resource = PEMInstallationAPIObject.task[i];
+         if (resource.type == 'javascript' && resource.id == 'animation') {
+            console.error(resource);
+            waiting += 1;
+            $.get(resource.url)
+               .done(function(scriptContent) {
+                  resource.content = scriptContent;
+                  console.error(resource);
+               })
+               .fail(fetchFail(resource.url))
+               .always(fetchAlways);
+            break; // important, otherwise "resource" variable gets messy
+         }
+      }
+   }
+
    // type is 'task', 'solution' or 'hint', subtype is null for task and solution, and the hint number for hints
    function fillSources(sources, type, subtype) {
       if (!sources) return;
@@ -179,10 +253,14 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    }
    fillSamples(FIOITaskMetaData.taskSamples, 'task');
    fillSources(FIOITaskMetaData.taskSources, 'task');
+   fillImages(PEMInstallationAPIObject.task);
    fillSources(FIOITaskMetaData.solutionSources, 'solution');
+   fillImages(PEMInstallationAPIObject.solution);
    for (var hintNum in FIOITaskMetaData.hintsSources) {
       fillSources(FIOITaskMetaData.hintsSources[hintNum], 'hint', hintNum);
+      fillImages(PEMInstallationAPIObject.hint[hintNum]);
    }
+   fillAnimation();
    fetchAlways();
 }
 
