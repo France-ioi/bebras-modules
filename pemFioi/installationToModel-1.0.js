@@ -1,8 +1,22 @@
 (function () {
 'use strict';
 
+function getAnimationRes(taskRes) {
+   for (var i = 0; i < taskRes.length; i++) {
+      var resource = taskRes[i];
+      if (resource.type == 'javascript' && resource.id == 'animation') {
+         return resource;
+      }
+   }
+   return null;
+}
+
 function saveTask(resources, metadata) {
    var task = ModelsManager.createRecord('tm_tasks');
+   var animationRes = getAnimationRes(resources.task);
+   if (animationRes && animationRes.content) {
+      task.sScriptAnimation = animationRes.content;
+   }
    task.sAuthor = metadata.authors ? metadata.authors.join(',') : '';
    task.nbHintsTotal = resources.hints ? resources.hints.length : 0;
    task.sTextId = metadata.id;
