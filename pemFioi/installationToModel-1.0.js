@@ -172,7 +172,6 @@ function saveLimits(resources, metadata, taskId) {
 function insertResourcesInModel(resources, metadata) {
    // we use ModelsManager to get the different source codes, etc. so that the structure
    // is identical to TaskPlatform
-   console.error('debug0');
    console.error(resources);
    var taskId = saveTask(resources, metadata);
    saveStrings(resources, metadata, taskId);

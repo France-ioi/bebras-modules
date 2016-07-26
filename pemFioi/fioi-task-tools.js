@@ -185,8 +185,6 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    function fillImages(resources) {
       for (var i = 0; i < resources.length; i++) {
          var resource = resources[i];
-         console.error(resource);
-         console.error(i);
          if (resource.type == 'image') {
             waiting += 1;
             ImgSrcToDataUrl(resource.url, imageDone(resource), imageFailed(resource));
@@ -198,12 +196,10 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
       for (var i = 0; i < PEMInstallationAPIObject.task.length; i++) {
          var resource = PEMInstallationAPIObject.task[i];
          if (resource.type == 'javascript' && resource.id == 'animation') {
-            console.error(resource);
             waiting += 1;
             $.get(resource.url)
                .done(function(scriptContent) {
                   resource.content = scriptContent;
-                  console.error(resource);
                })
                .fail(fetchFail(resource.url))
                .always(fetchAlways);
@@ -353,7 +349,6 @@ function includeSingleSources(resources, currentLang, urlMode) {
       var resource = getSourceResourceFromElement(resources, $(this));
       if (!resource) {
          console.error('unable to find the resource');
-         console.error(resources);
          return;
       }
       var answerVersion = getAnswerVersionInLanguage(resource.answerVersions, currentLang);
@@ -364,7 +359,6 @@ function includeSingleSources(resources, currentLang, urlMode) {
       if (urlMode) {
          $(this).html('<iframe src="'+answerVersion.answerUrl+'" width="600" height="400"></iframe>"');
       } else {
-         console.error(escapeCode(answerVersion.answerContent));
          $(this).html('<pre class="code lang-'+currentLang+'" data-code="'+escapeCode(answerVersion.answerContent)+'\n"></pre>');
       }
    });
@@ -386,7 +380,6 @@ function includeSourceTabs(resources, currentLang, urlMode) {
       var resource = getSourceResourceFromElement(resources, $(this));
       if (!resource) {
          console.error('unable to find the resource');
-         console.error(resources);
          return;
       }
       var name = resource.name; // TODO: add type to prevent clash between
