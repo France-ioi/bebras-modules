@@ -19,6 +19,8 @@ requirejs.config({
     "pem-api": taskPlatformPath+"/pem-api",
     "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsDirective": taskPlatformPath+"/hints/directive",
+    "showdown": modulesPath+"/ext/showdown/showdown.min",
+    "showdownConvert": modulesPath+"/pemFioi/showdownConvert",
     "showSource": taskPlatformPath+"/showSource",
     "showSample": taskPlatformPath+"/samples/directive",
   },
@@ -35,6 +37,7 @@ requirejs.config({
     "pem-api": {"deps": ["taskController", "platform-pr","angular-ui-ace", 'lodash']},
     "limitsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "hintsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
+    "showdownConvert": {"deps": ["showdown"]},
     "showSource": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "showSample": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "miniPlatform": {"deps": ["platform-pr"]},
@@ -46,5 +49,6 @@ require([
   'angular', 'angular-ui-bootstrap-tpls', 'angular-ui-ace',
   'fioi-editor2', 'jquery', 'lodash',
   'jschannel', 'platform-pr',
-  'miniPlatform', 'fioi-task-tools'
+  'miniPlatform', 'fioi-task-tools',
+  'showdown', 'showdownConvert'
 ]);
