@@ -9,13 +9,22 @@ Utilisation :
     affichée.
 */
 
-define(['showdown', 'jquery'], function (showdown) {
+var showdownConvert = function (showdown) {
     var showdownConverter = new showdown.Converter({headerLevelStart: 3});
-    $(".markdown").each(function(idx, elem) {
-        var newDiv = $('<div></div>');
-        newDiv.html(showdownConverter.makeHtml($(this).html()) + '</div>');
-        newDiv.addClass("markdown-translated");
-        newDiv.insertAfter($(this));
-        $(this).hide();
+    $( function () {
+        $(".markdown").each(function(idx, elem) {
+            var newDiv = $('<div></div>');
+            newDiv.html(showdownConverter.makeHtml($(this).html()) + '</div>');
+            newDiv.addClass("markdown-translated");
+            newDiv.insertAfter($(this));
+            $(this).hide();
+        })
     });
-});
+}
+
+// If loading through requirejs
+if (typeof define !== 'undefined') {
+    define(['showdown', 'jquery'], showdownConvert);
+} else {
+    showdownConvert(showdown);
+}
