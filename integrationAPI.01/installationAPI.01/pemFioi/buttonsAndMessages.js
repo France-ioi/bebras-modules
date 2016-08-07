@@ -332,7 +332,8 @@ window.displayHelper = {
       return true;
    },
 
-   setupLevels: function(initLevel) {
+   setupLevels: function(initLevel, reloadWithCallbacks) {
+      this.reloadWithCallbacks = reloadWithCallbacks;
       this.initLanguage();
       if (!initLevel) {
          if (!this.taskParams) {
@@ -351,9 +352,13 @@ window.displayHelper = {
       }
    },
    doSetupLevels: function(initLevel) {
-      task.reloadStateObject(task.getDefaultStateObject(), true);
-      task.reloadAnswerObject(task.getDefaultAnswerObject());
-
+      // TODO To fix: levelWrapper-1 does not work correctly without this part,
+      // so the level is loaded twice initially (once here, and once below).
+      if(!this.reloadWithCallbacks) {
+         task.reloadStateObject(task.getDefaultStateObject(), true);
+         task.reloadAnswerObject(task.getDefaultAnswerObject());
+      }
+      
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
@@ -370,7 +375,8 @@ window.displayHelper = {
          this.showPopupMessage(this.strings.harderLevelAvailable, 'blanket', this.strings.alright,
             function() {
                this.showMultiversionNotice = false;
-            });
+            }
+         );
       }
    },
    setupParams: function() {
@@ -474,34 +480,45 @@ window.displayHelper = {
       var state = task.getStateObject();
       state.level = newLevel;
       this.taskLevel = newLevel;
-
-      task.reloadStateObject(state, true);
-      task.reloadAnswerObject(answer);
-
-      this.submittedScore = this.levelsScores[this.taskLevel];
-      this.refreshMessages = true;
-      this.checkAnswerChanged();
-      this.stopShowingResult();
-
-      if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
-         this.showPopupMessage(this.strings.lockedLevel, 'lock');
-      } else if (!this.hasSolution) {
-         if ($('#tab_' + newLevel).hasClass('uselessLevel') && this.levelsScores[newLevel] < this.levelsMaxScores[newLevel]) {
-            this.showPopupMessage(this.strings.harderLevelSolved, 'tab', this.strings.showLevelAnyway, null, null, "warning");
-         } else if (newLevel == 'hard' && this.neverHadHard) {
-            var hardVersionKey = "levelVersionName_hard";
-            var easyVersionKey = "levelVersionName_easy"; 
-            if (this.pointsAsStars) {
-               hardVersionKey += "_stars";
-               easyVersionKey += "_stars";
-            }
-            this.showPopupMessage(this.formatTranslation(this.strings.hardVersionTakesTime, [this.strings[hardVersionKey], this.strings[easyVersionKey]]),
-               'tab',
-               this.strings.illKeepThatInMind, function() {
-                  this.neverHadHard = false;
+      var self = this;
+      
+      var afterReload = function() {
+         self.submittedScore = self.levelsScores[self.taskLevel];
+         self.refreshMessages = true;
+         self.checkAnswerChanged();
+         self.stopShowingResult();
+   
+         if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
+            self.showPopupMessage(self.strings.lockedLevel, 'lock');
+         } else if (!self.hasSolution) {
+            if ($('#tab_' + newLevel).hasClass('uselessLevel') && self.levelsScores[newLevel] < self.levelsMaxScores[newLevel]) {
+               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
+            } else if (newLevel == 'hard' && self.neverHadHard) {
+               var hardVersionKey = "levelVersionName_hard";
+               var easyVersionKey = "levelVersionName_easy"; 
+               if (self.pointsAsStars) {
+                  hardVersionKey += "_stars";
+                  easyVersionKey += "_stars";
                }
-            );
+               self.showPopupMessage(self.formatTranslation(self.strings.hardVersionTakesTime, [self.strings[hardVersionKey], self.strings[easyVersionKey]]),
+               'tab',
+                  self.strings.illKeepThatInMind, function() {
+                     self.neverHadHard = false;
+                  }
+               );
+            }
          }
+      };
+      
+      if(self.reloadWithCallbacks) {
+         task.reloadStateObject(state, function() {
+            task.reloadAnswerObject(answer, afterReload);
+         });
+      }
+      else {
+         task.reloadStateObject(state, true);
+         task.reloadAnswerObject(answer);
+         afterReload();
       }
    },
    getAvatar: function(mood) {
