@@ -67,7 +67,7 @@ task.getMetaData = function(callback) {
 // TODO We update the grader below, if the task has levels. Is this line necessary?
 var grader = grader ? grader : {};
 
-function initWrapper(initTaskFor, levels, defaultLevel) {
+function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    
    // Create a taskFor instance, possibly operating on an existing object.
    function createTask(displayFlag) {
@@ -91,7 +91,7 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
          taskFor.raphaelFactory.destroyAll();
          taskFor.simulationFactory.destroyAll();
          taskFor.delayFactory.destroyAll();
-         if(callback) {
+         if(callback && typeof callback === "function") {
             callback();
          }
       };
@@ -148,7 +148,7 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             level: defaultLevel
          };
          mainTask.loadLevel(state.level, null, views);
-         displayHelper.setupLevels();
+         displayHelper.setupLevels(null, reloadWithCallbacks);
          callback();
       }
       else {
@@ -213,7 +213,9 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             if(mainTask.resetDisplay) {
                mainTask.resetDisplay();
             }
-            callback();
+            if(callback && typeof callback === "function") {
+               callback();
+            }
          });
       }
       else {
@@ -223,7 +225,9 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
          } else {
             mainTask.reloadAnswerObject(JSON.parse(newAnswers));
          }
-         callback();
+         if(callback && typeof callback === "function") {
+            callback();
+         }
       }
    };
 
@@ -242,7 +246,9 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(state.levelAnswers[level]);
-            callback();
+            if(callback && typeof callback === "function") {
+               callback();
+            }
          });
       }
       else {
@@ -251,7 +257,9 @@ function initWrapper(initTaskFor, levels, defaultLevel) {
             mainTask.reloadAnswer(newState.displayedAnswer, callback);
          }
          else {
-            callback();
+            if(callback && typeof callback === "function") {
+               callback();
+            }
          }
       }
    };
