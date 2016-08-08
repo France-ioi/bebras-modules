@@ -108,6 +108,7 @@ var blocklyHelper = {
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
       blocklyHelper.addExtraBlocks();
 
+      this.programs = [];
       for (var iPlayer = this.mainContext.nbRobots - 1; iPlayer >= 0; iPlayer--) {
          this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
          this.languages[iPlayer] = "blockly";
@@ -120,11 +121,13 @@ var blocklyHelper = {
 
    unload: function() {
       var ws = Blockly.getMainWorkspace('blocklyDiv');
-      ws.dispose();
-      document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-      delete Blockly;
-      $(".blocklyWidgetDiv").remove();
-      $(".blocklyTooltipDiv").remove();
+      if (ws != null) {
+         ws.dispose();
+         document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
+         delete Blockly;
+         $(".blocklyWidgetDiv").remove();
+         $(".blocklyTooltipDiv").remove();
+      }
    },
 
    initXML: function() {
@@ -257,18 +260,21 @@ var blocklyHelper = {
 
    savePrograms: function() {
       this.programs[this.player].javascript = $("#program").val();
-
-      var xml = Blockly.Xml.workspaceToDom(this.workspace);
-      this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
-      this.programs[this.player].blocklyJS = this.getCode("javascript");
-      this.programs[this.player].blocklyPython = this.getCode("python");
+      if (this.workspace != null) {
+         var xml = Blockly.Xml.workspaceToDom(this.workspace);
+         this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
+         this.programs[this.player].blocklyJS = this.getCode("javascript");
+         this.programs[this.player].blocklyPython = this.getCode("python");
+      }
    },
 
    loadPrograms: function() {
       $("#program").val(this.programs[this.player].javascript);
-      var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
-      this.workspace.clear();
-      Blockly.Xml.domToWorkspace(this.workspace, xml);
+      if (this.workspace != null) {
+         var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
+         this.workspace.clear();
+         Blockly.Xml.domToWorkspace(this.workspace, xml);
+      }
    },
 
    changeLanguage: function() {
