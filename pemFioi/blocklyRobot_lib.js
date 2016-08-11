@@ -61,7 +61,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_jump = function(callback) {
-      if (!infos.gravity) {
+      if (!infos.hasGravity) {
          throw("Error: can't jump without gravity");
       }
       if (context.lost) {
