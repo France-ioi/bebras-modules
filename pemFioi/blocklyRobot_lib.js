@@ -6,11 +6,11 @@ var getRobotGridContext = function(display, infos) {
 
    var context = {
       display: display
-   }
+   };
 
    context.changeDelay = function(newDelay) {
       infos.actionDelay = newDelay;
-   }
+   };
 
    context.waitDelay = function(callback, value) {
       context.runner.waitDelay(callback, value, infos.actionDelay);
@@ -29,6 +29,10 @@ var getRobotGridContext = function(display, infos) {
       var item = context.items[context.curRobot];
       var coords = getCoordsInFront();
       if (!tileAllowed(coords.row, coords.col)) {
+         if (isOutsideGrid(coords.row, coords.col)) {
+            context.lost = true;
+            throw("Le robot sort de la grille !");
+         }
          var itemsInFront = context.getItems(coords.row, coords.col, {isObstacle: true});
          if (itemsInFront.length > 0) {
             throw(strings.obstacle);
@@ -37,24 +41,146 @@ var getRobotGridContext = function(display, infos) {
          context.waitDelay(callback);
          return;
       }
+      if (infos.hasGravity) {
+         var row = coords.row;
+         while ((!isOutsideGrid(row + 1, coords.col)) && (context.tiles[row + 1][coords.col] != 2)) {
+            row++;
+         }
+         if (isOutsideGrid(row + 1, coords.col)) {
+            context.lost = true;
+            throw("Le robot se jette dans le vide !");
+         }
+         if (row - coords.row > 2) {
+            context.lost = true;
+            throw("Le robot va tomber de haut et s'écraser !");
+         }
+         coords.row = row;
+      }
       context.nbMoves++;
       moveRobot(coords.row, coords.col, item.dir, callback);
-   }
+   };
 
-   context.robot_paint = function(callback) {
+   context.robot_jump = function(callback) {
+      if (!infos.gravity) {
+         throw("Error: can't jump without gravity");
+      }
       if (context.lost) {
          return;
       }
       var item = context.items[context.curRobot];
+      if (isOutsideGrid(item.row - 2, item.col)) {
+         context.lost = true;
+         throw("Le robot essaie de sauter en dehors de la grille !");
+      }
+      if (context.tiles[item.row - 1][item.col] != 2) { // TODO : replace 2 with something identifying a platform
+         context.lost = true;
+         throw("Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !");
+      }
+      context.nbMoves++;
+      moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
 
-      var newItem = {row: item.row, col: item.col, type: "paint"};
-      var paintItems = context.getItems(item.row, item.col, {category: "paint"});
+   context.robot_turnAround = function(callback) {
+      if (context.lost) {
+         return;
+      }
+      var item = context.items[context.curRobot];
+      var newDir = (item.dir + 2) % 4;
+      moveRobot(item.row, item.col, newDir, callback);
+   };
+
+   context.robot_platformInFront = function(callback) {
+      var item = context.items[context.curRobot];
+      var col = item.col;
+      if (item.dir == 0) {
+         col += 1;
+      } else {
+         col -= 1;
+      }
+      var platformInFront;
+      if (isOutsideGrid(item.row + 1, col)) {
+         platformInFront = false;
+      } else {
+         platformInFront = (context.tiles[item.row + 1][col] == 2); // TODO : replace 2
+      }
+      context.runner.noDelay(callback, platformInFront);
+   }
+
+   context.robot_platformInFrontAndBelow = function(callback) {
+      var item = context.items[context.curRobot];
+      var col = item.col;
+      if (item.dir == 0) {
+         col += 1;
+      } else {
+         col -= 1;
+      }
+      var row = item.row + 3;
+      var platformBelow;
+      if (isOutsideGrid(row, col)) {
+         platformBelow = false;
+      } else {
+         platformBelow = (context.tiles[row][col] == 2); // TODO : replace 2
+      }
+      context.runner.noDelay(callback, platformBelow);
+   }
+
+   context.robot_platformAbove = function(callback) {
+      var item = context.items[context.curRobot];
+      var platformAbove;
+      if (isOutsideGrid(item.row - 1, item.col)) {
+         platformAbove = false;
+      } else {
+         platformAbove = (context.tiles[item.row - 1][item.col] == 2); // TODO : replace 2
+      }
+      context.runner.noDelay(callback, platformAbove);
+   }
+         
+   context.robot_gridEdgeInFront = function(callback) {
+      var coords = getCoordsInFront();
+      var gridEdgeInFront = false;
+      if (isOutsideGrid(coords.row, coords.col)) {
+         gridEdgeInFront = true;
+      } else if (context.tiles[coords.row][coords.col] == 0) {
+         gridEdgeInFront = true;
+      }
+      context.runner.noDelay(callback, gridEdgeInFront);
+   }
+
+
+   function destroyItem(row, col, category) {
+      var foundItem = -1;
+      for (var iItem = 0; iItem < context.items.length; iItem++) {
+         var item = context.items[iItem];
+         if ((item.row == row) && (item.col == col) && (item.category == category)) {
+            foundItem = iItem;
+            break;
+         }
+      }
+      if (foundItem != -1) {
+         if (context.display) {
+            context.items[foundItem].element.remove();
+         }
+         context.items.splice(foundItem, 1);
+      }
+   };
+
+   function paint(row, col, paintType, callback) {
+      if (context.lost) {
+         return;
+      }
+
+      var newItem = {row: row, col: col, type: paintType};
+      var paintItems = context.getItems(row, col, {category: "paint"});
+      if ((paintItems.length != 0) && (paintItems[0].type != paintType)) {
+         destroyItem(row, col, "paint");
+         paintItems.splice(0, 1);
+      }
       if (paintItems.length == 0) {
          var addItem = function() {
             context.items.push(newItem);
             resetItem(newItem, context.items.length - 1, true);
             if (context.display) {
-               resetItemsZOrder(item.row, item.col);
+               resetItemsZOrder(row, col);
             }
          };
          if ((infos.actionDelay > 0) && (context.display)) {
@@ -68,9 +194,19 @@ var getRobotGridContext = function(display, infos) {
       context.waitDelay(callback);
    }
 
+   context.robot_paint = function(callback) {
+      var item = context.items[context.curRobot];
+      paint(item.row, item.col, "paint", callback);
+   };
+
+   context.robot_paintGray = function(callback) {
+      var item = context.items[context.curRobot];
+      paint(item.row, item.col, "paintGray", callback);
+   };
+
    context.robot_wait = function(callback) {
       context.waitDelay(callback);
-   }
+   };
 
    context.robot_right = function(callback) {
       if (context.lost) {
@@ -83,7 +219,7 @@ var getRobotGridContext = function(display, infos) {
       var item = context.items[context.curRobot];
       var newDir = (item.dir + dDir) % 4;
       moveRobot(item.row, item.col, newDir, callback);
-   }
+   };
 
    context.robot_left = function(callback) {
       if (context.lost) {
@@ -96,7 +232,55 @@ var getRobotGridContext = function(display, infos) {
       var item = context.items[context.curRobot];
       var newDir = (item.dir + dDir) % 4;
       moveRobot(item.row, item.col, newDir, callback);
-   }
+   };
+
+   context.robot_east = function(callback) {
+      if (context.lost) {
+         return;
+      }
+      var item = context.items[context.curRobot];
+      if (!tileAllowed(item.row, item.col + 1)) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row, item.col + 1, 0, callback);
+      }
+   };
+
+   context.robot_west = function(callback) {
+      if (context.lost) {
+         return;
+      }
+      var item = context.items[context.curRobot];
+      if (!tileAllowed(item.row, item.col - 1)) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row, item.col - 1, 2, callback);
+      }
+   };
+
+   context.robot_north = function(callback) {
+      if (context.lost) {
+         return;
+      }
+      var item = context.items[context.curRobot];
+      if (!tileAllowed(item.row - 1, item.col)) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row - 1, item.col, 3, callback);
+      }
+   };
+
+   context.robot_south = function(callback) {
+      if (context.lost) {
+         return;
+      }
+      var item = context.items[context.curRobot];
+      if (!tileAllowed(item.row + 1, item.col)) {
+         context.waitDelay(callback);
+      } else {
+         moveRobot(item.row + 1, item.col, 1, callback);
+      }
+   };
 
    context.debug_alert = function(message, callback) {
       message = message ? message.toString() : '';
@@ -104,20 +288,31 @@ var getRobotGridContext = function(display, infos) {
          alert(message);
       }
       context.callCallback(callback);
-   }
+   };
 
    context.robot_itemInFront = function(callback) {
       var itemsInFront = context.getItemsInFront({isObstacle: true});
       context.callCallback(callback, itemsInFront.length > 0);
-   }
+   };
 
    context.robot_obstacleInFront = function(callback) {
       categoryInFront("obstacle", false, callback);
-   }
-         
-   context.robot_paintInFront = function(callback) {
-      categoryInFront("paint", false, callback);
-   }
+   };
+
+   context.robot_paintGrayInFront = function(callback) {
+      var coords = getCoordsInFront();
+      paint(coords.row, coords.col, "paintGray", callback);
+   };
+
+   context.robot_colorUnder = function(callback) {
+      var robot = context.items[context.curRobot];
+      var itemsUnder = context.getItems(robot.row, robot.col, {hasColor: true});
+      if (itemsUnder.length == 0) {
+         context.callCallback(callback, "blanc");
+      } else {
+         context.callCallback(callback, infos.itemTypes[itemsUnder[0].type].color);
+      }
+   };
 
    context.robot_gridEdgeInFront = function(callback) {
       var coords = getCoordsInFront();
@@ -128,7 +323,7 @@ var getRobotGridContext = function(display, infos) {
          gridEdgeInFront = true;
       }
       context.callCallback(callback, gridEdgeInFront);
-   }
+   };
 
    context.robot_col = function(callback) {
       var item = context.items[context.curRobot];
@@ -137,17 +332,17 @@ var getRobotGridContext = function(display, infos) {
          col = context.nbCols - col + 1;
       }
       context.callCallback(callback, col);
-   }
+   };
 
    context.robot_row = function(callback) {
       context.callCallback(callback, context.items[context.curRobot].row + 1);
-   }
+   };
    
    var dirNames = ["E", "S", "O", "N"];
    context.robot_dir = function(callback) {
       var item = context.items[context.curRobot];
       context.callCallback(callback, dirNames[item.dir]);
-   }
+   };
 
    context.program_end = function(callback) {
       var curRobot = context.curRobot;
@@ -171,30 +366,54 @@ var getRobotGridContext = function(display, infos) {
       context.success = false;
       context.curRobot = 0;
       if (context.display) {
+         context.resetDisplay();
+      } else {
+         resetItems();
+      }
+      //resetScores();
+   };
+
+   context.resetDisplay = function() {
+      if (paper != null) {
+         paper.remove();
+      }
+      paper = new Raphael("grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+      $("#errors").html("");
+      resetBoard();
+      blocklyHelper.updateSize();
+      resetItems();
+      context.updateScale();
+   };
+
+   context.unload = function() {
+      if (context.display) {
          if (paper != null) {
             paper.remove();
          }
-         paper = new Raphael("grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-         $("#errors").html("");
-         resetBoard();
-      }
-      resetItems();
-      //resetScores();
-      if (context.display) {
-         task.updateScale();
       }
    };
 
    var allGenerators = {
       robot: {
          paint: { labelEn: "paint",           labelFr: strings.labelPaint,           codeFr: strings.codePaint,           category: "actions", type: 0, nbParams: 0, fct: context.robot_paint },
+         paintGray: { labelEn: "paintGray",           labelFr: strings.labelPaintGray,           codeFr: strings.codePaintGray,           category: "actions", type: 0, nbParams: 0, fct: context.robot_paintGray },
          forward: { labelEn: "forward",         labelFr: strings.labelForward,         codeFr: strings.codeForward,         category: "actions", type: 0, nbParams: 0, fct: context.robot_forward },
+         turnAround: { labelEn: "turnAround", labelFr: "faire demi-tour", codeFr: "demiTour", category: "actions", type: 0, nbParams: 0, fct: context.robot_turnAround },
+         jump: { labelEn: "jump", labelFr: "sauter", codeFr: "sauter", category: "actions", type: 0, nbParams: 0, fct: context.robot_jump },
          right: { labelEn: "right",           labelFr: strings.labelRight,           codeFr: strings.codeRight,           category: "actions", type: 0, nbParams: 0, fct: context.robot_right },
          left: { labelEn: "left",            labelFr: strings.labelLeft,            codeFr: strings.codeLeft,            category: "actions", type: 0, nbParams: 0, fct: context.robot_left },
+         east: { labelEn: "east",            labelFr: strings.labelEast,            codeFr: strings.codeEast,            category: "actions", type: 0, nbParams: 0, fct: context.robot_east },
+         west: { labelEn: "west",            labelFr: strings.labelWest,            codeFr: strings.codeWest,            category: "actions", type: 0, nbParams: 0, fct: context.robot_west },
+         north: { labelEn: "north",            labelFr: strings.labelNorth,            codeFr: strings.codeNorth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_north },
+         south: { labelEn: "south",            labelFr: strings.labelSouth,            codeFr: strings.codeSouth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_south },
          wait: { labelEn: "wait",            labelFr: strings.labelWait,            codeFr: strings.codeWait,            category: "actions", type: 0, nbParams: 0, fct: context.robot_wait },
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
-         paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintInFront },
+         paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
+         colorUnder: { labelEn: "colorUnder",    labelFr: strings.labelColorUnder,    codeFr: strings.codeColorUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_colorUnder },
          gridEdgeInFront: { labelEn: "gridEdgeInFront", labelFr: strings.labelGridEdgeInFront, codeFr: strings.codeGridEdgeInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_gridEdgeInFront },
+         platformInFront: { labelEn: "platformInFront", labelFr: "plateforme devant", codeFr: "plateformeDevant", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformInFront },
+         platformInFrontAndBelow: { labelEn: "platformInFrontAndBelow", labelFr: "plateforme devant plus bas", codeFr: "plateformeDevantPlusBas", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformInFrontAndBelow },
+         platformAbove: { labelEn: "platformAbove", labelFr: "plateforme au dessus", codeFr: "plateformeAuDessus", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformAbove },
          dir: { labelEn: "dir",             labelFr: strings.labelDir,             codeFr: strings.codeDir,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_dir },
          col: { labelEn: "col",             labelFr: strings.labelCol,             codeFr: strings.codeCol,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_col },
          row: { labelEn: "row",             labelFr: strings.labelRow,             codeFr: strings.codeRow,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_row }
@@ -206,7 +425,7 @@ var getRobotGridContext = function(display, infos) {
 
    var isOutsideGrid = function(row, col) {
       return ((col < 0) || (row < 0) || (col >= context.nbCols) || (row >= context.nbRows));
-   }
+   };
 
    var delta = [[0,1],[1,0],[0,-1],[-1,0]];
    var getCoordsInFront = function() {
@@ -225,7 +444,7 @@ var getRobotGridContext = function(display, infos) {
    var nbOfCategoryInFront = function(category) {
       var itemsInFront = getItemsInFront({category: category});
       return itemsInFront.length;
-   }
+   };
 
    var categoryInFront = function(category, count, callback) {
       var nbOfCategoryFound = nbOfCategoryInFront(category);
@@ -236,7 +455,7 @@ var getRobotGridContext = function(display, infos) {
          result = (nbOfCategoryFound > 0);
       }
       context.callCallback(callback, result);
-   }
+   };
 
    var resetBoard = function() {
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
@@ -310,11 +529,14 @@ var getRobotGridContext = function(display, infos) {
    var moveRobot = function(newRow, newCol, newDir, callback) {
       var iRobot = context.curRobot;
       var item = context.items[iRobot];
-      var animate = (newDir == item.dir);
+      var animate = (item.row != newRow) || (item.col != newCol);
+      item.dir = newDir;
+      if (context.display) {
+         attr = itemAttributes(item);
+         item.element.attr(attr);
+      }
       item.row = newRow;
       item.col = newCol;
-      var prevDir = item.dir;
-      item.dir = newDir;
       if (context.display) {
          var attr;
          if (animate) {
@@ -358,7 +580,7 @@ var getRobotGridContext = function(display, infos) {
          }
       }
       return listItems;
-   }
+   };
 
    var tileAllowed = function(row, col) {
       if (isOutsideGrid(row, col)) {
@@ -369,7 +591,7 @@ var getRobotGridContext = function(display, infos) {
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
      return (itemsInFront.length == 0);
-   }
+   };
 
    var itemAttributes = function(item) {
       var x = infos.cellSide * scale * item.col + item.offsetX * scale;
@@ -384,7 +606,7 @@ var getRobotGridContext = function(display, infos) {
       return { x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
    };
 
-   context.updateScale = function(newScale) {
+   context.updateScale = function() {
       if (!context.display) {
          return;
       }
@@ -416,7 +638,7 @@ var getRobotGridContext = function(display, infos) {
          texts[0].attr({x: infos.cellSide * 4.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
          texts[1].attr({x: infos.cellSide * 7.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
       }
-   }
+   };
 
    context.generators = {
    };

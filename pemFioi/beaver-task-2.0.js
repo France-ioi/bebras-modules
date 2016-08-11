@@ -68,7 +68,6 @@ task.getMetaData = function(callback) {
 var grader = grader ? grader : {};
 
 function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
-   
    // Create a taskFor instance, possibly operating on an existing object.
    function createTask(displayFlag) {
       var taskFor = {};
@@ -133,6 +132,9 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    var gradingTasks = {};
    
    task.load = function(views, callback) {
+      if (globalLoad != undefined) {
+         globalLoad(views);
+      }
       mainTask = createTask(true);
       task.displayedSubTask = mainTask;
       if(levels) {
@@ -205,6 +207,14 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
             levelAnswer = mainTask.getDefaultAnswerObject();
             state.levelAnswers[level] = levelAnswer;
          }
+/*
+         Mathias: Why not this?
+         var levelState = state.levelStates[level];
+         if(levelState === undefined || levelState === null) {
+            levelState = mainTask.getDefaultStateObject();
+            state.levelStates[level] = levelState;
+         }
+*/
          destroyTask(mainTask, function() {
             mainTask = createTask(true);
             task.displayedSubTask = mainTask;
@@ -307,8 +317,11 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          task.displayedSubTask = null;
          callback();
       });
+//      if (globalUnlad != undefined) {
+//         globalUnload();
+//      }
    };
-   
+
    function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
       // Create grading taskFor instance if it does not exist.
       if(!gradingTasks[level]) {
