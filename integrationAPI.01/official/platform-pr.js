@@ -127,9 +127,9 @@ if (!isCrossDomain()) {
             success([score, message, scoreToken]);
          };
          if (typeof task.gradeAnswer === 'function') {
-            task.gradeAnswer(params[0], params[1], newSuccess, error);
+            task.gradeAnswer(params[0], params[1], newSuccess);
          } else {
-            window.grader.gradeTask(params[0], params[1], newSuccess, error);
+            window.grader.gradeTask(params[0], params[1], newSuccess);
          }
       };
       var channelId = getUrlParameterByName('channelId');
@@ -180,7 +180,7 @@ if (!isCrossDomain()) {
       platform.chan.call({method: "platform.validate",
          params: sMode,
          error: error,
-         success: callAndTrigger(success)
+         success: callAndTrigger(success, 'validate', error, [sMode])
       });
    };
    platform.getTaskParams = function(key, defaultValue, success, error) {
