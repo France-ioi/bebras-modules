@@ -338,6 +338,100 @@ var getRobotGridContext = function(display, infos) {
       context.callCallback(callback, context.items[context.curRobot].row + 1);
    };
    
+   context.robot_onPill = function(callback) {
+      var item = context.items[context.curRobot];
+      var pills = getItems(item.row, item.col, {category: "pill"});
+      context.callCallback(callback, pills.length > 0);
+   }
+
+   var findPill = function(iPill) {
+      var pill = null;
+      for (var iItem = 1; iItem < context.items.length; iItem++) {
+         var item = context.items[iItem];
+         if (item.id == iPill) {
+            pill = item;
+            break;
+         }
+      }
+      return pill;
+   }
+
+   context.pill_exists = function(iPill, callback) {
+      var pill = findPill(iPill);
+      context.runner.noDelay(callback, pill != null);
+   }
+
+   context.pill_col = function(iPill, callback) {
+      var pill = findPill(iPill);
+      var res = 0;
+      if (pill != null) {
+         res = pill.col + 1;
+      }
+      context.callCallback(callback, res);
+   }
+
+   context.pill_row = function(iPill, callback) {
+      var pill = findPill(iPill);
+      var res = 0;
+      if (pill != null) {
+         res = pill.row + 1;
+      }
+      context.callCallback(callback, res);
+   };
+
+   context.pill_number = function(callback) {
+      context.callCallback(callback, context.nbPills);
+   };
+
+   context.robot_pickPill = function(callback) {
+      var item = context.items[context.curRobot];
+      var foundPill = 0;
+      for (var iPill = 1; iPill < context.items.length; iPill++) {
+         var pill = context.items[iPill];
+         if ((pill.row == item.row) && (pill.col == item.col)) {
+            foundPill = iPill;
+            break;
+         }
+      }
+      if (foundPill == 0) {
+         throw("Pas de pastille à ramasser");
+      }
+      if (context.items[foundPill].rank != context.nbTransportedPills + 1) {
+         throw("La pastille n'est pas celle qu'il faut ramasser maintenant.");
+      }
+      if (context.display) {
+         context.items[foundPill].element.remove();
+      }
+      context.items.splice(foundPill, 1);
+      context.nbTransportedPills++;
+      if (context.nbTransportedPills == context.nbPills) {
+         context.success = true;
+         throw("Bravo, vous avez ramassé toutes les pastilles dans le bon ordre !");
+      }
+//         context.transportedPill = pills[0].id;
+      context.waitDelay(callback);
+   };
+/*
+   context.robot_dropPill = function(callback) {
+      var item = context.items[context.curRobot];
+      var pills = getItems(item.row, item.col, {category: "pill"});
+      if (context.transportedPill == 0) {
+         throw("Le robot essaie de déposer une pastille mais n'en transporte pas.");
+      }
+      if (context.tiles[item.row][item.col] != 2) {
+         throw("Le robot essaie de déposer une pastille ailleurs que sur une étoile.");
+      }
+      context.nbDroppedPills++;
+      context.transportedPill = 0;
+      if (context.nbDroppedPills == context.items.length - 1) {
+         context.success = true;
+         throw("Bravo, vous avez déposé toutes les pastilles !");
+      }
+      context.waitDelay(callback);
+   }
+*/
+
+   
    var dirNames = ["E", "S", "O", "N"];
    context.robot_dir = function(callback) {
       var item = context.items[context.curRobot];
@@ -407,6 +501,9 @@ var getRobotGridContext = function(display, infos) {
          north: { labelEn: "north",            labelFr: strings.labelNorth,            codeFr: strings.codeNorth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_north },
          south: { labelEn: "south",            labelFr: strings.labelSouth,            codeFr: strings.codeSouth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_south },
          wait: { labelEn: "wait",            labelFr: strings.labelWait,            codeFr: strings.codeWait,            category: "actions", type: 0, nbParams: 0, fct: context.robot_wait },
+         pickPill: { labelEn: "pickPill", labelFr: "ramasser la pastille", codeFr: "ramasserPasille", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickPill },
+//       droppill: { labelEn: "dropPill", labelFr: "déposer la pastille", codeFr: "deposerPastille", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropPill },
+
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
          colorUnder: { labelEn: "colorUnder",    labelFr: strings.labelColorUnder,    codeFr: strings.codeColorUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_colorUnder },
@@ -416,7 +513,14 @@ var getRobotGridContext = function(display, infos) {
          platformAbove: { labelEn: "platformAbove", labelFr: "plateforme au dessus", codeFr: "plateformeAuDessus", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformAbove },
          dir: { labelEn: "dir",             labelFr: strings.labelDir,             codeFr: strings.codeDir,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_dir },
          col: { labelEn: "col",             labelFr: strings.labelCol,             codeFr: strings.codeCol,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_col },
-         row: { labelEn: "row",             labelFr: strings.labelRow,             codeFr: strings.codeRow,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_row }
+         row: { labelEn: "row",             labelFr: strings.labelRow,             codeFr: strings.codeRow,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_row },
+         onPill: { labelEn: "onPill", labelFr: "sur une pastille", codeFr: "surPastille", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onPill }
+      },
+      pill: {
+         number: { labelEn: "number", labelFr: "nombre total de pastilles", codeFr: "nombrePastilles", category: "sensors", type: 1, nbParams: 0, fct: context.pill_number },
+         exists: { labelEn: "exists", labelFr: "il existe une pastille ", codeFr: "existePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_exists },
+         row: { labelEn: "row", labelFr: "ligne de la pastille", codeFr: "lignePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_row },
+         col: { labelEn: "col", labelFr: "colonne de la pastille", codeFr: "colonnePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_col }
       },
       debug: {
          alert: { labelEn: "alert", labelFr: strings.labelAlert, codeFr: strings.codeAlert, category: "debug", type: 0, nbParams: 1, fct: context.debug_alert }
@@ -529,12 +633,16 @@ var getRobotGridContext = function(display, infos) {
    var moveRobot = function(newRow, newCol, newDir, callback) {
       var iRobot = context.curRobot;
       var item = context.items[iRobot];
-      var animate = (item.row != newRow) || (item.col != newCol);
-      item.dir = newDir;
-      if (context.display) {
-         attr = itemAttributes(item);
-         item.element.attr(attr);
+      var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
+      // If the robot turns and moves at the sime time, we do an instant turn (for now).
+      if ((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
+         item.dir = newDir;
+         if (context.display) {
+            attr = itemAttributes(item);
+            item.element.attr(attr);
+         }
       }
+      item.dir = newDir;
       item.row = newRow;
       item.col = newCol;
       if (context.display) {
