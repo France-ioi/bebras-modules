@@ -204,18 +204,17 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
             levelAnswer = mainTask.getDefaultAnswerObject();
             state.levelAnswers[level] = levelAnswer;
          }
-/*
-         Mathias: Why not this?
+
          var levelState = state.levelStates[level];
-         if(levelState === undefined || levelState === null) {
+         if(mainTask.getDefaultStateObject && (levelState === undefined || levelState === null)) {
             levelState = mainTask.getDefaultStateObject();
             state.levelStates[level] = levelState;
          }
-*/
+         
          destroyTask(mainTask, function() {
             mainTask = createTask(true);
             task.displayedSubTask = mainTask;
-            mainTask.loadLevel(level, state.levelStates[level]);
+            mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(levelAnswer);
             if(mainTask.resetDisplay) {
                mainTask.resetDisplay();
