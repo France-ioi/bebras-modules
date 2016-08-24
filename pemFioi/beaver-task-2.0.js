@@ -132,9 +132,6 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    var gradingTasks = {};
    
    task.load = function(views, callback) {
-      if (globalLoad != undefined) {
-         globalLoad(views);
-      }
       mainTask = createTask(true);
       task.displayedSubTask = mainTask;
       if(levels) {
@@ -317,9 +314,6 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          task.displayedSubTask = null;
          callback();
       });
-//      if (globalUnlad != undefined) {
-//         globalUnload();
-//      }
    };
 
    function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
