@@ -1,5 +1,3 @@
-'use strict';
-
 /* 
  * This file is to be included by beaver contest tasks, it defines a basic
  * implementation of the main functions of the task object, as well as a grader.
@@ -10,11 +8,12 @@
 
 var task = {};
 
-task.showViews = function(views, callback) {
-   callback();
+task.showViews = function(views, success, error) {
+   console.error('showViews');
+   success();
 };
 
-task.getViews = function(callback) {
+task.getViews = function(success, error) {
     // all beaver tasks have the same views
     var views = {
         task: {},
@@ -23,52 +22,58 @@ task.getViews = function(callback) {
         forum : {requires: "task"},
         editor : {requires: "task"}
     };
-    callback(views);
+    success(views);
 };
 
-task.updateToken = function(token, callback) {
+task.updateToken = function(token, success, error) {
    //console.warning("sorry, token system not available for this task");
-   callback();
+   success();
 };
 
-task.getHeight = function(callback) {
-   callback(parseInt($("body").outerHeight(true)));
+task.getHeight = function(success, error) {
+   success(parseInt($("body").outerHeight(true)));
 };
 
-task.unload = function(callback) {
-   callback();
+task.unload = function(success, error) {
+   success();
 };
 
-task.getState = function(callback) {
-   callback('');
+task.getState = function(success, error) {
+   success('');
 };
 
-task.getMetaData = function(callback) {
+task.getMetaData = function(success, error) {
+   console.error('getMetadata');
    if (typeof json !== 'undefined') {
-      callback(json);
+      success(json);
    } else {
-      callback({});
+      success({nbHints:0});
    }
-}
-
-task.reloadAnswer = function(strAnswer, callback) {
-   callback();
 };
 
-task.reloadState = function(state, callback) {
-   callback();
-}
-
-task.getAnswer = function(callback) {
-   callback('');
+task.reloadAnswer = function(strAnswer, success, error) {
+   success();
 };
 
-task.load = function(views, callback) {
-   callback();
-}
+task.reloadState = function(state, success, error) {
+   success();
+};
+
+task.getAnswer = function(success, error) {
+   success('');
+};
+
+task.load = function(views, success, error) {
+  console.error('load');
+   success();
+};
+
+task.gradeAnswer = function(answer, answerToken, success, error) {success(0, '');}
 
 var grader = {
-   gradeTask: function (answer, answerToken, callback) {
-      callback(0, "");
-   }
+   gradeTask: task.gradeAnswer
 };
+
+if (platform) {
+  platform.initWithTask(task);
+}
