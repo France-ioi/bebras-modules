@@ -13,10 +13,16 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.waitDelay = function(callback, value) {
+      if (infos.checkEndEveryTurn) {
+         infos.checkEndCondition(context, false);
+      }
       context.runner.waitDelay(callback, value, infos.actionDelay);
    };
 
    context.callCallback = function(callback, value) { // Default implementation
+      if (infos.checkEveryTurn) {
+         infos.checkEndCondition(context, false);
+      }
       context.runner.noDelay(callback, value);
    };
 
@@ -442,7 +448,7 @@ var getRobotGridContext = function(display, infos) {
       var curRobot = context.curRobot;
       if (!context.programEnded[curRobot]) {
          context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context);
+         infos.checkEndCondition(context, true);
       }
       context.waitDelay(callback);
    };
