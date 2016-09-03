@@ -640,7 +640,7 @@ function getBlocklyHelper() {
             {
                category: "math",
                name: this.strings.math,
-               coulor: 230,
+               colour: 230,
                blocks: [
                   { 
                         name: "math_number", 
@@ -755,7 +755,7 @@ function getBlocklyHelper() {
             {
                   category: "variables",
                   name: this.strings.variables,
-                  colour: 230,
+                  colour: 330,
                   custom: "VARIABLE",
                   blocks: []
             },
@@ -1140,7 +1140,7 @@ var initBlocklySubTask = function(subTask) {
          var prop = props[iProp];
          if (subTask.gridInfos[prop] != undefined) {
             var taskProp = subTask.gridInfos[prop];
-            if (typeof taskProp == "object") {
+            if ((typeof taskProp == "object") && (taskProp["easy"] != undefined)) {
                taskProp = taskProp[curLevel];
             }
             subTask.blocklyHelper[prop] = taskProp;
