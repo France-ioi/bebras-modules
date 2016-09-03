@@ -190,7 +190,7 @@ var getRobotGridContext = function(display, infos) {
             }
          };
          if ((infos.actionDelay > 0) && (context.display)) {
-            DelayedExec.setTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
+            context.delayFactory.createTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
                addItem();
             }, infos.actionDelay / 2);
          } else {
@@ -480,7 +480,7 @@ var getRobotGridContext = function(display, infos) {
       paper = new Raphael("grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
       $("#errors").html("");
       resetBoard();
-      blocklyHelper.updateSize();
+      context.blocklyHelper.updateSize();
       resetItems();
       context.updateScale();
    };
@@ -655,11 +655,11 @@ var getRobotGridContext = function(display, infos) {
          var attr;
          if (animate) {
             attr = itemAttributes(item);
-            DelayedExec.animateRaphael("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
+            context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
          } else {
             attr = itemAttributes(item);
             if (infos.actionDelay > 0) {
-               DelayedExec.setTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
+               context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
                   item.element.attr(attr);
                }, infos.actionDelay / 2);
             } else {
