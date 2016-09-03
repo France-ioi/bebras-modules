@@ -1127,18 +1127,6 @@ function initBlocklyRunner(context, messageCallback) {
 
 var initBlocklySubTask = function(subTask) {
    subTask.blocklyHelper = getBlocklyHelper();
-   if (subTask.gridInfos.includedAll != undefined) {
-      subTask.blocklyHelper.includedAll = subTask.gridInfos.includedAll;
-   }
-   if (subTask.gridInfos.groupByCategory != undefined) {
-      subTask.blocklyHelper.groupByCategory = subTask.gridInfos.groupByCategory;
-   }
-   if (subTask.gridInfos.includedCategories != undefined) {
-      subTask.blocklyHelper.includedCategories = subTask.gridInfos.includedCategories;
-   }
-   if (subTask.gridInfos.includedBlocks != undefined) {
-      subTask.blocklyHelper.includedBlocks = subTask.gridInfos.includedBlocks;
-   }
    subTask.answer = null;
    subTask.state = {};
 
@@ -1146,6 +1134,18 @@ var initBlocklySubTask = function(subTask) {
       this.level = curLevel;
 
       $('#question-iframe', window.parent.document).css('width', '100%');$('body').css('width', '100%');
+
+      var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks"];
+      for (var iProp = 0; iProp < props.length; iProp++) {
+         var prop = props[iProp];
+         if (subTask.gridInfos[prop] != undefined) {
+            var taskProp = subTask.gridInfos[prop];
+            if (typeof taskProp == "object") {
+               taskProp = taskProp[curLevel];
+            }
+            subTask.blocklyHelper[prop] = taskProp;
+         }
+      }
 
       this.context = getRobotGridContext(this.display, this.gridInfos);
       this.context.raphaelFactory = this.raphaelFactory;
