@@ -31,6 +31,10 @@ function getBlocklyHelper() {
       player: 0,
       workspace: null,
       prevWidth: 0,
+      groupByCategory: true,
+      includedAll: true,
+      includedCategories : [],
+      includedBlocks: [],
       languageStrings: {
          fr: {
             actions: "Actions",
@@ -561,6 +565,210 @@ function getBlocklyHelper() {
          return strCode;
       },
 
+      getStdBlocks: function() {
+         return [
+            {
+               category: "logic",
+               name: this.strings.logic,
+               colour: 65,
+               blocks: [
+                  {
+                     name: "controls_if",
+                     xml: "<block type='controls_if' colour='65'></block>"
+                  },
+                  { 
+                        name: "controls_if_else",
+                        xml: "<block type='controls_if_else' colour='65'></block>"
+                  },
+                  { 
+                        name: "logic_compare", 
+                        xml: "<block type='logic_compare'></block>"
+                  },
+                  { 
+                        name: "logic_operation", 
+                        xml: "<block type='logic_operation'></block>"
+                  },
+                  { 
+                        name: "logic_negate", 
+                        xml: "<block type='logic_negate'></block>"
+                  },
+                  { 
+                        name: "logic_boolean", 
+                        xml: "<block type='logic_boolean'></block>"
+                  }
+               ]
+            },
+            {
+               category: "loops",
+               name: this.strings.loops,
+               colour: 120,
+               blocks: [
+                  { 
+                        name: "controls_repeat", 
+                        xml: "<block type='controls_repeat'></block>"
+                  },
+                  { 
+                        name: "controls_whileUntil", 
+                        xml: "<block type='controls_whileUntil'></block>"
+                  },
+                  { 
+                        name: "controls_for", 
+                        xml: "<block type='controls_for'>" +
+            "                    <value name='FROM'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                    <value name='TO'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>10</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                    <value name='BY'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  { 
+                        name: "controls_flow_statements", 
+                        xml: "<block type='controls_flow_statements'></block>"
+                  }
+               ]
+            },
+            {
+               category: "math",
+               name: this.strings.math,
+               coulor: 230,
+               blocks: [
+                  { 
+                        name: "math_number", 
+                        xml: "<block type='math_number' gap='32'></block>"
+                  },
+                  {
+                        name: "math_arithmetic", 
+                        xml: "<block type='math_arithmetic'>" +
+            "                    <value name='A'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                    <value name='B'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_number_property", 
+                        xml: "<block type='math_number_property'>" +
+            "                    <value name='NUMBER_TO_CHECK'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>0</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_change", 
+                        xml: "<block type='math_change'>" +
+            "                    <value name='DELTA'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_round", 
+                        xml: "<block type='math_round'>" +
+            "                    <value name='NUM'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>3.1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_extra_single", 
+                        xml: "<block type='math_extra_single'>" +
+            "                    <value name='NUM'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>3.1</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_extra_double", 
+                        xml: "<block type='math_extra_double'>" +
+            "                    <value name='A'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='A'>2</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                    <value name='B'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='B'>2</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  },
+                  {
+                        name: "math_modulo", 
+                        xml: "<block type='math_modulo'>" +
+            "                    <value name='DIVIDEND'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>64</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                    <value name='DIVISOR'>" +
+            "                      <shadow type='math_number'>" +
+            "                        <field name='NUM'>10</field>" +
+            "                      </shadow>" +
+            "                    </value>" +
+            "                  </block>"
+                  }
+               ]
+            },
+            {
+               category: "text",
+               name: this.strings.text,
+               coulour: 210,
+               blocks: [
+                  {
+                        name: "text", 
+                        xml: "<block type='text'></block>"
+                  },
+                  {
+                        name: "text_join", 
+                        xml: "<block type='text_join'></block>"
+                  },
+                  {
+                        name: "text_append", 
+                        xml: "<block type='text_append'></block>"
+                  }
+               ]
+            },
+            {
+                  category: "variables",
+                  name: this.strings.variables,
+                  colour: 230,
+                  custom: "VARIABLE",
+                  blocks: []
+            },
+            {
+                  category: "functions",
+                  name: this.strings.functions,
+                  colour: 290,
+                  custom: "PROCEDURE",
+                  blocks: []
+            }
+         ];
+      },
+
       getToolboxXml: function() {
          var blocksByCategory = {
          }
@@ -575,118 +783,45 @@ function getBlocklyHelper() {
          }
          xml = "";
          for (var category in blocksByCategory) {
-            xml += "<category name='" + this.strings[category] + "' colour='210'>";
+            if (this.groupByCategory) {
+               xml += "<category name='" + this.strings[category] + "' colour='210'>";
+            }
             var blocks = blocksByCategory[category];
             for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
                xml += "<block type='" + blocks[iBlock] + "'></block>";
             }
-            xml += "</category>";
+            if (this.groupByCategory) {
+               xml += "</category>";
+            }
          }
-         xml +=
-   "                <category name='" + this.strings.logic + "' colour='65'>" +
-   "                  <block type='controls_if' colour='65'></block>" +
-   "                  <block type='controls_if_else' colour='65'></block>" +
-   "                  <block type='logic_compare'></block>" +
-   "                  <block type='logic_operation'></block>" +
-   "                  <block type='logic_negate'></block>" +
-   "                  <block type='logic_boolean'></block>" +
-   "                </category>" +
-   "                <category name='" + this.strings.loops + "' colour='120'>" +
-   "                  <block type='controls_repeat'></block>" +
-   "                  <block type='controls_whileUntil'></block>" +
-   "                  <block type='controls_for'>" +
-   "                    <value name='FROM'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                    <value name='TO'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>10</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                    <value name='BY'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='controls_flow_statements'></block>" +
-   "                </category>" +
-   "                <category name='" + this.strings.math + "' colour='230'>" +
-   "                  <block type='math_number' gap='32'></block>" +
-   "                  <block type='math_arithmetic'>" +
-   "                    <value name='A'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                    <value name='B'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_number_property'>" +
-   "                    <value name='NUMBER_TO_CHECK'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>0</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_change'>" +
-   "                    <value name='DELTA'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_round'>" +
-   "                    <value name='NUM'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>3.1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_extra_single'>" +
-   "                    <value name='NUM'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>3.1</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_extra_double'>" +
-   "                    <value name='A'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='A'>2</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                    <value name='B'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='B'>2</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                  <block type='math_modulo'>" +
-   "                    <value name='DIVIDEND'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>64</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                    <value name='DIVISOR'>" +
-   "                      <shadow type='math_number'>" +
-   "                        <field name='NUM'>10</field>" +
-   "                      </shadow>" +
-   "                    </value>" +
-   "                  </block>" +
-   "                </category>" +
-   "                <category name='" + this.strings.text + "' colour='210'>" +
-   "                  <block type='text'></block>" +
-   "                  <block type='text_join'></block>" +
-   "                  <block type='text_append'></block>" +
-   "                </category>" +
-   "                <category name='" + this.strings.variables + "' colour='330' custom='VARIABLE'></category>" +
-   "                <category name='" + this.strings.functions + "' colour='290' custom='PROCEDURE'></category>";
+         var stdBlocks = this.getStdBlocks();
+         for (var iCategory = 0; iCategory < stdBlocks.length; iCategory++) {
+            var category = stdBlocks[iCategory];
+            if (this.groupByCategory) {
+               var catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
+            }
+            var hasBlocks = false;
+            if (category.custom != undefined) {
+               catXml += "CUSTOM='" + category.custom + "'";
+               hasBlocks = true;
+            }
+            catXml += ">";
+            for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
+               var block = category.blocks[iBlock];
+               if (this.includedAll ||
+                   ($.inArray(category.category, this.includedCategories) != -1) ||
+                   ($.inArray(block.name, this.includedBlocks) != -1)) {
+                  catXml += block.xml;
+                  hasBlocks = true;
+               }
+            }
+            if (this.groupByCategory) {
+               catXml += "</category>";
+            }
+            if (hasBlocks) {
+               xml += catXml;
+            }
+         }
          return xml;
       },
       
@@ -992,6 +1127,18 @@ function initBlocklyRunner(context, messageCallback) {
 
 var initBlocklySubTask = function(subTask) {
    subTask.blocklyHelper = getBlocklyHelper();
+   if (subTask.gridInfos.includedAll != undefined) {
+      subTask.blocklyHelper.includedAll = subTask.gridInfos.includedAll;
+   }
+   if (subTask.gridInfos.groupByCategory != undefined) {
+      subTask.blocklyHelper.groupByCategory = subTask.gridInfos.groupByCategory;
+   }
+   if (subTask.gridInfos.includedCategories != undefined) {
+      subTask.blocklyHelper.includedCategories = subTask.gridInfos.includedCategories;
+   }
+   if (subTask.gridInfos.includedBlocks != undefined) {
+      subTask.blocklyHelper.includedBlocks = subTask.gridInfos.includedBlocks;
+   }
    subTask.answer = null;
    subTask.state = {};
 
