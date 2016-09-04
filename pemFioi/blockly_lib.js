@@ -22,7 +22,7 @@ function resetFormElement(e) {
   //e.preventDefault();
 }
 
-function getBlocklyHelper() {
+function getBlocklyHelper(maxBlocks) {
    return {
       textFile: null,
       extended: false,
@@ -71,7 +71,8 @@ function getBlocklyHelper() {
             saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
             avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
             reloadProgram: "Recharger :",
-            saveProgram: "Enregistrer"
+            saveProgram: "Enregistrer",
+            remainingBlocks: "Blocks restants : "
          },
          en: {
             actions: "Actions",
@@ -107,7 +108,8 @@ function getBlocklyHelper() {
             saveOrLoadProgram: "Save or reload your code:",
             avoidReloadingOtherTask: "Warning: do not reload code for another task!",
             reloadProgram: "Reload:",
-            saveProgram: "Save"
+            saveProgram: "Save",
+            remainingBlocks: "Blocks remaining: "
          },
          de: {
             actions: "Actions",
@@ -143,10 +145,15 @@ function getBlocklyHelper() {
             saveOrLoadProgram: "Save or reload your code:",
             avoidReloadingOtherTask: "Warning: do not reload code for another task!",
             reloadProgram: "Reload:",
-            saveProgram: "Save"
+            saveProgram: "Save",
+            remainingBlocks: "Blocks remaining: "
          }
       },
       loadHtml: function() {
+         var strMaxBlocks = "";
+         if (maxBlocks != undefined) {
+            strMaxBlocks = "<p>" + this.strings.remainingBlocks + "<span class='blocklyCapacity'>XXX</span</p>";
+         }
          $("#blocklyLibContent").html( 
             "         <p>" +
             "            <input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()' />" +
@@ -160,6 +167,7 @@ function getBlocklyHelper() {
             "            </select>" +
             "         </p>" +
             "         <p id='errors' style='color:red'></p>" +
+            strMaxBlocks +
             "         <xml id='toolbox' style='display: none'>" +
             "         </xml>" +
             "          <div style='height: 40px;display:none' id='lang'>" +
@@ -191,10 +199,24 @@ function getBlocklyHelper() {
             this.loadHtml();
             var xml = this.getToolboxXml();
             document.getElementById('toolbox').innerHTML = xml;
-            this.workspace = Blockly.inject('blocklyDiv', {toolbox: document.getElementById('toolbox'), sounds: false, media: "http://static3.castor-informatique.fr/contestAssets/blockly/"});
+            var wsConfig = {
+               toolbox: document.getElementById('toolbox'),
+               sounds: false,
+               media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
+            };
+            if (maxBlocks != undefined) {
+               wsConfig.maxBlocks = maxBlocks;
+            }
+            this.workspace = Blockly.inject('blocklyDiv', wsConfig);
             Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             this.addExtraBlocks();
+            var that = this;
+            function onchange(event) {
+               $('.blocklyCapacity').html(that.workspace.remainingCapacity());
+            }
+            this.workspace.addChangeListener(onchange);
+            onchange();
          } else {
             this.workspace = new Blockly.Workspace();
          }
@@ -1126,7 +1148,7 @@ function initBlocklyRunner(context, messageCallback) {
 
 
 var initBlocklySubTask = function(subTask) {
-   subTask.blocklyHelper = getBlocklyHelper();
+   subTask.blocklyHelper = getBlocklyHelper(subTask.gridInfos.maxInstructions);
    subTask.answer = null;
    subTask.state = {};
 
