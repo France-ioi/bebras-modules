@@ -819,8 +819,9 @@ function getBlocklyHelper(maxBlocks) {
          var stdBlocks = this.getStdBlocks();
          for (var iCategory = 0; iCategory < stdBlocks.length; iCategory++) {
             var category = stdBlocks[iCategory];
+            var catXml = "";
             if (this.groupByCategory) {
-               var catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
+               catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
             }
             var hasBlocks = false;
             if (category.custom != undefined) {
