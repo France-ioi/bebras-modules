@@ -612,9 +612,6 @@ var getRobotGridContext = function(display, infos) {
 
    var resetItems = function() {
       context.items = [];
-      for (var iItem = context.initItems.length - 1; iItem >= 0; iItem--) {
-         resetItem(context.initItems[iItem], iItem);
-      }
       var itemTypeByNum = {};
       for (var type in infos.itemTypes) {
          var itemType = infos.itemTypes[type];
@@ -633,6 +630,9 @@ var getRobotGridContext = function(display, infos) {
                });
             }
          }
+      }
+      for (var iItem = context.initItems.length - 1; iItem >= 0; iItem--) {
+         resetItem(context.initItems[iItem]);
       }
    };
 
