@@ -49,7 +49,7 @@ var getRobotGridContext = function(display, infos) {
       }
       if (infos.hasGravity) {
          var row = coords.row;
-         while ((!isOutsideGrid(row + 1, coords.col)) && (context.tiles[row + 1][coords.col] != 2)) {
+         while ((!isOutsideGrid(row + 1, coords.col)) && (context.tiles[row + 1][coords.col] != 2)) { // TODO: replace this 2 that represents a platform !!
             row++;
          }
          if (isOutsideGrid(row + 1, coords.col)) {
@@ -573,17 +573,17 @@ var getRobotGridContext = function(display, infos) {
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             var x = infos.cellSide * iCol * scale;
             var y = infos.cellSide * iRow * scale;
-            var iTile = context.tiles[iRow][iCol];
-            if (iTile != 0) {
-               cells[iRow][iCol] = paper.image(infos.imgTiles[iTile], x, y, infos.cellSide * scale, infos.cellSide * scale);
+            var itemTypeNum = context.tiles[iRow][iCol];
+            if (itemTypeNum > 0) {
+               cells[iRow][iCol] = paper.rect(x, y, infos.cellSide * scale, infos.cellSide * scale);
             }
          }
       }
    };
 
-   var resetItem = function(initItem, iItem) {
-      context.items[iItem] = {};
-      var item = context.items[iItem];
+   var resetItem = function(initItem) {
+      var item = {};
+      context.items.push(item);
       for (var property in initItem) {
          item[property] = initItem[property];
       }
@@ -614,6 +614,25 @@ var getRobotGridContext = function(display, infos) {
       context.items = [];
       for (var iItem = context.initItems.length - 1; iItem >= 0; iItem--) {
          resetItem(context.initItems[iItem], iItem);
+      }
+      var itemTypeByNum = {};
+      for (var type in infos.itemTypes) {
+         var itemType = infos.itemTypes[type];
+         if (itemType.num != undefined) {
+            itemTypeByNum[itemType.num] = type;
+         }
+      }
+      for (var iRow = 0; iRow < context.nbRows; iRow++) {
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            var itemTypeNum = context.tiles[iRow][iCol];
+            if (itemTypeByNum[itemTypeNum] != undefined) {
+               resetItem({
+                  row: iRow,
+                  col: iCol,
+                  type: itemTypeByNum[itemTypeNum],
+               });
+            }
+         }
       }
    };
 
