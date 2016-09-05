@@ -72,7 +72,7 @@ function getBlocklyHelper(maxBlocks) {
             avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
             reloadProgram: "Recharger :",
             saveProgram: "Enregistrer",
-            remainingBlocks: "Blocks restants : "
+            remainingBlocks: "Blocs restants : "
          },
          en: {
             actions: "Actions",
