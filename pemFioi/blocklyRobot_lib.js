@@ -3,9 +3,9 @@ var getRobotGridContext = function(display, infos) {
       fr: {
          labelWait: "attendre",
          codeWait: "attendre",
-         labelRight: "tourner à droite",
+         labelRight: "tourner Ã  droite",
          codeRight: "droite",
-         labelLeft: "tourner à gauche",
+         labelLeft: "tourner Ã  gauche",
          codeLeft: "gauche",
          labelForward: "avancer",
          codeForward: "avancer",
@@ -25,7 +25,7 @@ var getRobotGridContext = function(display, infos) {
          codeRow: "ligne",
          labelAlert: "alerte",
          codeAlert: "alerte",
-         obstacle: "Vous avez foncé sur un obstacle !" 
+         obstacle: "Vous avez foncÃ© sur un obstacle !" 
       }
    };
    var strings = languageStrings[stringsLanguage];
@@ -94,7 +94,7 @@ var getRobotGridContext = function(display, infos) {
          }
          if (row - coords.row > 2) {
             context.lost = true;
-            throw("Le robot va tomber de haut et s'écraser !");
+            throw("Le robot va tomber de haut et s'Ã©craser !");
          }
          coords.row = row;
       }
@@ -437,7 +437,7 @@ var getRobotGridContext = function(display, infos) {
          }
       }
       if (foundPill == 0) {
-         throw("Pas de pastille à ramasser");
+         throw("Pas de pastille Ã  ramasser");
       }
       if (context.items[foundPill].rank != context.nbTransportedPills + 1) {
          throw("La pastille n'est pas celle qu'il faut ramasser maintenant.");
@@ -449,7 +449,7 @@ var getRobotGridContext = function(display, infos) {
       context.nbTransportedPills++;
       if (context.nbTransportedPills == context.nbPills) {
          context.success = true;
-         throw("Bravo, vous avez ramassé toutes les pastilles dans le bon ordre !");
+         throw("Bravo, vous avez ramassÃ© toutes les pastilles dans le bon ordre !");
       }
 //         context.transportedPill = pills[0].id;
       context.waitDelay(callback);
@@ -459,16 +459,16 @@ var getRobotGridContext = function(display, infos) {
       var item = context.getRobotItem(context.curRobot);
       var pills = getItems(item.row, item.col, {category: "pill"});
       if (context.transportedPill == 0) {
-         throw("Le robot essaie de déposer une pastille mais n'en transporte pas.");
+         throw("Le robot essaie de dÃ©poser une pastille mais n'en transporte pas.");
       }
       if (context.tiles[item.row][item.col] != 2) {
-         throw("Le robot essaie de déposer une pastille ailleurs que sur une étoile.");
+         throw("Le robot essaie de dÃ©poser une pastille ailleurs que sur une Ã©toile.");
       }
       context.nbDroppedPills++;
       context.transportedPill = 0;
       if (context.nbDroppedPills == context.items.length - 1) {
          context.success = true;
-         throw("Bravo, vous avez déposé toutes les pastilles !");
+         throw("Bravo, vous avez dÃ©posÃ© toutes les pastilles !");
       }
       context.waitDelay(callback);
    }
@@ -545,7 +545,7 @@ var getRobotGridContext = function(display, infos) {
          south: { labelEn: "south",            labelFr: strings.labelSouth,            codeFr: strings.codeSouth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_south },
          wait: { labelEn: "wait",            labelFr: strings.labelWait,            codeFr: strings.codeWait,            category: "actions", type: 0, nbParams: 0, fct: context.robot_wait },
          pickPill: { labelEn: "pickPill", labelFr: "ramasser la pastille", codeFr: "ramasserPasille", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickPill },
-//       droppill: { labelEn: "dropPill", labelFr: "déposer la pastille", codeFr: "deposerPastille", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropPill },
+//       droppill: { labelEn: "dropPill", labelFr: "dÃ©poser la pastille", codeFr: "deposerPastille", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropPill },
 
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
