@@ -1,4 +1,35 @@
 var getRobotGridContext = function(display, infos) {
+   var languageStrings = {
+      fr: {
+         labelWait: "attendre",
+         codeWait: "attendre",
+         labelRight: "tourner à droite",
+         codeRight: "droite",
+         labelLeft: "tourner à gauche",
+         codeLeft: "gauche",
+         labelForward: "avancer",
+         codeForward: "avancer",
+         labelPaint: "peindre la case",
+         codePaint: "peindreCase",
+         labelGridEdgeInFront: "bord de la grille devant",
+         codeGridEdgeInFront: "bordGrilleDevant",
+         labelObstacleInFront: "obstacle devant",
+         codeObstacleInFront: "obstacleDevant",
+         labelPaintInFront: "peinture devant",
+         codePaintInFront: "peintureDevant",
+         labelDir: "direction du robot",
+         codeDir: "direction",
+         labelCol: "colonne du robot",
+         codeCol: "colonne",
+         labelRow: "ligne du robot",
+         codeRow: "ligne",
+         labelAlert: "alerte",
+         codeAlert: "alerte",
+         obstacle: "Vous avez foncé sur un obstacle !" 
+      }
+   };
+   var strings = languageStrings[stringsLanguage];
+   
    var cells = [];
    var texts = [];
    var scale = 1;
@@ -28,11 +59,16 @@ var getRobotGridContext = function(display, infos) {
 
    context.nbRobots = 1;
 
+   context.getRobotItem = function(iRobot) {
+      var items = context.getItems(undefined, undefined, {category: "robot"});
+      return items[iRobot];
+   };
+
    context.robot_forward = function(callback) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront();
       if (!tileAllowed(coords.row, coords.col)) {
          if (isOutsideGrid(coords.row, coords.col)) {
@@ -73,7 +109,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       if (isOutsideGrid(item.row - 2, item.col)) {
          context.lost = true;
          throw("Le robot essaie de sauter en dehors de la grille !");
@@ -90,13 +126,13 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var newDir = (item.dir + 2) % 4;
       moveRobot(item.row, item.col, newDir, callback);
    };
 
    context.robot_platformInFront = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var col = item.col;
       if (item.dir == 0) {
          col += 1;
@@ -113,7 +149,7 @@ var getRobotGridContext = function(display, infos) {
    }
 
    context.robot_platformInFrontAndBelow = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var col = item.col;
       if (item.dir == 0) {
          col += 1;
@@ -131,7 +167,7 @@ var getRobotGridContext = function(display, infos) {
    }
 
    context.robot_platformAbove = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var platformAbove;
       if (isOutsideGrid(item.row - 1, item.col)) {
          platformAbove = false;
@@ -201,12 +237,12 @@ var getRobotGridContext = function(display, infos) {
    }
 
    context.robot_paint = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       paint(item.row, item.col, "paint", callback);
    };
 
    context.robot_paintGray = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       paint(item.row, item.col, "paintGray", callback);
    };
 
@@ -222,7 +258,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.curRobot == 1) {
          dDir = 3;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var newDir = (item.dir + dDir) % 4;
       moveRobot(item.row, item.col, newDir, callback);
    };
@@ -235,7 +271,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.curRobot == 1) {
          dDir = 1;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var newDir = (item.dir + dDir) % 4;
       moveRobot(item.row, item.col, newDir, callback);
    };
@@ -244,7 +280,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row, item.col + 1)) {
          context.waitDelay(callback);
       } else {
@@ -256,7 +292,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row, item.col - 1)) {
          context.waitDelay(callback);
       } else {
@@ -268,7 +304,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row - 1, item.col)) {
          context.waitDelay(callback);
       } else {
@@ -280,7 +316,7 @@ var getRobotGridContext = function(display, infos) {
       if (context.lost) {
          return;
       }
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row + 1, item.col)) {
          context.waitDelay(callback);
       } else {
@@ -311,7 +347,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_colorUnder = function(callback) {
-      var robot = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var itemsUnder = context.getItems(robot.row, robot.col, {hasColor: true});
       if (itemsUnder.length == 0) {
          context.callCallback(callback, "blanc");
@@ -332,7 +368,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_col = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var col = item.col + 1;
       if (context.curRobot == 1) {
          col = context.nbCols - col + 1;
@@ -341,11 +377,12 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_row = function(callback) {
-      context.callCallback(callback, context.items[context.curRobot].row + 1);
+      var item = context.getRobotItem(context.curRobot);
+      context.callCallback(callback, item.row + 1);
    };
    
    context.robot_onPill = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var pills = getItems(item.row, item.col, {category: "pill"});
       context.callCallback(callback, pills.length > 0);
    }
@@ -390,7 +427,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_pickPill = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var foundPill = 0;
       for (var iPill = 1; iPill < context.items.length; iPill++) {
          var pill = context.items[iPill];
@@ -419,7 +456,7 @@ var getRobotGridContext = function(display, infos) {
    };
 /*
    context.robot_dropPill = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       var pills = getItems(item.row, item.col, {category: "pill"});
       if (context.transportedPill == 0) {
          throw("Le robot essaie de déposer une pastille mais n'en transporte pas.");
@@ -440,7 +477,7 @@ var getRobotGridContext = function(display, infos) {
    
    var dirNames = ["E", "S", "O", "N"];
    context.robot_dir = function(callback) {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, dirNames[item.dir]);
    };
 
@@ -539,7 +576,7 @@ var getRobotGridContext = function(display, infos) {
 
    var delta = [[0,1],[1,0],[0,-1],[-1,0]];
    var getCoordsInFront = function() {
-      var item = context.items[context.curRobot];
+      var item = context.getRobotItem(context.curRobot);
       return {
          row: item.row + delta[item.dir][0],
          col: item.col + delta[item.dir][1]
@@ -657,7 +694,7 @@ var getRobotGridContext = function(display, infos) {
 
    var moveRobot = function(newRow, newCol, newDir, callback) {
       var iRobot = context.curRobot;
-      var item = context.items[iRobot];
+      var item = context.getRobotItem(iRobot);
       var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
       // If the robot turns and moves at the sime time, we do an instant turn (for now).
       if ((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
@@ -694,7 +731,7 @@ var getRobotGridContext = function(display, infos) {
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
          var itemType = infos.itemTypes[item.type];
-         if ((item.row == row) && (item.col == col)) {
+         if ((row == undefined) || ((item.row == row) && (item.col == col))) {
             var accepted = true;
             for (var property in filters) {
                var value = filters[property];
