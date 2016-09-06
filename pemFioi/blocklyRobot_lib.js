@@ -9,6 +9,14 @@ var getRobotGridContext = function(display, infos) {
          codeLeft: "gauche",
          labelForward: "avancer",
          codeForward: "avancer",
+         labelEast: "droite",
+         codeEast: "droite",
+         labelSouth: "bas",
+         codeSouth: "bas",
+         labelWest: "gauche",
+         codeWest: "gauche",
+         labelNorth: "haut",
+         codeNorth: "haut",
          labelPaint: "peindre la case",
          codePaint: "peindreCase",
          labelGridEdgeInFront: "bord de la grille devant",
@@ -36,7 +44,8 @@ var getRobotGridContext = function(display, infos) {
    var paper;
 
    var context = {
-      display: display
+      display: display,
+      infos: infos
    };
 
    context.changeDelay = function(newDelay) {
@@ -44,16 +53,10 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.waitDelay = function(callback, value) {
-      if (infos.checkEndEveryTurn) {
-         infos.checkEndCondition(context, false);
-      }
       context.runner.waitDelay(callback, value, infos.actionDelay);
    };
 
    context.callCallback = function(callback, value) { // Default implementation
-      if (infos.checkEveryTurn) {
-         infos.checkEndCondition(context, false);
-      }
       context.runner.noDelay(callback, value);
    };
 
@@ -71,6 +74,10 @@ var getRobotGridContext = function(display, infos) {
       var item = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront();
       if (!tileAllowed(coords.row, coords.col)) {
+         if (infos.ignoreInvalidMoves) {
+            context.waitDelay(callback);
+            return;
+         }
          if (isOutsideGrid(coords.row, coords.col)) {
             context.lost = true;
             throw("Le robot sort de la grille !");
@@ -219,8 +226,7 @@ var getRobotGridContext = function(display, infos) {
       }
       if (paintItems.length == 0) {
          var addItem = function() {
-            context.items.push(newItem);
-            resetItem(newItem, context.items.length - 1, true);
+            resetItem(newItem);
             if (context.display) {
                resetItemsZOrder(row, col);
             }
@@ -333,7 +339,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_itemInFront = function(callback) {
-      var itemsInFront = context.getItemsInFront({isObstacle: true});
+      var itemsInFront = getItemsInFront({isObstacle: true});
       context.callCallback(callback, itemsInFront.length > 0);
    };
 
@@ -381,99 +387,155 @@ var getRobotGridContext = function(display, infos) {
       context.callCallback(callback, item.row + 1);
    };
    
-   context.robot_onPill = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
-      var pills = getItems(item.row, item.col, {category: "pill"});
-      context.callCallback(callback, pills.length > 0);
-   }
-
-   var findPill = function(iPill) {
-      var pill = null;
-      for (var iItem = 1; iItem < context.items.length; iItem++) {
-         var item = context.items[iItem];
-         if (item.id == iPill) {
-            pill = item;
-            break;
+   var findTransportable = function(id) {
+      var transportables = context.getItems(undefined, undefined, {isTransportable: true});
+      for (var iItem = 1; iItem < transportables.length; iItem++) {
+         var item = transportables[iItem];
+         if (item.id == id) {
+            return item;
          }
       }
-      return pill;
+      return null;
    }
 
-   context.pill_exists = function(iPill, callback) {
-      var pill = findPill(iPill);
-      context.runner.noDelay(callback, pill != null);
+   context.transportable_exists = function(id, callback) {
+      var transportable = findTransportable(id);
+      context.runner.noDelay(callback, transportable != null);
    }
 
-   context.pill_col = function(iPill, callback) {
-      var pill = findPill(iPill);
+   context.transportable_col = function(id, callback) {
+      var transportable = findTransportable(id);
       var res = 0;
-      if (pill != null) {
-         res = pill.col + 1;
+      if (transportable != null) {
+         res = transportable.col + 1;
       }
       context.callCallback(callback, res);
    }
 
-   context.pill_row = function(iPill, callback) {
-      var pill = findPill(iPill);
+   context.transportable_row = function(id, callback) {
+      var transportable = findTransportable(id);
       var res = 0;
-      if (pill != null) {
-         res = pill.row + 1;
+      if (transportable != null) {
+         res = transportable.row + 1;
       }
       context.callCallback(callback, res);
    };
 
-   context.pill_number = function(callback) {
-      context.callCallback(callback, context.nbPills);
+   context.transportable_number = function(callback) {
+      var transportables = context.getItems(undefined, undefined, {isTransportable: true});
+      context.callCallback(callback, transportables.length);
    };
 
-   context.robot_pickPill = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
-      var foundPill = 0;
-      for (var iPill = 1; iPill < context.items.length; iPill++) {
-         var pill = context.items[iPill];
-         if ((pill.row == item.row) && (pill.col == item.col)) {
-            foundPill = iPill;
-            break;
-         }
-      }
-      if (foundPill == 0) {
-         throw("Pas de pastille à ramasser");
-      }
-      if (context.items[foundPill].rank != context.nbTransportedPills + 1) {
-         throw("La pastille n'est pas celle qu'il faut ramasser maintenant.");
-      }
-      if (context.display) {
-         context.items[foundPill].element.remove();
-      }
-      context.items.splice(foundPill, 1);
-      context.nbTransportedPills++;
-      if (context.nbTransportedPills == context.nbPills) {
-         context.success = true;
-         throw("Bravo, vous avez ramassé toutes les pastilles dans le bon ordre !");
-      }
-//         context.transportedPill = pills[0].id;
-      context.waitDelay(callback);
+   context.robot_onTransportable = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
+      context.callCallback(callback, (transportables.length != 0));
    };
+
+   context.robot_transportableColor = function(callback) {
+      var result = getTransportableProperty("color");
+      context.callCallback(callback, result);
+   };
+
+   context.robot_transportableSquare = function(callback) {
+      var result = getTransportableProperty("shape");
+      context.callCallback(callback, result == "carré");
+   };
+
+   context.robot_transportableRed = function(callback) {
+      var result = getTransportableProperty("color");
+      context.callCallback(callback, result == "rouge");
+   };
+
+   var robotCellIsColor = function(callback, color) {
+      var robot = context.getRobotItem(context.curRobot);
+      var transportables = context.getItems(robot.row, robot.col, {category: paint});
+      var itemType = infos.itemTypes[transportables[0].type];
+      var result = false;
+      if ((transportables.length > 0) && (itemType.color != undefined)) {
+         result = (itemType.color == color);
+      }
+      context.callCallback(callback, result);
+   };
+
+   context.robot_greenCell = function(callback) {
+      robotCellIsColor(callback, "vert");
+   };
+
+   context.robot_brownCell = function(callback) {
+      robotCellIsColor(callback, "brown");
+   };
+
+   var getTransportableProperty = function(property) {
+      var robot = context.getRobotItem(context.curRobot);
+      var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
+      var itemType = infos.itemTypes[transportables[0].type];
+      if ((transportables.length > 0) && (itemType[property] != undefined)) {
+         return itemType[property];
+      }
+      return "";
+   }
+
+   context.robot_transportableShape = function(callback) {
+      var result = getTransportableProperty("shape");
+      context.callCallback(callback, result);
+   };
+
+   context.robot_pickTransportable = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
+      if (transportables.length == 0) {
+         throw("Rien à ramasser");
+      }
+      /*
+      if (transportables[0].rank != context.nbTransportedItems + 1) {
+         throw("L'objet n'est pas celui qu'il faut ramasser maintenant.");
+      }
+      */
+      var transportable = transportables[0];
+      context.items.splice(transportable.index, 1);
+      context.nbTransportedItems++;
+      context.transportedItem = transportable;
 /*
-   context.robot_dropPill = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
-      var pills = getItems(item.row, item.col, {category: "pill"});
-      if (context.transportedPill == 0) {
-         throw("Le robot essaie de déposer une pastille mais n'en transporte pas.");
-      }
-      if (context.tiles[item.row][item.col] != 2) {
-         throw("Le robot essaie de déposer une pastille ailleurs que sur une étoile.");
-      }
-      context.nbDroppedPills++;
-      context.transportedPill = 0;
-      if (context.nbDroppedPills == context.items.length - 1) {
+      if (context.nbTransportedItems == context.nbTransportableItems) {
          context.success = true;
-         throw("Bravo, vous avez déposé toutes les pastilles !");
+         throw("Bravo, vous avez ramassé tous les objets dans le bon ordre !");
       }
-      context.waitDelay(callback);
-   }
 */
+      context.waitDelay(function() {
+         if (context.display) {
+            transportable.element.remove();
+         }
+         callback();
+      });
+   };
 
+   context.robot_dropTransportable = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      if (context.transportedItem == 0) {
+         throw("Le robot essaie de déposer un objet mais n'en transporte pas.");
+      }
+      /*
+      if (context.tiles[robot.row][robot.col] != 2) { // TODO : replace
+         throw("Le robot essaie de déposer un objet ailleurs que sur une étoile.");
+      }
+      */
+      context.nbDroppedItems++;
+      context.nbTransportedItems = 0;
+      if (context.nbDroppedItems == context.nbTransportableItems - 1) {
+         context.success = true;
+         throw("Bravo, vous avez déposé toutes les objets !");
+      }
+      context.waitDelay(function() {
+         context.items.push(context.transportedItem);
+         context.transportedItem.row = robot.row;
+         context.transportedItem.col = robot.col;
+         if (context.display) {
+            redisplayItem(context.transportedItem);
+         }
+         callback();
+      });
+   }
    
    var dirNames = ["E", "S", "O", "N"];
    context.robot_dir = function(callback) {
@@ -544,8 +606,18 @@ var getRobotGridContext = function(display, infos) {
          north: { labelEn: "north",            labelFr: strings.labelNorth,            codeFr: strings.codeNorth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_north },
          south: { labelEn: "south",            labelFr: strings.labelSouth,            codeFr: strings.codeSouth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_south },
          wait: { labelEn: "wait",            labelFr: strings.labelWait,            codeFr: strings.codeWait,            category: "actions", type: 0, nbParams: 0, fct: context.robot_wait },
-         pickPill: { labelEn: "pickPill", labelFr: "ramasser la pastille", codeFr: "ramasserPasille", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickPill },
-//       droppill: { labelEn: "dropPill", labelFr: "déposer la pastille", codeFr: "deposerPastille", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropPill },
+         pickTransportable: { labelEn: "pickTransportable", labelFr: "ramasser l'objet", codeFr: "ramasserTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickTransportable },
+         dropTransportable: { labelEn: "dropTransportable", labelFr: "déposer l'objet", codeFr: "deposerTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropTransportable },
+         onTransportable: { labelEn: "onTransportable", labelFr: "sur un objet", codeFr: "surTransportable", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onTransportable },
+         transportableShape: { labelEn: "transportableShape", labelFr: "forme de l'objet", codeFr: "formeObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableShape },
+         transportableColor: { labelEn: "transportableColor", labelFr: "couleur de l'objet", codeFr: "couleurObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableColor },
+         transportableRed: { labelEn: "transportableRed", labelFr: "l'objet est rouge", codeFr: "objetRouge", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableRed },
+         transportableBlue: { labelEn: "transportableBlue", labelFr: "l'objet est bleu", codeFr: "objetBleu", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableBlue },
+         transportableSquare: { labelEn: "transportableSquare", labelFr: "l'objet est carré", codeFr: "objetCarre", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableSquare },
+
+         greenCell: { labelEnd: "cellGreen", labelFr: "case verte", codeFr: "caseVerte", category: "sensors", type: 1, nbParams: 0, fct: context.robot_greenCell },
+         brownCell: { labelEnd: "cellBrown", labelFr: "case marron", codeFr: "caseMarron", category: "sensors", type: 1, nbParams: 0, fct: context.robot_brownCell },
+
 
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
@@ -559,11 +631,11 @@ var getRobotGridContext = function(display, infos) {
          row: { labelEn: "row",             labelFr: strings.labelRow,             codeFr: strings.codeRow,             category: "sensors", type: 1, nbParams: 0, fct: context.robot_row },
          onPill: { labelEn: "onPill", labelFr: "sur une pastille", codeFr: "surPastille", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onPill }
       },
-      pill: {
-         number: { labelEn: "number", labelFr: "nombre total de pastilles", codeFr: "nombrePastilles", category: "sensors", type: 1, nbParams: 0, fct: context.pill_number },
-         exists: { labelEn: "exists", labelFr: "il existe une pastille ", codeFr: "existePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_exists },
-         row: { labelEn: "row", labelFr: "ligne de la pastille", codeFr: "lignePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_row },
-         col: { labelEn: "col", labelFr: "colonne de la pastille", codeFr: "colonnePastille", category: "sensors", type: 1, nbParams: 1, fct: context.pill_col }
+      transport: {
+         number: { labelEn: "number", labelFr: "nombre total d'objets à transporter", codeFr: "nombreTransportables", category: "sensors", type: 1, nbParams: 0, fct: context.transportable_number },
+         exists: { labelEn: "exists", labelFr: "il existe un objet à transporter ", codeFr: "existeTransportable", category: "sensors", type: 1, nbParams: 1, fct: context.transportable_exists },
+         row: { labelEn: "row", labelFr: "ligne de l'objet à transporter", codeFr: "ligneTransportable", category: "sensors", type: 1, nbParams: 1, fct: context.transportable_row },
+         col: { labelEn: "col", labelFr: "colonne d'objet à transporter", codeFr: "colonneTransportable", category: "sensors", type: 1, nbParams: 1, fct: context.transportable_col }
       },
       debug: {
          alert: { labelEn: "alert", labelFr: strings.labelAlert, codeFr: strings.codeAlert, category: "debug", type: 0, nbParams: 1, fct: context.debug_alert }
@@ -745,6 +817,7 @@ var getRobotGridContext = function(display, infos) {
                }
             }
             if (accepted) {
+               item.index = iItem;
                listItems.push(item);
             }
          }
@@ -816,7 +889,11 @@ var getRobotGridContext = function(display, infos) {
       context.generators[genType] = [];
       var gens = infos.generators[genType];
       for (var iGen = 0; iGen < gens.length; iGen++) {
-         context.generators[genType].push(allGenerators[genType][gens[iGen]]);
+         var gen = allGenerators[genType][gens[iGen]];
+         if (gen.fct == undefined) {
+            alert("error: undefined function for " + gen.labelEn);
+         }
+         context.generators[genType].push(gen);
       }
    }
 

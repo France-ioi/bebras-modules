@@ -823,10 +823,12 @@ function getBlocklyHelper(maxBlocks) {
             if (this.groupByCategory) {
                catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
             }
-            var hasBlocks = false;
+            var isIncluded = false;
             if (category.custom != undefined) {
                catXml += "CUSTOM='" + category.custom + "'";
-               hasBlocks = true;
+               if (this.includedAll || ($.inArray(category.category, this.includedCategories) != -1)) {
+                  isIncluded = true;
+               }
             }
             catXml += ">";
             for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
@@ -835,13 +837,13 @@ function getBlocklyHelper(maxBlocks) {
                    ($.inArray(category.category, this.includedCategories) != -1) ||
                    ($.inArray(block.name, this.includedBlocks) != -1)) {
                   catXml += block.xml;
-                  hasBlocks = true;
+                  isIncluded = true;
                }
             }
             if (this.groupByCategory) {
                catXml += "</category>";
             }
-            if (hasBlocks) {
+            if (isIncluded) {
                xml += catXml;
             }
          }
@@ -1092,6 +1094,9 @@ function initBlocklyRunner(context, messageCallback) {
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
+               if (context.infos.checkEveryTurn) {
+                  context.infos.checkEndCondition(context, false);
+               }
                var interpreter = interpreters[iInterpreter];
                var iter = 0;
                while (iter < maxIter) {
