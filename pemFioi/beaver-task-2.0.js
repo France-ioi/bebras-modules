@@ -229,7 +229,7 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          if (!newAnswers) {
             mainTask.reloadAnswerObject(mainTask.getDefaultAnswerObject());
          } else {
-            mainTask.reloadAnswerObject(JSON.parse(newAnswers));
+            mainTask.reloadAnswerObject(newAnswers);
          }
          if(callback && typeof callback === "function") {
             callback();
@@ -296,7 +296,13 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getAnswerObject = function() {
-      return state.levelAnswers;
+      if(levels) {
+         state.levelAnswers[state.level] = mainTask.getAnswerObject();
+         return state.levelAnswers;
+      }
+      else {
+         return mainTask.getAnswerObject();
+      }
    };
 
    task.unload = function(callback) {
@@ -308,7 +314,7 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
       }
       instances.push(mainTask);
       callbackLoop(instances, function(taskFor, loopCallback) {
-         destroyTask(mainTask, loopCallback);
+         destroyTask(taskFor, loopCallback);
       }, function() {
          task.displayedSubTask = null;
          callback();
@@ -331,41 +337,56 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          levelAnswer = gradingTasks[level][seed].getDefaultAnswerObject();
       }
       gradingTasks[level][seed].reloadAnswerObject(levelAnswer);
-      gradingTasks[level][seed].getGrade(function(grade) {
+      gradingTasks[level][seed].getGrade(function(result) {
          callback({
-            score: Math.round(grade.successRate * maxScore),
-            message: grade.message
+            score: Math.round(result.successRate * maxScore),
+            message: result.message
          });
       });
    }
    
+   function gradeAnswerNoLevels(seed, answer, maxScore, callback) {
+      var doGrading = function() {
+         if(answer === undefined || answer === null) {
+            answer = gradingTasks[seed].getDefaultAnswerObject();
+         }
+         gradingTasks[seed].reloadAnswerObject(answer);
+         gradingTasks[seed].getGrade(function(result) {
+            callback({
+               score: Math.round(result.successRate * maxScore),
+               message: result.message
+            });
+         });
+      };
+      if(!gradingTasks[seed]) {
+         var gradingTask = createTask(false);
+         gradingTasks[seed] = gradingTask;
+         gradingTask.load(null, doGrading);
+      }
+      else {
+         doGrading();
+      }
+   }
+   
    // TODO: case where gradeAnswer is called again before it calls its callback
    task.gradeAnswer = function(strAnswer, answerToken, callback, gradedLevel) {
-      if(levels) {
-         // TODO Can we fetch task params just once instead of every time?
-         // If we can, then why do we need to index by seed in graders[level][seed]?
-         platform.getTaskParams(null, null, function(taskParams) {
-            if (strAnswer === '') {
-               callback(taskParams.minScore, '');
-               return;
-            }
-            
-            var seed = taskParams.randomSeed;
+      // TODO Can we fetch task params just once instead of every time?
+      // If we can, then why do we need to index by seed in graders[level][seed]?
+      platform.getTaskParams(null, null, function(taskParams) {
+         if (strAnswer === '') {
+            callback(taskParams.minScore, '');
+            return;
+         }
+         
+         var seed = taskParams.randomSeed;
+         var parsedAnswer = $.parseJSON(strAnswer);
+         
+         if(levels) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            
-            // TODO generalize this according to list of levels?
-            // What can we assume agbout maxScores?
-            var gradingMaxScore = {
-               easy: maxScores.easy,
-               medium: maxScores.medium - maxScores.easy,
-               hard: maxScores.hard - maxScores.medium
-            };
-            
-            var levelAnswers = $.parseJSON(strAnswer);
+            var levelAnswers = parsedAnswer;
             var scores = {};
             var messages = {};
             
-            // Grade all levels. If gradedLevel is supplied, skip others.
             callbackLoop(levels, function(level, loopCallback) {
                if(gradedLevel !== null && gradedLevel !== undefined && level !== gradedLevel) {
                   loopCallback();
@@ -385,17 +406,17 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
                   callback(scores[gradedLevel], messages[gradedLevel]);
                }
             });
-         });
-      }
-      else {
-         // TODO What's the correct behavior here with no levels?   
-      }
+         }
+         else {
+            gradeAnswerNoLevels(seed, parsedAnswer, taskParams.maxScore, function(result) {
+               callback(result.score, result.message);
+            });
+         }
+      });
    };
    
-   if(levels) {
-      // TODO is this the correct behavior?
-      grader.gradeTask = task.gradeAnswer;
-   }
+   // TODO is this the correct behavior?
+   grader.gradeTask = task.gradeAnswer;
 }
 
 $('document').ready(function() {
