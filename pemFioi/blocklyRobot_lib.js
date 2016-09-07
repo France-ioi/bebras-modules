@@ -719,6 +719,11 @@ var getRobotGridContext = function(display, infos) {
       if (itemType.nbStates != undefined) {
          item.nbStates = itemType.nbStates;
       }
+      if (itemType.zOrder != undefined) {
+         item.zOrder = itemType.zOrder;
+      } else {
+         item.zOrder = 0;
+      }
       if (context.display) {
          redisplayItem(item);
       }
@@ -751,11 +756,24 @@ var getRobotGridContext = function(display, infos) {
    };
 
    var resetItemsZOrder = function(row, col) {
+      var cellItems = [];
       for (var iItem = context.items.length - 1; iItem >= 0; iItem--) {
          var item = context.items[iItem];
          if ((item.row == row) && (item.col == col)) {
-            item.element.toFront();
+            cellItems.push(item);
          }
+      }
+      cellItems.sort(function(itemA, itemB) {
+         if (itemA.zOrder < itemB.zOrder) {
+            return -1;
+         }
+         if (itemA.zOrder == itemB.zOrder) {
+            return 0;
+         }
+         return 1;
+      });
+      for (var iItem = 0; iItem < cellItems.length; iItem++) {
+         cellItems[iItem].element.toFront();
       }
    };
 
@@ -767,6 +785,7 @@ var getRobotGridContext = function(display, infos) {
       var y = infos.cellSide * item.row * scale;
       item.element = paper.image(infos.itemTypes[item.type].img, x, y, item.side * item.nbStates * scale, item.side * scale);
       item.element.attr(itemAttributes(item));
+      resetItemsZOrder(item.row, item.col);
    };
 
    var moveRobot = function(newRow, newCol, newDir, callback) {
