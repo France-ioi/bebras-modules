@@ -91,20 +91,29 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       if (infos.hasGravity) {
-         var row = coords.row;
-         while ((!isOutsideGrid(row + 1, coords.col)) && (context.tiles[row + 1][coords.col] != 2)) { // TODO: replace this 2 that represents a platform !!
-            row++;
-         }
-         if (isOutsideGrid(row + 1, coords.col)) {
-            context.lost = true;
-            throw("Le robot se jette dans le vide !");
-         }
-         if (row - coords.row > 2) {
-            context.lost = true;
-            throw("Le robot va tomber de haut et s'écraser !");
-         }
-         coords.row = row;
+         context.fall(item, coords, callback);
+      } else {
+         context.nbMoves++;
+         moveRobot(coords.row, coords.col, item.dir, callback);
       }
+   };
+
+   context.fall = function(item, coords, callback) {
+      var row = coords.row;
+      var platforms = context.getItems(row+1, coords.col, {category: "platform"});
+      while ((!isOutsideGrid(row + 1, coords.col)) && (platforms.length == 0)) {
+         row++;
+         platforms = context.getItems(row+1, coords.col, {category: "platform"});
+      }
+      if (isOutsideGrid(row + 1, coords.col)) {
+         context.lost = true;
+         throw("Le robot se jette dans le vide !");
+      }
+      if (row - coords.row > 2) {
+         context.lost = true;
+         throw("Le robot va tomber de haut et s'écraser !");
+      }
+      coords.row = row;
       context.nbMoves++;
       moveRobot(coords.row, coords.col, item.dir, callback);
    };
@@ -121,7 +130,8 @@ var getRobotGridContext = function(display, infos) {
          context.lost = true;
          throw("Le robot essaie de sauter en dehors de la grille !");
       }
-      if (context.tiles[item.row - 1][item.col] != 2) { // TODO : replace 2 with something identifying a platform
+      var platforms = context.getItems(item.row - 1, item.col, {category: "platform"});
+      if (platforms.length == 0) {
          context.lost = true;
          throw("Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !");
       }
@@ -139,20 +149,15 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_platformInFront = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
-      var col = item.col;
-      if (item.dir == 0) {
+      var robot = context.getRobotItem(context.curRobot);
+      var col = robot.col;
+      if (robot.dir == 0) {
          col += 1;
       } else {
          col -= 1;
       }
-      var platformInFront;
-      if (isOutsideGrid(item.row + 1, col)) {
-         platformInFront = false;
-      } else {
-         platformInFront = (context.tiles[item.row + 1][col] == 2); // TODO : replace 2
-      }
-      context.runner.noDelay(callback, platformInFront);
+      var platforms = context.getItems(robot.row + 1, col, {category: "platform"});
+      context.runner.noDelay(callback, (platforms.length > 0));
    }
 
    context.robot_platformInFrontAndBelow = function(callback) {
@@ -164,24 +169,14 @@ var getRobotGridContext = function(display, infos) {
          col -= 1;
       }
       var row = item.row + 3;
-      var platformBelow;
-      if (isOutsideGrid(row, col)) {
-         platformBelow = false;
-      } else {
-         platformBelow = (context.tiles[row][col] == 2); // TODO : replace 2
-      }
-      context.runner.noDelay(callback, platformBelow);
+      var platforms = context.getItems(row, col, {category: "platform"});
+      context.runner.noDelay(callback, (platforms.length > 0));
    }
 
    context.robot_platformAbove = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
-      var platformAbove;
-      if (isOutsideGrid(item.row - 1, item.col)) {
-         platformAbove = false;
-      } else {
-         platformAbove = (context.tiles[item.row - 1][item.col] == 2); // TODO : replace 2
-      }
-      context.runner.noDelay(callback, platformAbove);
+      var robot = context.getRobotItem(context.curRobot);
+      var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
+      context.runner.noDelay(callback, (platforms.length > 0));
    }
          
    context.robot_gridEdgeInFront = function(callback) {
@@ -432,6 +427,12 @@ var getRobotGridContext = function(display, infos) {
       context.callCallback(callback, (transportables.length != 0));
    };
 
+   context.robot_onHole = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var holes = context.getItems(robot.row, robot.col, {isHole: true});
+      context.callCallback(callback, (holes.length != 0));
+   };
+
    context.robot_transportableColor = function(callback) {
       var result = getTransportableProperty("color");
       context.callCallback(callback, result);
@@ -449,11 +450,13 @@ var getRobotGridContext = function(display, infos) {
 
    var robotCellIsColor = function(callback, color) {
       var robot = context.getRobotItem(context.curRobot);
-      var transportables = context.getItems(robot.row, robot.col, {category: paint});
-      var itemType = infos.itemTypes[transportables[0].type];
       var result = false;
-      if ((transportables.length > 0) && (itemType.color != undefined)) {
-         result = (itemType.color == color);
+      var transportables = context.getItems(robot.row, robot.col, {category: "paint"});
+      if (transportables.length > 0) {
+         var itemType = infos.itemTypes[transportables[0].type];
+         if ((transportables.length > 0) && (itemType.color != undefined)) {
+            result = (itemType.color == color);
+         }
       }
       context.callCallback(callback, result);
    };
@@ -611,15 +614,15 @@ var getRobotGridContext = function(display, infos) {
          pickTransportable: { labelEn: "pickTransportable", labelFr: "ramasser l'objet", codeFr: "ramasserTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickTransportable },
          dropTransportable: { labelEn: "dropTransportable", labelFr: "déposer l'objet", codeFr: "deposerTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropTransportable },
          onTransportable: { labelEn: "onTransportable", labelFr: "sur un objet", codeFr: "surTransportable", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onTransportable },
+         onHole: { labelEn: "onHole", labelFr: "sur un trou", codeFr: "surTrou", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onHole },
          transportableShape: { labelEn: "transportableShape", labelFr: "forme de l'objet", codeFr: "formeObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableShape },
          transportableColor: { labelEn: "transportableColor", labelFr: "couleur de l'objet", codeFr: "couleurObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableColor },
          transportableRed: { labelEn: "transportableRed", labelFr: "l'objet est rouge", codeFr: "objetRouge", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableRed },
          transportableBlue: { labelEn: "transportableBlue", labelFr: "l'objet est bleu", codeFr: "objetBleu", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableBlue },
          transportableSquare: { labelEn: "transportableSquare", labelFr: "l'objet est carré", codeFr: "objetCarre", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableSquare },
 
-         greenCell: { labelEnd: "cellGreen", labelFr: "case verte", codeFr: "caseVerte", category: "sensors", type: 1, nbParams: 0, fct: context.robot_greenCell },
-         brownCell: { labelEnd: "cellBrown", labelFr: "case marron", codeFr: "caseMarron", category: "sensors", type: 1, nbParams: 0, fct: context.robot_brownCell },
-
+         greenCell: { labelEnd: "cellGreen", labelFr: "sur une case verte", codeFr: "caseVerte", category: "sensors", type: 1, nbParams: 0, fct: context.robot_greenCell },
+         brownCell: { labelEnd: "cellBrown", labelFr: "sur une case marron", codeFr: "caseMarron", category: "sensors", type: 1, nbParams: 0, fct: context.robot_brownCell },
 
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
