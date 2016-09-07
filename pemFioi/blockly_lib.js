@@ -52,7 +52,7 @@ function getBlocklyHelper(maxBlocks) {
             smallestOfTwoNumbers: "Plus petit des deux nombres",
             greatestOfTwoNumbers: "Plus grand des deux nombres",
             programOfRobot: "Programme du robot",
-            tooManyIterations: "Trop d'itérations avant une action !",
+            tooManyIterations: "Votre programme met trop de temps à se terminer !",
             if: "si",
             do: "faire",
             else: "sinon",
@@ -72,6 +72,7 @@ function getBlocklyHelper(maxBlocks) {
             avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
             reloadProgram: "Recharger :",
             saveProgram: "Enregistrer",
+            limitBlocks: "Nombre maximum de blocks utilisables dans votre programme :",
             remainingBlocks: "Blocs restants : "
          },
          en: {
@@ -109,6 +110,7 @@ function getBlocklyHelper(maxBlocks) {
             avoidReloadingOtherTask: "Warning: do not reload code for another task!",
             reloadProgram: "Reload:",
             saveProgram: "Save",
+            limitBlocks: "Maximum amount of blocks in your program :",
             remainingBlocks: "Blocks remaining: "
          },
          de: {
@@ -146,13 +148,15 @@ function getBlocklyHelper(maxBlocks) {
             avoidReloadingOtherTask: "Warning: do not reload code for another task!",
             reloadProgram: "Reload:",
             saveProgram: "Save",
+            limitBlocks: "Maximum amount of blocks in your program :",
             remainingBlocks: "Blocks remaining: "
          }
       },
       loadHtml: function() {
          var strMaxBlocks = "";
          if (maxBlocks != undefined) {
-            strMaxBlocks = "<p>" + this.strings.remainingBlocks + "<span class='blocklyCapacity'>XXX</span</p>";
+            strMaxBlocks = "<p>" + this.strings.limitBlocks + " " + maxBlocks + "</p>" +
+            "<p>" + this.strings.remainingBlocks + "<span class='blocklyCapacity'>XXX</span></p>";
          }
          $("#blocklyLibContent").html( 
             "         <p>" +
@@ -483,7 +487,7 @@ function getBlocklyHelper(maxBlocks) {
             $("#grid").css("left", panelWidth + 20 + "px");
             if (this.languages[this.player] == "blockly") {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
-               Blockly.fireUiEvent(window, 'resize');
+               //Blockly.fireUiEvent(window, 'resize');
             }
          }
          this.prevWidth = panelWidth;
@@ -1098,8 +1102,7 @@ function initBlocklyRunner(context, messageCallback) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               var iter = 0;
-               while (iter < maxIter) {
+               while (context.curSteps[iInterpreter] < maxIter) {
                   if (!interpreter.step() || toStop[iInterpreter]) {
                      isRunning[iInterpreter] = false;;
                      break;
@@ -1107,11 +1110,11 @@ function initBlocklyRunner(context, messageCallback) {
                   if (interpreter.paused_) {
                      break;
                   }
-                  iter++;
+                  context.curSteps[iInterpreter]++;
                }
-               if (iter == maxIter) {
+               if (context.curSteps[iInterpreter] >= maxIter) {
                   isRunning[iInterpreter] = false;;
-                  throw this.strings.tooManyIterations;
+                  throw context.blocklyHelper.strings.tooManyIterations;
                }
             }
          } catch (e) {
@@ -1126,8 +1129,10 @@ function initBlocklyRunner(context, messageCallback) {
          //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
          interpreters = [];
          context.programEnded = [];
+         context.curSteps = [];
          context.reset();
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
+            context.curSteps[iInterpreter] = 0;
             context.programEnded[iInterpreter] = false;
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
@@ -1229,7 +1234,7 @@ var initBlocklySubTask = function(subTask) {
 
    subTask.updateScale = function() {
       this.context.updateScale();
-      //blocklyHelper.updateSize();
+      this.blocklyHelper.updateSize();
    };
 
    var resetScores = function() {
