@@ -9,13 +9,13 @@ var getRobotGridContext = function(display, infos) {
          codeLeft: "gauche",
          labelForward: "avancer",
          codeForward: "avancer",
-         labelEast: "droite",
+         labelEast: "avancer vers la droite",
          codeEast: "droite",
-         labelSouth: "bas",
+         labelSouth: "avancer vers le bas",
          codeSouth: "bas",
-         labelWest: "gauche",
+         labelWest: "avancer vers la gauche",
          codeWest: "gauche",
-         labelNorth: "haut",
+         labelNorth: "avancer vers le haut",
          codeNorth: "haut",
          labelPaint: "peindre la case",
          codePaint: "peindreCase",
@@ -469,6 +469,9 @@ var getRobotGridContext = function(display, infos) {
    var getTransportableProperty = function(property) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
+      if (transportables.length == 0) {
+         return "";
+      }
       var itemType = infos.itemTypes[transportables[0].type];
       if ((transportables.length > 0) && (itemType[property] != undefined)) {
          return itemType[property];
@@ -573,10 +576,9 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.resetDisplay = function() {
-      if (paper != null) {
-         paper.remove();
-      }
-      paper = new Raphael("grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+      this.delayFactory.destroyAll();
+      this.raphaelFactory.destroyAll();
+      paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
       $("#errors").html("");
       resetBoard();
       context.blocklyHelper.updateSize();
