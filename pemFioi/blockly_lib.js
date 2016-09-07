@@ -1157,11 +1157,34 @@ var initBlocklySubTask = function(subTask) {
    subTask.blocklyHelper = getBlocklyHelper(subTask.gridInfos.maxInstructions);
    subTask.answer = null;
    subTask.state = {};
+   subTask.iTestCase = 0;
+
+   if (subTask.data["medium"] == undefined) {
+      subTask.load = function(views, callback) {
+         subTask.loadLevel("easy");
+         callback();
+      };
+   }
+
 
    subTask.loadLevel = function(curLevel) {
       this.level = curLevel;
 
       $('#question-iframe', window.parent.document).css('width', '100%');$('body').css('width', '100%');
+
+      this.iTestCase = 0;
+      if (this.display) {
+         var gridHtml = "";
+         if (this.data[this.level].length > 0) {
+              gridHtml += "<center>" +
+                 "<input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>" +
+                 "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
+                 "<input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>" +
+                 "</center>";
+         }      
+         gridHtml += "<div id='grid' style='width:400px;height:200px;padding:10px'></div>";
+         $("#gridContainer").html(gridHtml);
+      }
 
       var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks"];
       for (var iProp = 0; iProp < props.length; iProp++) {
@@ -1190,6 +1213,7 @@ var initBlocklySubTask = function(subTask) {
       this.blocklyHelper.generators = this.context.generators;
       this.blocklyHelper.load(stringsLanguage, this.display);
 
+/*
       this.context.display = false;
       this.context.reset({
          tiles: this.data[this.level][0].tiles,
@@ -1199,6 +1223,8 @@ var initBlocklySubTask = function(subTask) {
          this.context.display = true;
          this.context.resetDisplay();
       }
+*/
+      subTask.changeTest(0);
    };
 
    subTask.updateScale = function() {
@@ -1232,6 +1258,7 @@ var initBlocklySubTask = function(subTask) {
    };
 
    var initContextForLevel = function(iTestCase) {
+      subTask.iTestCase = iTestCase;
       subTask.context.reset({
          tiles: subTask.data[subTask.level][iTestCase].tiles,
          initItems: subTask.data[subTask.level][iTestCase].initItems
@@ -1247,6 +1274,7 @@ var initBlocklySubTask = function(subTask) {
             $("#errors").html(message);
             platform.validate("done");
          });
+         subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.blocklyHelper.run(subTask.context);
       });
@@ -1296,6 +1324,15 @@ var initBlocklySubTask = function(subTask) {
    subTask.getDefaultAnswerObject = function() {
       var defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block></xml>';
       return [{javascript:"", blockly: defaultBlockly, blocklyJS: ""}];
+   };
+
+   subTask.changeTest = function(delta) {
+      var newTest = subTask.iTestCase + delta;
+      var nbTestCases = subTask.data[subTask.level].length;
+      if ((newTest >= 0) && (newTest < nbTestCases)) {
+         initContextForLevel(newTest);
+         $("#testCaseName").html("Test " + (newTest + 1) + "/" + nbTestCases);
+      }
    };
 
    subTask.getGrade = function(callback) {
