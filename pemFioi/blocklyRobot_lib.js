@@ -23,8 +23,26 @@ var getRobotGridContext = function(display, infos) {
          codeGridEdgeInFront: "bordGrilleDevant",
          labelObstacleInFront: "obstacle devant",
          codeObstacleInFront: "obstacleDevant",
+         labelObstacleEast: "obstacle à droite",
+         codeObstacleEast: "obstacleDroite",
+         labelObstacleWest: "obstacle à gauche",
+         codeObstacleWest: "obstacleGauche",
+         labelObstacleNorth: "obstacle en haut",
+         codeObstacleNorth: "obstacleHaut",
+         labelObstacleSouth: "obstacle en bas",
+         codeObstacleSouth: "obstacleBas",
+         labelCellGreen: "case verte",
+         labelCellBrown: "case marron",
+         labelCellMarked: "case marquée",
+         codeCellGreen: "caseVerte",
+         codeCellBrown: "caseMarron",
+         codeCellMarked: "caseMarquee",
          labelPaintInFront: "peinture devant",
          codePaintInFront: "peintureDevant",
+         codeColorUnder: "couleurCase",
+         codeNumberUnder: "nombreCase",
+         labelColorUnder: "couleur de la case",
+         labelNumberUnder: "nombre sur la case",
          labelDir: "direction du robot",
          codeDir: "direction",
          labelCol: "colonne du robot",
@@ -58,7 +76,7 @@ var getRobotGridContext = function(display, infos) {
 
    context.callCallback = function(callback, value) { // Default implementation
       context.runner.noDelay(callback, value);
-   };
+   }
 
    context.nbRobots = 1;
 
@@ -342,18 +360,52 @@ var getRobotGridContext = function(display, infos) {
       categoryInFront("obstacle", false, callback);
    };
 
+   context.robot_obstacleEast = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row, robot.col + 1, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot_obstacleWest = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row, robot.col - 1, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot_obstacleNorth = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot_obstacleSouth = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row + 1, robot.col, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
    context.robot_paintGrayInFront = function(callback) {
       var coords = getCoordsInFront();
       paint(coords.row, coords.col, "paintGray", callback);
    };
 
    context.robot_colorUnder = function(callback) {
-      var item = context.getRobotItem(context.curRobot);
+      var robot = context.getRobotItem(context.curRobot);
       var itemsUnder = context.getItems(robot.row, robot.col, {hasColor: true});
       if (itemsUnder.length == 0) {
          context.callCallback(callback, "blanc");
       } else {
          context.callCallback(callback, infos.itemTypes[itemsUnder[0].type].color);
+      }
+   };
+
+   context.robot_numberUnder = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length == 0) {
+         context.callCallback(callback, 0);
+      } else {
+         context.callCallback(callback, infos.itemTypes[itemsUnder[0].type].value);
       }
    };
 
@@ -463,6 +515,10 @@ var getRobotGridContext = function(display, infos) {
 
    context.robot_greenCell = function(callback) {
       robotCellIsColor(callback, "vert");
+   };
+
+   context.robot_markedCell = function(callback) {
+      robotCellIsColor(callback, "marker");
    };
 
    context.robot_brownCell = function(callback) {
@@ -623,10 +679,18 @@ var getRobotGridContext = function(display, infos) {
 
          greenCell: { labelEnd: "cellGreen", labelFr: "sur une case verte", codeFr: "caseVerte", category: "sensors", type: 1, nbParams: 0, fct: context.robot_greenCell },
          brownCell: { labelEnd: "cellBrown", labelFr: "sur une case marron", codeFr: "caseMarron", category: "sensors", type: 1, nbParams: 0, fct: context.robot_brownCell },
+         markedCell: { labelEnd: "cellMarked", labelFr: "sur une case marquée", codeFr: "caseMarquee", category: "sensors", type: 1, nbParams: 0, fct: context.robot_markedCell },
 
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
+         obstacleEast: { labelEn: "obstacleEast", labelFr: strings.labelObstacleEast, codeFr: strings.codeObstacleEast, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleEast },
+         obstacleWest: { labelEn: "obstacleWest", labelFr: strings.labelObstacleWest, codeFr: strings.codeObstacleWest, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleWest },
+         obstacleNorth: { labelEn: "obstacleNorth", labelFr: strings.labelObstacleNorth, codeFr: strings.codeObstacleNorth, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleNorth },
+         obstacleSouth: { labelEn: "obstacleSouth", labelFr: strings.labelObstacleSouth, codeFr: strings.codeObstacleSouth, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleSouth },
+
+         
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
          colorUnder: { labelEn: "colorUnder",    labelFr: strings.labelColorUnder,    codeFr: strings.codeColorUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_colorUnder },
+         numberUnder: { labelEn: "numberUnder",    labelFr: strings.labelNumberUnder,    codeFr: strings.codeNumberUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_numberUnder },
          gridEdgeInFront: { labelEn: "gridEdgeInFront", labelFr: strings.labelGridEdgeInFront, codeFr: strings.codeGridEdgeInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_gridEdgeInFront },
          platformInFront: { labelEn: "platformInFront", labelFr: "plateforme devant", codeFr: "plateformeDevant", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformInFront },
          platformInFrontAndBelow: { labelEn: "platformInFrontAndBelow", labelFr: "plateforme devant plus bas", codeFr: "plateformeDevantPlusBas", category: "sensors", type: 1, nbParams: 0, fct: context.robot_platformInFrontAndBelow },

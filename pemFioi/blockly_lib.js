@@ -211,10 +211,10 @@ function getBlocklyHelper(maxBlocks) {
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
             }
+            this.addExtraBlocks();
             this.workspace = Blockly.inject('blocklyDiv', wsConfig);
             Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
-            this.addExtraBlocks();
             var that = this;
             function onchange(event) {
                $('.blocklyCapacity').html(that.workspace.remainingCapacity());
@@ -632,6 +632,10 @@ function getBlocklyHelper(maxBlocks) {
                   { 
                         name: "controls_repeat", 
                         xml: "<block type='controls_repeat'></block>"
+                  },
+                  { 
+                        name: "controls_repeat_ext", 
+                        xml: "<block type='controls_repeat_ext'></block>"
                   },
                   { 
                         name: "controls_whileUntil", 
@@ -1088,7 +1092,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         var maxIter = 1000;
+         var maxIter = 10000;
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
@@ -1180,7 +1184,7 @@ var initBlocklySubTask = function(subTask) {
       this.iTestCase = 0;
       if (this.display) {
          var gridHtml = "";
-         if (this.data[this.level].length > 0) {
+         if (this.data[this.level].length > 1) {
               gridHtml += "<center>" +
                  "<input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>" +
                  "<span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>" +
@@ -1345,6 +1349,7 @@ var initBlocklySubTask = function(subTask) {
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
       var codes = [subTask.blocklyHelper.getFullCode(code)];
       var nbTestCases = subTask.data[subTask.level].length;
+      subTask.iTestCase = 0;
       initBlocklyRunner(subTask.context, function(message, success) {
          subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
          subTask.iTestCase++;
