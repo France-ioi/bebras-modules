@@ -13,6 +13,8 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+var highlightPause = false;
+
 function resetFormElement(e) {
   e.wrap('<form>').closest('form').get(0).reset();
   e.unwrap();
@@ -1022,6 +1024,12 @@ function getBlocklyHelper(maxBlocks) {
             }, 1000);
             return;
          }
+         if (this.mainContext.display) {
+            Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+            Blockly.JavaScript.addReservedWords('highlightBlock');
+         } else {
+            Blockly.JavaScript.STATEMENT_PREFIX = '';
+         }
          this.savePrograms();
          var codes = [];
          for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
@@ -1031,6 +1039,9 @@ function getBlocklyHelper(maxBlocks) {
             }
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
+         that.highlightPause = false;
+         that.workspace.traceOn(true);
+         that.workspace.highlightBlock(null);
          this.mainContext.runner.runCodes(codes);
       },
 
@@ -1080,6 +1091,20 @@ function initBlocklyRunner(context, messageCallback) {
             }
          }
          interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
+
+         function highlightBlock(id) {
+            if (context.display) {
+               context.blocklyHelper.workspace.highlightBlock(id);
+               highlightPause = true;
+            }
+         }
+
+         // Add an API function for highlighting blocks.
+         var wrapper = function(id) {
+           id = id ? id.toString() : '';
+           return interpreter.createPrimitive(highlightBlock(id));
+         };
+         interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
       };
 
       runner.stop = function() {
