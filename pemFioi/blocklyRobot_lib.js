@@ -23,6 +23,10 @@ var getRobotGridContext = function(display, infos) {
          codeGridEdgeInFront: "bordGrilleDevant",
          labelObstacleInFront: "obstacle devant",
          codeObstacleInFront: "obstacleDevant",
+         labelObstacleRight: "obstacle à droite",
+         codeObstacleRight: "obstacleDroite",
+         labelObstacleRight: "obstacle à gauche",
+         codeObstacleRight: "obstacleLeft",
          labelObstacleEast: "obstacle à droite",
          codeObstacleEast: "obstacleDroite",
          labelObstacleWest: "obstacle à gauche",
@@ -90,7 +94,7 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      var coords = getCoordsInFront();
+      var coords = getCoordsInFront(0);
       if (!tileAllowed(coords.row, coords.col)) {
          if (infos.ignoreInvalidMoves) {
             context.waitDelay(callback);
@@ -198,7 +202,7 @@ var getRobotGridContext = function(display, infos) {
    }
          
    context.robot_gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront();
+      var coords = getCoordsInFront(0);
       var gridEdgeInFront = false;
       if (isOutsideGrid(coords.row, coords.col)) {
          gridEdgeInFront = true;
@@ -360,6 +364,18 @@ var getRobotGridContext = function(display, infos) {
       categoryInFront("obstacle", false, callback);
    };
 
+   context.robot_obstacleRight = function(callback) {
+      var coords = getCoordsInFront(1);
+      var items = getItems(coords.row, coords.col, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot_obstacleLeft = function(callback) {
+      var coords = getCoordsInFront(-1);
+      var items = getItems(coords.row, coords.col, {isObstacle: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
    context.robot_obstacleEast = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var items = context.getItems(robot.row, robot.col + 1, {isObstacle: true});
@@ -385,7 +401,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_paintGrayInFront = function(callback) {
-      var coords = getCoordsInFront();
+      var coords = getCoordsInFront(0);
       paint(coords.row, coords.col, "paintGray", callback);
    };
 
@@ -410,7 +426,7 @@ var getRobotGridContext = function(display, infos) {
    };
 
    context.robot_gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront();
+      var coords = getCoordsInFront(0);
       var gridEdgeInFront = false;
       if (isOutsideGrid(coords.row, coords.col)) {
          gridEdgeInFront = true;
@@ -682,6 +698,8 @@ var getRobotGridContext = function(display, infos) {
          markedCell: { labelEnd: "cellMarked", labelFr: "sur une case marquée", codeFr: "caseMarquee", category: "sensors", type: 1, nbParams: 0, fct: context.robot_markedCell },
 
          obstacleInFront: { labelEn: "obstacleInFront", labelFr: strings.labelObstacleInFront, codeFr: strings.codeObstacleInFront, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleInFront },
+         obstacleRight: { labelEn: "obstacleRight", labelFr: strings.labelObstacleRight, codeFr: strings.codeObstacleRight, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleRight },
+         obstacleLeft: { labelEn: "obstacleLeft", labelFr: strings.labelObstacleLeft, codeFr: strings.codeObstacleLeft, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleLeft },
          obstacleEast: { labelEn: "obstacleEast", labelFr: strings.labelObstacleEast, codeFr: strings.codeObstacleEast, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleEast },
          obstacleWest: { labelEn: "obstacleWest", labelFr: strings.labelObstacleWest, codeFr: strings.codeObstacleWest, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleWest },
          obstacleNorth: { labelEn: "obstacleNorth", labelFr: strings.labelObstacleNorth, codeFr: strings.codeObstacleNorth, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleNorth },
@@ -716,16 +734,17 @@ var getRobotGridContext = function(display, infos) {
    };
 
    var delta = [[0,1],[1,0],[0,-1],[-1,0]];
-   var getCoordsInFront = function() {
+   var getCoordsInFront = function(dDir) {
       var item = context.getRobotItem(context.curRobot);
+      var lookDir = (item.dir + dDir + 4) % 4;
       return {
-         row: item.row + delta[item.dir][0],
-         col: item.col + delta[item.dir][1]
+         row: item.row + delta[lookDir][0],
+         col: item.col + delta[lookDir][1]
       };
    };
 
    var getItemsInFront = function(filters) {
-      var coords = getCoordsInFront(context);
+      var coords = getCoordsInFront(0);
       return context.getItems(coords.row, coords.col, filters);
    };
 
@@ -978,6 +997,9 @@ var getRobotGridContext = function(display, infos) {
       var gens = infos.generators[genType];
       for (var iGen = 0; iGen < gens.length; iGen++) {
          var gen = allGenerators[genType][gens[iGen]];
+         if (gen == undefined) {
+            alert("error: no generator for instruction '" + gens[iGen] + "'");
+         }
          if (gen.fct == undefined) {
             alert("error: undefined function for " + gen.labelEn);
          }
