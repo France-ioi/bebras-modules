@@ -1127,7 +1127,7 @@ function initBlocklyRunner(context, messageCallback) {
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
-               if (context.infos.checkEveryTurn) {
+               if (context.infos.checkEndEveryTurn) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
