@@ -612,9 +612,12 @@ window.displayHelper = {
       this.prevAnswer = strAnswer;
       this.submittedAnswer = strAnswer;
       if (this.showScore) {
-         this.updateScore(strAnswer, true);
+         this.updateScore(strAnswer, true, function() {
+            this.checkAnswerChanged(); // necessary?
+         });
+      } else {
+         this.checkAnswerChanged(); // necessary?
       }
-      this.checkAnswerChanged(); // necessary?
    },
 
    reloadState: function() {
@@ -668,23 +671,27 @@ window.displayHelper = {
                   self.prevLevelsScores[self.taskLevel] = self.levelsScores[self.taskLevel];
                }
             }
+            var refresh = function() {
+               self.refreshMessages = true;
+               self.checkAnswerChanged();
+            }
             self.submittedAnswer = strAnswer;
             if (self.showScore) {
-               self.updateScore(strAnswer, false);
+               self.updateScore(strAnswer, false, refresh);
             } else {
                self.savedAnswer = strAnswer;
+               refresh();
             }
-            self.refreshMessages = true;
-            self.checkAnswerChanged();
          });
       }
    },
 
-   updateScore: function(answer, allLevels) {
+   updateScore: function(answer, allLevels, callback) {
       var self = this;
       function refresh() {
          self.refreshMessages = true;
          self.checkAnswerChanged();
+         callback();
       }
       if (allLevels) {
          // TODO: make sure the grader doesn't evaluate each level at each call (most do right now!)
@@ -698,6 +705,7 @@ window.displayHelper = {
             if (self.hasLevels) {
                self.showValidatePopup(self.taskLevel);
             }
+            callback();
          });
       }
    },
@@ -1118,7 +1126,7 @@ window.displayHelper = {
       var self = displayHelper;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
-         self.updateScore(self.savedAnswer, false);
+         self.updateScore(self.savedAnswer, false, function() {});
       });
    },
 
