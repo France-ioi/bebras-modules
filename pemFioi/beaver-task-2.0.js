@@ -413,6 +413,7 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    
    // TODO is this the correct behavior?
    grader.gradeTask = task.gradeAnswer;
+   task.gradeTask = grader.gradeTask;
 }
 
 $('document').ready(function() {
