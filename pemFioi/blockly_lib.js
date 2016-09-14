@@ -233,7 +233,7 @@ function getBlocklyHelper(maxBlocks) {
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
             var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-            Blockly.Xml.domToWorkspace(this.workspace, Blockly.Xml.textToDom(xml));
+            Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
             this.savePrograms();
          }
       },
@@ -339,7 +339,7 @@ function getBlocklyHelper(maxBlocks) {
            return;
          }
          var tmpWorkspace = new Blockly.Workspace();
-         Blockly.Xml.domToWorkspace(tmpWorkspace, xml);
+         Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
          return this.getCode(language, tmpWorkspace);
       },
 
@@ -396,7 +396,7 @@ function getBlocklyHelper(maxBlocks) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
-            Blockly.Xml.domToWorkspace(this.workspace, xml);
+            Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
       },
 
@@ -1301,6 +1301,7 @@ var initBlocklySubTask = function(subTask) {
 
    subTask.run = function() {
       this.context.display = false;
+      this.getAnswerObject(); // to fill this.answer;
       this.getGrade(function(result) {
          subTask.context.display = true;
          subTask.changeSpeed();
