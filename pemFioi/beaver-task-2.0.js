@@ -321,23 +321,14 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
       });
    };
 
-   function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
-      // Create grading taskFor instance if it does not exist.
-      if(!gradingTasks[level]) {
-         gradingTasks[level] = {};
+   function gradeAnswerInner(gradingTask, answer, maxScore, callback) {
+      gradingTask.isGrading = true;
+      if(answer === undefined || answer === null) {
+         answer = gradingTask.getDefaultAnswerObject();
       }
-      if(!gradingTasks[level][seed]) {
-         var gradingTask = createTask(false);
-         gradingTask.loadLevel(level);
-         gradingTasks[level][seed] = gradingTask;
-      }
-      
-      // Load answer and grade it.
-      if(levelAnswer === undefined || levelAnswer === null) {
-         levelAnswer = gradingTasks[level][seed].getDefaultAnswerObject();
-      }
-      gradingTasks[level][seed].reloadAnswerObject(levelAnswer);
-      gradingTasks[level][seed].getGrade(function(result) {
+      gradingTask.reloadAnswerObject(answer);
+      gradingTask.getGrade(function(result) {
+         gradingTask.isGrading = false;
          callback({
             score: Math.round(result.successRate * maxScore),
             message: result.message
@@ -345,20 +336,25 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
       });
    }
    
+   function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
+      // Create grading taskFor instance if it does not exist.
+      if(!gradingTasks[level]) {
+         gradingTasks[level] = {};
+      }
+      if(!gradingTasks[level][seed] || gradingTasks[level][seed].isGrading) {
+         var gradingTask = createTask(false);
+         gradingTask.isGrading = false;
+         gradingTask.loadLevel(level);
+         gradingTasks[level][seed] = gradingTask;
+      }      
+      gradeAnswerInner(gradingTasks[level][seed], levelAnswer, maxScore, callback);
+   }
+
    function gradeAnswerNoLevels(seed, answer, maxScore, callback) {
       var doGrading = function() {
-         if(answer === undefined || answer === null) {
-            answer = gradingTasks[seed].getDefaultAnswerObject();
-         }
-         gradingTasks[seed].reloadAnswerObject(answer);
-         gradingTasks[seed].getGrade(function(result) {
-            callback({
-               score: Math.round(result.successRate * maxScore),
-               message: result.message
-            });
-         });
+         gradeAnswerInner(gradingTasks[seed], answer, maxScore, callback);
       };
-      if(!gradingTasks[seed]) {
+      if(!gradingTasks[seed] || gradingTasks[seed].isGrading) {
          var gradingTask = createTask(false);
          gradingTasks[seed] = gradingTask;
          gradingTask.load(null, doGrading);
