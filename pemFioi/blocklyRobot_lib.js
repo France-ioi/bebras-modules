@@ -305,6 +305,9 @@ var getRobotGridContext = function(display, infos) {
       }
       var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row, item.col + 1)) {
+         if (!infos.ignoreInvalidMoves) {
+            throw("Déplacement invalide");
+         }
          context.waitDelay(callback);
       } else {
          moveRobot(item.row, item.col + 1, 0, callback);
@@ -317,6 +320,9 @@ var getRobotGridContext = function(display, infos) {
       }
       var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row, item.col - 1)) {
+         if (!infos.ignoreInvalidMoves) {
+            throw("Déplacement invalide");
+         }
          context.waitDelay(callback);
       } else {
          moveRobot(item.row, item.col - 1, 2, callback);
@@ -329,6 +335,9 @@ var getRobotGridContext = function(display, infos) {
       }
       var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row - 1, item.col)) {
+         if (!infos.ignoreInvalidMoves) {
+            throw("Déplacement invalide");
+         }
          context.waitDelay(callback);
       } else {
          moveRobot(item.row - 1, item.col, 3, callback);
@@ -341,6 +350,9 @@ var getRobotGridContext = function(display, infos) {
       }
       var item = context.getRobotItem(context.curRobot);
       if (!tileAllowed(item.row + 1, item.col)) {
+         if (!infos.ignoreInvalidMoves) {
+            throw("Déplacement invalide");
+         }
          context.waitDelay(callback);
       } else {
          moveRobot(item.row + 1, item.col, 1, callback);
