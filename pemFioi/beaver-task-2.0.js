@@ -343,29 +343,69 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
    }
    
    function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
-      // Create grading taskFor instance if it does not exist.
+      var gradingTask;
+      
       if(!gradingTasks[level]) {
          gradingTasks[level] = {};
       }
-      if(!gradingTasks[level][seed] || gradingTasks[level][seed].isGrading) {
-         var gradingTask = createTask(false);
+      // Create new instance to be kept in gradingTasks array, and use it for this grading.
+      if(!gradingTasks[level][seed]) {
+         gradingTask = createTask(false);
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
          gradingTasks[level][seed] = gradingTask;
-      }      
-      gradeAnswerInner(gradingTasks[level][seed], levelAnswer, maxScore, callback);
+         gradeAnswerInner(gradingTask, levelAnswer, maxScore, callback);
+      }
+      // Current gradingTasks[level][seed] instance is busy, so create a temporary instance,
+      // to be destroyed immediately after grading.
+      else if(gradingTasks[level][seed].isGrading) {
+         gradingTask = createTask(false);
+         gradingTask.isGrading = false;
+         gradingTask.loadLevel(level);
+         gradeAnswerInner(gradingTask, answer, maxScore, function(result) {
+            destroyTask(gradingTask, function() {
+               callback(result);
+            });
+         });
+      }
+      // Current gradingTasks[level][seed] instance is not busy, use it.
+      else {
+         gradeAnswerInner(gradingTasks[level][seed], levelAnswer, maxScore, callback);
+      }
    }
 
    function gradeAnswerNoLevels(seed, answer, maxScore, callback) {
+      var gradingTask;
+
+      // Grade a task instance.
       var doGrading = function() {
-         gradeAnswerInner(gradingTasks[seed], answer, maxScore, callback);
+         gradeAnswerInner(gradingTask, answer, maxScore, callback);
       };
-      if(!gradingTasks[seed] || gradingTasks[seed].isGrading) {
-         var gradingTask = createTask(false);
+
+      // Grade a task instance and destroy it. Invoke callback after destruction.
+      var doGradingAndDestroy = function() {
+         gradeAnswerInner(gradingTask, answer, maxScore, function(result) {
+            destroyTask(gradingTask, function() {
+               callback(result);
+            });
+         });
+      };
+
+      // Create new instance to be kept in gradingTasks array, and use it for this grading.
+      if(!gradingTasks[seed]) {
+         gradingTask = createTask(false);
          gradingTasks[seed] = gradingTask;
          gradingTask.load(null, doGrading);
       }
+      // Current gradingTasks[seed] instance is busy, so create a temporary instance,
+      // to be destroyed immediately after grading.
+      else if(gradingTasks[seed].isGrading) {
+         gradingTask = createTask(false);
+         gradingTask.load(null, doGradingAndDestroy);
+      }
+      // Current gradingTasks[seed] instance is not busy, use it.
       else {
+         gradingTask = gradingTasks[seed];
          doGrading();
       }
    }
