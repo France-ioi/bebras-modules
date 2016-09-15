@@ -179,6 +179,12 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var currentPaperPos;
       var currentGridPos;
       function dragStart(x, y, event) {
+         // Dirty IE6 workaround to get the pageX,pageY properties.
+         // They appear to be missing from the original mouse event.
+         if(event.pageX === undefined) {
+            event.pageX = x;
+            event.pageY = y;
+         }
          anchorPaperPos = self.getPaperMouse(event);
          currentPaperPos = self.getPaperMouse(event);
          anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
