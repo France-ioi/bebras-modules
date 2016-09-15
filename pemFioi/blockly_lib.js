@@ -219,6 +219,7 @@ function getBlocklyHelper(maxBlocks) {
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
+               $('#question-iframe', window.parent.document).focus();
                $('.blocklyCapacity').html(that.workspace.remainingCapacity());
             }
             this.workspace.addChangeListener(onchange);
@@ -1205,6 +1206,7 @@ var initBlocklySubTask = function(subTask) {
       this.level = curLevel;
 
       $('#question-iframe', window.parent.document).css('width', '100%');$('body').css('width', '100%');
+      $('#question-iframe', window.parent.document).focus();
 
       this.iTestCase = 0;
       if (this.display) {
@@ -1404,3 +1406,44 @@ var initBlocklySubTask = function(subTask) {
    };
 }
 
+// We need to be able to clean all events
+
+if (EventTarget.prototype.addEventListenerBase == undefined) {
+   EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
+   EventTarget.prototype.addEventListener = function(type, listener)
+   {
+       if(!this.EventList) { this.EventList = []; }
+       this.addEventListenerBase.apply(this, arguments);
+       if(!this.EventList[type]) { this.EventList[type] = []; }
+       var list = this.EventList[type];
+       for(var index = 0; index != list.length; index++)
+       {
+           if(list[index] === listener) { return; }
+       }
+       list.push(listener);
+   };
+
+   EventTarget.prototype.removeEventListenerBase = EventTarget.prototype.removeEventListener;
+   EventTarget.prototype.removeEventListener = function(type, listener)
+   {
+       if(!this.EventList) { this.EventList = []; }
+       if(listener instanceof Function) { this.removeEventListenerBase.apply(this, arguments); }
+       if(!this.EventList[type]) { return; }
+       var list = this.EventList[type];
+       for(var index = 0; index != list.length;)
+       {
+           var item = list[index];
+           if(!listener)
+           {
+               this.removeEventListenerBase(type, item);
+               list.splice(index, 1); continue;
+           }
+           else if(item === listener)
+           {
+               list.splice(index, 1); break;
+           }
+           index++;
+       }
+       if(list.length == 0) { delete this.EventList[type]; }
+   };
+}
