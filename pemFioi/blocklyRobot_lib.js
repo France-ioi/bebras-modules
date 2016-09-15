@@ -384,7 +384,7 @@ var getRobotGridContext = function(display, infos) {
 
    context.robot_obstacleLeft = function(callback) {
       var coords = getCoordsInFront(-1);
-      var items = getItems(coords.row, coords.col, {isObstacle: true});
+      var items = context.getItems(coords.row, coords.col, {isObstacle: true});
       context.callCallback(callback, items.length > 0);
    };
 
