@@ -611,12 +611,13 @@ window.displayHelper = {
       this.savedAnswer = strAnswer;
       this.prevAnswer = strAnswer;
       this.submittedAnswer = strAnswer;
+      var that = this;
       if (this.showScore) {
          this.updateScore(strAnswer, true, function() {
-            this.checkAnswerChanged(); // necessary?
+            that.checkAnswerChanged(); // necessary?
          });
       } else {
-         this.checkAnswerChanged(); // necessary?
+         that.checkAnswerChanged(); // necessary?
       }
    },
 
