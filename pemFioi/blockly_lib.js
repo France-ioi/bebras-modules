@@ -1447,3 +1447,10 @@ if (EventTarget.prototype.addEventListenerBase == undefined) {
        if(list.length == 0) { delete this.EventList[type]; }
    };
 }
+
+function removeBlockly() {
+   $(".blocklyWidgetDiv").remove();
+   $(".blocklyTooltipDiv").remove();
+   document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
+   delete Blockly;
+}

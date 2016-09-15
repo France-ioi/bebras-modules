@@ -325,6 +325,10 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          task.displayedSubTask = null;
          callback();
       });
+
+      if (Blockly != undefined) { // TEMPORARY, to replace with a global unload function provided by the task
+         removeBlockly();
+      }
    };
 
    function gradeAnswerInner(gradingTask, answer, maxScore, callback) {
