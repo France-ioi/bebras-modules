@@ -1283,6 +1283,8 @@ var initBlocklySubTask = function(subTask) {
       callback();
    };
 
+   subTask.unload = subTask.unloadLevel;
+
    subTask.reset = function() {
       this.context.reset();
    };
