@@ -602,7 +602,7 @@ var getRobotGridContext = function(display, infos) {
 
    context.robot_dropTransportable = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
-      if (context.transportedItem == 0) {
+      if (context.transportedItem == undefined) {
          throw("Le robot essaie de déposer un objet mais n'en transporte pas.");
       }
       /*
@@ -623,6 +623,7 @@ var getRobotGridContext = function(display, infos) {
          if (context.display) {
             redisplayItem(context.transportedItem);
          }
+         context.transportedItem = undefined;
          callback();
       });
    }
