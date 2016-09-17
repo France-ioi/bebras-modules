@@ -55,7 +55,7 @@ var getRobotGridContext = function(display, infos) {
          codeRow: "ligne",
          labelAlert: "alerte",
          codeAlert: "alerte",
-         obstacle: "Vous avez foncé sur un obstacle !" 
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !" 
       }
    };
    var strings = languageStrings[stringsLanguage];
@@ -95,22 +95,8 @@ var getRobotGridContext = function(display, infos) {
       }
       var item = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront(0);
-      if (!tileAllowed(coords.row, coords.col)) {
-         if (infos.ignoreInvalidMoves) {
-            context.waitDelay(callback);
-            return;
-         }
-         if (isOutsideGrid(coords.row, coords.col)) {
-            context.lost = true;
-            throw("Le robot sort de la grille !");
-         }
-         var itemsInFront = context.getItems(coords.row, coords.col, {isObstacle: true});
-         if (itemsInFront.length > 0) {
-            throw(strings.obstacle);
-            context.lost = true;
-         }
+      if (!checkTileAllowed(coords.row, coords.col)) {
          context.waitDelay(callback);
-         return;
       }
       if (infos.hasGravity) {
          context.fall(item, coords, callback);
@@ -304,10 +290,7 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!tileAllowed(item.row, item.col + 1)) {
-         if (!infos.ignoreInvalidMoves) {
-            throw("Déplacement invalide");
-         }
+      if (!checkTileAllowed(item.row, item.col + 1)) {
          context.waitDelay(callback);
       } else {
          moveRobot(item.row, item.col + 1, 0, callback);
@@ -319,10 +302,7 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!tileAllowed(item.row, item.col - 1)) {
-         if (!infos.ignoreInvalidMoves) {
-            throw("Déplacement invalide");
-         }
+      if (!checkTileAllowed(item.row, item.col - 1)) {
          context.waitDelay(callback);
       } else {
          moveRobot(item.row, item.col - 1, 2, callback);
@@ -334,10 +314,7 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!tileAllowed(item.row - 1, item.col)) {
-         if (!infos.ignoreInvalidMoves) {
-            throw("Déplacement invalide");
-         }
+      if (!checkTileAllowed(item.row - 1, item.col)) {
          context.waitDelay(callback);
       } else {
          moveRobot(item.row - 1, item.col, 3, callback);
@@ -349,10 +326,7 @@ var getRobotGridContext = function(display, infos) {
          return;
       }
       var item = context.getRobotItem(context.curRobot);
-      if (!tileAllowed(item.row + 1, item.col)) {
-         if (!infos.ignoreInvalidMoves) {
-            throw("Déplacement invalide");
-         }
+      if (!checkTileAllowed(item.row + 1, item.col)) {
          context.waitDelay(callback);
       } else {
          moveRobot(item.row + 1, item.col, 1, callback);
@@ -696,9 +670,9 @@ var getRobotGridContext = function(display, infos) {
          north: { labelEn: "north",            labelFr: strings.labelNorth,            codeFr: strings.codeNorth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_north },
          south: { labelEn: "south",            labelFr: strings.labelSouth,            codeFr: strings.codeSouth,            category: "actions", type: 0, nbParams: 0, fct: context.robot_south },
          wait: { labelEn: "wait",            labelFr: strings.labelWait,            codeFr: strings.codeWait,            category: "actions", type: 0, nbParams: 0, fct: context.robot_wait },
-         pickTransportable: { labelEn: "pickTransportable", labelFr: "ramasser l'objet", codeFr: "ramasserTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickTransportable },
-         dropTransportable: { labelEn: "dropTransportable", labelFr: "déposer l'objet", codeFr: "deposerTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropTransportable },
-         onTransportable: { labelEn: "onTransportable", labelFr: "sur un objet", codeFr: "surTransportable", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onTransportable },
+         pickTransportable: { labelEn: "pickTransportable", labelFr: "ramasser la bille", codeFr: "ramasserTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_pickTransportable },
+         dropTransportable: { labelEn: "dropTransportable", labelFr: "déposer la bille", codeFr: "deposerTransportable", category: "actions", type: 0, nbParams: 0, fct: context.robot_dropTransportable },
+         onTransportable: { labelEn: "onTransportable", labelFr: "sur une bille", codeFr: "surTransportable", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onTransportable },
          onHole: { labelEn: "onHole", labelFr: "sur un trou", codeFr: "surTrou", category: "sensors", type: 1, nbParams: 0, fct: context.robot_onHole },
          transportableShape: { labelEn: "transportableShape", labelFr: "forme de l'objet", codeFr: "formeObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableShape },
          transportableColor: { labelEn: "transportableColor", labelFr: "couleur de l'objet", codeFr: "couleurObjet", category: "sensors", type: 1, nbParams: 0, fct: context.robot_transportableColor },
@@ -945,15 +919,21 @@ var getRobotGridContext = function(display, infos) {
       return listItems;
    };
 
-   var tileAllowed = function(row, col) {
-      if (isOutsideGrid(row, col)) {
-         return false;
-      }
-      if (context.tiles[row][col] == 0) {
-         return false;
+   var checkTileAllowed = function(row, col) {
+      if (isOutsideGrid(row, col) || (context.tiles[row][col] == 0)) {
+         if (infos.ignoreInvalidMoves) {
+            return fasle;
+         }
+         throw("Le robot sort de la grille !");
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
-     return (itemsInFront.length == 0);
+      if (itemsInFront.length > 0) {
+         if (infos.ignoreInvalidMoves) {
+            return fasle;
+         }
+         throw(strings.obstacle);
+      }
+      return true;
    };
 
    var itemAttributes = function(item) {
