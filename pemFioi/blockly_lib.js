@@ -1190,7 +1190,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
             if (context.linkBack && context.success) {
-               message += "<br/><input type='button' value='Retour à la liste des questions' onclick='window.parent.backToList()'></input>";
+               message += "<br/><a href='#' onclick='window.parent.backToList()'>Retour à la liste des questions</a>";
             }
             messageCallback(message);
          }
