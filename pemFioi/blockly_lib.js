@@ -658,7 +658,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   { 
                         name: "controls_repeat_ext", 
-                        xml: "<block type='controls_repeat_ext'></block>"
+                        xml: "<block type='controls_repeat_ext'><value name='TIMES'><block type='math_number'><field name='NUM'>10</field></block></value></block>"
                   },
                   { 
                         name: "controls_whileUntil", 
