@@ -1189,6 +1189,9 @@ function initBlocklyRunner(context, messageCallback) {
                   message = context.messagePrefixFailure + message;
                }
             }
+            if (context.linkBack && context.success) {
+               message += "<br/><input type='button' value='Retour à la liste des questions' onclick='window.parent.backToList()'></input>";
+            }
             messageCallback(message);
          }
       };
@@ -1341,6 +1344,7 @@ var initBlocklySubTask = function(subTask) {
       var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
       subTask.context.messagePrefixFailure = prefix;
       subTask.context.messagePrefixSuccess = prefix;
+      subTask.context.linkBack = false;
    };
 
    subTask.run = function() {
@@ -1363,6 +1367,7 @@ var initBlocklySubTask = function(subTask) {
          });
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
+         subTask.context.linkBack = true;
          subTask.context.messagePrefixSuccess = "Tous les tests : ";
          subTask.blocklyHelper.run(subTask.context);
       });
@@ -1449,6 +1454,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.iTestCase = 0;
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
+      subTask.context.linkBack = true;
       subTask.context.messagePrefixSuccess = "Tous les tests : ";
       subTask.context.runner.runCodes(codes);
    };
