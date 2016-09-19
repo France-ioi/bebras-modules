@@ -556,6 +556,9 @@ var getRobotGridContext = function(display, infos) {
          throw("L'objet n'est pas celui qu'il faut ramasser maintenant.");
       }
       */
+      if (context.nbTransportedItems > 0) {
+         throw("Le robot transporte déjà un objet");
+      }
       var transportable = transportables[0];
       context.items.splice(transportable.index, 1);
       context.nbTransportedItems++;
@@ -629,6 +632,7 @@ var getRobotGridContext = function(display, infos) {
       context.nbMoves = 0;
       context.success = false;
       context.curRobot = 0;
+      context.nbTransportedItems = 0;
       if (context.display) {
          context.resetDisplay();
       } else {
