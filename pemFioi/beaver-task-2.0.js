@@ -67,39 +67,39 @@ task.getMetaData = function(callback) {
 // TODO We update the grader below, if the task has levels. Is this line necessary?
 var grader = grader ? grader : {};
 
-function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
-   // Create a taskFor instance, possibly operating on an existing object.
+function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
+   // Create a subTask instance, possibly operating on an existing object.
    function createTask(displayFlag) {
-      var taskFor = {};
-      taskFor.delayFactory = new DelayFactory();
-      taskFor.raphaelFactory = new RaphaelFactory();
+      var subTask = {};
+      subTask.delayFactory = new DelayFactory();
+      subTask.raphaelFactory = new RaphaelFactory();
       
       // Simulation factory needs a specific corresponding delay factory.
-      // TODO should it expect something else? taskFor? A list of factories?
-      taskFor.simulationFactory = new SimulationFactory(taskFor.delayFactory);
+      // TODO should it expect something else? subTask? A list of factories?
+      subTask.simulationFactory = new SimulationFactory(subTask.delayFactory);
       
-      taskFor.display = displayFlag;
-      initTaskFor(taskFor);
-      return taskFor;
+      subTask.display = displayFlag;
+      initSubTask(subTask);
+      return subTask;
    }
    
-   // Destroy a taskFor instance.
-   function destroyTask(taskFor, callback) {
+   // Destroy a subTask instance.
+   function destroyTask(subTask, callback) {
       var doUnload = function() {
          // Order is important.
-         taskFor.raphaelFactory.destroyAll();
-         taskFor.simulationFactory.destroyAll();
-         taskFor.delayFactory.destroyAll();
+         subTask.raphaelFactory.destroyAll();
+         subTask.simulationFactory.destroyAll();
+         subTask.delayFactory.destroyAll();
          if(callback && typeof callback === "function") {
             callback();
          }
       };
       if(levels) {
-         taskFor.unloadLevel(doUnload);
+         subTask.unloadLevel(doUnload);
       }
       else {
          // TODO Can we assume non-level tasks will imeplement 'unload'?
-         taskFor.unload(doUnload);
+         subTask.unload(doUnload);
       }
    }
    
@@ -122,13 +122,13 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
       innerLoop();
    }
    
-   // Main taskFor instance, for user display.
+   // Main subTask instance, for user display.
    var mainTask;
    
    // The state of the task, including current level and levelState for each level.
    var state = null;
    
-   // Instances of taskFor intended for grading.
+   // Instances of subTask intended for grading.
    var gradingTasks = {};
    
    task.load = function(views, callback) {
@@ -319,8 +319,8 @@ function initWrapper(initTaskFor, levels, defaultLevel, reloadWithCallbacks) {
          }
       }
       instances.push(mainTask);
-      callbackLoop(instances, function(taskFor, loopCallback) {
-         destroyTask(taskFor, loopCallback);
+      callbackLoop(instances, function(subTask, loopCallback) {
+         destroyTask(subTask, loopCallback);
       }, function() {
          task.displayedSubTask = null;
          callback();
