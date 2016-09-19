@@ -176,7 +176,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             "            </p>" +
             "         </div>" +
                       "<div style='clear:both;'>" + strMaxBlocks + "</div>" +
-            "         <div id='blocklyContainer' style='resize:vertical;overflow:auto;height: 600px;padding-bottom:10px;border: solid black 1px;width: 100%;position:relative'>" +
+            "         <div id='blocklyContainer' style='resize:vertical;overflow:auto;height:1200px;padding-bottom:10px;border: solid black 1px;width: 100%;position:relative'>" +
             "            <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
             "            <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
             "         </div>" +
