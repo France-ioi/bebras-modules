@@ -78,7 +78,17 @@ task.reloadAnswer = function(strAnswer, callback) {
 };
 
 task.reloadState = function(state, callback) {
-   var stateObject = JSON.parse(state);
+   var stateObject;
+   if (!state) {
+      if (task.getDefaultStateObject) {
+         stateObject = task.getDefaultStateObject();
+      } else {
+         callback();
+         return;
+      }
+   } else {
+      stateObject = JSON.parse(state);
+   }
    if (stateObject && typeof stateObject.displayedAnswer !== 'undefined') {
       task.reloadAnswer(stateObject.displayedAnswer, callback);
    } else {
