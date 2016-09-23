@@ -713,7 +713,7 @@ window.displayHelper = {
    updateScoreOneLevel: function(answer, gradedLevel, callback) {
       var self = this;
       this.graderMessage = this.strings.gradingInProgress;
-      grader.gradeTask(answer, null, function(score, message) {
+      task.getLevelGrade(answer, null, function(score, message) {
          score = +score;
          self.submittedScore = score;
          if (self.hasSolution) {

@@ -414,8 +414,12 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       }
    }
    
+   task.gradeAnswer = function(strAnswer, answerToken, callback) {
+      task.getLevelGrade(strAnswer, answerToken, callback, null);
+   };
+
    // TODO: case where gradeAnswer is called again before it calls its callback
-   task.gradeAnswer = function(strAnswer, answerToken, callback, gradedLevel) {
+   task.getLevelGrade = function(strAnswer, answerToken, callback, gradedLevel) {
       // TODO Can we fetch task params just once instead of every time?
       // If we can, then why do we need to index by seed in graders[level][seed]?
       platform.getTaskParams(null, null, function(taskParams) {

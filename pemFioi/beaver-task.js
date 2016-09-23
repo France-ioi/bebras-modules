@@ -145,6 +145,10 @@ task.gradeAnswer = function(answer, answerToken, success, error) {
    grader.gradeTask(answer, answerToken, success, error);
 };
 
+task.getLevelGrade = function(answer, answerToken, callback, gradedLevel) {
+   task.gradeAnswer(answer, answerToken, callback);
+};
+
 var DelayedExec = {
    timeouts: {},
    intervals: {},
