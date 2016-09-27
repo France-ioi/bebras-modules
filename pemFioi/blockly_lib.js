@@ -222,9 +222,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (display) {
             this.loadHtml(nbTestCases);
             var xml = this.getToolboxXml();
-            document.getElementById('toolbox').innerHTML = xml;
             var wsConfig = {
-               toolbox: document.getElementById('toolbox'),
+               toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
                media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
             };
@@ -685,6 +684,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             "                  </block>"
                   },
                   { 
+                     name: "controls_forEach",
+                     excludedByDefault: true,
+                     xml: "<block type='controls_forEach'></block>"
+                  },
+                  { 
                         name: "controls_flow_statements", 
                         xml: "<block type='controls_flow_statements'></block>"
                   }
@@ -802,6 +806,241 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   {
                         name: "text_append", 
                         xml: "<block type='text_append'></block>"
+                  },
+                  {
+                     name: "text_length", 
+                     xml: "<block type='text_length'>" +
+                          "    <value name='VALUE'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_isEmpty", 
+                     xml: "<block type='text_isEmpty'>" +
+                          "    <value name='VALUE'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'></field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_indexOf", 
+                     xml: "<block type='text_indexOf'>" +
+                          "    <value name='VALUE'>" +
+                          "        <block type='variables_get'>" +
+                          "        <field name='VAR'>{textVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "    <value name='FIND'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_charAt", 
+                     xml: "<block type='text_charAt'>" +
+                          "    <value name='VALUE'>" +
+                          "        <block type='variables_get'>" +
+                          "        <field name='VAR'>{textVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_getSubstring", 
+                     xml: "<block type='text_getSubstring'>" +
+                          "    <value name='STRING'>" +
+                          "        <block type='variables_get'>" +
+                          "        <field name='VAR'>{textVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_changeCase", 
+                     xml: "<block type='text_changeCase'>" +
+                          "    <value name='TEXT'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_trim", 
+                     xml: "<block type='text_trim'>" +
+                          "    <value name='TEXT'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_print", 
+                     xml: "<block type='text_print'>" +
+                          "    <value name='TEXT'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "text_prompt_ext", 
+                     xml: "<block type='text_prompt_ext'>" +
+                          "    <value name='TEXT'>" +
+                          "        <shadow type='text'>" +
+                          "        <field name='TEXT'>abc</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  }
+               ]
+            },
+            {
+               category: "list",
+               name: this.strings.list,
+               coulour: 210,
+               blocks: [
+                  {
+                     name: "lists_create_with_empty", 
+                     xml: "<block type='lists_create_with'>" +
+                          "    <mutation items='0'></mutation>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_create_with", 
+                     xml: "<block type='lists_create_with'></block>"
+                  },
+                  {
+                     name: "lists_repeat", 
+                     xml: "<block type='lists_repeat'>" +
+                          "    <value name='NUM'>" +
+                          "        <shadow type='math_number'>" +
+                          "            <field name='NUM'>5</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_length", 
+                     xml: "<block type='lists_length'></block>"
+                  },
+                  {
+                     name: "lists_isEmpty", 
+                     xml: "<block type='lists_isEmpty'></block>"
+                  },
+                  {
+                     name: "lists_indexOf", 
+                     xml: "<block type='lists_indexOf'>" +
+                          "    <value name='VALUE'>" +
+                          "        <block type='variables_get'>" +
+                          "            <field name='VAR'>{listVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_getIndex", 
+                     xml: "<block type='lists_getIndex'>" +
+                          "    <value name='VALUE'>" +
+                          "        <block type='variables_get'>" +
+                          "            <field name='VAR'>{listVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_setIndex", 
+                     xml: "<block type='lists_setIndex'>" +
+                          "    <value name='LIST'>" +
+                          "        <block type='variables_get'>" +
+                          "            <field name='VAR'>{listVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_getSublist", 
+                     xml: "<block type='lists_getSublist'>" +
+                          "    <value name='LIST'>" +
+                          "        <block type='variables_get'>" +
+                          "            <field name='VAR'>{listVariable}</field>" +
+                          "        </block>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "lists_split", 
+                     xml: "<block type='lists_split'>" +
+                          "    <value name='DELIM'>" +
+                          "        <shadow type='text'>" +
+                          "            <field name='TEXT'>,</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  }
+               ]
+            },
+            {
+               category: "colour",
+               name: this.strings.colour,
+               coulour: 210,
+               blocks: [
+                  {
+                     name: "colour_picker", 
+                     xml: "<block type='colour_picker'></block>"
+                  },
+                  {
+                     name: "colour_random", 
+                     xml: "<block type='colour_random'></block>"
+                  },
+                  {
+                     name: "colour_rgb", 
+                     xml: "<block type='colour_rgb'>" +
+                          "    <value name='RED'>" +
+                          "        <shadow type='math_number'>" +
+                          "            <field name='NUM'>100</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "    <value name='GREEN'>" +
+                          "        <shadow type='math_number'>" +
+                          "            <field name='NUM'>50</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "    <value name='BLUE'>" +
+                          "        <shadow type='math_number'>" +
+                          "            <field name='NUM'>0</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
+                  },
+                  {
+                     name: "colour_blend", 
+                     xml: "<block type='colour_blend'>" +
+                          "    <value name='COLOUR1'>" +
+                          "        <shadow type='colour_picker'>" +
+                          "            <field name='COLOUR'>#ff0000</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "    <value name='COLOUR2'>" +
+                          "        <shadow type='colour_picker'>" +
+                          "            <field name='COLOUR'>#3333ff</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "    <value name='RATIO'>" +
+                          "        <shadow type='math_number'>" +
+                          "            <field name='NUM'>0.5</field>" +
+                          "        </shadow>" +
+                          "    </value>" +
+                          "</block>"
                   }
                ]
             },
@@ -856,7 +1095,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
             var isIncluded = false;
             if (category.custom != undefined) {
-               catXml += "CUSTOM='" + category.custom + "'";
+               catXml += " custom='" + category.custom + "'";
                if (this.includedAll || ($.inArray(category.category, this.includedCategories) != -1)) {
                   isIncluded = true;
                }
@@ -867,8 +1106,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                if (this.includedAll ||
                    ($.inArray(category.category, this.includedCategories) != -1) ||
                    ($.inArray(block.name, this.includedBlocks) != -1)) {
-                  catXml += block.xml;
-                  isIncluded = true;
+                  if (!block.excludedByDefault || ($.inArray(block.name, this.includedBlocks) != -1)) {
+                     catXml += block.xml;
+                     isIncluded = true;
+                  }
                }
             }
             if (this.groupByCategory) {
@@ -1287,17 +1528,6 @@ var initBlocklySubTask = function(subTask) {
       this.blocklyHelper.generators = this.context.generators;
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
-/*
-      this.context.display = false;
-      this.context.reset({
-         tiles: this.data[this.level][0].tiles,
-         initItems: this.data[this.level][0].initItems,
-      });
-      if (this.display) {
-         this.context.display = true;
-         this.context.resetDisplay();
-      }
-*/
       subTask.changeTest(0);
    };
 
@@ -1335,10 +1565,7 @@ var initBlocklySubTask = function(subTask) {
 
    var initContextForLevel = function(iTestCase) {
       subTask.iTestCase = iTestCase;
-      subTask.context.reset({
-         tiles: subTask.data[subTask.level][iTestCase].tiles,
-         initItems: subTask.data[subTask.level][iTestCase].initItems
-      });
+      subTask.context.reset(subTask.data[subTask.level][iTestCase]);
       subTask.context.iTestCase = iTestCase;
       subTask.context.nbTestCases = subTask.nbTestCases;
       var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
