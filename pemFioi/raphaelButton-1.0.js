@@ -94,7 +94,7 @@ function Button(paper, xPos, yPos, width, height, text) {
          if(that.buttonMode == "enabled") {
             that.moder.setMode("enabled");
             if(that.clickHandler) {
-               that.clickHandler();
+               that.clickHandler(that.clickData);
             }
          }
       };
@@ -117,8 +117,9 @@ function Button(paper, xPos, yPos, width, height, text) {
       this.elements.transLayer.unmousedown();
    };
 
-   this.click = function(handler) {
+   this.click = function(handler, data) {
       this.clickHandler = handler;
+      this.clickData = data;
    };
 
    this.unclick = function(handler) {
