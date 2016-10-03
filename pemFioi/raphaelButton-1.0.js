@@ -68,7 +68,7 @@ function Button(paper, xPos, yPos, width, height, text) {
    this.moder.setAttr("text", "mousedown", {"fill": "#aaaaaa"});
    this.moder.setAttr("text", "disabled", {"fill": "#aaaaaa"});
    this.elements.text[0].style.cursor = "default";
-   this.buttonMode = "enabled";
+   this.buttonMode = "";
 
    this.applyFunction = function(funcName, argsList) {
       if(!argsList) {
@@ -81,6 +81,9 @@ function Button(paper, xPos, yPos, width, height, text) {
    };
 
    this.enable = function() {
+      if(this.buttonMode == "enabled") {
+         return;
+      }
       this.buttonMode = "enabled";
       var that = this;
 
