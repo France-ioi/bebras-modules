@@ -201,7 +201,7 @@ function levelWrapperInitTask(initTaskFor)
 
    // overwrite the grader built by levelWrapperInitTask
    grader.gradeTask = function(strAnswer, token, callback) {
-      task.getLevelGrade(strAnswer, answerToken, callback, null);
+      task.getLevelGrade(strAnswer, token, callback, null);
    };
 
    task.getLevelGrade = function(strAnswer, token, callback, gradedLevel) {
@@ -277,7 +277,7 @@ function levelWrapperInitTask(initTaskFor)
 /*
 
    grader.gradeTask = function(strAnswer, token, callback) {
-      task.getLevelGrade(strAnswer, answerToken, callback, null);
+      task.getLevelGrade(strAnswer, token, callback, null);
    };
 
    task.getLevelGrade = function(strAnswer, token, callback, gradedLevel) {
