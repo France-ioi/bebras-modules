@@ -174,6 +174,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getStateObject = function() {
+      state.levelStates[state.level] = mainTask.getStateObject();
+      state.levelAnswers[state.level] = mainTask.getAnswerObject();
       return state;
    };
    
@@ -205,6 +207,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             state.levelAnswers[level] = levelAnswer;
          }
 
+         state.levelStates[state.level] = mainTask.getStateObject();
          var levelState = state.levelStates[level];
          if(mainTask.getDefaultStateObject && (levelState === undefined || levelState === null)) {
             levelState = mainTask.getDefaultStateObject();
