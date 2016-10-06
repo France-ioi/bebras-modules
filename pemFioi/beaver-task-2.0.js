@@ -124,6 +124,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    
    // Main subTask instance, for user display.
    var mainTask;
+   var mainTaskParams;
    
    // The state of the task, including current level and levelState for each level.
    var state = null;
@@ -132,28 +133,32 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    var gradingTasks = {};
    
    task.load = function(views, callback) {
-      mainTask = createTask(true);
-      task.displayedSubTask = mainTask;
-      if(levels) {
-         // TODO okay to assume default level is the first level, if not supplied?
-         if(defaultLevel === null || defaultLevel === undefined) {
-            defaultLevel = levels[0];
+      platform.getTaskParams(null, null, function(taskParams) {
+         mainTask = createTask(true);
+         mainTask.taskParams = taskParams;
+         mainTaskParams = taskParams;
+         task.displayedSubTask = mainTask;
+         if(levels) {
+            // TODO okay to assume default level is the first level, if not supplied?
+            if(defaultLevel === null || defaultLevel === undefined) {
+               defaultLevel = levels[0];
+            }
+            
+            // The objects levelAnswers and levelStates are indexed by level names.
+            state = {
+               levelAnswers: {},
+               levelStates: {},
+               level: defaultLevel
+            };
+            mainTask.loadLevel(state.level, null, views);
+            displayHelper.setupLevels(null, reloadWithCallbacks);
+            callback();
          }
-         
-         // The objects levelAnswers and levelStates are indexed by level names.
-         state = {
-            levelAnswers: {},
-            levelStates: {},
-            level: defaultLevel
-         };
-         mainTask.loadLevel(state.level, null, views);
-         displayHelper.setupLevels(null, reloadWithCallbacks);
-         callback();
-      }
-      else {
-         // TODO what's the desired behavior when no levels?
-         mainTask.load(views, callback);
-      }
+         else {
+            // TODO what's the desired behavior when no levels?
+            mainTask.load(views, callback);
+         }
+      });
    };
    
    task.getState = function(callback) {
@@ -216,6 +221,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          
          destroyTask(mainTask, function() {
             mainTask = createTask(true);
+            mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(levelAnswer);
@@ -252,6 +258,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
             mainTask = createTask(true);
+            mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(state.levelAnswers[level]);
@@ -349,7 +356,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       });
    }
    
-   function gradeAnswerByLevel(level, seed, levelAnswer, maxScore, callback) {
+   function gradeAnswerByLevel(taskParams, level, seed, levelAnswer, maxScore, callback) {
       var gradingTask;
       
       if(!gradingTasks[level]) {
@@ -358,6 +365,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       // Create new instance to be kept in gradingTasks array, and use it for this grading.
       if(!gradingTasks[level][seed]) {
          gradingTask = createTask(false);
+         gradingTask.taskParams = taskParams;
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
          gradingTasks[level][seed] = gradingTask;
@@ -367,6 +375,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       // to be destroyed immediately after grading.
       else if(gradingTasks[level][seed].isGrading) {
          gradingTask = createTask(false);
+         gradingTask.taskParams = taskParams;
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
          gradeAnswerInner(gradingTask, answer, maxScore, function(result) {
@@ -377,11 +386,12 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       }
       // Current gradingTasks[level][seed] instance is not busy, use it.
       else {
+         gradingTasks[level][seed].taskParams = taskParams;
          gradeAnswerInner(gradingTasks[level][seed], levelAnswer, maxScore, callback);
       }
    }
 
-   function gradeAnswerNoLevels(seed, answer, maxScore, callback) {
+   function gradeAnswerNoLevels(taskParams, seed, answer, maxScore, callback) {
       var gradingTask;
 
       // Grade a task instance.
@@ -401,6 +411,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       // Create new instance to be kept in gradingTasks array, and use it for this grading.
       if(!gradingTasks[seed]) {
          gradingTask = createTask(false);
+         gradingTask.taskParams = taskParams;
          gradingTasks[seed] = gradingTask;
          gradingTask.load(null, doGrading);
       }
@@ -408,11 +419,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       // to be destroyed immediately after grading.
       else if(gradingTasks[seed].isGrading) {
          gradingTask = createTask(false);
+         gradingTask.taskParams = taskParams;
          gradingTask.load(null, doGradingAndDestroy);
       }
       // Current gradingTasks[seed] instance is not busy, use it.
       else {
          gradingTask = gradingTasks[seed];
+         gradingTask.taskParams = taskParams;
          doGrading();
       }
    }
@@ -445,7 +458,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
                   loopCallback();
                   return;
                }
-               gradeAnswerByLevel(level, seed, levelAnswers[level], maxScores[level], function(result) {
+               gradeAnswerByLevel(taskParams, level, seed, levelAnswers[level], maxScores[level], function(result) {
                   scores[level] = result.score;
                   messages[level] = result.message;
                   loopCallback();
@@ -461,7 +474,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             });
          }
          else {
-            gradeAnswerNoLevels(seed, parsedAnswer, taskParams.maxScore, function(result) {
+            gradeAnswerNoLevels(taskParams, seed, parsedAnswer, taskParams.maxScore, function(result) {
                callback(result.score, result.message);
             });
          }
