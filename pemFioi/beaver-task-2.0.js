@@ -186,7 +186,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    
    task.reloadAnswer = function(strAnswer, callback) {
       var newAnswer;
-      if(strAnswer) {
+      if(strAnswer && strAnswer !== '') {
          newAnswer = JSON.parse(strAnswer);
       }
       else {
