@@ -68,7 +68,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.initLines = function() {
       var line;
-      this.paperRows = [];
+      this.horizontalLines = [];
       for (var iRow = 0; iRow <= this.rows; iRow++) {
          var rowY;
          if(iRow < this.rows) {
@@ -79,10 +79,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          }
          line = this.paper.path(["M", this.gridLeft, rowY, "H", this.gridRight]);
          line.attr(this.defaultLineAttr);
-         this.paperRows.push(line);
+         this.horizontalLines.push(line);
       }
 
-      this.paperCols = [];
+      this.verticalLines = [];
       for (var iCol = 0; iCol <= this.cols; iCol++) {
          var colX;
          if(iCol < this.cols) {
@@ -93,7 +93,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          }
          line = this.paper.path(["M", colX, this.gridTop, "V", this.gridBottom]);
          line.attr(this.defaultLineAttr);
-         this.paperCols.push(line);
+         this.verticalLines.push(line);
       }
    };
 
@@ -379,11 +379,11 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
 
       for (iRow = 0; iRow <= this.rows; iRow++) {
-         this.paperRows[iRow].remove();
+         this.horizontalLines[iRow].remove();
       }
 
       for (iCol = 0; iCol <= this.cols; iCol++) {
-         this.paperCols[iCol].remove();
+         this.verticalLines[iCol].remove();
       }
 
       if(this.overlay) {
