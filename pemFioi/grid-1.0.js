@@ -12,12 +12,48 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    // TODO: declare this.table here.
 
    this.element = $("#" + raphaelID);
-   this.gridRight = cellWidth * cols + gridLeft;
-   this.gridBottom = cellHeight * rows + gridTop;
 
    this.init = function() {
+      this.initCoordinates();
       this.initTable();
       this.initLines();
+   };
+
+   this.initCoordinates = function() {
+      this.constWidth = $.isNumeric(this.cellWidth);
+      this.constHeight = $.isNumeric(this.cellHeight);
+
+      this.rowY = [this.gridTop];
+      for(var row = 1; row < this.rows; row++) {
+         if(this.constHeight) {
+            this.rowY.push(this.rowY[row - 1] + this.cellHeight);
+         }
+         else {
+            this.rowY.push(this.rowY[row - 1] + this.cellHeight[row - 1]);
+         }
+      }
+      if(this.constHeight) {
+         this.gridBottom = this.rowY[this.rows - 1] + this.cellHeight;
+      }
+      else {
+         this.gridBottom = this.rowY[this.rows - 1] + this.cellHeight[this.rows - 1];
+      }
+
+      this.colX = [this.gridLeft];
+      for(var col = 1; col < this.cols; col++) {
+         if(this.constWidth) {
+            this.colX.push(this.colX[col - 1] + this.cellWidth);
+         }
+         else {
+            this.colX.push(this.colX[col - 1] + this.cellWidth[col - 1]);
+         }
+      }
+      if(this.constWidth) {
+         this.gridRight = this.colX[this.cols - 1] + this.cellWidth;
+      }
+      else {
+         this.gridRight = this.colX[this.cols - 1] + this.cellWidth[this.cols - 1];
+      }
    };
 
    this.initTable = function() {
@@ -34,16 +70,28 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var line;
       this.paperRows = [];
       for (var iRow = 0; iRow <= this.rows; iRow++) {
-         var rowY = this.gridTop + iRow * this.cellHeight;
-         line = this.paper.path(["M", this.gridLeft, rowY, "L", this.gridRight, rowY]);
+         var rowY;
+         if(iRow < this.rows) {
+            rowY = this.rowY[iRow];
+         }
+         else {
+            rowY = this.gridBottom;
+         }
+         line = this.paper.path(["M", this.gridLeft, rowY, "H", this.gridRight]);
          line.attr(this.defaultLineAttr);
          this.paperRows.push(line);
       }
 
       this.paperCols = [];
       for (var iCol = 0; iCol <= this.cols; iCol++) {
-         var colX = this.gridLeft + iCol * this.cellWidth;
-         line = this.paper.path(["M", colX, this.gridTop, "L", colX, this.gridBottom]);
+         var colX;
+         if(iCol < this.cols) {
+            colX = this.colX[iCol];
+         }
+         else {
+            colX = this.gridRight;
+         }
+         line = this.paper.path(["M", colX, this.gridTop, "V", this.gridBottom]);
          line.attr(this.defaultLineAttr);
          this.paperCols.push(line);
       }
@@ -88,16 +136,44 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       return this.table[row][col];
    };
 
-   this.getCellSize = function() {
-      return {
-         width: this.cellWidth,
-         height: this.cellHeight };
+   this.getCellSize = function(row, col) {
+      var result = {};
+      if(this.constWidth) {
+         result.width = this.cellWidth;
+      }
+      else {
+         result.width = this.cellWidth[col];
+      }
+      if(this.constHeight) {
+         result.height = this.cellHeight;
+      }
+      else {
+         result.height = this.cellHeight[row];
+      }
+      return result;
    };
 
    this.getCellPos = function(row, col) {
-      return {
-         x: this.gridLeft + col * cellWidth,
-         y: this.gridTop + row * cellHeight };
+      var result = {};
+      if(row < 0) {
+         result.y = this.gridTop;
+      }
+      else if(row >= this.rows) {
+         result.y = this.gridBottom;
+      }
+      else {
+         result.y = this.rowY[row];
+      }
+      if(col < 0) {
+         result.x = this.gridLeft;
+      }
+      else if(col >= this.cols) {
+         result.x = this.gridRight;
+      }
+      else {
+         result.x = this.colX[col];
+      }
+      return result;
    };
 
    this.isPaperPosOnGrid = function(paperPosition) {
@@ -111,27 +187,82 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    };
    
    this.paperPosToGridPos = function(paperPosition) {
-      return {
-         row: Math.floor((paperPosition.top - this.gridTop) / this.cellHeight),
-         col: Math.floor((paperPosition.left - this.gridLeft) / this.cellWidth)
-      };
+      var result = {};
+      if(this.constWidth) {
+         result.col = Math.floor((paperPosition.left - this.gridLeft) / this.cellWidth);
+      }
+      else {
+         result.col = this._binarySearchPos(this.colX, paperPosition.left, this.gridLeft, this.gridRight);
+      }
+      if(this.constHeight) {
+         result.row = Math.floor((paperPosition.top - this.gridTop) / this.cellHeight);
+      }
+      else {
+         result.row = this._binarySearchPos(this.rowY, paperPosition.top, this.gridTop, this.gridBottom);
+      }
+      return result;
+   };
+
+   this._binarySearchPos = function(array, value, min, max) {
+      if(value < min) {
+         return -1;
+      }
+      if(value >= max) {
+         return array.length;
+      }
+      var low = 0, high = array.length;
+      while(low < high - 1) {
+         var mid = Math.floor((low + high) / 2);
+         if(value < array[mid]) {
+            high = mid;
+         }
+         else if(value == array[mid]) {
+            return mid;
+         }
+         else {
+            low = mid;
+         }
+      }
+      return low;
    };
 
    this.getCellCenter = function(row, col) {
       var pos = this.getCellPos(row, col);
-      return {
-         x: pos.x + this.cellWidth/2,
-         y: pos.y + this.cellHeight/2 };
+      if(this.constWidth) {
+         pos.x += this.cellWidth / 2;
+      }
+      else {
+         pos.x += this.cellWidth[col] / 2;
+      }
+      if(this.constHeight) {
+         pos.y += this.cellHeight / 2;
+      }
+      else {
+         pos.y += this.cellHeight[row] / 2;
+      }
+      return pos;
    };
 
    this.addToCell = function(cellFiller, data) {
       // TODO: xPos and yPos should be renamed cellX and cellY
       var row = data.row;
       var col = data.col;
-      data.xPos = this.gridLeft + col * cellWidth;
-      data.yPos = this.gridTop + row * cellHeight;
-      data.cellWidth = this.cellWidth;
-      data.cellHeight = this.cellHeight;
+      var pos = this.getCellPos(row, col);
+      data.xPos = pos.x;
+      data.yPos = pos.y;
+      
+      if(this.constWidth) {
+         data.cellWidth = this.cellWidth;
+      }
+      else {
+         data.cellWidth = this.cellWidth[col];
+      }
+      if(this.constHeight) {
+         data.cellHeight = this.cellHeight;
+      }
+      else {
+         data.cellHeight = this.cellHeight[row];
+      }
       var contents = cellFiller(data, this.paper);
 
       if (!contents) {
