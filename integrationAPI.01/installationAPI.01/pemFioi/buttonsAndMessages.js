@@ -126,7 +126,7 @@ window.displayHelper = {
          levelName_easy: "Easy",
          levelName_medium: "Medium",
          levelName_hard: "Hard",
-         warningTimeout: "<p>Warning, it has been more than {0} minutes sincr you started working on this task.</p><p>You should probably switch to a diffrent task, by clicking on the button on the top-right.</p>",
+         warningTimeout: "<p>Warning, it has been more than {0} minutes since you started working on this task.</p><p>You should probably switch to a diffrent task, by clicking on the button on the top-right.</p>",
          alright: "Alright",
          moveOn: "Move on",
          solvedMoveOn: "You solved this task completely, move on to another task.",
