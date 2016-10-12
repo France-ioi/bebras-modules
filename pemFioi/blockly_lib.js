@@ -236,7 +236,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
-               $('#question-iframe', window.parent.document).focus();
+               window.focus();
                $('.blocklyCapacity').html(that.workspace.remainingCapacity());
             }
             this.workspace.addChangeListener(onchange);
@@ -1487,8 +1487,13 @@ var initBlocklySubTask = function(subTask) {
    subTask.loadLevel = function(curLevel) {
       this.level = curLevel;
 
-      $('#question-iframe', window.parent.document).css('width', '100%');$('body').css('width', '100%');
-      $('#question-iframe', window.parent.document).focus();
+      // TODO: fix bebras platform to make this unnecessary
+      try {
+         $('#question-iframe', window.parent.document).css('width', '100%');
+      } catch(e) {
+      }
+      $('body').css('width', '100%');
+      window.focus();
 
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
@@ -1619,7 +1624,7 @@ var initBlocklySubTask = function(subTask) {
 
    subTask.getStateObject = function() {
       this.state.level = this.level;
-      return state;
+      return this.state;
    };
 
    subTask.changeSpeed =  function() {
