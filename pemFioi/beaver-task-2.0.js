@@ -247,7 +247,11 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
 
    task.reloadState = function(newStateStr, callback) {
-      task.reloadStateObject(JSON.parse(newStateStr), callback);
+      if (newStateStr) {
+         task.reloadStateObject(JSON.parse(newStateStr), callback);
+      } else {
+         callback();
+      }
    };
 
    task.reloadStateObject = function(newState, callback) {
