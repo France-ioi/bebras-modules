@@ -351,7 +351,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var id = this._cellToHighlightID(row, col);
       if(this.cellHighlights[id]) {
          this.cellHighlights[id].remove();
-         delete this.cellHeight[id];
+         delete this.cellHighlights[id];
       }
    };
 
@@ -467,6 +467,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
       for (iCol = 0; iCol <= this.cols; iCol++) {
          this.verticalLines[iCol].remove();
+      }
+
+      for(var iCell in this.cellHighlights) {
+         this.cellHighlights[iCell].remove();
       }
 
       if(this.overlay) {
