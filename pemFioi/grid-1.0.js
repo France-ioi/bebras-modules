@@ -303,12 +303,14 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       return this.paper;
    };
    
-   this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins) {
+   this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins, dragThreshold) {
       var self = this;
       var anchorGridPos;
       var anchorPaperPos;
       var currentPaperPos;
       var currentGridPos;
+      var usingThreshold = (dragThreshold !== null && dragThreshold !== undefined);
+
       function dragStart(x, y, event) {
          // Dirty IE6 workaround to get the pageX,pageY properties.
          // They appear to be missing from the original mouse event.
@@ -319,10 +321,15 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          anchorPaperPos = self.getPaperMouse(event);
          currentPaperPos = self.getPaperMouse(event);
          anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
-         currentGridPos = self.paperPosToGridPos(anchorPaperPos);
          this.dragSelection = paper.rect().attr(selectionBoxAttr);
          if(onStart) {
             onStart(x, y, event, anchorPaperPos, anchorGridPos);
+         }
+         if(usingThreshold) {
+            currentGridPos = null;
+         }
+         else {
+            currentGridPos = self.paperPosToGridPos(anchorPaperPos);
          }
          if(onSelectionChange) {
             onSelectionChange(0, 0, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
@@ -338,6 +345,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          currentPaperPos.left = anchorPaperPos.left + dx;
          currentPaperPos.top = anchorPaperPos.top + dy;
 
+         var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
          this.dragSelection.attr({
             x: Math.min(anchorPaperPos.left, currentPaperPos.left),
@@ -345,16 +353,25 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
             width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
             height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
          });
-         if(onMove) {
-            onMove(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
-         }
-         if(onSelectionChange && newGridPos) {
-            if(newGridPos.col != currentGridPos.col || newGridPos.row != currentGridPos.row) {
-               onSelectionChange(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, newGridPos);
+
+         // Below threshold.
+         if(usingThreshold && getVectorLength(dx, dy) < dragThreshold) {
+            currentGridPos = null;
+            if(onMove) {
+               onMove(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+            }
+            if(oldGridPos != null) {
+               onSelectionChange(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
             }
          }
-         if(newGridPos) {
+         else {
             currentGridPos = newGridPos;
+            if(onMove) {
+               onMove(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+            }
+            if(oldGridPos == null || oldGridPos.row !== currentGridPos.row || oldGridPos.col !== currentGridPos.col) {
+               onSelectionChange(dx, dy, x, y, event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
+            }
          }
       }
       
@@ -392,6 +409,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       
       this.element.unbind("click", internalClickHandler);
    };
+
+   function getVectorLength(x, y) {
+      return Math.sqrt(x * x + y * y);
+   }
 
    this.init();
 }
