@@ -8,6 +8,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    this.gridLeft = gridLeft;
    this.gridTop = gridTop;
    this.defaultLineAttr = defaultLineAttr;
+   this.cellHighlights = {};
 
    // TODO: declare this.table here.
 
@@ -301,6 +302,59 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.getPaper = function() {
       return this.paper;
+   };
+
+   this.highlightCell = function(row, col, attr, xPad, yPad) {
+      this.unhighlightCell(row, col);
+      var cellPos = this.getCellPos(row, col);
+      var cellSize = this.getCellSize(row, col);
+
+      if(attr === null || attr === undefined) {
+         attr = {};
+      }
+      if(attr["stroke-width"] === null || attr["stroke-width"] === undefined) {
+         attr["stroke-width"] = 3;
+      }
+      if(attr.stroke === null || attr.stroke === undefined) {
+         attr.stroke = "red";
+      }
+      if(xPad === null || xPad === undefined) {
+         xPad = this.verticalLines[col].attrs["stroke-width"] / 2 + attr["stroke-width"] / 2;
+      }
+      if(yPad === null || yPad === undefined) {
+         yPad = this.horizontalLines[row].attrs["stroke-width"] / 2 + attr["stroke-width"] / 2;
+      }
+      if(attr.width === null || attr.width === undefined) {
+         attr.width = cellSize.width - 2 * xPad;
+      }
+      if(attr.height === null || attr.height === undefined) {
+         attr.height = cellSize.height - 2 * yPad;
+      }
+
+      var id = this._cellToHighlightID(row, col);
+      this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
+   };
+
+   this.unhighlightCell = function(row, col) {
+      var id = this._cellToHighlightID(row, col);
+      if(this.cellHighlights[id]) {
+         this.cellHighlights[id].remove();
+         delete this.cellHeight[id];
+      }
+   };
+
+   this.getCellHighlight = function(row, col) {
+      var id = this._cellToHighlightID(row, col);
+      return this.cellHighlights[id];
+   };
+
+   this.isCellHighlighted = function(row, col) {
+      var id = this._cellToHighlightID(row, col);
+      return !!this.cellHighlights[id];
+   };
+
+   this._cellToHighlightID = function(row, col) {
+      return row + "," + col;
    };
    
    this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins, dragThreshold) {
