@@ -319,10 +319,22 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          attr.stroke = "red";
       }
       if(xPad === null || xPad === undefined) {
-         xPad = this.verticalLines[col].attrs["stroke-width"] / 2 + attr["stroke-width"] / 2;
+         xPad = attr["stroke-width"] / 2;
+         if(this.verticalLines[col].attrs["stroke-width"] !== undefined) {
+            xPad += this.verticalLines[col].attrs["stroke-width"] / 2;
+         }
+         else {
+            xPad += 0.5;
+         }
       }
       if(yPad === null || yPad === undefined) {
-         yPad = this.horizontalLines[row].attrs["stroke-width"] / 2 + attr["stroke-width"] / 2;
+         yPad = attr["stroke-width"] / 2;
+         if(this.horizontalLines[row].attrs["stroke-width"] !== undefined) {
+            yPad += this.horizontalLines[row].attrs["stroke-width"] / 2;
+         }
+         else {
+            yPad += 0.5;
+         }
       }
       if(attr.width === null || attr.width === undefined) {
          attr.width = cellSize.width - 2 * xPad;
