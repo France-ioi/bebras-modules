@@ -133,6 +133,16 @@ function Button(paper, xPos, yPos, width, height, text) {
       this.moder.setAttr(name, mode, attr);
    };
 
+   this.addElement = function(name, element) {
+      this.elements[name] = element;
+      this.moder.addElement(name, element);
+      this.elements.transLayer.toFront();
+   };
+
+   this.changeOverlay = function(attr) {
+      this.elements.transLayer.attr(attr);
+   };
+
    this.show = function() {
       this.applyFunction("show");
    };
