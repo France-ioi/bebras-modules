@@ -55,6 +55,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       else {
          this.gridRight = this.colX[this.cols - 1] + this.cellWidth[this.cols - 1];
       }
+
+      this.gridWidth = this.gridRight - this.gridLeft;
+      this.gridHeight = this.gridBottom - this.gridTop;
    };
 
    this.initTable = function() {
@@ -451,6 +454,30 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          opacity: 0
       });
       this.overlay.drag(dragMove, dragStart, dragEnd);
+   };
+
+   this.getLeftX = function() {
+      return this.gridLeft;
+   };
+
+   this.getRightX = function() {
+      return this.gridRight;
+   };
+
+   this.getTopY = function() {
+      return this.gridTop;
+   };
+
+   this.getBottomY = function() {
+      return this.gridBottom;
+   };
+
+   this.getWidth = function() {
+      return this.gridWidth;
+   };
+
+   this.getHeight = function() {
+      return this.gridHeight;
    };
 
    this.remove = function() {
