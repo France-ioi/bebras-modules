@@ -289,7 +289,7 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled) {
       var offset = $(self.paper.canvas).offset();
       var xPos = event.pageX - offset.left;
       var yPos = event.pageY - offset.top;
-      callback(xPos, yPos);
+      callback(xPos, yPos, event);
    };
 
    if(enabled) {
@@ -398,33 +398,38 @@ function ElementRemover(id, graph, visualGraph, graphMouse, callback, forVertice
    }
 }
 
-function EdgeCreator(id, graph, visualGraph, graphMouse, vertexSelector, edgeCreator, enabled) {
+function EdgeCreator(id, paperElementID, paper, graph, visualGraph, graphMouse, vertexSelector, edgeCreator, enabled) {
    var self = this;
    this.id = id;
    this.graph = graph;
    this.visualGraph = visualGraph;
    this.graphMouse = graphMouse;
+   this.paperMouse = new PaperMouseEvent(paperElementID, paper, "click", paperEventHandler, enabled);
    this.enabled = false;
    this.parent = null;
+   this.selectedNow = false;
+
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
       }
       this.enabled = enabled;
       if(enabled) {
-         graphMouse.addEvent(id, "click", "vertex", null, [this.eventHandler]);
+         graphMouse.addEvent(id, "click", "vertex", null, [vertexEventHandler]);
       }
       else {
          graphMouse.removeEvent(id);
       }
+      this.paperMouse.setEnabled(enabled);
    };
 
-   this.eventHandler = function() {
+   function vertexEventHandler() {
       var id = this.data("id");
       if(self.parent === null) {
          self.parent = id;
          if(vertexSelector) {
             vertexSelector(id, true);
+            self.selectedNow = true;
          }
       }
       else if(id == self.parent) {
@@ -440,7 +445,20 @@ function EdgeCreator(id, graph, visualGraph, graphMouse, vertexSelector, edgeCre
          edgeCreator(self.parent, id);
          self.parent = null;
       }
-   };
+   }
+
+   function paperEventHandler(xPos, yPos, event) {
+      // We are relying on the fact that vertex event happens before the paper event, which seems to be the behavior of all browsers.
+      // Otherwise the vertex would be selected by the first and immediately deselected by the second.
+      if(self.selectedNow || self.parent == null) {
+         self.selectedNow = false;
+         return;
+      }
+      if(vertexSelector) {
+         vertexSelector(self.parent, false);
+      }
+      self.parent = null;
+   }
 
    if(enabled) {
       this.setEnabled(true);
