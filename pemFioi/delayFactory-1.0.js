@@ -32,7 +32,7 @@ function DelayFactory() {
       if(this.items[id] !== null && this.items[id] !== undefined) {
          throw "DelayFactory: id " + id + " already exists";
       }
-      this.intervals[id] = setTimeout(callback, delay);
+      this.intervals[id] = setInterval(callback, delay);
       this.items[id] = this.intervals[id];
    };
    
