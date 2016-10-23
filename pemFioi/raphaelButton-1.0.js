@@ -46,7 +46,7 @@ function ElementModer(defaultMode) {
 
 var _BUTTON_GUID = 0;
 
-function Button(paper, xPos, yPos, width, height, text) {
+function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, stepDelay, delayFactory) {
    _BUTTON_GUID++;
    this.guid = _BUTTON_GUID;
    this.elements = {};
@@ -88,15 +88,20 @@ function Button(paper, xPos, yPos, width, height, text) {
       var that = this;
 
       var mousedown = function() {
-         if(that.buttonMode == "enabled") {
-            that.moder.setMode("mousedown");
+         if(that.buttonMode != "enabled") {
+            return;
+         }
+
+         that.moder.setMode("mousedown");
+         if(repeat) {
+            that._startRepeater();
          }
       };
 
       var click = function() {
          if(that.buttonMode == "enabled") {
             that.moder.setMode("enabled");
-            if(that.clickHandler) {
+            if(!repeat && that.clickHandler) {
                that.clickHandler(that.clickData);
             }
          }
@@ -104,6 +109,9 @@ function Button(paper, xPos, yPos, width, height, text) {
       var mouseup = function() {
          if(that.buttonMode == "enabled") {
             that.moder.setMode("enabled");
+            if(repeat) {
+               that._stopRepeater();
+            }
          }
       };
 
@@ -113,7 +121,32 @@ function Button(paper, xPos, yPos, width, height, text) {
       this.moder.setMode("enabled");
    };
 
+   this._startRepeater = function() {
+      if(!this.clickHandler) {
+         return;
+      }
+      var self = this;
+      // First firing - immediately on mouse down.
+      this.clickHandler(this.clickData);
+      delayFactory.create(this.guid + "$buttonRepeatInitial", function() {
+         // Second firing - after the initial delay.
+         self.clickHandler(self.clickData);
+         delayFactory.create(self.guid + "$buttonRepeatStep", function() {
+            // Nth firing - after the step delay.
+            self.clickHandler(self.clickData);
+         }, stepDelay, true);
+      }, initialDelay);
+   };
+
+   this._stopRepeater = function() {
+      delayFactory.destroy(this.guid + "$buttonRepeatInitial");
+      delayFactory.destroy(this.guid + "$buttonRepeatStep");
+   };
+
    this.disable = function() {
+      if(repeat) {
+         this._stopRepeater();
+      }
       this.moder.setMode("disabled");
       this.buttonMode = "disabled";
       this.elements.transLayer.unclick();
