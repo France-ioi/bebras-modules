@@ -35,6 +35,7 @@ window.implementGetResources = function(task) {
       res.display_modules = [];
       res.sat = [];
       res.sat_modules = [];
+      res.files = [];
       if (!res.title) {
          res.title = $('title').text();
       }
@@ -101,7 +102,7 @@ window.implementGetResources = function(task) {
             curDest.push({ type: curType, url: $(this).attr('href'), id: $(this).attr('id') });
          }
          else {
-            curDest.push({ type: curType, content: $(this).html() });
+            curDest.push({ type: curType, id: $(this).attr('id'), content: $(this).html() });
          }
       });
 
@@ -144,6 +145,12 @@ window.implementGetResources = function(task) {
          });
          fillImages($(this).html(), images, res.hints[hintnum]);
       });
+
+      // Other resources
+      $('source, track').each(function() {
+        res.files.push({ type: this.tagName, url: $(this).attr('src') });
+      });
+
       taskResourcesLoaded = true;
       callback(res);
    };
