@@ -227,6 +227,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                sounds: false,
                media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
             };
+            if (!this.groupByCategory) {
+               wsConfig.scrollbars = true;
+            }
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
             }
