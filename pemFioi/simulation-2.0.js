@@ -162,7 +162,7 @@ function SimulationStep() {
    this.execute = function(delayFactory) {
       this.resetParents();
       for (var name in this.entries) {
-         if (!(this.entries[name].parents)) {
+         if (!(this.entries[name].parents) || this.entries[name].parents.length === 0) {
             this.executeEntry(name, delayFactory);
          }
       }
