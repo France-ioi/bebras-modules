@@ -1642,7 +1642,11 @@ var initBlocklySubTask = function(subTask) {
    };
 
    subTask.reloadAnswerObject = function(answerObj) {
-      this.answer = answerObj;
+      if(typeof answerObj === "undefined") {
+        this.answer = this.getDefaultAnswerObject();
+      } else {
+        this.answer = answerObj;
+      }
       this.blocklyHelper.programs = this.answer;
       if (this.answer != undefined) {
          this.blocklyHelper.loadPrograms();
