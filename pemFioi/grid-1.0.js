@@ -373,6 +373,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    };
    
    this.enableDragSelection = function(onStart, onMove, onUp, onSelectionChange, selectionBoxAttr, selectionMargins, dragThreshold) {
+      if(this.overlay) {
+         return;
+      }
       var self = this;
       var anchorGridPos;
       var anchorPaperPos;
@@ -406,6 +409,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
       function dragEnd(event) {
          this.dragSelection.remove();
+         this.dragSelection = null;
          if(onUp) {
             onUp(event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
          }
@@ -456,6 +460,17 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       this.overlay.drag(dragMove, dragStart, dragEnd);
    };
 
+   this.disableDragSelection = function() {
+      if(this.overlay) {
+         this.overlay.remove();
+         this.overlay = null;
+      }
+      if(this.dragSelection) {
+         this.dragSelection.remove();
+         this.dragSelection = null;
+      }
+   };
+
    this.getLeftX = function() {
       return this.gridLeft;
    };
@@ -500,10 +515,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          this.cellHighlights[iCell].remove();
       }
 
-      if(this.overlay) {
-         this.overlay.remove();
-      }
-      
+      this.disableDragSelection();
       this.element.unbind("click", internalClickHandler);
    };
 
