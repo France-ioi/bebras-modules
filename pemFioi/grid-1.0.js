@@ -102,10 +102,15 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    };
 
    this.clickCell = function(clickHandler) {
+      this.unclickCell();
       this.clickHandler = clickHandler;
       this.element.click({
          thisGrid: this
       }, internalClickHandler);
+   };
+
+   this.unclickCell = function() {
+      this.element.unbind("click", internalClickHandler);
    };
 
    var internalClickHandler = function(event) {
@@ -516,7 +521,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
 
       this.disableDragSelection();
-      this.element.unbind("click", internalClickHandler);
+      this.unclickCell();
    };
 
    function getVectorLength(x, y) {
