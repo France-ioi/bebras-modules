@@ -345,7 +345,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       }
    };
 
-   function gradeAnswerInner(gradingTask, answer, maxScore, callback) {
+   function gradeAnswerInner(gradingTask, answer, minScore, maxScore, callback) {
       gradingTask.isGrading = true;
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
@@ -353,14 +353,18 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       gradingTask.reloadAnswerObject(answer);
       gradingTask.getGrade(function(result) {
          gradingTask.isGrading = false;
+         var score = 0;
+         if(result.successRate > 0) {
+            score = Math.round(result.successRate * (maxScore - minScore) + minScore);
+         }
          callback({
-            score: Math.round(result.successRate * maxScore),
+            score: score,
             message: result.message
          });
       });
    }
    
-   function gradeAnswerByLevel(taskParams, level, seed, levelAnswer, maxScore, callback) {
+   function gradeAnswerByLevel(taskParams, level, seed, levelAnswer, minScore, maxScore, callback) {
       var gradingTask;
       
       if(!gradingTasks[level]) {
@@ -373,7 +377,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
          gradingTasks[level][seed] = gradingTask;
-         gradeAnswerInner(gradingTask, levelAnswer, maxScore, callback);
+         gradeAnswerInner(gradingTask, levelAnswer, minScore, maxScore, callback);
       }
       // Current gradingTasks[level][seed] instance is busy, so create a temporary instance,
       // to be destroyed immediately after grading.
@@ -382,7 +386,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          gradingTask.taskParams = taskParams;
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
-         gradeAnswerInner(gradingTask, answer, maxScore, function(result) {
+         gradeAnswerInner(gradingTask, answer, minScore, maxScore, function(result) {
             destroyTask(gradingTask, function() {
                callback(result);
             });
@@ -391,21 +395,21 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       // Current gradingTasks[level][seed] instance is not busy, use it.
       else {
          gradingTasks[level][seed].taskParams = taskParams;
-         gradeAnswerInner(gradingTasks[level][seed], levelAnswer, maxScore, callback);
+         gradeAnswerInner(gradingTasks[level][seed], levelAnswer, minScore, maxScore, callback);
       }
    }
 
-   function gradeAnswerNoLevels(taskParams, seed, answer, maxScore, callback) {
+   function gradeAnswerNoLevels(taskParams, seed, answer, minScore, maxScore, callback) {
       var gradingTask;
 
       // Grade a task instance.
       var doGrading = function() {
-         gradeAnswerInner(gradingTask, answer, maxScore, callback);
+         gradeAnswerInner(gradingTask, answer, minScore, maxScore, callback);
       };
 
       // Grade a task instance and destroy it. Invoke callback after destruction.
       var doGradingAndDestroy = function() {
-         gradeAnswerInner(gradingTask, answer, maxScore, function(result) {
+         gradeAnswerInner(gradingTask, answer, minScore, maxScore, function(result) {
             destroyTask(gradingTask, function() {
                callback(result);
             });
@@ -453,6 +457,11 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          
          if(levels) {
             var maxScores = displayHelper.getLevelsMaxScores();
+            var minScores = {
+               easy: 0,
+               medium: maxScores.easy,
+               hard: maxScores.medium
+            };
             var levelAnswers = parsedAnswer;
             var scores = {};
             var messages = {};
@@ -462,7 +471,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
                   loopCallback();
                   return;
                }
-               gradeAnswerByLevel(taskParams, level, seed, levelAnswers[level], maxScores[level], function(result) {
+               gradeAnswerByLevel(taskParams, level, seed, levelAnswers[level], minScores[level], maxScores[level], function(result) {
                   scores[level] = result.score;
                   messages[level] = result.message;
                   loopCallback();
@@ -478,7 +487,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             });
          }
          else {
-            gradeAnswerNoLevels(taskParams, seed, parsedAnswer, taskParams.maxScore, function(result) {
+            gradeAnswerNoLevels(taskParams, seed, parsedAnswer, taskParam.minScore, taskParams.maxScore, function(result) {
                callback(result.score, result.message);
             });
          }
