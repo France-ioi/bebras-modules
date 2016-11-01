@@ -46,6 +46,10 @@ textarea {
    text-align: center;
 }
 
+#task {
+   min-height: 700px;
+}
+
 #task h1,
 .question h1,
 #solution {
