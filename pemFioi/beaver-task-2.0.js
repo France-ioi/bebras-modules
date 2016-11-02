@@ -321,14 +321,15 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
 
    task.unload = function(callback) {
       var instances = [];
+      var iSeed;
       if (levels) {
          for(var iLevel in gradingTasks) {
-            for(var iSeed in gradingTasks[iLevel]) {
+            for(iSeed in gradingTasks[iLevel]) {
                instances.push(gradingTasks[iLevel][iSeed]);
             }
          }
       } else {
-         for(var iSeed in gradingTasks) {
+         for(iSeed in gradingTasks) {
             instances.push(gradingTasks[iSeed]);
          }
       }
@@ -340,7 +341,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          callback();
       });
 
-      if (Blockly != undefined) { // TEMPORARY, to replace with a global unload function provided by the task
+      if (typeof Blockly !== 'undefined') { // TEMPORARY, to replace with a global unload function provided by the task
          removeBlockly();
       }
    };
