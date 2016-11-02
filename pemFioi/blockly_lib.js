@@ -228,7 +228,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
             };
             if (!this.groupByCategory) {
+               wsConfig.comments = true;
                wsConfig.scrollbars = true;
+               wsConfig.trashcan = true;
             }
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
@@ -503,7 +505,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       updateSize: function() {
          var panelWidth = 500;
          if (this.languages[this.player] == "blockly") {
-            panelWidth = $("#blocklyDiv").width();
+            panelWidth = $("#blocklyDiv").width() - 10;
          } else {
             panelWidth = $("#program").width() + 20;
          }
