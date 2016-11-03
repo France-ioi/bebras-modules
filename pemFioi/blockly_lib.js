@@ -37,6 +37,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       includedAll: true,
       includedCategories : [],
       includedBlocks: [],
+      availableVariables: [],
       languageStrings: {
          fr: {
             actions: "Actions",
@@ -1124,6 +1125,37 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                xml += catXml;
             }
          }
+
+         // Handle variable blocks, which are normally automatically added with
+         // the VARIABLES category but can be customized here
+         if (this.availableVariables.length > 0 ||
+               ($.inArray('variables_get', this.includedBlocks) != -1) ||
+               ($.inArray('variables_set', this.includedBlocks) != -1)) {
+            if (this.groupByCategory) {
+               xml += "<category name='" + this.strings.variables + "' colour='330'>";
+            }
+
+            // block for each availableVariable
+            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
+               xml += "<block type='variables_get' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
+            }
+            // generic modifyable block
+            if ($.inArray('variables_get', this.includedBlocks) != -1) {
+               xml += "<block type='variables_get'></block>"
+            }
+
+            // same for setting variables
+            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
+               xml += "<block type='variables_set' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
+            }
+            if ($.inArray('variables_set', this.includedBlocks) != -1) {
+               xml += "<block type='variables_set'></block>"
+            }
+
+            if (this.groupByCategory) {
+               xml += "</category>";
+            }
+         }
          return xml;
       },
       
@@ -1511,7 +1543,7 @@ var initBlocklySubTask = function(subTask) {
          $("#gridContainer").html(gridHtml)
       }
 
-      var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks"];
+      var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks", "availableVariables"];
       for (var iProp = 0; iProp < props.length; iProp++) {
          var prop = props[iProp];
          if (subTask.gridInfos[prop] != undefined) {
