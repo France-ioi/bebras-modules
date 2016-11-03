@@ -131,8 +131,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    
    // Instances of subTask intended for grading.
    var gradingTasks = {};
+
+   // Store whether this task has loaded but reloadAnswer was not yet called.
+   // Used for automatically changing to the first level that can gain points.
+   var hasJustLoaded = false;
    
    task.load = function(views, callback) {
+      hasJustLoaded = true;
       platform.getTaskParams(null, null, function(taskParams) {
          mainTask = createTask(true);
          mainTask.taskParams = taskParams;
@@ -185,6 +190,30 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.reloadAnswer = function(strAnswer, callback) {
+      if(hasJustLoaded) {
+         // If this is the first time we reload an answer, jump to the first level that can gain points.
+         hasJustLoaded = false;
+         task.gradeAnswer(strAnswer, null, function(score, message) {
+            var maxScores = displayHelper.getLevelsMaxScores();
+            var level = "easy";
+            if(score >= maxScores.medium) {
+               level = "hard";
+            }
+            else if(score >= maxScores.easy) {
+               level = "medium";
+            }
+            var newAnswer = null;
+            if(strAnswer && strAnswer !== '') {
+               newAnswer = JSON.parse(strAnswer);
+            }
+            task.reloadAnswerObject(newAnswer, function() {
+               displayHelper.setLevel(level);
+               callback();
+            });
+         });
+         return;
+      }
+
       var newAnswer;
       if(strAnswer && strAnswer !== '') {
          newAnswer = JSON.parse(strAnswer);
