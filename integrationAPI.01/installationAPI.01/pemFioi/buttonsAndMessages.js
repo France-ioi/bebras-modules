@@ -17,7 +17,6 @@ window.displayHelper = {
    prevAnswer: '',
    readOnly: false,
    savedAnswer: '',
-   savedState: '{}',
    submittedAnswer: '',
    submittedScore: 0,
    hasAnswerChanged: true,
@@ -269,7 +268,6 @@ window.displayHelper = {
          self.readOnly = (self.taskParams.readonly === true || self.taskParams.readOnly == 'true');
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
-         self.savedState = '{}';
 
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
@@ -313,7 +311,6 @@ window.displayHelper = {
       this.prevAnswer = '';
       this.readOnly = false;
       this.savedAnswer = '';
-      this.savedState = '{}';
       this.submittedAnswer = '';
       this.submittedScore = 0;
       this.hasAnswerChanged = true;
@@ -617,7 +614,7 @@ window.displayHelper = {
       var that = this;
       if (this.showScore) {
          // TODO we only know the answer here, and not the state. Possibly problematic?
-         this.updateScore('{}', strAnswer, true, function() {
+         this.updateScore(strAnswer, true, function() {
             that.checkAnswerChanged(); // necessary?
          });
       } else {
@@ -650,22 +647,7 @@ window.displayHelper = {
                var defaultAnswer = task.getDefaultAnswerObject();
                var level = displayHelper.taskLevel;
                answer[level] = defaultAnswer[level];
-
-               task.getState(function(strState) {
-                  var state = $.parseJSON(strState);
-                  var defaultState = task.getDefaultStateObject();
-                  
-                  if(state.levelStates) {
-                     state.levelStates[level] = defaultState.levelStates[level];
-                  }
-                  else {
-                     // TODO is this the desired behavior for pre-beaver-task-2 tasks?
-                     state = defaultState;
-                  }
-                  task.reloadState(JSON.stringify(state), function() {
-                     task.reloadAnswer(JSON.stringify(answer), function() {});
-                  });
-               });
+               task.reloadAnswer(JSON.stringify(answer), function() {});
             });
          }
       }
@@ -681,39 +663,33 @@ window.displayHelper = {
       var self = this;
       if (mode == 'cancel') {
          this.savedAnswer = '';
-         this.savedState = JSON.stringify(task.getDefaultStateObject());
-         task.reloadState(this.savedState, function() {
-            task.reloadAnswer('', function() {
-               self.checkAnswerChanged();
-            });
+         task.reloadAnswer('', function() {
+            self.checkAnswerChanged();
          });
       } else {
-         task.getState(function(strState) {
-            task.getAnswer(function(strAnswer) {
-               if (!self.hasSolution) {
-                  self.prevSavedScore = self.graderScore;
-                  if (self.hasLevels) {
-                     self.prevLevelsScores[self.taskLevel] = self.levelsScores[self.taskLevel];
-                  }
+         task.getAnswer(function(strAnswer) {
+            if (!self.hasSolution) {
+               self.prevSavedScore = self.graderScore;
+               if (self.hasLevels) {
+                  self.prevLevelsScores[self.taskLevel] = self.levelsScores[self.taskLevel];
                }
-               var refresh = function() {
-                  self.refreshMessages = true;
-                  self.checkAnswerChanged();
-               };
-               self.submittedAnswer = strAnswer;
-               if (self.showScore) {
-                  self.updateScore(strState, strAnswer, false, refresh);
-               } else {
-                  self.savedAnswer = strAnswer;
-                  self.savedState = strState;
-                  refresh();
-               }
-            });
+            }
+            var refresh = function() {
+               self.refreshMessages = true;
+               self.checkAnswerChanged();
+            };
+            self.submittedAnswer = strAnswer;
+            if (self.showScore) {
+               self.updateScore(strAnswer, false, refresh);
+            } else {
+               self.savedAnswer = strAnswer;
+               refresh();
+            }
          });
       }
    },
 
-   updateScore: function(strState, strAnswer, allLevels, callback) {
+   updateScore: function(strAnswer, allLevels, callback) {
       var self = this;
       function refresh() {
          self.refreshMessages = true;
@@ -722,13 +698,13 @@ window.displayHelper = {
       }
       if (allLevels) {
          // TODO: make sure the grader doesn't evaluate each level at each call (most do right now!)
-         self.updateScoreOneLevel(strState, strAnswer, "easy", function() {
-            self.updateScoreOneLevel(strState, strAnswer, "medium", function() {
-               self.updateScoreOneLevel(strState, strAnswer, "hard", refresh);
+         self.updateScoreOneLevel(strAnswer, "easy", function() {
+            self.updateScoreOneLevel(strAnswer, "medium", function() {
+               self.updateScoreOneLevel(strAnswer, "hard", refresh);
             });
          });
       } else {
-         this.updateScoreOneLevel(strState, strAnswer, this.taskLevel, function() {
+         this.updateScoreOneLevel(strAnswer, this.taskLevel, function() {
             if (self.hasLevels) {
                self.showValidatePopup(self.taskLevel);
             }
@@ -736,7 +712,7 @@ window.displayHelper = {
          });
       }
    },
-   updateScoreOneLevel: function(strState, strAnswer, gradedLevel, callback) {
+   updateScoreOneLevel: function(strAnswer, gradedLevel, callback) {
       var self = this;
       this.graderMessage = this.strings.gradingInProgress;
       task.getLevelGrade(strAnswer, null, function(score, message) {
@@ -752,26 +728,15 @@ window.displayHelper = {
                   self.graderScore = score;
                   if (self.savedAnswer === '') {
                      self.savedAnswer = strAnswer;
-                     self.savedState = strState;
                   } else {
                      var savedAnswerObj = $.parseJSON(self.savedAnswer);
                      var answerObj = $.parseJSON(strAnswer);
                      savedAnswerObj[gradedLevel] = answerObj[gradedLevel];
                      self.savedAnswer = JSON.stringify(savedAnswerObj);
-
-                     var savedStateObj = $.parseJSON(self.savedState);
-                     var stateObj = $.parseJSON(strState);
-                     if(savedStateObj.levelStates) {
-                        savedStateObj.levelStates[gradedLevel] = stateObj.levelStates[gradedLevel];
-                     }
-                     else {
-                        // TODO pre-beaver-task-2 behavior?
-                     }
                   }
                }
             } else if (score > self.graderScore) {
                self.savedAnswer = strAnswer;
-               self.savedState = strState;
                self.graderScore = score;
             }
          }
@@ -1152,33 +1117,19 @@ window.displayHelper = {
 
    // Loads previously saved answer
    retrieveAnswer: function() {
-      var retrievedAnswer, retrievedState = '{}';
+      var retrievedAnswer;
       if (this.hasLevels) {
          var retrievedAnswerObj = task.getAnswerObject();
          var savedAnswerObj = $.parseJSON(this.savedAnswer);
          retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
          retrievedAnswer = JSON.stringify(retrievedAnswerObj);
-
-         var retrievedStateObj = task.getStateObject();
-         var savedStateObj = $.parseJSON(this.savedState);
-         if(retrievedStateObj.levelStates) {
-            retrievedStateObj.levelStates[this.taskLevel] = savedStateObj.levelStates[this.taskLevel];
-            retrievedState = JSON.stringify(retrievedStateObj);
-         }
-         else {
-            // TODO pre-beaver-task-2 behavior?
-         }
-
       } else {
          retrievedAnswer = this.savedAnswer;
-         retrievedState = this.savedState;
       }
       var self = displayHelper;
-      task.reloadState(retrievedState, function() {
-         task.reloadAnswer(retrievedAnswer, function() {
-            self.submittedAnswer = self.savedAnswer;
-            self.updateScore(self.savedState, self.savedAnswer, false, function() {});
-         });
+      task.reloadAnswer(retrievedAnswer, function() {
+         self.submittedAnswer = self.savedAnswer;
+         self.updateScore(self.savedAnswer, false, function() {});
       });
    },
 
