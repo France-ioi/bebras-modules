@@ -413,7 +413,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          }
       }
       function dragEnd(event) {
-         this.dragSelection.remove();
+         if (this.dragSelection != null) {
+            this.dragSelection.remove();
+         }
          this.dragSelection = null;
          if(onUp) {
             onUp(event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
