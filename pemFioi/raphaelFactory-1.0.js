@@ -25,14 +25,14 @@ function RaphaelFactory() {
       object.animate(params, time, function() {
          delete self.animations[name];
       });
-   },
+   };
 
    this.stopAnimate = function(name) {
       if (this.animations[name]) {
          this.animations[name].stop();
          delete this.animations[name];
       }
-   },
+   };
 
    this.destroy = function(id) {
       this.stop(id);
@@ -54,8 +54,8 @@ function RaphaelFactory() {
       for(var id in this.items) {
          this.stop(id);
       }
-      for(var id in this.animations) {
-         this.stopAnimate(id);
+      for(var animID in this.animations) {
+         this.stopAnimate(animID);
       }
       this.items = {};
    };
