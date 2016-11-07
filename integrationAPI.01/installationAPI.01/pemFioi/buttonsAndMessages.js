@@ -112,7 +112,8 @@ window.displayHelper = {
          contestOverAnswerNotSaved: "Le concours est terminé : votre réponse n'est pas enregistrée.",
             scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
             answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
-            reloadSubmittedAnswer: "recharger la réponse que vous avez soumise"
+            reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
+         difficultyWarning: "<strong>Attention</strong> : résoudre cette version prend du temps. Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
       },
       en: {
          version: "Version",
@@ -269,6 +270,7 @@ window.displayHelper = {
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
 
+         $("#difficultyWarning").html(self.strings.difficultyWarning);
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
