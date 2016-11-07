@@ -398,7 +398,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          anchorPaperPos = self.getPaperMouse(event);
          currentPaperPos = self.getPaperMouse(event);
          anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
-         this.dragSelection = paper.rect().attr(selectionBoxAttr);
+         self.dragSelection = paper.rect().attr(selectionBoxAttr);
          if(onStart) {
             onStart(x, y, event, anchorPaperPos, anchorGridPos);
          }
@@ -413,10 +413,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          }
       }
       function dragEnd(event) {
-         if (this.dragSelection != null) {
-            this.dragSelection.remove();
+         if (self.dragSelection != null) {
+            self.dragSelection.remove();
          }
-         this.dragSelection = null;
+         self.dragSelection = null;
          if(onUp) {
             onUp(event, anchorPaperPos, anchorGridPos, currentPaperPos, currentGridPos);
          }
@@ -427,7 +427,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
          var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
-         this.dragSelection.attr({
+         self.dragSelection.attr({
             x: Math.min(anchorPaperPos.left, currentPaperPos.left),
             y: Math.min(anchorPaperPos.top, currentPaperPos.top),
             width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
