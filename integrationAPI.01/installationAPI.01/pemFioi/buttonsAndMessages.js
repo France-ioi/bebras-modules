@@ -270,7 +270,7 @@ window.displayHelper = {
          self.graderScore = +self.taskParams.noScore;
          self.savedAnswer = '';
 
-         $("#difficultyWarning").html(self.strings.difficultyWarning);
+         $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
