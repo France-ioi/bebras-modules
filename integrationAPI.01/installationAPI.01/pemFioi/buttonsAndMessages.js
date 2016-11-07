@@ -113,7 +113,7 @@ window.displayHelper = {
             scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
             answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
             reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
-         difficultyWarning: "<strong>Attention</strong> : résoudre cette version prend du temps. Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
+         difficultyWarning: "<strong>Attention</strong> : résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
       },
       en: {
          version: "Version",
