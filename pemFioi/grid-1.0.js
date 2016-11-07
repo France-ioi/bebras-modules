@@ -469,6 +469,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.disableDragSelection = function() {
       if(this.overlay) {
+         this.overlay.undrag();
          this.overlay.remove();
          this.overlay = null;
       }
