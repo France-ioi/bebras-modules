@@ -46,6 +46,15 @@ textarea {
    text-align: center;
 }
 
+.warning-header { 
+   margin: 10px 0px 10px 0px; 
+   padding: 10px 10px 10px 10px; 
+   background: #FFAAAA; 
+   /*font-weight: bold;*/
+   border: 2px solid black; 
+   border-radius: 6px;
+ }
+
 #task h1,
 .question h1,
 #solution {
