@@ -7,6 +7,11 @@ function RaphaelFactory() {
          throw "RaphaelFactory: id " + id + " already exists";
       }
       this.items[id] = new Raphael(elementID, width, height);
+
+      // Offset in mouse events can be affected by the top left element in some browsers.
+      // This makes sure there is an element at 0,0.
+      this.items[id].rect(0, 0, 1, 1).attr("opacity", 0);
+
       return this.items[id];
    };
    
