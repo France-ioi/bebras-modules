@@ -8,7 +8,7 @@ function RaphaelFactory() {
       }
       this.items[id] = new Raphael(elementID, width, height);
 
-      // Offset in mouse events can be affected by the top left element in some browsers.
+      // Offset in mouse events can be affected by the top left element, in firefox 3.6 (and perhaps other browsers).
       // This makes sure there is an element at 0,0.
       this.items[id].rect(0, 0, 1, 1).attr("opacity", 0);
 
