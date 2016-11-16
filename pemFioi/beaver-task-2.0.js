@@ -517,7 +517,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             });
          }
          else {
-            gradeAnswerNoLevels(taskParams, seed, parsedAnswer, taskParam.minScore, taskParams.maxScore, function(result) {
+            gradeAnswerNoLevels(taskParams, seed, parsedAnswer, taskParams.minScore, taskParams.maxScore, function(result) {
                callback(result.score, result.message);
             });
          }
