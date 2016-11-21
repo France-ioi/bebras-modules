@@ -127,9 +127,9 @@ if (!isCrossDomain()) {
             success([score, message, scoreToken]);
          };
          if (typeof task.gradeAnswer === 'function') {
-            task.gradeAnswer(params[0], params[1], newSuccess);
+            task.gradeAnswer(params[0], params[1], newSuccess, error);
          } else {
-            window.grader.gradeTask(params[0], params[1], newSuccess);
+            window.grader.gradeTask(params[0], params[1], newSuccess, error);
          }
       };
       var channelId = getUrlParameterByName('channelId');
