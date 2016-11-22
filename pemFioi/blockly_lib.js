@@ -1555,7 +1555,7 @@ var initBlocklySubTask = function(subTask) {
          }
       }
 
-      this.context = getRobotGridContext(this.display, this.gridInfos);
+      this.context = getRobotGridContext(this.display, this.gridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;

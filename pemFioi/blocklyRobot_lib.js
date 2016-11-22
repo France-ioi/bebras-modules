@@ -1,4 +1,4 @@
-var getRobotGridContext = function(display, infos) {
+var getRobotGridContext = function(display, infos, curLevel) {
    var languageStrings = {
       fr: {
          labelWait: "attendre",
@@ -989,9 +989,13 @@ var getRobotGridContext = function(display, infos) {
 
    context.generators = {
    };
-   for(var genType in infos.generators) {
+   var generators = infos.generators;
+   if ((typeof generators == "object") && (generators["easy"] != undefined)) {
+      generators = generators[curLevel];
+   }
+   for(var genType in generators) {
       context.generators[genType] = [];
-      var gens = infos.generators[genType];
+      var gens = generators[genType];
       for (var iGen = 0; iGen < gens.length; iGen++) {
          var gen = allGenerators[genType][gens[iGen]];
          if (gen == undefined) {
