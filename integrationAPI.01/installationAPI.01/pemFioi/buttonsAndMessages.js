@@ -113,7 +113,7 @@ window.displayHelper = {
             scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
             answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
             reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
-         difficultyWarning: "<strong>Attention</strong> : résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
+         difficultyWarning: "<strong>Attention :</strong> résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
       },
       en: {
          version: "Version",
@@ -181,7 +181,7 @@ window.displayHelper = {
             scoreWouldStay: "With this answer, your score would stay the same:",
             answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
             reloadSubmittedAnswer: "reload the validated answer",
-         difficultyWarning: "<strong>Warning</strong>: soliving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
+         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
       },
       de: {
          version: "Version",
@@ -248,7 +248,8 @@ window.displayHelper = {
          contestOverAnswerNotSaved: "Le concours est terminé : votre réponse n'est pas enregistrée.",
             scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
             answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
-            reloadSubmittedAnswer: "recharger la réponse que vous avez soumise"
+            reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
+         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
       }
    },
 
