@@ -180,7 +180,8 @@ window.displayHelper = {
          contestOverAnswerNotSaved: "The contest being over, your new answer was not saved.",
             scoreWouldStay: "With this answer, your score would stay the same:",
             answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
-            reloadSubmittedAnswer: "reload the validated answer"
+            reloadSubmittedAnswer: "reload the validated answer",
+         difficultyWarning: "<strong>Warning</strong>: soliving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
       },
       de: {
          version: "Version",
