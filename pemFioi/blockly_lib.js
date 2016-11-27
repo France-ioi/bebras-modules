@@ -1467,8 +1467,11 @@ function initBlocklyRunner(context, messageCallback) {
                   message = context.messagePrefixFailure + message;
                }
             }
-            if (context.linkBack && context.success) {
-               message += "<br/><a href='#' onclick='window.parent.backToList()' style='text-decoration:underline'>Retour à la liste des questions</a>";
+            if (context.success) {
+               message = "<span style='color:green;font-weight:bold'>" + message + "</span>"; 
+               if (context.linkBack) {
+                  //message += "<br/><a href='#' onclick='window.parent.backToList()' style='text-decoration:underline'>Retour à la liste des questions</a>";
+               }
             }
             messageCallback(message);
          }
