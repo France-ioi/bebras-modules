@@ -161,7 +161,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       loadHtml: function(nbTestCases) {
          var strMaxBlocks = "";
          if (maxBlocks != undefined) {
-            strMaxBlocks = "<span class='blocklyCapacity'>XXX</span>" + this.strings.limitBlocks1 + maxBlocks + this.strings.limitBlocks2;
+            strMaxBlocks = "<span class='blocklyCapacity' style='display:inline-block;width:24px;text-align:right'>XXX</span>" + this.strings.limitBlocks1 + maxBlocks + this.strings.limitBlocks2;
          }
          $("#blocklyLibContent").html( 
             "         <xml id='toolbox' style='display: none'>" +
@@ -181,10 +181,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             "            <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
             "            <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
             "         </div>" +
-            "         <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-            "         <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-            "         <p>" + this.strings.reloadProgram + " <input type='file' id='input' onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-            "         <p><input type='button' value='" + this.strings.saveProgram + "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span>");
+            "         <div id='saveOrLoad'> "+
+            "            <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
+            "            <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
+            "            <p>" + this.strings.reloadProgram + " <input type='file' id='input' onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
+            "            <p><input type='button' value='" + this.strings.saveProgram + "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span>" +
+            "         </div>"
+         );
 
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
@@ -1544,6 +1547,12 @@ var initBlocklySubTask = function(subTask) {
          gridHtml += "<div id='gridButtonsAfter'></div>";
          gridHtml += "</center>";
          $("#gridContainer").html(gridHtml)
+         if (this.gridInfos.hideSaveOrLoad) {
+            // TODO: do without a timeout
+            setTimeout(function() {
+            $("#saveOrLoad").hide();
+            }, 0);
+         }
       }
 
       var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks", "availableVariables"];
