@@ -416,7 +416,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          gradingTask.taskParams = taskParams;
          gradingTask.isGrading = false;
          gradingTask.loadLevel(level);
-         gradeAnswerInner(gradingTask, answer, minScore, maxScore, function(result) {
+         gradeAnswerInner(gradingTask, levelAnswer, minScore, maxScore, function(result) {
             destroyTask(gradingTask, function() {
                callback(result);
             });
