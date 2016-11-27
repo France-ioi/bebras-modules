@@ -43,6 +43,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             actions: "Actions",
             sensors: "Capteurs",
             debug: "Débuggage",
+            colour: "Couleurs",
+            dicts: "Dictionnaires",
+            inputs: "Entrées",
+            lists: "Listes",
             logic: "Logique",
             loops: "Boucles",
             math: "Maths",
@@ -83,6 +87,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             actions: "Actions",
             sensors: "Sensors",
             debug: "Debug",
+            colour: "Colors",
+            dicts: "Dictionnaries",
+            inputs: "Inputs",
+            lists: "Lists",
             logic: "Logic",
             loops: "Loops",
             math: "Math",
@@ -122,6 +130,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             actions: "Aktionen",
             sensors: "Sensoren",
             debug: "Debug",
+            colour: "Farben",
+            dicts: "Diktionär",
+            inputs: "Eingaben",
+            lists: "Listen",
             logic: "Logik",
             loops: "Schleifen",
             math: "Mathe",
@@ -218,10 +230,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
 
-      load: function(language, display, nbTestCases) {
+      load: function(language, display, nbTestCases, options) {
          if (language == undefined) {
             language = "fr";
          }
+         if (options == undefined) options = {};
+         if (!options.divId) options.divId = 'blocklyDiv';
          this.strings = this.languageStrings[language];
          if (display) {
             this.loadHtml(nbTestCases);
@@ -239,8 +253,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
             }
+            if (options.readOnly) {
+               wsConfig.readOnly = true;
+            }
             this.addExtraBlocks();
-            this.workspace = Blockly.inject('blocklyDiv', wsConfig);
+            this.workspace = Blockly.inject(options.divId, wsConfig);
             Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
@@ -259,10 +276,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
-            var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-            Blockly.Events.recordUndo = false;
-            Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
-            Blockly.Events.recordUndo = true;
+            if(!options.noRobot) {
+               var xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+               Blockly.Events.recordUndo = false;
+               Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
+               Blockly.Events.recordUndo = true;
+            }
             this.savePrograms();
          }
       },
@@ -518,7 +537,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             $("#grid").css("left", panelWidth + 20 + "px");
             if (this.languages[this.player] == "blockly") {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
-               //Blockly.fireUiEvent(window, 'resize');
+               Blockly.svgResize(this.workspace);
             }
          }
          this.prevWidth = panelWidth;
@@ -625,13 +644,36 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       getStdBlocks: function() {
          return [
             {
+               category: "input",
+               name: this.strings.inputs,
+               colour: 345,
+               blocks: [
+                  { 
+                        name: "input_num", 
+                        xml: "<block type='input_num'></block>"
+                  },
+                  { 
+                        name: "input_char", 
+                        xml: "<block type='input_char'></block>"
+                  },
+                  { 
+                        name: "input_word", 
+                        xml: "<block type='input_word'></block>"
+                  },
+                  { 
+                        name: "input_line", 
+                        xml: "<block type='input_line'></block>"
+                  }
+               ]
+            },
+            {
                category: "logic",
                name: this.strings.logic,
                colour: 65,
                blocks: [
                   {
-                     name: "controls_if",
-                     xml: "<block type='controls_if' colour='65'></block>"
+                        name: "controls_if",
+                        xml: "<block type='controls_if' colour='65'></block>"
                   },
                   { 
                         name: "controls_if_else",
@@ -802,7 +844,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             {
                category: "text",
                name: this.strings.text,
-               coulour: 210,
+               colour: 210,
                blocks: [
                   {
                         name: "text", 
@@ -914,9 +956,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                ]
             },
             {
-               category: "list",
-               name: this.strings.list,
-               coulour: 210,
+               category: "lists",
+               name: this.strings.lists,
+               colour: 260,
                blocks: [
                   {
                      name: "lists_create_with_empty", 
@@ -987,6 +1029,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                           "</block>"
                   },
                   {
+                     name: "lists_sort", 
+                     xml: "<block type='lists_sort'></block>"
+                  },
+                  {
                      name: "lists_split", 
                      xml: "<block type='lists_split'>" +
                           "    <value name='DELIM'>" +
@@ -995,13 +1041,17 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                           "        </shadow>" +
                           "    </value>" +
                           "</block>"
-                  }
+                  },
+                  {
+                     name: "lists_append", 
+                     xml: "<block type='lists_append'></block>"
+                  },
                ]
             },
             {
                category: "colour",
                name: this.strings.colour,
-               coulour: 210,
+               colour: 210,
                blocks: [
                   {
                      name: "colour_picker", 
@@ -1050,6 +1100,25 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                           "        </shadow>" +
                           "    </value>" +
                           "</block>"
+                  }
+               ]
+            },
+            {
+               category: "dicsts",
+               name: this.strings.dicts,
+               colour: 0,
+               blocks: [
+                  { 
+                        name: "dict_get_literal", 
+                        xml: "<block type='dict_get_literal'></block>"
+                  },
+                  { 
+                        name: "dict_keys", 
+                        xml: "<block type='dict_keys'></block>"
+                  },
+                  { 
+                        name: "dicts_create_with", 
+                        xml: "<block type='dicts_create_with'></block>"
                   }
                ]
             },
