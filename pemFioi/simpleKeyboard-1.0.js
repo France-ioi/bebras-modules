@@ -1,4 +1,4 @@
-function Keyboard() {
+function Keyboard(afterPressCallback) {
    this.boxes = [];
    this.maps = [];
 
@@ -80,6 +80,9 @@ function Keyboard() {
          }
 
          element.text(content);
+      }
+      if (afterPressCallback) {
+         afterPressCallback(keyCode);
       }
    };
 }
