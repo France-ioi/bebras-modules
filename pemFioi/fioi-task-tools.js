@@ -195,7 +195,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    function fillAnimation() {
       for (var i = 0; i < PEMInstallationAPIObject.task.length; i++) {
          var resource = PEMInstallationAPIObject.task[i];
-         if (resource.type == 'javascript' && resource.id == 'animation') {
+         if (resource.type == 'javascript' && resource.id == 'animation' && typeof resource.url !== 'undefined') {
             waiting += 1;
             $.get(resource.url)
                .done(function(scriptContent) {
