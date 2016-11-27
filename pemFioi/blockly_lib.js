@@ -1470,7 +1470,7 @@ function initBlocklyRunner(context, messageCallback) {
             if (context.success) {
                message = "<span style='color:green;font-weight:bold'>" + message + "</span>"; 
                if (context.linkBack) {
-                  message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline'>Retour à la liste des questions</span>";
+                  message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
             }
             messageCallback(message);
