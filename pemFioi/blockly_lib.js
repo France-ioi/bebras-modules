@@ -1529,7 +1529,7 @@ var initBlocklySubTask = function(subTask) {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
-      $('body').css('width', '100%');
+      $('body').css('width', '100%').css('max-width', '1200px').css('margin', 'auto');
       window.focus();
 
       this.iTestCase = 0;
