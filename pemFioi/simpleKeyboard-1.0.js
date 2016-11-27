@@ -1,12 +1,16 @@
 function Keyboard(afterPressCallback) {
    this.boxes = [];
    this.maps = [];
+   this.realKeys = {};
 
-   this.registerButton = function(element, keyCode) {
+   this.registerButton = function (element, keyCode, enableRealKeyboard) {
       var that = this;
       element.click(function() {
          that._keyPress(keyCode);
       });
+      if (enableRealKeyboard) {
+         this.registerRealKeyboard(keyCode);
+      }
    };
 
    this.simulateKey = function(keyCode) {
@@ -20,7 +24,7 @@ function Keyboard(afterPressCallback) {
       });
    };
 
-   this.addMap = function(element, visualKeyRows) {
+   this.addMap = function(element, visualKeyRows, enableRealKeyboard) {
       this.maps.push(element);
       var content = "";
       var iRow, iKey, row, keyCode, buttonText;
@@ -45,9 +49,25 @@ function Keyboard(afterPressCallback) {
          row = visualKeyRows[iRow];
          for (iKey = 0; iKey < row.length; iKey++) {
             keyCode = this._getCharCode(row[iKey].keyCode);
-            this.registerButton($(".keyboard_button_" + keyCode), keyCode);
+            this.registerButton($(".keyboard_button_" + keyCode), keyCode, enableRealKeyboard);
          }
       }
+   };
+
+   this.registerRealKeyboard = function (keyCode) {
+      if ($.isEmptyObject(this.realKeys)) {
+         this._listenRealKeyboard();
+      }
+      this.realKeys[keyCode] = true;
+   };
+
+   this._listenRealKeyboard = function () {
+      var self = this;
+      $(document).bind("keypress.VIRTUAL_KEYBOARD", function (event) {
+         if (self.realKeys[event.which]) {
+            self._keyPress(event.which);
+         }
+      });
    };
 
    this._getCharCode = function(keyCode) {
@@ -61,6 +81,7 @@ function Keyboard(afterPressCallback) {
       for (var iMap in this.maps) {
          this.maps[iMap].html("");
       }
+      $(document).unbind("keypress.VIRTUAL_KEYBOARD");
    };
 
    this._keyPress = function(keyCode) {
