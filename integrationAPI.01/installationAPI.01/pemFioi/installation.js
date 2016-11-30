@@ -150,6 +150,15 @@ window.implementGetResources = function(task) {
       $('source, track').each(function() {
         res.files.push({ type: this.tagName, url: $(this).attr('src') });
       });
+      $('fioi-video-player').each(function() {
+        var fileAttributes = ["data-source", "data-image", "data-subtitles"];
+        for(var i=0; i<fileAttributes.length; i++) {
+           var curAttr = $(this).attr(fileAttributes[i]);
+           if(curAttr) {
+              res.files.push({ type: fileAttributes[i], url: curAttr });
+           }
+        }
+      });
 
       taskResourcesLoaded = true;
       callback(res);
