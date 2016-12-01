@@ -26,19 +26,21 @@ function resetFormElement(e) {
 
 var languageStrings = {
    fr: {
-      actions: "Actions",
-      sensors: "Capteurs",
-      debug: "Débuggage",
-      colour: "Couleurs",
-      dicts: "Dictionnaires",
-      inputs: "Entrées",
-      lists: "Listes",
-      logic: "Logique",
-      loops: "Boucles",
-      math: "Maths",
-      text: "Texte",
-      variables: "Variables",
-      functions: "Fonctions",
+      categories: {
+         actions: "Actions",
+         sensors: "Capteurs",
+         debug: "Débuggage",
+         colour: "Couleurs",
+         dicts: "Dictionnaires",
+         inputs: "Entrées",
+         lists: "Listes",
+         logic: "Logique",
+         loops: "Boucles",
+         math: "Maths",
+         text: "Texte",
+         variables: "Variables",
+         functions: "Fonctions",
+      },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
       download: "télécharger",
@@ -46,9 +48,6 @@ var languageStrings = {
       greatestOfTwoNumbers: "Plus grand des deux nombres",
       programOfRobot: "Programme du robot",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
-      if: "si",
-      do: "faire",
-      else: "sinon",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
       stopProgram: "Recommencer",
@@ -68,19 +67,21 @@ var languageStrings = {
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés."
    },
    en: {
-      actions: "Actions",
-      sensors: "Sensors",
-      debug: "Debug",
-      colour: "Colors",
-      dicts: "Dictionnaries",
-      inputs: "Inputs",
-      lists: "Lists",
-      logic: "Logic",
-      loops: "Loops",
-      math: "Math",
-      text: "Text",
-      variables: "Variables",
-      functions: "Functions",
+      categories: {
+         actions: "Actions",
+         sensors: "Sensors",
+         debug: "Debug",
+         colour: "Colors",
+         dicts: "Dictionnaries",
+         inputs: "Inputs",
+         lists: "Lists",
+         logic: "Logic",
+         loops: "Loops",
+         math: "Math",
+         text: "Text",
+         variables: "Variables",
+         functions: "Functions",
+      },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
       download: "download",
@@ -88,9 +89,6 @@ var languageStrings = {
       greatestOfTwoNumbers: "Greatest of the two numbers",
       programOfRobot: "Robot's program",
       tooManyIterations: "Too many iterations before an action!",
-      if: "if",
-      do: "do",
-      else: "else",
       submitProgram: "Validate this program",
       runProgram: "Run this program",
       stopProgram: "Stop",
@@ -110,19 +108,21 @@ var languageStrings = {
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available."
    },
    de: {
-      actions: "Aktionen",
-      sensors: "Sensoren",
-      debug: "Debug",
-      colour: "Farben",
-      dicts: "Diktionär",
-      inputs: "Eingaben",
-      lists: "Listen",
-      logic: "Logik",
-      loops: "Schleifen",
-      math: "Mathe",
-      text: "Texte",
-      variables: "Variablen",
-      functions: "Funktionen",
+      categories: {
+         actions: "Aktionen",
+         sensors: "Sensoren",
+         debug: "Debug",
+         colour: "Farben",
+         dicts: "Diktionär",
+         inputs: "Eingaben",
+         lists: "Listen",
+         logic: "Logik",
+         loops: "Schleifen",
+         math: "Mathe",
+         text: "Texte",
+         variables: "Variablen",
+         functions: "Funktionen",
+      },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
       download: "Herunterladen",
@@ -130,9 +130,6 @@ var languageStrings = {
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
-      if: "wenn",
-      do: "mache",
-      else: "sonst",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
       stopProgram: "Stop",
@@ -599,6 +596,115 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
       },
 
+      completeBlockHandler: function(block, objectName, context) {
+         if (typeof block.handler == "undefined") {
+            block.handler = context[objectName][block.name];
+         }
+      },
+      completeBlockJson: function(block, objectName, categoryName) {
+         if (typeof block.blocklyJson == "undefined") {
+            block.blocklyJson =  {};
+         }
+
+         // Set block name
+         if (typeof block.blocklyJson.type == "undefined") {
+            block.blocklyJson.type = block.name;
+         }
+
+         // Add connectors (top-bottom or left)
+         if (typeof block.blocklyJson.output == "undefined" &&
+             typeof block.blocklyJson.previousStatement == "undefined" &&
+             typeof block.blocklyJson.nextStatement == "undefined" &&
+             !(block.noConnectors)) {
+            if (block.yieldsValue) {
+               block.blocklyJson.output = null;
+            }
+            else {
+               block.blocklyJson.previousStatement = null;
+               block.blocklyJson.nextStatement = null;
+            }
+         }
+
+         // Add parameters
+         if (typeof block.blocklyJson.args0 == "undefined" &&
+             typeof block.params != "undefined" &&
+             block.params.length > 0) {
+            block.blocklyJson.args0 = [];
+            for (var iParam in block.params) {
+               var param = {
+                  type: "input_value",
+                  name: "PARAM_" + iParam
+               }
+                  
+               if (block.params[iParam] != null) {
+                  param.check = block.params[iParam]; // Should be a string!
+               }
+               block.blocklyJson.args0.push(param);
+            }
+         }
+
+         // Add message string
+         if (typeof block.blocklyJson.message0 == "undefined") {
+            block.blocklyJson.message0 = strings.label[block.name];
+            
+            if (typeof block.blocklyJson.args0 != "undefined") {
+               var iParam = 0;
+               for (var iArgs0 in block.blocklyJson.args0) {
+                  if (block.blocklyJson.args0[iArgs0].type == "input_value") {
+                     iParam += 1;
+                     block.blocklyJson.message0 += " %" + iParam;
+                  }
+               }
+            }
+         }
+
+         // Tooltip & HelpUrl should always exist, so lets just add empty ones in case they don't exist
+         if (typeof block.blocklyJson.tooltip == "undefined") { block.blocklyJson.tooltip = ""; }
+         if (typeof block.blocklyJson.helpUrl == "undefined") { block.blocklyJson.helpUrl = ""; } // TODO: Or maybe not?
+      }, 
+      completeBlockXml: function(block) {
+         if (typeof block.blocklyXml == "undefined" || block.blocklyXml == "") {
+            block.blocklyXml = "<block type='" + block.name + "'></block>";
+         }
+      },
+      completeCodeGenerators: function(block, objectName) {
+
+
+ 
+      },
+      completeCodeGenerators: function(blockInfo, objectName) {
+         if (typeof blockInfo.codeGenerators == "undefined") {
+            blockInfo.codeGenerators = {};
+         }
+         
+         for (language in {JavaScript: null, Python: null}) {
+            if (typeof blockInfo.codeGenerators[language] == "undefined") {
+               blockInfo.codeGenerators[language] = function(block) {
+                  var params = ""; // TODO: Change
+                  for (var iParam = 0; iParam < nbParams; iParam++) {
+                     if (iParam != 0) {
+                        params += ", ";
+                     }
+                     params += Blockly[language].valueToCode(block, 'NAME_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
+                  }
+                  if (type == 0) { // TODO: Change
+                     return code + "(" + params + ");\n";
+                  } else if (type == 1){
+                     return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+                  }
+               }
+            }
+         }
+      },
+      applyCodeGenerators: function(block) {
+         for (language in block.codeGenerators) {
+            Blockly[language][block.name] = block.codeGenerators[language];
+         }
+      },
+
+
+      
+
       createBlock: function(label, code, type, nbParams) {
          Blockly.Blocks[label] = {
            init: function() {
@@ -622,9 +728,33 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
       },
 
-      createGeneratorsAndBlocks: function(generators) {
+      /* createGeneratorsAndBlocks: function(generators) { 
          for (var objectName in generators) {
             for (var iGen = 0; iGen < generators[objectName].length; iGen++) {
+               var generator = generators[objectName][iGen];
+               var label = objectName + "_" + generator.labelEn + "__";
+               var code = generator.codeFr;
+               this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
+               this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
+            }
+         }
+      },*/
+
+      createGeneratorsAndBlocks: function() {
+         var customGenerators = this.blocklyHelper.mainContext.customBlocks;
+         for (var objectName in customGenerators) {
+            for (var iCategory in customGenerators[objectName]) {
+               var category =  customGenerators[objectName][iCategory];
+               for (var iBlock in category.blocks) {
+                  var block = category.blocks[iBlock];
+
+                  /* TODO: Allow library writers to provide there own JS/Python code instead of just a handler */
+                  completeBlockHandler(block, objectName, context);
+                  completeBlockJson(block, objectName, category.category); /* category.category is category name */
+                  completeBlockXml(block);
+                  completeCodeGenerators(block, objectName);
+                  applyCodeGenerators(block);
+               }
                var generator = generators[objectName][iGen];
                var label = objectName + "_" + generator.labelEn + "__";
                var code = generator.codeFr;
@@ -670,496 +800,482 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          return [
             {
                category: "input",
-               name: this.strings.inputs,
-               colour: 345,
                blocks: [
                   { 
-                        name: "input_num", 
-                        xml: "<block type='input_num'></block>"
+                     name: "input_num", 
+                     blocklyXml: "<block type='input_num'></block>"
                   },
                   { 
-                        name: "input_char", 
-                        xml: "<block type='input_char'></block>"
+                     name: "input_char", 
+                     blocklyXml: "<block type='input_char'></block>"
                   },
                   { 
-                        name: "input_word", 
-                        xml: "<block type='input_word'></block>"
+                     name: "input_word", 
+                     blocklyXml: "<block type='input_word'></block>"
                   },
                   { 
-                        name: "input_line", 
-                        xml: "<block type='input_line'></block>"
+                     name: "input_line", 
+                     blocklyXml: "<block type='input_line'></block>"
                   }
                ]
             },
             {
                category: "logic",
-               name: this.strings.logic,
-               colour: 65,
                blocks: [
                   {
-                        name: "controls_if",
-                        xml: "<block type='controls_if' colour='65'></block>"
+                     name: "controls_if",
+                     blocklyXml: "<block type='controls_if'></block>"
                   },
                   { 
-                        name: "controls_if_else",
-                        xml: "<block type='controls_if_else' colour='65'></block>"
+                     name: "controls_if_else",
+                     blocklyXml: "<block type='controls_if_else'></block>"
                   },
                   { 
-                        name: "logic_compare", 
-                        xml: "<block type='logic_compare'></block>"
+                     name: "logic_compare", 
+                     blocklyXml: "<block type='logic_compare'></block>"
                   },
                   { 
-                        name: "logic_operation", 
-                        xml: "<block type='logic_operation'></block>"
+                     name: "logic_operation", 
+                     blocklyXml: "<block type='logic_operation'></block>"
                   },
                   { 
-                        name: "logic_negate", 
-                        xml: "<block type='logic_negate'></block>"
+                     name: "logic_negate", 
+                     blocklyXml: "<block type='logic_negate'></block>"
                   },
                   { 
-                        name: "logic_boolean", 
-                        xml: "<block type='logic_boolean'></block>"
+                     name: "logic_boolean", 
+                     blocklyXml: "<block type='logic_boolean'></block>"
                   }
                ]
             },
             {
                category: "loops",
-               name: this.strings.loops,
-               colour: 120,
                blocks: [
                   { 
-                        name: "controls_repeat", 
-                        xml: "<block type='controls_repeat'></block>"
+                     name: "controls_repeat", 
+                     blocklyXml: "<block type='controls_repeat'></block>"
                   },
                   { 
-                        name: "controls_repeat_ext", 
-                        xml: "<block type='controls_repeat_ext'><value name='TIMES'><block type='math_number'><field name='NUM'>10</field></block></value></block>"
+                     name: "controls_repeat_ext", 
+                     blocklyXml: "<block type='controls_repeat_ext'>" +
+                                 "  <value name='TIMES'>" +
+                                 "    <block type='math_number'>" +
+                                 "      <field name='NUM'>10</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   { 
-                        name: "controls_whileUntil", 
-                        xml: "<block type='controls_whileUntil'></block>"
+                     name: "controls_whileUntil", 
+                     blocklyXml: "<block type='controls_whileUntil'></block>"
                   },
                   { 
-                        name: "controls_for", 
-                        xml: "<block type='controls_for'>" +
-            "                    <value name='FROM'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                    <value name='TO'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>10</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                    <value name='BY'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "controls_for", 
+                     blocklyXml: "<block type='controls_for'>" +
+                                 "  <value name='FROM'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='TO'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>10</field>" +
+                                 "     </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='BY'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   { 
                      name: "controls_forEach",
                      excludedByDefault: true,
-                     xml: "<block type='controls_forEach'></block>"
+                     blocklyXml: "<block type='controls_forEach'></block>"
                   },
                   { 
-                        name: "controls_flow_statements", 
-                        xml: "<block type='controls_flow_statements'></block>"
+                     name: "controls_flow_statements", 
+                     blocklyXml: "<block type='controls_flow_statements'></block>"
                   }
                ]
             },
             {
                category: "math",
-               name: this.strings.math,
-               colour: 230,
                blocks: [
                   { 
-                        name: "math_number", 
-                        xml: "<block type='math_number' gap='32'></block>"
+                     name: "math_number", 
+                     blocklyXml: "<block type='math_number' gap='32'></block>"
                   },
                   {
-                        name: "math_arithmetic", 
-                        xml: "<block type='math_arithmetic'>" +
-            "                    <value name='A'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                    <value name='B'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_arithmetic", 
+                     blocklyXml: "<block type='math_arithmetic'>" +
+                                 "  <value name='A'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='B'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_number_property", 
-                        xml: "<block type='math_number_property'>" +
-            "                    <value name='NUMBER_TO_CHECK'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>0</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_number_property", 
+                     blocklyXml: "<block type='math_number_property'>" +
+                                 "  <value name='NUMBER_TO_CHECK'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>0</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_change", 
-                        xml: "<block type='math_change'>" +
-            "                    <value name='DELTA'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_change", 
+                     blocklyXml: "<block type='math_change'>" +
+                                 "  <value name='DELTA'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_round", 
-                        xml: "<block type='math_round'>" +
-            "                    <value name='NUM'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>3.1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_round", 
+                     blocklyXml: "<block type='math_round'>" +
+                                 "  <value name='NUM'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>3.1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_extra_single", 
-                        xml: "<block type='math_extra_single'>" +
-            "                    <value name='NUM'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>3.1</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_extra_single", 
+                     blocklyXml: "<block type='math_extra_single'>" +
+                                 "  <value name='NUM'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>3.1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_extra_double", 
-                        xml: "<block type='math_extra_double'>" +
-            "                    <value name='A'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='A'>2</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                    <value name='B'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='B'>2</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_extra_double", 
+                     blocklyXml: "<block type='math_extra_double'>" +
+                                 "  <value name='A'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='A'>2</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='B'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='B'>2</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
-                        name: "math_modulo", 
-                        xml: "<block type='math_modulo'>" +
-            "                    <value name='DIVIDEND'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>64</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                    <value name='DIVISOR'>" +
-            "                      <shadow type='math_number'>" +
-            "                        <field name='NUM'>10</field>" +
-            "                      </shadow>" +
-            "                    </value>" +
-            "                  </block>"
+                     name: "math_modulo", 
+                     blocklyXml: "<block type='math_modulo'>" +
+                                 "  <value name='DIVIDEND'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>64</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='DIVISOR'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>10</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   }
                ]
             },
             {
                category: "text",
-               name: this.strings.text,
-               colour: 210,
                blocks: [
                   {
-                        name: "text", 
-                        xml: "<block type='text'></block>"
+                     name: "text", 
+                     blocklyXml: "<block type='text'></block>"
                   },
                   {
-                        name: "text_join", 
-                        xml: "<block type='text_join'></block>"
+                     name: "text_join", 
+                     blocklyXml: "<block type='text_join'></block>"
                   },
                   {
-                        name: "text_append", 
-                        xml: "<block type='text_append'></block>"
+                     name: "text_append", 
+                     blocklyXml: "<block type='text_append'></block>"
                   },
                   {
                      name: "text_length", 
-                     xml: "<block type='text_length'>" +
-                          "    <value name='VALUE'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_length'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_isEmpty", 
-                     xml: "<block type='text_isEmpty'>" +
-                          "    <value name='VALUE'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'></field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_isEmpty'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'></field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_indexOf", 
-                     xml: "<block type='text_indexOf'>" +
-                          "    <value name='VALUE'>" +
-                          "        <block type='variables_get'>" +
-                          "        <field name='VAR'>{textVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "    <value name='FIND'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_indexOf'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{textVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "  <value name='FIND'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_charAt", 
-                     xml: "<block type='text_charAt'>" +
-                          "    <value name='VALUE'>" +
-                          "        <block type='variables_get'>" +
-                          "        <field name='VAR'>{textVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_charAt'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{textVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_getSubstring", 
-                     xml: "<block type='text_getSubstring'>" +
-                          "    <value name='STRING'>" +
-                          "        <block type='variables_get'>" +
-                          "        <field name='VAR'>{textVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_getSubstring'>" +
+                                 "  <value name='STRING'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{textVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_changeCase", 
-                     xml: "<block type='text_changeCase'>" +
-                          "    <value name='TEXT'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_changeCase'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_trim", 
-                     xml: "<block type='text_trim'>" +
-                          "    <value name='TEXT'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_trim'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_print", 
-                     xml: "<block type='text_print'>" +
-                          "    <value name='TEXT'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_print'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "text_prompt_ext", 
-                     xml: "<block type='text_prompt_ext'>" +
-                          "    <value name='TEXT'>" +
-                          "        <shadow type='text'>" +
-                          "        <field name='TEXT'>abc</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='text_prompt_ext'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   }
                ]
             },
             {
                category: "lists",
-               name: this.strings.lists,
-               colour: 260,
                blocks: [
                   {
                      name: "lists_create_with_empty", 
-                     xml: "<block type='lists_create_with'>" +
-                          "    <mutation items='0'></mutation>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_create_with'>" +
+                                 "  <mutation items='0'></mutation>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_create_with", 
-                     xml: "<block type='lists_create_with'></block>"
+                     blocklyXml: "<block type='lists_create_with'></block>"
                   },
                   {
                      name: "lists_repeat", 
-                     xml: "<block type='lists_repeat'>" +
-                          "    <value name='NUM'>" +
-                          "        <shadow type='math_number'>" +
-                          "            <field name='NUM'>5</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_repeat'>" +
+                                 "  <value name='NUM'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>5</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_length", 
-                     xml: "<block type='lists_length'></block>"
+                     blocklyXml: "<block type='lists_length'></block>"
                   },
                   {
                      name: "lists_isEmpty", 
-                     xml: "<block type='lists_isEmpty'></block>"
+                     blocklyXml: "<block type='lists_isEmpty'></block>"
                   },
                   {
                      name: "lists_indexOf", 
-                     xml: "<block type='lists_indexOf'>" +
-                          "    <value name='VALUE'>" +
-                          "        <block type='variables_get'>" +
-                          "            <field name='VAR'>{listVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_indexOf'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{listVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_getIndex", 
-                     xml: "<block type='lists_getIndex'>" +
-                          "    <value name='VALUE'>" +
-                          "        <block type='variables_get'>" +
-                          "            <field name='VAR'>{listVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_getIndex'>" +
+                                 "  <value name='VALUE'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{listVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_setIndex", 
-                     xml: "<block type='lists_setIndex'>" +
-                          "    <value name='LIST'>" +
-                          "        <block type='variables_get'>" +
-                          "            <field name='VAR'>{listVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_setIndex'>" +
+                                 "  <value name='LIST'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{listVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_getSublist", 
-                     xml: "<block type='lists_getSublist'>" +
-                          "    <value name='LIST'>" +
-                          "        <block type='variables_get'>" +
-                          "            <field name='VAR'>{listVariable}</field>" +
-                          "        </block>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_getSublist'>" +
+                                 "  <value name='LIST'>" +
+                                 "    <block type='variables_get'>" +
+                                 "      <field name='VAR'>{listVariable}</field>" +
+                                 "    </block>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_sort", 
-                     xml: "<block type='lists_sort'></block>"
+                     blocklyXml: "<block type='lists_sort'></block>"
                   },
                   {
                      name: "lists_split", 
-                     xml: "<block type='lists_split'>" +
-                          "    <value name='DELIM'>" +
-                          "        <shadow type='text'>" +
-                          "            <field name='TEXT'>,</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='lists_split'>" +
+                                 "  <value name='DELIM'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>,</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "lists_append", 
-                     xml: "<block type='lists_append'></block>"
+                     blocklyXml: "<block type='lists_append'></block>"
                   },
                ]
             },
             {
                category: "colour",
-               name: this.strings.colour,
-               colour: 210,
                blocks: [
                   {
                      name: "colour_picker", 
-                     xml: "<block type='colour_picker'></block>"
+                     blocklyXml: "<block type='colour_picker'></block>"
                   },
                   {
                      name: "colour_random", 
-                     xml: "<block type='colour_random'></block>"
+                     blocklyXml: "<block type='colour_random'></block>"
                   },
                   {
                      name: "colour_rgb", 
-                     xml: "<block type='colour_rgb'>" +
-                          "    <value name='RED'>" +
-                          "        <shadow type='math_number'>" +
-                          "            <field name='NUM'>100</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "    <value name='GREEN'>" +
-                          "        <shadow type='math_number'>" +
-                          "            <field name='NUM'>50</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "    <value name='BLUE'>" +
-                          "        <shadow type='math_number'>" +
-                          "            <field name='NUM'>0</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='colour_rgb'>" +
+                                 "  <value name='RED'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>100</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='GREEN'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>50</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='BLUE'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>0</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   },
                   {
                      name: "colour_blend", 
-                     xml: "<block type='colour_blend'>" +
-                          "    <value name='COLOUR1'>" +
-                          "        <shadow type='colour_picker'>" +
-                          "            <field name='COLOUR'>#ff0000</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "    <value name='COLOUR2'>" +
-                          "        <shadow type='colour_picker'>" +
-                          "            <field name='COLOUR'>#3333ff</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "    <value name='RATIO'>" +
-                          "        <shadow type='math_number'>" +
-                          "            <field name='NUM'>0.5</field>" +
-                          "        </shadow>" +
-                          "    </value>" +
-                          "</block>"
+                     blocklyXml: "<block type='colour_blend'>" +
+                                 "  <value name='COLOUR1'>" +
+                                 "    <shadow type='colour_picker'>" +
+                                 "      <field name='COLOUR'>#ff0000</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='COLOUR2'>" +
+                                 "    <shadow type='colour_picker'>" +
+                                 "      <field name='COLOUR'>#3333ff</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='RATIO'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>0.5</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   }
                ]
             },
             {
-               category: "dicsts",
-               name: this.strings.dicts,
-               colour: 0,
+               category: "dicts",
                blocks: [
                   { 
-                        name: "dict_get_literal", 
-                        xml: "<block type='dict_get_literal'></block>"
+                     name: "dict_get_literal", 
+                     blocklyXml: "<block type='dict_get_literal'></block>"
                   },
                   { 
-                        name: "dict_keys", 
-                        xml: "<block type='dict_keys'></block>"
+                     name: "dict_keys", 
+                     blocklyXml: "<block type='dict_keys'></block>"
                   },
                   { 
-                        name: "dicts_create_with", 
-                        xml: "<block type='dicts_create_with'></block>"
+                     name: "dicts_create_with", 
+                     blocklyXml: "<block type='dicts_create_with'></block>"
                   }
                ]
             },
             {
-                  category: "variables",
-                  name: this.strings.variables,
-                  colour: 330,
-                  custom: "VARIABLE",
-                  blocks: []
+               category: "variables",
+               custom: "VARIABLE",
+               blocks: []
             },
             {
-                  category: "functions",
-                  name: this.strings.functions,
-                  colour: 290,
-                  custom: "PROCEDURE",
-                  blocks: []
+               category: "functions",
+               custom: "PROCEDURE",
+               blocks: []
             }
          ];
       },
@@ -1357,42 +1473,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          Blockly.Blocks.controls_if.init = function() {
             old.call(this);  
             this.setMutator(undefined)
-         };
-
-         Blockly.Blocks['controls_if_else'] = {
-           init: function() {
-             this.appendValueInput("IF")
-                 .setCheck("Boolean")
-                 .appendField(that.strings.if);
-             this.appendDummyInput()
-                 .appendField(that.strings.do);
-             this.appendStatementInput("DO");
-             this.appendDummyInput()
-                 .appendField(that.strings.else);
-             this.appendStatementInput("ELSE");
-             this.setInputsInline(false);
-             this.setPreviousStatement(true);
-             this.setNextStatement(true);
-             this.setColour(65);
-             this.setTooltip('');
-         //    this.setHelpUrl('http://www.example.com/');
-           }
-         };
-
-         Blockly.JavaScript['controls_if_else'] = function(block) {
-           var condition = Blockly.JavaScript.valueToCode(block, 'IF',  Blockly.JavaScript.ORDER_NONE) || 'false';
-           var stmtIf = Blockly.JavaScript.statementToCode(block, 'DO');
-           var stmtElse = Blockly.JavaScript.statementToCode(block, 'ELSE');
-           var code = "if (" + condition + ") {\n" + stmtIf + "} else {\n" + stmtElse + "}\n";
-           return code;
-         };
-
-         Blockly.Python['controls_if_else'] = function(block) {
-           var condition = Blockly.Python.valueToCode(block, 'IF',  Blockly.Python.ORDER_NONE) || 'false';
-           var stmtIf = Blockly.Python.statementToCode(block, 'DO');
-           var stmtElse = Blockly.Python.statementToCode(block, 'ELSE');
-           var code = "if (" + condition + "):\n" + stmtIf + "else:\n" + stmtElse + "\n";
-           return code;
          };
 
 
@@ -1661,13 +1741,13 @@ var initBlocklySubTask = function(subTask) {
          }
       }
 
-      this.context = getRobotGridContext(this.display, this.gridInfos, curLevel);
+      this.context = getContext(this.display, this.gridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
       this.blocklyHelper.mainContext = this.context;
-      this.blocklyHelper.createGeneratorsAndBlocks(this.context.generators);
+      this.blocklyHelper.createGeneratorsAndBlocks(); 
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
@@ -1795,7 +1875,7 @@ var initBlocklySubTask = function(subTask) {
 
    subTask.getDefaultAnswerObject = function() {
       var defaultBlockly;
-      if (true){//}this.startingBlock) {
+      if (this.blocklyHelper.startingBlock) {
          defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block></xml>';
       }
       else {
