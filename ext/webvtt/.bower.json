@@ -1,0 +1,29 @@
+{
+  "name": "webvtt",
+  "homepage": "https://github.com/annevk/webvtt",
+  "authors": [
+    "annevk@annevk.nl"
+  ],
+  "description": "WebVTT parser and validator",
+  "main": "parser.js",
+  "keywords": [
+    "WebVTT"
+  ],
+  "license": "CC0-1.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "_release": "3438c8385d",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "3438c8385d06c57d88d91743e309e64e17b326fe"
+  },
+  "_source": "git://github.com/annevk/webvtt.git",
+  "_target": "*",
+  "_originalSource": "annevk/webvtt"
+}

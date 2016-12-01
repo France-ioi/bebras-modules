@@ -17,12 +17,15 @@ requirejs.config({
     "installationToModel": modulesPath+"/pemFioi/installationToModel-1.0",
     "taskController": taskPlatformPath+"/taskController",
     "pem-api": taskPlatformPath+"/pem-api",
+    "animation": taskPlatformPath+"/animation",
+    "fioi-video-player": taskPlatformPath+"/fioi-video-player",
     "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsDirective": taskPlatformPath+"/hints/directive",
     "showdown": modulesPath+"/ext/showdown/showdown.min",
     "showdownConvert": modulesPath+"/pemFioi/showdownConvert",
     "showSource": taskPlatformPath+"/showSource",
     "showSample": taskPlatformPath+"/samples/directive",
+    "webvtt": modulesPath+"/ext/webvtt/parser",
   },
   "shim": {
     "jquery": {"exports": "$"},
@@ -43,6 +46,7 @@ requirejs.config({
     "miniPlatform": {"deps": ["platform-pr"]},
     "installation": {"deps": ["platform-pr"]},
     "fioi-task-tools": {"deps": ["platform-pr", "models", 'installationToModel', 'showSample', "modelsManager", 'jquery', 'installation', 'taskController','limitsDirective', 'pem-api', 'hintsDirective', 'showSource']},
+    "fioi-video-player": {"deps": ['animation', 'taskController', 'webvtt']},
   }
 });
 require([
@@ -50,5 +54,6 @@ require([
   'fioi-editor2', 'jquery', 'lodash',
   'jschannel', 'platform-pr',
   'miniPlatform', 'fioi-task-tools',
+  'fioi-video-player',
   'showdown', 'showdownConvert'
 ]);
