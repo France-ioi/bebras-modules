@@ -249,7 +249,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    }
    fillSamples(FIOITaskMetaData.taskSamples, 'task');
    fillSources(FIOITaskMetaData.taskSources, 'task');
-   fillImages(PEMInstallationAPIObject.task);
+//   fillImages(PEMInstallationAPIObject.task);
    fillSources(FIOITaskMetaData.solutionSources, 'solution');
    fillImages(PEMInstallationAPIObject.solution);
    for (var hintNum in FIOITaskMetaData.hintsSources) {
