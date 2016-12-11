@@ -33,6 +33,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       player: 0,
       workspace: null,
       prevWidth: 0,
+      definitions: {},
+      generators: [],
       groupByCategory: true,
       includedAll: true,
       includedCategories : [],
@@ -237,6 +239,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (options == undefined) options = {};
          if (!options.divId) options.divId = 'blocklyDiv';
          this.strings = this.languageStrings[language];
+
+         this.createGeneratorsAndBlocks(this.generators);
+
          if (display) {
             this.loadHtml(nbTestCases);
             var xml = this.getToolboxXml();
@@ -309,7 +314,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
                   var generator = this.generators[objectName][iGen];
                   if (generator.category == categories[iCategory]) {
-                     categoryStr += "<block type='" + objectName + "_" + generator.labelEn + "__'></block>";
+                     categoryStr += "<block type='";
+                     categoryStr += (objectName == '.') ? '' : objectName + "_";
+                     categoryStr += generator.labelEn + "__'></block>";
                   }
                }
             }
@@ -544,7 +551,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
 
       createGenerator: function(label, code, type, nbParams) {
+         var jsDefinitions = this.definitions['javascript'] ? this.definitions['javascript'] : [];
+         var pyDefinitions = this.definitions['python'] ? this.definitions['python'] : [];
          Blockly.JavaScript[label] = function(block) {
+            for (var iDef=0; iDef < jsDefinitions.length; iDef++) {
+               var def = jsDefinitions[iDef];
+               Blockly.Javascript.definitions_[def.label] = def.code;
+            }
             var params = "";
             for (var iParam = 0; iParam < nbParams; iParam++) {
                if (iParam != 0) {
@@ -559,6 +572,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
            }
          };
          Blockly.Python[label] = function(block) {
+            for (var iDef=0; iDef < pyDefinitions.length; iDef++) {
+               var def = pyDefinitions[iDef];
+               Blockly.Python.definitions_[def.label] = def.code;
+            }
             var params = "";
             for (var iParam = 0; iParam < nbParams; iParam++) {
                if (iParam != 0) {
@@ -601,9 +618,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var objectName in generators) {
             for (var iGen = 0; iGen < generators[objectName].length; iGen++) {
                var generator = generators[objectName][iGen];
-               var label = objectName + "_" + generator.labelEn + "__";
-               var code = generator.codeFr;
-               this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
+               if(objectName == '.') {
+                 var label = generator.labelEn + "__";
+                 var code = generator.codeFr;
+               } else {
+                 var label = objectName + "_" + generator.labelEn + "__";
+                 var code = objectName + "." + generator.codeFr;
+               }
+               this.createGenerator(label, code, generator.type, generator.nbParams);
                this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
             }
          }
@@ -944,6 +966,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                           "</block>"
                   },
                   {
+                     name: "text_print_noend", 
+                     xml: "<block type='text_print_noend'></block>"
+                  },
+                  {
                      name: "text_prompt_ext", 
                      xml: "<block type='text_prompt_ext'>" +
                           "    <value name='TEXT'>" +
@@ -1148,7 +1174,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                if (blocksByCategory[generator.category] == undefined) {
                   blocksByCategory[generator.category] = [];
                }
-               blocksByCategory[generator.category].push(objectName + "_" + generator.labelEn + "__");
+               var blockName = (objectName == '.') ? generator.labelEn + "__" : objectName + "_" + generator.labelEn + "__";
+               blocksByCategory[generator.category].push(blockName);
             }
          }
          xml = "";
@@ -1642,7 +1669,6 @@ var initBlocklySubTask = function(subTask) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       this.blocklyHelper.mainContext = this.context;
-      this.blocklyHelper.createGeneratorsAndBlocks(this.context.generators);
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
