@@ -250,6 +250,13 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
    fillSamples(FIOITaskMetaData.taskSamples, 'task');
    fillSources(FIOITaskMetaData.taskSources, 'task');
 //   fillImages(PEMInstallationAPIObject.task);
+   // TODO :: remove that
+   for (var i = 0; i < PEMInstallationAPIObject.task.length; i++) {
+      var resource = PEMInstallationAPIObject.task[i];
+      if (resource.type == 'image') {
+         resource.content = 'deprecated';
+      }
+   }
    fillSources(FIOITaskMetaData.solutionSources, 'solution');
    fillImages(PEMInstallationAPIObject.solution);
    for (var hintNum in FIOITaskMetaData.hintsSources) {
