@@ -846,7 +846,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   { 
                      name: "controls_if_else",
-                     blocklyXml: "<block type='controls_if_else'></block>"
+                     blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>"
                   },
                   { 
                      name: "logic_compare", 
@@ -1366,10 +1366,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          
          xmlString = "";         
 
-         for (cat in categories) {
-            for (block in categories[cat]) {
-               xmlString += categories[cat][block];
-            }               
+         if (this.includeBlocks.groupByCategory) {
+            for (cat in categories) {
+               xmlString += "<category name='" + cat + "'>";
+               for (block in categories[cat]) {
+                  xmlString += categories[cat][block];
+               }
+               xmlString += "</category>";
+            }
+         }
+         else {
+            for (cat in categories) {               
+               for (block in categories[cat]) {
+                  xmlString += categories[cat][block];
+               }               
+            }
          }
                      
          return xmlString;
