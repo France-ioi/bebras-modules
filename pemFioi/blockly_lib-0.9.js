@@ -273,6 +273,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
             this.addExtraBlocks();
             this.workspace = Blockly.inject(options.divId, wsConfig);
+
+            var toolboxNode = $('#toolboxXml');
+            if (toolboxNode.length != 0) {
+               toolboxNode.html(xml);
+            }
+            
             Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
@@ -601,7 +607,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             block.handler = context[objectName][block.name];
          }
       },
-      completeBlockJson: function(block, objectName, categoryName) {
+      completeBlockJson: function(block, objectName, categoryName, context) {
+         // Needs context object solely for the language strings. Maybe change that …
+         
          if (typeof block.blocklyJson == "undefined") {
             block.blocklyJson =  {};
          }
@@ -645,7 +653,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
-            block.blocklyJson.message0 = strings.label[block.name];
+            block.blocklyJson.message0 = context.strings.label[block.name];
             
             if (typeof block.blocklyJson.args0 != "undefined") {
                var iParam = 0;
@@ -667,11 +675,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             block.blocklyXml = "<block type='" + block.name + "'></block>";
          }
       },
-      completeCodeGenerators: function(block, objectName) {
-
-
- 
-      },
       completeCodeGenerators: function(blockInfo, objectName) {
          if (typeof blockInfo.codeGenerators == "undefined") {
             blockInfo.codeGenerators = {};
@@ -685,7 +688,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      if (iParam != 0) {
                         params += ", ";
                      }
-                     params += Blockly[language].valueToCode(block, 'NAME_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
+                     params += Blockly[language].valueToCode(block, 'PARAM_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
                   }
                   if (type == 0) { // TODO: Change
                      return code + "(" + params + ");\n";
@@ -702,10 +705,26 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
       },
 
-
+      createBlock: function(block) {
+         if (typeof block.blocklyInit == "undefined") {
+            blocklyjson = block.blocklyJson;
+            Blockly.Blocks[block.name] = {
+               init: function() {
+                  this.jsonInit(blocklyjson);
+               }
+            };
+         }
+         else if (typeof block.blocklyInit == "function") {
+            Blockly.Blocks[block.name] = {
+               init: block.blocklyInit()
+            };
+         }
+         else {
+            console.err(block.name + ".blocklyInit is defined but not a function");
+         }
+      },
       
-
-      createBlock: function(label, code, type, nbParams) {
+      /*createBlock: function(label, code, type, nbParams) {
          Blockly.Blocks[label] = {
            init: function() {
              this.appendDummyInput()
@@ -726,7 +745,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              this.setHelpUrl('');
            }
          };
-      },
+      },*/
 
       /* createGeneratorsAndBlocks: function(generators) { 
          for (var objectName in generators) {
@@ -741,7 +760,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },*/
 
       createGeneratorsAndBlocks: function() {
-         var customGenerators = this.blocklyHelper.mainContext.customBlocks;
+         var customGenerators = this.mainContext.customBlocks;
          for (var objectName in customGenerators) {
             for (var iCategory in customGenerators[objectName]) {
                var category =  customGenerators[objectName][iCategory];
@@ -749,17 +768,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   var block = category.blocks[iBlock];
 
                   /* TODO: Allow library writers to provide there own JS/Python code instead of just a handler */
-                  completeBlockHandler(block, objectName, context);
-                  completeBlockJson(block, objectName, category.category); /* category.category is category name */
-                  completeBlockXml(block);
-                  completeCodeGenerators(block, objectName);
-                  applyCodeGenerators(block);
+                  this.completeBlockHandler(block, objectName, this.mainContext);
+                  this.completeBlockJson(block, objectName, category.category, this.mainContext); /* category.category is category name */
+                  this.completeBlockXml(block);
+                  this.completeCodeGenerators(block, objectName);
+                  this.applyCodeGenerators(block);
+                  this.createBlock(block);
                }
-               var generator = generators[objectName][iGen];
-               var label = objectName + "_" + generator.labelEn + "__";
-               var code = generator.codeFr;
-               this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
-               this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
+               // TODO: Anything of this still needs to be done?
+               //this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
+               //this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
             }
          }
       },
@@ -1280,7 +1298,84 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          ];
       },
 
+      getBlockXmlInfo: function(generatorStruct, blockName) {
+         for (category in generatorStruct) {
+            for (block in generatorStruct[category].blocks) {
+               if (generatorStruct[category].blocks[block].name == blockName) {
+                  return {
+                     category: category,
+                     xml: generatorStruct[category].blocks[block].blocklyXml,
+                  };
+               }
+            }
+         }
+
+         console.error("Block not found: " + blockName);
+         return null;
+      },
+      appendAllBlockXmlInfoForCategory: function(generatorStruct, categoryName, appendTo) {
+         for (category in generatorStruct) {
+            if (category == categoryName) {
+               for (block in generatorStruct[category].blocks) {
+                  appendTo.push(generatorStruct[category].blocks[block].blocklyXml);
+               }
+            }
+         }
+      },
+
       getToolboxXml: function() {
+         var categories = {};
+
+         for (var blockType in this.includeBlocks.generatedBlocks) {
+            for (var iBlock in this.includeBlocks.generatedBlocks[blockType]) {
+               var blockName = this.includeBlocks.generatedBlocks[blockType][iBlock];
+               var blockXmlInfo = this.getBlockXmlInfo(this.mainContext.customBlocks[blockType], blockName);
+               if (blockXmlInfo == null) continue;
+               
+               if (!(blockXmlInfo.category in categories)) {
+                  categories[blockXmlInfo.category] = []
+               }
+               
+               categories[blockXmlInfo.category].push(blockXmlInfo.xml);
+            }
+         }
+
+         var stdBlocks = this.getStdBlocks();
+
+         if (this.includeBlocks.standardBlocks.includeAll) {
+            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
+         }
+         for (var categoryName in this.includeBlocks.standardBlocks.wholeCategories) {
+            if (!(categoryName in categories)) {
+               categories[categoryName] = []
+            }
+            this.appendAllBlockXmlInfoForCategory(stdBlocks, categoryName, categories[categoryName]);
+         }
+         for (var iBlock in this.includeBlocks.standardBlocks.singleBlocks) {
+            var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
+            var blockXmlInfo = this.getBlockXmlInfo(stdBlocks, blockName);
+            if (blockXmlInfo == null) continue;
+
+            if (!(blockXmlInfo.category in categories)) {
+               categories[categoryName] = []
+            }
+            
+            categories[blockXmlInfo.category].push(blockXmlInfo.xml);
+         }
+
+         
+         xmlString = "";         
+
+         for (cat in categories) {
+            for (block in categories[cat]) {
+               xmlString += categories[cat][block];
+            }               
+         }
+                     
+         return xmlString;
+      },
+      
+      getToolboxXml2: function() {
          var blocksByCategory = {
          }
          for (var objectName in this.generators) {
@@ -1753,7 +1848,9 @@ var initBlocklySubTask = function(subTask) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      this.blocklyHelper.generators = this.context.generators;
+      this.blocklyHelper.includeBlocks = this.context.infos.includeBlocks;
+      // TODO: Merge-in level dependent block information
+      
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
       subTask.changeTest(0);
