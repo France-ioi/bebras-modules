@@ -818,7 +818,7 @@ var getContext = function(display, infos, curLevel) {
          },
       ],
       debug: [{ category: "debug",
-                blocks: [{ name: "alert", handler: context.debug_alert }] }]
+                blocks: [{ name: "alert", params: [null], handler: context.debug_alert }] }]
    };
 
    var isOutsideGrid = function(row, col) {
