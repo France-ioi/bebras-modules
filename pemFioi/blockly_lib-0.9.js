@@ -661,6 +661,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
             block.blocklyJson.message0 = context.strings.label[block.name];
+
+            if (typeof block.blocklyJson.message0 == "undefined") {
+               block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
+            }
             
             if (typeof block.blocklyJson.args0 != "undefined") {
                var iParam = 0;
@@ -1388,7 +1392,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             categories[blockXmlInfo.category].push(blockXmlInfo.xml);
          }
 
-         console.log(this.mainContext.customBlocks);
+         //console.log(this.mainContext.customBlocks);
          /*console.log(stdBlocks);*/
          
          xmlString = "";         
