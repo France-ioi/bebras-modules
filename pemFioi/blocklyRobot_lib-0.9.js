@@ -24,7 +24,7 @@ var getContext = function(display, infos, curLevel) {
             transportableSquare: "l'objet est carré",
             greenCell: "sur une case verte",
             brownCell: "sur une case marron",
-            markedCell: "sur une case marquée"
+            markedCell: "sur une case marquée",
             platformInFront: "plateforme devant",
             platformInFrontAndBelow: "plateforme devant plus bas",
             platformAbove: "plateforme au dessus",
@@ -131,7 +131,7 @@ var getContext = function(display, infos, curLevel) {
             transportableSquare: "l'objet est carré",
             greenCell: "sur une case verte",
             brownCell: "sur une case marron",
-            markedCell: "sur une case marquée"
+            markedCell: "sur une case marquée",
             platformInFront: "plateforme devant",
             platformInFrontAndBelow: "plateforme devant plus bas",
             platformAbove: "plateforme au dessus",
