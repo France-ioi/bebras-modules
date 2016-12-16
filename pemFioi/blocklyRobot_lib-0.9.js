@@ -6,7 +6,7 @@ var getContext = function(display, infos, curLevel) {
             right: "tourner à droite",
             left: "tourner à gauche",
             forward: "avancer",
-            turnAround: "faire demi-tour"
+            turnAround: "faire demi-tour",
             jump: "sauter",
             east: "avancer vers la droite",
             south: "avancer vers le bas",
