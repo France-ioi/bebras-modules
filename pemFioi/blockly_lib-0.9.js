@@ -719,7 +719,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      }
                   }
 
-                  return code + "(" + params + ");\n"; // TODO: REALLY REALLY REALLY CHANGE!
+                  if (typeof(blockInfo.blocklyJson.output) == "undefined") {                     
+                     return code + "(" + params + ");\n";
+                  }
+                  else {
+                     return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+                  }
+                  
                   /*if (type == 0) { // TODO: Change
                      return code + "(" + params + ");\n";
                   } else if (type == 1){
