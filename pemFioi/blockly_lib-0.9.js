@@ -715,7 +715,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                            params += ", ";
                         }
                         iParam += 1;
-                        params += Blockly[language].valueToCode(block, 'PARAM_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
+                        params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
                      }
                   }
 
@@ -803,7 +803,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                for (var iBlock in category.blocks) {
                   var block = category.blocks[iBlock];
 
-                  /* TODO: Allow library writers to provide there own JS/Python code instead of just a handler */
+                  /* TODO: Allow library writers to provide their own JS/Python code instead of just a handler */
                   this.completeBlockHandler(block, objectName, this.mainContext);
                   this.completeBlockJson(block, objectName, category.category, this.mainContext); /* category.category is category name */
                   this.completeBlockXml(block);
@@ -1423,98 +1423,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          return xmlString;
       },
       
-      getToolboxXml2: function() {
-         var blocksByCategory = {
-         }
-         for (var objectName in this.generators) {
-            for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
-               var generator = this.generators[objectName][iGen];
-               if (blocksByCategory[generator.category] == undefined) {
-                  blocksByCategory[generator.category] = [];
-               }
-               blocksByCategory[generator.category].push(objectName + "_" + generator.labelEn + "__");
-            }
-         }
-         xml = "";
-         for (var category in blocksByCategory) {
-            if (this.groupByCategory) {
-               xml += "<category name='" + this.strings[category] + "' colour='210'>";
-            }
-            var blocks = blocksByCategory[category];
-            for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-               xml += "<block type='" + blocks[iBlock] + "'></block>";
-            }
-            if (this.groupByCategory) {
-               xml += "</category>";
-            }
-         }
-         var stdBlocks = this.getStdBlocks();
-         for (var iCategory = 0; iCategory < stdBlocks.length; iCategory++) {
-            var category = stdBlocks[iCategory];
-            var catXml = "";
-            if (this.groupByCategory) {
-               catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
-            }
-            var isIncluded = false;
-            if (category.custom != undefined) {
-               catXml += " custom='" + category.custom + "'";
-               if (this.includedAll || ($.inArray(category.category, this.includedCategories) != -1)) {
-                  isIncluded = true;
-               }
-            }
-            catXml += ">";
-            for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
-               var block = category.blocks[iBlock];
-               if (this.includedAll ||
-                   ($.inArray(category.category, this.includedCategories) != -1) ||
-                   ($.inArray(block.name, this.includedBlocks) != -1)) {
-                  if (!block.excludedByDefault || ($.inArray(block.name, this.includedBlocks) != -1)) {
-                     catXml += block.xml;
-                     isIncluded = true;
-                  }
-               }
-            }
-            if (this.groupByCategory) {
-               catXml += "</category>";
-            }
-            if (isIncluded) {
-               xml += catXml;
-            }
-         }
 
-         // Handle variable blocks, which are normally automatically added with
-         // the VARIABLES category but can be customized here
-         if (this.availableVariables.length > 0 ||
-               ($.inArray('variables_get', this.includedBlocks) != -1) ||
-               ($.inArray('variables_set', this.includedBlocks) != -1)) {
-            if (this.groupByCategory) {
-               xml += "<category name='" + this.strings.variables + "' colour='330'>";
-            }
-
-            // block for each availableVariable
-            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-               xml += "<block type='variables_get' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
-            }
-            // generic modifyable block
-            if ($.inArray('variables_get', this.includedBlocks) != -1) {
-               xml += "<block type='variables_get'></block>"
-            }
-
-            // same for setting variables
-            for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-               xml += "<block type='variables_set' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
-            }
-            if ($.inArray('variables_set', this.includedBlocks) != -1) {
-               xml += "<block type='variables_set'></block>"
-            }
-
-            if (this.groupByCategory) {
-               xml += "</category>";
-            }
-         }
-         return xml;
-      },
-      
       addExtraBlocks: function() {
          var that = this;
          Blockly.Blocks['math_extra_single'] = {
@@ -1678,6 +1587,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       }
    }
 }
+
 
 function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
@@ -1845,6 +1755,47 @@ function initBlocklyRunner(context, messageCallback) {
 }
 
 
+
+// Merges arrays by values
+// (Flat-Copy only)
+function mergeIntoArray(into, other) {
+   for (iOther in other) {
+      var intoContains = false;
+
+      for (iInto in into) {
+         if (other[iOther] == into[iInto]) {
+            intoContains = true;
+         }
+      }
+
+      if (!intoContains) {
+         into.push(other[iOther]);
+      }
+   }
+}
+
+// Merges objects into each other similar to $.extend, but
+// merges Arrays differently (see above)
+// (Deep-Copy only)
+function mergeIntoObject(into, other) {
+   for (property in other) {
+      if (other[property] instanceof Array) {
+         if (!(into[property] instanceof Array)) {
+            into[property] = [];
+         }
+         mergeIntoArray(into[property], other[property]);
+      }
+      if (other[property] instanceof Object) {
+         if (!(into[property] instanceof Object)) {
+            into[property] = {};
+         }
+         mergeIntoObject(into[property], other[property]);
+      }
+      into[property] = other[property];
+   }
+}
+
+
 var initBlocklySubTask = function(subTask) {
    subTask.blocklyHelper = getBlocklyHelper(subTask.gridInfos.maxInstructions);
    subTask.answer = null;
@@ -1911,8 +1862,63 @@ var initBlocklySubTask = function(subTask) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      this.blocklyHelper.includeBlocks = this.context.infos.includeBlocks;
-      // TODO: Merge-in level dependent block information
+      // Merge-in level dependent block information
+      var includeBlocks = JSON.parse(JSON.stringify(this.context.infos.includeBlocks)); // deep copy
+
+      function arrayContains(array, needle) { for (index in array) if (needle == array[index]) return true; return false; }
+      
+      // TODO: Is there a way to do this better?
+      // Maybe we can write a merger function that merges arrays as we need them
+      if (typeof(this.context.infos.additionalBlocksByLevel) != "undefined") {
+         var additionalBlocks = this.context.infos.additionalBlocksByLevel[curLevel];
+         if (typeof(additionalBlocks) != "undefined") {
+            if (typeof(additionalBlocks.groupByCategory) != "undefined") includeBlocks.groupByCategory = additionalBlocks.groupByCategory;
+            if (typeof(additionalBlocks.generatedBlocks) != "undefined") {
+               for (objectName in additionalBlocks.generatedBlocks) {
+                  for (iBlock in additionalBlocks.generatedBlocks[objectName]) {
+                     if (!(objectName in includeBlocks.generatedBlocks)) {
+                        includeBlocks.generatedBlocks[objectName] = [];
+                     }
+                     if (!arrayContains(includeBlocks.generatedBlocks[objectName], additionalBlocks.generatedBlocks[objectName][iBlock])) {
+                        includeBlocks.generatedBlocks[objectName].push(additionalBlocks.generatedBlocks[objectName][iBlock]);
+                     }
+                  }
+               }
+            }
+            if (typeof(additionalBlocks.standardBlocks) != "undefined") {
+               if (typeof(additionalBlocks.standardBlocks.includeAll) != "undefined")
+                  includeBlocks.standardBlocks.includeAll = additionalBlocks.standardBlocks.includeAll;
+               if (typeof(additionalBlocks.standardBlocks.wholeCategories) != "undefined") {
+                  for (iCategory in additionalBlocks.standardBlocks.wholeCategories) {
+                     if (!arrayContains(includeBlocks.standardBlocks.wholeCategories, additionalBlocks.standardBlocks.wholeCategories[iCategory])) {
+                        includeBlocks.standardBlocks.wholeCategories.push(additionalBlocks.standardBlocks.wholeCategories[iCategory]);
+                     }
+                  }
+               }
+               if (typeof(additionalBlocks.standardBlocks.singleBlocks) != "undefined") {
+                  for (iBlock in additionalBlocks.standardBlocks.singleBlocks) {
+                     if (!arrayContains(includeBlocks.standardBlocks.singleBlocks, additionalBlocks.standardBlocks.singleBlocks[iBlock])) {
+                        includeBlocks.standardBlocks.singleBlocks.push(additionalBlocks.standardBlocks.singleBlocks[iBlock]);
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      
+      // This does not quite work yet :(
+      /*var includeBlocks = {};
+      mergeIntoObject(includeBlocks, this.context.infos.includeBlocks);
+      if (typeof(this.context.infos.additionalBlocksByLevel) != "undefined") {
+         var additionalBlocks = this.context.infos.additionalBlocksByLevel[curLevel];
+         if (typeof(additionalBlocks) != "undefined") {
+            mergeIntoObject(includeBlocks, additionalBlocks);
+         }
+      }*/
+
+
+      this.blocklyHelper.includeBlocks = includeBlocks;
       
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
