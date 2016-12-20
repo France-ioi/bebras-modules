@@ -4,131 +4,7 @@
  */
 
 
-var languageStrings = {
-  fr: {
-    categories: {
-      actions: "Actions",
-      sensors: "Capteurs",
-      debug: "Débuggage",
-      colour: "Couleurs",
-      dicts: "Dictionnaires",
-      inputs: "Entrées",
-      lists: "Listes",
-      logic: "Logique",
-      loops: "Boucles",
-      math: "Maths",
-      text: "Texte",
-      variables: "Variables",
-      functions: "Fonctions"
-    },
-    invalidContent: "Contenu invalide",
-    unknownFileType: "Type de fichier non reconnu",
-    download: "télécharger",
-    smallestOfTwoNumbers: "Plus petit des deux nombres",
-    greatestOfTwoNumbers: "Plus grand des deux nombres",
-    programOfRobot: "Programme du robot",
-    tooManyIterations: "Votre programme met trop de temps à se terminer !",
-    submitProgram: "Valider le programme",
-    runProgram: "Exécuter sur ce test",
-    stopProgram: "Recommencer",
-    speed: "Vitesse :",
-    slowSpeed: "Lent",
-    mediumSpeed: "Moyen",
-    fastSpeed: "Rapide",
-    ludicrousSpeed: "Très rapide",
-    selectLanguage: "Langage :",
-    blocklyLanguage: "Blockly",
-    javascriptLanguage: "Javascript",
-    importFromBlockly: "Repartir de blockly",
-    saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
-    avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
-    reloadProgram: "Recharger :",
-    saveProgram: "Enregistrer",
-    limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés."
-  },
-  en: {
-    categories: {
-      actions: "Actions",
-      sensors: "Sensors",
-      debug: "Debug",
-      colour: "Colors",
-      dicts: "Dictionnaries",
-      inputs: "Inputs",
-      lists: "Lists",
-      logic: "Logic",
-      loops: "Loops",
-      math: "Math",
-      text: "Text",
-      variables: "Variables",
-      functions: "Functions"
-    },
-    invalidContent: "Invalid content",
-    unknownFileType: "Unrecognized file type",
-    download: "download",
-    smallestOfTwoNumbers: "Smallest of the two numbers",
-    greatestOfTwoNumbers: "Greatest of the two numbers",
-    programOfRobot: "Robot's program",
-    tooManyIterations: "Too many iterations before an action!",
-    submitProgram: "Validate this program",
-    runProgram: "Run this program",
-    stopProgram: "Stop",
-    speed: "Speed:",
-    slowSpeed: "Slow",
-    mediumSpeed: "Medium",
-    fastSpeed: "Fast",
-    ludicrousSpeed: "Very fast",
-    selectLanguage: "Language :",
-    blocklyLanguage: "Blockly",
-    javascriptLanguage: "Javascript",
-    importFromBlockly: "Generate from blockly",
-    saveOrLoadProgram: "Save or reload your code:",
-    avoidReloadingOtherTask: "Warning: do not reload code for another task!",
-    reloadProgram: "Reload:",
-    saveProgram: "Save",
-    limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available."
-  },
-  de: {
-    categories: {
-      actions: "Aktionen",
-      sensors: "Sensoren",
-      debug: "Debug",
-      colour: "Farben",
-      dicts: "Diktionär",
-      inputs: "Eingaben",
-      lists: "Listen",
-      logic: "Logik",
-      loops: "Schleifen",
-      math: "Mathe",
-      text: "Texte",
-      variables: "Variablen",
-      functions: "Funktionen"
-    },
-    invalidContent: "Ungültiger Inhalt",
-    unknownFileType: "Ungültiger Datentyp",
-    download: "Herunterladen",
-    smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
-    greatestOfTwoNumbers: "Größte von zwei Zahlen",
-    programOfRobot: "Programm des Roboters",
-    tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
-    submitProgram: "Programm überprüfen lassen",
-    runProgram: "Programm ausführen",
-    stopProgram: "Stop",
-    speed: "Ablaufgeschwindigkeit:",
-    slowSpeed: "Langsam",
-    mediumSpeed: "Mittel",
-    fastSpeed: "Schnell",
-    ludicrousSpeed: "Sehr schnell",
-    selectLanguage: "Sprache:",
-    blocklyLanguage: "Blockly",
-    javascriptLanguage: "Javascript",
-    importFromBlockly: "Generiere von Blockly-Blöcken",
-    saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
-    avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
-    reloadProgram: "Laden:",
-    saveProgram: "Speichern",
-    limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar."
-  }
-};
+
 
 function resetFormElement(e) {
   e.wrap('<form>').closest('form').get(0).reset();
@@ -173,29 +49,7 @@ function getSharedHelper(maxBlocks, nbTestCases) {
     nbTestCases: nbTestCases,
 
     loadHtml: function(nbTestCases) {
-      var gridButtonsBefore = "";
-      if (nbTestCases > 1) {
-        gridButtonsBefore += "<div>\n" +
-          "  <input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
-          "  <span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>\n" +
-          "  <input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
-          "</div>\n";
-      }
-      $("#gridButtonsBefore").html(gridButtonsBefore);
-      var gridButtonsAfter = this.strings.speed +
-        "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>\n" +
-        "  <option value='200'>" + this.strings.slowSpeed + "</option>\n" +
-        "  <option value='50'>" + this.strings.mediumSpeed + "</option>\n" +
-        "  <option value='5'>" + this.strings.fastSpeed + "</option>\n" +
-        "  <option value='0'>" + this.strings.ludicrousSpeed + "</option>\n" +
-        "</select>&nbsp;&nbsp;" +
-        "<input type='button' value='" + this.strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
-      if (nbTestCases > 1) {
-        gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
-      }
-      gridButtonsAfter += "<input type='button' value='" + this.strings.submitProgram + "' onclick='task.displayedSubTask.submit()' /><br/>" +
-        "<div id='errors' style='color:red;padding-top:10px;'></div>";
-      $("#gridButtonsAfter").html(gridButtonsAfter);
+
     },
 
     unload: function() {
@@ -1703,4 +1557,4 @@ var initBlocklySubTask = function(subTask) {
   };
 }
 
- 
+

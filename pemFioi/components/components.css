@@ -1,0 +1,66 @@
+.max-instructions {
+    display: inline-block;
+    width: 24px;
+    text-align: right;
+}
+
+#taskContent {
+    text-align: left;
+    position: relative;
+}
+
+#gridContainer {
+    float: right;
+    width: 400px;
+    padding: 10px;
+}
+
+#taskIntro {
+    width: 100%;
+}
+
+#lang {
+    height: 40px;
+    display: none;
+}
+
+.clearBoth {
+    clear: both;
+}
+
+#editorContainer {
+    resize: vertical;
+    overflow: auto;
+    height: 600px;
+    padding-bottom: 10px;
+    border: solid black 1px;
+    width: 100%;
+    position: relative;
+}
+
+#blockly-workspace {
+    height: 100%;
+    width: 100%;
+}
+
+#javascript-workspace {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#python-workspace {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#testCaseName {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#errors {
+    color: red;
+    padding-top: 10px;
+}

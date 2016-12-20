@@ -56,50 +56,11 @@ if (EventTarget.prototype.addEventListenerBase == undefined) {
 
 var highlightPause = false;
 
-function getBlocklyHelper(sharedHelper) {
+function BlocklyHelper() {
 
-  var shared = sharedHelper;
-  var _blockly = JSON.parse(JSON.stringify(sharedHelper)); // clone for overriding purposes
 
-  _blockly.loadHtml = function (nbTestCases) {
-    var strMaxBlocks = "";
-    if (maxBlocks != undefined) {
-      strMaxBlocks = this.strings.limitBlocks.format({
-        maxBlocks: maxBlocks,
-        remainingBlocks: "<span class='blocklyCapacity' style='display:inline-block;width:24px;text-align:right'>XXX</span>"
-      });
-    }
-    $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
-      "  <div style='height: 40px;display:none' id='lang'>" +
-      "    <p>" + this.strings.selectLanguage +
-      "      <select id='selectLanguage' onchange='task.displayedSubTask.blocklyHelper.changeLanguage()'>" +
-      "        <option value='blockly'>" + this.strings.blocklyLanguage + "</option>" +
-      "        <option value='javascript'>" + this.strings.javascriptLanguage + "</option>" +
-      "      </select>" +
-      "      <input type='button' class='language_javascript' value='" + this.strings.importFromBlockly +
-      "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
-      "    </p>" +
-      "  </div>" +
-      "  <div style='clear:both;'>" + strMaxBlocks + "</div>" +
-      "  <div id='blocklyContainer' style='resize:vertical; overflow:auto; height:600px; padding-bottom:10px; " +
-      "border: solid black 1px; width: 100%; position:relative;'>" +
-      "    <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
-      "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
-      "  </div>" +
-      "  <div id='saveOrLoad'> " +
-      "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-      "    <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-      "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
-      "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-      "    <p><input type='button' value='" + this.strings.saveProgram +
-      "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span></p>" +
-      "</div>"
-    );
 
-    shared.loadHtml(nbTestCases);
-  };
-
-  _blockly.load = function (language, display, nbTestCases, options) {
+  var load = function (language, display, nbTestCases, options) {
     if (language == undefined) {
       language = "fr";
     }
@@ -170,7 +131,7 @@ function getBlocklyHelper(sharedHelper) {
     }
   };
 
-  _blockly.unload = function () {
+  var unload = function () {
     //var ws = Blockly.getMainWorkspace('blocklyDiv');
     var ws = this.workspace;
     if (ws != null) {
@@ -186,7 +147,7 @@ function getBlocklyHelper(sharedHelper) {
 
   };
 
-  _blockly.initXML = function () {
+  var initXML = function () {
     var categories = ["actions", "sensors", "debug"];
     for (var iCategory = 0; iCategory < categories.length; iCategory++) {
       var categoryStr = "";
@@ -203,7 +164,7 @@ function getBlocklyHelper(sharedHelper) {
     }
   };
 
-  _blockly.createSelection = function (id, start, end) {
+  var createSelection = function (id, start, end) {
     var field = document.getElementById(id);
     if (field.createTextRange) {
       var selRange = field.createTextRange();
@@ -220,7 +181,7 @@ function getBlocklyHelper(sharedHelper) {
     field.focus();
   };
 
-  _blockly.showStep = function (interpreter, id) {
+  var showStep = function (interpreter, id) {
     var start, end;
     if (interpreter.stateStack[0]) {
       var node = interpreter.stateStack[0].node;
@@ -233,7 +194,7 @@ function getBlocklyHelper(sharedHelper) {
     this.createSelection(id, start, end);
   };
 
-  _blockly.loadPlayer = function (player) {
+  var loadPlayer = function (player) {
     this.savePrograms();
     this.player = player;
     for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
@@ -255,7 +216,7 @@ function getBlocklyHelper(sharedHelper) {
     this.loadPrograms();
   };
 
-  _blockly.savePrograms = function() {
+  var savePrograms = function () {
     this.programs[this.player].javascript = $("#program").val();
     if (this.workspace != null) {
       var xml = Blockly.Xml.workspaceToDom(this.workspace);
@@ -265,7 +226,7 @@ function getBlocklyHelper(sharedHelper) {
     }
   };
 
-  _blockly.loadPrograms = function() {
+  var loadPrograms = function () {
     $("#program").val(this.programs[this.player].javascript);
     if (this.workspace != null) {
       var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
@@ -274,7 +235,7 @@ function getBlocklyHelper(sharedHelper) {
     }
   };
 
-  _blockly.getCodeFromXml = function(xmlText, language) {
+  var getCodeFromXml = function (xmlText, language) {
     try {
       var xml = Blockly.Xml.textToDom(xmlText)
     } catch (e) {
@@ -286,7 +247,7 @@ function getBlocklyHelper(sharedHelper) {
     return this.getCode(language, tmpWorkspace);
   };
 
-  _blockly.getCode = function(language, codeWorkspace) {
+  var getCode = function (language, codeWorkspace) {
     if (codeWorkspace == undefined) {
       codeWorkspace = this.workspace;
     }
@@ -324,9 +285,7 @@ function getBlocklyHelper(sharedHelper) {
     return code;
   };
 
-
-
-  return _blockly;
+  return {};
 }
 
 
