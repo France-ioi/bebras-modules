@@ -2,7 +2,7 @@
  * @author John Ropas
  * @since 19/12/2016
  */
-var languageStrings = {
+var localizationStrings = {
   fr: {
     categories: {
       actions: "Actions",
@@ -138,13 +138,14 @@ var languageStrings = {
 };
 
 var CONSTANTS = {
-  HELPER_TYPES: {
+  EDITOR_TYPE: {
     BLOCKLY: 'blockly',
     JAVASCRIPT: 'javascript',
     PYTHON: 'python'
   },
   SETTINGS: {
-    DEFAULT_HELPER_TYPE: 'blockly'
+    DEFAULT_EDITOR_TYPE: 'blockly',
+    DEFAULT_LOCALIZATION: 'fr'
   },
   HTML: {
     EDITOR: '#editor'
@@ -156,25 +157,38 @@ var CONSTANTS = {
   }
 };
 
-function EditorFactory(nbTestCases, maxInstructions, type) {
-
-  this.localization = CONSTANTS.LOCALIZATION.EN;
-
+function EditorFactory(nbTestCases, maxInstructions, type, mainContext) {
+  this._nbTestCases = nbTestCases || 0;
+  this._maxInstructions = maxInstructions || undefined;
+  this._type = type || CONSTANTS.SETTINGS.DEFAULT_EDITOR_TYPE;
+  this._textFile = null;
+  this._extended = false;
+  this._programs = [];
+  this._languages = [];
+  this._player = 0;
+  this._workspace = null;
+  this._prevWidth = 0;
+  this._mainContext = mainContext;
+  this._localizationStrings = localizationStrings;
+  this._startingBlock = true;
+  this._localization = CONSTANTS.SETTINGS.DEFAULT_LOCALIZATION;
   this.setLocalization = function (localization) {
-    this.localization = localization;
+    this._localization = localization;
   };
-
-  this.strings = languageStrings[CONSTANTS.LOCALIZATION.EN];
-
-  this.nbTestCases = nbTestCases || 0;
-
-  this.maxInstructions = maxInstructions || undefined;
-
-  this.type = type || CONSTANTS.SETTINGS.DEFAULT_HELPER_TYPE;
-
-
-  this.changeLanguage = function (e) {
-
+  this.getLocalization = function () {
+    return this._localization;
+  };
+  this._strings = localizationStrings[this._localization];
+  this._visible = true;
+  this.isVisible = function (visibleBool) {
+    this._visible = visibleBool;
+  };
+  this.isVisible = function () {
+    return this._visible;
+  };
+  this._includedBlocks = [];
+  this.setIncludedBlocks = function (ibs) {
+    this._includedBlocks = ibs;
   };
 
   this._loadXML = function () {
@@ -183,13 +197,13 @@ function EditorFactory(nbTestCases, maxInstructions, type) {
 
   this._loadLanguageSelector = function () {
     return "<div id='lang'>" +
-      " <p>" + this.strings.selectLanguage +
+      " <p>" + this._strings.selectLanguage +
       "   <select id='selectLanguage' onchange='task.displayedSubTask.blocklyHelper.changeLanguage()'>" +
-      "     <option value='blockly'>" + this.strings.blocklyLanguage + "</option>" +
-      "     <option value='javascript'>" + this.strings.javascriptLanguage + "</option>" +
-      "     <option value='python'>" + this.strings.pythonLanguage + "</option>" +
+      "     <option value='blockly'>" + this._strings.blocklyLanguage + "</option>" +
+      "     <option value='javascript'>" + this._strings.javascriptLanguage + "</option>" +
+      "     <option value='python'>" + this._strings.pythonLanguage + "</option>" +
       "   </select>" +
-      "   <input type='button' class='language_javascript' value='" + this.strings.importFromBlockly + "'" +
+      "   <input type='button' class='language_javascript' value='" + this._strings.importFromBlockly + "'" +
       "   onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
       " </p>" +
       "</div>";
@@ -200,7 +214,7 @@ function EditorFactory(nbTestCases, maxInstructions, type) {
     var strMaxBlocks = "";
 
     if (this.maxInstructions) {
-      strMaxBlocks = this.strings.limitBlocks.format({
+      strMaxBlocks = this._strings.limitBlocks.format({
         maxBlocks: this.maxInstructions,
         remainingBlocks: "<span class='max-instructions'>XXX</span>"
       });
@@ -219,13 +233,13 @@ function EditorFactory(nbTestCases, maxInstructions, type) {
 
   this._loadEditorTools = function () {
     return "<div id='saveOrLoad'>" +
-      " <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-      " <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-      " <p>" + this.strings.reloadProgram +
+      " <p><b>" + this._strings.saveOrLoadProgram + "</b></p>" +
+      " <p>" + this._strings.avoidReloadingOtherTask + "</p>" +
+      " <p>" + this._strings.reloadProgram +
       "   <input type='file' id='input' onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'>" +
       " </p>" +
       " <p>" +
-      "   <input type='button' value='" + this.strings.saveProgram + "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' />" +
+      "   <input type='button' value='" + this._strings.saveProgram + "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' />" +
       "   <span id='saveUrl'></span>" +
       " </p>" +
       "</div>";
@@ -238,33 +252,33 @@ function EditorFactory(nbTestCases, maxInstructions, type) {
     if (this.nbTestCases > 1) {
       gridButtonsBefore +=
         "<div>" +
-        "  <input type='button' value='" + this.strings.buttons.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
+        "  <input type='button' value='" + this._strings.buttons.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
         "  <span id='testCaseName'>Test 1</span>" +
-        "  <input type='button' value='" + this.strings.buttons.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
+        "  <input type='button' value='" + this._strings.buttons.next + "' onclick='task.displayedSubTask.changeTest(1)'/>" +
         "</div>";
     }
 
     $("#gridButtonsBefore").html(gridButtonsBefore);
 
-    var gridButtonsAfter = this.strings.speed +
+    var gridButtonsAfter = this._strings.speed +
       "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>" +
-      "  <option value='200'>" + this.strings.slowSpeed + "</option>" +
-      "  <option value='50'>" + this.strings.mediumSpeed + "</option>" +
-      "  <option value='5'>" + this.strings.fastSpeed + "</option>" +
-      "  <option value='0'>" + this.strings.ludicrousSpeed + "</option>" +
+      "  <option value='200'>" + this._strings.slowSpeed + "</option>" +
+      "  <option value='50'>" + this._strings.mediumSpeed + "</option>" +
+      "  <option value='5'>" + this._strings.fastSpeed + "</option>" +
+      "  <option value='0'>" + this._strings.ludicrousSpeed + "</option>" +
       "</select>&nbsp;&nbsp;" +
-      "<input type='button' value='" + this.strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
+      "<input type='button' value='" + this._strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
     if (nbTestCases > 1) {
-      gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
+      gridButtonsAfter += "<input type='button' value='" + this._strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
     }
     gridButtonsAfter +=
-      "<input type='button' value='" + this.strings.submitProgram + "' onclick='task.displayedSubTask.submit()' />" +
+      "<input type='button' value='" + this._strings.submitProgram + "' onclick='task.displayedSubTask.submit()' />" +
       "<br/>" +
       "<div id='errors'></div>";
     $("#gridButtonsAfter").html(gridButtonsAfter);
   };
 
-  this.loadEditor = function () {
+  this._loadBasicEditor = function () {
     $(CONSTANTS.HTML.EDITOR).html(
       this._loadXML() +
       this._loadLanguageSelector() +
@@ -274,8 +288,126 @@ function EditorFactory(nbTestCases, maxInstructions, type) {
     );
 
     this._loadGridButtons();
-  }
+  };
+
+  this._loadBlocklyEditor = function (_options) {
+
+    var blocklyEditor = new BlocklyEditor('includeBlock', this._mainContext);
+
+    var options = _options || {};
+
+    options.divId = options.divId || 'blocklyDiv';
+
+    if (this._visible) {
+      var xml = blocklyEditor.getToolboxXml();
+
+      var wsConfig = {
+        toolbox: "<xml>" + xml + "</xml>",
+        sounds: false,
+        media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
+      };
+
+      if (!this._groupByCategory) {
+        wsConfig.comments = true;
+        wsConfig.scrollbars = true;
+        wsConfig.trashcan = true;
+      }
+      if (this._maxInstructions != undefined) {
+        wsConfig.maxBlocks = this._maxInstructions;
+      }
+      if (options.readOnly) {
+        wsConfig.readOnly = true;
+      }
+
+      blocklyEditor.addExtraBlocks();
+
+      this._workspace = Blockly.inject(options.divId, wsConfig);
+
+      var toolboxNode = $('#toolboxXml');
+
+      if (toolboxNode.length != 0) {
+        toolboxNode.html(xml);
+      }
+
+      Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
+
+      $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
+
+      var that = this;
+
+      var onchange = function (e) {
+        window.focus();
+        $('.blocklyCapacity').html(that.workspace.remainingCapacity());
+      };
+
+      this._workspace.addChangeListener(onchange);
+
+      onchange();
+
+    } else {
+
+      this.workspace = new Blockly.Workspace();
+    }
+
+    this._programs = [];
+
+    for (var iPlayer = this._mainContext.nbRobots - 1; iPlayer >= 0; iPlayer-=1) {
+      this._programs[iPlayer] = { blockly: null, blocklyJS: "", blocklyPython: "", javascript: "", python: "" };
+      this.languages[iPlayer] = "blockly";
+      this.setPlayer(iPlayer);
+      if (!options.noRobot) {
+        var newXml;
+        if (this._startingBlock) {
+          newXml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+        }
+        else {
+          newXml = '<xml></xml>';
+        }
+
+        Blockly.Events.recordUndo = false;
+        Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(newXml), this.workspace);
+        Blockly.Events.recordUndo = true;
+      }
+      this.savePrograms();
+    }
+  };
+
+  this.setPlayer = function (newPlayer) {
+    this._player = newPlayer;
+    $("#selectPlayer").val(this._player);
+    $(".robot0, .robot1").hide();
+    $(".robot" + this._player).show();
+  };
+
+  this.savePrograms = function () {
+    this._programs[this._player].javascript = $("#program").val();
+    if (this._workspace) {
+      var xml = Blockly.Xml.workspaceToDom(this._workspace);
+      this._programs[this._player].blockly = Blockly.Xml.domToText(xml);
+      this._programs[this._player].blocklyJS = this.getCode("javascript");
+      this._programs[this._player].blocklyPython = this.getCode("python");
+    }
+  };
+
+  this.render = function (language, display, nbTestCases, _options) {
+
+    this._loadBasicEditor();
+
+    switch (this._type) {
+      case CONSTANTS.EDITOR_TYPE.BLOCKLY:
+        this._loadBlocklyEditor(_options);
+        break;
+      case CONSTANTS.EDITOR_TYPE.JAVASCRIPT:
+        break;
+      case CONSTANTS.EDITOR_TYPE.PYTHON:
+        break;
+    }
+  };
+
 
 }
+
+
+
 
 
