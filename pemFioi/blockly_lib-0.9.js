@@ -64,7 +64,8 @@ var languageStrings = {
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
-      limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés."
+      limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
+      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés."
    },
    en: {
       categories: {
@@ -105,7 +106,8 @@ var languageStrings = {
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       reloadProgram: "Reload:",
       saveProgram: "Save",
-      limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available."
+      limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available."
    },
    de: {
       categories: {
@@ -146,7 +148,8 @@ var languageStrings = {
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
-      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar."
+      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available." // TODO :: translate
    }
 }
 
@@ -168,6 +171,7 @@ if (!String.prototype.format) {
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    return {
+      scratchMode: false,
       textFile: null,
       extended: false,
       programs: [],
@@ -182,14 +186,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       availableVariables: [],
       languageStrings: languageStrings,
       startingBlock: true,
+      mediaUrl: "http://static-fioi.mblockelet.info/scratch-blocks/media/",
       loadHtml: function(nbTestCases) {
-         var strMaxBlocks = "";
-         if (maxBlocks != undefined) {
-            strMaxBlocks = this.strings.limitBlocks.format({
-               maxBlocks: maxBlocks,
-               remainingBlocks: "<span class='blocklyCapacity' style='display:inline-block;width:24px;text-align:right'>XXX</span>"
-            });
-         }
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
                                       "    <p>" + this.strings.selectLanguage +
@@ -201,7 +199,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                         "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
                                       "    </p>" +
                                       "  </div>" +
-                                      "  <div style='clear:both;'>" + strMaxBlocks + "</div>" +
+                                      "  <div id='blocklyCapacity' style='clear:both;'></div>" +
                                       "  <div id='blocklyContainer' style='resize:vertical; overflow:auto; height:600px; padding-bottom:10px; " +
                                         "border: solid black 1px; width: 100%; position:relative;'>" +
                                       "    <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
@@ -240,12 +238,18 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (nbTestCases > 1) {
             gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
          }
-         gridButtonsAfter += "<input type='button' value='" + this.strings.submitProgram + "' onclick='task.displayedSubTask.submit()' /><br/>" +
-                             "<div id='errors' style='color:red;padding-top:10px;'></div>";
+         gridButtonsAfter += "<button onclick='task.displayedSubTask.submit()'>"
+                             + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='24px' width='24px'>" : '')
+                             + this.strings.submitProgram
+                             + "</button><br/>"
+                             + "<div id='errors' style='color:red;padding-top:10px;'></div>";
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
       load: function(language, display, nbTestCases, options) {
+         if(this.scratchMode) {
+            this.fixScratch();
+         }
          if (language == undefined) {
             language = "fr";
          }
@@ -258,7 +262,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
-               media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
+               media: this.mediaUrl
             };
             if (!this.groupByCategory) {
                wsConfig.comments = true;
@@ -270,6 +274,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
             if (options.readOnly) {
                wsConfig.readOnly = true;
+            }
+            if (this.scratchMode) {
+               wsConfig.zoom = { startScale: 0.75 };
             }
             this.addExtraBlocks();
             this.workspace = Blockly.inject(options.divId, wsConfig);
@@ -284,7 +291,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var that = this;
             function onchange(event) {
                window.focus();
-               $('.blocklyCapacity').html(that.workspace.remainingCapacity());
+               var remaining = that.workspace.remainingCapacity();
+               optLimitBlocks = {
+                  maxBlocks: maxBlocks,
+                  remainingBlocks: Math.abs(remaining)
+                  };
+               var strLimitBlocks = remaining < 0 ? that.strings.limitBlocksOver : that.strings.limitBlocks;
+               $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
+               $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
+               
             }
             this.workspace.addChangeListener(onchange);
             onchange();
@@ -633,10 +648,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              !(block.noConnectors)) {
             if (block.yieldsValue) {
                block.blocklyJson.output = null;
+               if(this.scratchMode) {
+                   block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   block.blocklyJson.colour = Blockly.Colours.sensing.primary;
+                   block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
+                   block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+               }
             }
             else {
                block.blocklyJson.previousStatement = null;
                block.blocklyJson.nextStatement = null;
+               if(this.scratchMode) {
+                   block.blocklyJson.colour = Blockly.Colours.motion.primary;
+                   block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+                   block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+               }
             }
          }
 
@@ -681,8 +707,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (typeof block.blocklyJson.tooltip == "undefined") { block.blocklyJson.tooltip = ""; }
          if (typeof block.blocklyJson.helpUrl == "undefined") { block.blocklyJson.helpUrl = ""; } // TODO: Or maybe not?
 
-
-         if (typeof block.blocklyJson.colour == "undefined") { block.blocklyJson.colour = 65; } // TODO: Load default colours + custom styles
+         // TODO: Load default colours + custom styles
+         if (typeof block.blocklyJson.colour == "undefined") {
+            if(this.scratchMode) {
+               block.blocklyJson.colour
+            } else {
+               block.blocklyJson.colour = 210;
+            }
+         }
       }, 
       completeBlockXml: function(block) {
          if (typeof block.blocklyXml == "undefined" || block.blocklyXml == "") {
@@ -927,7 +959,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                blocks: [
                   { 
                      name: "controls_repeat", 
-                     blocklyXml: "<block type='controls_repeat'></block>"
+                     blocklyXml: "<block type='controls_repeat'>"+
+                         (this.scratchMode ?
+                            '<value name="TIMES">'+
+                              '<shadow type="math_number">'+
+                              '<field name="NUM">10</field>'+
+                              '</shadow>'+
+                            '</value>' : '')+
+                                 "</block>"
                   },
                   { 
                      name: "controls_repeat_ext", 
@@ -1347,7 +1386,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      colour = colours.categories._default;
                   }
                   
-                  categoriesXml[blockXmlInfo.category] = "<category name='" + blockXmlInfo.category + "' colour='" + colour + "'>";
+                  categoriesXml[blockXmlInfo.category] = "<category "
+                     + " name='" + blockXmlInfo.category + "'"
+                     + " colour='" + colour + "'"
+                     + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
+                     + ">";
                }
                
                categories[blockXmlInfo.category].push(blockXmlInfo.xml);
@@ -1370,7 +1413,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   colour = colours.categories._default;
                }
                
-               categoriesXml[categoryName] = "<category name='" + categoryName + "' colour='" + colour + "'>";
+               categoriesXml[blockXmlInfo.category] = "<category "
+                  + " name='" + categoryName + "'"
+                  + " colour='" + colour + "'"
+                  + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
+                  + ">";
             }
             this.appendAllBlockXmlInfoForCategory(stdBlocks, categoryName, categories[categoryName]);
          }
@@ -1393,7 +1440,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   colour = colours.categories._default;
                }
                
-               categoriesXml[blockXmlInfo.category] = "<category name='" + blockXmlInfo.category + "' colour='" + colour + "'>";
+               categoriesXml[blockXmlInfo.category] = "<category "
+                  + " name='" + blockXmlInfo.category + "'"
+                  + " colour='" + colour + "'"
+                  + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
+                  + ">";
             }
             
             categories[blockXmlInfo.category].push(blockXmlInfo.xml);
@@ -1427,6 +1478,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
       addExtraBlocks: function() {
          var that = this;
+
+         if(this.scratchMode) {
+            // add some renamed blocks
+            var controlNames = ['repeat', 'if', 'if_else'];
+            for(i=0; i<controlNames.length; i++) {
+                Blockly.Blocks['controls_'+controlNames[i]] = Blockly.Blocks['control_'+controlNames[i]];
+            }
+         }
+
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -1552,6 +1612,57 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
       },
 
+      fixScratch: function() {
+         Blockly.Workspace.prototype.getFlyout = function () { return null; };
+
+         Blockly.Workspace.prototype.remainingCapacity = function() {
+           if (!maxBlocks) {
+             return Infinity;
+           }
+           return maxBlocks - this.getAllBlocks().length;
+         };
+         
+         
+         Blockly.JavaScript['controls_if'] = function(block) {
+           // If/elseif/else condition.
+           var n = 0;
+           var argument = Blockly.JavaScript.valueToCode(block, 'CONDITION',
+               Blockly.JavaScript.ORDER_NONE) || 'false';
+           var branch = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
+           var code = 'if (' + argument + ') {\n' + branch + '}';
+           return code + '\n';
+         };
+         
+         Blockly.JavaScript['controls_repeat'] = function(block) {
+           // Repeat n times.
+           if (block.getField('TIMES')) {
+             // Internal number.
+             var repeats = String(Number(block.getFieldValue('TIMES')));
+           } else {
+             // External number.
+             var repeats = Blockly.JavaScript.valueToCode(block, 'TIMES',
+                 Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
+           }
+           var branch = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
+           branch = Blockly.JavaScript.addLoopTrap(branch, block.id);
+           var code = '';
+           var loopVar = Blockly.JavaScript.variableDB_.getDistinctName(
+               'count', Blockly.Variables.NAME_TYPE);
+           var endVar = repeats;
+           if (!repeats.match(/^\w+$/) && !Blockly.isNumber(repeats)) {
+             var endVar = Blockly.JavaScript.variableDB_.getDistinctName(
+                 'repeat_end', Blockly.Variables.NAME_TYPE);
+             code += 'var ' + endVar + ' = ' + repeats + ';\n';
+           }
+           code += 'for (var ' + loopVar + ' = 0; ' +
+               loopVar + ' < ' + endVar + '; ' +
+               loopVar + '++) {\n' +
+               branch + '}\n';
+           return code;
+         };
+
+      },
+
       run: function() {
          var that = this;
          var nbRunning = this.mainContext.runner.nbRunning();
@@ -1578,8 +1689,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
          that.highlightPause = false;
-         that.workspace.traceOn(true);
-         that.workspace.highlightBlock(null);
+         if(this.scratchMode) {
+            if(that.workspace.remainingCapacity() < 0) {
+               $('#errors').html('Trop de blocs utilisés !');
+               return;
+            }
+         } else {
+            that.workspace.traceOn(true);
+            that.workspace.highlightBlock(null);
+         }
          this.mainContext.runner.runCodes(codes);
       },
 
@@ -1647,7 +1765,7 @@ function initBlocklyRunner(context, messageCallback) {
          interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
 
          function highlightBlock(id) {
-            if (context.display) {
+            if (context.display && !context.blocklyHelper.scratchMode) {
                context.blocklyHelper.workspace.highlightBlock(id);
                highlightPause = true;
             }
