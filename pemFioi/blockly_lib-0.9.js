@@ -697,6 +697,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // for closure:
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
+         var output = blockInfo.blocklyJson.output;
          
          for (language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {               
@@ -714,12 +715,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                         if (iParam) {
                            params += ", ";
                         }
-                        iParam += 1;
                         params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                        iParam += 1;
                      }
                   }
 
-                  if (typeof(blockInfo.blocklyJson.output) == "undefined") {                     
+                  if (typeof output == "undefined") {                     
                      return code + "(" + params + ");\n";
                   }
                   else {
