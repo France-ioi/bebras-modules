@@ -55,8 +55,8 @@ var getContext = function(display, infos, curLevel) {
          },
          code: {
             wait: "attendre",
-            right: "droite",
-            left: "gauche",
+            right: "tourneDroite",
+            left: "tourneGauche",
             turnAround: "demiTour",
             jump: "sauter",
             forward: "avancer",
@@ -792,6 +792,7 @@ var getContext = function(display, infos, curLevel) {
       context.success = false;
       context.curRobot = 0;
       context.nbTransportedItems = 0;
+      context.nbCollectedItems = 0;
       if (context.display) {
          context.resetDisplay();
       } else {
@@ -1070,8 +1071,31 @@ var getContext = function(display, infos, curLevel) {
       item.dir = newDir;
       item.row = newRow;
       item.col = newCol;
+
+
+      var collectibles = context.getItems(newRow, newCol, {isCollectible: true});
+      var collected = [];
+      while (collectibles.length > 0) {
+         var collectible = collectibles[0];
+         collected.push(collectible);
+         context.items.splice(collectible.index, 1);
+         collectibles.splice(0, 1);
+         context.nbCollectedItems++;
+      }
+
+      function removeItemsElements(items) {
+         for (var iItem = 0; iItem < items.length; iItem++) {
+             items[iItem].element.remove();
+         }
+      }
+
       if (context.display) {
          var attr;
+         if (collected.length > 0) {
+            context.delayFactory.createTimeout("removeItems" + iRobot + "_" + Math.random(), function() {
+               removeItemsElements(collected);
+            }, infos.actionDelay);
+         }
          if (animate) {
             attr = itemAttributes(item);
             context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
