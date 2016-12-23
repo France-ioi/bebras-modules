@@ -1413,7 +1413,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   colour = colours.categories._default;
                }
                
-               categoriesXml[blockXmlInfo.category] = "<category "
+               categoriesXml[categoryName] = "<category "
                   + " name='" + categoryName + "'"
                   + " colour='" + colour + "'"
                   + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
