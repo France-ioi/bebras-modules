@@ -3,168 +3,16 @@
  * @since 17/12/2016
  */
 
-// We need to be able to clean all events
-if (EventTarget.prototype.addEventListenerBase == undefined) {
-  EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
-  EventTarget.prototype.addEventListener = function (type, listener) {
-    if (!this.EventList) {
-      this.EventList = [];
-    }
-    this.addEventListenerBase.apply(this, arguments);
-    if (!this.EventList[type]) {
-      this.EventList[type] = [];
-    }
-    var list = this.EventList[type];
-    for (var index = 0; index != list.length; index++) {
-      if (list[index] === listener) {
-        return;
-      }
-    }
-    list.push(listener);
-  };
-
-  EventTarget.prototype.removeEventListenerBase = EventTarget.prototype.removeEventListener;
-  EventTarget.prototype.removeEventListener = function (type, listener) {
-    if (!this.EventList) {
-      this.EventList = [];
-    }
-    if (listener instanceof Function) {
-      this.removeEventListenerBase.apply(this, arguments);
-    }
-    if (!this.EventList[type]) {
-      return;
-    }
-    var list = this.EventList[type];
-    for (var index = 0; index != list.length;) {
-      var item = list[index];
-      if (!listener) {
-        this.removeEventListenerBase(type, item);
-        list.splice(index, 1);
-        continue;
-      }
-      else if (item === listener) {
-        list.splice(index, 1);
-        break;
-      }
-      index++;
-    }
-    if (list.length == 0) {
-      delete this.EventList[type];
-    }
-  };
-}
-
-var highlightPause = false;
-
-function BlocklyEditor(includeBlocks, mainContext) {
-
+function BlocklyController(includeBlocks, mainContext, strings) {
+  this._strings = strings;
   this._includedAll = true;
   this._includedCategories = [];
-
-  this._availableVariables = [];
   this._includeBlocks = includeBlocks;
-  this.setIncludeBlocks = function (ibs) {
-    this._includedBlocks = ibs;
-  };
-
-  this._includedBlocks = [];
-  this.setIncludedBlocks = function (ibs) {
-    this._includedBlocks = ibs;
-  };
-
   this._groupByCategory = true;
-
   this._mainContext = mainContext;
 
-  this.getToolboxXml2 = function () {
-    var blocksByCategory = {}
-    for (var objectName in this.generators) {
-      for (var iGen = 0; iGen < this.generators[objectName].length; iGen++) {
-        var generator = this.generators[objectName][iGen];
-        if (blocksByCategory[generator.category] == undefined) {
-          blocksByCategory[generator.category] = [];
-        }
-        blocksByCategory[generator.category].push(objectName + "_" + generator.labelEn + "__");
-      }
-    }
-    xml = "";
-    for (var category in blocksByCategory) {
-      if (this.groupByCategory) {
-        xml += "<category name='" + this.strings[category] + "' colour='210'>";
-      }
-      var blocks = blocksByCategory[category];
-      for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-        xml += "<block type='" + blocks[iBlock] + "'></block>";
-      }
-      if (this.groupByCategory) {
-        xml += "</category>";
-      }
-    }
-    var stdBlocks = this.getStdBlocks();
-    for (var iCategory = 0; iCategory < stdBlocks.length; iCategory++) {
-      var category = stdBlocks[iCategory];
-      var catXml = "";
-      if (this.groupByCategory) {
-        catXml = "<category name='" + category.name + "' colour='" + category.colour + "'";
-      }
-      var isIncluded = false;
-      if (category.custom != undefined) {
-        catXml += " custom='" + category.custom + "'";
-        if (this._includedAll || ($.inArray(category.category, this._includedCategories) != -1)) {
-          isIncluded = true;
-        }
-      }
-      catXml += ">";
-      for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
-        var block = category.blocks[iBlock];
-        if (this._includedAll ||
-          ($.inArray(category.category, this._includedCategories) != -1) ||
-          ($.inArray(block.name, this._includedBlocks) != -1)) {
-          if (!block.excludedByDefault || ($.inArray(block.name, this._includedBlocks) != -1)) {
-            catXml += block.xml;
-            isIncluded = true;
-          }
-        }
-      }
-      if (this.groupByCategory) {
-        catXml += "</category>";
-      }
-      if (isIncluded) {
-        xml += catXml;
-      }
-    }
-
-    // Handle variable blocks, which are normally automatically added with
-    // the VARIABLES category but can be customized here
-    if (this.availableVariables.length > 0 ||
-      ($.inArray('variables_get', this._includedBlocks) != -1) ||
-      ($.inArray('variables_set', this.includedBlocks) != -1)) {
-      if (this.groupByCategory) {
-        xml += "<category name='" + this.strings.variables + "' colour='330'>";
-      }
-
-      // block for each availableVariable
-      for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-        xml += "<block type='variables_get' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
-      }
-      // generic modifyable block
-      if ($.inArray('variables_get', this.includedBlocks) != -1) {
-        xml += "<block type='variables_get'></block>"
-      }
-
-      // same for setting variables
-      for (var iVar = 0; iVar < this.availableVariables.length; iVar++) {
-        xml += "<block type='variables_set' editable='false'><field name='VAR'>" + this.availableVariables[iVar] + "</field></block>";
-      }
-      if ($.inArray('variables_set', this.includedBlocks) != -1) {
-        xml += "<block type='variables_set'></block>"
-      }
-
-      if (this.groupByCategory) {
-        xml += "</category>";
-      }
-    }
-    return xml;
+  this.setGroupByCategory = function (shouldGroup){
+    this._groupByCategory = shouldGroup;
   };
 
   this.getToolboxXml = function () {
@@ -247,7 +95,7 @@ function BlocklyEditor(includeBlocks, mainContext) {
     //console.log(this.mainContext.customBlocks);
     /*console.log(stdBlocks);*/
 
-    xmlString = "";
+    var xmlString = "";
 
     if (this._includeBlocks.groupByCategory) {
       for (cat in categories) {
@@ -836,7 +684,7 @@ function BlocklyEditor(includeBlocks, mainContext) {
     Blockly.Blocks['robot_start'] = {
       init: function () {
         this.appendDummyInput()
-          .appendField(that.strings.programOfRobot);
+          .appendField(that._strings.programOfRobot);
         this.setNextStatement(true);
         this.setColour(210);
         this.setTooltip('');
@@ -865,6 +713,243 @@ function BlocklyEditor(includeBlocks, mainContext) {
       }
     }
   };
+
+  this.createGenerator = function (label, code, type, nbParams) {
+    Blockly.JavaScript[label] = function (block) {
+      var params = "";
+      for (var iParam = 0; iParam < nbParams; iParam++) {
+        if (iParam != 0) {
+          params += ", ";
+        }
+        params += Blockly.JavaScript.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.JavaScript.ORDER_ATOMIC);
+      }
+      if (type == 0) {
+        return code + "(" + params + ");\n";
+      } else if (type == 1) {
+        return [code + "(" + params + ")", Blockly.JavaScript.ORDER_NONE];
+      }
+    };
+    Blockly.Python[label] = function (block) {
+      var params = "";
+      for (var iParam = 0; iParam < nbParams; iParam++) {
+        if (iParam != 0) {
+          params += ", ";
+        }
+        params += Blockly.Python.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.Python.ORDER_ATOMIC);
+      }
+      if (type == 0) {
+        return code + "(" + params + ")\n";
+      } else if (type == 1) {
+        return [code + "(" + params + ")", Blockly.Python.ORDER_NONE];
+      }
+    };
+  };
+
+  this.completeBlockHandler = function (block, objectName, context) {
+    if (typeof block.handler == "undefined") {
+      block.handler = context[objectName][block.name];
+    }
+
+
+    if (typeof block.handler == "undefined") {
+      block.handler = (function (oName, bName) {
+        return function () {
+          console.error("Error: No handler given. No function context." + oName + "." + bName + "() found!");
+        }
+      })(objectName, block.name);
+    }
+  };
+
+  this.completeBlockJson = function (block, objectName, categoryName, context) {
+    // Needs context object solely for the language strings. Maybe change that …
+
+    if (typeof block.blocklyJson == "undefined") {
+      block.blocklyJson = {};
+    }
+
+    // Set block name
+    if (typeof block.blocklyJson.type == "undefined") {
+      block.blocklyJson.type = block.name;
+    }
+
+    // Add connectors (top-bottom or left)
+    if (typeof block.blocklyJson.output == "undefined" &&
+      typeof block.blocklyJson.previousStatement == "undefined" &&
+      typeof block.blocklyJson.nextStatement == "undefined" && !(block.noConnectors)) {
+      if (block.yieldsValue) {
+        block.blocklyJson.output = null;
+      }
+      else {
+        block.blocklyJson.previousStatement = null;
+        block.blocklyJson.nextStatement = null;
+      }
+    }
+
+    // Add parameters
+    if (typeof block.blocklyJson.args0 == "undefined" &&
+      typeof block.params != "undefined" &&
+      block.params.length > 0) {
+      block.blocklyJson.args0 = [];
+      for (var iParam in block.params) {
+        var param = {
+          type: "input_value",
+          name: "PARAM_" + iParam
+        }
+
+        if (block.params[iParam] != null) {
+          param.check = block.params[iParam]; // Should be a string!
+        }
+        block.blocklyJson.args0.push(param);
+      }
+    }
+
+    // Add message string
+    if (typeof block.blocklyJson.message0 == "undefined") {
+      block.blocklyJson.message0 = context.strings.label[block.name];
+
+      if (typeof block.blocklyJson.message0 == "undefined") {
+        block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
+      }
+
+      if (typeof block.blocklyJson.args0 != "undefined") {
+        var iParam = 0;
+        for (var iArgs0 in block.blocklyJson.args0) {
+          if (block.blocklyJson.args0[iArgs0].type == "input_value") {
+            iParam += 1;
+            block.blocklyJson.message0 += " %" + iParam;
+          }
+        }
+      }
+    }
+
+    // Tooltip & HelpUrl should always exist, so lets just add empty ones in case they don't exist
+    if (typeof block.blocklyJson.tooltip == "undefined") {
+      block.blocklyJson.tooltip = "";
+    }
+    if (typeof block.blocklyJson.helpUrl == "undefined") {
+      block.blocklyJson.helpUrl = "";
+    } // TODO: Or maybe not?
+
+
+    if (typeof block.blocklyJson.colour == "undefined") {
+      block.blocklyJson.colour = 65;
+    } // TODO: Load default colours + custom styles
+  };
+
+  this.completeBlockXml = function (block) {
+    if (typeof block.blocklyXml == "undefined" || block.blocklyXml == "") {
+      block.blocklyXml = "<block type='" + block.name + "'></block>";
+    }
+  };
+
+  this.completeCodeGenerators = function (blockInfo, objectName) {
+    if (typeof blockInfo.codeGenerators == "undefined") {
+      blockInfo.codeGenerators = {};
+    }
+
+    // for closure:
+    var args0 = blockInfo.blocklyJson.args0;
+    var code = this._mainContext.strings.code[blockInfo.name];
+
+    for (var language in { JavaScript: null, Python: null }) {
+      if (typeof blockInfo.codeGenerators[language] == "undefined") {
+        blockInfo.codeGenerators[language] = function (block) {
+          var params = "";
+
+          /* There are three kinds of input: value_input, statement_input and dummy_input,
+           We should definitely consider value_input here and not consider dummy_input here.
+
+           I don't know how statement_input is handled best, so I'll ignore it first -- Robert
+           */
+          var iParam = 0;
+          for (var iArgs0 in args0) {
+            if (args0[iArgs0].type == "input_value") {
+              if (iParam) {
+                params += ", ";
+              }
+              iParam += 1;
+              params += Blockly[language].valueToCode(block, 'PARAM_' + (iParam + 1), Blockly[language].ORDER_ATOMIC);
+            }
+          }
+
+          if (typeof(blockInfo.blocklyJson.output) == "undefined") {
+            return code + "(" + params + ");\n";
+          }
+          else {
+            return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+          }
+
+          /*if (type == 0) { // TODO: Change
+           return code + "(" + params + ");\n";
+           } else if (type == 1){
+           return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+           }*/
+        }
+      }
+    }
+  };
+
+  this.applyCodeGenerators =  function (block) {
+    for (var language in block.codeGenerators) {
+      Blockly[language][block.name] = block.codeGenerators[language];
+    }
+  };
+
+  this.createBlock = function (block) {
+    if (typeof block.blocklyInit == "undefined") {
+      var blocklyjson = block.blocklyJson;
+      Blockly.Blocks[block.name] = {
+        init: function () {
+          this.jsonInit(blocklyjson);
+        }
+      };
+    }
+    else if (typeof block.blocklyInit == "function") {
+      Blockly.Blocks[block.name] = {
+        init: block.blocklyInit()
+      };
+    }
+    else {
+      console.error(block.name + ".blocklyInit is defined but not a function");
+    }
+  };
+
+  this.createGeneratorsAndBlocks = function () {
+    var customGenerators = this._mainContext.customBlocks;
+    for (var objectName in customGenerators) {
+      for (var iCategory in customGenerators[objectName]) {
+        var category = customGenerators[objectName][iCategory];
+        for (var iBlock in category.blocks) {
+          var block = category.blocks[iBlock];
+
+          /* TODO: Allow library writers to provide there own JS/Python code instead of just a handler */
+          this.completeBlockHandler(block, objectName, this._mainContext);
+          this.completeBlockJson(block, objectName, category.category, this._mainContext);
+          /* category.category is category name */
+          this.completeBlockXml(block);
+          this.completeCodeGenerators(block, objectName);
+          this.applyCodeGenerators(block);
+          this.createBlock(block);
+        }
+        // TODO: Anything of this still needs to be done?
+        //this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
+        //this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
+      }
+    }
+  };
+
+  this.getCodeFromXml = function (xmlText, language) {
+    try {
+      var xml = Blockly.Xml.textToDom(xmlText)
+    } catch (e) {
+      alert(e);
+      return;
+    }
+    var tmpWorkspace = new Blockly.Workspace();
+    Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
+    return this.getCode(language, tmpWorkspace);
+  };
+
 }
 
-
+CodeEditor.Controllers.BlocklyController = BlocklyController;
