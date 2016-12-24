@@ -153,6 +153,17 @@ var languageStrings = {
    }
 }
 
+// Blockly to Scratch translations
+var blocklyToScratch = {
+    singleBlocks: {
+        'controls_if': 'control_if',
+        'controls_if_else': 'control_if_else',
+        'controls_repeat': 'control_repeat',
+        'controls_repeat_ext': 'control_repeat'
+    }
+}
+
+
 // from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
 // where they got it from the stackoverflow-code itself ("formatUnicorn")
 if (!String.prototype.format) {
@@ -903,6 +914,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       
 
       getStdBlocks: function() {
+         return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
+      },
+
+      getStdBlocklyBlocks: function() {
          return [
             {
                category: "input",
@@ -959,13 +974,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                blocks: [
                   { 
                      name: "controls_repeat", 
-                     blocklyXml: "<block type='controls_repeat'>"+
-                         (this.scratchMode ?
-                            '<value name="TIMES">'+
-                              '<shadow type="math_number">'+
-                              '<field name="NUM">10</field>'+
-                              '</shadow>'+
-                            '</value>' : '')+
+                     blocklyXml: "<block type='controls_repeat'>" +
                                  "</block>"
                   },
                   { 
@@ -1336,6 +1345,35 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          ];
       },
 
+      getStdScratchBlocks: function() {
+         // TODO :: make the list of standard scratch blocks
+         return [
+            {
+               category: "control",
+               blocks: [
+                  {
+                     name: "control_if",
+                     blocklyXml: "<block type='control_if'></block>"
+                  },
+                  { 
+                     name: "control_if_else",
+                     blocklyXml: "<block type='control_if_else'></block>"
+                  },
+                  { 
+                     name: "control_repeat", 
+                     blocklyXml: "<block type='control_repeat'>" +
+                                 "  <value name='TIMES'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>10</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+               ]
+            }
+         ];
+      },
+
       getBlockXmlInfo: function(generatorStruct, blockName) {
          for (iCategory in generatorStruct) {
             for (iBlock in generatorStruct[iCategory].blocks) {
@@ -1479,14 +1517,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       addExtraBlocks: function() {
          var that = this;
 
-         if(this.scratchMode) {
-            // add some renamed blocks
-            var controlNames = ['repeat', 'if', 'if_else'];
-            for(i=0; i<controlNames.length; i++) {
-                Blockly.Blocks['controls_'+controlNames[i]] = Blockly.Blocks['control_'+controlNames[i]];
-            }
-         }
-
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -1582,11 +1612,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
 
 
-         var old = Blockly.Blocks.controls_if.init; 
-         Blockly.Blocks.controls_if.init = function() {
-            old.call(this);  
-            this.setMutator(undefined)
-         };
+         if(!this.scratchMode) {
+            var old = Blockly.Blocks.controls_if.init; 
+            Blockly.Blocks.controls_if.init = function() {
+               old.call(this);  
+               this.setMutator(undefined)
+            };
+         }
 
 
          Blockly.Blocks['robot_start'] = {
@@ -1613,54 +1645,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
 
       fixScratch: function() {
-         Blockly.Workspace.prototype.getFlyout = function () { return null; };
+         // Store the maxBlocks information somehwere, as Scratch ignores it
+         Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
-         Blockly.Workspace.prototype.remainingCapacity = function() {
-           if (!maxBlocks) {
-             return Infinity;
-           }
-           return maxBlocks - this.getAllBlocks().length;
-         };
-         
-         
-         Blockly.JavaScript['controls_if'] = function(block) {
-           // If/elseif/else condition.
-           var n = 0;
-           var argument = Blockly.JavaScript.valueToCode(block, 'CONDITION',
-               Blockly.JavaScript.ORDER_NONE) || 'false';
-           var branch = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
-           var code = 'if (' + argument + ') {\n' + branch + '}';
-           return code + '\n';
-         };
-         
-         Blockly.JavaScript['controls_repeat'] = function(block) {
-           // Repeat n times.
-           if (block.getField('TIMES')) {
-             // Internal number.
-             var repeats = String(Number(block.getFieldValue('TIMES')));
-           } else {
-             // External number.
-             var repeats = Blockly.JavaScript.valueToCode(block, 'TIMES',
-                 Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
-           }
-           var branch = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
-           branch = Blockly.JavaScript.addLoopTrap(branch, block.id);
-           var code = '';
-           var loopVar = Blockly.JavaScript.variableDB_.getDistinctName(
-               'count', Blockly.Variables.NAME_TYPE);
-           var endVar = repeats;
-           if (!repeats.match(/^\w+$/) && !Blockly.isNumber(repeats)) {
-             var endVar = Blockly.JavaScript.variableDB_.getDistinctName(
-                 'repeat_end', Blockly.Variables.NAME_TYPE);
-             code += 'var ' + endVar + ' = ' + repeats + ';\n';
-           }
-           code += 'for (var ' + loopVar + ' = 0; ' +
-               loopVar + ' < ' + endVar + '; ' +
-               loopVar + '++) {\n' +
-               branch + '}\n';
-           return code;
-         };
-
+         // Translate requested Blocks from Blockly to Scratch blocks
+         // TODO :: full translation
+         var newSingleBlocks = [];
+         for (var iBlock in this.includeBlocks.standardBlocks.singleBlocks) {
+            var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
+            if(blocklyToScratch.singleBlocks[blockName]) {
+                newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName]);
+            } else {
+                newSingleBlocks.push(blockName);
+            }
+         }
+         this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
       },
 
       run: function() {
