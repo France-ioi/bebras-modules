@@ -47,6 +47,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Plus petit des deux nombres",
       greatestOfTwoNumbers: "Plus grand des deux nombres",
       programOfRobot: "Programme du robot",
+      flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
@@ -89,6 +90,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Smallest of the two numbers",
       greatestOfTwoNumbers: "Greatest of the two numbers",
       programOfRobot: "Robot's program",
+      flagClicked: "When %1 clicked",
       tooManyIterations: "Too many iterations before an action!",
       submitProgram: "Validate this program",
       runProgram: "Run this program",
@@ -131,6 +133,7 @@ var languageStrings = {
       smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
+      flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
@@ -182,7 +185,7 @@ if (!String.prototype.format) {
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    return {
-      scratchMode: false,
+      scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       textFile: null,
       extended: false,
       programs: [],
@@ -250,7 +253,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
          }
          gridButtonsAfter += "<button onclick='task.displayedSubTask.submit()'>"
-                             + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='24px' width='24px'>" : '')
+                             + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
                              + this.strings.submitProgram
                              + "</button><br/>"
                              + "<div id='errors' style='color:red;padding-top:10px;'></div>";
@@ -326,7 +329,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if(!options.noRobot) {
                var xml;
                if (this.startingBlock) {
-                  xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+                  if(this.scratchMode) {
+                     xml = '<xml><block type="robot_start" deletable="false" movable="false" x="10" y="20"></block></xml>';
+                  } else {
+                     xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+                  }
                }
                else {
                   xml = '<xml></xml>';
@@ -1612,28 +1619,53 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
 
 
-         if(!this.scratchMode) {
+         if(this.scratchMode) {
+            Blockly.Blocks['robot_start'] = {
+              init: function() {
+                this.jsonInit({
+                  "id": "event_whenflagclicked",
+                  "message0": that.strings.flagClicked,
+                  "args0": [
+                    {
+                      "type": "field_image",
+                      "src": Blockly.mainWorkspace.options.pathToMedia + "icons/event_whenflagclicked.svg",
+                      "width": 24,
+                      "height": 24,
+                      "alt": "flag",
+                      "flip_rtl": true
+                    }
+                  ],
+                  "inputsInline": true,
+                  "nextStatement": null,
+                  "category": Blockly.Categories.event,
+                  "colour": Blockly.Colours.event.primary,
+                  "colourSecondary": Blockly.Colours.event.secondary,
+                  "colourTertiary": Blockly.Colours.event.tertiary
+                });
+              }
+            };
+
+         } else {
             var old = Blockly.Blocks.controls_if.init; 
             Blockly.Blocks.controls_if.init = function() {
                old.call(this);  
                this.setMutator(undefined)
             };
+
+            Blockly.Blocks['robot_start'] = {
+              init: function() {
+                this.appendDummyInput()
+                    .appendField(that.strings.programOfRobot);
+                this.setNextStatement(true);
+                this.setColour(210);
+                this.setTooltip('');
+                this.deletable_ = false;
+                this.editable_ = false;
+                this.movable_ = false;
+            //    this.setHelpUrl('http://www.example.com/');
+              }
+            };
          }
-
-
-         Blockly.Blocks['robot_start'] = {
-           init: function() {
-             this.appendDummyInput()
-                 .appendField(that.strings.programOfRobot);
-             this.setNextStatement(true);
-             this.setColour(210);
-             this.setTooltip('');
-             this.deletable_ = false;
-             this.editable_ = false;
-             this.movable_ = false;
-         //    this.setHelpUrl('http://www.example.com/');
-           }
-         };
 
          Blockly.JavaScript['robot_start'] = function(block) {
            return "";
