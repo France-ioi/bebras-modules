@@ -214,7 +214,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "    </p>" +
                                       "  </div>" +
                                       "  <div id='blocklyCapacity' style='clear:both;'></div>" +
-                                      "  <div id='blocklyContainer' style='resize:vertical; overflow:auto; height:600px; padding-bottom:10px; " +
+                                      "  <div id='blocklyContainer' style='resize:vertical; overflow:hidden; height:600px; padding-bottom:10px; " +
                                         "border: solid black 1px; width: 100%; position:relative;'>" +
                                       "    <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
@@ -278,11 +278,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                sounds: false,
                media: this.mediaUrl
             };
-            if (!this.groupByCategory) {
-               wsConfig.comments = true;
-               wsConfig.scrollbars = true;
-               wsConfig.trashcan = true;
-            }
+            wsConfig.comments = true;
+            wsConfig.scrollbars = true;
+            wsConfig.trashcan = true;
             if (maxBlocks != undefined) {
                wsConfig.maxBlocks = maxBlocks;
             }
@@ -305,6 +303,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var that = this;
             function onchange(event) {
                window.focus();
+               Blockly.svgResize(that.workspace);
+
                var remaining = that.workspace.remainingCapacity();
                optLimitBlocks = {
                   maxBlocks: maxBlocks,
