@@ -200,7 +200,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       availableVariables: [],
       languageStrings: languageStrings,
       startingBlock: true,
-      mediaUrl: "http://static-fioi.mblockelet.info/scratch-blocks/media/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
