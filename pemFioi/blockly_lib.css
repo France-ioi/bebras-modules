@@ -1,0 +1,77 @@
+body.blockly > * {
+	width: auto;
+}
+@media screen and (max-width: 1199px) {
+	#task {
+		padding: 0 10px;
+	}
+}
+#taskContent {
+	clear: both;
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+#taskContent::before,
+#taskContent::after {
+	content: " ";
+	display: table;
+}
+#gridContainer,
+#blocklyLibContent,
+#blocklyContainer {
+	box-sizing: border-box;
+}
+@media screen and (min-width: 800px) {
+	#taskIntro {
+		float: left;
+		max-width: calc(100% - 450px);
+	}
+	#gridContainer {
+		float: right;
+	}
+}
+@media screen and (min-width: 1025px) {
+	#taskIntro {
+		float: none;
+		max-width: 1000px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	#gridContainer {
+		float: left;
+	}
+	#blocklyLibContent {
+		float: right;
+		width: calc(100% - 440px);
+	}
+}
+#blocklyContainer {
+	overflow: auto;
+	height: 600px;
+	border: 1px solid #8d9daa;
+	width: 100%;
+	position: relative;
+}
+#blocklyDiv {
+	height: 100%;
+	width: 100%;
+}
+#grid {
+	max-width: 400px;
+	padding: 10px;
+}
+
+.blocklyCapacity {
+	display: inline-block;
+	width: 24px;
+	text-align: right;
+}
+#testCaseName {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+#errors {
+	color:red;
+	padding-top:10px;
+}
