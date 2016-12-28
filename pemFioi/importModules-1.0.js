@@ -18,7 +18,7 @@ var importableModules = function () {
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
-      'blockly_lib': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "http://www.france-ioi.org/modules/pemFioi/blockly_lib.css"},
+      'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "http://www.france-ioi.org/modules/pemFioi/blockly_lib.css"},
 
       'blockly': {src: modulesPath+"/ext/blockly/blockly_compressed.js", id: "blockly"},
       'blockly_blocks': {src: modulesPath+"/ext/blockly/blocks_compressed.js", id: "blockly_blocks"},
