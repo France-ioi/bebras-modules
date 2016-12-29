@@ -281,9 +281,14 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
     var codes = [];
 
-    codes.push(this.getFullCode(this._programs.blocklyJS));
-    codes.push(this.getFullCode(this._programs.javascript));
-    // codes.push(this.getFullCode(this._programs.python));
+    switch (this._language){
+      case CodeEditor.CONST.LANGUAGES.BLOCKLY:
+        codes.push(this.getFullCode(this._programs.blocklyJS));
+        break;
+      case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
+        codes.push(this.getFullCode(this._programs.javascript));
+        break;
+    }
 
     this._workspace.traceOn(true);
 
