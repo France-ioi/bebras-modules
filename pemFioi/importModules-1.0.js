@@ -18,7 +18,6 @@ var importableModules = function () {
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
-      'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "http://www.france-ioi.org/modules/pemFioi/blockly_lib.css"},
 
       'blockly': {src: modulesPath+"/ext/blockly/blockly_compressed.js", id: "blockly"},
       'blockly_blocks': {src: modulesPath+"/ext/blockly/blocks_compressed.js", id: "blockly_blocks"},
@@ -26,6 +25,7 @@ var importableModules = function () {
       'blockly_python': {src: modulesPath+"/ext/blockly/python_compressed.js", id: "blockly_python"},
       'blockly_fr': {src: modulesPath+"/ext/blockly/fr.js", id: "blockly_fr"},
       'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.js", id: "blockly_lib"},
+      'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "blockly_lib_css"},
       'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.js", id: "blocklyRobot_lib"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
@@ -43,6 +43,7 @@ var languageScripts = {
       'blockly_python',
       'blockly_fr',
       'blockly_lib',
+      'blockly_lib_css',
       'blocklyRobot_lib',
    ],
    scratch: [

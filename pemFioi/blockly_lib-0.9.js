@@ -214,9 +214,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "    </p>" +
                                       "  </div>" +
                                       "  <div id='blocklyCapacity' style='clear:both;'></div>" +
-                                      "  <div id='blocklyContainer' style='resize:vertical; overflow:hidden; height:600px; padding-bottom:10px; " +
-                                        "border: solid black 1px; width: 100%; position:relative;'>" +
-                                      "    <div id='blocklyDiv' class='language_blockly' style='height: 100%; width: 100%'></div>" +
+                                      "  <div id='blocklyContainer'>" +
+                                      "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
                                       "  </div>" +
                                       "  <div id='saveOrLoad'> "+
@@ -233,7 +232,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (nbTestCases > 1) {
             gridButtonsBefore += "<div>\n" +
                                  "  <input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
-                                 "  <span id='testCaseName' style='padding-left: 20px; padding-right: 20px'>Test 1</span>\n" +
+                                 "  <span id='testCaseName'>Test 1</span>\n" +
                                  "  <input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
                                  "</div>\n";
          }      
@@ -256,7 +255,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                              + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
                              + this.strings.submitProgram
                              + "</button><br/>"
-                             + "<div id='errors' style='color:red;padding-top:10px;'></div>";
+                             + "<div id='errors'></div>";
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
@@ -594,8 +593,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             panelWidth = $("#program").width() + 20;
          }
          if (panelWidth != this.prevWidth) {
-            $("#taskIntro").css("width", panelWidth);
-            $("#grid").css("left", panelWidth + 20 + "px");
             if (this.languages[this.player] == "blockly") {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
                Blockly.svgResize(this.workspace);
@@ -1968,7 +1965,7 @@ var initBlocklySubTask = function(subTask) {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
-      $('body').css('width', '100%').css('max-width', '1200px').css('margin', 'auto');
+      $('body').addClass('blockly');
       window.focus();
 
       this.iTestCase = 0;
@@ -1976,7 +1973,7 @@ var initBlocklySubTask = function(subTask) {
       if (this.display) {
          var gridHtml = "<center>";
          gridHtml += "<div id='gridButtonsBefore'></div>";
-         gridHtml += "<div id='grid' style='width:400px;height:200px;padding:10px'></div>";
+         gridHtml += "<div id='grid'></div>";
          gridHtml += "<div id='gridButtonsAfter'></div>";
          gridHtml += "</center>";
          $("#gridContainer").html(gridHtml)
