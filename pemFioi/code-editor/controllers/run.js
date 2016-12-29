@@ -29,12 +29,12 @@ function RunController(ctx, msgCallback) {
   this.noDelay = function (callback, value) {
     var primitive = undefined;
     if (value != undefined) {
-      primitive = this.interpreters[context.curRobot].createPrimitive(value);
+      primitive = this.interpreters[this.context.curRobot].createPrimitive(value);
     }
     if (Math.random() < 0.1) {
       var identifier = "wait_" + Math.random();
       var that = this;
-      context.delayFactory.createTimeout(identifier, function () {
+      this.context.delayFactory.createTimeout(identifier, function () {
         callback(primitive);
         that.runSyncBlock();
       }, 0);
