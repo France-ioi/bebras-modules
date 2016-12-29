@@ -5,12 +5,14 @@
 
 //former initBlocklySubTask
 
-function SubTaskController (_subTask) {
+function SubTaskController(_subTask) {
 
   var subTask = _subTask;
 
   // former BlocklyHelper
   subTask.logicController = new CodeEditor.Controllers.LogicController(subTask.gridInfos.maxInstructions);
+
+  subTask.runController = {};
 
   subTask.answer = null;
 
@@ -53,18 +55,6 @@ function SubTaskController (_subTask) {
       }
     }
 
-    var props = ["includedAll", "groupByCategory", "includedCategories", "includedBlocks", "availableVariables"];
-    for (var iProp = 0; iProp < props.length; iProp++) {
-      var prop = props[iProp];
-      if (subTask.gridInfos[prop] != undefined) {
-        var taskProp = subTask.gridInfos[prop];
-        if ((typeof taskProp == "object") && (taskProp["easy"] != undefined)) {
-          taskProp = taskProp[curLevel];
-        }
-        subTask.logicController[prop] = taskProp;
-      }
-    }
-
     this.context = getContext(this.display, this.gridInfos, curLevel);
     this.context.raphaelFactory = this.raphaelFactory;
     this.context.delayFactory = this.delayFactory;
@@ -74,9 +64,8 @@ function SubTaskController (_subTask) {
     displayHelper.timeoutMinutes = 30;
 
     this.logicController.setMainContext(this.context);
-    this.logicController.setIncludeBlocks(this.context.infos.includeBlocks);
+    this.logicController.setIncludeBlocks(subTask.gridInfos.includeBlocks);
     this.logicController.load(stringsLanguage, this.display, this.data[curLevel].length);
-    this.logicController._blocklyControler.createGeneratorsAndBlocks();
 
     subTask.changeTest(0);
   };
@@ -114,10 +103,15 @@ function SubTaskController (_subTask) {
   };
 
   subTask.run = function () {
-    initBlocklyRunner(subTask.context, function (message, success) {
-      $("#errors").html(message);
-    });
+
+    subTask.runController = new CodeEditor.Controllers.RunController(
+      subTask.context,
+      function (message, success) {
+        $("#errors").html(message);
+      });
+
     initContextForLevel(subTask.iTestCase);
+
     subTask.logicController.run(subTask.context);
   };
 

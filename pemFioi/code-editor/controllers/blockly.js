@@ -5,15 +5,8 @@
 
 function BlocklyController(includeBlocks, mainContext, strings) {
   this._strings = strings;
-  this._includedAll = true;
-  this._includedCategories = [];
   this._includeBlocks = includeBlocks;
-  this._groupByCategory = true;
   this._mainContext = mainContext;
-
-  this.setGroupByCategory = function (shouldGroup){
-    this._groupByCategory = shouldGroup;
-  };
 
   this.getToolboxXml = function () {
     var categories = {};
@@ -98,7 +91,7 @@ function BlocklyController(includeBlocks, mainContext, strings) {
     var xmlString = "";
 
     if (this._includeBlocks.groupByCategory) {
-      for (cat in categories) {
+      for (var cat in categories) {
         xmlString += categoriesXml[cat];
         for (block in categories[cat]) {
           xmlString += categories[cat][block];
@@ -107,8 +100,8 @@ function BlocklyController(includeBlocks, mainContext, strings) {
       }
     }
     else {
-      for (cat in categories) {
-        for (block in categories[cat]) {
+      for (var cat in categories) {
+        for (var block in categories[cat]) {
           xmlString += categories[cat][block];
         }
       }
@@ -562,8 +555,8 @@ function BlocklyController(includeBlocks, mainContext, strings) {
   };
 
   this.getBlockXmlInfo =  function (generatorStruct, blockName) {
-    for (iCategory in generatorStruct) {
-      for (iBlock in generatorStruct[iCategory].blocks) {
+    for (var iCategory in generatorStruct) {
+      for (var iBlock in generatorStruct[iCategory].blocks) {
         if (generatorStruct[iCategory].blocks[iBlock].name == blockName) {
           return {
             category: generatorStruct[iCategory].category,
@@ -623,7 +616,7 @@ function BlocklyController(includeBlocks, mainContext, strings) {
         var OPERATORS =
           [
             ['min', 'MIN'],
-            ['max', 'MAX'],
+            ['max', 'MAX']
           ];
         this.setColour(Blockly.Blocks.math.HUE);
         this.setInputsInline(true);
@@ -705,9 +698,9 @@ function BlocklyController(includeBlocks, mainContext, strings) {
   };
 
   this.appendAllBlockXmlInfoForCategory =  function (generatorStruct, categoryName, appendTo) {
-    for (category in generatorStruct) {
+    for (var category in generatorStruct) {
       if (generatorStruct[category].category == categoryName) {
-        for (block in generatorStruct[category].blocks) {
+        for (var block in generatorStruct[category].blocks) {
           appendTo.push(generatorStruct[category].blocks[block].blocklyXml);
         }
       }

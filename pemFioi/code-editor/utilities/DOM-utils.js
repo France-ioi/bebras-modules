@@ -40,10 +40,18 @@ CodeEditor.Utils.DOM.generateWorkspace = function () {
     "</div>";
 };
 
+CodeEditor.Utils.DOM.displayLanguageWorkspace = function (language) {
+  $(CodeEditor.Utils.DOM.Elements.BLOCKLY_WORKSPACE).css('display', language === CodeEditor.CONST.LANGUAGES.BLOCKLY ? 'block' : 'none');
+  $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).css('display', language === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ? 'block' : 'none');
+  $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).css('display', language === CodeEditor.CONST.LANGUAGES.PYTHON ? 'block' : 'none');
+
+};
+
 CodeEditor.Utils.DOM.removeBlockly = function () {
   $(CodeEditor.Utils.DOM.Elements.BLOCKLY_WIDGET).remove();
   $(CodeEditor.Utils.DOM.Elements.BLOCKLY_TOOLTIP).remove();
-  document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
+  document.removeEventListener("keydown");
+  //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
   if (Blockly) {
     delete Blockly;
   }
