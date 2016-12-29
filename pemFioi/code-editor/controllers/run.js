@@ -17,10 +17,8 @@ function RunController(ctx, msgCallback) {
   this.waitDelay = function (callback, value, delay) {
     if (delay > 0) {
       var identifier = "wait" + this.context.curRobot + "_" + Math.random();
-      var that = this;
-      this.context.delayFactory.createTimeout(identifier, function () {
-        that.noDelay(callback, value)
-      }, delay);
+      var _noDelay = this.noDelay.bind(this, callback, value);
+      this.context.delayFactory.createTimeout(identifier, _noDelay, delay);
     } else {
       this.noDelay(callback, value);
     }
@@ -166,7 +164,7 @@ function RunController(ctx, msgCallback) {
   };
 
   this.context.runner = this;
-  this.context.callCallback = this.noDelay;
+  this.context.callCallback = this.noDelay.bind(this);
   this.context.programEnded = [];
 }
 

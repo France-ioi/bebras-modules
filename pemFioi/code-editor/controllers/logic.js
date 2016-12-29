@@ -350,7 +350,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     this.textFile = window.URL.createObjectURL(data);
 
     // returns a URL you can use as a href
-    $("#saveUrl").html(" <a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>" + this.strings.download + "</a>");
+    $("#saveUrl").html("<a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>" + this.strings.download + "</a>");
     return this.textFile;
   };
 
