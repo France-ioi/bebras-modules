@@ -121,10 +121,11 @@ function SubTaskController(_subTask) {
     this.getGrade(function (result) {
       subTask.context.display = true;
       subTask.changeSpeed();
-      initBlocklyRunner(subTask.context, function (message, success) {
-        $("#errors").html(message);
-        platform.validate("done");
-      });
+      subTask.runController = new CodeEditor.Controllers.RunController(
+        subTask.context, function (message, success) {
+          $("#errors").html(message);
+          platform.validate("done");
+        });
       subTask.changeTest(result.iTestCase - subTask.iTestCase);
       initContextForLevel(result.iTestCase);
       subTask.context.linkBack = true;
