@@ -78,12 +78,12 @@ function RunController(ctx, msgCallback) {
   };
 
   this.stop = function () {
-    for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+    for (var iInterpreter = 0; iInterpreter < this.interpreters.length; iInterpreter++) {
       if (this.isRunning[iInterpreter]) {
         this.toStop[iInterpreter] = true;
       }
     }
-    context.reset();
+    this.context.reset();
   };
 
   this.runSyncBlock = function () {
