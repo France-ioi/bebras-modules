@@ -16,7 +16,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   this._programs = {
     blockly: null,
     blocklyJS: null,
-    blocklyPython: null,
     javascript: null,
     python: null
   };

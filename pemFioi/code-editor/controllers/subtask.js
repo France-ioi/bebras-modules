@@ -10,7 +10,11 @@ function SubTaskController(_subTask) {
   var subTask = _subTask;
 
   // former BlocklyHelper
-  subTask.logicController = new CodeEditor.Controllers.LogicController(subTask.gridInfos.maxInstructions);
+  subTask.logicController = new CodeEditor.Controllers.LogicController(
+    0,
+    subTask.gridInfos.maxInstructions,
+    CodeEditor.CONST.LANGUAGES.BLOCKLY
+  );
 
   subTask.runController = {};
 
@@ -173,9 +177,11 @@ function SubTaskController(_subTask) {
     } else {
       this.answer = answerObj;
     }
-    this.logicController.programs = this.answer;
-    if (this.answer != undefined) {
-      this.logicController._loadPrograms();
+
+    subTask.logicController._programs = this.answer[0];
+
+    if (this.answer !== undefined) {
+      subTask.logicController._loadPrograms();
     }
   };
 
