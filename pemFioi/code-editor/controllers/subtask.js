@@ -178,7 +178,11 @@ function SubTaskController(_subTask) {
       this.answer = answerObj;
     }
 
-    subTask.logicController._programs = this.answer[0];
+    var prog = this.answer;
+    if (Array.isArray(prog)){
+      prog = prog[0];
+    }
+    subTask.logicController._programs = prog;
 
     if (this.answer !== undefined) {
       subTask.logicController._loadPrograms();
