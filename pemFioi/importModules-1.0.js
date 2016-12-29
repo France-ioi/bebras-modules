@@ -55,6 +55,7 @@ var languageScripts = {
       'scratch_fixes',
       'blockly_fr',
       'blockly_lib',
+      'blockly_lib_css',
       'blocklyRobot_lib',
    ]
 }
