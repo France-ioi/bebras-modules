@@ -1392,7 +1392,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
-         if (this.includeBlocks.variables.length > 0 ||
+         if (((this.includeBlocks.variables != undefined) && (this.includeBlocks.variables.length > 0 ))||
                (this.includeBlocks.variables_get != undefined) ||
                (this.includeBlocks.variables_set != undefined)) {
             var blocksXml = [];
