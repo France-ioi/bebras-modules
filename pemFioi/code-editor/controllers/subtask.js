@@ -209,11 +209,18 @@ function SubTaskController(_subTask) {
   };
 
   subTask.getGrade = function (callback) {
+
     subTask.context.changeDelay(0);
-    var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
-    var codes = [subTask.blocklyHelper.getFullCode(code)];
+
+    var code = subTask.logicController._getCodeFromBlocks(subTask.answer[0].blockly,
+      CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
+
+    var codes = [subTask.logicController.getFullCode(code)];
+
     subTask.iTestCase = 0;
-    initBlocklyRunner(subTask.context, function (message, success) {
+
+    subTask.runController = new CodeEditor.Controllers.RunController(
+      subTask.context, function (message, success) {
       subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
       subTask.iTestCase++;
       if (subTask.iTestCase < subTask.nbTestCases) {

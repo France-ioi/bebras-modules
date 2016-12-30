@@ -181,7 +181,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     this._programs.python = '';
     this._programs.javascript = '';
 
-    switch (this._language){
+    switch (this._language) {
       case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
         this._programs.javascript = this._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
         $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val(this._programs.javascript);
@@ -280,7 +280,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
     var codes = [];
 
-    switch (this._language){
+    switch (this._language) {
       case CodeEditor.CONST.LANGUAGES.BLOCKLY:
         codes.push(this.getFullCode(this._programs.blocklyJS));
         break;
@@ -407,7 +407,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if (this._maxInstructions) {
       strMaxBlocks = this._strings.limitBlocks.format({
         maxBlocks: this._maxInstructions,
-        remainingBlocks: "<span class='max-instructions'>XXX</span>"
+        remainingBlocks: "<span class='max-instructions'>" + this._maxInstructions + "</span>"
       });
     }
 
