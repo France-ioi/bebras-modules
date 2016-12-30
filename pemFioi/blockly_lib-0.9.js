@@ -10,6 +10,15 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+var arrayContains = function(array, needle) {
+   for (var index in array) {
+      if (needle == array[index]) {
+         return true;
+      }
+   }
+   return false;
+}
+
 var highlightPause = false;
 
 function resetFormElement(e) {
@@ -1921,15 +1930,6 @@ var initBlocklySubTask = function(subTask) {
       // Merge-in level dependent block information
       var includeBlocks = JSON.parse(JSON.stringify(this.context.infos.includeBlocks)); // deep copy
 
-      function arrayContains(array, needle) {
-         for (var index in array) {
-            if (needle == array[index]) {
-               return true;
-            }
-         }
-         return false;
-      }
-      
       // TODO: Is there a way to do this better?
       // Maybe we can write a merger function that merges arrays as we need them
       if (typeof(this.context.infos.additionalBlocksByLevel) != "undefined") {
