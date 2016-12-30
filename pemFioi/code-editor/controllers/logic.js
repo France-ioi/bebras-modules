@@ -8,8 +8,8 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   /**
    * Class properties
    */
-  this._nbTestCases = nbTestCases || 0;
-  this._maxInstructions = maxInstructions || undefined;
+  this._nbTestCases = 1;
+  this._maxInstructions =  maxInstructions || undefined;
   this._language = language || CodeEditor.CONST.SETTINGS.DEFAULT_LANGUAGE;
   this._textFile = null;
   this._extended = false;
@@ -83,7 +83,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
       var onchange = function (e) {
         window.focus();
-        $('.blocklyCapacity').html(ws.remainingCapacity());
+        $('.max-instructions').html(ws.remainingCapacity());
       };
 
       this._workspace.addChangeListener(onchange);
@@ -144,6 +144,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     } else if (language === CodeEditor.CONST.LANGUAGES.PYTHON) {
       languageObj = Blockly.Python;
     }
+
     languageObj.init(codeWorkspace);
 
     var code = [];
@@ -407,7 +408,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if (this._maxInstructions) {
       strMaxBlocks = this._strings.limitBlocks.format({
         maxBlocks: this._maxInstructions,
-        remainingBlocks: "<span class='max-instructions'>" + this._maxInstructions + "</span>"
+        remainingBlocks: "<span class='max-instructions'>XXX</span>"
       });
     }
 
@@ -443,7 +444,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
     var gridButtonsBefore = "";
 
-    if (this.nbTestCases > 1) {
+    if (this._nbTestCases > 1) {
       gridButtonsBefore +=
         "<div>" +
         "  <input type='button' value='" + this._strings.buttons.previous + "' onclick='task.displayedSubTask.changeTest(-1)'/>" +
@@ -462,7 +463,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "  <option value='0'>" + this._strings.ludicrousSpeed + "</option>" +
       "</select>&nbsp;&nbsp;" +
       "<input type='button' value='" + this._strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
-    if (nbTestCases > 1) {
+    if (this._nbTestCases > 0) {
       gridButtonsAfter += "<input type='button' value='" + this._strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
     }
     gridButtonsAfter +=

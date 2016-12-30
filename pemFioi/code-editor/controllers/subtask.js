@@ -10,11 +10,7 @@ function SubTaskController(_subTask) {
   var subTask = _subTask;
 
   // former BlocklyHelper
-  subTask.logicController = new CodeEditor.Controllers.LogicController(
-    0,
-    subTask.gridInfos.maxInstructions,
-    CodeEditor.CONST.LANGUAGES.BLOCKLY
-  );
+  subTask.logicController = {};
 
   subTask.runController = {};
 
@@ -59,15 +55,25 @@ function SubTaskController(_subTask) {
       }
     }
 
+
+
     this.context = getContext(this.display, this.gridInfos, curLevel);
     this.context.raphaelFactory = this.raphaelFactory;
     this.context.delayFactory = this.delayFactory;
-    this.context.blocklyHelper = this.logicController;
+
     //this.answer = task.getDefaultAnswerObject();
     displayHelper.hideValidateButton = true;
     displayHelper.timeoutMinutes = 30;
 
-    this.logicController.setMainContext(this.context);
+    this.logicController = new CodeEditor.Controllers.LogicController(
+      this.nbTestCases,
+      subTask.gridInfos.maxInstructions,
+      CodeEditor.CONST.LANGUAGES.BLOCKLY,
+      this.context
+    );
+
+    this.context.blocklyHelper = this.logicController;
+
     this.logicController.setIncludeBlocks(subTask.gridInfos.includeBlocks);
     this.logicController.load(stringsLanguage, this.display, this.data[curLevel].length);
 
@@ -212,8 +218,7 @@ function SubTaskController(_subTask) {
 
     subTask.context.changeDelay(0);
 
-    var code = subTask.logicController._getCodeFromBlocks(subTask.answer[0].blockly,
-      CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
+    var code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
 
     var codes = [subTask.logicController.getFullCode(code)];
 
