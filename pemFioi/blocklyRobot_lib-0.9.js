@@ -843,8 +843,8 @@ var getContext = function(display, infos, curLevel) {
     */
    
    context.customBlocks = {
-      robot: [
-         {  category: "actions",
+      robot: {
+         actions: {
             blocks: [  
                { name: "paint" },
                { name: "paintGrey" },
@@ -860,10 +860,10 @@ var getContext = function(display, infos, curLevel) {
                { name: "wait" },
                { name: "pickTransportable" },
                { name: "dropTransportable" },
-               { name: "dropTransportable" },
+               { name: "dropTransportable" }
             ]
          },
-         {  category: "sensors",
+         sensors: {
             blocks: [
                { name: "onTransportable",    yieldsValue: true },
                { name: "onHole",             yieldsValue: true },
@@ -895,23 +895,25 @@ var getContext = function(display, infos, curLevel) {
                { name: "dir",                yieldsValue: true },
                { name: "col",                yieldsValue: true },
                { name: "row",                yieldsValue: true },
-               { name: "onPill",             yieldsValue: true },
+               { name: "onPill",             yieldsValue: true }
             ]
-         },
-      ],
-      transport: [
-         {
-            category: "sensors",
+         }
+      },
+      transport: {
+         sensors: {
             blocks: [
                { name: "number", yieldsValue: true,                     handler: context.transportable_number },
                { name: "exists", yieldsValue: true,   params: [null],   handler: context.transportable_exists },
                { name: "trans_row",    yieldsValue: true,   params: [null],   handler: context.transportable_row },
                { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
             ]
-         },
-      ],
-      debug: [{ category: "debug",
-                blocks: [{ name: "alert", params: [null], handler: context.debug_alert }] }]
+         }
+      },
+      debug: {
+         debug: {
+             blocks: [{ name: "alert", params: [null], handler: context.debug_alert }]
+         }
+      }
    };
 
    var isOutsideGrid = function(row, col) {
