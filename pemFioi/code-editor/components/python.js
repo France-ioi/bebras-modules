@@ -22,6 +22,7 @@ function PythonInterpreter(context) {
   };
 
   this.clearOnNext = false;
+  this._paused = false;
 
   generateElements();
 
@@ -58,6 +59,7 @@ function PythonInterpreter(context) {
   };
 
   this.waitDelay = function (callback, value, delay) {
+    this._paused = true;
     if (delay > 0) {
       var identifier = "wait" + this.context.curRobot + "_" + Math.random();
       var _noDelay = this.noDelay.bind(this, callback, value);
@@ -83,8 +85,8 @@ function PythonInterpreter(context) {
     return result;
   };
 
-
   this.noDelay = function (callback, value) {
+    this._paused = true;
     var primitive = this._createPrimitive(value);
     if (Math.random() < 0.1) {
       var identifier = "wait_" + Math.random();
@@ -92,15 +94,20 @@ function PythonInterpreter(context) {
       this.context.delayFactory.createTimeout(identifier, function () {
         callback(primitive);
         that.clearOnNext = true;
+        that._paused = false;
+        that.step();
       }, 0);
     } else {
       callback(primitive);
       this.clearOnNext = true;
+      this._paused = false;
     }
   };
 
-  this.start = function () {
-    this.step(false);
+  this._shouldStep = function (){
+    if (!this._paused){
+      this.step();
+    }
   };
 
   this._onOutput = function (_output) {
@@ -109,6 +116,7 @@ function PythonInterpreter(context) {
     }
     that._output += _output;
     that.print(_output);
+    console.log('step');
   };
 
   this._onDebugOut = function (text) {
@@ -155,7 +163,7 @@ function PythonInterpreter(context) {
   this.runCodes = function (codes) {
     this._configure();
     this._code = codes[0];
-    this._setBreakpoint(1, false);
+    this._setBreakpoint(2, false);
     try {
       var susp_handlers = {};
       susp_handlers["*"] = this._debugger.suspension_handler.bind(this);
@@ -165,7 +173,7 @@ function PythonInterpreter(context) {
       this._onOutput(e.toString() + "\n")
     }
 
-    this._interval = window.setInterval(this.step.bind(this), 100);
+    this._interval = window.setInterval(this._shouldStep.bind(this), 100);
   };
 
   this.nbRunning = function () {

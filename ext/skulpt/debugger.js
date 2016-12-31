@@ -207,7 +207,7 @@ Sk.Debugger.prototype.add_breakpoint = function(filename, lineno, colno, tempora
     }
 };
 
-Sk.Debugger.prototype.suspension_handler = function(susp) {
+Sk.Debugger.prototype.suspension_handler = function(susp, step) {
     return new Promise(function(resolve, reject) {
         try {
             resolve(susp.resume());
