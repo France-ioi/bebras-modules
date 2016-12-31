@@ -220,7 +220,7 @@ function SubTaskController(_subTask) {
     }
     subTask.logicController._programs = prog;
 
-    if (this.answer !== undefined) {
+    if (this.answer !== undefined && subTask.context.display) {
       subTask.logicController._loadPrograms();
     }
   };

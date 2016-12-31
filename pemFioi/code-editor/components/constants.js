@@ -10,7 +10,7 @@ CodeEditor.CONST = {
     PYTHON: 'python'
   },
   SETTINGS: {
-    DEFAULT_LANGUAGE: 'blockly',
+    DEFAULT_LANGUAGE: 'python',
     DEFAULT_LOCALIZATION: 'en'
   },
   LOCALIZATION: {

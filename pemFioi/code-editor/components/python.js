@@ -206,7 +206,9 @@ function PythonInterpreter(context, msgCallback) {
 
   this._onStepError = function (message) {
     this.stop();
-    this.context.success = false;
+
+    message = "<span class='success'>" + message + "</span>";
+
     this.messageCallback(this.context.messagePrefixFailure + message);
   };
 

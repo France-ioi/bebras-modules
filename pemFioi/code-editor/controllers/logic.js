@@ -8,7 +8,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   /**
    * Class properties
    */
-  this._nbTestCases = 1;
+  this._nbTestCases = mainContext.nbTestCases;
   this._maxInstructions = maxInstructions || undefined;
   this._language = language || CodeEditor.CONST.SETTINGS.DEFAULT_LANGUAGE;
   this._textFile = null;
@@ -262,7 +262,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     window.setTimeout(this.run.bind(this), 100);
   };
 
-  this.getLanguage = function() {
+  this.getLanguage = function () {
     return this._language;
   };
 
@@ -439,14 +439,16 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "</div>";
   };
   this._loadBasicEditor = function () {
-    CodeEditor.Utils.DOM.loadBasicEditor(
-      this._loadXML() +
-      this._loadLanguageSelector() +
-      this._loadInstructionsTooltip() +
-      this._loadEditorWorkSpace() +
-      this._loadEditorTools()
-    );
-    this._loadGridButtons();
+    if (this._mainContext.display) {
+      CodeEditor.Utils.DOM.loadBasicEditor(
+        this._loadXML() +
+        this._loadLanguageSelector() +
+        this._loadInstructionsTooltip() +
+        this._loadEditorWorkSpace() +
+        this._loadEditorTools()
+      );
+      this._loadGridButtons();
+    }
   };
   this._loadGridButtons = function () {
 
