@@ -21,6 +21,8 @@ function PythonInterpreter(context) {
 
   };
 
+  this.clearOnNext = false;
+
   generateElements();
 
   var that = this;
@@ -89,9 +91,11 @@ function PythonInterpreter(context) {
       var that = this;
       this.context.delayFactory.createTimeout(identifier, function () {
         callback(primitive);
+        that.clearOnNext = true;
       }, 0);
     } else {
       callback(primitive);
+      this.clearOnNext = true;
     }
   };
 
@@ -161,15 +165,15 @@ function PythonInterpreter(context) {
       this._onOutput(e.toString() + "\n")
     }
 
-    this._interval = window.setInterval(this.start.bind(this), 100);
+    this._interval = window.setInterval(this.step.bind(this), 100);
   };
 
   this.nbRunning = function () {
     return 0;
   };
 
-  this.step = function (shouldResetStack) {
-    if (shouldResetStack) {
+  this.step = function () {
+    if (this.clearOnNext) {
       this._debugger.suspension_stack = [this._debugger.suspension_stack[0]];
     }
     this._debugger.enable_step_mode();
