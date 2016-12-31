@@ -3,29 +3,18 @@
  * @since 29/12/2016
  */
 
-function PythonInterpreter(context) {
+function PythonInterpreter(context, msgCallback) {
   this.context = context;
-  this._output = '';
-  this._callback = '';
+  this.messageCallback = msgCallback;
   this._code = '';
-  this._input = '';
-  this._interval = 0;
   this._editor_filename = "<stdin>";
-  this._debugger = new Sk.Debugger(this._editor_filename, this);
   this.context.runner = this;
-
-  var generateElements = function () {
-    var elements = '<pre id="edoutput" ></pre>';
-    elements += '<pre id="codeoutput" ></pre>';
-    $(CodeEditor.Utils.DOM.Elements.EDITOR).append(elements);
-
-  };
-
-  this.clearOnNext = false;
+  this._maxIterations = 1000;
+  this._resetCallstackOnNextStep = false;
   this._paused = false;
-
-  generateElements();
-
+  this._isRunning = false;
+  this._steps = 0;
+  this._timeouts = [];
   var that = this;
 
   this._skulptifyHandler = function (name, objectName, iCategory, iBlock) {
@@ -61,12 +50,23 @@ function PythonInterpreter(context) {
   this.waitDelay = function (callback, value, delay) {
     this._paused = true;
     if (delay > 0) {
-      var identifier = "wait" + this.context.curRobot + "_" + Math.random();
       var _noDelay = this.noDelay.bind(this, callback, value);
-      this.context.delayFactory.createTimeout(identifier, _noDelay, delay);
+      var timeoutId = window.setTimeout(_noDelay, delay);
+      this._timeouts.push(timeoutId);
     } else {
       this.noDelay(callback, value);
     }
+  };
+
+  this.noDelay = function (callback, value) {
+    var primitive = this._createPrimitive(value);
+    if (primitive !== Sk.builtin.none.none$) {
+      this._resetCallstackOnNextStep = true;
+    }
+    this._paused = false;
+    callback(primitive);
+    var timeoutId = window.setTimeout(this._continue.bind(this), 10);
+    this._timeouts.push(timeoutId);
   };
 
   this._createPrimitive = function (data) {
@@ -85,37 +85,8 @@ function PythonInterpreter(context) {
     return result;
   };
 
-  this.noDelay = function (callback, value) {
-    this._paused = true;
-    var primitive = this._createPrimitive(value);
-    if (Math.random() < 0.1) {
-      var identifier = "wait_" + Math.random();
-      var that = this;
-      this.context.delayFactory.createTimeout(identifier, function () {
-        that.clearOnNext = true;
-        that._paused = false;
-        callback(primitive);
-      }, 0);
-    } else {
-      this.clearOnNext = true;
-      this._paused = false;
-      callback(primitive);
-    }
-  };
-
-  this._shouldStep = function () {
-    if (!this._paused) {
-      this.step();
-    }
-  };
-
   this._onOutput = function (_output) {
-    if (_output === '\n') {
-      return;
-    }
-    that._output += _output;
     that.print(_output);
-    console.log('step');
   };
 
   this._onDebugOut = function (text) {
@@ -137,15 +108,13 @@ function PythonInterpreter(context) {
     this.context.callCallback = this.noDelay.bind(this);
   };
 
-  this._printFullOutput = function () {
-    console.log(this._output);
-  };
-
   this.print = function (message, className) {
     if (message === 'Program execution complete') {
-      window.clearInterval(this._interval);
+      this._resetInterpreterState();
     }
-    console.log('PRINT: ', message, className || '');
+    if (message) {
+      console.log('PRINT: ', message, className || '');
+    }
   };
 
   this._builtinRead = function (x) {
@@ -159,49 +128,73 @@ function PythonInterpreter(context) {
     return this._code.split('\n')[lineno];
   };
 
+  this._continue = function () {
+    if (this._steps < this._maxIterations && !this._paused && this._isRunning) {
+      this.step();
+    }
+  };
+
   this.runCodes = function (codes) {
+    this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
     this._code = codes[0];
-    this._setBreakpoint(2, false);
+    this._setBreakpoint(1, false);
     try {
       var susp_handlers = {};
       susp_handlers["*"] = this._debugger.suspension_handler.bind(this);
       var promise = this._debugger.asyncToPromise(this._asyncCallback.bind(this), susp_handlers, this._debugger);
       promise.then(this._debugger.success.bind(this._debugger), this._debugger.error.bind(this._debugger));
     } catch (e) {
-      this._onOutput(e.toString() + "\n")
+      this._onOutput(e.toString() + "\n");
+      console.log('exception');
     }
 
-     this._interval = window.setInterval(this._shouldStep.bind(this), 1);
+    this._resetInterpreterState();
+    this._isRunning = true;
+    this._continue();
   };
 
   this.nbRunning = function () {
-    console.log(this);
-    if (this._interval > 0 || this._paused) {
-      console.log('yes');
-      return 1;
-    } else {
-      console.log('not');
-      return 0;
-    }
+    return this._isRunning ? 1 : 0;
   };
 
   this.stop = function () {
-    window.clearInterval(this._interval);
+    for (var i = 0; i < this._timeouts.length; i += 1) {
+      window.clearTimeout(this._timeouts[i]);
+    }
+    this._resetInterpreterState();
     this.context.reset();
-    this._interval = 0;
-    this.clearOnNext = false;
+  };
+
+  this._resetInterpreterState = function () {
+    this._steps = 0;
+    this._isRunning = false;
+    this._resetCallstackOnNextStep = false;
     this._paused = false;
-    this.context.delayFactory.destroyAll();
-    console.log('asdfsadf');
+  };
+
+  this._resetCallstack = function () {
+    if (this._resetCallstackOnNextStep) {
+      this._resetCallstackOnNextStep = false;
+      this._debugger.suspension_stack = [this._debugger.suspension_stack[0]];
+    }
   };
 
   this.step = function () {
-    if (this.clearOnNext) {
-      this._debugger.suspension_stack = [this._debugger.suspension_stack[0]];
-    }
+    this._resetCallstack();
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
+    this._steps += 1;
+  };
+
+  this._onStepSuccess = function (){
+    this._continue();
+  };
+
+  this._onStepError = function (message) {
+    this.stop();
+    // this.messageCallback(this.context.messagePrefixFailure + message);
+    console.log(message);
   };
 
   this._setBreakpoint = function (bp, isTemporary) {

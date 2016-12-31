@@ -127,7 +127,11 @@ function SubTaskController(_subTask) {
           });
 
       } else {
-        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(this.context);
+        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+          this.context,
+          function (message, success) {
+            $("#errors").html(message);
+          });
       }
     }
 
@@ -229,14 +233,26 @@ function SubTaskController(_subTask) {
 
     subTask.context.changeDelay(0);
 
-    var code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
+    var code = "";
+    var codes = [];
 
-    var codes = [subTask.logicController.getFullCode(code)];
+    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+      subTask.runController = new CodeEditor.Controllers.RunController(
+        this.context, callback);
+      code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
+      codes = [subTask.logicController.getFullCode(code)];
+
+    } else {
+      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+        this.context, callback);
+      code = subTask.logicController._programs.python;
+      codes = [code];
+    }
 
     subTask.iTestCase = 0;
 
-    subTask.runController = new CodeEditor.Controllers.RunController(
-      subTask.context, function (message, success) {
+    var callback = function (message, success) {
       subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
       subTask.iTestCase++;
       if (subTask.iTestCase < subTask.nbTestCases) {
@@ -254,7 +270,21 @@ function SubTaskController(_subTask) {
         subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
         callback(subTask.testCaseResults[iWorstTestCase]);
       }
-    });
+    };
+
+    if (!subTask.runController && !subTask.pythonRunner) {
+      if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+        subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+        subTask.runController = new CodeEditor.Controllers.RunController(
+          this.context, callback);
+
+      } else {
+        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+          this.context, callback);
+      }
+    }
+
+
     subTask.iTestCase = 0;
     subTask.testCaseResults = [];
     initContextForLevel(subTask.iTestCase);
