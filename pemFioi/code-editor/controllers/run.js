@@ -75,13 +75,14 @@ function RunController(ctx, msgCallback) {
     interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
   };
 
-  this.stop = function () {
+  this.stop = function (callback) {
     for (var iInterpreter = 0; iInterpreter < this.interpreters.length; iInterpreter++) {
       if (this.isRunning[iInterpreter]) {
         this.toStop[iInterpreter] = true;
       }
     }
     this.context.reset();
+    callback();
   };
 
   this.runSyncBlock = function () {

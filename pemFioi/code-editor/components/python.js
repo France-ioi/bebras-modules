@@ -92,19 +92,19 @@ function PythonInterpreter(context) {
       var identifier = "wait_" + Math.random();
       var that = this;
       this.context.delayFactory.createTimeout(identifier, function () {
-        callback(primitive);
         that.clearOnNext = true;
         that._paused = false;
+        callback(primitive);
       }, 0);
     } else {
-      callback(primitive);
       this.clearOnNext = true;
       this._paused = false;
+      callback(primitive);
     }
   };
 
-  this._shouldStep = function (){
-    if (!this._paused){
+  this._shouldStep = function () {
+    if (!this._paused) {
       this.step();
     }
   };
@@ -142,7 +142,7 @@ function PythonInterpreter(context) {
   };
 
   this.print = function (message, className) {
-    if (message === 'Program execution complete'){
+    if (message === 'Program execution complete') {
       window.clearInterval(this._interval);
     }
     console.log('PRINT: ', message, className || '');
@@ -183,10 +183,12 @@ function PythonInterpreter(context) {
     }
   };
 
-  this.stop = function () {
+  this.stop = function (callback) {
     window.clearInterval(this._interval);
+    this.context.reset();
     this._interval = 0;
     this.clearOnNext = false;
+    this._paused = false;
   };
 
   this.step = function () {
