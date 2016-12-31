@@ -172,23 +172,28 @@ function PythonInterpreter(context) {
       this._onOutput(e.toString() + "\n")
     }
 
-    this._interval = window.setInterval(this._shouldStep.bind(this), 1);
+     this._interval = window.setInterval(this._shouldStep.bind(this), 1);
   };
 
   this.nbRunning = function () {
-    if (this._interval > 0) {
+    console.log(this);
+    if (this._interval > 0 || this._paused) {
+      console.log('yes');
       return 1;
     } else {
+      console.log('not');
       return 0;
     }
   };
 
-  this.stop = function (callback) {
+  this.stop = function () {
     window.clearInterval(this._interval);
     this.context.reset();
     this._interval = 0;
     this.clearOnNext = false;
     this._paused = false;
+    this.context.delayFactory.destroyAll();
+    console.log('asdfsadf');
   };
 
   this.step = function () {

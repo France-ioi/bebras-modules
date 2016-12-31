@@ -12,7 +12,9 @@ function SubTaskController(_subTask) {
   // former BlocklyHelper
   subTask.logicController = {};
 
-  subTask.runController = {};
+  subTask.runController = undefined;
+
+  subTask.pythonRunner = undefined;
 
   subTask.answer = null;
 
@@ -65,17 +67,18 @@ function SubTaskController(_subTask) {
     displayHelper.hideValidateButton = true;
     displayHelper.timeoutMinutes = 30;
 
-    this.logicController = new CodeEditor.Controllers.LogicController(
+    subTask.logicController = new CodeEditor.Controllers.LogicController(
       this.nbTestCases,
       subTask.gridInfos.maxInstructions,
       CodeEditor.CONST.LANGUAGES.BLOCKLY,
       this.context
     );
 
-    this.context.blocklyHelper = this.logicController;
+    subTask.context.blocklyHelper = this.logicController;
 
-    this.logicController.setIncludeBlocks(subTask.gridInfos.includeBlocks);
-    this.logicController.load(stringsLanguage, this.display, this.data[curLevel].length);
+    subTask.logicController.setIncludeBlocks(subTask.gridInfos.includeBlocks);
+    subTask.logicController.load(stringsLanguage, this.display, this.data[curLevel].length);
+
 
     subTask.changeTest(0);
   };
@@ -114,17 +117,20 @@ function SubTaskController(_subTask) {
 
   subTask.run = function () {
 
-    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
-      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-      subTask.runController = new CodeEditor.Controllers.RunController(
-        subTask.context,
-        function (message, success) {
-          $("#errors").html(message);
-        });
+    if (!subTask.runController && !subTask.pythonRunner) {
+      if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+        subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+        subTask.runController = new CodeEditor.Controllers.RunController(
+          this.context,
+          function (message, success) {
+            $("#errors").html(message);
+          });
 
-    } else {
-      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(subTask.context);
+      } else {
+        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(this.context);
+      }
     }
+
     initContextForLevel(subTask.iTestCase);
 
     subTask.logicController.run(subTask.context);

@@ -268,40 +268,42 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   };
 
   this.run = function () {
-    var nbRunning = this._mainContext.runner.nbRunning();
-    if (nbRunning > 0) {
-      this.stopAndTryAgain();
-      return undefined;
+    if (this._mainContext) {
+      var nbRunning = this._mainContext.runner.nbRunning();
+      if (nbRunning > 0) {
+        this.stopAndTryAgain();
+        return undefined;
+      }
+
+      if (this._mainContext.display) {
+        Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+        Blockly.JavaScript.addReservedWords('highlightBlock');
+      } else {
+        Blockly.JavaScript.STATEMENT_PREFIX = '';
+      }
+
+      this._savePrograms();
+
+      var codes = [];
+
+      switch (this._language) {
+        case CodeEditor.CONST.LANGUAGES.BLOCKLY:
+          codes.push(this.getFullCode(this._programs.blocklyJS));
+          break;
+        case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
+          codes.push(this.getFullCode(this._programs.javascript));
+          break;
+        case CodeEditor.CONST.LANGUAGES.PYTHON:
+          codes.push(this._programs.python);
+          break;
+      }
+
+      this._workspace.traceOn(true);
+
+      this._workspace.highlightBlock(null);
+
+      this._mainContext.runner.runCodes(codes);
     }
-
-    if (this._mainContext.display) {
-      Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
-      Blockly.JavaScript.addReservedWords('highlightBlock');
-    } else {
-      Blockly.JavaScript.STATEMENT_PREFIX = '';
-    }
-
-    this._savePrograms();
-
-    var codes = [];
-
-    switch (this._language) {
-      case CodeEditor.CONST.LANGUAGES.BLOCKLY:
-        codes.push(this.getFullCode(this._programs.blocklyJS));
-        break;
-      case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
-        codes.push(this.getFullCode(this._programs.javascript));
-        break;
-      case CodeEditor.CONST.LANGUAGES.PYTHON:
-        codes.push(this._programs.python);
-        break;
-    }
-
-    this._workspace.traceOn(true);
-
-    this._workspace.highlightBlock(null);
-
-    this._mainContext.runner.runCodes(codes);
   };
 
   this.getFullCode = function (code) {
