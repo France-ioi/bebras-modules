@@ -22,7 +22,9 @@ function PythonInterpreter(context, msgCallback) {
     handler += "\n\tvar result = Sk.builtin.none.none$;";
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
-    handler += '\n\ttask.displayedSubTask.context.customBlocks["' + objectName + '"][' + iCategory + '].blocks[' + iBlock + '].handler(resolve);';
+    // handler += "\n\ttry {";
+    handler += '\n\t\ttask.displayedSubTask.context.customBlocks["' + objectName + '"][' + iCategory + '].blocks[' + iBlock + '].handler(resolve);';
+    // handler += "\n\t} catch (e) {";
     handler += '\n\t}).then(function (value) {\nresult = value;\nreturn value;\n })};';
     handler += '\n\treturn susp;';
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
@@ -151,7 +153,8 @@ function PythonInterpreter(context, msgCallback) {
 
     this._resetInterpreterState();
     this._isRunning = true;
-    this._continue();
+    var timeoutId = window.setTimeout(this._continue.bind(this), 100);
+    this._timeouts.push(timeoutId);
   };
 
   this.nbRunning = function () {
