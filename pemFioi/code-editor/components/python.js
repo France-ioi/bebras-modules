@@ -95,7 +95,6 @@ function PythonInterpreter(context) {
         callback(primitive);
         that.clearOnNext = true;
         that._paused = false;
-        that.step();
       }, 0);
     } else {
       callback(primitive);
@@ -187,6 +186,7 @@ function PythonInterpreter(context) {
   this.stop = function () {
     window.clearInterval(this._interval);
     this._interval = 0;
+    this.clearOnNext = false;
   };
 
   this.step = function () {
