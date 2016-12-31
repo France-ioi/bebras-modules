@@ -22,9 +22,10 @@ function PythonInterpreter(context, msgCallback) {
     handler += "\n\tvar result = Sk.builtin.none.none$;";
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
-    // handler += "\n\ttry {";
+    handler += "\n\ttry {";
     handler += '\n\t\ttask.displayedSubTask.context.customBlocks["' + objectName + '"][' + iCategory + '].blocks[' + iBlock + '].handler(resolve);';
-    // handler += "\n\t} catch (e) {";
+    handler += "\n\t} catch (e) {";
+    handler += "\n\t\ttask.displayedSubTask.context.runner._onStepError(e)}";
     handler += '\n\t}).then(function (value) {\nresult = value;\nreturn value;\n })};';
     handler += '\n\treturn susp;';
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
@@ -112,10 +113,19 @@ function PythonInterpreter(context, msgCallback) {
 
   this.print = function (message, className) {
     if (message === 'Program execution complete') {
-      this._resetInterpreterState();
+      this._onFinished();
     }
     if (message) {
       console.log('PRINT: ', message, className || '');
+    }
+  };
+
+  this._onFinished = function () {
+    this._resetInterpreterState();
+    try {
+      this.context.infos.checkEndCondition(this.context, true);
+    } catch (e) {
+      this._onStepError(e);
     }
   };
 
@@ -196,8 +206,8 @@ function PythonInterpreter(context, msgCallback) {
 
   this._onStepError = function (message) {
     this.stop();
-    // this.messageCallback(this.context.messagePrefixFailure + message);
-    console.log(message);
+    this.context.success = false;
+    this.messageCallback(this.context.messagePrefixFailure + message);
   };
 
   this._setBreakpoint = function (bp, isTemporary) {

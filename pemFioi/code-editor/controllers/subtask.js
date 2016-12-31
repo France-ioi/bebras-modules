@@ -141,21 +141,36 @@ function SubTaskController(_subTask) {
   };
 
   subTask.submit = function () {
-    this.context.display = false;
-    this.getAnswerObject(); // to fill this.answer;
-    this.getGrade(function (result) {
+    subTask.context.display = false;
+    subTask.getAnswerObject(); // to fill this.answer;
+    subTask.getGrade(function (result) {
       subTask.context.display = true;
-      subTask.changeSpeed();
-      subTask.runController = new CodeEditor.Controllers.RunController(
-        subTask.context, function (message, success) {
-          $("#errors").html(message);
-          platform.validate("done");
-        });
+      subTask.changeSpeed(0);
+
+      if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+        subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+        subTask.runController = new CodeEditor.Controllers.RunController(
+          this.context,
+          function (message, success) {
+            $("#errors").html(message);
+            platform.validate("done");
+          });
+
+      } else {
+        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+          this.context,
+          function (message, success) {
+            $("#errors").html(message);
+            platform.validate("done");
+          });
+      }
+
+
       subTask.changeTest(result.iTestCase - subTask.iTestCase);
       initContextForLevel(result.iTestCase);
       subTask.context.linkBack = true;
       subTask.context.messagePrefixSuccess = "Tous les tests : ";
-      subTask.logicController.run(subTask.context);
+      subTask.logicController.run();
     });
   };
 
@@ -236,23 +251,7 @@ function SubTaskController(_subTask) {
     var code = "";
     var codes = [];
 
-    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
-      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-      subTask.runController = new CodeEditor.Controllers.RunController(
-        this.context, callback);
-      code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
-      codes = [subTask.logicController.getFullCode(code)];
-
-    } else {
-      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-        this.context, callback);
-      code = subTask.logicController._programs.python;
-      codes = [code];
-    }
-
-    subTask.iTestCase = 0;
-
-    var callback = function (message, success) {
+    var callbackPrivate = function (message, success) {
       subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
       subTask.iTestCase++;
       if (subTask.iTestCase < subTask.nbTestCases) {
@@ -272,15 +271,31 @@ function SubTaskController(_subTask) {
       }
     };
 
+    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+      subTask.runController = new CodeEditor.Controllers.RunController(
+        this.context, callback);
+      code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
+      codes = [subTask.logicController.getFullCode(code)];
+
+    } else {
+      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+        this.context, callback);
+      code = subTask.logicController._programs.python;
+      codes = [code];
+    }
+
+    subTask.iTestCase = 0;
+
     if (!subTask.runController && !subTask.pythonRunner) {
       if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
         subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
         subTask.runController = new CodeEditor.Controllers.RunController(
-          this.context, callback);
+          this.context, callbackPrivate);
 
       } else {
         subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-          this.context, callback);
+          this.context, callbackPrivate);
       }
     }
 

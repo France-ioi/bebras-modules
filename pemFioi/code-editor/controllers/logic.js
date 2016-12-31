@@ -259,9 +259,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
   this.stopAndTryAgain = function () {
     this._mainContext.runner.stop();
-    // var identifier = "run" + Math.random();
     window.setTimeout(this.run.bind(this), 100);
-    //this._mainContext.delayFactory.createTimeout(identifier, this.run, 1000);
   };
 
   this.getLanguage = function() {
