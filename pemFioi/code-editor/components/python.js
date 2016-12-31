@@ -173,11 +173,20 @@ function PythonInterpreter(context) {
       this._onOutput(e.toString() + "\n")
     }
 
-    this._interval = window.setInterval(this._shouldStep.bind(this), 100);
+    this._interval = window.setInterval(this._shouldStep.bind(this), 1);
   };
 
   this.nbRunning = function () {
-    return 0;
+    if (this._interval > 0) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+
+  this.stop = function () {
+    window.clearInterval(this._interval);
+    this._interval = 0;
   };
 
   this.step = function () {
