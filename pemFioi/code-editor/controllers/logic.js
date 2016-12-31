@@ -9,7 +9,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
    * Class properties
    */
   this._nbTestCases = 1;
-  this._maxInstructions =  maxInstructions || undefined;
+  this._maxInstructions = maxInstructions || undefined;
   this._language = language || CodeEditor.CONST.SETTINGS.DEFAULT_LANGUAGE;
   this._textFile = null;
   this._extended = false;
@@ -263,6 +263,10 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     this._mainContext.delayFactory.createTimeout(identifier, this.run, 1000);
   };
 
+  this.getLanguage = function() {
+    return this._language;
+  };
+
   this.run = function () {
     var nbRunning = this._mainContext.runner.nbRunning();
     if (nbRunning > 0) {
@@ -287,6 +291,9 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         break;
       case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
         codes.push(this.getFullCode(this._programs.javascript));
+        break;
+      case CodeEditor.CONST.LANGUAGES.PYTHON:
+        codes.push(this._programs.python);
         break;
     }
 

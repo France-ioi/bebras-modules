@@ -114,12 +114,17 @@ function SubTaskController(_subTask) {
 
   subTask.run = function () {
 
-    subTask.runController = new CodeEditor.Controllers.RunController(
-      subTask.context,
-      function (message, success) {
-        $("#errors").html(message);
-      });
+    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+      subTask.runController = new CodeEditor.Controllers.RunController(
+        subTask.context,
+        function (message, success) {
+          $("#errors").html(message);
+        });
 
+    } else {
+      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(subTask.context);
+    }
     initContextForLevel(subTask.iTestCase);
 
     subTask.logicController.run(subTask.context);

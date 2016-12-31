@@ -11,6 +11,7 @@ CodeEditor.Utils.Localization = {};
 CodeEditor.Utils.DOM = {};
 CodeEditor.Controllers = {};
 CodeEditor.CONST = {};
+CodeEditor.Interpreters = {};
 
 
 
