@@ -1,6 +1,8 @@
-body.blockly > * {
+body.blockly > *,
+body > * {
 	width: auto;
 }
+
 @media screen and (max-width: 1199px) {
 	#task {
 		padding: 0 10px;
