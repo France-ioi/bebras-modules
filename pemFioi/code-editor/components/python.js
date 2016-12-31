@@ -161,7 +161,7 @@ function PythonInterpreter(context) {
       this._onOutput(e.toString() + "\n")
     }
 
-    this._interval = window.setInterval(this.start.bind(this), 500);
+    this._interval = window.setInterval(this.start.bind(this), 100);
   };
 
   this.nbRunning = function () {
