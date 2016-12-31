@@ -150,7 +150,7 @@ function SubTaskController(_subTask) {
       if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
         subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
         subTask.runController = new CodeEditor.Controllers.RunController(
-          this.context,
+          subTask.context,
           function (message, success) {
             $("#errors").html(message);
             platform.validate("done");
@@ -158,7 +158,7 @@ function SubTaskController(_subTask) {
 
       } else {
         subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-          this.context,
+          subTask.context,
           function (message, success) {
             $("#errors").html(message);
             platform.validate("done");
@@ -271,32 +271,21 @@ function SubTaskController(_subTask) {
       }
     };
 
+
+    subTask.iTestCase = 0;
+
     if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
       subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
       subTask.runController = new CodeEditor.Controllers.RunController(
-        this.context, callback);
+        this.context, callbackPrivate);
       code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
       codes = [subTask.logicController.getFullCode(code)];
 
     } else {
       subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-        this.context, callback);
+        this.context, callbackPrivate);
       code = subTask.logicController._programs.python;
       codes = [code];
-    }
-
-    subTask.iTestCase = 0;
-
-    if (!subTask.runController && !subTask.pythonRunner) {
-      if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
-        subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-        subTask.runController = new CodeEditor.Controllers.RunController(
-          this.context, callbackPrivate);
-
-      } else {
-        subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-          this.context, callbackPrivate);
-      }
     }
 
 
