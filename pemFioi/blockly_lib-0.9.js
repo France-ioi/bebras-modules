@@ -1554,7 +1554,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   "args0": [
                     {
                       "type": "field_image",
-                      "src": Blockly.mainWorkspace.options.pathToMedia + "/icons/event_whenflagclicked.svg",
+                      "src": Blockly.mainWorkspace.options.pathToMedia + "icons/event_whenflagclicked.svg",
                       "width": 24,
                       "height": 24,
                       "alt": "flag",
