@@ -1747,7 +1747,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         var maxIter = 20000;
+         var maxIter = 40000;
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
@@ -1872,13 +1872,88 @@ function mergeIntoObject(into, other) {
    }
 }
 
+/*
+{ shared: { field1: X }, easy: { field2: Y } } becomes { field1: X, field2: Y } if the current level is easy
+{ shared: [X, Y], easy: [Z] }  becomes [X, Y, Z] if the current level is easy
+{ easy: X, medium: Y, hard: Z}  becomes X if the current level is easy
+*/
+
+function testLevelSpecific() {
+   var tests = [
+      {
+         in: { field1: "X", field2: "Y" },
+         out: { field1: "X", field2: "Y" }
+      },
+      {
+            in: { easy: "X", medium: "Y", hard: "Z"},
+            out: "X"
+      },
+      {
+          in: { shared: { field1: "X" }, easy: { field2: "Y" } },
+          out: { field1: "X", field2: "Y" }
+      },
+      {
+            in: { shared: ["X", "Y"], easy: ["Z"] },
+            out: ["X", "Y", "Z"]
+      }
+   ];
+   for (var iTest = 0; iTest < tests.length; iTest++) {
+      var res = extractLevelSpecific(tests[iTest].in, "easy");
+      if (JSON.stringify(res) != JSON.stringify(tests[iTest].out)) { // TODO better way to compare two objects
+         console.error("Test " + iTest + " failed: returned " + JSON.stringify(res));
+      }
+   }
+}
+
+function extractLevelSpecific(item, level) {
+   if ((typeof item != "object") || Array.isArray(item)) {
+      return item;
+   }
+   if (item.shared === undefined) {
+      if (item[level] === undefined) {
+         var newItem = {};
+         for (var prop in item) {
+            newItem[prop] = extractLevelSpecific(item[prop], level);
+         }
+         return newItem;
+      }
+      return extractLevelSpecific(item[level], level);
+   }
+   if (Array.isArray(item.shared)) {
+      var newItem = [];
+      for (var iElem = 0; iElem < item.shared.length; iElem++) {
+         newItem.push(extractLevelSpecific(item.shared[iElem], level));
+      }
+      if (item[level] != undefined) {
+         if (!Array.isArray(item[level])) {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var iElem = 0; iElem < item[level].length; iElem++) {
+            newItem.push(extractLevelSpecific(item[level][iElem], level));
+         }
+      }
+      return newItem;
+   }
+   if (typeof item.shared == "object") {
+      var newItem = {};
+      for (var prop in item.shared) {
+         newItem[prop] = extractLevelSpecific(item.shared[prop], level);
+      }
+      if (item[level] != undefined) {
+         if (typeof item[level] != "object") {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var prop in item[level]) {
+            newItem[prop] = extractLevelSpecific(item[level][prop], level);
+         }
+      }
+      return newItem;
+   }
+   console.error("Invalid type for shared property");
+}
+
 
 var initBlocklySubTask = function(subTask) {
-   subTask.blocklyHelper = getBlocklyHelper(subTask.gridInfos.maxInstructions);
-   subTask.answer = null;
-   subTask.state = {};
-   subTask.iTestCase = 0;
-
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
@@ -1888,6 +1963,13 @@ var initBlocklySubTask = function(subTask) {
 
 
    subTask.loadLevel = function(curLevel) {
+      subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos);
+
+      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
+      subTask.answer = null;
+      subTask.state = {};
+      subTask.iTestCase = 0;
+
       this.level = curLevel;
 
       // TODO: fix bebras platform to make this unnecessary
@@ -1907,7 +1989,7 @@ var initBlocklySubTask = function(subTask) {
          gridHtml += "<div id='gridButtonsAfter'></div>";
          gridHtml += "</center>";
          $("#gridContainer").html(gridHtml)
-         if (this.gridInfos.hideSaveOrLoad) {
+         if (subTask.levelGridInfos.hideSaveOrLoad) {
             // TODO: do without a timeout
             setTimeout(function() {
             $("#saveOrLoad").hide();
@@ -1915,7 +1997,7 @@ var initBlocklySubTask = function(subTask) {
          }
       }
 
-      this.context = getContext(this.display, this.gridInfos, curLevel);
+      this.context = getContext(this.display, subTask.levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
@@ -1927,61 +2009,7 @@ var initBlocklySubTask = function(subTask) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      // Merge-in level dependent block information
-      var includeBlocks = JSON.parse(JSON.stringify(this.context.infos.includeBlocks)); // deep copy
-
-      // TODO: Is there a way to do this better?
-      // Maybe we can write a merger function that merges arrays as we need them
-      if (typeof(this.context.infos.additionalBlocksByLevel) != "undefined") {
-         var additionalBlocks = this.context.infos.additionalBlocksByLevel[curLevel];
-         if (typeof(additionalBlocks) != "undefined") {
-            if (typeof(additionalBlocks.groupByCategory) != "undefined") includeBlocks.groupByCategory = additionalBlocks.groupByCategory;
-            if (typeof(additionalBlocks.generatedBlocks) != "undefined") {
-               for (var objectName in additionalBlocks.generatedBlocks) {
-                  for (var iBlock in additionalBlocks.generatedBlocks[objectName]) {
-                     if (!(objectName in includeBlocks.generatedBlocks)) {
-                        includeBlocks.generatedBlocks[objectName] = [];
-                     }
-                     if (!arrayContains(includeBlocks.generatedBlocks[objectName], additionalBlocks.generatedBlocks[objectName][iBlock])) {
-                        includeBlocks.generatedBlocks[objectName].push(additionalBlocks.generatedBlocks[objectName][iBlock]);
-                     }
-                  }
-               }
-            }
-            if (typeof(additionalBlocks.standardBlocks) != "undefined") {
-               if (typeof(additionalBlocks.standardBlocks.includeAll) != "undefined")
-                  includeBlocks.standardBlocks.includeAll = additionalBlocks.standardBlocks.includeAll;
-               if (typeof(additionalBlocks.standardBlocks.wholeCategories) != "undefined") {
-                  for (var iCategory in additionalBlocks.standardBlocks.wholeCategories) {
-                     if (!arrayContains(includeBlocks.standardBlocks.wholeCategories, additionalBlocks.standardBlocks.wholeCategories[iCategory])) {
-                        includeBlocks.standardBlocks.wholeCategories.push(additionalBlocks.standardBlocks.wholeCategories[iCategory]);
-                     }
-                  }
-               }
-               if (typeof(additionalBlocks.standardBlocks.singleBlocks) != "undefined") {
-                  for (var iBlock in additionalBlocks.standardBlocks.singleBlocks) {
-                     if (!arrayContains(includeBlocks.standardBlocks.singleBlocks, additionalBlocks.standardBlocks.singleBlocks[iBlock])) {
-                        includeBlocks.standardBlocks.singleBlocks.push(additionalBlocks.standardBlocks.singleBlocks[iBlock]);
-                     }
-                  }
-               }
-            }
-         }
-      }
-
-      
-      // This does not quite work yet :(
-      /*var includeBlocks = {};
-      mergeIntoObject(includeBlocks, this.context.infos.includeBlocks);
-      if (typeof(this.context.infos.additionalBlocksByLevel) != "undefined") {
-         var additionalBlocks = this.context.infos.additionalBlocksByLevel[curLevel];
-         if (typeof(additionalBlocks) != "undefined") {
-            mergeIntoObject(includeBlocks, additionalBlocks);
-         }
-      }*/
-
-
-      this.blocklyHelper.includeBlocks = includeBlocks;
+      this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
       
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
@@ -2127,7 +2155,7 @@ var initBlocklySubTask = function(subTask) {
       var codes = [subTask.blocklyHelper.getFullCode(code)];
       subTask.iTestCase = 0;
       initBlocklyRunner(subTask.context, function(message, success) {
-         subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
+         subTask.testCaseResults[subTask.iTestCase] = subTask.levelGridInfos.computeGrade(subTask.context, message);
          subTask.iTestCase++;
          if (subTask.iTestCase < subTask.nbTestCases) {
             initContextForLevel(subTask.iTestCase);
