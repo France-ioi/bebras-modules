@@ -1963,7 +1963,7 @@ var initBlocklySubTask = function(subTask) {
 
 
    subTask.loadLevel = function(curLevel) {
-      subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos);
+      subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
 
       subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
       subTask.answer = null;
