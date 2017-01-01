@@ -168,7 +168,8 @@ var blocklyToScratch = {
         'controls_if': 'control_if',
         'controls_if_else': 'control_if_else',
         'controls_repeat': 'control_repeat',
-        'controls_repeat_ext': 'control_repeat'
+        'controls_repeat_ext': 'control_repeat',
+        'logic_negate': 'operator_not'
     }
 }
 
@@ -1320,6 +1321,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                  "  </value>" +
                                  "</block>"
                   },
+               ],
+            },
+            {
+               category: "operator",
+               blocks: [
+                  {
+                     name: "operator_not",
+                     blocklyXml: "<block type='operator_not'></block>"
+                  }
                ]
             }
          ];

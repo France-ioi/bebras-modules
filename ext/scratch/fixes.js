@@ -130,6 +130,34 @@ Blockly.Blocks['control_if_else'] = {
   }
 };
 
+Blockly.Blocks['operator_not'] = {
+  /**
+   * Block for "not" unary boolean operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LOGIC_NEGATE_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "OPERAND",
+          "check": "Boolean"
+        }
+      ],
+      "inputsInline": true,
+      "output": "Boolean",
+      "category": Blockly.Categories.operators,
+      "colour": Blockly.Colours.operators.primary,
+      "colourSecondary": Blockly.Colours.operators.secondary,
+      "colourTertiary": Blockly.Colours.operators.tertiary,
+      "outputShape": Blockly.OUTPUT_SHAPE_HEXAGONAL
+    });
+  }
+};
+
+
+
 Blockly.JavaScript['control_if'] = function(block) {
   // If/then condition.
   var n = 0;
