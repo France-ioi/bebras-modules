@@ -40,6 +40,9 @@ var getContext = function(display, infos, curLevel) {
             cellBrown: "case marron",
             cellMarked: "case marquée",
             paintInFront: "peinture devant",
+            paintNorthWest: "peinture en haut à gauche",
+            paintNorth: "peinture en haut",
+            paintNorthEast: "peinture en haut à droite",
             colorUnder: "couleur de la case",
             numberUnder: "nombre sur la case",
             dir: "direction du robot",
@@ -92,6 +95,9 @@ var getContext = function(display, infos, curLevel) {
             cellBrown: "caseMarron",
             cellMarked: "caseMarquee",
             paintInFront: "peintureDevant",
+            paintNorthWest: "peintureHautGauche",
+            paintNorth: "peintureHaut",
+            paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
             dir: "direction",
@@ -147,6 +153,9 @@ var getContext = function(display, infos, curLevel) {
             cellBrown: "braunes Feld",
             cellMarked: "markiertes Feld",
             paintInFront: "vor Farbe",
+            paintNorthWest: "TODO TRANSLATE",
+            paintNorth: "TODO TRANSLATE",
+            paintNorthEast: "TODO TRANSLATE",
             colorUnder: "auf Farbe",
             numberUnder: "Nummer des Feldes",
             dir: "Richtung des Roboters",
@@ -199,6 +208,9 @@ var getContext = function(display, infos, curLevel) {
             cellBrown: "caseMarron",
             cellMarked: "caseMarquee",
             paintInFront: "vorFarbe",
+            paintNorthWest: "TODO TRANSLATE",
+            paintNorth: "TODO TRANSLATE",
+            paintNorthEast: "TODO TRANSLATE",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
             dir: "Richtung",
@@ -545,9 +557,28 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, items.length > 0);
    };
 
-   context.robot.paintGrayInFront = function(callback) {
+   context.robot.paintInFront = function(callback) {
       var coords = getCoordsInFront(0);
-      paint(coords.row, coords.col, "paintGray", callback);
+      var items = context.getItems(coords.row, coords.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorthWest = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col - 1, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorth = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+
+   context.robot.paintNorthEast = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row - 1, robot.col + 1, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
    };
 
    context.robot.colorUnder = function(callback) {
@@ -886,6 +917,9 @@ var getContext = function(display, infos, curLevel) {
                { name: "obstacleSouth",      yieldsValue: true },
                
                { name: "paintInFront",       yieldsValue: true },
+               { name: "paintNorth",         yieldsValue: true },
+               { name: "paintNorthWest",     yieldsValue: true },
+               { name: "paintNorthEast",     yieldsValue: true },
                { name: "colorUnder",         yieldsValue: true },
                { name: "numberUnder",        yieldsValue: true },
                { name: "gridEdgeInFront",    yieldsValue: true },
@@ -1145,14 +1179,14 @@ var getContext = function(display, infos, curLevel) {
    var checkTileAllowed = function(row, col) {
       if (isOutsideGrid(row, col) || (context.tiles[row][col] == 0)) {
          if (infos.ignoreInvalidMoves) {
-            return fasle;
+            return false;
          }
          throw("Le robot sort de la grille !");
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
          if (infos.ignoreInvalidMoves) {
-            return fasle;
+            return false;
          }
          throw(strings.obstacle);
       }
