@@ -179,6 +179,11 @@ Blockly.JavaScript['control_repeat'] = function(block) {
   return code;
 };
 
+Blockly.JavaScript['operator_not'] = function(block) {
+   var b = Blockly.JavaScript.ORDER_LOGICAL_NOT;
+   return["!"+ (Blockly.JavaScript.valueToCode(block,"OPERAND",b) || "true"), b]
+};
+
 // TODO :: Python generation
 Blockly.Python['control_if'] = function(block) { return '# Error: control_if not implemented in Python!'; }
 Blockly.Python['control_if_else'] = function(block) { return '# Error: control_if_else not implemented in Python!'; }
