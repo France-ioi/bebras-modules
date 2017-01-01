@@ -452,7 +452,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
             this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.player].blocklyJS = this.getCode("javascript");
-            this.programs[this.player].blocklyPython = this.getCode("python");
+            //this.programs[this.player].blocklyPython = this.getCode("python");
          }
       },
 
