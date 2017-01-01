@@ -202,7 +202,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       prevWidth: 0,
       languageStrings: languageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly' : "http://static3.castor-informatique.fr/contestAssets/blockly",
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
@@ -1389,7 +1389,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          this.addBlocksAndCategories(this.includeBlocks.standardBlocks.singleBlocks, stdBlocks, categoriesInfos);
 
-
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
          if (((this.includeBlocks.variables != undefined) && (this.includeBlocks.variables.length > 0 ))||
@@ -1555,7 +1554,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   "args0": [
                     {
                       "type": "field_image",
-                      "src": Blockly.mainWorkspace.options.pathToMedia + "icons/event_whenflagclicked.svg",
+                      "src": Blockly.mainWorkspace.options.pathToMedia + "/icons/event_whenflagclicked.svg",
                       "width": 24,
                       "height": 24,
                       "alt": "flag",
