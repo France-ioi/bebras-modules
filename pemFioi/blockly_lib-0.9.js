@@ -202,7 +202,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       prevWidth: 0,
       languageStrings: languageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly' : "http://static3.castor-informatique.fr/contestAssets/blockly",
+      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
