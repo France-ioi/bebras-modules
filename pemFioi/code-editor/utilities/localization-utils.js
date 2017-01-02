@@ -45,6 +45,9 @@ CodeEditor.Utils.Localization.Strings = {
     reloadProgram: "Recharger :",
     saveProgram: "Enregistrer",
     limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
+    limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
+    limitElements: "{remainingBlocks} éléments restants sur {maxBlocks} autorisés.",
+    limitElementsOver: "{remainingBlocks} éléments en trop utilisés pour {maxBlocks} autorisés.",
     buttons: {
       next: 'Next',
       previous: 'Previous'
@@ -91,6 +94,9 @@ CodeEditor.Utils.Localization.Strings = {
     reloadProgram: "Reload:",
     saveProgram: "Save",
     limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
+    limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
+    limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
+    limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
     buttons: {
       next: 'Suivant',
       previous: 'Précédent'
@@ -135,6 +141,10 @@ CodeEditor.Utils.Localization.Strings = {
     avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
     reloadProgram: "Laden:",
     saveProgram: "Speichern",
-    limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar."
+    limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
+    // TODO :: translate next three
+    limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
+    limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
+    limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
   }
 };

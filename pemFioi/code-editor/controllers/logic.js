@@ -79,11 +79,21 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
       $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
 
-      var ws = this._workspace;
+      var that = this;
 
       var onchange = function (e) {
         window.focus();
-        $('.max-instructions').html(ws.remainingCapacity());
+
+        if(maxInstructions) {
+          var remaining = that._workspace.remainingCapacity();
+          var optLimitBlocks = {
+             maxBlocks: maxInstructions,
+             remainingBlocks: Math.abs(remaining)
+             };
+          var strLimitBlocks = remaining < 0 ? that._strings.limitBlocksOver : that._strings.limitBlocks;
+          $('#capacity').css('color', remaining < 0 ? 'red' : '');
+          $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
+        }
       };
 
       this._workspace.addChangeListener(onchange);
@@ -410,17 +420,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "</div>";
   };
   this._loadInstructionsTooltip = function () {
-
-    var strMaxBlocks = "";
-
-    if (this._maxInstructions) {
-      strMaxBlocks = this._strings.limitBlocks.format({
-        maxBlocks: this._maxInstructions,
-        remainingBlocks: "<span class='max-instructions'>XXX</span>"
-      });
-    }
-
-    return CodeEditor.Utils.DOM.clearFix(strMaxBlocks);
+    return CodeEditor.Utils.DOM.clearFix('', 'capacity');
   };
   this._loadEditorWorkSpace = function () {
     return CodeEditor.Utils.DOM.generateWorkspace();
@@ -448,6 +448,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         this._loadEditorTools()
       );
       this._loadGridButtons();
+      this._bindEditorEvents();
     }
   };
   this._loadGridButtons = function () {
@@ -481,6 +482,21 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "<br/>" +
       "<div id='errors'></div>";
     $("#gridButtonsAfter").html(gridButtonsAfter);
+  };
+  this._bindEditorEvents = function () {
+    var that = this;
+    var updatePythonCount = function () {
+      if(that._language != 'python' || !maxInstructions) { return; }
+      var remaining = maxInstructions - pythonCount($(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val());
+      var optLimitElements = {
+         maxBlocks: maxInstructions,
+         remainingBlocks: Math.abs(remaining)
+         };
+      var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
+      $('#capacity').css('color', remaining < 0 ? 'red' : '');
+      $('#capacity').html(strLimitElements.format(optLimitElements));
+    }
+    $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).on('input propertychange', debounce(updatePythonCount, 500, false))
   };
 
   this.toggleSize = function () {

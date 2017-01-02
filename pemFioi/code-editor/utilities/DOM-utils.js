@@ -28,8 +28,8 @@ CodeEditor.Utils.DOM.loadBasicEditor = function (html) {
   $(CodeEditor.Utils.DOM.Elements.EDITOR).html(html);
 };
 
-CodeEditor.Utils.DOM.clearFix = function (html) {
-  return "<div class='clearBoth' >" + html + "</div>";
+CodeEditor.Utils.DOM.clearFix = function (html, divId) {
+  return "<div "+(divId ? "id='"+divId+"'" : '')+"class='clearBoth' >" + html + "</div>";
 };
 
 CodeEditor.Utils.DOM.generateWorkspace = function () {

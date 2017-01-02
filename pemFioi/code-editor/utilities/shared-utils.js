@@ -86,3 +86,26 @@ if (EventTarget.prototype.addEventListenerBase == undefined) {
 }
 
 var highlightPause = false;
+
+/*
+debounce:
+   execute a function only every threshold milliseconds.
+   wait: do not execute the function until the calls stop
+*/
+function debounce(fn, threshold, wait) {
+   var timeout;
+   return function debounced() {
+      if (timeout) {
+         if(wait) {
+            clearTimeout(timeout);
+         } else {
+            return;
+         }
+      }
+      function delayed() {
+         fn();
+         timeout = null;
+      }
+      timeout = setTimeout(delayed, threshold || 100);
+   }
+}

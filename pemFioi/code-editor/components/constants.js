@@ -11,7 +11,7 @@ CodeEditor.CONST = {
   },
   SETTINGS: {
     DEFAULT_LANGUAGE: 'python',
-    DEFAULT_LOCALIZATION: 'en'
+    DEFAULT_LOCALIZATION: 'fr'
   },
   LOCALIZATION: {
     FR: 'fr',
