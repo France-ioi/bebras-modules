@@ -686,7 +686,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // TODO: Load default colours + custom styles
          if (typeof block.blocklyJson.colour == "undefined") {
             if(this.scratchMode) {
-               block.blocklyJson.colour
+               block.blocklyJson.colour = Blockly.Colours.motion.primary;
+               block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+               block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
             } else {
                block.blocklyJson.colour = 210;
             }
