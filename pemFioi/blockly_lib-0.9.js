@@ -315,7 +315,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                var strLimitBlocks = remaining < 0 ? that.strings.limitBlocksOver : that.strings.limitBlocks;
                $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
                $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
-               
             }
             this.workspace.addChangeListener(onchange);
             onchange();
@@ -365,6 +364,17 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          else {
             return '<xml></xml>';
          }
+      },
+
+      checkRobotStart: function () {
+         if(!this.startingBlock || !this.workspace) { return; }
+         var blocks = this.workspace.getTopBlocks(true);
+         for(b=0; b<blocks.length; b++) {
+            if(blocks[b].type == 'robot_start') { return;}
+         }
+
+         var xml = Blockly.Xml.textToDom(this.getDefaultBlocklyContent())
+         Blockly.Xml.domToWorkspace(xml, this.workspace);
       },
 
       setPlayer: function(newPlayer) {
@@ -451,6 +461,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
 
       savePrograms: function() {
+         this.checkRobotStart();
+
          this.programs[this.player].javascript = $("#program").val();
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
@@ -461,12 +473,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
 
       loadPrograms: function() {
-         $("#program").val(this.programs[this.player].javascript);
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
+         $("#program").val(this.programs[this.player].javascript);
       },
 
       changeLanguage: function() {
@@ -1649,7 +1661,22 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          } else {
             Blockly.JavaScript.STATEMENT_PREFIX = '';
          }
+         var topBlocks = this.workspace.getTopBlocks(true);
+         var robotStartHasChildren = false;
+         for(var b=0; b<blocks.length; b++) {
+            var block = blocks[b];
+            if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
+               robotStartHasChildren = true;
+               break;
+            } // There can be multiple robot_start blocks sometimes
+         }
+         if(!robotStartHasChildren) {
+            $('#errors').html('Le programme est vide ! Connectez des blocs.');
+            return;
+         }
+
          this.savePrograms();
+
          var codes = [];
          for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
             var language = this.languages[iRobot];
