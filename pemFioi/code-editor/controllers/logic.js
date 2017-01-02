@@ -207,7 +207,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   this.load = function (language, display, nbTestCases, _options) {
 
     this._loadBasicEditor();
-
+    CodeEditor.Utils.DOM.displayLanguageWorkspace(this._language);
     switch (this._language) {
       case CodeEditor.CONST.LANGUAGES.BLOCKLY:
         this._loadBlocklyController(_options);
@@ -284,11 +284,13 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         return undefined;
       }
 
-      if (this._mainContext.display) {
-        Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
-        Blockly.JavaScript.addReservedWords('highlightBlock');
-      } else {
-        Blockly.JavaScript.STATEMENT_PREFIX = '';
+      if (this._language == 'blockly') {
+        if (this._mainContext.display) {
+          Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
+          Blockly.JavaScript.addReservedWords('highlightBlock');
+        } else {
+          Blockly.JavaScript.STATEMENT_PREFIX = '';
+        }
       }
 
       this._savePrograms();
@@ -307,9 +309,10 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
           break;
       }
 
-      this._workspace.traceOn(true);
-
-      this._workspace.highlightBlock(null);
+      if (this._language == 'blockly') {
+        this._workspace.traceOn(true);
+        this._workspace.highlightBlock(null);
+      }
 
       this._mainContext.runner.runCodes(codes);
     }
@@ -442,7 +445,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if (this._mainContext.display) {
       CodeEditor.Utils.DOM.loadBasicEditor(
         this._loadXML() +
-        this._loadLanguageSelector() +
+//        this._loadLanguageSelector() +
         this._loadInstructionsTooltip() +
         this._loadEditorWorkSpace() +
         this._loadEditorTools()

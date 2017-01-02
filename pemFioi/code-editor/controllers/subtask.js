@@ -70,7 +70,7 @@ function SubTaskController(_subTask) {
     subTask.logicController = new CodeEditor.Controllers.LogicController(
       this.nbTestCases,
       subTask.gridInfos.maxInstructions,
-      CodeEditor.CONST.LANGUAGES.BLOCKLY,
+      CodeEditor.CONST.LANGUAGES.PYTHON,
       this.context
     );
 

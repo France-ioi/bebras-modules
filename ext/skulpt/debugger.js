@@ -314,5 +314,3 @@ Sk.Debugger.prototype.execute = function (suspendablefn, suspHandlers) {
     this.eval_callback(r);
   }
 };
-
-goog.exportSymbol("Sk.Debugger", Sk.Debugger);

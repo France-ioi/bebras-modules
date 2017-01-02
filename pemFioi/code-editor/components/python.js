@@ -121,7 +121,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onFinished = function () {
-    this._resetInterpreterState();
+    this.stop();
     try {
       this.context.infos.checkEndCondition(this.context, true);
     } catch (e) {
