@@ -329,17 +329,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
             if(!options.noRobot) {
-               var xml;
-               if (this.startingBlock) {
-                  if(this.scratchMode) {
-                     xml = '<xml><block type="robot_start" deletable="false" movable="false" x="10" y="20"></block></xml>';
-                  } else {
-                     xml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-                  }
-               }
-               else {
-                  xml = '<xml></xml>';
-               }
+               var xml = this.getDefaultBlocklyContent();
 
                Blockly.Events.recordUndo = false;
                Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
@@ -361,6 +351,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
                delete Blockly;
             }
+         }
+      },
+
+      getDefaultBlocklyContent: function () {
+         if (this.startingBlock) {
+            if(this.scratchMode) {
+               return '<xml><block type="robot_start" deletable="false" movable="false" x="10" y="20"></block></xml>';
+            } else {
+               return '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
+            }
+         }
+         else {
+            return '<xml></xml>';
          }
       },
 
@@ -1299,9 +1302,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
       getStdScratchBlocks: function() {
          // TODO :: make the list of standard scratch blocks
-         return [
-            {
-               category: "control",
+         return {
+            control: {
                blocks: [
                   {
                      name: "control_if",
@@ -1323,8 +1325,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                ],
             },
-            {
-               category: "operator",
+            operator: {
                blocks: [
                   {
                      name: "operator_not",
@@ -1332,7 +1333,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   }
                ]
             }
-         ];
+         };
       },
 
       getBlockXmlInfo: function(generatorStruct, blockName) {
@@ -2140,13 +2141,7 @@ var initBlocklySubTask = function(subTask) {
    };
 
    subTask.getDefaultAnswerObject = function() {
-      var defaultBlockly;
-      if (this.blocklyHelper.startingBlock) {
-         defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block></xml>';
-      }
-      else {
-         defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
-      }
+      var defaultBlockly = this.blocklyHelper.getDefaultBlocklyContent();
       return [{javascript:"", blockly: defaultBlockly, blocklyJS: ""}];
    };
 
