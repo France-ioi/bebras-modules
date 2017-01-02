@@ -17,13 +17,13 @@ function PythonInterpreter(context, msgCallback) {
   this._timeouts = [];
   var that = this;
 
-  this._skulptifyHandler = function (name, objectName, iCategory, iBlock) {
+  this._skulptifyHandler = function (name, objectName, iCategory, blockName) {
     var handler = '\tvar susp = new Sk.misceval.Suspension();';
     handler += "\n\tvar result = Sk.builtin.none.none$;";
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
     handler += "\n\ttry {";
-    handler += '\n\t\ttask.displayedSubTask.context.customBlocks["' + objectName + '"][' + iCategory + '].blocks[' + iBlock + '].handler(resolve);';
+    handler += '\n\t\ttask.displayedSubTask.context["' + objectName + '"]["' + blockName + '"](resolve);';
     handler += "\n\t} catch (e) {";
     handler += "\n\t\ttask.displayedSubTask.context.runner._onStepError(e)}";
     handler += '\n\t}).then(function (value) {\nresult = value;\nreturn value;\n })};';
@@ -32,7 +32,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._injectFunctions = function () {
-    var final = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
+    var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
     for (var objectName in this.context.customBlocks) {
       for (var iCategory in this.context.customBlocks[objectName]) {
         for (var iBlock in this.context.customBlocks[objectName][iCategory].blocks) {
@@ -41,13 +41,13 @@ function PythonInterpreter(context, msgCallback) {
           if (typeof(code) == "undefined") {
             code = blockInfo.name;
           }
-          final += this._skulptifyHandler(code, objectName, iCategory, iBlock);
+          modContents += this._skulptifyHandler(code, objectName, iCategory, blockInfo.name);
         }
       }
     }
 
-    final += "\nreturn mod;\n};";
-    Sk.builtinFiles["files"]["src/lib/robot.js"] = final;
+    modContents += "\nreturn mod;\n};";
+    Sk.builtinFiles["files"]["src/lib/robot.js"] = modContents;
   };
 
   this.waitDelay = function (callback, value, delay) {

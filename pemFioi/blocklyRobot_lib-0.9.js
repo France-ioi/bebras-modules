@@ -826,7 +826,7 @@ var getContext = function(display, infos, curLevel) {
       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
       $("#errors").html("");
       resetBoard();
-      context.blocklyHelper.updateSize();
+//      context.blocklyHelper.updateSize();
       resetItems();
       context.updateScale();
    };
