@@ -31,7 +31,17 @@ var importableModules = function () {
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
       'scratch_blocks': {src: modulesPath+"/ext/scratch/blocks_compressed_vertical.js", id: "scratch_blocks"},
-      'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"}
+      'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"},
+
+      'python_index': {src: modulesPath+"pemFioi/code-editor/index.js", id: "python_index"},
+      'python_constants': {src: modulesPath+"pemFioi/code-editor/components/constants.js", id: "python_constants"},
+      'python_dom_utils': {src: modulesPath+"pemFioi/code-editor/utilities/DOM-utils.js", id: "python_dom_utils"},
+      'python_localization_utils': {src: modulesPath+"pemFioi/code-editor/utilities/localization-utils.js", id: "python_localization_utils"},
+      'python_shared_utils': {src: modulesPath+"pemFioi/code-editor/utilities/shared-utils.js", id: "python_shared_utils"},
+      'python_logic': {src: modulesPath+"pemFioi/code-editor/controllers/logic.js", id: "python_logic"},
+      'python_css': {type: "stylesheet", src: modulesPath+"pemFioi/code-editor/stylesheets/ui.css", id: "python_css"},
+      'python_subtask': {src: modulesPath+"pemFioi/code-editor/controllers/subtask.js", id: "python_subtask"},
+      'python_python': {src: modulesPath+"pemFioi/code-editor/components/python.js", id: "python_python"}
    }
 }
 
@@ -59,7 +69,16 @@ var languageScripts = {
       'blocklyRobot_lib'
    ],
    python: [
-      'blocklyRobot_lib',
+      'python_index',
+      'python_constants',
+      'python_dom_utils',
+      'python_localization_utils',
+      'python_shared_utils',
+      'python_logic',
+      'python_css',
+      'python_subtask',
+      'python_python',
+      'blocklyRobot_lib'
    ]
 }
 
