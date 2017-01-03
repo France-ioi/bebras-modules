@@ -31,7 +31,7 @@ var importableModules = function () {
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
       'scratch_blocks': {src: modulesPath+"/ext/scratch/blocks_compressed_vertical.js", id: "scratch_blocks"},
-      'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"},
+      'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"}
    }
 }
 
@@ -44,7 +44,7 @@ var languageScripts = {
       'blockly_fr',
       'blockly_lib',
       'blockly_lib_css',
-      'blocklyRobot_lib',
+      'blocklyRobot_lib'
    ],
    scratch: [
       'scratch',
@@ -56,6 +56,9 @@ var languageScripts = {
       'blockly_fr',
       'blockly_lib',
       'blockly_lib_css',
+      'blocklyRobot_lib'
+   ],
+   python: [
       'blocklyRobot_lib',
    ]
 }
