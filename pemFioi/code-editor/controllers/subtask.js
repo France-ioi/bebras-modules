@@ -7,6 +7,86 @@
 
 function SubTaskController(_subTask) {
 
+   /*
+   { shared: { field1: X }, easy: { field2: Y } } becomes { field1: X, field2: Y } if the current level is easy
+   { shared: [X, Y], easy: [Z] }  becomes [X, Y, Z] if the current level is easy
+   { easy: X, medium: Y, hard: Z}  becomes X if the current level is easy
+   */
+
+   function testLevelSpecific() {
+      var tests = [
+         {
+            in: { field1: "X", field2: "Y" },
+            out: { field1: "X", field2: "Y" }
+         },
+         {
+               in: { easy: "X", medium: "Y", hard: "Z"},
+               out: "X"
+         },
+         {
+             in: { shared: { field1: "X" }, easy: { field2: "Y" } },
+             out: { field1: "X", field2: "Y" }
+         },
+         {
+               in: { shared: ["X", "Y"], easy: ["Z"] },
+               out: ["X", "Y", "Z"]
+         }
+      ];
+      for (var iTest = 0; iTest < tests.length; iTest++) {
+         var res = extractLevelSpecific(tests[iTest].in, "easy");
+         if (JSON.stringify(res) != JSON.stringify(tests[iTest].out)) { // TODO better way to compare two objects
+            console.error("Test " + iTest + " failed: returned " + JSON.stringify(res));
+         }
+      }
+   }
+
+   function extractLevelSpecific(item, level) {
+      if ((typeof item != "object") || Array.isArray(item)) {
+         return item;
+      }
+      if (item.shared === undefined) {
+         if (item[level] === undefined) {
+            var newItem = {};
+            for (var prop in item) {
+               newItem[prop] = extractLevelSpecific(item[prop], level);
+            }
+            return newItem;
+         }
+         return extractLevelSpecific(item[level], level);
+      }
+      if (Array.isArray(item.shared)) {
+         var newItem = [];
+         for (var iElem = 0; iElem < item.shared.length; iElem++) {
+            newItem.push(extractLevelSpecific(item.shared[iElem], level));
+         }
+         if (item[level] != undefined) {
+            if (!Array.isArray(item[level])) {
+               console.error("Incompatible types when merging shared and " + level);
+            }
+            for (var iElem = 0; iElem < item[level].length; iElem++) {
+               newItem.push(extractLevelSpecific(item[level][iElem], level));
+            }
+         }
+         return newItem;
+      }
+      if (typeof item.shared == "object") {
+         var newItem = {};
+         for (var prop in item.shared) {
+            newItem[prop] = extractLevelSpecific(item.shared[prop], level);
+         }
+         if (item[level] != undefined) {
+            if (typeof item[level] != "object") {
+               console.error("Incompatible types when merging shared and " + level);
+            }
+            for (var prop in item[level]) {
+               newItem[prop] = extractLevelSpecific(item[level][prop], level);
+            }
+         }
+         return newItem;
+      }
+      console.error("Invalid type for shared property");
+   }
+
   var subTask = _subTask;
 
   // former BlocklyHelper
@@ -30,6 +110,7 @@ function SubTaskController(_subTask) {
   }
 
   subTask.loadLevel = function (curLevel) {
+    this.levelGridInfos = extractLevelSpecific(this.gridInfos, curLevel);
     this.level = curLevel;
 
     // TODO: fix bebras platform to make this unnecessary
@@ -49,7 +130,7 @@ function SubTaskController(_subTask) {
       gridHtml += "<div id='gridButtonsAfter'></div>";
       gridHtml += "</center>";
       $("#gridContainer").html(gridHtml);
-      if (this.gridInfos.hideSaveOrLoad) {
+      if (this.levelGridInfos.hideSaveOrLoad) {
         // TODO: do without a timeout
         setTimeout(function () {
           $("#saveOrLoad").hide();
@@ -59,7 +140,7 @@ function SubTaskController(_subTask) {
 
 
 
-    this.context = getContext(this.display, this.gridInfos, curLevel);
+    this.context = getContext(this.display, this.levelGridInfos, curLevel);
     this.context.raphaelFactory = this.raphaelFactory;
     this.context.delayFactory = this.delayFactory;
 
@@ -69,14 +150,14 @@ function SubTaskController(_subTask) {
 
     subTask.logicController = new CodeEditor.Controllers.LogicController(
       this.nbTestCases,
-      subTask.gridInfos.maxInstructions,
+      subTask.levelGridInfos.maxInstructions,
       CodeEditor.CONST.LANGUAGES.PYTHON,
       this.context
     );
 
     subTask.context.blocklyHelper = this.logicController;
 
-    subTask.logicController.setIncludeBlocks(subTask.gridInfos.includeBlocks);
+    subTask.logicController.setIncludeBlocks(subTask.levelGridInfos.includeBlocks);
     subTask.logicController.load(stringsLanguage, this.display, this.data[curLevel].length);
 
 
@@ -255,7 +336,7 @@ function SubTaskController(_subTask) {
     var codes = [];
 
     var callbackPrivate = function (message, success) {
-      subTask.testCaseResults[subTask.iTestCase] = subTask.gridInfos.computeGrade(subTask.context, message);
+      subTask.testCaseResults[subTask.iTestCase] = subTask.levelGridInfos.computeGrade(subTask.context, message);
       subTask.iTestCase++;
       if (subTask.iTestCase < subTask.nbTestCases) {
         initContextForLevel(subTask.iTestCase);
