@@ -37,7 +37,7 @@ function SubTaskController(_subTask) {
       $('#question-iframe', window.parent.document).css('width', '100%');
     } catch (e) {
     }
-    $('body').css('width', '100%').css('margin', 'auto');
+    $('body').css("width", "100%").addClass('blockly');
     window.focus();
 
     this.iTestCase = 0;
