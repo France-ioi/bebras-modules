@@ -201,9 +201,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       player: 0,
       workspace: null,
       prevWidth: 0,
+      trashInToolbox: false,
       languageStrings: languageStrings,
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
                                       "  <div style='height: 40px;display:none' id='lang'>" +
@@ -293,6 +295,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                wsConfig.zoom = { startScale: 0.75 };
             }
             this.addExtraBlocks();
+            if(this.trashInToolbox) {
+               Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
+            }
             this.workspace = Blockly.inject(options.divId, wsConfig);
 
             var toolboxNode = $('#toolboxXml');
@@ -300,7 +305,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                toolboxNode.html(xml);
             }
             
-            Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
@@ -567,7 +571,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          if (panelWidth != this.prevWidth) {
             if (this.languages[this.player] == "blockly") {
-               Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+               if (this.trashInToolbox) {
+                  Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+               }
                Blockly.svgResize(this.workspace);
             }
          }

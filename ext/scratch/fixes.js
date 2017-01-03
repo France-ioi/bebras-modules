@@ -1,3 +1,6 @@
+// Change gap between blocks in the toolbox
+Blockly.Flyout.prototype.GAP_Y = 14;
+
 Blockly.Workspace.prototype.getFlyout = function () { return null; };
 
 Blockly.Workspace.prototype.remainingCapacity = function() {
