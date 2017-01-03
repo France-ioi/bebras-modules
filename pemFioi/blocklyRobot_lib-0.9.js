@@ -64,7 +64,7 @@ var getContext = function(display, infos, curLevel) {
             south: "bas",
             west: "gauche",
             north: "haut",
-            paint: "peindreCase",
+            paint: "peindre",
             pickTransportable: "ramasser",
             dropTransportable: "deposer",
             onTransportable: "surObjet",
