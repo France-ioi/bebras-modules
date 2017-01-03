@@ -8,106 +8,107 @@ function BlocklyController(includeBlocks, mainContext, strings) {
   this._includeBlocks = includeBlocks;
   this._mainContext = mainContext;
 
-  this.getToolboxXml = function () {
-    var categories = {};
-    var categoriesXml = {};
-    var colours = this.getDefaultColours();
+  this.addBlocksAndCategories = function(blockNames, blocksDefinition, categoriesInfos) {
+      var colours = this.getDefaultColours();
+      for (var iBlock = 0; iBlock < blockNames.length; iBlock++) {
+         var blockName = blockNames[iBlock];
+         var blockXmlInfo = this.getBlockXmlInfo(blocksDefinition, blockName);
+         var categoryName = blockXmlInfo.category;
 
-    for (var blockType in this._includeBlocks.generatedBlocks) {
-      for (var iBlock in this._includeBlocks.generatedBlocks[blockType]) {
-        var blockName = this._includeBlocks.generatedBlocks[blockType][iBlock];
-        var blockXmlInfo = this.getBlockXmlInfo(this._mainContext.customBlocks[blockType], blockName);
-        if (blockXmlInfo == null) {
-          console.error("Custom Block not found: " + blockName);
-          continue;
-        }
-
-        if (!(blockXmlInfo.category in categories)) {
-          categories[blockXmlInfo.category] = [];
-
-          var colour = colours.blocks[blockName];
-          if (typeof(colour) == "undefined") {
-            colour = colours.categories[blockXmlInfo.category]
-          }
-          if (typeof(colour) == "undefined") {
-            colour = colours.categories._default;
-          }
-
-          categoriesXml[blockXmlInfo.category] = "<category name='" + blockXmlInfo.category + "' colour='" + colour + "'>";
-        }
-
-        categories[blockXmlInfo.category].push(blockXmlInfo.xml);
+         if (!(categoryName in categoriesInfos)) {
+            categoriesInfos[categoryName] = {
+               blocksXml: [],
+               colour: colours.blocks[blockName]
+            };
+         }            
+         categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
       }
-    }
+   };
 
-    var stdBlocks = this.getStdBlocks();
+   this.getToolboxXml = function () {
+      var categoriesInfos = {};
+      var colours = this.getDefaultColours();
 
-    if (this._includeBlocks.standardBlocks.includeAll) {
-      this._includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
-    }
-    for (var iCategory in this._includeBlocks.standardBlocks.wholeCategories) {
-      var categoryName = this._includeBlocks.standardBlocks.wholeCategories[iCategory];
-      if (!(categoryName in categories)) {
-        categories[categoryName] = [];
-
-        var colour = colours.categories[categoryName];
-
-        if (typeof(colour) == "undefined") {
-          colour = colours.categories._default;
-        }
-
-        categoriesXml[categoryName] = "<category name='" + categoryName + "' colour='" + colour + "'>";
-      }
-      this.appendAllBlockXmlInfoForCategory(stdBlocks, categoryName, categories[categoryName]);
-    }
-    for (var iBlock in this._includeBlocks.standardBlocks.singleBlocks) {
-      var blockName = this._includeBlocks.standardBlocks.singleBlocks[iBlock];
-      var blockXmlInfo = this.getBlockXmlInfo(stdBlocks, blockName);
-      if (blockXmlInfo == null) {
-        console.error("Std Block not found: " + blockName);
-        continue;
+      for (var blockType in this._includeBlocks.generatedBlocks) {
+         this.addBlocksAndCategories(this._includeBlocks.generatedBlocks[blockType], this._mainContext.customBlocks[blockType], categoriesInfos);
       }
 
-      if (!(blockXmlInfo.category in categories)) {
-        categories[blockXmlInfo.category] = [];
+      var stdBlocks = this.getStdBlocks();
 
-        var colour = colours.blocks[blockName];
-        if (typeof(colour) == "undefined") {
-          colour = colours.categories[blockXmlInfo.category]
-        }
-        if (typeof(colour) == "undefined") {
-          colour = colours.categories._default;
-        }
-
-        categoriesXml[blockXmlInfo.category] = "<category name='" + blockXmlInfo.category + "' colour='" + colour + "'>";
+      if (this._includeBlocks.standardBlocks.includeAll) {
+         this._includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "functions"];
+      }
+      var wholeCategories = this._includeBlocks.standardBlocks.wholeCategories;
+      for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
+         var categoryName = wholeCategories[iCategory];
+         if (!(categoryName in categoriesInfos)) {
+            categoriesInfos[categoryName] = {
+               blocksXml: [],
+            };
+         }
+         var blocks = stdBlocks[categoryName].blocks;
+         for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+            categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
+         }
       }
 
-      categories[blockXmlInfo.category].push(blockXmlInfo.xml);
-    }
+      this.addBlocksAndCategories(this._includeBlocks.standardBlocks.singleBlocks, stdBlocks, categoriesInfos);
 
-    //console.log(this.mainContext.customBlocks);
-    /*console.log(stdBlocks);*/
+      // Handle variable blocks, which are normally automatically added with
+      // the VARIABLES category but can be customized here
+      if (((this._includeBlocks.variables != undefined) && (this._includeBlocks.variables.length > 0 ))||
+            (this._includeBlocks.variables_get != undefined) ||
+            (this._includeBlocks.variables_set != undefined)) {
+         var blocksXml = [];
 
-    var xmlString = "";
+         // block for each availableVariable
+         for (var iVar = 0; iVar < this._includeBlocks.variables.length; iVar++) {
+            blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + this._includeBlocks.variables[iVar] + "</field></block>");
+         }
+         // generic modifyable block
+         if (this._includeBlocks.variables_get != undefined) {
+            blocksXml.push("<block type='variables_get'></block>");
+         }
 
-    if (this._includeBlocks.groupByCategory) {
-      for (var cat in categories) {
-        xmlString += categoriesXml[cat];
-        for (block in categories[cat]) {
-          xmlString += categories[cat][block];
-        }
-        xmlString += "</category>";
+         // same for setting variables
+         for (var iVar = 0; iVar < this._includeBlocks.variables.length; iVar++) {
+            blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + this._includeBlocks.variables[iVar] + "</field></block>");
+         }
+         if (this._includeBlocks.variables_set != undefined) {
+            blocksXml.push("<block type='variables_set'></block>");
+         }
+         categoriesInfos["variables"] = {
+            blocksXml: blocksXml,
+            colour: 330
+         }
       }
-    }
-    else {
-      for (var cat in categories) {
-        for (var block in categories[cat]) {
-          xmlString += categories[cat][block];
-        }
-      }
-    }
 
-    return xmlString;
+      var xmlString = "";         
+      for (var categoryName in categoriesInfos) {
+         var categoryInfo = categoriesInfos[categoryName];
+         if (this._includeBlocks.groupByCategory) {
+            var colour = categoryInfo.colour;
+            if (typeof(colour) == "undefined") {
+               colour = colours.categories[categoryName]
+               if (typeof(colour) == "undefined") {
+                  colour = colours.categories._default;
+               }
+            }               
+            xmlString += "<category "
+                     + " name='" + this.strings.categories[categoryName] + "'"
+                     + " colour='" + colour + "'"
+                     + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
+                     + ">";
+         }
+         var blocks = categoryInfo.blocksXml;
+         for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
+            xmlString += blocks[iBlock];
+         }
+         if (this._includeBlocks.groupByCategory) {
+            xmlString += "</category>";
+         }
+      }
+      return xmlString;
   };
 
   this.getDefaultColours = function () {
@@ -127,7 +128,11 @@ function BlocklyController(includeBlocks, mainContext, strings) {
     };
   };
 
-  this.getStdBlocks = function () {
+  this.getStdBlocks = function() {
+      return this.getStdBlocklyBlocks();
+  };
+
+  this.getStdBlocklyBlocks = function () {
     return [
       {
         category: "input",
