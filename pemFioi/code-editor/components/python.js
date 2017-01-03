@@ -11,7 +11,7 @@ function PythonInterpreter(context, msgCallback) {
   this._code = '';
   this._editor_filename = "<stdin>";
   this.context.runner = this;
-  this._maxIterations = 1000;
+  this._maxIterations = 40000;
   this._resetCallstackOnNextStep = false;
   this._paused = false;
   this._isRunning = false;
