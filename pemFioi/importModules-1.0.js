@@ -24,6 +24,8 @@ var importableModules = function () {
       'blockly_javascript': {src: modulesPath+"/ext/blockly/javascript_compressed.js", id: "blockly_javascript"},
       'blockly_python': {src: modulesPath+"/ext/blockly/python_compressed.js", id: "blockly_python"},
       'blockly_fr': {src: modulesPath+"/ext/blockly/fr.js", id: "blockly_fr"},
+      'blockly_en': {src: modulesPath+"/ext/blockly/en.js", id: "blockly_en"},
+      'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
       'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.js", id: "blockly_lib"},
       'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "blockly_lib_css"},
       'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.js", id: "blocklyRobot_lib"},
@@ -51,7 +53,7 @@ var languageScripts = {
       'blockly_blocks',
       'blockly_javascript',
       'blockly_python',
-      'blockly_fr',
+      'blockly_' + window.stringsLanguage,
       'blockly_lib',
       'blockly_lib_css',
       'blocklyRobot_lib'
@@ -63,7 +65,7 @@ var languageScripts = {
       'blockly_javascript',
       'blockly_python',
       'scratch_fixes',
-      'blockly_fr',
+      'blockly_' + window.stringsLanguage,
       'blockly_lib',
       'blockly_lib_css',
       'blocklyRobot_lib'
