@@ -244,7 +244,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          $("#gridButtonsBefore").html(gridButtonsBefore);
          
          
-         var gridButtonsAfter = this.strings.speed +
+         var gridButtonsAfter = this.strings.speed + " " +
                                 "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>\n" + 
                                 "  <option value='200'>" + this.strings.slowSpeed + "</option>\n" + 
                                 "  <option value='50'>" + this.strings.mediumSpeed + "</option>\n" +
