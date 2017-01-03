@@ -318,6 +318,12 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     }
   };
 
+  this.stop = function () {
+    if(this._mainContext.runner) {
+      this._mainContext.runner.stop();
+    }
+  }
+
   this.getFullCode = function (code) {
     return this.getBlocklyLibCode(this.generators) + code + "program_end()";
   };

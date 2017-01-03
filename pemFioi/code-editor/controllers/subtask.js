@@ -37,7 +37,7 @@ function SubTaskController(_subTask) {
       $('#question-iframe', window.parent.document).css('width', '100%');
     } catch (e) {
     }
-    $('body').css('width', '100%').css('max-width', '1200px').css('margin', 'auto');
+    $('body').css('width', '100%').css('margin', 'auto');
     window.focus();
 
     this.iTestCase = 0;
@@ -116,6 +116,7 @@ function SubTaskController(_subTask) {
   };
 
   subTask.run = function () {
+    subTask.logicController.stop();
 
     if (!subTask.runController && !subTask.pythonRunner) {
       if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
@@ -141,6 +142,8 @@ function SubTaskController(_subTask) {
   };
 
   subTask.submit = function () {
+    subTask.logicController.stop();
+
     subTask.context.display = false;
     subTask.getAnswerObject(); // to fill this.answer;
     subTask.getGrade(function (result) {
@@ -294,6 +297,7 @@ function SubTaskController(_subTask) {
     initContextForLevel(subTask.iTestCase);
     subTask.context.linkBack = true;
     subTask.context.messagePrefixSuccess = "Tous les tests : ";
+
     subTask.context.runner.runCodes(codes);
   };
 
@@ -301,3 +305,5 @@ function SubTaskController(_subTask) {
 }
 
 CodeEditor.Controllers.SubTask = SubTaskController;
+
+var initBlocklySubTask = CodeEditor.Controllers.SubTask;

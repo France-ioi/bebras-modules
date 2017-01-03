@@ -4,7 +4,7 @@
  */
 
 CodeEditor.Utils.DOM.Elements = {
-  EDITOR: '#editor',
+  EDITOR: '#blocklyLibContent', // TODO :: change
   BLOCKLY_WIDGET: ".blocklyWidgetDiv",
   BLOCKLY_TOOLTIP: ".blocklyTooltipDiv",
   EDITOR_CONTAINER: '#editorContainer',

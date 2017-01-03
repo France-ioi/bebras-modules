@@ -3,6 +3,8 @@
  * @since 29/12/2016
  */
 
+var currentPythonContext = null;
+
 function PythonInterpreter(context, msgCallback) {
   this.context = context;
   this.messageCallback = msgCallback;
@@ -23,9 +25,9 @@ function PythonInterpreter(context, msgCallback) {
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
     handler += "\n\ttry {";
-    handler += '\n\t\ttask.displayedSubTask.context["' + objectName + '"]["' + blockName + '"](resolve);';
+    handler += '\n\t\tcurrentPythonContext["' + objectName + '"]["' + blockName + '"](resolve);';
     handler += "\n\t} catch (e) {";
-    handler += "\n\t\ttask.displayedSubTask.context.runner._onStepError(e)}";
+    handler += "\n\t\tcurrentPythonContext.runner._onStepError(e)}";
     handler += '\n\t}).then(function (value) {\nresult = value;\nreturn value;\n })};';
     handler += '\n\treturn susp;';
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
@@ -147,6 +149,15 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.runCodes = function (codes) {
+    if(Sk.running) {
+      if(typeof Sk.runQueue === 'undefined') {
+        Sk.runQueue = [];
+      }
+      Sk.runQueue.push({ctrl: this, codes: codes});
+      console.log('Putting execution in queue');
+      return;
+    }
+    currentPythonContext = this.context;
     this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
     this._code = codes[0];
@@ -162,6 +173,7 @@ function PythonInterpreter(context, msgCallback) {
     }
 
     this._resetInterpreterState();
+    Sk.running = true;
     this._isRunning = true;
     var timeoutId = window.setTimeout(this._continue.bind(this), 100);
     this._timeouts.push(timeoutId);
@@ -175,8 +187,16 @@ function PythonInterpreter(context, msgCallback) {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
+    if(Sk.runQueue) {
+      for (var i=0; i<Sk.runQueue.length; i++) {
+        if(Sk.runQueue[i].ctrl === this) {
+          console.log('Removing execution from queue');
+          Sk.runQueue.splice(i, 1);
+          i--;
+        }
+      }
+    }
     this._resetInterpreterState();
-    this.context.reset();
   };
 
   this._resetInterpreterState = function () {
@@ -184,6 +204,12 @@ function PythonInterpreter(context, msgCallback) {
     this._isRunning = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
+    Sk.running = false;
+    if(Sk.runQueue && Sk.runQueue.length > 0) {
+      console.log('Continuing executions from queue');
+      var nextExec = Sk.runQueue.shift();
+      setTimeout(function () { nextExec.ctrl.runCodes(nextExec.codes); }, 100);
+    }
   };
 
   this._resetCallstack = function () {
