@@ -508,7 +508,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     gridButtonsAfter +=
       "<input type='button' value='" + this._strings.submitProgram + "' onclick='task.displayedSubTask.submit()' />" +
       "<br/>" +
-      "<div id='errors'></div>";
+      "<div id='errors' style='width: 400px'></div>";
     $("#gridButtonsAfter").html(gridButtonsAfter);
   };
   this._bindEditorEvents = function () {

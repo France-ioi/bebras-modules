@@ -260,7 +260,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                              + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
                              + this.strings.submitProgram
                              + "</button><br/>"
-                             + "<div id='errors'></div>";
+                             + "<div id='errors' style='width: 400px;'></div>";
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
