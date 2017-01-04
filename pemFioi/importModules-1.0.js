@@ -59,7 +59,7 @@ var languageScripts = {
       'blockly_blocks',
       'blockly_javascript',
       'blockly_python',
-      'blockly_' + window.stringsLanguage,
+      'blockly_' + (window.stringsLanguage ? window.stringsLanguage : 'fr'),
       'blockly_lib',
       'blockly_lib_css',
       'blocklyRobot_lib'
@@ -71,7 +71,7 @@ var languageScripts = {
       'blockly_javascript',
       'blockly_python',
       'scratch_fixes',
-      'blockly_' + window.stringsLanguage,
+      'blockly_' + (window.stringsLanguage ? window.stringsLanguage : 'fr'),
       'blockly_lib',
       'blockly_lib_css',
       'blocklyRobot_lib'
