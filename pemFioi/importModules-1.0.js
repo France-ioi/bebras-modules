@@ -150,7 +150,11 @@ function conditionalLanguageElements(lang) {
    for(var iElem=0; iElem< elemList.length; iElem++) {
       elem = elemList[iElem];
       if(elem.getAttribute('data-lang') != lang) {
-         elem.remove();
+         if(typeof elem.remove === 'function') {
+            elem.remove();
+         } else {
+            elem.outerHTML = ''; // IE11 support
+         }
       }
    }
 }
