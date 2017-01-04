@@ -118,7 +118,7 @@ function PythonInterpreter(context, msgCallback) {
       this._onFinished();
     }
     if (message) {
-      console.log('PRINT: ', message, className || '');
+      //console.log('PRINT: ', message, className || '');
     }
   };
 
@@ -156,7 +156,6 @@ function PythonInterpreter(context, msgCallback) {
         Sk.runQueue = [];
       }
       Sk.runQueue.push({ctrl: this, codes: codes});
-      console.log('Putting execution in queue');
       return;
     }
     currentPythonContext = this.context;
@@ -171,7 +170,7 @@ function PythonInterpreter(context, msgCallback) {
       promise.then(this._debugger.success.bind(this._debugger), this._debugger.error.bind(this._debugger));
     } catch (e) {
       this._onOutput(e.toString() + "\n");
-      console.log('exception');
+      //console.log('exception');
     }
 
     this._resetInterpreterState();
@@ -192,7 +191,6 @@ function PythonInterpreter(context, msgCallback) {
     if(Sk.runQueue) {
       for (var i=0; i<Sk.runQueue.length; i++) {
         if(Sk.runQueue[i].ctrl === this) {
-          console.log('Removing execution from queue');
           Sk.runQueue.splice(i, 1);
           i--;
         }
@@ -208,7 +206,6 @@ function PythonInterpreter(context, msgCallback) {
     this._paused = false;
     Sk.running = false;
     if(Sk.runQueue && Sk.runQueue.length > 0) {
-      console.log('Continuing executions from queue');
       var nextExec = Sk.runQueue.shift();
       setTimeout(function () { nextExec.ctrl.runCodes(nextExec.codes); }, 100);
     }

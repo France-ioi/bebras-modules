@@ -205,7 +205,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   };
 
   this.load = function (language, display, nbTestCases, _options) {
-
     this._loadBasicEditor();
     CodeEditor.Utils.DOM.displayLanguageWorkspace(this._language);
     switch (this._language) {
@@ -215,6 +214,9 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
         break;
       case CodeEditor.CONST.LANGUAGES.PYTHON:
+        if(! $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val()) {
+          $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val("from robot import *\n");
+        }
         break;
     }
   };
@@ -312,6 +314,23 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       if (this._language == 'blockly') {
         this._workspace.traceOn(true);
         this._workspace.highlightBlock(null);
+      }
+
+      if(this._language == CodeEditor.CONST.LANGUAGES.PYTHON) {
+        var code = codes[0];
+        if(pythonCount(code) > maxInstructions) {
+          $('#errors').html("Vous utilisez trop d'éléments Python !");
+          return;
+        }
+        if(pythonCount(code) <= 0) {
+          $('#errors').html("Vous ne pouvez pas valider un programme vide !");
+          return;
+        }
+        var match = /from\s+robot\s+import\s+\*/.exec(code);
+        if(match === null) {
+          $('#errors').html("Vous devez mettre la ligne<br /><code>from robot import *</code><br />dans votre programme.");
+          return;
+        }
       }
 
       this._mainContext.runner.runCodes(codes);

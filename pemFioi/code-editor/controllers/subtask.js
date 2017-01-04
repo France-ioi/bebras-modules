@@ -190,7 +190,11 @@ function SubTaskController(_subTask) {
     subTask.context.reset(subTask.data[subTask.level][iTestCase]);
     subTask.context.iTestCase = iTestCase;
     subTask.context.nbTestCases = subTask.nbTestCases;
-    var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
+    if(subTask.nbTestCases > 1) {
+      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
+    } else {
+      var prefix = '';
+    }
     subTask.context.messagePrefixFailure = prefix;
     subTask.context.messagePrefixSuccess = prefix;
     subTask.context.linkBack = false;
@@ -260,6 +264,7 @@ function SubTaskController(_subTask) {
 
   subTask.stop = function () {
     this.context.runner.stop();
+    this.context.reset();
   };
 
   subTask.reloadStateObject = function (stateObj) {
@@ -317,7 +322,7 @@ function SubTaskController(_subTask) {
     else {
       defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
     }
-    return [{ javascript: "", blockly: defaultBlockly, blocklyJS: "" }];
+    return [{ javascript: "", python: "from robot import *\n", blockly: defaultBlockly, blocklyJS: "" }];
   };
 
   subTask.changeTest = function (delta) {
