@@ -232,6 +232,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         delete Blockly;
       }
     }
+    this.stop();
   };
 
   /**
