@@ -145,6 +145,8 @@ function PythonInterpreter(context, msgCallback) {
   this._continue = function () {
     if (this._steps < this._maxIterations && !this._paused && this._isRunning) {
       this.step();
+    } else {
+      this._onStepError("Nombre maximum d'itérations dépassé");
     }
   };
 
