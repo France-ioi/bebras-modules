@@ -180,6 +180,14 @@ $(document).ready(function() {
    if (typeof json !== 'undefined') {
       res = json;
    }
+
+   if(window.preprocessingFunctions) {
+      for(var i=0; i<window.preprocessingFunctions.length; i++) {
+         window.preprocessingFunctions[i]();
+      }
+   }
+   window.preprocessingFunctions = [];
+
    res.hints = [];
    $('.hint').each(function(index) {
       res.hints[res.hints.length] = [{type: 'html', content: $(this).html() }];

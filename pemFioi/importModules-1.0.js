@@ -166,6 +166,8 @@ function importLanguageModules(defaultLang) {
 
    importModules(languageScripts[lang]);
 
-   window.addEventListener('DOMContentLoaded', function () { conditionalLanguageElements(lang); });
-   window.addEventListener('load', function () { conditionalLanguageElements(lang); });
+   if(!window.preprocessingFunctions) { window.preprocessingFunctions = []; }
+   var fct = function () { conditionalLanguageElements(lang); };
+   window.preprocessingFunctions.push(fct);
+   window.addEventListener('DOMContentLoaded', fct);
 }
