@@ -2223,9 +2223,15 @@ var initBlocklySubTask = function(subTask) {
 
 // We need to be able to clean all events
 
-if (EventTarget.prototype.addEventListenerBase == undefined) {
-   EventTarget.prototype.addEventListenerBase = EventTarget.prototype.addEventListener;
-   EventTarget.prototype.addEventListener = function(type, listener)
+if (Node && Node.prototype.addEventListenerBase == undefined) {
+   // IE11 doesn't have EventTarget
+   if(typeof EventTarget === 'undefined') {
+      var targetPrototype = Node.prototype;
+   } else {
+      var targetPrototype = EventTarget.prototype;
+   }
+   targetPrototype.addEventListenerBase = targetPrototype.addEventListener;
+   targetPrototype.addEventListener = function(type, listener)
    {
        if(!this.EventList) { this.EventList = []; }
        this.addEventListenerBase.apply(this, arguments);
@@ -2238,8 +2244,8 @@ if (EventTarget.prototype.addEventListenerBase == undefined) {
        list.push(listener);
    };
 
-   EventTarget.prototype.removeEventListenerBase = EventTarget.prototype.removeEventListener;
-   EventTarget.prototype.removeEventListener = function(type, listener)
+   targetPrototype.removeEventListenerBase = targetPrototype.removeEventListener;
+   targetPrototype.removeEventListener = function(type, listener)
    {
        if(!this.EventList) { this.EventList = []; }
        if(listener instanceof Function) { this.removeEventListenerBase.apply(this, arguments); }
