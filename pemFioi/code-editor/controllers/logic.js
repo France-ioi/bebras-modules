@@ -329,7 +329,12 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         }
         var match = /from\s+robot\s+import\s+\*/.exec(code);
         if(match === null) {
-          $('#errors').html("Vous devez mettre la ligne<br /><code>from robot import *</code><br />dans votre programme.");
+          $('#errors').html("Vous devez mettre la ligne <code>from robot import *</code> dans votre programme.");
+          return;
+        }
+        var match = /(^[\n\r\s]*|[\n\r\s]+)def\s+\w+/.exec(code);
+        if(match !== null) {
+          $('#errors').html("Vous n'avez pas le droit de définir des fonctions.");
           return;
         }
       }
