@@ -13,7 +13,7 @@ var pythonCountPatterns = [
    // Special syntax
    {pattern: /^from\s+\w+\s+import\s+[^\n\r]/, block: false}, // from robot import *
    {pattern: /^import\s+[^\n\r]+/, block: false}, // import x, y, z
-   {pattern: /^for\s+\w+\s+in\s+range\([^:]+:/, block: true}, // for i in range(5): is only one block; it's a bit tricky
+   {pattern: /^for\s+\w+\s+in\s+range/, block: false}, // for i in range(5): is only one block; it's a bit tricky
 
    {pattern: /^\w+/, block: true},
 
