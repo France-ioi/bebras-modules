@@ -34,9 +34,7 @@ CodeEditor.Utils.DOM.clearFix = function (html, divId) {
 
 CodeEditor.Utils.DOM.generateWorkspace = function () {
   return "<div id='" + CodeEditor.Utils.DOM.Elements.EDITOR_CONTAINER_ID + "'>" +
-    " <div id='" + CodeEditor.Utils.DOM.Elements.BLOCKLY_WORKSPACE_ID + "' class='language_blockly'></div>" +
-    " <textarea id='" + CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE_ID + "' class='language_javascript'></textarea>" +
-    " <textarea id='" + CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE_ID + "' class='language_python'></textarea>" +
+    " <div id='" + CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE_ID + "' class='language_python' style='width: 100%; height: 100%'></div>" +
     "</div>";
 };
 

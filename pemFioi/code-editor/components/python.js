@@ -17,6 +17,7 @@ function PythonInterpreter(context, msgCallback) {
   this._isRunning = false;
   this._steps = 0;
   this._timeouts = [];
+  this._editorMarker = null;
   var that = this;
 
   this._skulptifyHandler = function (name, objectName, iCategory, blockName) {
@@ -190,6 +191,10 @@ function PythonInterpreter(context, msgCallback) {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
+    if(this._editorMarker) {
+      this.context.blocklyHelper._aceEditor.session.removeMarker(this._editorMarker);
+      this._editorMarker = null;
+    }
     if(Sk.runQueue) {
       for (var i=0; i<Sk.runQueue.length; i++) {
         if(Sk.runQueue[i].ctrl === this) {
@@ -222,6 +227,31 @@ function PythonInterpreter(context, msgCallback) {
 
   this.step = function () {
     this._resetCallstack();
+    if(this.context.display) {
+      var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
+      if(curSusp.lineno) {
+        var editor = this.context.blocklyHelper._aceEditor;
+        var splitCode = this._code.split(/[\r\n]/);
+        var Range = ace.require('ace/range').Range;
+        if(this._editorMarker) {
+          editor.session.removeMarker(this._editorMarker);
+          this._editorMarker = null;
+        }
+        this._editorMarker = editor.session.addMarker(
+          new Range(curSusp.lineno-1, curSusp.colno, curSusp.lineno, 0),
+          "aceHighlight",
+          "line");
+      }
+
+      this._paused = true;
+      setTimeout(this.realStep.bind(this), this.context.infos.actionDelay/4);
+    } else {
+      this.realStep();
+    }
+  };
+
+  this.realStep = function () {
+    this._paused = false;
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
     this._steps += 1;

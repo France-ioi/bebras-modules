@@ -16,6 +16,8 @@ var importableModules = function () {
       'miniPlatform': {class: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
+      'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
+      'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
 
@@ -78,6 +80,8 @@ var languageScripts = {
    ],
    python: [
       'python_count',
+      'ace',
+      'ace_python',
       'skulpt',
       'skulpt_stdlib',
       'skulpt_debugger',

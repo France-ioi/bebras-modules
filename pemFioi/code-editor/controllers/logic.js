@@ -19,6 +19,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     javascript: null,
     python: null
   };
+  this._aceEditor = null;
   this._workspace = null;
   this._prevWidth = 0;
   this._mainContext = mainContext;
@@ -123,7 +124,9 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
   this._savePrograms = function () {
     this._programs.javascript = $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val();
-    this._programs.python = $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val();
+    if(this._aceEditor) {
+      this._programs.python = this._aceEditor.getValue();
+    }
     if (this._workspace) {
       var xml = Blockly.Xml.workspaceToDom(this._workspace);
       this._programs.blockly = Blockly.Xml.domToText(xml);
@@ -133,7 +136,10 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
   this._loadPrograms = function () {
     $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val(this._programs.javascript);
-    $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val(this._programs.python);
+    if(this._aceEditor) {
+      this._aceEditor.setValue(this._programs.python);
+      this._aceEditor.selection.clearSelection();
+    }
     if (this._workspace) {
       var xml = Blockly.Xml.textToDom(this._programs.blockly);
       this._workspace.clear();
@@ -199,7 +205,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         break;
       case CodeEditor.CONST.LANGUAGES.PYTHON:
         this._programs.python = this._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
-        $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val(this._programs.python);
+        this._aceEditor.setValue(this._programs.python);
         break;
     }
   };
@@ -214,8 +220,8 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
         break;
       case CodeEditor.CONST.LANGUAGES.PYTHON:
-        if(! $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val()) {
-          $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val("from robot import *\n");
+        if(this._aceEditor && ! this._aceEditor.getValue()) {
+          this._aceEditor.setValue("from robot import *\n");
         }
         break;
     }
@@ -476,6 +482,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
         this._loadEditorWorkSpace() +
         this._loadEditorTools()
       );
+      this._loadAceEditor();
       this._loadGridButtons();
       this._bindEditorEvents();
     }
@@ -512,11 +519,17 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "<div id='errors' style='width: 400px'></div>";
     $("#gridButtonsAfter").html(gridButtonsAfter);
   };
+  this._loadAceEditor = function () {
+    this._aceEditor = ace.edit(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE_ID);
+    this._aceEditor.$blockScrolling = Infinity;
+    this._aceEditor.getSession().setMode("ace/mode/python");
+    this._aceEditor.setFontSize(16);
+  };
   this._bindEditorEvents = function () {
     var that = this;
     var updatePythonCount = function () {
-      if(that._language != 'python' || !maxInstructions) { return; }
-      var remaining = maxInstructions - pythonCount($(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).val());
+      if(that._language != 'python' || !maxInstructions || !that._aceEditor) { return; }
+      var remaining = maxInstructions - pythonCount(that._aceEditor.getValue());
       var optLimitElements = {
          maxBlocks: maxInstructions,
          remainingBlocks: Math.abs(remaining)
@@ -525,7 +538,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       $('#capacity').css('color', remaining < 0 ? 'red' : '');
       $('#capacity').html(strLimitElements.format(optLimitElements));
     }
-    $(CodeEditor.Utils.DOM.Elements.PYTHON_WORKSPACE).on('input propertychange', debounce(updatePythonCount, 500, false))
+    this._aceEditor.getSession().on('change', debounce(updatePythonCount, 500, false))
   };
 
   this.toggleSize = function () {
@@ -542,11 +555,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   };
   this.updateSize = function () {
     var panelWidth = 500;
-    if (this._language === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-      panelWidth = $(CodeEditor.Utils.DOM.Elements.BLOCKLY_WORKSPACE).width() - 10;
-    } else {
-      panelWidth = $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).width() + 20;
-    }
+    panelWidth = $(CodeEditor.Utils.DOM.Elements.EDITOR_CONTAINER_ID).width() - 30;
     if (panelWidth != this._prevWidth) {
       $("#taskIntro").css("width", panelWidth);
       $("#grid").css("left", panelWidth + 20 + "px");

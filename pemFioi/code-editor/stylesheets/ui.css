@@ -3,7 +3,7 @@ body > * {
 	width: auto;
 }
 
-@media screen and (max-width: 1199px) {
+@media screen {
 	#task {
 		padding: 0 10px;
 	}
@@ -119,4 +119,9 @@ body > * {
 .success{
     color:green;
     font-weight:bold;
+}
+.aceHighlight {
+   position: absolute;
+   background: rgba(100, 100, 200, 0.5);
+   z-index: 20;
 }
