@@ -125,3 +125,8 @@ body > * {
    background: rgba(100, 100, 200, 0.5);
    z-index: 20;
 }
+code {
+   font-family: courier;
+   background-color: #EEE;
+   white-space: pre
+}
