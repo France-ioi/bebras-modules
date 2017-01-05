@@ -66,6 +66,8 @@ function PythonInterpreter(context, msgCallback) {
   this.noDelay = function (callback, value) {
     var primitive = this._createPrimitive(value);
     if (primitive !== Sk.builtin.none.none$) {
+      // Apparently when we create a new primitive, the debugger adds a call to
+      // the callstack.
       this._resetCallstackOnNextStep = true;
     }
     this._paused = false;
@@ -214,7 +216,7 @@ function PythonInterpreter(context, msgCallback) {
   this._resetCallstack = function () {
     if (this._resetCallstackOnNextStep) {
       this._resetCallstackOnNextStep = false;
-      this._debugger.suspension_stack = [this._debugger.suspension_stack[0]];
+      this._debugger.suspension_stack.pop();
     }
   };
 
