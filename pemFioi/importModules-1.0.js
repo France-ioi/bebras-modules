@@ -153,7 +153,15 @@ function conditionalLanguageElements(lang) {
 
    for(var iElem=0; iElem< elemList.length; iElem++) {
       elem = elemList[iElem];
-      if(elem.getAttribute('data-lang') != lang) {
+      var elemLangs = elem.getAttribute('data-lang').split(' ');
+      var elemOk = false;
+      for (var i=0; i<elemLangs.length; i++) {
+         if(elemLangs[i] == lang) {
+            elemOk = true;
+            break;
+         }
+      }
+      if(!elemOk) {
          if(typeof elem.remove === 'function') {
             elem.remove();
          } else {
