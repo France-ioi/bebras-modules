@@ -227,22 +227,22 @@ function PythonInterpreter(context, msgCallback) {
 
   this.step = function () {
     this._resetCallstack();
-    if(this.context.display) {
+    var editor = this.context.blocklyHelper._aceEditor;
+    if(editor && this._editorMarker) {
+      editor.session.removeMarker(this._editorMarker);
+      this._editorMarker = null;
+    }
+    var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
+    if(this.context.display && markDelay > 30) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp.lineno) {
-        var editor = this.context.blocklyHelper._aceEditor;
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
-        if(this._editorMarker) {
-          editor.session.removeMarker(this._editorMarker);
-          this._editorMarker = null;
-        }
         this._editorMarker = editor.session.addMarker(
           new Range(curSusp.lineno-1, curSusp.colno, curSusp.lineno, 0),
           "aceHighlight",
           "line");
       }
-
       this._paused = true;
       setTimeout(this.realStep.bind(this), this.context.infos.actionDelay/4);
     } else {
