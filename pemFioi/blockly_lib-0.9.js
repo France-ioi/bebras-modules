@@ -1769,6 +1769,7 @@ function initBlocklyRunner(context, messageCallback) {
 
          function highlightBlock(id) {
             if (context.display && !context.blocklyHelper.scratchMode) {
+               context.blocklyHelper.workspace.traceOn(true);
                context.blocklyHelper.workspace.highlightBlock(id);
                highlightPause = true;
             }
