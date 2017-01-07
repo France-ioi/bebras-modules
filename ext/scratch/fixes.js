@@ -8,8 +8,22 @@ Blockly.Workspace.prototype.remainingCapacity = function() {
   if (!maxBlocks) {
     return Infinity;
   }
-  return maxBlocks - this.getAllBlocks().length;
+
+  // Count number of blocks
+  var blocks = this.getAllBlocks();
+  var blockCount = 0;
+  for (var b = 0; b < blocks.length; b++) {
+    var block = blocks[b];
+    // Exclude math_number as it's often used in situations where it doesn't
+    // count in Blockly; probably find a better criteria
+    // (parentBlock_.type == 'control_repeat' ?)
+    if(block.type != 'math_number') {
+      blockCount += 1;
+    }
+  }
+  return maxBlocks - blockCount;
 };
+
 
 Blockly.Blocks['control_repeat'] = {
   /**
