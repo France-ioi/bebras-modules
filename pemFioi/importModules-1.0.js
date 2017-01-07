@@ -1,3 +1,7 @@
+(function () {
+
+var importedModules = {};
+
 var importableModules = function () {
    // Wait to have modulesPath defined before executing the function
    return {
@@ -55,48 +59,55 @@ var importableModules = function () {
    }
 }
 
-var languageScripts = {
-   blockly: [
-      'blockly',
-      'blockly_blocks',
-      'blockly_javascript',
-      'blockly_python',
-      'blockly_' + (window.stringsLanguage ? window.stringsLanguage : 'fr'),
-      'blockly_lib',
-      'blockly_lib_css',
-      'blocklyRobot_lib'
-   ],
-   scratch: [
-      'scratch',
-      'scratch_blocks_common',
-      'scratch_blocks',
-      'blockly_javascript',
-      'blockly_python',
-      'scratch_fixes',
-      'blockly_' + (window.stringsLanguage ? window.stringsLanguage : 'fr'),
-      'blockly_lib',
-      'blockly_lib_css',
-      'blocklyRobot_lib'
-   ],
-   python: [
-      'python_count',
-      'ace',
-      'ace_python',
-      'skulpt',
-      'skulpt_stdlib',
-      'skulpt_debugger',
-      'python_index',
-      'python_constants',
-      'python_dom_utils',
-      'python_localization_utils',
-      'python_shared_utils',
-      'python_blockly',
-      'python_logic',
-      'python_css',
-      'python_subtask',
-      'python_python',
-      'blocklyRobot_lib'
-   ]
+var languageScripts = function () {
+   var strLang = window.stringsLanguage ? window.stringsLanguage : 'fr';
+   return {
+      blockly: [
+         'acorn',
+         'interpreter',
+         'blockly',
+         'blockly_blocks',
+         'blockly_javascript',
+         'blockly_python',
+         'blockly_' + strLang,
+         'blockly_lib',
+         'blockly_lib_css',
+         'blocklyRobot_lib'
+      ],
+      scratch: [
+         'acorn',
+         'interpreter',
+         'scratch',
+         'scratch_blocks_common',
+         'scratch_blocks',
+         'blockly_javascript',
+         'blockly_python',
+         'scratch_fixes',
+         'blockly_' + strLang,
+         'blockly_lib',
+         'blockly_lib_css',
+         'blocklyRobot_lib'
+      ],
+      python: [
+         'python_count',
+         'ace',
+         'ace_python',
+         'skulpt',
+         'skulpt_stdlib',
+         'skulpt_debugger',
+         'python_index',
+         'python_constants',
+         'python_dom_utils',
+         'python_localization_utils',
+         'python_shared_utils',
+         'python_blockly',
+         'python_logic',
+         'python_css',
+         'python_subtask',
+         'python_python',
+         'blocklyRobot_lib'
+      ]
+   }
 }
 
 
@@ -126,12 +137,21 @@ var QueryString = function () {
 
 
 function importModules(modulesList) {
-   if(typeof importableModules == 'function') { importableModules = importableModules(); };
+   if(typeof importableModules == 'function') {
+      importableModules = importableModules();
+   };
    var modulesStr = '';
    for(var iMod in modulesList) {
       var moduleName = modulesList[iMod];
       var curModule = importableModules[moduleName];
       if(curModule) {
+         // Avoid importing the same module twice
+         if(importedModules[moduleName] === true) {
+            continue;
+         } else {
+            importedModules[moduleName] = true;
+         }
+
          var modClass = curModule.class ? curModule.class : 'module';
          var modSrc = curModule.src;
          var modId = curModule.id ? curModule.id : moduleName;
@@ -176,6 +196,10 @@ function importLanguageModules(defaultLang) {
    // Default language
    var lang = QueryString.language ? QueryString.language : defaultLang;
 
+   if(typeof languageScripts == 'function') {
+      languageScripts = languageScripts();
+   };
+
    if(!languageScripts[lang]) {
       console.error("Language "+lang+" unknown, couldn't load scripts.");
    }
@@ -187,3 +211,9 @@ function importLanguageModules(defaultLang) {
    window.preprocessingFunctions.push(fct);
    window.addEventListener('DOMContentLoaded', fct);
 }
+
+window.importModules = importModules;
+window.conditionalLanguageElements = conditionalLanguageElements;
+window.importLanguageModules = importLanguageModules;
+
+})();
