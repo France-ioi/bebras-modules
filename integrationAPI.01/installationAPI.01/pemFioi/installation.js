@@ -154,8 +154,12 @@ window.implementGetResources = function(task) {
         var fileAttributes = ["data-source", "data-image", "data-subtitles"];
         for(var i=0; i<fileAttributes.length; i++) {
            var curAttr = $(this).attr(fileAttributes[i]);
-           if(curAttr) {
-              res.files.push({ type: fileAttributes[i], url: curAttr });
+           curAttr = curAttr ? curAttr.split(';') : [];
+           for(var a=0; a<curAttr.length; a++) {
+              var curAttrFile = curAttr[a];
+              if(curAttrFile && curAttrFile != 'animation' && curAttrFile != 'none') {
+                 res.files.push({ type: fileAttributes[i], url: curAttrFile });
+              }
            }
         }
       });
@@ -207,7 +211,7 @@ function fillImages(text, images, res) {
    var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
-      var regexp = new RegExp("[\'\"]([^\"\']*." + ext + ")[\'\"]", "g");
+      var regexp = new RegExp("[\'\"]([^;\"\']*." + ext + ")[\'\"]", "g");
       while (true) {
          var match = regexp.exec(text);
          if (!match) {
