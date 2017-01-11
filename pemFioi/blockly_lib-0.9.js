@@ -1413,11 +1413,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var stdBlocks = this.getStdBlocks();
 
          if (this.includeBlocks.standardBlocks.includeAll) {
-            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "functions"];
+            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories;
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
+            if (categoryName == 'variables') {
+               this.includeBlocks.variables_get = true;
+               this.includeBlocks.variables_set = true;
+               continue;
+            }
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: [],
@@ -1437,10 +1442,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                (this.includeBlocks.variables_get != undefined) ||
                (this.includeBlocks.variables_set != undefined)) {
             var blocksXml = [];
+            var includedVariables = this.includeBlocks.variables ? this.includeBlocks.variables : [];
 
             // block for each availableVariable
-            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
-               blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
+            for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+               blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
             }
             // generic modifyable block
             if (this.includeBlocks.variables_get != undefined) {
@@ -1448,8 +1454,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
 
             // same for setting variables
-            for (var iVar = 0; iVar < this.includeBlocks.variables.length; iVar++) {
-               blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + this.includeBlocks.variables[iVar] + "</field></block>");
+            for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+               blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
             }
             if (this.includeBlocks.variables_set != undefined) {
                blocksXml.push("<block type='variables_set'></block>");
