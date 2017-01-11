@@ -74,7 +74,9 @@ var languageStrings = {
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
-      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés."
+      limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
+      previousTestcase: "Précédent", 
+      nextTestcase: "Suivant",
    },
    en: {
       categories: {
@@ -117,7 +119,9 @@ var languageStrings = {
       reloadProgram: "Reload:",
       saveProgram: "Save",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
-      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available."
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
+      previousTestcase: "Previous", 
+      nextTestcase: "Next",
    },
    de: {
       categories: {
@@ -133,7 +137,10 @@ var languageStrings = {
          math: "Mathe",
          text: "Texte",
          variables: "Variablen",
-         functions: "Funktionen"
+         functions: "Funktionen",
+         read: "Einlesen",
+         print: "Ausgeben",
+         turtle: "Turtle",
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -160,7 +167,9 @@ var languageStrings = {
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
-      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available." // TODO :: translate
+      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
+      previousTestcase: "Vorheriger", 
+      nextTestcase: "Nächster",
    }
 }
 
@@ -238,9 +247,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
             gridButtonsBefore += "<div>\n" +
-                                 "  <input type='button' value='Précédent' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
+                                 "  <input type='button' value='" + this.strings.previousTestcase + "' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
                                  "  <span id='testCaseName'>Test 1</span>\n" +
-                                 "  <input type='button' value='Suivant' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
+                                 "  <input type='button' value='" + this.strings.nextTestcase + "' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
                                  "</div>\n";
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
