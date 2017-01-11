@@ -12,6 +12,40 @@
  *   - task.getMetaData(), as documented in the PEM
  */
 
+
+   var languageStrings = {
+      fr: {
+         'task': 'Exercice',
+         'submission': 'Soumission',
+         'solution': 'Solution',
+         'editor': 'Résoudre',
+         'hints': 'Conseils',
+         'showSolution': 'Voir la solution',
+         'yourScore': "Votre score :",
+         'canReadSolution': "Vous pouvez maintenant lire la solution en bas de la page.",
+      },
+      en: {
+         'task': 'Task',
+         'submission': 'Submission',
+         'solution': 'Solution',
+         'editor': 'Edit',
+         'hints': 'Hints',
+         'showSolution': 'Show solution',
+         'yourScore': "Your score:",
+         'canReadSolution': "You can now read the solution at the bottom of this page.",
+      },
+      de: {
+         'task': 'Aufgabe',
+         'submission': 'Abgabe',
+         'solution': 'Lösung',
+         'editor': 'Bearbeiten',
+         'hints': 'Hinweise',
+         'showSolution': 'Lösung anzeigen',
+         'yourScore': "Dein Punktestand:",
+         'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
+      },
+   };
+   
 function inIframe() {
    try {
       return window.self !== window.top;
@@ -49,7 +83,7 @@ function miniPlatformPreviewGrade(answer) {
             "<div style='padding:50px'><span id='previewScoreMessage'></span><br/><br/><input type='button' onclick='$(\"#previewScorePopup\").remove()' value='OK' /></div></div></div>").insertBefore("#solution");
       }
       $("#previewScorePopup").show();
-      $("#previewScoreMessage").html("<b>Votre score : " + score + "/" + maxScore + "</b><br/>Vous pouvez maintenant lire la solution en bas de la page.");
+      $("#previewScoreMessage").html("<b>" + languageStrings[window.stringsLanguage].showSolution + " " + score + "/" + maxScore + "</b><br/>" + languageStrings[window.stringsLanguage].showSolution);
    };
    // acceptedAnswers is not documented, but necessary for old Bebras tasks
    if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
@@ -86,7 +120,7 @@ var miniPlatformValidate = function(mode, success, error) {
    if (mode == 'cancel') {
       alreadyStayed = false;
    } else {
-      $("#task").append("<center id='toremove'><br/><input type='button' value='Voir la solution' onclick='miniPlatformShowSolution()'></input></center>");
+      $("#task").append("<center id='toremove'><br/><input type='button' value='" + languageStrings[window.stringsLanguage].showSolution + "' onclick='miniPlatformShowSolution()'></input></center>");
    }
    platform.trigger('validate', [mode]);
    if (success) {
@@ -179,29 +213,7 @@ $(document).ready(function() {
                $('#choose-view-'+view).addClass('btn-info');
             };
          };
-         var languageStrings = {
-            fr: {
-               'task': 'Exercice',
-               'submission': 'Soumission',
-               'solution': 'Solution',
-               'editor': 'Résoudre',
-               'hints': 'Conseils',
-            },
-            en: {
-               'task': 'Task',
-               'submission': 'Submission',
-               'solution': 'Solution',
-               'editor': 'Edit',
-               'hints': 'Hints',
-            },
-            de: {
-               'task': 'Aufgabe',
-               'submission': 'Abgabe',
-               'solution': 'Lösung',
-               'editor': 'Bearbeiten',
-               'hints': 'Hinweise',
-            },
-         };
+         
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
             task.getViews(function(views){
