@@ -179,12 +179,28 @@ $(document).ready(function() {
                $('#choose-view-'+view).addClass('btn-info');
             };
          };
-         var frenchName = {
-            'task': 'Exercice',
-            'submission': 'Soumission',
-            'solution': 'Solution',
-            'editor': 'Résoudre',
-            'hints': 'Conseils'
+         var languageStrings = {
+            fr: {
+               'task': 'Exercice',
+               'submission': 'Soumission',
+               'solution': 'Solution',
+               'editor': 'Résoudre',
+               'hints': 'Conseils',
+            },
+            en: {
+               'task': 'Task',
+               'submission': 'Submission',
+               'solution': 'Solution',
+               'editor': 'Edit',
+               'hints': 'Hints',
+            },
+            de: {
+               'task': 'Aufgabe',
+               'submission': 'Abgabe',
+               'solution': 'Lösung',
+               'editor': 'Bearbeiten',
+               'hints': 'Hinweise',
+            },
          };
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
@@ -195,7 +211,7 @@ $(document).ready(function() {
                for (var viewName in views)
                {
                   if (!views[viewName].requires) {
-                     $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + frenchName[viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
+                     $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
                   }
                }
             });
