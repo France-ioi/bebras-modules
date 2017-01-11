@@ -1,3 +1,5 @@
+"use strict";
+
 var getUrlParameter = function getUrlParameter(sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1));
     var sURLVariables = sPageURL.split('&');
@@ -312,7 +314,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                Blockly.svgResize(that.workspace);
 
                var remaining = that.workspace.remainingCapacity();
-               optLimitBlocks = {
+               var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
                   };
@@ -352,7 +354,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                $(".blocklyWidgetDiv").remove();
                $(".blocklyTooltipDiv").remove();
                document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-               delete Blockly;
+               //delete Blockly;
             }
          }
       },
@@ -373,7 +375,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       checkRobotStart: function () {
          if(!this.startingBlock || !this.workspace) { return; }
          var blocks = this.workspace.getTopBlocks(true);
-         for(b=0; b<blocks.length; b++) {
+         for(var b=0; b<blocks.length; b++) {
             if(blocks[b].type == 'robot_start') { return;}
          }
 
@@ -431,7 +433,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         blocks = codeWorkspace.getTopBlocks(true);
+         var blocks = codeWorkspace.getTopBlocks(true);
          var languageObj = null;
          if (language == "javascript") {
             languageObj = Blockly.JavaScript;
@@ -2274,5 +2276,5 @@ function removeBlockly() {
    $(".blocklyWidgetDiv").remove();
    $(".blocklyTooltipDiv").remove();
    document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-   delete Blockly;
+   // delete Blockly;
 }
