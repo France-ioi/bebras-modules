@@ -1686,8 +1686,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          var topBlocks = this.workspace.getTopBlocks(true);
          var robotStartHasChildren = false;
-         for(var b=0; b<blocks.length; b++) {
-            var block = blocks[b];
+         for(var b=0; b<topBlocks.length; b++) {
+            var block = topBlocks[b];
             if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
                robotStartHasChildren = true;
                break;
