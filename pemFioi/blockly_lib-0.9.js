@@ -892,7 +892,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
       
       getDefaultColours: function() {
-         return {
+         var colours = {
             categories: {
                logic: 210,
                loops: 120,
@@ -906,6 +906,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             },
             blocks: {},
          };
+         
+         if (typeof provideBlocklyColours == "function") {
+            var providedColours = provideBlocklyColours();
+
+            for (group in providedColours) {
+               if (! group in colours) {
+                  colours[group] = {};
+               }
+               for (name in providedColours[group]) {
+                  colours[group][name] = providedColours[group][name];
+               }
+            }
+         }
+
+         return colours;
       },
       
 
