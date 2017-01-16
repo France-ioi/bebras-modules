@@ -1434,8 +1434,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
             if (categoryName == 'variables') {
-               this.includeBlocks.variables_get = true;
-               this.includeBlocks.variables_set = true;
+               if(!this.includeBlocks.variables) { this.includeBlocks.variables = []; }
+               this.includeBlocks.variables.push('*');
                continue;
             }
             if (!(categoryName in categoriesInfos)) {
@@ -1453,28 +1453,62 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
-         if (((this.includeBlocks.variables != undefined) && (this.includeBlocks.variables.length > 0 ))||
-               (this.includeBlocks.variables_get != undefined) ||
-               (this.includeBlocks.variables_set != undefined)) {
+         if (typeof this.includeBlocks.variables !== 'undefined') {
             var blocksXml = [];
-            var includedVariables = this.includeBlocks.variables ? this.includeBlocks.variables : [];
+            var includedVariablesAll = false;
+            var includedVariables = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : ['*'];
+            var includedVariableBlocks = {};
+            if (typeof this.includeBlocks.variablesOnlyBlocks === 'undefined') {
+               includedVariableBlocks = {get: true, set: true, incr: true};
+            } else {
+               for (var iBlock=0; iBlock < this.includeBlocks.variablesOnlyBlocks.length; iBlock++) {
+                  includedVariableBlocks[this.includeBlocks.variablesOnlyBlocks[iBlock]] = true;
+               }
+            }
 
-            // block for each availableVariable
-            for (var iVar = 0; iVar < includedVariables.length; iVar++) {
-               blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+            if(includedVariableBlocks.get) {
+               // block for each availableVariable
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+               }
+               // generic modifyable block
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='variables_get'></block>");
+               }
             }
-            // generic modifyable block
-            if (this.includeBlocks.variables_get != undefined) {
-               blocksXml.push("<block type='variables_get'></block>");
+ 
+            if(includedVariableBlocks.set) {
+               // same for setting variables
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+               }
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='variables_set'></block>");
+               }
             }
 
-            // same for setting variables
-            for (var iVar = 0; iVar < includedVariables.length; iVar++) {
-               blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
+            if(includedVariableBlocks.incr) {
+               // same for setting variables
+               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
+                  if(includedVariables[iVar] == '*') {
+                     includedVariablesAll = true;
+                     continue;
+                  }
+                  blocksXml.push("<block type='math_change' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
+               }
+               if (includedVariablesAll) {
+                  blocksXml.push("<block type='math_change'><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
+               }
             }
-            if (this.includeBlocks.variables_set != undefined) {
-               blocksXml.push("<block type='variables_set'></block>");
-            }
+
             categoriesInfos["variables"] = {
                blocksXml: blocksXml,
                colour: 330
@@ -1701,8 +1735,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          var topBlocks = this.workspace.getTopBlocks(true);
          var robotStartHasChildren = false;
-         for(var b=0; b<blocks.length; b++) {
-            var block = blocks[b];
+         for(var b=0; b<topBlocks.length; b++) {
+            var block = topBlocks[b];
             if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
                robotStartHasChildren = true;
                break;
