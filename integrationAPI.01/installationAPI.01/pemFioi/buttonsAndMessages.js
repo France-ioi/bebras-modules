@@ -208,7 +208,7 @@ window.displayHelper = {
          worseScoreStays: "Das ist weniger als vorher; dein Punktestand bleibt:",
          scoreStays: "Dein Punktestand bleibt gleich:",
          score: "Punktestand:",
-         noPointsForLevel: "Du hast nicht genug Punkte für diese Version erhalten.",
+         noPointsForLevel: "Du hast noch keine Punkte für diese Version erhalten.",
          outOf: "von",
          tryToDoBetterOrChangeTask: "Versuche, dich zu verbessern oder wähle eine andere Frage.",
          tryToDoBetterOrMoveToNextLevel: "Versuche, dich zu verbessern oder wähle schwierigere Version.",
