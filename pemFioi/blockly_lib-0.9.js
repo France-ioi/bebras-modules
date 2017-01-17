@@ -209,6 +209,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       extended: false,
       programs: [],
       languages: [],
+      definitions: {},
+      simpleGenerators: {},
       player: 0,
       workspace: null,
       prevWidth: 0,
@@ -216,6 +218,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       languageStrings: languageStrings,
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+
+      includeBlocks: {
+         groupByCategory: true,
+         generatedBlocks: {},
+         standardBlocks: {
+            includeAll: true,
+            wholeCategories: [],
+            singleBlocks: []
+         }
+      },
 
       loadHtml: function(nbTestCases) {
          $("#blocklyLibContent").html("<xml id='toolbox' style='display: none'></xml>" +
@@ -287,6 +299,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.strings = this.languageStrings[language];
          if (display) {
             this.loadHtml(nbTestCases);
+            this.createSimpleGeneratorsAndBlocks();
             var xml = this.getToolboxXml();
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
@@ -342,7 +355,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
-            if(!options.noRobot) {
+            if(this.startingBlock) {
                var xml = this.getDefaultBlocklyContent();
 
                Blockly.Events.recordUndo = false;
@@ -591,37 +604,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.prevWidth = panelWidth;
       },
 
-      createGenerator: function(label, code, type, nbParams) {
-         Blockly.JavaScript[label] = function(block) {
-            var params = "";
-            for (var iParam = 0; iParam < nbParams; iParam++) {
-               if (iParam != 0) {
-                  params += ", ";
-               }
-               params += Blockly.JavaScript.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.JavaScript.ORDER_ATOMIC);
-            }
-           if (type == 0) {
-              return code + "(" + params + ");\n";
-           } else if (type == 1){
-              return [code + "(" + params + ")", Blockly.JavaScript.ORDER_NONE];
-           }
-         };
-         Blockly.Python[label] = function(block) {
-            var params = "";
-            for (var iParam = 0; iParam < nbParams; iParam++) {
-               if (iParam != 0) {
-                  params += ", ";
-               }
-               params += Blockly.Python.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.Python.ORDER_ATOMIC);
-            }
-            if (type == 0) {
-               return code + "(" + params + ")\n";
-            } else if (type == 1) {
-               return [code + "(" + params + ")", Blockly.Python.ORDER_NONE];
-            }
-         };
-      },
-
       completeBlockHandler: function(block, objectName, context) {
          if (typeof block.handler == "undefined") {
             block.handler = context[objectName][block.name];
@@ -800,7 +782,48 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
       },
       
-      /*createBlock: function(label, code, type, nbParams) {
+      createSimpleGenerator: function(label, code, type, nbParams) {
+         var jsDefinitions = this.definitions['javascript'] ? this.definitions['javascript'] : [];
+         var pyDefinitions = this.definitions['python'] ? this.definitions['python'] : [];
+         Blockly.JavaScript[label] = function(block) {
+            for (var iDef=0; iDef < jsDefinitions.length; iDef++) {
+               var def = jsDefinitions[iDef];
+               Blockly.Javascript.definitions_[def.label] = def.code;
+            }
+            var params = "";
+            for (var iParam = 0; iParam < nbParams; iParam++) {
+               if (iParam != 0) {
+                  params += ", ";
+               }
+               params += Blockly.JavaScript.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.JavaScript.ORDER_ATOMIC);
+            }
+           if (type == 0) {
+              return code + "(" + params + ");\n";
+           } else if (type == 1){
+              return [code + "(" + params + ")", Blockly.JavaScript.ORDER_NONE];
+           }
+         };
+         Blockly.Python[label] = function(block) {
+            for (var iDef=0; iDef < pyDefinitions.length; iDef++) {
+               var def = pyDefinitions[iDef];
+               Blockly.Python.definitions_[def.label] = def.code;
+            }
+            var params = "";
+            for (var iParam = 0; iParam < nbParams; iParam++) {
+               if (iParam != 0) {
+                  params += ", ";
+               }
+               params += Blockly.Python.valueToCode(block, 'NAME_' + (iParam + 1), Blockly.Python.ORDER_ATOMIC);
+            }
+            if (type == 0) {
+               return code + "(" + params + ")\n";
+            } else if (type == 1) {
+               return [code + "(" + params + ")", Blockly.Python.ORDER_NONE];
+            }
+         };
+      },
+
+      createSimpleBlock: function(label, code, type, nbParams) {
          Blockly.Blocks[label] = {
            init: function() {
              this.appendDummyInput()
@@ -821,19 +844,25 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              this.setHelpUrl('');
            }
          };
-      },*/
+      },
 
-      /* createGeneratorsAndBlocks: function(generators) { 
-         for (var objectName in generators) {
-            for (var iGen = 0; iGen < generators[objectName].length; iGen++) {
-               var generator = generators[objectName][iGen];
-               var label = objectName + "_" + generator.labelEn + "__";
-               var code = generator.codeFr;
-               this.createGenerator(label, objectName + "." + code, generator.type, generator.nbParams);
-               this.createBlock(label, generator.labelFr, generator.type, generator.nbParams);
+      createSimpleGeneratorsAndBlocks: function() { 
+         for (var genName in this.simpleGenerators) {
+            for (var iGen = 0; iGen < this.simpleGenerators[genName].length; iGen++) {
+               var generator = this.simpleGenerators[genName][iGen];
+               if(genName == '.') {
+                 var label = generator.label + "__";
+                 var code = generator.code;
+               } else {
+                 var label = genName + "_" + generator.label + "__";
+                 var code = genName + "." + generator.code;
+               }
+               this.createSimpleGenerator(label, code, generator.type, generator.nbParams);
+               // TODO :: merge createSimpleBlock with completeBlock*
+               this.createSimpleBlock(label, generator.label, generator.type, generator.nbParams);
             }
          }
-      },*/
+      },
 
       createGeneratorsAndBlocks: function() {
          var customGenerators = this.mainContext.customBlocks;
@@ -1425,12 +1454,26 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
          }
 
+         for (var genName in this.simpleGenerators) {
+            for (var iGen = 0; iGen < this.simpleGenerators[genName].length; iGen++) {
+               var generator = this.simpleGenerators[genName][iGen];
+               if (categoriesInfos[generator.category] == undefined) {
+                  categoriesInfos[generator.category] = {
+                     blocksXml: [],
+                     colour: 210
+                  };
+               }
+               var blockName = (genName == '.') ? generator.label + "__" : genName + "_" + generator.label + "__";
+               categoriesInfos[generator.category].blocksXml.push("<block type='"+blockName+"'></block>");
+            }
+         }
+
          var stdBlocks = this.getStdBlocks();
 
          if (this.includeBlocks.standardBlocks.includeAll) {
             this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
          }
-         var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories;
+         var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
             if (categoryName == 'variables') {
@@ -1449,7 +1492,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
          }
 
-         this.addBlocksAndCategories(this.includeBlocks.standardBlocks.singleBlocks, stdBlocks, categoriesInfos);
+         this.addBlocksAndCategories(this.includeBlocks.standardBlocks.singleBlocks || [], stdBlocks, categoriesInfos);
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
