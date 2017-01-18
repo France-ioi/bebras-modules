@@ -939,8 +939,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if (typeof provideBlocklyColours == "function") {
             var providedColours = provideBlocklyColours();
 
-            for (group in providedColours) {
-               if (! group in colours) {
+            for (var group in providedColours) {
+               if (!(group in colours)) {
                   colours[group] = {};
                }
                for (name in providedColours[group]) {
@@ -983,7 +983,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                blocks: [
                   {
                      name: "controls_if",
-                     blocklyXml: "<block type='controls_if'></block>"
+                     blocklyXml: "<block type='controls_if'></block>",                     
                   },
                   { 
                      name: "controls_if_else",
@@ -1011,8 +1011,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                blocks: [
                   { 
                      name: "controls_repeat", 
-                     blocklyXml: "<block type='controls_repeat'>" +
-                                 "</block>"
+                     blocklyXml: "<block type='controls_repeat'></block>",
+                     excludedByDefault: true,
                   },
                   { 
                      name: "controls_repeat_ext", 
@@ -1443,6 +1443,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                };
             }            
             categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+         }
+
+         // by the way, just change the defaul colours of the blockly blocks:
+         var defCat = ["logic", "loops", "math", "text", "lists", "colour"]
+         for (var iCat in defCat) {
+            Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
          }
       },
 
