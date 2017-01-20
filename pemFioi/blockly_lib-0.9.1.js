@@ -45,7 +45,7 @@ var localLanguageStrings = {
          logic: "Logique",
          loops: "Boucles",
          math: "Maths",
-         text: "Texte",
+         texts: "Texte",
          variables: "Variables",
          functions: "Fonctions"
       },
@@ -90,7 +90,7 @@ var localLanguageStrings = {
          logic: "Logic",
          loops: "Loops",
          math: "Math",
-         text: "Text",
+         texts: "Text",
          variables: "Variables",
          functions: "Functions"
       },
@@ -135,7 +135,7 @@ var localLanguageStrings = {
          logic: "Logik",
          loops: "Schleifen",
          math: "Mathe",
-         text: "Text",
+         texts: "Text",
          variables: "Variablen",
          functions: "Funktionen",
          read: "Einlesen",
@@ -216,7 +216,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       prevWidth: 0,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
-      startingBlock: true,
+      startingBlock: false, // I set this to false for now … How should this be set optimally? By BlocklyType lib?
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
       includeBlocks: {
@@ -740,7 +740,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // for closure:
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
-         console.log(code);
          var output = blockInfo.blocklyJson.output;
          
          for (var language in {JavaScript: null, Python: null}) {
@@ -1107,7 +1106,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='math_modulo'></block>"
                },
             ],
-            text: [
+            texts: [
                {
                   name: "text", 
                   blocklyXml: "<block type='text'></block>"
@@ -1471,7 +1470,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var stdBlocks = this.getStdBlocks();
 
          if (this.includeBlocks.standardBlocks.includeAll) {
-            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "text", "lists", "colour", "dicts", "variables", "functions"];
+            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "colour", "dicts", "variables", "functions"];
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
@@ -1784,18 +1783,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          var topBlocks = this.workspace.getTopBlocks(true);
          var robotStartHasChildren = false;
-         for(var b=0; b<topBlocks.length; b++) {
-            var block = topBlocks[b];
-            if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
-               robotStartHasChildren = true;
-               break;
-            } // There can be multiple robot_start blocks sometimes
-         }
-         if(!robotStartHasChildren) {
-            $('#errors').html('Le programme est vide ! Connectez des blocs.');
-            return;
-         }
 
+         if (this.startingBlock) {
+            for(var b=0; b<topBlocks.length; b++) {
+               var block = topBlocks[b];
+               if(block.type == 'robot_start' && block.childBlocks_.length > 0) {
+                  robotStartHasChildren = true;
+                  break;
+               } // There can be multiple robot_start blocks sometimes
+            }
+            if(!robotStartHasChildren) {
+               $('#errors').html('Le programme est vide ! Connectez des blocs.');
+               return;
+            }
+         }
+            
          this.savePrograms();
 
          var codes = [];
