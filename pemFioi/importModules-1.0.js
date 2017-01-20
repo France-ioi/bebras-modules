@@ -35,6 +35,8 @@ var importableModules = function () {
       'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.js", id: "blockly_lib"},
       'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "blockly_lib_css"},
       'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.js", id: "blocklyRobot_lib"},
+      'blockly_lib091': {src: modulesPath+"/pemFioi/blockly_lib-0.9.1.js", id: "blockly_lib"},
+      'blocklyRobot_lib091': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
@@ -73,6 +75,18 @@ var languageScripts = function () {
          'blockly_lib',
          'blockly_lib_css',
          'blocklyRobot_lib'
+      ],
+      blockly091: [
+         'acorn',
+         'interpreter',
+         'blockly',
+         'blockly_blocks',
+         'blockly_javascript',
+         'blockly_python',
+         'blockly_' + strLang,
+         'blockly_lib091',
+         'blockly_lib_css',
+         'blocklyRobot_lib091'
       ],
       scratch: [
          'acorn',
