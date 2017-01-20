@@ -215,7 +215,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       workspace: null,
       prevWidth: 0,
       trashInToolbox: false,
-      //languageStrings: languageStrings,
+      languageStrings: window.LanguageStrings,
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
@@ -740,6 +740,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // for closure:
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
+         console.log(code);
          var output = blockInfo.blocklyJson.output;
          
          for (var language in {JavaScript: null, Python: null}) {
@@ -1870,11 +1871,10 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.initInterpreter = function(interpreter, scope) {
          for (var objectName in context.customBlocks) {
-            for (var iCategory in context.customBlocks[objectName]) {
-               for (var iBlock in context.customBlocks[objectName][iCategory].blocks) {
-                  var blockInfo = context.customBlocks[objectName][iCategory].blocks[iBlock];
+            for (var category in context.customBlocks[objectName]) {
+               for (var iBlock in context.customBlocks[objectName][category]) {
+                  var blockInfo = context.customBlocks[objectName][category][iBlock];
                   var code = context.strings.code[blockInfo.name];
-
                   if (typeof(code) == "undefined")
                      code = blockInfo.name;
                   
