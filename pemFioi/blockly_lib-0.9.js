@@ -129,13 +129,13 @@ var languageStrings = {
          sensors: "Sensoren",
          debug: "Debug",
          colour: "Farben",
-         dicts: "Diktionär",
+         dicts: "Hash-Map",
          input: "Eingabe",
          lists: "Listen",
          logic: "Logik",
          loops: "Schleifen",
          math: "Mathe",
-         text: "Texte",
+         text: "Text",
          variables: "Variablen",
          functions: "Funktionen",
          read: "Einlesen",
@@ -701,8 +701,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
                block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
             } else {
-               block.blocklyJson.colour = 210;
+               var colours = this.getDefaultColours();
+               block.blocklyJson.colour = 210; // default: blue
+               console.log(block.name);
+               console.log(categoryName);
+               console.log(colours);
+               if ("blocks" in colours &&  block.name in colours.blocks) {
+                  block.blocklyJson.colour = colours.blocks[block.name];                  
+               }
+               else if ("categories" in colours) {
+                  if (categoryName in colours.categories) {
+                     block.blocklyJson.colour = colours.categories[categoryName];                     
+                  }
+                  else if ("_default" in colours.categories) {
+                     block.blocklyJson.colour = colours.categories["_default"];                     
+                  }
+               }
             }
+            
          }
       }, 
       completeBlockXml: function(block) {
@@ -874,7 +890,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
                   /* TODO: Allow library writers to provide their own JS/Python code instead of just a handler */
                   this.completeBlockHandler(block, objectName, this.mainContext);
-                  this.completeBlockJson(block, objectName, category.category, this.mainContext); /* category.category is category name */
+                  this.completeBlockJson(block, objectName, categoryName, this.mainContext); /* category.category is category name */
                   this.completeBlockXml(block);
                   this.completeCodeGenerators(block, objectName);
                   this.applyCodeGenerators(block);
@@ -926,7 +942,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                logic: 210,
                loops: 120,
                math: 230,
-               text: 160,
+               texts: 160,
                lists: 260,
                colour: 20,
                variables: 330,
@@ -1446,7 +1462,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
 
          // by the way, just change the defaul colours of the blockly blocks:
-         var defCat = ["logic", "loops", "math", "text", "lists", "colour"]
+         var defCat = ["logic", "loops", "math", "texts", "lists", "colour"]
          for (var iCat in defCat) {
             Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
          }
