@@ -1,5 +1,5 @@
 var getContext = function(display, infos, curLevel) {
-   var languageStrings = {
+   var localLanguageStrings = {
       fr: {
          label: {
             wait: "attendre",
@@ -215,7 +215,17 @@ var getContext = function(display, infos, curLevel) {
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       }
    };
-   var strings = languageStrings[stringsLanguage];
+
+   window.stringsLanguage = window.stringsLanguage || "fr";
+   window.languageStrings = window.languageStrings || {};
+
+   if (typeof window.languageStrings != "object") {
+      console.error("window.languageStrings is not an object");
+   }
+   else { // merge translations
+      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
+   }   
+   var strings = window.languageStrings;
    
    var cells = [];
    var texts = [];

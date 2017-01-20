@@ -32,7 +32,7 @@ function resetFormElement(e) {
   //e.preventDefault();
 }
 
-var languageStrings = {
+var localLanguageStrings = {
    fr: {
       categories: {
          actions: "Actions",
@@ -215,7 +215,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       workspace: null,
       prevWidth: 0,
       trashInToolbox: false,
-      languageStrings: languageStrings,
+      //languageStrings: languageStrings,
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
@@ -291,12 +291,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if(this.scratchMode) {
             this.fixScratch();
          }
-         if (language == undefined) {
-            language = "fr";
-         }
+
          if (options == undefined) options = {};
          if (!options.divId) options.divId = 'blocklyDiv';
-         this.strings = this.languageStrings[language];
+
+         window.stringsLanguage = window.stringsLanguage || "fr";
+         window.languageStrings = window.languageStrings || {};
+
+         if (typeof window.languageStrings != "object") {
+            console.error("window.languageStrings is not an object");
+         }
+         else { // merge translations
+            $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
+         }         
+         this.strings = window.languageStrings;
+         
          if (display) {
             this.loadHtml(nbTestCases);
             this.createSimpleGeneratorsAndBlocks();
@@ -703,9 +712,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
-               console.log(block.name);
-               console.log(categoryName);
-               console.log(colours);
                if ("blocks" in colours &&  block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];                  
                }
@@ -885,8 +891,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var objectName in customGenerators) {
             for (var categoryName in customGenerators[objectName]) {
                var category =  customGenerators[objectName][categoryName];
-               for (var iBlock = 0; iBlock < category.blocks.length; iBlock++) {
-                  var block = category.blocks[iBlock];
+               for (var iBlock = 0; iBlock < category.length; iBlock++) {
+                  var block = category[iBlock];
 
                   /* TODO: Allow library writers to provide their own JS/Python code instead of just a handler */
                   this.completeBlockHandler(block, objectName, this.mainContext);
@@ -1413,7 +1419,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
       getBlockXmlInfo: function(generatorStruct, blockName) {
          for (var categoryName in generatorStruct) {
-            var blocks = generatorStruct[categoryName].blocks;
+            var blocks = generatorStruct[categoryName];
             for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
                var block = blocks[iBlock];
                if (block.name == blockName) {
