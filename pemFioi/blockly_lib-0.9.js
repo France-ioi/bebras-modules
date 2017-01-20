@@ -703,6 +703,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
+               console.log(block.name);
+               console.log(categoryName);
+               console.log(colours);
                if ("blocks" in colours &&  block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];                  
                }
@@ -734,39 +737,36 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var output = blockInfo.blocklyJson.output;
          
          for (var language in {JavaScript: null, Python: null}) {
-            if (typeof blockInfo.codeGenerators[language] == "undefined") {               
-               blockInfo.codeGenerators[language] = function(block) {
-                  var params = "";               
+            if (typeof blockInfo.codeGenerators[language] == "undefined") {
+               function setCodeGeneratorForLanguage(language) {
+                  blockInfo.codeGenerators[language] = function(block) {
+                     var params = "";               
 
-                  /* There are three kinds of input: value_input, statement_input and dummy_input,
-                     We should definitely consider value_input here and not consider dummy_input here.
+                     /* There are three kinds of input: value_input, statement_input and dummy_input,
+                        We should definitely consider value_input here and not consider dummy_input here.
 
-                     I don't know how statement_input is handled best, so I'll ignore it first -- Robert
-                   */
-                  var iParam = 0;
-                  for (var iArgs0 in args0) {
-                     if (args0[iArgs0].type == "input_value") {
-                        if (iParam) {
-                           params += ", ";
+                        I don't know how statement_input is handled best, so I'll ignore it first -- Robert
+                      */
+                     var iParam = 0;
+                     for (var iArgs0 in args0) {
+                        if (args0[iArgs0].type == "input_value") {
+                           if (iParam) {
+                              params += ", ";
+                           }
+                           params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
+                           iParam += 1;
                         }
-                        params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
-                        iParam += 1;
+                     }
+
+                     if (typeof output == "undefined") {                     
+                        return code + "(" + params + ");\n";
+                     }
+                     else {
+                        return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
                      }
                   }
-
-                  if (typeof output == "undefined") {                     
-                     return code + "(" + params + ");\n";
-                  }
-                  else {
-                     return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
-                  }
-                  
-                  /*if (type == 0) { // TODO: Change
-                     return code + "(" + params + ");\n";
-                  } else if (type == 1){
-                     return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
-                  }*/
-               }
+               };
+               setCodeGeneratorForLanguage(language);
             }
          }
       },
