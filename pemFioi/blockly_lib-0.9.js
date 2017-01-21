@@ -967,7 +967,22 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       
 
       getStdBlocks: function() {
-         return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
+         var stdBlocks = this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
+
+         // Check each block is actually loaded in current context
+         for(var category in stdBlocks) {
+            var verifiedBlocks = [];
+            var blockList = stdBlocks[category].blocks;
+            for(var b=0; b<blockList.length; b++) {
+               var blocklyName = blockList[b].depends ? blockList[b].depends : blockList[b].name;
+               if(Blockly.Blocks[blocklyName]) {
+                  verifiedBlocks.push(blockList[b]);
+               }
+            }
+            stdBlocks[category].blocks = verifiedBlocks;
+         }
+
+         return stdBlocks;
       },
 
       getStdBlocklyBlocks: function() {
@@ -1000,6 +1015,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   { 
                      name: "controls_if_else",
+                     depends: "controls_if",
                      blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>"
                   },
                   { 
@@ -1115,6 +1131,26 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      blocklyXml: "<block type='text'></block>"
                   },
                   {
+                     name: "text_print", 
+                     blocklyXml: "<block type='text_print'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "text_print_noend", 
+                     blocklyXml: "<block type='text_print_noend'>" +
+                                 "  <value name='TEXT'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>abc</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+                  {
                      name: "text_join", 
                      blocklyXml: "<block type='text_join'></block>"
                   },
@@ -1190,16 +1226,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   {
                      name: "text_trim", 
                      blocklyXml: "<block type='text_trim'>" +
-                                 "  <value name='TEXT'>" +
-                                 "    <shadow type='text'>" +
-                                 "      <field name='TEXT'>abc</field>" +
-                                 "    </shadow>" +
-                                 "  </value>" +
-                                 "</block>"
-                  },
-                  {
-                     name: "text_print", 
-                     blocklyXml: "<block type='text_print'>" +
                                  "  <value name='TEXT'>" +
                                  "    <shadow type='text'>" +
                                  "      <field name='TEXT'>abc</field>" +
