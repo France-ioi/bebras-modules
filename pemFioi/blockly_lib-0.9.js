@@ -1,5 +1,3 @@
-"use strict";
-
 var getUrlParameter = function getUrlParameter(sParam) {
     var sPageURL = decodeURIComponent(window.location.search.substring(1));
     var sURLVariables = sPageURL.split('&');
