@@ -150,8 +150,8 @@ var localLanguageStrings = {
       programOfRobot: "Programm des Roboters",
       flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
-      submitProgram: "Programm überprüfen lassen",
-      runProgram: "Programm ausführen",
+      submitProgram: "Ausführen",
+      runProgram: "Testen",
       stopProgram: "Stop",
       speed: "Ablaufgeschwindigkeit:",
       slowSpeed: "Langsam",
@@ -168,8 +168,8 @@ var localLanguageStrings = {
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
-      previousTestcase: "Vorheriger", 
-      nextTestcase: "Nächster",
+      previousTestcase: " < ", 
+      nextTestcase: " > ",
    }
 }
 
@@ -1475,7 +1475,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
-            if (false) if (categoryName == 'variables') {
+            if (categoryName == 'variables') {
                if(!this.includeBlocks.variables) { this.includeBlocks.variables = []; }
                this.includeBlocks.variables.push('*');
                continue;
@@ -1499,7 +1499,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
-         if (false) if (typeof this.includeBlocks.variables !== 'undefined') {
+         if (typeof this.includeBlocks.variables !== 'undefined') {
             var blocksXml = [];
             var includedVariablesAll = false;
             var includedVariables = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : ['*'];
