@@ -1094,7 +1094,18 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   },
                   {
                      name: "math_arithmetic", 
-                     blocklyXml: "<block type='math_arithmetic'></block>"
+                     blocklyXml: "<block type='math_arithmetic'>" +
+                                 "   <value name='A'>" +
+                                 "      <shadow type='math_number'>" +
+                                 "         <field name='NUM'>1</field>" +
+                                 "      </shadow>" +
+                                 "   </value>" +
+                                 "   <value name='B'>" +
+                                 "      <shadow type='math_number'>" +
+                                 "        <field name='NUM'>1</field>" +
+                                 "      </shadow>" +
+                                 "   </value>" +
+                                 "</block>"
                   },
                   {
                      name: "math_number_property", 
