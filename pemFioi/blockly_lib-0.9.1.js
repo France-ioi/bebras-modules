@@ -54,7 +54,6 @@ var localLanguageStrings = {
       download: "télécharger",
       smallestOfTwoNumbers: "Plus petit des deux nombres",
       greatestOfTwoNumbers: "Plus grand des deux nombres",
-      programOfRobot: "Programme du robot",
       flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
       submitProgram: "Valider le programme",
@@ -99,7 +98,6 @@ var localLanguageStrings = {
       download: "download",
       smallestOfTwoNumbers: "Smallest of the two numbers",
       greatestOfTwoNumbers: "Greatest of the two numbers",
-      programOfRobot: "Robot's program",
       flagClicked: "When %1 clicked",
       tooManyIterations: "Too many iterations before an action!",
       submitProgram: "Validate this program",
@@ -147,7 +145,6 @@ var localLanguageStrings = {
       download: "Herunterladen",
       smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
-      programOfRobot: "Programm des Roboters",
       flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
       submitProgram: "Ausführen",
@@ -216,7 +213,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       prevWidth: 0,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
-      startingBlock: false, // I set this to false for now … How should this be set optimally? By BlocklyType lib?
+      startingBlock: true, 
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
       includeBlocks: {
@@ -1726,7 +1723,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             Blockly.Blocks['robot_start'] = {
               init: function() {
                 this.appendDummyInput()
-                    .appendField(that.strings.programOfRobot);
+                    .appendField(that.strings.startingBlockName);
                 this.setNextStatement(true);
                 this.setColour(210);
                 this.setTooltip('');

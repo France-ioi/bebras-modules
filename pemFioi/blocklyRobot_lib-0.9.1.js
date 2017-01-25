@@ -106,6 +106,7 @@ var getContext = function(display, infos, curLevel) {
             trans_col: "colonneTransportable",
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+         startingBlockName: "Programme du robot",
       },
       de: {
          label: {
@@ -171,7 +172,7 @@ var getContext = function(display, infos, curLevel) {
             south: "unten",
             west: "links",
             north: "oben",
-            paint: "bemaleFeld",
+            paint: "bemale",
             pickTransportable: "ramasserTransportable",
             dropTransportable: "deposerTransportable",
             onTransportable: "surTransportable",
@@ -181,9 +182,9 @@ var getContext = function(display, infos, curLevel) {
             transportableRed: "objetRouge",
             transportableBlue: "objetBleu",
             transportableSquare: "objetCarre",
-            greenCell: "caseVerte",
-            brownCell: "caseMarron",
-            markedCell: "caseMarquee",
+            greenCell: "feldGruen",
+            brownCell: "feldBraun",
+            markedCell: "feldMarikiert",
             platformInFront: "plateformeDevant",
             platformInFrontAndBelow: "plateformeDevantPlusBas",
             platformAbove: "plateformeAuDessus",
@@ -213,6 +214,10 @@ var getContext = function(display, infos, curLevel) {
             trans_col: "colonneTransportable",
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+         startingBlockName: "Programm des Roboters",
+      },
+      en:  {
+         startingBlockName: "Robot's program",
       }
    };
 
