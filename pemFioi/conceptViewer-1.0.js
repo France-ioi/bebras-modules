@@ -152,9 +152,9 @@ var baseUrl = 'https://static-items.algorea.org/files/checkouts/c1212c2f48bf3944
 var testConcepts = [
     {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
     {id: 'language', name: "Création d'un programme", url: baseUrl+'#language'},
-    {id: 'blockly_print', name: 'Afficher du texte', url: baseUrl+'#blockly_print'},
-    {id: 'blockly_print_no_end', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_print_no_end'},
-    {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_control_repeat'},
+    {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
+    {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend'},
+    {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
     {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
     {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
     ];
