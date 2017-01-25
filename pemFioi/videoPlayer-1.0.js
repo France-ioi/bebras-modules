@@ -403,7 +403,7 @@ playerApp.directive('fioiVideoPlayer', function() {
                 newHtml += '   <img src="'+curVideo.image+'" width="'+width+'px" height="'+height+'px" />';
             }
             if(curVideo.subtitles) {
-                newHtml += '   <div id="subtitlesContainer" style="position: absolute; top: '+(height-80)+'px; left: 0px; height: 80px; width: 100%; background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-size: 24px"></div>'
+                newHtml += '   <div id="subtitlesContainer" style="position: absolute; top: '+(height-72)+'px; left: 0px; height: 80px; width: 100%; background: rgba(0, 0, 0, 0.8); color: white; text-align: center; font-size: 24px"></div>'
             }
             newHtml += '</div>';
         }
