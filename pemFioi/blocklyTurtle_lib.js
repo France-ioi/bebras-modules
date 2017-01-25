@@ -64,10 +64,10 @@ var makeTurtle = function() {
 
 
 var getContext = function(display, infos) {
-   var languageStrings = {
+   var localLanguageStrings = {
       fr: {
           
-         
+         startingBlockName: "Turtle-Programm:",
       },
       de: {
          label: {
@@ -85,10 +85,21 @@ var getContext = function(display, infos) {
             turn: "drehe",
             alert: "alert",
             log: "log",
-         }
+         },
+         startingBlockName: "Turtle-Programm",
       }
    };
-   var strings = languageStrings[stringsLanguage];
+   
+   window.stringsLanguage = window.stringsLanguage || "fr";
+   window.languageStrings = window.languageStrings || {};
+
+   if (typeof window.languageStrings != "object") {
+      console.error("window.languageStrings is not an object");
+   }
+   else { // merge translations
+      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
+   }   
+   var strings = window.languageStrings;
    
    var cells = [];
    var texts = [];

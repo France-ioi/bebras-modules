@@ -1,7 +1,7 @@
 "use strict";
 
 var getContext = function(display, infos) {
-   var languageStrings = {
+   var localLanguageStrings = {
       de: {
          label: {
             print: "schreibe",
@@ -16,11 +16,21 @@ var getContext = function(display, infos) {
             readInteger: "leseGanzzahl",
             readFloat: "leseKommazahl",
             eof: "eingabeEnde",
-         }
+         },
+         startingBlockName: "Programm",
       }
    }
    
-   var strings = languageStrings[stringsLanguage];
+   window.stringsLanguage = window.stringsLanguage || "fr";
+   window.languageStrings = window.languageStrings || {};
+
+   if (typeof window.languageStrings != "object") {
+      console.error("window.languageStrings is not an object");
+   }
+   else { // merge translations
+      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
+   }   
+   var strings = window.languageStrings;
    
    var cells = [];
    var texts = [];
@@ -129,29 +139,32 @@ var getContext = function(display, infos) {
       return result;
    }
       
-   context.printer.read = function(callback) {      
+   context.printer.read = function(callback) {
+      var str = context.printer.commonRead()
       context.updateScale();
-      context.callCallback(callback, context.printer.commonRead());
+      context.waitDelay(callback, str);
    }
 
 
    context.printer.readInteger = function(callback) {
+      var num = parseInt(context.printer.commonRead());
       context.updateScale();
-      context.callCallback(callback, parseInt(context.printer.commonRead()));
+      context.waitDelay(callback, num);
    }
 
    context.printer.readFloat = function(callback) {
+      var num = parseFloat(context.printer.commonRead());
       context.updateScale();
-      context.callCallback(callback, parseFloat(context.printer.commonRead()));
+      context.waitDelay(callback, num);
    }
 
    context.printer.eof = function(callback) {
       var index = context.printer.input_text.indexOf('\n');
       
       if (index < 0) {         
-         context.callCallback(callback, true);
+         context.waitDelay(callback, true);
       }
-      context.callCallback(callback, false);
+      context.waitDelay(callback, false);
    }
 
 
