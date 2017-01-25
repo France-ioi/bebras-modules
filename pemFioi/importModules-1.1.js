@@ -32,9 +32,12 @@ var importableModules = function () {
       'blockly_fr': {src: modulesPath+"/ext/blockly/fr.js", id: "blockly_fr"},
       'blockly_en': {src: modulesPath+"/ext/blockly/en.js", id: "blockly_en"},
       'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
-      'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.js", id: "blockly_lib"},
+      'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.1.js", id: "blockly_lib"},
       'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "blockly_lib_css"},
-      'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.js", id: "blocklyRobot_lib"},
+      
+      'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
+      'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
+      'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
@@ -72,7 +75,6 @@ var languageScripts = function () {
          'blockly_' + strLang,
          'blockly_lib',
          'blockly_lib_css',
-         'blocklyRobot_lib'
       ],
       scratch: [
          'acorn',
