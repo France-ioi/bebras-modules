@@ -109,7 +109,7 @@ var getContext = function(display, infos) {
    var context = {
       display: display,
       infos: infos,
-      turtle: {displayTurtle : new makeTurtle, solutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle},
+      turtle: {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle},
       strings: strings,
    };
 
@@ -165,27 +165,43 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(gridInfos) {
-      if (context.display) {
+      if (context.display && gridInfos) {
          context.resetDisplay();
-      } else {
-         // ... ?
+
+         context.turtle.displayTurtle.setDrawingContext(document.getElementById('displayfield').getContext('2d'));
+         context.turtle.displaySolutionTurtle.setDrawingContext(document.getElementById('solutionfield').getContext('2d'));
+
+         context.turtle.displayTurtle.reset();
+         context.turtle.displaySolutionTurtle.reset();         
+      }
+    
+      function createMeACanvas() {
+         var canvas = document.createElement('canvas');
+         canvas.width = 300;
+         canvas.height = 300;
+         canvas.style.width = "300px";
+         canvas.style.heigth = "300px";
+         canvas.style.border = "1px solid black";
+         canvas.style.display = "none";
+
+         //document.body.appendChild(canvas); // for debug
+         return canvas;
       }
       
       if (gridInfos) {
+         context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
+         context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
+
+         context.turtle.invisibleTurtle.reset();
+         context.turtle.invisibleSolutionTurtle.reset();
+         
          context.drawSolution = gridInfos.drawSolution;
+
+         context.drawSolution(context.turtle.invisibleSolutionTurtle);
+         if (context.display) {
+            context.drawSolution(context.turtle.displaySolutionTurtle);
+         }
       }
-
-      context.turtle.displayTurtle.setDrawingContext(document.getElementById('displayfield').getContext('2d'));
-      context.turtle.solutionTurtle.setDrawingContext(document.getElementById('solutionfield').getContext('2d'));
-      context.turtle.invisibleTurtle.setDrawingContext(document.getElementById('invisibledisplayfield').getContext('2d'));
-
-      context.turtle.solutionTurtle.reset();
-      context.turtle.invisibleTurtle.reset();
-
-      context.drawSolution(context.turtle.solutionTurtle);
-
-      
-      // ... ?
    };
 
    context.resetDisplay = function() {
@@ -196,7 +212,8 @@ var getContext = function(display, infos) {
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
       context.turtle.displayTurtle.reset();
-      context.updateScale();
+      
+      context.updateScale(); // does nothing for now 
    };
 
    context.unload = function() {
@@ -295,11 +312,6 @@ var getContext = function(display, infos) {
 
 
    context.updateScale = function() {
-      if (!context.display) {
-         return;
-      }
-      // ...
-      
    };
 
    return context;
