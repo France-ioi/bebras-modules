@@ -951,10 +951,23 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             },
             blocks: {},
          };
+
+         if (typeof this.mainContext.provideBlocklyColours == "function") {
+            var providedColours = this.mainContext.provideBlocklyColours();
+            
+            for (var group in providedColours) {
+               if (!(group in colours)) {
+                  colours[group] = {};
+               }
+               for (name in providedColours[group]) {
+                  colours[group][name] = providedColours[group][name];
+               }
+            }
+         }
          
          if (typeof provideBlocklyColours == "function") {
             var providedColours = provideBlocklyColours();
-
+            
             for (var group in providedColours) {
                if (!(group in colours)) {
                   colours[group] = {};
