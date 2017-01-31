@@ -244,6 +244,31 @@ var getContext = function(display, infos, curLevel) {
       strings: strings,
    };
 
+   switch (infos.blocklyColourTheme) {
+      case "bwinf":
+         context.provideBlocklyColours = function() {
+            return {
+               categories: {
+                  logic: 100,
+                  loops: 180,
+                  math: 220,
+                  text: 250,
+                  lists: 60,
+                  colour: 310,
+                  variables: 340,
+                  functions: 20,
+                  actions: 260,
+                  sensors: 340,
+                  _default: 280,
+               },
+               blocks: {},
+            };
+         }
+         break;
+      default:
+         // we could set printer specific default colours here, if we wanted to …
+   }
+
    context.changeDelay = function(newDelay) {
       infos.actionDelay = newDelay;
    };
