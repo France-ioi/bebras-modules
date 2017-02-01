@@ -105,8 +105,13 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable",
          },
+         messages: {
+            marblesPlacedCorrectly: "Bravo, vous avez rangé toutes les billes&nbsp;!",
+            marblesPlacedIncorrectly: "Les billes sont mal rangées !",
+         },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programme du robot",
+         
       },
       de: {
          label: {
@@ -212,6 +217,10 @@ var getContext = function(display, infos, curLevel) {
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable",
+         },
+         messages: {
+            marblesPlacedCorrectly: "Bravo! Du hast alle Murmeln richtig angeordnet!",
+            marblesPlacedIncorrectly: "Die Murmeln sind leider nicht richtig angeordnet!",
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programm des Roboters",

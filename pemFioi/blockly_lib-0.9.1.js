@@ -76,6 +76,8 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       previousTestcase: "Précédent", 
       nextTestcase: "Suivant",
+      allTests: "Tous les tests : ",
+      errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
    },
    en: {
       categories: {
@@ -120,6 +122,8 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       previousTestcase: "Previous", 
       nextTestcase: "Next",
+      allTests: "All tests: ",
+      errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
    },
    de: {
       categories: {
@@ -167,6 +171,8 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
       previousTestcase: " < ", 
       nextTestcase: " > ",
+      allTests: "Alle Testfälle: ",
+      errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
    }
 }
 
@@ -1803,7 +1809,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               $('#errors').html('Le programme est vide ! Connectez des blocs.');
+               $('#errors').html(window.languageStrings.errorEmptyProgram);
                return;
             }
          }
@@ -2252,7 +2258,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = "Tous les tests : ";
+         subTask.context.messagePrefixSuccess = window.languageStrings.allTests;
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -2343,7 +2349,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests : ";
+      subTask.context.messagePrefixSuccess = window.languageStrings.allTests;
       subTask.context.runner.runCodes(codes);
    };
 }
