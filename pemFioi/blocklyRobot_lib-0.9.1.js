@@ -114,6 +114,12 @@ var getContext = function(display, infos, curLevel) {
             notReachedGreenZone: "Le robot n'a pas atteint la zone verte !",
             patternDrawn: "Bravo, vous avez reproduit le motif !",
             patternNotDrawn: "Le robot n'a pas peint les cases exactement comme souhaité.",
+
+            nothingToPickUp: "Rien à ramasser",
+            alreadyTransporting: "Le robot transporte déjà un objet",
+            notTransporting: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+            successDroppedAllObjects: "Bravo, vous avez déposé toutes les objets !",
+            leavesGrid: "Le robot sort de la grille !",
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programme du robot",
@@ -233,6 +239,12 @@ var getContext = function(display, infos, curLevel) {
             notReachedGreenZone: "Der Roboter ist nicht auf dem grünen Feld!",
             patternDrawn: "Bravo! Du hast das Muster richtig nachgezeichnet.",
             patternNotDrawn: "Der Roboter hat das Muster nicht genau so gemalt, wie vorgegeben!",
+
+            nothingToPickUp: "Der Roboter kann hier nichts aufheben.",
+            alreadyTransporting: "Der Roboter transportiert bereits etwas.",
+            notTransporting: "Der Roboter versucht etwas abzulegen, transportiert aber gar nichts.",
+            successDroppedAllObjects: "Bravo! du hast alle Sachen abgelegt.",
+            leavesGrid: "Der Roboter hat das Gitter verlassen!",
          },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
          startingBlockName: "Programm des Roboters",
@@ -788,7 +800,7 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
       if (transportables.length == 0) {
-         throw("Rien à ramasser");
+         throw(context.strings.messages.nothingToPickUp);
       }
       /*
       if (transportables[0].rank != context.nbTransportedItems + 1) {
@@ -796,7 +808,7 @@ var getContext = function(display, infos, curLevel) {
       }
       */
       if (context.nbTransportedItems > 0) {
-         throw("Le robot transporte déjà un objet");
+         throw(context.strings.messages.alreadyTransporting);
       }
       var transportable = transportables[0];
       context.items.splice(transportable.index, 1);
@@ -819,7 +831,7 @@ var getContext = function(display, infos, curLevel) {
    context.robot.dropTransportable = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       if (context.transportedItem == undefined) {
-         throw("Le robot essaie de déposer un objet mais n'en transporte pas.");
+         throw(context.strings.messages.notTransporting);
       }
       /*
       if (context.tiles[robot.row][robot.col] != 2) { // TODO : replace
@@ -830,7 +842,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbTransportedItems = 0;
       if (context.nbDroppedItems == context.nbTransportableItems - 1) {
          context.success = true;
-         throw("Bravo, vous avez déposé toutes les objets !");
+         throw(context.strings.messages.successDroppedAllObjects);
       }
       context.waitDelay(function() {
          context.items.push(context.transportedItem);
@@ -1224,7 +1236,7 @@ var getContext = function(display, infos, curLevel) {
          if (infos.ignoreInvalidMoves) {
             return false;
          }
-         throw("Le robot sort de la grille !");
+         throw(context.strings.messages.leavesGrid);
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
