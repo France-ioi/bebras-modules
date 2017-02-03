@@ -147,9 +147,9 @@ var localLanguageStrings = {
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
       download: "Herunterladen",
-      smallestOfTwoNumbers: "Kleinste von zwei Zahlen",
-      greatestOfTwoNumbers: "Größte von zwei Zahlen",
-      flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
+      smallestOfTwoNumbers: "Kleinere von zwei Zahlen",
+      greatestOfTwoNumbers: "Größere von zwei Zahlen",
+      flagClicked: "Sobald %1 geklickt", // (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
       submitProgram: "Ausführen",
       runProgram: "Testen",
@@ -167,8 +167,8 @@ var localLanguageStrings = {
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
-      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Blöcken verfügbar.",
-      limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
+      limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
+      limitBlocksOver: "Noch {remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verfügbar.", // TODO :: stimmt das?
       previousTestcase: " < ", 
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
