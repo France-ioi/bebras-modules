@@ -1448,16 +1448,18 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: [],
-                  colour: colours.blocks[blockName]
+                  colour: colours.blocks[blockName],
                };
             }            
             categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
          }
 
          // by the way, just change the defaul colours of the blockly blocks:
-         var defCat = ["logic", "loops", "math", "texts", "lists", "colour"]
-         for (var iCat in defCat) {
-            Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
+         if(!this.scratchMode) {
+            var defCat = ["logic", "loops", "math", "texts", "lists", "colour"];
+            for (var iCat in defCat) {
+               Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
+            }
          }
       },
 
@@ -1465,6 +1467,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var categoriesInfos = {};
          var colours = this.getDefaultColours();
 
+         // Reset the flyoutOptions
+         Blockly.Variables.flyoutOptions = {
+            any: false,
+            anyButton: !!this.includeBlocks.groupByCategory,
+            fixed: [],
+            includedBlocks: {get: true, set: true, incr: true},
+            shortList: true,
+         };
+         
          for (var blockType in this.includeBlocks.generatedBlocks) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
          }
@@ -1475,7 +1486,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                if (categoriesInfos[generator.category] == undefined) {
                   categoriesInfos[generator.category] = {
                      blocksXml: [],
-                     colour: 210
+                     colour: 210,
                   };
                }
                var blockName = (genName == '.') ? generator.label + "__" : genName + "_" + generator.label + "__";
@@ -1491,16 +1502,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
-            if (categoryName == 'variables') {
-               if(!this.includeBlocks.variables) { this.includeBlocks.variables = []; }
-               this.includeBlocks.variables.push('*');
-               continue;
-            }
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: [],
                };
-            }      
+            }
+            if (categoryName == 'variables') {
+               Blockly.Variables.flyoutOptions.any = true;
+               continue;
+            }
             var blocks = stdBlocks[categoryName];
             if (!(blocks instanceof Array)) { // just for now, maintain backwards compatibility
                blocks = blocks.blocks;
@@ -1516,59 +1526,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
          if (typeof this.includeBlocks.variables !== 'undefined') {
-            var blocksXml = [];
-            var includedVariablesAll = false;
-            var includedVariables = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : ['*'];
-            var includedVariableBlocks = {};
-            if (typeof this.includeBlocks.variablesOnlyBlocks === 'undefined') {
-               includedVariableBlocks = {get: true, set: true, incr: true};
-            } else {
+            Blockly.Variables.flyoutOptions.fixed = (this.includeBlocks.variables.length > 0) ? this.includeBlocks.variables : [];
+            if (typeof this.includeBlocks.variablesOnlyBlocks !== 'undefined') {
+               Blockly.Variables.flyoutOptions.includedBlocks = {get: false, set: false, incr: false};
                for (var iBlock=0; iBlock < this.includeBlocks.variablesOnlyBlocks.length; iBlock++) {
-                  includedVariableBlocks[this.includeBlocks.variablesOnlyBlocks[iBlock]] = true;
+                  Blockly.Variables.flyoutOptions.includedBlocks[this.includeBlocks.variablesOnlyBlocks[iBlock]] = true;
                }
             }
 
-            if(includedVariableBlocks.get) {
-               // block for each availableVariable
-               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
-                  if(includedVariables[iVar] == '*') {
-                     includedVariablesAll = true;
-                     continue;
-                  }
-                  blocksXml.push("<block type='variables_get' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
-               }
-               // generic modifyable block
-               if (includedVariablesAll) {
-                  blocksXml.push("<block type='variables_get'></block>");
-               }
-            }
- 
-            if(includedVariableBlocks.set) {
-               // same for setting variables
-               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
-                  if(includedVariables[iVar] == '*') {
-                     includedVariablesAll = true;
-                     continue;
-                  }
-                  blocksXml.push("<block type='variables_set' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field></block>");
-               }
-               if (includedVariablesAll) {
-                  blocksXml.push("<block type='variables_set'></block>");
-               }
+            var varAnyIdx = Blockly.Variables.flyoutOptions.fixed.indexOf('*');
+            if(varAnyIdx > -1) {
+               Blockly.Variables.flyoutOptions.fixed.splice(varAnyIdx, 1);
+               Blockly.Variables.flyoutOptions.any = true;
             }
 
-            if(includedVariableBlocks.incr) {
-               // same for setting variables
-               for (var iVar = 0; iVar < includedVariables.length; iVar++) {
-                  if(includedVariables[iVar] == '*') {
-                     includedVariablesAll = true;
-                     continue;
-                  }
-                  blocksXml.push("<block type='math_change' editable='false'><field name='VAR'>" + includedVariables[iVar] + "</field><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
-               }
-               if (includedVariablesAll) {
-                  blocksXml.push("<block type='math_change'><value name='DELTA'><shadow type='math_number'></shadow></value></block>");
-               }
+            var blocksXml = Blockly.Variables.flyoutCategory();
+            var xmlSer = new XMLSerializer();
+            for(var i=0; i<blocksXml.length; i++) {
+               blocksXml[i] = xmlSer.serializeToString(blocksXml[i]);
             }
 
             categoriesInfos["variables"] = {
@@ -1592,8 +1567,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                           + " name='" + this.strings.categories[categoryName] + "'"
                           + " colour='" + colour + "'"
                           + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
-                          + (categoryName == "variables" ? " custom=\"VARIABLE\"" : "")
-                          + (categoryName == "functions" ? " custom=\"PROCEDURE\"" : "")
+                          + (categoryName == 'variables' ? ' custom="VARIABLE"' : '')
+                          + (categoryName == 'functions' ? ' custom="PROCEDURE"' : '')
                           + ">";
             }
             var blocks = categoryInfo.blocksXml;
