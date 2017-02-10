@@ -174,11 +174,15 @@ var languageStrings = {
 // Blockly to Scratch translations
 var blocklyToScratch = {
     singleBlocks: {
-        'controls_if': 'control_if',
-        'controls_if_else': 'control_if_else',
-        'controls_repeat': 'control_repeat',
-        'controls_repeat_ext': 'control_repeat',
-        'logic_negate': 'operator_not'
+        'controls_if': ['control_if'],
+        'controls_if_else': ['control_if_else'],
+        'controls_repeat': ['control_repeat'],
+        'controls_repeat_ext': ['control_repeat'],
+        'controls_whileUntil': ['control_repeat_until'],
+        'logic_negate': ['operator_not'],
+        'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+        'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
+        'logic_operation': ['operator_and', 'operator_or']
     }
 }
 
@@ -216,6 +220,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       languageStrings: languageStrings,
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+
 
       includeBlocks: {
          groupByCategory: true,
@@ -1446,15 +1451,80 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                  "  </value>" +
                                  "</block>"
                   },
+                  { 
+                     name: "control_repeat_until", 
+                     blocklyXml: "<block type='control_repeat_until'></block>"
+                  }
                ],
             },
             operator: {
                blocks: [
                   {
+                     name: "operator_add",
+                     blocklyXml: "<block type='operator_add'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_subtract",
+                     blocklyXml: "<block type='operator_subtract'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_multiply",
+                     blocklyXml: "<block type='operator_multiply'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_divide",
+                     blocklyXml: "<block type='operator_divide'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_equals",
+                     blocklyXml: "<block type='operator_equals'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_gt",
+                     blocklyXml: "<block type='operator_gt'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_lt",
+                     blocklyXml: "<block type='operator_lt'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_and",
+                     blocklyXml: "<block type='operator_and'></block>"
+                  },
+                  {
+                     name: "operator_or",
+                     blocklyXml: "<block type='operator_or'></block>"
+                  },
+                  {
                      name: "operator_not",
                      blocklyXml: "<block type='operator_not'></block>"
                   }
                ]
+            },
+            variables: {
+               custom: "VARIABLE",
+               blocks: []
             }
          };
       },
@@ -1781,9 +1851,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var iBlock = 0;  iBlock < this.includeBlocks.standardBlocks.singleBlocks.length; iBlock++) {
             var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
             if(blocklyToScratch.singleBlocks[blockName]) {
-                newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName]);
+               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
+                  newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
+               }
             } else {
-                newSingleBlocks.push(blockName);
+               newSingleBlocks.push(blockName);
             }
          }
          this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;

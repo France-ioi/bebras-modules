@@ -89,6 +89,7 @@ var languageScripts = function () {
          'blockly_python',
          'scratch_fixes',
          'blockly_' + strLang,
+         'blockly_fioi',
          'blockly_lib',
          'blockly_lib_css',
          'blocklyRobot_lib'
