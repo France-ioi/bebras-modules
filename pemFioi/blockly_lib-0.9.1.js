@@ -1111,11 +1111,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                },
                {
                   name: "math_extra_single", 
-                  blocklyXml: "<block type='math_extra_single'></block>"
+                  blocklyXml: "<block type='math_extra_single'></block>",
+                  excludedByDefault: true,
                },
                {
                   name: "math_extra_double", 
-                  blocklyXml: "<block type='math_extra_double'></block>"
+                  blocklyXml: "<block type='math_extra_double'></block>",
+                  excludedByDefault: true,
                },
                {
                   name: "math_modulo", 
@@ -1218,7 +1220,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "      <field name='TEXT'>abc</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "</block>"
+                              "</block>",
+                  excludedByDefault: true,
                },
                {
                   name: "text_prompt_ext", 
@@ -1228,7 +1231,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "      <field name='TEXT'>abc</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "</block>"
+                              "</block>",
+                  excludedByDefault: true,
                }
             ],
             lists: [
@@ -1517,7 +1521,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
             
             for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-               categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
+               if (!(blocks[iBlock].excludedByDefault)) {
+                  categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
+               }
             }
          }
 

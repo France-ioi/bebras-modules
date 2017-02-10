@@ -232,9 +232,9 @@ var getContext = function(display, infos, curLevel) {
          },
          messages: {
             marblePlacedCorrectly: "Bravo! Du hast die Murmel an die richtige Stelle verschoben.",
-            marblePlacedIncorrectly: "Die Murmel ist leider nicht an der richtigne Stelle!",
+            marblePlacedIncorrectly: "Die Murmel ist nicht an der richtigen Stelle platziert!",
             marblesPlacedCorrectly: "Bravo! Du hast alle Murmeln richtig angeordnet.",
-            marblesPlacedIncorrectly: "Die Murmeln sind leider nicht richtig angeordnet!",
+            marblesPlacedIncorrectly: "Die Murmeln sind noch nicht richtig angeordnet!",
             reachedGreenZone: "Bravo! Der Roboter hat das grüne Feld erreicht.",
             notReachedGreenZone: "Der Roboter ist nicht auf dem grünen Feld!",
             patternDrawn: "Bravo! Du hast das Muster richtig nachgezeichnet.",
