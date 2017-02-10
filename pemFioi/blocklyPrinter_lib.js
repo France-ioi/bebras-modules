@@ -46,6 +46,10 @@ var getContext = function(display, infos) {
       }
    };
 
+   if (infos.showIfMutator) {
+      context.showIfMutator = true;
+   }
+
    switch (infos.blocklyColourTheme) {
       case "bwinf":
          context.provideBlocklyColours = function() {

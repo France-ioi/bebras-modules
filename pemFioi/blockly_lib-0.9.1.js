@@ -1019,7 +1019,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                },
                { 
                   name: "controls_if_else",
-                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>"
+                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
+                  excludedByDefault: this.mainContext.showIfMutator,
                },
                { 
                   name: "logic_compare", 
@@ -1714,12 +1715,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             };
 
          } else {
-            var old = Blockly.Blocks.controls_if.init; 
-            Blockly.Blocks.controls_if.init = function() {
-               old.call(this);  
-               this.setMutator(undefined)
-            };
-
+            if (!(this.mainContext.showIfMutator)) {
+               var old = Blockly.Blocks.controls_if.init; 
+               Blockly.Blocks.controls_if.init = function() {
+                  old.call(this);  
+                  this.setMutator(undefined)
+               };
+            }
+            
             Blockly.Blocks['robot_start'] = {
               init: function() {
                 this.appendDummyInput()
