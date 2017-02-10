@@ -78,6 +78,8 @@ var localLanguageStrings = {
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      textVariable: "texte",
+      listVariable: "liste",
    },
    en: {
       categories: {
@@ -124,6 +126,8 @@ var localLanguageStrings = {
       nextTestcase: "Next",
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      textVariable: "text",
+      listVariable: "list",
    },
    de: {
       categories: {
@@ -173,6 +177,8 @@ var localLanguageStrings = {
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
+      textVariable: "Text",
+      listVariable: "Liste",
    }
 }
 
@@ -1586,6 +1592,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                xmlString += "</category>";
             }
          }
+
+         (function (strings) {
+            xmlString = xmlString.replace(/{(\w+)}/g, function(m, p1) {return strings[p1]}); // taken from blockly/demo/code
+         })(this.strings);
+         
          return xmlString;
       },
       
