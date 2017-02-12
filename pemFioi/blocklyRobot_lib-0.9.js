@@ -29,6 +29,7 @@ var getContext = function(display, infos, curLevel) {
             platformInFrontAndBelow: "plateforme devant plus bas",
             platformAbove: "plateforme au dessus",
             gridEdgeInFront: "bord de la grille devant",
+            gridEdgeAbove: "bord de la grille au dessus",
             obstacleInFront: "obstacle devant",
             obstacleRight: "obstacle à droite",
             obstacleLeft: "obstacle à gauche",
@@ -81,6 +82,7 @@ var getContext = function(display, infos, curLevel) {
             platformInFrontAndBelow: "plateformeDevantPlusBas",
             platformAbove: "plateformeAuDessus",
             gridEdgeInFront: "bordGrilleDevant",
+            gridEdgeAbove: "bordBrilleAuDessus",
             obstacleInFront: "obstacleDevant",
             obstacleRight: "obstacleADroite",
             obstacleLeft: "obstacleAGauche",
@@ -136,6 +138,7 @@ var getContext = function(display, infos, curLevel) {
             platformInFrontAndBelow: "vor und über Plattform",
             platformAbove: "unter Plattform",
             gridEdgeInFront: "vor Rand des Gitters",
+            gridEdgeAbove: "bord de la grille au dessus",
             obstacleInFront: "vor Hindernis",
             obstacleRight: "Hindernis rechts",
             obstacleLeft: "Hindernis links",
@@ -188,6 +191,7 @@ var getContext = function(display, infos, curLevel) {
             platformInFrontAndBelow: "plateformeDevantPlusBas",
             platformAbove: "plateformeAuDessus",
             gridEdgeInFront: "vorGitterrand",
+            gridEdgeAbove: "bordGrilleAuDessus",
             obstacleInFront: "vorHindernis",
             obstacleRight: "obstacleDroite",
             obstacleLeft: "obstacleGauche",
@@ -355,6 +359,17 @@ var getContext = function(display, infos, curLevel) {
          gridEdgeInFront = true;
       }
       context.runner.noDelay(callback, gridEdgeInFront);
+   }
+
+   context.robot.gridEdgeAbove = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var gridEdgeAbove = false;
+      if (isOutsideGrid(robot.row - 1, robot.col)) {
+         gridEdgeAbove = true;
+      } else if (context.tiles[robot.row - 1][robot.col] == 0) {
+         gridEdgeAbove = true;
+      }
+      context.runner.noDelay(callback, gridEdgeAbove);
    }
 
 
@@ -587,17 +602,6 @@ var getContext = function(display, infos, curLevel) {
       } else {
          context.callCallback(callback, infos.itemTypes[itemsUnder[0].type].value);
       }
-   };
-
-   context.robot.gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront(0);
-      var gridEdgeInFront = false;
-      if (isOutsideGrid(coords.row, coords.col)) {
-         gridEdgeInFront = true;
-      } else if (context.tiles[coords.row][coords.col] == 0) {
-         gridEdgeInFront = true;
-      }
-      context.callCallback(callback, gridEdgeInFront);
    };
 
    context.robot.col = function(callback) {
@@ -911,6 +915,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "colorUnder",         yieldsValue: true },
                { name: "numberUnder",        yieldsValue: true },
                { name: "gridEdgeInFront",    yieldsValue: true },
+               { name: "gridEdgeAbove",      yieldsValue: true },
                { name: "platformInFront",    yieldsValue: true },
                { name: "platformInFrontAndBelow", yieldsValue: true },
                { name: "platformAbove",      yieldsValue: true },
