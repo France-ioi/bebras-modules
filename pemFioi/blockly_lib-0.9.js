@@ -1672,6 +1672,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                         + " colour='" + colour + "'"
                         + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
                         + (categoryName == 'variables' ? ' custom="VARIABLE"' : '')
+                        + (categoryName == 'functions' ? ' custom="PROCEDURE"' : '')
                         + ">";
             }
             var blocks = categoryInfo.blocksXml;
