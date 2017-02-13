@@ -706,9 +706,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
-               console.log(block.name);
-               console.log(categoryName);
-               console.log(colours);
+               //console.log(block.name);
+               //console.log(categoryName);
+               //console.log(colours);
                if ("blocks" in colours &&  block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];                  
                }
