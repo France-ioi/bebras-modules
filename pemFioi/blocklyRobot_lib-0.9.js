@@ -43,6 +43,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peinture en haut à droite",
             colorUnder: "couleur de la case",
             numberUnder: "nombre sur la case",
+            writeNumber: "mettre le nombre de la case à",
             dir: "direction du robot",
             col: "colonne du robot",
             row: "ligne du robot",
@@ -96,6 +97,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
+            writeNumber: "ecrireNombre",
             dir: "direction",
             col: "colonne",
             row: "ligne",
@@ -152,6 +154,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "TODO TRANSLATE",
             colorUnder: "auf Farbe",
             numberUnder: "Nummer des Feldes",
+            writeNumber: "Write a number",
             dir: "Richtung des Roboters",
             col: "Spalte des Roboters",
             row: "Zeile des Roboters",
@@ -205,6 +208,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "TODO TRANSLATE",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
+            writeNumber: "TODO TRANSLATE",
             dir: "Richtung",
             col: "Spalte",
             row: "Zeile",
@@ -604,6 +608,20 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
+   context.robot.writeNumber = function(value, callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length == 0) {
+         context.callCallback(callback);
+      } else {
+         itemsUnder[0].type = value.data;
+         if (context.display) {
+            redisplayItem(itemsUnder[0]);
+         }
+         context.callCallback(callback);
+      }
+   };
+
    context.robot.col = function(callback) {
       var item = context.getRobotItem(context.curRobot);
       var col = item.col + 1;
@@ -883,7 +901,8 @@ var getContext = function(display, infos, curLevel) {
                { name: "wait" },
                { name: "pickTransportable" },
                { name: "dropTransportable" },
-               { name: "dropTransportable" }
+               { name: "dropTransportable" },
+               { name: "writeNumber", params: [null] },
             ]
          },
          sensors: {
@@ -935,7 +954,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
             ]
          }
-      },
+      },      
       debug: {
          debug: {
              blocks: [{ name: "alert", params: [null], handler: context.debug_alert }]
@@ -1080,7 +1099,12 @@ var getContext = function(display, infos, curLevel) {
       }
       var x = infos.cellSide * item.col * scale;
       var y = infos.cellSide * item.row * scale;
-      item.element = paper.image(infos.itemTypes[item.type].img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      var itemType = infos.itemTypes[item.type];
+      if (itemType.img) {
+         item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      } else if (itemType.value !== undefined) {
+         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, itemType.value).attr({"font-size": item.side * scale / 2});
+      }
       item.element.attr(itemAttributes(item));
       resetItemsZOrder(item.row, item.col);
    };
@@ -1187,6 +1211,7 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var itemAttributes = function(item) {
+      var itemType = infos.itemTypes[item.type];
       var x = infos.cellSide * scale * item.col + item.offsetX * scale;
       var y = (infos.cellSide * item.row - (item.side - infos.cellSide)) * scale + item.offsetY * scale;
       var xClip = x;
@@ -1196,6 +1221,10 @@ var getContext = function(display, infos, curLevel) {
          x = x - (dirToState[item.dir] * item.side * scale); 
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
+      if (!itemType.img) {
+         x += item.side * scale / 2;
+         y += item.side * scale / 2;
+      }
       return { x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
    };
 
@@ -1225,6 +1254,7 @@ var getContext = function(display, infos, curLevel) {
       }
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
+         redisplayItem(item);
          item.element.attr(itemAttributes(item));
       }
       if (texts[0] && texts[1]) {
