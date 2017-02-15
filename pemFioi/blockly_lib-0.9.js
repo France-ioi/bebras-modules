@@ -179,10 +179,12 @@ var blocklyToScratch = {
         'controls_repeat': ['control_repeat'],
         'controls_repeat_ext': ['control_repeat'],
         'controls_whileUntil': ['control_repeat_until'],
+        'controls_untilWhile': ['control_repeat_until'],
         'logic_negate': ['operator_not'],
         'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
         'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
-        'logic_operation': ['operator_and', 'operator_or']
+        'logic_operation': ['operator_and', 'operator_or'],
+        'math_number': []
     }
 }
 
@@ -302,6 +304,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.strings = this.languageStrings[language];
          if (display) {
             this.loadHtml(nbTestCases);
+            this.addExtraBlocks();
             this.createSimpleGeneratorsAndBlocks();
             var xml = this.getToolboxXml();
             var wsConfig = {
@@ -321,7 +324,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (this.scratchMode) {
                wsConfig.zoom = { startScale: 0.75 };
             }
-            this.addExtraBlocks();
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
             }
@@ -706,9 +708,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
-               console.log(block.name);
-               console.log(categoryName);
-               console.log(colours);
+               //console.log(block.name);
+               //console.log(categoryName);
+               //console.log(colours);
                if ("blocks" in colours &&  block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];                  
                }
@@ -1059,6 +1061,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   { 
                      name: "controls_whileUntil", 
                      blocklyXml: "<block type='controls_whileUntil'></block>"
+                  },
+                  { 
+                     name: "controls_untilWhile", 
+                     blocklyXml: "<block type='controls_whileUntil'><field name='MODE'>UNTIL</field></block>",
+                     excludedByDefault: true
                   },
                   { 
                      name: "controls_for", 
@@ -1672,6 +1679,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                         + " colour='" + colour + "'"
                         + (this.scratchMode ? " secondaryColour='" + colour + "'" : '')
                         + (categoryName == 'variables' ? ' custom="VARIABLE"' : '')
+                        + (categoryName == 'functions' ? ' custom="PROCEDURE"' : '')
                         + ">";
             }
             var blocks = categoryInfo.blocksXml;
@@ -1688,6 +1696,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
       addExtraBlocks: function() {
          var that = this;
+
+         Blockly.Blocks['controls_untilWhile'] = Blockly.Blocks['controls_whileUntil'];
+         Blockly.JavaScript['controls_untilWhile'] = Blockly.JavaScript['controls_whileUntil'];
+         Blockly.Python['controls_untilWhile'] = Blockly.Python['controls_whileUntil'];
 
          Blockly.Blocks['math_extra_single'] = {
            /**
