@@ -1,21 +1,25 @@
 "use strict";
 
 var makeTurtle = function() {
-   this.reset = function() {
+   this.reset = function(stepsize) {
       this.x = 150;
       this.y = 150;
+      this.stepsize = 1;
       this.direction = 0;
       this.paint = true;
+      this.stepsize = 5;
       if (this.drawingContext)
          this.drawingContext.clearRect(0, 0, 300, 300);
       if (this.turtle) {
          this.turtle.style.left= this.x - 11 + "px";
          this.turtle.style.top= this.y - 13 + "px";
          this.turtle.style.transform = "none";
-         
+      }
+      if (stepsize) {
+         this.stepsize = stepsize;
       }
    }
-   this.reset();
+   this.reset(5);
    
    this.turn = function(angle) {
       this.direction += angle*Math.PI/180;
@@ -27,8 +31,8 @@ var makeTurtle = function() {
    this.move = function(amount) {
       this.drawingContext.beginPath();
       this.drawingContext.moveTo(this.x, this.y);
-      this.x -= amount*10*Math.sin(this.direction);
-      this.y -= amount*10*Math.cos(this.direction);
+      this.x -= amount * this.stepsize * 10 * Math.sin(this.direction);
+      this.y -= amount * this.stepsize * 10 * Math.cos(this.direction);
       this.drawingContext.lineTo(this.x, this.y);
       if (this.paint) {
          this.drawingContext.stroke();
@@ -48,6 +52,9 @@ var makeTurtle = function() {
    
    this.set_colour = function(colour) {
       this.drawingContext.strokeStyle = colour;
+   }
+   this.set_stepsize = function(stepsize) {
+      this.stepsize = stepsize;
    }
    this.setDrawingContext = function(drawingContext) {
       this.drawingContext = drawingContext;
@@ -72,6 +79,8 @@ var getContext = function(display, infos) {
       de: {
          label: {
             move: "gehe",
+            moveamount: "gehe # Schritte",
+            moveamountvalue: "gehe %1 Schritte",
             turnleft: "drehe nach links",
             turnright: "drehe nach rechts",
             turn: "drehe (Grad) ",
@@ -80,6 +89,8 @@ var getContext = function(display, infos) {
          },
          code: {
             move: "gehe",
+            moveamount: "geheSchritte",
+            moveamountvalue: "geheSchritte",
             turnleft: "drehe_links",
             turnright: "drehe_rechts",
             turn: "drehe",
@@ -87,6 +98,10 @@ var getContext = function(display, infos) {
             log: "log",
          },
          startingBlockName: "Turtle-Programm",
+         messages: {
+            paintingWrong: "Das sieht noch nicht ganz richtig aus. Versuch es noch einmal!",
+            paintingCorrect: "Sehr gut! Du hast die Zeichnung richtig nachgemacht.",            
+         }
       }
    };
    
@@ -112,6 +127,28 @@ var getContext = function(display, infos) {
       turtle: {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle},
       strings: strings,
    };
+
+   switch (infos.blocklyColourTheme) {
+      case "bwinf":
+         context.provideBlocklyColours = function() {
+            return {
+               categories: {
+                  logic: 100,
+                  loops: 180,
+                  math: 220,
+                  texts: 250,
+                  lists: 60,
+                  colour: 280,
+                  turtle: 310,
+                  _default: 280,
+               },
+               blocks: {},
+            };
+         }
+         break;
+      default:
+         // we could set turtle specific default colours here, if we wanted to …
+   }
 
    context.changeDelay = function(newDelay) {
       infos.actionDelay = newDelay;
@@ -171,8 +208,8 @@ var getContext = function(display, infos) {
          context.turtle.displayTurtle.setDrawingContext(document.getElementById('displayfield').getContext('2d'));
          context.turtle.displaySolutionTurtle.setDrawingContext(document.getElementById('solutionfield').getContext('2d'));
 
-         context.turtle.displayTurtle.reset();
-         context.turtle.displaySolutionTurtle.reset();         
+         context.turtle.displayTurtle.reset(context.infos.turtleStepSize);
+         context.turtle.displaySolutionTurtle.reset(context.infos.turtleStepSize);
       }
     
       function createMeACanvas() {
@@ -192,8 +229,8 @@ var getContext = function(display, infos) {
          context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
          context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
 
-         context.turtle.invisibleTurtle.reset();
-         context.turtle.invisibleSolutionTurtle.reset();
+         context.turtle.invisibleTurtle.reset(context.infos.turtleStepSize);
+         context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize);
          
          context.drawSolution = gridInfos.drawSolution;
 
@@ -207,7 +244,7 @@ var getContext = function(display, infos) {
    context.resetDisplay = function() {
       $("#errors").html("");
 
-      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.1;filter: alpha(opacity=10);' src='grid5.png'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.2;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='turtle.svg' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
+      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.1;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.2;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='turtle.svg' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
       
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
@@ -228,10 +265,26 @@ var getContext = function(display, infos) {
          fn(context.turtle.displayTurtle);
       }
    }
-   
+
    context.turtle.move = function(callback) {
       callOnAllTurtles((turtle) => {
-         turtle.move(5);
+         turtle.move(1);
+      })
+      
+      context.waitDelay(callback);
+   }
+
+   context.turtle.moveamount = function(param, callback) {
+      callOnAllTurtles((turtle) => {
+         turtle.move(param);
+      })
+      
+      context.waitDelay(callback);
+   }
+
+   context.turtle.moveamountvalue = function(param, callback) {
+      callOnAllTurtles((turtle) => {
+         turtle.move(param);
       })
       
       context.waitDelay(callback);
@@ -265,9 +318,12 @@ var getContext = function(display, infos) {
       turtle: {
          turtle: [
             { name: "move" },
+            { name: "move" },
+            { name: "moveamount", params: [null]},
+            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 2}]},},
             { name: "turnleft" },
             { name: "turnright" },
-            { name: "turn",     params: [null]},
+            { name: "turn",       params: [null]},
          ],
       },
       
