@@ -771,6 +771,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                            params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
                            iParam += 1;
                         }
+                        if (args0[iArgs0].type == "field_number") {
+                           if (iParam) {
+                              params += ", ";
+                           }
+                           params += block.getFieldValue('PARAM_' + iParam);
+                           iParam += 1;
+                        }
                      }
 
                      if (typeof output == "undefined") {                     
