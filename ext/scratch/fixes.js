@@ -182,7 +182,7 @@ Blockly.Blocks['control_repeat_until'] = {
       "args2": [
         {
           "type": "field_image",
-          "src": Blockly.mainWorkspace.options.pathToMedia + "/c_arrow.svg",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "c_arrow.svg",
           "width": 16,
           "height": 16,
           "alt": "*",
