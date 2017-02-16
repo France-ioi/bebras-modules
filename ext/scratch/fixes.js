@@ -419,10 +419,14 @@ Blockly.JavaScript['data_variable'] = function(block) {
 
 Blockly.JavaScript['data_setvariableto'] = function(block) {
   // Variable setter.
-  var argument0 = Blockly.JavaScript.valueToCode(block, 'VALUE',
-      Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
-  var varName = Blockly.JavaScript.variableDB_.getName(
-      block.getVariableField(), Blockly.Variables.NAME_TYPE);
+  if (block.getField("VALUE")) {
+     var argument0 = String(Number(block.getFieldValue("VALUE")));
+  } else {
+     var val = Blockly.JavaScript.valueToCode(block, "VALUE", Blockly.JavaScript.ORDER_ASSIGNMENT);
+     val = val.substring(1, val.length - 1);
+     var argument0 = Number(val) || "0";
+  }
+  var varName = Blockly.JavaScript.variableDB_.getName(block.getVariableField(), Blockly.Variables.NAME_TYPE);
   return varName + ' = ' + argument0 + ';\n';
 };
 
