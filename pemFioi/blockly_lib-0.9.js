@@ -42,6 +42,8 @@ var languageStrings = {
          lists: "Listes",
          logic: "Logique",
          loops: "Boucles",
+         control: "Contrôles",
+         operator: "Opérateurs",
          math: "Maths",
          text: "Texte",
          variables: "Variables",
@@ -1572,7 +1574,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // by the way, just change the defaul colours of the blockly blocks:
          if(!this.scratchMode) {
-            var defCat = ["logic", "loops", "math", "texts", "lists", "colour"]
+            var defCat = ["logic", "control", "operator", "texts", "lists", "colour"]
             for (var iCat in defCat) {
                Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
             }
