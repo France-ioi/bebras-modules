@@ -1261,7 +1261,7 @@ var getContext = function(display, infos, curLevel) {
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min($("#grid").width() / (context.nbCols + marginAsCols), $("#grid").height() / (context.nbRows + marginAsRows));
+         newCellSide = Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows));
       } else {
          newCellSide = 0;
       }
