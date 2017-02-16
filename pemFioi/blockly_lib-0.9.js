@@ -945,7 +945,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             categories: {
                logic: 210,
                loops: 120,
+               control: 120,
                math: 230,
+               operator: 230,
                texts: 160,
                lists: 260,
                colour: 20,
@@ -1574,7 +1576,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          // by the way, just change the defaul colours of the blockly blocks:
          if(!this.scratchMode) {
-            var defCat = ["logic", "control", "operator", "texts", "lists", "colour"]
+            var defCat = ["logic", "loops", "math", "texts", "lists", "colour"]
             for (var iCat in defCat) {
                Blockly.Blocks[defCat[iCat]].HUE = colours.categories[defCat[iCat]];
             }
