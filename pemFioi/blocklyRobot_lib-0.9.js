@@ -226,9 +226,24 @@ var getContext = function(display, infos, curLevel) {
    var strings = languageStrings[stringsLanguage];
    
    var cells = [];
-   var texts = [];
+   var colsLabels = [];
+   var rowsLabels = [];
    var scale = 1;
    var paper;
+
+   if (infos.leftMargin === undefined) {
+      infos.leftMargin = 0;
+   }
+   if (infos.topMargin === undefined) {
+      if (infos.showLabels) {
+         infos.topMargin = 0;
+      } else {
+         infos.topMargin = infos.cellSide / 2;
+      }
+   }
+   if (infos.showLabels) {      infos.leftMargin += infos.cellSide;
+      infos.topMargin += infos.cellSide;
+   }
 
    var context = {
       display: display,
@@ -997,16 +1012,23 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, result);
    };
 
+   // positions and dimensions will be set later by updateScale
    var resetBoard = function() {
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          cells[iRow] = [];
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
-            var x = infos.cellSide * iCol * scale;
-            var y = infos.cellSide * iRow * scale;
             var itemTypeNum = context.tiles[iRow][iCol];
             if (itemTypeNum > 0) {
-               cells[iRow][iCol] = paper.rect(x, y, infos.cellSide * scale, infos.cellSide * scale);
+               cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
             }
+         }
+      }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
       }
    };
@@ -1097,8 +1119,8 @@ var getContext = function(display, infos, curLevel) {
       if (item.element != null) {
          item.element.remove();
       }
-      var x = infos.cellSide * item.col * scale;
-      var y = infos.cellSide * item.row * scale;
+      var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row + infos.topMargin) * scale;
       var itemType = infos.itemTypes[item.type];
       if (itemType.img) {
          item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
@@ -1212,8 +1234,8 @@ var getContext = function(display, infos, curLevel) {
 
    var itemAttributes = function(item) {
       var itemType = infos.itemTypes[item.type];
-      var x = infos.cellSide * scale * item.col + item.offsetX * scale;
-      var y = (infos.cellSide * item.row - (item.side - infos.cellSide)) * scale + item.offsetY * scale;
+      var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
       var xClip = x;
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
@@ -1237,29 +1259,39 @@ var getContext = function(display, infos, curLevel) {
       }
       var newCellSide;
       if (context.nbCols && context.nbRows) {
-         newCellSide = Math.min($("#grid").width() / context.nbCols, $("#grid").height() / context.nbRows);
+         var marginAsCols = infos.leftMargin / infos.cellSide;
+         var marginAsRows = infos.topMargin / infos.cellSide;
+         newCellSide = Math.min($("#grid").width() / (context.nbCols + marginAsCols), $("#grid").height() / (context.nbRows + marginAsRows));
       } else {
          newCellSide = 0;
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize(infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             if (cells[iRow][iCol] != undefined) {
-               var x = infos.cellSide * iCol * scale;
-               var y = infos.cellSide * iRow * scale;
+               var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
+               var y = (infos.cellSide * iRow + infos.topMargin) * scale;
                cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
             }
+         }
+      }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            var x = (infos.leftMargin - infos.cellSide / 2) * scale;
+            var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
+            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
+            var y = (infos.topMargin - infos.cellSide / 2) * scale;
+            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
          }
       }
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
          redisplayItem(item);
          item.element.attr(itemAttributes(item));
-      }
-      if (texts[0] && texts[1]) {
-         texts[0].attr({x: infos.cellSide * 4.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
-         texts[1].attr({x: infos.cellSide * 7.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
       }
    };
 
