@@ -732,8 +732,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      block.blocklyJson.colour = colours.categories["_default"];                     
                   }
                }
-            }
-            
+            }            
          }
       }, 
       completeBlockXml: function(block) {
@@ -1051,6 +1050,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   name: "logic_boolean", 
                   blocklyXml: "<block type='logic_boolean'></block>"
                },
+               { 
+                  name: "logic_boolean", 
+                  blocklyXml: "<block type='logic_null'></block>",
+                  excludedByDefault: true,
+               },
+               { 
+                  name: "logic_boolean", 
+                  blocklyXml: "<block type='logic_ternary'></block>",
+                  excludedByDefault: true,
+               },
             ],
             loops: [
                { 
@@ -1067,6 +1076,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "    </shadow>" +
                               "  </value>" +
                               "</block>"
+               },
+               { 
+                  name: "controls_repeat_ext_noShadow", 
+                  blocklyXml: "<block type='controls_repeat_ext'></block>",
+                  excludedByDefault: true,
                },
                { 
                   name: "controls_whileUntil", 
@@ -1093,9 +1107,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                { 
-                  name: "controls_forEach",
+                  name: "controls_for_noShadow", 
+                  blocklyXml: "<block type='controls_for'></block>",
                   excludedByDefault: true,
-                  blocklyXml: "<block type='controls_forEach'></block>"
+               },
+               { 
+                  name: "controls_forEach",
+                  blocklyXml: "<block type='controls_forEach'></block>",
+                  excludedByDefault: true,
                },
                { 
                   name: "controls_flow_statements", 
@@ -1109,23 +1128,69 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                },
                {
                   name: "math_arithmetic", 
-                  blocklyXml: "<block type='math_arithmetic'></block>"
+                  blocklyXml: "<block type='math_arithmetic'>" +
+                              "  <value name='A'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='B'>" + 
+                              "    <shadow type='math_number'>" + 
+                              "      <field name='NUM'>1</field>" + 
+                              "    </shadow>" + 
+                              "  </value>" + 
+                              "</block>",
                },
                {
-                  name: "math_number_property", 
-                  blocklyXml: "<block type='math_number_property'></block>"
+                  name: "math_arithmetic_noShadow", 
+                  blocklyXml: "<block type='math_arithmetic'></block>",
+                  excludedByDefault: true,
                },
-               /*{
-                  name: "math_change", 
-                  blocklyXml: "<block type='math_change'></block>"
-               },*/
                {
-                  name: "math_round", 
-                  blocklyXml: "<block type='math_round'></block>"
+                  name: "math_single",
+                  blocklyXml: "<block type='math_single'>" +
+                              "  <value name='NUM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>9</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+               },
+               {
+                  name: "math_single_noShadow",
+                  blocklyXml: "<block type='math_single'></block>",
+                  excludedByDefault: true,
                },
                {
                   name: "math_extra_single", 
+                  blocklyXml: "<block type='math_extra_single'>" +
+                              "  <value name='NUM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>9</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_extra_single_noShadow", 
                   blocklyXml: "<block type='math_extra_single'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_extra_double", 
+                  blocklyXml: "<block type='math_extra_double'>" +
+                              "  <value name='A'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='B'>" + 
+                              "    <shadow type='math_number'>" + 
+                              "      <field name='NUM'>1</field>" + 
+                              "    </shadow>" + 
+                              "  </value>" + 
+                              "</block>",
                   excludedByDefault: true,
                },
                {
@@ -1134,8 +1199,132 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
                {
-                  name: "math_modulo", 
-                  blocklyXml: "<block type='math_modulo'></block>"
+                  name: "math_trig",
+                  blocklyXml: "<block type='math_trig'>" +
+                              "  <value name='NUM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>45</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_trig_noShadow",
+                  blocklyXml: "<block type='math_trig'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_constant",
+                  blocklyXml: "<block type='math_constant'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_number_property",
+                  blocklyXml: "<block type='math_number_property'>" +
+                              "  <value name='NUMBER_TO_CHECK'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+               },
+               {
+                  name: "math_number_property_noShadow", 
+                  blocklyXml: "<block type='math_number_property'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_round",
+                  blocklyXml: "<block type='math_round'>" +
+                              "  <value name='NUM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>3.1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+               },
+               {
+                  name: "math_round_noShadow", 
+                  blocklyXml: "<block type='math_round'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_on_list",
+                  blocklyXml: "<block type='math_on_list'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_modulo",
+                  blocklyXml: "<block type='math_modulo'>" +
+                              "  <value name='DIVIDEND'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>64</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='DIVISOR'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>10</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+               },
+               {
+                  name: "math_modulo_noShadow", 
+                  blocklyXml: "<block type='math_modulo'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_constrain",
+                  blocklyXml: "<block type='math_constrain'>" +
+                              "  <value name='VALUE'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>50</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='LOW'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='HIGH'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>100</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_constrain_noShadow",
+                  blocklyXml: "<block type='math_constrain'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_random_int",
+                  blocklyXml: "<block type='math_random_int'>" +
+                              "  <value name='FROM'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "  <value name='TO'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>100</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_random_int_noShadow",
+                  blocklyXml: "<block type='math_random_int'></block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "math_random_float",
+                  blocklyXml: "<block type='math_random_float'></block>",
+                  excludedByDefault: true,
                },
             ],
             texts: [
@@ -1162,6 +1351,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "text_length_noShadow", 
+                  blocklyXml: "<block type='text_length'></block>",
+                  excludedByDefault: true,
+               },
+               {
                   name: "text_isEmpty", 
                   blocklyXml: "<block type='text_isEmpty'>" +
                               "  <value name='VALUE'>" +
@@ -1170,6 +1364,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "    </shadow>" +
                               "  </value>" +
                               "</block>"
+               },
+               {
+                  name: "text_isEmpty_noShadow", 
+                  blocklyXml: "<block type='text_isEmpty'></block>",
+                  excludedByDefault: true,
                },
                {
                   name: "text_indexOf", 
@@ -1187,6 +1386,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "text_indexOf_noShadow", 
+                  blocklyXml: "<block type='text_indexOf'></block>",
+                  excludedByDefault: true,
+               },
+               {
                   name: "text_charAt", 
                   blocklyXml: "<block type='text_charAt'>" +
                               "  <value name='VALUE'>" +
@@ -1195,6 +1399,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "    </block>" +
                               "  </value>" +
                               "</block>"
+               },
+               {
+                  name: "text_charAt_noShado", 
+                  blocklyXml: "<block type='text_charAt'></block>",
+                  excludedByDefault: true,
+                  
                },
                {
                   name: "text_getSubstring", 
@@ -1207,6 +1417,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "text_getSubstring_noShadow", 
+                  blocklyXml: "<block type='text_getSubstring'></block>",
+                  excludedByDefault: true,
+               },
+               {
                   name: "text_changeCase", 
                   blocklyXml: "<block type='text_changeCase'>" +
                               "  <value name='TEXT'>" +
@@ -1217,6 +1432,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "text_changeCase_noShadow", 
+                  blocklyXml: "<block type='text_changeCase'></block>",
+                  excludedByDefault: true,
+               },
+               {
                   name: "text_trim", 
                   blocklyXml: "<block type='text_trim'>" +
                               "  <value name='TEXT'>" +
@@ -1225,6 +1445,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "    </shadow>" +
                               "  </value>" +
                               "</block>"
+               },
+               {
+                  name: "text_trim_noShadow", 
+                  blocklyXml: "<block type='text_trim'></block>"
                },
                {
                   name: "text_print", 
@@ -1238,6 +1462,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
                {
+                  name: "text_print_noShadow", 
+                  blocklyXml: "<block type='text_print'></block>",
+                  excludedByDefault: true,
+               },
+               {
                   name: "text_prompt_ext", 
                   blocklyXml: "<block type='text_prompt_ext'>" +
                               "  <value name='TEXT'>" +
@@ -1246,6 +1475,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "    </shadow>" +
                               "  </value>" +
                               "</block>",
+                  excludedByDefault: true,
+               },
+               {
+                  name: "text_prompt_ext_noShadow", 
+                  blocklyXml: "<block type='text_prompt_ext'></block>",
                   excludedByDefault: true,
                }
             ],
@@ -1364,7 +1598,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "      <field name='NUM'>0</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "</block>"
+                              "</block>",
+               },
+               {
+                  name: "colour_rgb_noShadow", 
+                  blocklyXml: "<block type='colour_rgb'></block>",
+                  excludedByDefault: true,
                },
                {
                   name: "colour_blend", 
@@ -1384,7 +1623,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "      <field name='NUM'>0.5</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "</block>"
+                              "</block>",
+               },
+               {
+                  name: "colour_blend_noShadow", 
+                  blocklyXml: "<block type='colour_blend'></block>",
+                  excludedByDefault: true,
                },
             ],
             dicts: [
