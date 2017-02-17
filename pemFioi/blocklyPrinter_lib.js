@@ -18,6 +18,10 @@ var getContext = function(display, infos) {
             eof: "eingabeEnde",
          },
          startingBlockName: "Programm",
+         messages: {
+            outputWrong: "Das hat noch nicht ganz geklappt. Versuch es noch einmal!",
+            outputCorrect: "Bravo! Du hast alle Zeilen richtig ausgegeben!",
+         }
       }
    }
    
@@ -118,10 +122,6 @@ var getContext = function(display, infos) {
       if (context.taskInfos.input) {
          context.printer.input_text = context.taskInfos.input;
       }
-      
-//      context.printer.input_text = "1\n1\n1\n1\n1\n1\n1\n1\n1\n";
-      
-      //resetScores();
       context.updateScale();
    };
 
@@ -146,8 +146,15 @@ var getContext = function(display, infos) {
       if (context.lost) {
          return;
       }
+
+      if (typeof callback == "undefined") {
+         callback = value;
+         value = "";
+      }
+      
       context.printer.output_text += value + "\n";
       context.updateScale();
+      
       context.waitDelay(callback);
    }
 
