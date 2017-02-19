@@ -423,7 +423,7 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
      var argument0 = String(Number(block.getFieldValue("VALUE")));
   } else {
      var val = Blockly.JavaScript.valueToCode(block, "VALUE", Blockly.JavaScript.ORDER_ASSIGNMENT);
-     if (val == "\"") {
+     if (val[0] == "\"") {
         val = val.substring(1, val.length - 1);
      }
      var argument0 = val || "0";
