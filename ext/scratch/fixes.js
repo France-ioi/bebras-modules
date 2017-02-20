@@ -33,6 +33,50 @@ Blockly.Workspace.prototype.remainingCapacity = function() {
   return maxBlocks - blockCount;
 };
 
+/**
+ * Check if 3D transforms are supported by adding an element
+ * and attempting to set the property.
+ * @return {boolean} true if 3D transforms are supported
+ */
+Blockly.is3dSupported = function() {
+  if (Blockly.cache3dSupported_ !== null) {
+    return Blockly.cache3dSupported_;
+  }
+  // CC-BY-SA Lorenzo Polidori
+  // https://stackoverflow.com/questions/5661671/detecting-transform-translate3d-support
+  if (!window.getComputedStyle) {
+    return false;
+  }
+
+  try {
+    var el = document.createElement('p'),
+      has3d,
+      transforms = {
+        'webkitTransform': '-webkit-transform',
+        'OTransform': '-o-transform',
+        'msTransform': '-ms-transform',
+        'MozTransform': '-moz-transform',
+        'transform': 'transform'
+      };
+
+    // Add it to the body to get the computed style.
+    document.body.insertBefore(el, null);
+
+    for (var t in transforms) {
+      if (el.style[t] !== undefined) {
+        el.style[t] = 'translate3d(1px,1px,1px)';
+        has3d = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+      }
+    }
+
+    document.body.removeChild(el);
+    Blockly.cache3dSupported_ = (has3d !== undefined && has3d.length > 0 && has3d !== "none");
+  } catch (e) {
+    Blockly.cache3dSupported_ = false;
+  }
+  return Blockly.cache3dSupported_;
+};
+
 
 Blockly.Blocks['control_repeat'] = {
   /**
