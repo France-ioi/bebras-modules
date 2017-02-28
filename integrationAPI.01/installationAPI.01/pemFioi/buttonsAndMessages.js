@@ -606,6 +606,9 @@ window.displayHelper = {
       }
    },
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
+      if ($('#popupMessage').length == 0) {
+         $('#task').after('<div id="popupMessage"></div>');
+      }
       if (mode != 'blanket') {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
@@ -722,11 +725,7 @@ window.displayHelper = {
             });
          }
       }
-      if (this.hasLevels) {
-         this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, confirmRestartAll, this.strings.no);
-      } else {
-         confirmRestartAll();
-      }
+      this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, confirmRestartAll, this.strings.no);
    },
 
    validate: function(mode) {
@@ -778,6 +777,8 @@ window.displayHelper = {
          this.updateScoreOneLevel(strAnswer, this.taskLevel, function() {
             if (self.hasLevels) {
                self.showValidatePopup(self.taskLevel);
+            } else {
+               self.showValidatePopup();
             }
             callback();
          });
@@ -868,7 +869,13 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       var buttonText = this.strings.alright;
       var avatarMood = "error";
-      if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+      if ((gradedLevel == undefined) && (this.graderScore >= this.taskParams.maxScore - 0.001)) {
+         avatarMood = "success";
+         buttonText = this.strings.moveOn;
+         fullMessage += "<br/><br/>";
+         actionNext = "nextTask";
+         fullMessage += this.strings.solvedMoveOn;
+      } else if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
          avatarMood = "success";
          buttonText = this.strings.moveOn;
          fullMessage += "<br/><br/>";
