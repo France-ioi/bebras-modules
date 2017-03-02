@@ -466,11 +466,7 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   if (block.getField("VALUE")) {
      var argument0 = String(Number(block.getFieldValue("VALUE")));
   } else {
-     var val = Blockly.JavaScript.valueToCode(block, "VALUE", Blockly.JavaScript.ORDER_ASSIGNMENT);
-     if (val[0] == "\"") {
-        val = val.substring(1, val.length - 1);
-     }
-     var argument0 = val || "0";
+     var argument0 = Blockly.JavaScript.valueToCode(block, "VALUE", Blockly.JavaScript.ORDER_ASSIGNMENT) || "0";
   }
   var varName = Blockly.JavaScript.variableDB_.getName(block.getVariableField(), Blockly.Variables.NAME_TYPE);
   return varName + ' = ' + argument0 + ';\n';
@@ -506,6 +502,20 @@ Blockly.JavaScript['operators'] = function(block) {
   var code = argument0 + ' ' + opInfo.op + ' ' + argument1;
   return [code, opInfo.order];
 }
+
+Blockly.JavaScript['text'] = function(block) {
+  // Text value. Output an integer if the content is an int, as Scratch is
+  // ambiguous on these fields.
+  var val = block.getFieldValue('TEXT');
+  if(val.search(/^\d+$/) < 0) {
+    // string
+    var code = Blockly.JavaScript.quote_(val);
+  } else {
+    // int
+    var code = val;
+  }
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
 
 Blockly.JavaScript['operator_add'] = Blockly.JavaScript['operators'];
 Blockly.JavaScript['operator_subtract'] = Blockly.JavaScript['operators'];
