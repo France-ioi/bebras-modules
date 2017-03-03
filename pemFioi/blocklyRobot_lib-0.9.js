@@ -8,6 +8,7 @@ var getContext = function(display, infos, curLevel) {
             forward: "avancer",
             turnAround: "faire demi-tour",
             jump: "sauter",
+            down: "descendre",
             east: "avancer vers la droite",
             south: "avancer vers le bas",
             west: "avancer vers la gauche",
@@ -61,6 +62,7 @@ var getContext = function(display, infos, curLevel) {
             left: "tournerGauche",
             turnAround: "demiTour",
             jump: "sauter",
+            down: "descendre",
             forward: "avancer",
             east: "droite",
             south: "bas",
@@ -118,6 +120,7 @@ var getContext = function(display, infos, curLevel) {
             left: "drehe nach links",
             turnAround: "faire demi-tour",
             jump: "sauter",
+            down: "descendre",
             forward: "gehe vorwärts",
             east: "gehe nach rechts",
             south: "gehe nach unten",
@@ -172,6 +175,7 @@ var getContext = function(display, infos, curLevel) {
             left: "dreheLinks",
             turnAround: "demiTour",
             jump: "sauter",
+            down: "descendre",
             forward: "geheVorwaerts",
             east: "droite",
             south: "bas",
@@ -327,6 +331,27 @@ var getContext = function(display, infos, curLevel) {
       }
       context.nbMoves++;
       moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
+
+   context.robot.down = function(callback) {
+      if (!infos.hasGravity) {
+         throw("Error: can't go down without gravity");
+      }
+      if (context.lost) {
+         return;
+      }
+      var item = context.getRobotItem(context.curRobot);
+      if (isOutsideGrid(item.row + 2, item.col)) {
+         context.lost = true;
+         throw("Le robot essaie de descendre en dehors de la grille !");
+      }
+      var platforms = context.getItems(item.row + 3, item.col, {category: "platform"});
+      if (platforms.length == 0) {
+         context.lost = true;
+         throw("Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !");
+      }
+      context.nbMoves++;
+      moveRobot(item.row + 2, item.col, item.dir, callback);
    };
 
    context.robot.turnAround = function(callback) {
@@ -907,6 +932,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "forward" },
                { name: "turnAround" },
                { name: "jump" },
+               { name: "down" },
                { name: "right" },
                { name: "left" },
                { name: "east" },
