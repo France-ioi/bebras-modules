@@ -1013,7 +1013,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "dropTransportable" },
                { name: "writeNumber", params: [null] },
                { name: "addPlatformAbove",   yieldsValue: false },
-               { name: "addPlatformInFrontAndBelow",   yieldsValue: false },
+               { name: "addPlatformInFront",   yieldsValue: false },
             ]
          },
          sensors: {
