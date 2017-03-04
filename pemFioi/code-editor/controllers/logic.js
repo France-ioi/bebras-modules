@@ -325,6 +325,11 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
       if(this._language == CodeEditor.CONST.LANGUAGES.PYTHON) {
         var code = codes[0];
+        var forbidden = pythonForbidden(code, this._includeBlocks);
+        if(forbidden) {
+          $('#errors').html("Le mot-clé "+forbidden+" est interdit ici !");
+          return;
+        }
         if(pythonCount(code) > maxInstructions) {
           $('#errors').html("Vous utilisez trop d'éléments Python !");
           return;
@@ -529,7 +534,16 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     var that = this;
     var updatePythonCount = function () {
       if(that._language != 'python' || !maxInstructions || !that._aceEditor) { return; }
-      var remaining = maxInstructions - pythonCount(that._aceEditor.getValue());
+      var code = that._aceEditor.getValue();
+
+      var forbidden = pythonForbidden(code, that._includeBlocks);
+      if(forbidden) {
+        $('#capacity').css('color', 'red');
+        $('#capacity').html("Mot-clé interdit utilisé : "+forbidden);
+        return;
+      }
+
+      var remaining = maxInstructions - pythonCount(code);
       var optLimitElements = {
          maxBlocks: maxInstructions,
          remainingBlocks: Math.abs(remaining)
@@ -566,6 +580,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     }
     this._prevWidth = panelWidth;
   };
-}
+ }
 
 CodeEditor.Controllers.LogicController = LogicController;

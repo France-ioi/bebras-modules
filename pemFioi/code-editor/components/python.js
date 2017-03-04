@@ -20,13 +20,19 @@ function PythonInterpreter(context, msgCallback) {
   this._editorMarker = null;
   var that = this;
 
-  this._skulptifyHandler = function (name, objectName, iCategory, blockName) {
+  this._skulptifyHandler = function (name, generatorName, blockName) {
     var handler = '\tvar susp = new Sk.misceval.Suspension();';
     handler += "\n\tvar result = Sk.builtin.none.none$;";
+
+    // If there are arguments, convert them from Skulpt format to the libs format
+    handler += "\n\tvar args = Array.from(arguments);";
+    handler += "\n\tfor(var i=0; i<args.length; i++) { args[i] = {data: args[i].v}; };";
+
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
+    handler += "\n\targs.push(resolve);";
     handler += "\n\ttry {";
-    handler += '\n\t\tcurrentPythonContext["' + objectName + '"]["' + blockName + '"](resolve);';
+    handler += '\n\t\tcurrentPythonContext["' + generatorName + '"]["' + blockName + '"].apply(currentPythonContext, args);';
     handler += "\n\t} catch (e) {";
     handler += "\n\t\tcurrentPythonContext.runner._onStepError(e)}";
     handler += '\n\t}).then(function (value) {\nresult = value;\nreturn value;\n })};';
@@ -35,16 +41,18 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._injectFunctions = function () {
+    // Generate Python lib robot from all generated blocks
     var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
-    for (var objectName in this.context.customBlocks) {
-      for (var iCategory in this.context.customBlocks[objectName]) {
-        for (var iBlock in this.context.customBlocks[objectName][iCategory].blocks) {
-          var blockInfo = this.context.customBlocks[objectName][iCategory].blocks[iBlock];
-          var code = this.context.strings.code[blockInfo.name];
+    if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
+      for (var generatorName in this.context.infos.includeBlocks.generatedBlocks) {
+        var blockList = this.context.infos.includeBlocks.generatedBlocks[generatorName];
+        for (var iBlock=0; iBlock < blockList.length; iBlock++) {
+          var blockName = blockList[iBlock];
+          var code = this.context.strings.code[blockName];
           if (typeof(code) == "undefined") {
-            code = blockInfo.name;
+            code = blockName;
           }
-          modContents += this._skulptifyHandler(code, objectName, iCategory, blockInfo.name);
+          modContents += this._skulptifyHandler(code, generatorName, blockName);
         }
       }
     }
@@ -84,7 +92,7 @@ function PythonInterpreter(context, msgCallback) {
     var type = typeof data;
     var result;
     if (type === 'number') {
-      result = new Sk.builtin.int(data);
+      result = new Sk.builtin.int_(data);
     } else if (type === 'string') {
       result = new Sk.builtin.str(data);
     } else if (type === 'boolean') {

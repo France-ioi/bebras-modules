@@ -126,7 +126,7 @@ function SubTaskController(_subTask) {
     if (this.display) {
       var gridHtml = "<center>";
       gridHtml += "<div id='gridButtonsBefore'></div>";
-      gridHtml += "<div id='grid' style='width:400px;height:200px;padding:10px'></div>";
+      gridHtml += "<div id='grid'></div>";
       gridHtml += "<div id='gridButtonsAfter'></div>";
       gridHtml += "</center>";
       $("#gridContainer").html(gridHtml);
