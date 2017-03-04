@@ -1,3 +1,5 @@
+// TODO :: move to code-editor
+
 /* 
 pythonCount:
    returns number of Blockly blocks corresponding to some Python code.
@@ -66,19 +68,41 @@ var pythonForbiddenBlocks = {
       'controls_whileUntil': ['while'],
       'controls_untilWhile': ['while']
     },
+    'lists': {
+      'lists_create_with_empty': ['list', 'set', 'list_brackets'],
+      'lists_create_with': ['list', 'set', 'list_brackets'],
+      'lists_repeat' : ['list', 'set', 'list_brackets'],
+      'lists_length' : ['list', 'set', 'list_brackets'],
+      'lists_isEmpty' : ['list', 'set', 'list_brackets'],
+      'lists_indexOf' : ['list', 'set', 'list_brackets'],
+      'lists_getIndex': ['list', 'set', 'list_brackets'],
+      'lists_setIndex': ['list', 'set', 'list_brackets'],
+      'lists_getSublist': ['list', 'set', 'list_brackets'],
+      'lists_sort' : ['list', 'set', 'list_brackets'],
+      'lists_split' : ['list', 'set', 'list_brackets'],
+      'lists_append': ['list', 'set', 'list_brackets']
+    },
     'functions': {
       'procedures_def': ['def']
     }
 };
 
-function pythonForbidden(code, includeBlocks) {
+function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'def'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'def'];
+   var allowed = []
+
+   if(!includeBlocks) {
+     return {forbidden: forbidden, allowed: allowed};
+   }
 
    var removeForbidden = function(kwList) {
       for(var k=0; k<kwList.length; k++) {
          var idx = forbidden.indexOf(kwList[k]);
-         if(idx >= 0) { forbidden.splice(idx, 1); }
+         if(idx >= 0) {
+            forbidden.splice(idx, 1);
+            allowed.push(kwList[k]);
+         }
       }
    };
 
@@ -88,7 +112,7 @@ function pythonForbidden(code, includeBlocks) {
       }
       if(includeBlocks.standardBlocks.wholeCategories) {
          for(var c=0; c<includeBlocks.standardBlocks.wholeCategories.length; c++) {
-            var categoryName = includeBlocks.standardBlocks.wholeCategories[i];
+            var categoryName = includeBlocks.standardBlocks.wholeCategories[c];
             if(pythonForbiddenBlocks[categoryName]) {
                for(blockName in pythonForbiddenBlocks[categoryName]) {
                   removeForbidden(pythonForbiddenBlocks[categoryName][blockName]);
@@ -108,6 +132,12 @@ function pythonForbidden(code, includeBlocks) {
       }
    }
 
+   return {forbidden: forbidden, allowed: allowed};
+}
+
+function pythonForbidden(code, includeBlocks) {
+   var forbidden = pythonForbiddenLists(includeBlocks).forbidden;
+
    if(forbidden.length <= 0) { return false; }
 
    // Remove comments and strings before scanning
@@ -121,15 +151,24 @@ function pythonForbidden(code, includeBlocks) {
    for(var i=0; i<removePatterns.length; i++) {
       while(removePatterns[i].exec(code)) {
          code = code.replace(removePatterns[i], '');
-      }
+     }
    }
 
    // Scan for each forbidden keyword
    for(var i=0; i<forbidden.length; i++) {
-      var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
-      if(re.exec(code)) {
-         // Forbidden keyword found
-         return forbidden[i];
+      if(forbidden[i] == 'list_brackets') {
+         // Special pattern for lists
+         var re = /[\[\]]/;
+         if(re.exec(code)) {
+            // Forbidden keyword found
+            return 'crochets [ ]'; // TODO :: i18n ?
+         }
+      } else {
+         var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
+         if(re.exec(code)) {
+            // Forbidden keyword found
+            return forbidden[i];
+         }
       }
    }
 

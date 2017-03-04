@@ -121,6 +121,9 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable",
          },
+         description: {
+            paint: "peindre() : peindre la case sous le robot"
+         },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       },
       de: {
@@ -243,6 +246,8 @@ var getContext = function(display, infos, curLevel) {
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable",
+         },
+         description: {
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       }

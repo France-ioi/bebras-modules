@@ -426,6 +426,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   };
   this.setIncludeBlocks = function (blocks) {
     this._includeBlocks = blocks;
+    this.updateTaskIntro();
   };
   this.setMainContext = function (mainContext) {
     this._mainContext = mainContext;
@@ -553,6 +554,78 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       $('#capacity').html(strLimitElements.format(optLimitElements));
     }
     this._aceEditor.getSession().on('change', debounce(updatePythonCount, 500, false))
+  };
+
+  this.updateTaskIntro = function () {
+    var pythonDiv = $('#taskIntro .pythonIntro');
+    if(pythonDiv.length == 0) {
+      pythonDiv = $('<div class="pythonIntro"></div>').appendTo('#taskIntro');
+    }
+
+    if(this._mainContext.infos.noPythonHelp) {
+       pythonDiv.html('');
+       return;
+    }
+
+    var pythonHtml = '<hr />';
+
+    if(this._includeBlocks && this._includeBlocks.generatedBlocks) {
+      pythonHtml += '<p>Votre programme doit commencer par la ligne :</p>'
+                  +  '<p><code>from robot import *</code></p>'
+                  +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
+                  +  '<ul>';
+
+      for (var generatorName in this._includeBlocks.generatedBlocks) {
+        var blockList = this._includeBlocks.generatedBlocks[generatorName];
+        for (var iBlock=0; iBlock < blockList.length; iBlock++) {
+          var blockName = blockList[iBlock];
+          var blockDesc = this._mainContext.strings.description[blockName];
+          if (!blockDesc) {
+            var funcName = this._mainContext.strings.code[blockName];
+            if (!funcName) {
+              funcName = blockName;
+            }
+            blockDesc = funcName + '()';
+          }
+          pythonHtml += '<li><code>' + blockDesc + '</code></li>';
+        }
+      }
+      pythonHtml += '</ul>';
+    }
+
+    var pflInfos = pythonForbiddenLists(this._includeBlocks);
+
+    var elifIdx = pflInfos.allowed.indexOf('elif');
+    if(elifIdx >= 0) {
+      pflInfos.allowed.splice(elifIdx, 1);
+    }
+    elifIdx = pflInfos.forbidden.indexOf('elif');
+    if(elifIdx >= 0) {
+      pflInfos.forbidden.splice(elifIdx, 1);
+    }
+
+    var listsIdx = pflInfos.allowed.indexOf('list_brackets');
+    if(listsIdx >= 0) {
+      pflInfos.allowed[listsIdx] = 'crochets [ ]';
+    }
+    listsIdx = pflInfos.forbidden.indexOf('list_brackets');
+    if(listsIdx >= 0) {
+      pflInfos.forbidden[listsIdx] = 'crochets [ ]';
+    }
+
+    if(pflInfos.allowed.length == 1) {
+      pythonHtml += '<p>Le mot-clé suivant est autorisé : <code>' + pflInfos.allowed[0] + '</code></p>';
+    } else if (pflInfos.allowed.length > 0) {
+      pythonHtml += '<p>Les mots-clés suivants sont autorisés : <code>' + pflInfos.allowed.join('</code>, <code>') + '</code></p>';
+    }
+    if(pflInfos.forbidden.length == 1) {
+      pythonHtml += '<p>Le mot-clé suivant est interdit : <code>' + pflInfos.forbidden[0] + '</code></p>';
+    } else if(pflInfos.forbidden.length > 0) {
+      pythonHtml += '<p>Les mots-clés suivants sont interdits : <code>' + pflInfos.forbidden.join('</code>, <code>') + '</code></p>';
+    }
+
+    pythonHtml += '<p>Vous êtes autorisé à lire de la documentation sur python ou utiliser un moteur de recherche pendant le concours.</p>';
+    pythonDiv.html(pythonHtml);
   };
 
   this.toggleSize = function () {
