@@ -569,6 +569,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col + 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col + 1, 0, callback);
       }
    };
@@ -581,6 +582,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col - 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col - 1, 2, callback);
       }
    };
@@ -593,6 +595,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row - 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row - 1, item.col, 3, callback);
       }
    };
@@ -605,6 +608,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row + 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row + 1, item.col, 1, callback);
       }
    };
