@@ -186,6 +186,7 @@ var blocklyToScratch = {
         'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
         'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
         'logic_operation': ['operator_and', 'operator_or'],
+        'text_join': ['operator_join'],
         'math_number': []
     }
 }
@@ -1530,6 +1531,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   {
                      name: "operator_not",
                      blocklyXml: "<block type='operator_not'></block>"
+                  },
+                  {
+                     name: "operator_join",
+                     blocklyXml: "<block type='operator_join'>" +
+                                 "  <value name='STRING1'><shadow type='text'><field name='TEXT'></field></shadow></value>" +
+                                 "  <value name='STRING2'><shadow type='text'><field name='TEXT'></field></shadow></value>" +
+                                 "</block>"
                   }
                ]
             },

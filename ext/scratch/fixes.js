@@ -388,7 +388,34 @@ Blockly.Blocks['operator_or'] = {
   }
 };
 
-
+Blockly.Blocks['operator_join'] = {
+  /**
+   * Block for string join operator.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_CREATE_JOIN_TITLE_JOIN+" %1 %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "STRING1"
+        },
+        {
+          "type": "input_value",
+          "name": "STRING2"
+        }
+      ],
+      "inputsInline": true,
+      "output": "String",
+      "category": Blockly.Categories.operators,
+      "colour": Blockly.Colours.operators.primary,
+      "colourSecondary": Blockly.Colours.operators.secondary,
+      "colourTertiary": Blockly.Colours.operators.tertiary,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
+    });
+  }
+};
 
 Blockly.JavaScript['control_if'] = function(block) {
   // If/then condition.
@@ -526,6 +553,15 @@ Blockly.JavaScript['operator_gt'] = Blockly.JavaScript['operators'];
 Blockly.JavaScript['operator_lt'] = Blockly.JavaScript['operators'];
 Blockly.JavaScript['operator_and'] = Blockly.JavaScript['operators'];
 Blockly.JavaScript['operator_or'] = Blockly.JavaScript['operators'];
+
+Blockly.JavaScript['operator_join'] = function(block) {
+  var argument0 = Blockly.JavaScript.valueToCode(block, 'STRING1', Blockly.JavaScript.ORDER_NONE) || '';
+  if(argument0 == 'NaN') { argument0 = ''; };
+  var argument1 = Blockly.JavaScript.valueToCode(block, 'STRING2', Blockly.JavaScript.ORDER_NONE) || '';
+  if(argument1 == 'NaN') { argument1 = ''; };
+  var code = 'String(' + argument0 + ') + String(' + argument1 + ')';
+  return [code, Blockly.JavaScript.ORDER_ADDITION];
+}
 
 // TODO :: Python generation
 Blockly.Python['control_if'] = function(block) { return '# Error: control_if not implemented in Python!'; }
