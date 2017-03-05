@@ -59,18 +59,19 @@ var languageStrings = {
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
-      stopProgram: "Recommencer",
+      stopProgram: "|<",
       speed: "Vitesse :",
-      slowSpeed: "Lent",
-      mediumSpeed: "Moyen",
-      fastSpeed: "Rapide",
-      ludicrousSpeed: "Très rapide",
+      slowSpeed: ">",
+      mediumSpeed: ">>",
+      fastSpeed: ">>>",
+      ludicrousSpeed: ">|",
       selectLanguage: "Langage :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Repartir de blockly",
       saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
+      files: "Fichiers",
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
@@ -209,7 +210,14 @@ if (!String.prototype.format) {
    }
 }
 
-
+function showModal(id) {
+  var el = '#' + id
+  $(el).show();
+}
+function closeModal(id) {
+  var el = '#' + id;
+  $(el).hide();
+}
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    return {
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
@@ -255,16 +263,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
                                       "  </div>" +
-                                      "  <div id='saveOrLoad'> "+
-                                      "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-                                      "    <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-                                      "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
-                                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-                                      "    <p><input type='button' value='" + this.strings.saveProgram +
-                                        "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span></p>" +
-                                      "</div>"
+                                      "  <div id='saveOrLoadModal' style='display:none'></div>\n"
          );
-        
+        var saveOrLoadModal = "<div class='modal'>" +
+                          "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +
+                          "    <button type='button' class='btn' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' >" + this.strings.saveProgram +
+                            "</button><span id='saveUrl'></span>\n" +
+                          "    <p>" + this.strings.avoidReloadingOtherTask + "</p>\n" +
+                          "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
+                            "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>\n" +
+                          "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
+                          "</div>"
+        ;
+        $("#saveOrLoadModal").html(saveOrLoadModal);
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
             gridButtonsBefore += "<div>\n" +
@@ -272,23 +283,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                  "  <span id='testCaseName'>Test 1</span>\n" +
                                  "  <input type='button' value='" + this.strings.nextTestcase + "' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
                                  "</div>\n";
-         }      
-         $("#gridButtonsBefore").html(gridButtonsBefore);
-         
-         
-         var gridButtonsAfter = this.strings.speed + " " +
-                                "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>\n" + 
-                                "  <option value='200'>" + this.strings.slowSpeed + "</option>\n" + 
-                                "  <option value='50'>" + this.strings.mediumSpeed + "</option>\n" +
-                                "  <option value='5'>" + this.strings.fastSpeed + "</option>\n" +
-                                "  <option value='0'>" + this.strings.ludicrousSpeed + "</option>\n" +
-                                "</select>&nbsp;&nbsp;" +
-                                "<input type='button' value='" + this.strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
-         
-         if (nbTestCases > 1) {
-            gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
          }
-         gridButtonsAfter += "<button onclick='task.displayedSubTask.submit()'>"
+         $("#gridButtonsBefore").html(gridButtonsBefore);
+
+         var gridButtonsAfter = "<div id='selectSpeed'>" +
+          "  <div class='btn-group'>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.stop()'>" + this.strings.stopProgram + " </button>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(200)'>" + this.strings.slowSpeed + "</button>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(50)'>" + this.strings.mediumSpeed + "</button>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(5)'>" + this.strings.fastSpeed + "</button>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(0)'>" + this.strings.ludicrousSpeed + "</button>\n" +
+          "  </div>" +
+          "</div>";
+         gridButtonsAfter += "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
                              + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
                              + this.strings.submitProgram
                              + "</button><br/>"
@@ -1022,7 +1029,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                blocks: [
                   {
                      name: "controls_if",
-                     blocklyXml: "<block type='controls_if'></block>",                     
+                     blocklyXml: "<block type='controls_if'></block>"
                   },
                   { 
                      name: "controls_if_else",
@@ -2353,7 +2360,7 @@ var initBlocklySubTask = function(subTask) {
       this.getAnswerObject(); // to fill this.answer;
       this.getGrade(function(result) {
          subTask.context.display = true;
-         subTask.changeSpeed();
+         subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
             $("#errors").html(message);
             platform.validate("done");
@@ -2388,8 +2395,11 @@ var initBlocklySubTask = function(subTask) {
       return this.state;
    };
 
-   subTask.changeSpeed =  function() {
-      this.context.changeDelay(parseInt($("#selectSpeed").val()));
+   subTask.changeSpeed =  function(speed) {
+      this.context.changeDelay(speed);
+      if ((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
+         this.run();
+      }
    };
 
    subTask.getAnswerObject = function() {
