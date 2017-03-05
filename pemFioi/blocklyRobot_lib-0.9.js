@@ -360,6 +360,11 @@ var getContext = function(display, infos, curLevel) {
          context.lost = true;
          throw("Le robot essaie de sauter en dehors de la grille !");
       }
+      var obstacle = context.getItems(item.row - 2, item.col, {category: "obstacle"});
+      if (obstacle.length > 0) {
+         context.lost = true;
+         throw("Le robot essaie de sauter mais il y a un obstacle qui le bloque");
+      }
       var platforms = context.getItems(item.row - 1, item.col, {category: "platform"});
       if (platforms.length == 0) {
          context.lost = true;
@@ -504,6 +509,10 @@ var getContext = function(display, infos, curLevel) {
       var platforms = context.getItems(row, col, {category: "platform"});
       if (platforms.length > 0) {
          throw("Il y a déjà une plateforme sur cette case");
+      }
+      var obstacles = context.getItems(row, col, {isObstacle: true});
+      if (obstacles.length > 0) {
+         throw("Il y a un obstacle sur cette case");
       }
       createItem({row: row, col: col, type: "platform"});
       context.waitDelay(callback);
