@@ -61,6 +61,7 @@ var languageStrings = {
       runProgram: "Exécuter sur ce test",
       stopProgram: "|<",
       speed: "Vitesse :",
+      stepProgram: "|>",
       slowSpeed: ">",
       mediumSpeed: ">>",
       fastSpeed: ">>>",
@@ -289,6 +290,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var gridButtonsAfter = "<div id='selectSpeed'>" +
           "  <div class='btn-group'>\n" +
           "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.stop()'>" + this.strings.stopProgram + " </button>\n" +
+          "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.step()'>" + this.strings.stepProgram + " </button>\n" +
           "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(200)'>" + this.strings.slowSpeed + "</button>\n" +
           "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(50)'>" + this.strings.mediumSpeed + "</button>\n" +
           "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(5)'>" + this.strings.fastSpeed + "</button>\n" +
@@ -1893,7 +1895,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
       },
 
-      run: function() {
+      initRun: function() {
          var that = this;
          var nbRunning = this.mainContext.runner.nbRunning();
          if (nbRunning > 0) {
@@ -1943,7 +1945,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             that.workspace.traceOn(true);
             that.workspace.highlightBlock(null);
          }
-         this.mainContext.runner.runCodes(codes);
+         this.mainContext.runner.initCodes(codes);
+      },
+
+      run: function () {
+         this.initRun();
+         this.mainContext.runner.run();
+      },
+
+      step: function () {
+         if(this.mainContext.runner.nbRunning() <= 0) {
+            this.initRun();
+         }
+         this.mainContext.runner.step();
       },
 
       getFullCode: function(code) {
@@ -1957,6 +1971,8 @@ function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
 
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
+      runner.isStepRunning = false;
+
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
@@ -1977,11 +1993,15 @@ function initBlocklyRunner(context, messageCallback) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               runner.runSyncBlock();
+               if(!runner.isStepRunning) {
+                 runner.runSyncBlock();
+               }
             }, 0);
          } else {
             callback(primitive);
-            runner.runSyncBlock();
+            if(!runner.isStepRunning) {
+              runner.runSyncBlock();
+            }
          }
       };
 
@@ -2088,7 +2108,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
-      runner.runCodes = function(codes) {
+      runner.initCodes = function(codes) {
          //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
          interpreters = [];
          context.programEnded = [];
@@ -2101,6 +2121,19 @@ function initBlocklyRunner(context, messageCallback) {
             isRunning[iInterpreter] = true;
             toStop[iInterpreter] = false;
          }
+      };
+
+      runner.runCodes = function(codes) {
+         runner.initCodes(codes);
+         runner.runSyncBlock();
+      };
+
+      runner.run = function () {
+         runner.runSyncBlock();
+      };
+
+      runner.step = function () {
+         runner.isStepRunning = true;
          runner.runSyncBlock();
       };
 
@@ -2374,6 +2407,16 @@ var initBlocklySubTask = function(subTask) {
       });
    };
 
+   subTask.step = function () {
+      if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
+        initBlocklyRunner(subTask.context, function(message, success) {
+           $("#errors").html(message);
+        });
+        initContextForLevel(subTask.iTestCase);
+      }
+      subTask.blocklyHelper.step(subTask.context);
+   };
+
    subTask.stop = function() {
       this.context.runner.stop();
    };
@@ -2400,6 +2443,9 @@ var initBlocklySubTask = function(subTask) {
       this.context.changeDelay(speed);
       if ((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
          this.run();
+      } else if (this.context.runner.isStepRunning) {
+         this.context.runner.isStepRunning = false;
+         this.context.runner.run();
       }
    };
 
