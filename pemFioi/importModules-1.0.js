@@ -101,6 +101,7 @@ var languageScripts = function () {
          'skulpt',
          'skulpt_stdlib',
          'skulpt_debugger',
+         'blockly_lib_css',
          'python_index',
          'python_constants',
          'python_dom_utils',

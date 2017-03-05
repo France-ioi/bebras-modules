@@ -482,7 +482,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     return CodeEditor.Utils.DOM.generateWorkspace();
   };
   this._loadEditorTools = function () {
-    return "<div id='saveOrLoad'>" +
+    var saveOrLoadHtml = "<div id='saveOrLoad'>" +
       " <p><b>" + this._strings.saveOrLoadProgram + "</b></p>" +
       " <p>" + this._strings.avoidReloadingOtherTask + "</p>" +
       " <p>" + this._strings.reloadProgram +
@@ -493,6 +493,8 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       "   <span id='saveUrl'></span>" +
       " </p>" +
       "</div>";
+    // TODO :: disabled
+    return '';
   };
   this._loadBasicEditor = function () {
     if (this._mainContext.display) {
@@ -509,7 +511,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     }
   };
   this._loadGridButtons = function () {
-
     var gridButtonsBefore = "";
 
     if (this._nbTestCases > 1) {
@@ -523,23 +524,20 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
 
     $("#gridButtonsBefore").html(gridButtonsBefore);
 
-    var gridButtonsAfter = this._strings.speed +
-      "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>" +
-      "  <option value='200'>" + this._strings.slowSpeed + "</option>" +
-      "  <option value='50'>" + this._strings.mediumSpeed + "</option>" +
-      "  <option value='5'>" + this._strings.fastSpeed + "</option>" +
-      "  <option value='0'>" + this._strings.ludicrousSpeed + "</option>" +
-      "</select>&nbsp;&nbsp;" +
-      "<input type='button' value='" + this._strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
-    if (this._nbTestCases > 1) {
-      gridButtonsAfter += "<input type='button' value='" + this._strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
-    }
-    gridButtonsAfter +=
-      "<input type='button' value='" + this._strings.runStepProgram + "' onclick='task.displayedSubTask.step()' />" +
-      "<br/>" +
-      "<input type='button' value='" + this._strings.submitProgram + "' onclick='task.displayedSubTask.submit()' />" +
+    var gridButtonsAfter = "<div id='selectSpeed'>" +
+      "  <div class='btn-group'>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.stop()'>" + this._strings.stopProgram + " </button>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.step()'>" + this._strings.stepProgram + " </button>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(200)'>" + this._strings.slowSpeed + "</button>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(50)'>" + this._strings.mediumSpeed + "</button>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(5)'>" + this._strings.fastSpeed + "</button>\n" +
+      "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(0)'>" + this._strings.ludicrousSpeed + "</button>\n" +
+      "  </div>" +
+      "</div>" +
+      "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>" + this._strings.submitProgram + "</button>" +
       "<br/>" +
       "<div id='errors' style='width: 400px'></div>";
+
     $("#gridButtonsAfter").html(gridButtonsAfter);
   };
   this._loadAceEditor = function () {
@@ -552,6 +550,12 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     var that = this;
     var updatePythonCount = function () {
       if(that._language != 'python' || !maxInstructions || !that._aceEditor) { return; }
+
+      if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
+        that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
+        that._mainContext.runner._editorMarker = null;
+      }
+
       var code = that._aceEditor.getValue();
 
       var forbidden = pythonForbidden(code, that._includeBlocks);

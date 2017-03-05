@@ -253,14 +253,14 @@ function PythonInterpreter(context, msgCallback) {
   this.step = function () {
     this._resetCallstack();
     var editor = this.context.blocklyHelper._aceEditor;
-    if(editor && this._editorMarker) {
-      editor.session.removeMarker(this._editorMarker);
-      this._editorMarker = null;
-    }
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
     if(this.context.display && (this._isStepRunning || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp.lineno) {
+        if(editor && this._editorMarker) {
+          editor.session.removeMarker(this._editorMarker);
+          this._editorMarker = null;
+        }
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
         this._editorMarker = editor.session.addMarker(

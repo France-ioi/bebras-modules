@@ -267,7 +267,7 @@ function SubTaskController(_subTask) {
     subTask.getAnswerObject(); // to fill this.answer;
     subTask.getGrade(function (result) {
       subTask.context.display = true;
-      subTask.changeSpeed(0);
+      subTask.context.changeDelay(200);
 
       if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
         subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
@@ -319,8 +319,14 @@ function SubTaskController(_subTask) {
     return this.state;
   };
 
-  subTask.changeSpeed = function () {
-    this.context.changeDelay(parseInt($("#selectSpeed").val()));
+  subTask.changeSpeed = function (speed) {
+    this.context.changeDelay(speed);
+    if((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
+      this.run();
+    } else if (this.context.runner._isStepRunning) {
+      this.context.runner._isStepRunning = false;
+      this.context.runner.step();
+    }
   };
 
   subTask.getAnswerObject = function () {
