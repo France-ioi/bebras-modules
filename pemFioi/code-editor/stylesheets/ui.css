@@ -128,5 +128,5 @@ body > * {
 code {
    font-family: courier;
    background-color: #EEE;
-   white-space: pre
+   white-space: pre-wrap;
 }
