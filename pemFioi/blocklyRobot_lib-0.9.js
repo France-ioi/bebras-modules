@@ -33,6 +33,7 @@ var getContext = function(display, infos, curLevel) {
             platformAbove: "plateforme au dessus",
             gridEdgeInFront: "bord de la grille devant",
             gridEdgeAbove: "bord de la grille au dessus",
+            gridEdgeBelow: "bord de la grille en dessous",
             gridEdgeEast: "bord de la grille à droite",
             gridEdgeWest: "bord de la grille à gauche",
             obstacleInFront: "obstacle devant",
@@ -94,7 +95,8 @@ var getContext = function(display, infos, curLevel) {
             gridEdgeInFront: "bordGrilleDevant",
             gridEdgeEast: "bordGrilleDroite",
             gridEdgeWest: "bordGrilleGauche",
-            gridEdgeAbove: "bordBrilleAuDessus",
+            gridEdgeAbove: "bordGrilleAuDessus",
+            gridEdgeBelow: "bordGrilleEnDessous",
             obstacleInFront: "obstacleDevant",
             obstacleRight: "obstacleADroite",
             obstacleLeft: "obstacleAGauche",
@@ -130,6 +132,8 @@ var getContext = function(display, infos, curLevel) {
                 gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
                 gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
                 gridEdgeWest: "bordGrilleDroite() : le bord de la grille est-il juste à droite du robot ?",
+                gridEdgeAbove: "bordGrilleAuDessus() : le bord de la grille est-il juste au dessus du robot ?",
+                gridEdgeBelow: "bordGrilleEnDessous() : le bord de la grille est-il juste en dessous du robot ?",
                 platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
                 numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
                 col: "colonne() : colonne du robot",
@@ -172,6 +176,7 @@ var getContext = function(display, infos, curLevel) {
             gridEdgeEast: "bord de la grille à droite",
             gridEdgeWest: "bord de la grille à gauche",
             gridEdgeAbove: "bord de la grille au dessus",
+            gridEdgeBelow: "bord de la grille en dessous",
             obstacleInFront: "vor Hindernis",
             obstacleRight: "Hindernis rechts",
             obstacleLeft: "Hindernis links",
@@ -232,6 +237,7 @@ var getContext = function(display, infos, curLevel) {
             gridEdgeEast: "bordGrilleDroite",
             gridEdgeWest: "bordGrilleGauche",
             gridEdgeAbove: "bordGrilleAuDessus",
+            gridEdgeBelow: "bordGrilleEnDessous",
             obstacleInFront: "vorHindernis",
             obstacleRight: "obstacleDroite",
             obstacleLeft: "obstacleGauche",
@@ -453,6 +459,11 @@ var getContext = function(display, infos, curLevel) {
    context.robot.gridEdgeAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       gridEdgeCoord(robot.row - 1, robot.col, callback);
+   };
+
+   context.robot.gridEdgeBelow = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row + 1, robot.col, callback);
    };
 
    context.robot.gridEdgeEast = function(callback) {
@@ -969,6 +980,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbCollectedItems = 0;
       if (context.display) {
          context.resetDisplay();
+         $("#nbMoves").html(context.nbMoves);
       } else {
          resetItems();
       }
@@ -1074,6 +1086,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "gridEdgeEast",       yieldsValue: true },
                { name: "gridEdgeWest",       yieldsValue: true },
                { name: "gridEdgeAbove",      yieldsValue: true },
+               { name: "gridEdgeBelow",      yieldsValue: true },
                { name: "platformInFront",    yieldsValue: true },
                { name: "platformInFrontAndBelow", yieldsValue: true },
                { name: "platformAbove",      yieldsValue: true },
@@ -1308,6 +1321,7 @@ var getContext = function(display, infos, curLevel) {
                item.element.attr(attr);
             }
          }
+         $("#nbMoves").html(context.nbMoves);
       }
       context.waitDelay(callback);
    };
