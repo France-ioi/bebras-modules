@@ -121,8 +121,19 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable",
          },
-         description: {
-            paint: "peindre() : peindre la case sous le robot"
+         description: { 
+                platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
+                obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
+                onHole: "surTrou() : le robot est-il sur un trou ?",
+                onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+                paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
+                gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
+                gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
+                gridEdgeWest: "bordGrilleDroite() : le bord de la grille est-il juste à droite du robot ?",
+                platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
+                numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
+                col: "colonne() : colonne du robot",
+                row: "ligne() : ligne du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       },
