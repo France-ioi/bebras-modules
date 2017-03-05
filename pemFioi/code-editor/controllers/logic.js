@@ -211,6 +211,7 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   };
 
   this.load = function (language, display, nbTestCases, _options) {
+    this._nbTestCases = nbTestCases;
     this._loadBasicEditor();
     CodeEditor.Utils.DOM.displayLanguageWorkspace(this._language);
     switch (this._language) {
