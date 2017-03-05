@@ -2029,6 +2029,7 @@ function initBlocklyRunner(context, messageCallback) {
          for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
             if (isRunning[iInterpreter]) {
                toStop[iInterpreter] = true;
+               isRunning[iInterpreter] = false;
             }
          }
          context.reset();
@@ -2060,7 +2061,7 @@ function initBlocklyRunner(context, messageCallback) {
                   context.curSteps[iInterpreter]++;
                }
                if (context.curSteps[iInterpreter] >= maxIter) {
-                  isRunning[iInterpreter] = false;;
+                  isRunning[iInterpreter] = false;
                   throw context.blocklyHelper.strings.tooManyIterations;
                }
             }
