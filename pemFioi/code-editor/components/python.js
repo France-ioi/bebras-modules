@@ -15,6 +15,7 @@ function PythonInterpreter(context, msgCallback) {
   this._resetCallstackOnNextStep = false;
   this._paused = false;
   this._isRunning = false;
+  this._isStepRunning = false;
   this._steps = 0;
   this._timeouts = [];
   this._editorMarker = null;
@@ -161,7 +162,7 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this.runCodes = function (codes) {
+  this.initCodes = function (codes) {
     if(Sk.running) {
       if(typeof Sk.runQueue === 'undefined') {
         Sk.runQueue = [];
@@ -187,8 +188,23 @@ function PythonInterpreter(context, msgCallback) {
     this._resetInterpreterState();
     Sk.running = true;
     this._isRunning = true;
+  };
+
+  this.run = function () {
     var timeoutId = window.setTimeout(this._continue.bind(this), 100);
     this._timeouts.push(timeoutId);
+  };
+
+  this.runCodes = function(codes) {
+    this.initCodes(codes);
+    this.run();
+  };
+
+  this.runStep = function () {
+    if(this._isRunning) {
+      this._isStepRunning = true;
+      this.step();
+    }
   };
 
   this.nbRunning = function () {
@@ -199,7 +215,7 @@ function PythonInterpreter(context, msgCallback) {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
-    if(this._editorMarker) {
+    if(this._editorMarker && !this._isStepRunning) {
       this.context.blocklyHelper._aceEditor.session.removeMarker(this._editorMarker);
       this._editorMarker = null;
     }
@@ -217,6 +233,7 @@ function PythonInterpreter(context, msgCallback) {
   this._resetInterpreterState = function () {
     this._steps = 0;
     this._isRunning = false;
+    this._isStepRunning = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
     Sk.running = false;
@@ -241,7 +258,7 @@ function PythonInterpreter(context, msgCallback) {
       this._editorMarker = null;
     }
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
-    if(this.context.display && markDelay > 30) {
+    if(this.context.display && (this._isStepRunning || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp.lineno) {
         var splitCode = this._code.split(/[\r\n]/);
@@ -259,7 +276,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.realStep = function () {
-    this._paused = false;
+    this._paused = this._isStepRunning;
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
     this._steps += 1;

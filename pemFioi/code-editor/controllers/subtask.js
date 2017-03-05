@@ -226,6 +226,40 @@ function SubTaskController(_subTask) {
     subTask.logicController.run(subTask.context);
   };
 
+  subTask.stepRunning = false;
+
+  subTask.step = function () {
+    // shouldn't happen, but avoid breaking a running background execution
+    if(!subTask.context.display) { return; }
+
+    if(!subTask.pythonRunner || !subTask.pythonRunner._isRunning) {
+      subTask.logicController.stop();
+  
+      if (!subTask.runController && !subTask.pythonRunner) {
+        if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
+          subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
+          subTask.runController = new CodeEditor.Controllers.RunController(
+            this.context,
+            function (message, success) {
+              $("#errors").html(message);
+            });
+  
+        } else {
+          subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+            this.context,
+            function (message, success) {
+              $("#errors").html(message);
+            });
+        }
+      }
+  
+      initContextForLevel(subTask.iTestCase);
+      subTask.stepRunning = false;
+    }
+
+    subTask.logicController.step(subTask.context);
+  };
+
   subTask.submit = function () {
     subTask.logicController.stop();
 
@@ -263,7 +297,7 @@ function SubTaskController(_subTask) {
   };
 
   subTask.stop = function () {
-    this.context.runner.stop();
+    this.logicController.stop();
     this.context.reset();
   };
 
