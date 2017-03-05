@@ -183,10 +183,11 @@ var blocklyToScratch = {
         'controls_whileUntil': ['control_repeat_until'],
         'controls_untilWhile': ['control_repeat_until'],
         'logic_negate': ['operator_not'],
-        'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+        'logic_boolean': [],
         'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
         'logic_operation': ['operator_and', 'operator_or'],
         'text_join': ['operator_join'],
+        'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
         'math_number': []
     }
 }
