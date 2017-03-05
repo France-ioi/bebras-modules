@@ -483,9 +483,13 @@ Blockly.JavaScript['operator_not'] = function(block) {
 
 Blockly.JavaScript['data_variable'] = function(block) {
   // Variable getter.
-  var code = Blockly.JavaScript.variableDB_.getName(block.getVariableField(),
-      Blockly.Variables.NAME_TYPE);
-  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  return [varName, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['data_setvariableto'] = function(block) {
@@ -495,7 +499,12 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   } else {
      var argument0 = Blockly.JavaScript.valueToCode(block, "VALUE", Blockly.JavaScript.ORDER_ASSIGNMENT) || "0";
   }
-  var varName = Blockly.JavaScript.variableDB_.getName(block.getVariableField(), Blockly.Variables.NAME_TYPE);
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
   return varName + ' = ' + argument0 + ';\n';
 };
 
@@ -503,8 +512,12 @@ Blockly.JavaScript['data_changevariableby'] = function(block) {
   // Increment
   var argument0 = Blockly.JavaScript.valueToCode(block, 'VALUE',
       Blockly.JavaScript.ORDER_ASSIGNMENT) || '0';
-  var varName = Blockly.JavaScript.variableDB_.getName(
-      block.getVariableField(), Blockly.Variables.NAME_TYPE);
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
   return varName + ' += ' + argument0 + ';\n';
 };
 
