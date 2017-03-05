@@ -2057,6 +2057,9 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.runSyncBlock = function() {
          var maxIter = 40000;
+         if (context.infos.maxIter != undefined) {
+            maxIter = context.infos.maxIter;
+         }
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
