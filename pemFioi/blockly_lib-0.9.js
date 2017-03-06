@@ -350,7 +350,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
-               window.focus();
                Blockly.svgResize(that.workspace);
 
                var remaining = that.workspace.remainingCapacity();
