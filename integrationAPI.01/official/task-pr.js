@@ -33,7 +33,7 @@ function taskCaller(task, request, content, error) {
          var oldCallback = content[askedCallbackIdx];
          var timeout = window.setTimeout(function() {
             error('timeout reached for '+request);
-         }, 5000);
+         }, 15000);
          var newCallback = function() {
             window.clearTimeout(timeout);
             if (functionsToTrigger[request]) {
