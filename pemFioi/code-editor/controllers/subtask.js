@@ -232,6 +232,8 @@ function SubTaskController(_subTask) {
     // shouldn't happen, but avoid breaking a running background execution
     if(!subTask.context.display) { return; }
 
+    subTask.context.changeDelay(200);
+
     if(!subTask.pythonRunner || !subTask.pythonRunner._isRunning) {
       subTask.logicController.stop();
   

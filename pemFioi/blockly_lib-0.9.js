@@ -1971,7 +1971,8 @@ function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
 
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
-      runner.isStepRunning = false;
+      runner.stepInProgress = false;
+      runner.stepMode = false;
 
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
@@ -1993,14 +1994,18 @@ function initBlocklyRunner(context, messageCallback) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               if(!runner.isStepRunning) {
-                 runner.runSyncBlock();
+               if(runner.stepMode) {
+                  runner.stepInProgress = false;
+               } else {
+                  runner.runSyncBlock();
                }
             }, 0);
          } else {
             callback(primitive);
-            if(!runner.isStepRunning) {
-              runner.runSyncBlock();
+            if(runner.stepMode) {
+               runner.stepInProgress = false;
+            } else {
+               runner.runSyncBlock();
             }
          }
       };
@@ -2066,6 +2071,9 @@ function initBlocklyRunner(context, messageCallback) {
             });
             return;
          }*/
+
+         runner.stepInProgress = true;
+
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
@@ -2089,6 +2097,8 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
          } catch (e) {
+            runner.stepInProgress = false;
+
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                isRunning[iInterpreter] = false;
             }
@@ -2114,6 +2124,8 @@ function initBlocklyRunner(context, messageCallback) {
       runner.initCodes = function(codes) {
          //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
          interpreters = [];
+         runner.stepInProgress = false;
+         runner.stepMode = false;
          context.programEnded = [];
          context.curSteps = [];
          context.reset();
@@ -2132,12 +2144,23 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.run = function () {
-         runner.runSyncBlock();
+         runner.stepMode = false;
+         if(!runner.stepInProgress) {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               interpreters[iInterpreter].paused_ = false;
+            }
+            runner.runSyncBlock();
+         }
       };
 
       runner.step = function () {
-         runner.isStepRunning = true;
-         runner.runSyncBlock();
+         runner.stepMode = true;
+         if(!runner.stepInProgress) {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               interpreters[iInterpreter].paused_ = false;
+            }
+            runner.runSyncBlock();
+         }
       };
 
       runner.nbRunning = function() {
@@ -2411,6 +2434,7 @@ var initBlocklySubTask = function(subTask) {
    };
 
    subTask.step = function () {
+      subTask.context.changeDelay(200);
       if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
         initBlocklyRunner(subTask.context, function(message, success) {
            $("#errors").html(message);
@@ -2446,8 +2470,7 @@ var initBlocklySubTask = function(subTask) {
       this.context.changeDelay(speed);
       if ((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
          this.run();
-      } else if (this.context.runner.isStepRunning) {
-         this.context.runner.isStepRunning = false;
+      } else if (this.context.runner.stepMode) {
          this.context.runner.run();
       }
    };
