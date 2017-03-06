@@ -137,7 +137,10 @@ var getContext = function(display, infos, curLevel) {
                 platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
                 numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
                 col: "colonne() : colonne du robot",
-                row: "ligne() : ligne du robot"
+                row: "ligne() : ligne du robot",
+                paintNorth: "peintureHaut() : retourne vrai si la case au dessus est peinte",
+                paintNorthWest: "peintureHautGauche() : retourne vrai si la case au dessus à gauche est peinte",
+                paintNorthEast: "peintureHautDroite() : retourne vrai si la case au dessus à droite est peinte"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       },
