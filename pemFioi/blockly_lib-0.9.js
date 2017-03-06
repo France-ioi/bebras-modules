@@ -755,6 +755,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          
          for (var language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {
+               // Prevent the function name to be used as a variable
+               Blockly[language].addReservedWords(code);
+
                function setCodeGeneratorForLanguage(language) {
                   blockInfo.codeGenerators[language] = function(block) {
                      var params = "";               
@@ -815,6 +818,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       createSimpleGenerator: function(label, code, type, nbParams) {
          var jsDefinitions = this.definitions['javascript'] ? this.definitions['javascript'] : [];
          var pyDefinitions = this.definitions['python'] ? this.definitions['python'] : [];
+
+         // Prevent the function name to be used as a variable
+         Blockly.JavaScript.addReservedWords(code);
+         Blockly.Python.addReservedWords(code);
+
          Blockly.JavaScript[label] = function(block) {
             for (var iDef=0; iDef < jsDefinitions.length; iDef++) {
                var def = jsDefinitions[iDef];
