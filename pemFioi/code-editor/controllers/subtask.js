@@ -226,8 +226,6 @@ function SubTaskController(_subTask) {
     subTask.logicController.run(subTask.context);
   };
 
-  subTask.stepRunning = false;
-
   subTask.step = function () {
     // shouldn't happen, but avoid breaking a running background execution
     if(!subTask.context.display) { return; }
@@ -256,7 +254,6 @@ function SubTaskController(_subTask) {
       }
   
       initContextForLevel(subTask.iTestCase);
-      subTask.stepRunning = false;
     }
 
     subTask.logicController.step(subTask.context);
@@ -325,8 +322,8 @@ function SubTaskController(_subTask) {
     this.context.changeDelay(speed);
     if((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
       this.run();
-    } else if (this.context.runner._isStepRunning) {
-      this.context.runner._isStepRunning = false;
+    } else if (this.context.runner._stepMode) {
+      this.context.runner._stepMode = false;
       this.context.runner.step();
     }
   };

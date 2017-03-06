@@ -15,7 +15,8 @@ function PythonInterpreter(context, msgCallback) {
   this._resetCallstackOnNextStep = false;
   this._paused = false;
   this._isRunning = false;
-  this._isStepRunning = false;
+  this._stepInProgress = false;
+  this._stepMode = false;
   this._steps = 0;
   this._timeouts = [];
   this._editorMarker = null;
@@ -191,6 +192,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.run = function () {
+    this._stepMode = false;
     var timeoutId = window.setTimeout(this._continue.bind(this), 100);
     this._timeouts.push(timeoutId);
   };
@@ -201,8 +203,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.runStep = function () {
-    if(this._isRunning) {
-      this._isStepRunning = true;
+    this._stepMode = true;
+    if(this._isRunning && !this._stepInProgress) {
       this.step();
     }
   };
@@ -211,13 +213,20 @@ function PythonInterpreter(context, msgCallback) {
     return this._isRunning ? 1 : 0;
   };
 
+  this.removeEditorMarker = function () {
+    var editor = this.context.blocklyHelper._aceEditor;
+    if(editor && this._editorMarker) {
+      editor.session.removeMarker(this._editorMarker);
+      this._editorMarker = null;
+    }
+  };
+
   this.stop = function () {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
-    if(this._editorMarker && !this._isStepRunning) {
-      this.context.blocklyHelper._aceEditor.session.removeMarker(this._editorMarker);
-      this._editorMarker = null;
+    if(!this._stepMode) {
+      this.removeEditorMarker();
     }
     if(Sk.runQueue) {
       for (var i=0; i<Sk.runQueue.length; i++) {
@@ -233,7 +242,8 @@ function PythonInterpreter(context, msgCallback) {
   this._resetInterpreterState = function () {
     this._steps = 0;
     this._isRunning = false;
-    this._isStepRunning = false;
+    this._stepMode = false;
+    this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
     Sk.running = false;
@@ -252,15 +262,13 @@ function PythonInterpreter(context, msgCallback) {
 
   this.step = function () {
     this._resetCallstack();
+    this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
-    if(this.context.display && (this._isStepRunning || markDelay > 30)) {
+    if(this.context.display && (this._stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp.lineno) {
-        if(editor && this._editorMarker) {
-          editor.session.removeMarker(this._editorMarker);
-          this._editorMarker = null;
-        }
+        this.removeEditorMarker();
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
         this._editorMarker = editor.session.addMarker(
@@ -271,18 +279,20 @@ function PythonInterpreter(context, msgCallback) {
       this._paused = true;
       setTimeout(this.realStep.bind(this), this.context.infos.actionDelay/4);
     } else {
+      this.removeEditorMarker();
       this.realStep();
     }
   };
 
   this.realStep = function () {
-    this._paused = this._isStepRunning;
+    this._paused = this._stepMode;
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
     this._steps += 1;
   };
 
   this._onStepSuccess = function (){
+    this._stepInProgress = false;
     this._continue();
   };
 

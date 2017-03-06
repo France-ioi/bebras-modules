@@ -28,7 +28,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   this._localization = CodeEditor.CONST.SETTINGS.DEFAULT_LOCALIZATION;
   this._strings = CodeEditor.Utils.Localization.Strings[this._localization];
   this._includeBlocks = null;
-  this.isStepRunning = false;
 
   this._blocklyControler = null;
 
@@ -367,7 +366,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if(this._mainContext.runner) {
       this._mainContext.runner.stop();
     }
-    this.isStepRunning = false;
   }
 
   this.getFullCode = function (code) {
