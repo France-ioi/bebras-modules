@@ -138,9 +138,9 @@ var getContext = function(display, infos, curLevel) {
                 numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
                 col: "colonne() : colonne du robot",
                 row: "ligne() : ligne du robot",
-                paintNorth: "peintureHaut() : retourne vrai si la case au dessus est peinte",
-                paintNorthWest: "peintureHautGauche() : retourne vrai si la case au dessus à gauche est peinte",
-                paintNorthEast: "peintureHautDroite() : retourne vrai si la case au dessus à droite est peinte"
+                paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
+                paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
+                paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       },
