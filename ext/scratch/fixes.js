@@ -49,6 +49,40 @@ Blockly.WorkspaceSvg.prototype.clear = function(deleting) {
   }
 };
 
+// Prevent the workspace from shifting when we create a new block (especially
+// with categories enabled)
+Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
+  var topBlocks = this.getTopBlocks(false);
+  // There are no blocks, return empty rectangle.
+  if (!topBlocks.length) {
+    return {x: 0, y: 0, width: 0, height: 0};
+  }
+
+  // Initialize boundary using the first block.
+  var boundary = topBlocks[0].getBoundingRectangle();
+
+  // Start at 1 since the 0th block was used for initialization
+  for (var i = 1; i < topBlocks.length; i++) {
+    var blockBoundary = topBlocks[i].getBoundingRectangle();
+    if (blockBoundary.bottomRight.x > boundary.bottomRight.x) {
+      boundary.bottomRight.x = blockBoundary.bottomRight.x;
+    }
+    if (blockBoundary.topLeft.y < boundary.topLeft.y) {
+      boundary.topLeft.y = blockBoundary.topLeft.y;
+    }
+    if (blockBoundary.bottomRight.y > boundary.bottomRight.y) {
+      boundary.bottomRight.y = blockBoundary.bottomRight.y;
+    }
+  }
+  return {
+    x: 0, // yep the ugly fix is that
+    y: boundary.topLeft.y,
+    width: boundary.bottomRight.x - boundary.topLeft.x,
+    height: boundary.bottomRight.y - boundary.topLeft.y
+  };
+};
+
+
 /**
  * Check if 3D transforms are supported by adding an element
  * and attempting to set the property.
