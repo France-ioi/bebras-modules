@@ -22,8 +22,11 @@ function PythonInterpreter(context, msgCallback) {
   this._editorMarker = null;
   var that = this;
 
-  this._skulptifyHandler = function (name, generatorName, blockName) {
-    var handler = '\tvar susp = new Sk.misceval.Suspension();';
+  this._skulptifyHandler = function (name, generatorName, blockName, nbArgs) {
+    var handler = '';
+    handler += "\tSk.builtin.pyCheckArgs('" + name + "', arguments, " + nbArgs + ", " + nbArgs + ");";
+
+    handler += "\n\tvar susp = new Sk.misceval.Suspension();";
     handler += "\n\tvar result = Sk.builtin.none.none$;";
 
     // If there are arguments, convert them from Skulpt format to the libs format
@@ -46,6 +49,19 @@ function PythonInterpreter(context, msgCallback) {
     // Generate Python lib robot from all generated blocks
     var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
     if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
+      // Flatten customBlocks information for easy access
+      var blocksNbArgs = {};
+      for (var generatorName in this.context.customBlocks) {
+        for (var typeName in this.context.customBlocks[generatorName]) {
+          var blockList = this.context.customBlocks[generatorName][typeName].blocks;
+          for (var iBlock=0; iBlock < blockList.length; iBlock++) {
+            var blockInfo = blockList[iBlock];
+            blocksNbArgs[blockInfo.name] = blockInfo.params ? blockInfo.params.length : 0;
+          }
+        }
+      }
+
+      // Generate functions used in the task
       for (var generatorName in this.context.infos.includeBlocks.generatedBlocks) {
         var blockList = this.context.infos.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
@@ -54,7 +70,9 @@ function PythonInterpreter(context, msgCallback) {
           if (typeof(code) == "undefined") {
             code = blockName;
           }
-          modContents += this._skulptifyHandler(code, generatorName, blockName);
+          var nbArgs = blocksNbArgs[blockName] ? blocksNbArgs[blockName] : 0;
+
+          modContents += this._skulptifyHandler(code, generatorName, blockName, nbArgs);
         }
       }
     }
