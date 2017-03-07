@@ -33,6 +33,22 @@ Blockly.Workspace.prototype.remainingCapacity = function() {
   return maxBlocks - blockCount;
 };
 
+// Pass to this.clear that we are deleting the workspace
+Blockly.Workspace.prototype.dispose = function() {
+  this.listeners_.length = 0;
+  this.clear(true);
+  // Remove from workspace database.
+  delete Blockly.Workspace.WorkspaceDB_[this.id];
+};
+
+Blockly.WorkspaceSvg.prototype.clear = function(deleting) {
+  this.setResizesEnabled(false);
+  Blockly.WorkspaceSvg.superClass_.clear.call(this);
+  if(!deleting) { // Do not try to resize if we're deleting the workspace
+    this.setResizesEnabled(true);
+  }
+};
+
 /**
  * Check if 3D transforms are supported by adding an element
  * and attempting to set the property.
