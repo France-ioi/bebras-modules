@@ -463,6 +463,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
            return;
          }
          var tmpWorkspace = new Blockly.Workspace();
+         if(this.scratchMode) {
+           // Make sure it has the right information from this blocklyHelper
+           tmpWorkspace.maxBlocks = function () { return maxBlocks; };
+         }
          Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
          return this.getCode(language, tmpWorkspace);
       },
@@ -471,6 +475,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       getCode: function(language, codeWorkspace) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
+         }
+         if(codeWorkspace.remainingCapacity() < 0) {
+            // Safeguard: avoid generating code when we use too many blocks
+            return '';
          }
          var blocks = codeWorkspace.getTopBlocks(true);
          var languageObj = null;
