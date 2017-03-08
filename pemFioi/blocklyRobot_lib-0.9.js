@@ -140,7 +140,8 @@ var getContext = function(display, infos, curLevel) {
                 row: "ligne() : ligne du robot",
                 paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
                 paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
-                paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?"
+                paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
+                writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
       },
