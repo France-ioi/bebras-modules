@@ -609,35 +609,56 @@ window.displayHelper = {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
-      if (mode != 'blanket') {
+      if (mode == 'blanket' || mode == 'input') {
+         $('#popupMessage').addClass('floatingMessage');
+      } else {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
-      } else {
-         $('#popupMessage').addClass('floatingMessage');
       }
 
-      if (!yesButtonText) {
-         yesButtonText = this.strings.alright;
-      }
       // Hack: when in the context of the platform, we need to change the path
       var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
-      var buttonYes = mode == 'lock' ? '' : '<button class="buttonYes">' + (yesButtonText || this.strings.alright) + '</button>';
+      if(mode == 'lock') {
+         var buttonYes = '';
+      } else if (mode == 'input') {
+         var buttonYes = '<button class="buttonYes">' + (yesButtonText || this.strings.validate) + '</button>';
+      } else {
+         var buttonYes = '<button class="buttonYes">' + (yesButtonText || this.strings.alright) + '</button>';
+      }
       var buttonNo = '';
       if (noButtonText != undefined) {
          buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + noButtonText + '</button>';
       }
-      $('#popupMessage').html('<div class="container">' +
+      var popupHtml = '<div class="container">' +
          '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
-         '<div class="message">' + message + '</div>' + buttonYes + buttonNo + '</div>').show();
-      $('#popupMessage .buttonYes').click(function() {
+         '<div class="message">' + message + '</div>';
+      if(mode == 'input') {
+         popupHtml += '<input id="popupInput" type="text"></input>';
+      }
+      popupHtml += buttonYes + buttonNo + '</div>';
+      $('#popupMessage').html(popupHtml).show();
+      if(mode == 'input') {
+         $('#popupInput').focus();
+      }
+
+      var validateFunc = function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
          if (agreeFunc) {
-            agreeFunc();
+            if(mode == 'input') {
+                agreeFunc($('#popupInput').val());
+            } else {
+                agreeFunc();
+            }
          }
+      }
+      $('#popupMessage .buttonYes').click(validateFunc);
+      $('#popupInput').keypress(function (e) {
+         if(e.which === 13) { validateFunc(); }
       });
+
       $('#popupMessage .buttonNo').click(function() {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();

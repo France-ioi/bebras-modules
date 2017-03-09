@@ -210,6 +210,10 @@ h1 .stars {
 #popupMessage p:first-child {
    margin-top: 0;
 }
+#popupMessage input {
+   margin-top: 1em;
+   margin-left: 200px;
+}
 #popupMessage button {
    margin-top: 1em;
    margin-left: 200px;
