@@ -402,18 +402,18 @@ function SubTaskController(_subTask) {
 
     subTask.iTestCase = 0;
 
-    if (subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.JAVASCRIPT ||
-      subTask.logicController.getLanguage() === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-      subTask.runController = new CodeEditor.Controllers.RunController(
-        this.context, callbackPrivate);
-      code = subTask.logicController._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
-      codes = [subTask.logicController.getFullCode(code)];
+    subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
+      this.context, callbackPrivate);
+    code = subTask.logicController._programs.python;
+    codes = [code];
 
-    } else {
-      subTask.pythonRunner = new CodeEditor.Interpreters.PythonInterpreter(
-        this.context, callbackPrivate);
-      code = subTask.logicController._programs.python;
-      codes = [code];
+    // Check code isn't too long
+    if(pythonCount(code) > subTask.logicController._maxInstructions) {
+        callback({
+            message: "Vous utilisez trop d'éléments Python !",
+            successRate: 0
+        });
+        return;
     }
 
 
