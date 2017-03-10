@@ -44,6 +44,16 @@
          'yourScore': "Dein Punktestand:",
          'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
       },
+      es: {
+         'task': ‘Problema’,
+         'submission': ‘Sumisión’,
+         'solution': ‘Solución’,
+         'editor': ‘Editar’,
+         'hints': ‘Pistas’,
+         'showSolution': ‘Mostrar solución',
+         'yourScore': “Su puntuación:",
+         'canReadSolution': “Puede leer la solución al final de esta página.",
+      },
    };
    
 function inIframe() {
