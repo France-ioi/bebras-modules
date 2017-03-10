@@ -144,6 +144,7 @@ var getContext = function(display, infos, curLevel) {
                 writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+         exit_grid: "Le robot sort de la grille !"
       },
       de: {
          label: {
@@ -271,6 +272,7 @@ var getContext = function(display, infos, curLevel) {
          description: {
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
+         exit_grid: "Le robot sort de la grille !"
       },
       es: {
          label: {
@@ -415,6 +417,7 @@ var getContext = function(display, infos, curLevel) {
                 paintNorthEast: "pintadoArribaIzquierda() : ¿se encuentra pintada la casilla de arriba a la izquierda?"
          },
          obstacle: "¡El robot intenta moverse sobre un obstáculo!",
+         exit_grid: "¡El robot salió de la cuadrícula!"
       },
    };
    var strings = languageStrings[stringsLanguage];
@@ -1506,7 +1509,7 @@ var getContext = function(display, infos, curLevel) {
          if (infos.ignoreInvalidMoves) {
             return false;
          }
-         throw("Le robot sort de la grille !");
+         throw(strings.exit_grid);
       }
       var itemsInFront = context.getItems(row, col, {isObstacle: true});
       if (itemsInFront.length > 0) {
