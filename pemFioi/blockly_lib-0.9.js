@@ -79,6 +79,8 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       previousTestcase: "Précédent", 
       nextTestcase: "Suivant",
+      allTests: "Tous les tests :",
+      emptyProgram: "Le programme est vide ! Connectez des blocs.",
    },
    en: {
       categories: {
@@ -124,6 +126,8 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       previousTestcase: "Previous", 
       nextTestcase: "Next",
+      allTests: "All tests:",
+      emptyProgram: "The program is empty! Connect some blocks.",
    },
    de: {
       categories: {
@@ -172,8 +176,61 @@ var languageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.", // TODO :: translate
       previousTestcase: "Vorheriger", 
       nextTestcase: "Nächster",
+      allTests: "Tous le tests :",
+      emptyProgram: "Le programme est vide ! Connectez des blocs.",
+   },
+   es: {
+      categories: {
+         actions: "Acciones",
+         sensors: "Sensores",
+         debug: "Depurar",
+         colour: "Colores",
+         dicts: "Diccionarios",
+         input: "Entradas",
+         lists: "Listas",
+         logic: "Lógica",
+         loops: "Búcles",
+         control: "Control",
+         operator: "Operadores",
+         math: "Mate",
+         text: "Texto",
+         variables: "Variables",
+         functions: "Funciones"
+      },
+      invalidContent: "Contenido inválido",
+      unknownFileType: "Tipo de archivo no reconocido",
+      download: "descargar",
+      smallestOfTwoNumbers: "El menor de dos números",
+      greatestOfTwoNumbers: "El mayor de dos números",
+      programOfRobot: "Programa de robot",
+      flagClicked: "Cuando se hace click en %1",
+      tooManyIterations: "¡Su programa se tomó demasiado tiempo para terminar!",
+      submitProgram: "Validar el programa",
+      runProgram: "Ejecutar el programa",
+      stopProgram: "|<",
+      speed: "Velocidad:",
+      stepProgram: "|>",
+      slowSpeed: ">",
+      mediumSpeed: ">>",
+      fastSpeed: ">>>",
+      ludicrousSpeed: ">|",
+      selectLanguage: "Lenguaje:",
+      blocklyLanguage: "Blockly",
+      javascriptLanguage: "Javascript",
+      importFromBlockly: "Generar desde blockly",
+      saveOrLoadProgram: "Guardar o cargar su programa:",
+      avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
+      files: "Archivos",
+      reloadProgram: "Recargar:",
+      saveProgram: "Guardar",
+      limitBlocks: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.",
+      limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
+      previousTestcase: "Anterior", 
+      nextTestcase: "Siguiente",
+      allTests: "Todas las pruebas:",
+      emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
    }
-}
+};
 
 // Blockly to Scratch translations
 var blocklyToScratch = {
@@ -1936,7 +1993,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             } // There can be multiple robot_start blocks sometimes
          }
          if(!robotStartHasChildren) {
-            $('#errors').html('Le programme est vide ! Connectez des blocs.');
+            $('#errors').html(this.strings.emptyProgram);
             return;
          }
 
@@ -2316,14 +2373,16 @@ function extractLevelSpecific(item, level) {
 }
 
 
-var initBlocklySubTask = function(subTask) {
+var initBlocklySubTask = function(subTask, language) {
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
          callback();
       };
    }
-
+   if (language == undefined) {
+      language = "fr";
+   }
 
    subTask.loadLevel = function(curLevel) {
       subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
@@ -2443,7 +2502,7 @@ var initBlocklySubTask = function(subTask) {
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
-         subTask.context.messagePrefixSuccess = "Tous les tests : ";
+         subTask.context.messagePrefixSuccess = languageStrings[language].allTests;
          subTask.blocklyHelper.run(subTask.context);
       });
    };
@@ -2550,7 +2609,7 @@ var initBlocklySubTask = function(subTask) {
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
       subTask.context.linkBack = true;
-      subTask.context.messagePrefixSuccess = "Tous les tests : ";
+      subTask.context.messagePrefixSuccess = languageStrings[language].allTests;
       subTask.context.runner.runCodes(codes);
    };
 }
