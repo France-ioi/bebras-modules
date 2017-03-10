@@ -82,6 +82,13 @@ Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
   };
 };
 
+Blockly.WorkspaceSvg.prototype.renameVariable = function(oldName, newName) {
+  Blockly.WorkspaceSvg.superClass_.renameVariable.call(this, oldName, newName);
+  // Don't refresh the toolbox if there's a drag in progress.
+  if (this.toolbox_ && this.toolbox_.flyout_ && !Blockly.Flyout.startFlyout_) {
+    this.toolbox_.refreshSelection();
+  }
+}
 
 /**
  * Check if 3D transforms are supported by adding an element
