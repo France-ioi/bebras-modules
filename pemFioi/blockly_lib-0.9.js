@@ -81,6 +81,7 @@ var languageStrings = {
       nextTestcase: "Suivant",
       allTests: "Tous les tests :",
       emptyProgram: "Le programme est vide ! Connectez des blocs.",
+      uninitializedVar: "Variable non initialisée :"
    },
    en: {
       categories: {
@@ -128,6 +129,7 @@ var languageStrings = {
       nextTestcase: "Next",
       allTests: "All tests:",
       emptyProgram: "The program is empty! Connect some blocks.",
+      uninitializedVar: "Uninitialized variable:"
    },
    de: {
       categories: {
@@ -177,7 +179,8 @@ var languageStrings = {
       previousTestcase: "Vorheriger", 
       nextTestcase: "Nächster",
       allTests: "Tous le tests :",
-      emptyProgram: "Le programme est vide ! Connectez des blocs.",
+      emptyProgram: "Le programme est vide ! Connectez des blocs.", // TODO :: translate
+      uninitializedVar: "Uninitialized variable:" // TODO :: translate
    },
    es: {
       categories: {
@@ -229,6 +232,7 @@ var languageStrings = {
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
       emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
+      uninitializedVar: "Uninitialized variable:" // TODO :: translate
    }
 };
 
@@ -2039,12 +2043,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 }
 
 
-function initBlocklyRunner(context, messageCallback) {
-   init(context, [], [], [], false, {});
+function initBlocklyRunner(context, messageCallback, language) {
+   init(context, [], [], [], false, {}, language);
 
-   function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
+   function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
       runner.stepInProgress = false;
       runner.stepMode = false;
+      runner.strings = languageStrings[language];
 
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
@@ -2176,6 +2181,20 @@ function initBlocklyRunner(context, messageCallback) {
             }
 
             var message = e.toString();
+
+            // Translate "Unknown identifier" message
+            if(message.substring(0, 20) == "Unknown identifier: ") {
+               var varName = message.substring(20);
+               // Get original variable name if possible
+               for(var dbIdx in Blockly.JavaScript.variableDB_.db_) {
+                  if(Blockly.JavaScript.variableDB_.db_[dbIdx] == varName) {
+                     varName = dbIdx.substring(0, dbIdx.length - 9);
+                     break;
+                  }
+               }
+               message = this.strings.uninitializedVar + ' ' + varName;
+            }
+
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
                if (context.success) {
                   message = context.messagePrefixSuccess + message;
@@ -2484,7 +2503,7 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.run = function() {
       initBlocklyRunner(subTask.context, function(message, success) {
          $("#errors").html(message);
-      });
+      }, language);
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);
    };
@@ -2498,7 +2517,7 @@ var initBlocklySubTask = function(subTask, language) {
          initBlocklyRunner(subTask.context, function(message, success) {
             $("#errors").html(message);
             platform.validate("done");
-         });
+         }, language);
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
@@ -2512,7 +2531,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
         initBlocklyRunner(subTask.context, function(message, success) {
            $("#errors").html(message);
-        });
+        }, language);
         initContextForLevel(subTask.iTestCase);
       }
       subTask.blocklyHelper.step(subTask.context);
@@ -2604,7 +2623,7 @@ var initBlocklySubTask = function(subTask, language) {
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
             callback(subTask.testCaseResults[iWorstTestCase]);
          }
-      });
+      }, language);
       subTask.iTestCase = 0;
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
