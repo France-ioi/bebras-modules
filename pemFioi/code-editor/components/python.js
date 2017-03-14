@@ -11,18 +11,23 @@ function PythonInterpreter(context, msgCallback) {
   this._code = '';
   this._editor_filename = "<stdin>";
   this.context.runner = this;
-  this._maxIterations = 40000;
+  this._maxIterations = 4000;
+  this._maxIterWithoutAction = 50;
   this._resetCallstackOnNextStep = false;
   this._paused = false;
   this._isRunning = false;
   this._stepInProgress = false;
   this._stepMode = false;
   this._steps = 0;
+  this._stepsWithoutAction = 0;
+  this._lastNbActions = null;
+  this._hasActions = false;
+  this._nbActions = 0;
   this._timeouts = [];
   this._editorMarker = null;
   var that = this;
 
-  this._skulptifyHandler = function (name, generatorName, blockName, nbArgs) {
+  this._skulptifyHandler = function (name, generatorName, blockName, nbArgs, type) {
     var handler = '';
     handler += "\tSk.builtin.pyCheckArgs('" + name + "', arguments, " + nbArgs + ", " + nbArgs + ");";
 
@@ -36,6 +41,12 @@ function PythonInterpreter(context, msgCallback) {
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";
     handler += "\n\targs.push(resolve);";
+
+    // Count actions
+    if(type == 'actions') {
+      handler += "\n\tcurrentPythonContext.runner._nbActions += 1;";
+    }
+
     handler += "\n\ttry {";
     handler += '\n\t\tcurrentPythonContext["' + generatorName + '"]["' + blockName + '"].apply(currentPythonContext, args);';
     handler += "\n\t} catch (e) {";
@@ -50,13 +61,15 @@ function PythonInterpreter(context, msgCallback) {
     var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
     if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
       // Flatten customBlocks information for easy access
-      var blocksNbArgs = {};
+      var blocksInfos = {};
       for (var generatorName in this.context.customBlocks) {
         for (var typeName in this.context.customBlocks[generatorName]) {
           var blockList = this.context.customBlocks[generatorName][typeName].blocks;
           for (var iBlock=0; iBlock < blockList.length; iBlock++) {
             var blockInfo = blockList[iBlock];
-            blocksNbArgs[blockInfo.name] = blockInfo.params ? blockInfo.params.length : 0;
+            blocksInfos[blockInfo.name] = {
+              nbArgs: blockInfo.params ? blockInfo.params.length : 0,
+              type: typeName};
           }
         }
       }
@@ -70,9 +83,14 @@ function PythonInterpreter(context, msgCallback) {
           if (typeof(code) == "undefined") {
             code = blockName;
           }
-          var nbArgs = blocksNbArgs[blockName] ? blocksNbArgs[blockName] : 0;
+          var nbArgs = blocksInfos[blockName] ? blocksInfos[blockName].nbArgs : 0;
+          var type = blocksInfos[blockName] ? blocksInfos[blockName].type : 'actions';
 
-          modContents += this._skulptifyHandler(code, generatorName, blockName, nbArgs);
+          if(type == 'actions') {
+            this._hasActions = true;
+          }
+
+          modContents += this._skulptifyHandler(code, generatorName, blockName, nbArgs, type);
         }
       }
     }
@@ -163,7 +181,6 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._builtinRead = function (x) {
-    this._injectFunctions();
     if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
       throw "File not found: '" + x + "'";
     return Sk.builtinFiles["files"][x];
@@ -175,7 +192,9 @@ function PythonInterpreter(context, msgCallback) {
 
   this._continue = function () {
     if (this._steps >= this._maxIterations) {
-      this._onStepError("Nombre maximum d'itérations dépassé");
+      this._onStepError(CodeEditor.Utils.Localization.Strings['fr'].tooManyIterations);
+    } else if (this._stepsWithoutAction >= this._maxIterWithoutAction) {
+      this._onStepError(CodeEditor.Utils.Localization.Strings['fr'].tooManyIterationsWithoutAction);
     } else if (!this._paused && this._isRunning) {
       this.step();
     }
@@ -192,8 +211,21 @@ function PythonInterpreter(context, msgCallback) {
     currentPythonContext = this.context;
     this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
+    this._injectFunctions();
     this._code = codes[0];
     this._setBreakpoint(1, false);
+
+    if(typeof this.context.infos.maxIter !== 'undefined') {
+      this._maxIterations = Math.ceil(this.context.infos.maxIter/10);
+    }
+    if(typeof this.context.infos.maxIterWithoutAction !== 'undefined') {
+      this._maxIterWithoutAction = Math.ceil(this.context.infos.maxIterWithoutAction/10);
+    }
+    if(!this._hasActions) {
+      // No limit on 
+      this._maxIterWithoutAction = this._maxIterations;
+    }
+
     try {
       var susp_handlers = {};
       susp_handlers["*"] = this._debugger.suspension_handler.bind(this);
@@ -259,6 +291,10 @@ function PythonInterpreter(context, msgCallback) {
 
   this._resetInterpreterState = function () {
     this._steps = 0;
+    this._stepsWithoutAction = 0;
+    this._lastNbActions = 0;
+    this._nbActions = 0;
+
     this._isRunning = false;
     this._stepMode = false;
     this._stepInProgress = false;
@@ -307,6 +343,12 @@ function PythonInterpreter(context, msgCallback) {
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
     this._steps += 1;
+    if(this._lastNbActions != this._nbActions) {
+      this._lastNbActions = this._nbActions;
+      this._stepsWithoutAction = 0;
+    } else {
+      this._stepsWithoutAction += 1;
+    }
   };
 
   this._onStepSuccess = function (){

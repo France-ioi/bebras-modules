@@ -27,6 +27,7 @@ CodeEditor.Utils.Localization.Strings = {
     greatestOfTwoNumbers: "Plus grand des deux nombres",
     programOfRobot: "Programme du robot",
     tooManyIterations: "Votre programme met trop de temps à se terminer !",
+    tooManyIterationsWithoutAction: "Votre programme s'est exécuté trop longtemps sans effectuer d'action !",
     submitProgram: "Valider le programme",
     runProgram: "Exécuter sur ce test",
     stopProgram: "|<",

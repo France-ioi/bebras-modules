@@ -57,6 +57,7 @@ var languageStrings = {
       programOfRobot: "Programme du robot",
       flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
+      tooManyIterationsWithoutAction: "Votre programme s'est exécuté trop longtemps sans effectuer d'action !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
       stopProgram: "|<",
@@ -106,7 +107,8 @@ var languageStrings = {
       greatestOfTwoNumbers: "Greatest of the two numbers",
       programOfRobot: "Robot's program",
       flagClicked: "When %1 clicked",
-      tooManyIterations: "Too many iterations before an action!",
+      tooManyIterations: "Too many iterations!",
+      tooManyIterationsWithoutAction: "Too many iterations without action!",
       submitProgram: "Validate this program",
       runProgram: "Run this program",
       stopProgram: "Stop",
@@ -157,7 +159,8 @@ var languageStrings = {
       greatestOfTwoNumbers: "Größte von zwei Zahlen",
       programOfRobot: "Programm des Roboters",
       flagClicked: "When %1 clicked", // TODO :: translate (scratch start flag, %1 is the flag icon)
-      tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
+      tooManyIterations: "Zu viele Iterationen!",
+      tooManyIterationsWithoutAction: "Zu viele Iterationen vor einer Aktion!",
       submitProgram: "Programm überprüfen lassen",
       runProgram: "Programm ausführen",
       stopProgram: "Stop",
@@ -208,6 +211,7 @@ var languageStrings = {
       programOfRobot: "Programa de robot",
       flagClicked: "Cuando se hace click en %1",
       tooManyIterations: "¡Su programa se tomó demasiado tiempo para terminar!",
+      tooManyIterationsWithoutAction: "¡Su programa se tomó demasiado tiempo para terminar!", // TODO :: change translation
       submitProgram: "Validar el programa",
       runProgram: "Ejecutar el programa",
       stopProgram: "|<",
@@ -2047,6 +2051,8 @@ function initBlocklyRunner(context, messageCallback, language) {
    init(context, [], [], [], false, {}, language);
 
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
+      runner.hasActions = false;
+      runner.nbActions = 0;
       runner.stepInProgress = false;
       runner.stepMode = false;
       runner.strings = languageStrings[language];
@@ -2088,6 +2094,15 @@ function initBlocklyRunner(context, messageCallback, language) {
       };
 
       runner.initInterpreter = function(interpreter, scope) {
+         var makeHandler = function(runner, handler) {
+            // For commands belonging to the "actions" category, we count the
+            // number of actions to put a limit on steps without actions
+            return function () {
+               runner.nbActions += 1;
+               handler.apply(this, arguments);
+            };
+         };
+
          for (var objectName in context.customBlocks) {
             for (var iCategory in context.customBlocks[objectName]) {
                for (var iBlock in context.customBlocks[objectName][iCategory].blocks) {
@@ -2096,8 +2111,15 @@ function initBlocklyRunner(context, messageCallback, language) {
 
                   if (typeof(code) == "undefined")
                      code = blockInfo.name;
+
+                  if(iCategory == 'actions') {
+                     runner.hasActions = true;
+                     var handler = makeHandler(runner, blockInfo.handler);
+                  } else {
+                     var handler = blockInfo.handler;
+                  }
                   
-                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(blockInfo.handler));
+                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
                }
             }            
          }
@@ -2139,9 +2161,19 @@ function initBlocklyRunner(context, messageCallback, language) {
 
       runner.runSyncBlock = function() {
          var maxIter = 40000;
+         var maxIterWithoutAction = 500;
          if (context.infos.maxIter != undefined) {
             maxIter = context.infos.maxIter;
          }
+         if (context.infos.maxIterWithoutAction != undefined) {
+            maxIterWithoutAction = context.infos.maxIterWithoutAction;
+         }
+
+         if(!runner.hasActions) {
+            // If there's no actions in the current task, "disable" the limit
+            maxIterWithoutAction = maxIter;
+         }
+
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
@@ -2158,7 +2190,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               while (context.curSteps[iInterpreter] < maxIter) {
+               while (context.curSteps[iInterpreter].total < maxIter && context.curSteps[iInterpreter].withoutAction < maxIterWithoutAction) {
                   if (!interpreter.step() || toStop[iInterpreter]) {
                      isRunning[iInterpreter] = false;;
                      break;
@@ -2166,11 +2198,20 @@ function initBlocklyRunner(context, messageCallback, language) {
                   if (interpreter.paused_) {
                      break;
                   }
-                  context.curSteps[iInterpreter]++;
+                  context.curSteps[iInterpreter].total++;
+                  if(context.curSteps[iInterpreter].lastNbMoves != runner.nbActions) {
+                     context.curSteps[iInterpreter].lastNbMoves = runner.nbActions;
+                     context.curSteps[iInterpreter].withoutAction = 0;
+                  } else {
+                     context.curSteps[iInterpreter].withoutAction++;
+                  }
                }
-               if (context.curSteps[iInterpreter] >= maxIter) {
+               if (context.curSteps[iInterpreter].total >= maxIter) {
                   isRunning[iInterpreter] = false;
                   throw context.blocklyHelper.strings.tooManyIterations;
+               } else if(context.curSteps[iInterpreter].withoutAction >= maxIterWithoutAction) {
+                  isRunning[iInterpreter] = false;
+                  throw context.blocklyHelper.strings.tooManyIterationsWithoutAction;
                }
             }
          } catch (e) {
@@ -2215,13 +2256,17 @@ function initBlocklyRunner(context, messageCallback, language) {
       runner.initCodes = function(codes) {
          //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
          interpreters = [];
+         runner.nbActions = 0;
          runner.stepInProgress = false;
          runner.stepMode = false;
          context.programEnded = [];
          context.curSteps = [];
          context.reset();
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
-            context.curSteps[iInterpreter] = 0;
+            context.curSteps[iInterpreter] = {
+               total: 0,
+               withoutAction: 0,
+               lastNbMoves: 0};
             context.programEnded[iInterpreter] = false;
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
