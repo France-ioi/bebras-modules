@@ -321,7 +321,7 @@ function PythonInterpreter(context, msgCallback) {
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
     if(this.context.display && (this._stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
-      if(curSusp.lineno) {
+      if(curSusp && curSusp.lineno) {
         this.removeEditorMarker();
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;

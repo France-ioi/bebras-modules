@@ -368,7 +368,9 @@ function SubTaskController(_subTask) {
     var newTest = subTask.iTestCase + delta;
     if ((newTest >= 0) && (newTest < this.nbTestCases)) {
       initContextForLevel(newTest);
-      $("#testCaseName").html("Test " + (newTest + 1) + "/" + this.nbTestCases);
+      if(this.display) {
+        $("#testCaseName").html("Test " + (newTest + 1) + "/" + this.nbTestCases);
+      }
     }
   };
 
