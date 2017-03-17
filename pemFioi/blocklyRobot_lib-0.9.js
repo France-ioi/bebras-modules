@@ -144,7 +144,20 @@ var getContext = function(display, infos, curLevel) {
                 writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
-         exit_grid: "Le robot sort de la grille !"
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
       de: {
          label: {
@@ -272,7 +285,20 @@ var getContext = function(display, infos, curLevel) {
          description: {
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
-         exit_grid: "Le robot sort de la grille !"
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
       es: {
          label: {
@@ -288,10 +314,10 @@ var getContext = function(display, infos, curLevel) {
             west: "avanzar hacia la izquierda",
             north: "avanzar hacia arriba",
             paint: "pintar la casilla",
-            pickTransportable: "Recoger la bola",
-            dropTransportable: "Dejar caer la bola",
+            pickTransportable: "recoger la bola",
+            dropTransportable: "dejar caer la bola",
             onTransportable: "sobre una bola",
-            onHole: "Sobre un hoyo",
+            onHole: "sobre un agujero",
             transportableShape: "forma del objeto",
             transportableColor: "color del objeto",
             transportableRed:  "el objeto es rojo",
@@ -301,9 +327,9 @@ var getContext = function(display, infos, curLevel) {
             brownCell: "sobre una casilla café",
             markedCell: "sobre una casilla marcada",
             addPlatformAbove: "construir una plataforma por encima",
-            addPlatformInFront: "construir una plataforma por delante",
-            platformInFront: "plataforma delante",
-            platformInFrontAndBelow: "plataforma delante y abajo",
+            addPlatformInFront: "construir una plataforma por adelante",
+            platformInFront: "plataforma adelante",
+            platformInFrontAndBelow: "plataforma adelante y abajo",
             platformAbove: "plataforma por encima",
             gridEdgeInFront: "borde de la cuadrícula adelante",
             gridEdgeAbove: "borde de la cuadrícula arriba",
@@ -352,7 +378,7 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "recoger",
             dropTransportable: "soltar",
             onTransportable: "sobreObjeto",
-            onHole: "sobreHoyo",
+            onHole: "sobreAgujero",
             transportableShape: "formaObjeto",
             transportableColor: "colorObjeto",
             transportableRed: "objetoRojo",
@@ -399,16 +425,16 @@ var getContext = function(display, infos, curLevel) {
          },
          description: { 
                 platformAbove: "plataformaArriba() : ¿hay una plataforma arriba del robot?",
-                obstacleInFront: "obstáculoAdelante() : ¿hay un obstáculo delante del robot?",
-                onHole: "sobreHoyo() : ¿se encuentra el robot sobre un hoyo?",
+                obstacleInFront: "obstáculoAdelante() : ¿hay un obstáculo adelante del robot?",
+                onHole: "sobreAgujero() : ¿se encuentra el robot sobre un agujero?",
                 onTransportable: "sobreObjeto() : ¿se encuentra el robot sobre un objeto que puede recoger?",
                 paintOnCell: "pinturaEnCasilla() : ¿está pintada la casilla en la que está el robot?",
-                gridEdgeInFront: "bordeCuadriculaAdelante() : ¿está el borde de la cuadrícula justo delante del robot?",
+                gridEdgeInFront: "bordeCuadriculaAdelante() : ¿está el borde de la cuadrícula justo adelante del robot?",
                 gridEdgeEast: "bordeCuadriculaDerecha() : ¿está el borde de la cuadrícula justo a la izquierda del robot?",
                 gridEdgeWest: "bordeCuadriculaIzquierda() : ¿está el borde de la cuadrícula justo a la izquierda del robot?",
                 gridEdgeAbove: "bordeCuadriculaArriba() : ¿está el borde de la cuadrícula justo arriba del robot?",
                 gridEdgeBelow: "bordeCuadriculaAbajo() : ¿está el borde de la cuadrícula justo abajo del robot?",
-                platformInFront: "plataformaAdelante() : ¿hay una plataforma delante del robot?",
+                platformInFront: "plataformaAdelante() : ¿hay una plataforma adelante del robot?",
                 numberUnder: "numeroCasilla() : número escrito sobre la casilla del robot",
                 col: "columna() : columna del robot",
                 row: "fila() : fila del robot",
@@ -417,7 +443,20 @@ var getContext = function(display, infos, curLevel) {
                 paintNorthEast: "pintadoArribaIzquierda() : ¿se encuentra pintada la casilla de arriba a la izquierda?"
          },
          obstacle: "¡El robot intenta moverse sobre un obstáculo!",
-         exit_grid: "¡El robot salió de la cuadrícula!"
+         exit_grid: "¡El robot salió de la cuadrícula!",
+         nothingToPickUp: "No hay algo para recoger",
+         alreadyTransportingObject: "El robot ya transporta un objeto",
+         jumpOutsideGrid: "¡El robot intenta saltar fuera de la cuadrícula!",
+         jumpObstacleBlocking: "El robot intenta saltar pero hay un obstáculo que lo bloquea",
+         jumpNoPlatform: "¡El robot intenta saltar pero no hay una plataforma arriba!",
+         downOutsideGrid: "¡El robot intenta descender fuera de la cuadrícula!",
+         downNoPlatform: "¡El robot intenta descender pero no hay plataforma abajo!",
+         falls: "El robot cae al vacío",
+         willFallAndCrash: "¡El robot va a caer y chocar!",
+         dropWithoutItem: "El robot intenta soltar un objeto, pero no carga nada.",
+         droppedAllItems: "¡Bien hecho! ¡Ha soltado todos los objetos!",
+         obstacleOnCell: "Hay un obstáculo en esta casilla",
+         platformOnCell: "Ya hay una plataforma sobre esta casilla"
       },
    };
    var strings = languageStrings[stringsLanguage];
@@ -459,7 +498,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.callCallback = function(callback, value) { // Default implementation
       context.runner.noDelay(callback, value);
-   }
+   };
 
    context.nbRobots = 1;
 
@@ -494,11 +533,11 @@ var getContext = function(display, infos, curLevel) {
       }
       if (isOutsideGrid(row + 1, coords.col)) {
          context.lost = true;
-         throw("Le robot se jette dans le vide !");
+         throw(strings.falls);
       }
       if (row - coords.row > 2) {
          context.lost = true;
-         throw("Le robot va tomber de haut et s'écraser !");
+         throw(strings.willFallAndCrash);
       }
       coords.row = row;
       context.nbMoves++;
@@ -515,17 +554,17 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       if (isOutsideGrid(item.row - 2, item.col)) {
          context.lost = true;
-         throw("Le robot essaie de sauter en dehors de la grille !");
+         throw(strings.jumpOutsideGrid);
       }
       var obstacle = context.getItems(item.row - 2, item.col, {category: "obstacle"});
       if (obstacle.length > 0) {
          context.lost = true;
-         throw("Le robot essaie de sauter mais il y a un obstacle qui le bloque");
+         throw(strings.jumpObstacleBlocking);
       }
       var platforms = context.getItems(item.row - 1, item.col, {category: "platform"});
       if (platforms.length == 0) {
          context.lost = true;
-         throw("Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !");
+         throw(strings.jumpNoPlatform);
       }
       context.nbMoves++;
       moveRobot(item.row - 2, item.col, item.dir, callback);
@@ -541,12 +580,12 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       if (isOutsideGrid(item.row + 2, item.col)) {
          context.lost = true;
-         throw("Le robot essaie de descendre en dehors de la grille !");
+         throw(strings.downOutsideGrid);
       }
       var platforms = context.getItems(item.row + 3, item.col, {category: "platform"});
       if (platforms.length == 0) {
          context.lost = true;
-         throw("Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !");
+         throw(strings.downNoPlatform);
       }
       context.nbMoves++;
       moveRobot(item.row + 2, item.col, item.dir, callback);
@@ -571,7 +610,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var platforms = context.getItems(robot.row + 1, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformInFrontAndBelow = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -584,7 +623,7 @@ var getContext = function(display, infos, curLevel) {
       var row = item.row + 3;
       var platforms = context.getItems(row, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
@@ -605,7 +644,7 @@ var getContext = function(display, infos, curLevel) {
          gridEdge = true;
       }
       context.runner.noDelay(callback, gridEdge);
-   };
+   }
 
    context.robot.gridEdgeAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
@@ -642,7 +681,7 @@ var getContext = function(display, infos, curLevel) {
          }
          context.items.splice(foundItem, 1);
       }
-   };
+   }
 
    function createItem(newItem) {
       var robot = context.getRobotItem(context.curRobot);
@@ -670,11 +709,11 @@ var getContext = function(display, infos, curLevel) {
    function addPlatform(row, col, callback) {
       var platforms = context.getItems(row, col, {category: "platform"});
       if (platforms.length > 0) {
-         throw("Il y a déjà une plateforme sur cette case");
+         throw(strings.platformOnCell);
       }
       var obstacles = context.getItems(row, col, {isObstacle: true});
       if (obstacles.length > 0) {
-         throw("Il y a un obstacle sur cette case");
+         throw(strings.obstacleOnCell);
       }
       createItem({row: row, col: col, type: "platform"});
       context.waitDelay(callback);
@@ -684,12 +723,12 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront(robot.dir);
       addPlatform(coords.row + 1, coords.col, callback);
-   }
+   };
 
    context.robot.addPlatformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       addPlatform(robot.row - 1, robot.col, callback);
-   }
+   };
 
    function paint(row, col, paintType, callback) {
       if (context.lost) {
@@ -940,12 +979,12 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       return null;
-   }
+   };
 
    context.transportable_exists = function(id, callback) {
       var transportable = findTransportable(id);
       context.runner.noDelay(callback, transportable != null);
-   }
+   };
 
    context.transportable_col = function(id, callback) {
       var transportable = findTransportable(id);
@@ -954,7 +993,7 @@ var getContext = function(display, infos, curLevel) {
          res = transportable.col + 1;
       }
       context.callCallback(callback, res);
-   }
+   };
 
    context.transportable_row = function(id, callback) {
       var transportable = findTransportable(id);
@@ -1033,7 +1072,7 @@ var getContext = function(display, infos, curLevel) {
          return itemType[property];
       }
       return "";
-   }
+   };
 
    context.robot.transportableShape = function(callback) {
       var result = getTransportableProperty("shape");
@@ -1044,7 +1083,7 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
       if (transportables.length == 0) {
-         throw("Rien à ramasser");
+         throw(strings.nothingToPickUp);
       }
       /*
       if (transportables[0].rank != context.nbTransportedItems + 1) {
@@ -1052,7 +1091,7 @@ var getContext = function(display, infos, curLevel) {
       }
       */
       if (context.nbTransportedItems > 0) {
-         throw("Le robot transporte déjà un objet");
+         throw(strings.alreadyTransportingObject);
       }
       var transportable = transportables[0];
       context.items.splice(transportable.index, 1);
@@ -1075,7 +1114,7 @@ var getContext = function(display, infos, curLevel) {
    context.robot.dropTransportable = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       if (context.transportedItem == undefined) {
-         throw("Le robot essaie de déposer un objet mais n'en transporte pas.");
+         throw(strings.dropWithoutItem);
       }
       /*
       if (context.tiles[robot.row][robot.col] != 2) { // TODO : replace
@@ -1086,7 +1125,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbTransportedItems = 0;
       if (context.nbDroppedItems == context.nbTransportableItems - 1) {
          context.success = true;
-         throw("Bravo, vous avez déposé toutes les objets !");
+         throw(strings.droppedAllItems);
       }
       context.waitDelay(function() {
          context.items.push(context.transportedItem);
@@ -1098,7 +1137,7 @@ var getContext = function(display, infos, curLevel) {
          context.transportedItem = undefined;
          callback();
       });
-   }
+   };
    
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
@@ -1585,4 +1624,4 @@ var getContext = function(display, infos, curLevel) {
    };
 
    return context;
-}
+};
