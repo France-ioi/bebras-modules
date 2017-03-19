@@ -47,7 +47,7 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
         oldVarField.setValue(newVarName);
 
         // Delete the data_variable which was dragged onto here
-        childBlock.dispose();
+        setTimeout(function () { childBlock.dispose(); }, 0);
       } catch(e) {
         // Abort
       }
