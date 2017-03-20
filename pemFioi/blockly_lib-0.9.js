@@ -2053,8 +2053,12 @@ function initBlocklyRunner(context, messageCallback, language) {
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
       runner.hasActions = false;
       runner.nbActions = 0;
+
       runner.stepInProgress = false;
       runner.stepMode = false;
+      runner.nextCallBack = null;
+      runner.firstHighlight = true;
+
       runner.strings = languageStrings[language];
 
       runner.waitDelay = function(callback, value, delay) {
@@ -2077,19 +2081,11 @@ function initBlocklyRunner(context, messageCallback, language) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               if(runner.stepMode) {
-                  runner.stepInProgress = false;
-               } else {
-                  runner.runSyncBlock();
-               }
+               runner.runSyncBlock();
             }, 0);
          } else {
             callback(primitive);
-            if(runner.stepMode) {
-               runner.stepInProgress = false;
-            } else {
-               runner.runSyncBlock();
-            }
+            runner.runSyncBlock();
          }
       };
 
@@ -2133,20 +2129,33 @@ function initBlocklyRunner(context, messageCallback, language) {
          }*/
          interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
 
-         function highlightBlock(id) {
-            if (context.display && !context.blocklyHelper.scratchMode) {
-               context.blocklyHelper.workspace.traceOn(true);
-               context.blocklyHelper.workspace.highlightBlock(id);
-               highlightPause = true;
+         function highlightBlock(id, callback) {
+            id = id ? id.toString() : '';
+
+            var cb = function () {
+              if (context.display && !context.blocklyHelper.scratchMode) {
+                 context.blocklyHelper.workspace.traceOn(true);
+                 context.blocklyHelper.workspace.highlightBlock(id);
+                 highlightPause = true;
+              }
+              callback();
+            }
+
+            // We always execute directly the first highlightBlock
+            if(runner.firstHighlight || !runner.stepMode) {
+               runner.firstHighlight = false;
+               cb();
+               runner.runSyncBlock();
+            } else {
+               // Interrupt here for step mode, allows to stop before each
+               // instruction
+               runner.nextCallback = cb;
+               runner.stepInProgress = false;
             }
          }
 
          // Add an API function for highlighting blocks.
-         var wrapper = function(id) {
-           id = id ? id.toString() : '';
-           return interpreter.createPrimitive(highlightBlock(id));
-         };
-         interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
+         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(highlightBlock));
       };
 
       runner.stop = function() {
@@ -2182,6 +2191,12 @@ function initBlocklyRunner(context, messageCallback, language) {
          }*/
 
          runner.stepInProgress = true;
+
+         // Handle the callback from last highlightBlock
+         if(runner.nextCallback) {
+            runner.nextCallback();
+            runner.nextCallback = null;
+         }
 
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
@@ -2259,6 +2274,7 @@ function initBlocklyRunner(context, messageCallback, language) {
          runner.nbActions = 0;
          runner.stepInProgress = false;
          runner.stepMode = false;
+         runner.firstHighlight = true;
          context.programEnded = [];
          context.curSteps = [];
          context.reset();
