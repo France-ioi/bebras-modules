@@ -2053,6 +2053,7 @@ function initBlocklyRunner(context, messageCallback, language) {
    function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
       runner.hasActions = false;
       runner.nbActions = 0;
+      runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
 
       runner.stepInProgress = false;
       runner.stepMode = false;
@@ -2064,7 +2065,7 @@ function initBlocklyRunner(context, messageCallback, language) {
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
-                  runner.noDelay(callback, value);
+                  runner.noDelay(callback, value, true);
                },
                delay
             );
@@ -2073,7 +2074,7 @@ function initBlocklyRunner(context, messageCallback, language) {
          }
       };
 
-      runner.noDelay = function(callback, value) {
+      runner.noDelay = function(callback, value, hadDelay) {
          var primitive = undefined;
          if (value != undefined) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
@@ -2081,11 +2082,21 @@ function initBlocklyRunner(context, messageCallback, language) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               runner.runSyncBlock();
+               if(runner.stepMode && runner.scratchMode && hadDelay) {
+                  // Interrupt only in scratch mode, when a robot action with a
+                  // delay occured, as there's no other feedback to the user
+                  runner.stepInProgress = false;
+               } else {
+                  runner.runSyncBlock();
+               }
             }, 0);
          } else {
             callback(primitive);
-            runner.runSyncBlock();
+            if(runner.stepMode && runner.scratchMode && hadDelay) {
+               runner.stepInProgress = false;
+            } else {
+               runner.runSyncBlock();
+            }
          }
       };
 
@@ -2133,7 +2144,7 @@ function initBlocklyRunner(context, messageCallback, language) {
             id = id ? id.toString() : '';
 
             var cb = function () {
-              if (context.display && !context.blocklyHelper.scratchMode) {
+              if (context.display && !runner.scratchMode) {
                  context.blocklyHelper.workspace.traceOn(true);
                  context.blocklyHelper.workspace.highlightBlock(id);
                  highlightPause = true;
@@ -2142,7 +2153,7 @@ function initBlocklyRunner(context, messageCallback, language) {
             }
 
             // We always execute directly the first highlightBlock
-            if(runner.firstHighlight || !runner.stepMode) {
+            if(runner.firstHighlight || runner.scratchMode || !runner.stepMode) {
                runner.firstHighlight = false;
                cb();
                runner.runSyncBlock();
