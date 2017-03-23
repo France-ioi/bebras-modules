@@ -29,254 +29,38 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   this._strings = CodeEditor.Utils.Localization.Strings[this._localization];
   this._includeBlocks = null;
 
-  this._blocklyControler = null;
-
-  this._loadBlocklyController = function (_options) {
-
-    this._blocklyControler = new CodeEditor.Controllers.BlocklyController(
-      this._includeBlocks,
-      this._mainContext,
-      this._strings
-    );
-
-    this._blocklyControler.createGeneratorsAndBlocks();
-
-    var options = _options || {};
-
-    options.divId = options.divId || CodeEditor.Utils.DOM.Elements.BLOCKLY_WORKSPACE;
-
-    if (this._visible) {
-      var xml = this._blocklyControler.getToolboxXml();
-
-      var wsConfig = {
-        toolbox: "<xml>" + xml + "</xml>",
-        sounds: false,
-        media: "http://static3.castor-informatique.fr/contestAssets/blockly/"
-      };
-
-
-      wsConfig.comments = true;
-      wsConfig.scrollbars = true;
-      wsConfig.trashcan = true;
-
-      if (this._maxInstructions != undefined) {
-        wsConfig.maxBlocks = this._maxInstructions;
-      }
-      if (options.readOnly) {
-        wsConfig.readOnly = true;
-      }
-
-      this._blocklyControler.addExtraBlocks();
-
-      this._workspace = Blockly.inject(options.divId, wsConfig);
-
-      var toolboxNode = $('#toolboxXml');
-
-      if (toolboxNode.length != 0) {
-        toolboxNode.html(xml);
-      }
-
-      Blockly.Trashcan.prototype.MARGIN_SIDE_ = 410;
-
-      $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
-
-      var that = this;
-
-      var onchange = function (e) {
-        window.focus();
-
-        if(maxInstructions) {
-          var remaining = that._workspace.remainingCapacity();
-          var optLimitBlocks = {
-             maxBlocks: maxInstructions,
-             remainingBlocks: Math.abs(remaining)
-             };
-          var strLimitBlocks = remaining < 0 ? that._strings.limitBlocksOver : that._strings.limitBlocks;
-          $('#capacity').css('color', remaining < 0 ? 'red' : '');
-          $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
-        }
-      };
-
-      this._workspace.addChangeListener(onchange);
-
-      onchange();
-
-    } else {
-
-      this._workspace = new Blockly.Workspace();
-    }
-
-    if (!options.noRobot) {
-      var newXml;
-      if (this._startingBlock) {
-        newXml = '<xml><block type="robot_start" deletable="false" movable="false"></block></xml>';
-      }
-      else {
-        newXml = '<xml></xml>';
-      }
-
-      Blockly.Events.recordUndo = false;
-      Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(newXml), this._workspace);
-      Blockly.Events.recordUndo = true;
-    }
-    this._savePrograms();
-  };
-
   this._savePrograms = function () {
-    this._programs.javascript = $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val();
     if(this._aceEditor) {
       this._programs.python = this._aceEditor.getValue();
-    }
-    if (this._workspace) {
-      var xml = Blockly.Xml.workspaceToDom(this._workspace);
-      this._programs.blockly = Blockly.Xml.domToText(xml);
-      this._programs.blocklyJS = this._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
     }
   };
 
   this._loadPrograms = function () {
-    $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val(this._programs.javascript);
     if(this._aceEditor) {
       this._aceEditor.setValue(this._programs.python);
       this._aceEditor.selection.clearSelection();
     }
-    if (this._workspace) {
-      var xml = Blockly.Xml.textToDom(this._programs.blockly);
-      this._workspace.clear();
-      Blockly.Xml.domToWorkspace(xml, this._workspace);
-    }
-  };
-
-  this._getCodeFromBlocks = function (language, codeWs) {
-
-    var codeWorkspace = codeWs || this._workspace;
-
-    var blocks = codeWorkspace.getTopBlocks(true);
-
-    var languageObj = null;
-
-    if (language === CodeEditor.CONST.LANGUAGES.JAVASCRIPT) {
-      languageObj = Blockly.JavaScript;
-    } else if (language === CodeEditor.CONST.LANGUAGES.PYTHON) {
-      languageObj = Blockly.Python;
-    }
-
-    languageObj.init(codeWorkspace);
-
-    var code = [];
-
-    var comments = [];
-
-    for (var b = 0; b < blocks.length; b++) {
-      var block = blocks[b];
-      var blockCode = languageObj.blockToCode(block);
-      if (["procedures_defnoreturn", "procedures_defreturn"].indexOf(block.type) > -1) {
-        // For function blocks, the code is stored in languageObj.definitions_
-      } else {
-        if (block.type == "robot_start" || !this._startingBlock) {
-          comments.push(blockCode);
-        }
-      }
-    }
-
-    for (var def in languageObj.definitions_) {
-      code.push(languageObj.definitions_[def]);
-    }
-
-    code = code.join("\n");
-    code += comments.join("\n");
-
-    return code;
   };
 
   this.switchLanguage = function (e) {
     this._language = e.value;
-    CodeEditor.Utils.DOM.displayLanguageWorkspace(this._language);
-  };
-
-  this.importFromBlockly = function (e) {
-    this._programs.python = '';
-    this._programs.javascript = '';
-
-    switch (this._language) {
-      case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
-        this._programs.javascript = this._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
-        $(CodeEditor.Utils.DOM.Elements.JAVASCRIPT_WORKSPACE).val(this._programs.javascript);
-        break;
-      case CodeEditor.CONST.LANGUAGES.PYTHON:
-        this._programs.python = this._getCodeFromBlocks(CodeEditor.CONST.LANGUAGES.JAVASCRIPT);
-        this._aceEditor.setValue(this._programs.python);
-        break;
-    }
   };
 
   this.load = function (language, display, nbTestCases, _options) {
     this._nbTestCases = nbTestCases;
     this._loadBasicEditor();
-    CodeEditor.Utils.DOM.displayLanguageWorkspace(this._language);
-    switch (this._language) {
-      case CodeEditor.CONST.LANGUAGES.BLOCKLY:
-        this._loadBlocklyController(_options);
-        break;
-      case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
-        break;
-      case CodeEditor.CONST.LANGUAGES.PYTHON:
-        if(this._aceEditor && ! this._aceEditor.getValue()) {
-          this._aceEditor.setValue("from robot import *\n");
-        }
-        break;
+    if(this._aceEditor && ! this._aceEditor.getValue()) {
+      this._aceEditor.setValue("from robot import *\n");
     }
   };
 
   this.unload = function () {
-    var ws = this._workspace;
-    if (ws != null) {
-      ws.dispose();
-      if (false) {
-        $(".blocklyWidgetDiv").remove();
-        $(".blocklyTooltipDiv").remove();
-        document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-        delete Blockly;
-      }
-    }
     this.stop();
   };
 
   /**
    * Code running specific operations
    */
-  this.getBlocklyLibCode = function (generators) {
-    var strCode = "";
-    for (var objectName in generators) {
-      strCode += "var " + objectName + " = {\n";
-      for (var iGen = 0; iGen < generators[objectName].length; iGen++) {
-        var generator = generators[objectName][iGen];
-
-        if (generator.nbParams == 0) {
-          strCode += generator.codeFr + ": function() { ";
-        } else {
-          strCode += generator.codeFr + ": function(param1) { ";
-        }
-        if (generator.type == 1) {
-          strCode += "return ";
-        }
-        if (generator.nbParams == 0) {
-          strCode += objectName + "_" + generator.labelEn + "(); }";
-        } else {
-          strCode += objectName + "_" + generator.labelEn + "(param1); }";
-        }
-        if (iGen < generators[objectName].length - 1) {
-          strCode += ",";
-        }
-        strCode += "\n";
-      }
-      strCode += "};\n\n";
-    }
-    strCode += "Math['max'] = function(a, b) { if (a > b) return a; return b; };\n";
-    strCode += "Math['min'] = function(a, b) { if (a > b) return b; return a; };\n";
-    return strCode;
-  };
-
   this.stopAndTryAgain = function () {
     this.stop();
     window.setTimeout(this.run.bind(this), 100);
@@ -295,56 +79,29 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       return undefined;
     }
 
-    if (this._language == 'blockly') {
-      if (this._mainContext.display) {
-        Blockly.JavaScript.STATEMENT_PREFIX = 'highlightBlock(%1);\n';
-        Blockly.JavaScript.addReservedWords('highlightBlock');
-      } else {
-        Blockly.JavaScript.STATEMENT_PREFIX = '';
-      }
-    }
-
     this._savePrograms();
 
     var codes = [];
+    codes.push(this._programs.python);
 
-    switch (this._language) {
-      case CodeEditor.CONST.LANGUAGES.BLOCKLY:
-        codes.push(this.getFullCode(this._programs.blocklyJS));
-        break;
-      case CodeEditor.CONST.LANGUAGES.JAVASCRIPT:
-        codes.push(this.getFullCode(this._programs.javascript));
-        break;
-      case CodeEditor.CONST.LANGUAGES.PYTHON:
-        codes.push(this._programs.python);
-        break;
+    var code = codes[0];
+    var forbidden = pythonForbidden(code, this._includeBlocks);
+    if(forbidden) {
+      $('#errors').html("Le mot-clé "+forbidden+" est interdit ici !");
+      return;
     }
-
-    if (this._language == 'blockly') {
-      this._workspace.traceOn(true);
-      this._workspace.highlightBlock(null);
+    if(pythonCount(code) > maxInstructions) {
+      $('#errors').html("Vous utilisez trop d'éléments Python !");
+      return;
     }
-
-    if(this._language == CodeEditor.CONST.LANGUAGES.PYTHON) {
-      var code = codes[0];
-      var forbidden = pythonForbidden(code, this._includeBlocks);
-      if(forbidden) {
-        $('#errors').html("Le mot-clé "+forbidden+" est interdit ici !");
-        return;
-      }
-      if(pythonCount(code) > maxInstructions) {
-        $('#errors').html("Vous utilisez trop d'éléments Python !");
-        return;
-      }
-      if(pythonCount(code) <= 0) {
-        $('#errors').html("Vous ne pouvez pas valider un programme vide !");
-        return;
-      }
-      var match = /from\s+robot\s+import\s+\*/.exec(code);
-      if(match === null) {
-        $('#errors').html("Vous devez mettre la ligne <code>from robot import *</code> dans votre programme.");
-        return;
-      }
+    if(pythonCount(code) <= 0) {
+      $('#errors').html("Vous ne pouvez pas valider un programme vide !");
+      return;
+    }
+    var match = /from\s+robot\s+import\s+\*/.exec(code);
+    if(match === null) {
+      $('#errors').html("Vous devez mettre la ligne <code>from robot import *</code> dans votre programme.");
+      return;
     }
 
     this._mainContext.runner.initCodes(codes);
@@ -367,10 +124,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
       this._mainContext.runner.stop();
     }
   }
-
-  this.getFullCode = function (code) {
-    return this.getBlocklyLibCode(this.generators) + code + "program_end()";
-  };
 
   /**
    *  IO specific operations
@@ -444,9 +197,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
   this.setMainContext = function (mainContext) {
     this._mainContext = mainContext;
   };
-  this.isVisible = function (visibleBool) {
-    this._visible = visibleBool;
-  };
   this.isVisible = function () {
     return this._visible;
   };
@@ -456,22 +206,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
    */
   this._loadXML = function () {
     return "<xml id='toolbox' style='display: none'></xml>";
-  };
-  this._loadLanguageSelector = function () {
-    return "<div id='lang'>" +
-      " <p>" + this._strings.selectLanguage +
-      "   <select id='selectLanguage' onchange='task.displayedSubTask.logicController.switchLanguage(this)'>" +
-      "     <option value='" + CodeEditor.CONST.LANGUAGES.BLOCKLY + "'>" + this._strings.blocklyLanguage +
-      "     </option>" +
-      "     <option value='" + CodeEditor.CONST.LANGUAGES.JAVASCRIPT + "'>" + this._strings.javascriptLanguage +
-      "     </option>" +
-      "     <option value='" + CodeEditor.CONST.LANGUAGES.PYTHON + "'>" + this._strings.pythonLanguage +
-      "     </option>" +
-      "   </select>" +
-      "   <input type='button' class='language_javascript' value='" + this._strings.importFromBlockly + "'" +
-      "   onclick='task.displayedSubTask.logicController.importFromBlockly()' />" +
-      " </p>" +
-      "</div>";
   };
   this._loadInstructionsTooltip = function () {
     return CodeEditor.Utils.DOM.clearFix('', 'capacity');
@@ -498,7 +232,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if (this._mainContext.display) {
       CodeEditor.Utils.DOM.loadBasicEditor(
         this._loadXML() +
-//        this._loadLanguageSelector() +
         this._loadInstructionsTooltip() +
         this._loadEditorWorkSpace() +
         this._loadEditorTools()
@@ -665,10 +398,6 @@ function LogicController(nbTestCases, maxInstructions, language, mainContext) {
     if (panelWidth != this._prevWidth) {
       $("#taskIntro").css("width", panelWidth);
       $("#grid").css("left", panelWidth + 20 + "px");
-      if (this._language === CodeEditor.CONST.LANGUAGES.BLOCKLY) {
-        Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
-        Blockly.svgResize(this._workspace);
-      }
     }
     this._prevWidth = panelWidth;
   };

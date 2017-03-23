@@ -89,21 +89,9 @@ body > * {
     position: relative;
 }
 
-#blockly-workspace {
-    height: 100%;
-    width: 100%;
-}
-
-#javascript-workspace {
-    width: 100%;
-    height: 100%;
-    display: none;
-}
-
 #python-workspace {
     width: 100%;
     height: 100%;
-    display: none;
 }
 
 #testCaseName {

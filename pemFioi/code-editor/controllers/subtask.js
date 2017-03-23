@@ -354,14 +354,7 @@ function SubTaskController(_subTask) {
   };
 
   subTask.getDefaultAnswerObject = function () {
-    var defaultBlockly;
-    if (this.logicController.startingBlock) {
-      defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block><block type="robot_start" deletable="false" movable="false" x="0" y="0"></block></xml>';
-    }
-    else {
-      defaultBlockly = '<xml xmlns="http://www.w3.org/1999/xhtml"></xml>';
-    }
-    return [{ javascript: "", python: "from robot import *\n", blockly: defaultBlockly, blocklyJS: "" }];
+    return [{ javascript: "", python: "from robot import *\n", blockly: "", blocklyJS: "" }];
   };
 
   subTask.changeTest = function (delta) {
