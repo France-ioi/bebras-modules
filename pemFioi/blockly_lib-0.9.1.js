@@ -44,6 +44,8 @@ var localLanguageStrings = {
          lists: "Listes",
          logic: "Logique",
          loops: "Boucles",
+         control: "Contrôles",
+         operator: "Opérateurs",
          math: "Maths",
          texts: "Texte",
          variables: "Variables",
@@ -56,20 +58,23 @@ var localLanguageStrings = {
       greatestOfTwoNumbers: "Plus grand des deux nombres",
       flagClicked: "Quand %1 cliqué",
       tooManyIterations: "Votre programme met trop de temps à se terminer !",
+      tooManyIterationsWithoutAction: "Votre programme s'est exécuté trop longtemps sans effectuer d'action !",
       submitProgram: "Valider le programme",
       runProgram: "Exécuter sur ce test",
-      stopProgram: "Recommencer",
+      stopProgram: "|<",
       speed: "Vitesse :",
-      slowSpeed: "Lent",
-      mediumSpeed: "Moyen",
-      fastSpeed: "Rapide",
-      ludicrousSpeed: "Très rapide",
+      stepProgram: "|>",
+      slowSpeed: ">",
+      mediumSpeed: ">>",
+      fastSpeed: ">>>",
+      ludicrousSpeed: ">|",
       selectLanguage: "Langage :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Repartir de blockly",
       saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
+      files: "Fichiers",
       reloadProgram: "Recharger :",
       saveProgram: "Enregistrer",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
@@ -78,6 +83,7 @@ var localLanguageStrings = {
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      uninitializedVar: "Variable non initialisée :"
       textVariable: "texte",
       listVariable: "liste",
    },
@@ -92,6 +98,8 @@ var localLanguageStrings = {
          lists: "Lists",
          logic: "Logic",
          loops: "Loops",
+         control: "Contrôles",
+         operator: "Opérateurs",
          math: "Math",
          texts: "Text",
          variables: "Variables",
@@ -103,15 +111,17 @@ var localLanguageStrings = {
       smallestOfTwoNumbers: "Smallest of the two numbers",
       greatestOfTwoNumbers: "Greatest of the two numbers",
       flagClicked: "When %1 clicked",
-      tooManyIterations: "Too many iterations before an action!",
+      tooManyIterations: "Too many iterations!",
+      tooManyIterationsWithoutAction: "Too many iterations without action!",
       submitProgram: "Validate this program",
       runProgram: "Run this program",
-      stopProgram: "Stop",
+      stopProgram: "|<",
       speed: "Speed:",
-      slowSpeed: "Slow",
-      mediumSpeed: "Medium",
-      fastSpeed: "Fast",
-      ludicrousSpeed: "Very fast",
+      stepProgram: "|>",
+      slowSpeed: ">",
+      mediumSpeed: ">>",
+      fastSpeed: ">>>",
+      ludicrousSpeed: ">|",
       selectLanguage: "Language :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
@@ -126,6 +136,7 @@ var localLanguageStrings = {
       nextTestcase: "Next",
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      uninitializedVar: "Uninitialized variable:",
       textVariable: "text",
       listVariable: "list",
    },
@@ -140,6 +151,8 @@ var localLanguageStrings = {
          lists: "Listen",
          logic: "Logik",
          loops: "Schleifen",
+         control: "Contrôles",
+         operator: "Opérateurs",
          math: "Mathe",
          texts: "Text",
          variables: "Variablen",
@@ -154,21 +167,24 @@ var localLanguageStrings = {
       smallestOfTwoNumbers: "Kleinere von zwei Zahlen",
       greatestOfTwoNumbers: "Größere von zwei Zahlen",
       flagClicked: "Sobald %1 geklickt", // (scratch start flag, %1 is the flag icon)
-      tooManyIterations: "Zu viele Iterationen vor einer Aktion!",
+      tooManyIterations: "Zu viele Anweisungen wurden ausgeführt!",
+      tooManyIterationsWithoutAction: "Zu viele Anweisungen wurden ausgeführt ohne eine Aktion!",
       submitProgram: "Ausführen",
       runProgram: "Testen",
-      stopProgram: "Stop",
+      stopProgram: "|<",
       speed: "Ablaufgeschwindigkeit:",
-      slowSpeed: "Langsam",
-      mediumSpeed: "Mittel",
-      fastSpeed: "Schnell",
-      ludicrousSpeed: "Sehr schnell",
+      stepProgram: "|>",
+      slowSpeed: ">",
+      mediumSpeed: ">>",
+      fastSpeed: ">>>",
+      ludicrousSpeed: ">|",
       selectLanguage: "Sprache:",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Generiere von Blockly-Blöcken",
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
+      files: "Dateien",
       reloadProgram: "Laden:",
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
@@ -177,21 +193,30 @@ var localLanguageStrings = {
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
+      uninitializedVar: "Nicht-initialisierte Variable:"
       textVariable: "Text",
       listVariable: "Liste",
    }
-}
+};
 
 // Blockly to Scratch translations
 var blocklyToScratch = {
-    singleBlocks: {
-        'controls_if': 'control_if',
-        'controls_if_else': 'control_if_else',
-        'controls_repeat': 'control_repeat',
-        'controls_repeat_ext': 'control_repeat',
-        'logic_negate': 'operator_not'
+   singleBlocks: {
+      'controls_if': ['control_if'],
+      'controls_if_else': ['control_if_else'],
+      'controls_repeat': ['control_repeat'],
+      'controls_repeat_ext': ['control_repeat'],
+      'controls_whileUntil': ['control_repeat_until'],
+      'controls_untilWhile': ['control_repeat_until'],
+      'logic_negate': ['operator_not'],
+      'logic_boolean': [],
+      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
+      'logic_operation': ['operator_and', 'operator_or'],
+      'text_join': ['operator_join'],
+      'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+      'math_number': [],
     }
-}
+};
 
 
 // from http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
@@ -210,6 +235,15 @@ if (!String.prototype.format) {
    }
 }
 
+
+function showModal(id) {
+   var el = '#' + id
+   $(el).show();
+}
+function closeModal(id) {
+   var el = '#' + id;
+   $(el).hide();
+}
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    return {
@@ -247,7 +281,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "        <option value='javascript'>" + this.strings.javascriptLanguage + "</option>" +
                                       "      </select>" +
                                       "      <input type='button' class='language_javascript' value='" + this.strings.importFromBlockly +
-                                        "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
+                                      "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
                                       "    </p>" +
                                       "  </div>" +
                                       "  <div id='blocklyCapacity' style='clear:both;'></div>" +
@@ -255,15 +289,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
                                       "  </div>" +
-                                      "  <div id='saveOrLoad'> "+
-                                      "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>" +
-                                      "    <p>" + this.strings.avoidReloadingOtherTask + "</p>" +
-                                      "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
-                                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>" +
-                                      "    <p><input type='button' value='" + this.strings.saveProgram +
-                                        "' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' /><span id='saveUrl'></span></p>" +
-                                      "</div>"
-         );
+                                      "  <div id='saveOrLoadModal' style='display:none'></div>\n");
+
+         var saveOrLoadModal = "<div class='modal'>" +
+                               "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +
+                               "    <button type='button' class='btn' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' >" + his.strings.saveProgram +
+                               "</button><span id='saveUrl'></span>\n" +
+                               "    <p>" + this.strings.avoidReloadingOtherTask + "</p>\n" +
+                               "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
+                               "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>\n" +
+                               "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
+                               "</div>";
+        $("#saveOrLoadModal").html(saveOrLoadModal);
+         
         
          var gridButtonsBefore = "";
          if (nbTestCases > 1) {
@@ -275,24 +313,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }      
          $("#gridButtonsBefore").html(gridButtonsBefore);
          
-         
-         var gridButtonsAfter = this.strings.speed + " " +
-                                "<select id='selectSpeed' onchange='task.displayedSubTask.changeSpeed()'>\n" + 
-                                "  <option value='200'>" + this.strings.slowSpeed + "</option>\n" + 
-                                "  <option value='50'>" + this.strings.mediumSpeed + "</option>\n" +
-                                "  <option value='5'>" + this.strings.fastSpeed + "</option>\n" +
-                                "  <option value='0'>" + this.strings.ludicrousSpeed + "</option>\n" +
-                                "</select>&nbsp;&nbsp;" +
-                                "<input type='button' value='" + this.strings.stopProgram + "' onclick='task.displayedSubTask.stop()'/><br/><br/>";
-         
-         if (nbTestCases > 1) {
-            gridButtonsAfter += "<input type='button' value='" + this.strings.runProgram + "' onclick='task.displayedSubTask.run()'/>&nbsp;&nbsp;";
-         }
-         gridButtonsAfter += "<button onclick='task.displayedSubTask.submit()'>"
-                             + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
-                             + this.strings.submitProgram
-                             + "</button><br/>"
-                             + "<div id='errors' style='width: 400px;'></div>";
+         var gridButtonsAfter = "<div id='selectSpeed'>" +
+                                "  <div class='btn-group'>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.stop()'>" + this.strings.stopProgram + " </button>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.step()'>" + this.strings.stepProgram + " </button>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(200)'>" + this.strings.slowSpeed + "</button>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(50)'>" + this.strings.mediumSpeed + "</button>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(5)'>" + this.strings.fastSpeed + "</button>\n" +
+                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(0)'>" + this.strings.ludicrousSpeed + "</button>\n" +
+                                "  </div>" +
+                                "</div>";
+         gridButtonsAfter += "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+                           + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
+                           + this.strings.submitProgram
+                           + "</button><br/>"
+                           + "<div id='errors' style='width: 400px;'></div>";
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
@@ -317,6 +352,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          
          if (display) {
             this.loadHtml(nbTestCases);
+            this.addExtraBlocks();
             this.createSimpleGeneratorsAndBlocks();
             var xml = this.getToolboxXml();
             var wsConfig = {
@@ -336,7 +372,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (this.scratchMode) {
                wsConfig.zoom = { startScale: 0.75 };
             }
-            this.addExtraBlocks();
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
             }
@@ -350,7 +385,6 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
-               window.focus();
                Blockly.svgResize(that.workspace);
 
                var remaining = that.workspace.remainingCapacity();
@@ -464,6 +498,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
            return;
          }
          var tmpWorkspace = new Blockly.Workspace();
+         if(this.scratchMode) {
+            // Make sure it has the right information from this blocklyHelper
+            tmpWorkspace.maxBlocks = function () { return maxBlocks; };
+         }
          Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
          return this.getCode(language, tmpWorkspace);
       },
@@ -472,6 +510,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       getCode: function(language, codeWorkspace) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
+         }
+         if(codeWorkspace.remainingCapacity() < 0) {
+            // Safeguard: avoid generating code when we use too many blocks
+            return '';
          }
          var blocks = codeWorkspace.getTopBlocks(true);
          var languageObj = null;
@@ -756,6 +798,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          
          for (var language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {
+               // Prevent the function name to be used as a variable
+               Blockly[language].addReservedWords(code);
                function setCodeGeneratorForLanguage(language) {
                   blockInfo.codeGenerators[language] = function(block) {
                      var params = "";               
@@ -832,6 +876,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       createSimpleGenerator: function(label, code, type, nbParams) {
          var jsDefinitions = this.definitions['javascript'] ? this.definitions['javascript'] : [];
          var pyDefinitions = this.definitions['python'] ? this.definitions['python'] : [];
+
+         // Prevent the function name to be used as a variable
+         Blockly.JavaScript.addReservedWords(code);
+         Blockly.Python.addReservedWords(code);
+         
          Blockly.JavaScript[label] = function(block) {
             for (var iDef=0; iDef < jsDefinitions.length; iDef++) {
                var def = jsDefinitions[iDef];
@@ -972,7 +1021,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             categories: {
                logic: 210,
                loops: 120,
+               control: 120,
                math: 230,
+               operator: 230,
                texts: 160,
                lists: 260,
                colour: 20,
@@ -1098,6 +1149,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                { 
                   name: "controls_whileUntil", 
                   blocklyXml: "<block type='controls_whileUntil'></block>"
+               },
+               { 
+                  name: "controls_untilWhile", 
+                  blocklyXml: "<block type='controls_whileUntil'><field name='MODE'>UNTIL</field></block>",
+                  excludedByDefault: true,
                },
                { 
                   name: "controls_for", 
@@ -1868,6 +1924,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       addExtraBlocks: function() {
          var that = this;
 
+
+         Blockly.Blocks['controls_untilWhile'] = Blockly.Blocks['controls_whileUntil'];
+         Blockly.JavaScript['controls_untilWhile'] = Blockly.JavaScript['controls_whileUntil'];
+         Blockly.Python['controls_untilWhile'] = Blockly.Python['controls_whileUntil'];
+         
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -2032,7 +2093,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          for (var iBlock = 0;  iBlock < this.includeBlocks.standardBlocks.singleBlocks.length; iBlock++) {
             var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
             if(blocklyToScratch.singleBlocks[blockName]) {
-                newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName]);
+               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
+                  newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
+               }
             } else {
                 newSingleBlocks.push(blockName);
             }
@@ -2040,7 +2103,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
       },
 
-      run: function() {
+      initRun: function() {
          var that = this;
          var nbRunning = this.mainContext.runner.nbRunning();
          if (nbRunning > 0) {
@@ -2093,7 +2156,20 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             that.workspace.traceOn(true);
             that.workspace.highlightBlock(null);
          }
-         this.mainContext.runner.runCodes(codes);
+         this.mainContext.runner.initCodes(codes);
+      },
+
+      
+      run: function () {
+         this.initRun();
+         this.mainContext.runner.run();
+      },
+
+      step: function () {
+         if(this.mainContext.runner.nbRunning() <= 0) {
+            this.initRun();
+         }
+         this.mainContext.runner.step();
       },
 
       getFullCode: function(code) {
@@ -2103,14 +2179,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 }
 
 
-function initBlocklyRunner(context, messageCallback) {
-   init(context, [], [], [], false, {});
+function initBlocklyRunner(context, messageCallback, language) {
+   init(context, [], [], [], false, {}, language);
 
-   function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
+   function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
+      runner.hasActions = false;
+      runner.nbActions = 0;
+      runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
+
+      runner.stepInProgress = false;
+      runner.stepMode = false;
+      runner.nextCallBack = null;
+      runner.firstHighlight = true;
+
+      runner.strings = languageStrings[language];
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
-                  runner.noDelay(callback, value);
+                  runner.noDelay(callback, value, true);
                },
                delay
             );
@@ -2119,7 +2205,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
-      runner.noDelay = function(callback, value) {
+      runner.noDelay = function(callback, value, hadDelay) {
          var primitive = undefined;
          if (value != undefined) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
@@ -2127,24 +2213,51 @@ function initBlocklyRunner(context, messageCallback) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               runner.runSyncBlock();
+               if(runner.stepMode && runner.scratchMode && hadDelay) {
+                  // Interrupt only in scratch mode, when a robot action with a
+                  // delay occured, as there's no other feedback to the user
+                  runner.stepInProgress = false;
+               } else {
+                  runner.runSyncBlock();
+               }
             }, 0);
          } else {
             callback(primitive);
-            runner.runSyncBlock();
+            if(runner.stepMode && runner.scratchMode && hadDelay) {
+               runner.stepInProgress = false;
+            } else {
+               runner.runSyncBlock();
+            }
          }
       };
 
       runner.initInterpreter = function(interpreter, scope) {
+         var makeHandler = function(runner, handler) {
+            // For commands belonging to the "actions" category, we count the
+            // number of actions to put a limit on steps without actions
+            return function () {
+               runner.nbActions += 1;
+               handler.apply(this, arguments);
+            };
+         };
+         
          for (var objectName in context.customBlocks) {
             for (var category in context.customBlocks[objectName]) {
                for (var iBlock in context.customBlocks[objectName][category]) {
                   var blockInfo = context.customBlocks[objectName][category][iBlock];
                   var code = context.strings.code[blockInfo.name];
-                  if (typeof(code) == "undefined")
+                  if (typeof(code) == "undefined") {
                      code = blockInfo.name;
+                  }
+
+                  if(iCategory == 'actions') {
+                     runner.hasActions = true;
+                     var handler = makeHandler(runner, blockInfo.handler);
+                  } else {
+                     var handler = blockInfo.handler;
+                  }
                   
-                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(blockInfo.handler));
+                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
                }
             }            
          }
@@ -2158,26 +2271,40 @@ function initBlocklyRunner(context, messageCallback) {
          }*/
          interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
 
-         function highlightBlock(id) {
-            if (context.display && !context.blocklyHelper.scratchMode) {
-               context.blocklyHelper.workspace.traceOn(true);
-               context.blocklyHelper.workspace.highlightBlock(id);
-               highlightPause = true;
+         function highlightBlock(id, callback) {
+            id = id ? id.toString() : '';
+            
+            var cb = function () {
+               if (context.display && !runner.scratchMode) {
+                  context.blocklyHelper.workspace.traceOn(true);
+                  context.blocklyHelper.workspace.highlightBlock(id);
+                  highlightPause = true;
+               }
+               callback();
+            }
+            
+            // We always execute directly the first highlightBlock
+            if(runner.firstHighlight || runner.scratchMode || !runner.stepMode) {
+               runner.firstHighlight = false;
+               cb();
+               runner.runSyncBlock();
+            } else {
+               // Interrupt here for step mode, allows to stop before each
+               // instruction
+               runner.nextCallback = cb;
+               runner.stepInProgress = false;
             }
          }
 
          // Add an API function for highlighting blocks.
-         var wrapper = function(id) {
-           id = id ? id.toString() : '';
-           return interpreter.createPrimitive(highlightBlock(id));
-         };
-         interpreter.setProperty(scope, 'highlightBlock', interpreter.createNativeFunction(wrapper));
+         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(highlightBlock));
       };
 
       runner.stop = function() {
          for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
             if (isRunning[iInterpreter]) {
                toStop[iInterpreter] = true;
+               isRunning[iInterpreter] = false;
             }
          }
          context.reset();
@@ -2185,12 +2312,33 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.runSyncBlock = function() {
          var maxIter = 400000;
+
+         var maxIterWithoutAction = 500;
+         if (context.infos.maxIter != undefined) {
+            maxIter = context.infos.maxIter;
+         }
+         if (context.infos.maxIterWithoutAction != undefined) {
+            maxIterWithoutAction = context.infos.maxIterWithoutAction;
+         }
+
+         if(!runner.hasActions) {
+            // If there's no actions in the current task, "disable" the limit
+            maxIterWithoutAction = maxIter;
+         }
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
             });
             return;
-         }*/
+      }*/
+
+         runner.stepInProgress = true;
+         // Handle the callback from last highlightBlock
+         if(runner.nextCallback) {
+            runner.nextCallback();
+            runner.nextCallback = null;
+         }
+         
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
@@ -2198,27 +2346,52 @@ function initBlocklyRunner(context, messageCallback) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               while (context.curSteps[iInterpreter] < maxIter) {
+               while (context.curSteps[iInterpreter].total < maxIter && context.curSteps[iInterpreter].withoutAction < maxIterWithoutAction) {
                   if (!interpreter.step() || toStop[iInterpreter]) {
-                     isRunning[iInterpreter] = false;;
+                     isRunning[iInterpreter] = false;
                      break;
                   }
                   if (interpreter.paused_) {
                      break;
                   }
-                  context.curSteps[iInterpreter]++;
+                  context.curSteps[iInterpreter].total++;
+                  if(context.curSteps[iInterpreter].lastNbMoves != runner.nbActions) {
+                     context.curSteps[iInterpreter].lastNbMoves = runner.nbActions;
+                     context.curSteps[iInterpreter].withoutAction = 0;
+                  } else {
+                     context.curSteps[iInterpreter].withoutAction++;
+                  }
                }
-               if (context.curSteps[iInterpreter] >= maxIter) {
-                  isRunning[iInterpreter] = false;;
+               if (context.curSteps[iInterpreter].total >= maxIter) {
+                  isRunning[iInterpreter] = false;
                   throw context.blocklyHelper.strings.tooManyIterations;
+               } else if(context.curSteps[iInterpreter].withoutAction >= maxIterWithoutAction) {
+                  isRunning[iInterpreter] = false;
+                  throw context.blocklyHelper.strings.tooManyIterationsWithoutAction;
                }
             }
          } catch (e) {
+            runner.stepInProgress = false;
+            
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                isRunning[iInterpreter] = false;
             }
 
             var message = e.toString();
+
+            // Translate "Unknown identifier" message
+            if(message.substring(0, 20) == "Unknown identifier: ") {
+               var varName = message.substring(20);
+               // Get original variable name if possible
+               for(var dbIdx in Blockly.JavaScript.variableDB_.db_) {
+                  if(Blockly.JavaScript.variableDB_.db_[dbIdx] == varName) {
+                     varName = dbIdx.substring(0, dbIdx.length - 9);
+                     break;
+                  }
+               }
+               message = this.strings.uninitializedVar + ' ' + varName;
+            }
+            
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
                if (context.success) {
                   message = context.messagePrefixSuccess + message;
@@ -2236,21 +2409,53 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
-      runner.runCodes = function(codes) {
+      runner.initCodes = function(codes) {
          //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
          interpreters = [];
+         runner.nbActions = 0;
+         runner.stepInProgress = false;
+         runner.stepMode = false;
+         runner.firstHighlight = true;
          context.programEnded = [];
          context.curSteps = [];
          context.reset();
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
-            context.curSteps[iInterpreter] = 0;
+            context.curSteps[iInterpreter] = {
+               total: 0,
+               withoutAction: 0,
+               lastNbMoves: 0,
+            };
             context.programEnded[iInterpreter] = false;
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
             toStop[iInterpreter] = false;
          }
+      };
+      runner.runCodes = function(codes) {
+         runner.initCodes(codes);
          runner.runSyncBlock();
       };
+
+      runner.run = function () {
+         runner.stepMode = false;
+         if(!runner.stepInProgress) {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               interpreters[iInterpreter].paused_ = false;
+            }
+            runner.runSyncBlock();
+         }
+      };
+
+      runner.step = function () {
+         runner.stepMode = true;
+         if(!runner.stepInProgress) {
+            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               interpreters[iInterpreter].paused_ = false;
+            }
+            runner.runSyncBlock();
+         }
+      };
+
 
       runner.nbRunning = function() {
          var nbRunning = 0;
@@ -2390,7 +2595,7 @@ function extractLevelSpecific(item, level) {
 }
 
 
-var initBlocklySubTask = function(subTask) {
+var initBlocklySubTask = function(subTask, language) {
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
@@ -2398,7 +2603,10 @@ var initBlocklySubTask = function(subTask) {
       };
    }
 
-
+   if (language == undefined) {
+      language = "fr";
+   }
+   
    subTask.loadLevel = function(curLevel) {
       subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
 
@@ -2499,7 +2707,7 @@ var initBlocklySubTask = function(subTask) {
    subTask.run = function() {
       initBlocklyRunner(subTask.context, function(message, success) {
          $("#errors").html(message);
-      });
+      }, language);
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);
    };
@@ -2509,17 +2717,28 @@ var initBlocklySubTask = function(subTask) {
       this.getAnswerObject(); // to fill this.answer;
       this.getGrade(function(result) {
          subTask.context.display = true;
-         subTask.changeSpeed();
+         subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
             $("#errors").html(message);
             platform.validate("done");
-         });
+         }, language);
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
          subTask.context.messagePrefixSuccess = window.languageStrings.allTests;
          subTask.blocklyHelper.run(subTask.context);
       });
+   };
+
+   subTask.step = function () {
+      subTask.context.changeDelay(200);
+      if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
+        initBlocklyRunner(subTask.context, function(message, success) {
+           $("#errors").html(message);
+        }, language);
+        initContextForLevel(subTask.iTestCase);
+      }
+      subTask.blocklyHelper.step(subTask.context);
    };
 
    subTask.stop = function() {
@@ -2544,8 +2763,13 @@ var initBlocklySubTask = function(subTask) {
       return this.state;
    };
 
-   subTask.changeSpeed =  function() {
-      this.context.changeDelay(parseInt($("#selectSpeed").val()));
+   subTask.changeSpeed =  function(speed) {
+      this.context.changeDelay(speed);
+      if ((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
+         this.run();
+      } else if (this.context.runner.stepMode) {
+         this.context.runner.run();
+      }
    };
 
    subTask.getAnswerObject = function() {
@@ -2603,7 +2827,7 @@ var initBlocklySubTask = function(subTask) {
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
             callback(subTask.testCaseResults[iWorstTestCase]);
          }
-      });
+      }, language);
       subTask.iTestCase = 0;
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
