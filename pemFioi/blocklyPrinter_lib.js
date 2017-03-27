@@ -5,16 +5,16 @@ var getContext = function(display, infos) {
       de: {
          label: {
             print: "schreibe",
-            read: "lese",
-            readInteger: "lese ganze Zahl",
-            readFloat: "lese Komma-Zahl",
+            read: "lies",
+            readInteger: "lies ganze Zahl",
+            readFloat: "lies Komma-Zahl",
             eof: "Ende der Eingabe",
          },
          code: {
             print: "schreibe",
-            read: "lese",
-            readInteger: "leseGanzzahl",
-            readFloat: "leseKommazahl",
+            read: "lies",
+            readInteger: "liesGanzzahl",
+            readFloat: "liesKommazahl",
             eof: "eingabeEnde",
          },
          startingBlockName: "Programm",
