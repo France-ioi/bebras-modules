@@ -10,6 +10,20 @@ Blockly.Block.prototype.getVariableField = function () {
   return null;
 };
 
+// Add a border when a block is glowing to make it more obvious
+Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
+  var blockSvg = this.getSvgRoot();
+  for(var i=0; i<blockSvg.children.length; i++) {
+     if(blockSvg.children[i].classList[0] == 'blocklyPath') {
+        blockSvg = blockSvg.children[i];
+        break;
+     }
+  }
+  blockSvg.style.strokeWidth = isGlowingBlock ? '4px' : '';
+  this.isGlowingBlock_ = isGlowingBlock;
+  this.updateColour();
+};
+
 // Change behavior when we attach a data_variable along a data_variablemenu
 Blockly.Connection.prototype.connect_ = function(childConnection) {
   var parentConnection = this;
@@ -170,36 +184,21 @@ Blockly.WorkspaceSvg.prototype.clear = function(deleting) {
 
 // Prevent the workspace from shifting when we create a new block (especially
 // with categories enabled)
+Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox_ = Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox;
 Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
-  var topBlocks = this.getTopBlocks(false);
-  // There are no blocks, return empty rectangle.
-  if (!topBlocks.length) {
-    return {x: 0, y: 0, width: 0, height: 0};
-  }
+  var originalBbox = Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox_.apply(this, arguments);
+  originalBbox.x = 0;
+  return originalBbox;
+}
 
-  // Initialize boundary using the first block.
-  var boundary = topBlocks[0].getBoundingRectangle();
-
-  // Start at 1 since the 0th block was used for initialization
-  for (var i = 1; i < topBlocks.length; i++) {
-    var blockBoundary = topBlocks[i].getBoundingRectangle();
-    if (blockBoundary.bottomRight.x > boundary.bottomRight.x) {
-      boundary.bottomRight.x = blockBoundary.bottomRight.x;
-    }
-    if (blockBoundary.topLeft.y < boundary.topLeft.y) {
-      boundary.topLeft.y = blockBoundary.topLeft.y;
-    }
-    if (blockBoundary.bottomRight.y > boundary.bottomRight.y) {
-      boundary.bottomRight.y = blockBoundary.bottomRight.y;
-    }
-  }
-  return {
-    x: 0, // yep the ugly fix is that
-    y: boundary.topLeft.y,
-    width: boundary.bottomRight.x - boundary.topLeft.x,
-    height: boundary.bottomRight.y - boundary.topLeft.y
-  };
-};
+// Move the dropdown slightly higher to make its target clearer
+Blockly.DropDownDiv.getPositionMetrics_ = Blockly.DropDownDiv.getPositionMetrics;
+Blockly.DropDownDiv.getPositionMetrics = function () {
+  var originalPos = Blockly.DropDownDiv.getPositionMetrics_.apply(this, arguments);
+  originalPos.initialY -= 20;
+  originalPos.finalY -= 20;
+  return originalPos;
+}
 
 Blockly.WorkspaceSvg.prototype.renameVariable = function(oldName, newName) {
   Blockly.WorkspaceSvg.superClass_.renameVariable.call(this, oldName, newName);
@@ -681,7 +680,12 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
-  return varName + ' = ' + argument0 + ';\n';
+  var assignCode = varName + ' = ' + argument0 + ';\n';
+
+  // Report value if available
+  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+
+  return assignCode + reportCode;
 };
 
 Blockly.JavaScript['data_changevariableby'] = function(block) {
@@ -694,7 +698,12 @@ Blockly.JavaScript['data_changevariableby'] = function(block) {
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
-  return varName + ' += ' + argument0 + ';\n';
+  var incrCode = varName + ' += ' + argument0 + ';\n';
+
+  // Report value if available
+  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+
+  return incrCode + reportCode;
 };
 
 Blockly.JavaScript['operators'] = function(block) {
