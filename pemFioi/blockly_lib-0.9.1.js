@@ -696,13 +696,17 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (typeof block.blocklyJson.message0 == "undefined") {
                block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
             }
-            
+
+            // append all missing params to the message string
             if (typeof block.blocklyJson.args0 != "undefined") {
-               var iParam = 0;
-               for (var iArgs0 in block.blocklyJson.args0) {
-                  if (block.blocklyJson.args0[iArgs0].type == "input_value") {
-                     iParam += 1;
-                     block.blocklyJson.message0 += " %" + iParam;
+               var alreadyInserted = (block.blocklyJson.message0.match(/%/g) || []).length;
+               for (var iArgs0 = alreadyInserted; iArgs0 < block.blocklyJson.args0.length; iArgs0++) {
+                  if (block.blocklyJson.args0[iArgs0].type == "input_value"
+                      || block.blocklyJson.args0[iArgs0].type == "field_number"
+                      || block.blocklyJson.args0[iArgs0].type == "field_angle"
+                      || block.blocklyJson.args0[iArgs0].type == "field_colour"
+                      || block.blocklyJson.args0[iArgs0].type == "field_dropdown") {
+                     block.blocklyJson.message0 += " %" + (iArgs0 + 1);
                   }
                }
             }
@@ -770,11 +774,20 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                            params += Blockly[language].valueToCode(block, 'PARAM_' + iParam, Blockly[language].ORDER_ATOMIC);
                            iParam += 1;
                         }
-                        if (args0[iArgs0].type == "field_number") {
+                        if (args0[iArgs0].type == "field_number"
+                            || args0[iArgs0].type == "field_angle"
+                            || args0[iArgs0].type == "field_dropdown") {
                            if (iParam) {
                               params += ", ";
                            }
                            params += block.getFieldValue('PARAM_' + iParam);
+                           iParam += 1;
+                        }
+                        if (args0[iArgs0].type == "field_colour") {
+                           if (iParam) {
+                              params += ", ";
+                           }
+                           params += '"' + block.getFieldValue('PARAM_' + iParam) + '"';
                            iParam += 1;
                         }
                      }
@@ -2171,7 +2184,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         var maxIter = 40000;
+         var maxIter = 400000;
    /*      if (turn > 90) {
             task.program_end(function() {
                that.stop();
