@@ -29,12 +29,16 @@ var makeTurtle = function() {
       }
    }
    this.move = function(amount) {
-      this.drawingContext.beginPath();
-      this.drawingContext.moveTo(this.x, this.y);
+      if (this.paint) {
+         this.drawingContext.beginPath();
+         this.drawingContext.moveTo(this.x, this.y);
+      }
+      
       this.x -= amount * this.stepsize * 10 * Math.sin(this.direction);
       this.y -= amount * this.stepsize * 10 * Math.cos(this.direction);
-      this.drawingContext.lineTo(this.x, this.y);
+     
       if (this.paint) {
+         this.drawingContext.lineTo(this.x, this.y);
          this.drawingContext.stroke();
       }
       
@@ -67,7 +71,7 @@ var makeTurtle = function() {
       this.turtle.style.left= this.x - 11 + "px";
       this.turtle.style.top= this.y - 13 + "px";
    }
-}
+};
 
 
 var getContext = function(display, infos) {
@@ -79,10 +83,21 @@ var getContext = function(display, infos) {
       de: {
          label: {
             move: "gehe",
-            moveamount: "gehe # Schritte",
+            moveamount: "gehe %1 Schritte",
             moveamountvalue: "gehe %1 Schritte",
-            turnleft: "drehe nach links",
-            turnright: "drehe nach rechts",
+            turnleft: "drehe nach links ↺",
+            turnright: "drehe nach rechts ↻",
+            turnleftamount: "drehe um %1° nach links ↺",
+            turnrightamount: "drehe um %1° nach rechts ↻",
+            turnleftamountvalue: "drehe um %1 nach links ↺",
+            turnrightamountvalue: "drehe um %1 nach rechts ↻",
+            turneitheramount: "drehe um %1° nach %2",
+            turneitheramountvalue: "drehe um %1 nach %2",
+            penup: "hebe Stift ab",
+            pendown: "setze Stift auf",
+            peneither: "%1",
+            colour2: "setze Farbe",
+            colourvalue: "setze Farbe %1",
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
@@ -91,8 +106,18 @@ var getContext = function(display, infos) {
             move: "gehe",
             moveamount: "geheSchritte",
             moveamountvalue: "geheSchritte",
-            turnleft: "drehe_links",
-            turnright: "drehe_rechts",
+            turnleft: "dreheLinks",
+            turnright: "dreheRechts",
+            turnleftamount: "dreheLinksGrad",
+            turnrightamount: "dreheRechtsGrad",
+            turnleftamountvalue: "dreheLinksGrad",
+            turnrightamountvalue: "dreheRechtsGrad",
+            turneitheramountvalue: "dreheGrad",
+            penup: "stiftHoch",
+            pendown: "stiftRunter",
+            peneither: "stift",
+            colour2: "setzeFarbe",
+            colourvalue: "setzeFarbe",
             turn: "drehe",
             alert: "alert",
             log: "log",
@@ -138,7 +163,7 @@ var getContext = function(display, infos) {
                   math: 220,
                   texts: 250,
                   lists: 60,
-                  colour: 280,
+                  colour: 60,
                   turtle: 310,
                   _default: 280,
                },
@@ -266,67 +291,136 @@ var getContext = function(display, infos) {
       }
    }
 
-   context.turtle.move = function(callback) {
-      callOnAllTurtles((turtle) => {
-         turtle.move(1);
-      })
-      
-      context.waitDelay(callback);
-   }
-
    context.turtle.moveamount = function(param, callback) {
+      if (typeof callback == "undefined") {
+         callback = param;
+         param = 0;
+      }
+         
       callOnAllTurtles((turtle) => {
          turtle.move(param);
       })
       
       context.waitDelay(callback);
    }
-
-   context.turtle.moveamountvalue = function(param, callback) {
-      callOnAllTurtles((turtle) => {
-         turtle.move(param);
-      })
-      
-      context.waitDelay(callback);
-   }
-
-   context.turtle.turn = function(callback, param) {
+   
+   // DEPRECATED
+   context.turtle.turn = function(param, callback) {
       callOnAllTurtles((turtle) => {
          turtle.turn(param);
       })
 
       context.waitDelay(callback);
    }
-   
-   context.turtle.turnleft = function(callback) {
-      callOnAllTurtles((turtle) => {
-         turtle.turn(90);
-      })
 
-      context.waitDelay(callback);
-   }
-   
-   context.turtle.turnright = function(callback) {
+   context.turtle.turneitheramount = function(degree, direction, callback) {
+      if (typeof callback == "undefined") {
+         callback = direction;
+         direction = "l";
+         if (typeof callback == "undefined") {
+            callback = degree;
+            degree = 0;
+         }
+      }
+
       callOnAllTurtles((turtle) => {
-         turtle.turn(-90);
+         if (direction == "l") {
+            turtle.turn(degree);
+         }
+         else {
+            turtle.turn(-degree);
+         }
+            
       });
       
       context.waitDelay(callback);
    }
 
+   context.turtle.peneither = function(status, callback) {
+      callOnAllTurtles((turtle) => {
+         if (status == "up") {
+            turtle.stop_painting();
+         }
+         else {
+            turtle.start_painting();
+         }
+      })
+
+      context.waitDelay(callback);
+   }
+
+   context.turtle.move = function(callback) {
+      context.turtle.moveamount(1, callback);
+   }
+   context.turtle.turnleftamount = function(param, callback) {
+      context.turtle.turneitheramount(param, "l", callback);
+   }
+   context.turtle.turnrightamount = function(param, callback) {
+      context.turtle.turneitheramount(param, "r", callback);
+   }
+   context.turtle.turnleft = function(callback) {
+      context.turtle.turnleftamount(90, callback);
+   }   
+   context.turtle.turnright = function(callback) {
+      context.turtle.turnrightamount(90, callback);
+   }
+   context.turtle.penup = function(callback) {
+      context.turtle.peneither("up", callback);
+   }
+   context.turtle.pendown = function(callback) {
+      context.turtle.peneither("down", callback);
+   }
+
+   context.turtle.moveamountvalue = context.turtle.moveamount;
+   context.turtle.turnleftamountvalue = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue = context.turtle.turnrightamount;
+   context.turtle.turneitheramountvalue = context.turtle.turneitheramount;
+   
+
+   context.turtle.colour2 = function(colour, callback) {
+      if (typeof callback == "undefined") {
+         callback = colour;
+         colour = "#000000";
+      }
+
+      callOnAllTurtles((turtle) => {
+         turtle.set_colour(colour);
+      })
+
+      context.waitDelay(callback);
+   }
+   context.turtle.colourvalue = context.turtle.colour2;
+   
    context.customBlocks = {
       turtle: {
          turtle: [
-            { name: "move" },
             { name: "move" },
             { name: "moveamount", params: [null]},
             { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 2}]},},
             { name: "turnleft" },
             { name: "turnright" },
-            { name: "turn",       params: [null]},
-         ],
+            { name: "turn",      params: [null]},
+            { name: "turnleftamount", params: [null]},
+            { name: "turnrightamount", params: [null]},
+            { name: "turnleftamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
+            { name: "turnrightamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
+            { name: "turneitheramount", blocklyJson: {"args0": [
+               {"type": "input_value", "name": "PARAM_0"},
+               {"type": "field_dropdown", "name": "PARAM_1", "options":
+                [["links ↺","'l'"],["rechts ↻","'r'"],]},]},},
+            { name: "turneitheramountvalue", blocklyJson: {"args0": [
+               {"type": "field_angle", "name": "PARAM_0", "angle": 90},
+               {"type": "field_dropdown", "name": "PARAM_1", "options":
+                [["links ↺","'l'"],["rechts ↻","'r'"],]},]},},
+            { name: "penup" },
+            { name: "pendown" },
+            { name: "peneither", blocklyJson: {"args0": [
+               {"type": "field_dropdown", "name": "PARAM_0", "options":
+                [["hebe Stift ab","'up'"],["setze Stift auf","'down'"],]},]},},
+            { name: "colour2", params: [null]},
+            { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]},},
+          ],
       },
-      
       debug: {
          debug: [
             { name: "alert", params: [null], handler: context.debug_alert,
