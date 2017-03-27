@@ -8,6 +8,7 @@ var getContext = function(display, infos, curLevel) {
             forward: "avancer",
             turnAround: "faire demi-tour",
             jump: "sauter",
+            down: "descendre",
             east: "avancer vers la droite",
             south: "avancer vers le bas",
             west: "avancer vers la gauche",
@@ -25,10 +26,16 @@ var getContext = function(display, infos, curLevel) {
             greenCell: "sur une case verte",
             brownCell: "sur une case marron",
             markedCell: "sur une case marquée",
+            addPlatformAbove: "construire une plateforme au dessus",
+            addPlatformInFront: "construire une plateforme devant",
             platformInFront: "plateforme devant",
             platformInFrontAndBelow: "plateforme devant plus bas",
             platformAbove: "plateforme au dessus",
             gridEdgeInFront: "bord de la grille devant",
+            gridEdgeAbove: "bord de la grille au dessus",
+            gridEdgeBelow: "bord de la grille en dessous",
+            gridEdgeEast: "bord de la grille à droite",
+            gridEdgeWest: "bord de la grille à gauche",
             obstacleInFront: "obstacle devant",
             obstacleRight: "obstacle à droite",
             obstacleLeft: "obstacle à gauche",
@@ -37,6 +44,7 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "obstacle en haut",
             obstacleSouth: "obstacle en bas",
             paintInFront: "peinture devant",
+            paintOnCell: "peinture sur la case",
             paintNorthWest: "peinture en haut à gauche",
             paintNorth: "peinture en haut",
             paintNorthEast: "peinture en haut à droite",
@@ -59,6 +67,7 @@ var getContext = function(display, infos, curLevel) {
             left: "tournerGauche",
             turnAround: "demiTour",
             jump: "sauter",
+            down: "descendre",
             forward: "avancer",
             east: "droite",
             south: "bas",
@@ -78,10 +87,16 @@ var getContext = function(display, infos, curLevel) {
             brownCell: "caseMarron",
             markedCell: "caseMarquee",
             platformInFront: "plateformeDevant",
+            addPlatformAbove: "construirePlateformeAuDessus",
+            addPlatformInFront: "construirePlateformeDevant",
             platformInFrontAndBelow: "plateformeDevantPlusBas",
             platformAbove: "plateformeAuDessus",
             gridEdgeInFront: "bordGrilleDevant",
             obstacleInFront: "obstacleDevant",
+            gridEdgeEast: "bordGrilleDroite",
+            gridEdgeWest: "bordGrilleGauche",
+            gridEdgeAbove: "bordGrilleAuDessus",
+            gridEdgeBelow: "bordGrilleEnDessous",
             obstacleRight: "obstacleADroite",
             obstacleLeft: "obstacleAGauche",
             obstacleEast: "obstacleDroite",
@@ -89,11 +104,14 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "obstacleHaut",
             obstacleSouth: "obstacleBas",
             paintInFront: "peintureDevant",
+            paintOnCell: "peintureSurCase",
             paintNorthWest: "peintureHautGauche",
             paintNorth: "peintureHaut",
             paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
+            writeNumber: "mettre le nombre de la case à",
+            writeNumber: "ecrireNombre",
             dir: "direction",
             col: "colonne",
             row: "ligne",
@@ -121,9 +139,42 @@ var getContext = function(display, infos, curLevel) {
             successDroppedAllObjects: "Bravo, vous avez déposé toutes les objets !",
             leavesGrid: "Le robot sort de la grille !",
          },
+         description: { 
+            platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
+            obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
+            onHole: "surTrou() : le robot est-il sur un trou ?",
+            onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+            paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
+            gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
+            gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
+            gridEdgeWest: "bordGrilleDroite() : le bord de la grille est-il juste à droite du robot ?",
+            gridEdgeAbove: "bordGrilleAuDessus() : le bord de la grille est-il juste au dessus du robot ?",
+            gridEdgeBelow: "bordGrilleEnDessous() : le bord de la grille est-il juste en dessous du robot ?",
+            platformInFront: "plateformeDevant() : y a-t-il une plateforme devant le robot ?",
+            numberUnder: "nombreCase() : nombre inscrit sur la case du robot",
+            col: "colonne() : colonne du robot",
+            row: "ligne() : ligne du robot",
+            paintNorth: "peintureHaut() : la case au dessus est-elle peinte ?",
+            paintNorthWest: "peintureHautGauche() : la case au dessus à gauche est-elle peinte ?",
+            paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
+            writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
+         },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programme du robot",
-         
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
       de: {
          label: {
@@ -132,6 +183,7 @@ var getContext = function(display, infos, curLevel) {
             left: "drehe nach links",
             turnAround: "drehe um",
             jump: "spring",
+            down: "gehe runter",
             forward: "gehe vorwärts",
             east: "gehe nach rechts",
             south: "gehe nach unten",
@@ -150,10 +202,16 @@ var getContext = function(display, infos, curLevel) {
             greenCell: "auf grünem Feld",
             brownCell: "auf braunem Feld",
             markedCell: "auf markiertem Feld",
+            addPlatformAbove: "baue Plateform darüber",
+            addPlatformInFront: "baue Plateform davor",
             platformInFront: "vor Plattform",
             platformInFrontAndBelow: "vor und über Plattform",
             platformAbove: "unter Plattform",
             gridEdgeInFront: "vor Rand des Gitters",
+            gridEdgeAbove: "unter Rand des Gitters",
+            gridEdgeBelow: "über Rand des Gitters",
+            gridEdgeEast: "links vom Gitterrand",
+            gridEdgeWest: "rechts vom Gitterrand",
             obstacleInFront: "vor Hindernis",
             obstacleRight: "Hindernis rechts",
             obstacleLeft: "Hindernis links",
@@ -162,11 +220,13 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "Hindernis oben",
             obstacleSouth: "Hindernis unten",
             paintInFront: "vor Farbe",
+            paintOnCell: "Farbe auf Feld",
             paintNorthWest: "Farbe oben links",
             paintNorth: "Farbe oben",
             paintNorthEast: "Farbe oben rechts",
             colorUnder: "auf Farbe",
             numberUnder: "Nummer des Feldes",
+            writeNumber: "Setze die Nummer des Feldes auf",
             dir: "Richtung des Roboters",
             col: "Spalte des Roboters",
             row: "Zeile des Roboters",
@@ -184,6 +244,7 @@ var getContext = function(display, infos, curLevel) {
             left: "dreheLinks",
             turnAround: "dreheUm",
             jump: "spring",
+            down: "geheRunter",
             forward: "geheVorwaerts",
             east: "rechts",
             south: "unten",
@@ -203,9 +264,15 @@ var getContext = function(display, infos, curLevel) {
             brownCell: "feldBraun",
             markedCell: "feldMarikiert",
             platformInFront: "vorPlattform",
+            addPlatformAbove: "bauePlattformDarueber",
+            addPlatformInFront: "bauePlattformDavor",
             platformInFrontAndBelow: "vorUeberPlatform",
             platformAbove: "unterPlatform",
             gridEdgeInFront: "vorGitterrand",
+            gridEdgeEast: "gitterrandRechts",
+            gridEdgeWest: "gitterrandLinks",
+            gridEdgeAbove: "unterGitterrand",
+            gridEdgeBelow: "ueberGitterrand",
             obstacleInFront: "vorHindernis",
             obstacleRight: "hindernisRechts",
             obstacleLeft: "hindernisLinks",
@@ -214,11 +281,13 @@ var getContext = function(display, infos, curLevel) {
             obstacleNorth: "hindenisOben",
             obstacleSouth: "hindenisUnten",
             paintInFront: "vorFarbe",
+            paintOnCell: "farbeAufFeld",
             paintNorthWest: "farbeObenLinks",
             paintNorth: "farbeOben",
             paintNorthEast: "farbeObenRechts",
             colorUnder: "farbe",
             numberUnder: "feldNummer",
+            writeNumber: "schreibeFeldNummer",
             dir: "Richtung",
             col: "Spalte",
             row: "Zeile",
@@ -246,8 +315,25 @@ var getContext = function(display, infos, curLevel) {
             successDroppedAllObjects: "Bravo! du hast alle Sachen abgelegt.",
             leavesGrid: "Der Roboter hat das Gitter verlassen!",
          },
+         description: {
+         },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
          startingBlockName: "Programm des Roboters",
+
+         exit_grid: "Le robot sort de la grille !",
+         nothingToPickUp: "Rien à ramasser",
+         alreadyTransportingObject: "Le robot transporte déjà un objet",
+         jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
+         jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
+         jumpNoPlatform: "Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !",
+         downOutsideGrid: "Le robot essaie de descendre en dehors de la grille !",
+         downNoPlatform: "Le robot essaie de descendre mais il n'y a pas de plateforme en dessous !",
+         falls: "Le robot se jette dans le vide",
+         willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
+         dropWithoutItem: "Le robot essaie de déposer un objet mais n'en transporte pas.",
+         droppedAllItems: "Bravo, vous avez déposé toutes les objets !",
+         obstacleOnCell: "Il y a un obstacle sur cette case",
+         platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
       en:  {
          startingBlockName: "Robot's program",
@@ -266,9 +352,24 @@ var getContext = function(display, infos, curLevel) {
    var strings = window.languageStrings;
    
    var cells = [];
-   var texts = [];
+   var colsLabels = [];
+   var rowsLabels = [];
    var scale = 1;
    var paper;
+
+   if (infos.leftMargin === undefined) {
+      infos.leftMargin = 0;
+   }
+   if (infos.topMargin === undefined) {
+      if (infos.showLabels) {
+         infos.topMargin = 0;
+      } else {
+         infos.topMargin = infos.cellSide / 2;
+      }
+   }
+   if (infos.showLabels) {      infos.leftMargin += infos.cellSide;
+      infos.topMargin += infos.cellSide;
+   }
 
    var context = {
       display: display,
@@ -312,7 +413,7 @@ var getContext = function(display, infos, curLevel) {
 
    context.callCallback = function(callback, value) { // Default implementation
       context.runner.noDelay(callback, value);
-   }
+   };
 
    context.nbRobots = 1;
 
@@ -347,11 +448,11 @@ var getContext = function(display, infos, curLevel) {
       }
       if (isOutsideGrid(row + 1, coords.col)) {
          context.lost = true;
-         throw("Le robot se jette dans le vide !");
+         throw(strings.falls);
       }
       if (row - coords.row > 2) {
          context.lost = true;
-         throw("Le robot va tomber de haut et s'écraser !");
+         throw(strings.willFallAndCrash);
       }
       coords.row = row;
       context.nbMoves++;
@@ -368,15 +469,41 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       if (isOutsideGrid(item.row - 2, item.col)) {
          context.lost = true;
-         throw("Le robot essaie de sauter en dehors de la grille !");
+         throw(strings.jumpOutsideGrid);
+      }
+      var obstacle = context.getItems(item.row - 2, item.col, {category: "obstacle"});
+      if (obstacle.length > 0) {
+         context.lost = true;
+         throw(strings.jumpObstacleBlocking);
       }
       var platforms = context.getItems(item.row - 1, item.col, {category: "platform"});
       if (platforms.length == 0) {
          context.lost = true;
-         throw("Le robot essaie de sauter mais il n'y a pas de plateforme au dessus !");
+         throw(strings.jumpNoPlatform);
       }
       context.nbMoves++;
       moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
+
+   context.robot.down = function(callback) {
+      if (!infos.hasGravity) {
+         throw("Error: can't go down without gravity");
+      }
+      if (context.lost) {
+         return;
+      }
+      var item = context.getRobotItem(context.curRobot);
+      if (isOutsideGrid(item.row + 2, item.col)) {
+         context.lost = true;
+         throw(strings.downOutsideGrid);
+      }
+      var platforms = context.getItems(item.row + 3, item.col, {category: "platform"});
+      if (platforms.length == 0) {
+        context.lost = true;
+         throw(strings.downNoPlatform);
+      }
+      context.nbMoves++;
+      moveRobot(item.row + 2, item.col, item.dir, callback);
    };
 
    context.robot.turnAround = function(callback) {
@@ -398,7 +525,7 @@ var getContext = function(display, infos, curLevel) {
       }
       var platforms = context.getItems(robot.row + 1, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformInFrontAndBelow = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -411,25 +538,48 @@ var getContext = function(display, infos, curLevel) {
       var row = item.row + 3;
       var platforms = context.getItems(row, col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
-   }
+   };
 
    context.robot.platformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
-      context.runner.noDelay(callback, (platforms.length > 0));
-   }
-         
-   context.robot.gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront(0);
-      var gridEdgeInFront = false;
-      if (isOutsideGrid(coords.row, coords.col)) {
-         gridEdgeInFront = true;
-      } else if (context.tiles[coords.row][coords.col] == 0) {
-         gridEdgeInFront = true;
-      }
-      context.runner.noDelay(callback, gridEdgeInFront);
+      context.;runner.noDelay(callback, (platforms.length > 0));
    }
 
+   function gridEdgeCoord(row, col, callback) {
+      var gridEdge = false;
+      if (isOutsideGrid(row, col)) {
+         gridEdge = true;
+      } else if (context.tiles[row][col] == 0) {
+         gridEdge = true;
+      }
+      context.runner.noDelay(callback, gridEdge);
+   };
+
+   context.robot.gridEdgeInFront = function(callback) {
+      var coords = getCoordsInFront(0);
+      gridEdgeCoord(coords.row, coords.col, callback);
+   };
+
+   context.robot.gridEdgeAbove = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row - 1, robot.col, callback);
+   };
+
+   context.robot.gridEdgeBelow = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row + 1, robot.col, callback);
+   };
+
+   context.robot.gridEdgeEast = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row, robot.col + 1, callback);
+   };
+
+   context.robot.gridEdgeWest = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      gridEdgeCoord(robot.row, robot.col - 1, callback);
+   };
 
    function destroyItem(row, col, category) {
       var foundItem = -1;
@@ -448,6 +598,54 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
+   function createItem(newItem) {
+      var robot = context.getRobotItem(context.curRobot);
+      if (isOutsideGrid(newItem.row, newItem.col)) {
+         throw("La case est en dehors de la grille");
+      }
+      var addItem = function() {
+         resetItem(newItem);
+         if (context.display) {
+            resetItemsZOrder(newItem.row, newItem.col);
+            if ((robot.col != newItem.col) || (robot.row != newItem.row)) {
+               resetItemsZOrder(robot.row, robot.col);
+            }
+         }
+      };
+      if ((infos.actionDelay > 0) && (context.display)) {
+         context.delayFactory.createTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
+            addItem();
+         }, infos.actionDelay / 2);
+      } else {
+         addItem();
+      }
+   };
+
+   function addPlatform(row, col, callback) {
+      var platforms = context.getItems(row, col, {category: "platform"});
+      if (platforms.length > 0) {
+         throw(strings.platformOnCell);
+      }
+      var obstacles = context.getItems(row, col, {isObstacle: true});
+      if (obstacles.length > 0) {
+         throw(strings.obstacleOnCell);
+      }
+      createItem({row: row, col: col, type: "platform"});
+      context.waitDelay(callback);
+   };
+   
+   context.robot.addPlatformInFront = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var coords = getCoordsInFront(robot.dir);
+      addPlatform(coords.row + 1, coords.col, callback);
+   };
+   
+   context.robot.addPlatformAbove = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      addPlatform(robot.row - 1, robot.col, callback);
+   };
+
+   
    function paint(row, col, paintType, callback) {
       if (context.lost) {
          return;
@@ -460,19 +658,7 @@ var getContext = function(display, infos, curLevel) {
          paintItems.splice(0, 1);
       }
       if (paintItems.length == 0) {
-         var addItem = function() {
-            resetItem(newItem);
-            if (context.display) {
-               resetItemsZOrder(row, col);
-            }
-         };
-         if ((infos.actionDelay > 0) && (context.display)) {
-            context.delayFactory.createTimeout("addItem" + context.curRobot + "_" + Math.random(), function() {
-               addItem();
-            }, infos.actionDelay / 2);
-         } else {
-            addItem();
-         }
+         createItem(newItem);
       }
       context.waitDelay(callback);
    }
@@ -525,6 +711,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col + 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col + 1, 0, callback);
       }
    };
@@ -537,6 +724,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row, item.col - 1)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row, item.col - 1, 2, callback);
       }
    };
@@ -549,6 +737,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row - 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row - 1, item.col, 3, callback);
       }
    };
@@ -561,6 +750,7 @@ var getContext = function(display, infos, curLevel) {
       if (!checkTileAllowed(item.row + 1, item.col)) {
          context.waitDelay(callback);
       } else {
+         context.nbMoves++;
          moveRobot(item.row + 1, item.col, 1, callback);
       }
    };
@@ -624,6 +814,12 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, items.length > 0);
    };
 
+   context.robot.paintOnCell = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var items = context.getItems(robot.row, robot.col, {isPaint: true});
+      context.callCallback(callback, items.length > 0);
+   };
+   
    context.robot.paintNorthWest = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var items = context.getItems(robot.row - 1, robot.col - 1, {isPaint: true});
@@ -662,15 +858,18 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.robot.gridEdgeInFront = function(callback) {
-      var coords = getCoordsInFront(0);
-      var gridEdgeInFront = false;
-      if (isOutsideGrid(coords.row, coords.col)) {
-         gridEdgeInFront = true;
-      } else if (context.tiles[coords.row][coords.col] == 0) {
-         gridEdgeInFront = true;
+   context.robot.writeNumber = function(value, callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var itemsUnder = context.getItems(robot.row, robot.col, {category: "number"});
+      if (itemsUnder.length == 0) {
+         context.callCallback(callback);
+      } else {
+         itemsUnder[0].type = value.data;
+         if (context.display) {
+            redisplayItem(itemsUnder[0]);
+         }
+         context.callCallback(callback);
       }
-      context.callCallback(callback, gridEdgeInFront);
    };
 
    context.robot.col = function(callback) {
@@ -696,12 +895,12 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       return null;
-   }
+   };
 
    context.transportable_exists = function(id, callback) {
       var transportable = findTransportable(id);
       context.runner.noDelay(callback, transportable != null);
-   }
+   };
 
    context.transportable_col = function(id, callback) {
       var transportable = findTransportable(id);
@@ -710,7 +909,7 @@ var getContext = function(display, infos, curLevel) {
          res = transportable.col + 1;
       }
       context.callCallback(callback, res);
-   }
+   };
 
    context.transportable_row = function(id, callback) {
       var transportable = findTransportable(id);
@@ -789,7 +988,7 @@ var getContext = function(display, infos, curLevel) {
          return itemType[property];
       }
       return "";
-   }
+   };
 
    context.robot.transportableShape = function(callback) {
       var result = getTransportableProperty("shape");
@@ -854,7 +1053,7 @@ var getContext = function(display, infos, curLevel) {
          context.transportedItem = undefined;
          callback();
       });
-   }
+   };
    
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
@@ -887,6 +1086,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbCollectedItems = 0;
       if (context.display) {
          context.resetDisplay();
+         $("#nbMoves").html(context.nbMoves);
       } else {
          resetItems();
       }
@@ -942,6 +1142,7 @@ var getContext = function(display, infos, curLevel) {
             { name: "forward" },
             { name: "turnAround" },
             { name: "jump" },
+            { name: "down" },
             { name: "right" },
             { name: "left" },
             { name: "east" },
@@ -951,7 +1152,9 @@ var getContext = function(display, infos, curLevel) {
             { name: "wait" },
             { name: "pickTransportable" },
             { name: "dropTransportable" },
-            { name: "dropTransportable" },
+            { name: "writeNumber", params: [null] },
+            { name: "addPlatformAbove",   yieldsValue: false },
+            { name: "addPlatformInFront",   yieldsValue: false },
          ],
          sensors: [
             { name: "onTransportable",    yieldsValue: true },
@@ -975,12 +1178,17 @@ var getContext = function(display, infos, curLevel) {
             { name: "obstacleSouth",      yieldsValue: true },
             
             { name: "paintInFront",       yieldsValue: true },
+            { name: "paintOnCell",        yieldsValue: true },
             { name: "paintNorth",         yieldsValue: true },
             { name: "paintNorthWest",     yieldsValue: true },
             { name: "paintNorthEast",     yieldsValue: true },
             { name: "colorUnder",         yieldsValue: true },
             { name: "numberUnder",        yieldsValue: true },
             { name: "gridEdgeInFront",    yieldsValue: true },
+            { name: "gridEdgeEast",       yieldsValue: true },
+            { name: "gridEdgeWest",       yieldsValue: true },
+            { name: "gridEdgeAbove",      yieldsValue: true },
+            { name: "gridEdgeBelow",      yieldsValue: true },
             { name: "platformInFront",    yieldsValue: true },
             { name: "platformInFrontAndBelow", yieldsValue: true },
             { name: "platformAbove",      yieldsValue: true },
@@ -1040,16 +1248,23 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, result);
    };
 
+   // positions and dimensions will be set later by updateScale
    var resetBoard = function() {
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          cells[iRow] = [];
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
-            var x = infos.cellSide * iCol * scale;
-            var y = infos.cellSide * iRow * scale;
             var itemTypeNum = context.tiles[iRow][iCol];
             if (itemTypeNum > 0) {
-               cells[iRow][iCol] = paper.rect(x, y, infos.cellSide * scale, infos.cellSide * scale);
+               cells[iRow][iCol] = paper.rect(0,0,10,10);
             }
+         }
+      }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
       }
    };
@@ -1140,9 +1355,14 @@ var getContext = function(display, infos, curLevel) {
       if (item.element != null) {
          item.element.remove();
       }
-      var x = infos.cellSide * item.col * scale;
-      var y = infos.cellSide * item.row * scale;
-      item.element = paper.image(infos.itemTypes[item.type].img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row + infos.topMargin) * scale;
+      var itemType = infos.itemTypes[item.type];
+      if (itemType.img) {
+         item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      } else if (itemType.value !== undefined) {
+         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, itemType.value).attr({"font-size": item.side * scale / 2});
+      }
       item.element.attr(itemAttributes(item));
       resetItemsZOrder(item.row, item.col);
    };
@@ -1200,6 +1420,7 @@ var getContext = function(display, infos, curLevel) {
                item.element.attr(attr);
             }
          }
+         $("#nbMoves").html(context.nbMoves);
       }
       context.waitDelay(callback);
    };
@@ -1249,8 +1470,9 @@ var getContext = function(display, infos, curLevel) {
    };
 
    var itemAttributes = function(item) {
-      var x = infos.cellSide * scale * item.col + item.offsetX * scale;
-      var y = (infos.cellSide * item.row - (item.side - infos.cellSide)) * scale + item.offsetY * scale;
+      var itemType = infos.itemTypes[item.type];
+      var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
       var xClip = x;
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
@@ -1258,6 +1480,10 @@ var getContext = function(display, infos, curLevel) {
          x = x - (dirToState[item.dir] * item.side * scale); 
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
+      if (!itemType.img) {
+         x += item.side * scale / 2;
+         y += item.side * scale / 2;
+      }
       return { x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
    };
 
@@ -1270,30 +1496,41 @@ var getContext = function(display, infos, curLevel) {
       }
       var newCellSide;
       if (context.nbCols && context.nbRows) {
-         newCellSide = Math.min($("#grid").width() / context.nbCols, $("#grid").height() / context.nbRows);
+         var marginAsCols = infos.leftMargin / infos.cellSide;
+         var marginAsRows = infos.topMargin / infos.cellSide;
+         newCellSide = Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows));
       } else {
          newCellSide = 0;
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize(infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             if (cells[iRow][iCol] != undefined) {
-               var x = infos.cellSide * iCol * scale;
-               var y = infos.cellSide * iRow * scale;
+               var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
+               var y = (infos.cellSide * iRow + infos.topMargin) * scale;
                cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
             }
          }
       }
+      if (infos.showLabels) {
+         for (var iRow = 0; iRow < context.nbRows; iRow++) {
+            var x = (infos.leftMargin - infos.cellSide / 2) * scale;
+            var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
+            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+         for (var iCol = 0; iCol < context.nbCols; iCol++) {
+            var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
+            var y = (infos.topMargin - infos.cellSide / 2) * scale;
+            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+      }
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
+         redisplayItem(item);
          item.element.attr(itemAttributes(item));
-      }
-      if (texts[0] && texts[1]) {
-         texts[0].attr({x: infos.cellSide * 4.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
-         texts[1].attr({x: infos.cellSide * 7.5 * scale, y: infos.cellSide * scale * 0.5, "font-size": 18 * scale});
       }
    };
 
    return context;
-}
+};
