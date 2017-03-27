@@ -83,7 +83,7 @@ var localLanguageStrings = {
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
-      uninitializedVar: "Variable non initialisée :"
+      uninitializedVar: "Variable non initialisée :",
       textVariable: "texte",
       listVariable: "liste",
    },
@@ -193,7 +193,7 @@ var localLanguageStrings = {
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
-      uninitializedVar: "Nicht-initialisierte Variable:"
+      uninitializedVar: "Nicht-initialisierte Variable:",
       textVariable: "Text",
       listVariable: "Liste",
    }
@@ -293,7 +293,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          var saveOrLoadModal = "<div class='modal'>" +
                                "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +
-                               "    <button type='button' class='btn' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' >" + his.strings.saveProgram +
+                               "    <button type='button' class='btn' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' >" + this.strings.saveProgram +
                                "</button><span id='saveUrl'></span>\n" +
                                "    <p>" + this.strings.avoidReloadingOtherTask + "</p>\n" +
                                "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
@@ -2250,7 +2250,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                      code = blockInfo.name;
                   }
 
-                  if(iCategory == 'actions') {
+                  if(category == 'actions') {
                      runner.hasActions = true;
                      var handler = makeHandler(runner, blockInfo.handler);
                   } else {

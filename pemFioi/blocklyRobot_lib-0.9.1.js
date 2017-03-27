@@ -543,7 +543,7 @@ var getContext = function(display, infos, curLevel) {
    context.robot.platformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
-      context.;runner.noDelay(callback, (platforms.length > 0));
+      context.runner.noDelay(callback, (platforms.length > 0));
    }
 
    function gridEdgeCoord(row, col, callback) {
