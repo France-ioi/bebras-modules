@@ -67,7 +67,7 @@ var languageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Remettre à zéro",
+      stopProgramDesc: "Repartir du début",
       stepProgramDesc: "Exécution pas-à-pas",
       slowSpeedDesc: "Exécuter sur ce test",
       mediumSpeedDesc: "Vitesse moyenne",
@@ -133,7 +133,7 @@ var languageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Reset execution",
+      stopProgramDesc: "Restart from the beginning",
       stepProgramDesc: "Step-by-step execution",
       slowSpeedDesc: "Execute on this test",
       mediumSpeedDesc: "Average speed",
@@ -201,7 +201,7 @@ var languageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Reset execution", // TODO :: translate and next 5
+      stopProgramDesc: "Restart from the beginning", // TODO :: translate and next 5
       stepProgramDesc: "Step-by-step execution",
       slowSpeedDesc: "Execute on this test",
       mediumSpeedDesc: "Average speed",
@@ -268,7 +268,7 @@ var languageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Reset execution", // TODO :: translate and next 5
+      stopProgramDesc: "Restart from the beginning", // TODO :: translate and next 5
       stepProgramDesc: "Step-by-step execution",
       slowSpeedDesc: "Execute on this test",
       mediumSpeedDesc: "Average speed",
@@ -409,7 +409,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
         // Buttons from buttonsAndMessages
         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="width: 438px; padding: 1px;">';
-        var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
+        var placementNames = ['graderMessage', 'validate', 'saved'];
         for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
            var placement = 'displayHelper_' + placementNames[iPlacement];
            if ($('#' + placement).length === 0) {
@@ -417,6 +417,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
            }
         }
         addTaskHTML += '</div>';
+        if(!$('#displayHelper_cancel').length) {
+           $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
+        }
 
         var gridButtonsAfter = ''
         gridButtonsAfter += "<div id='testSelector' style='width: 420px;'></div>"
@@ -486,10 +489,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
 
                // TODO :: put into a resetDisplay function, find other elements to reset
-               if(that.scratchMode) {
-                  that.glowBlock(null);
+               var newBlockly = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(that.workspace));
+               if(that.programs[that.player] && newBlockly != that.programs[that.player].blockly) {
+                  // only reset when program changed
+                  if(that.scratchMode) {
+                     that.glowBlock(null);
+                  }
+
+                  that.resetTestScores(nbTestCases);
                }
-               that.resetTestScores(nbTestCases);
             }
             this.workspace.addChangeListener(onchange);
             onchange();
@@ -2786,7 +2794,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.getAnswerObject(); // to fill this.answer;
       $('#displayHelper_graderMessage').html('<div style="margin: .2em 0; color: red; font-weight: bold;">' + languageStrings[language].gradingInProgress + '</div>');
       this.getGrade(function(result) {
-         $('#displayHelper_graderMessage').html();
+         $('#displayHelper_graderMessage').html('');
          subTask.context.display = true;
          subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
@@ -2921,9 +2929,11 @@ var initBlocklySubTask = function(subTask, language) {
                }
                var results = {
                   message: msg,
-                  successRate: subTask.testCaseResults[iWorstTestCase],
+                  successRate: subTask.testCaseResults[iWorstTestCase].successRate,
                   iTestCase: iWorstTestCase
                  };
+            } else {
+               var results = subTask.testCaseResults[iWorstTestCase];
             }
             callback(results);
          }
