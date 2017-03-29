@@ -297,7 +297,7 @@ var getContext = function(display, infos) {
          param = 0;
       }
          
-      callOnAllTurtles((turtle) => {
+      callOnAllTurtles(function(turtle) {
          turtle.move(param);
       })
       
@@ -306,7 +306,7 @@ var getContext = function(display, infos) {
    
    // DEPRECATED
    context.turtle.turn = function(param, callback) {
-      callOnAllTurtles((turtle) => {
+      callOnAllTurtles(function(turtle) {
          turtle.turn(param);
       })
 
@@ -323,7 +323,7 @@ var getContext = function(display, infos) {
          }
       }
 
-      callOnAllTurtles((turtle) => {
+      callOnAllTurtles(function(turtle) {
          if (direction == "l") {
             turtle.turn(degree);
          }
@@ -337,7 +337,7 @@ var getContext = function(display, infos) {
    }
 
    context.turtle.peneither = function(status, callback) {
-      callOnAllTurtles((turtle) => {
+      callOnAllTurtles(function(turtle) {
          if (status == "up") {
             turtle.stop_painting();
          }
@@ -383,7 +383,7 @@ var getContext = function(display, infos) {
          colour = "#000000";
       }
 
-      callOnAllTurtles((turtle) => {
+      callOnAllTurtles(function(turtle) {
          turtle.set_colour(colour);
       })
 
