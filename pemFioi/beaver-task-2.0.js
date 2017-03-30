@@ -190,8 +190,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.reloadAnswer = function(strAnswer, callback) {
-      if(hasJustLoaded) {
-         // If this is the first time we reload an answer, jump to the first level that can gain points.
+      if(hasJustLoaded && levels) {
+         // If this is the first time we reload an answer, jump to the first
+         // level that can gain points, if there are levels.
          hasJustLoaded = false;
          task.gradeAnswer(strAnswer, null, function(score, message) {
             var maxScores = displayHelper.getLevelsMaxScores();
