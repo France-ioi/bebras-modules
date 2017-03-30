@@ -68,6 +68,12 @@ var localLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      stopProgramDesc: "Repartir du début",
+      stepProgramDesc: "Exécution pas-à-pas",
+      slowSpeedDesc: "Exécuter sur ce test",
+      mediumSpeedDesc: "Vitesse moyenne",
+      fastSpeedDesc: "Vitesse rapide",
+      ludicrousSpeedDesc: "Vitesse très rapide",
       selectLanguage: "Langage :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
@@ -83,7 +89,16 @@ var localLanguageStrings = {
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      tooManyBlocks: "Vous utilisez trop de blocs !",
       uninitializedVar: "Variable non initialisée :",
+      valueTrue: 'vrai',
+      valueFalse: 'faux',
+      correctAnswer: 'Réponse correcte',
+      partialAnswer: 'Réponse améliorable',
+      wrongAnswer: 'Réponse inconnecte',
+      resultsNoSuccess: "Vous n'avez validé aucun test.",
+      resultsPartialSuccess: "Vous avez validé seulement {nbSuccess} test(s) sur {nbTests}.",
+      gradingInProgress: "Évaluation en cours",
       textVariable: "texte",
       listVariable: "liste",
    },
@@ -122,6 +137,12 @@ var localLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      stopProgramDesc: "Restart from the beginning",
+      stepProgramDesc: "Step-by-step execution",
+      slowSpeedDesc: "Execute on this test",
+      mediumSpeedDesc: "Average speed",
+      fastSpeedDesc: "Fast speed",
+      ludicrousSpeedDesc: "Ludicrous speed",
       selectLanguage: "Language :",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
@@ -136,7 +157,16 @@ var localLanguageStrings = {
       nextTestcase: "Next",
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
+      tooManyBlocks: "You use too many blocks!",
       uninitializedVar: "Uninitialized variable:",
+      valueTrue: 'true',
+      valueFalse: 'false',
+      correctAnswer: 'Correct answer',
+      partialAnswer: 'Partial answer',
+      wrongAnswer: 'Wrong answer',
+      resultsNoSuccess: "You passed none of the tests.",
+      resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
+      gradingInProgress: "Grading in process",
       textVariable: "text",
       listVariable: "list",
    },
@@ -178,6 +208,12 @@ var localLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
+      stopProgramDesc: "Restart from the beginning", // TODO :: translate and next 5
+      stepProgramDesc: "Step-by-step execution",
+      slowSpeedDesc: "Execute on this test",
+      mediumSpeedDesc: "Average speed",
+      fastSpeedDesc: "Fast speed",
+      ludicrousSpeedDesc: "Ludicrous speed",
       selectLanguage: "Sprache:",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
@@ -193,7 +229,17 @@ var localLanguageStrings = {
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
-      uninitializedVar: "Nicht-initialisierte Variable:",
+      emptyProgram: "Le programme est vide ! Connectez des blocs.", // TODO :: translate this one and next 9
+      tooManyBlocks: "You use too many blocks!",
+      uninitializedVar: "Uninitialized variable:",
+      valueTrue: 'true',
+      valueFalse: 'false',
+      correctAnswer: 'Correct answer',
+      partialAnswer: 'Partial answer',
+      wrongAnswer: 'Wrong answer',
+      resultsNoSuccess: "You passed none of the tests.",
+      resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
+      gradingInProgress: "Das Ergebnis wird ausgewertet …",
       textVariable: "Text",
       listVariable: "Liste",
    }
@@ -262,6 +308,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       startingBlock: true, 
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
+      glowingBlock: null,
+
       includeBlocks: {
          groupByCategory: true,
          generatedBlocks: {},
@@ -300,34 +348,31 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>\n" +
                                "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
                                "</div>";
-        $("#saveOrLoadModal").html(saveOrLoadModal);
+         $("#saveOrLoadModal").html(saveOrLoadModal);
          
         
-         var gridButtonsBefore = "";
-         if (nbTestCases > 1) {
-            gridButtonsBefore += "<div>\n" +
-                                 "  <input type='button' value='" + this.strings.previousTestcase + "' onclick='task.displayedSubTask.changeTest(-1)'/>\n" +
-                                 "  <span id='testCaseName'>Test 1</span>\n" +
-                                 "  <input type='button' value='" + this.strings.nextTestcase + "' onclick='task.displayedSubTask.changeTest(1)'/>\n" +
-                                 "</div>\n";
-         }      
-         $("#gridButtonsBefore").html(gridButtonsBefore);
+         // Buttons from buttonsAndMessages
+         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="width: 438px; padding: 1px;">';
+         var placementNames = ['graderMessage', 'validate', 'saved'];
+         for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
+            var placement = 'displayHelper_' + placementNames[iPlacement];
+            if ($('#' + placement).length === 0) {
+               addTaskHTML += '<div id="' + placement + '"></div>';
+            }
+         }
+         addTaskHTML += '</div>';
+         if(!$('#displayHelper_cancel').length) {
+            $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
+         }
          
-         var gridButtonsAfter = "<div id='selectSpeed'>" +
-                                "  <div class='btn-group'>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.stop()'>" + this.strings.stopProgram + " </button>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.step()'>" + this.strings.stepProgram + " </button>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(200)'>" + this.strings.slowSpeed + "</button>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(50)'>" + this.strings.mediumSpeed + "</button>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(5)'>" + this.strings.fastSpeed + "</button>\n" +
-                                "    <button type='button' class='btn btn-default btn-icon' onclick='task.displayedSubTask.changeSpeed(0)'>" + this.strings.ludicrousSpeed + "</button>\n" +
-                                "  </div>" +
-                                "</div>";
-         gridButtonsAfter += "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+         var gridButtonsAfter = '';
+         gridButtonsAfter += "<div id='testSelector' style='width: 420px;'></div>"
+                           + "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
                            + (this.scratchMode ? "<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" : '')
                            + this.strings.submitProgram
                            + "</button><br/>"
-                           + "<div id='errors' style='width: 400px;'></div>";
+                           + "<div id='errors' style='width: 400px;'></div>"
+                           + addTaskHTML;
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
       
@@ -391,10 +436,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
-                  };
+               };
                var strLimitBlocks = remaining < 0 ? that.strings.limitBlocksOver : that.strings.limitBlocks;
                $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
                $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
+
+               // TODO :: put into a resetDisplay function, find other elements to reset
+               var newBlockly = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(that.workspace));
+               if(that.programs[that.player] && newBlockly != that.programs[that.player].blockly) {
+                  // only reset when program changed
+                  if(that.scratchMode) {
+                     that.glowBlock(null);
+                  }
+                  
+                  that.resetTestScores(nbTestCases);
+               }
             }
             this.workspace.addChangeListener(onchange);
             onchange();
@@ -416,6 +472,108 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
             this.savePrograms();
          }
+      },
+
+      initTestSelector: function (nbTestCases) {
+         var buttons = [
+            {cls: 'speedStop', label: this.strings.stopProgram, tooltip: this.strings.stopProgramDesc, onclick: 'task.displayedSubTask.stop()'},
+            {cls: 'speedStep', label: this.strings.stepProgram, tooltip: this.strings.stepProgramDesc, onclick: 'task.displayedSubTask.step()'},
+            {cls: 'speedSlow', label: this.strings.slowSpeed, tooltip: this.strings.slowSpeedDesc, onclick: 'task.displayedSubTask.changeSpeed(200)'},
+            {cls: 'speedMedium', label: this.strings.mediumSpeed, tooltip: this.strings.mediumSpeedDesc, onclick: 'task.displayedSubTask.changeSpeed(50)'},
+            {cls: 'speedFast', label: this.strings.fastSpeed, tooltip: this.strings.fastSpeedDesc, onclick: 'task.displayedSubTask.changeSpeed(5)'},
+            {cls: 'speedLudicrous', label: this.strings.ludicrousSpeed, tooltip: this.strings.ludicrousSpeedDesc, onclick: 'task.displayedSubTask.changeSpeed(0)'}
+         ];
+
+         var selectSpeed = "<div class='selectSpeed'>" +
+                           "  <div class='btn-group'>\n";
+         for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
+            var btn = buttons[btnIdx];
+            selectSpeed += "    <button type='button' class='"+btn.cls+" btn btn-default btn-icon'>"+btn.label+" </button>\n";
+         }
+         selectSpeed += "  </div></div>";
+
+         var html = '<div class="panel-group">';
+         for(var iTest=0; iTest<nbTestCases; iTest++) {
+            html += '<div id="testPanel'+iTest+'" class="panel panel-default">'
+                 +  '  <div class="panel-heading" onclick="task.displayedSubTask.changeTestTo('+iTest+')"><h4 class="panel-title"></h4></div>'
+                 +  '  <div class="panel-body">'
+                  + selectSpeed
+                 +  '  </div>'
+                 +  '</div>';
+         }
+         $('#testSelector').html(html);
+
+         var selectSpeedClickHandler = function () {
+            var thisBtn = $(this);
+            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
+               var btnInfo = buttons[btnIdx];
+               if(thisBtn.hasClass(btnInfo.cls)) {
+                  $('#errors').html(btnInfo.tooltip);
+                  eval(btnInfo.onclick);
+                  break;
+               }
+            }
+         }
+         var selectSpeedHoverHandler = function () {
+            var thisBtn = $(this);
+            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
+               var btnInfo = buttons[btnIdx];
+               if(thisBtn.hasClass(btnInfo.cls)) {
+                  $('#errors').html(btnInfo.tooltip);
+                  break;
+               }
+            }
+         };
+         var selectSpeedHoverClear = function () {
+            // Only clear #errors if the tooltip was for this button
+            var thisBtn = $(this);
+            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
+               var btnInfo = buttons[btnIdx];
+               if(thisBtn.hasClass(btnInfo.cls)) {
+                  if($('#errors').html() == btnInfo.tooltip) {
+                     $('#errors').html('');
+                  }
+                  break;
+               }
+            }
+         };
+
+         // TODO :: better display functions for #errors
+         $('.selectSpeed button').click(selectSpeedClickHandler);
+         $('.selectSpeed button').hover(selectSpeedHoverHandler, selectSpeedHoverClear);
+
+
+         this.updateTestSelector(0);
+         this.resetTestScores(nbTestCases);
+      },
+
+      updateTestScores: function (testScores) {
+         // Display test results
+         for(var iTest=0; iTest<testScores.length; iTest++) {
+            if(testScores[iTest].successRate >= 1) {
+               var icon = '<span class="testResultIcon" style="color: green">✔</span>';
+               var label = '<span class="testResult testSuccess">'+this.strings.correctAnswer+'</span>';
+            } else if(testScores[iTest].successRate > 0) {
+               var icon = '<span class="testResultIcon" style="color: orange">✖</span>';
+               var label = '<span class="testResult testPartial">'+this.strings.partialAnswer+'</span>';
+            } else {
+               var icon = '<span class="testResultIcon" style="color: red">✖</span>';
+               var label = '<span class="testResult testFailure">'+this.strings.wrongAnswer+'</span>';
+            }
+            $('#testPanel'+iTest+' .panel-title').html(icon+' Test '+(iTest+1)+' '+label);
+         }
+      },
+
+      resetTestScores: function (nbTestCases) {
+         // Reset test results display
+         for(var iTest=0; iTest<nbTestCases; iTest++) {
+            $('#testPanel'+iTest+' .panel-title').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
+         }
+      },
+
+      updateTestSelector: function (newCurTest) {
+         $("#testSelector .panel-body").hide();
+         $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#errors')).show();
       },
 
       unload: function() {
@@ -598,7 +756,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      var xml = Blockly.Xml.textToDom(code);
                      that.programs[that.player].blockly = code;
                   } catch(e) {
-                     $("#errors").html(that.strings.invalidContent);
+                     $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
                   that.languages[that.player] = "blockly";
                } else {
@@ -611,7 +769,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
             reader.readAsText(file);
          } else {
-            $("#errors").html(this.strings.unknownFileType);
+            $("#errors").html('<span class="testError">'+this.strings.unknownFileType+'</span>');
          }
       },
 
@@ -836,11 +994,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                         }
                      }
 
+                     var callCode = code + '(' + params + ')';
+                     // Add reportValue to show the value in step-by-step mode
+                     var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
+
                      if (typeof output == "undefined") {                     
-                        return code + "(" + params + ");\n";
+                        return callCode + ";\n";
                      }
                      else {
-                        return [code + "(" + params + ")", Blockly[language].ORDER_NONE];
+                        return [reportedCode, Blockly[language].ORDER_NONE];
                      }
                   }
                };
@@ -848,6 +1010,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
          }
       },
+      
       applyCodeGenerators: function(block) {
          for (var language in block.codeGenerators) {
             Blockly[language][block.name] = block.codeGenerators[language];
@@ -2103,6 +2266,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
       },
 
+      glowBlock: function(id) {
+         // highlightBlock replacement for Scratch
+         if(this.glowingBlock) {
+            try {
+               this.workspace.glowBlock(this.glowingBlock, false);
+            } catch(e) {}
+         }
+         if(id) {
+            this.workspace.glowBlock(id, true);
+         }
+         this.glowingBlock = id;
+      },
+
       initRun: function() {
          var that = this;
          var nbRunning = this.mainContext.runner.nbRunning();
@@ -2131,7 +2307,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               $('#errors').html(window.languageStrings.errorEmptyProgram);
+               $("#errors").html('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
                return;
             }
          }
@@ -2149,7 +2325,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          that.highlightPause = false;
          if(this.scratchMode) {
             if(that.workspace.remainingCapacity() < 0) {
-               $('#errors').html('Trop de blocs utilisés !');
+               $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
                return;
             }
          } else {
@@ -2193,10 +2369,26 @@ function initBlocklyRunner(context, messageCallback, language) {
       runner.firstHighlight = true;
 
       runner.strings = languageStrings[language];
+
+      runner.reportBlockValue = function(id, value, varName) {
+         // Show a popup displaying the value of a block in step-by-step mode
+         if(context.display && runner.stepMode) {
+            var displayStr = value.toString();
+            if(value.type == 'boolean') {
+               displayStr = value.data ? runner.strings.valueTrue : runner.strings.valueFalse;
+            }
+            if(varName) {
+               displayStr = varName.toString() + ' = ' + displayStr;
+            }
+            context.blocklyHelper.workspace.reportValue(id, displayStr);
+         }
+         return value;
+      };
+      
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
-                  runner.noDelay(callback, value, true);
+                  runner.noDelay(callback, value);
                },
                delay
             );
@@ -2205,7 +2397,7 @@ function initBlocklyRunner(context, messageCallback, language) {
          }
       };
 
-      runner.noDelay = function(callback, value, hadDelay) {
+      runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value != undefined) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
@@ -2213,21 +2405,11 @@ function initBlocklyRunner(context, messageCallback, language) {
          if (Math.random() < 0.1) {
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                callback(primitive);
-               if(runner.stepMode && runner.scratchMode && hadDelay) {
-                  // Interrupt only in scratch mode, when a robot action with a
-                  // delay occured, as there's no other feedback to the user
-                  runner.stepInProgress = false;
-               } else {
-                  runner.runSyncBlock();
-               }
+               runner.runSyncBlock();
             }, 0);
          } else {
             callback(primitive);
-            if(runner.stepMode && runner.scratchMode && hadDelay) {
-               runner.stepInProgress = false;
-            } else {
-               runner.runSyncBlock();
-            }
+            runner.runSyncBlock();
          }
       };
 
@@ -2274,30 +2456,36 @@ function initBlocklyRunner(context, messageCallback, language) {
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
             
-            var cb = function () {
-               if (context.display && !runner.scratchMode) {
+            if (context.display) {
+               if(!runner.scratchMode) {
                   context.blocklyHelper.workspace.traceOn(true);
                   context.blocklyHelper.workspace.highlightBlock(id);
                   highlightPause = true;
+               } else {
+                  context.blocklyHelper.glowBlock(id);
+                  highlightPause = true;
                }
-               callback();
             }
             
             // We always execute directly the first highlightBlock
-            if(runner.firstHighlight || runner.scratchMode || !runner.stepMode) {
+            if(runner.firstHighlight || !runner.stepMode) {
                runner.firstHighlight = false;
-               cb();
+               callback();
                runner.runSyncBlock();
             } else {
                // Interrupt here for step mode, allows to stop before each
                // instruction
-               runner.nextCallback = cb;
+               runner.nextCallback = callback;
                runner.stepInProgress = false;
             }
          }
 
          // Add an API function for highlighting blocks.
          interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(highlightBlock));
+
+         // Add an API function to report a value.
+         interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
+        
       };
 
       runner.stop = function() {
@@ -2307,6 +2495,12 @@ function initBlocklyRunner(context, messageCallback, language) {
                isRunning[iInterpreter] = false;
             }
          }
+
+         if(runner.scratchMode) {
+            Blockly.DropDownDiv.hide();
+            context.blocklyHelper.glowBlock(null);
+         }
+         
          context.reset();
       };
 
@@ -2389,7 +2583,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                      break;
                   }
                }
-               message = this.strings.uninitializedVar + ' ' + varName;
+               message = strings.uninitializedVar + ' ' + varName;
             }
             
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
@@ -2655,9 +2849,13 @@ var initBlocklySubTask = function(subTask, language) {
       displayHelper.timeoutMinutes = 30;
 
       this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
-      
+
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
+      if(this.display) {
+         this.blocklyHelper.initTestSelector(this.nbTestCases);
+      }
+      
       subTask.changeTest(0);
    };
 
@@ -2698,15 +2896,15 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.reset(subTask.data[subTask.level][iTestCase]);
       subTask.context.iTestCase = iTestCase;
       subTask.context.nbTestCases = subTask.nbTestCases;
-      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
-      subTask.context.messagePrefixFailure = prefix;
-      subTask.context.messagePrefixSuccess = prefix;
+      //      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
+      subTask.context.messagePrefixFailure = '';
+      subTask.context.messagePrefixSuccess = '';
       subTask.context.linkBack = false;
    };
 
    subTask.run = function() {
       initBlocklyRunner(subTask.context, function(message, success) {
-         $("#errors").html(message);
+         $("#errors").html('<span class="testError">'+message+'</span>');
       }, language);
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);
@@ -2715,11 +2913,15 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.submit = function() {
       this.context.display = false;
       this.getAnswerObject(); // to fill this.answer;
+
+      $('#displayHelper_graderMessage').html('<div style="margin: .2em 0; color: red; font-weight: bold;">' + languageStrings.gradingInProgress + '</div>');
+      
       this.getGrade(function(result) {
+         $('#displayHelper_graderMessage').html("");
          subTask.context.display = true;
          subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
-            $("#errors").html(message);
+            $("#errors").html('<span class="testError">'+message+'</span>');
             platform.validate("done");
          }, language);
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
@@ -2734,7 +2936,7 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.changeDelay(200);
       if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
         initBlocklyRunner(subTask.context, function(message, success) {
-           $("#errors").html(message);
+           $("#errors").html('<span class="testError">'+message+'</span>');
         }, language);
         initContextForLevel(subTask.iTestCase);
       }
@@ -2800,7 +3002,16 @@ var initBlocklySubTask = function(subTask, language) {
       var newTest = subTask.iTestCase + delta;
       if ((newTest >= 0) && (newTest < this.nbTestCases)) {
          initContextForLevel(newTest);
-         $("#testCaseName").html("Test " + (newTest + 1) + "/" + this.nbTestCases);
+         if(subTask.context.display) {
+            subTask.blocklyHelper.updateTestSelector(newTest);
+         }
+      }
+   };
+
+   subTask.changeTestTo = function(iTest) {
+      var delta = iTest - subTask.iTestCase;
+      if(delta != 0) {
+         subTask.changeTest(delta);
       }
    };
 
@@ -2818,14 +3029,36 @@ var initBlocklySubTask = function(subTask, language) {
          } else {
             var iWorstTestCase = 0;
             var worstRate = 1;
+            var nbSuccess = 0;
             for (var iCase = 0; iCase < subTask.nbTestCases; iCase++) {
+               if (subTask.testCaseResults[iCase].successRate >= 1) {
+                  nbSuccess++;
+               }
                if (subTask.testCaseResults[iCase].successRate < worstRate) {
                   worstRate = subTask.testCaseResults[iCase].successRate;
                   iWorstTestCase = iCase;
                }
             }
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
-            callback(subTask.testCaseResults[iWorstTestCase]);
+            subTask.blocklyHelper.updateTestScores(subTask.testCaseResults);
+            if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {
+               if(nbSuccess > 0) {
+                  var msg = languageStrings.resultsPartialSuccess.format({
+                     nbSuccess: nbSuccess,
+                     nbTests: subTask.nbTestCases
+                     });
+               } else {
+                  var msg = languageStrings.resultsNoSuccess;
+               }
+               var results = {
+                  message: msg,
+                  successRate: subTask.testCaseResults[iWorstTestCase].successRate,
+                  iTestCase: iWorstTestCase
+               };
+            } else {
+               var results = subTask.testCaseResults[iWorstTestCase];
+            }
+            callback(results);
          }
       }, language);
       subTask.iTestCase = 0;
