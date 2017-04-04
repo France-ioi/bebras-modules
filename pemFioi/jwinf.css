@@ -1,0 +1,14 @@
+
+
+#tabsMenu .li {
+    background: rgba(155, 177, 27, 0.47);
+}
+
+
+#taskIntro {
+    font-weight:normal;
+}
+
+img.beaver {
+    content:url("../img/jwinf-fox.jpg");
+}
