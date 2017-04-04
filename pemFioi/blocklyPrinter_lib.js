@@ -21,6 +21,11 @@ var getContext = function(display, infos) {
          messages: {
             outputWrong: "Das hat noch nicht ganz geklappt. Versuch es noch einmal!",
             outputCorrect: "Bravo! Du hast alle Zeilen richtig ausgegeben!",
+            tooFewChars: "Zeile zu kurz: Zeile ",
+            tooManyChars: "Zeile zu lang: Zeile ",
+            tooFewLines: "Zu wenig Zeilen ausgegeben",
+            tooManyLines: "Zu viele Zeilen ausgegeben",
+            correctOutput: "Die Ausgabe ist richtig!",
          }
       }
    }
@@ -260,5 +265,55 @@ var getContext = function(display, infos) {
       $("#input").text(context.printer.input_text);
    };
 
+   context.checkOutputHelper = function() {
+      var expectedLines = this.taskInfos.output.replace(/\s*$/,"").split("\n");
+      var actualLines = this.printer.output_text.replace(/\s*$/,"").split("\n");
+      
+      var iLine = 0;
+      
+      for (iLine = 0; iLine < expectedLines.length && iLine < actualLines.length; iLine++) {
+         var expectedLine = expectedLines[iLine].replace(/\s*$/,"");
+         var actualLine = actualLines[iLine].replace(/\s*$/,"");
+         
+         var iChar = 0;
+         for (iChar = 0; iChar < expectedLine.length && iChar < actualLine.length; iChar++) {
+            if (actualLine[iChar] != expectedLine[iChar]) {
+               this.success = false;
+               var errorstring = "Deine Ausgabe stimmt nicht mit der " +
+                                 "erwarteten Ausgabe überein; in Zeile " +
+                                      (iLine + 1) + ":<br>Erwartet: \"<b>" +
+                                 expectedLine + "</b>\",<br>deine Ausgabe: \"<b>" +
+                                 actualLine + "</b>\".<br>(Erstes falsches Zeichen in Spalte " +
+                                      (iChar + 1) + "; erwartet: \"<b>" +
+                                 expectedLine[iChar] + "</b>\", deine Ausgabe: \"<b>" +
+                                 actualLine[iChar] + "</b>\".)"
+               throw(errorstring); // add line info iLine + 1, add char info iChar + 1
+            }
+         }
+
+         if (actualLine.length < expectedLine.length) {
+            this.success = false;
+            throw(strings.messages.tooFewChars + (iLine + 1)); // add line info iLine + 1
+         }
+         
+         if (actualLine.length > expectedLine.length) {
+            this.success = false;
+            throw(strings.messages.tooManyChars + (iLine + 1)); // add line info iLine + 1
+         }
+      }
+
+      if (actualLines.length < expectedLines.length) {
+         this.success = false;
+         throw(strings.messages.tooFewLines);
+      }
+      
+      if (actualLines.length > expectedLines.length) {
+         this.success = false;
+         throw(strings.messages.tooManyLines);
+      }
+   }
+   
+   
+   
    return context;
 }
