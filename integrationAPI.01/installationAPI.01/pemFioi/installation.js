@@ -146,6 +146,14 @@ window.implementGetResources = function(task) {
          fillImages($(this).html(), images, res.hints[hintnum]);
       });
 
+      // Links
+      $('iframe').each(function () {
+        var curUrl = $(this).attr('src');
+        if(curUrl.indexOf('://') == -1 && curUrl.charAt(0) != '/') {
+          res.files.push({ type: this.tagName, url: $(this).attr('src') });
+        }
+      });
+
       // Other resources
       $('source, track').each(function() {
         res.files.push({ type: this.tagName, url: $(this).attr('src') });
