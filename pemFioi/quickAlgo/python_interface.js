@@ -244,6 +244,7 @@ function LogicController(nbTestCases, maxInstructions) {
     this._aceEditor.setFontSize(16);
   };
   this._bindEditorEvents = function () {
+    $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
     var that = this;
     var updatePythonCount = function () {
       if(that._language != 'python' || !maxInstructions || !that._aceEditor) { return; }
@@ -270,6 +271,8 @@ function LogicController(nbTestCases, maxInstructions) {
       var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
       $('#capacity').css('color', remaining < 0 ? 'red' : '');
       $('#capacity').html(strLimitElements.format(optLimitElements));
+
+      $('.blocklyDropDownDiv').remove();
     }
     this._aceEditor.getSession().on('change', debounce(updatePythonCount, 500, false))
   };

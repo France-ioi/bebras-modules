@@ -56,7 +56,7 @@ var importableModules = function () {
       'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"},
 
       'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
-      'skulpt': {src: modulesPath+"ext/skulpt/skulpt.min.js", id: "skulpt"},
+      'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
@@ -119,7 +119,7 @@ var languageScripts = function () {
          'python_count',
          'ace',
          'ace_python',
-         'skulpt',
+         'skulpt_quickAlgo',
          'skulpt_stdlib',
          'skulpt_debugger',
          'quickAlgo_utils',

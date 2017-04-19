@@ -116,6 +116,7 @@ function PythonInterpreter(context, msgCallback) {
       // Apparently when we create a new primitive, the debugger adds a call to
       // the callstack.
       this._resetCallstackOnNextStep = true;
+      this.reportValue(value);
     }
     this._paused = false;
     callback(primitive);
@@ -271,6 +272,51 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
+  this.reportValue = function (value, varName) {
+    // Show a popup displaying the value of a block in step-by-step mode
+    if(value.v !== undefined) {
+      value = value.v;
+    } else if(typeof value == 'object') {
+      return value;
+    }
+    if(this._editorMarker && context.display && this._stepMode) {
+      var highlighted = $('.aceHighlight');
+      if(highlighted.length == 0) {
+        return value;
+      } else if(highlighted.find('.ace_start').length > 0) {
+        var target = highlighted.find('.ace_start')[0];
+      } else {
+        var target = highlighted[0];
+      }
+      var bbox = target.getBoundingClientRect();
+
+      var leftPos = bbox.left+10;
+      var topPos = bbox.top-14;
+
+      var displayStr = value.toString();
+      if(typeof value == 'boolean') {
+         displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
+      }
+      if(varName) {
+         displayStr = '' + varName + ' = ' + displayStr;
+      }
+
+      var dropDownDiv = '' +
+        '<div class="blocklyDropDownDiv" style="transition: transform 0.25s, opacity 0.25s; background-color: rgb(255, 255, 255); border-color: rgb(170, 170, 170); left: '+leftPos+'px; top: '+topPos+'px; display: block; opacity: 1; transform: translate(0px, -20px);">' +
+        '  <div class="blocklyDropDownContent">' +
+        '    <div class="valueReportBox">' +
+        displayStr +
+        '    </div>' +
+        '  </div>' +
+        '  <div class="blocklyDropDownArrow arrowBottom" style="transform: translate(22px, 15px) rotate(45deg);"></div>' +
+        '</div>';
+
+      $('.blocklyDropDownDiv').remove();
+      $('body').append(dropDownDiv);
+    }
+    return value;
+  };
+
   this.stop = function () {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
@@ -339,6 +385,9 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.realStep = function () {
+    // For reportValue in Skulpt
+    window.currentPythonRunner = this;
+
     this._paused = this._stepMode;
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
