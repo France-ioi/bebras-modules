@@ -1,7 +1,7 @@
-/*!
- * @author John Ropas
- * @since 29/12/2016
- */
+/*
+    python_runner:
+        Python code runner.
+*/
 
 var currentPythonContext = null;
 
@@ -64,7 +64,7 @@ function PythonInterpreter(context, msgCallback) {
       var blocksInfos = {};
       for (var generatorName in this.context.customBlocks) {
         for (var typeName in this.context.customBlocks[generatorName]) {
-          var blockList = this.context.customBlocks[generatorName][typeName].blocks;
+          var blockList = this.context.customBlocks[generatorName][typeName];
           for (var iBlock=0; iBlock < blockList.length; iBlock++) {
             var blockInfo = blockList[iBlock];
             blocksInfos[blockInfo.name] = {
@@ -192,9 +192,9 @@ function PythonInterpreter(context, msgCallback) {
 
   this._continue = function () {
     if (this._steps >= this._maxIterations) {
-      this._onStepError(CodeEditor.Utils.Localization.Strings['fr'].tooManyIterations);
+      this._onStepError(window.languageStrings.tooManyIterations);
     } else if (this._stepsWithoutAction >= this._maxIterWithoutAction) {
-      this._onStepError(CodeEditor.Utils.Localization.Strings['fr'].tooManyIterationsWithoutAction);
+      this._onStepError(window.languageStrings.tooManyIterationsWithoutAction);
     } else if (!this._paused && this._isRunning) {
       this.step();
     }
@@ -373,4 +373,6 @@ function PythonInterpreter(context, msgCallback) {
   }
 }
 
-CodeEditor.Interpreters.PythonInterpreter = PythonInterpreter;
+function initBlocklyRunner(context, msgCallback) {
+   return new PythonInterpreter(context, msgCallback);
+};
