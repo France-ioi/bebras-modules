@@ -2263,7 +2263,14 @@ function initBlocklyRunner(context, messageCallback, language) {
                displayStr = value.data ? runner.strings.valueTrue : runner.strings.valueFalse;
             }
             if(varName) {
-               displayStr = varName.toString() + ' = ' + displayStr;
+               varName = varName.toString();
+               for(var dbIdx in Blockly.JavaScript.variableDB_.db_) {
+                  if(Blockly.JavaScript.variableDB_.db_[dbIdx] == varName) {
+                     varName = dbIdx.substring(0, dbIdx.length - 9);
+                     break;
+                  }
+               }
+               displayStr = varName + ' = ' + displayStr;
             }
             context.blocklyHelper.workspace.reportValue(id, displayStr);
          }
