@@ -1,3 +1,8 @@
+// Configure default language
+if(!window.stringsLanguage) {
+    window.stringsLanguage = 'fr';
+}
+
 requirejs.config({
   "paths": {
     "ace": modulesPath+"/ext/ace/ace",
@@ -18,7 +23,7 @@ requirejs.config({
     "taskController": taskPlatformPath+"/taskController",
     "pem-api": taskPlatformPath+"/pem-api",
     "animation": taskPlatformPath+"/animation",
-    "fioi-video-player": taskPlatformPath+"/fioi-video-player",
+    "fioi-video-player": modulesPath+"/pemFioi/videoPlayer-1.0",
     "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsDirective": taskPlatformPath+"/hints/directive",
     "showdown": modulesPath+"/ext/showdown/showdown.min",
