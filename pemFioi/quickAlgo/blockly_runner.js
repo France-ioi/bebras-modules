@@ -158,8 +158,6 @@ function initBlocklyRunner(context, messageCallback) {
             Blockly.DropDownDiv.hide();
             context.blocklyHelper.glowBlock(null);
          }
-         
-         context.reset();
       };
 
       runner.runSyncBlock = function() {
@@ -317,6 +315,10 @@ function initBlocklyRunner(context, messageCallback) {
             }
          }
          return nbRunning;
+      };
+
+      runner.isRunning = function ()    
+         return this.nbRunning() == 0;
       };
 
       context.runner = runner;

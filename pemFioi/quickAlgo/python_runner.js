@@ -272,17 +272,19 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this.reportValue = function (value, varName) {
+  this.reportValue = function (origValue, varName) {
     // Show a popup displaying the value of a block in step-by-step mode
-    if(value.v !== undefined) {
-      value = value.v;
-    } else if(typeof value == 'object') {
-      return value;
+    if(origValue.v !== undefined) {
+      value = origValue.v;
+    } else if(typeof origValue == 'object') {
+      return origValue;
+    } else {
+      value = origValue;
     }
     if(this._editorMarker && context.display && this._stepMode) {
       var highlighted = $('.aceHighlight');
       if(highlighted.length == 0) {
-        return value;
+        return origValue;
       } else if(highlighted.find('.ace_start').length > 0) {
         var target = highlighted.find('.ace_start')[0];
       } else {
@@ -314,16 +316,14 @@ function PythonInterpreter(context, msgCallback) {
       $('.blocklyDropDownDiv').remove();
       $('body').append(dropDownDiv);
     }
-    return value;
+    return origValue;
   };
 
   this.stop = function () {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
-    if(!this._stepMode) {
-      this.removeEditorMarker();
-    }
+    this.removeEditorMarker();
     if(Sk.runQueue) {
       for (var i=0; i<Sk.runQueue.length; i++) {
         if(Sk.runQueue[i].ctrl === this) {
@@ -333,6 +333,10 @@ function PythonInterpreter(context, msgCallback) {
       }
     }
     this._resetInterpreterState();
+  };
+
+  this.isRunning = function () {
+    return this._isRunning;
   };
 
   this._resetInterpreterState = function () {

@@ -167,6 +167,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
       },
 
+      setIncludeBlocks: function(includeBlocks) {
+         this.includeBlocks = includeBlocks;
+      },
+
       getDefaultContent: function () {
          if (this.startingBlock) {
             if(this.scratchMode) {

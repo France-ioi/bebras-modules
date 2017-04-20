@@ -290,7 +290,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var pythonHtml = '<hr />';
 
-    if(this.includeBlocks && this._includeBlocks.generatedBlocks) {
+    if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
       pythonHtml += '<p>Votre programme doit commencer par la ligne :</p>'
                   +  '<p><code>from robot import *</code></p>'
                   +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'

@@ -58,7 +58,7 @@ var initBlocklySubTask = function(subTask, language) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      this.blocklyHelper.includeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);;
+      this.blocklyHelper.setIncludeBlocks(extractLevelSpecific(this.context.infos.includeBlocks, curLevel));
 
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
 
@@ -157,6 +157,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.context.runner) {
          this.context.runner.stop();
       }
+      this.context.reset();
    };
 
    subTask.reloadStateObject = function(stateObj) {
@@ -179,7 +180,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.changeSpeed =  function(speed) {
       this.context.changeDelay(speed);
-      if ((this.context.runner == undefined) || (this.context.runner.nbRunning() == 0)) {
+      if ((this.context.runner == undefined) || !this.context.runner.isRunning()) {
          this.run();
       } else if (this.context.runner.stepMode) {
          this.context.runner.run();
