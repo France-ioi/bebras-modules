@@ -317,7 +317,7 @@ function initBlocklyRunner(context, messageCallback) {
          return nbRunning;
       };
 
-      runner.isRunning = function ()    
+      runner.isRunning = function () {
          return this.nbRunning() == 0;
       };
 
