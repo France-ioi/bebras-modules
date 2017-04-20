@@ -17,7 +17,7 @@ function PythonInterpreter(context, msgCallback) {
   this._paused = false;
   this._isRunning = false;
   this._stepInProgress = false;
-  this._stepMode = false;
+  this.stepMode = false;
   this._steps = 0;
   this._stepsWithoutAction = 0;
   this._lastNbActions = null;
@@ -223,7 +223,7 @@ function PythonInterpreter(context, msgCallback) {
       this._maxIterWithoutAction = Math.ceil(this.context.infos.maxIterWithoutAction/10);
     }
     if(!this._hasActions) {
-      // No limit on 
+      // No limit on
       this._maxIterWithoutAction = this._maxIterations;
     }
 
@@ -243,7 +243,10 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.run = function () {
-    this._stepMode = false;
+    if(this.stepMode) {
+      this._paused = this._stepInProgress;
+      this.stepMode = false;
+    }
     var timeoutId = window.setTimeout(this._continue.bind(this), 100);
     this._timeouts.push(timeoutId);
   };
@@ -254,7 +257,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.runStep = function () {
-    this._stepMode = true;
+    this.stepMode = true;
     if(this._isRunning && !this._stepInProgress) {
       this.step();
     }
@@ -272,50 +275,85 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
+  this.unSkulptValue = function (origValue) {
+    // Transform a value, possibly a Skulpt one, into a printable value
+    if(origValue.constructor === Sk.builtin.dict) {
+      var keys = Object.keys(origValue);
+      var dictElems = [];
+      for(var i=0; i<keys.length; i++) {
+        if(keys[i] == 'size' || keys[i] == '__class__'
+                             || !origValue[keys[i]].items
+                             || !origValue[keys[i]].items[0]) {
+          continue;
+        }
+        var items = origValue[keys[i]].items[0];
+        dictElems.push('' + this.unSkulptValue(items.lhs) + ': ' + this.unSkulptValue(items.rhs));
+      }
+      var value = '{' + dictElems.join(',' ) + '}';
+    } else if(origValue.constructor === Sk.builtin.list) {
+      var oldArray = origValue.v;
+      var newArray = [];
+      for(var i=0; i<oldArray.length; i++) {
+        newArray.push(this.unSkulptValue(oldArray[i]));
+      }
+      var value = '[' + newArray.join(', ') + ']';
+    } else if(origValue.v !== undefined) {
+      var value = origValue.v;
+      if(typeof value == 'string') {
+        value = '"' + value + '"';
+      }
+    } else if(typeof origValue == 'object') {
+      var value = origValue;
+    }
+    return value;
+  };
+
   this.reportValue = function (origValue, varName) {
     // Show a popup displaying the value of a block in step-by-step mode
-    if(origValue.v !== undefined) {
-      value = origValue.v;
-    } else if(typeof origValue == 'object') {
+    if(origValue.constructor === Sk.builtin.func
+        || value === undefined
+        || !this._editorMarker
+        || !context.display
+        || !this.stepMode) {
       return origValue;
+    }
+
+    var value = this.unSkulptValue(origValue);
+
+    var highlighted = $('.aceHighlight');
+    if(highlighted.length == 0) {
+      return origValue;
+    } else if(highlighted.find('.ace_start').length > 0) {
+      var target = highlighted.find('.ace_start')[0];
     } else {
-      value = origValue;
+      var target = highlighted[0];
     }
-    if(this._editorMarker && context.display && this._stepMode) {
-      var highlighted = $('.aceHighlight');
-      if(highlighted.length == 0) {
-        return origValue;
-      } else if(highlighted.find('.ace_start').length > 0) {
-        var target = highlighted.find('.ace_start')[0];
-      } else {
-        var target = highlighted[0];
-      }
-      var bbox = target.getBoundingClientRect();
+    var bbox = target.getBoundingClientRect();
 
-      var leftPos = bbox.left+10;
-      var topPos = bbox.top-14;
+    var leftPos = bbox.left+10;
+    var topPos = bbox.top-14;
 
-      var displayStr = value.toString();
-      if(typeof value == 'boolean') {
-         displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
-      }
-      if(varName) {
-         displayStr = '' + varName + ' = ' + displayStr;
-      }
-
-      var dropDownDiv = '' +
-        '<div class="blocklyDropDownDiv" style="transition: transform 0.25s, opacity 0.25s; background-color: rgb(255, 255, 255); border-color: rgb(170, 170, 170); left: '+leftPos+'px; top: '+topPos+'px; display: block; opacity: 1; transform: translate(0px, -20px);">' +
-        '  <div class="blocklyDropDownContent">' +
-        '    <div class="valueReportBox">' +
-        displayStr +
-        '    </div>' +
-        '  </div>' +
-        '  <div class="blocklyDropDownArrow arrowBottom" style="transform: translate(22px, 15px) rotate(45deg);"></div>' +
-        '</div>';
-
-      $('.blocklyDropDownDiv').remove();
-      $('body').append(dropDownDiv);
+    var displayStr = value.toString();
+    if(typeof value == 'boolean') {
+       displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
     }
+    if(varName) {
+       displayStr = '' + varName + ' = ' + displayStr;
+    }
+
+    var dropDownDiv = '' +
+      '<div class="blocklyDropDownDiv" style="transition: transform 0.25s, opacity 0.25s; background-color: rgb(255, 255, 255); border-color: rgb(170, 170, 170); left: '+leftPos+'px; top: '+topPos+'px; display: block; opacity: 1; transform: translate(0px, -20px);">' +
+      '  <div class="blocklyDropDownContent">' +
+      '    <div class="valueReportBox">' +
+      displayStr +
+      '    </div>' +
+      '  </div>' +
+      '  <div class="blocklyDropDownArrow arrowBottom" style="transform: translate(22px, 15px) rotate(45deg);"></div>' +
+      '</div>';
+
+    $('.blocklyDropDownDiv').remove();
+    $('body').append(dropDownDiv);
+
     return origValue;
   };
 
@@ -346,7 +384,7 @@ function PythonInterpreter(context, msgCallback) {
     this._nbActions = 0;
 
     this._isRunning = false;
-    this._stepMode = false;
+    this.stepMode = false;
     this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
@@ -369,7 +407,7 @@ function PythonInterpreter(context, msgCallback) {
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
-    if(this.context.display && (this._stepMode || markDelay > 30)) {
+    if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp && curSusp.lineno) {
         this.removeEditorMarker();
@@ -392,7 +430,7 @@ function PythonInterpreter(context, msgCallback) {
     // For reportValue in Skulpt
     window.currentPythonRunner = this;
 
-    this._paused = this._stepMode;
+    this._paused = this.stepMode;
     this._debugger.enable_step_mode();
     this._debugger.resume.call(this._debugger);
     this._steps += 1;
