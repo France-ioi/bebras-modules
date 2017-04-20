@@ -6,10 +6,10 @@
 
 "use strict";
 
-function initBlocklyRunner(context, messageCallback, language) {
-   init(context, [], [], [], false, {}, language);
+function initBlocklyRunner(context, messageCallback) {
+   init(context, [], [], [], false, {});
 
-   function init(context, interpreters, isRunning, toStop, stopPrograms, runner, language) {
+   function init(context, interpreters, isRunning, toStop, stopPrograms, runner) {
       runner.hasActions = false;
       runner.nbActions = 0;
       runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
@@ -19,7 +19,7 @@ function initBlocklyRunner(context, messageCallback, language) {
       runner.nextCallBack = null;
       runner.firstHighlight = true;
 
-      runner.strings = languageStrings[language];
+      runner.strings = languageStrings;
 
       runner.reportBlockValue = function(id, value, varName) {
          // Show a popup displaying the value of a block in step-by-step mode

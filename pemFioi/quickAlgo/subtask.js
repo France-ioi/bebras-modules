@@ -115,7 +115,7 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.run = function() {
       initBlocklyRunner(subTask.context, function(message, success) {
          $("#errors").html('<span class="testError">'+message+'</span>');
-      }, language);
+      });
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);
    };
@@ -133,7 +133,7 @@ var initBlocklySubTask = function(subTask, language) {
          initBlocklyRunner(subTask.context, function(message, success) {
             $("#errors").html('<span class="testError">'+message+'</span>');
             platform.validate("done");
-         }, language);
+         });
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
          initContextForLevel(result.iTestCase);
          subTask.context.linkBack = true;
@@ -147,14 +147,16 @@ var initBlocklySubTask = function(subTask, language) {
       if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
         initBlocklyRunner(subTask.context, function(message, success) {
            $("#errors").html('<span class="testError">'+message+'</span>');
-        }, language);
+        });
         initContextForLevel(subTask.iTestCase);
       }
       subTask.blocklyHelper.step(subTask.context);
    };
 
    subTask.stop = function() {
-      this.context.runner.stop();
+      if(this.context.runner) {
+         this.context.runner.stop();
+      }
    };
 
    subTask.reloadStateObject = function(stateObj) {
@@ -272,7 +274,7 @@ var initBlocklySubTask = function(subTask, language) {
             }
             callback(results);
          }
-      }, language);
+      });
       subTask.iTestCase = 0;
       subTask.testCaseResults = [];
       initContextForLevel(subTask.iTestCase);
