@@ -35,7 +35,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
            alert(e);
            return;
          }
-         var tmpWorkspace = new Blockly.Workspace();
+         // New workspaces need options, else they can give unpredictable results
+         var tmpOptions = new Blockly.Options({});
+         var tmpWorkspace = new Blockly.Workspace(tmpOptions);
          if(this.scratchMode) {
             // Make sure it has the right information from this blocklyHelper
             tmpWorkspace.maxBlocks = function () { return maxBlocks; };

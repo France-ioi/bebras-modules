@@ -132,7 +132,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.workspace.addChangeListener(onchange);
             onchange();
          } else {
-            this.workspace = new Blockly.Workspace();
+            var tmpOptions = new Blockly.Options({});
+            this.workspace = new Blockly.Workspace(tmpOptions);
          }
 
          this.programs = [];
