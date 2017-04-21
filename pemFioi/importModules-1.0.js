@@ -54,6 +54,7 @@ var importableModules = function () {
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
       'scratch_blocks': {src: modulesPath+"/ext/scratch/blocks_compressed_vertical.js", id: "scratch_blocks"},
       'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"},
+      'scratch_procedures': {src: modulesPath+"/ext/scratch/procedures.js", id: "scratch_procedures"},
 
       'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
       'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
@@ -103,6 +104,7 @@ var languageScripts = function () {
          'blockly_javascript',
          'blockly_python',
          'scratch_fixes',
+         'scratch_procedures',
          'blockly_' + strLang,
          'blockly_fioi',
          'quickAlgo_utils',

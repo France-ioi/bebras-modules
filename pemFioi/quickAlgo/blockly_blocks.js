@@ -1244,7 +1244,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   }
                ],
-            variables: []
+            variables: [],
+            functions: []
          };
       },
 

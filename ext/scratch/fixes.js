@@ -1,3 +1,124 @@
+Blockly.createDom_ = function(container, options) {
+  // Sadly browsers (Chrome vs Firefox) are currently inconsistent in laying
+  // out content in RTL mode.  Therefore Blockly forces the use of LTR,
+  // then manually positions content in RTL as needed.
+  container.setAttribute('dir', 'LTR');
+  // Closure can be trusted to create HTML widgets with the proper direction.
+  goog.ui.Component.setDefaultRightToLeft(options.RTL);
+
+  // Load CSS.
+  Blockly.Css.inject(options.hasCss, options.pathToMedia);
+
+  // Build the SVG DOM.
+  var svg = Blockly.createSvgElement('svg', {
+    'xmlns': 'http://www.w3.org/2000/svg',
+    'xmlns:html': 'http://www.w3.org/1999/xhtml',
+    'xmlns:xlink': 'http://www.w3.org/1999/xlink',
+    'version': '1.1',
+    'class': 'blocklySvg'
+  }, container);
+  var defs = Blockly.createSvgElement('defs', {}, svg);
+  // Each filter/pattern needs a unique ID for the case of multiple Blockly
+  // instances on a page.  Browser behaviour becomes undefined otherwise.
+  // https://neil.fraser.name/news/2015/11/01/
+  // TODO (tmickel): Look into whether block highlighting still works.
+  // Reference commit:
+  // https://github.com/google/blockly/commit/144be4d49f36fdba260a26edbd170ae75bbc37a6
+  var rnd = String(Math.random()).substring(2);
+
+
+  // Add embossFilter
+  var embossFilter = Blockly.createSvgElement('filter',
+      {'id': 'blocklyEmbossFilter' + rnd}, defs);
+  Blockly.createSvgElement('feGaussianBlur',
+      {'in': 'SourceAlpha', 'stdDeviation': 1, 'result': 'blur'}, embossFilter);
+  var feSpecularLighting = Blockly.createSvgElement('feSpecularLighting',
+      {'in': 'blur', 'surfaceScale': 1, 'specularConstant': 0.5,
+       'specularExponent': 10, 'lighting-color': 'white', 'result': 'specOut'},
+      embossFilter);
+  Blockly.createSvgElement('fePointLight',
+      {'x': -5000, 'y': -10000, 'z': 20000}, feSpecularLighting);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'specOut', 'in2': 'SourceAlpha', 'operator': 'in',
+       'result': 'specOut'}, embossFilter);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'SourceGraphic', 'in2': 'specOut', 'operator': 'arithmetic',
+       'k1': 0, 'k2': 1, 'k3': 1, 'k4': 0}, embossFilter);
+  options.embossFilterId = embossFilter.id;
+
+
+  // Using a dilate distorts the block shape.
+  // Instead use a gaussian blur, and then set all alpha to 1 with a transfer.
+  var stackGlowFilter = Blockly.createSvgElement('filter',
+      {'id': 'blocklyStackGlowFilter',
+        'height': '160%', 'width': '180%', y: '-30%', x: '-40%'}, defs);
+  options.stackGlowBlur = Blockly.createSvgElement('feGaussianBlur',
+      {'in': 'SourceGraphic',
+      'stdDeviation': Blockly.STACK_GLOW_RADIUS}, stackGlowFilter);
+  // Set all gaussian blur pixels to 1 opacity before applying flood
+  var componentTransfer = Blockly.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, stackGlowFilter);
+  Blockly.createSvgElement('feFuncA',
+      {'type': 'table', 'tableValues': '0' + ' 1'.repeat(16)}, componentTransfer);
+  // Color the highlight
+  Blockly.createSvgElement('feFlood',
+      {'flood-color': Blockly.Colours.stackGlow,
+       'flood-opacity': Blockly.Colours.stackGlowOpacity, 'result': 'outColor'}, stackGlowFilter);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'outColor', 'in2': 'outBlur',
+       'operator': 'in', 'result': 'outGlow'}, stackGlowFilter);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, stackGlowFilter);
+
+  // Filter for replacement marker
+  var replacementGlowFilter = Blockly.createSvgElement('filter',
+      {'id': 'blocklyReplacementGlowFilter',
+        'height': '160%', 'width': '180%', y: '-30%', x: '-40%'}, defs);
+  Blockly.createSvgElement('feGaussianBlur',
+      {'in': 'SourceGraphic',
+      'stdDeviation': Blockly.REPLACEMENT_GLOW_RADIUS}, replacementGlowFilter);
+  // Set all gaussian blur pixels to 1 opacity before applying flood
+  var componentTransfer = Blockly.createSvgElement('feComponentTransfer', {'result': 'outBlur'}, replacementGlowFilter);
+  Blockly.createSvgElement('feFuncA',
+      {'type': 'table', 'tableValues': '0' + ' 1'.repeat(16)}, componentTransfer);
+  // Color the highlight
+  Blockly.createSvgElement('feFlood',
+      {'flood-color': Blockly.Colours.replacementGlow,
+       'flood-opacity': Blockly.Colours.replacementGlowOpacity, 'result': 'outColor'}, replacementGlowFilter);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'outColor', 'in2': 'outBlur',
+       'operator': 'in', 'result': 'outGlow'}, replacementGlowFilter);
+  Blockly.createSvgElement('feComposite',
+      {'in': 'SourceGraphic', 'in2': 'outGlow', 'operator': 'over'}, replacementGlowFilter);
+
+  var disabledPattern = Blockly.createSvgElement('pattern',
+      {'id': 'blocklyDisabledPattern' + rnd,
+       'patternUnits': 'userSpaceOnUse',
+       'width': 10, 'height': 10}, defs);
+  Blockly.createSvgElement('rect',
+      {'width': 10, 'height': 10, 'fill': '#aaa'}, disabledPattern);
+  Blockly.createSvgElement('path',
+      {'d': 'M 0 0 L 10 10 M 10 0 L 0 10', 'stroke': '#cc0'}, disabledPattern);
+  options.disabledPatternId = disabledPattern.id;
+
+  var gridPattern = Blockly.createSvgElement('pattern',
+      {'id': 'blocklyGridPattern' + rnd,
+       'patternUnits': 'userSpaceOnUse'}, defs);
+  if (options.gridOptions['length'] > 0 && options.gridOptions['spacing'] > 0) {
+    Blockly.createSvgElement('line',
+        {'stroke': options.gridOptions['colour']},
+        gridPattern);
+    if (options.gridOptions['length'] > 1) {
+      Blockly.createSvgElement('line',
+          {'stroke': options.gridOptions['colour']},
+          gridPattern);
+    }
+    // x1, y1, x1, x2 properties will be set later in updateGridPattern_.
+  }
+  options.gridPattern = gridPattern;
+  return svg;
+};
+
+
 // Change gap between blocks in the toolbox
 Blockly.Flyout.prototype.GAP_Y = 14;
 

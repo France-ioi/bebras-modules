@@ -128,6 +128,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                   
                   window.quickAlgoInterface.resetTestScores(nbTestCases);
                }
+
+               // Refresh the toolbox for new procedures (same with variables
+               // but it's already handled correctly there)
+               if(that.scratchMode && that.includeBlocks.groupByCategory) {
+                  that.workspace.toolbox_.refreshSelection();
+               }
             }
             this.workspace.addChangeListener(onchange);
             onchange();
