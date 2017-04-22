@@ -1342,7 +1342,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var categoriesInfos = {};
          var colours = this.getDefaultColours();
 
-         // Reset the flyoutOptions
+         // Reset the flyoutOptions for the variables and the procedures
          Blockly.Variables.flyoutOptions = {
             any: false,
             anyButton: !!this.includeBlocks.groupByCategory,
@@ -1350,7 +1350,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             includedBlocks: {get: true, set: true, incr: true},
             shortList: true,
          };
-         
+
+         Blockly.Procedures.flyoutOptions = {
+            includedBlocks: {noret: false, ret: false, ifret: false}
+         };
+
          for (var blockType in this.includeBlocks.generatedBlocks) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
          }
@@ -1385,6 +1389,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if (categoryName == 'variables') {
                Blockly.Variables.flyoutOptions.any = true;
                continue;
+            } else if (categoryName == 'functions') {
+               Blockly.Procedures.flyoutOptions.includedBlocks = {noret: true, ret: true, ifret: true};
+               continue;
             }
             var blocks = stdBlocks[categoryName];
             if (!(blocks instanceof Array)) { // just for now, maintain backwards compatibility
@@ -1398,7 +1405,34 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
 
-         this.addBlocksAndCategories(this.includeBlocks.standardBlocks.singleBlocks || [], stdBlocks, categoriesInfos);
+         var singleBlocks = this.includeBlocks.standardBlocks.singleBlocks || [];
+         for(var iBlock = 0; iBlock < singleBlocks.length; iBlock++) {
+            var blockName = singleBlocks[iBlock];
+            if(blockName == 'procedures_defnoreturn') {
+               Blockly.Procedures.flyoutOptions.includedBlocks['noret'] = true;
+            } else if(blockName == 'procedures_defreturn') {
+               Blockly.Procedures.flyoutOptions.includedBlocks['ret'] = true;
+            } else if(blockName == 'procedures_ifreturn') {
+               Blockly.Procedures.flyoutOptions.includedBlocks['ifret'] = true;
+            } else {
+               continue;
+            }
+            // If we're here, a block has been found
+            singleBlocks.splice(iBlock, 1);
+            iBlock--;
+         }
+         if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']
+               || Blockly.Procedures.flyoutOptions.includedBlocks['ret']
+               || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+            categoriesInfos['functions'] = {
+               blocksXml: [],
+            };
+            if(!this.includeBlocks.groupByCategory) {
+               console.error('Task configuration error: groupByCategory must be activated for functions.');
+            }
+         }
+
+         this.addBlocksAndCategories(singleBlocks, stdBlocks, categoriesInfos);
 
          // Handle variable blocks, which are normally automatically added with
          // the VARIABLES category but can be customized here
