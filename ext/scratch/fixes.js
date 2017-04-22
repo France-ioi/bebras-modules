@@ -118,6 +118,50 @@ Blockly.createDom_ = function(container, options) {
   return svg;
 };
 
+// Fix arguments missing, possibility to silence error message
+Blockly.Workspace.prototype.deleteVariable = function(name, silent) {
+  var workspace = this;
+  function doDeletion(variableUses, index) {
+    Blockly.Events.setGroup(true);
+    for (var i = 0; i < variableUses.length; i++) {
+      variableUses[i].dispose(true, false);
+    }
+    Blockly.Events.setGroup(false);
+    workspace.variableList.splice(index, 1);
+  }
+  var variableIndex = this.variableIndexOf(name);
+  if (variableIndex != -1) {
+    // Check whether this variable is a function parameter before deleting.
+    var uses = this.getVariableUses(name);
+    for (var i = 0, block; block = uses[i]; i++) {
+      if ((block.type == 'procedures_defnoreturn' ||
+        block.type == 'procedures_defreturn') && !silent) {
+        var procedureName = block.getFieldValue('NAME');
+        Blockly.alert(
+            Blockly.Msg.CANNOT_DELETE_VARIABLE_PROCEDURE.
+            replace('%1', name).
+            replace('%2', procedureName));
+        return;
+      }
+    }
+
+    if (uses.length > 1) {
+      // Confirm before deleting multiple blocks.
+      Blockly.confirm(
+          Blockly.Msg.DELETE_VARIABLE_CONFIRMATION.replace('%1', uses.length).
+          replace('%2', name),
+          function(ok) {
+            if (ok) {
+              doDeletion(uses, variableIndex);
+            }
+          });
+    } else {
+      // No confirmation necessary for a single block.
+      doDeletion(uses, variableIndex);
+    }
+  }
+};
+
 
 // Change gap between blocks in the toolbox
 Blockly.Flyout.prototype.GAP_Y = 14;

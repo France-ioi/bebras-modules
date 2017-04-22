@@ -458,9 +458,18 @@ Blockly.Blocks['procedures_mutatorarg'] = {
     var source = this.sourceBlock_;
     if (source && source.workspace && source.workspace.options
         && source.workspace.options.parentWorkspace) {
+      // Remove the old variable
+      if(this.currentVariable_) {
+        var source = this.sourceBlock_;
+        if (source && source.workspace && source.workspace.options
+            && source.workspace.options.parentWorkspace) {
+          source.workspace.options.parentWorkspace.deleteVariable(this.currentVariable_, true);
+        }
+      }
+      this.currentVariable_ = newText;
       source.workspace.options.parentWorkspace.createVariable(newText);
     }
-  }
+  },
 };
 
 Blockly.Blocks['procedures_callnoreturn'] = {
@@ -627,6 +636,11 @@ Blockly.Blocks['procedures_callnoreturn'] = {
     // Remove deleted inputs.
     while (this.getInput('ARG' + i)) {
       this.removeInput('ARG' + i);
+      // Fix input shape not being deleted
+      if(this.inputShapes_['ARG'+i]) {
+        goog.dom.removeNode(this.inputShapes_['ARG'+i]);
+        delete this.inputShapes_['ARG'+i];
+      }
       i++;
     }
     // Add 'with:' if there are parameters, remove otherwise.
@@ -643,6 +657,8 @@ Blockly.Blocks['procedures_callnoreturn'] = {
         }
       }
     }
+    // Fix input shapes not being created
+    this.initSvg();
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
