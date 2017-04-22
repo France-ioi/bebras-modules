@@ -21,10 +21,26 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.strings = languageStrings;
 
+      runner.valueToString = function(value) {
+         if(interpreters.length == 0) {
+            return value.toString(); // We "need" an interpreter to access ARRAY prototype
+         }
+         var itp = interpreters[0];
+         if(itp.isa(value, itp.ARRAY)) {
+            var strs = [];
+            for(var i = 0; i < value.length; i++) {
+               strs[i] = runner.valueToString(value.properties[i]);
+            }
+            return '['+strs.join(', ')+']';
+         } else {
+            return value.toString();
+         }
+      };
+
       runner.reportBlockValue = function(id, value, varName) {
          // Show a popup displaying the value of a block in step-by-step mode
          if(context.display && runner.stepMode) {
-            var displayStr = value.toString();
+            var displayStr = runner.valueToString(value);
             if(value.type == 'boolean') {
                displayStr = value.data ? runner.strings.valueTrue : runner.strings.valueFalse;
             }
@@ -239,7 +255,7 @@ function initBlocklyRunner(context, messageCallback) {
                      break;
                   }
                }
-               message = strings.uninitializedVar + ' ' + varName;
+               message = runner.strings.uninitializedVar + ' ' + varName;
             }
             
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
