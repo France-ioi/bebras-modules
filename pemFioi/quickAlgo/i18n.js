@@ -10,6 +10,7 @@ var localLanguageStrings = {
          sensors: "Capteurs",
          debug: "Débuggage",
          colour: "Couleurs",
+         data: "Données",
          dicts: "Dictionnaires",
          input: "Entrées",
          lists: "Listes",
@@ -81,6 +82,7 @@ var localLanguageStrings = {
          sensors: "Sensors",
          debug: "Debug",
          colour: "Colors",
+         data: "Data",
          dicts: "Dictionnaries",
          input: "Input",
          lists: "Lists",
@@ -151,6 +153,7 @@ var localLanguageStrings = {
          sensors: "Sensoren",
          debug: "Debug",
          colour: "Farben",
+         data: "Data", // TODO :: translate
          dicts: "Hash-Map",
          input: "Eingabe",
          lists: "Listen",
@@ -226,6 +229,7 @@ var localLanguageStrings = {
          sensors: "Sensores",
          debug: "Depurar",
          colour: "Colores",
+         data: "Data", // TODO :: translate
          dicts: "Diccionarios",
          input: "Entradas",
          lists: "Listas",

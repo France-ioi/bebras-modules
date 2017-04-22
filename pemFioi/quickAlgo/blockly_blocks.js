@@ -14,6 +14,10 @@ var blocklyToScratch = {
       'controls_repeat_ext': ['control_repeat'],
       'controls_whileUntil': ['control_repeat_until'],
       'controls_untilWhile': ['control_repeat_until'],
+      'lists_repeat': ['data_listrepeat'],
+      'lists_create_with_empty': [], // Scratch logic is not to initialize
+      'lists_getIndex': ['data_itemoflist'],
+      'lists_setIndex': ['data_replaceitemoflist'],
       'logic_negate': ['operator_not'],
       'logic_boolean': [],
       'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
@@ -1150,8 +1154,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       getStdScratchBlocks: function() {
          // TODO :: make the list of standard scratch blocks
          return {
-            control: [ 
-                  {  
+            control: [
+                  {
                      name: "control_if",
                      blocklyXml: "<block type='control_if'></block>"
                   },
@@ -1160,7 +1164,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                      blocklyXml: "<block type='control_if_else'></block>"
                   },
                   {
-                     name: "control_repeat", 
+                     name: "control_repeat",
                      blocklyXml: "<block type='control_repeat'>" +
                                  "  <value name='TIMES'>" +
                                  "    <shadow type='math_number'>" +
@@ -1170,8 +1174,50 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   },
                   {
-                     name: "control_repeat_until", 
+                     name: "control_repeat_until",
                      blocklyXml: "<block type='control_repeat_until'></block>"
+                  }
+               ],
+            data: [
+                  {
+                     name: "data_listrepeat",
+                     blocklyXml: "<block type='data_listrepeat'>" +
+                                 "  <value name='ITEM'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>thing</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='TIMES'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "data_itemoflist",
+                     blocklyXml: "<block type='data_itemoflist'>" +
+                                 "  <value name='INDEX'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "data_replaceitemoflist",
+                     blocklyXml: "<block type='data_replaceitemoflist'>" +
+                                 "  <value name='INDEX'>" +
+                                 "    <shadow type='math_number'>" +
+                                 "      <field name='NUM'>1</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "  <value name='ITEM'>" +
+                                 "    <shadow type='text'>" +
+                                 "      <field name='TEXT'>thing</field>" +
+                                 "    </shadow>" +
+                                 "  </value>" +
+                                 "</block>"
                   }
                ],
             operator: [

@@ -610,6 +610,35 @@ Blockly.Blocks['operator_not'] = {
   }
 };
 
+// Create list from repetition of item
+Blockly.Blocks['data_listrepeat'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.DATA_LISTREPEAT_TITLE,
+      "args0": [
+        {
+          "type": "field_variable",
+          "name": "LIST"
+        },
+        {
+          "type": "input_value",
+          "name": "ITEM"
+        },
+        {
+          "type": "input_value",
+          "name": "TIMES"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "category": Blockly.Categories.data,
+      "colour": Blockly.Colours.data.primary,
+      "colourSecondary": Blockly.Colours.data.secondary,
+      "colourTertiary": Blockly.Colours.data.tertiary
+    });
+  }
+};
+
 Blockly.Blocks['data_setvariableto'] = {
   /**
    * Block to set variable to a certain value
@@ -820,6 +849,67 @@ Blockly.JavaScript['operator_not'] = function(block) {
    return["!"+ (Blockly.JavaScript.valueToCode(block,"OPERAND",b) || "true"), b]
 };
 
+Blockly.JavaScript['data_listrepeat'] = function(block) {
+  // Create a list with one element repeated.
+  var functionName = Blockly.JavaScript.provideFunction_(
+      'listsRepeat',
+      ['function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
+          '(value, n) {',
+       '  var array = [];',
+       '  for (var i = 0; i < n; i++) {',
+       '    array[i] = value;',
+       '  }',
+       '  return array;',
+       '}']);
+  var element = Blockly.JavaScript.valueToCode(block, 'ITEM',
+      Blockly.JavaScript.ORDER_COMMA) || 'null';
+  var repeatCount = Blockly.JavaScript.valueToCode(block, 'TIMES',
+      Blockly.JavaScript.ORDER_COMMA) || '0';
+  var code = functionName + '(' + element + ', ' + repeatCount + ')';
+
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  var assignCode = 'var ' + varName + ' = ' + code + ';\n';
+
+  // Report value if available
+  var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
+
+  return assignCode + reportCode;
+};
+
+Blockly.JavaScript['data_itemoflist'] = function(block) {
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+
+  var at = Blockly.JavaScript.getAdjusted(block, 'INDEX');
+  var code = varName + '[' + at + ']';
+  return [code, Blockly.JavaScript.ORDER_MEMBER];
+};
+
+Blockly.JavaScript['data_replaceitemoflist'] = function(block) {
+  // Set element at index.
+  // Note: Until February 2013 this block did not have MODE or WHERE inputs.
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+
+  var value = Blockly.JavaScript.valueToCode(block, 'ITEM',
+      Blockly.JavaScript.ORDER_ASSIGNMENT) || 'null';
+  var at = Blockly.JavaScript.getAdjusted(block, 'INDEX');
+  return varName + '[' + at + '] = ' + value + ';\n';
+};
+
 
 Blockly.JavaScript['data_variable'] = function(block) {
   // Variable getter.
@@ -845,7 +935,7 @@ Blockly.JavaScript['data_setvariableto'] = function(block) {
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
-  var assignCode = varName + ' = ' + argument0 + ';\n';
+  var assignCode = 'var ' + varName + ' = ' + argument0 + ';\n';
 
   // Report value if available
   var reportCode = "reportBlockValue('" + block.id + "', '" + varName + " = ' + " + varName + ");\n";
