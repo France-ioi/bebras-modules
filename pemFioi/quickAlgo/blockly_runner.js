@@ -174,6 +174,11 @@ function initBlocklyRunner(context, messageCallback) {
             Blockly.DropDownDiv.hide();
             context.blocklyHelper.glowBlock(null);
          }
+
+         runner.nbActions = 0;
+         runner.stepInProgress = false;
+         runner.stepMode = false;
+         runner.firstHighlight = true;
       };
 
       runner.runSyncBlock = function() {
@@ -334,7 +339,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.isRunning = function () {
-         return this.nbRunning() == 0;
+         return this.nbRunning() > 0;
       };
 
       context.runner = runner;
