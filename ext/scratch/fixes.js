@@ -610,6 +610,64 @@ Blockly.Blocks['operator_not'] = {
   }
 };
 
+// Fix title
+Blockly.Blocks['data_replaceitemoflist'] = {
+  /**
+   * Block to insert item to list.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LISTS_SET_INDEX_SET + " %1 " + Blockly.Msg.LISTS_INLIST + " %2 " + Blockly.Msg.LISTS_SET_INDEX_INPUT_TO + " %3",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "INDEX"
+        },
+        {
+          "type": "field_variable",
+          "name": "LIST"
+        },
+        {
+          "type": "input_value",
+          "name": "ITEM"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "category": Blockly.Categories.data,
+      "colour": Blockly.Colours.data.primary,
+      "colourSecondary": Blockly.Colours.data.secondary,
+      "colourTertiary": Blockly.Colours.data.tertiary
+    });
+  }
+};
+
+// Fix title
+Blockly.Blocks['data_itemoflist'] = {
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.LISTS_GET_INDEX_GET + " %1 " + Blockly.Msg.LISTS_INLIST + " %2",
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "INDEX"
+        },
+        {
+          "type": "field_variable",
+          "name": "LIST"
+        }
+      ],
+      "output": null,
+      "category": Blockly.Categories.data,
+      "colour": Blockly.Colours.data.primary,
+      "colourSecondary": Blockly.Colours.data.secondary,
+      "colourTertiary": Blockly.Colours.data.tertiary,
+      "outputShape": Blockly.OUTPUT_SHAPE_ROUND
+    });
+  }
+};
+
 // Create list from repetition of item
 Blockly.Blocks['data_listrepeat'] = {
   init: function() {

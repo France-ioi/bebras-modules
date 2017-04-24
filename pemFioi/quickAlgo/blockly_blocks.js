@@ -1178,13 +1178,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                      blocklyXml: "<block type='control_repeat_until'></block>"
                   }
                ],
-            data: [
+            lists: [
                   {
                      name: "data_listrepeat",
                      blocklyXml: "<block type='data_listrepeat'>" +
+                                 "  <field name='LIST'>" +
+                                 this.strings.listVariable +
+                                 "  </field>" +
                                  "  <value name='ITEM'>" +
                                  "    <shadow type='text'>" +
-                                 "      <field name='TEXT'>thing</field>" +
+                                 "      <field name='TEXT'></field>" +
                                  "    </shadow>" +
                                  "  </value>" +
                                  "  <value name='TIMES'>" +
@@ -1197,6 +1200,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_itemoflist",
                      blocklyXml: "<block type='data_itemoflist'>" +
+                                 "  <field name='LIST'>" +
+                                 this.strings.listVariable +
+                                 "  </field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1207,6 +1213,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_replaceitemoflist",
                      blocklyXml: "<block type='data_replaceitemoflist'>" +
+                                 "  <field name='LIST'>" +
+                                 this.strings.listVariable +
+                                 "  </field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1214,7 +1223,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "  </value>" +
                                  "  <value name='ITEM'>" +
                                  "    <shadow type='text'>" +
-                                 "      <field name='TEXT'>thing</field>" +
+                                 "      <field name='TEXT'></field>" +
                                  "    </shadow>" +
                                  "  </value>" +
                                  "</block>"
@@ -1376,7 +1385,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var stdBlocks = this.getStdBlocks();
 
          if (this.includeBlocks.standardBlocks.includeAll) {
-            this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "colour", "dicts", "variables", "functions"];
+            if(this.scratchMode) {
+               this.includeBlocks.standardBlocks.wholeCategories = ["control", "lists", "operator", "variables", "functions"];
+            } else {
+               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "colour", "dicts", "variables", "functions"];
+            }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
