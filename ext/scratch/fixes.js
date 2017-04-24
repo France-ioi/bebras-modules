@@ -618,7 +618,7 @@ Blockly.Blocks['data_replaceitemoflist'] = {
    */
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.LISTS_SET_INDEX_SET + " %1 " + Blockly.Msg.LISTS_INLIST + " %2 " + Blockly.Msg.LISTS_SET_INDEX_INPUT_TO + " %3",
+      "message0": Blockly.Msg.DATA_REPLACEITEMOFLIST_TITLE,
       "args0": [
         {
           "type": "input_value",
@@ -647,7 +647,7 @@ Blockly.Blocks['data_replaceitemoflist'] = {
 Blockly.Blocks['data_itemoflist'] = {
   init: function() {
     this.jsonInit({
-      "message0": Blockly.Msg.LISTS_GET_INDEX_GET + " %1 " + Blockly.Msg.LISTS_INLIST + " %2",
+      "message0": Blockly.Msg.DATA_ITEMOFLIST_TITLE,
       "args0": [
         {
           "type": "input_value",
