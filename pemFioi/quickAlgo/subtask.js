@@ -3,8 +3,6 @@
         Logic for quickAlgo tasks, implements the Bebras task API.
 */
 
-"use strict";
-
 var initBlocklySubTask = function(subTask, language) {
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {

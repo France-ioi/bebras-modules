@@ -4,8 +4,6 @@
         value reporting features.
 */
 
-"use strict";
-
 function initBlocklyRunner(context, messageCallback) {
    init(context, [], [], [], false, {});
 

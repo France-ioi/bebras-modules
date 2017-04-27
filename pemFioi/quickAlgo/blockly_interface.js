@@ -3,8 +3,6 @@
         Blockly mode interface and running logic
 */
 
-"use strict";
-
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),

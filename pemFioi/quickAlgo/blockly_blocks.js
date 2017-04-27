@@ -3,8 +3,6 @@
         Block generation and configuration logic for the Blockly mode
 */
 
-"use strict";
-
 // Blockly to Scratch translations
 var blocklyToScratch = {
    singleBlocks: {
