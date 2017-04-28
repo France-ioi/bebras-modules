@@ -364,3 +364,10 @@ input[type=button] {
 .panel-body:after {
   clear: both;
 }
+#testSelector .panel-heading {
+  border: 1px solid transparent;
+}
+#testSelector .panel-heading:hover {
+  cursor: pointer;
+  border: 1px solid #000000;
+}

@@ -212,6 +212,9 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.changeTest = function(delta) {
       var newTest = subTask.iTestCase + delta;
       if ((newTest >= 0) && (newTest < this.nbTestCases)) {
+         if(this.context.runner) {
+            this.context.runner.stop();
+         }
          initContextForLevel(newTest);
          if(subTask.context.display) {
             window.quickAlgoInterface.updateTestSelector(newTest);

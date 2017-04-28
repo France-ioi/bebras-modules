@@ -44,9 +44,18 @@ function initBlocklyRunner(context, messageCallback) {
             }
             if(varName) {
                varName = varName.toString();
+               // Get the original variable name
                for(var dbIdx in Blockly.JavaScript.variableDB_.db_) {
                   if(Blockly.JavaScript.variableDB_.db_[dbIdx] == varName) {
                      varName = dbIdx.substring(0, dbIdx.length - 9);
+                     // Get the variable name with the right case
+                     for(var i=0; i<context.blocklyHelper.workspace.variableList.length; i++) {
+                        var varNameCase = context.blocklyHelper.workspace.variableList[i];
+                        if(varName.toLowerCase() == varNameCase.toLowerCase()) {
+                           varName = varNameCase;
+                           break;
+                        }
+                     }
                      break;
                   }
                }
