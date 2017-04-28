@@ -673,7 +673,7 @@ window.displayHelper = {
          }
       }
    },
-   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood) {
+   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -702,7 +702,7 @@ window.displayHelper = {
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>';
       if(mode == 'input') {
-         popupHtml += '<input id="popupInput" type="text"></input>';
+         popupHtml += '<input id="popupInput" type="text" value="' + (defaultText ? defaultText : '') + '"></input>';
       }
       popupHtml += buttonYes + buttonNo + '</div>';
       $('#popupMessage').html(popupHtml).show();
