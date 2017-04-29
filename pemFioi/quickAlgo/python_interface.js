@@ -246,8 +246,8 @@ function LogicController(nbTestCases, maxInstructions) {
   this._bindEditorEvents = function () {
     $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
     var that = this;
-    var updatePythonCount = function () {
-      if(that._language != 'python' || !maxInstructions || !that._aceEditor) { return; }
+    var onEditorChange = function () {
+      if(!maxInstructions || !that._aceEditor) { return; }
 
       if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
         that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
@@ -272,9 +272,16 @@ function LogicController(nbTestCases, maxInstructions) {
       $('#capacity').css('color', remaining < 0 ? 'red' : '');
       $('#capacity').html(strLimitElements.format(optLimitElements));
 
+      // Interrupt any ongoing execution
+      if(that._mainContext.runner) {
+         that._mainContext.runner.stop();
+         that._mainContext.reset();
+      }
+
+      // Close reportValue popups
       $('.blocklyDropDownDiv').remove();
     }
-    this._aceEditor.getSession().on('change', debounce(updatePythonCount, 500, false))
+    this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
 
   this.updateTaskIntro = function () {

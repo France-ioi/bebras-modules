@@ -120,6 +120,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                var newBlockly = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(that.workspace));
                if(that.programs[that.player] && newBlockly != that.programs[that.player].blockly) {
                   // only reset when program changed
+                  if(that.mainContext.runner) {
+                     that.mainContext.runner.stop();
+                     that.mainContext.reset();
+                  }
                   if(that.scratchMode) {
                      that.glowBlock(null);
                   }
