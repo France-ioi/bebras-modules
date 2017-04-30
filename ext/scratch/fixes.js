@@ -321,12 +321,26 @@ Blockly.Workspace.prototype.remainingCapacity = function() {
   var blockCount = 0;
   for (var b = 0; b < blocks.length; b++) {
     var block = blocks[b];
-    // Exclude math_number as it's often used in situations where it doesn't
-    // count in Blockly; probably find a better criteria
-    // (parentBlock_.type == 'control_repeat' ?)
-    if(block.type != 'math_number') {
+    // Counting is tricky because some blocks in Scratch don't count in Blockly
+    if(block.parentBlock_) {
+      // There's a parent (container) block
+      if((block.type == 'math_number' && block.parentBlock_.type == 'control_repeat') ||
+         (block.type == 'data_variablemenu' &&
+            (block.parentBlock_.type == 'data_variable' ||
+             block.parentBlock_.type == 'data_setvariableto' ||
+             block.parentBlock_.type == 'data_changevariableby'))) {
+        continue;
+      }
+    } else {
+      if(block.type == 'data_variablemenu') {
+        continue;
+      }
+    }
+    if(block.type == 'data_itemoflist' || block.type == 'data_replaceitemoflist') {
+      // Count one extra for these ones
       blockCount += 1;
     }
+    blockCount += 1;
   }
   return maxBlocks - blockCount;
 };
