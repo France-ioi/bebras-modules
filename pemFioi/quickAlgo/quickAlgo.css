@@ -71,6 +71,10 @@ body > * {
 	color: red;
 }
 
+.blocklyToolboxDiv {
+    background-color: #ddd !important;
+}
+
 /*
 	Run test speed selector
 	Rip-off of bootstrap btn and btn-group rules
