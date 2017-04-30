@@ -37,6 +37,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
            alert(e);
            return;
          }
+
+         // Remove statement prefix (highlightBlock)
+         var statementPrefix = Blockly.JavaScript.STATEMENT_PREFIX;
+         Blockly.JavaScript.STATEMENT_PREFIX = '';
+
          // New workspaces need options, else they can give unpredictable results
          var tmpOptions = new Blockly.Options({});
          var tmpWorkspace = new Blockly.Workspace(tmpOptions);
@@ -45,7 +50,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             tmpWorkspace.maxBlocks = function () { return maxBlocks; };
          }
          Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
-         return this.getCode(language, tmpWorkspace);
+         var code = this.getCode(language, tmpWorkspace);
+
+         Blockly.JavaScript.STATEMENT_PREFIX = statementPrefix;
+         return code;
       },
 
       getCode: function(language, codeWorkspace) {

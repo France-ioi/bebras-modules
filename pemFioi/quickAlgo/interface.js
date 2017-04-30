@@ -5,6 +5,7 @@
 
 var quickAlgoInterface = {
    strings: {},
+   displayedTestScores: false, // Are there results currently displayed?
 
    loadInterface: function() {
       this.strings = window.languageStrings;
@@ -126,11 +127,13 @@ var quickAlgoInterface = {
 
 
       this.updateTestSelector(0);
+      this.displayedTestScores = true;
       this.resetTestScores(nbTestCases);
    },
 
    updateTestScores: function (testScores) {
       // Display test results
+      this.displayedTestScores = true;
       for(var iTest=0; iTest<testScores.length; iTest++) {
          if(testScores[iTest].successRate >= 1) {
             var icon = '<span class="testResultIcon" style="color: green">✔</span>';
@@ -148,9 +151,11 @@ var quickAlgoInterface = {
 
    resetTestScores: function (nbTestCases) {
       // Reset test results display
+      if(!this.displayedTestScores) { return; }
       for(var iTest=0; iTest<nbTestCases; iTest++) {
          $('#testPanel'+iTest+' .panel-title').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
       }
+      this.displayedTestScores = false;
    },
 
    updateTestSelector: function (newCurTest) {
