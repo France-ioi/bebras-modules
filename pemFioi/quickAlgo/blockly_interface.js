@@ -448,7 +448,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    // TODO :: temporary until splitting of the block functions logic is done
    var blocklyHelper = getBlocklyInterface(maxBlocks, nbTestCases);
-   Object.assign(blocklyHelper, getBlocklyBlockFunctions(maxBlocks, nbTestCases));
+   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks, nbTestCases);
+   for(var property in blocklyBlockFunc) {
+      blocklyHelper[property] = blocklyBlockFunc[property];
+   }
    return blocklyHelper;
 }
 
