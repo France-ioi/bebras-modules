@@ -1044,10 +1044,10 @@ var getContext = function(display, infos, curLevel) {
    var robotCellIsColor = function(callback, color) {
       var robot = context.getRobotItem(context.curRobot);
       var result = false;
-      var transportables = context.getItems(robot.row, robot.col, {category: "paint"});
-      if (transportables.length > 0) {
-         var itemType = infos.itemTypes[transportables[0].type];
-         if ((transportables.length > 0) && (itemType.color != undefined)) {
+      var painted = context.getItems(robot.row, robot.col, {category: "paint"});
+      if (painted.length > 0) {
+         var itemType = infos.itemTypes[painted[0].type];
+         if ((painted.length > 0) && (itemType.color != undefined)) {
             result = (itemType.color == color);
          }
       }
@@ -1059,7 +1059,10 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.robot.markedCell = function(callback) {
-      robotCellIsColor(callback, "marker");
+      var robot = context.getRobotItem(context.curRobot);
+      var markers = context.getItems(robot.row, robot.col, {isMarker: true});
+      var result = (markers.length > 0);
+      context.callCallback(callback, result);
    };
 
    context.robot.brownCell = function(callback) {
@@ -1593,7 +1596,7 @@ var getContext = function(display, infos, curLevel) {
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows));
+         newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
       } else {
          newCellSide = 0;
       }
