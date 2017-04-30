@@ -356,6 +356,9 @@ Blockly.WorkspaceSvg.prototype.getBlocksBoundingBox = function() {
   return originalBbox;
 }
 
+// Put the padding to 0 to avoid issues with clicks getting misplaced
+Blockly.DropDownDiv.PADDING_Y = 0;
+
 // Move the dropdown slightly higher to make its target clearer
 Blockly.DropDownDiv.getPositionMetrics_ = Blockly.DropDownDiv.getPositionMetrics;
 Blockly.DropDownDiv.getPositionMetrics = function () {

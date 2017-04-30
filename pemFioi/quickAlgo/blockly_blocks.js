@@ -1188,9 +1188,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_listrepeat",
                      blocklyXml: "<block type='data_listrepeat'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='ITEM'>" +
                                  "    <shadow type='text'>" +
                                  "      <field name='TEXT'></field>" +
@@ -1206,9 +1204,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_itemoflist",
                      blocklyXml: "<block type='data_itemoflist'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1219,9 +1215,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_replaceitemoflist",
                      blocklyXml: "<block type='data_replaceitemoflist'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
