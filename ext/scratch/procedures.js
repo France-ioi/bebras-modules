@@ -810,6 +810,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
+    this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,
