@@ -22,10 +22,7 @@ var blocklyToScratch = {
       'logic_operation': ['operator_and', 'operator_or'],
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
-      'math_number': [],
-      // TODO :: temporary
-      'procedures_defnoreturn': ['procedures_defnoreturn', 'math_number'],
-      'procedures_defreturn': ['procedures_defreturn', 'math_number'],
+      'math_number': []
     }
 };
 
@@ -1449,7 +1446,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             categoriesInfos['functions'] = {
                blocksXml: [],
             };
-            singleBlocks.push('math_number'); // TODO :: temporary
+            if(this.scratchMode && singleBlocks.indexOf('math_number') == -1) {
+               singleBlocks.push('math_number'); // TODO :: temporary
+            }
             if(!this.includeBlocks.groupByCategory) {
                console.error('Task configuration error: groupByCategory must be activated for functions.');
             }
