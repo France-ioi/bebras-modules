@@ -83,7 +83,8 @@ var pythonForbiddenBlocks = {
       'lists_append': ['list', 'set', 'list_brackets']
     },
     'functions': {
-      'procedures_def': ['def']
+      'procedures_defnoreturn': ['def'],
+      'procedures_defreturn': ['def']
     }
 };
 
@@ -114,7 +115,7 @@ function pythonForbiddenLists(includeBlocks) {
          for(var c=0; c<includeBlocks.standardBlocks.wholeCategories.length; c++) {
             var categoryName = includeBlocks.standardBlocks.wholeCategories[c];
             if(pythonForbiddenBlocks[categoryName]) {
-               for(blockName in pythonForbiddenBlocks[categoryName]) {
+               for(var blockName in pythonForbiddenBlocks[categoryName]) {
                   removeForbidden(pythonForbiddenBlocks[categoryName][blockName]);
                }
             }
