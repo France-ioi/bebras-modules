@@ -172,7 +172,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                this.glowBlock(null);
             }
 
-            window.quickAlgoInterface.resetTestScores(nbTestCases);
+            window.quickAlgoInterface.resetTestScores();
          } else {
             Blockly.svgResize(this.workspace);
          }

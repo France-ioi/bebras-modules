@@ -5,7 +5,7 @@
 
 var quickAlgoInterface = {
    strings: {},
-   displayedTestScores: false, // Are there results currently displayed?
+   nbTestCases: 0,
 
    loadInterface: function() {
       this.strings = window.languageStrings;
@@ -56,6 +56,8 @@ var quickAlgoInterface = {
    },
 
    initTestSelector: function (nbTestCases) {
+      this.nbTestCases = nbTestCases;
+
       var buttons = [
          {cls: 'speedStop', label: this.strings.stopProgram, tooltip: this.strings.stopProgramDesc, onclick: 'task.displayedSubTask.stop()'},
          {cls: 'speedStep', label: this.strings.stepProgram, tooltip: this.strings.stepProgramDesc, onclick: 'task.displayedSubTask.step()'},
@@ -74,9 +76,9 @@ var quickAlgoInterface = {
       selectSpeed += "  </div></div>";
 
       var html = '<div class="panel-group">';
-      for(var iTest=0; iTest<nbTestCases; iTest++) {
+      for(var iTest=0; iTest<this.nbTestCases; iTest++) {
          html += '<div id="testPanel'+iTest+'" class="panel panel-default">';
-         if(nbTestCases > 1) {
+         if(this.nbTestCases > 1) {
             html += '  <div class="panel-heading" onclick="task.displayedSubTask.changeTestTo('+iTest+')"><h4 class="panel-title"></h4></div>';
          }
          html += '  <div class="panel-body">'
@@ -127,13 +129,11 @@ var quickAlgoInterface = {
 
 
       this.updateTestSelector(0);
-      this.displayedTestScores = true;
-      this.resetTestScores(nbTestCases);
+      this.resetTestScores();
    },
 
    updateTestScores: function (testScores) {
       // Display test results
-      this.displayedTestScores = true;
       for(var iTest=0; iTest<testScores.length; iTest++) {
          if(testScores[iTest].successRate >= 1) {
             var icon = '<span class="testResultIcon" style="color: green">✔</span>';
@@ -149,13 +149,11 @@ var quickAlgoInterface = {
       }
    },
 
-   resetTestScores: function (nbTestCases) {
+   resetTestScores: function () {
       // Reset test results display
-      if(!this.displayedTestScores) { return; }
-      for(var iTest=0; iTest<nbTestCases; iTest++) {
+      for(var iTest=0; iTest<this.nbTestCases; iTest++) {
          $('#testPanel'+iTest+' .panel-title').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
       }
-      this.displayedTestScores = false;
    },
 
    updateTestSelector: function (newCurTest) {

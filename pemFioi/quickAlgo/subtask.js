@@ -246,7 +246,8 @@ var initBlocklySubTask = function(subTask, language) {
 
       if(levelResultsCache[code]) {
          // We already have a cached result for that
-         callback(levelResultsCache[code]);
+         window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
+         callback(levelResultsCache[code].results);
          return;
       }
 
@@ -290,7 +291,10 @@ var initBlocklySubTask = function(subTask, language) {
             } else {
                var results = subTask.testCaseResults[iWorstTestCase];
             }
-            levelResultsCache[code] = results;
+            levelResultsCache[code] = {
+               results: results,
+               fullResults: subTask.testCaseResults
+               };
             callback(results);
          }
       });
