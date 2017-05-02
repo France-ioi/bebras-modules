@@ -22,7 +22,10 @@ var blocklyToScratch = {
       'logic_operation': ['operator_and', 'operator_or'],
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
-      'math_number': []
+      'math_change': ['data_changevariableby'],
+      'math_number': [],
+      'variables_get': ['data_variable'],
+      'variables_set': ['data_setvariableto'],
     }
 };
 
@@ -30,6 +33,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    // TODO :: completely split the logic so it can be a separate object
 
    return {
+      allBlocksAllowed: [],
       getCodeFromXml: function(xmlText, language) {
          try {
            var xml = Blockly.Xml.textToDom(xmlText)
@@ -1342,6 +1346,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                };
             }            
             categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+            this.allBlocksAllowed.push(blockName);
          }
 
          // by the way, just change the defaul colours of the blockly blocks:
@@ -1369,6 +1374,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.Procedures.flyoutOptions = {
             includedBlocks: {noret: false, ret: false, ifret: false}
          };
+
+         // Initialize allBlocksAllowed
+         this.allBlocksAllowed = ['robot_start'];
+         if(this.scratchMode) {
+            this.allBlocksAllowed = this.allBlocksAllowed.concat(['math_number', 'text']);
+         }
+
 
          for (var blockType in this.includeBlocks.generatedBlocks) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
@@ -1437,12 +1449,20 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                continue;
             }
             // If we're here, a block has been found
+            this.allBlocksAllowed = this.allBlocksAllowed.concat([blockName, 'procedures_callnoreturn', 'procedures_callreturn']);
             singleBlocks.splice(iBlock, 1);
             iBlock--;
          }
          if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']) {
+               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defnoreturn', 'procedures_callnoreturn']);
+            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
+               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defreturn', 'procedures_callnoreturn']);
+            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+               this.allBlocksAllowed.push('procedures_ifreturn');
+            }
             categoriesInfos['functions'] = {
                blocksXml: [],
             };
@@ -1483,6 +1503,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                blocksXml: blocksXml,
                colour: 330
             }
+         }
+
+         if(Blockly.Variables.flyoutOptions.includedBlocks['get']) {
+            this.allBlocksAllowed.push('variables_get');
+         }
+         if(Blockly.Variables.flyoutOptions.includedBlocks['set']) {
+            this.allBlocksAllowed.push('variables_set');
+         }
+         if(Blockly.Variables.flyoutOptions.includedBlocks['incr']) {
+            this.allBlocksAllowed.push('math_change');
          }
 
          var xmlString = "";         
@@ -1683,28 +1713,49 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          };
       },
 
+      blocksToScratch: function(blockList) {
+         var scratchBlocks = [];
+         for (var iBlock = 0;  iBlock < blockList.length; iBlock++) {
+            var blockName = blockList[iBlock];
+            if(blocklyToScratch.singleBlocks[blockName]) {
+               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
+                  scratchBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
+               }
+            } else {
+                scratchBlocks.push(blockName);
+            }
+         }
+         return scratchBlocks;
+      },
+
       fixScratch: function() {
          // Store the maxBlocks information somehwere, as Scratch ignores it
          Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
          // Translate requested Blocks from Blockly to Scratch blocks
          // TODO :: full translation
-         var newSingleBlocks = [];
-         for (var iBlock = 0;  iBlock < this.includeBlocks.standardBlocks.singleBlocks.length; iBlock++) {
-            var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
-            if(blocklyToScratch.singleBlocks[blockName]) {
-               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
-                  newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
-               }
-            } else {
-                newSingleBlocks.push(blockName);
-            }
-         }
-         this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
+         this.includeBlocks.standardBlocks.singleBlocks = this.blocksToScratch(this.includeBlocks.standardBlocks.singleBlocks);
       },
 
       getFullCode: function(code) {
          return this.getBlocklyLibCode(this.generators) + code + "program_end()";
+      },
+
+      checkBlocksAreAllowed: function(xml) {
+         var allowed = this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
+         var blockList = xml.getElementsByTagName('block');
+         var notAllowed = [];
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockName = block.getAttribute('type');
+            if(allowed.indexOf(blockName) == -1) {
+               notAllowed.push(blockName);
+            }
+         }
+         if(notAllowed.length > 0) {
+            console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
+         }
+         return !(notAllowed.length);
       }
    };
 }

@@ -293,11 +293,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                if (code[0] == "<") {
                   try {
                      var xml = Blockly.Xml.textToDom(code);
+                     if(!that.checkBlocksAreAllowed(xml)) {
+                        //throw 'not allowed'; // TODO :: do something; for now do nothing as the system might not be complete
+                     }
                      that.programs[that.player].blockly = code;
+                     that.languages[that.player] = "blockly";
                   } catch(e) {
                      $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
-                  that.languages[that.player] = "blockly";
                } else {
                   that.programs[that.player].javascript = code;
                   that.languages[that.player] = "javascript";
