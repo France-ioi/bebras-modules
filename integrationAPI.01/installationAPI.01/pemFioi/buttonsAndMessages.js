@@ -964,7 +964,7 @@ window.displayHelper = {
          fullMessage += "<br/><br/>";
          actionNext = "nextTask";
          fullMessage += this.strings.solvedMoveOn;
-      } else if (this.graderScore >= maxScores[gradedLevel] - 0.001) {
+      } else if (maxScores && (gradedLevel !== undefined) && this.graderScore >= maxScores[gradedLevel] - 0.001) {
          avatarMood = "success";
          buttonText = this.strings.moveOn;
          fullMessage += "<br/><br/>";

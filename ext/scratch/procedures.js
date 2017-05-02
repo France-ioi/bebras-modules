@@ -689,7 +689,9 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       }
     }
     // Fix input shapes not being created
-    this.initSvg();
+    if(this.initSvg) {
+      this.initSvg();
+    }
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
