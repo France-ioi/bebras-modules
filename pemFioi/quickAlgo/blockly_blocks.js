@@ -1756,6 +1756,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
          }
          return !(notAllowed.length);
+      },
+
+      cleanBlockIds: function(xml) {
+         // Clean up block IDs which contain now forbidden characters
+         var blockList = xml.getElementsByTagName('block');
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockId = block.getAttribute('id');
+            if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
+               block.setAttribute('id', Blockly.genUid());
+            }
+         }
       }
    };
 }

@@ -261,6 +261,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
+            this.cleanBlockIds(xml);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
          $("#program").val(this.programs[this.player].javascript);
