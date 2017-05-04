@@ -113,6 +113,7 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(taskInfos) {
+      this.success = false;
       if (context.display) {
          context.resetDisplay();
       } else {
