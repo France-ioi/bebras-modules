@@ -101,6 +101,7 @@ var getContext = function(display, infos) {
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
+            inputvalue: "Eingabewert",
          },
          code: {
             move: "gehe",
@@ -121,6 +122,7 @@ var getContext = function(display, infos) {
             turn: "drehe",
             alert: "alert",
             log: "log",
+            inputvalue: "eingabewert",
          },
          startingBlockName: "Turtle-Programm",
          messages: {
@@ -165,6 +167,7 @@ var getContext = function(display, infos) {
                   lists: 60,
                   colour: 60,
                   turtle: 310,
+                  turtleInput: 20,
                   _default: 280,
                },
                blocks: {},
@@ -258,6 +261,7 @@ var getContext = function(display, infos) {
          context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize);
          
          context.drawSolution = gridInfos.drawSolution;
+         context.inputValue   = gridInfos.inputValue;
 
          context.drawSolution(context.turtle.invisibleSolutionTurtle);
          if (context.display) {
@@ -370,6 +374,9 @@ var getContext = function(display, infos) {
    context.turtle.pendown = function(callback) {
       context.turtle.peneither("down", callback);
    }
+   context.turtle.inputvalue = function(callback) {
+      context.callCallback(callback, context.inputValue);
+   };
 
    context.turtle.moveamountvalue = context.turtle.moveamount;
    context.turtle.turnleftamountvalue = context.turtle.turnleftamount;
@@ -419,6 +426,9 @@ var getContext = function(display, infos) {
                 [["hebe Stift ab","'up'"],["setze Stift auf","'down'"],]},]},},
             { name: "colour2", params: [null]},
             { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]},},
+         ],
+         turtleInput: [
+            { name: "inputvalue", yieldsValue: true, },
           ],
       },
       debug: {

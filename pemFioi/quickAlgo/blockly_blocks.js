@@ -613,6 +613,27 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
                { 
+                  name: "controls_for_fillShadow", 
+                  blocklyXml: "<block type='controls_for'>" +
+                              "  <value name='FROM'>" +
+                              "    <block type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </block>" +
+                              "  </value>" +
+                              "  <value name='TO'>" +
+                              "    <block type='math_number'>" +
+                              "      <field name='NUM'>10</field>" +
+                              "     </block>" +
+                              "  </value>" +
+                              "  <value name='BY'>" +
+                              "    <block type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </block>" +
+                              "  </value>" +
+                              "</block>",
+                  excludedByDefault: true,
+               },
+               { 
                   name: "controls_forEach",
                   blocklyXml: "<block type='controls_forEach'></block>",
                   excludedByDefault: true,

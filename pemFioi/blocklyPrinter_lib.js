@@ -5,9 +5,9 @@ var getContext = function(display, infos) {
       de: {
          label: {
             print: "schreibe",
-            read: "lies",
-            readInteger: "lies ganze Zahl",
-            readFloat: "lies Komma-Zahl",
+            read: "lies Zeile",
+            readInteger: "lies Zeile als ganze Zahl",
+            readFloat: "lies Zeile als Komma-Zahl",
             eof: "Ende der Eingabe",
          },
          code: {
