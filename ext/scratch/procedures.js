@@ -417,7 +417,8 @@ Blockly.Blocks['procedures_mutatorarg'] = {
    * @this Blockly.Block
    */
   init: function() {
-    var field = new Blockly.FieldTextInput('x', this.validator_);
+    var varName = this.getVarName_();
+    var field = new Blockly.FieldTextInput(varName, this.validator_);
     this.appendDummyInput()
         .appendField(Blockly.Msg.PROCEDURES_MUTATORARG_TITLE)
         .appendField(field, 'NAME');
@@ -432,10 +433,10 @@ Blockly.Blocks['procedures_mutatorarg'] = {
     // Create the default variable when we drag the block in from the flyout.
     // Have to do this after installing the field on the block.
     field.onFinishEditing_ = this.createNewVar_;
-    field.onFinishEditing_('x');
+    field.onFinishEditing_(varName);
   },
   /**
-   * Obtain a valid name for the procedure.
+   * Obtain a valid name for the procedure argument.
    * Merge runs of whitespace.  Strip leading and trailing whitespace.
    * Beyond this, all names are legal.
    * @param {string} newVar User-supplied name.
@@ -445,7 +446,31 @@ Blockly.Blocks['procedures_mutatorarg'] = {
    */
   validator_: function(newVar) {
     newVar = newVar.replace(/[\s\xa0]+/g, ' ').replace(/^ | $/g, '');
+    // Check the name is not already in use
+    var source = this.sourceBlock_;
+    if(source && this.currentVariable_ != newVar && source.workspace && source.workspace.options && source.workspace.options.parentWorkspace) {
+      var parentWorkspace = source.workspace.options.parentWorkspace;
+      var variablesList = Blockly.Variables.allVariables(parentWorkspace);
+      if(variablesList.indexOf(newVar) != -1) {
+        // Reject this argument name
+        return null;
+      }
+    }
     return newVar || null;
+  },
+  getVarName_: function() {
+    // Get an unique variable name
+    if (this.workspace && this.workspace.options
+        && this.workspace.options.parentWorkspace) {
+      var variablesList = Blockly.Variables.allVariables(this.workspace.options.parentWorkspace);
+      var variablesList2 = Blockly.Variables.allUsedVariables(this.workspace.options.parentWorkspace);
+      var i = 1;
+      while(variablesList.indexOf('p'+i) != -1) {
+        i += 1;
+      }
+      return 'p' + i;
+    }
+    return 'p1';
   },
   /**
    * Called when focusing away from the text field.
@@ -455,19 +480,25 @@ Blockly.Blocks['procedures_mutatorarg'] = {
    * @this Blockly.FieldTextInput
    */
   createNewVar_: function(newText) {
+    if(this.currentVariable_ == newText) { return; }
     var source = this.sourceBlock_;
-    if (source && source.workspace && source.workspace.options
+    if(source && (source.flyoutRect_ || source.isInsertionMarker_)) {
+      return; // Don't create variables if this block is not a real block
+    }
+    if(source && source.workspace && source.workspace.options
         && source.workspace.options.parentWorkspace) {
+      var parentWorkspace = source.workspace.options.parentWorkspace;
+      var variablesList = Blockly.Variables.allVariables(parentWorkspace);
+
       // Remove the old variable
       if(this.currentVariable_) {
-        var source = this.sourceBlock_;
-        if (source && source.workspace && source.workspace.options
-            && source.workspace.options.parentWorkspace) {
-          source.workspace.options.parentWorkspace.deleteVariable(this.currentVariable_, true);
-        }
+        parentWorkspace.deleteVariable(this.currentVariable_, true);
       }
       this.currentVariable_ = newText;
-      source.workspace.options.parentWorkspace.createVariable(newText);
+      parentWorkspace.createVariable(newText);
+    }
+    if(source.workspace && source.workspace.flyout_) {
+      source.workspace.flyout_.show(source.workspace.options.languageTree.childNodes);
     }
   },
 };
@@ -658,7 +689,9 @@ Blockly.Blocks['procedures_callnoreturn'] = {
       }
     }
     // Fix input shapes not being created
-    this.initSvg();
+    if(this.initSvg) {
+      this.initSvg();
+    }
   },
   /**
    * Create XML to represent the (non-editable) name and arguments.
@@ -810,6 +843,7 @@ Blockly.Blocks['procedures_callreturn'] = {
     this.arguments_ = [];
     this.quarkConnections_ = {};
     this.quarkIds_ = null;
+    this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);
   },
   getProcedureCall: Blockly.Blocks['procedures_callnoreturn'].getProcedureCall,
   renameProcedure: Blockly.Blocks['procedures_callnoreturn'].renameProcedure,

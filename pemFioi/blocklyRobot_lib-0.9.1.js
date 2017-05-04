@@ -17,6 +17,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser la bille",
             dropTransportable: "déposer la bille",
             onTransportable: "sur une bille",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "sur un trou",
             transportableShape: "forme de l'objet",
             transportableColor: "couleur de l'objet",
@@ -77,6 +83,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser",
             dropTransportable: "deposer",
             onTransportable: "surObjet",
+            onRoundObject: "surRond",
+            onSquareObject: "surCarre",
+            onTriangleObject: "surTriangle",
+            onDottedObject: "surObjetPoints",
+            onFullObject: "surObjetPlein",
+            onStripedObject: "surObjetRaye",
             onHole: "surTrou",
             transportableShape: "formeObjet",
             transportableColor: "couleurObjet",
@@ -144,6 +156,12 @@ var getContext = function(display, infos, curLevel) {
             obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
             onHole: "surTrou() : le robot est-il sur un trou ?",
             onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+            onRoundObject: "surRond() : le robot est-il sur un objet rond ?",
+            onSquareObject: "surCarre() : le robot est-il sur un objet carré ?",
+            onTriangleObject: "surTriangle() : le robot est-il sur un objet triangle ?",
+            onDottedObject: "surObjetPoints() : le robot est-il sur un objet rempli de points ?",
+            onFullObject: "surObjetPlein() : le robot est-il sur un objet plein ?",
+            onStripedObject: "surObjetRaye() : le robot est-il sur un objet rayé ?",
             paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
             gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
             gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
@@ -193,6 +211,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "hebe Murmel auf",
             dropTransportable: "lege Murmel ab",
             onTransportable: "auf einer Murmel",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "auf einem Loch",
             transportableShape: "Form des Objekts",
             transportableColor: "Farbe des Objekts",
@@ -254,6 +278,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "hebeAuf",
             dropTransportable: "legeAb",
             onTransportable: "aufMurmel",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "aufLoch",
             transportableShape: "objektform",
             transportableColor: "objektfarbe",
@@ -349,8 +379,31 @@ var getContext = function(display, infos, curLevel) {
    else { // merge translations
       $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
    }   
+
+   function replaceStringsRec(source, dest) {
+      if ((typeof source != "object") || (typeof dest != "object")) {
+         return;
+      }
+      for (var key1 in source) {
+         if (dest[key1] != undefined) {
+            if (typeof dest[key1] == "object") {
+               replaceStringsRec(source[key1], dest[key1]);
+            } else {
+               dest[key1] = source[key1];
+            }
+         }
+      }
+   }
+
    var strings = window.languageStrings;
-   
+
+   if (infos.languageStrings != undefined) {
+      if (infos.languageStrings.blocklyRobot_lib != undefined) {
+         var infosStrings = infos.languageStrings.blocklyRobot_lib;
+         replaceStringsRec(infosStrings, strings);
+      }
+   }
+
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
@@ -937,6 +990,42 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, (holes.length != 0));
    };
 
+   context.robot.onRoundObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isRound: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onSquareObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isSquare: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onTriangleObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isTriangle: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onFullObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isFull: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onDottedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isDotted: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onStripedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isStriped: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
    context.robot.transportableColor = function(callback) {
       var result = getTransportableProperty("color");
       context.callCallback(callback, result);
@@ -955,10 +1044,10 @@ var getContext = function(display, infos, curLevel) {
    var robotCellIsColor = function(callback, color) {
       var robot = context.getRobotItem(context.curRobot);
       var result = false;
-      var transportables = context.getItems(robot.row, robot.col, {category: "paint"});
-      if (transportables.length > 0) {
-         var itemType = infos.itemTypes[transportables[0].type];
-         if ((transportables.length > 0) && (itemType.color != undefined)) {
+      var painted = context.getItems(robot.row, robot.col, {category: "paint"});
+      if (painted.length > 0) {
+         var itemType = infos.itemTypes[painted[0].type];
+         if ((painted.length > 0) && (itemType.color != undefined)) {
             result = (itemType.color == color);
          }
       }
@@ -970,7 +1059,10 @@ var getContext = function(display, infos, curLevel) {
    };
 
    context.robot.markedCell = function(callback) {
-      robotCellIsColor(callback, "marker");
+      var robot = context.getRobotItem(context.curRobot);
+      var markers = context.getItems(robot.row, robot.col, {isMarker: true});
+      var result = (markers.length > 0);
+      context.callCallback(callback, result);
    };
 
    context.robot.brownCell = function(callback) {
@@ -1158,6 +1250,12 @@ var getContext = function(display, infos, curLevel) {
          ],
          sensors: [
             { name: "onTransportable",    yieldsValue: true },
+            { name: "onRoundObject",      yieldsValue: true },
+            { name: "onSquareObject",     yieldsValue: true },
+            { name: "onTriangleObject",   yieldsValue: true },
+            { name: "onDottedObject",     yieldsValue: true },
+            { name: "onStripedObject",    yieldsValue: true },
+            { name: "onFullObject",       yieldsValue: true },
             { name: "onHole",             yieldsValue: true },
             { name: "transportableShape", yieldsValue: true },
             { name: "transportableColor", yieldsValue: true },
@@ -1498,7 +1596,7 @@ var getContext = function(display, infos, curLevel) {
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows));
+         newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
       } else {
          newCellSide = 0;
       }

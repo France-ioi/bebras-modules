@@ -3,8 +3,6 @@
         Blockly mode interface and running logic
 */
 
-"use strict";
-
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
@@ -105,38 +103,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             }
             
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
-            var that = this;
-            function onchange(event) {
-               Blockly.svgResize(that.workspace);
-
-               var remaining = that.workspace.remainingCapacity();
-               var optLimitBlocks = {
-                  maxBlocks: maxBlocks,
-                  remainingBlocks: Math.abs(remaining)
-               };
-               var strLimitBlocks = remaining < 0 ? that.strings.limitBlocksOver : that.strings.limitBlocks;
-               $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
-               $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
-
-               // TODO :: put into a resetDisplay function, find other elements to reset
-               var newBlockly = Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(that.workspace));
-               if(that.programs[that.player] && newBlockly != that.programs[that.player].blockly) {
-                  // only reset when program changed
-                  if(that.scratchMode) {
-                     that.glowBlock(null);
-                  }
-                  
-                  window.quickAlgoInterface.resetTestScores(nbTestCases);
-               }
-
-               // Refresh the toolbox for new procedures (same with variables
-               // but it's already handled correctly there)
-               if(that.scratchMode && that.includeBlocks.groupByCategory) {
-                  that.workspace.toolbox_.refreshSelection();
-               }
-            }
-            this.workspace.addChangeListener(onchange);
-            onchange();
+            this.workspace.addChangeListener(this.onChange.bind(this));
+            this.onChange();
          } else {
             var tmpOptions = new Blockly.Options({});
             this.workspace = new Blockly.Workspace(tmpOptions);
@@ -170,6 +138,49 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
                //delete Blockly;
             }
+         }
+      },
+
+      onChange: function(event) {
+         var eventType = event ? event.constructor : null;
+
+         var isBlockEvent = event ? (
+            eventType === Blockly.Events.Create ||
+            eventType === Blockly.Events.Delete ||
+            eventType === Blockly.Events.Move ||
+            eventType === Blockly.Events.Change) : true;
+
+         if(isBlockEvent) {
+            if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
+               // Update the remaining blocks display
+               var remaining = this.workspace.remainingCapacity();
+               var optLimitBlocks = {
+                  maxBlocks: maxBlocks,
+                  remainingBlocks: Math.abs(remaining)
+               };
+               var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
+               $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
+               $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
+            }
+
+            // TODO :: put into a resetDisplay function, find other elements to reset
+            if(this.mainContext.runner && this.mainContext.runner.nbRunning() > 0) {
+               this.mainContext.runner.stop();
+               this.mainContext.reset();
+            }
+            if(this.scratchMode) {
+               this.glowBlock(null);
+            }
+
+            window.quickAlgoInterface.resetTestScores();
+         } else {
+            Blockly.svgResize(this.workspace);
+         }
+
+         // Refresh the toolbox for new procedures (same with variables
+         // but it's already handled correctly there)
+         if(this.scratchMode && this.includeBlocks.groupByCategory) {
+            this.workspace.toolbox_.refreshSelection();
          }
       },
 
@@ -250,6 +261,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
+            this.cleanBlockIds(xml);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
          $("#program").val(this.programs[this.player].javascript);
@@ -282,11 +294,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                if (code[0] == "<") {
                   try {
                      var xml = Blockly.Xml.textToDom(code);
+                     if(!that.checkBlocksAreAllowed(xml)) {
+                        //throw 'not allowed'; // TODO :: do something; for now do nothing as the system might not be complete
+                     }
                      that.programs[that.player].blockly = code;
+                     that.languages[that.player] = "blockly";
                   } catch(e) {
                      $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
-                  that.languages[that.player] = "blockly";
                } else {
                   that.programs[that.player].javascript = code;
                   that.languages[that.player] = "javascript";
@@ -437,7 +452,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 function getBlocklyHelper(maxBlocks, nbTestCases) {
    // TODO :: temporary until splitting of the block functions logic is done
    var blocklyHelper = getBlocklyInterface(maxBlocks, nbTestCases);
-   Object.assign(blocklyHelper, getBlocklyBlockFunctions(maxBlocks, nbTestCases));
+   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks, nbTestCases);
+   for(var property in blocklyBlockFunc) {
+      blocklyHelper[property] = blocklyBlockFunc[property];
+   }
    return blocklyHelper;
 }
 

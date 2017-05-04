@@ -3,8 +3,6 @@
         Logic for quickAlgo tasks, implements the Bebras task API.
 */
 
-"use strict";
-
 var initBlocklySubTask = function(subTask, language) {
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
@@ -24,6 +22,12 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.answer = null;
       subTask.state = {};
       subTask.iTestCase = 0;
+      if(!window.taskResultsCache) {
+         window.taskResultsCache = {};
+      }
+      if(!window.taskResultsCache[curLevel]) {
+         window.taskResultsCache[curLevel] = {};
+      }
 
       this.level = curLevel;
 
@@ -214,6 +218,9 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.changeTest = function(delta) {
       var newTest = subTask.iTestCase + delta;
       if ((newTest >= 0) && (newTest < this.nbTestCases)) {
+         if(this.context.runner) {
+            this.context.runner.stop();
+         }
          initContextForLevel(newTest);
          if(subTask.context.display) {
             window.quickAlgoInterface.updateTestSelector(newTest);
@@ -231,8 +238,19 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.getGrade = function(callback) {
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
-      var codes = [subTask.blocklyHelper.getFullCode(code)];
+      code = subTask.blocklyHelper.getFullCode(code);
+      var codes = [code]; // We only ever send one code to grade
       subTask.iTestCase = 0;
+
+      var levelResultsCache = window.taskResultsCache[this.level];
+
+      if(levelResultsCache[code]) {
+         // We already have a cached result for that
+         window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
+         callback(levelResultsCache[code].results);
+         return;
+      }
+
       initBlocklyRunner(subTask.context, function(message, success) {
          subTask.testCaseResults[subTask.iTestCase] = subTask.levelGridInfos.computeGrade(subTask.context, message);
          subTask.iTestCase++;
@@ -273,6 +291,10 @@ var initBlocklySubTask = function(subTask, language) {
             } else {
                var results = subTask.testCaseResults[iWorstTestCase];
             }
+            levelResultsCache[code] = {
+               results: results,
+               fullResults: subTask.testCaseResults
+               };
             callback(results);
          }
       });

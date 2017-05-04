@@ -3,8 +3,6 @@
         Block generation and configuration logic for the Blockly mode
 */
 
-"use strict";
-
 // Blockly to Scratch translations
 var blocklyToScratch = {
    singleBlocks: {
@@ -24,7 +22,10 @@ var blocklyToScratch = {
       'logic_operation': ['operator_and', 'operator_or'],
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+      'math_change': ['data_changevariableby'],
       'math_number': [],
+      'variables_get': ['data_variable'],
+      'variables_set': ['data_setvariableto'],
     }
 };
 
@@ -32,6 +33,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    // TODO :: completely split the logic so it can be a separate object
 
    return {
+      allBlocksAllowed: [],
       getCodeFromXml: function(xmlText, language) {
          try {
            var xml = Blockly.Xml.textToDom(xmlText)
@@ -39,6 +41,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
            alert(e);
            return;
          }
+
+         // Remove statement prefix (highlightBlock)
+         var statementPrefix = Blockly.JavaScript.STATEMENT_PREFIX;
+         Blockly.JavaScript.STATEMENT_PREFIX = '';
+
          // New workspaces need options, else they can give unpredictable results
          var tmpOptions = new Blockly.Options({});
          var tmpWorkspace = new Blockly.Workspace(tmpOptions);
@@ -47,7 +54,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             tmpWorkspace.maxBlocks = function () { return maxBlocks; };
          }
          Blockly.Xml.domToWorkspace(xml, tmpWorkspace);
-         return this.getCode(language, tmpWorkspace);
+         var code = this.getCode(language, tmpWorkspace);
+
+         Blockly.JavaScript.STATEMENT_PREFIX = statementPrefix;
+         return code;
       },
 
       getCode: function(language, codeWorkspace) {
@@ -1203,9 +1213,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_listrepeat",
                      blocklyXml: "<block type='data_listrepeat'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='ITEM'>" +
                                  "    <shadow type='text'>" +
                                  "      <field name='TEXT'></field>" +
@@ -1221,9 +1229,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_itemoflist",
                      blocklyXml: "<block type='data_itemoflist'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1234,9 +1240,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_replaceitemoflist",
                      blocklyXml: "<block type='data_replaceitemoflist'>" +
-                                 "  <field name='LIST'>" +
-                                 this.strings.listVariable +
-                                 "  </field>" +
+                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1248,6 +1252,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "    </shadow>" +
                                  "  </value>" +
                                  "</block>"
+                  }
+               ],
+            math: [
+                  {
+                     name: "math_number",
+                     blocklyXml: "<block type='math_number' gap='32'></block>"
                   }
                ],
             operator: [
@@ -1357,6 +1367,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                };
             }            
             categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+            this.allBlocksAllowed.push(blockName);
          }
 
          // by the way, just change the defaul colours of the blockly blocks:
@@ -1384,6 +1395,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.Procedures.flyoutOptions = {
             includedBlocks: {noret: false, ret: false, ifret: false}
          };
+
+         // Initialize allBlocksAllowed
+         this.allBlocksAllowed = ['robot_start'];
+         if(this.scratchMode) {
+            this.allBlocksAllowed = this.allBlocksAllowed.concat(['math_number', 'text']);
+         }
+
 
          for (var blockType in this.includeBlocks.generatedBlocks) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
@@ -1452,15 +1470,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                continue;
             }
             // If we're here, a block has been found
+            this.allBlocksAllowed = this.allBlocksAllowed.concat([blockName, 'procedures_callnoreturn', 'procedures_callreturn']);
             singleBlocks.splice(iBlock, 1);
             iBlock--;
          }
          if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ret']
                || Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+            if(Blockly.Procedures.flyoutOptions.includedBlocks['noret']) {
+               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defnoreturn', 'procedures_callnoreturn']);
+            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ret']) {
+               this.allBlocksAllowed = this.allBlocksAllowed.concat(['procedures_defreturn', 'procedures_callnoreturn']);
+            } else if(Blockly.Procedures.flyoutOptions.includedBlocks['ifret']) {
+               this.allBlocksAllowed.push('procedures_ifreturn');
+            }
             categoriesInfos['functions'] = {
                blocksXml: [],
             };
+            if(this.scratchMode && singleBlocks.indexOf('math_number') == -1) {
+               singleBlocks.push('math_number'); // TODO :: temporary
+            }
             if(!this.includeBlocks.groupByCategory) {
                console.error('Task configuration error: groupByCategory must be activated for functions.');
             }
@@ -1495,6 +1524,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                blocksXml: blocksXml,
                colour: 330
             }
+         }
+
+         if(Blockly.Variables.flyoutOptions.includedBlocks['get']) {
+            this.allBlocksAllowed.push('variables_get');
+         }
+         if(Blockly.Variables.flyoutOptions.includedBlocks['set']) {
+            this.allBlocksAllowed.push('variables_set');
+         }
+         if(Blockly.Variables.flyoutOptions.includedBlocks['incr']) {
+            this.allBlocksAllowed.push('math_change');
          }
 
          var xmlString = "";         
@@ -1695,28 +1734,61 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          };
       },
 
+      blocksToScratch: function(blockList) {
+         var scratchBlocks = [];
+         for (var iBlock = 0;  iBlock < blockList.length; iBlock++) {
+            var blockName = blockList[iBlock];
+            if(blocklyToScratch.singleBlocks[blockName]) {
+               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
+                  scratchBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
+               }
+            } else {
+                scratchBlocks.push(blockName);
+            }
+         }
+         return scratchBlocks;
+      },
+
       fixScratch: function() {
          // Store the maxBlocks information somehwere, as Scratch ignores it
          Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
          // Translate requested Blocks from Blockly to Scratch blocks
          // TODO :: full translation
-         var newSingleBlocks = [];
-         for (var iBlock = 0;  iBlock < this.includeBlocks.standardBlocks.singleBlocks.length; iBlock++) {
-            var blockName = this.includeBlocks.standardBlocks.singleBlocks[iBlock];
-            if(blocklyToScratch.singleBlocks[blockName]) {
-               for(var b=0; b<blocklyToScratch.singleBlocks[blockName].length; b++) {
-                  newSingleBlocks.push(blocklyToScratch.singleBlocks[blockName][b]);
-               }
-            } else {
-                newSingleBlocks.push(blockName);
-            }
-         }
-         this.includeBlocks.standardBlocks.singleBlocks = newSingleBlocks;
+         this.includeBlocks.standardBlocks.singleBlocks = this.blocksToScratch(this.includeBlocks.standardBlocks.singleBlocks);
       },
 
       getFullCode: function(code) {
          return this.getBlocklyLibCode(this.generators) + code + "program_end()";
+      },
+
+      checkBlocksAreAllowed: function(xml) {
+         var allowed = this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
+         var blockList = xml.getElementsByTagName('block');
+         var notAllowed = [];
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockName = block.getAttribute('type');
+            if(allowed.indexOf(blockName) == -1) {
+               notAllowed.push(blockName);
+            }
+         }
+         if(notAllowed.length > 0) {
+            console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
+         }
+         return !(notAllowed.length);
+      },
+
+      cleanBlockIds: function(xml) {
+         // Clean up block IDs which contain now forbidden characters
+         var blockList = xml.getElementsByTagName('block');
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var blockId = block.getAttribute('id');
+            if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
+               block.setAttribute('id', Blockly.genUid());
+            }
+         }
       }
    };
 }
