@@ -1310,7 +1310,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
                {
-                   name: "controls_repeat_ext",
+                   name: "controls_repeat_ext_fillShadow",
                    blocklyXml: "<block type='controls_repeat_ext'>" +
                    "  <value name='TIMES'>" +
                    "    <block type='math_number'>" +
