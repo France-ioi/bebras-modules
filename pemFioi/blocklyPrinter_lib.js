@@ -1,5 +1,14 @@
 "use strict";
 
+function escapeHtml(unsafe) {
+    return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 var getContext = function(display, infos) {
    var localLanguageStrings = {
       de: {
@@ -284,11 +293,11 @@ var getContext = function(display, infos) {
                var errorstring = "Deine Ausgabe stimmt nicht mit der " +
                                  "erwarteten Ausgabe überein; in Zeile " +
                                       (iLine + 1) + ":<br>Erwartet: \"<b>" +
-                                 expectedLine + "</b>\",<br>deine Ausgabe: \"<b>" +
-                                 actualLine + "</b>\".<br>(Erstes falsches Zeichen in Spalte " +
+                                      escapeHtml(expectedLine) + "</b>\",<br>deine Ausgabe: \"<b>" +
+                                 escapeHtml(actualLine) + "</b>\".<br>(Erstes falsches Zeichen in Spalte " +
                                       (iChar + 1) + "; erwartet: \"<b>" +
-                                 expectedLine[iChar] + "</b>\", deine Ausgabe: \"<b>" +
-                                 actualLine[iChar] + "</b>\".)"
+                                      escapeHtml(expectedLine[iChar]) + "</b>\", deine Ausgabe: \"<b>" +
+                                 escapeHtml(actualLine[iChar]) + "</b>\".)"
                throw(errorstring); // add line info iLine + 1, add char info iChar + 1
             }
          }

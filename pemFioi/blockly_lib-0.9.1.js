@@ -1309,6 +1309,16 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='controls_repeat_ext'></block>",
                   excludedByDefault: true,
                },
+               {
+                   name: "controls_repeat_ext",
+                   blocklyXml: "<block type='controls_repeat_ext'>" +
+                   "  <value name='TIMES'>" +
+                   "    <block type='math_number'>" +
+                   "      <field name='NUM'>10</field>" +
+                   "    </block>" +
+                   "  </value>" +
+                   "</block>"
+               },
                { 
                   name: "controls_whileUntil", 
                   blocklyXml: "<block type='controls_whileUntil'></block>"
@@ -1342,6 +1352,26 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   name: "controls_for_noShadow", 
                   blocklyXml: "<block type='controls_for'></block>",
                   excludedByDefault: true,
+               },
+               {
+                   name: "controls_for_fillShadow",
+                   blocklyXml: "<block type='controls_for'>" +
+                   "  <value name='FROM'>" +
+                   "    <block type='math_number'>" +
+                   "      <field name='NUM'>1</field>" +
+                   "    </block>" +
+                   "  </value>" +
+                   "  <value name='TO'>" +
+                   "    <block type='math_number'>" +
+                   "      <field name='NUM'>10</field>" +
+                   "     </block>" +
+                   "  </value>" +
+                   "  <value name='BY'>" +
+                   "    <block type='math_number'>" +
+                   "      <field name='NUM'>1</field>" +
+                   "    </block>" +
+                   "  </value>" +
+                   "</block>"
                },
                { 
                   name: "controls_forEach",
