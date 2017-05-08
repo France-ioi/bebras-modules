@@ -152,6 +152,75 @@ function getUrlParameter(sParam)
     }
 }
 
+var chooseView = (function () {
+   // Manages the buttons to choose the view
+   return {
+      doubleEnabled: false,
+      isDouble: false,
+      lastShownViews: {},
+
+      init: function(views) {
+         if (! $("#choose-view").length)
+            $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
+         $("#choose-view").html("");
+         for(var viewName in views) {
+            if (!views[viewName].requires) {
+               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>')
+               $("#choose-view").append(btn);
+               btn.click(this.selectFactory(viewName));
+            }
+         }
+      },
+
+      reinit: function(views) {
+         this.init(views);
+         var newShownViews = {};
+         for(var viewName in this.lastShownViews) {
+            if(!this.lastShownViews[viewName]) { continue; }
+            if(views[viewName] && !views[viewName].requires) {
+               newShownViews[viewName] = true;
+            }
+         }
+         for(var viewName in views) {
+            if(views[viewName].includes) {
+               for(var i=0; i<views[viewName].includes.length; i++) {
+                  if(this.lastShownViews[views[viewName].includes[i]]) {
+                     newShownViews[viewName] = true;
+                  }
+               }
+            }
+         }
+         this.update(newShownViews);
+      },
+
+      selectFactory: function(viewName) {
+         var that = this;
+         return function () {
+            that.select(viewName);
+         };
+      },
+
+      select: function(viewName) {
+         var that = this;
+         var shownViews = {};
+         shownViews[viewName] = true;
+         task.showViews(shownViews, function () {
+            that.update(shownViews);
+         });
+      },
+
+      update: function(shownViews) {
+         this.lastShownViews = shownViews;
+         $('.choose-view-button').removeClass('btn-info');
+         for(var viewName in shownViews) {
+            if(shownViews[viewName]) {
+               $('#choose-view-'+viewName).addClass('btn-info');
+            }
+         };
+      }
+   };
+})();
+
 $(document).ready(function() {
    var hasPlatform = false;
    try {
@@ -214,35 +283,21 @@ $(document).ready(function() {
          if (taskMetaData.fullFeedback) {
             loadedViews.grader = true;
          }
-         var showViewsHandlerFactory = function (view) {
-            return function() {
-               var tmp = {};
-               tmp[view] = true;
-               task.showViews(tmp, function(){});
-               $('.choose-view-button').removeClass('btn-info');
-               $('#choose-view-'+view).addClass('btn-info');
-            };
-         };
          
          task.load(loadedViews, function() {
             platform.trigger('load', [loadedViews]);
-            task.getViews(function(views){
-               if (! $("#choose-view").length)
-                  $(document.body).append('<div id="choose-view" style="margin-top:8em"></div>');
-               $("#choose-view").html("");
-               for (var viewName in views)
-               {
-                  if (!views[viewName].requires) {
-                     $("#choose-view").append($('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>').click(showViewsHandlerFactory(viewName)));
-                  }
-               }
+            task.getViews(function(views) {
+               chooseView.init(views);
             });
             task.showViews(shownViews, function() {
-                 $('.choose-view-button').removeClass('btn-info');
-               $.each(shownViews, function(viewName) {
-                  $('#choose-view-'+viewName).addClass('btn-info');
-               });
+               chooseView.update(shownViews);
                platform.trigger('showViews', [{"task": true}]);
+            });
+         });
+
+         window.addEventListener('resize', function() {
+            task.getViews(function(views) {
+               chooseView.reinit(views);
             });
          });
       };
