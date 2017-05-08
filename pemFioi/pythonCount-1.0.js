@@ -90,7 +90,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'def'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', 'def', 'break', 'continue'];
    var allowed = []
 
    if(!includeBlocks) {
@@ -163,6 +163,13 @@ function pythonForbidden(code, includeBlocks) {
          if(re.exec(code)) {
             // Forbidden keyword found
             return 'crochets [ ]'; // TODO :: i18n ?
+         }
+      } else if(forbidden[i] == 'dict_brackets') {
+         // Special pattern for lists
+         var re = /[\{\}]/;
+         if(re.exec(code)) {
+            // Forbidden keyword found
+            return 'accolades { }'; // TODO :: i18n ?
          }
       } else {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');

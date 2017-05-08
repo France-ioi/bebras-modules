@@ -341,6 +341,15 @@ function LogicController(nbTestCases, maxInstructions) {
       pflInfos.forbidden[listsIdx] = 'crochets [ ]';
     }
 
+    var listsIdx = pflInfos.allowed.indexOf('dict_brackets');
+    if(listsIdx >= 0) {
+      pflInfos.allowed[listsIdx] = 'accolades { }';
+    }
+    listsIdx = pflInfos.forbidden.indexOf('dict_brackets');
+    if(listsIdx >= 0) {
+      pflInfos.forbidden[listsIdx] = 'accolades { }';
+    }
+
     if(pflInfos.allowed.length == 1) {
       pythonHtml += '<p>Le mot-clé suivant est autorisé : <code>' + pflInfos.allowed[0] + '</code></p>';
     } else if (pflInfos.allowed.length > 0) {
