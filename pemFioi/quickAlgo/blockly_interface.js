@@ -130,12 +130,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          try {
             // Need to hide the WidgetDiv before disposing of the workspace
             Blockly.WidgetDiv.hide();
-         } finally {}
+         } catch(e) {}
          var ws = this.workspace;
          if (ws != null) {
             try {
                ws.dispose();
-            } finally {}
+            } catch(e) {}
             // TODO: this should be in a global unload function
             if (false) {
                $(".blocklyWidgetDiv").remove();
