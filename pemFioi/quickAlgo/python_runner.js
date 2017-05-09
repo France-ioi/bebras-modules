@@ -277,7 +277,9 @@ function PythonInterpreter(context, msgCallback) {
 
   this.unSkulptValue = function (origValue) {
     // Transform a value, possibly a Skulpt one, into a printable value
-    if(origValue.constructor === Sk.builtin.dict) {
+    if(typeof origValue !== 'object' || origValue === null) {
+      var value = origValue;
+    } else if(origValue.constructor === Sk.builtin.dict) {
       var keys = Object.keys(origValue);
       var dictElems = [];
       for(var i=0; i<keys.length; i++) {
