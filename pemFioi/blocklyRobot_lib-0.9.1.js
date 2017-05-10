@@ -348,7 +348,7 @@ var getContext = function(display, infos, curLevel) {
          description: {
          },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
-         startingBlockName: "Programm des Roboters",
+         startingBlockName: "Roboter-Programm:",
 
          exit_grid: "Der Roboter hat das Gitter verlassen!",
          nothingToPickUp: "Hier gibt es nichts zum aufheben!",

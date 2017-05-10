@@ -78,7 +78,7 @@ var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
           
-         startingBlockName: "Programm der Schildkröte:",
+         startingBlockName: "Schildkröten-Programm:",
       },
       de: {
          label: {

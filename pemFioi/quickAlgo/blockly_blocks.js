@@ -557,12 +557,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='logic_boolean'></block>"
                },
                { 
-                  name: "logic_boolean", 
+                  name: "logic_null",
                   blocklyXml: "<block type='logic_null'></block>",
                   excludedByDefault: true,
                },
                { 
-                  name: "logic_boolean", 
+                  name: "logic_ternary",
                   blocklyXml: "<block type='logic_ternary'></block>",
                   excludedByDefault: true,
                },
