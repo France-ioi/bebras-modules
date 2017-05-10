@@ -61,6 +61,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       load: function(language, display, nbTestCases, options) {
+         FioiBlockly.loadLanguage(language);
+
          if(this.scratchMode) {
             this.fixScratch();
          }
