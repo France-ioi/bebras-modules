@@ -66,7 +66,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
          if(codeWorkspace.remainingCapacity() < 0) {
             // Safeguard: avoid generating code when we use too many blocks
-            return '';
+            return 'throw "'+this.strings.tooManyBlocks+'";';
          }
          var blocks = codeWorkspace.getTopBlocks(true);
          var languageObj = null;
