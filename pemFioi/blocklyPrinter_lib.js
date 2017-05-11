@@ -28,8 +28,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
-            outputWrong: "Das hat noch nicht ganz geklappt. Versuch es noch einmal!",
-            outputCorrect: "Bravo! Du hast alle Zeilen richtig ausgegeben!",
+             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
+             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile ",
             tooManyChars: "Zeile zu lang: Zeile ",
             tooFewLines: "Zu wenig Zeilen ausgegeben",
@@ -122,7 +122,7 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(taskInfos) {
-      this.success = false;
+      this.success = undefined;
       if (context.display) {
          context.resetDisplay();
       } else {
@@ -290,8 +290,7 @@ var getContext = function(display, infos) {
          for (iChar = 0; iChar < expectedLine.length && iChar < actualLine.length; iChar++) {
             if (actualLine[iChar] != expectedLine[iChar]) {
                this.success = false;
-               var errorstring = "Deine Ausgabe stimmt nicht mit der " +
-                                 "erwarteten Ausgabe überein; in Zeile " +
+               var errorstring = "Das Programm hat nicht alle Zeilen richtig ausgegeben.; in Zeile " +
                                       (iLine + 1) + ":<br>Erwartet: \"<b>" +
                                       escapeHtml(expectedLine) + "</b>\",<br>deine Ausgabe: \"<b>" +
                                  escapeHtml(actualLine) + "</b>\".<br>(Erstes falsches Zeichen in Spalte " +
