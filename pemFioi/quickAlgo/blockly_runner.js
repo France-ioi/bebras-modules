@@ -12,9 +12,16 @@ function initBlocklyRunner(context, messageCallback) {
       runner.nbActions = 0;
       runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
 
+      // Iteration limits
+      runner.maxIter = 400000;
+      runner.maxIterWithoutAction = 500;
+
+      // During step-by-step mode
       runner.stepInProgress = false;
       runner.stepMode = false;
       runner.nextCallBack = null;
+
+      // First highlightBlock of this run
       runner.firstHighlight = true;
 
       runner.strings = languageStrings;
@@ -84,7 +91,9 @@ function initBlocklyRunner(context, messageCallback) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
          }
          if (Math.random() < 0.1) {
+            runner.stackResetting = true;
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
+               runner.stackResetting = false;
                callback(primitive);
                runner.runSyncBlock();
             }, 0);
@@ -189,27 +198,6 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         var maxIter = 400000;
-
-         var maxIterWithoutAction = 500;
-         if (context.infos.maxIter != undefined) {
-            maxIter = context.infos.maxIter;
-         }
-         if (context.infos.maxIterWithoutAction != undefined) {
-            maxIterWithoutAction = context.infos.maxIterWithoutAction;
-         }
-
-         if(!runner.hasActions) {
-            // If there's no actions in the current task, "disable" the limit
-            maxIterWithoutAction = maxIter;
-         }
-   /*      if (turn > 90) {
-            task.program_end(function() {
-               that.stop();
-            });
-            return;
-      }*/
-
          runner.stepInProgress = true;
          // Handle the callback from last highlightBlock
          if(runner.nextCallback) {
@@ -224,7 +212,7 @@ function initBlocklyRunner(context, messageCallback) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               while (context.curSteps[iInterpreter].total < maxIter && context.curSteps[iInterpreter].withoutAction < maxIterWithoutAction) {
+               while (context.curSteps[iInterpreter].total < runner.maxIter && context.curSteps[iInterpreter].withoutAction < runner.maxIterWithoutAction) {
                   if (!interpreter.step() || toStop[iInterpreter]) {
                      isRunning[iInterpreter] = false;
                      break;
@@ -240,19 +228,22 @@ function initBlocklyRunner(context, messageCallback) {
                      context.curSteps[iInterpreter].withoutAction++;
                   }
                }
-               if (context.curSteps[iInterpreter].total >= maxIter) {
-                  isRunning[iInterpreter] = false;
-                  throw context.blocklyHelper.strings.tooManyIterations;
-               } else if(context.curSteps[iInterpreter].withoutAction >= maxIterWithoutAction) {
-                  isRunning[iInterpreter] = false;
-                  throw context.blocklyHelper.strings.tooManyIterationsWithoutAction;
+               if (!context.programEnded[iInterpreter]) {
+                  if (context.curSteps[iInterpreter].total >= runner.maxIter) {
+                     isRunning[iInterpreter] = false;
+                     throw context.blocklyHelper.strings.tooManyIterations;
+                  } else if(context.curSteps[iInterpreter].withoutAction >= runner.maxIterWithoutAction) {
+                     isRunning[iInterpreter] = false;
+                     throw context.blocklyHelper.strings.tooManyIterationsWithoutAction;
+                  }
                }
             }
          } catch (e) {
             runner.stepInProgress = false;
-            
+
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                isRunning[iInterpreter] = false;
+               context.programEnded[iInterpreter] = true;
             }
 
             var message = e.toString();
@@ -307,6 +298,19 @@ function initBlocklyRunner(context, messageCallback) {
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
             toStop[iInterpreter] = false;
+         }
+         runner.maxIter = 400000;
+         if (context.infos.maxIter != undefined) {
+            runner.maxIter = context.infos.maxIter;
+         }
+         if(runner.hasActions) {
+            runner.maxIterWithoutAction = 500;
+            if (context.infos.maxIterWithoutAction != undefined) {
+               runner.maxIterWithoutAction = context.infos.maxIterWithoutAction;
+            }
+         } else {
+            // If there's no actions in the current task, "disable" the limit
+            runner.maxIterWithoutAction = runner.maxIter;
          }
       };
       runner.runCodes = function(codes) {
