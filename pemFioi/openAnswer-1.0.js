@@ -31,13 +31,6 @@ function initOpenAnswer(selector, btnLabel, savedMsg) {
     callback(Math.max(600, parseInt($("html").outerHeight(true))));
   };
 
-  task.getViews = function(callback) {
-    var views = {
-      task: {}
-    };
-    callback(views);
-  };
-
   task.getAnswerObject = function () {
     return $(selector).find('.openAnswerArea').val();
   };
