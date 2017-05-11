@@ -329,11 +329,14 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "zeileObjekt",
             trans_col: "spalteObjekt",
          },
+
+
+
          messages: {
-            marblePlacedCorrectly: "Bravo! Du hast die Murmel an die richtige Stelle verschoben.",
-            marblePlacedIncorrectly: "Die Murmel ist nicht an der richtigen Stelle platziert!",
-            marblesPlacedCorrectly: "Bravo! Du hast alle Murmeln richtig angeordnet.",
-            marblesPlacedIncorrectly: "Die Murmeln sind noch nicht richtig angeordnet!",
+             marblePlacedCorrectly: "Bravo! Der Roboter hat die Murmel richtig abgelegt.",
+             marblePlacedIncorrectly: "Der Roboter hat die Murmel nicht richtig abgelegt.",
+            marblesPlacedCorrectly: "Bravo! Der Roboter hat die Murmeln richtig abgelegt.",
+            marblesPlacedIncorrectly: "Der Roboter hat die Murmeln nicht richtig abgelegt.",
             reachedGreenZone: "Bravo! Der Roboter hat das grüne Feld erreicht.",
             notReachedGreenZone: "Der Roboter ist nicht auf dem grünen Feld!",
             patternDrawn: "Bravo! Du hast das Muster richtig nachgezeichnet.",
@@ -348,7 +351,7 @@ var getContext = function(display, infos, curLevel) {
          description: {
          },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
-         startingBlockName: "Roboter-Programm:",
+         startingBlockName: "Roboter-Programm",
 
          exit_grid: "Der Roboter hat das Gitter verlassen!",
          nothingToPickUp: "Hier gibt es nichts zum aufheben!",

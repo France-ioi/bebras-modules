@@ -78,7 +78,7 @@ var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
           
-         startingBlockName: "Schildkröten-Programm:",
+          startingBlockName: "Program du tortue",
       },
       de: {
          label: {
@@ -124,10 +124,11 @@ var getContext = function(display, infos) {
             log: "log",
             inputvalue: "eingabewert",
          },
-         startingBlockName: "Programm der Schildkröte",
+         startingBlockName: "Schildkröten-Programm",
          messages: {
-            paintingWrong: "Das sieht noch nicht ganz richtig aus. Versuch es noch einmal!",
-            paintingCorrect: "Sehr gut! Du hast die Zeichnung richtig gemacht.",
+             paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
+            paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet.",
+
          }
       }
    };
