@@ -1,4 +1,12 @@
 function initOpenAnswer(selector, btnLabel, savedMsg) {
+  // Get the right path to the images for buttonsAndMessages
+  if(typeof window.contestsRoot == 'undefined') {
+    window.contestsRoot = window.modulesPath;
+  }
+  if(typeof window.contestsFolder == 'undefined') {
+    window.contestFolder = 'img';
+  }
+
   task.load = function (views, callback) {
     var area = $(selector);
     area.html('' +
@@ -15,6 +23,19 @@ function initOpenAnswer(selector, btnLabel, savedMsg) {
     $('body').append('<div id="displayHelperAnswering" style="display: none;"></div>');
 
     callback();
+  };
+
+  // TODO :: test this fix on getHeight on other beaver tasks
+  task.getHeight = function(callback) {
+    // Minimum 600px height for the popup
+    callback(Math.max(600, parseInt($("html").outerHeight(true))));
+  };
+
+  task.getViews = function(callback) {
+    var views = {
+      task: {}
+    };
+    callback(views);
   };
 
   task.getAnswerObject = function () {
