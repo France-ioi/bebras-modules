@@ -176,8 +176,8 @@ var localLanguageStrings = {
       greatestOfTwoNumbers: "Größere von zwei Zahlen",
       flagClicked: "Sobald %1 geklickt", // (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Anweisungen wurden ausgeführt!",
-      tooManyIterationsWithoutAction: "Zu viele Anweisungen wurden ausgeführt ohne eine Aktion!",
-      submitProgram: "Ausführen",
+      tooManyIterationsWithoutAction: "Zu viele Anweisungen ohne eine Aktion wurden ausgeführt!",
+      submitProgram: "Ausführen und bewerten",
       runProgram: "Testen",
       stopProgram: "|<",
       speed: "Ablaufgeschwindigkeit:",
