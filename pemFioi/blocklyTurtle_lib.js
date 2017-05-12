@@ -91,6 +91,10 @@ var getContext = function(display, infos) {
             turnrightamount: "drehe um %1° nach rechts ↻",
             turnleftamountvalue: "drehe um %1 nach links ↺",
             turnrightamountvalue: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_noround: "drehe um %1 Grad nach links ↺",
+            turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
+            turnleftamountvalue_options: "drehe um %1 nach links ↺",
+            turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
             penup: "hebe Stift ab",
@@ -113,6 +117,10 @@ var getContext = function(display, infos) {
             turnrightamount: "dreheRechtsGrad",
             turnleftamountvalue: "dreheLinksGrad",
             turnrightamountvalue: "dreheRechtsGrad",
+            turnleftamountvalue_noround: "dreheLinksGrad",
+            turnrightamountvalue_noround: "dreheRechtsGrad",
+            turnleftamountvalue_options: "dreheLinksGrad",
+            turnrightamountvalue_options: "dreheRechtsGrad",
             turneitheramountvalue: "dreheGrad",
             penup: "stiftHoch",
             pendown: "stiftRunter",
@@ -383,6 +391,10 @@ var getContext = function(display, infos) {
    context.turtle.turnleftamountvalue = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue = context.turtle.turnrightamount;
    context.turtle.turneitheramountvalue = context.turtle.turneitheramount;
+   context.turtle.turnleftamountvalue_noround = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_noround = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_options = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_options = context.turtle.turnrightamount;
    
 
    context.turtle.colour2 = function(colour, callback) {
@@ -412,6 +424,12 @@ var getContext = function(display, infos) {
             { name: "turnrightamount", params: [null]},
             { name: "turnleftamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
             { name: "turnrightamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
+            { name: "turnleftamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]},},
+            { name: "turnrightamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]},},
+            { name: "turnleftamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],]}]},},
+            { name: "turnrightamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],]}]},},
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
