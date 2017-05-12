@@ -90,6 +90,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.unloadLevel = function(callback) {
+      window.quickAlgoInterface.resetTestScores();
       this.context.unload();
       this.blocklyHelper.unload();
       callback();
@@ -143,7 +144,7 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.context.linkBack = true;
          subTask.context.messagePrefixSuccess = window.languageStrings.allTests;
          subTask.blocklyHelper.run(subTask.context);
-      });
+      }, true);
    };
 
    subTask.step = function () {
@@ -235,7 +236,7 @@ var initBlocklySubTask = function(subTask, language) {
       }
    };
 
-   subTask.getGrade = function(callback) {
+   subTask.getGrade = function(callback, display) {
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
       code = subTask.blocklyHelper.getFullCode(code);
@@ -271,7 +272,9 @@ var initBlocklySubTask = function(subTask, language) {
                }
             }
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
-            window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
+            if(display) {
+               window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
+            }
             if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {
                if(subTask.nbTestCases == 1) {
                   var msg = subTask.testCaseResults[iWorstTestCase].message;
