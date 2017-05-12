@@ -122,7 +122,7 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(taskInfos) {
-      this.success = undefined;
+      this.success = false;
       if (context.display) {
          context.resetDisplay();
       } else {
