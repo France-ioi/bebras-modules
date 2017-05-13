@@ -19,6 +19,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       languageStrings: window.LanguageStrings,
       startingBlock: true, 
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      unloaded: false,
 
       glowingBlock: null,
 
@@ -61,6 +62,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       load: function(language, display, nbTestCases, options) {
+         this.unloaded = false;
+
          FioiBlockly.loadLanguage(language);
 
          if(this.scratchMode) {
@@ -129,6 +132,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       unload: function() {
+         this.unloaded = true;
+
          try {
             // Need to hide the WidgetDiv before disposing of the workspace
             Blockly.WidgetDiv.hide();
@@ -253,6 +258,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       savePrograms: function() {
+         if(this.unloaded) {
+            console.error('savePrograms called after unload');
+            return;
+         }
+
          this.checkRobotStart();
 
          this.programs[this.player].javascript = $("#program").val();
