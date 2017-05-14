@@ -6,6 +6,7 @@
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
+      maxBlocks: maxBlocks,
       textFile: null,
       extended: false,
       programs: [],
@@ -163,7 +164,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(isBlockEvent) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                // Update the remaining blocks display
-               var remaining = this.workspace.remainingCapacity();
+               var remaining = this.workspace.remainingCapacity(maxBlocks);
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
@@ -438,7 +439,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          that.highlightPause = false;
          if(this.scratchMode) {
-            if(that.workspace.remainingCapacity() < 0) {
+            if(that.workspace.remainingCapacity(maxBlocks) < 0) {
                $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
                return;
             }
