@@ -148,11 +148,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       unload: function() {
          this.unloadLevel();
-         $(".blocklyDropDownDiv").remove();
-         $(".blocklyWidgetDiv").remove();
-         $(".blocklyTooltipDiv").remove();
-         Blockly.removeEvents();
-         //delete Blockly;
+         removeBlockly();
       },
 
       onChange: function(event) {
@@ -479,8 +475,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 }
 
 function removeBlockly() {
+   $(".blocklyDropDownDiv").remove();
    $(".blocklyWidgetDiv").remove();
    $(".blocklyTooltipDiv").remove();
-   document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
+   Blockly.removeEvents();
    // delete Blockly;
 }
