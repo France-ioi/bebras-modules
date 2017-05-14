@@ -65,6 +65,7 @@ Blockly.Blocks['procedures_defnoreturn'] = {
     this.arguments_ = [];
     this.setStatements_(true);
     this.statementConnection_ = null;
+    this.updatePreviews = function () {}; // Hack to avoid disconnecting blocks
   },
   /**
    * Add or remove the statement block from this function definition.
@@ -365,6 +366,7 @@ Blockly.Blocks['procedures_defreturn'] = {
     this.arguments_ = [];
     this.setStatements_(true);
     this.statementConnection_ = null;
+    this.updatePreviews = function () {}; // Hack to avoid disconnecting blocks
   },
   setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
   updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
