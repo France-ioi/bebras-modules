@@ -131,8 +131,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
       },
 
-      unload: function() {
-         this.unloaded = true;
+      unloadLevel: function() {
+         this.unloaded = true; // Prevents from saving programs after unload
 
          try {
             // Need to hide the WidgetDiv before disposing of the workspace
@@ -143,14 +143,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             try {
                ws.dispose();
             } catch(e) {}
-            // TODO: this should be in a global unload function
-            if (false) {
-               $(".blocklyWidgetDiv").remove();
-               $(".blocklyTooltipDiv").remove();
-               document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-               //delete Blockly;
-            }
          }
+      },
+
+      unload: function() {
+         this.unloadLevel();
+         $(".blocklyDropDownDiv").remove();
+         $(".blocklyWidgetDiv").remove();
+         $(".blocklyTooltipDiv").remove();
+         Blockly.removeEvents();
+         //delete Blockly;
       },
 
       onChange: function(event) {
