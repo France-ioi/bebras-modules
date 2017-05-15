@@ -92,11 +92,16 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.unloadLevel = function(callback) {
       window.quickAlgoInterface.resetTestScores();
       this.context.unload();
-      this.blocklyHelper.unload();
+      this.blocklyHelper.unloadLevel();
       callback();
    };
 
-   subTask.unload = subTask.unloadLevel;
+   subTask.unload = function(callback) {
+      subTask.unloadLevel(function () {
+         this.blocklyHelper.unload();
+         callback();
+      });
+   };
 
    subTask.reset = function() {
       this.context.reset();

@@ -64,7 +64,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(codeWorkspace.remainingCapacity() < 0) {
+         if(codeWorkspace.remainingCapacity(this.maxBlocks) < 0) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }

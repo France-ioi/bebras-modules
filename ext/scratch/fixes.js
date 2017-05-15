@@ -310,10 +310,12 @@ Blockly.Connection.prototype.connect_ = function(childConnection) {
 
 Blockly.Workspace.prototype.getFlyout = function () { return null; };
 
-Blockly.Workspace.prototype.remainingCapacity = function() {
-  var maxBlocks = this.maxBlocks();
+Blockly.Workspace.prototype.remainingCapacity = function(maxBlocks) {
   if (!maxBlocks) {
-    return Infinity;
+    maxBlocks = this.maxBlocks();
+    if (!maxBlocks) {
+      return Infinity;
+    }
   }
 
   // Count number of blocks

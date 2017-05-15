@@ -6,6 +6,7 @@
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
+      maxBlocks: maxBlocks,
       textFile: null,
       extended: false,
       programs: [],
@@ -19,6 +20,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       languageStrings: window.LanguageStrings,
       startingBlock: true, 
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      unloaded: false,
 
       glowingBlock: null,
 
@@ -61,6 +63,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       load: function(language, display, nbTestCases, options) {
+         this.unloaded = false;
+
          FioiBlockly.loadLanguage(language);
 
          if(this.scratchMode) {
@@ -128,7 +132,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
       },
 
-      unload: function() {
+      unloadLevel: function() {
+         this.unloaded = true; // Prevents from saving programs after unload
+
          try {
             // Need to hide the WidgetDiv before disposing of the workspace
             Blockly.WidgetDiv.hide();
@@ -138,14 +144,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             try {
                ws.dispose();
             } catch(e) {}
-            // TODO: this should be in a global unload function
-            if (false) {
-               $(".blocklyWidgetDiv").remove();
-               $(".blocklyTooltipDiv").remove();
-               document.removeEventListener("keydown", Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
-               //delete Blockly;
-            }
          }
+      },
+
+      unload: function() {
+         this.unloadLevel();
+         removeBlockly();
       },
 
       onChange: function(event) {
@@ -160,7 +164,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(isBlockEvent) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                // Update the remaining blocks display
-               var remaining = this.workspace.remainingCapacity();
+               var remaining = this.workspace.remainingCapacity(maxBlocks);
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
@@ -253,6 +257,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       savePrograms: function() {
+         if(this.unloaded) {
+            console.error('savePrograms called after unload');
+            return;
+         }
+
          this.checkRobotStart();
 
          this.programs[this.player].javascript = $("#program").val();
@@ -430,7 +439,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          that.highlightPause = false;
          if(this.scratchMode) {
-            if(that.workspace.remainingCapacity() < 0) {
+            if(that.workspace.remainingCapacity(maxBlocks) < 0) {
                $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
                return;
             }
@@ -467,8 +476,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 }
 
 function removeBlockly() {
+   $(".blocklyDropDownDiv").remove();
    $(".blocklyWidgetDiv").remove();
    $(".blocklyTooltipDiv").remove();
-   document.removeEventListener("keydown"); //, Blockly.onKeyDown_); // TODO: find correct way to remove all event listeners
+   Blockly.removeEvents();
    // delete Blockly;
 }

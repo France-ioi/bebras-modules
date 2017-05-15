@@ -28,16 +28,15 @@ body {
 }
 #dualViewLeft {
    display: inline-block;
+   vertical-align: top;
    width: 49%;
    padding-right: 4px;
 }
 #dualViewRight {
    display: inline-block;
+   vertical-align: top;
    width: 49%;
    height: 100%;
-   position: absolute;
-   top: 0px;
-   left: 50%;
    border-left: 1px solid black;
    padding-left: 4px;
    padding-top: 40px;
