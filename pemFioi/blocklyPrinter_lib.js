@@ -1,4 +1,4 @@
-"use strict";
+
 
 function escapeHtml(unsafe) {
     return unsafe
