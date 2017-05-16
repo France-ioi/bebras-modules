@@ -17,7 +17,7 @@ function initOpenAnswer(selector, btnLabel, savedMsg) {
       '</button></div>');
 
     area.find('.openAnswerBtn').click(function () {
-      platform.validate('next', function () {});
+      platform.validate('stay', function () {});
     });
 
     $('body').append('<div id="displayHelperAnswering" style="display: none;"></div>');
@@ -36,7 +36,7 @@ function initOpenAnswer(selector, btnLabel, savedMsg) {
   };
 
   task.reloadAnswer = function(strAnswer, callback) {
-     $(selector).find('.openAnswerArea').val(strAnswer);
+     $(selector).find('.openAnswerArea').val(JSON.parse(strAnswer));
      callback();
   };
 
