@@ -36,7 +36,10 @@ function initOpenAnswer(selector, btnLabel, savedMsg) {
   };
 
   task.reloadAnswer = function(strAnswer, callback) {
-     $(selector).find('.openAnswerArea').val(JSON.parse(strAnswer));
+     try {
+        strAnswer = JSON.parse(strAnswer);
+     } catch(e) {}
+     $(selector).find('.openAnswerArea').val(strAnswer);
      callback();
   };
 
