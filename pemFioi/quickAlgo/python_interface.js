@@ -59,6 +59,8 @@ function LogicController(nbTestCases, maxInstructions) {
     this.stop();
   };
 
+  this.unloadLevel = this.unload;
+
   this.getCodeFromXml = function (code, lang) {
     // TODO :: rename
     return code;
