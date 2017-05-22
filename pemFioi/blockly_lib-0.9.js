@@ -94,7 +94,7 @@ var languageStrings = {
       valueFalse: 'faux',
       correctAnswer: 'Réponse correcte',
       partialAnswer: 'Réponse améliorable',
-      wrongAnswer: 'Réponse inconnecte',
+      wrongAnswer: 'Réponse incorrecte',
       resultsNoSuccess: "Vous n'avez validé aucun test.",
       resultsPartialSuccess: "Vous avez validé seulement {nbSuccess} test(s) sur {nbTests}.",
       gradingInProgress: "Évaluation en cours"
