@@ -353,17 +353,17 @@ function LogicController(nbTestCases, maxInstructions) {
     }
 
     if(pflInfos.allowed.length == 1) {
-      pythonHtml += '<p>Le mot-clé suivant est autorisé : <code>' + pflInfos.allowed[0] + '</code></p>';
+      pythonHtml += '<p>Le mot-clé suivant est autorisé : <code>' + pflInfos.allowed[0] + '</code>.</p>';
     } else if (pflInfos.allowed.length > 0) {
-      pythonHtml += '<p>Les mots-clés suivants sont autorisés : <code>' + pflInfos.allowed.join('</code>, <code>') + '</code></p>';
+      pythonHtml += '<p>Les mots-clés suivants sont autorisés : <code>' + pflInfos.allowed.join('</code>, <code>') + '</code>.</p>';
     }
     if(pflInfos.forbidden.length == 1) {
-      pythonHtml += '<p>Le mot-clé suivant est interdit : <code>' + pflInfos.forbidden[0] + '</code></p>';
+      pythonHtml += '<p>Le mot-clé suivant est interdit : <code>' + pflInfos.forbidden[0] + '</code>.</p>';
     } else if(pflInfos.forbidden.length > 0) {
-      pythonHtml += '<p>Les mots-clés suivants sont interdits : <code>' + pflInfos.forbidden.join('</code>, <code>') + '</code></p>';
+      pythonHtml += '<p>Les mots-clés suivants sont interdits : <code>' + pflInfos.forbidden.join('</code>, <code>') + '</code>.</p>';
     }
 
-    pythonHtml += '<p>Vous êtes autorisé à lire de la documentation sur python ou utiliser un moteur de recherche pendant le concours.</p>';
+    pythonHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python ou utiliser un moteur de recherche pendant le concours.</p>';
     pythonDiv.html(pythonHtml);
   };
 
