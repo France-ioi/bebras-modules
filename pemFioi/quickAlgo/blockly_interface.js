@@ -21,6 +21,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       startingBlock: true, 
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       unloaded: false,
+      quickAlgoInterface: window.quickAlgoInterface,
 
       glowingBlock: null,
 
@@ -183,7 +184,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                this.glowBlock(null);
             }
 
-            window.quickAlgoInterface.resetTestScores();
+            if(this.quickAlgoInterface) {
+               this.quickAlgoInterface.resetTestScores();
+            }
          } else {
             Blockly.svgResize(this.workspace);
          }
