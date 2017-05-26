@@ -1103,6 +1103,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='lists_append'></block>"
                },
             ],
+            // Note :: this category is not enabled unless explicitly specified
             colour: [
                {
                   name: "colour_picker", 
@@ -1427,7 +1428,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(this.scratchMode) {
                this.includeBlocks.standardBlocks.wholeCategories = ["control", "lists", "operator", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "colour", "dicts", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "variables", "functions"];
             }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
