@@ -865,6 +865,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='text'></block>"
                },
                {
+                  name: "text_print", 
+                  blocklyXml: "<block type='text_print'>" +
+                              "  <value name='TEXT'>" +
+                              "    <shadow type='text'>" +
+                              "      <field name='TEXT'>abc</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "text_print_noend", 
+                  blocklyXml: "<block type='text_print_noend'>" +
+                              "  <value name='TEXT'>" +
+                              "    <shadow type='text'>" +
+                              "      <field name='TEXT'>abc</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
                   name: "text_join", 
                   blocklyXml: "<block type='text_join'></block>"
                },
@@ -980,17 +1000,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "text_trim_noShadow", 
-                  blocklyXml: "<block type='text_trim'></block>"
-               },
-               {
-                  name: "text_print", 
-                  blocklyXml: "<block type='text_print'>" +
-                              "  <value name='TEXT'>" +
-                              "    <shadow type='text'>" +
-                              "      <field name='TEXT'>abc</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>",
+                  blocklyXml: "<block type='text_trim'></block>",
                   excludedByDefault: true,
                },
                {
@@ -1210,6 +1220,24 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                      blocklyXml: "<block type='control_repeat_until'></block>"
                   }
                ],
+            input: [
+               { 
+                  name: "input_num", 
+                  blocklyXml: "<block type='input_num'></block>"
+               },
+               { 
+                  name: "input_char", 
+                  blocklyXml: "<block type='input_char'></block>"
+               },
+               { 
+                  name: "input_word", 
+                  blocklyXml: "<block type='input_word'></block>"
+               },
+               { 
+                  name: "input_line", 
+                  blocklyXml: "<block type='input_line'></block>"
+               },
+            ],
             lists: [
                   {
                      name: "data_listrepeat",
@@ -1331,6 +1359,28 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   }
                ],
+            texts: [
+               {
+                  name: "text_print", 
+                  blocklyXml: "<block type='text_print'>" +
+                              "  <value name='TEXT'>" +
+                              "    <shadow type='text'>" +
+                              "      <field name='TEXT'>abc</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               {
+                  name: "text_print_noend", 
+                  blocklyXml: "<block type='text_print_noend'>" +
+                              "  <value name='TEXT'>" +
+                              "    <shadow type='text'>" +
+                              "      <field name='TEXT'>abc</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"
+               },
+               ],
             variables: [],
             functions: []
          };
@@ -1426,7 +1476,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          if (this.includeBlocks.standardBlocks.includeAll) {
             if(this.scratchMode) {
-               this.includeBlocks.standardBlocks.wholeCategories = ["control", "lists", "operator", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "texts", "variables", "functions"];
             } else {
                this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "variables", "functions"];
             }

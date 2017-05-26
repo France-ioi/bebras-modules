@@ -437,6 +437,16 @@ Blockly.is3dSupported = function() {
 };
 
 
+Blockly.Colours['input'] = {
+    'primary': '#891431',
+    'secondary': '#840A28',
+    'tertiary': '#630D23'};
+
+Blockly.Colours['texts'] = {
+    'primary': '#18BC85',
+    'secondary': '#0DA572',
+    'tertiary': '#128E65'};
+
 Blockly.Blocks['control_repeat'] = {
   /**
    * Block for repeat n times (external number).
@@ -863,6 +873,31 @@ Blockly.Blocks['operator_join'] = {
   }
 };
 
+Blockly.Blocks['text_print'] = {
+  /**
+   * Block for print statement.
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "message0": Blockly.Msg.TEXT_PRINT_TITLE,
+      "args0": [
+        {
+          "type": "input_value",
+          "name": "TEXT"
+        }
+      ],
+      "previousStatement": null,
+      "nextStatement": null,
+      "colour": Blockly.Colours.texts.primary,
+      "colourSecondary": Blockly.Colours.texts.secondary,
+      "colourTertiary": Blockly.Colours.texts.tertiary,
+      "tooltip": Blockly.Msg.TEXT_PRINT_TOOLTIP,
+      "helpUrl": Blockly.Msg.TEXT_PRINT_HELPURL
+    });
+  }
+};
+
 Blockly.JavaScript['control_if'] = function(block) {
   // If/then condition.
   var n = 0;
@@ -1219,7 +1254,7 @@ Blockly.Python['data_setvariableto'] = function(block) {
   } else {
     var varName = 'unnamed_variable'; // Block is still loading
   }
-  return 'var ' + varName + ' = ' + argument0 + ';\n';
+  return varName + ' = ' + argument0 + ';\n';
 }
 
 Blockly.Python['data_changevariableby'] = function(block) {
