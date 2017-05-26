@@ -1093,8 +1093,195 @@ Blockly.JavaScript['operator_join'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_ADDITION];
 }
 
-// TODO :: Python generation
-Blockly.Python['control_if'] = function(block) { return '# Error: control_if not implemented in Python!'; }
-Blockly.Python['control_if_else'] = function(block) { return '# Error: control_if_else not implemented in Python!'; }
-Blockly.Python['control_if_repeat'] = function(block) { return '# Error: control_repeat not implemented in Python!'; }
-Blockly.Python['operator_not'] = function(block) { return '# Error: operator_not not implemented in Python!'; }
+
+Blockly.Python['control_if'] = function(block) {
+  var argument = Blockly.Python.valueToCode(block, 'CONDITION',
+      Blockly.Python.ORDER_NONE) || 'False';
+  var branch = Blockly.Python.statementToCode(block, 'SUBSTACK') ||
+      Blockly.Python.PASS;
+  var code = 'if ' + argument + ':\n' + branch;
+  return code;
+}
+
+Blockly.Python['control_if_else'] = function(block) {
+  var argument = Blockly.Python.valueToCode(block, 'CONDITION',
+      Blockly.Python.ORDER_NONE) || 'False';
+  var branch = Blockly.Python.statementToCode(block, 'SUBSTACK') ||
+      Blockly.Python.PASS;
+  var code = 'if ' + argument + ':\n' + branch;
+  branch = Blockly.Python.statementToCode(block, 'SUBSTACK2') ||
+      Blockly.Python.PASS;
+  code += 'else:\n' + branch;
+  return code;
+}
+
+Blockly.Python['control_repeat'] = function(block) {
+  // Repeat n times.
+  if (block.getField('TIMES')) {
+    // Internal number.
+    var repeats = String(parseInt(block.getFieldValue('TIMES'), 10));
+  } else {
+    // External number.
+    var repeats = Blockly.Python.valueToCode(block, 'TIMES',
+        Blockly.Python.ORDER_NONE) || '0';
+  }
+  if (Blockly.isNumber(repeats)) {
+    repeats = parseInt(repeats, 10);
+  } else {
+    repeats = 'int(' + repeats + ')';
+  }
+  var branch = Blockly.Python.statementToCode(block, 'SUBSTACK');
+  branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+      Blockly.Python.PASS;
+  var loopVar = Blockly.Python.variableDB_.getDistinctName(
+      'count', Blockly.Variables.NAME_TYPE);
+  var code = 'for ' + loopVar + ' in range(' + repeats + '):\n' + branch;
+  return code;
+}
+
+Blockly.Python['control_repeat_until'] = function(block) {
+  var argument0 = Blockly.Python.valueToCode(block, 'CONDITION',
+      Blockly.Python.ORDER_LOGICAL_NOT) || 'False';
+  var branch = Blockly.Python.statementToCode(block, 'SUBSTACK');
+  branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+      Blockly.Python.PASS;
+  return 'while not ' + argument0 + ':\n' + branch;
+}
+
+Blockly.Python['operator_not'] = function(block) {
+   var b = Blockly.Python.ORDER_LOGICAL_NOT;
+   return["not "+ (Blockly.Python.valueToCode(block, "OPERAND", b) || "True"), b]
+}
+
+Blockly.Python['data_listrepeat'] = function(block) {
+  // Create a list with one element repeated.
+  var item = Blockly.Python.valueToCode(block, 'ITEM',
+      Blockly.Python.ORDER_NONE) || 'None';
+  var times = Blockly.Python.valueToCode(block, 'TIMES',
+      Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
+  var code = '[' + item + '] * ' + times;
+
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.JavaScript.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  return varName + ' = ' + code + '\n';
+}
+
+Blockly.Python['data_itemoflist'] = function(block) {
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+
+  var at = Blockly.Python.getAdjustedInt(block, 'INDEX');
+  var code = varName + '[' + at + ']';
+  return [code, Blockly.Python.ORDER_MEMBER];
+}
+
+Blockly.Python['data_replaceitemoflist'] = function(block) {
+  var blockVarName = block.getFieldValue('LIST');
+  if(blockVarName) {
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+
+  var value = Blockly.Python.valueToCode(block, 'ITEM',
+      Blockly.Python.ORDER_ASSIGNMENT) || 'null';
+  var at = Blockly.Python.getAdjustedInt(block, 'INDEX');
+  return varName + '[' + at + '] = ' + value + '\n';
+}
+
+Blockly.Python['data_variable'] = function(block) {
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  return [varName, Blockly.Python.ORDER_ATOMIC];
+}
+
+Blockly.Python['data_setvariableto'] = function(block) {
+  if (block.getField("VALUE")) {
+     var argument0 = String(Number(block.getFieldValue("VALUE")));
+  } else {
+     var argument0 = Blockly.Python.valueToCode(block, "VALUE", Blockly.Python.ORDER_ASSIGNMENT) || "0";
+  }
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  return 'var ' + varName + ' = ' + argument0 + ';\n';
+}
+
+Blockly.Python['data_changevariableby'] = function(block) {
+  var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
+      Blockly.Python.ORDER_ASSIGNMENT) || '0';
+  var blockVarName = block.getVariableField();
+  if(blockVarName) {
+    var varName = Blockly.Python.variableDB_.getName(blockVarName, Blockly.Variables.NAME_TYPE);
+  } else {
+    var varName = 'unnamed_variable'; // Block is still loading
+  }
+  return varName + ' += ' + argument0 + ';\n';
+}
+
+Blockly.Python['text'] = function(block) {
+  var val = block.getFieldValue('TEXT');
+  if(val.search(/^\d+$/) < 0) {
+    // string
+    var code = Blockly.Python.quote_(val);
+  } else {
+    // int
+    var code = val;
+  }
+  return [code, Blockly.Python.ORDER_ATOMIC];
+}
+
+Blockly.Python['operators'] = function(block) {
+  var nameToOp = {
+    'operator_add': {op: '+', varname: 'NUM', order: Blockly.Python.ORDER_ADDITION},
+    'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_SUBTRACTION},
+    'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATION},
+    'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_DIVISION},
+    'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_EQUALITY},
+    'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_and': {op: 'and', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_AND},
+    'operator_or': {op: 'or', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_OR}
+  };
+  var opInfo = nameToOp[block.type];
+  var argument0 = Blockly.Python.valueToCode(block, opInfo.varname+'1', opInfo.order) || '0';
+  if(argument0 == 'NaN') { argument0 = '0'; };
+  var argument1 = Blockly.Python.valueToCode(block, opInfo.varname+'2', opInfo.order) || '0';
+  if(argument1 == 'NaN') { argument1 = '0'; };
+  var code = argument0 + ' ' + opInfo.op + ' ' + argument1;
+  return [code, opInfo.order];
+}
+
+Blockly.Python['operator_add'] = Blockly.Python['operators'];
+Blockly.Python['operator_subtract'] = Blockly.Python['operators'];
+Blockly.Python['operator_multiply'] = Blockly.Python['operators'];
+Blockly.Python['operator_divide'] = Blockly.Python['operators'];
+Blockly.Python['operator_equals'] = Blockly.Python['operators'];
+Blockly.Python['operator_gt'] = Blockly.Python['operators'];
+Blockly.Python['operator_lt'] = Blockly.Python['operators'];
+Blockly.Python['operator_and'] = Blockly.Python['operators'];
+Blockly.Python['operator_or'] = Blockly.Python['operators'];
+
+Blockly.Python['operator_join'] = function(block) {
+  var argument0 = Blockly.Python.valueToCode(block, 'STRING1', Blockly.Python.ORDER_NONE) || '';
+  if(argument0 == 'NaN') { argument0 = ''; };
+  var argument1 = Blockly.Python.valueToCode(block, 'STRING2', Blockly.Python.ORDER_NONE) || '';
+  if(argument1 == 'NaN') { argument1 = ''; };
+  var code = '"%s%s" % (' + argument0 + ', ' + argument1 + ')';
+  return [code, Blockly.Python.ORDER_MULTIPLICATIVE];
+}
