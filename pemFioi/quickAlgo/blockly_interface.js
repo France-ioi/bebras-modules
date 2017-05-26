@@ -76,6 +76,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (!options.divId) options.divId = 'blocklyDiv';
 
          this.strings = window.languageStrings;
+         if (options.startingBlockName) {
+            this.strings.startingBlockName = options.startingBlockName;
+         }
          
          if (display) {
             this.loadHtml(nbTestCases);
