@@ -26,6 +26,7 @@ requirejs.config({
     "fioi-video-player": modulesPath+"/pemFioi/videoPlayer-1.0",
     "limitsDirective": taskPlatformPath+"/limits/directive",
     "hintsDirective": taskPlatformPath+"/hints/directive",
+    "selectLang": taskPlatformPath+"/selectLang",
     "showdown": modulesPath+"/ext/showdown/showdown.min",
     "showdownConvert": modulesPath+"/pemFioi/showdownConvert",
     "showSource": taskPlatformPath+"/showSource",
@@ -45,6 +46,7 @@ requirejs.config({
     "pem-api": {"deps": ["taskController", "platform-pr","angular-ui-ace", 'lodash']},
     "limitsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "hintsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
+    "selectLang": {"deps": ["taskController"]},
     "showdownConvert": {"deps": ["showdown"]},
     "showSource": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "showSample": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
@@ -55,7 +57,7 @@ requirejs.config({
   }
 });
 require([
-  'angular', 'angular-ui-bootstrap-tpls', 'angular-ui-ace',
+  'angular', 'angular-ui-bootstrap-tpls', 'angular-ui-ace', 'selectLang',
   'fioi-editor2', 'jquery', 'lodash',
   'jschannel', 'platform-pr',
   'miniPlatform', 'fioi-task-tools',
