@@ -1174,6 +1174,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
             ],
+            // dicts category is not included unless explicitly specified
+            // TODO :: add a dict_set block, reactivate the category
             dicts: [
                { 
                   name: "dict_get_literal", 
@@ -1478,7 +1480,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(this.scratchMode) {
                this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "texts", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "variables", "functions"];
             }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
