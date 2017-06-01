@@ -64,7 +64,11 @@ var initBlocklySubTask = function(subTask, language) {
 
       this.blocklyHelper.setIncludeBlocks(extractLevelSpecific(this.context.infos.includeBlocks, curLevel));
 
-      this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length);
+      var blocklyOptions = {
+         readOnly: !!subTask.taskParams.readOnly
+         };
+
+      this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 
       if(this.display) {
          window.quickAlgoInterface.initTestSelector(this.nbTestCases);
