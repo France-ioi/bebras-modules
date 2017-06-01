@@ -97,8 +97,9 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.unload = function(callback) {
+      var that = this;
       subTask.unloadLevel(function () {
-         this.blocklyHelper.unload();
+         that.blocklyHelper.unload();
          callback();
       });
    };
