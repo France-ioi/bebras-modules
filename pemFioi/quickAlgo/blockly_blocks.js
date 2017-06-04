@@ -97,6 +97,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
          var code = code.join("\n");
+         code += "\n";
          code += comments.join("\n");
          return code;
       },
