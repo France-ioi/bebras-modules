@@ -1194,7 +1194,7 @@ Blockly.Python['data_listrepeat'] = function(block) {
       Blockly.Python.ORDER_NONE) || 'None';
   var times = Blockly.Python.valueToCode(block, 'TIMES',
       Blockly.Python.ORDER_MULTIPLICATIVE) || '0';
-  var code = '[' + item + '] * ' + times;
+  var code = '[' + item + '] * (' + times + ')';
 
   var blockVarName = block.getFieldValue('LIST');
   if(blockVarName) {
