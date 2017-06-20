@@ -519,6 +519,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='input_num'></block>"
                },
                { 
+                  name: "input_num_next", 
+                  blocklyXml: "<block type='input_num_next'></block>"
+               },
+               { 
                   name: "input_char", 
                   blocklyXml: "<block type='input_char'></block>"
                },
@@ -530,6 +534,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   name: "input_line", 
                   blocklyXml: "<block type='input_line'></block>"
                },
+               { 
+                  name: "input_num_list", 
+                  blocklyXml: "<block type='input_num_list'></block>"
+               }
             ],
             logic: [
                {
