@@ -519,6 +519,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='input_num'></block>"
                },
                { 
+                  name: "input_num_list", 
+                  blocklyXml: "<block type='input_num_list'></block>"
+               },
+               { 
+                  name: "input_line", 
+                  blocklyXml: "<block type='input_line'></block>"
+               },
+               { 
                   name: "input_num_next", 
                   blocklyXml: "<block type='input_num_next'></block>"
                },
@@ -529,14 +537,6 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                { 
                   name: "input_word", 
                   blocklyXml: "<block type='input_word'></block>"
-               },
-               { 
-                  name: "input_line", 
-                  blocklyXml: "<block type='input_line'></block>"
-               },
-               { 
-                  name: "input_num_list", 
-                  blocklyXml: "<block type='input_num_list'></block>"
                }
             ],
             logic: [
@@ -1237,17 +1237,25 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   blocklyXml: "<block type='input_num'></block>"
                },
                { 
+                  name: "input_num_list", 
+                  blocklyXml: "<block type='input_num_list'></block>"
+               },
+               { 
+                  name: "input_line", 
+                  blocklyXml: "<block type='input_line'></block>"
+               },
+               { 
+                  name: "input_num_next", 
+                  blocklyXml: "<block type='input_num_next'></block>"
+               },
+               { 
                   name: "input_char", 
                   blocklyXml: "<block type='input_char'></block>"
                },
                { 
                   name: "input_word", 
                   blocklyXml: "<block type='input_word'></block>"
-               },
-               { 
-                  name: "input_line", 
-                  blocklyXml: "<block type='input_line'></block>"
-               },
+               }
             ],
             lists: [
                   {
