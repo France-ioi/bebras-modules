@@ -1104,6 +1104,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
+                  name: "lists_sort_place", 
+                  blocklyXml: "<block type='lists_sort_place'></block>"
+               },
+               {
                   name: "lists_sort", 
                   blocklyXml: "<block type='lists_sort'></block>"
                },
@@ -1183,20 +1187,22 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   excludedByDefault: true,
                },
             ],
-            // dicts category is not included unless explicitly specified
-            // TODO :: add a dict_set block, reactivate the category
             dicts: [
+               { 
+                  name: "dicts_create_with", 
+                  blocklyXml: "<block type='dicts_create_with'></block>"
+               },
                { 
                   name: "dict_get_literal", 
                   blocklyXml: "<block type='dict_get_literal'></block>"
                },
                { 
-                  name: "dict_keys", 
-                  blocklyXml: "<block type='dict_keys'></block>"
+                  name: "dict_set_literal", 
+                  blocklyXml: "<block type='dict_set_literal'></block>"
                },
                { 
-                  name: "dicts_create_with", 
-                  blocklyXml: "<block type='dicts_create_with'></block>"
+                  name: "dict_keys", 
+                  blocklyXml: "<block type='dict_keys'></block>"
                },
             ],
             variables: [],
@@ -1497,7 +1503,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(this.scratchMode) {
                this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "texts", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "variables", "functions"];
+               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "variables", "functions"];
             }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
