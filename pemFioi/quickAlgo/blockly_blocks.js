@@ -1306,6 +1306,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "    </shadow>" +
                                  "  </value>" +
                                  "</block>"
+                  },
+                  {
+                     name: "lists_sort_place",
+                     blocklyXml: "<block type='lists_sort_place'></block>"
                   }
                ],
             math: [
