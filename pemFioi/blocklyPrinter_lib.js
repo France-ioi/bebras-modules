@@ -11,6 +11,33 @@ function escapeHtml(unsafe) {
 
 var getContext = function(display, infos) {
    var localLanguageStrings = {
+      fr: {
+         label: {
+            print: "écrire",
+            read: "lies Zeile",
+            readInteger: "lies Zeile als ganze Zahl",
+            readFloat: "lies Zeile als Komma-Zahl",
+            eof: "Ende der Eingabe",
+         },
+         code: {
+            print: "schreibe",
+            read: "lies",
+            readInteger: "liesGanzzahl",
+            readFloat: "liesKommazahl",
+            eof: "eingabeEnde",
+         },
+         startingBlockName: "Programm",
+         messages: {
+             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
+             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
+            tooFewChars: "Zeile zu kurz: Zeile ",
+            tooManyChars: "Zeile zu lang: Zeile ",
+            tooFewLines: "Zu wenig Zeilen ausgegeben",
+            tooManyLines: "Zu viele Zeilen ausgegeben",
+            correctOutput: "Die Ausgabe ist richtig!",
+            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
+         }
+      },
       de: {
          label: {
             print: "schreibe",
