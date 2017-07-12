@@ -91,8 +91,7 @@ var languageScripts = function () {
          'scratch_fixes',
          'blockly_' + strLang,
          'blockly_lib',
-         'blockly_lib_css',
-         'blocklyRobot_lib'
+         'blockly_lib_css'
       ],
       python: [
          'python_count',
@@ -110,8 +109,7 @@ var languageScripts = function () {
          'python_logic',
          'python_css',
          'python_subtask',
-         'python_python',
-         'blocklyRobot_lib'
+         'python_python'
       ]
    }
 }
