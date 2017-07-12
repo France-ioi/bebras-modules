@@ -14,8 +14,8 @@ var getContext = function(display, infos) {
       fr: {
          label: {
             print: "écrire",
-            read: "lies Zeile",
-            readInteger: "lies Zeile als ganze Zahl",
+            read: "lire une ligne",
+            readInteger: "lire un entier sur une ligne",
             readFloat: "lies Zeile als Komma-Zahl",
             eof: "Ende der Eingabe",
          },
@@ -36,6 +36,7 @@ var getContext = function(display, infos) {
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
+         }, description: {
          }
       },
       de: {
@@ -63,6 +64,7 @@ var getContext = function(display, infos) {
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
+         }, description: {
          }
       }
    }
