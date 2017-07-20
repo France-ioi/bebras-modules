@@ -26,6 +26,8 @@ var getContext = function(display, infos) {
             readFloat: "liesKommazahl",
             eof: "eingabeEnde",
          },
+         description: {
+         },
          startingBlockName: "Programm",
          messages: {
              outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
@@ -53,6 +55,8 @@ var getContext = function(display, infos) {
             readInteger: "liesGanzzahl",
             readFloat: "liesKommazahl",
             eof: "eingabeEnde",
+         },
+         description: {
          },
          startingBlockName: "Programm",
          messages: {
@@ -196,8 +200,8 @@ var getContext = function(display, infos) {
          callback = value;
          value = "";
       }
-      
-      context.printer.output_text += value + "\n";
+
+      context.printer.output_text += value.data + "\n";
       context.updateScale();
       
       context.waitDelay(callback);
