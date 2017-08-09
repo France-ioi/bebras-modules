@@ -263,7 +263,20 @@ var initBlocklySubTask = function(subTask, language) {
       }
 
       initBlocklyRunner(subTask.context, function(message, success) {
-         subTask.testCaseResults[subTask.iTestCase] = subTask.levelGridInfos.computeGrade(subTask.context, message);
+         var computeGrade = function(context, message) {
+            var rate = 0;
+            if (context.success) {
+               rate = 1;
+            }
+            return {
+               successRate: rate,
+               message: message
+            };
+         }
+         if (subTask.levelGridInfos.computeGrade != undefined) {
+            computeGrade = subTask.levelGridInfos.computeGrade;
+         }
+         subTask.testCaseResults[subTask.iTestCase] = computeGrade(subTask.context, message)
          subTask.iTestCase++;
          if (subTask.iTestCase < subTask.nbTestCases) {
             initContextForLevel(subTask.iTestCase);

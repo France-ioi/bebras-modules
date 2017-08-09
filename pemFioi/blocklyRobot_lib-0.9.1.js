@@ -149,6 +149,10 @@ var getContext = function(display, infos, curLevel) {
             alreadyTransporting: "Le robot transporte déjà un objet",
             notTransporting: "Le robot essaie de déposer un objet mais n'en transporte pas.",
             successDroppedAllObjects: "Bravo, vous avez déposé toutes les objets !",
+            successMarkersPainted: "Bravo, votre robot a peint le motif !",
+            failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
+            successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
+            failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
             leavesGrid: "Le robot sort de la grille !",
          },
          description: { 
@@ -346,6 +350,10 @@ var getContext = function(display, infos, curLevel) {
             alreadyTransporting: "Der Roboter transportiert bereits etwas.",
             notTransporting: "Der Roboter versucht etwas abzulegen, transportiert aber gar nichts.",
             successDroppedAllObjects: "Bravo! Du hast alle Sachen abgelegt.",
+            successMarkersPainted: "Bravo, votre robot a peint le motif !",
+            failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
+            successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
+            failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
             leavesGrid: "Der Roboter hat das Gitter verlassen!",
          },
          description: {
@@ -517,6 +525,10 @@ var getContext = function(display, infos, curLevel) {
             alreadyTransporting: "Le robot transporte déjà un objet",
             notTransporting: "Le robot essaie de déposer un objet mais n'en transporte pas.",
             successDroppedAllObjects: "Bravo, vous avez déposé toutes les objets !",
+            successMarkersPainted: "Bravo, votre robot a peint le motif !",
+            failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
+            successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
+            failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
             leavesGrid: "Le robot sort de la grille !",
          },
          description: { 
@@ -1825,4 +1837,49 @@ var getContext = function(display, infos, curLevel) {
    };
 
    return context;
+};
+
+
+var robotEndConditions = {
+   checkMarkersPainted: function(context, lastTurn) {
+      var solved = true;
+      for (var iRow = 0; iRow < context.tiles.length; iRow++) {
+         var row = context.tiles[iRow];
+         for (var iCol = 0; iCol < row.length; iCol++) {
+            var markers = context.getItems(iRow, iCol, {isMarker: true});
+            var paint = context.getItems(iRow, iCol, {isPaint: true});
+            if (paint.length != markers.length) {
+               solved = false;
+            }
+         }
+      }
+      if (solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successMarkersPainted);
+      }
+      if (lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureMarkersPainted);
+      }
+   },
+   checkPickedAllCollectibles: function(context, lastTurn) {
+      var solved = true;
+      for (var iRow = 0; iRow < context.tiles.length; iRow++) {
+         var row = context.tiles[iRow];
+         for (var iCol = 0; iCol < row.length; iCol++) {
+            var collectibles = context.getItems(iRow, iCol, {isCollectible: true});
+            if (collectibles.length != 0) {
+               solved = false;
+            }
+         }
+      }
+      if (solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPickedAllCollectibles);
+      }
+      if (lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePickedAllCollectibles);
+      }
+   }
 };
