@@ -153,6 +153,12 @@ var getContext = function(display, infos, curLevel) {
             failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
             successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
             failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
+            successReachGeenArea: "Bravo, le robot a atteint la zone verte !",
+            failureReachGeenArea: "Le robot n'a pas atteint la zone verte !",
+            successOneMarbleInHole: "Bravo, vous avez rangé la bille&nbsp;!",
+            successAllMarblesInHoles: "Bravo, vous avez rangé toutes les billes&nbsp;!",
+            failureOneMarbleInHole: "La bille est mal rangée !",
+            failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
             leavesGrid: "Le robot sort de la grille !",
          },
          description: { 
@@ -354,6 +360,12 @@ var getContext = function(display, infos, curLevel) {
             failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
             successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
             failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
+            successReachGeenArea: "Bravo, le robot a atteint la zone verte !",
+            failureReachGeenArea: "Le robot n'a pas atteint la zone verte !",
+            successOneMarbleInHole: "Bravo, vous avez rangé la bille&nbsp;!",
+            successAllMarblesInHoles: "Bravo, vous avez rangé toutes les billes&nbsp;!",
+            failureOneMarbleInHole: "La bille est mal rangée !",
+            failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
             leavesGrid: "Der Roboter hat das Gitter verlassen!",
          },
          description: {
@@ -529,6 +541,12 @@ var getContext = function(display, infos, curLevel) {
             failureMarkersPainted: "Le robot n'a pas peint les bonnes cases.",
             successPickedAllCollectibles: "Bravo, votre robot a tout ramassé !",
             failurePickedAllCollectibles: "Votre robot n'a pas tout ramassé !",
+            successReachGeenArea: "Bravo, le robot a atteint la zone verte !",
+            failureReachGeenArea: "Le robot n'a pas atteint la zone verte !",
+            successOneMarbleInHole: "Bravo, vous avez rangé la bille&nbsp;!",
+            successAllMarblesInHoles: "Bravo, vous avez rangé toutes les billes&nbsp;!",
+            failureOneMarbleInHole: "La bille est mal rangée !",
+            failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
             leavesGrid: "Le robot sort de la grille !",
          },
          description: { 
@@ -1880,6 +1898,49 @@ var robotEndConditions = {
       if (lastTurn) {
          context.success = false;
          throw(window.languageStrings.messages.failurePickedAllCollectibles);
+      }
+   },
+   checkReachGreenArea: function(context, lastTurn) {
+      var robot = context.getRobotItem(context.curRobot);
+      var paints = context.getItems(robot.row, robot.col, {color: "vert"}); // TODO: internationalize color
+      if (paints.length != 0) {
+         context.success = true;
+         throw(window.languageStrings.messages.successReachGeenArea);
+      }
+      if (lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachGeenArea);
+      }
+   },
+   checkMarblesInHoles: function(context, lastTurn) {
+      var solved = true;
+      var nbHoles = 0;
+      for (var iRow = 0; iRow < context.tiles.length; iRow++) {
+         var row = context.tiles[iRow];
+         for (var iCol = 0; iCol < row.length; iCol++) {
+            var marbles = context.getItems(iRow, iCol, {category: "marble"});
+            var holes = context.getItems(iRow, iCol, {category: "hole"});
+            nbHoles += holes.length;
+            if (marbles.length != holes.length) {
+               solved = false;
+            }
+         }
+      }
+      if (solved) {
+         context.success = true;
+         if (nbHoles == 1) {
+            throw(window.languageStrings.messages.successOneMarbleInHole);
+         } else {
+            throw(window.languageStrings.messages.successAllMarblesInHoles);
+         }
+      }
+      if (lastTurn) {
+         context.success = false;
+         if (nbHoles == 1) {
+            throw(window.languageStrings.messages.failureOneMarbleInHole);
+         } else {
+            throw(window.languageStrings.messages.failureAllMarblesInHoles);
+         }
       }
    }
 };
