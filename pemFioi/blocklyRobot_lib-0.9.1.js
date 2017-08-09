@@ -56,6 +56,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peinture en haut à droite",
             colorUnder: "couleur de la case",
             numberUnder: "nombre sur la case",
+            writeNumber: "mettre le nombre de la case à",
             dir: "direction du robot",
             col: "colonne du robot",
             row: "ligne du robot",
@@ -122,7 +123,6 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
-            writeNumber: "mettre le nombre de la case à",
             writeNumber: "ecrireNombre",
             dir: "direction",
             col: "colonne",
@@ -444,6 +444,7 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peinture en haut à droite",
             colorUnder: "couleur de la case",
             numberUnder: "nombre sur la case",
+            writeNumber: "mettre le nombre de la case à",
             dir: "direction du robot",
             col: "colonne du robot",
             row: "ligne du robot",
@@ -510,7 +511,6 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peintureHautDroite",
             colorUnder: "couleurCase",
             numberUnder: "nombreCase",
-            writeNumber: "mettre le nombre de la case à",
             writeNumber: "ecrireNombre",
             dir: "direction",
             col: "colonne",
@@ -592,6 +592,10 @@ var getContext = function(display, infos, curLevel) {
          obstacleOnCell: "Il y a un obstacle sur cette case",
          platformOnCell: "Il y a déjà une plateforme sur cette case"
       },
+      none: {
+         comment: {
+         }
+      }
    };
 
    window.stringsLanguage = window.stringsLanguage || "fr";
@@ -653,6 +657,7 @@ var getContext = function(display, infos, curLevel) {
       infos: infos,
       robot: {},
       strings: strings,
+      localLanguageStrings: localLanguageStrings
    };
 
    switch (infos.blocklyColourTheme) {

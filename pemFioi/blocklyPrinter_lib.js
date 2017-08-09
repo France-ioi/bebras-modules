@@ -70,6 +70,10 @@ var getContext = function(display, infos) {
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
          }, description: {
          }
+      },
+      none: {
+         comment: {
+         }
       }
    }
    
@@ -92,6 +96,7 @@ var getContext = function(display, infos) {
       display: display,
       infos: infos,
       strings: strings,
+      localLanguageStrings: localLanguageStrings,
       printer: {
          input_text : "",
          output_text : "",

@@ -132,11 +132,17 @@ var getContext = function(display, infos) {
             log: "log",
             inputvalue: "eingabewert",
          },
+         description: {
+         },
          startingBlockName: "Schildkröten-Programm",
          messages: {
              paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
             paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet.",
 
+         }
+      },
+      none: {
+         comment: {
          }
       }
    };
@@ -162,6 +168,7 @@ var getContext = function(display, infos) {
       infos: infos,
       turtle: {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle},
       strings: strings,
+      localLanguageStrings: localLanguageStrings
    };
 
    switch (infos.blocklyColourTheme) {

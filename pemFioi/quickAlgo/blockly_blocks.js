@@ -547,7 +547,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                { 
                   name: "controls_if_else",
                   blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
-                  excludedByDefault: this.mainContext.showIfMutator,
+                  excludedByDefault: this.mainContext ? this.mainContext.showIfMutator : false,
                },
                { 
                   name: "logic_compare", 
@@ -1267,7 +1267,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_listrepeat",
                      blocklyXml: "<block type='data_listrepeat'>" +
-                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
+                                 "  <field name='LIST'>" + (this.strings ? this.strings.listVariable : 'list') + "</field>" +
                                  "  <value name='ITEM'>" +
                                  "    <shadow type='text'>" +
                                  "      <field name='TEXT'></field>" +
@@ -1283,7 +1283,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_itemoflist",
                      blocklyXml: "<block type='data_itemoflist'>" +
-                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
+                                 "  <field name='LIST'>" + (this.strings ? this.strings.listVariable : 'list') + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +
@@ -1294,7 +1294,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "data_replaceitemoflist",
                      blocklyXml: "<block type='data_replaceitemoflist'>" +
-                                 "  <field name='LIST'>" + this.strings.listVariable + "</field>" +
+                                 "  <field name='LIST'>" + (this.strings ? this.strings.listVariable : 'list') + "</field>" +
                                  "  <value name='INDEX'>" +
                                  "    <shadow type='math_number'>" +
                                  "      <field name='NUM'>1</field>" +

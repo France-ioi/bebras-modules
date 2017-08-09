@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title class="doc_title">quickAlgo library documentation</title>
+  <script type="text/javascript" src="../../ext/jquery/2.1/jquery.min.js"></script>
+  <script type="text/javascript" src="blockly_blocks.js"></script>
+  <script type="text/javascript" src="doc.js"></script>
+  <script type="text/javascript" src="../blocklyRobot_lib-0.9.1.js"></script>
+  <script type="text/javascript">
+contexts['blocklyRobot'] = getContext;
+  </script>
+  <script type="text/javascript" src="../blocklyPrinter_lib.js"></script>
+  <script type="text/javascript">
+contexts['blocklyPrinter'] = getContext;
+  </script>
+  <script type="text/javascript" src="../blocklyTurtle_lib.js"></script>
+  <script type="text/javascript">
+contexts['blocklyTurtle'] = getContext;
+  </script>
+  <style>
+table {
+  border-collapse: collapse;
+}
+
+th {
+  font-weight: bold;
+}
+
+table, th, td {
+  border: 1px solid black;
+  padding: 2px;
+}
+
+.subcategory {
+  font-weight: bold;
+  text-align: center;
+}
+  </style>
+</head>
+<body>
+  <h1 class="doc_title">quickAlgo library documentation</h1>
+  <div>
+    <p>
+      <a class="blockly_title" href="#blockly">Documentation des blocs génériques Blockly</a>
+    </p>
+    <p>
+      <span class="lib_select">Librairie :</span>
+      <select id="lib" onchange="generateLangSelector();">
+        <option value="blocklyRobot">blocklyRobot</option>
+      </select>
+    </p>
+    <p>
+      <span class="lang_select">Langue :</span>
+      <select id="lang" onchange="updateDocumentation();">
+        <option value="fr">Français</option>
+      </select>
+    </p>
+  </div>
+  <hr />
+  <div id="documentation"></div>
+
+  <a id="blockly"></a>
+  <h2 class="blockly_title">Documentation des blocs génériques Blockly</h2>
+  <div>
+    <p>
+      <select id="blocklySelector" onchange="generateBlocklyDocumentation();">
+        <option value="blockly" selected>Blockly</option>
+        <option value="scratch">Scratch</option>
+      </select>
+    </p>
+  </div>
+  <div id="blocklyDocumentation"></div>
+</body>
+</html>
