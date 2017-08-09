@@ -60,6 +60,20 @@ var docLanguageStrings = {
 
 // Comments for each Blockly/Scratch block
 var docBlockly = {
+  logic_compare: 'One block. Menu allows to choose the comparison operator.',
+  logic_operation: 'One block. Menu allows to choose the operator (AND, OR).',
+  logic_boolean: 'One block. Menu allows to choose between TRUE and FALSE.',
+  controls_repeat: 'Box allows to input the desired integer.',
+  controls_repeat_ext: 'User can put any block returning an integer, such as a variable.',
+  controls_whileUntil: 'One block. Menu allows to choose between "while" and "until".',
+  controls_flow_statements: 'Allows to break through a loop.',
+  math_number: 'Allows to use a number (in a formula).',
+  math_arithmetic: 'One block. Allows to computer basic arithmetic operations.',
+  math_number_property: 'One block. Allows to check an integer for various properties.',
+  math_round: 'One block. Allows to get the round, floor or ceil of an integer.',
+  math_extra_single: 'One block. Allows to choose between abs or opposite.',
+  math_extra_double: 'One block. Allows to choose between min or max.',
+  text: 'Allows to use a string (in a formula).'
 };
 
 // Generate the documentation for a specific category
@@ -176,7 +190,7 @@ function generateBlocklyDocumentation() {
     var blockList = stdBlocks[subCategory];
     for(var i=0; i < blockList.length; i++) {
       var blockInfo = blockList[i];
-      var imgId = lang + '-' + blockInfo.name;
+      var imgId = lang + '_' + blockInfo.name;
       html += '<tr>';
       html += '<td id="img-' + imgId + '"></td>';
       html += '<td>' + blockInfo.name + '</td>';
@@ -187,7 +201,7 @@ function generateBlocklyDocumentation() {
       var imgUrl = '../../img/quickAlgo/doc/' + imgId + '.png';
       imageExists(imgUrl, imgId, function (imgUrl, imgId) {
           // Image exists
-          $('#img-' + imgId).html('<img src="' + imgUrl + '" />');
+          $('#img-' + imgId).html('<img class="blockImg" src="' + imgUrl + '" />');
         });
     }
   }
