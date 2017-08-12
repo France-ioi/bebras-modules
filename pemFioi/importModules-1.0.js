@@ -37,8 +37,8 @@ var importableModules = function () {
       'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
       'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},
       'blockly_fioi': {src: modulesPath+"/ext/blockly-fioi/fioi-blockly.min.js", id: "blockly_fioi"},
-      'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
 
+      'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
       'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"}, // for BWINF legacy
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
@@ -64,17 +64,7 @@ var importableModules = function () {
       'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
       'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
-      'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
-
-      'python_index': {src: modulesPath+"pemFioi/code-editor/index.js", id: "python_index"},
-      'python_constants': {src: modulesPath+"pemFioi/code-editor/components/constants.js", id: "python_constants"},
-      'python_dom_utils': {src: modulesPath+"pemFioi/code-editor/utilities/DOM-utils.js", id: "python_dom_utils"},
-      'python_localization_utils': {src: modulesPath+"pemFioi/code-editor/utilities/localization-utils.js", id: "python_localization_utils"},
-      'python_shared_utils': {src: modulesPath+"pemFioi/code-editor/utilities/shared-utils.js", id: "python_shared_utils"},
-      'python_logic': {src: modulesPath+"pemFioi/code-editor/controllers/logic.js", id: "python_logic"},
-      'python_css': {type: "stylesheet", src: modulesPath+"pemFioi/code-editor/stylesheets/ui.css", id: "python_css"},
-      'python_subtask': {src: modulesPath+"pemFioi/code-editor/controllers/subtask.js", id: "python_subtask"},
-      'python_python': {src: modulesPath+"pemFioi/code-editor/components/python.js", id: "python_python"}
+      'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"}
    }
 }
 
