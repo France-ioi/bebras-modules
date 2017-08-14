@@ -97,12 +97,12 @@ function generateCategory(context, lang, strings, category) {
     for(var i=0; i < blockList.length; i++) {
       var blockInfo = blockList[i];
       html += '<tr>';
-      html += '<td>' + (ctxStr.label[blockInfo.name] ? ctxStr.label[blockInfo.name] : '<span style="color: red;">' + strings.nameUndefined + '</span>') + '</td>';
-      html += '<td>' + (ctxStr.code[blockInfo.name] ? ctxStr.code[blockInfo.name] : '<span style="color: red;">' + strings.nameUndefined + '</span>') + '</td>';
+      html += '<td>' + (ctxStr.label && ctxStr.label[blockInfo.name] ? ctxStr.label[blockInfo.name] : '<span style="color: red;">' + strings.nameUndefined + '</span>') + '</td>';
+      html += '<td>' + (ctxStr.code && ctxStr.code[blockInfo.name] ? ctxStr.code[blockInfo.name] : '<span style="color: red;">' + strings.nameUndefined + '</span>') + '</td>';
       html += '<td>' + blockInfo.name + '</td>';
       html += '<td>' + (blockInfo.yieldsValue ? strings.sensor : strings.action) + '</td>';
       html += '<td>' + (blockInfo.params ? blockInfo.params.length : '') + '</td>';
-      html += '<td>' + (ctxStr.description[blockInfo.name] ? ctxStr.description[blockInfo.name] : '') + '</td>';
+      html += '<td>' + (ctxStr.description && ctxStr.description[blockInfo.name] ? ctxStr.description[blockInfo.name] : '') + '</td>';
       html += '<td>' + (context.localLanguageStrings['none'].comment[blockInfo.name] ? context.localLanguageStrings['none'].comment[blockInfo.name] : '') + '</td>';
       html += '</tr>';
     }
