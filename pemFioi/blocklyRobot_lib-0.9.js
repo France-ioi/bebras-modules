@@ -66,7 +66,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "attendre",
@@ -133,7 +133,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
          description: { 
                 platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
@@ -243,7 +243,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "warte",
@@ -310,7 +310,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
          description: {
          },
@@ -396,7 +396,7 @@ var getContext = function(display, infos, curLevel) {
             number: "número total de objetos a transportar",
             exists: "existe un objeto a transportar ",
             trans_row: "fila del objeto a transportar",
-            trans_col: "columna del objeto a transportar",
+            trans_col: "columna del objeto a transportar"
          },
          code: {
             wait: "esperar",
@@ -463,7 +463,7 @@ var getContext = function(display, infos, curLevel) {
             number: "numeroTransportables",
             exists: "existeTransportable",
             trans_row: "filaTransportable",
-            trans_col: "columnaTransportable",
+            trans_col: "columnaTransportable"
          },
          description: { 
                 platformAbove: "plataformaArriba() : ¿hay una plataforma arriba del robot?",
@@ -499,7 +499,7 @@ var getContext = function(display, infos, curLevel) {
          droppedAllItems: "¡Bien hecho! ¡Ha soltado todos los objetos!",
          obstacleOnCell: "Hay un obstáculo en esta casilla",
          platformOnCell: "Ya hay una plataforma sobre esta casilla"
-      },
+      }
    };
 
    function replaceStringsRec(source, dest) {
@@ -549,7 +549,7 @@ var getContext = function(display, infos, curLevel) {
       display: display,
       infos: infos,
       robot: {},
-      strings: strings,
+      strings: strings
    };
 
    context.changeDelay = function(newDelay) {
@@ -1340,7 +1340,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "dropTransportable" },
                { name: "writeNumber", params: [null] },
                { name: "addPlatformAbove",   yieldsValue: false },
-               { name: "addPlatformInFront",   yieldsValue: false },
+               { name: "addPlatformInFront",   yieldsValue: false }
             ]
          },
          sensors: {
@@ -1516,7 +1516,7 @@ var getContext = function(display, infos, curLevel) {
                resetItem({
                   row: iRow,
                   col: iCol,
-                  type: itemTypeByNum[itemTypeNum],
+                  type: itemTypeByNum[itemTypeNum]
                });
             }
          }

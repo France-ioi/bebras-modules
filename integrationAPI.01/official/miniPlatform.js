@@ -22,7 +22,7 @@
          'hints': 'Conseils',
          'showSolution': 'Voir la solution',
          'yourScore': "Votre score :",
-         'canReadSolution': "Vous pouvez maintenant lire la solution en bas de la page.",
+         'canReadSolution': "Vous pouvez maintenant lire la solution en bas de la page."
       },
       en: {
          'task': 'Task',
@@ -32,7 +32,7 @@
          'hints': 'Hints',
          'showSolution': 'Show solution',
          'yourScore': "Your score:",
-         'canReadSolution': "You can now read the solution at the bottom of this page.",
+         'canReadSolution': "You can now read the solution at the bottom of this page."
       },
       de: {
          'task': 'Aufgabe',
@@ -42,7 +42,7 @@
          'hints': 'Hinweise',
          'showSolution': 'Lösung anzeigen',
          'yourScore': "Dein Punktestand:",
-         'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
+         'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen."
       },
       es: {
          'task': 'Problema',

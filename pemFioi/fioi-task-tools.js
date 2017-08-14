@@ -77,7 +77,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
          if (!sampleResource) {
             sampleResource = {
                type: 'sample',
-               name: sampleName,
+               name: sampleName
             };
             samplesResources[type][sampleName] = sampleResource;
          }

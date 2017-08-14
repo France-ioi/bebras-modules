@@ -25,11 +25,11 @@ showSourceApp.directive('showSource', ['$rootScope', function() {
          showGutter: false,
          rendererOptions: {
                maxLines: 'Infinity',
-               printMarginColumn: false,
+               printMarginColumn: false
          },
          advanced: {
                highlightActiveLine: false,
-               readOnly: true,
+               readOnly: true
          }
       };
       for(var i=0; i<allSourceLanguages.length; i++) {

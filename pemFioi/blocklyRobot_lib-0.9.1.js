@@ -66,7 +66,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "attendre",
@@ -133,7 +133,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
          messages: {
             nothingToPickUp: "Rien à ramasser",
@@ -150,7 +150,7 @@ var getContext = function(display, infos, curLevel) {
             successAllMarblesInHoles: "Bravo, vous avez rangé toutes les billes&nbsp;!",
             failureOneMarbleInHole: "La bille est mal rangée !",
             failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
-            leavesGrid: "Le robot sort de la grille !",
+            leavesGrid: "Le robot sort de la grille !"
          },
          description: { 
             platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
@@ -261,7 +261,7 @@ var getContext = function(display, infos, curLevel) {
             number: "Anzahl Objekte",
             exists: "Objekt vorhanden",
             trans_row: "Zeile des Objekts",
-            trans_col: "Spalte des Objekts",
+            trans_col: "Spalte des Objekts"
          },
          code: {
             wait: "warte",
@@ -328,7 +328,7 @@ var getContext = function(display, infos, curLevel) {
             number: "anzahlObjekte",
             exists: "objektVorhanden",
             trans_row: "zeileObjekt",
-            trans_col: "spalteObjekt",
+            trans_col: "spalteObjekt"
          },
 
          messages: {
@@ -346,7 +346,7 @@ var getContext = function(display, infos, curLevel) {
             successAllMarblesInHoles: "Bravo! Der Roboter hat die Murmeln richtig abgelegt.",
             failureOneMarbleInHole: "Der Roboter hat die Murmel nicht richtig abgelegt.",
             failureAllMarblesInHoles: "Der Roboter hat die Murmeln nicht richtig abgelegt.",
-            leavesGrid: "Der Roboter hat das Gitter verlassen!",
+            leavesGrid: "Der Roboter hat das Gitter verlassen!"
          },
          description: {
          },
@@ -433,7 +433,7 @@ var getContext = function(display, infos, curLevel) {
             number: "total number of objects to transport",
             exists: "there is an object that can be transported",
             trans_row: "row of the object to transport",
-            trans_col: "column of the object to transport",
+            trans_col: "column of the object to transport"
          },
          code: {
             wait: "wait",
@@ -500,7 +500,7 @@ var getContext = function(display, infos, curLevel) {
             number: "numberOfObjects",
             exists: "existObject",
             trans_row: "objectRow",
-            trans_col: "objectColumn",
+            trans_col: "objectColumn"
          },
          messages: {
             nothingToPickUp: "Rien à ramasser",
@@ -517,7 +517,7 @@ var getContext = function(display, infos, curLevel) {
             successAllMarblesInHoles: "Bravo, vous avez rangé toutes les billes&nbsp;!",
             failureOneMarbleInHole: "La bille est mal rangée !",
             failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
-            leavesGrid: "Le robot sort de la grille !",
+            leavesGrid: "Le robot sort de la grille !"
          },
          description: { 
             platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
@@ -645,9 +645,9 @@ var getContext = function(display, infos, curLevel) {
                   functions: 20,
                   actions: 260,
                   sensors: 340,
-                  _default: 280,
+                  _default: 280
                },
-               blocks: {},
+               blocks: {}
             };
          }
          break;
@@ -1445,7 +1445,7 @@ var getContext = function(display, infos, curLevel) {
             { name: "dropTransportable" },
             { name: "writeNumber", params: [null] },
             { name: "addPlatformAbove",   yieldsValue: false },
-            { name: "addPlatformInFront",   yieldsValue: false },
+            { name: "addPlatformInFront",   yieldsValue: false }
          ],
          sensors: [
             { name: "onTransportable",    yieldsValue: true },
@@ -1492,22 +1492,22 @@ var getContext = function(display, infos, curLevel) {
             { name: "dir",                yieldsValue: true },
             { name: "col",                yieldsValue: true },
             { name: "row",                yieldsValue: true },
-            { name: "onPill",             yieldsValue: true },
-         ],
+            { name: "onPill",             yieldsValue: true }
+         ]
       },
       transport: {
          sensors: [
             { name: "number", yieldsValue: true,                     handler: context.transportable_number },
             { name: "exists", yieldsValue: true,   params: [null],   handler: context.transportable_exists },
             { name: "trans_row",    yieldsValue: true,   params: [null],   handler: context.transportable_row },
-            { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col },
-         ],
+            { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
+         ]
       },
       debug: {
          debug: [
-            { name: "alert", params: [null], handler: context.debug_alert },
-         ],
-      },
+            { name: "alert", params: [null], handler: context.debug_alert }
+         ]
+      }
    };
 
    var isOutsideGrid = function(row, col) {
@@ -1616,7 +1616,7 @@ var getContext = function(display, infos, curLevel) {
                resetItem({
                   row: iRow,
                   col: iCol,
-                  type: itemTypeByNum[itemTypeNum],
+                  type: itemTypeByNum[itemTypeNum]
                });
             }
          }

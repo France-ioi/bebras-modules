@@ -500,7 +500,7 @@ Blockly.Blocks['procedures_mutatorarg'] = {
     if(source.workspace && source.workspace.flyout_) {
       source.workspace.flyout_.show(source.workspace.options.languageTree.childNodes);
     }
-  },
+  }
 };
 
 Blockly.Blocks['procedures_callnoreturn'] = {

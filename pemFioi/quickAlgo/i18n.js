@@ -74,7 +74,7 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Vous avez validé seulement {nbSuccess} test(s) sur {nbTests}.",
       gradingInProgress: "Évaluation en cours",
       textVariable: "texte",
-      listVariable: "liste",
+      listVariable: "liste"
    },
    en: {
       categories: {
@@ -145,7 +145,7 @@ var localLanguageStrings = {
       resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
       gradingInProgress: "Grading in process",
       textVariable: "text",
-      listVariable: "list",
+      listVariable: "list"
    },
    de: {
       categories: {
@@ -167,7 +167,7 @@ var localLanguageStrings = {
          functions: "Funktionen",
          read: "Einlesen",
          print: "Ausgeben",
-         turtle: "Turtle",
+         turtle: "Turtle"
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -221,7 +221,7 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Du hast {nbSuccess} von {nbTests} Testfällen richtig.",
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
       textVariable: "Text",
-      listVariable: "Liste",
+      listVariable: "Liste"
    },
    es: {
       categories: {

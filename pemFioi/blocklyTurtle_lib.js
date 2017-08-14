@@ -78,7 +78,7 @@ var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
           
-          startingBlockName: "Program du tortue",
+          startingBlockName: "Program du tortue"
       },
       de: {
          label: {
@@ -105,7 +105,7 @@ var getContext = function(display, infos) {
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
-            inputvalue: "Eingabewert",
+            inputvalue: "Eingabewert"
          },
          code: {
             move: "gehe",
@@ -130,14 +130,14 @@ var getContext = function(display, infos) {
             turn: "drehe",
             alert: "alert",
             log: "log",
-            inputvalue: "eingabewert",
+            inputvalue: "eingabewert"
          },
          description: {
          },
          startingBlockName: "Schildkröten-Programm",
          messages: {
              paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
-            paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet.",
+            paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet."
 
          }
       },
@@ -184,9 +184,9 @@ var getContext = function(display, infos) {
                   colour: 60,
                   turtle: 310,
                   turtleInput: 20,
-                  _default: 280,
+                  _default: 280
                },
-               blocks: {},
+               blocks: {}
             };
          }
          break;
@@ -423,48 +423,48 @@ var getContext = function(display, infos) {
          turtle: [
             { name: "move" },
             { name: "moveamount", params: [null]},
-            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 2}]},},
+            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 2}]}},
             { name: "turnleft" },
             { name: "turnright" },
             { name: "turn",      params: [null]},
             { name: "turnleftamount", params: [null]},
             { name: "turnrightamount", params: [null]},
-            { name: "turnleftamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
-            { name: "turnrightamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]},},
-            { name: "turnleftamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]},},
-            { name: "turnrightamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]},},
+            { name: "turnleftamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]}},
+            { name: "turnrightamountvalue", blocklyJson: {"args0": [{"type": "field_angle", "name": "PARAM_0", "angle": 90}]}},
+            { name: "turnleftamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]}},
+            { name: "turnrightamountvalue_noround", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 90}]}},
             { name: "turnleftamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
-                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"],]}]},},
+                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
             { name: "turnrightamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
-                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"],]}]},},
+                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["links ↺","'l'"],["rechts ↻","'r'"],]},]},},
+                [["links ↺","'l'"],["rechts ↻","'r'"]]}]}},
             { name: "turneitheramountvalue", blocklyJson: {"args0": [
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["links ↺","'l'"],["rechts ↻","'r'"],]},]},},
+                [["links ↺","'l'"],["rechts ↻","'r'"]]}]}},
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
                {"type": "field_dropdown", "name": "PARAM_0", "options":
-                [["hebe Stift ab","'up'"],["setze Stift auf","'down'"],]},]},},
+                [["hebe Stift ab","'up'"],["setze Stift auf","'down'"]]}]}},
             { name: "colour2", params: [null]},
-            { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]},},
+            { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
          ],
          turtleInput: [
-            { name: "inputvalue", yieldsValue: true, },
-          ],
+            { name: "inputvalue", yieldsValue: true }
+          ]
       },
       debug: {
          debug: [
             { name: "alert", params: [null], handler: context.debug_alert,
               blocklyXml: "<block type='alert'><value name='PARAM_0'><block type='text'><field name='TEXT'></field></block></value></block>"},
             { name: "log",   params: [null], handler: context.debug_log,
-              blocklyXml: "<block type='log'><value name='PARAM_0'><block type='text'><field name='TEXT'></field></block></value></block>"},
-         ],
-      },
+              blocklyXml: "<block type='log'><value name='PARAM_0'><block type='text'><field name='TEXT'></field></block></value></block>"}
+         ]
+      }
    };
    
 

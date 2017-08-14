@@ -16,7 +16,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this.programs = [{
     blockly: null,
     blocklyJS: null,
-    javascript: null,
+    javascript: null
   }];
   this._aceEditor = null;
   this._workspace = null;

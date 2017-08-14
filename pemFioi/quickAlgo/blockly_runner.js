@@ -292,7 +292,7 @@ function initBlocklyRunner(context, messageCallback) {
             context.curSteps[iInterpreter] = {
                total: 0,
                withoutAction: 0,
-               lastNbMoves: 0,
+               lastNbMoves: 0
             };
             context.programEnded[iInterpreter] = false;
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));

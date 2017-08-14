@@ -876,7 +876,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
                resetItem({
                   row: iRow,
                   col: iCol,
-                  type: itemTypeByNum[itemTypeNum],
+                  type: itemTypeByNum[itemTypeNum]
                });
             }
          }

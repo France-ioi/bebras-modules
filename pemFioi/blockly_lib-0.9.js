@@ -181,7 +181,7 @@ var languageStrings = {
          functions: "Funktionen",
          read: "Einlesen",
          print: "Ausgeben",
-         turtle: "Turtle",
+         turtle: "Turtle"
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -1223,9 +1223,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                colour: 20,
                variables: 330,
                functions: 290,
-               _default: 65,
+               _default: 65
             },
-            blocks: {},
+            blocks: {}
          };
          
          if (typeof provideBlocklyColours == "function") {
@@ -1320,7 +1320,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   { 
                      name: "controls_repeat", 
                      blocklyXml: "<block type='controls_repeat'></block>",
-                     excludedByDefault: true,
+                     excludedByDefault: true
                   },
                   { 
                      name: "controls_repeat_ext", 
@@ -1627,7 +1627,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   {
                      name: "lists_append", 
                      blocklyXml: "<block type='lists_append'></block>"
-                  },
+                  }
                ]
             },
             colour: {
@@ -1736,7 +1736,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      name: "control_repeat_until", 
                      blocklyXml: "<block type='control_repeat_until'></block>"
                   }
-               ],
+               ]
             },
             operator: {
                blocks: [
@@ -1825,7 +1825,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                if (block.name == blockName) {
                   return {
                      category: categoryName,
-                     xml: block.blocklyXml,
+                     xml: block.blocklyXml
                   };
                }
             }
@@ -1870,7 +1870,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             anyButton: !!this.includeBlocks.groupByCategory,
             fixed: [],
             includedBlocks: {get: true, set: true, incr: true},
-            shortList: true,
+            shortList: true
          };
 
          for (var blockType in this.includeBlocks.generatedBlocks) {
@@ -1991,7 +1991,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              var OPERATORS =
                  [
                   [Blockly.Msg.MATH_SINGLE_OP_ABSOLUTE, 'ABS'],
-                  ['-', 'NEG'],
+                  ['-', 'NEG']
              ];
              this.setHelpUrl(Blockly.Msg.MATH_SINGLE_HELPURL);
              this.setColour(Blockly.Blocks.math.HUE);
@@ -2025,7 +2025,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
              var OPERATORS =
                  [
                   ['min', 'MIN'],
-                  ['max', 'MAX'],
+                  ['max', 'MAX']
              ];
              this.setColour(Blockly.Blocks.math.HUE);
              this.setInputsInline(true);

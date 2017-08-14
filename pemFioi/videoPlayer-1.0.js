@@ -120,7 +120,7 @@ function getFioiPlayer() {
                 play: playFunc,
                 pause: $.noop,
                 step: playFunc,
-                seek: playFunc,
+                seek: playFunc
                 };
             this.players.push(newPlayer);
             newIdx = this.players.indexOf(newPlayer);

@@ -17,14 +17,14 @@ var getContext = function(display, infos) {
             read: "lire une ligne",
             readInteger: "lire un entier sur une ligne",
             readFloat: "lies Zeile als Komma-Zahl",
-            eof: "Ende der Eingabe",
+            eof: "Ende der Eingabe"
          },
          code: {
             print: "schreibe",
             read: "lies",
             readInteger: "liesGanzzahl",
             readFloat: "liesKommazahl",
-            eof: "eingabeEnde",
+            eof: "eingabeEnde"
          },
          description: {
          },
@@ -37,7 +37,7 @@ var getContext = function(display, infos) {
             tooFewLines: "Zu wenig Zeilen ausgegeben",
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
-            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
+            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
          }, description: {
          }
       },
@@ -47,14 +47,14 @@ var getContext = function(display, infos) {
             read: "lies Zeile",
             readInteger: "lies Zeile als ganze Zahl",
             readFloat: "lies Zeile als Komma-Zahl",
-            eof: "Ende der Eingabe",
+            eof: "Ende der Eingabe"
          },
          code: {
             print: "schreibe",
             read: "lies",
             readInteger: "liesGanzzahl",
             readFloat: "liesKommazahl",
-            eof: "eingabeEnde",
+            eof: "eingabeEnde"
          },
          description: {
          },
@@ -67,7 +67,7 @@ var getContext = function(display, infos) {
             tooFewLines: "Zu wenig Zeilen ausgegeben",
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
-            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …",
+            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
          }, description: {
          }
       },
@@ -99,7 +99,7 @@ var getContext = function(display, infos) {
       localLanguageStrings: localLanguageStrings,
       printer: {
          input_text : "",
-         output_text : "",
+         output_text : ""
       }
    };
 
@@ -120,9 +120,9 @@ var getContext = function(display, infos) {
                   colour: 310,
                   read: 10,
                   print: 60,
-                  _default: 280,
+                  _default: 280
                },
-               blocks: {},
+               blocks: {}
             };
          }
          break;
@@ -267,14 +267,14 @@ var getContext = function(display, infos) {
    context.customBlocks = {
       printer: {
          print: [
-            { name: "print", params: [null]},
+            { name: "print", params: [null]}
          ],
          read:  [
             { name: "read", yieldsValue: true },
             { name: "readInteger", yieldsValue: true },
             { name: "readFloat", yieldsValue: true },
-            { name: "eof", yieldsValue: true },
-         ],
+            { name: "eof", yieldsValue: true }
+         ]
       }
    }
 
