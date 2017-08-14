@@ -295,7 +295,22 @@ $(document).ready(function() {
             });
          });
 
-         window.addEventListener('resize', function() {
+         /* For the 'resize' event listener below, we use a cross-browser
+          * compatible version for "addEventListener" (modern) and "attachEvent" (old).
+          * Source: https://stackoverflow.com/questions/6927637/addeventlistener-in-internet-explorer
+          */
+         function addEvent(evnt, elem, func) {
+            if (elem.addEventListener)  // W3C DOM
+               elem.addEventListener(evnt,func,false);
+            else if (elem.attachEvent) { // IE DOM
+               elem.attachEvent("on"+evnt, func);
+            }
+            else { // No much to do
+               elem[evnt] = func;
+            }
+         }
+
+         addEvent('resize', window, function() {
             task.getViews(function(views) {
                chooseView.reinit(views);
             });
