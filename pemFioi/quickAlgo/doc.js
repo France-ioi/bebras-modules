@@ -5,12 +5,12 @@ var docLanguageStrings = {
   fr: {
     lang: 'Français',
 
-    title: 'Documentation des librairies quickAlgo',
-    library: 'Librairie :',
+    title: 'Documentation des bibliothèques quickAlgo',
+    library: 'Bibliothèque :',
     language: 'Langue :',
     blocklyTitle: 'Documentation des blocs génériques Blockly',
     scratchTitle: 'Documentation des blocs génériques Scratch',
-    libTitle: 'Documentation de la librairie',
+    libTitle: 'Documentation de la bibliothèque',
 
     category: 'Catégorie',
     subcategory: 'Sous-catégorie',
@@ -23,9 +23,9 @@ var docLanguageStrings = {
   en: {
     lang: 'English',
 
-    title: 'quickAlgo librairies documentation',
-    library: 'Library :',
-    language: 'Language :',
+    title: 'quickAlgo libraries documentation',
+    library: 'Library:',
+    language: 'Language:',
     blocklyTitle: 'Documentation for generic Blockly blocks',
     scratchTitle: 'Documentation for generic Scratch blocks',
     libTitle: 'Documentation for library',
@@ -41,9 +41,9 @@ var docLanguageStrings = {
   de: {
     lang: 'Deutsch',
 
-    title: 'quickAlgo librairies documentation',
-    library: 'Library :',
-    language: 'Language :',
+    title: 'quickAlgo libraries documentation',
+    library: 'Library:',
+    language: 'Language:',
     blocklyTitle: 'Documentation for generic Blockly blocks',
     scratchTitle: 'Documentation for generic Scratch blocks',
     libTitle: 'Documentation for library',
