@@ -282,6 +282,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       for (var iContent = 0; iContent < contents.length; iContent++) {
          cell.push(contents[iContent]);
       }
+
+      if(this.overlay) {
+         this.overlay.toFront();
+      }
    };
 
    this.setAllCells = function(cellFiller, data) {
