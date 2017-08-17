@@ -2,18 +2,20 @@ var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
          label: {
-            fillCanvas: "remplir avec",
-            setFill: "définir la couleur de fond à",
-            setStroke: "définir le contour à",
-            drawRectangle: "dessiner un rectangle",
-            drawEllipse: "dessiner une ellipse"
+            background: "remplir avec",
+            fill: "définir la couleur de fond à",
+            stroke: "définir la couleur de contour à",
+            strokeWeight: "définir l'épaisseur de contour à",
+            rect: "dessiner un rectangle",
+            ellipse: "dessiner une ellipse"
          },
          code: {
-            fillCanvas: "remplirToile",
-            setFill: "definirFond",
-            setStroke: "definirContour",
-            drawRectangle: "dessinerRectangle",
-            drawEllipse: "dessinerEllipse"
+            background: "arrierePlan",
+            fill: "couleurFond",
+            stroke: "couleurContour",
+            strokeWeight: "epaisseurContour",
+            rect: "rect",
+            ellipse: "ellipse"
          },
          description: {
          },
@@ -81,31 +83,30 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(taskInfos) {
+      context.processing.ops = [];
       if (context.display) {
          context.resetDisplay();
       }
    };
 
-   function sketchProc(processing) {
-      processing.setup = function() {
-         processing.size(300, 300);
-         processing.frameRate(10);
-         processing.background(255);
-      };
-
-      processing.draw = function() {
-         for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
-            var op = context.processing.ops[iOp];
-            processing[op.func].apply(null, op.args);
-         }
-      };
-   }
-
    context.resetDisplay = function() {
       var canvas = $('<canvas>').css('border', '1px solid black');
       $('#grid').empty().append(canvas);
 
-      var processingInstance = new Processing(canvas.get(0), sketchProc);
+      var processingInstance = new Processing(canvas.get(0), function(processing) {
+         processing.setup = function() {
+            processing.size(300, 300);
+            processing.frameRate(10);
+            processing.background(255);
+         };
+
+         processing.draw = function() {
+            for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
+               var op = context.processing.ops[iOp];
+               processing[op.func].apply(null, op.args);
+            }
+         };
+      });
 
       context.blocklyHelper.updateSize();
       context.updateScale();
@@ -117,30 +118,13 @@ var getContext = function(display, infos) {
    };
 
 
-   context.processing.fillCanvas = function(callback, color) {
-      context.processing.ops.push({ func: 'background', args: [color] });
-      context.waitDelay(callback);
-   };
-
-   context.processing.setFill = function(callback, color) {
-      context.processing.ops.push({ func: 'fill', args: [color] });
-      context.waitDelay(callback);
-   };
-
-   context.processing.setStroke = function(callback, color, width) {
-      context.processing.ops.push({ func: 'stroke', args: [color] });
-      context.processing.ops.push({ func: 'strokeWeight', args: [width] });
-      context.waitDelay(callback);
-   };
-
-   context.processing.drawRectangle = function(callback, p1, p2) {
-      context.processing.ops.push({ func: 'rect', args: [p1.x, p1.y, p2.x, p2.y] });
-      context.waitDelay(callback);
-   };
-
-   context.processing.drawEllipse = function(callback, center, rads) {
-      context.processing.ops.push({ func: 'ellipse', args: [center.x, center.y, rads.x, rads.y] });
-      context.waitDelay(callback);
+   context.processing.commonOp = function() {
+      var args = [];
+      for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
+         args.push(arguments[iArg].data);
+      }
+      context.processing.ops.push({ func: arguments[0], args: args });
+      context.waitDelay(arguments[arguments.length - 1]);
    };
 
 
@@ -154,15 +138,31 @@ var getContext = function(display, infos) {
 
    context.customBlocks = {
       processing: {
-         draw: [
-            { name: "fillCanvas", params: [null] },
-            { name: "setFill", params: [null] },
-            { name: "setStroke", params: [null, null] },
-            { name: "drawRectangle", params: [null, null] },
-            { name: "drawEllipse", params: [null, null] }
+         color: [
+            { name: "background", params: [null, null, null] },
+            { name: "fill", params: [null, null, null] },
+            { name: "stroke", params: [null, null, null] }
+         ],
+         attributes: [
+            { name: "strokeWeight", params: [null] }
+         ],
+         shapes: [
+            { name: "rect", params: [null, null, null, null] },
+            { name: "ellipse", params: [null, null, null, null] }
          ]
       }
    };
+
+   for (var category in context.customBlocks.processing) {
+      for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
+         (function() {
+            var funcName = context.customBlocks.processing[category][iFunc].name;
+            context.processing[funcName] = function() {
+               context.processing.commonOp.apply(null, [funcName].concat(Array.apply(null, arguments)));
+            };
+         })();
+      }
+   }
 
 
    context.getItems = function(row, col, filters) {

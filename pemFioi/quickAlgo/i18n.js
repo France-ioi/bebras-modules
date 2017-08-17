@@ -8,8 +8,10 @@ var localLanguageStrings = {
       categories: {
          actions: "Actions",
          sensors: "Capteurs",
-         debug: "Débuggage",
+         debug: "Débogage",
          colour: "Couleurs",
+         color: "Couleurs",
+         attributes: "Réglages",
          data: "Données",
          dicts: "Dictionnaires",
          input: "Entrées",
@@ -25,7 +27,7 @@ var localLanguageStrings = {
          read: "Lecture",
          print: "Écriture",
          turtle: "Tortue",
-         draw: "Dessin"
+         shapes: "Formes"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
