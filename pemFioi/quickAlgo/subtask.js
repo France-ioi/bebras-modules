@@ -46,7 +46,7 @@ var initBlocklySubTask = function(subTask, language) {
          if (subTask.levelGridInfos.hideSaveOrLoad) {
             $("#saveOrLoadBtn").hide();
          }
-         if (subTask.levelGridInfos.example) {
+         if (subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language]) {
             $("#loadExampleBtn").show();
          }
       }

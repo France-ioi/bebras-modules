@@ -4,13 +4,12 @@
 */
 
 function LogicController(nbTestCases, maxInstructions) {
-
   /**
    * Class properties
    */
   this._nbTestCases = nbTestCases;
   this._maxInstructions = maxInstructions || undefined;
-  this._language = 'python';
+  this.language = 'python';
   this._textFile = null;
   this._extended = false;
   this.programs = [{
@@ -51,7 +50,7 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.switchLanguage = function (e) {
-    this._language = e.value;
+    this.language = e.value;
   };
 
   this.load = function (language, display, nbTestCases, _options) {
@@ -91,7 +90,7 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.getLanguage = function () {
-    return this._language;
+    return this.language;
   };
 
   this.prepareRun = function () {
@@ -184,7 +183,7 @@ function LogicController(nbTestCases, maxInstructions) {
       $("#errors").html(this.strings.unknownFileType);
     }
   };
-  this._downloadProgram = function () {
+  this.saveProgram = function () {
     this.savePrograms();
     var code = this.programs[0].blockly;
     var data = new Blob([code], { type: 'text/plain' });
@@ -198,7 +197,9 @@ function LogicController(nbTestCases, maxInstructions) {
     this.textFile = window.URL.createObjectURL(data);
 
     // returns a URL you can use as a href
-    $("#saveUrl").html("<a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>" + this.strings.download + "</a>");
+    $("#saveUrl").html("<a id='downloadAnchor' href='" + this.textFile + "' download='robot_python_program.txt'>" + this._strings.download + "</a>");
+    var downloadAnchor = document.getElementById('downloadAnchor');
+    downloadAnchor.click();
     return this.textFile;
   };
 
@@ -228,9 +229,6 @@ function LogicController(nbTestCases, maxInstructions) {
   /**
    * DOM specific operations
    */
-  this._loadInstructionsTooltip = function () {
-    return "<div id='capacity' class='clearBoth' ></div>";
-  };
   this._loadEditorWorkSpace = function () {
     return "<div id='blocklyContainer'>" + // TODO :: change ID here and in CSS
            "<div id='python-workspace' class='language_python' style='width: 100%; height: 100%'></div>" +
@@ -239,7 +237,6 @@ function LogicController(nbTestCases, maxInstructions) {
   this._loadBasicEditor = function () {
     if (this._mainContext.display) {
       $('#languageInterface').html(
-        this._loadInstructionsTooltip() +
         this._loadEditorWorkSpace()
       );
       this._loadAceEditor();

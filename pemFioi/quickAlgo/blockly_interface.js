@@ -10,6 +10,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       textFile: null,
       extended: false,
       programs: [],
+      language: (typeof Blockly.Blocks['control_if'] !== 'undefined') ? 'scratch' : 'blockly',
       languages: [],
       definitions: {},
       simpleGenerators: {},
@@ -47,7 +48,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                                      "' style='display:none' onclick='task.displayedSubTask.blocklyHelper.importFromBlockly()' />" +
                                      "    </p>" +
                                      "  </div>" +
-                                     "  <div id='blocklyCapacity' style='clear:both;'></div>" +
                                      "  <div id='blocklyContainer'>" +
                                      "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                      "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
@@ -174,8 +174,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                   remainingBlocks: Math.abs(remaining)
                };
                var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
-               $('#blocklyCapacity').css('color', remaining < 0 ? 'red' : '');
-               $('#blocklyCapacity').html(strLimitBlocks.format(optLimitBlocks));
+               $('#capacity').css('color', remaining < 0 ? 'red' : '');
+               $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
             }
 
             // TODO :: put into a resetDisplay function, find other elements to reset
@@ -385,7 +385,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.textFile = window.URL.createObjectURL(data);
 
          // returns a URL you can use as a href
-         $("#saveUrl").html(" <a href='" + this.textFile + "' download='robot_" + this.languages[this.player] + "_program.txt'>" + this.strings.download + "</a>");
+         $("#saveUrl").html(" <a id='downloadAnchor' href='" + this.textFile + "' download='robot_" + this.language + "_program.txt'>" + this.strings.download + "</a>");
+         var downloadAnchor = document.getElementById('downloadAnchor');
+         downloadAnchor.click();
          return this.textFile;
       },
 

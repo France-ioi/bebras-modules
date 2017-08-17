@@ -17,8 +17,22 @@ var quickAlgoInterface = {
       gridHtml += "</center>";
       $("#gridContainer").html(gridHtml)
 
-      $("#blocklyLibContent").html("<div id='languageInterface'></div>" +
-                                   "<div id='saveOrLoadModal' style='display:none'></div>\n");
+      $("#blocklyLibContent").html(
+         "<div id='editorBar'>" +
+         "  <div id='editorButtons'></div>" +
+         "  <div id='capacity'></div>" +
+         "</div>" +
+         "<div id='languageInterface'></div>" +
+         "<div id='saveOrLoadModal' style='display:none'></div>\n");
+
+      // Upper right load buttons
+      $("#editorButtons").html(
+         "<button type='button' id='loadExampleBtn' class='btn btn-xs btn-default' style='display: none;' onclick='task.displayedSubTask.loadExample()'>" +
+         this.strings.loadExample +
+         "</button>&nbsp;" +
+         "<button type='button' id='saveOrLoadBtn' class='btn btn-xs btn-default' onclick='quickAlgoInterface.saveOrLoad()'>" +
+         this.strings.saveOrLoadButton +
+         "</button>");
 
       var saveOrLoadModal = "<div class='modal'>" +
                             "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +
@@ -51,15 +65,7 @@ var quickAlgoInterface = {
                         + this.strings.submitProgram
                         + "</button><br/>"
                         + "<div id='messages' style='width: 400px;'><span id='tooltip'></span><span id='errors'></span></div>"
-                        + addTaskHTML
-                        + "<div id='saveLoadButtons' style='width: 400px;'>"
-                        + "<button type='button' id='loadExampleBtn' class='btn btn-default' style='display: none;' onclick='task.displayedSubTask.loadExample()'>"
-                        + this.strings.loadExample
-                        + "</button>&nbsp;"
-                        + "<button type='button' id='saveOrLoadBtn' class='btn btn-default' onclick='quickAlgoInterface.saveOrLoad()'>"
-                        + this.strings.saveOrLoadButton
-                        + "</button>"
-                        + "</div>";
+                        + addTaskHTML;
       $("#gridButtonsAfter").html(gridButtonsAfter);
    },
 
