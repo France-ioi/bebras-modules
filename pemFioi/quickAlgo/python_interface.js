@@ -43,6 +43,13 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
 
+  this.loadExample = function (example) {
+    if(!example.python) { return; }
+    this._aceEditor.setValue('' + example.python + '\n\n' + this._aceEditor.getValue());
+    var Range = ace.require('ace/range').Range;
+    this._aceEditor.selection.setRange(new Range(0, 0, example.python.split(/\r\n|\r|\n/).length, 0));
+  };
+
   this.switchLanguage = function (e) {
     this._language = e.value;
   };
