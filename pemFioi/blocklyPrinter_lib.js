@@ -16,29 +16,28 @@ var getContext = function(display, infos) {
             print: "écrire",
             read: "lire une ligne",
             readInteger: "lire un entier sur une ligne",
-            readFloat: "lies Zeile als Komma-Zahl",
-            eof: "Ende der Eingabe"
+            readFloat: "lire un nombre à virgule sur une ligne",
+            eof: "terminer la saisie"
          },
          code: {
-            print: "schreibe",
-            read: "lies",
-            readInteger: "liesGanzzahl",
-            readFloat: "liesKommazahl",
-            eof: "eingabeEnde"
+            print: "écrire",
+            read: "lire",
+            readInteger: "lireEntier",
+            readFloat: "lireDecimal",
+            eof: "finSaisie"
          },
          description: {
          },
-         startingBlockName: "Programm",
+         startingBlockName: "Programme",
          messages: {
-             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
-             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
-            tooFewChars: "Zeile zu kurz: Zeile ",
-            tooManyChars: "Zeile zu lang: Zeile ",
-            tooFewLines: "Zu wenig Zeilen ausgegeben",
-            tooManyLines: "Zu viele Zeilen ausgegeben",
-            correctOutput: "Die Ausgabe ist richtig!",
-            moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
-         }, description: {
+            outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
+            outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
+            tooFewChars: "Ligne trop courte : ligne ",
+            tooManyChars: "Ligne trop longue : ligne ",
+            tooFewLines: "Trop peu de lignes en sortie",
+            tooManyLines: "Trop de lignes en sortie",
+            correctOutput: "La sortie est correcte !",
+            moreThan100Moves: "La sortie est correcte, mais vous l'avez produite en plus de 100 étapes…"
          }
       },
       de: {
@@ -60,15 +59,14 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
-             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
-             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
+            outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
+            outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile ",
             tooManyChars: "Zeile zu lang: Zeile ",
             tooFewLines: "Zu wenig Zeilen ausgegeben",
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
-         }, description: {
          }
       },
       none: {

@@ -77,8 +77,7 @@ var makeTurtle = function() {
 var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
-          
-          startingBlockName: "Program du tortue"
+         startingBlockName: "Programme de la tortue"
       },
       de: {
          label: {
@@ -136,9 +135,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Schildkröten-Programm",
          messages: {
-             paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
+            paintingWrong: "Die Schildkröte hat nicht alles richtig gezeichnet.",
             paintingCorrect: "Bravo! Die Schildkröte hat alles richtig gezeichnet."
-
          }
       },
       none: {
