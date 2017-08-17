@@ -117,28 +117,28 @@ var getContext = function(display, infos) {
    };
 
 
-   context.processing.fillCanvas = function(color, callback) {
+   context.processing.fillCanvas = function(callback, color) {
       context.processing.ops.push({ func: 'background', args: [color] });
       context.waitDelay(callback);
    };
 
-   context.processing.setFill = function(color, callback) {
+   context.processing.setFill = function(callback, color) {
       context.processing.ops.push({ func: 'fill', args: [color] });
       context.waitDelay(callback);
    };
 
-   context.processing.setStroke = function(color, width, callback) {
+   context.processing.setStroke = function(callback, color, width) {
       context.processing.ops.push({ func: 'stroke', args: [color] });
       context.processing.ops.push({ func: 'strokeWeight', args: [width] });
       context.waitDelay(callback);
    };
 
-   context.processing.drawRectangle = function(p1, p2, callback) {
+   context.processing.drawRectangle = function(callback, p1, p2) {
       context.processing.ops.push({ func: 'rect', args: [p1.x, p1.y, p2.x, p2.y] });
       context.waitDelay(callback);
    };
 
-   context.processing.drawEllipse = function(center, rads, callback) {
+   context.processing.drawEllipse = function(callback, center, rads) {
       context.processing.ops.push({ func: 'ellipse', args: [center.x, center.y, rads.x, rads.y] });
       context.waitDelay(callback);
    };
