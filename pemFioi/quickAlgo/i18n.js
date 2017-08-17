@@ -50,6 +50,8 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Repartir de blockly",
+      loadExample: "Charger l'exemple",
+      saveOrLoadButton: "Charger / enregistrer",
       saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
@@ -122,6 +124,8 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Generate from blockly",
+      loadExample: "Load example",
+      saveOrLoadButton: "Load / save",
       saveOrLoadProgram: "Save or reload your code:",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       reloadProgram: "Reload:",
@@ -196,6 +200,8 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Generiere von Blockly-Blöcken",
+      loadExample: "Load example", // TODO :: translate
+      saveOrLoadButton: "Load / save", // TODO :: translate
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",

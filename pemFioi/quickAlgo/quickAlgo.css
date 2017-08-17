@@ -63,10 +63,12 @@ body > * {
 	padding-left: 20px;
 	padding-right: 20px;
 }
-#errors, .errors {
+
+#messages {
 	padding-top:10px;
     min-height: 28px;
 }
+
 #errors .testError {
 	color: red;
 }

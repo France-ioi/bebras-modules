@@ -289,6 +289,39 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          $("#program").val(this.programs[this.player].javascript);
       },
 
+      loadExample: function(exampleObj) {
+         var example = this.scratchMode ? exampleObj.scratch : exampleObj.blockly
+         if (this.workspace != null && example) {
+            var xml = Blockly.Xml.textToDom(example);
+            this.cleanBlockIds(xml);
+
+            
+
+            // Remove robot_start
+            if(xml.children.length == 1 && xml.children[0].getAttribute('type') == 'robot_start') {
+               xml = xml.firstChild.firstChild;
+            }
+
+            // Shift to x=200 y=20 + offset
+            if(!this.exampleOffset) { this.exampleOffset = 0; }
+            xml.firstChild.setAttribute('x', 200 + this.exampleOffset);
+            xml.firstChild.setAttribute('y', 20 + this.exampleOffset);
+            // Add an offset of 10 each time, so if someone clicks the button
+            // multiple times the blocks don't stack
+            this.exampleOffset += 10;
+
+            Blockly.Xml.domToWorkspace(xml, this.workspace);
+
+            if(this.scratchMode) {
+               this.glowBlock(this.glowingBlock);
+               this.glowingBlock = xml.firstChild.getAttribute('id');
+            } else {
+               this.workspace.traceOn(true);
+               this.workspace.highlightBlock(xml.firstChild.getAttribute('id'));
+            }
+         }
+      },
+
       changeLanguage: function() {
          this.languages[this.player] = $("#selectLanguage").val();
          this.loadPlayer(this.player);

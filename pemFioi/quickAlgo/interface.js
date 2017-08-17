@@ -50,8 +50,16 @@ var quickAlgoInterface = {
                         + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
                         + this.strings.submitProgram
                         + "</button><br/>"
-                        + "<div id='errors' style='width: 400px;'></div>"
-                        + addTaskHTML;
+                        + "<div id='messages' style='width: 400px;'><span id='tooltip'></span><span id='errors'></span></div>"
+                        + addTaskHTML
+                        + "<div id='saveLoadButtons' style='width: 400px;'>"
+                        + "<button type='button' id='loadExampleBtn' class='btn btn-default' style='display: none;' onclick='task.displayedSubTask.loadExample()'>"
+                        + this.strings.loadExample
+                        + "</button>&nbsp;"
+                        + "<button type='button' id='saveOrLoadBtn' class='btn btn-default' onclick='quickAlgoInterface.saveOrLoad()'>"
+                        + this.strings.saveOrLoadButton
+                        + "</button>"
+                        + "</div>";
       $("#gridButtonsAfter").html(gridButtonsAfter);
    },
 
@@ -93,7 +101,7 @@ var quickAlgoInterface = {
          for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
             var btnInfo = buttons[btnIdx];
             if(thisBtn.hasClass(btnInfo.cls)) {
-               $('#errors').html(btnInfo.tooltip);
+               $('#tooltip').html(btnInfo.tooltip + '<br>');
                eval(btnInfo.onclick);
                break;
             }
@@ -104,19 +112,19 @@ var quickAlgoInterface = {
          for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
             var btnInfo = buttons[btnIdx];
             if(thisBtn.hasClass(btnInfo.cls)) {
-               $('#errors').html(btnInfo.tooltip);
+               $('#tooltip').html(btnInfo.tooltip + '<br>');
                break;
             }
          }
       };
       var selectSpeedHoverClear = function () {
-         // Only clear #errors if the tooltip was for this button
+         // Only clear #tooltip if the tooltip was for this button
          var thisBtn = $(this);
          for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
             var btnInfo = buttons[btnIdx];
             if(thisBtn.hasClass(btnInfo.cls)) {
-               if($('#errors').html() == btnInfo.tooltip) {
-                  $('#errors').html('');
+               if($('#tooltip').html() == btnInfo.tooltip + '<br>') {
+                  $('#tooltip').html('');
                }
                break;
             }
@@ -158,6 +166,10 @@ var quickAlgoInterface = {
 
    updateTestSelector: function (newCurTest) {
       $("#testSelector .panel-body").hide();
-      $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#errors')).show();
+      $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
+   },
+
+   saveOrLoad: function () {
+      $("#saveOrLoadModal").show();
    }
 };

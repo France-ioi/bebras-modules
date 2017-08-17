@@ -44,10 +44,10 @@ var initBlocklySubTask = function(subTask, language) {
       if (this.display) {
          window.quickAlgoInterface.loadInterface();
          if (subTask.levelGridInfos.hideSaveOrLoad) {
-            // TODO: do without a timeout
-            setTimeout(function() {
-            $("#saveOrLoad").hide();
-            }, 0);
+            $("#saveOrLoadBtn").hide();
+         }
+         if (subTask.levelGridInfos.example) {
+            $("#loadExampleBtn").show();
          }
       }
 
@@ -182,6 +182,10 @@ var initBlocklySubTask = function(subTask, language) {
 //      initContextForLevel(this.level);
 
 //      this.context.runner.stop();
+   };
+
+   subTask.loadExample = function() {
+      subTask.blocklyHelper.loadExample(subTask.levelGridInfos.example);
    };
 
    subTask.getDefaultStateObject = function() {
