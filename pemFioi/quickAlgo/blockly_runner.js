@@ -16,6 +16,9 @@ function initBlocklyRunner(context, messageCallback) {
       runner.maxIter = 400000;
       runner.maxIterWithoutAction = 500;
 
+      // Counts the call stack depth to know when to reset it
+      runner.stackCount = 0;
+
       // During step-by-step mode
       runner.stepInProgress = false;
       runner.stepMode = false;
@@ -75,6 +78,7 @@ function initBlocklyRunner(context, messageCallback) {
       
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
+            runner.stackCount = 0;
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
                   runner.noDelay(callback, value);
                },
@@ -90,7 +94,8 @@ function initBlocklyRunner(context, messageCallback) {
          if (value != undefined) {
             primitive = interpreters[context.curRobot].createPrimitive(value);
          }
-         if (Math.random() < 0.1) {
+         if (runner.stackCount > 100) {
+            runner.stackCount = 0;
             runner.stackResetting = true;
             context.delayFactory.createTimeout("wait_" + Math.random(), function() {
                runner.stackResetting = false;
@@ -98,6 +103,7 @@ function initBlocklyRunner(context, messageCallback) {
                runner.runSyncBlock();
             }, 0);
          } else {
+            runner.stackCount += 1;
             callback(primitive);
             runner.runSyncBlock();
          }
@@ -285,6 +291,7 @@ function initBlocklyRunner(context, messageCallback) {
          runner.stepInProgress = false;
          runner.stepMode = false;
          runner.firstHighlight = true;
+         runner.stackCount = 0;
          context.programEnded = [];
          context.curSteps = [];
          context.reset();
