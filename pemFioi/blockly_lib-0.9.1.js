@@ -49,7 +49,10 @@ var localLanguageStrings = {
          math: "Maths",
          texts: "Texte",
          variables: "Variables",
-         functions: "Fonctions"
+         functions: "Fonctions",
+         read: "Lecture",
+         print: "Écriture",
+         turtle: "Tortue"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
@@ -118,7 +121,10 @@ var localLanguageStrings = {
          math: "Math",
          texts: "Text",
          variables: "Variables",
-         functions: "Functions"
+         functions: "Functions",
+         read: "Reading",
+         print: "Writing",
+         turtle: "Turtle"
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",

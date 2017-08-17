@@ -17,7 +17,7 @@ var getContext = function(display, infos) {
             read: "lire une ligne",
             readInteger: "lire un entier sur une ligne",
             readFloat: "lire un nombre à virgule sur une ligne",
-            eof: "terminer la saisie"
+            eof: "fin de la saisie"
          },
          code: {
             print: "écrire",
