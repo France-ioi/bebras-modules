@@ -24,7 +24,8 @@ var localLanguageStrings = {
          functions: "Fonctions",
          read: "Lecture",
          print: "Écriture",
-         turtle: "Tortue"
+         turtle: "Tortue",
+         draw: "Dessin"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
