@@ -7,7 +7,12 @@ var getContext = function(display, infos) {
             stroke: "définir la couleur de contour à",
             strokeWeight: "définir l'épaisseur de contour à",
             rect: "dessiner un rectangle",
-            ellipse: "dessiner une ellipse"
+            ellipse: "dessiner une ellipse",
+            line: "dessiner une ligne",
+            triangle: "dessiner un triangle",
+            quad: "dessiner un quadrilatère",
+            arc: "dessiner un arc",
+            point: "dessiner un point"
          },
          code: {
             background: "arrierePlan",
@@ -15,7 +20,12 @@ var getContext = function(display, infos) {
             stroke: "couleurContour",
             strokeWeight: "epaisseurContour",
             rect: "rect",
-            ellipse: "ellipse"
+            ellipse: "ellipse",
+            line: "ligne",
+            triangle: "triangle",
+            quad: "quad",
+            arc: "arc",
+            point: "point"
          },
          description: {
          },
