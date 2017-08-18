@@ -71,7 +71,7 @@ var getContext = function(display, infos) {
             shapes: 180
          }
       };
-   }
+   };
 
    context.changeDelay = function(newDelay) {
       infos.actionDelay = newDelay;
@@ -141,7 +141,7 @@ var getContext = function(display, infos) {
    context.processing.commonOp = function() {
       var args = [];
       for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
-         args.push(arguments[iArg].data);
+         args.push(arguments[iArg]);
       }
       context.processing.ops.push({ func: arguments[0], args: args });
       context.waitDelay(arguments[arguments.length - 1]);
