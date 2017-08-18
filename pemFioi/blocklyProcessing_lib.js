@@ -53,6 +53,16 @@ var getContext = function(display, infos) {
       }
    };
 
+   context.provideBlocklyColours = function() {
+      return {
+         categories: {
+            color: 10,
+            attributes: 280,
+            shapes: 180
+         }
+      };
+   }
+
    context.changeDelay = function(newDelay) {
       infos.actionDelay = newDelay;
    };
@@ -148,7 +158,12 @@ var getContext = function(display, infos) {
          ],
          shapes: [
             { name: "rect", params: [null, null, null, null] },
-            { name: "ellipse", params: [null, null, null, null] }
+            { name: "ellipse", params: [null, null, null, null] },
+            { name: "line", params: [null, null, null, null] },
+            { name: "triangle", params: [null, null, null, null, null, null] },
+            { name: "quad", params: [null, null, null, null, null, null, null, null] },
+            { name: "arc", params: [null, null, null, null, null, null] },
+            { name: "point", params: [null, null] }
          ]
       }
    };
