@@ -10,7 +10,6 @@ var localLanguageStrings = {
          sensors: "Capteurs",
          debug: "Débogage",
          colour: "Couleurs",
-         color: "Couleurs",
          attributes: "Réglages",
          data: "Données",
          dicts: "Dictionnaires",

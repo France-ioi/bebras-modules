@@ -2,6 +2,7 @@ var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
          label: {
+            colourValue: "",
             background: "remplir avec",
             fill: "définir la couleur de fond à",
             stroke: "définir la couleur de contour à",
@@ -15,6 +16,7 @@ var getContext = function(display, infos) {
             point: "dessiner un point"
          },
          code: {
+            colourValue: "couleur",
             background: "arrierePlan",
             fill: "couleurFond",
             stroke: "couleurContour",
@@ -66,7 +68,7 @@ var getContext = function(display, infos) {
    context.provideBlocklyColours = function() {
       return {
          categories: {
-            color: 10,
+            colour: 10,
             attributes: 280,
             shapes: 180
          }
@@ -111,7 +113,8 @@ var getContext = function(display, infos) {
 
    context.resetDisplay = function() {
       var canvas = $('<canvas>').css('border', '1px solid black');
-      $('#grid').empty().append(canvas);
+      var coordinatesContainer = $('<div>').text(" ");
+      $('#grid').empty().append(canvas, coordinatesContainer);
 
       var processingInstance = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
@@ -126,6 +129,17 @@ var getContext = function(display, infos) {
                processing[op.func].apply(null, op.args);
             }
          };
+
+         processing.mouseMoved = function() {
+            coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
+         };
+         processing.mouseDragged = function() {
+            coordinatesContainer.find('span').remove();
+            coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
+         };
+         processing.mouseOut = function() {
+            coordinatesContainer.text(" ");
+         };
       });
 
       context.blocklyHelper.updateSize();
@@ -138,10 +152,10 @@ var getContext = function(display, infos) {
    };
 
 
-   context.processing.commonOp = function() {
+   context.processing.commonOp = function() {console.log(arguments);
       var args = [];
       for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
-         args.push(arguments[iArg]);
+         args.push(arguments[iArg]);//.data);
       }
       context.processing.ops.push({ func: arguments[0], args: args });
       context.waitDelay(arguments[arguments.length - 1]);
@@ -158,8 +172,10 @@ var getContext = function(display, infos) {
 
    context.customBlocks = {
       processing: {
-         color: [
-            { name: "background", params: [null, null, null] },
+         colour: [
+            { name: "colourValue", blocklyJson: { output: null,
+               "args0": [{ type: "field_colour", name: "colour", colour: "#ff0000" }] } },
+            { name: "background", params: [null, null, null], blocklyJson: { inputsInline: true } },
             { name: "fill", params: [null, null, null] },
             { name: "stroke", params: [null, null, null] }
          ],
