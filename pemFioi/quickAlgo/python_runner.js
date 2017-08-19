@@ -212,6 +212,10 @@ function PythonInterpreter(context, msgCallback) {
       Sk.runQueue.push({ctrl: this, codes: codes});
       return;
     }
+
+    // Set Skulpt to Python 3
+    Sk.python3 = true;
+
     currentPythonContext = this.context;
     this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
