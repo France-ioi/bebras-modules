@@ -78,7 +78,12 @@ function LogicController(nbTestCases, maxInstructions) {
   }
 
   this.getDefaultContent = function () {
-    return "from robot import *\n";
+    var availableModules = this.getAvailableModules();
+    var content = '';
+    for(var i=0; i < availableModules.length; i++) {
+      content += 'from ' + availableModules[i] + ' import *\n';
+    }
+    return content;
   };
 
   /**
@@ -121,10 +126,14 @@ function LogicController(nbTestCases, maxInstructions) {
       $('#errors').html("Vous ne pouvez pas valider un programme vide !");
       return;
     }
-    var match = /from\s+robot\s+import\s+\*/.exec(code);
-    if(match === null) {
-      $('#errors').html("Vous devez mettre la ligne <code>from robot import *</code> dans votre programme.");
-      return;
+    var availableModules = this.getAvailableModules();
+    for(var i=0; i < availableModules.length; i++) {
+      var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
+      match = match.exec(code);
+      if(match === null) {
+        $('#errors').html("Vous devez mettre la ligne <code>from " + availableModules[i] + " import *</code> dans votre programme.");
+        return;
+      }
     }
 
     this._mainContext.runner.initCodes(codes);
@@ -290,6 +299,20 @@ function LogicController(nbTestCases, maxInstructions) {
     this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
 
+  this.getAvailableModules = function () {
+    if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
+      var availableModules = [];
+      for (var generatorName in this.includeBlocks.generatedBlocks) {
+        if(this.includeBlocks.generatedBlocks[generatorName].length) {
+          availableModules.push(generatorName);
+        }
+      }
+      return availableModules;
+    } else {
+      return [];
+    }
+  };
+
   this.updateTaskIntro = function () {
     var pythonDiv = $('#taskIntro .pythonIntro');
     if(pythonDiv.length == 0) {
@@ -303,11 +326,19 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var pythonHtml = '<hr />';
 
-    if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
-      pythonHtml += '<p>Votre programme doit commencer par la ligne :</p>'
-                  +  '<p><code>from robot import *</code></p>'
-                  +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
-                  +  '<ul>';
+    var availableModules = this.getAvailableModules();
+    if(availableModules.length) {
+      pythonHtml += '<p>Votre programme doit commencer par ';
+      pythonHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
+      pythonHtml += ' :</p>'
+                 +  '<p><code>'
+                 +  'from ' + availableModules[0] + ' import *';
+      for(var i=1; i < availableModules.length; i++) {
+        pythonHtml += '\nfrom ' + availableModules[i] + ' import *';
+      }
+      pythonHtml += '</code></p>'
+                 +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
+                 +  '<ul>';
 
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];

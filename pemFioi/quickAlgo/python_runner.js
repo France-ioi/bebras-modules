@@ -25,6 +25,8 @@ function PythonInterpreter(context, msgCallback) {
   this._nbActions = 0;
   this._timeouts = [];
   this._editorMarker = null;
+  this.availableModules = [];
+
   var that = this;
 
   this._skulptifyHandler = function (name, generatorName, blockName, nbArgs, type) {
@@ -57,8 +59,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._injectFunctions = function () {
-    // Generate Python lib robot from all generated blocks
-    var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
+    // Generate Python custom libraries from all generated blocks
     if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
       // Flatten customBlocks information for easy access
       var blocksInfos = {};
@@ -77,6 +78,8 @@ function PythonInterpreter(context, msgCallback) {
       // Generate functions used in the task
       for (var generatorName in this.context.infos.includeBlocks.generatedBlocks) {
         var blockList = this.context.infos.includeBlocks.generatedBlocks[generatorName];
+        if(!blockList.length) { continue; }
+        var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
           var blockName = blockList[iBlock];
           var code = this.context.strings.code[blockName];
@@ -92,11 +95,11 @@ function PythonInterpreter(context, msgCallback) {
 
           modContents += this._skulptifyHandler(code, generatorName, blockName, nbArgs, type);
         }
+        modContents += "\nreturn mod;\n};";
+        Sk.builtinFiles["files"]["src/lib/"+generatorName+".js"] = modContents;
+        this.availableModules.push(generatorName);
       }
     }
-
-    modContents += "\nreturn mod;\n};";
-    Sk.builtinFiles["files"]["src/lib/robot.js"] = modContents;
   };
 
   this.waitDelay = function (callback, value, delay) {
