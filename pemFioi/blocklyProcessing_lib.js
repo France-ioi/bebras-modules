@@ -138,7 +138,11 @@ var getContext = function(display, infos) {
             coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
          };
          processing.mouseOut = function() {
-            coordinatesContainer.text(" ");
+            if (coordinatesContainer.find('span').length > 0) {
+               coordinatesContainer.find('span').remove();
+            } else {
+               coordinatesContainer.text(" ");
+            }
          };
       });
 
@@ -152,13 +156,17 @@ var getContext = function(display, infos) {
    };
 
 
-   context.processing.commonOp = function() {console.log(arguments);
+   context.processing.commonOp = function() {
       var args = [];
       for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
          args.push(arguments[iArg]);//.data);
       }
       context.processing.ops.push({ func: arguments[0], args: args });
       context.waitDelay(arguments[arguments.length - 1]);
+   };
+
+   context.processing.colourValue = function(colour, callback) {
+      context.waitDelay(callback, colour);
    };
 
 
@@ -173,23 +181,23 @@ var getContext = function(display, infos) {
    context.customBlocks = {
       processing: {
          colour: [
-            { name: "colourValue", blocklyJson: { output: null,
-               "args0": [{ type: "field_colour", name: "colour", colour: "#ff0000" }] } },
+            { name: "colourValue", params: [null], blocklyJson: { output: null,
+               args0: [{ type: "field_colour", name: "colour", colour: "#ff0000" }] } },
             { name: "background", params: [null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "fill", params: [null, null, null] },
-            { name: "stroke", params: [null, null, null] }
+            { name: "fill", params: [null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "stroke", params: [null, null, null], blocklyJson: { inputsInline: true } }
          ],
          attributes: [
-            { name: "strokeWeight", params: [null] }
+            { name: "strokeWeight", params: [null], blocklyJson: { inputsInline: true } }
          ],
          shapes: [
-            { name: "rect", params: [null, null, null, null] },
-            { name: "ellipse", params: [null, null, null, null] },
-            { name: "line", params: [null, null, null, null] },
-            { name: "triangle", params: [null, null, null, null, null, null] },
-            { name: "quad", params: [null, null, null, null, null, null, null, null] },
-            { name: "arc", params: [null, null, null, null, null, null] },
-            { name: "point", params: [null, null] }
+            { name: "rect", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "ellipse", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "line", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "triangle", params: [null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "quad", params: [null, null, null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "arc", params: [null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
+            { name: "point", params: [null, null], blocklyJson: { inputsInline: true } }
          ]
       }
    };
@@ -198,9 +206,11 @@ var getContext = function(display, infos) {
       for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
          (function() {
             var funcName = context.customBlocks.processing[category][iFunc].name;
-            context.processing[funcName] = function() {
-               context.processing.commonOp.apply(null, [funcName].concat(Array.apply(null, arguments)));
-            };
+            if (!context.processing[funcName]) {
+               context.processing[funcName] = function() {
+                  context.processing.commonOp.apply(null, [funcName].concat(Array.apply(null, arguments)));
+               };
+            }
          })();
       }
    }
