@@ -20,7 +20,7 @@ var getContext = function(display, infos) {
             eof: "fin de la saisie"
          },
          code: {
-            print: "écrire",
+            print: "ecrire",
             read: "lire",
             readInteger: "lireEntier",
             readFloat: "lireDecimal",
@@ -204,7 +204,7 @@ var getContext = function(display, infos) {
          value = "";
       }
 
-      context.printer.output_text += value.data + "\n";
+      context.printer.output_text += value + "\n";
       context.updateScale();
       
       context.waitDelay(callback);

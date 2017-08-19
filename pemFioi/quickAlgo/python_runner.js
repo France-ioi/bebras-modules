@@ -36,7 +36,7 @@ function PythonInterpreter(context, msgCallback) {
 
     // If there are arguments, convert them from Skulpt format to the libs format
     handler += "\n\tvar args = Array.from(arguments);";
-    handler += "\n\tfor(var i=0; i<args.length; i++) { args[i] = {data: args[i].v}; };";
+    handler += "\n\tfor(var i=0; i<args.length; i++) { args[i] = args[i].v; };";
 
     handler += "\n\tsusp.resume = function() { return result; };";
     handler += "\n\tsusp.data = {type: 'Sk.promise', promise: new Promise(function(resolve) {";

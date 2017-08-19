@@ -1116,7 +1116,7 @@ var getContext = function(display, infos, curLevel) {
       if (itemsUnder.length == 0) {
          context.callCallback(callback);
       } else {
-         itemsUnder[0].type = value.data;
+         itemsUnder[0].type = value;
          if (context.display) {
             redisplayItem(itemsUnder[0]);
          }
