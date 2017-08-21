@@ -568,38 +568,12 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   window.stringsLanguage = window.stringsLanguage || "fr";
-   window.languageStrings = window.languageStrings || {};
+   var context = quickAlgoContext(display, infos);
 
-   if (typeof window.languageStrings != "object") {
-      console.error("window.languageStrings is not an object");
-   }
-   else { // merge translations
-      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-   }   
-
-   function replaceStringsRec(source, dest) {
-      if ((typeof source != "object") || (typeof dest != "object")) {
-         return;
-      }
-      for (var key1 in source) {
-         if (dest[key1] != undefined) {
-            if (typeof dest[key1] == "object") {
-               replaceStringsRec(source[key1], dest[key1]);
-            } else {
-               dest[key1] = source[key1];
-            }
-         }
-      }
-   }
-
-   var strings = window.languageStrings;
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
    if (infos.languageStrings != undefined) {
-      if (infos.languageStrings.blocklyRobot_lib != undefined) {
-         var infosStrings = infos.languageStrings.blocklyRobot_lib;
-         replaceStringsRec(infosStrings, strings);
-      }
+      replaceStringsRec(infos.languageStrings.blocklyRobot_lib, strings);
    }
 
    var cells = [];
@@ -618,17 +592,12 @@ var getContext = function(display, infos, curLevel) {
          infos.topMargin = infos.cellSide / 2;
       }
    }
-   if (infos.showLabels) {      infos.leftMargin += infos.cellSide;
+   if (infos.showLabels) {
+      infos.leftMargin += infos.cellSide;
       infos.topMargin += infos.cellSide;
    }
 
-   var context = {
-      display: display,
-      infos: infos,
-      robot: {},
-      strings: strings,
-      localLanguageStrings: localLanguageStrings
-   };
+   context.robot = {};
 
    switch (infos.blocklyColourTheme) {
       case "bwinf":
@@ -654,20 +623,6 @@ var getContext = function(display, infos, curLevel) {
       default:
          // we could set printer specific default colours here, if we wanted to …
    }
-
-   context.changeDelay = function(newDelay) {
-      infos.actionDelay = newDelay;
-   };
-
-   context.waitDelay = function(callback, value) {
-      context.runner.waitDelay(callback, value, infos.actionDelay);
-   };
-
-   context.callCallback = function(callback, value) { // Default implementation
-      context.runner.noDelay(callback, value);
-   };
-
-   context.nbRobots = 1;
 
    context.getRobotItem = function(iRobot) {
       var items = context.getItems(undefined, undefined, {category: "robot"});
@@ -1007,14 +962,6 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   context.debug_alert = function(message, callback) {
-      message = message ? message.toString() : '';
-      if (context.display) {
-         alert(message);
-      }
-      context.callCallback(callback);
-   };
-
    context.robot.itemInFront = function(callback) {
       var itemsInFront = getItemsInFront({isObstacle: true});
       context.callCallback(callback, itemsInFront.length > 0);
@@ -1352,15 +1299,6 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, dirNames[item.dir]);
    };
 
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
-   };
-
    context.reset = function(gridInfos) {
       if (gridInfos) {
          context.tiles = gridInfos.tiles;
@@ -1388,7 +1326,6 @@ var getContext = function(display, infos, curLevel) {
       this.delayFactory.destroyAll();
       this.raphaelFactory.destroyAll();
       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-      $("#errors").html("");
       resetBoard();
 //      context.blocklyHelper.updateSize();
       resetItems();

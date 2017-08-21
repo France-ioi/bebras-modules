@@ -44,6 +44,7 @@ var importableModules = function () {
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
       'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
+      'blockly-example': {src: modulesPath+"/pemFioi/blocklyExample_lib.js", id: "blocklyExample_lib"},
       'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
 
       'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},
@@ -55,6 +56,7 @@ var importableModules = function () {
       'quickAlgo_python_interface': {src: modulesPath+"/pemFioi/quickAlgo/python_interface.js", id: "quickAlgo_python_interface"},
       'quickAlgo_python_runner': {src: modulesPath+"/pemFioi/quickAlgo/python_runner.js", id: "quickAlgo_python_runner"},
       'quickAlgo_subtask': {src: modulesPath+"/pemFioi/quickAlgo/subtask.js", id: "quickAlgo_subtask"},
+      'quickAlgo_context': {src: modulesPath+"/pemFioi/quickAlgo/context.js", id: "quickAlgo_context"},
       'quickAlgo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/quickAlgo/quickAlgo.css", id: "quickAlgo_css"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
@@ -89,6 +91,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_interface',
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css'
       ],
       scratch: [
@@ -110,6 +113,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_interface',
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css'
       ],
       python: [
@@ -125,6 +129,7 @@ var languageScripts = function () {
          'quickAlgo_python_interface',
          'quickAlgo_python_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css'
       ]
    }

@@ -74,31 +74,18 @@ var getContext = function(display, infos) {
          }
       }
    }
-   
-   window.stringsLanguage = window.stringsLanguage || "fr";
-   window.languageStrings = window.languageStrings || {};
 
-   if (typeof window.languageStrings != "object") {
-      console.error("window.languageStrings is not an object");
-   }
-   else { // merge translations
-      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-   }   
-   var strings = window.languageStrings;
+   var context = quickAlgoContext(display, infos);
+
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);
    
    var cells = [];
    var texts = [];
    var scale = 1;
 
-   var context = {
-      display: display,
-      infos: infos,
-      strings: strings,
-      localLanguageStrings: localLanguageStrings,
-      printer: {
-         input_text : "",
-         output_text : ""
-      }
+   context.printer = {
+      input_text : "",
+      output_text : ""
    };
 
    if (infos.showIfMutator) {
@@ -128,35 +115,6 @@ var getContext = function(display, infos) {
          // we could set printer specific default colours here, if we wanted to …
    }
             
-   context.changeDelay = function(newDelay) {
-      infos.actionDelay = newDelay;
-   };
-
-   context.waitDelay = function(callback, value) {
-      context.runner.waitDelay(callback, value, infos.actionDelay);
-   };
-
-   context.callCallback = function(callback, value) { // Default implementation
-      context.runner.noDelay(callback, value);
-   };
-
-   context.nbRobots = 1;
-
-   context.getRobotItem = function(iRobot) {
-      var items = context.getItems(undefined, undefined, {category: "robot"});
-      return items[iRobot];
-   };
-
-
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
-   };
-
    context.reset = function(taskInfos) {
       this.success = false;
       if (context.display) {
@@ -254,14 +212,6 @@ var getContext = function(display, infos) {
    }
 
 
-   context.debug_alert = function(message, callback) {
-      message = message ? message.toString() : '';
-      if (context.display) {
-         alert(message);
-      }
-      context.callCallback(callback);
-   };
-
    context.customBlocks = {
       printer: {
          print: [
@@ -276,33 +226,6 @@ var getContext = function(display, infos) {
       }
    }
 
-
-   context.getItems = function(row, col, filters) {
-      var listItems = [];
-      for (var iItem = 0; iItem < context.items.length; iItem++) {
-         var item = context.items[iItem];
-         var itemType = infos.itemTypes[item.type];
-         if ((row == undefined) || ((item.row == row) && (item.col == col))) {
-            var accepted = true;
-            for (var property in filters) {
-               var value = filters[property];
-               if ((itemType[property] == undefined) && (value != undefined)) {
-                  accepted = false;
-                  break;
-               }
-               if ((itemType[property] != undefined) && (itemType[property] != value)) {
-                  accepted = false;
-                  break;
-               }
-            }
-            if (accepted) {
-               item.index = iItem;
-               listItems.push(item);
-            }
-         }
-      }
-      return listItems;
-   };
 
    context.updateScale = function() {
       if (!context.display) {

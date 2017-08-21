@@ -53,6 +53,7 @@ var importableModules = function () {
       'quickAlgo_python_interface': {src: modulesPath+"/pemFioi/quickAlgo/python_interface.js", id: "quickAlgo_python_interface"},
       'quickAlgo_python_runner': {src: modulesPath+"/pemFioi/quickAlgo/python_runner.js", id: "quickAlgo_python_runner"},
       'quickAlgo_subtask': {src: modulesPath+"/pemFioi/quickAlgo/subtask.js", id: "quickAlgo_subtask"},
+      'quickAlgo_context': {src: modulesPath+"/pemFioi/quickAlgo/context.js", id: "quickAlgo_context"},
       'quickAlgo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/quickAlgo/quickAlgo.css", id: "quickAlgo_css"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
@@ -87,6 +88,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_interface',
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css',
          'blocklyRobot_lib'
       ],
@@ -109,6 +111,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_interface',
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css',
          'blocklyRobot_lib'
       ],
@@ -125,6 +128,7 @@ var languageScripts = function () {
          'quickAlgo_python_interface',
          'quickAlgo_python_runner',
          'quickAlgo_subtask',
+         'quickAlgo_context',
          'quickAlgo_css',
          'blocklyRobot_lib'
       ]

@@ -39,28 +39,11 @@ var getContext = function(display, infos) {
          comment: {}
       }
    }
-   
-   window.stringsLanguage = window.stringsLanguage || "fr";
-   window.languageStrings = window.languageStrings || {};
 
-   if (typeof window.languageStrings != "object") {
-      console.error("window.languageStrings is not an object");
-   }
-   else { // merge translations
-      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-   }   
-   var strings = window.languageStrings;
+   var context = quickAlgoContext(display, infos);
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);   
    
-   var cells = [];
-   var texts = [];
-   var scale = 1;
-
-   var context = {
-      display: display,
-      infos: infos,
-      strings: strings,
-      localLanguageStrings: localLanguageStrings,
-      processing: {
+   context.processing = {
          ops: []
       }
    };
@@ -73,35 +56,6 @@ var getContext = function(display, infos) {
             shapes: 180
          }
       };
-   };
-
-   context.changeDelay = function(newDelay) {
-      infos.actionDelay = newDelay;
-   };
-
-   context.waitDelay = function(callback, value) {
-      context.runner.waitDelay(callback, value, infos.actionDelay);
-   };
-
-   context.callCallback = function(callback, value) { // Default implementation
-      context.runner.noDelay(callback, value);
-   };
-
-   context.nbRobots = 1;
-
-   context.getRobotItem = function(iRobot) {
-      var items = context.getItems(undefined, undefined, {category: "robot"});
-      return items[iRobot];
-   };
-
-
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
    };
 
    context.reset = function(taskInfos) {
@@ -169,14 +123,6 @@ var getContext = function(display, infos) {
       context.waitDelay(callback, colour);
    };
 
-
-   context.debug_alert = function(message, callback) {
-      message = message ? message.toString() : '';
-      if (context.display) {
-         alert(message);
-      }
-      context.callCallback(callback);
-   };
 
    context.customBlocks = {
       processing: {

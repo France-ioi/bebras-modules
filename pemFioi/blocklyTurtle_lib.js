@@ -144,30 +144,16 @@ var getContext = function(display, infos) {
          }
       }
    };
-   
-   window.stringsLanguage = window.stringsLanguage || "fr";
-   window.languageStrings = window.languageStrings || {};
 
-   if (typeof window.languageStrings != "object") {
-      console.error("window.languageStrings is not an object");
-   }
-   else { // merge translations
-      $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-   }   
-   var strings = window.languageStrings;
+   var context = quickAlgoContext(display, infos);
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);
    
    var cells = [];
    var texts = [];
    var scale = 1;
    var paper;
 
-   var context = {
-      display: display,
-      infos: infos,
-      turtle: {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle},
-      strings: strings,
-      localLanguageStrings: localLanguageStrings
-   };
+   context.turtle = {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle};
 
    switch (infos.blocklyColourTheme) {
       case "bwinf":
@@ -192,34 +178,6 @@ var getContext = function(display, infos) {
          // we could set turtle specific default colours here, if we wanted to …
    }
 
-   context.changeDelay = function(newDelay) {
-      infos.actionDelay = newDelay;
-   };
-
-   context.waitDelay = function(callback, value) {
-      context.runner.waitDelay(callback, value, infos.actionDelay);
-   };
-
-   context.callCallback = function(callback, value) { // Default implementation
-      context.runner.noDelay(callback, value);
-   };
-
-   context.nbRobots = 1;
-
-   context.getRobotItem = function(iRobot) {
-      var items = context.getItems(undefined, undefined, {category: "robot"});
-      return items[iRobot];
-   };
-
-
-   context.debug_alert = function(callback, message) {
-      message = message ? message.toString() : '';
-      if (context.display) {
-         alert(message);
-      }
-      context.callCallback(callback);
-   };
-
    context.debug_log = function(callback, message) {
       message = message ? message.toString() : '';
       if (context.display) {
@@ -230,17 +188,6 @@ var getContext = function(display, infos) {
          console.log("^^^^^");
       }
       context.callCallback(callback);
-   };
-
-   
-
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
    };
 
    context.reset = function(gridInfos) {
@@ -285,8 +232,6 @@ var getContext = function(display, infos) {
    };
 
    context.resetDisplay = function() {
-      $("#errors").html("");
-
       $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.1;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.2;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='turtle.svg' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
       
       context.blocklyHelper.updateSize();
@@ -300,6 +245,9 @@ var getContext = function(display, infos) {
       if (context.display) {
          // ... clean up necessary?
       }
+   };
+
+   context.updateScale = function() {
    };
 
    function callOnAllTurtles(fn) {
@@ -465,38 +413,6 @@ var getContext = function(display, infos) {
       }
    };
    
-
-   context.getItems = function(row, col, filters) {
-      var listItems = [];
-      for (var iItem = 0; iItem < context.items.length; iItem++) {
-         var item = context.items[iItem];
-         var itemType = infos.itemTypes[item.type];
-         if ((row == undefined) || ((item.row == row) && (item.col == col))) {
-            var accepted = true;
-            for (var property in filters) {
-               var value = filters[property];
-               if ((itemType[property] == undefined) && (value != undefined)) {
-                  accepted = false;
-                  break;
-               }
-               if ((itemType[property] != undefined) && (itemType[property] != value)) {
-                  accepted = false;
-                  break;
-               }
-            }
-            if (accepted) {
-               item.index = iItem;
-               listItems.push(item);
-            }
-         }
-      }
-      return listItems;
-   };
-
-
-
-   context.updateScale = function() {
-   };
 
    return context;
 }
