@@ -20,8 +20,8 @@ var getContext = function(display, infos) {
             eof: "fin de la saisie"
          },
          code: {
-            print: "ecrire",
-            read: "lire",
+            print: "print",
+            read: "input",
             readInteger: "lireEntier",
             readFloat: "lireDecimal",
             eof: "finSaisie"
