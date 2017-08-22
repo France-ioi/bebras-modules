@@ -93,7 +93,10 @@ function Simulation(id, delayFactory) {
       }
 
       this.expediting = true;
-      this.steps[this.stepIndex].setExpedite(true);
+      
+      if(this.steps.length > this.stepIndex) {
+         this.steps[this.stepIndex].setExpedite(true);
+      }
    };
 
    this.clear = function() {
