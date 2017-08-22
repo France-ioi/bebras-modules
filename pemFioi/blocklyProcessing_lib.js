@@ -44,8 +44,7 @@ var getContext = function(display, infos) {
    var strings = context.setLocalLanguageStrings(localLanguageStrings);   
    
    context.processing = {
-         ops: []
-      }
+      ops: []
    };
 
    context.provideBlocklyColours = function() {
