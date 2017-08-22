@@ -22,7 +22,8 @@
          'hints': 'Conseils',
          'showSolution': 'Voir la solution',
          'yourScore': "Votre score :",
-         'canReadSolution': "Vous pouvez maintenant lire la solution en bas de la page."
+         'canReadSolution': "Vous pouvez maintenant lire la solution en bas de la page.",
+         'gradeAnswer': "Tester le grader"
       },
       en: {
          'task': 'Task',
@@ -32,7 +33,8 @@
          'hints': 'Hints',
          'showSolution': 'Show solution',
          'yourScore': "Your score:",
-         'canReadSolution': "You can now read the solution at the bottom of this page."
+         'canReadSolution': "You can now read the solution at the bottom of this page.",
+         'gradeAnswer': 'Test grader'
       },
       de: {
          'task': 'Aufgabe',
@@ -42,7 +44,8 @@
          'hints': 'Hinweise',
          'showSolution': 'Lösung anzeigen',
          'yourScore': "Dein Punktestand:",
-         'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen."
+         'canReadSolution': "Du kannst dir jetzt die Lösung unten auf der Seite anschauen.",
+         'gradeAnswer': 'Test grader'
       },
       es: {
          'task': 'Problema',
@@ -52,7 +55,8 @@
          'hints': 'Pistas',
          'showSolution': 'Mostrar solución',
          'yourScore': 'Su puntuación:',
-         'canReadSolution': 'Puede leer la solución al final de esta página.'
+         'canReadSolution': 'Puede leer la solución al final de esta página.',
+         'gradeAnswer': 'Test grader'
       }
    };
    
@@ -170,6 +174,18 @@ var chooseView = (function () {
                btn.click(this.selectFactory(viewName));
             }
          }
+         $("#grade").remove();
+         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + languageStrings[window.stringsLanguage].gradeAnswer + '</button></center>');
+         $(document.body).append(btnGradeAnswer);
+         btnGradeAnswer.click(function() {
+            task.getAnswer(function(answer) {
+               task.gradeAnswer(answer, null, function(score, message, scoreToken) {
+                  alert("Score : " + score + ", message : " + message);
+               });
+            }, function() {
+               alert("error");
+            });
+         })
       },
 
       reinit: function(views) {
