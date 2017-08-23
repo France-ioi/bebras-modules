@@ -336,6 +336,11 @@ function Crane(simulationFactory, userSettings) {
          this._drawButtons();
       }
 
+      if(this.settings.targetMode) {
+         // Column labels.
+         this._drawLabels();
+      }
+
       // Floor.
       this.visuals.floor = paper.path([
          "M",
@@ -383,6 +388,15 @@ function Crane(simulationFactory, userSettings) {
          var xPos = this._columnIndexToLeftX(column) + this.settings.blockWidth / 2 - this.settings.buttonWidth / 2;
          this.visuals.buttons[column] = new Button(this.settings.paper, xPos, yPos, this.settings.buttonWidth, this.settings.buttonHeight, column + 1);
          this.visuals.buttons[column].click(this._clickButton, {column: column});
+      }
+   };
+
+   this._drawLabels = function() {
+      this.visuals.labels = {};
+      var yPos = this.settings.floorCenterY + this.settings.buttonPadTop + this.settings.buttonHeight / 2;
+      for(var column = 0; column < this.columns; column++) {
+         var xPos = this._columnIndexToLeftX(column) + this.settings.blockWidth / 2;
+         this.visuals.labels[column] = this.settings.paper.text(xPos, yPos, column + 1).attr(this.settings.labelTextAttr);
       }
    };
 
@@ -534,6 +548,11 @@ function Crane(simulationFactory, userSettings) {
       }
       delete this.visuals.buttons;
 
+      for(var iLabel in this.visuals.labels) {
+         this.visuals.labels[iLabel].remove();
+      }
+      delete this.visuals.labels;
+
       for(var iElement in this.visuals) {
          this.visuals[iElement].remove();
       }
@@ -571,7 +590,10 @@ function Crane(simulationFactory, userSettings) {
          "stroke-width": 1
       },
       buttonWidth: 40,
-      buttonHeight: 40
+      buttonHeight: 40,
+      labelTextAttr: {
+         "font-size": 16
+      }
    };
 
    this._init();
