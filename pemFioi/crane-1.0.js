@@ -38,6 +38,10 @@ function Crane(simulationFactory, userSettings) {
 
    this._defaultEmpty = function() {};
 
+   this._defaultColumnText = function(column) {
+      return column + 1;
+   };
+
    this.getActionSequence = function() {
       return $.extend(true, [], this.actionSequence);
    };
@@ -386,7 +390,8 @@ function Crane(simulationFactory, userSettings) {
       var yPos = this.settings.floorCenterY + this.settings.buttonPadTop;
       for(var column = 0; column < this.columns; column++) {
          var xPos = this._columnIndexToLeftX(column) + this.settings.blockWidth / 2 - this.settings.buttonWidth / 2;
-         this.visuals.buttons[column] = new Button(this.settings.paper, xPos, yPos, this.settings.buttonWidth, this.settings.buttonHeight, column + 1);
+         var text = this.settings.columnTextFunction(column);
+         this.visuals.buttons[column] = new Button(this.settings.paper, xPos, yPos, this.settings.buttonWidth, this.settings.buttonHeight, text);
          this.visuals.buttons[column].click(this._clickButton, {column: column});
       }
    };
@@ -396,7 +401,8 @@ function Crane(simulationFactory, userSettings) {
       var yPos = this.settings.floorCenterY + this.settings.buttonPadTop + this.settings.buttonHeight / 2;
       for(var column = 0; column < this.columns; column++) {
          var xPos = this._columnIndexToLeftX(column) + this.settings.blockWidth / 2;
-         this.visuals.labels[column] = this.settings.paper.text(xPos, yPos, column + 1).attr(this.settings.labelTextAttr);
+         var text = this.settings.columnTextFunction(column);
+         this.visuals.labels[column] = this.settings.paper.text(xPos, yPos, text).attr(this.settings.labelTextAttr);
       }
    };
 
@@ -593,7 +599,8 @@ function Crane(simulationFactory, userSettings) {
       buttonHeight: 40,
       labelTextAttr: {
          "font-size": 16
-      }
+      },
+      columnTextFunction: this._defaultColumnText
    };
 
    this._init();
