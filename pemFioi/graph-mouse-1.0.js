@@ -306,6 +306,9 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
    this.graph = graph;
    this.visualGraph = visualGraph;
    this.graphMouse = graphMouse;
+   this.snapEnabled = false;
+   this.snapX = null;
+   this.snapY = null;
    this.enabled = false;
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -317,6 +320,14 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
       }
       else {
          graphMouse.removeEvent(id);
+      }
+   };
+
+   this.setSnapEnabled = function(enabled, snapX, snapY) {
+      this.snapEnabled = enabled;
+      if(enabled) {
+         this.snapX = snapX;
+         this.snapY = snapY;
       }
    };
 
@@ -332,7 +343,13 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
-      self.visualGraph.graphDrawer.moveVertex(self.elementID, self.originalPosition.x + dx, self.originalPosition.y + dy);
+      var newX = self.originalPosition.x + dx;
+      var newY = self.originalPosition.y + dy;
+      if(self.snapEnabled) {
+         newX -= (newX % self.snapX);
+         newY -= (newY % self.snapY);
+      }
+      self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
 
    if(enabled) {
