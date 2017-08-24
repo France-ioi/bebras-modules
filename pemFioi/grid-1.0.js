@@ -496,6 +496,15 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
    };
 
+   this.linesToBack = function() {
+      for (var iRow = 0; iRow <= this.rows; iRow++) {
+         this.horizontalLines[iRow].toBack();
+      }
+      for (var iCol = 0; iCol <= this.cols; iCol++) {
+         this.verticalLines[iCol].toBack();
+      }
+   };
+
    this.getLeftX = function() {
       return this.gridLeft;
    };
