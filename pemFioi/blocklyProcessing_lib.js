@@ -6,20 +6,24 @@ var getContext = function(display, infos) {
             background: "remplir avec",
             fill: "définir la couleur de fond à",
             stroke: "définir la couleur de contour à",
+            noFill: "ne pas mettre de fond",
+            noStroke: "ne pas mettre de contour",
             strokeWeight: "définir l'épaisseur de contour à",
-            rect: "dessiner un rectangle",
-            ellipse: "dessiner une ellipse",
-            line: "dessiner une ligne",
-            triangle: "dessiner un triangle",
-            quad: "dessiner un quadrilatère",
-            arc: "dessiner un arc",
-            point: "dessiner un point"
+            rect: "dessiner un rectangle à %1 %2 de taille %3 %4",
+            ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
+            line: "dessiner une ligne de %1 %2 à %3 %4",
+            triangle: "dessiner un triangle aux points %1 %2, %3 %4, %5 %6",
+            quad: "dessiner un quadrilatère aux points %1 %2, %3 %4, %5 %6, %7 %8",
+            arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5 %6",
+            point: "dessiner un point à %1 %2"
          },
          code: {
             colourValue: "couleur",
             background: "arrierePlan",
             fill: "couleurFond",
             stroke: "couleurContour",
+            noFill: "pasDeFond",
+            noStroke: "pasDeContour",
             strokeWeight: "epaisseurContour",
             rect: "rect",
             ellipse: "ellipse",
@@ -126,34 +130,53 @@ var getContext = function(display, infos) {
    context.customBlocks = {
       processing: {
          colour: [
-            { name: "colourValue", params: [null], blocklyJson: { output: null,
+            { name: "colourValue", params: [null], blocklyJson: { output: 'Colour',
                args0: [{ type: "field_colour", name: "colour", colour: "#ff0000" }] } },
-            { name: "background", params: [null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "fill", params: [null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "stroke", params: [null, null, null], blocklyJson: { inputsInline: true } }
+            { name: "background", params: ['Number', 'Number', 'Number'] },
+            { name: "fill", params: ['Number', 'Number', 'Number'] },
+            { name: "stroke", params: ['Number', 'Number', 'Number'] },
+            { name: "noFill" },
+            { name: "noStroke" },
+            { name: "colorMode", params: ['Dropdown', 'Number', 'Number', 'Number', 'Number'], blocklyJson: {
+               args0: [{ type: "field_dropdown", name: "mode", options: [["RVB", Processing.RGB], ["TSV", Processing.HSB]] }] } }
          ],
          attributes: [
-            { name: "strokeWeight", params: [null], blocklyJson: { inputsInline: true } }
+            { name: "strokeWeight", params: ['Number'] }
          ],
          shapes: [
-            { name: "rect", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "ellipse", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "line", params: [null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "triangle", params: [null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "quad", params: [null, null, null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "arc", params: [null, null, null, null, null, null], blocklyJson: { inputsInline: true } },
-            { name: "point", params: [null, null], blocklyJson: { inputsInline: true } }
+            { name: "rect", params: ['Number', 'Number', 'Number', 'Number'] },
+            { name: "ellipse", params: ['Number', 'Number', 'Number', 'Number'] },
+            { name: "line", params: ['Number', 'Number', 'Number', 'Number'] },
+            { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "quad", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "point", params: ['Number', 'Number'] }
          ]
       }
    };
 
+   var typeDefaults = { 'Number': ['math_number', 0] };
    for (var category in context.customBlocks.processing) {
       for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
          (function() {
-            var funcName = context.customBlocks.processing[category][iFunc].name;
-            if (!context.processing[funcName]) {
-               context.processing[funcName] = function() {
-                  context.processing.commonOp.apply(null, [funcName].concat(Array.apply(null, arguments)));
+            var func = context.customBlocks.processing[category][iFunc];
+            if (!context.processing[func.name]) {
+               if (func.params) {
+                  func.blocklyJson = { inputsInline: true };
+                  func.blocklyXml = '<block type="' + func.name + '">';
+                  for (var iParam = 0; iParam < func.params.length; iParam++) {
+                     var paramDef = typeDefaults[func.params[iParam]];
+                     if (paramDef) {
+                        func.blocklyXml +=
+                           '<value name="PARAM_' + iParam + '">' +
+                              '<shadow type="' + paramDef[0] + '"><field name="NUM">' + paramDef[1] + '</field></shadow>' +
+                           '</value>';
+                     }
+                  }
+                  func.blocklyXml += '</block>';
+               }
+               context.processing[func.name] = function() {
+                  context.processing.commonOp.apply(null, [func.name].concat(Array.apply(null, arguments)));
                };
             }
          })();
