@@ -331,7 +331,8 @@ var getContext = function(display, infos) {
                            paramData = { pType: 'field_dropdown' };
                            funcArgs[iParam] = $.extend({ options: [] }, funcArgs[iParam]);
                            for (var iValue = 0; iValue < paramType.length; iValue++) {
-                              funcArgs[iParam].options.push([strings.values[paramType[iValue]], Processing[paramType[iValue]]]);
+                              funcArgs[iParam].options.push([strings.values[paramType[iValue]],
+                                 typeof Processing !== 'undefined' ? Processing[paramType[iValue]] : paramType[iValue]]);
                            }
                         }
                         funcArgs[iParam] = $.extend({ type: paramData.pType, name: "PARAM_" + iParam }, funcArgs[iParam]);
