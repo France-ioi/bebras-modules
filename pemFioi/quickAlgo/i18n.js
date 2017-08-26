@@ -10,7 +10,6 @@ var localLanguageStrings = {
          sensors: "Capteurs",
          debug: "Débogage",
          colour: "Couleurs",
-         attributes: "Réglages",
          data: "Données",
          dicts: "Dictionnaires",
          input: "Entrées",
@@ -24,9 +23,7 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Fonctions",
          read: "Lecture",
-         print: "Écriture",
-         turtle: "Tortue",
-         shapes: "Formes"
+         print: "Écriture"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
@@ -46,7 +43,7 @@ var localLanguageStrings = {
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
       stopProgramDesc: "Repartir du début",
-      stepProgramDesc: "Exécution pas-à-pas",
+      stepProgramDesc: "Exécution pas à pas",
       slowSpeedDesc: "Exécuter sur ce test",
       mediumSpeedDesc: "Vitesse moyenne",
       fastSpeedDesc: "Vitesse rapide",
@@ -102,8 +99,7 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Functions",
          read: "Reading",
-         print: "Writing",
-         turtle: "Turtle"
+         print: "Writing"
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
@@ -178,8 +174,7 @@ var localLanguageStrings = {
          variables: "Variablen",
          functions: "Funktionen",
          read: "Einlesen",
-         print: "Ausgeben",
-         turtle: "Turtle"
+         print: "Ausgeben"
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",

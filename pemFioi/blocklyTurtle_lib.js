@@ -77,9 +77,15 @@ var makeTurtle = function() {
 var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
+         categories: {
+            turtle: "Tortue"
+         },
          startingBlockName: "Programme de la tortue"
       },
       de: {
+         categories: {
+            turtle: "Schildkröte"
+         },
          label: {
             move: "gehe",
             moveamount: "gehe %1 Schritte",
