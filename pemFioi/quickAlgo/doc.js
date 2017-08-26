@@ -12,8 +12,8 @@ var docLanguageStrings = {
     scratchTitle: 'Documentation des blocs génériques Scratch',
     libTitle: 'Documentation de la bibliothèque',
 
-    category: 'Catégorie',
-    subcategory: 'Sous-catégorie',
+    category: 'Catégorie « {} »',
+    subcategory: 'Sous-catégorie « {} »',
     blocklyColumns: ["Apparence", "Nom interne", "Commentaire"],
     columns: ["Nom du bloc", "Nom Python", "Nom interne", "Type", "Arguments", "Description", "Commentaire"],
     nameUndefined: 'non défini !',
@@ -30,26 +30,8 @@ var docLanguageStrings = {
     scratchTitle: 'Documentation for generic Scratch blocks',
     libTitle: 'Documentation for library',
 
-    category: 'Category',
-    subcategory: 'Subcategory',
-    blocklyColumns: ["Display", "Internal name", "Comment"],
-    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
-    nameUndefined: 'undefined!',
-    action: 'Action',
-    sensor: 'Sensor'
-  },
-  de: {
-    lang: 'Deutsch',
-
-    title: 'quickAlgo libraries documentation',
-    library: 'Library:',
-    language: 'Language:',
-    blocklyTitle: 'Documentation for generic Blockly blocks',
-    scratchTitle: 'Documentation for generic Scratch blocks',
-    libTitle: 'Documentation for library',
-
-    category: 'Category',
-    subcategory: 'Subcategory',
+    category: 'Category “{}”',
+    subcategory: 'Subcategory “{}”',
     blocklyColumns: ["Display", "Internal name", "Comment"],
     columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
     nameUndefined: 'undefined!',
@@ -79,9 +61,10 @@ var docBlockly = {
 // Generate the documentation for a specific category
 function generateCategory(context, lang, strings, category) {
   var ctxStr = context.localLanguageStrings[lang];
+  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
 
   var html = '';
-  html += '<h3>' + strings.category + ' "' + category + '"</h3>';
+  html += '<h3>' + strings.category.replace('{}', category) + '</h3>';
   html += '<table>';
 
   html += '<tr>';
@@ -92,7 +75,9 @@ function generateCategory(context, lang, strings, category) {
 
   // Generate for each subcategory
   for(var subCategory in context.customBlocks[category]) {
-    html += '<tr><td colspan="' + strings.columns.length + '" class="subcategory">' + strings.subcategory + ' ' + subCategory + '</td></tr>';
+    html += '<tr><td colspan="' + strings.columns.length + '" class="subcategory">' + strings.subcategory.replace('{}', subCategory) +
+      (ctxStr.categories && ctxStr.categories[subCategory] ? ' (' + ctxStr.categories[subCategory] + ')' :
+         (globalStr.categories && globalStr.categories[subCategory] ? ' (' + globalStr.categories[subCategory] + ')' : '')) + '</td></tr>';
     var blockList = context.customBlocks[category][subCategory];
     for(var i=0; i < blockList.length; i++) {
       var blockInfo = blockList[i];
@@ -167,6 +152,7 @@ function generateBlocklyDocumentation() {
   var lang = $('#lang').val();
   if(!lang) { lang = 'en'; }
   var strings = docLanguageStrings[lang] ? docLanguageStrings[lang] : docLanguageStrings['en'];
+  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
 
   var blocklyBlocks = getBlocklyBlockFunctions(0, 1);
   var scratchMode = $('#blocklySelector').val() == 'scratch';
@@ -186,7 +172,8 @@ function generateBlocklyDocumentation() {
   // Generate for each subcategory
   for(var subCategory in stdBlocks) {
     if(stdBlocks[subCategory].length == 0) { continue; }
-    html += '<tr><td colspan="' + strings.blocklyColumns.length + '" class="subcategory">' + strings.subcategory + ' ' + subCategory + '</td></tr>';
+    html += '<tr><td colspan="' + strings.blocklyColumns.length + '" class="subcategory">' + strings.subcategory.replace('{}', subCategory) +
+      (globalStr.categories && globalStr.categories[subCategory] ? ' (' + globalStr.categories[subCategory] + ')' : '') + '</td></tr>';
     var blockList = stdBlocks[subCategory];
     for(var i=0; i < blockList.length; i++) {
       var blockInfo = blockList[i];
