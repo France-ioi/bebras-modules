@@ -11,56 +11,143 @@ var getContext = function(display, infos) {
             typography: "Typographie"
          },
          label: {
-            background: "remplir avec",
-            colorMode: "utiliser le mode de couleur %1 avec les limites %2 %3 %4 %5",
-            fill: "définir la couleur de fond à",
-            noFill: "ne pas mettre de fond",
-            noStroke: "ne pas mettre de contour",
-            stroke: "définir la couleur de contour à",
-            strokeWeight: "définir l'épaisseur de contour à",
+            // environment
+            popStyle: "dépiler le style",
+            pushStyle: "empiler le style",
+            cursor: "utiliser le pointeur de souris",
+            focused: "le canevas est sélectionné",
+            frameCount: "numéro d'itération",
+            frameRate: "définir le taux de rafraichissement à",
+            __frameRate: "taux de rafraichissement",
+            width: "largeur",
+            height: "hauteur",
+            resize: "redimensionner à la taille",
+            // shape
             arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5 %6",
             ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
             line: "dessiner une ligne de %1 %2 à %3 %4",
             point: "dessiner un point à %1 %2",
             quad: "dessiner un quadrilatère aux points %1 %2, %3 %4, %5 %6, %7 %8",
             rect: "dessiner un rectangle à %1 %2 de taille %3 %4",
-            triangle: "dessiner un triangle aux points %1 %2, %3 %4, %5 %6"
+            triangle: "dessiner un triangle aux points %1 %2, %3 %4, %5 %6",
+            bezier: "dessiner une courbe de Bézier allant de %1 %2 avec l'ancre %3 %4 et l'ancre %5 %6 jusqu'à %7 %8",
+            bezierDetail: "définir la résolution des courbes de Bézier à",
+            bezierPoint: "coordonnée sur la courbe de Bézier allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
+            bezierTangent: "tangente sur la courbe de Bézier allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
+            curve: "dessiner une courbe spline allant de %1 %2 avec l'ancre %3 %4 et l'ancre %5 %6 jusqu'à %7 %8",
+            curveDetail: "définir la résolution des courbes splines à",
+            curvePoint: "coordonnée sur la courbe spline allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
+            curveTangent: "tangente sur la courbe spline allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
+            curveTightness: "définir la tension des courbes splines à",
+            box: "dessiner une boite de taille",
+            sphere: "dessiner une sphère de rayon",
+            sphereDetail: "définir la résolution des sphères à",
+            ellipseMode: "utiliser le mode %1 pour les ellipses",
+            noSmooth: "désactiver le lissage",
+            rectMode: "utiliser le mode %1 pour les rectangles",
+            smooth: "activer le lissage",
+            strokeCap: "utiliser des terminaisons",
+            strokeJoin: "utiliser des jointures",
+            strokeWeight: "définir l'épaisseur de contour à",
+            beginShape: "commencer une forme avec le mode",
+            bezierVertex: "placer un sommet de courbe de Bézier à",
+            curveVertex: "placer un sommet de courbe spline à",
+            endShape: "terminer une forme",
+            texture: "utiliser la texture",
+            textureMode: "utiliser le mode %1 pour se référer à la texture",
+            vertex: "placer un sommet à",
+            shape: "afficher la forme %1 à %2 %3 avec la taille %4 %5",
+            shapeMode: "utiliser le mode %1 pour les formes",
+            // debug
+            print: "sortir le texte",
+            println: "sortir la ligne",
+            // transform
+            applyMatrix: "appliquer la matrice",
+            popMatrix: "dépiler la matrice",
+            printMatrix: "sortir la matrice",
+            pushMatrix: "empiler la matrice",
+            resetMatrix: "réinitialiser la matrice",
+            rotate: "tourner de",
+            rotateX: "tourner sur l'axe X de",
+            rotateY: "tourner sur l'axe Y de",
+            rotateZ: "tourner sur l'axe Z de",
+            scale: "redimensionner de",
+            translate: "déplacer de",
+            // effect
+            // ...
+            // colour
+            background: "remplir l'arrière-plan avec",
+            colorMode: "utiliser le mode de couleur %1 avec les limites %2 %3 %4 %5",
+            fill: "définir la couleur de fond à",
+            noFill: "désactiver le fond",
+            noStroke: "désactiver le contour",
+            stroke: "définir la couleur de contour à",
+            alpha: "opacité dans",
+            blendColor: "mélanger les couleurs %1 et %2 avec le mode %3",
+            blue: "bleu dans",
+            brightness: "luminosité dans",
+            color: "couleur",
+            green: "vert dans",
+            hue: "teinte dans",
+            lerpColor: "couleur interpolée entre %1 et %2 à l'emplacement %3",
+            red: "rouge dans",
+            saturation: "saturation dans",
+            // image
+            createImage: "créer une image de taille %1 %2",
+            image: "afficher l'image %1 à %2 %3 avec la taille %4 %5",
+            imageMode: "utiliser le mode %1 pour le positionnement des images",
+            noTint: "désactiver le teint des images",
+            tint: "utiliser pour les images un teint",
+            blend: "mélanger la source à %1 %2 taille %3 %4 avec la destination à %5 %6 taille %7 %8 avec le mode %9",
+            copy: "copier la source à %1 %2 taille %3 %4 sur la destination à %5 %6 taille %7 %8 avec le mode %9",
+            filter: "appliquer le filtre %1 avec le niveau %2",
+            get: "récupérer les pixels à %1 %2 taille %3 %4",
+            loadPixels: "charger les pixels",
+            pixels: "pixels",
+            set: "placer à %1 %2 la couleur %3",
+            updatePixels: "actualiser les pixels",
+            // rendering
+            createGraphics: "nouveau graphisme de taille %1 %2 avec le moteur %3",
+            // typography
+            // ...
          },
          code: {
-            background: "arrièrePlan",
-            colorMode: "modeCouleur",
-            fill: "couleurFond",
-            noFill: "pasDeFond",
-            noStroke: "pasDeContour",
-            stroke: "couleurContour",
-            strokeWeight: "épaisseurContour",
+            // shape
             arc: "arc",
             ellipse: "ellipse",
             line: "ligne",
             point: "point",
             quad: "quad",
             rect: "rect",
-            triangle: "triangle"
+            triangle: "triangle",
+            strokeWeight: "épaisseurContour",
+            // color
+            background: "arrièrePlan",
+            colorMode: "modeCouleur",
+            fill: "couleurFond",
+            noFill: "pasDeFond",
+            noStroke: "pasDeContour",
+            stroke: "couleurContour"
          },
          description: {},
          values: {
-            ARROW: "flèche",
-            CROSS: "croix",
-            HAND: "main",
-            MOVE: "déplacement",
-            TEXT: "texte",
-            WAIT: "attente",
-            RGB: "RVB",
-            HSB: "TSL",
-            CENTER: "centre",
-            RADIUS: "rayon",
-            CORNER: "coin",
-            CORNERS: "coins",
-            SQUARE: "carré",
-            PROJECT: "projeté",
-            ROUND: "arrondi",
-            MITER: "onglet",
-            BEVEL: "biseauté",
+            // environment
+            ARROW: "Flèche",
+            CROSS: "Croix",
+            HAND: "Main",
+            MOVE: "Déplacement",
+            TEXT: "Texte",
+            WAIT: "Attente",
+            // shape
+            CENTER: "Centre",
+            RADIUS: "Rayon",
+            CORNER: "Coin",
+            CORNERS: "Coins",
+            SQUARE: "carrées",
+            PROJECT: "projetées",
+            ROUND: "arrondies",
+            MITER: "en onglet",
+            BEVEL: "biseautées",
             POINTS: "points",
             LINES: "lignes",
             TRIANGLES: "triangles",
@@ -70,8 +157,11 @@ var getContext = function(display, infos) {
             QUAD_STRIP: "quadrilatères en bande",
             IMAGE: "image",
             NORMALIZED: "normalisé",
-            CLOSE: "fermer",
-            BLEND: "mélange",
+            CLOSE: "fermée",
+            // color
+            RGB: "RVB",
+            HSB: "TSL",
+            BLEND: "fusion",
             ADD: "addition",
             SUBTRACT: "soustraction",
             DARKEST: "plus sombre",
@@ -85,16 +175,26 @@ var getContext = function(display, infos) {
             SOFT_LIGHT: "lumière douce",
             DODGE: "assombrissement",
             BURN: "éclaircissement",
+            // image
             ARGB: "ARVB",
             ALPHA: "alpha",
-            THRESHOLD: "seuiller",
-            GRAY: "désaturer",
-            INVERT: "inverser",
-            POSTERIZE: "postériser",
-            BLUR: "flouter",
-            OPAQUE: "rendre opaque",
-            ERODE: "éroder",
-            DILATE: "dilater"
+            THRESHOLD: "Seuiller",
+            GRAY: "Désaturer",
+            INVERT: "Inverser",
+            POSTERIZE: "Postériser",
+            BLUR: "Flouter",
+            OPAQUE: "Rendre opaque",
+            ERODE: "Éroder",
+            DILATE: "Dilater",
+            // typography
+            LEFT: "Gauche",
+            RIGHT: "Droite",
+            TOP: "Haut",
+            BOTTOM: "Bas",
+            BASELINE: "Ligne de base",
+            MODEL: "Modèle",
+            SCREEN: "Écran",
+            SHAPE: "Forme"
          },
          startingBlockName: "Programme",
          messages: {}
@@ -219,12 +319,12 @@ var getContext = function(display, infos) {
             //
             { name: "bezier", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante avec coordonnée z (12 paramètres)
             { name: "bezierDetail", params: ['Number'] },
-            { name: "bezierPoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "bezierTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "bezierPoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
+            { name: "bezierTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "curve", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante avec coordonnée z (12 paramètres)
             { name: "curveDetail", params: ['Number'] },
-            { name: "curvePoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "curveTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "curvePoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
+            { name: "curveTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "curveTightness", params: ['Number'] },
             //
             { name: "box", params: ['Number', 'Number', 'Number'] }, // variante avec un unique paramètre
@@ -249,6 +349,12 @@ var getContext = function(display, infos) {
             //
             { name: "shape", params: ['Shape', 'Number', 'Number', 'Number', 'Number'] }, // variantes à 1 et 3 paramètres
             { name: "shapeMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
+            //
+            { name: "isVisible", yieldsValue: true },
+            { name: "setVisible", params: ['Boolean'] },
+            { name: "disableStyle" },
+            { name: "enableStyle" },
+            { name: "getChild", params: ['String'] }
          ],
          debug: [
             { name: "print", params: [null] },
@@ -302,7 +408,7 @@ var getContext = function(display, infos) {
             { name: "specular", params: ['Number', 'Number', 'Number'] }, // variante : gray + palette
          ],
          colour: [
-            { name: "background", params: ['Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
+            { name: "background", params: ['Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette + image
             { name: "colorMode", params: [{ options: ["RGB", "HSB"] }, 'Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 4 paramètres
             { name: "fill", params: ['Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
             { name: "noFill" },
@@ -332,14 +438,14 @@ var getContext = function(display, infos) {
             //
             { name: "blend", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
                   { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
-                     "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] }] }, // variante : ajout d’un premier paramètre de type Image
-            { name: "copy", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante : ajout d’un premier paramètre de type Image
+                     "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] }] }, // variante : ajout d’un premier paramètre image
+            { name: "copy", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante : ajout d’un premier paramètre image
             { name: "filter", params: [{ options: ["THRESHOLD", "GRAY", "INVERT", "POSTERIZE", "BLUR", "OPAQUE", "ERODE",
-                     "DILATE"] }, 'Image'] }, // variante à 1 paramètre
+                     "DILATE"] }, 'Number'] }, // variante à 1 paramètre + image
             { name: "get", params: ['Number', 'Number', 'Number', 'Number'], yieldsValue: true }, // variantes à 0 et 2 paramètres
             { name: "loadPixels" },
             { name: "pixels", yieldsValue: true },
-            { name: "set", params: ['Number', 'Number', 'Colour'] }, // variante : Image en troisième paramètre
+            { name: "set", params: ['Number', 'Number', 'Colour'] }, // variante : image en troisième paramètre
             { name: "updatePixels" }
          ],
          rendering: [
