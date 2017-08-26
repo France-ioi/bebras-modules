@@ -37,6 +37,42 @@ var docLanguageStrings = {
     nameUndefined: 'undefined!',
     action: 'Action',
     sensor: 'Sensor'
+  },
+  de: {
+    lang: 'Deutsch',
+
+    title: 'quickAlgo libraries documentation',
+    library: 'Library:',
+    language: 'Language:',
+    blocklyTitle: 'Documentation for generic Blockly blocks',
+    scratchTitle: 'Documentation for generic Scratch blocks',
+    libTitle: 'Documentation for library',
+
+    category: 'Category “{}”',
+    subcategory: 'Subcategory “{}”',
+    blocklyColumns: ["Display", "Internal name", "Comment"],
+    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
+    nameUndefined: 'undefined!',
+    action: 'Action',
+    sensor: 'Sensor'
+  },
+  es: {
+    lang: 'Español',
+
+    title: 'quickAlgo libraries documentation',
+    library: 'Library:',
+    language: 'Language:',
+    blocklyTitle: 'Documentation for generic Blockly blocks',
+    scratchTitle: 'Documentation for generic Scratch blocks',
+    libTitle: 'Documentation for library',
+
+    category: 'Category “{}”',
+    subcategory: 'Subcategory “{}”',
+    blocklyColumns: ["Display", "Internal name", "Comment"],
+    columns: ["Block name", "Python name", "Internal name", "Type", "Arguments", "Description", "Comment"],
+    nameUndefined: 'undefined!',
+    action: 'Action',
+    sensor: 'Sensor'
   }
 };
 
@@ -135,7 +171,6 @@ function generateLangSelector() {
     html += '</option>';
   }
   $('#lang').html(html);
-  updateDocumentation();
 }
 
 
@@ -224,4 +259,29 @@ $(function () {
   generateLibSelector();
   generateLangSelector();
   updateDocumentation();
+  loadPageArgs();
 });
+
+
+var pageArgs = {};
+
+// Restore arguments to reload previous settings
+function loadPageArgs() {
+   var argsList = location.search.substr(1).split('&');
+   for(var iArg = 0; iArg < argsList.length; iArg++) {
+      var arg = argsList[iArg].split('=');
+      if (arg.length >= 2 && $('#' + arg[0] + ' option[value="' + arg[1] + '"]').length >= 1) {
+         $('#' + arg[0]).val(arg[1]).change();
+      }
+   }
+}
+
+// Write current arguments in the location
+function updatePageArg(id, value) {
+   pageArgs[id] = value;
+   var argsList = [];
+   for(var argName in pageArgs) {
+      argsList.push(argName + '=' + pageArgs[argName]);
+   }
+   history.replaceState(null, '', '?' + argsList.join('&'));
+}

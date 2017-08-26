@@ -57,13 +57,12 @@ table, th, td {
     </p>
     <p>
       <span class="lib_select">Bibliothèque :</span>
-      <select id="lib" onchange="generateLangSelector();">
-        <option value="blocklyRobot">blocklyRobot</option>
+      <select id="lib" onchange="generateLangSelector(); updateDocumentation(); updatePageArg(this.id, this.value);">
       </select>
     </p>
     <p>
       <span class="lang_select">Langue :</span>
-      <select id="lang" onchange="updateDocumentation();">
+      <select id="lang" onchange="updateDocumentation(); updatePageArg(this.id, this.value);">
         <option value="fr">Français</option>
       </select>
     </p>
@@ -75,7 +74,7 @@ table, th, td {
   <h2 class="blockly_title">Documentation des blocs génériques Blockly</h2>
   <div>
     <p>
-      <select id="blocklySelector" onchange="generateBlocklyDocumentation();">
+      <select id="blocklySelector" onchange="generateBlocklyDocumentation(); updatePageArg(this.id, this.value);">
         <option value="blockly" selected>Blockly</option>
         <option value="scratch">Scratch</option>
       </select>
