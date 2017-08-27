@@ -64,7 +64,7 @@ var getContext = function(display, infos) {
             enableStyle: "activer le style spécifique",
             getChild: "enfant %1",
             // debug
-            print: "sortir le texte %1",
+            print: "sortir %1",
             println: "sortir la ligne %1",
             // transform
             applyMatrix: "appliquer la matrice %1 %2 %3 %4, %5 %6 %7 %8, %9 %10 %11 %12, %13 %14 %15 %16",
@@ -104,7 +104,7 @@ var getContext = function(display, infos) {
             noTint: "désactiver le teint des images",
             tint: "utiliser pour les images un teint %1 %2 %3 %4",
             blend: "mélanger la source à %1 %2 taille %3 %4 avec la destination à %5 %6 taille %7 %8 avec le mode %9",
-            copy: "copier la source à %1 %2 taille %3 %4 sur la destination à %5 %6 taille %7 %8 avec le mode %9",
+            copy: "copier la source à %1 %2 taille %3 %4 sur la destination à %5 %6 taille %7 %8",
             filter: "appliquer le filtre %1 avec le niveau %2",
             get: "récupérer les pixels à %1 %2 taille %3 %4",
             loadPixels: "charger les pixels",
@@ -290,7 +290,7 @@ var getContext = function(display, infos) {
             BURN: "éclaircissement",
             // image
             ARGB: "ARVB",
-            ALPHA: "alpha",
+            ALPHA: "Alpha",
             THRESHOLD: "Seuiller",
             GRAY: "Désaturer",
             INVERT: "Inverser",
@@ -567,7 +567,7 @@ var getContext = function(display, infos) {
             { name: "updatePixels" }
          ],
          rendering: [
-            { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }] }
+            { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }], yieldsValue: true }
          ],
          typography: [
             { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
@@ -602,28 +602,24 @@ var getContext = function(display, infos) {
                   var funcArgs = func.blocklyJson.args0;
                   for (var iParam = 0; iParam < func.params.length; iParam++) {
                      var paramType = func.params[iParam];
-                     if (paramType != null) {
-                        var paramData;
-                        if (paramType.options) {
-                           paramData = { pType: 'field_dropdown' };
-                           funcArgs[iParam] = $.extend({ options: [] }, funcArgs[iParam]);
-                           for (var iValue = 0; iValue < paramType.options.length; iValue++) {
-                              funcArgs[iParam].options.push([strings.values[paramType.options[iValue]],
-                                 typeof Processing !== 'undefined' ? Processing[paramType.options[iValue]] : paramType.options[iValue]]);
-                           }
-                           func.params[iParam] = 'Choice';
-                        } else {
-                           paramData = typeKeywords[paramType] || { pType: 'input_value' };
+                     var paramData = typeKeywords[paramType] || { pType: 'input_value' };
+                     if (paramType && paramType.options) {
+                        paramData = { pType: 'field_dropdown' };
+                        funcArgs[iParam] = $.extend({ options: [] }, funcArgs[iParam]);
+                        for (var iValue = 0; iValue < paramType.options.length; iValue++) {
+                           funcArgs[iParam].options.push([strings.values[paramType.options[iValue]],
+                              typeof Processing !== 'undefined' ? Processing[paramType.options[iValue]] : paramType.options[iValue]]);
                         }
-                        funcArgs[iParam] = $.extend({ type: paramData.pType, name: "PARAM_" + iParam }, funcArgs[iParam]);
-                        if (paramData.colour) {
-                           funcArgs[iParam].colour = paramData.colour;
-                        } else if (paramData.vType) {
-                           func.blocklyXml +=
-                              '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
-                                 '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
-                              '</shadow></value>';
-                        }
+                        func.params[iParam] = 'Choice';
+                     }
+                     funcArgs[iParam] = $.extend({ type: paramData.pType, name: "PARAM_" + iParam }, funcArgs[iParam]);
+                     if (paramData.colour) {
+                        funcArgs[iParam].colour = paramData.colour;
+                     } else if (paramData.vType) {
+                        func.blocklyXml +=
+                           '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
+                              '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
+                           '</shadow></value>';
                      }
                   }
                   func.blocklyXml += '</block>';
