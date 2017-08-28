@@ -447,7 +447,7 @@ var getContext = function(display, infos) {
             { name: "quad", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "rect",
                variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             //
             { name: "bezier",
@@ -491,7 +491,7 @@ var getContext = function(display, infos) {
                   ['Number', 'Number', 'Number', 'Number', 'Number']] },
             //
             { name: "shape",
-               variants: [['Shape'], ['Shape', 'Number', 'Number'], ['Shape', 'Number', 'Number', 'Number', 'Number'] },
+               variants: [['Shape'], ['Shape', 'Number', 'Number'], ['Shape', 'Number', 'Number', 'Number', 'Number']] },
             { name: "shapeMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
             //
             { name: "isVisible", yieldsValue: true },
@@ -520,7 +520,7 @@ var getContext = function(display, infos) {
          ],
          effect: [
             { name: "ambientLight",
-               variants: [['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+               variants: [['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "directionalLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "lightFalloff", params: ['Number', 'Number', 'Number'] },
             { name: "lightSpecular", params: ['Number', 'Number', 'Number'] },
@@ -593,8 +593,8 @@ var getContext = function(display, infos) {
                variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst'],
                   ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst']] },
             { name: "copy",
-               variants: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "filter", variants: [['FilterConst'], ['FilterConst', 'Number']] },
             { name: "get", variants: [[], ['Number', 'Number'], ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
             { name: "loadPixels" },
@@ -653,9 +653,9 @@ var getContext = function(display, infos) {
                   var blockArgs = block.blocklyJson.args0;
                   for (var iParam = 0; iParam < block.params.length; iParam++) {
                      params[iParam] = block.params[iParam];
-                     var paramData = typeData[paramType] || { bType: 'input_value' };
+                     var paramData = typeData[params[iParam]] || { bType: 'input_value' };
                      if (params[iParam] && params[iParam].options) {
-                        paramData = paramType;
+                        paramData = params[iParam];
                         block.params[iParam] = 'Const';
                      }
                      if (paramData.options) {

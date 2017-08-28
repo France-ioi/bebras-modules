@@ -284,5 +284,5 @@ function updatePageArg(id, value) {
    for(var argName in pageArgs) {
       argsList.push(argName + '=' + pageArgs[argName]);
    }
-   history.replaceState(null, '', '?' + argsList.join('&'));
+   history.replaceState(null, '', '?' + argsList.join('&') + location.hash);
 }
