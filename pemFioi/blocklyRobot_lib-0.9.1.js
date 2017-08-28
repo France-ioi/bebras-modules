@@ -546,7 +546,7 @@ var getContext = function(display, infos, curLevel) {
             writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
-         startingBlockName: "Programme du robot",
+         startingBlockName: "Program",
          exit_grid: "Le robot sort de la grille !",
          nothingToPickUp: "Rien à ramasser",
          alreadyTransportingObject: "Le robot transporte déjà un objet",

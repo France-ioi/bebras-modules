@@ -485,7 +485,7 @@ function EdgeCreator(id, paperElementID, paper, graph, visualGraph, graphMouse, 
    }
 }
 
-function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, forVertices, forEdges, vertexThreshold, edgeThreshold, enabled) {
+function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, forVertices, forEdges, forBackground, vertexThreshold, edgeThreshold, enabled) {
    var self = this;
    this.id = id;
    this.graph = graph;
@@ -501,18 +501,29 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
    };
 
    function eventHandler(xPos, yPos) {
+      // Check if vertex was clicked
       var vertex = self.getFuzzyVertex(xPos, yPos);
       if(vertex !== null) {
          if(forVertices) {
             callback("vertex", vertex, xPos, yPos);
          }
+         // Clicking a vertex cancels any other type, regardless of forVertices flag.
          return;
       }
-      if(forEdges) {
-         var edge = self.getFuzzyEdge(xPos, yPos);
-         if(edge !== null) {
+
+      // Check if edge was clicked.
+      var edge = self.getFuzzyEdge(xPos, yPos);
+      if(edge !== null) {
+         if(forEdges) {
             callback("edge", edge, xPos, yPos);
          }
+         // Clicking an edge cancels the click on the background, regardless of forEdges.
+         return;
+      }
+
+      // Background was clicked.
+      if(forBackground) {
+         callback(null, null, xPos, yPos);
       }
    }
    
@@ -558,7 +569,7 @@ function FuzzyRemover(id, paperElementID, paper, graph, visualGraph, callback, f
    this.graph = graph;
    this.visualGraph = visualGraph;
    this.enabled = false;
-   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", paperElementID, paper, graph, visualGraph, deleteElement, forVertices, forEdges, vertexThreshold, edgeThreshold, enabled);
+   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", paperElementID, paper, graph, visualGraph, deleteElement, forVertices, forEdges, false, vertexThreshold, edgeThreshold, enabled);
    this.forVertices = forVertices;
    this.forEdges = forEdges;
    this.setEnabled = function(enabled) {
