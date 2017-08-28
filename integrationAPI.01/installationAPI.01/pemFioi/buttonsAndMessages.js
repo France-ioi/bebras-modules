@@ -1084,7 +1084,7 @@ window.displayHelper = {
       scoreDiffMsg += " " + this.graderScore + this.strings.outOf + this.taskParams.maxScore + ".";
       if ((this.hasSolution && this.savedAnswer != this.prevAnswer) ||
           (this.graderScore > 0 && (taskMode == 'saved_changed' || showRetrieveAnswer))) {
-          scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">Rechargez la réponse validée.</a>';
+         scoreDiffMsg += ' <a href="#" onclick="displayHelper.retrieveAnswer(); return false;">' +  this.strings.reloadValidAnswer + '</a>';
       }
       return scoreDiffMsg;
    },
