@@ -24,7 +24,7 @@ var getContext = function(display, infos) {
             height: "hauteur",
             resize: "redimensionner à la taille %1 %2",
             // shape
-            arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5 %6",
+            arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5° et %6°",
             ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
             line: "dessiner une ligne de %1 %2 à %3 %4",
             point: "dessiner un point à %1 %2",
@@ -73,10 +73,10 @@ var getContext = function(display, infos) {
             printMatrix: "sortir la matrice",
             pushMatrix: "empiler la matrice",
             resetMatrix: "réinitialiser la matrice",
-            rotate: "pivoter de %1",
-            rotateX: "pivoter sur l'axe X de %1",
-            rotateY: "pivoter sur l'axe Y de %1",
-            rotateZ: "pivoter sur l'axe Z de %1",
+            rotate: "pivoter de %1°",
+            rotateX: "pivoter sur l'axe X de %1°",
+            rotateY: "pivoter sur l'axe Y de %1°",
+            rotateZ: "pivoter sur l'axe Z de %1°",
             scale: "appliquer une échelle de %1 %2 %3",
             translate: "déplacer de %1 %2 %3",
             // effect
@@ -367,7 +367,7 @@ var getContext = function(display, infos) {
          processing.draw = function() {
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
-               typeof processing[op.func] == 'function' ? processing[op.func].apply(processing, op.args) : processing[op.func];
+               typeof processing[op.block] == 'function' ? processing[op.block].apply(processing, op.values) : processing[op.block];
             }
          };
 
@@ -402,20 +402,20 @@ var getContext = function(display, infos) {
       var ret;
       for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
          var op = context.processing.ops[iOp];
-         ret = typeof pg[op.func] == 'function' ? pg[op.func].apply(pg, op.args) : pg[op.func];
+         ret = typeof pg[op.block] == 'function' ? pg[op.block].apply(pg, op.values) : pg[op.block];
       }
       return ret;
    }
 
    context.processing.commonOp = function() {
-      var funcName = arguments[0], args = [];
-      for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
-         args.push(arguments[iArg]);
+      var blockName = arguments[0], values = [];
+      for (var iParam = 1; iParam < arguments.length - 1; iParam++) {
+         values.push(arguments[iParam]);
       }
-      if (funcName.substr(0, 5) == 'print') {
-         context.processing.internalInstance[funcName](args);
+      if (blockName.substr(0, 5) == 'print') {
+         context.processing.internalInstance[blockName](values);
       } else {
-         context.processing.ops.push({ func: funcName, args: args });
+         context.processing.ops.push({ block: blockName, values: values });
       }
       context.waitDelay(arguments[arguments.length - 1], drawOnBuffer());
    };
@@ -427,10 +427,11 @@ var getContext = function(display, infos) {
             { name: "popStyle" },
             { name: "pushStyle" },
             //
-            { name: "cursor", params: [{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }] }, // variante : image, x y
+            { name: "cursor",
+               variants: [[{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }], ['Image', 'Number', 'Number']] },
             { name: "focused", yieldsValue: true },
             { name: "frameCount", yieldsValue: true },
-            { name: "frameRate", params: ['Number'] }, // 60 par défaut
+            { name: "frameRate", params: ['Number'] },
             { name: "__frameRate", yieldsValue: true },
             { name: "width", yieldsValue: true },
             { name: "height", yieldsValue: true },
@@ -438,27 +439,34 @@ var getContext = function(display, infos) {
             { name: "resize", params: ['Number', 'Number'] }
          ],
          shape: [
-            { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // les deux derniers paramètres sont des angles
+            { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'] },
             { name: "ellipse", params: ['Number', 'Number', 'Number', 'Number'] },
-            { name: "line", params: ['Number', 'Number', 'Number', 'Number'] }, // variante : x1, y1, z1, x2, y2, z2
-            { name: "point", params: ['Number', 'Number'] }, // variante : x, y, z
+            { name: "line",
+               variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
+            { name: "point", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] },
             { name: "quad", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "rect", params: ['Number', 'Number', 'Number', 'Number'] }, // variante ajoutant : radius ou (tlradius, trradius, brradius, blradius)
+            { name: "rect",
+               variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             //
-            { name: "bezier", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante avec coordonnée z (12 paramètres)
+            { name: "bezier",
+               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "bezierDetail", params: ['Number'] },
             { name: "bezierPoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "bezierTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "curve", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante avec coordonnée z (12 paramètres)
+            { name: "curve",
+               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "curveDetail", params: ['Number'] },
             { name: "curvePoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "curveTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "curveTightness", params: ['Number'] },
             //
-            { name: "box", params: ['Number', 'Number', 'Number'] }, // variante avec un unique paramètre
+            { name: "box", variants: [['Number'], ['Number', 'Number', 'Number']] },
             { name: "sphere", params: ['Number'] },
-            { name: "sphereDetail", params: ['Number', 'Number'] }, // variante avec un unique paramètre
+            { name: "sphereDetail", variants: [['Number'], ['Number', 'Number']] },
             //
             { name: "ellipseMode", params: [{ options: ["CENTER", "RADIUS", "CORNER", "CORNERS"] }] },
             { name: "noSmooth" },
@@ -468,15 +476,22 @@ var getContext = function(display, infos) {
             { name: "strokeJoin", params: [{ options: ["MITER", "BEVEL", "ROUND"] }] },
             { name: "strokeWeight", params: ['Number'] },
             // attention : les fonctions « vertex » ci-dessous ignorent scale()
-            { name: "beginShape", params: [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }] }, // variante sans paramètre
-            { name: "bezierVertex", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante avec coordonnée z (9 paramètres)
-            { name: "curveVertex", params: ['Number', 'Number'] }, // variante avec coordonnée z
-            { name: "endShape", params: [{ options: ["CLOSE"] }] }, // variante sans paramètre
+            { name: "beginShape",
+               variants: [[],
+                  [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }]] },
+            { name: "bezierVertex",
+               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
+            { name: "curveVertex", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] },
+            { name: "endShape", variants: [[], [{ options: ["CLOSE"] }]] },
             { name: "texture", params: ['Image'] },
             { name: "textureMode", params: [{ options: ["IMAGE", "NORMALIZED"] }] },
-            { name: "vertex", params: ['Number', 'Number', 'Number', 'Number', 'Number'] }, // variantes à 2, 3 et 4 paramètres
+            { name: "vertex",
+               variants: [['Number', 'Number'], ['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number']] },
             //
-            { name: "shape", params: ['Shape', 'Number', 'Number', 'Number', 'Number'] }, // variantes à 1 et 3 paramètres
+            { name: "shape",
+               variants: [['Shape'], ['Shape', 'Number', 'Number'], ['Shape', 'Number', 'Number', 'Number', 'Number'] },
             { name: "shapeMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
             //
             { name: "isVisible", yieldsValue: true },
@@ -496,15 +511,16 @@ var getContext = function(display, infos) {
             { name: "printMatrix" },
             { name: "pushMatrix" },
             { name: "resetMatrix" },
-            { name: "rotate", params: ['Number'] }, // le paramètre est un angle
-            { name: "rotateX", params: ['Number'] }, // le paramètre est un angle
-            { name: "rotateY", params: ['Number'] }, // le paramètre est un angle
-            { name: "rotateZ", params: ['Number'] }, // le paramètre est un angle
-            { name: "scale", params: ['Number', 'Number', 'Number'] }, // variantes à 1 et 2 paramètres
-            { name: "translate", params: ['Number', 'Number', 'Number'] } // variantes à 2 paramètres
+            { name: "rotate", params: ['Angle'] },
+            { name: "rotateX", params: ['Angle'] },
+            { name: "rotateY", params: ['Angle'] },
+            { name: "rotateZ", params: ['Angle'] },
+            { name: "scale", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number']] },
+            { name: "translate", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] }
          ],
          effect: [
-            { name: "ambientLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante à 3 paramètres
+            { name: "ambientLight",
+               variants: [['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "directionalLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "lightFalloff", params: ['Number', 'Number', 'Number'] },
             { name: "lightSpecular", params: ['Number', 'Number', 'Number'] },
@@ -515,11 +531,12 @@ var getContext = function(display, infos) {
             { name: "spotLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             //
             { name: "beginCamera" },
-            { name: "camera", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante sans paramètre
+            { name: "camera",
+               variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "endCamera" },
             { name: "frustum", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "ortho", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante sans paramètre
-            { name: "perspective", params: ['Number', 'Number', 'Number', 'Number'] }, // variante sans paramètre
+            { name: "ortho", variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
+            { name: "perspective", variants: [[], ['Number', 'Number', 'Number', 'Number']] },
             { name: "printCamera" },
             { name: "printProjection" },
             //
@@ -530,27 +547,32 @@ var getContext = function(display, infos) {
             { name: "screenY", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             { name: "screenZ", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             //
-            { name: "ambient", params: ['Number', 'Number', 'Number'] }, // variante : gray + palette
-            { name: "emissive", params: ['Number', 'Number', 'Number'] }, // variante : gray + palette
+            { name: "ambient", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
+            { name: "emissive", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
             { name: "shininess", params: ['Number'] },
-            { name: "specular", params: ['Number', 'Number', 'Number'] }, // variante : gray + palette
+            { name: "specular", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] }
          ],
          color: [
-            { name: "background", params: ['Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette + image
-            { name: "colorMode", params: [{ options: ["RGB", "HSB"] }, 'Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 4 paramètres
-            { name: "fill", params: ['Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
+            { name: "background",
+               variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number'], ['Colour'], ['Image']] },
+            { name: "colorMode",
+               variants: [['ColorModeConst'], ['ColorModeConst', 'Number'], ['ColorModeConst', 'Number', 'Number', 'Number'],
+                  ['ColorModeConst', 'Number', 'Number', 'Number', 'Number']] },
+            { name: "fill",
+               variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number'], ['Colour']] },
             { name: "noFill" },
             { name: "noStroke" },
-            { name: "stroke", params: ['Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
+            { name: "stroke", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'], ['Colour']] },
             //
             { name: "alpha", params: ['Colour'], yieldsValue: true },
-            { name: "blendColor", params: ['Colour', 'Colour',
-                  { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
-                     "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] }],
-               yieldsValue: true },
+            { name: "blendColor", params: ['Colour', 'Colour', 'BlendConst'], yieldsValue: true },
             { name: "blue", params: ['Colour'], yieldsValue: true },
             { name: "brightness", params: ['Colour'], yieldsValue: true },
-            { name: "color", params: ['Number', 'Number', 'Number', 'Number'], yieldsValue: true }, // variantes à 1, 2 et 3 paramètres + palette
+            { name: "color",
+               variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
             { name: "green", params: ['Colour'], yieldsValue: true },
             { name: "hue", params: ['Colour'], yieldsValue: true },
             { name: "lerpColor", params: ['Colour', 'Colour', 'Number'], yieldsValue: true },
@@ -560,21 +582,24 @@ var getContext = function(display, infos) {
          image: [
             { name: "createImage", params: ['Number', 'Number', { options: ["RGB", "ARGB", "ALPHA"] }], yieldsValue: true },
             //
-            { name: "image", params: ['Image', 'Number', 'Number', 'Number', 'Number'] }, // variante à 3 paramètres
+            { name: "image", variants: [['Image', 'Number', 'Number'], ['Image', 'Number', 'Number', 'Number', 'Number']] },
             { name: "imageMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
             { name: "noTint" },
-            { name: "tint", params: ['Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
+            { name: "tint",
+               variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number'], ['Colour']] },
             //
-            { name: "blend", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
-                  { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
-                     "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] }] }, // variante : ajout d’un premier paramètre image
-            { name: "copy", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }, // variante : ajout d’un premier paramètre image
-            { name: "filter", params: [{ options: ["THRESHOLD", "GRAY", "INVERT", "POSTERIZE", "BLUR", "OPAQUE", "ERODE",
-                     "DILATE"] }, 'Number'] }, // variante à 1 paramètre + image
-            { name: "get", params: ['Number', 'Number', 'Number', 'Number'], yieldsValue: true }, // variantes à 0 et 2 paramètres
+            { name: "blend",
+               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst']] },
+            { name: "copy",
+               variants: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "filter", variants: [['FilterConst'], ['FilterConst', 'Number']] },
+            { name: "get", variants: [[], ['Number', 'Number'], ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
             { name: "loadPixels" },
             { name: "pixels", yieldsValue: true },
-            { name: "set", params: ['Number', 'Number', 'Colour'] }, // variante : image en troisième paramètre
+            { name: "set", variants: [['Number', 'Number', 'Colour'], ['Number', 'Number', 'Number']] },
             { name: "updatePixels" }
          ],
          rendering: [
@@ -583,7 +608,10 @@ var getContext = function(display, infos) {
          typography: [
             { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
             { name: "loadFont", params: ['String'], yieldsValue: true },
-            { name: "text_", params: ['String', 'Number', 'Number', 'Number', 'Number'] }, // variante : data, x, y + éventuel ajout de z
+            { name: "text_",
+               variants: [[null, 'Number', 'Number'], [null, 'Number', 'Number', 'Number'],
+                  ['String', 'Number', 'Number', 'Number', 'Number'],
+                  ['String', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "textFont", params: ['Font', 'Number'] },
             //
             { name: "textAlign", params: [{ options: ["LEFT", "CENTER", "RIGHT"] }, { options: ["TOP", "BOTTOM", "CENTER", "BASELINE"] }] },
@@ -598,52 +626,69 @@ var getContext = function(display, infos) {
       }
    };
 
-   var typeKeywords = {
-      'Number': { pType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
-      'String': { pType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
-      'Colour': { pType: 'input_value', vType: 'colour_picker', fName: 'COLOUR', defVal: "#ffffff" }
+   var typeData = {
+      'Number': { bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
+      'String': { bType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
+      'Colour': { bType: 'input_value', vType: 'colour_picker', fName: 'COLOUR', defVal: "#ffffff",
+         conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
+      'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
+         conv: function(value) { return value * Processing.PI / 180; } },
+      'ColorModeConst': { options: ["RGB", "HSB"] },
+      'BlendConst': { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
+            "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] },
+      'FilterConst': { options: ["THRESHOLD", "GRAY", "INVERT", "POSTERIZE", "BLUR", "OPAQUE", "ERODE", "DILATE"] }
    };
    for (var category in context.customBlocks.processing) {
-      for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
+      for (var iBlock = 0; iBlock < context.customBlocks.processing[category].length; iBlock++) {
          (function() {
-            var func = context.customBlocks.processing[category][iFunc];
-            if (!context.processing[func.name]) {
-               if (func.params) {
-                  func.blocklyJson = $.extend({ inputsInline: true, args0: {} }, func.blocklyJson);
-                  func.blocklyXml = '<block type="' + func.name + '">';
-                  var funcArgs = func.blocklyJson.args0;
-                  for (var iParam = 0; iParam < func.params.length; iParam++) {
-                     var paramType = func.params[iParam];
-                     var paramData = typeKeywords[paramType] || { pType: 'input_value' };
-                     if (paramType && paramType.options) {
-                        paramData = { pType: 'field_dropdown' };
-                        funcArgs[iParam] = $.extend({ options: [] }, funcArgs[iParam]);
-                        for (var iValue = 0; iValue < paramType.options.length; iValue++) {
-                           funcArgs[iParam].options.push([strings.values[paramType.options[iValue]],
-                              typeof Processing !== 'undefined' ? Processing[paramType.options[iValue]] : paramType.options[iValue]]);
-                        }
-                        func.params[iParam] = 'Choice';
+            var block = context.customBlocks.processing[category][iBlock];
+            if (!context.processing[block.name]) {
+               var params = [];
+               if (block.params || block.variants) {
+                  if (block.variants) {
+                     block.params = block.variants[0];
+                  }
+                  block.blocklyJson = $.extend({ inputsInline: true, args0: {} }, block.blocklyJson);
+                  block.blocklyXml = '<block type="' + block.name + '">';
+                  var blockArgs = block.blocklyJson.args0;
+                  for (var iParam = 0; iParam < block.params.length; iParam++) {
+                     params[iParam] = block.params[iParam];
+                     var paramData = typeData[paramType] || { bType: 'input_value' };
+                     if (params[iParam] && params[iParam].options) {
+                        paramData = paramType;
+                        block.params[iParam] = 'Const';
                      }
-                     funcArgs[iParam] = $.extend({ type: paramData.pType, name: "PARAM_" + iParam }, funcArgs[iParam]);
+                     if (paramData.options) {
+                        paramData.bType = 'field_dropdown';
+                        blockArgs[iParam] = $.extend({ options: [] }, blockArgs[iParam]);
+                        for (var iValue = 0; iValue < paramData.options.length; iValue++) {
+                           blockArgs[iParam].options.push([strings.values[paramData.options[iValue]],
+                              typeof Processing !== 'undefined' ? Processing[paramData.options[iValue]] : paramData.options[iValue]]);
+                        }
+                     }
+                     if (paramData.pType) {
+                        block.params[iParam] = paramData.pType;
+                     }
+                     blockArgs[iParam] = $.extend({ type: paramData.bType, name: "PARAM_" + iParam }, blockArgs[iParam]);
                      if (paramData.vType) {
-                        func.blocklyXml +=
+                        block.blocklyXml +=
                            '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
                               '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
                            '</shadow></value>';
                      }
                   }
-                  func.blocklyXml += '</block>';
+                  block.blocklyXml += '</block>';
                }
-               context.processing[func.name] = function() {
-                  var args = [func.name.replace(/_$/, '')];
-                  for (var iArg = 0; iArg < arguments.length; iArg++) {
-                     var arg = arguments[iArg];
-                     if (typeof arg == 'string' && func.params[iArg] == 'Colour' && arg[0] == '#') {
-                       arg = parseInt('0xFF' + arg.substr(1));
+               context.processing[block.name] = function() {
+                  var values = [block.name.replace(/_$/, '')];
+                  for (var iParam = 0; iParam < arguments.length; iParam++) {
+                     var val = arguments[iParam];
+                     if (params[iParam] in typeData && typeData[params[iParam]].conv) {
+                       val = typeData[params[iParam]].conv(val);
                      }
-                     args.push(arg);
+                     values.push(val);
                   }
-                  context.processing.commonOp.apply(null, args);
+                  context.processing.commonOp.apply(null, values);
                };
             }
          })();
