@@ -299,6 +299,10 @@ var getContext = function(display, infos) {
             OPAQUE: "Rendre opaque",
             ERODE: "Éroder",
             DILATE: "Dilater",
+            // rendering
+            P2D: "P2D",
+            P3D: "P3D",
+            JAVA2D: "JAVA2D",
             // typography
             LEFT: "Gauche",
             RIGHT: "Droite",
@@ -583,13 +587,14 @@ var getContext = function(display, infos) {
             //
             { name: "textAscent", yieldsValue: true },
             { name: "textDescent", yieldsValue: true }
-         ],
+         ]
       }
    };
 
    var typeKeywords = {
       'Number': { pType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
-      'Colour': { pType: 'input_value', vType: 'field_colour', fName: 'COL', defVal: "#ff0000" }
+      'String': { pType: 'input_value', vType: 'field_input', fName: 'TEXT', defVal: '' },
+      'Colour': { pType: 'input_value', vType: 'field_colour', fName: 'COLOUR', defVal: "#ff0000" }
    };
    for (var category in context.customBlocks.processing) {
       for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
