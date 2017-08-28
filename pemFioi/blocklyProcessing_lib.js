@@ -6,6 +6,7 @@ var getContext = function(display, infos) {
             shape: "Formes",
             transform: "Transformations",
             effect: "Effets",
+            color: "Couleurs",
             image: "Images",
             rendering: "Rendu",
             typography: "Typographie"
@@ -116,7 +117,7 @@ var getContext = function(display, infos) {
             // typography
             createFont: "nouvelle police de nom %1 et de taille %2",
             loadFont: "nouvelle police de nom %1",
-            text: "afficher le texte %1 à %2 %3 dans un cadre de taille %4 %5",
+            text_: "afficher le texte %1 à %2 %3 dans un cadre de taille %4 %5",
             textFont: "définir la police du texte à %1 avec la taille %2",
             textAlign: "définir l'alignement du texte, à l'horizontale : %1 et à la verticale : %2",
             textLeading: "définir l'interligne du texte à %1",
@@ -232,7 +233,7 @@ var getContext = function(display, infos) {
             // typography
             createFont: "nouvellePolice",
             loadFont: "nouvellePolice",
-            text: "texte",
+            text_: "texte",
             textFont: "policeTexte",
             textAlign: "alignementTexte",
             textLeading: "interligneTexte",
@@ -325,6 +326,7 @@ var getContext = function(display, infos) {
    var strings = context.setLocalLanguageStrings(localLanguageStrings);   
    
    context.processing = {
+      internalInstance: null,
       ops: []
    };
 
@@ -335,7 +337,7 @@ var getContext = function(display, infos) {
             shape: 100,
             debug: 200,
             transform: 300,
-            colour: 400,
+            color: 400,
             image: 80,
             rendering: 180,
             typography: 280
@@ -344,6 +346,7 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(taskInfos) {
+      context.processing.internalInstance = new Processing();
       context.processing.ops = [];
       if (context.display) {
          context.resetDisplay();
@@ -395,7 +398,7 @@ var getContext = function(display, infos) {
 
 
    function drawOnBuffer() {
-      var pg = Processing.createGraphics(300, 300);
+      var pg = context.processing.internalInstance.createGraphics(300, 300);
       var ret;
       for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
          var op = context.processing.ops[iOp];
@@ -405,11 +408,15 @@ var getContext = function(display, infos) {
    }
 
    context.processing.commonOp = function() {
-      var args = [];
+      var funcName = arguments[0], args = [];
       for (var iArg = 1; iArg < arguments.length - 1; iArg++) {
          args.push(arguments[iArg]);
       }
-      context.processing.ops.push({ func: arguments[0], args: args });
+      if (funcName.substr(0, 5) == 'print') {
+         context.processing.internalInstance[funcName](args);
+      } else {
+         context.processing.ops.push({ func: funcName, args: args });
+      }
       context.waitDelay(arguments[arguments.length - 1], drawOnBuffer());
    };
 
@@ -528,7 +535,7 @@ var getContext = function(display, infos) {
             { name: "shininess", params: ['Number'] },
             { name: "specular", params: ['Number', 'Number', 'Number'] }, // variante : gray + palette
          ],
-         colour: [
+         color: [
             { name: "background", params: ['Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette + image
             { name: "colorMode", params: [{ options: ["RGB", "HSB"] }, 'Number', 'Number', 'Number', 'Number'] }, // variantes à 1, 2 et 4 paramètres
             { name: "fill", params: ['Number', 'Number', 'Number'] }, // variantes à 1, 2 et 3 paramètres + palette
@@ -576,7 +583,7 @@ var getContext = function(display, infos) {
          typography: [
             { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
             { name: "loadFont", params: ['String'], yieldsValue: true },
-            { name: "text", params: ['String', 'Number', 'Number', 'Number', 'Number'] }, // variante : data, x, y + éventuel ajout de z
+            { name: "text_", params: ['String', 'Number', 'Number', 'Number', 'Number'] }, // variante : data, x, y + éventuel ajout de z
             { name: "textFont", params: ['Font', 'Number'] },
             //
             { name: "textAlign", params: [{ options: ["LEFT", "CENTER", "RIGHT"] }, { options: ["TOP", "BOTTOM", "CENTER", "BASELINE"] }] },
@@ -593,8 +600,8 @@ var getContext = function(display, infos) {
 
    var typeKeywords = {
       'Number': { pType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
-      'String': { pType: 'input_value', vType: 'field_input', fName: 'TEXT', defVal: '' },
-      'Colour': { pType: 'input_value', vType: 'field_colour', fName: 'COLOUR', defVal: "#ff0000" }
+      'String': { pType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
+      'Colour': { pType: 'input_value', vType: 'colour_picker', fName: 'COLOUR', defVal: "#ffffff" }
    };
    for (var category in context.customBlocks.processing) {
       for (var iFunc = 0; iFunc < context.customBlocks.processing[category].length; iFunc++) {
@@ -618,9 +625,7 @@ var getContext = function(display, infos) {
                         func.params[iParam] = 'Choice';
                      }
                      funcArgs[iParam] = $.extend({ type: paramData.pType, name: "PARAM_" + iParam }, funcArgs[iParam]);
-                     if (paramData.colour) {
-                        funcArgs[iParam].colour = paramData.colour;
-                     } else if (paramData.vType) {
+                     if (paramData.vType) {
                         func.blocklyXml +=
                            '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
                               '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
@@ -630,7 +635,15 @@ var getContext = function(display, infos) {
                   func.blocklyXml += '</block>';
                }
                context.processing[func.name] = function() {
-                  context.processing.commonOp.apply(null, [func.name].concat(Array.apply(null, arguments)));
+                  var args = [func.name.replace(/_$/, '')];
+                  for (var iArg = 0; iArg < arguments.length; iArg++) {
+                     var arg = arguments[iArg];
+                     if (typeof arg == 'string' && func.params[iArg] == 'Colour' && arg[0] == '#') {
+                       arg = parseInt('0xFF' + arg.substr(1));
+                     }
+                     args.push(arg);
+                  }
+                  context.processing.commonOp.apply(null, args);
                };
             }
          })();
