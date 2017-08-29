@@ -1,6 +1,6 @@
 // This is an example of library for use with quickAlgo.
 
-var getContext = function(display, infos) {
+var getContext = function(display, infos, curLevel) {
    // Local language strings for each language
    var localLanguageStrings = {
       fr: { // French strings

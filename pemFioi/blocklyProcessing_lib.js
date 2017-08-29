@@ -375,8 +375,8 @@ var getContext = function(display, infos) {
    }
 
    var context = quickAlgoContext(display, infos);
-   var strings = context.setLocalLanguageStrings(localLanguageStrings);   
-   
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);
+
    context.processing = {
       internalInstance: null,
       ops: []
@@ -400,6 +400,9 @@ var getContext = function(display, infos) {
    context.reset = function(taskInfos) {
       context.processing.internalInstance = new Processing();
       context.processing.ops = [];
+      if (taskInfos) {
+         context.processing.initialDrawing = taskInfos.initialDrawing || null;
+      }
       if (context.display) {
          context.resetDisplay();
       }
@@ -413,10 +416,13 @@ var getContext = function(display, infos) {
       var processingInstance = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
             processing.size(300, 300);
-            processing.background(255);
          };
 
          processing.draw = function() {
+            processing.background(255);
+            if (context.processing.initialDrawing) {
+               context.processing.initialDrawing(processing);
+            }
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
                typeof processing[op.block] == 'function' ? processing[op.block].apply(processing, op.values) : processing[op.block];
@@ -581,7 +587,7 @@ var getContext = function(display, infos) {
             { name: "normal", params: ['Number', 'Number', 'Number'] },
             { name: "pointLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "spotLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
-                  'Number', 'Number'] },
+                  'Number', 'Number', 'Number'] },
             //
             { name: "beginCamera" },
             { name: "camera",
@@ -700,6 +706,8 @@ var getContext = function(display, infos) {
                if (block.params || block.variants) {
                   if (block.variants) {
                      block.params = block.variants[0];
+                     strings.label[block.name] = strings.label[block.name].replace(
+                        new RegExp('\s*' + (block.params.length == 0 ? '()%1' : '(%' + block.params.length + ')') + '.*$', 'g'), '$1');
                   }
                   block.blocklyJson = $.extend({ inputsInline: true, args0: {} }, block.blocklyJson);
                   block.blocklyXml = '<block type="' + block.name + '">';
