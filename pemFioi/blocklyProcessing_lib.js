@@ -464,6 +464,12 @@ var getContext = function(display, infos) {
       context.updateScale();
    };
 
+   context.updateScale = function() {
+      if (!context.display) {
+         return;
+      }
+   };
+
    context.unload = function() {
       if (context.display) {
       }
@@ -706,7 +712,7 @@ var getContext = function(display, infos) {
       'Colour': { bType: 'input_value', vType: 'colour_picker', fName: 'COLOUR', defVal: "#ffffff",
          conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
       'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
-         conv: function(value) { return value * Processing.PI / 180; } },
+         conv: function(value) { return value * Math.PI / 180; } },
       'ColorModeConst': { options: ["RGB", "HSB"] },
       'BlendConst': { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
             "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] },
@@ -760,7 +766,7 @@ var getContext = function(display, infos) {
                   for (var iParam = 0; iParam < arguments.length; iParam++) {
                      var val = arguments[iParam];
                      if (params[iParam] in typeData && typeData[params[iParam]].conv) {
-                       val = typeData[params[iParam]].conv(val);
+                        val = typeData[params[iParam]].conv(val);
                      }
                      values.push(val);
                   }
@@ -770,40 +776,6 @@ var getContext = function(display, infos) {
          })();
       }
    }
-
-
-   context.getItems = function(row, col, filters) {
-      var listItems = [];
-      for (var iItem = 0; iItem < context.items.length; iItem++) {
-         var item = context.items[iItem];
-         var itemType = infos.itemTypes[item.type];
-         if ((row == undefined) || ((item.row == row) && (item.col == col))) {
-            var accepted = true;
-            for (var property in filters) {
-               var value = filters[property];
-               if ((itemType[property] == undefined) && (value != undefined)) {
-                  accepted = false;
-                  break;
-               }
-               if ((itemType[property] != undefined) && (itemType[property] != value)) {
-                  accepted = false;
-                  break;
-               }
-            }
-            if (accepted) {
-               item.index = iItem;
-               listItems.push(item);
-            }
-         }
-      }
-      return listItems;
-   };
-
-   context.updateScale = function() {
-      if (!context.display) {
-         return;
-      }
-   };
 
 
    return context;
