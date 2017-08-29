@@ -367,6 +367,7 @@ var getContext = function(display, infos) {
             SHAPE: "Forme"
          },
          startingBlockName: "Programme",
+         hideInitialDrawing: "Cacher le motif de départ",
          messages: {}
       },
       none: {
@@ -409,18 +410,32 @@ var getContext = function(display, infos) {
    };
 
    context.resetDisplay = function() {
+      var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
       var canvas = $('<canvas>').css('border', '1px solid black');
       var coordinatesContainer = $('<div>').text(" ");
       $('#grid').empty().append(canvas, coordinatesContainer);
 
+      if (infos.buttonHideInitialDrawing) {
+         if (hideInitialDrawing.length == 0) {
+            hideInitialDrawing = $('<label for="hideInitialDrawing">');
+            hideInitialDrawing.text(" " + strings.hideInitialDrawing);
+            hideInitialDrawing.prepend($('<input id="hideInitialDrawing" type="checkbox">'));
+         }
+         $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
+      }
+
       var processingInstance = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
             processing.size(300, 300);
+            processing.background(255);
+            if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+               context.processing.initialDrawing(processing);
+            }
          };
 
          processing.draw = function() {
             processing.background(255);
-            if (context.processing.initialDrawing) {
+            if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
                context.processing.initialDrawing(processing);
             }
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
