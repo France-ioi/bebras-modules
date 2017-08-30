@@ -44,12 +44,22 @@ var quickAlgoContext = function(display, infos) {
 
   context.waitDelay = function(callback, value) {
     // Call the callback with value after actionDelay
-    context.runner.waitDelay(callback, value, infos.actionDelay);
+    if(context.runner) {
+      context.runner.waitDelay(callback, value, infos.actionDelay);
+    } else {
+      // When a function is used outside of an execution
+      setTimeout(function () { callback(value); }, infos.actionDelay);
+    }
   };
 
   context.callCallback = function(callback, value) {
     // Call the callback with value directly
-    context.runner.noDelay(callback, value);
+    if(context.runner) {
+      context.runner.noDelay(callback, value);
+    } else {
+      // When a function is used outside of an execution
+      callback(value);
+    }
   };
 
   context.debug_alert = function(message, callback) {
