@@ -262,7 +262,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += block.getFieldValue('PARAM_' + iParam);
+                           params += JSON.stringify(block.getFieldValue('PARAM_' + iParam));
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_colour") {
