@@ -29,9 +29,9 @@ function PythonInterpreter(context, msgCallback) {
 
   var that = this;
 
-  this._skulptifyHandler = function (name, generatorName, blockName, nbArgs, type) {
+  this._skulptifyHandler = function (name, generatorName, blockName, minArgs, maxArgs, type) {
     var handler = '';
-    handler += "\tSk.builtin.pyCheckArgs('" + name + "', arguments, " + nbArgs + ", " + nbArgs + ");";
+    handler += "\tSk.builtin.pyCheckArgs('" + name + "', arguments, " + minArgs + ", " + maxArgs + ");";
 
     handler += "\n\tvar susp = new Sk.misceval.Suspension();";
     handler += "\n\tvar result = Sk.builtin.none.none$;";
@@ -69,8 +69,19 @@ function PythonInterpreter(context, msgCallback) {
           for (var iBlock=0; iBlock < blockList.length; iBlock++) {
             var blockInfo = blockList[iBlock];
             blocksInfos[blockInfo.name] = {
-              nbArgs: blockInfo.params ? blockInfo.params.length : 0,
+              nbArgs: 0, // handled below
               type: typeName};
+            var variants = blockInfo.variants ? blockInfo.variants : (blockInfo.params ? [blockInfo.params] : []);
+            if(variants.length) {
+              var minArgs = variants[0].length;
+              var maxArgs = minArgs;
+              for(var i=1; i < variants.length; i++) {
+                minArgs = Math.min(minArgs, variants[i].length);
+                maxArgs = Math.max(maxArgs, variants[i].length);
+              }
+              blocksInfos[blockInfo.name].minArgs = minArgs;
+              blocksInfos[blockInfo.name].maxArgs = maxArgs;
+            }
           }
         }
       }
@@ -86,14 +97,15 @@ function PythonInterpreter(context, msgCallback) {
           if (typeof(code) == "undefined") {
             code = blockName;
           }
-          var nbArgs = blocksInfos[blockName] ? blocksInfos[blockName].nbArgs : 0;
+          var maxArgs = blocksInfos[blockName] ? blocksInfos[blockName].maxArgs : 0;
+          var minArgs = blocksInfos[blockName] ? blocksInfos[blockName].minArgs : maxArgs;
           var type = blocksInfos[blockName] ? blocksInfos[blockName].type : 'actions';
 
           if(type == 'actions') {
             this._hasActions = true;
           }
 
-          modContents += this._skulptifyHandler(code, generatorName, blockName, nbArgs, type);
+          modContents += this._skulptifyHandler(code, generatorName, blockName, minArgs, maxArgs, type);
         }
         modContents += "\nreturn mod;\n};";
         Sk.builtinFiles["files"]["src/lib/"+generatorName+".js"] = modContents;
