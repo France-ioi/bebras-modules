@@ -429,18 +429,18 @@ var getContext = function(display, infos) {
             processing.size(300, 300);
             processing.background(255);
             if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
-               context.processing.pushStyle();
+               processing.pushStyle();
                context.processing.initialDrawing(processing);
-               context.processing.popStyle();
+               processing.popStyle();
             }
          };
 
          processing.draw = function() {
             processing.background(255);
             if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
-               context.processing.pushStyle();
+               processing.pushStyle();
                context.processing.initialDrawing(processing);
-               context.processing.popStyle();
+               processing.popStyle();
             }
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
@@ -717,7 +717,7 @@ var getContext = function(display, infos) {
          conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
       'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
          conv: function(value) { return value * Math.PI / 180; } },
-      'Const': { conv: function(value) { /*return context.processing.internalInstance[value];*/ var number = parseInt(value); return number == NaN ? value : number; } },
+      'Const': { conv: function(value) { return context.processing.internalInstance[value]; } },
       'ColorModeConst': { options: ["RGB", "HSB"] },
       'BlendConst': { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
             "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] },
@@ -750,8 +750,7 @@ var getContext = function(display, infos) {
                         paramData.bType = 'field_dropdown';
                         blockArgs[iParam] = $.extend({ options: [] }, blockArgs[iParam]);
                         for (var iValue = 0; iValue < paramData.options.length; iValue++) {
-                           blockArgs[iParam].options.push([strings.values[paramData.options[iValue]],
-                              /*paramData.options[iValue]*/context.processing.internalInstance[paramData.options[iValue]]]);
+                           blockArgs[iParam].options.push([strings.values[paramData.options[iValue]], paramData.options[iValue]]);
                         }
                      }
                      if (paramData.pType) {
