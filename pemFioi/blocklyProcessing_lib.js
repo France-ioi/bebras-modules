@@ -155,11 +155,11 @@ var getContext = function(display, infos) {
          },
          code: {
             // environment
-            popStyle: "dépilerStyle",
+            popStyle: "depilerStyle",//dépilerStyle
             pushStyle: "empilerStyle",
             cursor: "curseurSouris",
-            focused: "canevasSélectionné",
-            frameCount: "numéroItération",
+            focused: "canevasSelectionne",//canevasSélectionné
+            frameCount: "numeroIteration",//numéroItération
             frameRate: "changerTauxRafraichissement",
             __frameRate: "tauxRafraichissement",
             width: "largeur",
@@ -174,24 +174,24 @@ var getContext = function(display, infos) {
             rect: "rect",
             triangle: "triangle",
             bezier: "bezier",
-            bezierDetail: "détailBezier",
+            bezierDetail: "detailBezier",//détailBezier
             bezierPoint: "pointBezier",
             bezierTangent: "tangenteBezier",
             curve: "courbe",
-            curveDetail: "détailCourbes",
+            curveDetail: "detailCourbes",//détailCourbes
             curvePoint: "pointCourbe",
             curveTangent: "tangenteCourbe",
             curveTightness: "tensionCourbes",
             box: "boite",
-            sphere: "sphère",
-            sphereDetail: "détailSphères",
+            sphere: "sphere",//sphère
+            sphereDetail: "detailSpheres",//détailSphères
             ellipseMode: "modeEllipses",
-            noSmooth: "désactiverLissage",
+            noSmooth: "desactiverLissage",//désactiverLissage
             rectMode: "modeRectangles",
             smooth: "lissage",
             strokeCap: "terminaisonsLignes",
             strokeJoin: "jointuresLignes",
-            strokeWeight: "épaisseurLignes",
+            strokeWeight: "epaisseurLignes",//épaisseurLignes
             beginShape: "commencerForme",
             bezierVertex: "sommetBezier",
             curveVertex: "sommetCourbe",
@@ -203,7 +203,7 @@ var getContext = function(display, infos) {
             shapeMode: "modeFormes",
             isVisible: "estVisible",
             setVisible: "changerVisible",
-            disableStyle: "désactiverStyle",
+            disableStyle: "desactiverStyle",//désactiverStyle
             enableStyle: "activerStyle",
             getChild: "enfant",
             // debug
@@ -211,71 +211,71 @@ var getContext = function(display, infos) {
             println: "sortirLigne",
             // transform
             applyMatrix: "appliquerMatrice",
-            popMatrix: "dépilerMatrice",
+            popMatrix: "depilerMatrice",//dépilerMatrice
             printMatrix: "sortirMatrice",
             pushMatrix: "empilerMatrice",
-            resetMatrix: "réinitialiserMatrice",
+            resetMatrix: "reinitialiserMatrice",//réinitialiserMatrice
             rotate: "pivoter",
             rotateX: "pivoterX",
             rotateY: "pivoterY",
             rotateZ: "pivoterZ",
-            scale: "mettreÉchelle",
-            translate: "déplacer",
+            scale: "mettreEchelle",//mettreÉchelle
+            translate: "deplacer",//déplacer
             // effect
-            ambientLight: "lumièreAmbiante",
-            directionalLight: "lumièreDirectionnelle",
-            lightFalloff: "réductionLumière",
-            lightSpecular: "lumièreSpéculaire",
-            lights: "lumières",
-            noLights: "désactiverLumières",
+            ambientLight: "lumiereAmbiante",//lumièreAmbiante
+            directionalLight: "lumiereDirectionnelle",//lumièreDirectionnelle
+            lightFalloff: "reductionLumiere",//réductionLumière
+            lightSpecular: "lumiereSpeculaire",//lumièreSpéculaire
+            lights: "lumieres",//lumières
+            noLights: "desactiverLumieres",//désactiverLumières
             normal: "normal",
-            pointLight: "lumièrePoint",
-            spotLight: "lumièreProjetée",
-            beginCamera: "commencerCaméra",
-            camera: "caméra",
-            endCamera: "terminerCaméra",
+            pointLight: "lumierePoint",//lumièrePoint
+            spotLight: "lumiereProjetee",//lumièreProjetée
+            beginCamera: "commencerCamera",//commencerCaméra
+            camera: "camera",//caméra
+            endCamera: "terminerCamera",//terminerCaméra
             frustum: "frustum",
             ortho: "ortho",
             perspective: "perspective",
             printCamera: "sortirCamera",
             printProjection: "sortirProjection",
-            modelX: "modèleX",
-            modelY: "modèleY",
-            modelZ: "modèleZ",
-            screenX: "écranX",
-            screenY: "écranY",
-            screenZ: "écranZ",
+            modelX: "modeleX",//modèleX
+            modelY: "modeleY",//modèleY
+            modelZ: "modeleZ",//modèleZ
+            screenX: "ecranX",//écranX
+            screenY: "ecranY",//écranY
+            screenZ: "ecranZ",//écranZ
             ambient: "ambiante",
-            emissive: "émissive",
+            emissive: "emissive",//émissive
             shininess: "brillante",
-            specular: "spéculaire",
+            specular: "speculaire",//spéculaire
             // color
-            background: "arrièrePlan",
+            background: "arrierePlan",//arrièrePlan
             colorMode: "modeCouleurs",
             fill: "couleurFond",
-            noFill: "désactiverFond",
-            noStroke: "désactiverLigne",
+            noFill: "desactiverFond",//désactiverFond
+            noStroke: "desactiverLigne",//désactiverLigne
             stroke: "couleurLigne",
-            alpha: "opacité",
-            blendColor: "mélangerCouleurs",
+            alpha: "opacite",//opacité
+            blendColor: "melangerCouleurs",//mélangerCouleurs
             blue: "bleu",
-            brightness: "luminosité",
+            brightness: "luminosite",//luminosité
             color: "couleur",
             green: "vert",
             hue: "teinte",
-            lerpColor: "couleurIntermédiaire",
+            lerpColor: "couleurIntermediaire",//couleurIntermédiaire
             red: "rouge",
             saturation: "saturation",
             // image
             createImage: "nouvelleImage",
             image: "image",
             imageMode: "modeImages",
-            noTint: "désactiverTeint",
+            noTint: "desactiverTeint",//désactiverTeint
             tint: "teint",
-            blend: "mélanger",
+            blend: "melanger",//mélanger
             copy: "copier",
             filter: "appliquerFiltre",
-            get: "récupérerPixels",
+            get: "recupererPixels",//récupérerPixels
             loadPixels: "chargerPixels",
             pixels: "pixels",
             set: "placerPixels",
@@ -409,6 +409,15 @@ var getContext = function(display, infos) {
       }
    };
 
+   function initGraphics(pg) {
+      pg.background(255);
+      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+         pg.pushStyle();
+         context.processing.initialDrawing(pg);
+         pg.popStyle();
+      }
+   }
+
    context.resetDisplay = function() {
       var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
       var canvas = $('<canvas>').css('border', '1px solid black');
@@ -428,20 +437,10 @@ var getContext = function(display, infos) {
          processing.setup = function() {
             processing.size(300, 300);
             processing.background(255);
-            if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
-               processing.pushStyle();
-               context.processing.initialDrawing(processing);
-               processing.popStyle();
-            }
          };
 
          processing.draw = function() {
-            processing.background(255);
-            if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
-               processing.pushStyle();
-               context.processing.initialDrawing(processing);
-               processing.popStyle();
-            }
+            initGraphics(processing);
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
                typeof processing[op.block] == 'function' ? processing[op.block].apply(processing, op.values) : processing[op.block];
@@ -481,12 +480,14 @@ var getContext = function(display, infos) {
 
 
    function drawOnBuffer() {
-      var pg = context.processing.internalInstance.createGraphics(300, 300);
+      var buffer = context.processing.internalInstance.createGraphics(300, 300);
+      initGraphics(buffer);
       var ret;
       for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
          var op = context.processing.ops[iOp];
-         ret = typeof pg[op.block] == 'function' ? pg[op.block].apply(pg, op.values) : pg[op.block];
+         ret = typeof buffer[op.block] == 'function' ? buffer[op.block].apply(buffer, op.values) : buffer[op.block];
       }
+      context.processing.buffer = buffer;
       return ret;
    }
 
@@ -503,6 +504,12 @@ var getContext = function(display, infos) {
       context.waitDelay(arguments[arguments.length - 1], drawOnBuffer());
    };
 
+   context.processing.pixels = function(index, callback) {
+      drawOnBuffer();
+      context.processing.buffer.loadPixels();
+      context.waitDelay(callback, context.processing.buffer.pixels().toArray());
+   };
+
 
    context.customBlocks = {
       processing: {
@@ -512,12 +519,12 @@ var getContext = function(display, infos) {
             //
             { name: "cursor",
                variants: [[{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }], ['Image', 'Number', 'Number']] },
-            { name: "focused", yieldsValue: true },
-            { name: "frameCount", yieldsValue: true },
+            { name: "focused", yieldsValue: true }, // must be a value
+            { name: "frameCount", yieldsValue: true }, // must be a value
             { name: "frameRate", params: ['Number'] },
-            { name: "__frameRate", yieldsValue: true },
-            { name: "width", yieldsValue: true },
-            { name: "height", yieldsValue: true },
+            { name: "__frameRate", yieldsValue: true }, // must be a value
+            { name: "width", yieldsValue: true }, // must be a value
+            { name: "height", yieldsValue: true }, // must be a value
             //
             { name: "resize", params: ['Number', 'Number'] }
          ],
@@ -558,7 +565,7 @@ var getContext = function(display, infos) {
             { name: "strokeCap", params: [{ options: ["SQUARE", "PROJECT", "ROUND"] }] },
             { name: "strokeJoin", params: [{ options: ["MITER", "BEVEL", "ROUND"] }] },
             { name: "strokeWeight", params: ['Number'] },
-            // attention : les fonctions « vertex » ci-dessous ignorent scale()
+            //
             { name: "beginShape",
                variants: [[],
                   [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }]] },
@@ -682,7 +689,7 @@ var getContext = function(display, infos) {
             { name: "filter", variants: [['FilterConst'], ['FilterConst', 'Number']] },
             { name: "get", variants: [[], ['Number', 'Number'], ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
             { name: "loadPixels" },
-            { name: "pixels", yieldsValue: true },
+            { name: "pixels", yieldsValue: true }, // must be a list
             { name: "set", variants: [['Number', 'Number', 'Colour'], ['Number', 'Number', 'Number']] },
             { name: "updatePixels" }
          ],
@@ -781,6 +788,29 @@ var getContext = function(display, infos) {
          })();
       }
    }
+
+
+   context.checkCoveredColors = function(toCover, toAvoid) {
+      var buffer = context.processing.internalInstance.createGraphics(300, 300);
+      initGraphics(buffer);
+      buffer.loadPixels();
+      var initialPixels = buffer.pixels.toArray();
+      drawOnBuffer();
+      context.processing.buffer.loadPixels();
+      var finalPixels = context.processing.buffer.pixels.toArray();
+      var result = [true, true];
+      for (var iPixel = 0; iPixel < initialPixels.length && iPixel < finalPixels.length; iPixel++) {
+         var initialPixel = initialPixels[iPixel], finalPixel = finalPixels[iPixel];
+         var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
+         var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
+         if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
+            result[0] = false;
+         } else if (r1 == toAvoid[0] && g1 == toAvoid[1] && b1 == toAvoid[2] && (r2 != r1 || g2 != g1 || b2 != b1)) {
+            result[1] = false;
+         }
+      }
+      return result;
+   };
 
 
    return context;
