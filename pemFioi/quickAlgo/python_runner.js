@@ -144,7 +144,7 @@ function PythonInterpreter(context, msgCallback) {
       return Sk.builtin.none.none$;  // Reuse the same object.
     }
     var type = typeof data;
-    var result;
+    var result = {v: data}; // Emulate a Skulpt object as default
     if (type === 'number') {
       result = new Sk.builtin.int_(data);
     } else if (type === 'string') {
