@@ -58,6 +58,19 @@ function PythonInterpreter(context, msgCallback) {
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
   };
 
+  this._skulptifyConst = function(name, value) {
+    if(typeof value === "number") {
+      var handler = 'Sk.builtin.int_(' + value + ');';
+    } else if(typeof value === "boolean") {
+      var handler = 'Sk.builtin.bool(' + value.toString() + ');';
+    } else if(typeof value === "string") {
+      var handler = 'Sk.builtin.str(' + JSON.stringify(value) + ');';
+    } else {
+      throw "Unable to translate value '" + value + "' into a Skulpt constant.";
+    }
+    return '\nmod.' + name + ' = new ' + handler + '\n';
+  };
+
   this._injectFunctions = function () {
     // Generate Python custom libraries from all generated blocks
     if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
@@ -107,6 +120,20 @@ function PythonInterpreter(context, msgCallback) {
 
           modContents += this._skulptifyHandler(code, generatorName, blockName, minArgs, maxArgs, type);
         }
+
+        // TODO :: allow selection of constants available in a task
+//        if(this.context.infos.includeBlocks.constants && this.context.infos.includeBlocks.constants[generatorName]) {
+        if(this.context.customConstants && this.context.customConstants[generatorName]) {
+          var constList = this.context.customConstants[generatorName];
+          for(var iConst=0; iConst < constList.length; iConst++) {
+            var name = constList[iConst].name;
+            if(this.context.strings.constant && this.context.strings.constant[name]) {
+              name = this.context.strings.constant[name];
+            }
+            modContents += this._skulptifyConst(name, constList[iConst].value)
+          }
+        }
+
         modContents += "\nreturn mod;\n};";
         Sk.builtinFiles["files"]["src/lib/"+generatorName+".js"] = modContents;
         this.availableModules.push(generatorName);

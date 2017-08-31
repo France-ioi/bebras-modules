@@ -17,10 +17,16 @@ var getContext = function(display, infos, curLevel) {
             readSensor: "lireCapteur"
          },
          description: {
-            // Descriptions of the functions in Python
+            // Descriptions of the functions in Python (optional)
             doAction: "faireAction(valeur) : réalise l'action avec la valeur spécifiée",
             doNothing: "rienFaire() : ne fait rien",
             readSensor: "lireCapteur() : lit le capteur, et renvoie la valeur sous la forme d'un entier"
+         },
+         constant: {
+            // Translations for constant names (optional)
+            "ONE": "UN",
+            "TRUEVALUE": "VALEURVRAI",
+            "LIBNAME": "NOMLIB"
          },
          startingBlockName: "Programme", // Name for the starting block
          messages: {
@@ -148,6 +154,15 @@ var getContext = function(display, infos, curLevel) {
          ]
       }
       // We can add multiple namespaces by adding other keys to customBlocks.
+   };
+
+   // Constants available in Python
+   context.customConstants = {
+      example: [
+         { name: "ONE", value: 1 },
+         { name: "TRUEVALUE", value: true },
+         { name: "LIBNAME", value: "example" }
+      ]
    };
 
    // Don't forget to return our newly created context!
