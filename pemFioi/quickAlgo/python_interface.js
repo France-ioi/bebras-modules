@@ -340,6 +340,9 @@ function LogicController(nbTestCases, maxInstructions) {
                  +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
                  +  '<ul>';
 
+      var availableConsts = [];
+
+      // Generate list of functions available
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
@@ -354,8 +357,24 @@ function LogicController(nbTestCases, maxInstructions) {
           }
           pythonHtml += '<li><code>' + blockDesc + '</code></li>';
         }
+
+        // Handle constants as well
+        if(this._mainContext.customConstants && this._mainContext.customConstants[generatorName]) {
+          var constList = this._mainContext.customConstants[generatorName];
+          for(var iConst=0; iConst < constList.length; iConst++) {
+            var name = constList[iConst].name;
+            if(this._mainContext.strings.constant && this._mainContext.strings.constant[name]) {
+              name = this._mainContext.strings.constant[name];
+            }
+            availableConsts.push(name);
+          }
+        }
       }
       pythonHtml += '</ul>';
+    }
+
+    if(availableConsts.length) {
+      pythonHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code></p>';
     }
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
