@@ -417,6 +417,10 @@ var getContext = function(display, infos) {
          pg.popStyle();
       }
    }
+   function resetGraphics(pg) {
+      pg.resetMatrix();
+      pg.noLights();
+   }
 
    context.resetDisplay = function() {
       var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
@@ -441,10 +445,13 @@ var getContext = function(display, infos) {
 
          processing.draw = function() {
             initGraphics(processing);
+            resetGraphics(processing);
+            processing.pushStyle();
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
                typeof processing[op.block] == 'function' ? processing[op.block].apply(processing, op.values) : processing[op.block];
             }
+            processing.popStyle();
          };
 
          processing.mouseMoved = function() {
