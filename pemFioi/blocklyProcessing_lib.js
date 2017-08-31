@@ -3,13 +3,25 @@ var getContext = function(display, infos) {
       fr: {
          categories: {
             environment: "Environnement",
-            shape: "Formes",
+            shape_2D: "Formes - 2D",
+            shape_curve: "Formes - courbes",
+            shape_3D: "Formes - 3D",
+            shape_attributes: "Formes - attributs",
+            shape_vertex: "Formes - sommets",
+            shape_other: "Formes - autres",
+            image_loading: "Images - chargement",
+            image_pixels: "Images - pixels",
             transform: "Transformations",
-            effect: "Effets",
-            color: "Couleurs",
-            image: "Images",
+            effect_lights: "Effets - lumières",
+            effect_camera: "Effets - caméra",
+            effect_coordinates: "Effets - coordonnées",
+            effect_material: "Effets - matière",
+            color_setting: "Couleurs - réglages",
+            color_creating_reading: "Couleurs - création et lecture",
             rendering: "Rendu",
-            typography: "Typographie"
+            typography_loading: "Typographie - chargement",
+            typography_attributes: "Typographie - attributs",
+            typography_metrics: "Typographie - mesures"
          },
          label: {
             // environment
@@ -533,7 +545,7 @@ var getContext = function(display, infos) {
             //
             { name: "resize", params: ['Number', 'Number'] }
          ],
-         shape: [
+         shape_2D: [
             { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'] },
             { name: "ellipse", params: ['Number', 'Number', 'Number', 'Number'] },
             { name: "line",
@@ -543,8 +555,9 @@ var getContext = function(display, infos) {
             { name: "rect",
                variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number'],
                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            //
+            { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }
+         ],
+         shape_curve: [
             { name: "bezier",
                variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
@@ -557,20 +570,23 @@ var getContext = function(display, infos) {
             { name: "curveDetail", params: ['Number'] },
             { name: "curvePoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
             { name: "curveTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "curveTightness", params: ['Number'] },
-            //
+            { name: "curveTightness", params: ['Number'] }
+         ],
+         shape_3D: [
             { name: "box", variants: [['Number'], ['Number', 'Number', 'Number']] },
             { name: "sphere", params: ['Number'] },
-            { name: "sphereDetail", variants: [['Number'], ['Number', 'Number']] },
-            //
+            { name: "sphereDetail", variants: [['Number'], ['Number', 'Number']] }
+         ],
+         shape_attributes: [
             { name: "ellipseMode", params: [{ options: ["CENTER", "RADIUS", "CORNER", "CORNERS"] }] },
             { name: "noSmooth" },
             { name: "rectMode", params: [{ options: ["CORNER", "CORNERS", "CENTER", "RADIUS"] }] },
             { name: "smooth" },
             { name: "strokeCap", params: [{ options: ["SQUARE", "PROJECT", "ROUND"] }] },
             { name: "strokeJoin", params: [{ options: ["MITER", "BEVEL", "ROUND"] }] },
-            { name: "strokeWeight", params: ['Number'] },
-            //
+            { name: "strokeWeight", params: ['Number'] }
+         ],
+         shape_vertex: [
             { name: "beginShape",
                variants: [[],
                   [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }]] },
@@ -583,12 +599,12 @@ var getContext = function(display, infos) {
             { name: "textureMode", params: [{ options: ["IMAGE", "NORMALIZED"] }] },
             { name: "vertex",
                variants: [['Number', 'Number'], ['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number']] },
-            //
+                  ['Number', 'Number', 'Number', 'Number', 'Number']] }
+         ],
+         shape_other: [
             { name: "shape",
                variants: [['Shape'], ['Shape', 'Number', 'Number'], ['Shape', 'Number', 'Number', 'Number', 'Number']] },
             { name: "shapeMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
-            //
             { name: "isVisible", yieldsValue: true },
             { name: "setVisible", params: ['Boolean'] },
             { name: "disableStyle" },
@@ -613,7 +629,7 @@ var getContext = function(display, infos) {
             { name: "scale", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number']] },
             { name: "translate", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] }
          ],
-         effect: [
+         effect_lights: [
             { name: "ambientLight",
                variants: [['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "directionalLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
@@ -624,8 +640,9 @@ var getContext = function(display, infos) {
             { name: "normal", params: ['Number', 'Number', 'Number'] },
             { name: "pointLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
             { name: "spotLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
-                  'Number', 'Number', 'Number'] },
-            //
+                  'Number', 'Number', 'Number'] }
+         ],
+         effect_camera: [
             { name: "beginCamera" },
             { name: "camera",
                variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
@@ -634,21 +651,23 @@ var getContext = function(display, infos) {
             { name: "ortho", variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
             { name: "perspective", variants: [[], ['Number', 'Number', 'Number', 'Number']] },
             { name: "printCamera" },
-            { name: "printProjection" },
-            //
+            { name: "printProjection" }
+         ],
+         effect_coordinates: [
             { name: "modelX", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             { name: "modelY", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             { name: "modelZ", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             { name: "screenX", params: ['Number', 'Number', 'Number'], yieldsValue: true },
             { name: "screenY", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "screenZ", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            //
+            { name: "screenZ", params: ['Number', 'Number', 'Number'], yieldsValue: true }
+         ],
+         effect_material: [
             { name: "ambient", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
             { name: "emissive", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
             { name: "shininess", params: ['Number'] },
             { name: "specular", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] }
          ],
-         color: [
+         color_setting: [
             { name: "background",
                variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
                   ['Number', 'Number', 'Number', 'Number'], ['Colour'], ['Image']] },
@@ -661,7 +680,8 @@ var getContext = function(display, infos) {
             { name: "noFill" },
             { name: "noStroke" },
             { name: "stroke", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'], ['Colour']] },
-            //
+        ],
+        color_creating_reading: [
             { name: "alpha", params: ['Colour'], yieldsValue: true },
             { name: "blendColor", params: ['Colour', 'Colour', 'BlendConst'], yieldsValue: true },
             { name: "blue", params: ['Colour'], yieldsValue: true },
@@ -675,7 +695,7 @@ var getContext = function(display, infos) {
             { name: "red", params: ['Colour'], yieldsValue: true },
             { name: "saturation", params: ['Colour'], yieldsValue: true }
          ],
-         image: [
+         image_loading: [
             { name: "createImage", params: ['Number', 'Number', { options: ["RGB", "ARGB", "ALPHA"] }], yieldsValue: true },
             //
             { name: "image", variants: [['Image', 'Number', 'Number'], ['Image', 'Number', 'Number', 'Number', 'Number']] },
@@ -684,7 +704,8 @@ var getContext = function(display, infos) {
             { name: "tint",
                variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
                   ['Number', 'Number', 'Number', 'Number'], ['Colour']] },
-            //
+            ],
+         image_pixels: [
             { name: "blend",
                variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst'],
                   ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst']] },
@@ -701,21 +722,23 @@ var getContext = function(display, infos) {
          rendering: [
             { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }], yieldsValue: true }
          ],
-         typography: [
+         typography_loading: [
             { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
             { name: "loadFont", params: ['String'], yieldsValue: true },
             { name: "text_",
                variants: [[null, 'Number', 'Number'], [null, 'Number', 'Number', 'Number'],
                   ['String', 'Number', 'Number', 'Number', 'Number'],
                   ['String', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "textFont", params: ['Font', 'Number'] },
-            //
+            { name: "textFont", params: ['Font', 'Number'] }
+         ],
+         typography_attributes: [
             { name: "textAlign", params: [{ options: ["LEFT", "CENTER", "RIGHT"] }, { options: ["TOP", "BOTTOM", "CENTER", "BASELINE"] }] },
             { name: "textLeading", params: ['Number'] },
             { name: "textMode", params: [{ options: ["MODEL", "SCREEN", "SHAPE"] }] },
             { name: "textSize", params: ['Number'] },
-            { name: "textWidth", params: ['String'], yieldsValue: true },
-            //
+            { name: "textWidth", params: ['String'], yieldsValue: true }
+         ],
+         typography_metrics: [
             { name: "textAscent", yieldsValue: true },
             { name: "textDescent", yieldsValue: true }
          ]
