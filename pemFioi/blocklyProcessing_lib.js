@@ -416,10 +416,9 @@ var getContext = function(display, infos) {
          context.processing.initialDrawing(pg);
          pg.popStyle();
       }
-   }
-   function resetGraphics(pg) {
       pg.resetMatrix();
       pg.noLights();
+      pg.fill(128);
    }
 
    context.resetDisplay = function() {
@@ -445,7 +444,6 @@ var getContext = function(display, infos) {
 
          processing.draw = function() {
             initGraphics(processing);
-            resetGraphics(processing);
             processing.pushStyle();
             for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
                var op = context.processing.ops[iOp];
