@@ -280,7 +280,7 @@ function initBlocklyRunner(context, messageCallback) {
                   //message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
             }
-            messageCallback(message);
+            setTimeout(function() { messageCallback(message); }, 0);
          }
       };
 
