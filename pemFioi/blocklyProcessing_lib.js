@@ -29,13 +29,10 @@ var getContext = function(display, infos) {
             pushStyle: "empiler le style",
             cursor: "utiliser le pointeur de souris %1",
             focused: "le canevas est sélectionné",
-            frameCount: "numéro d'itération",
-            frameRate: "définir le taux de rafraichissement à %1",
-            __frameRate: "taux de rafraichissement",
             width: "largeur",
             height: "hauteur",
             resize: "redimensionner à la taille %1 %2",
-            // shape
+            // shape_2D
             arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5° et %6°",
             ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
             line: "dessiner une ligne de %1 %2 à %3 %4",
@@ -43,6 +40,7 @@ var getContext = function(display, infos) {
             quad: "dessiner un quadrilatère aux points %1 %2, %3 %4, %5 %6, %7 %8",
             rect: "dessiner un rectangle à %1 %2 de taille %3 %4",
             triangle: "dessiner un triangle aux points %1 %2, %3 %4, %5 %6",
+            // shape_curve
             bezier: "dessiner une courbe de Bézier allant de %1 %2 avec l'ancre %3 %4 et l'ancre %5 %6 jusqu'à %7 %8",
             bezierDetail: "définir la résolution des courbes de Bézier à %1",
             bezierPoint: "coordonnée sur la courbe de Bézier allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
@@ -52,9 +50,11 @@ var getContext = function(display, infos) {
             curvePoint: "coordonnée sur la courbe spline allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
             curveTangent: "tangente sur la courbe spline allant de %1 avec les ancres %2 et %3 jusqu'au point %4 à l'emplacement %5",
             curveTightness: "définir la tension des courbes splines à %1",
+            // shape_3D
             box: "dessiner une boite de taille %1 %2 %3",
             sphere: "dessiner une sphère de rayon %1",
             sphereDetail: "définir la résolution des sphères à %1 %2",
+            // shape_attributes
             ellipseMode: "utiliser le mode %1 pour les ellipses",
             noSmooth: "désactiver le lissage",
             rectMode: "utiliser le mode %1 pour les rectangles",
@@ -62,6 +62,7 @@ var getContext = function(display, infos) {
             strokeCap: "utiliser des terminaisons %1",
             strokeJoin: "utiliser des jointures %1",
             strokeWeight: "définir l'épaisseur des lignes à %1",
+            // shape_vertex
             beginShape: "commencer une forme avec le mode %1",
             bezierVertex: "placer un sommet de courbe de Bézier à %1 %2 %3 %4 %5 %6",
             curveVertex: "placer un sommet de courbe spline à %1 %2",
@@ -69,6 +70,7 @@ var getContext = function(display, infos) {
             texture: "utiliser la texture %1",
             textureMode: "utiliser le mode %1 pour se référer à la texture",
             vertex: "placer un sommet à %1 %2 %3 %4 %5",
+            // shape_other
             shape: "afficher la forme %1 à %2 %3 avec la taille %4 %5",
             shapeMode: "utiliser le mode %1 pour les formes",
             isVisible: "est visible",
@@ -91,7 +93,7 @@ var getContext = function(display, infos) {
             rotateZ: "pivoter sur l'axe Z de %1°",
             scale: "appliquer une échelle de %1 %2 %3",
             translate: "déplacer de %1 %2 %3",
-            // effect
+            // effect_lights
             ambientLight: "ajouter une lumière ambiante %1 %2 %3 à %4 %5 %6",
             directionalLight: "ajouter une lumière directionnelle %1 %2 %3 vers %4 %5 %6",
             lightFalloff: "placer la réduction de lumière sur %1 %2 %3",
@@ -101,6 +103,7 @@ var getContext = function(display, infos) {
             normal: "définir le vecteur normal utilisé à %1 %2 %3",
             pointLight: "ajouter une lumière %1 %2 %3 partant de %4 %5 %6",
             spotLight: "ajouter une lumière %1 %2 %3 partant de %4 %5 %6 vers %7 %8 %9 selon un angle de %10 et une exponentielle de %11",
+            // effect_camera
             beginCamera: "commencer un déplacement de la caméra",
             camera: "placer la caméra à %1 %2 %3 visant %4 %5 %6 éloignée de %7 %8 %9",
             endCamera: "terminer un déplacement de la caméra",
@@ -109,23 +112,26 @@ var getContext = function(display, infos) {
             perspective: "définir la projection de perspective à %1 %2 %3 %4",
             printCamera: "sortir la matrice de la caméra",
             printProjection: "sortir la matrice de la projection",
+            // effect_coordinates
             modelX: "coordonnée X sur le modèle du point %1 %2 %3",
             modelY: "coordonnée Y sur le modèle du point %1 %2 %3",
             modelZ: "coordonnée Z sur le modèle du point %1 %2 %3",
             screenX: "coordonnée X sur l'écran du point %1 %2 %3",
             screenY: "coordonnée Y sur l'écran du point %1 %2 %3",
             screenZ: "coordonnée Z sur l'écran du point %1 %2 %3",
+            // effect_material
             ambient: "définir la réflectance sur les formes à %1 %2 %3",
             emissive: "définir l'émission sur les formes à %1 %2 %3",
             shininess: "définir la brillance sur les formes à %1",
             specular: "définir la spécularité des formes à %1",
-            // color
+            // color_setting
             background: "remplir l'arrière-plan avec %1 %2 %3 %4",
             colorMode: "utiliser le mode de couleur %1 avec les limites %2 %3 %4 %5",
             fill: "définir la couleur de fond à %1 %2 %3",
             noFill: "désactiver le fond",
             noStroke: "désactiver la ligne de contour",
             stroke: "définir la couleur de ligne à %1 %2 %3",
+            // color_creating_reading
             alpha: "opacité dans %1",
             blendColor: "mélanger les couleurs %1 et %2 avec le mode %3",
             blue: "bleu dans %1",
@@ -136,12 +142,13 @@ var getContext = function(display, infos) {
             lerpColor: "couleur intermédiaire entre %1 et %2 à l'emplacement %3",
             red: "rouge dans %1",
             saturation: "saturation dans %1",
-            // image
+            // image_loading
             createImage: "nouvelle image de taille %1 %2 au format %3",
             image: "afficher l'image %1 à %2 %3 avec la taille %4 %5",
             imageMode: "utiliser le mode %1 pour le positionnement des images",
             noTint: "désactiver le teint des images",
             tint: "utiliser pour les images un teint %1 %2 %3 %4",
+            // image_pixels
             blend: "mélanger la source à %1 %2 taille %3 %4 avec la destination à %5 %6 taille %7 %8 avec le mode %9",
             copy: "copier la source à %1 %2 taille %3 %4 sur la destination à %5 %6 taille %7 %8",
             filter: "appliquer le filtre %1 avec le niveau %2",
@@ -152,16 +159,18 @@ var getContext = function(display, infos) {
             updatePixels: "actualiser les pixels",
             // rendering
             createGraphics: "nouveau graphisme de taille %1 %2 avec le moteur %3",
-            // typography
+            // typography_loading
             createFont: "nouvelle police de nom %1 et de taille %2",
             loadFont: "nouvelle police de nom %1",
             text_: "afficher le texte %1 à %2 %3 dans un cadre de taille %4 %5",
             textFont: "définir la police du texte à %1 avec la taille %2",
+            // typography_attributes
             textAlign: "définir l'alignement du texte, à l'horizontale : %1 et à la verticale : %2",
             textLeading: "définir l'interligne du texte à %1",
             textMode: "utiliser le mode %1 pour le texte",
             textSize: "définir la taille du texte à %1",
             textWidth: "largeur du texte %1",
+            // typography_metrics
             textAscent: "hauteur du texte au-dessus de la ligne de base",
             textDescent: "hauteur du texte en dessous de la ligne de base"
          },
@@ -171,13 +180,10 @@ var getContext = function(display, infos) {
             pushStyle: "empilerStyle",
             cursor: "curseurSouris",
             focused: "canevasSelectionne",//canevasSélectionné
-            frameCount: "numeroIteration",//numéroItération
-            frameRate: "changerTauxRafraichissement",
-            __frameRate: "tauxRafraichissement",
             width: "largeur",
             height: "hauteur",
             resize: "redimensionner",
-            // shape
+            // shape_2D
             arc: "arc",
             ellipse: "ellipse",
             line: "ligne",
@@ -185,6 +191,7 @@ var getContext = function(display, infos) {
             quad: "quad",
             rect: "rect",
             triangle: "triangle",
+            // shape_curve
             bezier: "bezier",
             bezierDetail: "detailBezier",//détailBezier
             bezierPoint: "pointBezier",
@@ -194,9 +201,11 @@ var getContext = function(display, infos) {
             curvePoint: "pointCourbe",
             curveTangent: "tangenteCourbe",
             curveTightness: "tensionCourbes",
+            // shape_3D
             box: "boite",
             sphere: "sphere",//sphère
             sphereDetail: "detailSpheres",//détailSphères
+            // shape_attributes
             ellipseMode: "modeEllipses",
             noSmooth: "desactiverLissage",//désactiverLissage
             rectMode: "modeRectangles",
@@ -204,6 +213,7 @@ var getContext = function(display, infos) {
             strokeCap: "terminaisonsLignes",
             strokeJoin: "jointuresLignes",
             strokeWeight: "epaisseurLignes",//épaisseurLignes
+            // shape_vertex
             beginShape: "commencerForme",
             bezierVertex: "sommetBezier",
             curveVertex: "sommetCourbe",
@@ -211,6 +221,7 @@ var getContext = function(display, infos) {
             texture: "texture",
             textureMode: "modeTextures",
             vertex: "sommet",
+            // shape_other
             shape: "forme",
             shapeMode: "modeFormes",
             isVisible: "estVisible",
@@ -233,7 +244,7 @@ var getContext = function(display, infos) {
             rotateZ: "pivoterZ",
             scale: "mettreEchelle",//mettreÉchelle
             translate: "deplacer",//déplacer
-            // effect
+            // effect_lights
             ambientLight: "lumiereAmbiante",//lumièreAmbiante
             directionalLight: "lumiereDirectionnelle",//lumièreDirectionnelle
             lightFalloff: "reductionLumiere",//réductionLumière
@@ -243,6 +254,7 @@ var getContext = function(display, infos) {
             normal: "normal",
             pointLight: "lumierePoint",//lumièrePoint
             spotLight: "lumiereProjetee",//lumièreProjetée
+            // effect_camera
             beginCamera: "commencerCamera",//commencerCaméra
             camera: "camera",//caméra
             endCamera: "terminerCamera",//terminerCaméra
@@ -251,23 +263,26 @@ var getContext = function(display, infos) {
             perspective: "perspective",
             printCamera: "sortirCamera",
             printProjection: "sortirProjection",
+            // effect_coordinates
             modelX: "modeleX",//modèleX
             modelY: "modeleY",//modèleY
             modelZ: "modeleZ",//modèleZ
             screenX: "ecranX",//écranX
             screenY: "ecranY",//écranY
             screenZ: "ecranZ",//écranZ
+            // effect_material
             ambient: "ambiante",
             emissive: "emissive",//émissive
             shininess: "brillante",
             specular: "speculaire",//spéculaire
-            // color
+            // color_setting
             background: "arrierePlan",//arrièrePlan
             colorMode: "modeCouleurs",
             fill: "couleurFond",
             noFill: "desactiverFond",//désactiverFond
             noStroke: "desactiverLigne",//désactiverLigne
             stroke: "couleurLigne",
+            // color_creating_reading
             alpha: "opacite",//opacité
             blendColor: "melangerCouleurs",//mélangerCouleurs
             blue: "bleu",
@@ -278,12 +293,13 @@ var getContext = function(display, infos) {
             lerpColor: "couleurIntermediaire",//couleurIntermédiaire
             red: "rouge",
             saturation: "saturation",
-            // image
+            // image_loading
             createImage: "nouvelleImage",
             image: "image",
             imageMode: "modeImages",
             noTint: "desactiverTeint",//désactiverTeint
             tint: "teint",
+            // image_displaying
             blend: "melanger",//mélanger
             copy: "copier",
             filter: "appliquerFiltre",
@@ -294,16 +310,18 @@ var getContext = function(display, infos) {
             updatePixels: "actualiserPixels",
             // rendering
             createGraphics: "nouveauGraphisme",
-            // typography
+            // typography_loading
             createFont: "nouvellePolice",
             loadFont: "chargerPolice",
             text_: "texte",
             textFont: "policeTexte",
+            // typography_attributes
             textAlign: "alignementTexte",
             textLeading: "interligneTexte",
             textMode: "modeTexte",
             textSize: "tailleTexte",
             textWidth: "largeurTexte",
+            // typography_metrics
             textAscent: "ascensionTexte",
             textDescent: "descenteTexte"
          },
@@ -471,6 +489,7 @@ var getContext = function(display, infos) {
 
       var processingInstance = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
+            processing.frameRate(10);
             processing.size(300, 300);
             processing.background(255);
          };
@@ -545,16 +564,11 @@ var getContext = function(display, infos) {
          environment: [
             { name: "popStyle" },
             { name: "pushStyle" },
-            //
             { name: "cursor",
                variants: [[{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }], ['Image', 'Number', 'Number']] },
             { name: "focused", yieldsValue: true }, // must be a value
-            { name: "frameCount", yieldsValue: true }, // must be a value
-            { name: "frameRate", params: ['Number'] },
-            { name: "__frameRate", yieldsValue: true }, // must be a value
             { name: "width", yieldsValue: true }, // must be a value
             { name: "height", yieldsValue: true }, // must be a value
-            //
             { name: "resize", params: ['Number', 'Number'] }
          ],
          shape_2D: [
@@ -709,7 +723,6 @@ var getContext = function(display, infos) {
          ],
          image_loading: [
             { name: "createImage", params: ['Number', 'Number', { options: ["RGB", "ARGB", "ALPHA"] }], yieldsValue: true },
-            //
             { name: "image", variants: [['Image', 'Number', 'Number'], ['Image', 'Number', 'Number', 'Number', 'Number']] },
             { name: "imageMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
             { name: "noTint" },
