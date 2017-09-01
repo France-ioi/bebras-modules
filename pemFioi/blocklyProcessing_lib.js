@@ -445,6 +445,14 @@ var getContext = function(display, infos) {
       pg.noLights();
       pg.fill(128);
    }
+   function drawOps(pg) {
+      var ret;
+      for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
+         var op = context.processing.ops[iOp];
+         ret = typeof pg[op.block] == 'function' ? pg[op.block].apply(pg, op.values) : pg[op.block];
+      }
+      return ret;
+   }
 
    context.resetDisplay = function() {
       var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
@@ -470,10 +478,7 @@ var getContext = function(display, infos) {
          processing.draw = function() {
             initGraphics(processing);
             processing.pushStyle();
-            for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
-               var op = context.processing.ops[iOp];
-               typeof processing[op.block] == 'function' ? processing[op.block].apply(processing, op.values) : processing[op.block];
-            }
+            drawOps(processing);
             processing.popStyle();
          };
 
@@ -510,15 +515,9 @@ var getContext = function(display, infos) {
 
 
    function drawOnBuffer() {
-      var buffer = context.processing.internalInstance.createGraphics(300, 300);
-      initGraphics(buffer);
-      var ret;
-      for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
-         var op = context.processing.ops[iOp];
-         ret = typeof buffer[op.block] == 'function' ? buffer[op.block].apply(buffer, op.values) : buffer[op.block];
-      }
-      context.processing.buffer = buffer;
-      return ret;
+      context.processing.buffer = context.processing.internalInstance.createGraphics(300, 300);
+      initGraphics(context.processing.buffer);
+      return drawOps(context.processing.buffer);
    }
 
    context.processing.commonOp = function() {
@@ -729,7 +728,7 @@ var getContext = function(display, infos) {
             { name: "get", variants: [[], ['Number', 'Number'], ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
             { name: "loadPixels" },
             { name: "pixels", yieldsValue: true }, // must be a list
-            { name: "set", variants: [['Number', 'Number', 'Colour'], ['Number', 'Number', 'Number']] },
+            { name: "set", variants: [['Number', 'Number', 'Colour'], ['Number', 'Number', 'Image']] },
             { name: "updatePixels" }
          ],
          rendering: [
@@ -835,13 +834,13 @@ var getContext = function(display, infos) {
       var buffer = context.processing.internalInstance.createGraphics(300, 300);
       initGraphics(buffer);
       buffer.loadPixels();
-      var initialPixels = buffer.pixels.toArray();
+      var initialPixels = buffer.pixels;
       drawOnBuffer();
       context.processing.buffer.loadPixels();
-      var finalPixels = context.processing.buffer.pixels.toArray();
+      var finalPixels = context.processing.buffer.pixels;
       var result = [true, true];
-      for (var iPixel = 0; iPixel < initialPixels.length && iPixel < finalPixels.length; iPixel++) {
-         var initialPixel = initialPixels[iPixel], finalPixel = finalPixels[iPixel];
+      for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
+         var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
          var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
          var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
          if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
