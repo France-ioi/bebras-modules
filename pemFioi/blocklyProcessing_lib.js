@@ -31,7 +31,6 @@ var getContext = function(display, infos) {
             focused: "le canevas est sélectionné",
             width: "largeur",
             height: "hauteur",
-            resize: "redimensionner à la taille %1 %2",
             // shape_2D
             arc: "dessiner un arc à %1 %2 de taille %3 %4 entre les angles %5° et %6°",
             ellipse: "dessiner une ellipse à %1 %2 de taille %3 %4",
@@ -148,6 +147,7 @@ var getContext = function(display, infos) {
             imageMode: "utiliser le mode %1 pour le positionnement des images",
             noTint: "désactiver le teint des images",
             tint: "utiliser pour les images un teint %1 %2 %3 %4",
+            resize: "redimensionner à la taille %1 %2",
             // image_pixels
             blend: "mélanger la source à %1 %2 taille %3 %4 avec la destination à %5 %6 taille %7 %8 avec le mode %9",
             copy: "copier la source à %1 %2 taille %3 %4 sur la destination à %5 %6 taille %7 %8",
@@ -159,7 +159,10 @@ var getContext = function(display, infos) {
             updatePixels: "actualiser les pixels",
             // rendering
             createGraphics: "nouveau graphisme de taille %1 %2 avec le moteur %3",
+            beginDraw: "commencer à dessiner",
+            endDraw: "terminer de dessiner",
             // typography_loading
+            PFont_list: "liste des polices disponibles",
             createFont: "nouvelle police de nom %1 et de taille %2",
             loadFont: "nouvelle police de nom %1",
             text_: "afficher le texte %1 à %2 %3 dans un cadre de taille %4 %5",
@@ -182,7 +185,6 @@ var getContext = function(display, infos) {
             focused: "canevasSelectionne",//canevasSélectionné
             width: "largeur",
             height: "hauteur",
-            resize: "redimensionner",
             // shape_2D
             arc: "arc",
             ellipse: "ellipse",
@@ -299,6 +301,7 @@ var getContext = function(display, infos) {
             imageMode: "modeImages",
             noTint: "desactiverTeint",//désactiverTeint
             tint: "teint",
+            resize: "redimensionner",
             // image_displaying
             blend: "melanger",//mélanger
             copy: "copier",
@@ -310,7 +313,10 @@ var getContext = function(display, infos) {
             updatePixels: "actualiserPixels",
             // rendering
             createGraphics: "nouveauGraphisme",
+            beginDraw: "commencerDessin",
+            endDraw: "terminerDessin",
             // typography_loading
+            PFont_list: "listePolices",
             createFont: "nouvellePolice",
             loadFont: "chargerPolice",
             text_: "texte",
@@ -325,7 +331,173 @@ var getContext = function(display, infos) {
             textAscent: "ascensionTexte",
             textDescent: "descenteTexte"
          },
-         description: {},
+         description: {
+            // environment
+            popStyle: "depilerStyle() : restaure le style précédant l'empilement correspondant avec empilerStyle()",//dépilerStyle
+            pushStyle: "empilerStyle() : enregistre le style actuel afin qu'il puisse être restauré par depilerStyle()",
+            cursor: "curseurSouris(…) : utilise l'image indiquée ou fournie pour représenter la souris sur le canevas",
+            focused: "canevasSelectionne : vrai si le canevas est sélectionné, faux sinon",//canevasSélectionné
+            width: "largeur : largeur du canevas",
+            height: "hauteur : hauteur du canevas",
+            // shape_2D
+            arc: "arc(x, y, largeur, hauteur, début, fin) : dessine l'arc de l'ellipse aux propriétés indiquées, " +
+               "depuis l'angle <var>début</var> jusqu'à l'angle <var>fin</var> (donnés en degrés)",
+            ellipse: "ellipse(x, y, largeur, hauteur) : dessine l'ellipse aux coordonnées indiquées avec la taille indiquée, " +
+               "dont le fonctionnement peut être changé par la fonction modeEllipses",
+            line: "ligne(…) : dessine la ligne allant du premier point au second point indiqués",
+            point: "point(…) : dessine un point (disque dont le diamètre correspond à l'épaisseur des lignes actuelle) " +
+               "aux coordonnées indiquées",
+            quad: "quad(x1, y1, x2, y2, x3, y3, x4, y4) : dessine un quadrilatère ayant pour sommets les quatre points indiqués",
+            rect: "rect(…) : dessine un rectangle aux coordonnées indiquées avec la taille indiquée, dont le fonctionnement " +
+             "peut être changé par la fonction modeRectangles, et avec les rayons indiqués pour arrondir les coins",
+            triangle: "triangle(x1, y1, x2, y2, x3, y3) : dessine un triangle ayant pour sommets les trois points indiqués",
+            // shape_curve
+            /*bezier: "bezier",
+            bezierDetail: "detailBezier",//détailBezier
+            bezierPoint: "pointBezier",
+            bezierTangent: "tangenteBezier",
+            curve: "courbe",
+            curveDetail: "detailCourbes",//détailCourbes
+            curvePoint: "pointCourbe",
+            curveTangent: "tangenteCourbe",
+            curveTightness: "tensionCourbes",
+            // shape_3D
+            box: "boite",
+            sphere: "sphere",//sphère
+            sphereDetail: "detailSpheres",//détailSphères*/
+            // shape_attributes
+            ellipseMode: "modeEllipses('CENTER' | 'RADIUS' | 'CORNER' | 'CORNERS') : définit la manière dont les propriétés " +
+               "des ellipses sont interprétées — 'CENTER' et 'RADIUS' utilisent les coordonnées comme centre, 'RADIUS' utilise " +
+               "la taille comme des rayons, 'CORNER' et 'CORNERS' utilisent les coordonnées comme coin haut-gauche, " +
+               "'CORNERS' utilise la taille comme coordonnées du coin bas-droite",
+            noSmooth: "desactiverLissage() : désactive le lissage appliqué aux formes",//désactiverLissage
+            rectMode: "modeRectangles('CORNER' | 'CORNERS' | 'CENTER' | 'RADIUS') : définit la manière dont les propriétés " +
+               "des rectangles sont interprétées — voir modeEllipses",
+            smooth: "lissage() : active le lissage appliqué aux formes",
+            strokeCap: "terminaisonsLignes('SQUARE' | 'PROJECT' | 'ROUND') : définit le style de terminaison des lignes",
+            strokeJoin: "jointuresLignes('MITER' | 'BEVEL' | 'ROUND') : définit le style de jointure des segments de lignes",
+            strokeWeight: "epaisseurLignes(épaisseur) : définit l'épaisseur des lignes, en pixels",//épaisseurLignes
+            // shape_vertex
+            /*beginShape: "commencerForme",
+            bezierVertex: "sommetBezier",
+            curveVertex: "sommetCourbe",
+            endShape: "terminerForme",
+            texture: "texture",
+            textureMode: "modeTextures",
+            vertex: "sommet",
+            // shape_other
+            shape: "forme",
+            shapeMode: "modeFormes",
+            isVisible: "estVisible",
+            setVisible: "changerVisible",
+            disableStyle: "desactiverStyle",//désactiverStyle
+            enableStyle: "activerStyle",
+            getChild: "enfant",*/
+            // debug
+            print: "sortirTexte(données) : affiche le texte ou les données indiquées dans la console",
+            println: "sortirLigne(données) : affiche le texte ou les données indiquées dans la console, suivies d'une fin de ligne",
+            // transform
+            /*applyMatrix: "appliquerMatrice",
+            popMatrix: "depilerMatrice",//dépilerMatrice
+            printMatrix: "sortirMatrice",
+            pushMatrix: "empilerMatrice",
+            resetMatrix: "reinitialiserMatrice",//réinitialiserMatrice
+            rotate: "pivoter",
+            rotateX: "pivoterX",
+            rotateY: "pivoterY",
+            rotateZ: "pivoterZ",
+            scale: "mettreEchelle",//mettreÉchelle
+            translate: "deplacer",//déplacer
+            // effect_lights
+            ambientLight: "lumiereAmbiante",//lumièreAmbiante
+            directionalLight: "lumiereDirectionnelle",//lumièreDirectionnelle
+            lightFalloff: "reductionLumiere",//réductionLumière
+            lightSpecular: "lumiereSpeculaire",//lumièreSpéculaire
+            lights: "lumieres",//lumières
+            noLights: "desactiverLumieres",//désactiverLumières
+            normal: "normal",
+            pointLight: "lumierePoint",//lumièrePoint
+            spotLight: "lumiereProjetee",//lumièreProjetée
+            // effect_camera
+            beginCamera: "commencerCamera",//commencerCaméra
+            camera: "camera",//caméra
+            endCamera: "terminerCamera",//terminerCaméra
+            frustum: "frustum",
+            ortho: "ortho",
+            perspective: "perspective",
+            printCamera: "sortirCamera",
+            printProjection: "sortirProjection",
+            // effect_coordinates
+            modelX: "modeleX",//modèleX
+            modelY: "modeleY",//modèleY
+            modelZ: "modeleZ",//modèleZ
+            screenX: "ecranX",//écranX
+            screenY: "ecranY",//écranY
+            screenZ: "ecranZ",//écranZ
+            // effect_material
+            ambient: "ambiante",
+            emissive: "emissive",//émissive
+            shininess: "brillante",
+            specular: "speculaire",//spéculaire*/
+            // color_setting
+            background: "arrierePlan(…) : remplit le canevas avec la couleur indiquée " +
+               "(doit être utilisé en tout début de programme)",//arrièrePlan
+            colorMode: "modeCouleurs(…) : définit la manière dont les composantes des couleurs sont interprétées ; le premier " +
+               "paramètre définit le mode ('RGB' pour rouge, vert et bleu ; 'HSB' pour teinte, saturation, luminosité) ; " +
+               "les suivants définissent la valeur maximale (255 par défaut)",
+            fill: "couleurFond(…) : définit la couleur de fond utilisée pour le dessin",
+            noFill: "desactiverFond() : utilise un fond transparent pour les prochains dessins",//désactiverFond
+            noStroke: "desactiverLigne() : utilise une ligne transparente pour les prochains dessins",//désactiverLigne
+            stroke: "couleurLigne(…) : définit la couleur de ligne utilisée pour le dessin",
+            // color_creating_reading
+            alpha: "opacite(couleur) : extrait la quantité d'opacité d'une couleur",//opacité
+            //blendColor: "melangerCouleurs",//mélangerCouleurs
+            blue: "bleu(couleur) : extrait la quantité de bleu d'une couleur",
+            brightness: "luminosite(couleur) : extrait la quantité de bleu d'une couleur",//luminosité
+            color: "couleur(…) : crée une couleur avec les valeurs indiquées",
+            green: "vert(couleur) : extrait la quantité de vert d'une couleur",
+            hue: "teinte(couleur) : extrait la quantité de teinte d'une couleur",
+            lerpColor: "couleurIntermediaire(c1, c2, emplacement) : fournit une couleur interpolée entre les deux couleurs " +
+               "indiquées, l'emplacement étant une valeur entre 0 et 1 (0 correspond à la première couleur, 0,1 en est proche, " +
+               "0,5 est au milieu des deux…)",//couleurIntermédiaire
+            red: "rouge(couleur) : extrait la quantité de rouge d'une couleur",
+            saturation: "saturation(couleur) : extrait la quantité de saturation d'une couleur",
+            // image_loading
+            /*createImage: "nouvelleImage",
+            image: "image",
+            imageMode: "modeImages",
+            noTint: "desactiverTeint",//désactiverTeint
+            tint: "teint",
+            resize: "redimensionner",
+            // image_displaying
+            blend: "melanger",//mélanger
+            copy: "copier",
+            filter: "appliquerFiltre",
+            get: "recupererPixels",//récupérerPixels
+            loadPixels: "chargerPixels",
+            pixels: "pixels",
+            set: "placerPixels",
+            updatePixels: "actualiserPixels",
+            // rendering
+            createGraphics: "nouveauGraphisme",
+            beginDraw: "commencerDessin()",
+            endDraw: "terminerDessin()",
+            // typography_loading
+            PFont_list: "listePolices()",
+            createFont: "nouvellePolice",
+            loadFont: "chargerPolice",
+            text_: "texte",
+            textFont: "policeTexte",
+            // typography_attributes
+            textAlign: "alignementTexte",
+            textLeading: "interligneTexte",
+            textMode: "modeTexte",
+            textSize: "tailleTexte",
+            textWidth: "largeurTexte",
+            // typography_metrics
+            textAscent: "ascensionTexte",
+            textDescent: "descenteTexte"*/
+         },
          values: {
             // environment
             ARROW: "Flèche",
@@ -467,7 +639,8 @@ var getContext = function(display, infos) {
       var ret;
       for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
          var op = context.processing.ops[iOp];
-         ret = typeof pg[op.block] == 'function' ? pg[op.block].apply(pg, op.values) : pg[op.block];
+         var obj = op.obj ? op.obj : pg;
+         ret = typeof obj[op.block] == 'function' ? obj[op.block].apply(obj, op.values) : obj[op.block];
       }
       return ret;
    }
@@ -534,22 +707,27 @@ var getContext = function(display, infos) {
 
 
    function drawOnBuffer() {
-      context.processing.buffer = context.processing.internalInstance.createGraphics(300, 300);
-      initGraphics(context.processing.buffer);
-      return drawOps(context.processing.buffer);
+      var buffer = context.processing.buffer = context.processing.internalInstance.createGraphics(300, 300);
+      buffer.beginDraw();
+      initGraphics(buffer);
+      var ret = drawOps(buffer);
+      buffer.endDraw();
+      return buffer;
    }
 
    context.processing.commonOp = function() {
+      var callback = arguments[arguments.length - 1];
       var blockName = arguments[0], values = [];
       for (var iParam = 1; iParam < arguments.length - 1; iParam++) {
          values.push(arguments[iParam]);
       }
-      if (blockName.substr(0, 5) == 'print') {
+      if (blockName.substr(0, 5) == "print") {
          context.processing.internalInstance[blockName](values);
+         context.waitDelay(callback);
       } else {
-         context.processing.ops.push({ block: blockName, values: values });
+         context.processing.ops.push({ block: blockName, values: values, obj: this === context ? null : this });
+         context.waitDelay(callback, drawOnBuffer());
       }
-      context.waitDelay(arguments[arguments.length - 1], drawOnBuffer());
    };
 
    context.processing.pixels = function(index, callback) {
@@ -568,8 +746,7 @@ var getContext = function(display, infos) {
                variants: [[{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }], ['Image', 'Number', 'Number']] },
             { name: "focused", yieldsValue: true }, // must be a value
             { name: "width", yieldsValue: true }, // must be a value
-            { name: "height", yieldsValue: true }, // must be a value
-            { name: "resize", params: ['Number', 'Number'] }
+            { name: "height", yieldsValue: true } // must be a value
          ],
          shape_2D: [
             { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'] },
@@ -729,6 +906,7 @@ var getContext = function(display, infos) {
             { name: "tint",
                variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
                   ['Number', 'Number', 'Number', 'Number'], ['Colour']] },
+            { name: "resize", params: ['Number', 'Number'] }
             ],
          image_pixels: [
             { name: "blend",
@@ -745,9 +923,12 @@ var getContext = function(display, infos) {
             { name: "updatePixels" }
          ],
          rendering: [
-            { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }], yieldsValue: true }
+            { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }], yieldsValue: true },
+            { name: "beginDraw" },
+            { name: "endDraw" }
          ],
          typography_loading: [
+            { name: "PFont_list", yieldsValue: true },
             { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
             { name: "loadFont", params: ['String'], yieldsValue: true },
             { name: "text_",
@@ -827,7 +1008,7 @@ var getContext = function(display, infos) {
                   block.blocklyXml += '</block>';
                }
                context.processing[block.name] = function() {
-                  var values = [block.name.replace(/_$/, '')];
+                  var values = [block.name.replace(/_$/, '').replace('_', '.')];
                   for (var iParam = 0; iParam < arguments.length; iParam++) {
                      var val = arguments[iParam];
                      if (params[iParam] in typeData && typeData[params[iParam]].conv) {
@@ -835,7 +1016,7 @@ var getContext = function(display, infos) {
                      }
                      values.push(val);
                   }
-                  context.processing.commonOp.apply(null, values);
+                  context.processing.commonOp.apply(this, values);
                };
             }
          })();
@@ -845,7 +1026,9 @@ var getContext = function(display, infos) {
 
    context.checkCoveredColors = function(toCover, toAvoid) {
       var buffer = context.processing.internalInstance.createGraphics(300, 300);
+      buffer.beginDraw();
       initGraphics(buffer);
+      buffer.endDraw();
       buffer.loadPixels();
       var initialPixels = buffer.pixels;
       drawOnBuffer();
