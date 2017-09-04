@@ -19,10 +19,10 @@ var importableModules = function () {
       'simulation-2.0': {src: modulesPath+"/pemFioi/simulation-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-2.0.js"},
       'raphaelButton-1.0': {src: modulesPath+"/pemFioi/raphaelButton-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-1.0.js"},
 
-      'platform-pr': {class: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
-      'buttonsAndMessages': {class: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
-      'installationAPI.01': {class: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
-      'miniPlatform': {class: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
+      'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
+      'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
+      'installationAPI.01': {classStr: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
+      'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
@@ -183,7 +183,7 @@ function importModules(modulesList) {
             importedModules[moduleName] = true;
          }
 
-         var modClass = curModule.class ? curModule.class : 'module';
+         var modClass = curModule.classStr ? curModule.classStr : 'module';
          var modSrc = curModule.src;
          var modId = curModule.id ? curModule.id : moduleName;
          if(curModule.type == 'stylesheet') {
