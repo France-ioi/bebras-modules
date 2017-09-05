@@ -570,7 +570,12 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          hideInitialDrawing: "Cacher le motif de départ",
-         messages: {}
+         messages: {
+            redCoveredGreenNotCovered: "Vous avez bien recouvert tout le rouge sans toucher au vert.",
+            redNotCovered: "Recouvrez bien toute la partie rouge.",
+            greenCovered: "Vous avez caché la partie rouge, mais avez recouvert une partie du vert.",
+            redNotCoveredGreenCovered: "Vous n'avez pas masqué la partie rouge, et avez recouvert une partie du vert !"
+         }
       },
       en: {
          categories: {
@@ -1457,3 +1462,18 @@ var getContext = function(display, infos) {
 
    return context;
 }
+
+var processingEndConditions = {
+   checkRedCoveredGreenNotCovered: function(context, lastTurn) {
+      var success = context.checkCoveredColors([255, 0, 0], [0, 255, 0])
+      if (!success[0] && !success[1]) {
+         throw(window.languageStrings.messages.redNotCoveredGreenCovered);
+      } else if (!success[0]) {
+         throw(window.languageStrings.messages.redNotCovered);
+      } else if (!success[1]) {
+         throw(window.languageStrings.messages.greenCovered);
+      }
+      throw(window.languageStrings.messages.redCoveredGreenNotCovered);
+   }
+     
+};
