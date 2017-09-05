@@ -1131,7 +1131,7 @@ var getContext = function(display, infos) {
          context.processing.internalInstance[blockName](values);
          context.waitDelay(callback);
       } else {
-         context.processing.ops.push({ block: blockName, values: values, obj: this === context ? null : this });
+         context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
          context.waitDelay(callback, drawOnBuffer());
       }
    };
