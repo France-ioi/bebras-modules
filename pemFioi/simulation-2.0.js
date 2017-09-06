@@ -99,6 +99,10 @@ function Simulation(id, delayFactory) {
       }
    };
 
+   this.isOnLastStep = function() {
+      return this.stepIndex === this.steps.length - 1;
+   };
+
    this.clear = function() {
       this.stop();
       this.steps = [];
