@@ -428,7 +428,12 @@ function Crane(simulationFactory, userSettings) {
    };
 
    this._onStepFinish = function(params, duration, callback) {
-      self.settings.onSimulationFinish();
+      /* If the step being finished now is the last one, this is currently the simulation end.
+       * This condition may be false if the user clicked on another button before we reach here.
+       */
+      if(self.simulation.isOnLastStep()) {
+         self.settings.onSimulationFinish();
+      }
       callback();
    };
 
