@@ -257,14 +257,14 @@ var initBlocklySubTask = function(subTask, language) {
       var codes = [code]; // We only ever send one code to grade
       subTask.iTestCase = 0;
 
-      var levelResultsCache = window.taskResultsCache[this.level];
+/*      var levelResultsCache = window.taskResultsCache[this.level];
 
       if(levelResultsCache[code]) {
          // We already have a cached result for that
          window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
          callback(levelResultsCache[code].results);
          return;
-      }
+      }*/
 
       initBlocklyRunner(subTask.context, function(message, success) {
          var computeGrade = function(context, message) {
@@ -321,10 +321,10 @@ var initBlocklySubTask = function(subTask, language) {
             } else {
                var results = subTask.testCaseResults[iWorstTestCase];
             }
-            levelResultsCache[code] = {
+            /*levelResultsCache[code] = {
                results: results,
                fullResults: subTask.testCaseResults
-               };
+               };*/
             callback(results);
          }
       });
