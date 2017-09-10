@@ -12,11 +12,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       programs: [],
       language: (typeof Blockly.Blocks['control_if'] !== 'undefined') ? 'scratch' : 'blockly',
       languages: [],
+      locale: 'fr',
       definitions: {},
       simpleGenerators: {},
       player: 0,
       workspace: null,
       prevWidth: 0,
+      options: {},
+      nbTestCases: 1,
+      divId: 'blocklyDiv',
+      hidden: false,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
       startingBlock: true, 
@@ -63,23 +68,27 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.createGeneratorsAndBlocks();
       },
 
-      load: function(language, display, nbTestCases, options) {
+      load: function(locale, display, nbTestCases, options) {
          this.unloaded = false;
 
-         FioiBlockly.loadLanguage(language);
+         FioiBlockly.loadLanguage(locale);
 
          if(this.scratchMode) {
             this.fixScratch();
          }
 
          if (options == undefined) options = {};
-         if (!options.divId) options.divId = 'blocklyDiv';
+         if (options.divId) this.divId = options.divId;
 
          this.strings = window.languageStrings;
          if (options.startingBlockName) {
             this.strings.startingBlockName = options.startingBlockName;
          }
-         
+
+         this.locale = locale;
+         this.nbTestCases = nbTestCases;
+         this.options = options;
+
          if (display) {
             this.loadHtml(nbTestCases);
             this.addExtraBlocks();
@@ -105,7 +114,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
             }
-            this.workspace = Blockly.inject(options.divId, wsConfig);
+            this.workspace = Blockly.inject(this.divId, wsConfig);
+
+            // Start checking whether it's hidden, to sort out contents
+            // automatically when it's displayed
+            if(this.hiddenCheckTimeout) {
+               clearTimeout(this.hiddenCheckTimeout);
+            }
+            this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 0);
 
             var toolboxNode = $('#toolboxXml');
             if (toolboxNode.length != 0) {
@@ -137,6 +153,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       unloadLevel: function() {
+         if(this.hiddenCheckTimeout) {
+            clearTimeout(this.hiddenCheckTimeout);
+         }
          this.unloaded = true; // Prevents from saving programs after unload
 
          try {
@@ -152,8 +171,37 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       unload: function() {
+         if(this.hiddenCheckTimeout) {
+            clearTimeout(this.hiddenCheckTimeout);
+         }
          this.unloadLevel();
          removeBlockly();
+      },
+
+      reload: function() {
+         // Reload Blockly editor
+         this.savePrograms();
+         var programs = this.programs;
+         this.unloadLevel();
+         $('#'+this.divId).html('');
+         this.load(this.locale, true, this.nbTestCases, this.options);
+         this.programs = programs;
+         this.loadPrograms();
+      },
+
+      hiddenCheck: function() {
+         // Check whether the Blockly editor is hidden
+         var visible = $('#'+this.divId).is(':visible');
+         if(this.hidden && visible) {
+            this.hidden = false;
+            // Reload the Blockly editor to remove display issues after
+            // being hidden
+            console.log('reload');
+            this.reload();
+            return; // it will be restarted by reload
+         }
+         this.hidden = !visible;
+         this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 500);
       },
 
       onChange: function(event) {
