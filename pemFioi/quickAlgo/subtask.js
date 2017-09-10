@@ -213,6 +213,10 @@ var initBlocklySubTask = function(subTask, language) {
       return this.answer;
    };
 
+   subTask.getAnswer = function (callback) {
+      callback(this.getAnswerObject());
+   };
+
    subTask.reloadAnswerObject = function(answerObj) {
       if(typeof answerObj === "undefined") {
         this.answer = this.getDefaultAnswerObject();
@@ -223,6 +227,11 @@ var initBlocklySubTask = function(subTask, language) {
       if (this.answer != undefined) {
          this.blocklyHelper.loadPrograms();
       }
+   };
+
+   subTask.reloadAnswer = function(answer, callback) {
+      this.reloadAnswerObject(answer);
+      callback();
    };
 
    subTask.getDefaultAnswerObject = function() {
