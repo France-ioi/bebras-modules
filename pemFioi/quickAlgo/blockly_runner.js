@@ -11,6 +11,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.hasActions = false;
       runner.nbActions = 0;
       runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
+      runner.delayFactory = new DelayFactory();
 
       // Iteration limits
       runner.maxIter = 400000;
@@ -79,7 +80,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             runner.stackCount = 0;
-            context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
+            runner.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
                   runner.noDelay(callback, value);
                },
                delay
@@ -97,7 +98,7 @@ function initBlocklyRunner(context, messageCallback) {
          if (runner.stackCount > 100) {
             runner.stackCount = 0;
             runner.stackResetting = true;
-            context.delayFactory.createTimeout("wait_" + Math.random(), function() {
+            runner.delayFactory.createTimeout("wait_" + Math.random(), function() {
                runner.stackResetting = false;
                callback(primitive);
                runner.runSyncBlock();
@@ -210,7 +211,7 @@ function initBlocklyRunner(context, messageCallback) {
             runner.nextCallback();
             runner.nextCallback = null;
          }
-         
+
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
@@ -218,7 +219,7 @@ function initBlocklyRunner(context, messageCallback) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               while (context.curSteps[iInterpreter].total < runner.maxIter && context.curSteps[iInterpreter].withoutAction < runner.maxIterWithoutAction) {
+               while (context.curSteps[iInterpreter].total < runner.maxIter && context.curSteps[iInterpreter].withoutAction < runner.maxIterWithoutAction && !context.programEnded[iInterpreter]) {
                   if (!interpreter.step() || toStop[iInterpreter]) {
                      isRunning[iInterpreter] = false;
                      break;
@@ -280,12 +281,13 @@ function initBlocklyRunner(context, messageCallback) {
                   //message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
             }
+            runner.delayFactory.destroyAll();
             setTimeout(function() { messageCallback(message); }, 0);
          }
       };
 
       runner.initCodes = function(codes) {
-         //this.mainContext.delayFactory.stopAll(); pb: it would top existing graders
+         runner.delayFactory.destroyAll();
          interpreters = [];
          runner.nbActions = 0;
          runner.stepInProgress = false;
