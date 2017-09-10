@@ -4,6 +4,10 @@
 */
 
 var initBlocklySubTask = function(subTask, language) {
+   // Blockly tasks need to always have the level-specific behavior from
+   // beaver-task-2.0
+   subTask.assumeLevels = true;
+
    if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
@@ -14,7 +18,7 @@ var initBlocklySubTask = function(subTask, language) {
    if (language == undefined) {
       language = "fr";
    }
-   
+
    subTask.loadLevel = function(curLevel) {
       subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
 
@@ -213,10 +217,6 @@ var initBlocklySubTask = function(subTask, language) {
       return this.answer;
    };
 
-   subTask.getAnswer = function (callback) {
-      callback(this.getAnswerObject());
-   };
-
    subTask.reloadAnswerObject = function(answerObj) {
       if(typeof answerObj === "undefined") {
         this.answer = this.getDefaultAnswerObject();
@@ -227,11 +227,6 @@ var initBlocklySubTask = function(subTask, language) {
       if (this.answer != undefined) {
          this.blocklyHelper.loadPrograms();
       }
-   };
-
-   subTask.reloadAnswer = function(answer, callback) {
-      this.reloadAnswerObject(answer);
-      callback();
    };
 
    subTask.getDefaultAnswerObject = function() {

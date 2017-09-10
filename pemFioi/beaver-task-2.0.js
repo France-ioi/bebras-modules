@@ -100,7 +100,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             callback();
          }
       };
-      if(levels) {
+      if(levels || subTask.assumeLevels) {
          subTask.unloadLevel(doUnload);
       }
       else {
@@ -149,10 +149,14 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          mainTask.taskParams = taskParams;
          mainTaskParams = taskParams;
          task.displayedSubTask = mainTask;
-         if(levels) {
+         if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
-               defaultLevel = levels[0];
+               if(mainTask.assumeLevels) {
+                  defaultLevel = "easy";
+               } else {
+                  defaultLevel = levels[0];
+               }
             }
             
             // The objects levelAnswers and levelStates are indexed by level names.
@@ -162,7 +166,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
                level: defaultLevel
             };
             mainTask.loadLevel(state.level, null, views);
-            displayHelper.setupLevels(null, reloadWithCallbacks);
+            if(levels) {
+               displayHelper.setupLevels(null, reloadWithCallbacks);
+            }
             callback();
          }
          else {
@@ -173,7 +179,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getState = function(callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Update state to reflect latest user interaction.
          state.levelStates[state.level] = mainTask.getStateObject();
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
@@ -232,7 +238,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.reloadAnswerObject = function(newAnswers, callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          if (!newAnswers) {
             state.levelAnswers = {};
          }
@@ -291,7 +297,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
 
    task.reloadStateObject = function(newState, callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Recreate the task to reflect the new state.
          state = newState;
          var level = state.level;
@@ -333,7 +339,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
 
    task.getAnswer = function(callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Update answer to reflect latest user interaction.
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
          callback(JSON.stringify(state.levelAnswers));
@@ -346,7 +352,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getAnswerObject = function() {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
          return state.levelAnswers;
       }
@@ -386,6 +392,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       gradingTask.isGrading = true;
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
+      }
+      if(mainTask.assumeLevels) {
+         answer = answer.easy;
       }
       gradingTask.reloadAnswerObject(answer);
       gradingTask.getGrade(function(result) {
