@@ -42,7 +42,7 @@ task.getViews = function(callback) {
 
     // Only declare the solution view if there's actually one
     var solution = $('#solution').html();
-    if(solution && ('' + solution).trim()) {
+    if(solution && $.trim('' + solution)) {
         views.solution = {};
     }
 
