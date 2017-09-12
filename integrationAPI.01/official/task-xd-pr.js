@@ -111,7 +111,12 @@ function Task(iframe, callback) {
          trans.delayReturn(true);
       });
       this.chan.bind('platform.updateHeight', function (trans, height) {
-         platform.updateHeight(height, trans.complete, trans.error);
+         // Legacy
+         platform.updateDisplay({height: height}, trans.complete, trans.error);
+         trans.delayReturn(true);
+      });
+      this.chan.bind('platform.updateDisplay', function (trans, data) {
+         platform.updateDisplay(data, trans.complete, trans.error);
          trans.delayReturn(true);
       });
       this.chan.bind('platform.openUrl', function (trans, url) {
@@ -298,7 +303,12 @@ Platform.prototype.getTask = function() {
 Platform.prototype.validate = function(mode, success, error) {error('platform.validate is not defined');};
 Platform.prototype.showView = function(views, success, error) {error('platform.validate is not defined');};
 Platform.prototype.askHint = function(platformToken, success, error) {error('platform.validate is not defined');};
-Platform.prototype.updateHeight = function(height, success, error) {this.task.iframe.height(parseInt(height)+40);success();};
+Platform.prototype.updateHeight = function(height, success, error) { this.updateDisplay({height: height}); };
+Platform.prototype.updateDisplay = function(data, success, error) {
+   if(data.height) {
+      this.task.iframe.height(parseInt(height)+40);success();
+   }
+};
 Platform.prototype.openUrl = function(url) {error('platform.openUrl is not defined!');};
 Platform.prototype.getTaskParams = function(key, defaultValue, success, error) {
    var res = {minScore: -3, maxScore: 10, randomSeed: 0, noScore: 0, readOnly: false, options: {}};

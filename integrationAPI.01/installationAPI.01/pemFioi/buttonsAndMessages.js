@@ -1277,7 +1277,7 @@ window.displayHelper = {
       window.task.getHeight(function(height) {
          if (height != self.lastSentHeight) {
             self.lastSentHeight = height;
-            window.platform.updateHeight(height, function(){});
+            window.platform.updateDisplay({height: height}, function(){});
          }
       });
    },
