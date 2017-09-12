@@ -243,19 +243,25 @@ VisualGraph.fromJSON = function(visualGraphStr, id, paper, graph, graphDrawer, a
    return new VisualGraph(id, paper, graph, graphDrawer, autoDraw, visualInfo.vertexVisualInfo, visualInfo.edgeVisualInfo);
 };
 
-function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
+function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexMover) {
    this.circleAttr = circleAttr;
    this.lineAttr = lineAttr;
    this.init = function(paper, graph, visualGraph) {
       this.paper = paper;
       this.graph = graph;
       this.visualGraph = visualGraph;
+      this.customElements = {};
+      this.originalPositions = {};
    };
    this.drawVertex = function(id, info, visualInfo) {
       var pos = this._getVertexPosition(visualInfo);
+      this.originalPositions[id] = pos;
+
       var result = [this.paper.circle(pos.x, pos.y).attr(this.circleAttr)];
       if(vertexDrawer) {
-         result = result.concat(vertexDrawer(id, info, pos.x, pos.y));
+         var raphaels = vertexDrawer(id, info, pos.x, pos.y);
+         this._addCustomElements(id, raphaels);
+         result = result.concat(raphaels);
       }
       return result;
    };
@@ -275,6 +281,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
    this.getVertexPosition = function(id) {
       return this._getVertexPosition(this.visualGraph.getVertexVisualInfo(id));
    };
+   this._addCustomElements = function(id, raphaels) {
+      // Save original attributes. This allows us to move the object later by transformation.
+      this.customElements[id] = [];
+      for(var iElement in raphaels) {
+         var raphael = raphaels[iElement];
+         this.customElements[id].push({
+            raphael: raphael,
+            originalAttrs: $.extend(true, {}, raphael.attrs)
+         });
+      }
+   };
    this.moveVertex = function(id, x, y) {
       var info = this.visualGraph.getVertexVisualInfo(id);
       info.x = x;
@@ -285,6 +302,14 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
          cy: y
       });
 
+      // Move the custom Raphael objects.
+      if(vertexMover) {
+         vertexMover(id, raphaels, x, y);
+      }
+      if(autoMove) {
+         this._moveCustomElements(id, x, y);
+      }
+
       var childrenIDs = this.graph.getChildren(id);
       for(var iChild in childrenIDs) {
          this.refreshEdgePosition(id, childrenIDs[iChild]);
@@ -293,6 +318,21 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
          var parentIDs = this.graph.getParents(id);
          for(var iParent in parentIDs) {
             this.refreshEdgePosition(parentIDs[iParent], id);
+         }
+      }
+   };
+   this._moveCustomElements = function(id, x, y) {
+      var elements = this.customElements[id];
+      var transformation = ["T", x - this.originalPositions[id].x, y - this.originalPositions[id].y];
+      for(var iElement in elements) {
+         var element = elements[iElement];
+         // Paths get transformed using Raphael.transformPath,
+         // for compatibility. Other objects get transformed normally.
+         if(element.raphael.type === "path") {
+            element.raphael.attr({path: Raphael.transformPath(element.originalAttrs.path, transformation)});
+         }
+         else {
+            element.raphael.transform(transformation);
          }
       }
    };
