@@ -600,3 +600,112 @@ function FuzzyRemover(id, paperElementID, paper, graph, visualGraph, callback, f
       this.enabled = false;
    }
 }
+
+function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, graphMouse, onDragEnd, onVertexSelect, onPairSelect, onEdgeSelect, vertexThreshold, edgeThreshold, dragThreshold, dragLimits, enabled) {
+   var self = this;
+   this.id = id;
+   this.graph = graph;
+   this.visualGraph = visualGraph;
+   this.enabled = false;
+   this.selectionParent = null;
+   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", paperElementID, paper, graph, visualGraph, onFuzzyClick, false, true, true, vertexThreshold, edgeThreshold, enabled);
+   this.setEnabled = function(enabled) {
+      if(enabled == this.enabled) {
+         return;
+      }
+      this.enabled = enabled;
+
+      if(enabled) {
+         graphMouse.addEvent(id + "$$$dragAndConnect", "drag", "vertex", null, [this.moveHandler, this.startHandler, this.endHandler]);
+      }
+      else {
+         graphMouse.removeEvent(id + "$$$dragAndConnect");
+         self.isDragging = false;
+      }
+      this.fuzzyClicker.setEnabled(enabled);
+   };
+
+   function onFuzzyClick(elementType, id) {
+      if(elementType === "edge") {
+         if(onEdgeSelect) {
+            onEdgeSelect(id);
+         }
+      }
+      else {
+         self.clickHandler(id);
+      }
+   }
+
+   this.startHandler = function(x, y, event) {
+      self.elementID = this.data("id");
+      self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
+      self.isDragging = false;
+      self.visualGraph.elementToFront(self.elementID);
+   };
+
+   this.endHandler = function(event) {
+      if(self.isDragging) {
+         if(onDragEnd) {
+            onDragEnd(self.elementID);
+         }
+         self.isDragging = false;
+         return;
+      }
+
+      self.clickHandler(self.elementID);
+   };
+
+   this.moveHandler = function(dx, dy, x, y, event) {
+      if(!self.isDragging && dx * dx + dy * dy >= dragThreshold * dragThreshold) {
+         self.isDragging = true;
+      }
+      if(!self.isDragging) {
+         return;
+      }
+
+      var newX = self.originalPosition.x + dx;
+      var newY = self.originalPosition.y + dy;
+      if(dragLimits) {
+         newX = Math.min(dragLimits.maxX, Math.max(newX, dragLimits.minX));
+         newY = Math.min(dragLimits.maxY, Math.max(newY, dragLimits.minY));
+      }
+
+      self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+   };
+
+   this.clickHandler = function(id) {
+      // Click on background or on the selected vertex -  deselect it.
+      if(id === null || id === self.selectionParent) {
+         if(self.selectionParent !== null && onVertexSelect) {
+            onVertexSelect(self.selectionParent, false);
+         }
+         self.selectionParent = null;
+         return;
+      }
+
+      // Start a new pair.
+      if(self.selectionParent === null) {
+         self.selectionParent = id;
+         if(onVertexSelect) {
+            onVertexSelect(id, true);
+         }
+         return;
+      }
+
+      // Finish a new pair.
+      if(onPairSelect) {
+         onPairSelect(self.selectionParent, id);
+      }
+      if(onVertexSelect) {
+         onVertexSelect(self.selectionParent, false);
+      }
+      self.selectionParent = null;
+   };
+
+   if(enabled) {
+      this.setEnabled(true);
+   }
+   else {
+      this.enabled = false;
+   }
+}
