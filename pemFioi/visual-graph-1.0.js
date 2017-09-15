@@ -221,6 +221,13 @@ function VisualGraph(id, paper, graph, graphDrawer, autoDraw, vertexVisualInfo, 
       return [];
    };
 
+   this.elementToFront = function(id) {
+      var raphaels = this.getRaphaelsFromID(id);
+      for(var iElement in raphaels) {
+         raphaels[iElement].toFront();
+      }
+   };
+
    this.toJSON = function() {
       return JSON.stringify({
          vertexVisualInfo: this.vertexVisualInfo,
