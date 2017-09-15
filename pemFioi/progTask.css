@@ -63,3 +63,37 @@ body {
   from { transform: scale(1) rotate(0deg); }
   to { transform: scale(1) rotate(360deg); }
 }
+
+
+pre.task-example-input,
+pre.task-example-output {
+  margin: 8px 4px 8px 16px;
+  padding: 6px;
+  padding-left: 8px;
+  overflow: auto;
+  border: 1px solid #999;
+  border-left: 4px solid #222;
+  background: rgba(248, 248, 248, .9);
+  font-size: .9rem;
+  line-height: 1.2;
+}
+pre.task-example-input {
+  border-left-color: blue !important;
+}
+pre.task-example-output {
+  border-left-color: red !important;
+}
+.task-example-io-title {
+  position: relative;
+  margin: 0;
+  color: #111;
+  font-style: italic;
+}
+.task-example-io-title:before {
+  content: "↳";
+  position: absolute;
+  left: 0;
+  top: 26px;
+  font-size: 1rem;
+  font-style: normal;
+}
