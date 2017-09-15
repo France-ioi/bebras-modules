@@ -6,7 +6,7 @@ function getFioiPlayer() {
         currentSeek: 0,
         duration: 0,
         loaded: false,
-        stay: false,
+        endReset: false,
         ended: false,
 
         targetDiv: null,
@@ -213,18 +213,20 @@ function getFioiPlayer() {
             }
             this.isPlaying = false;
             $(this.targetDiv).find('#play-pause-glyph').addClass('glyphicon-play').removeClass('glyphicon-pause');
-            $(this.targetDiv).find('#play-pause-ctn').show();
+            if(!this.ended) {
+                $(this.targetDiv).find('#play-pause-ctn').show();
+            }
         },
 
         stop: function(ending) {
-            this.pause();
-            var fioiPlayer = this;
-            if(ending && this.stay) {
+            if(ending && !this.endReset) {
                 this.ended = true;
                 this.progressBar.value = this.progressBar.max;
             } else {
+                var fioiPlayer = this;
                 setTimeout(function() { fioiPlayer.seek(0); }, 100);
             }
+            this.pause();
         },
 
         step: function() {
@@ -417,8 +419,8 @@ playerApp.directive('fioiVideoPlayer', function() {
         var newId = elem.attr('data-id');
         newFioiPlayer.bind($('#'+newId));
 
-        if(elem.attr('data-stay')) {
-            newFioiPlayer.stay = true;
+        if(elem.attr('data-end-reset')) {
+            newFioiPlayer.endReset = true;
         }
 
         var videoAttrs = getVideoHtmlAttrs($(elem));
