@@ -9,6 +9,7 @@ requirejs.config({
     "angular": modulesPath+"/ext/angular/angular.min",
     "angular-ui-bootstrap-tpls": modulesPath+"/ext/angular-ui-bootstrap/ui-bootstrap-tpls-1.3.1.min",
     "angular-ui-ace": modulesPath+"/ext/angular-ui-ace/ui-ace",
+    "angular-sanitize": modulesPath+"/ext/angular-sanitize/angular-sanitize.min",
     "fioi-editor2": modulesPath+"/ext/fioi-editor2/fioi-editor2.min",
     "jquery": modulesPath+"/ext/jquery/2.1/jquery.min",
     "lodash": modulesPath+"/ext/lodash/lodash.min",
@@ -31,7 +32,11 @@ requirejs.config({
     "showdownConvert": modulesPath+"/pemFioi/showdownConvert",
     "showSource": taskPlatformPath+"/showSource",
     "showSample": taskPlatformPath+"/samples/directive",
-    "webvtt": modulesPath+"/ext/webvtt/parser"
+    "webvtt": modulesPath+"/ext/webvtt/parser",
+
+    "i18next": modulesPath+"/ext/i18next/i18next.min",
+    "i18next-xhr-backend": modulesPath+"/ext/i18next/i18nextXHRBackend.min",
+    "ng-i18next": modulesPath+"/ext/i18next/ng-i18next.min"
   },
   "shim": {
     "jquery": {"exports": "$"},
@@ -42,7 +47,9 @@ requirejs.config({
     "angular-ui-bootstrap-tpls": {"deps": ["angular"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "platform-pr": {"deps": ["jquery", "jschannel"]},
-    "taskController": {"deps": ["angular-ui-ace", 'lodash']},
+    "angular-sanitize": {"deps": ["angular"]},
+    "ng-i18next": {"deps": ["angular-sanitize", "i18next", "i18next-xhr-backend"]},
+    "taskController": {"deps": ["angular-ui-ace", 'ng-i18next', 'lodash']},
     "pem-api": {"deps": ["taskController", "platform-pr","angular-ui-ace", 'lodash']},
     "limitsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
     "hintsDirective": {"deps": ["taskController", "angular-ui-ace", 'lodash']},
