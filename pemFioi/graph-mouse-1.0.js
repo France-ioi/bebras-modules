@@ -334,6 +334,7 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
    this.startHandler = function(x, y, event) {
       self.elementID = this.data("id");
       self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
+      self.visualGraph.elementToFront(self.elementID);
    };
 
    this.endHandler = function(event) {
