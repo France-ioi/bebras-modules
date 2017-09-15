@@ -431,12 +431,23 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       // In modern browsers the path is an array and we can get the endpoints
       // directly. In old browsers it may be a comma separated string.
       if($.isArray(edgePath)) {
-         x1 = parseInt(edgePath[0][1]);
-         y1 = parseInt(edgePath[0][2]);
-         x2 = parseInt(edgePath[1][1]);
-         y2 = parseInt(edgePath[1][2]);
+         if($.isArray(edgePath[0])) {
+            // Path a 2D array: [["M", x1, y1], ["L", x2, y2]]
+            x1 = parseInt(edgePath[0][1]);
+            y1 = parseInt(edgePath[0][2]);
+            x2 = parseInt(edgePath[1][1]);
+            y2 = parseInt(edgePath[1][2]);
+         }
+         else {
+            // Path is an array: ["M", x1, y1, "L", x2, y2]
+            x1 = parseInt(edgePath[1]);
+            y1 = parseInt(edgePath[2]);
+            x2 = parseInt(edgePath[4]);
+            y2 = parseInt(edgePath[5]);
+         }
       }
       else {
+         // Path is a string: "M,x1,y1,L,x2,y2"
          var parts = edgePath.split(",");
          x1 = parseInt(parts[1]);
          y1 = parseInt(parts[2]);
