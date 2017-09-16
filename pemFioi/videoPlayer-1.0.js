@@ -222,6 +222,10 @@ function getFioiPlayer() {
             if(ending && !this.endReset) {
                 this.ended = true;
                 this.progressBar.value = this.progressBar.max;
+                var lastPlayer = this.players[this.players.length-1];
+                if(lastPlayer.animation) {
+                   lastPlayer.animation(lastPlayer.duration + 60);
+                }
             } else {
                 var fioiPlayer = this;
                 setTimeout(function() { fioiPlayer.seek(0); }, 100);
@@ -291,14 +295,15 @@ function bindVttReader(url, selector) {
         }
         for(idx=curIdx; idx<vttCues.length; idx++) {
             if(vttCues[idx].startTime > t) {
-                selected.html('');
-                return;
+                break;
             } else if(vttCues[idx].endTime > t) {
                 selected.html(vttCues[idx].text.replace(/\n/g, '<br>'));
+                selected.show();
                 return;
             }
         }
         selected.html('');
+        selected.hide();
     };
 }
 
