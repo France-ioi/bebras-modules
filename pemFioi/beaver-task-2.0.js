@@ -300,6 +300,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(levels || mainTask.assumeLevels) {
          // Recreate the task to reflect the new state.
          state = newState;
+         if(!state.levelStates) { state.levelStates = {}; }
+         if(!state.levelAnswers) { state.levelAnswers = {}; }
+         if(!state.level) { state.level = 'easy'; }
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
