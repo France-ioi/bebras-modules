@@ -396,7 +396,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
       }
-      if(mainTask.assumeLevels) {
+      if(!levels && mainTask.assumeLevels && answer.easy) {
          answer = answer.easy;
       }
       gradingTask.reloadAnswerObject(answer);
