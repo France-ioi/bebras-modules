@@ -859,7 +859,7 @@ var getContext = function(display, infos, curLevel) {
       }
 
       var newItem = {row: row, col: col, type: paintType};
-      var paintItems = context.getItems(row, col, {category: "paint"});
+      var paintItems = context.getItems(row, col, {isPaint: true});
       if ((paintItems.length != 0) && (paintItems[0].type != paintType)) {
          destroyItem(row, col, "paint");
          paintItems.splice(0, 1);
