@@ -553,7 +553,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
  ************************************************************************/
 
 function extractLevelSpecific(item, level) {
-   if ((typeof item != "object") || Array.isArray(item)) {
+   if ((typeof item != "object") || $.isArray(item)) {
       return item;
    }
    if (item.shared === undefined) {
@@ -566,13 +566,13 @@ function extractLevelSpecific(item, level) {
       }
       return extractLevelSpecific(item[level], level);
    }
-   if (Array.isArray(item.shared)) {
+   if ($.isArray(item.shared)) {
       var newItem = [];
       for (var iElem = 0; iElem < item.shared.length; iElem++) {
          newItem.push(extractLevelSpecific(item.shared[iElem], level));
       }
       if (item[level] != undefined) {
-         if (!Array.isArray(item[level])) {
+         if (!$.isArray(item[level])) {
             console.error("Incompatible types when merging shared and " + level);
          }
          for (var iElem = 0; iElem < item[level].length; iElem++) {
