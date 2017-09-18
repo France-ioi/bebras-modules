@@ -139,53 +139,6 @@ function testLevelSpecific() {
    }
 }
 
-function extractLevelSpecific(item, level) {
-   if ((typeof item != "object") || Array.isArray(item)) {
-      return item;
-   }
-   if (item.shared === undefined) {
-      if (item[level] === undefined) {
-         var newItem = {};
-         for (var prop in item) {
-            newItem[prop] = extractLevelSpecific(item[prop], level);
-         }
-         return newItem;
-      }
-      return extractLevelSpecific(item[level], level);
-   }
-   if (Array.isArray(item.shared)) {
-      var newItem = [];
-      for (var iElem = 0; iElem < item.shared.length; iElem++) {
-         newItem.push(extractLevelSpecific(item.shared[iElem], level));
-      }
-      if (item[level] != undefined) {
-         if (!Array.isArray(item[level])) {
-            console.error("Incompatible types when merging shared and " + level);
-         }
-         for (var iElem = 0; iElem < item[level].length; iElem++) {
-            newItem.push(extractLevelSpecific(item[level][iElem], level));
-         }
-      }
-      return newItem;
-   }
-   if (typeof item.shared == "object") {
-      var newItem = {};
-      for (var prop in item.shared) {
-         newItem[prop] = extractLevelSpecific(item.shared[prop], level);
-      }
-      if (item[level] != undefined) {
-         if (typeof item[level] != "object") {
-            console.error("Incompatible types when merging shared and " + level);
-         }
-         for (var prop in item[level]) {
-            newItem[prop] = extractLevelSpecific(item[level][prop], level);
-         }
-      }
-      return newItem;
-   }
-   console.error("Invalid type for shared property");
-}
-
 
 
 // We need to be able to clean all events
