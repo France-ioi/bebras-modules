@@ -40,6 +40,10 @@ function ElementModer(defaultMode) {
          this.elements[name].attr(this.modes[mode][name]);
       }
    };
+
+   this.getMode = function() {
+      return this.mode;
+   };
 }
 
 // LATER: should be allowed to customize the font in the button.
@@ -179,6 +183,10 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
    this.show = function() {
       this.applyFunction("show");
+   };
+
+   this.getMode = function() {
+      return this.moder.getMode();
    };
 
    this.hide = function() {
