@@ -47,28 +47,32 @@ function ElementModer(defaultMode) {
 var _BUTTON_GUID = 0;
 
 function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, stepDelay, delayFactory) {
+   var self = this;
    _BUTTON_GUID++;
    this.guid = _BUTTON_GUID;
-   this.elements = {};
-   var cornerRadius = 4;
-   var shadowWidth = 1;
-   this.elements.shadow = paper.rect(xPos+1, yPos, width-1 + shadowWidth, height + shadowWidth).attr({"r": cornerRadius});
-   this.elements.rect = paper.rect(xPos, yPos, width, height).attr({"fill": "#dddddd", "r": cornerRadius});
-   this.elements.text = paper.text(xPos + width / 2, yPos + height / 2, text).attr({"font-size": 16});
-   this.elements.transLayer = paper.rect(xPos, yPos, width, height).attr({opacity: 0, fill: "black"});
-   this.moder = new ElementModer("enabled");
-   this.moder.addElement("shadow", this.elements.shadow);
-   this.moder.addElement("rect", this.elements.rect);
-   this.moder.addElement("text", this.elements.text);
-   this.moder.setAttr("rect", "mousedown", {"fill": "#e5e5e5"});
-   this.moder.setAttr("rect", "enabled", {"fill": "#dddddd"});
-   this.moder.setAttr("rect", "disabled", {"fill": "#dddddd"});
-   this.moder.setAttr("shadow", "enabled", {"fill": "black"});
-   this.moder.setAttr("text", "enabled", {"fill": "black"});
-   this.moder.setAttr("text", "mousedown", {"fill": "#aaaaaa"});
-   this.moder.setAttr("text", "disabled", {"fill": "#aaaaaa"});
-   this.elements.text[0].style.cursor = "default";
-   this.buttonMode = "";
+
+   this.init = function() {
+      this.elements = {};
+      var cornerRadius = 4;
+      var shadowWidth = 1;
+      this.elements.shadow = paper.rect(xPos + 1, yPos, width - 1 + shadowWidth, height + shadowWidth).attr({"r": cornerRadius});
+      this.elements.rect = paper.rect(xPos, yPos, width, height).attr({"fill": "#dddddd", "r": cornerRadius});
+      this.elements.text = paper.text(xPos + width / 2, yPos + height / 2, text).attr({"font-size": 16});
+      this.elements.transLayer = paper.rect(xPos, yPos, width, height).attr({opacity: 0, fill: "black"});
+      this.moder = new ElementModer("enabled");
+      this.moder.addElement("shadow", this.elements.shadow);
+      this.moder.addElement("rect", this.elements.rect);
+      this.moder.addElement("text", this.elements.text);
+      this.moder.setAttr("rect", "mousedown", {"fill": "#e5e5e5"});
+      this.moder.setAttr("rect", "enabled", {"fill": "#dddddd"});
+      this.moder.setAttr("rect", "disabled", {"fill": "#dddddd"});
+      this.moder.setAttr("shadow", "enabled", {"fill": "black"});
+      this.moder.setAttr("text", "enabled", {"fill": "black"});
+      this.moder.setAttr("text", "mousedown", {"fill": "#aaaaaa"});
+      this.moder.setAttr("text", "disabled", {"fill": "#aaaaaa"});
+      this.elements.text[0].style.cursor = "default";
+      this.enable();
+   };
 
    this.applyFunction = function(funcName, argsList) {
       if(!argsList) {
@@ -81,36 +85,34 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
    };
 
    this.enable = function() {
-      if(this.buttonMode == "enabled") {
+      if(this.enabled) {
          return;
       }
-      this.buttonMode = "enabled";
-      var that = this;
+      this.enabled = true;
 
       var mousedown = function() {
-         if(that.buttonMode != "enabled") {
-            return;
-         }
-
-         that.moder.setMode("mousedown");
-         if(repeat) {
-            that._startRepeater();
+         if(self.enabled) {
+            self.moder.setMode("mousedown");
+            if(repeat) {
+               self._startRepeater();
+            }
          }
       };
 
       var click = function() {
-         if(that.buttonMode == "enabled") {
-            that.moder.setMode("enabled");
-            if(!repeat && that.clickHandler) {
-               that.clickHandler(that.clickData);
+         if(self.enabled) {
+            self.moder.setMode("enabled");
+            if(!repeat && self.clickHandler) {
+               self.clickHandler(self.clickData);
             }
          }
       };
+
       var mouseup = function() {
-         if(that.buttonMode == "enabled") {
-            that.moder.setMode("enabled");
+         if(self.enabled) {
+            self.moder.setMode("enabled");
             if(repeat) {
-               that._stopRepeater();
+               self._stopRepeater();
             }
          }
       };
@@ -125,7 +127,6 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       if(!this.clickHandler) {
          return;
       }
-      var self = this;
       // First firing - immediately on mouse down.
       this.clickHandler(this.clickData);
       delayFactory.create(this.guid + "$buttonRepeatInitial", function() {
@@ -148,7 +149,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          this._stopRepeater();
       }
       this.moder.setMode("disabled");
-      this.buttonMode = "disabled";
+      this.enabled = false;
       this.elements.transLayer.unclick();
       this.elements.transLayer.unmousedown();
    };
@@ -190,5 +191,5 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.applyFunction("remove");
    };
 
-   this.enable();
+   this.init();
 }
