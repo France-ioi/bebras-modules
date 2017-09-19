@@ -93,9 +93,12 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          return;
       }
       this.enabled = true;
+      this.mouseover = false;
+      this.mousedown = false;
 
       var mousedown = function() {
          if(self.enabled) {
+            self.mousedown = true;
             self.moder.setMode("mousedown");
             if(repeat) {
                self._startRepeater();
@@ -114,6 +117,15 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
       var mouseup = function() {
          if(self.enabled) {
+
+            // If we received a mousedown event previously, and now the mouse is up
+            // and the mouse is not over the button, then this was a drag attempt.
+            if(self.mousedown && !self.mouseover) {
+               if(self.dragAttemptHandler) {
+                  self.dragAttemptHandler(self.dragAttemptData);
+               }
+            }
+            self.mousedown = false;
             self.moder.setMode("enabled");
             if(repeat) {
                self._stopRepeater();
@@ -121,8 +133,22 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          }
       };
 
+      var mouseover = function() {
+         if(self.enabled) {
+            self.mouseover = true;
+         }
+      };
+
+      var mouseout = function() {
+         if(self.enabled) {
+            self.mouseover = false;
+         }
+      };
+
       this.elements.transLayer.click(click);
       this.elements.transLayer.mousedown(mousedown);
+      this.elements.transLayer.mouseover(mouseover);
+      this.elements.transLayer.mouseout(mouseout);
       $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
       this.moder.setMode("enabled");
    };
@@ -154,8 +180,12 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       }
       this.moder.setMode("disabled");
       this.enabled = false;
+      this.mouseover = false;
+      this.mousedown = false;
       this.elements.transLayer.unclick();
       this.elements.transLayer.unmousedown();
+      this.elements.transLayer.unmouseover();
+      this.elements.transLayer.unmouseout();
    };
 
    this.click = function(handler, data) {
@@ -165,6 +195,11 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
    this.unclick = function(handler) {
       delete this.clickHandler;
+   };
+
+   this.dragAttempt = function(handler, data) {
+      this.dragAttemptHandler = handler;
+      this.dragAttemptData = data;
    };
 
    this.setAttr = function(name, mode, attr) {
