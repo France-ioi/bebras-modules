@@ -1136,6 +1136,9 @@ var getContext = function(display, infos) {
          context.waitDelay(callback);
       } else {
          context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
+         if(context.display) {
+            context.processing_main.redraw();
+         }
          context.waitDelay(callback, drawOnBuffer());
       }
    };
@@ -1427,7 +1430,6 @@ var getContext = function(display, infos) {
                      values.push(val);
                   }
                   context.processing.commonOp.apply(this, values);
-                  context.processing_main.redraw();
                };
             }
          })();
