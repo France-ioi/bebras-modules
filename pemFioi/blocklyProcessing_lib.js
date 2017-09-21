@@ -1077,7 +1077,6 @@ var getContext = function(display, infos) {
             processing.background(255);
             processing.noLoop();
          };
-//dimk
          processing.draw = function() {
             initGraphics(processing);
             processing.pushStyle();
