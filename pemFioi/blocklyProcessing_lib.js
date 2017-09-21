@@ -1071,13 +1071,13 @@ var getContext = function(display, infos) {
          $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
       }
 
-      var processingInstance = new Processing(canvas.get(0), function(processing) {
+      context.processing_main = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
-            processing.frameRate(10);
             processing.size(300, 300);
             processing.background(255);
+            processing.noLoop();
          };
-
+//dimk
          processing.draw = function() {
             initGraphics(processing);
             processing.pushStyle();
@@ -1428,6 +1428,7 @@ var getContext = function(display, infos) {
                      values.push(val);
                   }
                   context.processing.commonOp.apply(this, values);
+                  context.processing_main.redraw();
                };
             }
          })();
@@ -1475,5 +1476,5 @@ var processingEndConditions = {
       }
       throw(window.languageStrings.messages.redCoveredGreenNotCovered);
    }
-     
+
 };
