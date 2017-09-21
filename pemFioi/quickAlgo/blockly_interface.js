@@ -121,7 +121,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(this.hiddenCheckTimeout) {
                clearTimeout(this.hiddenCheckTimeout);
             }
-            this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 0);
+            if(!options.noHiddenCheck) {
+               this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 0);
+            }
 
             var toolboxNode = $('#toolboxXml');
             if (toolboxNode.length != 0) {
