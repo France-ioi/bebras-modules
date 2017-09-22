@@ -91,7 +91,7 @@ var getContext = function(display, infos) {
             rotateY: "pivoter sur l'axe Y de %1°",
             rotateZ: "pivoter sur l'axe Z de %1°",
             scale: "appliquer une échelle de %1 %2 %3",
-            translate: "déplacer de %1 %2 %3",
+            translate: infos['processing3D'] ? "déplacer de %1 %2 %3" : "déplacer de %1 %2",
             // effect_lights
             ambientLight: "ajouter une lumière ambiante %1 %2 %3 à %4 %5 %6",
             directionalLight: "ajouter une lumière directionnelle %1 %2 %3 vers %4 %5 %6",
@@ -668,7 +668,7 @@ var getContext = function(display, infos) {
             rotateY: "rotate on Y axis by %1°",
             rotateZ: "rotate on Z axis by %1°",
             scale: "scale by %1 %2 %3",
-            translate: "translate by %1 %2 %3",
+            translate: infos['processing3D'] ? "déplacer de %1 %2 %3" : "translate by %1 %2",
             // effect_lights
             ambientLight: "add an ambient light %1 %2 %3 at %4 %5 %6",
             directionalLight: "add a directional light %1 %2 %3 toward %4 %5 %6",
@@ -1035,7 +1035,8 @@ var getContext = function(display, infos) {
       }
    };
 
-   function initGraphics(pg) {
+
+   function initGraphics2D(pg) {
       pg.background(255);
       if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
          pg.pushStyle();
@@ -1046,6 +1047,16 @@ var getContext = function(display, infos) {
       pg.noLights();
       pg.fill(128);
    }
+
+   function initGraphics3D(pg) {
+      pg.background(255);
+      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+         context.processing.initialDrawing(pg);
+      }
+   }
+
+   var initGraphics = infos['processing3D'] ? initGraphics3D : initGraphics2D;
+
    function drawOps(pg) {
       var ret;
       for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
@@ -1055,6 +1066,7 @@ var getContext = function(display, infos) {
       }
       return ret;
    }
+
 
    context.resetDisplay = function() {
       var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
@@ -1073,24 +1085,38 @@ var getContext = function(display, infos) {
 
       context.processing_main = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
-            processing.size(300, 300);
+            processing.size(300, 300, infos['processing3D'] ? processing.P3D : processing.P2D);
             processing.background(255);
             processing.noLoop();
          };
          processing.draw = function() {
             initGraphics(processing);
-            processing.pushStyle();
+            if(!infos['processing3D']) {
+                  processing.pushStyle();
+            }
             drawOps(processing);
-            processing.popStyle();
+            if(!infos['processing3D']) {
+                  processing.popStyle();
+            }
          };
 
-         processing.mouseMoved = function() {
-            coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
-         };
-         processing.mouseDragged = function() {
-            coordinatesContainer.find('span').remove();
-            coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
-         };
+         if(infos['processing3D']) {
+            processing.mouseMoved = function() {
+                  coordinatesContainer.text(
+                        '(X:' + (processing.mouseX - Math.round(processing.width * 0.5)) + ', ' +
+                        'Y:' + (processing.mouseY - Math.round(processing.height * 0.5)) + ', ' +
+                        'Z: 0)'
+                  );
+            };
+         } else {
+            processing.mouseMoved = function() {
+                  coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
+            };
+            processing.mouseDragged = function() {
+                  coordinatesContainer.find('span').remove();
+                  coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
+            };
+         }
          processing.mouseOut = function() {
             if (coordinatesContainer.find('span').length > 0) {
                coordinatesContainer.find('span').remove();
@@ -1243,7 +1269,7 @@ var getContext = function(display, infos) {
             { name: "rotateY", params: ['Angle'] },
             { name: "rotateZ", params: ['Angle'] },
             { name: "scale", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number']] },
-            { name: "translate", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] }
+            { name: "translate", params: (infos['processing3D'] ? ['Number', 'Number', 'Number'] : ['Number', 'Number']) }
          ],
          effect_lights: [
             { name: "ambientLight",
