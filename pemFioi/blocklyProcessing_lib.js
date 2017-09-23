@@ -668,7 +668,7 @@ var getContext = function(display, infos) {
             rotateY: "rotate on Y axis by %1°",
             rotateZ: "rotate on Z axis by %1°",
             scale: "scale by %1 %2 %3",
-            translate: infos['processing3D'] ? "déplacer de %1 %2 %3" : "translate by %1 %2",
+            translate: infos['processing3D'] ? "translate by %1 %2 %3" : "translate by %1 %2",
             // effect_lights
             ambientLight: "add an ambient light %1 %2 %3 at %4 %5 %6",
             directionalLight: "add a directional light %1 %2 %3 toward %4 %5 %6",
@@ -1091,30 +1091,30 @@ var getContext = function(display, infos) {
          };
          processing.draw = function() {
             initGraphics(processing);
-            if(!infos['processing3D']) {
-                  processing.pushStyle();
+            if (!infos['processing3D']) {
+               processing.pushStyle();
             }
             drawOps(processing);
-            if(!infos['processing3D']) {
-                  processing.popStyle();
+            if (!infos['processing3D']) {
+               processing.popStyle();
             }
          };
 
-         if(infos['processing3D']) {
+         if (infos['processing3D']) {
             processing.mouseMoved = function() {
-                  coordinatesContainer.text(
-                        '(X:' + (processing.mouseX - Math.round(processing.width * 0.5)) + ', ' +
-                        'Y:' + (processing.mouseY - Math.round(processing.height * 0.5)) + ', ' +
-                        'Z: 0)'
-                  );
+               coordinatesContainer.text(
+                  '(X:' + (processing.mouseX - Math.round(processing.width * 0.5)) + ', ' +
+                  'Y:' + (processing.mouseY - Math.round(processing.height * 0.5)) + ', ' +
+                  'Z: 0)'
+               );
             };
          } else {
             processing.mouseMoved = function() {
-                  coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
+               coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
             };
             processing.mouseDragged = function() {
-                  coordinatesContainer.find('span').remove();
-                  coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
+               coordinatesContainer.find('span').remove();
+               coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
             };
          }
          processing.mouseOut = function() {
@@ -1162,7 +1162,7 @@ var getContext = function(display, infos) {
          context.waitDelay(callback);
       } else {
          context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
-         if(context.display) {
+         if (context.display) {
             context.processing_main.redraw();
          }
          context.waitDelay(callback, drawOnBuffer());
@@ -1476,11 +1476,9 @@ var getContext = function(display, infos) {
       var result = [true, true];
       for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
          var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
-         var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
-         var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
-         if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
+         if (finalPixel == toCover) {
             result[0] = false;
-         } else if (r1 == toAvoid[0] && g1 == toAvoid[1] && b1 == toAvoid[2] && (r2 != r1 || g2 != g1 || b2 != b1)) {
+         } else if (initialPixel == toAvoid && finalPixel != toAvoid) {
             result[1] = false;
          }
       }
@@ -1493,7 +1491,8 @@ var getContext = function(display, infos) {
 
 var processingEndConditions = {
    checkRedCoveredGreenNotCovered: function(context, lastTurn) {
-      var success = context.checkCoveredColors([255, 0, 0], [0, 255, 0])
+      var success = context.checkCoveredColors(
+         context.processing.internalInstance.color(0xFFFF0000), context.processing.internalInstance.color(0xFF00FF00))
       if (!success[0] && !success[1]) {
          throw(window.languageStrings.messages.redNotCoveredGreenCovered);
       } else if (!success[0]) {
@@ -1503,5 +1502,4 @@ var processingEndConditions = {
       }
       throw(window.languageStrings.messages.redCoveredGreenNotCovered);
    }
-
 };
