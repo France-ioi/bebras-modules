@@ -1038,7 +1038,7 @@ var getContext = function(display, infos) {
 
    function initGraphics2D(pg) {
       pg.background(255);
-      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+      if (context.processing.initialDrawing && (!$('#hideInitialDrawing').prop('checked') || pg != context.processing_main)) {
          pg.pushStyle();
          context.processing.initialDrawing(pg);
          pg.popStyle();
@@ -1047,14 +1047,12 @@ var getContext = function(display, infos) {
       pg.noLights();
       pg.fill(128);
    }
-
    function initGraphics3D(pg) {
       pg.background(255);
-      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+      if (context.processing.initialDrawing && (!$('#hideInitialDrawing').prop('checked') || pg != context.processing_main)) {
          context.processing.initialDrawing(pg);
       }
    }
-
    var initGraphics = infos['processing3D'] ? initGraphics3D : initGraphics2D;
 
    function drawOps(pg) {
@@ -1069,7 +1067,7 @@ var getContext = function(display, infos) {
 
 
    context.resetDisplay = function() {
-      var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
+      var hideInitialDrawing = $('[for="hideInitialDrawing"]');
       var canvas = $('<canvas>').css('border', '1px solid black');
       var coordinatesContainer = $('<div>').text(" ");
       $('#grid').empty().append(canvas, coordinatesContainer);
@@ -1081,6 +1079,9 @@ var getContext = function(display, infos) {
             hideInitialDrawing.prepend($('<input id="hideInitialDrawing" type="checkbox">'));
          }
          $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
+         $('#hideInitialDrawing').change(function() {
+            context.processing_main.redraw();
+         });
       }
 
       context.processing_main = new Processing(canvas.get(0), function(processing) {
