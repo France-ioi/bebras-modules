@@ -44,7 +44,7 @@ var quickAlgoInterface = {
                             "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
                             "</div>";
       $("#saveOrLoadModal").html(saveOrLoadModal);
-      
+
       // Buttons from buttonsAndMessages
       var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="width: 438px; padding: 1px;">';
       var placementNames = ['graderMessage', 'validate', 'saved'];
@@ -58,7 +58,7 @@ var quickAlgoInterface = {
       if(!$('#displayHelper_cancel').length) {
          $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
       }
-      
+
       var gridButtonsAfter = '';
       gridButtonsAfter += "<div id='testSelector' style='width: 420px;'></div>"
                         + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"

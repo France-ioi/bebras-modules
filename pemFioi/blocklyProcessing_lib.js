@@ -1,4 +1,8 @@
 var getContext = function(display, infos) {
+
+    var initial_canvas_size = 300;
+
+
    var localLanguageStrings = {
       fr: {
          categories: {
@@ -570,6 +574,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          hideInitialDrawing: "Cacher le motif de départ",
+         scaleDrawing: "Scale X2",
          messages: {
             redCoveredGreenNotCovered: "Vous avez bien recouvert tout le rouge sans toucher au vert.",
             redNotCovered: "Recouvrez bien toute la partie rouge.",
@@ -981,6 +986,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Program",
          hideInitialDrawing: "Hide initial drawing",
+         scaleDrawing: "Scale X2",
          messages: {}
       },
       none: {
@@ -988,13 +994,29 @@ var getContext = function(display, infos) {
       }
    }
 
-   var context = quickAlgoContext(display, infos);
-   var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
-   context.processing = {
-      internalInstance: new Processing(),
-      ops: []
-   };
+    var context = quickAlgoContext(display, infos);
+    var strings = context.setLocalLanguageStrings(localLanguageStrings);
+
+
+    context.processing = {
+        internalInstance: new Processing(),
+        ops: [],
+        state: {
+            scale: 1,
+            hideInitialDrawing: false,
+        },
+        getCanvasSize: function() {
+            return initial_canvas_size * context.processing.state.scale
+        },
+        overload: {
+            resetMatrix: function(pg) {
+                pg.resetMatrix();
+                pg.scale(context.processing.state.scale);
+            }
+        }
+    };
+
 
    context.provideBlocklyColours = function() {
       return {
@@ -1038,7 +1060,8 @@ var getContext = function(display, infos) {
 
    function initGraphics2D(pg) {
       pg.background(255);
-      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+      pg.scale(context.processing.state.scale);
+      if (context.processing.initialDrawing && !context.processing.state.hideInitialDrawing) {
          pg.pushStyle();
          context.processing.initialDrawing(pg);
          pg.popStyle();
@@ -1046,46 +1069,87 @@ var getContext = function(display, infos) {
       pg.resetMatrix();
       pg.noLights();
       pg.fill(128);
+      pg.scale(context.processing.state.scale);
    }
 
    function initGraphics3D(pg) {
       pg.background(255);
-      if (context.processing.initialDrawing && !$('#hideInitialDrawing').prop('checked')) {
+      pg.translate(pg.width/2, pg.height/2, 0);
+      pg.scale(context.processing.state.scale);
+      if (context.processing.initialDrawing && !context.processing.state.hideInitialDrawing) {
          context.processing.initialDrawing(pg);
       }
    }
 
-   var initGraphics = infos['processing3D'] ? initGraphics3D : initGraphics2D;
 
-   function drawOps(pg) {
-      var ret;
-      for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
-         var op = context.processing.ops[iOp];
-         var obj = op.obj ? op.obj : pg;
-         ret = typeof obj[op.block] == 'function' ? obj[op.block].apply(obj, op.values) : obj[op.block];
-      }
-      return ret;
-   }
+    var initGraphics = infos['processing3D'] ? initGraphics3D : initGraphics2D;
+
+    function drawOps(pg) {
+        var ret;
+        for (var iOp = 0; iOp < context.processing.ops.length; iOp++) {
+            var op = context.processing.ops[iOp];
+            var obj = op.obj ? op.obj : pg;
+            var func = context.processing.overload[op.block];
+            if(func) {
+                func(obj, op.values);
+            } else {
+                ret = typeof obj[op.block] == 'function' ? obj[op.block].apply(obj, op.values) : obj[op.block];
+            }
+        }
+        return ret;
+    }
 
 
-   context.resetDisplay = function() {
-      var hideInitialDrawing = $('[for="hideInitialDrawing"]').parent();
+    context.setScale = function(s) {
+        context.processing.state.scale = s;
+        context.canvas_element.width(context.processing.getCanvasSize());
+        context.canvas_element.height(context.processing.getCanvasSize());
+        context.resetDisplay();
+    }
+
+
+    context.resetDisplay = function() {
       var canvas = $('<canvas>').css('border', '1px solid black');
+      context.canvas_element = canvas;
       var coordinatesContainer = $('<div>').text(" ");
       $('#grid').empty().append(canvas, coordinatesContainer);
 
-      if (infos.buttonHideInitialDrawing) {
-         if (hideInitialDrawing.length == 0) {
-            hideInitialDrawing = $('<label for="hideInitialDrawing">');
-            hideInitialDrawing.text(" " + strings.hideInitialDrawing);
-            hideInitialDrawing.prepend($('<input id="hideInitialDrawing" type="checkbox">'));
-         }
-         $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
+      if(infos.buttonScaleDrawing) {
+        var scaleDrawing = $('<label for="scaleDrawing">');
+        scaleDrawing.text(" " + strings.scaleDrawing);
+        var cb = $('<input id="scaleDrawing" type="checkbox">');
+        cb.prop('checked', context.processing.state.scale > 1);
+        scaleDrawing.prepend(cb);
+        $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(scaleDrawing));
+        cb.change(function(e) {
+            context.setScale($(e.target).prop('checked') ? 2 : 1);
+        })
       }
+
+      var hideInitialDrawing = $('[for="hideInitialDrawing"]');
+      if (infos.buttonHideInitialDrawing) {
+        if (hideInitialDrawing.length == 0) {
+           hideInitialDrawing = $('<label for="hideInitialDrawing">');
+           hideInitialDrawing.text(" " + strings.hideInitialDrawing);
+           var cb = $('<input id="hideInitialDrawing" type="checkbox">');
+           cb.prop('checked', context.processing.state.hideInitialDrawing);
+           hideInitialDrawing.prepend(cb);
+        }
+        $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
+        $('#hideInitialDrawing').change(function(e) {
+            context.processing.state.hideInitialDrawing = $(e.target).prop('checked');
+            context.processing_main.redraw();
+        });
+      }
+
 
       context.processing_main = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
-            processing.size(300, 300, infos['processing3D'] ? processing.P3D : processing.P2D);
+            processing.size(
+                context.processing.getCanvasSize(),
+                context.processing.getCanvasSize(),
+                infos['processing3D'] ? processing.P3D : processing.P2D
+            );
             processing.background(255);
             processing.noLoop();
          };
@@ -1100,21 +1164,30 @@ var getContext = function(display, infos) {
             }
          };
 
+
+         function normalizeCoord(v, offset) {
+            return Math.max(0, Math.round(v / context.processing.state.scale)) - (offset ? offset : 0);
+         }
+
+
          if(infos['processing3D']) {
             processing.mouseMoved = function() {
-                  coordinatesContainer.text(
-                        '(X:' + (processing.mouseX - Math.round(processing.width * 0.5)) + ', ' +
-                        'Y:' + (processing.mouseY - Math.round(processing.height * 0.5)) + ', ' +
-                        'Z: 0)'
-                  );
+                var x = normalizeCoord(processing.mouseX, Math.round(processing.width * 0.5));
+                var y = normalizeCoord(processing.mouseY, Math.round(processing.height * 0.5));
+                coordinatesContainer.text('(X:' + x + ', ' + 'Y:' + y + ', Z: 0)');
             };
          } else {
             processing.mouseMoved = function() {
-                  coordinatesContainer.text(processing.mouseX + " × " + processing.mouseY);
+                // avoid -1 value
+                var x = normalizeCoord(processing.mouseX);
+                var y = normalizeCoord(processing.mouseY);
+                coordinatesContainer.text(x + " × " + y);
             };
             processing.mouseDragged = function() {
-                  coordinatesContainer.find('span').remove();
-                  coordinatesContainer.append($('<span>').text(" — " + processing.mouseX + " × " + processing.mouseY));
+                var x = normalizeCoord(processing.mouseX);
+                var y = normalizeCoord(processing.mouseY);
+                coordinatesContainer.find('span').remove();
+                coordinatesContainer.append($('<span>').text(" — " + x + " × " + y));
             };
          }
          processing.mouseOut = function() {
@@ -1125,10 +1198,10 @@ var getContext = function(display, infos) {
             }
          };
       });
-
       context.blocklyHelper.updateSize();
       context.updateScale();
    };
+
 
    context.updateScale = function() {
       if (!context.display) {
@@ -1136,20 +1209,24 @@ var getContext = function(display, infos) {
       }
    };
 
+
    context.unload = function() {
       if (context.display) {
       }
    };
 
 
-   function drawOnBuffer() {
-      var buffer = context.processing.buffer = context.processing.internalInstance.createGraphics(300, 300);
-      buffer.beginDraw();
-      initGraphics(buffer);
-      var ret = drawOps(buffer);
-      buffer.endDraw();
-      return buffer;
-   }
+    function drawOnBuffer() {
+        var buffer = context.processing.buffer = context.processing.internalInstance.createGraphics(
+            context.processing.getCanvasSize(),
+            context.processing.getCanvasSize()
+        );
+        buffer.beginDraw();
+        initGraphics(buffer);
+        var ret = drawOps(buffer);
+        buffer.endDraw();
+        return buffer;
+    }
 
    context.processing.commonOp = function() {
       var callback = arguments[arguments.length - 1];
@@ -1463,32 +1540,34 @@ var getContext = function(display, infos) {
    }
 
 
-   context.checkCoveredColors = function(toCover, toAvoid) {
-      var buffer = context.processing.internalInstance.createGraphics(300, 300);
-      buffer.beginDraw();
-      initGraphics(buffer);
-      buffer.endDraw();
-      buffer.loadPixels();
-      var initialPixels = buffer.pixels;
-      drawOnBuffer();
-      context.processing.buffer.loadPixels();
-      var finalPixels = context.processing.buffer.pixels;
-      var result = [true, true];
-      for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
-         var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
-         var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
-         var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
-         if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
-            result[0] = false;
-         } else if (r1 == toAvoid[0] && g1 == toAvoid[1] && b1 == toAvoid[2] && (r2 != r1 || g2 != g1 || b2 != b1)) {
-            result[1] = false;
-         }
-      }
-      return result;
-   };
 
-
-   return context;
+    context.checkCoveredColors = function(toCover, toAvoid) {
+        var buffer = context.processing.internalInstance.createGraphics(
+            context.processing.getCanvasSize(),
+            context.processing.getCanvasSize()
+        );
+        buffer.beginDraw();
+        initGraphics(buffer);
+        buffer.endDraw();
+        buffer.loadPixels();
+        var initialPixels = buffer.pixels;
+        drawOnBuffer();
+        context.processing.buffer.loadPixels();
+        var finalPixels = context.processing.buffer.pixels;
+        var result = [true, true];
+        for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
+            var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
+            var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
+            var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
+            if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
+                result[0] = false;
+            } else if (r1 == toAvoid[0] && g1 == toAvoid[1] && b1 == toAvoid[2] && (r2 != r1 || g2 != g1 || b2 != b1)) {
+                result[1] = false;
+            }
+        }
+        return result;
+    };
+    return context;
 }
 
 var processingEndConditions = {
