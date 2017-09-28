@@ -7,7 +7,8 @@ var quickAlgoInterface = {
    strings: {},
    nbTestCases: 0,
 
-   loadInterface: function() {
+   loadInterface: function(context) {
+      this.context = context;
       this.strings = window.languageStrings;
 
       var gridHtml = "<center>";
@@ -46,7 +47,7 @@ var quickAlgoInterface = {
       $("#saveOrLoadModal").html(saveOrLoadModal);
 
       // Buttons from buttonsAndMessages
-      var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="width: 438px; padding: 1px;">';
+      var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
       var placementNames = ['graderMessage', 'validate', 'saved'];
       for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
          var placement = 'displayHelper_' + placementNames[iPlacement];
@@ -59,15 +60,34 @@ var quickAlgoInterface = {
          $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
       }
 
-      var gridButtonsAfter = '';
-      gridButtonsAfter += "<div id='testSelector' style='width: 420px;'></div>"
-                        + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
-                        + this.strings.submitProgram
-                        + "</button><br/>"
-                        + "<div id='messages' style='width: 400px;'><span id='tooltip'></span><span id='errors'></span></div>"
-                        + addTaskHTML;
+      var scaleControl = '';
+      if(context.display && context.infos.buttonScaleDrawing) {
+        var scaleControl = '<div class="scaleDrawingControl">' +
+            '<label for="scaleDrawing"><input id="scaleDrawing" type="checkbox">' +
+            this.strings.scaleDrawing +
+            '</label>' +
+            '</div>';
+      }
+
+      var gridButtonsAfter = scaleControl
+        + "<div id='testSelector'></div>"
+        + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+        + this.strings.submitProgram
+        + "</button><br/>"
+        + "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
+        + addTaskHTML;
       $("#gridButtonsAfter").html(gridButtonsAfter);
+      $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
+
+
+    onScaleDrawingChange: function(e) {
+        var scaled = $(e.target).prop('checked');
+        $("#gridContainer").toggleClass('gridContainerScaled', scaled);
+        $("#blocklyLibContent").toggleClass('blocklyLibContentScaled', scaled);
+        this.context.setScale(scaled ? 2 : 1);
+    },
+
 
    initTestSelector: function (nbTestCases) {
       this.nbTestCases = nbTestCases;

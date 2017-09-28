@@ -24,6 +24,9 @@ body > * {
 #blocklyContainer {
 	box-sizing: border-box;
 }
+.scaleDrawingControl {
+    display: none;
+}
 @media screen and (min-width: 1025px) {
 	#taskIntro {
 		float: none;
@@ -32,12 +35,23 @@ body > * {
 		margin-right: auto;
 	}
 	#gridContainer {
-		float: left;
-	}
+        float: left;
+        width: 430px;
+    }
 	#blocklyLibContent {
 		float: right;
 		width: calc(100% - 440px);
-	}
+    }
+    .scaleDrawingControl {
+        display: block;
+    }
+    .gridContainerScaled {
+        width: 630px !important;
+    }
+
+    .blocklyLibContentScaled {
+        width: calc(100% - 640px) !important;
+    }
 }
 #blocklyContainer {
 	overflow: hidden;
@@ -49,9 +63,6 @@ body > * {
 #blocklyDiv {
 	height: 100%;
 	width: 100%;
-}
-#grid {
-	max-width: 400px;
 }
 
 #testCaseName {
@@ -293,7 +304,6 @@ input[type=button] {
    z-index: 20;
 }
 #testSelector {
-    width: 400px;
     padding-left: 10px;
 }
 .testResult {

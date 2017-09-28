@@ -63,7 +63,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       limitElements: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitElementsOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
-      previousTestcase: "Précédent", 
+      previousTestcase: "Précédent",
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
@@ -78,7 +78,8 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Vous avez validé seulement {nbSuccess} test(s) sur {nbTests}.",
       gradingInProgress: "Évaluation en cours",
       textVariable: "texte",
-      listVariable: "liste"
+      listVariable: "liste",
+      scaleDrawing: "Scale 2X"
    },
    en: {
       categories: {
@@ -138,7 +139,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
       limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
-      previousTestcase: "Previous", 
+      previousTestcase: "Previous",
       nextTestcase: "Next",
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
@@ -153,7 +154,8 @@ var localLanguageStrings = {
       resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
       gradingInProgress: "Grading in process",
       textVariable: "text",
-      listVariable: "list"
+      listVariable: "list",
+      scaleDrawing: "Scale 2X"
    },
    de: {
       categories: {
@@ -214,7 +216,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
       limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
-      previousTestcase: " < ", 
+      previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
@@ -230,7 +232,8 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Du hast {nbSuccess} von {nbTests} Testfällen richtig.",
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
       textVariable: "Text",
-      listVariable: "Liste"
+      listVariable: "Liste",
+      scaleDrawing: "Scale 2X"
    },
    es: {
       categories: {

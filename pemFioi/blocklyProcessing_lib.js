@@ -673,7 +673,7 @@ var getContext = function(display, infos) {
             rotateY: "rotate on Y axis by %1°",
             rotateZ: "rotate on Z axis by %1°",
             scale: "scale by %1 %2 %3",
-            translate: infos['processing3D'] ? "déplacer de %1 %2 %3" : "translate by %1 %2",
+            translate: infos['processing3D'] ? "translate by %1 %2 %3" : "translate by %1 %2",
             // effect_lights
             ambientLight: "add an ambient light %1 %2 %3 at %4 %5 %6",
             directionalLight: "add a directional light %1 %2 %3 toward %4 %5 %6",
@@ -1058,10 +1058,10 @@ var getContext = function(display, infos) {
    };
 
 
-   function initGraphics2D(pg) {
+   function initGraphics2D(pg, forceInitialDrawing) {
       pg.background(255);
       pg.scale(context.processing.state.scale);
-      if (context.processing.initialDrawing && !context.processing.state.hideInitialDrawing) {
+      if (context.processing.initialDrawing && (!context.processing.state.hideInitialDrawing || forceInitialDrawing)) {
          pg.pushStyle();
          context.processing.initialDrawing(pg);
          pg.popStyle();
@@ -1072,11 +1072,12 @@ var getContext = function(display, infos) {
       pg.scale(context.processing.state.scale);
    }
 
-   function initGraphics3D(pg) {
+
+   function initGraphics3D(pg, forceInitialDrawing) {
       pg.background(255);
       pg.translate(pg.width/2, pg.height/2, 0);
       pg.scale(context.processing.state.scale);
-      if (context.processing.initialDrawing && !context.processing.state.hideInitialDrawing) {
+      if (context.processing.initialDrawing && (!context.processing.state.hideInitialDrawing || forceInitialDrawing)) {
          context.processing.initialDrawing(pg);
       }
    }
@@ -1100,8 +1101,8 @@ var getContext = function(display, infos) {
     }
 
 
-    context.setScale = function(s) {
-        context.processing.state.scale = s;
+    context.setScale = function(scale) {
+        context.processing.state.scale = scale;
         context.canvas_element.width(context.processing.getCanvasSize());
         context.canvas_element.height(context.processing.getCanvasSize());
         context.resetDisplay();
@@ -1113,18 +1114,6 @@ var getContext = function(display, infos) {
       context.canvas_element = canvas;
       var coordinatesContainer = $('<div>').text(" ");
       $('#grid').empty().append(canvas, coordinatesContainer);
-
-      if(infos.buttonScaleDrawing) {
-        var scaleDrawing = $('<label for="scaleDrawing">');
-        scaleDrawing.text(" " + strings.scaleDrawing);
-        var cb = $('<input id="scaleDrawing" type="checkbox">');
-        cb.prop('checked', context.processing.state.scale > 1);
-        scaleDrawing.prepend(cb);
-        $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(scaleDrawing));
-        cb.change(function(e) {
-            context.setScale($(e.target).prop('checked') ? 2 : 1);
-        })
-      }
 
       var hideInitialDrawing = $('[for="hideInitialDrawing"]');
       if (infos.buttonHideInitialDrawing) {
@@ -1155,25 +1144,27 @@ var getContext = function(display, infos) {
          };
          processing.draw = function() {
             initGraphics(processing);
-            if(!infos['processing3D']) {
-                  processing.pushStyle();
+            if (!infos['processing3D']) {
+               processing.pushStyle();
             }
             drawOps(processing);
-            if(!infos['processing3D']) {
-                  processing.popStyle();
+            if (!infos['processing3D']) {
+               processing.popStyle();
             }
          };
 
 
          function normalizeCoord(v, offset) {
-            return Math.max(0, Math.round(v / context.processing.state.scale)) - (offset ? offset : 0);
+            return Math.max(0, Math.round(v / context.processing.state.scale)) -
+                (offset ? Math.round(offset / context.processing.state.scale) : 0);
          }
 
 
          if(infos['processing3D']) {
             processing.mouseMoved = function() {
-                var x = normalizeCoord(processing.mouseX, Math.round(processing.width * 0.5));
-                var y = normalizeCoord(processing.mouseY, Math.round(processing.height * 0.5));
+                var ofs = Math.round(0.5 * context.processing.getCanvasSize());
+                var x = normalizeCoord(processing.mouseX, ofs);
+                var y = normalizeCoord(processing.mouseY, ofs);
                 coordinatesContainer.text('(X:' + x + ', ' + 'Y:' + y + ', Z: 0)');
             };
          } else {
@@ -1222,7 +1213,7 @@ var getContext = function(display, infos) {
             context.processing.getCanvasSize()
         );
         buffer.beginDraw();
-        initGraphics(buffer);
+        initGraphics(buffer, true);
         var ret = drawOps(buffer);
         buffer.endDraw();
         return buffer;
@@ -1239,7 +1230,7 @@ var getContext = function(display, infos) {
          context.waitDelay(callback);
       } else {
          context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
-         if(context.display) {
+         if (context.display) {
             context.processing_main.redraw();
          }
          context.waitDelay(callback, drawOnBuffer());
@@ -1540,6 +1531,28 @@ var getContext = function(display, infos) {
    }
 
 
+   context.checkCoveredColors = function(toCover, toAvoid) {
+      var buffer = context.processing.internalInstance.createGraphics(300, 300);
+      buffer.beginDraw();
+      initGraphics(buffer, true);
+      buffer.endDraw();
+      buffer.loadPixels();
+      var initialPixels = buffer.pixels;
+      drawOnBuffer();
+      context.processing.buffer.loadPixels();
+      var finalPixels = context.processing.buffer.pixels;
+      var result = [true, true];
+      for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
+         var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
+         if (finalPixel == toCover) {
+            result[0] = false;
+         } else if (initialPixel == toAvoid && finalPixel != toAvoid) {
+            result[1] = false;
+         }
+      }
+      return result;
+   };
+
 
     context.checkCoveredColors = function(toCover, toAvoid) {
         var buffer = context.processing.internalInstance.createGraphics(
@@ -1547,7 +1560,7 @@ var getContext = function(display, infos) {
             context.processing.getCanvasSize()
         );
         buffer.beginDraw();
-        initGraphics(buffer);
+        initGraphics(buffer, true);
         buffer.endDraw();
         buffer.loadPixels();
         var initialPixels = buffer.pixels;
@@ -1572,7 +1585,8 @@ var getContext = function(display, infos) {
 
 var processingEndConditions = {
    checkRedCoveredGreenNotCovered: function(context, lastTurn) {
-      var success = context.checkCoveredColors([255, 0, 0], [0, 255, 0])
+      var success = context.checkCoveredColors(
+         context.processing.internalInstance.color(0xFFFF0000), context.processing.internalInstance.color(0xFF00FF00))
       if (!success[0] && !success[1]) {
          throw(window.languageStrings.messages.redNotCoveredGreenCovered);
       } else if (!success[0]) {
@@ -1582,5 +1596,4 @@ var processingEndConditions = {
       }
       throw(window.languageStrings.messages.redCoveredGreenNotCovered);
    }
-
 };

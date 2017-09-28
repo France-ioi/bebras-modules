@@ -45,20 +45,21 @@ var initBlocklySubTask = function(subTask, language) {
 
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
-      if (this.display) {
-         window.quickAlgoInterface.loadInterface();
-         if (subTask.levelGridInfos.hideSaveOrLoad) {
-            $("#saveOrLoadBtn").hide();
-         }
-         if (subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language]) {
-            $("#loadExampleBtn").show();
-         }
-      }
 
       this.context = getContext(this.display, subTask.levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
+
+      if (this.display) {
+        window.quickAlgoInterface.loadInterface(this.context);
+        if (subTask.levelGridInfos.hideSaveOrLoad) {
+           $("#saveOrLoadBtn").hide();
+        }
+        if (subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language]) {
+           $("#loadExampleBtn").show();
+        }
+     }
 
       this.blocklyHelper.loadContext(this.context);
 
@@ -77,7 +78,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.display) {
          window.quickAlgoInterface.initTestSelector(this.nbTestCases);
       }
-      
+
       subTask.changeTest(0);
    };
 
@@ -144,7 +145,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.getAnswerObject(); // to fill this.answer;
 
       $('#displayHelper_graderMessage').html('<div style="margin: .2em 0; color: red; font-weight: bold;">' + languageStrings.gradingInProgress + '</div>');
-      
+
       this.getGrade(function(result) {
          $('#displayHelper_graderMessage').html("");
          subTask.context.display = true;
