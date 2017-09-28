@@ -381,6 +381,9 @@ function Crane(simulationFactory, userSettings) {
          for(var index = 0; index < tower.length; index++) {
             var id = tower[index];
             this.visuals.blocks[id] = this.settings.blockDrawer(this.settings.paper, id, 0, 0);
+            for(var iElement in this.visuals.blocks[id]) {
+               this.visuals.blocks[id][iElement].click(self.settings.onBlockClick);
+            }
          }
       }
    };
@@ -576,6 +579,7 @@ function Crane(simulationFactory, userSettings) {
       canDrop: this._defaultCanDrop,
       onError: this._defaultEmpty,
       onClick: this._defaultEmpty,
+      onBlockClick: this._defaultEmpty,
       onSimulationFinish: this._defaultEmpty,
       animTimeVertical: 150,
       animTimeHorizontal: 150,
