@@ -302,9 +302,9 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled) {
 
 function VertexDragger(settings) {
    var self = this;
-   this.snapEnabled = false;
-   this.snapX = null;
-   this.snapY = null;
+   this.gridEnabled = false;
+   this.gridX = null;
+   this.gridY = null;
    this.enabled = false;
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -319,11 +319,11 @@ function VertexDragger(settings) {
       }
    };
 
-   this.setSnapEnabled = function(enabled, snapX, snapY) {
-      this.snapEnabled = enabled;
+   this.setGridEnabled = function(enabled, gridX, gridY) {
+      this.gridEnabled = enabled;
       if(enabled) {
-         this.snapX = snapX;
-         this.snapY = snapY;
+         this.gridX = gridX;
+         this.gridY = gridY;
       }
    };
 
@@ -342,9 +342,9 @@ function VertexDragger(settings) {
    this.moveHandler = function(dx, dy, x, y, event) {
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
-      if(self.snapEnabled) {
-         newX -= (newX % self.snapX);
-         newY -= (newY % self.snapY);
+      if(self.gridEnabled) {
+         newX -= (newX % self.gridX);
+         newY -= (newY % self.gridY);
       }
       settings.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
