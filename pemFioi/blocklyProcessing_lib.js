@@ -1537,33 +1537,10 @@ var getContext = function(display, infos) {
    }
 
 
-   context.checkCoveredColors = function(toCover, toAvoid) {
-      var buffer = context.processing.internalInstance.createGraphics(300, 300);
-      buffer.beginDraw();
-      initGraphics(buffer, true);
-      buffer.endDraw();
-      buffer.loadPixels();
-      var initialPixels = buffer.pixels;
-      drawOnBuffer();
-      context.processing.buffer.loadPixels();
-      var finalPixels = context.processing.buffer.pixels;
-      var result = [true, true];
-      for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
-         var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
-         if (finalPixel == toCover) {
-            result[0] = false;
-         } else if (initialPixel == toAvoid && finalPixel != toAvoid) {
-            result[1] = false;
-         }
-      }
-      return result;
-   };
-
-
     context.checkCoveredColors = function(toCover, toAvoid) {
         var buffer = context.processing.internalInstance.createGraphics(
-            context.processing.getCanvasSize().width,
-            context.processing.getCanvasSize().height
+                context.processing.getCanvasSize().width,
+                context.processing.getCanvasSize().height
         );
         buffer.beginDraw();
         initGraphics(buffer, true);
@@ -1576,16 +1553,16 @@ var getContext = function(display, infos) {
         var result = [true, true];
         for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
             var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
-            var r1 = buffer.red(initialPixel), g1 = buffer.green(initialPixel), b1 = buffer.blue(initialPixel);
-            var r2 = buffer.red(finalPixel), g2 = buffer.green(finalPixel), b2 = buffer.blue(finalPixel);
-            if (r2 == toCover[0] && g2 == toCover[1] && b2 == toCover[2]) {
+            if (finalPixel == toCover) {
                 result[0] = false;
-            } else if (r1 == toAvoid[0] && g1 == toAvoid[1] && b1 == toAvoid[2] && (r2 != r1 || g2 != g1 || b2 != b1)) {
+            } else if (initialPixel == toAvoid && finalPixel != toAvoid) {
                 result[1] = false;
             }
         }
         return result;
     };
+
+
     return context;
 }
 
