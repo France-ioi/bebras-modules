@@ -306,6 +306,8 @@ function VertexDragger(settings) {
    this.gridX = null;
    this.gridY = null;
    this.enabled = false;
+   this.occupiedSnapPositions = {};
+   this.vertexToSnapPosition = {};
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -334,6 +336,9 @@ function VertexDragger(settings) {
    };
 
    this.endHandler = function(event) {
+      if(settings.snapPositions) {
+         self.updateOccupiedSnap();
+      }
       if(settings.callback) {
          settings.callback(self.elementID);
       }
@@ -346,7 +351,54 @@ function VertexDragger(settings) {
          newX -= (newX % self.gridX);
          newY -= (newY % self.gridY);
       }
+      if(settings.snapPositions) {
+         var position = self.getSnapPosition(newX, newY);
+         if(position !== null) {
+            newX = position.x;
+            newY = position.y;
+         }
+         else {
+            self.freeSnapFromVertex(self.elementID);
+         }
+      }
       settings.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+   };
+
+   self.freeSnapFromVertex = function(id) {
+      var iPosition = self.vertexToSnapPosition[id];
+      if(iPosition !== null && iPosition !== undefined) {
+         delete self.occupiedSnapPositions[iPosition];
+         delete self.vertexToSnapPosition[id];
+      }
+   };
+
+   self.getSnapPosition = function(x, y) {
+      for(var iPosition in settings.snapPositions) {
+         if(self.occupiedSnapPositions[iPosition]) {
+            continue;
+         }
+         var position = settings.snapPositions[iPosition];
+         if((x - position.x) * (x - position.x) + (y - position.y) * (y - position.y) <= settings.snapThreshold * settings.snapThreshold) {
+            return position;
+         }
+      }
+      return null;
+   };
+
+   self.updateOccupiedSnap = function() {
+      self.occupiedSnapPositions = {};
+      var vertices = settings.visualGraph.graph.getAllVertices();
+      for(var iPosition in settings.snapPositions) {
+         var snapPosition = settings.snapPositions[iPosition];
+         for(var iVertex in vertices) {
+            var vertexPosition = settings.visualGraph.graphDrawer.getVertexPosition(vertices[iVertex]);
+            if(snapPosition.x === vertexPosition.x && snapPosition.y === vertexPosition.y) {
+               self.occupiedSnapPositions[iPosition] = true;
+               self.vertexToSnapPosition[vertices[iVertex]] = iPosition;
+               break;
+            }
+         }
+      }
    };
 
    if(settings.enabled) {
