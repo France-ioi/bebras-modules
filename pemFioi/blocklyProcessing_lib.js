@@ -1,6 +1,9 @@
 var getContext = function(display, infos) {
 
-    var initial_canvas_size = 300;
+    var initial_canvas_size = {
+        width: 300,
+        height: 300
+    }
 
 
    var localLanguageStrings = {
@@ -574,7 +577,6 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          hideInitialDrawing: "Cacher le motif de départ",
-         scaleDrawing: "Scale X2",
          messages: {
             redCoveredGreenNotCovered: "Vous avez bien recouvert tout le rouge sans toucher au vert.",
             redNotCovered: "Recouvrez bien toute la partie rouge.",
@@ -986,7 +988,6 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Program",
          hideInitialDrawing: "Hide initial drawing",
-         scaleDrawing: "Scale X2",
          messages: {}
       },
       none: {
@@ -1007,7 +1008,11 @@ var getContext = function(display, infos) {
             hideInitialDrawing: false,
         },
         getCanvasSize: function() {
-            return initial_canvas_size * context.processing.state.scale
+            var size = context.processing.options['canvas_size'] ? context.processing.options.canvas_size : initial_canvas_size;
+            return {
+                width: size.width * context.processing.state.scale,
+                height: size.height * context.processing.state.scale
+            }
         },
         overload: {
             resetMatrix: function(pg) {
@@ -1049,6 +1054,7 @@ var getContext = function(display, infos) {
    context.reset = function(taskInfos) {
       context.processing.internalInstance = new Processing();
       context.processing.ops = [];
+      context.processing.options = taskInfos.options || {};
       if (taskInfos) {
          context.processing.initialDrawing = taskInfos.initialDrawing || null;
       }
@@ -1103,8 +1109,8 @@ var getContext = function(display, infos) {
 
     context.setScale = function(scale) {
         context.processing.state.scale = scale;
-        context.canvas_element.width(context.processing.getCanvasSize());
-        context.canvas_element.height(context.processing.getCanvasSize());
+        context.canvas_element.width(context.processing.getCanvasSize().width);
+        context.canvas_element.height(context.processing.getCanvasSize().height);
         context.resetDisplay();
     }
 
@@ -1135,8 +1141,8 @@ var getContext = function(display, infos) {
       context.processing_main = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
             processing.size(
-                context.processing.getCanvasSize(),
-                context.processing.getCanvasSize(),
+                context.processing.getCanvasSize().width,
+                context.processing.getCanvasSize().height,
                 infos['processing3D'] ? processing.P3D : processing.P2D
             );
             processing.background(255);
@@ -1162,9 +1168,9 @@ var getContext = function(display, infos) {
 
          if(infos['processing3D']) {
             processing.mouseMoved = function() {
-                var ofs = Math.round(0.5 * context.processing.getCanvasSize());
-                var x = normalizeCoord(processing.mouseX, ofs);
-                var y = normalizeCoord(processing.mouseY, ofs);
+                var cs = context.processing.getCanvasSize();
+                var x = normalizeCoord(processing.mouseX, Math.round(0.5 * cs.width));
+                var y = normalizeCoord(processing.mouseY, Math.round(0.5 * cs.height));
                 coordinatesContainer.text('(X:' + x + ', ' + 'Y:' + y + ', Z: 0)');
             };
          } else {
@@ -1209,8 +1215,8 @@ var getContext = function(display, infos) {
 
     function drawOnBuffer() {
         var buffer = context.processing.buffer = context.processing.internalInstance.createGraphics(
-            context.processing.getCanvasSize(),
-            context.processing.getCanvasSize()
+            context.processing.getCanvasSize().width,
+            context.processing.getCanvasSize().height
         );
         buffer.beginDraw();
         initGraphics(buffer, true);
@@ -1556,8 +1562,8 @@ var getContext = function(display, infos) {
 
     context.checkCoveredColors = function(toCover, toAvoid) {
         var buffer = context.processing.internalInstance.createGraphics(
-            context.processing.getCanvasSize(),
-            context.processing.getCanvasSize()
+            context.processing.getCanvasSize().width,
+            context.processing.getCanvasSize().height
         );
         buffer.beginDraw();
         initGraphics(buffer, true);

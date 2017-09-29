@@ -152,7 +152,7 @@ var getContext = function(display, infos, curLevel) {
             failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
             leavesGrid: "Le robot sort de la grille !"
          },
-         description: { 
+         description: {
             platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
             obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
             onHole: "surTrou() : le robot est-il sur un trou ?",
@@ -519,7 +519,7 @@ var getContext = function(display, infos, curLevel) {
             failureAllMarblesInHoles: "Les billes ne sont pas toutes bien rangées !",
             leavesGrid: "Le robot sort de la grille !"
          },
-         description: { 
+         description: {
             platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
             obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
             onHole: "surTrou() : le robot est-il sur un trou ?",
@@ -840,19 +840,19 @@ var getContext = function(display, infos, curLevel) {
       createItem({row: row, col: col, type: "platform"});
       context.waitDelay(callback);
    };
-   
+
    context.robot.addPlatformInFront = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var coords = getCoordsInFront(robot.dir);
       addPlatform(coords.row + 1, coords.col, callback);
    };
-   
+
    context.robot.addPlatformAbove = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       addPlatform(robot.row - 1, robot.col, callback);
    };
 
-   
+
    function paint(row, col, paintType, callback) {
       if (context.lost) {
          return;
@@ -1018,7 +1018,7 @@ var getContext = function(display, infos, curLevel) {
       var items = context.getItems(robot.row, robot.col, {isPaint: true});
       context.callCallback(callback, items.length > 0);
    };
-   
+
    context.robot.paintNorthWest = function(callback) {
       var robot = context.getRobotItem(context.curRobot);
       var items = context.getItems(robot.row - 1, robot.col - 1, {isPaint: true});
@@ -1084,7 +1084,7 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, item.row + 1);
    };
-   
+
    var findTransportable = function(id) {
       var transportables = context.getItems(undefined, undefined, {isTransportable: true});
       for (var iItem = 1; iItem < transportables.length; iItem++) {
@@ -1292,7 +1292,7 @@ var getContext = function(display, infos, curLevel) {
          callback();
       });
    };
-   
+
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -1361,10 +1361,10 @@ var getContext = function(display, infos, curLevel) {
       [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
-   
+
    context.customBlocks = {
       robot: {
-         actions: [  
+         actions: [
             { name: "paint" },
             { name: "paintGrey" },
             { name: "forward" },
@@ -1398,11 +1398,11 @@ var getContext = function(display, infos, curLevel) {
             { name: "transportableRed",   yieldsValue: true },
             { name: "transportableBlue",  yieldsValue: true },
             { name: "transportableSquare", yieldsValue: true },
-            
+
             { name: "greenCell",          yieldsValue: true },
             { name: "brownCell",          yieldsValue: true },
             { name: "markedCell",         yieldsValue: true },
-            
+
             { name: "obstacleInFront",    yieldsValue: true },
             { name: "obstacleRight",      yieldsValue: true },
             { name: "obstacleLeft",       yieldsValue: true },
@@ -1410,7 +1410,7 @@ var getContext = function(display, infos, curLevel) {
             { name: "obstacleWest",       yieldsValue: true },
             { name: "obstacleNorth",      yieldsValue: true },
             { name: "obstacleSouth",      yieldsValue: true },
-            
+
             { name: "paintInFront",       yieldsValue: true },
             { name: "paintOnCell",        yieldsValue: true },
             { name: "paintNorth",         yieldsValue: true },
@@ -1711,7 +1711,7 @@ var getContext = function(display, infos, curLevel) {
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
          var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale); 
+         x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       if (!itemType.img) {

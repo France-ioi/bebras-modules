@@ -55,7 +55,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          codeRow: "ligne",
          labelAlert: "alerte",
          codeAlert: "alerte",
-         obstacle: "Le robot essaie de se déplacer sur un obstacle !" 
+         obstacle: "Le robot essaie de se déplacer sur un obstacle !"
       },
       es: {
          labelWait: "esperar",
@@ -112,11 +112,11 @@ var getRobotGridContext = function(display, infos, curLevel) {
          codeRow: "fila",
          labelAlert: "alerta",
          codeAlert: "alerta",
-         obstacle: "¡El robot intenta desplazarse sobre un obstáculo!" 
+         obstacle: "¡El robot intenta desplazarse sobre un obstáculo!"
       }
    };
    var strings = languageStrings[stringsLanguage];
-   
+
    var cells = [];
    var texts = [];
    var scale = 1;
@@ -243,7 +243,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
    }
-         
+
    context.robot_gridEdgeInFront = function(callback) {
       var coords = getCoordsInFront(0);
       var gridEdgeInFront = false;
@@ -492,7 +492,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, item.row + 1);
    };
-   
+
    var findTransportable = function(id) {
       var transportables = context.getItems(undefined, undefined, {isTransportable: true});
       for (var iItem = 1; iItem < transportables.length; iItem++) {
@@ -661,7 +661,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          callback();
       });
    }
-   
+
    var dirNames = ["E", "S", "O", "N"];
    context.robot_dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -753,7 +753,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
          obstacleNorth: { labelEn: "obstacleNorth", labelFr: strings.labelObstacleNorth, codeFr: strings.codeObstacleNorth, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleNorth },
          obstacleSouth: { labelEn: "obstacleSouth", labelFr: strings.labelObstacleSouth, codeFr: strings.codeObstacleSouth, category: "sensors", type: 1, nbParams: 0, fct: context.robot_obstacleSouth },
 
-         
+
          paintInFront: { labelEn: "paintInFront",    labelFr: strings.labelPaintInFront,    codeFr: strings.codePaintInFront,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_paintGrayInFront },
          colorUnder: { labelEn: "colorUnder",    labelFr: strings.labelColorUnder,    codeFr: strings.codeColorUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_colorUnder },
          numberUnder: { labelEn: "numberUnder",    labelFr: strings.labelNumberUnder,    codeFr: strings.codeNumberUnder,    category: "sensors", type: 1, nbParams: 0, fct: context.robot_numberUnder },
@@ -1004,7 +1004,7 @@ var getRobotGridContext = function(display, infos, curLevel) {
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
          var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale); 
+         x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       return { x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
