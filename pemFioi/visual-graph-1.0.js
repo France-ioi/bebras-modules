@@ -228,6 +228,18 @@ function VisualGraph(id, paper, graph, graphDrawer, autoDraw, vertexVisualInfo, 
       }
    };
 
+   this.setPaper = function(paper) {
+      this.paper = paper;
+   };
+
+   this.setDrawer = function(graphDrawer) {
+      this.graphDrawer = graphDrawer;
+   };
+
+   this.getGraph = function() {
+      return this.graph;
+   };
+
    this.toJSON = function() {
       return JSON.stringify({
          vertexVisualInfo: this.vertexVisualInfo,
