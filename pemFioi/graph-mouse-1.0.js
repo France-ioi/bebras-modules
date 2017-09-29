@@ -411,6 +411,9 @@ function VertexDragger(settings) {
    else {
       this.enabled = false;
    }
+   if(settings.snapPositions) {
+      self.updateOccupiedSnap();
+   }
 }
 
 function ElementRemover(id, graph, visualGraph, graphMouse, callback, forVertices, forEdges, enabled) {
