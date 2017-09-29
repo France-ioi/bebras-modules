@@ -300,12 +300,8 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled) {
    }
 }
 
-function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGetter, enabled) {
+function VertexDragger(settings) {
    var self = this;
-   this.id = id;
-   this.graph = graph;
-   this.visualGraph = visualGraph;
-   this.graphMouse = graphMouse;
    this.snapEnabled = false;
    this.snapX = null;
    this.snapY = null;
@@ -316,10 +312,10 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
       }
       this.enabled = enabled;
       if(enabled) {
-         graphMouse.addEvent(id, "drag", "vertex", null, [this.moveHandler, this.startHandler, this.endHandler], handleGetter);
+         settings.graphMouse.addEvent(settings.id, "drag", "vertex", null, [this.moveHandler, this.startHandler, this.endHandler], settings.handleGetter);
       }
       else {
-         graphMouse.removeEvent(id);
+         settings.graphMouse.removeEvent(settings.id);
       }
    };
 
@@ -333,13 +329,13 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
 
    this.startHandler = function(x, y, event) {
       self.elementID = this.data("id");
-      self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
-      self.visualGraph.elementToFront(self.elementID);
+      self.originalPosition = settings.visualGraph.graphDrawer.getVertexPosition(self.elementID);
+      settings.visualGraph.elementToFront(self.elementID);
    };
 
    this.endHandler = function(event) {
-      if(callback) {
-         callback(self.elementID);
+      if(settings.callback) {
+         settings.callback(self.elementID);
       }
    };
 
@@ -350,10 +346,10 @@ function VertexDragger(id, graph, visualGraph, graphMouse, callback, handleGette
          newX -= (newX % self.snapX);
          newY -= (newY % self.snapY);
       }
-      self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+      settings.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
 
-   if(enabled) {
+   if(settings.enabled) {
       this.setEnabled(true);
    }
    else {
