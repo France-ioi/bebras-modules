@@ -361,6 +361,10 @@ function VertexDragger(settings) {
             self.freeSnapFromVertex(self.elementID);
          }
       }
+      if(settings.dragLimits) {
+         newX = Math.max(settings.dragLimits.minX, Math.min(settings.dragLimits.maxX, newX));
+         newY = Math.max(settings.dragLimits.minY, Math.min(settings.dragLimits.maxY, newY));
+      }
       settings.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
 
@@ -406,6 +410,9 @@ function VertexDragger(settings) {
    }
    else {
       this.enabled = false;
+   }
+   if(settings.snapPositions) {
+      self.updateOccupiedSnap();
    }
 }
 
