@@ -1051,17 +1051,17 @@ var getContext = function(display, infos) {
       };
    };
 
-   context.reset = function(taskInfos) {
-      context.processing.internalInstance = new Processing();
-      context.processing.ops = [];
-      context.processing.options = taskInfos.options || {};
-      if (taskInfos) {
-         context.processing.initialDrawing = taskInfos.initialDrawing || null;
-      }
-      if (context.display) {
-         context.resetDisplay();
-      }
-   };
+    context.reset = function(taskInfos) {
+        context.processing.internalInstance = new Processing();
+        context.processing.ops = [];
+        if (taskInfos) {
+            context.processing.options = taskInfos.options || {};
+            context.processing.initialDrawing = taskInfos.initialDrawing || null;
+        }
+        if (context.display) {
+            context.resetDisplay();
+        }
+    };
 
 
    function initGraphics2D(pg, forceInitialDrawing) {
@@ -1550,6 +1550,7 @@ var getContext = function(display, infos) {
         drawOnBuffer();
         context.processing.buffer.loadPixels();
         var finalPixels = context.processing.buffer.pixels;
+        console.log(finalPixels);
         var result = [true, true];
         for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
             var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
