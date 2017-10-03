@@ -1,9 +1,12 @@
 var getContext = function(display, infos) {
 
-    var initial_canvas_size = {
+    var DEFAULT_CANVAS_SIZE = {
         width: 300,
         height: 300
     }
+
+    var SCALED = true;
+    var BACKGROUND = 255;
 
 
    var localLanguageStrings = {
@@ -988,7 +991,13 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Program",
          hideInitialDrawing: "Hide initial drawing",
-         messages: {}
+         messages: {
+             // google translate :)
+            redCoveredGreenNotCovered: "You covered all the red without touching the green.",
+            redNotCovered: "Cover the entire red part well.",
+            greenCovered: "You hid the red part, but covered some of the green.",
+            redNotCoveredGreenCovered: "You did not hide the red part, and covered some of the green!"
+         }
       },
       none: {
          comment: {}
@@ -1007,8 +1016,11 @@ var getContext = function(display, infos) {
             scale: 1,
             hideInitialDrawing: false,
         },
-        getCanvasSize: function() {
-            var size = context.processing.options['canvas_size'] ? context.processing.options.canvas_size : initial_canvas_size;
+        getCanvasSize: function(scaled) {
+            var size = context.processing.options['canvas_size'] ? context.processing.options.canvas_size : DEFAULT_CANVAS_SIZE;
+            if(!scaled) {
+                return size;
+            }
             return {
                 width: size.width * context.processing.state.scale,
                 height: size.height * context.processing.state.scale
@@ -1065,7 +1077,7 @@ var getContext = function(display, infos) {
 
 
    function initGraphics2D(pg, forceInitialDrawing) {
-      pg.background(255);
+      pg.background(BACKGROUND);
       pg.scale(context.processing.state.scale);
       if (context.processing.initialDrawing && (!context.processing.state.hideInitialDrawing || forceInitialDrawing)) {
          pg.pushStyle();
@@ -1080,8 +1092,8 @@ var getContext = function(display, infos) {
 
 
    function initGraphics3D(pg, forceInitialDrawing) {
-      pg.background(255);
-      pg.translate(pg.width/2, pg.height/2, 0);
+      pg.background(BACKGROUND);
+      pg.translate(Math.round(0.5 * pg.width), Math.round(0.5 * pg.height), 0);
       pg.scale(context.processing.state.scale);
       if (context.processing.initialDrawing && (!context.processing.state.hideInitialDrawing || forceInitialDrawing)) {
          context.processing.initialDrawing(pg);
@@ -1109,8 +1121,8 @@ var getContext = function(display, infos) {
 
     context.setScale = function(scale) {
         context.processing.state.scale = scale;
-        context.canvas_element.width(context.processing.getCanvasSize().width);
-        context.canvas_element.height(context.processing.getCanvasSize().height);
+        context.canvas_element.width(context.processing.getCanvasSize(SCALED).width);
+        context.canvas_element.height(context.processing.getCanvasSize(SCALED).height);
         context.resetDisplay();
     }
 
@@ -1137,15 +1149,14 @@ var getContext = function(display, infos) {
         });
       }
 
-
       context.processing_main = new Processing(canvas.get(0), function(processing) {
          processing.setup = function() {
             processing.size(
-                context.processing.getCanvasSize().width,
-                context.processing.getCanvasSize().height,
+                context.processing.getCanvasSize(SCALED).width,
+                context.processing.getCanvasSize(SCALED).height,
                 infos['processing3D'] ? processing.P3D : processing.P2D
             );
-            processing.background(255);
+            processing.background(BACKGROUND);
             processing.noLoop();
          };
          processing.draw = function() {
@@ -1168,7 +1179,7 @@ var getContext = function(display, infos) {
 
          if(infos['processing3D']) {
             processing.mouseMoved = function() {
-                var cs = context.processing.getCanvasSize();
+                var cs = context.processing.getCanvasSize(SCALED);
                 var x = normalizeCoord(processing.mouseX, Math.round(0.5 * cs.width));
                 var y = normalizeCoord(processing.mouseY, Math.round(0.5 * cs.height));
                 coordinatesContainer.text('(X:' + x + ', ' + 'Y:' + y + ', Z: 0)');
@@ -1550,7 +1561,6 @@ var getContext = function(display, infos) {
         drawOnBuffer();
         context.processing.buffer.loadPixels();
         var finalPixels = context.processing.buffer.pixels;
-        console.log(finalPixels);
         var result = [true, true];
         for (var iPixel = 0; iPixel < initialPixels.getLength() && iPixel < finalPixels.getLength(); iPixel++) {
             var initialPixel = initialPixels.getPixel(iPixel), finalPixel = finalPixels.getPixel(iPixel);
@@ -1564,20 +1574,141 @@ var getContext = function(display, infos) {
     };
 
 
+/*
+    function displayLabeledFigures(labels, max_value) {
+        var div = $('#displayLabeledFigures');
+        if(div.length == 0) {
+            var div = $('<div id="displayLabeledFigures">')
+                .css('position', 'fixed')
+                .css('z-index', 10000)
+                .css('left', '0px')
+                .css('top', '0px')
+            div.append($('<canvas>'));
+            $(document.body).append(div);
+        }
+        var canvas = div.find('canvas');
+        canvas.width(context.processing.getCanvasSize().width);
+        canvas.height(context.processing.getCanvasSize().height);
+        var p = new Processing(canvas[0], function(processing) {
+            processing.setup = function() {
+               processing.size(
+                   context.processing.getCanvasSize().width,
+                   context.processing.getCanvasSize().height,
+                   processing.P2D
+               );
+               processing.background(BACKGROUND);
+               processing.noLoop();
+            };
+        });
+        p.loadPixels();
+        for(var i=0; i<labels.length; i++) {
+            var c = labels[i] ? Math.floor(200 * labels[i] / max_value) : 255;
+            p.pixels.setPixel(i, p.color(c));
+        }
+        p.updatePixels();
+    }
+*/
+
+
+    context.getFiguresCount = function(bg, pixels, width) {
+        var labels = new Array(pixels.getLength());
+        var links = [];
+
+        function getLinkRoot(l) {
+            return links[l] ? getLinkRoot(links[l]) : l;
+        }
+
+        function addLink(ll, lt) {
+            var new_root = getLinkRoot(lt);
+            var old_root = links[ll];
+            if(old_root) {
+                if(new_root == old_root) return;
+                for(var i=0; i<links.length; i++) {
+                    if(links[i] == old_root) {
+                        links[i] = new_root;
+                    }
+                }
+                links[old_root] = new_root;
+            }
+            links[ll] = new_root;
+        }
+
+        var n = 0;
+        var fl,ft;
+        for(var i=0; i<pixels.getLength(); i++) {
+            if(pixels.getPixel(i) === bg) continue;
+            ll = i - 1 >= 0 ? labels[i - 1] : 0;
+            lt = i - width >= 0 ? labels[i - width] : 0;
+            if(ll && lt) {
+                labels[i] = ll;
+                if(ll != lt) {
+                    addLink(ll, lt)
+                }
+            } else if(ll && !lt) {
+                labels[i] = ll;
+            } else if(!ll && lt) {
+                labels[i] = lt;
+            } else {
+                labels[i] = ++n;
+            }
+        }
+        var v;
+        for(var i=0; i<labels.length; i++) {
+            if(v = links[labels[i]]) {
+                labels[i] = v;
+            }
+        }
+//        displayLabeledFigures(labels, n);
+        var count = 0;
+        var is_counted = {};
+        for(var i=0; i<labels.length; i++) {
+            v = labels[i];
+            if(!v || is_counted[v]) continue;
+            is_counted[v] = true;
+            count++;
+        }
+        return count;
+    }
+
+    context.checkFiguresCount = function(bg, target_count) {
+        var buffer = context.processing.internalInstance.createGraphics(
+            context.processing.getCanvasSize().width,
+            context.processing.getCanvasSize().height
+        );
+        buffer.beginDraw();
+        drawOps(buffer);
+        buffer.endDraw();
+        buffer.loadPixels();
+        var figures_count = context.getFiguresCount(
+            bg,
+            buffer.pixels,
+            buffer.width
+        );
+        return target_count == figures_count;
+    }
+
+
     return context;
 }
 
 var processingEndConditions = {
-   checkRedCoveredGreenNotCovered: function(context, lastTurn) {
-      var success = context.checkCoveredColors(
-         context.processing.internalInstance.color(0xFFFF0000), context.processing.internalInstance.color(0xFF00FF00))
-      if (!success[0] && !success[1]) {
-         throw(window.languageStrings.messages.redNotCoveredGreenCovered);
-      } else if (!success[0]) {
-         throw(window.languageStrings.messages.redNotCovered);
-      } else if (!success[1]) {
-         throw(window.languageStrings.messages.greenCovered);
-      }
-      throw(window.languageStrings.messages.redCoveredGreenNotCovered);
-   }
+    checkRedCoveredGreenNotCovered: function(context, lastTurn) {
+        var success = context.checkCoveredColors(
+            context.processing.internalInstance.color(0xFFFF0000), context.processing.internalInstance.color(0xFF00FF00))
+        if (!success[0] && !success[1]) {
+            throw(window.languageStrings.messages.redNotCoveredGreenCovered || '');
+        } else if (!success[0]) {
+            throw(window.languageStrings.messages.redNotCovered || '');
+        } else if (!success[1]) {
+            throw(window.languageStrings.messages.greenCovered || '');
+        }
+        throw(window.languageStrings.messages.redCoveredGreenNotCovered || '');
+    },
+
+    checkAllFiguresConnected: function(context, lastTurn) {
+        if(!context.checkFiguresCount(0x00000000, 1)) {
+            throw('All figures must be connected');
+        }
+        throw('All figures connected');
+    }
 };
