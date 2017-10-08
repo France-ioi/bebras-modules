@@ -262,7 +262,7 @@ VisualGraph.fromJSON = function(visualGraphStr, id, paper, graph, graphDrawer, a
    return new VisualGraph(id, paper, graph, graphDrawer, autoDraw, visualInfo.vertexVisualInfo, visualInfo.edgeVisualInfo);
 };
 
-function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexMover) {
+function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexMover, thickMode, innerLineAttr) {
    this.circleAttr = circleAttr;
    this.lineAttr = lineAttr;
    this.init = function(paper, graph, visualGraph) {
@@ -285,7 +285,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return result;
    };
    this.drawEdge = function(id, vertex1, vertex2, vertex1Info, vertex2Info, vertex1VisualInfo, vertex2VisualInfo, edgeInfo, edgeVisualInfo) {
-      return [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
+      var result = [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
+      if(thickMode) {
+         result.push(this.paper.path(this._getThickEdgePath(vertex1, vertex2)).attr(innerLineAttr));
+      }
+      return result;
    };
    this._getVertexPosition = function(visualInfo) {
       if(visualInfo.x === undefined || visualInfo.x === null) {
@@ -360,10 +364,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
       var newPath = this._getEdgePath(vertex1, vertex2);
+      var newInnerPath;
+      if(thickMode) {
+         newInnerPath = this._getThickEdgePath(vertex1, vertex2);
+      }
       for(var iEdge in edges) {
          var edgeID = edges[iEdge];
          var raphaels = this.visualGraph.getRaphaelsFromID(edgeID);
          raphaels[0].attr("path", newPath);
+         if(thickMode) {
+            raphaels[1].attr("path", newInnerPath);
+         }
       }
    };
    this._getEdgePath = function(vertex1, vertex2) {
@@ -411,6 +422,12 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          return ["M", x2, y2, "L", x1 + w, y1 + h];
       }
    };
+   this._getThickEdgePath = function(vertex1, vertex2) {
+      var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
+      var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
+      var x1 = info1.x, y1 = info1.y, x2 = info2.x, y2 = info2.y;
+      return ["M", x1, y1, "L", x2, y2];
+   };
    this.setCircleAttr = function(circleAttr) {
       this.circleAttr = circleAttr;
    };
@@ -424,7 +441,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       var edges = this.graph.getAllEdges();
       for(var iEdge in edges) {
-         this.visualGraph.getRaphaelsFromID(edges[iEdge])[0].attr(this.lineAttr);
+         var raphaels = this.visualGraph.getRaphaelsFromID(edges[iEdge]);
+         raphaels[0].attr(this.lineAttr);
+         if(thickMode) {
+            raphaels[1].attr(innerLineAttr);
+         }
       }
    };
    this.getDistanceFromVertex = function(id, xPos, yPos) {
