@@ -285,11 +285,13 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return result;
    };
    this.drawEdge = function(id, vertex1, vertex2, vertex1Info, vertex2Info, vertex1VisualInfo, vertex2VisualInfo, edgeInfo, edgeVisualInfo) {
-      var result = [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
       if(thickMode) {
-         result.push(this.paper.path(this._getThickEdgePath(vertex1, vertex2)).attr(innerLineAttr));
+         var path = this._getThickEdgePath(vertex1, vertex2);
+         return [this.paper.path(path).attr(this.lineAttr).toBack(), this.paper.path(path).attr(innerLineAttr)];
       }
-      return result;
+      else {
+         return [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
+      }
    };
    this._getVertexPosition = function(visualInfo) {
       if(visualInfo.x === undefined || visualInfo.x === null) {
@@ -363,17 +365,19 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var edges = this.graph.getEdgesFrom(vertex1, vertex2);
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
-      var newPath = this._getEdgePath(vertex1, vertex2);
-      var newInnerPath;
+      var newPath;
       if(thickMode) {
-         newInnerPath = this._getThickEdgePath(vertex1, vertex2);
+         newPath = this._getThickEdgePath(vertex1, vertex2);
+      }
+      else {
+         newPath = this._getEdgePath(vertex1, vertex2);
       }
       for(var iEdge in edges) {
          var edgeID = edges[iEdge];
          var raphaels = this.visualGraph.getRaphaelsFromID(edgeID);
          raphaels[0].attr("path", newPath);
          if(thickMode) {
-            raphaels[1].attr("path", newInnerPath);
+            raphaels[1].attr("path", newPath);
          }
       }
    };
