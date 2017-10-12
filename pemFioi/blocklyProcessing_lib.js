@@ -1375,9 +1375,30 @@ var getContext = function(display, infos) {
             { name: "curveTightness", params: ['Number'] }
          ],
          shape_3D: [
-            { name: "box", variants: [['Number'], ['Number', 'Number', 'Number']] },
-            { name: "sphere", params: ['Number'] },
-            { name: "sphereDetail", variants: [['Number'], ['Number', 'Number']] }
+            { name: "box",
+                variants: [
+                    ['Number'],
+                    ['Number', 'Number', 'Number']
+                ],
+                variants_names: [
+                    ['size'],
+                    ['width', 'height', 'depth']
+                ],
+            },
+            { name: "sphere",
+                params: ['Number'],
+                params_names: ['radius']
+            },
+            { name: "sphereDetail",
+                variants: [
+                    ['Number'],
+                    ['Number', 'Number']
+                ],
+                variants_names: [
+                    ['res'],
+                    ['ures', 'vres']
+                ]
+            }
          ],
          shape_attributes: [
             { name: "ellipseMode", params: [{ options: ["CENTER", "RADIUS", "CORNER", "CORNERS"] }] },
