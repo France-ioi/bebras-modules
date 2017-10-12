@@ -346,14 +346,18 @@ function LogicController(nbTestCases, maxInstructions) {
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
-          var blockName = blockList[iBlock];
-          var blockDesc = this._mainContext.strings.description[blockName];
-          if (!blockDesc) {
-            var funcName = this._mainContext.strings.code[blockName];
-            if (!funcName) {
-              funcName = blockName;
+          if(this._mainContext.docGenerator) {
+            var blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock])
+          } else {
+            var blockName = blockList[iBlock];
+            var blockDesc = this._mainContext.strings.description[blockName];
+            if (!blockDesc) {
+              var funcName = this._mainContext.strings.code[blockName];
+              if (!funcName) {
+                funcName = blockName;
+              }
+              blockDesc = funcName + '()';
             }
-            blockDesc = funcName + '()';
           }
           pythonHtml += '<li><code>' + blockDesc + '</code></li>';
         }

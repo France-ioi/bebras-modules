@@ -346,24 +346,24 @@ var getContext = function(display, infos) {
          },
          description: {
             // environment
-            popStyle: "depilerStyle() : restaure le style précédant l'empilement correspondant avec empilerStyle()",//dépilerStyle
-            pushStyle: "empilerStyle() : enregistre le style actuel afin qu'il puisse être restauré par depilerStyle()",
-            cursor: "curseurSouris(…) : utilise l'image indiquée ou fournie pour représenter la souris sur le canevas",
+            popStyle: "restaure le style précédant l'empilement correspondant avec empilerStyle()",//dépilerStyle
+            pushStyle: "enregistre le style actuel afin qu'il puisse être restauré par depilerStyle()",
+            cursor: "utilise l'image indiquée ou fournie pour représenter la souris sur le canevas",
             focused: "canevasSelectionne : vrai si le canevas est sélectionné, faux sinon",//canevasSélectionné
             width: "largeur : largeur du canevas",
             height: "hauteur : hauteur du canevas",
             // shape_2D
-            arc: "arc(x, y, largeur, hauteur, début, fin) : dessine l'arc de l'ellipse aux propriétés indiquées, " +
+            arc: "dessine l'arc de l'ellipse aux propriétés indiquées, " +
                "depuis l'angle <var>début</var> jusqu'à l'angle <var>fin</var> (donnés en degrés)",
-            ellipse: "ellipse(x, y, largeur, hauteur) : dessine l'ellipse aux coordonnées indiquées avec la taille indiquée, " +
+            ellipse: "dessine l'ellipse aux coordonnées indiquées avec la taille indiquée, " +
                "dont le fonctionnement peut être changé par la fonction modeEllipses",
-            line: "ligne(…) : dessine la ligne allant du premier point au second point indiqués",
-            point: "point(…) : dessine un point (disque dont le diamètre correspond à l'épaisseur des lignes actuelle) " +
+            line: "dessine la ligne allant du premier point au second point indiqués",
+            point: "dessine un point (disque dont le diamètre correspond à l'épaisseur des lignes actuelle) " +
                "aux coordonnées indiquées",
-            quad: "quad(x1, y1, x2, y2, x3, y3, x4, y4) : dessine un quadrilatère ayant pour sommets les quatre points indiqués",
-            rect: "rect(…) : dessine un rectangle aux coordonnées indiquées avec la taille indiquée, dont le fonctionnement " +
+            quad: "dessine un quadrilatère ayant pour sommets les quatre points indiqués",
+            rect: "dessine un rectangle aux coordonnées indiquées avec la taille indiquée, dont le fonctionnement " +
              "peut être changé par la fonction modeRectangles, et avec les rayons indiqués pour arrondir les coins",
-            triangle: "triangle(x1, y1, x2, y2, x3, y3) : dessine un triangle ayant pour sommets les trois points indiqués",
+            triangle: "dessine un triangle ayant pour sommets les trois points indiqués",
             // shape_curve
             /*bezier: "bezier",
             bezierDetail: "detailBezier",//détailBezier
@@ -383,13 +383,13 @@ var getContext = function(display, infos) {
                "des ellipses sont interprétées — 'CENTER' et 'RADIUS' utilisent les coordonnées comme centre, 'RADIUS' utilise " +
                "la taille comme des rayons, 'CORNER' et 'CORNERS' utilisent les coordonnées comme coin haut-gauche, " +
                "'CORNERS' utilise la taille comme coordonnées du coin bas-droite",
-            noSmooth: "desactiverLissage() : désactive le lissage appliqué aux formes",//désactiverLissage
+            noSmooth: "désactive le lissage appliqué aux formes",//désactiverLissage
             rectMode: "modeRectangles('CORNER' | 'CORNERS' | 'CENTER' | 'RADIUS') : définit la manière dont les propriétés " +
                "des rectangles sont interprétées — voir modeEllipses",
-            smooth: "lissage() : active le lissage appliqué aux formes",
+            smooth: "active le lissage appliqué aux formes",
             strokeCap: "terminaisonsLignes('SQUARE' | 'PROJECT' | 'ROUND') : définit le style de terminaison des lignes",
             strokeJoin: "jointuresLignes('MITER' | 'BEVEL' | 'ROUND') : définit le style de jointure des segments de lignes",
-            strokeWeight: "epaisseurLignes(épaisseur) : définit l'épaisseur des lignes, en pixels",//épaisseurLignes
+            strokeWeight: "définit l'épaisseur des lignes, en pixels",//épaisseurLignes
             // shape_vertex
             /*beginShape: "commencerForme",
             bezierVertex: "sommetBezier",
@@ -407,8 +407,8 @@ var getContext = function(display, infos) {
             enableStyle: "activerStyle",
             getChild: "enfant",*/
             // debug
-            print: "sortirTexte(données) : affiche le texte ou les données indiquées dans la console",
-            println: "sortirLigne(données) : affiche le texte ou les données indiquées dans la console, suivies d'une fin de ligne",
+            print: "affiche le texte ou les données indiquées dans la console",
+            println: "affiche le texte ou les données indiquées dans la console, suivies d'une fin de ligne",
             // transform
             /*applyMatrix: "appliquerMatrice",
             popMatrix: "depilerMatrice",//dépilerMatrice
@@ -453,28 +453,28 @@ var getContext = function(display, infos) {
             shininess: "brillante",
             specular: "speculaire",//spéculaire*/
             // color_setting
-            background: "arrierePlan(…) : remplit le canevas avec la couleur indiquée " +
+            background: "remplit le canevas avec la couleur indiquée " +
                "(doit être utilisé en tout début de programme)",//arrièrePlan
-            colorMode: "modeCouleurs(…) : définit la manière dont les composantes des couleurs sont interprétées ; le premier " +
+            colorMode: "définit la manière dont les composantes des couleurs sont interprétées ; le premier " +
                "paramètre définit le mode ('RGB' pour rouge, vert et bleu ; 'HSB' pour teinte, saturation, luminosité) ; " +
                "les suivants définissent la valeur maximale (255 par défaut)",
-            fill: "couleurFond(…) : définit la couleur de fond utilisée pour le dessin",
-            noFill: "desactiverFond() : utilise un fond transparent pour les prochains dessins",//désactiverFond
-            noStroke: "desactiverLigne() : utilise une ligne transparente pour les prochains dessins",//désactiverLigne
-            stroke: "couleurLigne(…) : définit la couleur de ligne utilisée pour le dessin",
+            fill: "définit la couleur de fond utilisée pour le dessin",
+            noFill: "utilise un fond transparent pour les prochains dessins",//désactiverFond
+            noStroke: "utilise une ligne transparente pour les prochains dessins",//désactiverLigne
+            stroke: "définit la couleur de ligne utilisée pour le dessin",
             // color_creating_reading
-            alpha: "opacite(couleur) : extrait la quantité d'opacité d'une couleur",//opacité
+            alpha: "extrait la quantité d'opacité d'une couleur",//opacité
             //blendColor: "melangerCouleurs",//mélangerCouleurs
-            blue: "bleu(couleur) : extrait la quantité de bleu d'une couleur",
-            brightness: "luminosite(couleur) : extrait la quantité de bleu d'une couleur",//luminosité
-            color: "couleur(…) : crée une couleur avec les valeurs indiquées",
-            green: "vert(couleur) : extrait la quantité de vert d'une couleur",
-            hue: "teinte(couleur) : extrait la quantité de teinte d'une couleur",
-            lerpColor: "couleurIntermediaire(c1, c2, emplacement) : fournit une couleur interpolée entre les deux couleurs " +
+            blue: "extrait la quantité de bleu d'une couleur",
+            brightness: "extrait la quantité de bleu d'une couleur",//luminosité
+            color: "crée une couleur avec les valeurs indiquées",
+            green: "extrait la quantité de vert d'une couleur",
+            hue: "extrait la quantité de teinte d'une couleur",
+            lerpColor: "fournit une couleur interpolée entre les deux couleurs " +
                "indiquées, l'emplacement étant une valeur entre 0 et 1 (0 correspond à la première couleur, 0,1 en est proche, " +
                "0,5 est au milieu des deux…)",//couleurIntermédiaire
-            red: "rouge(couleur) : extrait la quantité de rouge d'une couleur",
-            saturation: "saturation(couleur) : extrait la quantité de saturation d'une couleur",
+            red: "extrait la quantité de rouge d'une couleur",
+            saturation: "extrait la quantité de saturation d'une couleur",
             // image_loading
             /*createImage: "nouvelleImage",
             image: "image",
@@ -510,6 +510,14 @@ var getContext = function(display, infos) {
             // typography_metrics
             textAscent: "ascensionTexte",
             textDescent: "descenteTexte"*/
+            width: 'width',
+            height: 'height',
+            tlradius: 'top left radius',
+            trradius: 'top right radius',
+            brradius: 'bottom right radius',
+            blradius: 'bottom left radius',
+            start: 'start',
+            stop: 'stop'
          },
          values: {
             // environment
@@ -1302,16 +1310,54 @@ var getContext = function(display, infos) {
             { name: "height", yieldsValue: true } // must be a value
          ],
          shape_2D: [
-            { name: "arc", params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'] },
-            { name: "ellipse", params: ['Number', 'Number', 'Number', 'Number'] },
+            { name: "arc",
+                params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'],
+                params_names: ['x', 'y', 'width', 'height', 'start', 'stop']
+            },
+            { name: "ellipse",
+                params: ['Number', 'Number', 'Number', 'Number'],
+                params_names: ['x', 'y', 'width', 'height']
+            },
             { name: "line",
-               variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "point", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] },
-            { name: "quad", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+               variants: [
+                   ['Number', 'Number', 'Number', 'Number'],
+                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+                ],
+                variants_names: [
+                    ['x1', 'y1', 'x2', 'y2'],
+                    ['x1', 'y1', 'z1', 'x2', 'y2', 'z2'],
+                ]
+            },
+            { name: "point",
+                variants: [
+                    ['Number', 'Number'],
+                    ['Number', 'Number', 'Number']
+                ],
+                variants_names: [
+                    ['x', 'y'],
+                    ['x', 'y', 'z']
+                ]
+            },
+            { name: "quad",
+                params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4']
+            },
             { name: "rect",
-               variants: [['Number', 'Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "triangle", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] }
+               variants: [
+                   ['Number', 'Number', 'Number', 'Number'],
+                   ['Number', 'Number', 'Number', 'Number', 'Number'],
+                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                   ['x', 'y', 'width', 'height'],
+                   ['x', 'y', 'width', 'height', 'radius'],
+                   ['x', 'y', 'width', 'height', 'tlradius', 'trradius', 'brradius', 'blradius']
+               ]
+            },
+            { name: "triangle",
+                params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3']
+            }
          ],
          shape_curve: [
             { name: "bezier",
@@ -1576,6 +1622,76 @@ var getContext = function(display, infos) {
       }
    }
 
+
+
+
+    context.docGenerator = {
+
+        variants_cache: null,
+        separators: {
+            argument: ', ',
+            variant: '<br>',
+            description: ': '
+        },
+
+        init: function() {
+            if(this.variants_cache) return;
+            this.variants_cache = {};
+            for(var lib in context.customBlocks) {
+                for(var section in context.customBlocks[lib]) {
+                    var blocks = context.customBlocks[lib][section];
+                    for(var i=0; i<blocks.length; i++) {
+                        var block = blocks[i];
+                        if(block.variants_names) {
+                            this.variants_cache[block.name] = [];
+                            for(var j=0; j<block.variants_names.length; j++) {
+                                this.variants_cache[block.name].push(
+                                    this.formatArguments(block.variants_names[j])
+                                )
+                            }
+                        } else if(block.params_names) {
+                            this.variants_cache[block.name] = [
+                                this.formatArguments(block.params_names)
+                            ];
+                        }
+                    }
+
+                }
+            }
+        },
+
+
+        formatArguments: function(arg_names) {
+            var res = [];
+            for(var i=0; i<arg_names.length; i++) {
+                var arg = arg_names[i];
+                res.push(context.strings.description[arg] || arg);
+            }
+            return res.join(this.separators.argument);
+        },
+
+
+        blockDescription: function(name) {
+            this.init();
+            var description = context.strings.description[name] || '';
+            var separator_description = description == '' ? ' ' : this.separators.description;
+
+            var visible_name = context.strings.code[name] || name;
+            var variants = this.variants_cache[name];
+
+            var res = [];
+            if(variants) {
+                for(var i=0; i<variants.length; i++) {
+                    res.push(visible_name + '(' + variants[i] + ')');
+                }
+                return res.join(this.separators.variant) +
+                    (res.length > 1 ? this.separators.variant : separator_description) +
+                    description;
+            }
+            return visible_name + '()' + separator_description + description
+        }
+
+    }
 
     return context;
 }
