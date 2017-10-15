@@ -29,6 +29,7 @@ function Crane(simulationFactory, userSettings) {
       var yPos = centerY - height / 2;
       var rect = paper.rect(xPos, yPos, width, height);
       var text = paper.text(centerX, centerY, blockID.charAt(0)).attr("font-size", 24);
+      text[0].style.cursor = "default";
       return [rect, text];
    };
 
@@ -406,6 +407,7 @@ function Crane(simulationFactory, userSettings) {
          var xPos = this._columnIndexToLeftX(column) + this.settings.blockWidth / 2;
          var text = this.settings.columnTextFunction(column);
          this.visuals.labels[column] = this.settings.paper.text(xPos, yPos, text).attr(this.settings.labelTextAttr);
+         this.visuals.labels[column][0].style.cursor = "default";
       }
    };
 
