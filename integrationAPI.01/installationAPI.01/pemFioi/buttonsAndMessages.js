@@ -23,6 +23,7 @@ window.displayHelper = {
    taskSelector: '#task',
    hideValidateButton: false,
    hideRestartButton: false,
+   confirmRestartAll: true,
    showScore: false,
    refreshMessages: true,
    stoppedShowingResult: false,
@@ -798,7 +799,12 @@ window.displayHelper = {
     * Internal functions *
     **********************/
    restartAll: function() {
-      this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, this.restartAllNoConfirm, this.strings.no);
+      if(this.confirmRestartAll) {
+         this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, this.restartAllNoConfirm, this.strings.no);
+      }
+      else {
+         this.restartAllNoConfirm();
+      }
    },
 
    restartAllNoConfirm: function() {
