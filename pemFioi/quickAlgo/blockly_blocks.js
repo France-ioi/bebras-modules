@@ -1433,6 +1433,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return null;
       },
 
+
       addBlocksAndCategories: function(blockNames, blocksDefinition, categoriesInfos) {
          var colours = this.getDefaultColours();
          for (var iBlock = 0; iBlock < blockNames.length; iBlock++) {
@@ -1483,8 +1484,42 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
 
+         if('wholeCategories' in this.includeBlocks.generatedBlocks) {
+            for(var blockType in this.includeBlocks.generatedBlocks.wholeCategories) {
+              var categories = this.includeBlocks.generatedBlocks.wholeCategories[blockType];
+              for(var i=0; i<categories.length; i++) {
+                var category = categories[i];
+                if(blockType in this.mainContext.customBlocks && category in this.mainContext.customBlocks[blockType]) {
+                  var contextBlocks = this.mainContext.customBlocks[blockType][category];
+                  var blockNames = [];
+                  for(var i=0; i<contextBlocks.length; i++) {
+                    blockNames.push(contextBlocks[i].name);
+                  }
+                  this.addBlocksAndCategories(
+                    blockNames,
+                    this.mainContext.customBlocks[blockType],
+                    categoriesInfos
+                  );
+                }
+              }
+            }
+         }
+         if('singleBlocks' in this.includeBlocks.generatedBlocks) {
+            for(var blockType in this.includeBlocks.generatedBlocks.singleBlocks) {
+              this.addBlocksAndCategories(
+                this.includeBlocks.generatedBlocks.singleBlocks[blockType],
+                this.mainContext.customBlocks[blockType],
+                categoriesInfos
+              );
+            }
+         }
          for (var blockType in this.includeBlocks.generatedBlocks) {
-            this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
+            if(blockType == 'wholeCategories' || blockType == 'singleBlocks') continue;
+            this.addBlocksAndCategories(
+              this.includeBlocks.generatedBlocks[blockType],
+              this.mainContext.customBlocks[blockType],
+              categoriesInfos
+            );
          }
 
          for (var genName in this.simpleGenerators) {

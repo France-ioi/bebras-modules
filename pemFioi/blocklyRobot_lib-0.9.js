@@ -135,7 +135,7 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "ligneTransportable",
             trans_col: "colonneTransportable"
          },
-         description: { 
+         description: {
                 platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
                 obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
                 onHole: "surTrou() : le robot est-il sur un trou ?",
@@ -465,7 +465,7 @@ var getContext = function(display, infos, curLevel) {
             trans_row: "filaTransportable",
             trans_col: "columnaTransportable"
          },
-         description: { 
+         description: {
                 platformAbove: "plataformaArriba() : ¿hay una plataforma arriba del robot?",
                 obstacleInFront: "obstáculoAdelante() : ¿hay un obstáculo adelante del robot?",
                 onHole: "sobreAgujero() : ¿se encuentra el robot sobre un agujero?",
@@ -694,7 +694,7 @@ var getContext = function(display, infos, curLevel) {
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
    };
-         
+
    context.robot.gridEdgeInFront = function(callback) {
       var coords = getCoordsInFront(0);
       gridEdgeCoord(coords.row, coords.col, callback);
@@ -1033,7 +1033,7 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, item.row + 1);
    };
-   
+
    var findTransportable = function(id) {
       var transportables = context.getItems(undefined, undefined, {isTransportable: true});
       for (var iItem = 1; iItem < transportables.length; iItem++) {
@@ -1238,7 +1238,7 @@ var getContext = function(display, infos, curLevel) {
          callback();
       });
    };
-   
+
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -1317,11 +1317,11 @@ var getContext = function(display, infos, curLevel) {
       [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
-   
+
    context.customBlocks = {
       robot: {
          actions: {
-            blocks: [  
+            blocks: [
                { name: "paint" },
                { name: "paintGrey" },
                { name: "forward" },
@@ -1358,11 +1358,11 @@ var getContext = function(display, infos, curLevel) {
                { name: "transportableRed",   yieldsValue: true },
                { name: "transportableBlue",  yieldsValue: true },
                { name: "transportableSquare", yieldsValue: true },
-               
+
                { name: "greenCell",          yieldsValue: true },
                { name: "brownCell",          yieldsValue: true },
                { name: "markedCell",         yieldsValue: true },
-               
+
                { name: "obstacleInFront",    yieldsValue: true },
                { name: "obstacleRight",      yieldsValue: true },
                { name: "obstacleLeft",       yieldsValue: true },
@@ -1370,7 +1370,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "obstacleWest",       yieldsValue: true },
                { name: "obstacleNorth",      yieldsValue: true },
                { name: "obstacleSouth",      yieldsValue: true },
-               
+
                { name: "paintInFront",       yieldsValue: true },
                { name: "paintOnCell",        yieldsValue: true },
                { name: "paintNorth",         yieldsValue: true },
@@ -1402,7 +1402,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
             ]
          }
-      },      
+      },
       debug: {
          debug: {
              blocks: [{ name: "alert", params: [null], handler: context.debug_alert }]
@@ -1674,7 +1674,7 @@ var getContext = function(display, infos, curLevel) {
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
          var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale); 
+         x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       if (!itemType.img) {
