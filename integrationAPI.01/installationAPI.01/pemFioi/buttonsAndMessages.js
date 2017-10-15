@@ -798,23 +798,23 @@ window.displayHelper = {
     * Internal functions *
     **********************/
    restartAll: function() {
-      var that = this;
-      function confirmRestartAll() {
-         that.stopShowingResult();
-         if (!that.hasLevels) {
-            // TODO is this the desired behavior for no levels?
-            task.reloadAnswer('', function() {});
-         } else {
-            task.getAnswer(function(strAnswer) {
-               var answer = $.parseJSON(strAnswer);
-               var defaultAnswer = task.getDefaultAnswerObject();
-               var level = displayHelper.taskLevel;
-               answer[level] = defaultAnswer[level];
-               task.reloadAnswer(JSON.stringify(answer), function() {});
-            });
-         }
+      this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, this.restartAllNoConfirm, this.strings.no);
+   },
+
+   restartAllNoConfirm: function() {
+      displayHelper.stopShowingResult();
+      if (!displayHelper.hasLevels) {
+         // TODO is this the desired behavior for no levels?
+         task.reloadAnswer('', function() {});
+      } else {
+         task.getAnswer(function(strAnswer) {
+            var answer = $.parseJSON(strAnswer);
+            var defaultAnswer = task.getDefaultAnswerObject();
+            var level = displayHelper.taskLevel;
+            answer[level] = defaultAnswer[level];
+            task.reloadAnswer(JSON.stringify(answer), function() {});
+         });
       }
-      this.showPopupMessage(this.strings.confirmRestart, 'blanket', this.strings.yes, confirmRestartAll, this.strings.no);
    },
 
    validate: function(mode) {
