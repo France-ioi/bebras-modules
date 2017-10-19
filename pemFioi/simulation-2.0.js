@@ -260,16 +260,16 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
             that.stop();
          };
 
+         //console.log("Entry: registering animation for " + that.name);
+         that.actingObject = that.onExec(that.params, duration, onFinish);
          if (that.useTimeout) {
-            //console.log("Entry: registering timeout for " + that.name);
-            that.actingObject = that.onExec(that.params, onFinish);
-
-            if(!expedite) {
+            if(expedite || duration === 0) {
+               onFinish();
+            }
+            else {
+               //console.log("Entry: registering timeout for " + that.name);
                delayFactory.create(_SIMULATION_TIMEOUT_PREFIX + that.name, onFinish, duration);
             }
-         } else {
-            //console.log("Entry: registering animation for " + that.name);
-            that.actingObject = that.onExec(that.params, duration, onFinish);
          }
       };
 
