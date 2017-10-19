@@ -11,7 +11,7 @@ function Simulation(id, delayFactory) {
       step.addEntryAllParents({
          name: "simulation$$$",
          action: {
-            onExec: function(duration, params, callback) {
+            onExec: function(params, duration, callback) {
                that.playing = false;
                that.stepIndex++;
                if (that.autoPlaying) {
