@@ -656,14 +656,17 @@ function FuzzyRemover(id, paperElementID, paper, graph, visualGraph, callback, f
    }
 }
 
-function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, graphMouse, onDragEnd, onVertexSelect, onPairSelect, onEdgeSelect, vertexThreshold, edgeThreshold, dragThreshold, dragLimits, enabled) {
+function VertexDragAndConnect(settings) {
    var self = this;
-   this.id = id;
-   this.graph = graph;
-   this.visualGraph = visualGraph;
+   var id = settings.id;
+   var paper = settings.paper;
+   var graph = settings.graph;
+   var visualGraph = settings.visualGraph;
+   var graphMouse = settings.graphMouse;
+   var dragThreshold = settings.dragThreshold;
    this.enabled = false;
    this.selectionParent = null;
-   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", paperElementID, paper, graph, visualGraph, onFuzzyClick, false, true, true, vertexThreshold, edgeThreshold, enabled);
+   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, visualGraph, onFuzzyClick, false, true, true, settings.vertexThreshold, settings.edgeThreshold, false);
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -682,8 +685,8 @@ function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, gra
 
    function onFuzzyClick(elementType, id) {
       if(elementType === "edge") {
-         if(onEdgeSelect) {
-            onEdgeSelect(id);
+         if(settings.onEdgeSelect) {
+            settings.onEdgeSelect(id);
          }
       }
       else {
@@ -693,15 +696,15 @@ function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, gra
 
    this.startHandler = function(x, y, event) {
       self.elementID = this.data("id");
-      self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
+      self.originalPosition = visualGraph.graphDrawer.getVertexPosition(self.elementID);
       self.isDragging = false;
-      self.visualGraph.elementToFront(self.elementID);
+      visualGraph.elementToFront(self.elementID);
    };
 
    this.endHandler = function(event) {
       if(self.isDragging) {
-         if(onDragEnd) {
-            onDragEnd(self.elementID);
+         if(settings.onDragEnd) {
+            settings.onDragEnd(self.elementID);
          }
          self.isDragging = false;
          return;
@@ -720,19 +723,19 @@ function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, gra
 
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
-      if(dragLimits) {
-         newX = Math.min(dragLimits.maxX, Math.max(newX, dragLimits.minX));
-         newY = Math.min(dragLimits.maxY, Math.max(newY, dragLimits.minY));
+      if(settings.dragLimits) {
+         newX = Math.min(settings.dragLimits.maxX, Math.max(newX, settings.dragLimits.minX));
+         newY = Math.min(settings.dragLimits.maxY, Math.max(newY, settings.dragLimits.minY));
       }
 
-      self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+      visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
 
    this.clickHandler = function(id) {
       // Click on background or on the selected vertex -  deselect it.
       if(id === null || id === self.selectionParent) {
-         if(self.selectionParent !== null && onVertexSelect) {
-            onVertexSelect(self.selectionParent, false);
+         if(self.selectionParent !== null && settings.onVertexSelect) {
+            settings.onVertexSelect(self.selectionParent, false);
          }
          self.selectionParent = null;
          return;
@@ -741,23 +744,23 @@ function VertexDragAndConnect(id, paperElementID, paper, graph, visualGraph, gra
       // Start a new pair.
       if(self.selectionParent === null) {
          self.selectionParent = id;
-         if(onVertexSelect) {
-            onVertexSelect(id, true);
+         if(settings.onVertexSelect) {
+            settings.onVertexSelect(id, true);
          }
          return;
       }
 
       // Finish a new pair.
-      if(onPairSelect) {
-         onPairSelect(self.selectionParent, id);
+      if(settings.onPairSelect) {
+         settings.onPairSelect(self.selectionParent, id);
       }
-      if(onVertexSelect) {
-         onVertexSelect(self.selectionParent, false);
+      if(settings.onVertexSelect) {
+         settings.onVertexSelect(self.selectionParent, false);
       }
       self.selectionParent = null;
    };
 
-   if(enabled) {
+   if(settings.enabled) {
       this.setEnabled(true);
    }
    else {
