@@ -697,14 +697,24 @@ function VertexDragAndConnect(settings) {
    this.startHandler = function(x, y, event) {
       self.elementID = this.data("id");
       self.originalPosition = visualGraph.graphDrawer.getVertexPosition(self.elementID);
+      self.lastGoodPosition = visualGraph.graphDrawer.getVertexPosition(self.elementID);
       self.isDragging = false;
       visualGraph.elementToFront(self.elementID);
    };
 
    this.endHandler = function(event) {
       if(self.isDragging) {
+         var isSnappedToGoodPosition = false;
+
+         if(settings.snapToLastGoodPosition) {
+            var position = visualGraph.graphDrawer.getVertexPosition(self.elementID);
+            if(!settings.isGoodPosition(self.elementID, position)) {
+               visualGraph.graphDrawer.moveVertex(self.elementID, self.lastGoodPosition.x, self.lastGoodPosition.y);
+               isSnappedToGoodPosition = true;
+            }
+         }
          if(settings.onDragEnd) {
-            settings.onDragEnd(self.elementID);
+            settings.onDragEnd(self.elementID, isSnappedToGoodPosition);
          }
          self.isDragging = false;
          return;
@@ -726,6 +736,15 @@ function VertexDragAndConnect(settings) {
       if(settings.dragLimits) {
          newX = Math.min(settings.dragLimits.maxX, Math.max(newX, settings.dragLimits.minX));
          newY = Math.min(settings.dragLimits.maxY, Math.max(newY, settings.dragLimits.minY));
+      }
+      if(settings.snapToLastGoodPosition) {
+         var position = {
+            x: newX,
+            y: newY
+         };
+         if(settings.isGoodPosition(self.elementID, position)) {
+            self.lastGoodPosition = position;
+         }
       }
 
       visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
