@@ -774,7 +774,7 @@ function VertexDragAndConnect(settings) {
          settings.onPairSelect(self.selectionParent, id);
       }
       if(settings.onVertexSelect) {
-         settings.onVertexSelect(self.selectionParent, false);
+         settings.onVertexSelect(self.selectionParent, false, true);
       }
       self.selectionParent = null;
    };
