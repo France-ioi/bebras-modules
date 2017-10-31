@@ -114,7 +114,8 @@ window.displayHelper = {
          scoreWouldStay: "Avec cette réponse, votre score resterait le même :",
          answerNotSavedContestOver: "Le concours étant terminé, votre réponse n'a pas été enregistrée. Vous pouvez {0}.",
          reloadSubmittedAnswer: "recharger la réponse que vous avez soumise",
-         difficultyWarning: "<strong>Attention :</strong> résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets."
+         difficultyWarning: "<strong>Attention :</strong> résoudre cette version prend du temps.<br/>Vous pourrez résoudre bien plus rapidement les versions 2 et 3 étoiles d'autres sujets.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       en: {
          version: "Version",
@@ -182,7 +183,8 @@ window.displayHelper = {
          scoreWouldStay: "With this answer, your score would stay the same:",
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "reload the validated answer",
-         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly."
+         difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       de: {
          version: "Version",
@@ -250,7 +252,8 @@ window.displayHelper = {
          scoreWouldStay: "Mit dieser Antwort bliebe dein Punktestand gleich:",
          answerNotSavedContestOver: "Der Contest ist vorbei, deine Antwort wurde nicht eingereicht. Du kannst {0}.",
          reloadSubmittedAnswer: "Lade die Lösung, die du eingereicht hast",
-         difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen."
+         difficultyWarning: "<strong>Achtung:</strong> diese Version zu lösen kann einige Zeit in Anspruch nehmen.<br/>Die 2- und 3-Stern Version von anderen Aufgaben lassen sich schneller lösen.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       ar: {
          version: "المستوى",
@@ -318,7 +321,8 @@ window.displayHelper = {
          scoreWouldStay: "بهذه الإجابة سوف يظل مجموع نقاطك كما هو",
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "اعد تحميل الإجابة المحققة",
-         difficultyWarning: "تنبيه: حل هذه النسخة سوف يستغرق وقت كثير. الإفضل أن تبدأ في حل مسائل أخرى"
+         difficultyWarning: "تنبيه: حل هذه النسخة سوف يستغرق وقت كثير. الإفضل أن تبدأ في حل مسائل أخرى",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       },
       es: {
          version: "Versión",
@@ -386,7 +390,8 @@ window.displayHelper = {
          scoreWouldStay: "Con esta respuesta, su puntuación será la misma:",
          answerNotSavedContestOver: "El concurso está terminando y su respuesta no ha sido guardada. Usted puede {0}.",
          reloadSubmittedAnswer: "recargar la respuesta que ha enviado",
-         difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas."
+         difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
+         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
       }
    },
    initLanguage: function() {
@@ -409,6 +414,7 @@ window.displayHelper = {
          self.savedAnswer = '';
 
          $("#difficultyWarning").html(self.strings.difficultyWarning).addClass("warningHeader");
+         $("#enemyWarning").html(self.strings.enemyWarning).addClass("warningHeader");
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered">';
          // Place button placements at the end of HTML if they don't already exist
          var placementNames = ['graderMessage', 'validate', 'cancel', 'saved'];
