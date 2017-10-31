@@ -1202,13 +1202,12 @@ var getContext = function(display, infos) {
                 (offset ? Math.round(offset / context.processing.state.scale) : 0);
          }
 
-
-         if(infos['processing3D']) {
+         if (infos['processing3D']) {
             processing.mouseMoved = function() {
                 var cs = context.processing.getCanvasSize(constants.SCALED);
-                var x = normalizeCoord(processing.mouseX, Math.round(0.5 * cs.width));
-                var y = normalizeCoord(processing.mouseY, Math.round(0.5 * cs.height));
-                coordinatesContainer.text('(X:' + x + ', ' + 'Y:' + y + ', Z: 0)');
+                var x = normalizeCoord(processing.mouseX, Math.round(cs.width / 2));
+                var y = normalizeCoord(processing.mouseY, Math.round(cs.height / 2));
+                coordinatesContainer.text("(X: " + x + ", Y: " + y + ", Z: 0)");
             };
          } else {
             processing.mouseMoved = function() {
