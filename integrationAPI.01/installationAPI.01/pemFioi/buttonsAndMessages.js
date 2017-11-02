@@ -680,7 +680,7 @@ window.displayHelper = {
          }
       }
    },
-   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText) {
+   showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -728,8 +728,23 @@ window.displayHelper = {
                 agreeFunc();
             }
          }
-      }
+      };
+
+      var validateFuncNo = function() {
+         $('#popupMessage').hide();
+         $('#displayHelperAnswering, #taskContent').show();
+         displayHelper.popupMessageShown = false;
+         if (disagreeFunc) {
+            if(mode == 'input') {
+                disagreeFunc($('#popupInput').val());
+            } else {
+                disagreeFunc();
+            }
+         }
+      };
+
       $('#popupMessage .buttonYes').click(validateFunc);
+      $('#popupMessage .buttonNo').click(validateFuncNo);
       $('#popupInput').keypress(function (e) {
          if(e.which === 13) { validateFunc(); }
       });
