@@ -1,4 +1,4 @@
-/* 
+/*
  * This file is to be included by beaver contest tasks, it defines a basic
  * implementation of the main functions of the task object, as well as a grader.
  *
@@ -62,6 +62,11 @@ task.reloadState = function(state, success, error) {
 task.getAnswer = function(success, error) {
    success('');
 };
+
+task.reloadAnswerObject = function(answerObj) {}
+task.getAnswerObject = function() {}
+task.getDefaultAnswerObject = function() {}
+
 
 task.load = function(views, success, error) {
   console.error('load');

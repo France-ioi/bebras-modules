@@ -1,7 +1,7 @@
 (function() {
 'use strict';
 
-/* 
+/*
  * Implementation of a small platform for standalone tasks, mostly for
  * development, demo and testing purposes.
  *
@@ -11,6 +11,9 @@
  *     implementation of the integration API
  *   - task.getMetaData(), as documented in the PEM
  */
+
+    // demo platform key
+    var demo_key = 'buddy'
 
 
    var languageStrings = {
@@ -59,14 +62,63 @@
          'gradeAnswer': 'Test grader'
       }
    };
-   
-function inIframe() {
-   try {
-      return window.self !== window.top;
-   } catch (e) {
-      return false;
-   }
-}
+
+
+    function inIframe() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return false;
+        }
+    }
+
+
+
+    if(typeof window.signJWT == 'undefined') {
+        window.signJWT = function(data, key) {
+            return null
+        }
+    }
+
+    function TaskToken(data, key) {
+
+        this.data = data
+        this.data.hints_requested = []
+        this.key = key
+
+        this.addHintRequest = function(hint_params, callback) {
+            var jh = JSON.stringify(hint_params)
+            var exists = this.data.hints_requested.find(function(h) {
+                return JSON.stringify(h) === jh
+            })
+            if(!exists) {
+                this.data.hints_requested.push(hint_params)
+            }
+            this.get(callback)
+        },
+
+        this.get = function(callback) {
+            var res = signJWT(this.data, this.key)
+            // imitate async req
+            setTimeout(function() {
+                callback(res)
+            }, 100)
+        }
+    }
+
+
+    function AnswerToken(key) {
+        this.key = key
+        this.get = function(answer, callback) {
+            var res = signJWT(answer, this.key)
+            // imitate async req
+            setTimeout(function() {
+                callback(res)
+            }, 100)
+        }
+    }
+
+
 
 var taskMetaData;
 
@@ -146,10 +198,10 @@ function getUrlParameter(sParam)
 {
     var sPageURL = window.location.search.substring(1);
     var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) 
+    for (var i = 0; i < sURLVariables.length; i++)
     {
         var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) 
+        if (sParameterName[0] == sParam)
         {
             return decodeURIComponent(sParameterName[1]);
         }
@@ -179,9 +231,11 @@ var chooseView = (function () {
          $(document.body).append(btnGradeAnswer);
          btnGradeAnswer.click(function() {
             task.getAnswer(function(answer) {
-               task.gradeAnswer(answer, null, function(score, message, scoreToken) {
-                  alert("Score : " + score + ", message : " + message);
-               });
+                answer_token.get(answer, function(answer_token) {
+                    task.gradeAnswer(answer, answer_token, function(score, message, scoreToken) {
+                        alert("Score : " + score + ", message : " + message);
+                    });
+                })
             }, function() {
                alert("error");
             });
@@ -237,7 +291,18 @@ var chooseView = (function () {
    };
 })();
 
+
+
+
+
 $(document).ready(function() {
+    window.task_token = new TaskToken({
+        id: json.id,
+        random_seed: Math.floor(Math.random() * 10)
+    }, demo_key)
+    window.answer_token = new AnswerToken(demo_key)
+
+
    var hasPlatform = false;
    try {
        hasPlatform = (inIframe() && (typeof parent.TaskProxyManager !== 'undefined') && (typeof parent.generating == 'undefined' || parent.generating === true));
@@ -278,7 +343,7 @@ $(document).ready(function() {
                } else if (res.options && key in res.options) {
                   res = res.options[key];
                } else {
-                  res = (typeof defaultValue !== 'undefined') ? defaultValue : null; 
+                  res = (typeof defaultValue !== 'undefined') ? defaultValue : null;
                }
             }
             if (success) {
@@ -287,11 +352,19 @@ $(document).ready(function() {
                return res;
             }
          };
-         platform.askHint = function(hintToken, success, error) {
+         platform.askHint = function(hint_params, success, error) {
+            success()
+             /*
             $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
                if (success) {success();}
             }, 'json');
+            */
+            task_token.addHintRequest(hint_params, function(token) {
+                task.updateToken(token)
+            })
          };
+
+
          var loadedViews = {'task': true, 'solution': true, 'hints': true, 'editor': true, 'grader': true, 'metadata': true, 'submission': true};
          var shownViews = {'task': true};
          // TODO: modifs ARTHUR à relire
@@ -305,17 +378,29 @@ $(document).ready(function() {
          if (taskMetaData.fullFeedback) {
             loadedViews.grader = true;
          }
-         
-         task.load(loadedViews, function() {
-            platform.trigger('load', [loadedViews]);
-            task.getViews(function(views) {
-               chooseView.init(views);
-            });
-            task.showViews(shownViews, function() {
-               chooseView.update(shownViews);
-               platform.trigger('showViews', [{"task": true}]);
-            });
-         });
+
+         task.load(
+             loadedViews,
+             function() {
+                platform.trigger('load', [loadedViews]);
+                task.getViews(function(views) {
+                    chooseView.init(views);
+                });
+                task.showViews(shownViews, function() {
+                    chooseView.update(shownViews);
+                    platform.trigger('showViews', [{"task": true}]);
+                });
+             },
+             function(error) {
+                 console.error(error)
+             }
+        );
+
+
+        task_token.get(function(token) {
+            task.updateToken(token)
+        })
+
 
          /* For the 'resize' event listener below, we use a cross-browser
           * compatible version for "addEventListener" (modern) and "attachEvent" (old).
