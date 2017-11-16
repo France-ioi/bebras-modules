@@ -398,7 +398,7 @@ $(document).ready(function() {
 
 
         task_token.get(function(token) {
-            task.updateToken(token)
+            task.updateToken(token, function() {})
         })
 
 
