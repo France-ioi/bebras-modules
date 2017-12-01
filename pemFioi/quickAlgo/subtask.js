@@ -259,6 +259,18 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
       code = subTask.blocklyHelper.getFullCode(code);
+
+      var checkError = '';
+      var checkDisplay = function(err) { checkError = err; }
+      if(!subTask.blocklyHelper.checkCode(code, checkDisplay)) {
+         var results = {
+            message: checkError,
+            successRate: 0,
+            iTestCase: 0
+         };
+         callback(results);
+      }
+
       var codes = [code]; // We only ever send one code to grade
       subTask.iTestCase = 0;
 
