@@ -269,6 +269,7 @@ var initBlocklySubTask = function(subTask, language) {
             iTestCase: 0
          };
          callback(results);
+         return;
       }
 
       var codes = [code]; // We only ever send one code to grade
