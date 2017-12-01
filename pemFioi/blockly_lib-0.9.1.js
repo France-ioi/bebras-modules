@@ -319,7 +319,7 @@ var localLanguageStrings = {
       gradingInProgress: "Ocenjevanje poteka",
       textVariable: "besedilo",
       listVariable: "tabela"
-   },
+   }
 };
 
 // Blockly to Scratch translations

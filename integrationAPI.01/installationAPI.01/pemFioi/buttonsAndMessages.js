@@ -392,7 +392,7 @@ window.displayHelper = {
          reloadSubmittedAnswer: "recargar la respuesta que ha enviado",
          difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
          enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
-      }
+      },
       sl: {
          version: "Stopnja",
          levelVersionName_easy: "enostavna stopnja",
