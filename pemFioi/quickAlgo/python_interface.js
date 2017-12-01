@@ -77,6 +77,38 @@ function LogicController(nbTestCases, maxInstructions) {
     return code;
   }
 
+  this.checkCode = function(code, display) {
+    // Check a code before validation; display is a function which will get
+    // error messages
+    var forbidden = pythonForbidden(code, this.includeBlocks);
+    if(!display) {
+       display = function() {};
+    }
+
+    if(forbidden) {
+      display("Le mot-clé "+forbidden+" est interdit ici !");
+      return false;
+    }
+    if(pythonCount(code) > maxInstructions) {
+      display("Vous utilisez trop d'éléments Python !");
+      return false;
+    }
+    if(pythonCount(code) <= 0) {
+      display("Vous ne pouvez pas valider un programme vide !");
+      return false;
+    }
+    var availableModules = this.getAvailableModules();
+    for(var i=0; i < availableModules.length; i++) {
+      var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
+      match = match.exec(code);
+      if(match === null) {
+        display("Vous devez mettre la ligne <code>from " + availableModules[i] + " import *</code> dans votre programme.");
+        return false;
+      }
+    }
+    return true;
+  }
+
   this.getDefaultContent = function () {
     var availableModules = this.getAvailableModules();
     var content = '';
@@ -107,35 +139,18 @@ function LogicController(nbTestCases, maxInstructions) {
       return undefined;
     }
 
+    // Get code
     this.savePrograms();
-
     var codes = [];
     codes.push(this.programs[0].blockly);
-
     var code = codes[0];
-    var forbidden = pythonForbidden(code, this.includeBlocks);
-    if(forbidden) {
-      $('#errors').html("Le mot-clé "+forbidden+" est interdit ici !");
-      return;
-    }
-    if(pythonCount(code) > maxInstructions) {
-      $('#errors').html("Vous utilisez trop d'éléments Python !");
-      return;
-    }
-    if(pythonCount(code) <= 0) {
-      $('#errors').html("Vous ne pouvez pas valider un programme vide !");
-      return;
-    }
-    var availableModules = this.getAvailableModules();
-    for(var i=0; i < availableModules.length; i++) {
-      var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
-      match = match.exec(code);
-      if(match === null) {
-        $('#errors').html("Vous devez mettre la ligne <code>from " + availableModules[i] + " import *</code> dans votre programme.");
-        return;
-      }
+
+    // Abort if code is not valid
+    if(!this.checkCode(code, function(err) { $('#errors').html(err); })) {
+       return;
     }
 
+    // Initialize runner
     this._mainContext.runner.initCodes(codes);
   };
 
