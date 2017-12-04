@@ -31,7 +31,14 @@ task.updateToken = function(token, success, error) {
 };
 
 task.getHeight = function(success, error) {
-   success(parseInt($("body").outerHeight(true)));
+    var D = document;
+    var h = Math.max(
+        D.body.scrollHeight, D.documentElement.scrollHeight,
+        D.body.offsetHeight, D.documentElement.offsetHeight,
+        D.body.clientHeight, D.documentElement.clientHeight
+    );
+    success(h);
+   //success(parseInt($("body").outerHeight(true)));
 };
 
 task.unload = function(success, error) {
