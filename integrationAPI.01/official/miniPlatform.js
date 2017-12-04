@@ -336,7 +336,7 @@ $(document).ready(function() {
             minScore = 0;
          }
          platform.getTaskParams = function(key, defaultValue, success, error) {
-            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': 0, 'options': taskOptions};
+            var res = {'minScore': minScore, 'maxScore': 40, 'noScore': 0, 'readOnly': false, 'randomSeed': "0", 'options': taskOptions};
             if (key) {
                if (key !== 'options' && key in res) {
                   res = res[key];
