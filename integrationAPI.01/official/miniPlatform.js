@@ -360,7 +360,7 @@ $(document).ready(function() {
             }, 'json');
             */
             task_token.addHintRequest(hint_params, function(token) {
-                task.updateToken(token)
+                task.updateToken(token, function() {})
             })
          };
 
