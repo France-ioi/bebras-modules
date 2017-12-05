@@ -498,6 +498,13 @@ function PythonInterpreter(context, msgCallback) {
   this._onStepError = function (message) {
     this.stop();
 
+    message = '' + message
+
+    // Skulpt doesn't support well NoneTypes
+    if(message.indexOf("TypeError: Cannot read property") > -1 && message.indexOf("undefined") > -1) {
+      message = message.replace(/^.* line/, "TypeError: NoneType value used in operation on line");
+    }
+
     message = "<span class='success'>" + message + "</span>";
 
     this.messageCallback(this.context.messagePrefixFailure + message);
