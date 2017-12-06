@@ -31,12 +31,9 @@ task.updateToken = function(token, success, error) {
 };
 
 task.getHeight = function(success, error) {
-    var D = document;
-    var h = Math.max(
-        D.body.scrollHeight, D.documentElement.scrollHeight,
-        D.body.offsetHeight, D.documentElement.offsetHeight,
-        D.body.clientHeight, D.documentElement.clientHeight
-    );
+    var d = document;
+    var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
+    console.log(h, parseInt($("body").outerHeight(true)))
     success(h);
    //success(parseInt($("body").outerHeight(true)));
 };
