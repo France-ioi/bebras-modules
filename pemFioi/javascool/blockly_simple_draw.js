@@ -121,7 +121,8 @@ var getContext = function(display, infos) {
 
                 context.javascool[block.name] = function() {
                     var callback = arguments[arguments.length - 1]
-                    draw && draw[block.name].apply(this, arguments)
+                    console.log(block.name)
+                    draw && draw[block.name].apply(draw, arguments)
                     callback()
                 }
 
