@@ -124,6 +124,11 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var gridPos = that.paperPosToGridPos(paperPosition);
       event.data.row = gridPos.row;
       event.data.col = gridPos.col;
+
+      if(!that.table[gridPos.row]) {
+         throw "Grid bad cell. Row=" + gridPos.row + " Col=" + gridPos.col;
+      }
+
       event.data.cell = that.table[gridPos.row][gridPos.col];
       that.clickHandler(event);
    };

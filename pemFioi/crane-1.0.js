@@ -428,6 +428,7 @@ function Crane(simulationFactory, userSettings) {
          }
       });
       if(!self.simulation.isPlaying() && self.simulation.canPlay()) {
+         self.simulation.setExpedite(false);
          self.simulation.play();
       }
    };
@@ -518,7 +519,6 @@ function Crane(simulationFactory, userSettings) {
       if(this.simulation.canPlay() && !this.simulation.isPlaying()) {
          this.simulation.play();
       }
-      this.simulation.setExpedite(false);
    };
 
    this.canUndo = function() {

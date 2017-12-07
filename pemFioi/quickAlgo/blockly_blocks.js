@@ -1879,6 +1879,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return this.getBlocklyLibCode(this.generators) + code + "program_end()";
       },
 
+      checkCode: function(code, display) {
+         // TODO :: check a code is okay for validation; for now it's checked
+         // by getCode so this function is not useful in the Blockly/Scratch
+         // version
+         return true;
+      },
+
       checkBlocksAreAllowed: function(xml) {
          var allowed = this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
          var blockList = xml.getElementsByTagName('block');
