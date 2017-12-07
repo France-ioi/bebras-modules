@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="simple_draw.js"></script>
+    </head>
+    <body>
+        <div id="example"></div>
+        <div id="example2"></div>
+        <script type="text/javascript">
+            var sd = new SimpleDraw({
+                parent: document.getElementById('example')
+            })
+            sd.setPoint(0.5, 0.5, 9)
+            sd.setPoint(0.7, 0.7, 9)
+            sd.addString(0.6, 0.5, "coucou", 9)
+            sd.addLine(0.1, 0.1, 0.2, 0.2, 9)
+            sd.addCircle(0, 0, 0.5, 9)
+        </script>
+    </body>
+</html>
