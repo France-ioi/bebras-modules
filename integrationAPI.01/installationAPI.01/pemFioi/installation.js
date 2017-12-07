@@ -23,7 +23,8 @@ window.implementGetResources = function(task) {
       res.task_modules = [];
       res.solution_modules = [];
       res.grader_modules = [];
-      if (!'hints' in res) {
+      if (!res.hints) {
+         res.hints = [];
          $('.hint').each(function(index) {
             res.hints[res.hints.length] = [{type: 'html', content: $(this).html() }];
             $(this).attr('hint-Num', res.hints.length-1);

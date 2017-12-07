@@ -296,13 +296,6 @@ var chooseView = (function () {
 
 
 $(document).ready(function() {
-    window.task_token = new TaskToken({
-        id: json.id,
-        random_seed: Math.floor(Math.random() * 10)
-    }, demo_key)
-    window.answer_token = new AnswerToken(demo_key)
-
-
    var hasPlatform = false;
    try {
        hasPlatform = (inIframe() && (typeof parent.TaskProxyManager !== 'undefined') && (typeof parent.generating == 'undefined' || parent.generating === true));
@@ -314,6 +307,12 @@ $(document).ready(function() {
    }
    if (!hasPlatform) {
       var platformLoad = function(task) {
+         window.task_token = new TaskToken({
+            id: taskMetaData.id,
+            random_seed: Math.floor(Math.random() * 10)
+         }, demo_key)
+         window.answer_token = new AnswerToken(demo_key)
+
          platform.validate = miniPlatformValidate;
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
