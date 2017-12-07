@@ -81,7 +81,7 @@ function SimpleDraw(options) {
     }
 
     function color(idx) {
-        var c = options.palette[idx] ? options.palette[idx] : options.paletts[0]
+        var c = options.palette[idx] ? options.palette[idx] : options.palette[0]
         context.fillStyle = c
         context.strokeStyle = c
     }
