@@ -1,6 +1,5 @@
 var getContext = function(display, infos) {
 
-
     var simple_draw_strings = {
         fr: {
             categories: {
@@ -45,8 +44,9 @@ var getContext = function(display, infos) {
     var draw;
 
     context.reset = function(taskInfos) {
+        if(!context.display) return
         draw && draw.destroy()
-        $('#grid').empty()
+        //$('#grid').empty()
         draw = new SimpleDraw({
             parent: $('#grid')[0]
         })
@@ -121,7 +121,7 @@ var getContext = function(display, infos) {
 
                 context.javascool[block.name] = function() {
                     var callback = arguments[arguments.length - 1]
-                    draw[block.name].apply(this, arguments)
+                    draw && draw[block.name].apply(this, arguments)
                     callback()
                 }
 
