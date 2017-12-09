@@ -708,6 +708,9 @@ var getContext = function(display, infos, curLevel) {
 			checkEndCondition: robotEndConditions.checkContainersFilled
 		}
 	};
+
+   var iconSrc = $("img[src$='icon.png']").attr("src");
+   var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
 	
 	if(infos.newBlocks == undefined)
 		infos.newBlocks = [];
@@ -1288,7 +1291,7 @@ var getContext = function(display, infos, curLevel) {
 		var y = (infos.cellSide * item.row + infos.topMargin) * scale;
 		var itemType = infos.itemTypes[item.type];
 		if(itemType.img) {
-			item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+			item.element = paper.image(imgPrefix + itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
 		}
 		else if(item.value !== undefined) {
 			item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
