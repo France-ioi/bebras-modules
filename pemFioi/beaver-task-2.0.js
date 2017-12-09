@@ -306,7 +306,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
-            mainTask = createTask(true);
+            mainTask = createTask(false);
             mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
