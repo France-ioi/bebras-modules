@@ -26,6 +26,7 @@ var getContext = function(display, infos, curLevel) {
 					right: "tourner à droite",
 					turnAround: "faire demi-tour",
 					forward: "avancer",
+					backwards: "reculer",
 					jump: "sauter",
 					obstacleInFront: "obstacle devant",
 					obstacleEast: "obstacle à droite",
@@ -57,6 +58,7 @@ var getContext = function(display, infos, curLevel) {
 					right: "tournerDroite",
 					turnAround: "demiTour",
 					forward: "avancer",
+					backwards: "reculer",
 					jump: "sauter",
 					obstacleInFront: "obstacleDevant",
 					obstacleEast: "obstacleDroite",
@@ -833,6 +835,15 @@ var getContext = function(display, infos, curLevel) {
 		block: { name: "forward" },
 		func: function(callback) {
 			this.forward(callback);
+		}
+	});
+	
+	infos.newBlocks.push({
+		name: "backwards",
+		type: "actions",
+		block: { name: "backwards" },
+		func: function(callback) {
+			this.backwards(callback);
 		}
 	});
 	
@@ -1649,7 +1660,7 @@ var getContext = function(display, infos, curLevel) {
 	};
 	
 	context.forward = function(callback) {
-		var item = context.getRobot();
+		var robot = context.getRobot();
 		var coords = context.coordsInFront();
 		if(!context.tryToBeOn(coords.row, coords.col)) {
 			context.waitDelay(callback);
@@ -1659,7 +1670,22 @@ var getContext = function(display, infos, curLevel) {
 		}
 		else {
 			context.nbMoves++;
-			context.moveRobot(coords.row, coords.col, item.dir, callback);
+			context.moveRobot(coords.row, coords.col, robot.dir, callback);
+		}
+	};
+	
+	context.backwards = function(callback) {
+		var robot = context.getRobot();
+		var coords = context.coordsInFront(2);
+		if(!context.tryToBeOn(coords.row, coords.col)) {
+			context.waitDelay(callback);
+		}
+		if(infos.hasGravity) {
+			context.fall(item, coords.row, coords.col, callback);
+		}
+		else {
+			context.nbMoves++;
+			context.moveRobot(coords.row, coords.col, robot.dir, callback);
 		}
 	};
 	
