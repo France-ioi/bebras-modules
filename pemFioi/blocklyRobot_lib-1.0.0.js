@@ -682,7 +682,7 @@ var getContext = function(display, infos, curLevel) {
 			backgroundColor: "#ffbf5e",
 			itemTypes: {
 				red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
-				cell: { num: 2, color: "#ffbf5e", side: 60 },
+				cell: { num: 2, color: "#ffbf5e", side: 60, zOrder: -1 },
 				marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
 				paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
 				number: { side: 60, zOrder: 1 }
@@ -692,8 +692,8 @@ var getContext = function(display, infos, curLevel) {
 		rocket: {
 			itemTypes: {
 				green_robot: { img: "green_robot.png", side: 50, nbStates: 9, isRobot: true, offsetX: 3, zOrder: 2 },
-				cell: { num: 2, img: "cell.png", side: 60},
-				stars: { num: 3, img: "stars.png", side: 60},
+				cell: { num: 2, img: "cell.png", side: 60, zOrder: -1},
+				stars: { num: 3, img: "stars.png", side: 60, zOrder: -1},
 				obstacle: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 0 },
 				rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 0 }			
 			},
@@ -710,7 +710,6 @@ var getContext = function(display, infos, curLevel) {
 			checkEndCondition: robotEndConditions.checkContainersFilled
 		}
 	};
-
    var iconSrc = $("img[src$='icon.png']").attr("src");
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
 	
@@ -1480,6 +1479,7 @@ var getContext = function(display, infos, curLevel) {
 	context.moveRobot = function(newRow, newCol, newDir, callback) {
 		var iRobot = context.getRobotId();
 		var item = context.items[iRobot];
+		item.element.toFront();
 		var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
 		
 		if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
