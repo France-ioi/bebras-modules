@@ -26,6 +26,7 @@ var getContext = function(display, infos, curLevel) {
 					right: "tourner à droite",
 					turnAround: "faire demi-tour",
 					forward: "avancer",
+					backwards: "reculer",
 					jump: "sauter",
 					obstacleInFront: "obstacle devant",
 					obstacleEast: "obstacle à droite",
@@ -57,7 +58,8 @@ var getContext = function(display, infos, curLevel) {
 					right: "tournerDroite",
 					turnAround: "demiTour",
 					forward: "avancer",
-					jump: "sauter",
+					backwards: "reculer",
+               jump: "sauter",
 					obstacleInFront: "obstacleDevant",
 					obstacleEast: "obstacleDroite",
 					obstacleWest: "obstacleGauche",
@@ -708,6 +710,8 @@ var getContext = function(display, infos, curLevel) {
 			checkEndCondition: robotEndConditions.checkContainersFilled
 		}
 	};
+   var iconSrc = $("img[src$='icon.png']").attr("src");
+   var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
 	
 	if(infos.newBlocks == undefined)
 		infos.newBlocks = [];
@@ -830,6 +834,15 @@ var getContext = function(display, infos, curLevel) {
 		block: { name: "forward" },
 		func: function(callback) {
 			this.forward(callback);
+		}
+	});
+	
+	infos.newBlocks.push({
+		name: "backwards",
+		type: "actions",
+		block: { name: "backwards" },
+		func: function(callback) {
+			this.backwards(callback);
 		}
 	});
 	
@@ -1288,7 +1301,7 @@ var getContext = function(display, infos, curLevel) {
 		var y = (infos.cellSide * item.row + infos.topMargin) * scale;
 		var itemType = infos.itemTypes[item.type];
 		if(itemType.img) {
-			item.element = paper.image(itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+			item.element = paper.image(imgPrefix + itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
 		}
 		else if(item.value !== undefined) {
 			item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
@@ -1648,7 +1661,7 @@ var getContext = function(display, infos, curLevel) {
 	};
 	
 	context.forward = function(callback) {
-		var item = context.getRobot();
+		var robot = context.getRobot();
 		var coords = context.coordsInFront();
 		if(!context.tryToBeOn(coords.row, coords.col)) {
 			context.waitDelay(callback);
@@ -1658,11 +1671,26 @@ var getContext = function(display, infos, curLevel) {
 		}
 		else {
 			context.nbMoves++;
-			context.moveRobot(coords.row, coords.col, item.dir, callback);
+			context.moveRobot(coords.row, coords.col, robot.dir, callback);
 		}
 	};
 	
-	context.north = function(callback) {
+	context.backwards = function(callback) {
+		var robot = context.getRobot();
+		var coords = context.coordsInFront(2);
+		if(!context.tryToBeOn(coords.row, coords.col)) {
+			context.waitDelay(callback);
+		}
+		if(infos.hasGravity) {
+			context.fall(item, coords.row, coords.col, callback);
+		}
+		else {
+			context.nbMoves++;
+			context.moveRobot(coords.row, coords.col, robot.dir, callback);
+		}
+	};
+	
+   context.north = function(callback) {
 		var item = context.getRobot();
 		if(!context.tryToBeOn(item.row - 1, item.col)) {
 			context.waitDelay(callback);
