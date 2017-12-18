@@ -63,6 +63,25 @@
       }
    };
 
+   /*
+   * Create custom elements for platformless implementation
+   * Use URL hash #platform=PLATFORMNAME to display platformlike elements
+   */
+   var miniPlatformWrapping = {
+      castor: {
+         'header' : '\
+            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
+               <table style="width:770px;margin: 10px auto;">\
+                  <td><img src="../../modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><span style="font-size:32px;">Concours castor</span></td>\
+                  <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
+               </table>\
+            </div>'
+      }
+   };
+   var platformName = getHashParameter('platform');
+
+
 
     function inIframe() {
         try {
@@ -208,6 +227,20 @@ function getUrlParameter(sParam)
     }
 }
 
+function getHashParameter(sParam)
+{
+    var sPageURL = window.location.hash.substring(1);
+    var sURLVariables = sPageURL.split('&');
+    for (var i = 0; i < sURLVariables.length; i++)
+    {
+        var sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] == sParam)
+        {
+            return decodeURIComponent(sParameterName[1]);
+        }
+    }
+}
+
 var chooseView = (function () {
    // Manages the buttons to choose the view
    return {
@@ -306,6 +339,11 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
+      if (platformName && miniPlatformWrapping[platformName]) {
+         if (miniPlatformWrapping[platformName].header) {
+            $('body').prepend(miniPlatformWrapping[platformName].header);
+         }
+      }
       var platformLoad = function(task) {
          window.task_token = new TaskToken({
             id: taskMetaData.id,
