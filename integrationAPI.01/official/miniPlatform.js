@@ -151,10 +151,11 @@ var taskMetaData;
 var compiledTask = true;
 
 window.miniPlatformShowSolution = function() {
-   $("#toremove").hide();
+   $("#showSolutionButton").hide();
    task.getAnswer(function(answer) {
       task.showViews({"task": true, "solution": true}, function() {
-         miniPlatformPreviewGrade(answer);
+         // For tasks with no feedback / older tasks
+         // miniPlatformPreviewGrade(answer);
          platform.trigger('showViews', [{"task": true, "solution": true}]);
       });
    });
@@ -207,11 +208,8 @@ var miniPlatformValidate = function(mode, success, error) {
          alreadyStayed = true;
       }
    }
-   $("#toremove").remove();
    if (mode == 'cancel') {
       alreadyStayed = false;
-   } else {
-      $("#task").append("<center id='toremove'><br/><input type='button' value='" + languageStrings[window.stringsLanguage].showSolution + "' onclick='miniPlatformShowSolution()'></input></center>");
    }
    platform.trigger('validate', [mode]);
    if (success) {
@@ -258,6 +256,8 @@ var chooseView = (function () {
          if (! $("#choose-view").length)
             $(document.body).append('<div id="choose-view" style="margin-top:6em"></div>');
          $("#choose-view").html("");
+         // Display buttons to select task view or solution view
+         /*
          for(var viewName in views) {
             if (!views[viewName].requires) {
                var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>')
@@ -265,9 +265,13 @@ var chooseView = (function () {
                btn.click(this.selectFactory(viewName));
             }
          }
+         */
          $("#grade").remove();
          var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + languageStrings[window.stringsLanguage].gradeAnswer + '</button></center>');
-         $(document.body).append(btnGradeAnswer);
+         // display grader button only if dev mode by adding URL hash 'dev'
+         if (getHashParameter('dev')) {
+            $(document.body).append(btnGradeAnswer);
+         }
          btnGradeAnswer.click(function() {
             task.getAnswer(function(answer) {
                 answer_token.get(answer, function(answer_token) {
@@ -428,6 +432,8 @@ $(document).ready(function() {
                     chooseView.update(shownViews);
                     platform.trigger('showViews', [{"task": true}]);
                 });
+                $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
                 if (miniPlatformWrapping[displayHelper.avatarType].header) {
