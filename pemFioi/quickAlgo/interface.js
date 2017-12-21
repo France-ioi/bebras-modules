@@ -192,6 +192,8 @@ var quickAlgoInterface = {
 
    updateTestSelector: function (newCurTest) {
       $("#testSelector .panel-body").hide();
+      $("#testSelector .panel").removeClass('currentTest');
+      $("#testPanel"+newCurTest).addClass('currentTest');
       $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
    },
 
