@@ -391,10 +391,33 @@ input[type=button] {
 .panel-body:after {
   clear: both;
 }
+#testSelector .panel.currentTest {
+  border-color: #2991d6;
+}
 #testSelector .panel-heading {
-  border: 1px solid transparent;
+  border: 1px solid #8bc4e9;
+  background-color: #ddedf8;
+  position: relative;
 }
 #testSelector .panel-heading:hover {
   cursor: pointer;
   border: 1px solid #000000;
+}
+#testSelector .panel-heading::after {
+  content: "\25bc";
+  position: absolute;
+  right: 10px;
+  top: 3px;
+}
+#testSelector .currentTest .panel-heading {
+  background-color: #a1cfed;
+  border-color: transparent;
+  color: #333;
+}
+#testSelector .currentTest .panel-heading:hover {
+  cursor: default;
+  border-color: transparent;
+}
+#testSelector .currentTest .panel-heading::after {
+  content: normal;
 }
