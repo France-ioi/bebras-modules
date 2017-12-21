@@ -432,7 +432,9 @@ $(document).ready(function() {
                     chooseView.update(shownViews);
                     platform.trigger('showViews', [{"task": true}]);
                 });
-                $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                if ($("#solution").length) {
+                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                }
 
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
