@@ -53,13 +53,12 @@ var initBlocklySubTask = function(subTask, language) {
 
       if (this.display) {
         window.quickAlgoInterface.loadInterface(this.context);
-        if (subTask.levelGridInfos.hideSaveOrLoad) {
-           $("#saveOrLoadBtn").hide();
-        }
-        if (subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language]) {
-           $("#loadExampleBtn").show();
-        }
-     }
+        window.quickAlgoInterface.setOptions({
+           hideSaveOrLoad: subTask.levelGridInfos.hideSaveOrLoad,
+           hasExample: subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language],
+           conceptViewer: subTask.levelGridInfos.conceptViewer
+           });
+      }
 
       this.blocklyHelper.loadContext(this.context);
 
@@ -67,7 +66,8 @@ var initBlocklySubTask = function(subTask, language) {
       displayHelper.hideValidateButton = true;
       displayHelper.timeoutMinutes = 30;
 
-      this.blocklyHelper.setIncludeBlocks(extractLevelSpecific(this.context.infos.includeBlocks, curLevel));
+      var curIncludeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);
+      this.blocklyHelper.setIncludeBlocks(curIncludeBlocks);
 
       var blocklyOptions = {
          readOnly: !!subTask.taskParams.readOnly
@@ -77,6 +77,16 @@ var initBlocklySubTask = function(subTask, language) {
 
       if(this.display) {
          window.quickAlgoInterface.initTestSelector(this.nbTestCases);
+
+         // TODO :: testConcepts is temporary-ish
+         if(subTask.levelGridInfos.conceptViewer) {
+            var concepts = window.getConceptsFromBlocks(curIncludeBlocks, testConcepts);
+            if(subTask.levelGridInfos.conceptViewer.length) {
+               concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
+            }
+            concepts = window.conceptsFill(concepts, testConcepts);
+            window.conceptViewer.loadConcepts(concepts);
+         }
       }
 
       subTask.changeTest(0);
