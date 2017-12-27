@@ -8,6 +8,7 @@ var quickAlgoInterface = {
    nbTestCases: 0,
 
    loadInterface: function(context) {
+      // Load quickAlgo interface into the DOM
       this.context = context;
       this.strings = window.languageStrings;
 
@@ -28,6 +29,9 @@ var quickAlgoInterface = {
 
       // Upper right load buttons
       $("#editorButtons").html(
+         "<button type='button' id='displayHelpBtn' class='btn btn-xs btn-default' style='display: none;' onclick='conceptViewer.show()'>" +
+         "?" +
+         "</button>&nbsp;" +
          "<button type='button' id='loadExampleBtn' class='btn btn-xs btn-default' style='display: none;' onclick='task.displayedSubTask.loadExample()'>" +
          this.strings.loadExample +
          "</button>&nbsp;" +
@@ -80,16 +84,35 @@ var quickAlgoInterface = {
       $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
 
+   setOptions: function(opt) {
+      // Load options from the task
+      if(opt.hideSaveOrLoad) {
+         $('#saveOrLoadBtn').hide();
+      } else {
+         $('#saveOrLoadBtn').show();
+      }
+      if(opt.hasExample) {
+         $('#loadExampleBtn').show();
+      } else {
+         $('#loadExampleBtn').hide();
+      }
+      if(opt.conceptViewer) {
+         $('#displayHelpBtn').show();
+      } else {
+         $('#displayHelpBtn').hide();
+      }
+   },
 
-    onScaleDrawingChange: function(e) {
-        var scaled = $(e.target).prop('checked');
-        $("#gridContainer").toggleClass('gridContainerScaled', scaled);
-        $("#blocklyLibContent").toggleClass('blocklyLibContentScaled', scaled);
-        this.context.setScale(scaled ? 2 : 1);
-    },
+   onScaleDrawingChange: function(e) {
+      var scaled = $(e.target).prop('checked');
+      $("#gridContainer").toggleClass('gridContainerScaled', scaled);
+      $("#blocklyLibContent").toggleClass('blocklyLibContentScaled', scaled);
+      this.context.setScale(scaled ? 2 : 1);
+   },
 
 
    initTestSelector: function (nbTestCases) {
+      // Create the DOM for the tests display (typically on the left side)
       this.nbTestCases = nbTestCases;
 
       var buttons = [

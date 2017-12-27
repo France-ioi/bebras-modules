@@ -27,6 +27,7 @@ var importableModules = function () {
 
       'conceptDisplay-1.0': {src: modulesPath+"/pemFioi/conceptDisplay-1.0.js", id: "concept_display"},
       'conceptViewer-1.0': {src: modulesPath+"/pemFioi/conceptViewer-1.0.js", id: "concept_viewer"},
+      'conceptViewer_css-1.0': {type: "stylesheet", src: modulesPath+"/pemFioi/conceptViewer-1.0.css", id: "concept_viewer_css"},
 
       'blockly': {src: modulesPath+"/ext/blockly/blockly_compressed.js", id: "blockly"},
       'blockly_blocks': {src: modulesPath+"/ext/blockly/blocks_compressed.js", id: "blockly_blocks"},
