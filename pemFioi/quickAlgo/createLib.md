@@ -1,15 +1,3 @@
-- comment faire tourner ça en local
-- créer la base de sa lib: copier l'exemple et changer x et y
-- créer un exo qui utilise sa lib
-- ajouter un premier bloc basique et l'utiliser dans son sujet
-- comment gérer son propre affichage. exemples de raphael et processing
-- gérer la validation (faire attention au mode display)
-- types de paramètres, valeurs de retours
-- blocs avec valeurs par défaut
-- blocs avec plusieurs nombres de paramètres possibles
-- comment faire des blocs custom (voir la doc de blockly ?)
-- gestion des chaînes / traductions
-
 # Manual: create a new quickAlgo library
 
 ## Setup the Bebras environment
@@ -57,19 +45,24 @@ In the file, you’ll see the following sections:
 * block definitions (`context.customBlocks`);
 * Python constant definitions (`context.customContants`).
 
+Many comments (after `//` or within `/*` and `*/`) provide information about each element.
+You might preferably remove them to finalize your library.
+
+Firstly, you should change every occurrence of the word `example` to the codename of your library.
+
 …
 
 ## Create an exercise for testing
 
 …
 
-## Create your first block
+## Experiment with your first block
 
 …
 
 ## Manage the display
 
-…
+… (use Raphael and Processing as examples)
 
 ## Check end conditions
 
@@ -84,6 +77,10 @@ In the file, you’ll see the following sections:
 ### Default values
 
 …
+
+### Custom blocks
+
+… (link to Blockly doc)
 
 ## Texts and translations
 

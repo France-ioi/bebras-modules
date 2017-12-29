@@ -123,7 +123,7 @@ var getContext = function(display, infos, curLevel) {
       {
          group: [{
             name: "someName",
-            category: "categoryName",
+            // category: "categoryName",
             // yieldsValue: optional true: Makes a block with return value rather than simple command
             // params: optional array of parameter types. The value 'null' denotes /any/ type. For specific types, see the Blockly documentation ([1,2])
             // handler: optional handler function. Otherwise the function context.group.blockName will be used
