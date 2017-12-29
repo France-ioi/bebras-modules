@@ -139,7 +139,7 @@ var getContext = function(display, infos, curLevel) {
       }
       [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
-    */
+   */
 
    context.customBlocks = {
       // Define our blocks for our namespace "example"

@@ -1,16 +1,14 @@
 var getContext = function(display, infos) {
 
-    var constants = {
-        DEFAULT_CANVAS_SIZE: {
-            width: 300, //px
-            height: 300 //px
-        },
-        SCALED: 1,
-        BACKGROUND: 0xFFFFFFFF,
-        SKIP_DRAW_OPS: 1
-    }
-
-
+   var constants = {
+      DEFAULT_CANVAS_SIZE: {
+         width: 300, //px
+         height: 300 //px
+      },
+      SCALED: 1,
+      BACKGROUND: 0xFFFFFFFF,
+      SKIP_DRAW_OPS: 1
+   };
 
    var localLanguageStrings = {
       fr: {
@@ -346,8 +344,8 @@ var getContext = function(display, infos) {
          },
          description: {
             // environment
-            popStyle: "restaure le style précédant l'empilement correspondant avec empilerStyle()",//dépilerStyle
-            pushStyle: "enregistre le style actuel afin qu'il puisse être restauré par depilerStyle()",
+            popStyle: "restaure le style précédant l'empilement correspondant avec empilerStyle()",
+            pushStyle: "enregistre le style actuel afin qu'il puisse être restauré par depilerStyle()",//dépilerStyle
             cursor: "utilise l'image indiquée ou fournie pour représenter la souris sur le canevas",
             focused: "canevasSelectionne : vrai si le canevas est sélectionné, faux sinon",//canevasSélectionné
             width: "largeur : largeur du canevas",
@@ -519,7 +517,7 @@ var getContext = function(display, infos) {
             start: 'start',
             stop: 'stop'
          },
-         values: {
+         constantLabel: {
             // environment
             ARROW: "Flèche",
             CROSS: "Croix",
@@ -585,9 +583,77 @@ var getContext = function(display, infos) {
             TOP: "Haut",
             BOTTOM: "Bas",
             BASELINE: "Ligne de base",
-            MODEL: "Modèle",
-            SCREEN: "Écran",
-            SHAPE: "Forme"
+            MODEL: "modèle",
+            SHAPE: "forme"
+         },
+         constant: {
+            // environment
+            ARROW: "FLECHE",//FLÈCHE
+            CROSS: "CROIX",
+            HAND: "MAIN",
+            MOVE: "DEPLACEMENT",//DÉPLACEMENT
+            TEXT: "TEXTE",
+            WAIT: "ATTENTE",
+            // shape
+            CENTER: "CENTRE",
+            RADIUS: "RAYON",
+            CORNER: "COIN",
+            CORNERS: "COINS",
+            SQUARE: "CARREES",//CARRÉES
+            PROJECT: "PROJETEES",//PROJETÉES
+            ROUND: "ARRONDIES",
+            MITER: "EN_ONGLET",
+            BEVEL: "BISEAUTEES",//BISEAUTÉES
+            POINTS: "POINTS",
+            LINES: "LIGNES",
+            TRIANGLES: "TRIANGLES",
+            TRIANGLE_FAN: "TRIANGLES_EN_EVENTAIL",//TRIANGLES_EN_ÉVANTAIL
+            TRIANGLE_STRIP: "TRIANGLES_EN_BANDE",
+            QUADS: "QUADRILATERES",//QUADRILATÈRES
+            QUAD_STRIP: "QUADRILATÈRES_EN_BANDE",//QUADRILATÈRES_EN_BANDE
+            IMAGE: "IMAGE",
+            NORMALIZED: "NORMALISE",//NORMALISÉ
+            CLOSE: "FERMEE",//FERMÉE
+            // color
+            RGB: "RVB",
+            HSB: "TSL",
+            BLEND: "FUSION",
+            ADD: "ADDITION",
+            SUBTRACT: "SOUSTRACTION",
+            DARKEST: "PLUS_SOMBRE",
+            LIGHTEST: "PLUS_LUMINEUX",
+            DIFFERENCE: "DIFFERENCE",//DIFFÉRENCE
+            EXCLUSION: "EXCLUSION",
+            MULTIPLY: "MULTIPLICATION",
+            SCREEN: "ECRAN",//ÉCRAN
+            OVERLAY: "RECOUVREMENT",
+            HARD_LIGHT: "LUMIERE_DURE",//LUMIÈRE_DURE
+            SOFT_LIGHT: "LUMIERE_DOUCE",//LUMIÈRE_DOUCE
+            DODGE: "ASSOMBRISSEMENT",
+            BURN: "ECLAIRCISSEMENT",//ÉCLAIRCISSEMENT
+            // image
+            ARGB: "ARVB",
+            ALPHA: "ALPHA",
+            THRESHOLD: "SEUILLER",
+            GRAY: "DESATURER",//DÉSATURER
+            INVERT: "INVERSER",
+            POSTERIZE: "POSTERISER",//POSTÉRISER
+            BLUR: "FLOUTER",
+            OPAQUE: "RENDRE_OPAQUE",
+            ERODE: "ERODER",//ÉRODER
+            DILATE: "DILATER",
+            // rendering
+            P2D: "P2D",
+            P3D: "P3D",
+            JAVA2D: "JAVA2D",
+            // typography
+            LEFT: "GAUCHE",
+            RIGHT: "DROITE",
+            TOP: "HAUT",
+            BOTTOM: "BAS",
+            BASELINE: "LIGNE_DE_BASE",
+            MODEL: "MODELE",//MODÈLE
+            SHAPE: "FORME"
          },
          startingBlockName: "Programme",
          hideInitialDrawing: "Cacher le motif de départ",
@@ -933,7 +999,7 @@ var getContext = function(display, infos) {
             textDescent: "textDescent"
          },
          description: {},
-         values: {
+         constantLabel: {
             // environment
             ARROW: "Arrow",
             CROSS: "Cross",
@@ -1000,7 +1066,6 @@ var getContext = function(display, infos) {
             BOTTOM: "Bottom",
             BASELINE: "Baseline",
             MODEL: "Model",
-            SCREEN: "Screen",
             SHAPE: "Shape"
          },
          startingBlockName: "Program",
@@ -1145,15 +1210,15 @@ var getContext = function(display, infos) {
 
 
 
-    context.setScale = function(scale) {
-        context.processing.state.scale = scale;
-        context.canvas_element.width(context.processing.getCanvasSize(constants.SCALED).width);
-        context.canvas_element.height(context.processing.getCanvasSize(constants.SCALED).height);
-        context.resetDisplay();
-    }
+   context.setScale = function(scale) {
+       context.processing.state.scale = scale;
+       context.canvas_element.width(context.processing.getCanvasSize(constants.SCALED).width);
+       context.canvas_element.height(context.processing.getCanvasSize(constants.SCALED).height);
+       context.resetDisplay();
+   }
 
 
-    context.resetDisplay = function() {
+   context.resetDisplay = function() {
       var canvas = $('<canvas>').css('border', '1px solid black');
       context.canvas_element = canvas;
       var coordinatesContainer = $('<div>').text(" ");
@@ -1161,18 +1226,18 @@ var getContext = function(display, infos) {
 
       var hideInitialDrawing = $('[for="hideInitialDrawing"]');
       if (infos.buttonHideInitialDrawing) {
-        if (hideInitialDrawing.length == 0) {
-           hideInitialDrawing = $('<label for="hideInitialDrawing">');
-           hideInitialDrawing.text(" " + strings.hideInitialDrawing);
-           var cb = $('<input id="hideInitialDrawing" type="checkbox">');
-           cb.prop('checked', context.processing.state.hideInitialDrawing);
-           hideInitialDrawing.prepend(cb);
-        }
-        $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
-        $('#hideInitialDrawing').change(function(e) {
+         if (hideInitialDrawing.length == 0) {
+            hideInitialDrawing = $('<label for="hideInitialDrawing">');
+            hideInitialDrawing.text(" " + strings.hideInitialDrawing);
+            var cb = $('<input id="hideInitialDrawing" type="checkbox">');
+            cb.prop('checked', context.processing.state.hideInitialDrawing);
+            hideInitialDrawing.prepend(cb);
+         }
+         $('#grid').prepend($('<div style="margin-bottom: 4px;">').append(hideInitialDrawing));
+         $('#hideInitialDrawing').change(function(e) {
             context.processing.state.hideInitialDrawing = $(e.target).prop('checked');
             context.processing.previewInstance.redraw();
-        });
+         });
       }
 
       context.processing.previewInstance = new Processing(canvas.get(0), function(processing) {
@@ -1251,44 +1316,45 @@ var getContext = function(display, infos) {
 
 
 
-    function drawOnBuffer(mode) {
-        var buffer = context.processing.createBuffer();
-        buffer.beginDraw();
-        initGraphics(buffer, true);
-        if(mode !== constants.SKIP_DRAW_OPS) {
-            drawOps(buffer);
-        }
-        buffer.endDraw();
-        return buffer;
-    }
 
-    context.getPixels = function(mode) {
-        var buffer = drawOnBuffer(mode);
-        buffer.loadPixels();
-        return buffer.pixels;
-    }
+   function drawOnBuffer(mode) {
+      var buffer = context.processing.createBuffer();
+      buffer.beginDraw();
+      initGraphics(buffer, true);
+      if(mode !== constants.SKIP_DRAW_OPS) {
+         drawOps(buffer);
+      }
+      buffer.endDraw();
+      return buffer;
+   }
+
+   context.getPixels = function(mode) {
+      var buffer = drawOnBuffer(mode);
+      buffer.loadPixels();
+      return buffer.pixels;
+   }
 
 
 
-    context.processing.commonOp = function() {
-        var callback = arguments[arguments.length - 1];
-        var blockName = arguments[0], values = [];
-        for (var iParam = 1; iParam < arguments.length - 1; iParam++) {
-            values.push(arguments[iParam]);
-        }
-        if (blockName.substr(0, 5) == "print") {
-            context.processing.internalInstance[blockName](values);
-            context.waitDelay(callback);
-        } else {
-            context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
-            if (context.display) {
-                context.processing.previewInstance.redraw();
-            }
-            callback();
-            // why drawOnBuffer was here?
-            //context.waitDelay(callback, drawOnBuffer());
-        }
-    };
+   context.processing.commonOp = function() {
+      var callback = arguments[arguments.length - 1];
+      var blockName = arguments[0], values = [];
+      for (var iParam = 1; iParam < arguments.length - 1; iParam++) {
+         values.push(arguments[iParam]);
+      }
+      if (blockName.substr(0, 5) == "print") {
+         context.processing.internalInstance[blockName](values);
+         context.waitDelay(callback);
+      } else {
+         context.processing.ops.push({ block: blockName, values: values });//, obj: this === context ? null : this });
+         if (context.display) {
+            context.processing.previewInstance.redraw();
+         }
+         //callback();
+         // why drawOnBuffer was here? Because it provides the potential return value
+         context.waitDelay(callback, drawOnBuffer());
+      }
+   };
 
    context.processing.pixels = function(index, callback) {
       var buffer = drawOnBuffer();
@@ -1303,59 +1369,67 @@ var getContext = function(display, infos) {
             { name: "popStyle" },
             { name: "pushStyle" },
             { name: "cursor",
-               variants: [[{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }], ['Image', 'Number', 'Number']] },
+               variants: [
+                  [{ options: ["ARROW", "CROSS", "HAND", "MOVE", "TEXT", "WAIT"] }],
+                  ['Image', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['mode'],
+                  ['image', 'x', 'y']
+               ]
+            },
             { name: "focused", yieldsValue: true }, // must be a value
             { name: "width", yieldsValue: true }, // must be a value
             { name: "height", yieldsValue: true } // must be a value
          ],
          shape_2D: [
             { name: "arc",
-                params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'],
-                params_names: ['x', 'y', 'width', 'height', 'start', 'stop']
+               params: ['Number', 'Number', 'Number', 'Number', 'Angle', 'Angle'],
+               params_names: ['x', 'y', 'width', 'height', 'start', 'stop']
             },
             { name: "ellipse",
-                params: ['Number', 'Number', 'Number', 'Number'],
-                params_names: ['x', 'y', 'width', 'height']
+               params: ['Number', 'Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'width', 'height']
             },
             { name: "line",
                variants: [
-                   ['Number', 'Number', 'Number', 'Number'],
-                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']
-                ],
-                variants_names: [
-                    ['x1', 'y1', 'x2', 'y2'],
-                    ['x1', 'y1', 'z1', 'x2', 'y2', 'z2'],
-                ]
+                  ['Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x1', 'y1', 'x2', 'y2'],
+                  ['x1', 'y1', 'z1', 'x2', 'y2', 'z2'],
+               ]
             },
             { name: "point",
-                variants: [
-                    ['Number', 'Number'],
-                    ['Number', 'Number', 'Number']
-                ],
-                variants_names: [
-                    ['x', 'y'],
-                    ['x', 'y', 'z']
-                ]
+               variants: [
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x', 'y'],
+                  ['x', 'y', 'z']
+               ]
             },
             { name: "quad",
-                params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4']
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4']
             },
             { name: "rect",
                variants: [
-                   ['Number', 'Number', 'Number', 'Number'],
-                   ['Number', 'Number', 'Number', 'Number', 'Number'],
-                   ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+                  ['Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
                ],
                variants_names: [
-                   ['x', 'y', 'width', 'height'],
-                   ['x', 'y', 'width', 'height', 'radius'],
-                   ['x', 'y', 'width', 'height', 'tlradius', 'trradius', 'brradius', 'blradius']
+                  ['x', 'y', 'width', 'height'],
+                  ['x', 'y', 'width', 'height', 'radius'],
+                  ['x', 'y', 'width', 'height', 'tlradius', 'trradius', 'brradius', 'blradius']
                ]
             },
             { name: "triangle",
-                params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3']
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['x1', 'y1', 'x2', 'y2', 'x3', 'y3']
             }
          ],
          shape_curve: [
@@ -1375,28 +1449,28 @@ var getContext = function(display, infos) {
          ],
          shape_3D: [
             { name: "box",
-                variants: [
-                    ['Number'],
-                    ['Number', 'Number', 'Number']
-                ],
-                variants_names: [
-                    ['size'],
-                    ['width', 'height', 'depth']
-                ],
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['size'],
+                  ['width', 'height', 'depth']
+               ],
             },
             { name: "sphere",
-                params: ['Number'],
-                params_names: ['radius']
+               params: ['Number'],
+               params_names: ['radius']
             },
             { name: "sphereDetail",
-                variants: [
-                    ['Number'],
-                    ['Number', 'Number']
-                ],
-                variants_names: [
-                    ['res'],
-                    ['ures', 'vres']
-                ]
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number']
+               ],
+               variants_names: [
+                  ['res'],
+                  ['ures', 'vres']
+               ]
             }
          ],
          shape_attributes: [
@@ -1610,7 +1684,7 @@ var getContext = function(display, infos) {
                         paramData.bType = 'field_dropdown';
                         blockArgs[iParam] = $.extend({ options: [] }, blockArgs[iParam]);
                         for (var iValue = 0; iValue < paramData.options.length; iValue++) {
-                           blockArgs[iParam].options.push([strings.values[paramData.options[iValue]], paramData.options[iValue]]);
+                           blockArgs[iParam].options.push([strings.constantLabel[paramData.options[iValue]], paramData.options[iValue]]);
                         }
                      }
                      if (paramData.pType) {
@@ -1642,7 +1716,10 @@ var getContext = function(display, infos) {
       }
    }
 
-
+   context.customConstants = { processing: [] };
+   for (var constName in strings.constant) {
+      context.customConstants.processing[constName] = context.processing.internalInstance[constName];
+   }
 
 
     context.docGenerator = {
