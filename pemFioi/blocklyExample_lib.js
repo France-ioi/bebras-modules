@@ -50,6 +50,15 @@ var getContext = function(display, infos, curLevel) {
    // Some data can be made accessible by the library through the context object
    context.example = {};
 
+   context.provideBlocklyColours = function() {
+      return {
+         categories: {
+            actions: 0,
+            sensors: 100
+         }
+      };
+   };
+
    // A context must have a reset function to get back to the initial state
    context.reset = function(taskInfos) {
       // Do something here
