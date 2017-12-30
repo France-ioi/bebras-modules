@@ -662,9 +662,9 @@ var getContext = function(display, infos) {
             redNotCovered: "Recouvrez bien toute la partie rouge.",
             greenCovered: "Vous avez caché la partie rouge, mais avez recouvert une partie du vert.",
             redNotCoveredGreenCovered: "Vous n'avez pas masqué la partie rouge, et avez recouvert une partie du vert !",
-            tooManyWhitePixelsCovered: 'Too many white pixels was covered, your score is {score} of {initial_score}.',
-            allFiguresMustBeConnected: 'All figures must be connected',
-            taskCompleted: 'Task completed'
+            tooManyWhitePixelsCovered: "Trop de pixels blancs ont été recouverts. Votre score est de {score} sur {initial_score}.",
+            allFiguresMustBeConnected: "Toutes les formes doivent être connexes.",
+            taskCompleted: "Mission accomplie !"
          }
       },
       en: {
@@ -1065,8 +1065,8 @@ var getContext = function(display, infos) {
             TOP: "Top",
             BOTTOM: "Bottom",
             BASELINE: "Baseline",
-            MODEL: "Model",
-            SHAPE: "Shape"
+            MODEL: "model",
+            SHAPE: "shape"
          },
          startingBlockName: "Program",
          hideInitialDrawing: "Hide initial drawing",
@@ -1076,9 +1076,9 @@ var getContext = function(display, infos) {
             redNotCovered: "Cover the entire red part.",
             greenCovered: "You hid the red part, but covered some of the green.",
             redNotCoveredGreenCovered: "You did not hide the red part, and covered some of the green!",
-            tooManyWhitePixelsCovered: 'Too many white pixels was covered, your score is {score} of {initial_score}.',
-            allFiguresMustBeConnected: 'All figures must be connected',
-            taskCompleted: 'Task completed'
+            tooManyWhitePixelsCovered: "Too many white pixels were covered, your score is {score} of {initial_score}.",
+            allFiguresMustBeConnected: "All figures must be connected.",
+            taskCompleted: "Task completed!"
          }
       },
       none: {
@@ -1718,7 +1718,7 @@ var getContext = function(display, infos) {
 
    context.customConstants = { processing: [] };
    for (var constName in strings.constant) {
-      context.customConstants.processing[constName] = context.processing.internalInstance[constName];
+      context.customConstants.processing.push({ name: constName, value: context.processing.internalInstance[constName] });
    }
 
 
@@ -1812,6 +1812,7 @@ var processingEndConditions = {
                 finalPixels
             )
         }
+
         if(options.checkAllFiguresConnected) {
             processingEndConditions.checkAllFiguresConnected(
                 context.processing.internalInstance.color(context.constants.BACKGROUND),
