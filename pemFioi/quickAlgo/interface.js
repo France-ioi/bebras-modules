@@ -6,6 +6,7 @@
 var quickAlgoInterface = {
    strings: {},
    nbTestCases: 0,
+   delayFactory: new DelayFactory(),
 
    loadInterface: function(context) {
       // Load quickAlgo interface into the DOM
@@ -97,6 +98,7 @@ var quickAlgoInterface = {
          $('#loadExampleBtn').hide();
       }
       if(opt.conceptViewer) {
+         conceptViewer.load(opt.conceptViewerLang);
          $('#displayHelpBtn').show();
       } else {
          $('#displayHelpBtn').hide();
@@ -110,6 +112,19 @@ var quickAlgoInterface = {
       this.context.setScale(scaled ? 2 : 1);
    },
 
+   blinkRemaining: function(times, red) {
+      var capacity = $('#capacity');
+      if(times % 2 == 0) {
+         capacity.removeClass('capacityRed');
+      } else {
+         capacity.addClass('capacityRed');
+      }
+      if(times > (red ? 1 : 0)) {
+         var that = this;
+         this.delayFactory.destroy('blinkRemaining');
+         this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 200);
+      }
+   },
 
    initTestSelector: function (nbTestCases) {
       // Create the DOM for the tests display (typically on the left side)

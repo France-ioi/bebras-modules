@@ -103,7 +103,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             wsConfig.scrollbars = true;
             wsConfig.trashcan = true;
             if (maxBlocks != undefined) {
-               wsConfig.maxBlocks = maxBlocks;
+               wsConfig.maxBlocks = maxBlocks + 1;
             }
             if (options.readOnly) {
                wsConfig.readOnly = true;
@@ -218,28 +218,33 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(isBlockEvent) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                // Update the remaining blocks display
-               var remaining = this.workspace.remainingCapacity(maxBlocks);
+               var remaining = this.workspace.remainingCapacity(maxBlocks+1);
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
                };
                var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
-               $('#capacity').css('color', remaining < 0 ? 'red' : '');
                $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
+               if(remaining == 0) {
+                  quickAlgoInterface.blinkRemaining(4);
+               } else if(remaining < 0) {
+                  quickAlgoInterface.blinkRemaining(5, true);
+               } else {
+                  quickAlgoInterface.blinkRemaining(0); // reset
+               }
             }
 
             // TODO :: put into a resetDisplay function, find other elements to reset
-            if(this.mainContext.runner && this.mainContext.runner.nbRunning() > 0) {
-               this.mainContext.runner.stop();
-               this.mainContext.reset();
+            if(this.mainContext.runner) {
+               this.mainContext.runner.reset();
             }
             if(this.scratchMode) {
                this.glowBlock(null);
             }
-
             if(this.quickAlgoInterface) {
                this.quickAlgoInterface.resetTestScores();
             }
+            $('#errors').html('');
          } else {
             Blockly.svgResize(this.workspace);
          }

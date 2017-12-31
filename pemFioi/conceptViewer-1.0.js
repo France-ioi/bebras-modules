@@ -3,9 +3,25 @@ var conceptViewer = {
   loaded: false,
   shownConcept: null,
 
-  load: function () {
+  load: function (lang) {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
+
+    // TODO :: allow changing list of languages
+    var allLangs = [
+      {id: 'blockly', lbl: 'Blockly'},
+      {id: 'scratch', lbl: 'Scratch'},
+      {id: 'python', lbl: 'Python'}
+      ];
+    var langOptions = '';
+    for(var i=0; i<allLangs.length; i++) {
+      langOptions += '<option value="' + allLangs[i].id + '"';
+      if((!lang && i == 0) || allLangs[i].id == lang) {
+        langOptions += ' selected';
+      }
+      langOptions += '>' + allLangs[i].lbl + '</option>';
+    }
+
     $('body').append(''
       + '<div id="conceptViewer" style="display: none;">'
       + '  <div class="content">'
@@ -14,8 +30,7 @@ var conceptViewer = {
       + '      <div class="navigationLanguage">'
       + '        Langage de programmation&nbsp;:'
       + '        <select class="languageSelect" onchange="conceptViewer.languageChanged();">'
-      + '          <option value="blockly">Blockly</option>' // TODO :: allow changing list of languages
-      + '          <option value="python">Python</option>'
+      + langOptions
       + '        </select>'
       + '      </div>'
       + '      <hr />'
@@ -70,14 +85,14 @@ var conceptViewer = {
 
   loadConcepts: function (newConcepts) {
     // Load new concept information
-    if(!this.loaded) { this.load(); }
+    this.load();
     this.concepts = newConcepts;
     this.loadNavigation();
   },
 
   show: function (initConcept=true) {
     // Display the conceptViewer
-    if(!this.loaded) { this.load(); }
+    this.load();
     $('#conceptViewer').fadeIn(500);
 
     if (this.shownConcept && initConcept) {
@@ -87,7 +102,7 @@ var conceptViewer = {
 
   hide: function () {
     // Hide the conceptViewer
-    if(!this.loaded) { this.load(); }
+    this.load();
     $('#conceptViewer').fadeOut(500);
     $('#conceptViewer .viewerContent').attr('src', '');
   },
