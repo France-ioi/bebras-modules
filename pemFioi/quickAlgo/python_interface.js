@@ -288,8 +288,8 @@ function LogicController(nbTestCases, maxInstructions) {
 
       var forbidden = pythonForbidden(code, that.includeBlocks);
       if(forbidden) {
-        $('#capacity').css('color', 'red');
         $('#capacity').html("Mot-clé interdit utilisé : "+forbidden);
+        quickAlgoInterface.blinkRemaining(5, true);
         return;
       }
 
@@ -299,14 +299,22 @@ function LogicController(nbTestCases, maxInstructions) {
          remainingBlocks: Math.abs(remaining)
          };
       var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
-      $('#capacity').css('color', remaining < 0 ? 'red' : '');
       $('#capacity').html(strLimitElements.format(optLimitElements));
+      if(remaining == 0) {
+         quickAlgoInterface.blinkRemaining(4);
+      } else if(remaining < 0) {
+         quickAlgoInterface.blinkRemaining(5, true);
+      } else {
+         quickAlgoInterface.blinkRemaining(0);
+      }
 
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {
          that._mainContext.runner.stop();
          that._mainContext.reset();
       }
+
+      $('#errors').html('');
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();

@@ -12,6 +12,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.nbActions = 0;
       runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
       runner.delayFactory = new DelayFactory();
+      runner.contextReset = false;
 
       // Iteration limits
       runner.maxIter = 400000;
@@ -205,6 +206,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
+         runner.contextReset = false;
          runner.stepInProgress = true;
          // Handle the callback from last highlightBlock
          if(runner.nextCallback) {
@@ -296,7 +298,7 @@ function initBlocklyRunner(context, messageCallback) {
          runner.stackCount = 0;
          context.programEnded = [];
          context.curSteps = [];
-         context.reset();
+         runner.reset();
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
             context.curSteps[iInterpreter] = {
                total: 0,
@@ -322,6 +324,7 @@ function initBlocklyRunner(context, messageCallback) {
             runner.maxIterWithoutAction = runner.maxIter;
          }
       };
+
       runner.runCodes = function(codes) {
          runner.initCodes(codes);
          runner.runSyncBlock();
@@ -347,7 +350,6 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
-
       runner.nbRunning = function() {
          var nbRunning = 0;
          for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
@@ -360,6 +362,12 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.isRunning = function () {
          return this.nbRunning() > 0;
+      };
+
+      runner.reset = function() {
+         if(runner.contextReset) { return; }
+         context.reset();
+         runner.contextReset = true;
       };
 
       context.runner = runner;

@@ -56,7 +56,8 @@ var initBlocklySubTask = function(subTask, language) {
         window.quickAlgoInterface.setOptions({
            hideSaveOrLoad: subTask.levelGridInfos.hideSaveOrLoad,
            hasExample: subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language],
-           conceptViewer: subTask.levelGridInfos.conceptViewer
+           conceptViewer: subTask.levelGridInfos.conceptViewer,
+           conceptViewerLang: this.blocklyHelper.language
            });
       }
 
@@ -187,6 +188,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.context.runner) {
          this.context.runner.stop();
       }
+      $('#errors').html('');
       this.context.reset();
    };
 

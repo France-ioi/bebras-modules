@@ -303,6 +303,13 @@ input[type=button] {
    background: rgba(100, 100, 200, 0.5);
    z-index: 20;
 }
+#capacity {
+    display: inline;
+}
+.capacityRed {
+    background-color: #E77471;
+    color: black;
+}
 #testSelector {
     padding-left: 10px;
 }
