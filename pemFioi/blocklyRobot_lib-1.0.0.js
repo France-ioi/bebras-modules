@@ -35,6 +35,10 @@ var getContext = function(display, infos, curLevel) {
                obstacleSouth: "obstacle en bas",
                obstacleRight: "obstacle à droite",
                obstacleLeft: "obstacle à gauche",
+               gridEdgeEast: "bord de la grille à droite",
+               gridEdgeWest: "bord de la grille à gauche",
+               gridEdgeNorth: "bord de la grille en haut",
+               gridEdgeSouth: "bord de la grille en bas",
                platformInFront: "plateforme devant",
                withdrawObject: "ramasser l'objet",
                dropObject: "déposer l'objet",
@@ -67,6 +71,10 @@ var getContext = function(display, infos, curLevel) {
                obstacleSouth: "obstacleBas",
                obstacleRight: "obstacleDroiteRel",
                obstacleLeft: "obstacleGaucheRel",
+               gridEdgeEast: "bordGrilleDroite",
+               gridEdgeWest: "bordGrilleGauche",
+               gridEdgeNorth: "bordGrilleHaut",
+               gridEdgeSouth: "bordGrilleBas",
                platformInFront: "plateformeDevant",
                withdrawObject: "ramasserObjet",
                dropObject: "deposerObjet",
@@ -83,6 +91,7 @@ var getContext = function(display, infos, curLevel) {
                leavesGrid: "Le robot sort de la grille !",
                obstacle: "Le robot essaie de se déplacer sur un obstacle !",
                nothingToPickUp: "Il n'y a rien à ramasser !",
+               nothingToLookAt: "Il n'y a ni carte ni conteneur sur cette case",
                falls: "Le robot se jette dans le vide",
                willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
                jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
@@ -219,7 +228,8 @@ var getContext = function(display, infos, curLevel) {
                   pushObject: "pousser la caisse",
                   onContainer: "sur une case marquée",
                   pushableInFront: "caisse devant",
-                  obstacleInFront: "mur devant"
+                  obstacleInFront: "mur devant",
+                  readNumber: "nombre sur la case"
                },
                messages: {
                   successContainersFilled: "Bravo, les caisses sont bien rangées !",
@@ -349,6 +359,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isRound===true;}));
                }
             },
@@ -368,6 +380,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
                }
             },
@@ -387,6 +401,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isTriangle===true;}));
                }
             },
@@ -406,6 +422,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isPurple===true;}));
                }
             },
@@ -425,6 +443,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isOrange===true;}));
                }
             },
@@ -444,6 +464,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isGreen===true;}));
                }
             },
@@ -463,6 +485,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isQuadrille===true;}));
                }
             },
@@ -482,6 +506,8 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
                   this.callCallback(callback, this.isOn(function(obj) {return obj.isStriped===true;}));
                }
             },
@@ -501,17 +527,22 @@ var getContext = function(display, infos, curLevel) {
                   yieldsValue: true
                },
                func: function(callback) {
-                  this.callCallback(callback, this.isOn(function(obj) {return obj.isDotted===true;}));
+                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
+                     throw(strings.messages.nothingToLookAt);
+                  this.callCallback(callback, this.isOn(function(obj) {return obj.isDotted===true ;}));
                }
             }
          ],
-         containerSize: 100,
+         bagSize: 1,
+         backgroundColor: "#abeaf4",
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
-            cell: {num: 1, img: "cell.png", side: 60, zOrder: 0},
             purple: { num: 2, img: "purple.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isPurple === true; }, zOrder: 0 },
             green: { num: 3, img: "green.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isGreen === true; }, zOrder: 0 },
             orange: { num: 4, img: "orange.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isOrange === true; }, zOrder: 0 },
+            dotted: { num: 5, img: "dotted.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isDotted === true; }, zOrder: 0 },
+            striped: { num: 6, img: "striped.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isStriped === true; }, zOrder: 0 },
+            quadrille: { num: 7, img: "quadrille.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isQuadrille === true; }, zOrder: 0 },
             roundPurpleQuadrille: { img: "roundPurpleQuadrille.png", side: 60, isWithdrawable: true, isRound: true, isPurple: true, isQuadrille: true, zOrder: 1 },
             squarePurpleQuadrille: { img: "squarePurpleQuadrille.png", side: 60, isWithdrawable: true, isSquare: true, isPurple: true, isQuadrille: true, zOrder: 1 },
             trianglePurpleQuadrille: { img: "trianglePurpleQuadrille.png", side: 60, isWithdrawable: true, isTriangle: true, isPurple: true, isQuadrille: true, zOrder: 1 },
@@ -542,6 +573,15 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
+      chticode: {
+         itemTypes: {
+            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true },
+            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
+            gem: { num: 3, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
+            green: { num: 3, color: "#b5e61d", side: 60, isExit: true}
+         },
+         checkEndCondition: robotEndConditions.checkBothReachAndCollect
+      },
       cones: {
          bagInit: {
            count: 200,
@@ -552,6 +592,7 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             cone: { num: 3, img: "cone.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
+            contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -623,9 +664,9 @@ var getContext = function(display, infos, curLevel) {
              }
            }
          ],
-         backgroundColor: "#6fcc8e",
+         backgroundColor: "#a40e0e",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
+            green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
             YY: { num: 2, img: "YY.png", side: 60, isWithdrawable: true, isYellow: true, zOrder: 1 },
             YO: { num: 3, img: "YO.png", side: 60, isWithdrawable: true, isYellow: true, isOrange: true, zOrder: 1 },
             YB: { num: 4, img: "YB.png", side: 60, isWithdrawable: true, isYellow: true, isBlue: true, zOrder: 1 },
@@ -634,7 +675,9 @@ var getContext = function(display, infos, curLevel) {
             OB: { num: 7, img: "OB.png", side: 60, isWithdrawable: true, isOrange: true, isBlue: true, zOrder: 1 },
             BY: { num: 8, img: "BY.png", side: 60, isWithdrawable: true, isBlue: true, isYellow: true, zOrder: 1 },
             BO: { num: 9, img: "BO.png", side: 60, isWithdrawable: true, isBlue: true, isOrange: true, zOrder: 1 },
-            BB: { num: 10, img: "BB.png", side: 60, isWithdrawable: true, isBlue: true, zOrder: 1 }
+            BB: { num: 10, img: "BB.png", side: 60, isWithdrawable: true, isBlue: true, zOrder: 1 },
+            board_background: { num: 11, color: "#ffffff", side: 60, zOrder: 0 },
+            board: {num: 12, side: 60, isWritable: true, zOrder: 1 }
          }
       },
       gems: {
@@ -660,7 +703,9 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true,  zOrder: 2 },
             hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
-            marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 }
+            marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
+            number: { num: 5, side: 60, zOrder: 1 },
+            board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -705,7 +750,8 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 60, nbStates: 9, isRobot: true, offsetX: 3, zOrder: 2 },
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
-            box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 }         
+            box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
+            number: { num: 5, side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       }
@@ -923,6 +969,46 @@ var getContext = function(display, infos, curLevel) {
          var robot = this.getRobot();
          var coords = this.coordsInFront(3);
          this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeEast",
+      type: "sensors",
+      block: { name: "gridEdgeEast", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.col == this.nbCols - 1));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeWest",
+      type: "sensors",
+      block: { name: "gridEdgeWest", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.col == 0));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeNorth",
+      type: "sensors",
+      block: { name: "gridEdgeNorth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.row == 0));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeSouth",
+      type: "sensors",
+      block: { name: "gridEdgeSouth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.row == this.nbRows - 1));
       }
    });
    
@@ -1637,6 +1723,14 @@ var getContext = function(display, infos, curLevel) {
          var object = context.bag.pop();
          object.row = item.row;
          object.col = item.col;
+         var itemsOn = context.getItemsOn(item.row, item.col);
+         var maxi = 0;
+         for(var item in itemsOn) {
+            if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+               maxi = itemsOn[item].zOrder;
+            }
+         }
+         object.zOrder = maxi + 0.000001;
          context.items.push(object);
          
          if(context.display) {
@@ -1844,6 +1938,11 @@ var robotEndConditions = {
                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
                      solved = false;
                   }
+                  for(var item in context.bag) {
+                     if(filter(context.bag[item])) {
+                        solved = false;
+                     }
+                  }
                }
             }
             else {
@@ -1861,6 +1960,28 @@ var robotEndConditions = {
       if(lastTurn) {
          context.success = false;
          throw(window.languageStrings.messages.failureContainersFilled);
+      }
+   },
+   checkBothReachAndCollect: function(context, lastTurn) {
+      var robot = context.getRobot();
+      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+         var solved = true;
+         for(var row = 0;row < context.nbRows;row++) {
+            for(var col = 0;col < context.nbCols;col++) {
+               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+                  solved = false;
+               }
+            }
+         }
+         
+         if(solved) {
+            context.success = true;
+            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         }
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachExit);
       }
    }
 };
