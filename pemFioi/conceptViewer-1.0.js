@@ -28,7 +28,7 @@ var conceptViewer = {
       + '    <div class="exit" onclick="conceptViewer.hide();">x</div>'
       + '    <div class="navigation">'
       + '      <div class="navigationLanguage">'
-      + '        Langage de programmation&nbsp;:'
+      + '        Langage&nbsp;:'
       + '        <select class="languageSelect" onchange="conceptViewer.languageChanged();">'
       + langOptions
       + '        </select>'
@@ -172,7 +172,10 @@ var testConcepts = [
     {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
     {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if'},
     {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else'},
+    {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil'},
+    {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
     {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
+    {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
     {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
     {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
     ];
