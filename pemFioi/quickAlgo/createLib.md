@@ -1,9 +1,9 @@
 # Manual: create a new quickAlgo library
 
-## Setup the Bebras environment
+## Get the Bebras environment
 
-The preferred way uses [Git](https://www.git-scm.com/downloads) which allows you to easily keep up to date
-with the Bebras resources and to submit your work, but you can also make it work with simple downloads with your browser.
+The preferred way uses [Git](https://www.git-scm.com/downloads) which allows you to easily stay up to date
+with the Bebras resources and to submit your work, but you can also simply download the environment with your browser.
 
 *  **With Git:**
 
@@ -38,16 +38,16 @@ ready to be used for a new library. You can create your library as a copy of thi
 replacing `Example` with the name of your library in the filename.
 For instance, your new file will be named `blocklyMyLib_lib.js`.
 
-In the file, you’ll see the following sections:
+In the file, you’ll see the following sections (with the according definitions):
 * display strings (`localLanguageStrings`);
 * basic variables (`context`, `strings`, `context.example`);
 * context management functions (`reset`, `resetDisplay`, `updateScale`, `unload`);
-* your library’s functions (`context.example.anything`);
-* block definitions (`context.customBlocks`);
-* Python constant definitions (`context.customContants`).
+* your library’s functions (`context.example.something`);
+* block definitions (`context.customBlocks`, `context.provideBlocklyColours`);
+* Python constant definitions (`context.customConstants`).
 
-Many comments (after `//` or within `/*` and `*/`) provide information about each element.
-You can of course remove them whenever you don’t need them anymore.
+Many comments (`// end-line` or `/* multi-line */`) provide information about those elements.
+You can of course remove them whenever they are useless for you.
 
 You should start by changing every occurrence of the word `example` to the name of your library.
 
@@ -61,7 +61,7 @@ Your new rule should look like this:
 
 At the end of this step, your library can already be used.
 
-## Create an exercise for testing
+## Initiate a task for testing
 
 Shaping your library will be much easier if you can test it along the way.
 
@@ -70,7 +70,7 @@ the `blockly-example` library. Make a copy of this folder, changing `example` to
 or your actual name as usual. Then go into your new folder.
 
 In the file `index.html`:
-* change the `window.stringsLanguage` value to the one you want, e.g. `'en'`;
+* change the `window.stringsLanguage` value to the code of the user language you want, e.g. `'en'`;
 * ensure the `importModules-*.js` included script is the one you chose at the previous step;
 * at the end of the `importModules(…)` statement, change `blockly-example` to the name
   of your importing rule;
@@ -80,9 +80,9 @@ In the file `index.html`:
 In the `task.js` file, change the word `example` to the name of your library.
 
 From there, you can open the file `index.html` in your browser and have fun
-with the three inactive blocks.
+with the three effectless blocks.
 
-## Experiment with your first block
+## Program your first block
 
 …
 
