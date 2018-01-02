@@ -50,15 +50,6 @@ var getContext = function(display, infos, curLevel) {
    // Some data can be made accessible by the library through the context object
    context.example = {};
 
-   context.provideBlocklyColours = function() {
-      return {
-         categories: {
-            actions: 0,
-            sensors: 100
-         }
-      };
-   };
-
    // A context must have a reset function to get back to the initial state
    context.reset = function(taskInfos) {
       // Do something here
@@ -163,6 +154,16 @@ var getContext = function(display, infos, curLevel) {
          ]
       }
       // We can add multiple namespaces by adding other keys to customBlocks.
+   };
+
+   // Color indexes of block categories (as a hue in the range 0–420)
+   context.provideBlocklyColours = function() {
+      return {
+         categories: {
+            actions: 0,
+            sensors: 100
+         }
+      };
    };
 
    // Constants available in Python
