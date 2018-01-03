@@ -430,7 +430,7 @@ function LogicController(nbTestCases, maxInstructions) {
     processForbiddenList(pflInfos.allowed, 'autorisé');
     processForbiddenList(pflInfos.forbidden, 'interdit');
 
-    pythonHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python ou utiliser un moteur de recherche pendant le concours.</p>';
+    pythonHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
     pythonDiv.html(pythonHtml);
 
     var controller = this;

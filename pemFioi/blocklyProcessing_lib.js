@@ -360,7 +360,7 @@ var getContext = function(display, infos) {
                "aux coordonnées indiquées",
             quad: "dessine un quadrilatère ayant pour sommets les quatre points indiqués",
             rect: "dessine un rectangle aux coordonnées indiquées avec la taille indiquée, dont le fonctionnement " +
-             "peut être changé par la fonction modeRectangles, et avec les rayons indiqués pour arrondir les coins",
+               "peut être changé par la fonction <code>modeRectangles</code>, et avec les rayons indiqués pour arrondir les coins",
             triangle: "dessine un triangle ayant pour sommets les trois points indiqués",
             // shape_curve
             /*bezier: "bezier",
@@ -387,8 +387,8 @@ var getContext = function(display, infos) {
             smooth: "active le lissage appliqué aux formes",
             strokeCap: "définit le style de terminaison des lignes (<code>CARREES</code>, <code>PROJETEES</code> " +//CARRÉES, PROJETÉES
                "ou <code>ARRONDIES</code>)",
-            strokeJoin: "définit le style de jointure des segments de lignes (<code>EN_ONGLET</code>, <code>BISEAUTEES</code>, " +//BISEAUTÉES
-               "<code>ARRONDIES</code>)",
+            strokeJoin: "définit le style de jointure des segments de lignes (<code>EN_ONGLET</code>, <code>BISEAUTEES</code> " +//BISEAUTÉES
+               "ou <code>ARRONDIES</code>)",
             strokeWeight: "définit l'épaisseur des lignes, en pixels",
             // shape_vertex
             /*beginShape: "commencerForme",
@@ -454,8 +454,8 @@ var getContext = function(display, infos) {
             specular: "speculaire",//spéculaire*/
             // color_setting
             background: "remplit le canevas avec la couleur indiquée (doit être utilisé en tout début de programme)",
-            colorMode: "définit la manière dont les composantes des couleurs sont interprétées ; le premier " +
-               "paramètre définit le mode (RVB pour rouge, vert et bleu ; TSL pour teinte, saturation, luminosité) ; " +
+            colorMode: "définit la manière dont les composantes des couleurs sont interprétées ; le premier paramètre définit " +
+               "le mode (<code>RVB</code> pour rouge, vert et bleu ; <code>TSL</code> pour teinte, saturation, luminosité) ; " +
                "les suivants définissent la valeur maximale (255 par défaut)",
             fill: "définit la couleur de fond utilisée pour le dessin",
             noFill: "utilise un fond transparent pour les prochains dessins",
@@ -467,7 +467,7 @@ var getContext = function(display, infos) {
                "(<code>FUSION</code>, <code>ADDITION</code>, <code>SOUSTRACTION</code>, <code>LE_PLUS_SOMBRE</code>, " +
                "<code>LE_PLUS_LUMINEUX</code>, <code>DIFFERENCE</code>, <code>EXCLUSION</code>, <code>MULTIPLICATION</code>, " +//DIFFÉRENCE
                "<code>ECRAN</code>, <code>RECOUVREMENT</code>, <code>LUMIERE_DURE</code>, <code>LUMIERE_DOUCE</code>, " +//ÉCRAN, LUMIÈRE_DURE, LUMIÈRE_DOUCE
-               "<code>ASSOMBRISSEMENT</code>, <code>ECLAIRCISSEMENT</code>)",//ÉCLAIRCISSEMENT
+               "<code>ASSOMBRISSEMENT</code> ou <code>ECLAIRCISSEMENT</code>)",//ÉCLAIRCISSEMENT
             blue: "extrait la valeur de bleu d'une couleur",
             brightness: "extrait la valeur de luminosité d'une couleur",
             color: "crée une couleur avec les valeurs indiquées",
@@ -525,7 +525,22 @@ var getContext = function(display, infos) {
             brradius: "rayonBD",
             blradius: "rayonBG",
             start: "début",
-            stop: "fin"
+            stop: "fin",
+            text: "texte",
+            gray: "gris",
+            alpha: "opacité",
+            value1: "valeur1",
+            value2: "valeur2",
+            value3: "valeur3",
+            color: "couleur",
+            color1: "couleur1",
+            color2: "couleur2",
+            range: "étendue",
+            range1: "étendue1",
+            range2: "étendue2",
+            range3: "étendue3",
+            range4: "étendue4",
+            amount: "emplacement"
          },
          constantLabel: {
             // environment
@@ -1795,7 +1810,6 @@ var getContext = function(display, infos) {
          conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
       'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
          conv: function(value) { return value * Math.PI / 180; } },
-      'Const': { conv: function(value) { return context.processing.internalInstance[value]; } },
       'ColorModeConst': { options: ["RGB", "HSB"] },
       'BlendConst': { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
             "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] },
@@ -1828,7 +1842,9 @@ var getContext = function(display, infos) {
                         paramData.bType = 'field_dropdown';
                         blockArgs[iParam] = $.extend({ options: [] }, blockArgs[iParam]);
                         for (var iValue = 0; iValue < paramData.options.length; iValue++) {
-                           blockArgs[iParam].options.push([strings.constantLabel[paramData.options[iValue]], paramData.options[iValue]]);
+                           blockArgs[iParam].options.push(
+                              [strings.constantLabel[paramData.options[iValue]],
+                              context.processing.internalInstance[paramData.options[iValue]]]);
                         }
                      }
                      if (paramData.pType) {
