@@ -1810,6 +1810,7 @@ var getContext = function(display, infos) {
          conv: function(value) { return typeof value == 'string' ? parseInt('0xff' + value.substr(1)) : value; } },
       'Angle': { pType: 'Number', bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0,
          conv: function(value) { return value * Math.PI / 180; } },
+      'Const': { conv: function(value) { return context.processing.internalInstance[value] || value; } },
       'ColorModeConst': { options: ["RGB", "HSB"] },
       'BlendConst': { options: ["BLEND", "ADD", "SUBTRACT", "DARKEST", "LIGHTEST", "DIFFERENCE", "EXCLUSION", "MULTIPLY", "SCREEN",
             "OVERLAY", "HARD_LIGHT", "SOFT_LIGHT", "DODGE", "BURN"] },
@@ -1843,8 +1844,7 @@ var getContext = function(display, infos) {
                         blockArgs[iParam] = $.extend({ options: [] }, blockArgs[iParam]);
                         for (var iValue = 0; iValue < paramData.options.length; iValue++) {
                            blockArgs[iParam].options.push(
-                              [strings.constantLabel[paramData.options[iValue]],
-                              context.processing.internalInstance[paramData.options[iValue]]]);
+                              [strings.constantLabel[paramData.options[iValue]], paramData.options[iValue]]);
                         }
                      }
                      if (paramData.pType) {
