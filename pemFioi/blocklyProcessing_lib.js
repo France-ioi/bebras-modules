@@ -27,10 +27,10 @@ var getContext = function(display, infos) {
             effect_material: "Effets – matière",
             color_setting: "Couleurs – réglages",
             color_creating_reading: "Couleurs – création et lecture",
-            image_loading: "Images – chargement",
+            image_displaying: "Images – affichage",
             image_pixels: "Images – pixels",
             rendering: "Rendu",
-            typography_loading: "Typographie – chargement",
+            typography_displaying: "Typographie – affichage",
             typography_attributes: "Typographie – attributs",
             typography_metrics: "Typographie – mesures"
          },
@@ -152,7 +152,7 @@ var getContext = function(display, infos) {
             lerpColor: "couleur intermédiaire entre %1 et %2 à l'emplacement %3",
             red: "rouge dans %1",
             saturation: "saturation dans %1",
-            // image_loading
+            // image_displaying
             createImage: "nouvelle image de taille %1 %2 au format %3",
             image: "afficher l'image %1 à %2 %3 avec la taille %4 %5",
             imageMode: "utiliser le mode %1 pour le positionnement des images",
@@ -172,7 +172,7 @@ var getContext = function(display, infos) {
             createGraphics: "nouveau graphisme de taille %1 %2 avec le moteur %3",
             beginDraw: "commencer à dessiner",
             endDraw: "terminer de dessiner",
-            // typography_loading
+            // typography_displaying
             PFont_list: "liste des polices disponibles",
             createFont: "nouvelle police de nom %1 et de taille %2",
             loadFont: "nouvelle police de nom %1",
@@ -306,7 +306,7 @@ var getContext = function(display, infos) {
             lerpColor: "couleurIntermediaire",//couleurIntermédiaire
             red: "rouge",
             saturation: "saturation",
-            // image_loading
+            // image_displaying
             createImage: "nouvelleImage",
             image: "image",
             imageMode: "modeImages",
@@ -326,7 +326,7 @@ var getContext = function(display, infos) {
             createGraphics: "nouveauGraphisme",
             beginDraw: "commencerDessin",
             endDraw: "terminerDessin",
-            // typography_loading
+            // typography_displaying
             PFont_list: "listePolices",
             createFont: "nouvellePolice",
             loadFont: "chargerPolice",
@@ -478,7 +478,7 @@ var getContext = function(display, infos) {
                "0,5 est au milieu des deux…)",
             red: "extrait la quantité de rouge d'une couleur",
             saturation: "extrait la quantité de saturation d'une couleur",
-            // image_loading
+            // image_displaying
             /*createImage: "nouvelleImage",
             image: "image",
             imageMode: "modeImages",
@@ -498,7 +498,7 @@ var getContext = function(display, infos) {
             createGraphics: "nouveauGraphisme",
             beginDraw: "commencerDessin()",
             endDraw: "terminerDessin()",
-            // typography_loading
+            // typography_displaying
             PFont_list: "listePolices()",
             createFont: "nouvellePolice",
             loadFont: "chargerPolice",
@@ -526,6 +526,36 @@ var getContext = function(display, infos) {
             blradius: "rayonBG",
             start: "début",
             stop: "fin",
+            detail: "détail",
+            squishy: "tension",
+            visible: "visible",
+            target: "cible",
+            angle: "angle",
+            constant: "constante",
+            linear: "coefLin",
+            quadratic: "coefQuad",
+            concentration: "concentration",
+            eyeX: "xŒil",
+            eyeY: "yŒil",
+            eyeZ: "zŒil",
+            centerX: "xCentre",
+            centerY: "yCentre",
+            centerZ: "zCentre",
+            upX: "xHaut",
+            upY: "yHaut",
+            upZ: "zHaut",
+            left: "gauche",
+            right: "droite",
+            bottom: "bas",
+            top: "haut",
+            near: "auprès",
+            far: "auLoin",
+            fov: "champDeVision",
+            aspect: "aspect",
+            zNear: "zPrès",
+            zFar: "zLoin",
+            shine: "brillance",
+            size: "taille",
             text: "texte",
             gray: "gris",
             alpha: "opacité",
@@ -540,7 +570,20 @@ var getContext = function(display, infos) {
             range2: "étendue2",
             range3: "étendue3",
             range4: "étendue4",
-            amount: "emplacement"
+            amount: "emplacement",
+            srcImg: "imgSrc",
+            dx: "xDest",
+            dy: "yDest",
+            dwidth: "largeurDest",
+            dheight: "largeurDest",
+            param: "param",
+            renderer: "moteur",
+            name: "nom",
+            data: "donnée",
+            font: "police",
+            align: "align",
+            yAlign: "alignY",
+            dist: "dist"
          },
          constantLabel: {
             // environment
@@ -711,10 +754,10 @@ var getContext = function(display, infos) {
             effect_material: "Effect – material",
             color_setting: "Color – setting",
             color_creating_reading: "Color – creating and reading",
-            image_loading: "Image – loading",
+            image_displaying: "Image – displaying",
             image_pixels: "Image – pixels",
             rendering: "Rendering",
-            typography_loading: "Typography – loading",
+            typography_displaying: "Typography – displaying",
             typography_attributes: "Typography – attributes",
             typography_metrics: "Typography – metrics"
          },
@@ -836,7 +879,7 @@ var getContext = function(display, infos) {
             lerpColor: "lerp color between %1 and %2 at position %3",
             red: "red of %1",
             saturation: "saturation of %1",
-            // image_loading
+            // image_displaying
             createImage: "new image of size %1 %2 with format %3",
             image: "display image %1 at %2 %3 with size %4 %5",
             imageMode: "use %1 mode to position images",
@@ -856,7 +899,7 @@ var getContext = function(display, infos) {
             createGraphics: "new graphics of size %1 %2 with renderer %3",
             beginDraw: "begin drawing",
             endDraw: "end drawing",
-            // typography_loading
+            // typography_displaying
             PFont_list: "list available fonts",
             createFont: "new font with name %1 and size %2",
             loadFont: "new font with name %1",
@@ -990,7 +1033,7 @@ var getContext = function(display, infos) {
             lerpColor: "lerpColor",
             red: "red",
             saturation: "saturation",
-            // image_loading
+            // image_displaying
             createImage: "createImage",
             image: "image",
             imageMode: "imageMode",
@@ -1010,7 +1053,7 @@ var getContext = function(display, infos) {
             createGraphics: "createGraphics",
             beginDraw: "beginDraw",
             endDraw: "endDraw",
-            // typography_loading
+            // typography_displaying
             PFont_list: "PFont_list",
             createFont: "createFont",
             loadFont: "loadFont",
@@ -1173,10 +1216,10 @@ var getContext = function(display, infos) {
             effect_material: 415,
             color_setting: 75,
             color_creating_reading: 85,
-            image_loading: 175,
+            image_displaying: 175,
             image_pixels: 185,
             rendering: 280,
-            typography_loading: 370,
+            typography_displaying: 370,
             typography_attributes: 380,
             typography_metrics: 390,
          }
@@ -1465,18 +1508,57 @@ var getContext = function(display, infos) {
          ],
          shape_curve: [
             { name: "bezier",
-               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "bezierDetail", params: ['Number'] },
-            { name: "bezierPoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "bezierTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
+               variants: [
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x1', 'y1', 'cx1', 'cy1', 'cx2', 'cy2', 'x2', 'y2'],
+                  ['x1', 'y1', 'z1', 'cx1', 'cy1', 'cz1', 'cx2', 'cy2', 'cz2', 'x2', 'y2', 'z2']
+               ]
+            },
+            { name: "bezierDetail",
+               params: ['Number'],
+               params_names: ['detail']
+            },
+            { name: "bezierPoint",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['a', 'b', 'c', 'd', 't'],
+               yieldsValue: true
+            },
+            { name: "bezierTangent",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['a', 'b', 'c', 'd', 't'],
+               yieldsValue: true
+            },
             { name: "curve",
-               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "curveDetail", params: ['Number'] },
-            { name: "curvePoint", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "curveTangent", params: ['Number', 'Number', 'Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "curveTightness", params: ['Number'] }
+               variants: [
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x1', 'y1', 'x2', 'y2', 'x3', 'y3', 'x4', 'y4'],
+                  ['x1', 'y1', 'z1', 'x2', 'y2', 'z2', 'x3', 'y3', 'z3', 'x4', 'y4', 'z4']
+               ]
+            },
+            { name: "curveDetail",
+               params: ['Number'],
+               params_names: ['detail']
+            },
+            { name: "curvePoint",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['a', 'b', 'c', 'd', 't'],
+               yieldsValue: true
+            },
+            { name: "curveTangent",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['a', 'b', 'c', 'd', 't'],
+               yieldsValue: true
+            },
+            { name: "curveTightness",
+               params: ['Number'],
+               params_names: ['squishy']
+            }
          ],
          shape_3D: [
             { name: "box",
@@ -1530,28 +1612,96 @@ var getContext = function(display, infos) {
          ],
          shape_vertex: [
             { name: "beginShape",
-               variants: [[],
-                  [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }]] },
+               variants: [
+                  [],
+                  [{ options: ["POINTS", "LINES", "TRIANGLES", "TRIANGLE_FAN", "TRIANGLE_STRIP", "QUADS", "QUAD_STRIP"] }]
+               ],
+               variants_names: [
+                  [],
+                  ['mode']
+               ]
+            },
             { name: "bezierVertex",
-               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "curveVertex", variants: [['Number', 'Number'], ['Number', 'Number', 'Number']] },
-            { name: "endShape", variants: [[], [{ options: ["CLOSE"] }]] },
-            { name: "texture", params: ['Image'] },
-            { name: "textureMode", params: [{ options: ["IMAGE", "NORMALIZED"] }] },
+               variants: [
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['cx1', 'cy1', 'cx2', 'cy2', 'x', 'y'],
+                  ['cx1', 'cy1', 'cz1', 'cx2', 'cy2', 'cz2', 'x', 'y', 'z']
+               ]
+            },
+            { name: "curveVertex",
+               variants: [
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x', 'y'],
+                  ['x', 'y', 'z']
+               ]
+            },
+            { name: "endShape",
+               variants: [
+                  [],
+                  [{ options: ["CLOSE"] }]
+               ],
+               variants_names: [
+                  [],
+                  ['mode']
+               ]
+            },
+            { name: "texture",
+               params: ['Image'],
+               params_names: ['image']
+            },
+            { name: "textureMode",
+               params: [{ options: ["IMAGE", "NORMALIZED"] }],
+               params_names: ['mode']
+            },
             { name: "vertex",
-               variants: [['Number', 'Number'], ['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number', 'Number']] }
+               variants: [
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x', 'y'],
+                  ['x', 'y', 'z'],
+                  ['x', 'y', 'u', 'v'],
+                  ['x', 'y', 'z', 'u', 'v']
+               ]
+            }
          ],
          shape_other: [
             { name: "shape",
-               variants: [['Shape'], ['Shape', 'Number', 'Number'], ['Shape', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "shapeMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
+               variants: [
+                  ['Shape'],
+                  ['Shape', 'Number', 'Number'],
+                  ['Shape', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['shape'],
+                  ['shape', 'x', 'y'],
+                  ['shape', 'x', 'y', 'width', 'height']
+               ]
+            },
+            { name: "shapeMode",
+               params: [{ options: ["CORNER", "CORNERS", "CENTER"] }],
+               params_names: ['mode']
+            },
             { name: "isVisible", yieldsValue: true },
-            { name: "setVisible", params: ['Boolean'] },
+            { name: "setVisible",
+               params: ['Boolean'],
+               params_names: ['visible']
+            },
             { name: "disableStyle" },
             { name: "enableStyle" },
-            { name: "getChild", params: ['String'] }
+            { name: "getChild",
+               params: ['String'],
+               params_names: ['target']
+            }
          ],
          debug: [
             { name: "print",
@@ -1564,56 +1714,200 @@ var getContext = function(display, infos) {
             }
          ],
          transform: [
-            { name: "applyMatrix", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
-                  'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
+            { name: "applyMatrix",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
+                  'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['n1_1', 'n1_2', 'n1_3', 'n1_4', 'n2_1', 'n2_2', 'n2_3', 'n2_4',
+                  'n3_1', 'n3_2', 'n3_3', 'n3_4', 'n4_1', 'n4_2', 'n4_3', 'n4_4']
+            },
             { name: "popMatrix" },
             { name: "printMatrix" },
             { name: "pushMatrix" },
             { name: "resetMatrix" },
-            { name: "rotate", params: ['Angle'] },
-            { name: "rotateX", params: ['Angle'] },
-            { name: "rotateY", params: ['Angle'] },
-            { name: "rotateZ", params: ['Angle'] },
-            { name: "scale", variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number']] },
-            { name: "translate", params: (infos['processing3D'] ? ['Number', 'Number', 'Number'] : ['Number', 'Number']) }
+            { name: "rotate",
+               params: ['Angle'],
+               params_names: ['angle']
+            },
+            { name: "rotateX",
+               params: ['Angle'],
+               params_names: ['angle']
+            },
+            { name: "rotateY",
+               params: ['Angle'],
+               params_names: ['angle']
+            },
+            { name: "rotateZ",
+               params: ['Angle'],
+               params_names: ['angle']
+            },
+            { name: "scale",
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['size'],
+                  ['x', 'y', 'z']
+               ]
+            },
+            { name: "translate",
+               params: infos['processing3D'] ? ['Number', 'Number', 'Number'] : ['Number', 'Number'],
+               params_names: infos['processing3D'] ? ['x', 'y', 'z'] : ['x', 'y']
+            }
          ],
          effect_lights: [
             { name: "ambientLight",
-               variants: [['Number', 'Number', 'Number'], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "directionalLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "lightFalloff", params: ['Number', 'Number', 'Number'] },
-            { name: "lightSpecular", params: ['Number', 'Number', 'Number'] },
+               variants: [
+                  ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['v1', 'v2', 'v3'],
+                  ['v1', 'v2', 'v3', 'x', 'y', 'z']
+               ]
+            },
+            { name: "directionalLight",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['v1', 'v2', 'v3', 'nx', 'ny', 'nz']
+            },
+            { name: "lightFalloff",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['constant', 'linear', 'quadratic']
+            },
+            { name: "lightSpecular",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['v1', 'v2', 'v3']
+            },
             { name: "lights" },
             { name: "noLights" },
-            { name: "normal", params: ['Number', 'Number', 'Number'] },
-            { name: "pointLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "spotLight", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
-                  'Number', 'Number', 'Number'] }
+            { name: "normal",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['nx', 'ny', 'nz']
+            },
+            { name: "pointLight",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['v1', 'v2', 'v3', 'nx', 'ny', 'nz']
+            },
+            { name: "spotLight",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number',
+                  'Number', 'Number', 'Number'],
+               params_names: ['v1', 'v2', 'v3', 'nx', 'ny', 'nz', 'angle', 'concentration']
+            }
          ],
          effect_camera: [
             { name: "beginCamera" },
             { name: "camera",
-               variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
+               variants: [
+                  [],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  [],
+                  ['eyeX', 'eyeY', 'eyeZ', 'centerX', 'centerY', 'centerZ', 'upX', 'upY', 'upZ']
+               ]
+            },
             { name: "endCamera" },
-            { name: "frustum", params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'] },
-            { name: "ortho", variants: [[], ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "perspective", variants: [[], ['Number', 'Number', 'Number', 'Number']] },
+            { name: "frustum",
+               params: ['Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+               params_names: ['left', 'right', 'bottom', 'top', 'near', 'far']
+            },
+            { name: "ortho",
+               variants: [
+                  [],
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  [],
+                  ['left', 'right', 'bottom', 'top', 'near', 'far']
+               ]
+            },
+            { name: "perspective",
+               variants: [
+                  [],
+                  ['Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  [],
+                  ['fov', 'aspect', 'zNear', 'zFar']
+               ]
+            },
             { name: "printCamera" },
             { name: "printProjection" }
          ],
          effect_coordinates: [
-            { name: "modelX", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "modelY", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "modelZ", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "screenX", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "screenY", params: ['Number', 'Number', 'Number'], yieldsValue: true },
-            { name: "screenZ", params: ['Number', 'Number', 'Number'], yieldsValue: true }
+            { name: "modelX",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            },
+            { name: "modelY",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            },
+            { name: "modelZ",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            },
+            { name: "screenX",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            },
+            { name: "screenY",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            },
+            { name: "screenZ",
+               params: ['Number', 'Number', 'Number'],
+               params_names: ['x', 'y', 'z'],
+               yieldsValue: true
+            }
          ],
          effect_material: [
-            { name: "ambient", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
-            { name: "emissive", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] },
-            { name: "shininess", params: ['Number'] },
-            { name: "specular", variants: [['Number'], ['Number', 'Number', 'Number'], ['Colour']] }
+            { name: "ambient",
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number', 'Number'],
+                  ['Colour']
+               ],
+               variants_names: [
+                  ['gray'],
+                  ['value1', 'value2', 'value3'],
+                  ['color']
+               ]
+            },
+            { name: "emissive",
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number', 'Number'],
+                  ['Colour']
+               ],
+               variants_names: [
+                  ['gray'],
+                  ['value1', 'value2', 'value3'],
+                  ['color']
+               ]
+            },
+            { name: "shininess",
+               params: ['Number'],
+               params_names: ['shine']
+            },
+            { name: "specular",
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number', 'Number'],
+                  ['Colour']
+               ],
+               variants_names: [
+                  ['gray'],
+                  ['value1', 'value2', 'value3'],
+                  ['color']
+               ]
+            }
          ],
          color_setting: [
             { name: "background",
@@ -1750,51 +2044,182 @@ var getContext = function(display, infos) {
                yieldsValue: true
             }
          ],
-         image_loading: [
-            { name: "createImage", params: ['Number', 'Number', { options: ["RGB", "ARGB", "ALPHA"] }], yieldsValue: true },
-            { name: "image", variants: [['Image', 'Number', 'Number'], ['Image', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "imageMode", params: [{ options: ["CORNER", "CORNERS", "CENTER"] }] },
+         image_displaying: [
+            { name: "createImage",
+               params: ['Number', 'Number', { options: ["RGB", "ARGB", "ALPHA"] }],
+               params_names: ['width', 'height', 'format'],
+               yieldsValue: true
+            },
+            { name: "image",
+               variants: [
+                  ['Image', 'Number', 'Number'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['image', 'x', 'y'],
+                  ['image', 'x', 'y', 'width', 'height']
+               ]
+            },
+            { name: "imageMode",
+               params: [{ options: ["CORNER", "CORNERS", "CENTER"] }],
+               params_names: ['mode']
+            },
             { name: "noTint" },
             { name: "tint",
-               variants: [['Number'], ['Number', 'Number'], ['Number', 'Number', 'Number'],
-                  ['Number', 'Number', 'Number', 'Number'], ['Colour']] },
-            { name: "resize", params: ['Number', 'Number'] }
+               variants: [
+                  ['Number'],
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number'],
+                  ['Colour'],
+                  ['Colour', 'Number']
+               ],
+               variants_names: [
+                  ['gray'],
+                  ['gray', 'alpha'],
+                  ['value1', 'value2', 'value3'],
+                  ['value1', 'value2', 'value3', 'alpha'],
+                  ['color'],
+                  ['color', 'alpha']
+               ]
+            },
+            { name: "resize",
+               params: ['Number', 'Number'],
+               params_names: ['width', 'height']
+            }
          ],
          image_pixels: [
             { name: "blend",
-               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst'],
-                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst']] },
+               variants: [
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'BlendConst']
+               ],
+               variants_names: [
+                  ['x', 'y', 'width', 'height', 'dx', 'dy', 'dwidth', 'dheight', 'mode'],
+                  ['srcImg', 'x', 'y', 'width', 'height', 'dx', 'dy', 'dwidth', 'dheight', 'mode']
+               ]
+            },
             { name: "copy",
-               variants: [['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
-                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "filter", variants: [['FilterConst'], ['FilterConst', 'Number']] },
-            { name: "get", variants: [[], ['Number', 'Number'], ['Number', 'Number', 'Number', 'Number']], yieldsValue: true },
+               variants: [
+                  ['Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number'],
+                  ['Image', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['x', 'y', 'width', 'height', 'dx', 'dy', 'dwidth', 'dheight'],
+                  ['srcImg', 'x', 'y', 'width', 'height', 'dx', 'dy', 'dwidth', 'dheight']
+               ]
+            },
+            { name: "filter",
+               variants: [
+                  ['FilterConst'],
+                  ['FilterConst', 'Number']
+               ],
+               variants_names: [
+                  ['mode'],
+                  ['mode', 'param']
+               ]
+            },
+            { name: "get",
+               variants: [
+                  [],
+                  ['Number', 'Number'],
+                  ['Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  [],
+                  ['x', 'y'],
+                  ['x', 'y', 'width', 'height']
+               ],
+               yieldsValue: true
+            },
             { name: "loadPixels" },
             { name: "pixels", yieldsValue: true }, // must be a list
-            { name: "set", variants: [['Number', 'Number', 'Colour'], ['Number', 'Number', 'Image']] },
+            { name: "set",
+               variants: [
+                  ['Number', 'Number', 'Colour'],
+                  ['Number', 'Number', 'Image']
+               ],
+               variants_names: [
+                  ['x', 'y', 'color'],
+                  ['x', 'y', 'image']
+               ]
+            },
             { name: "updatePixels" }
          ],
          rendering: [
-            { name: "createGraphics", params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }], yieldsValue: true },
+            { name: "createGraphics",
+               params: ['Number', 'Number', { options: ["P2D", "P3D", "JAVA2D"] }],
+               params_names: ['width', 'height', 'renderer'],
+               yieldsValue: true
+            },
             { name: "beginDraw" },
             { name: "endDraw" }
          ],
-         typography_loading: [
+         typography_displaying: [
             { name: "PFont_list", yieldsValue: true },
-            { name: "createFont", params: ['String', 'Number'], yieldsValue: true },
-            { name: "loadFont", params: ['String'], yieldsValue: true },
+            { name: "createFont",
+               params: ['String', 'Number'],
+               params_names: ['name', 'size'],
+               yieldsValue: true
+            },
+            { name: "loadFont",
+               params: ['String'],
+               params_names: ['name'],
+               yieldsValue: true
+            },
             { name: "text_",
-               variants: [[null, 'Number', 'Number'], [null, 'Number', 'Number', 'Number'],
+               variants: [
+                  [null, 'Number', 'Number'],
+                  [null, 'Number', 'Number', 'Number'],
                   ['String', 'Number', 'Number', 'Number', 'Number'],
-                  ['String', 'Number', 'Number', 'Number', 'Number', 'Number']] },
-            { name: "textFont", params: ['Font', 'Number'] }
+                  ['String', 'Number', 'Number', 'Number', 'Number', 'Number']
+               ],
+               variants_names: [
+                  ['data', 'x', 'y'],
+                  ['data', 'x', 'y', 'z'],
+                  ['text', 'x', 'y', 'width', 'height'],
+                  ['text', 'x', 'y', 'width', 'height', 'z']
+               ]
+            },
+            { name: "textFont",
+               variants: [
+                  ['Font'],
+                  ['Font', 'Number']
+               ],
+               variants_names: [
+                  ['font'],
+                  ['font', 'size']
+               ]
+            }
          ],
          typography_attributes: [
-            { name: "textAlign", params: [{ options: ["LEFT", "CENTER", "RIGHT"] }, { options: ["TOP", "BOTTOM", "CENTER", "BASELINE"] }] },
-            { name: "textLeading", params: ['Number'] },
-            { name: "textMode", params: [{ options: ["MODEL", "SCREEN", "SHAPE"] }] },
-            { name: "textSize", params: ['Number'] },
-            { name: "textWidth", params: ['String'], yieldsValue: true }
+            { name: "textAlign",
+               variants: [
+                  [{ options: ["LEFT", "CENTER", "RIGHT"] }],
+                  [{ options: ["LEFT", "CENTER", "RIGHT"] }, { options: ["TOP", "BOTTOM", "CENTER", "BASELINE"] }]
+               ],
+               variants_names: [
+                  ['align'],
+                  ['align', 'yAlign']
+               ]
+            },
+            { name: "textLeading",
+               params: ['Number'],
+               params_names: ['dist']
+            },
+            { name: "textMode",
+               params: [{ options: ["MODEL", "SCREEN", "SHAPE"] }],
+               params_names: ['mode']
+            },
+            { name: "textSize",
+               params: ['Number'],
+               params_names: ['size']
+            },
+            { name: "textWidth",
+               params: ['String'],
+               params_names: ['text'],
+               yieldsValue: true
+            }
          ],
          typography_metrics: [
             { name: "textAscent", yieldsValue: true },
