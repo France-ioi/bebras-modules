@@ -69,8 +69,7 @@ var getContext = function(display, infos, curLevel) {
       context.updateScale();
    };
 
-   // Update the context's display to the new scale (after a window resize for
-   // instance)
+   // Update the context's display to the new scale (after a window resize for instance)
    context.updateScale = function() {
       if (!context.display) {
          return;
