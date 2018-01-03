@@ -103,7 +103,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             wsConfig.scrollbars = true;
             wsConfig.trashcan = true;
             if (maxBlocks != undefined) {
-               wsConfig.maxBlocks = maxBlocks + 1;
+               // Add 1 to compensate for the starting block
+               // Add 1000 to allow for a larger block limit
+               wsConfig.maxBlocks = maxBlocks + 1001;
             }
             if (options.readOnly) {
                wsConfig.readOnly = true;
@@ -206,6 +208,19 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 500);
       },
 
+      resetDisplayFct: function() {
+         if(this.mainContext.runner) {
+            this.mainContext.runner.reset();
+         }
+         if(this.scratchMode) {
+            this.glowBlock(null);
+         }
+         if(this.quickAlgoInterface) {
+            this.quickAlgoInterface.resetTestScores();
+         }
+         $('#errors').html('');
+      },
+
       onChange: function(event) {
          var eventType = event ? event.constructor : null;
 
@@ -219,6 +234,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                // Update the remaining blocks display
                var remaining = this.workspace.remainingCapacity(maxBlocks+1);
+               if(!this.scratchMode) {
+                  remaining -= 1000; // Remove the 1000 added to the limit earlier
+               }
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
@@ -234,17 +252,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                }
             }
 
-            // TODO :: put into a resetDisplay function, find other elements to reset
-            if(this.mainContext.runner) {
-               this.mainContext.runner.reset();
+            if(!this.resetDisplay) {
+               this.resetDisplay = debounce(this.resetDisplayFct.bind(this), 500, false);
             }
-            if(this.scratchMode) {
-               this.glowBlock(null);
-            }
-            if(this.quickAlgoInterface) {
-               this.quickAlgoInterface.resetTestScores();
-            }
-            $('#errors').html('');
+            this.resetDisplay();
          } else {
             Blockly.svgResize(this.workspace);
          }
@@ -534,12 +545,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
          that.highlightPause = false;
-         if(this.scratchMode) {
-            if(that.workspace.remainingCapacity(maxBlocks) < 0) {
-               $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
-               return;
-            }
-         } else {
+         if(that.workspace.remainingCapacity(maxBlocks+1) < (this.scratchMode ? 0 : 1000)) {
+            $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            return;
+         }
+         if(!this.scratchMode) {
             that.workspace.traceOn(true);
             that.workspace.highlightBlock(null);
          }
