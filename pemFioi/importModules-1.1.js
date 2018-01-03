@@ -59,7 +59,7 @@ var importableModules = function () {
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
       'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
-      'blockly-example': {src: modulesPath+"/pemFioi/blocklyExample_lib.js", id: "blocklyExample_lib"},
+      'blockly-template': {src: modulesPath+"/pemFioi/blocklyTemplate_lib.js", id: "blocklyTemplate_lib"},
       'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
 
       'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},

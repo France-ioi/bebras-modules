@@ -33,27 +33,27 @@ You can ensure it works by opening any task as a file `index.html` in a subfolde
 
 ## Setup your library
 
-The file `blocklyExample_lib.js` within the folder `modules/pemFioi` is a library with simple settings,
+The file `blocklyTemplate_lib.js` within the folder `modules/pemFioi` is a library with simple settings,
 ready to be used for a new library. You can create your library as a copy of this file,
-replacing `Example` with the name of your library in the filename.
+replacing `Template` with the name of your library in the filename.
 For instance, your new file will be named `blocklyMyLib_lib.js`.
 
-In the file, you’ll see the following sections (with the according definitions):
-* display strings (`localLanguageStrings`);
-* basic variables (`context`, `strings`, `context.example`);
-* context management functions (`reset`, `resetDisplay`, `updateScale`, `unload`);
-* your library’s functions (`context.example.something`);
-* block definitions (`context.customBlocks`, `context.provideBlocklyColours`);
-* Python constant definitions (`context.customConstants`).
+In the file, you’ll see the following sections with the given identifiers:
+1. Display strings: `localLanguageStrings`
+2. Basic variables: `context`, `strings`, `context.template`
+3. Context management functions: `reset`, `resetDisplay`, `updateScale`, `unload`
+4. Your library’s functions: `context.template.something`
+5. Block definitions: `context.customBlocks`, `context.provideBlocklyColours`
+6. Python constant definitions: `context.customConstants`
 
 Many comments (`// end-line` or `/* multi-line */`) provide information about those elements.
 You can of course remove them whenever they are useless for you.
 
-You should start by changing every occurrence of the word `example` to the name of your library.
+You should start by changing every occurrence of the word `template` to the name of your library.
 
 Then you must specify an importing rule for your library:
 open one of the `importModules-*.js` files (the one you want to use; currently 1.1 is recommended),
-duplicate the line of `blockly-example` and edit the words `example` and `Example` to refer to your library.
+duplicate the line of `blockly-template` and edit the words `template` and `Template` to refer to your library.
 Your new rule should look like this:
 ```js
 'blockly-myLib': {src: modulesPath+"/pemFioi/blocklyMyLib_lib.js", id: "blocklyMyLib_lib"},
@@ -65,19 +65,19 @@ At the end of this step, your library can already be used.
 
 Shaping your library will be much easier if you can test it along the way.
 
-In the folder `module_testing`, a subfolder `test-example` contains an exercise that tests
-the `blockly-example` library. Make a copy of this folder, changing `example` to `myLib`
-or your actual name as usual. Then go into your new folder.
+In the folder `module_testing`, a subfolder `test-template` contains an exercise that tests
+the `blockly-template` library. Make a copy of this folder, changing `template` to `myLib`
+or your actual name as usual. Then enter your new folder.
 
 In the file `index.html`:
 * change the `window.stringsLanguage` value to the code of the user language you want, e.g. `'en'`;
 * ensure the `importModules-*.js` included script is the one you chose at the previous step;
-* at the end of the `importModules(…)` statement, change `blockly-example` to the name
+* at the end of the `importModules(…)` statement, change `blockly-template` to the name
   of your importing rule;
 * you may specify a title for your task in the `<title>` and `<h1>` tags,
   and user instructions in the `<div id="taskIntro">` tag.
 
-In the `task.js` file, change the word `example` to the name of your library.
+In the `task.js` file, change the word `template` to the name of your library.
 
 From there, you can open the file `index.html` in your browser and have fun
 with the three effectless blocks.
@@ -94,7 +94,7 @@ with the three effectless blocks.
 
 … (with and without display)
 
-## Block configuration
+## Define advanced blocks
 
 ### Parameter types and return values
 

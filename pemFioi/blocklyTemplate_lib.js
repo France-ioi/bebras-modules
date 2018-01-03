@@ -1,4 +1,4 @@
-// This is an example of library for use with quickAlgo.
+// This is a template of library for use with quickAlgo.
 
 var getContext = function(display, infos, curLevel) {
    // Local language strings for each language
@@ -35,9 +35,9 @@ var getContext = function(display, infos, curLevel) {
       none: {
          comment: {
             // Comments for each block, used in the auto-generated documentation for task writers
-            doAction: "This function needs an integer, but does nothing because it's an example.",
-            doNothing: "This function really does nothing, it's an example.",
-            readSensor: "Will always return 1, because it's an example."
+            doAction: "This function needs an integer, but does nothing because it's a template.",
+            doNothing: "This function really does nothing, it's a template.",
+            readSensor: "Will always return 1, because it's a template."
          }
       }
    }
@@ -48,7 +48,7 @@ var getContext = function(display, infos, curLevel) {
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
    // Some data can be made accessible by the library through the context object
-   context.example = {};
+   context.template = {};
 
    // A context must have a reset function to get back to the initial state
    context.reset = function(taskInfos) {
@@ -91,25 +91,25 @@ var getContext = function(display, infos, curLevel) {
       Blocks will generally use context.group.blockName as their handler
       function, hence we generally use this name for the functions. */
 
-   context.example.doAction = function(value, callback) {
+   context.template.doAction = function(value, callback) {
       // Do the action, and do the display of the action
       // The timing of the action should correspond to infos.actionDelay, which
       // changes depending on the speed chosen by the user
 
       // For actions, we call the callback through waitDelay, to wait for the
       // end of the display animation associated with the action (here, there's
-      // no display animation because it's an example)
+      // no display animation because it's a template)
       context.waitDelay(callback);
    };
 
-   context.example.doNothing = function(callback) {
-      // Example of function without argument
+   context.template.doNothing = function(callback) {
+      // Template of function without argument
       context.waitDelay(callback);
    };
 
-   context.example.readSensor = function(callback) {
+   context.template.readSensor = function(callback) {
       // This is a sensor: it returns a value.
-      // Here, it always returns 1 because it's an example.
+      // Here, it always returns 1 because it's a template.
       var returnVal = 1;
 
       // Here, there's no delay as there's no display; we give the return value
@@ -142,8 +142,8 @@ var getContext = function(display, infos, curLevel) {
    */
 
    context.customBlocks = {
-      // Define our blocks for our namespace "example"
-      example: {
+      // Define our blocks for our namespace "template"
+      template: {
          // Categories are reflected in the Blockly menu
          actions: [
             { name: "doAction", params: [null] }, // Function taking an argument
@@ -168,10 +168,10 @@ var getContext = function(display, infos, curLevel) {
 
    // Constants available in Python
    context.customConstants = {
-      example: [
+      template: [
          { name: "ONE", value: 1 },
          { name: "TRUEVALUE", value: true },
-         { name: "LIBNAME", value: "example" }
+         { name: "LIBNAME", value: "template" }
       ]
    };
 
