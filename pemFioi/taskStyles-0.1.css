@@ -164,6 +164,9 @@ textarea {
 #taskContent {
    text-align: justify;
 }
+.pythonIntro code {
+   cursor: pointer;
+}
 
 #success,
 #error {

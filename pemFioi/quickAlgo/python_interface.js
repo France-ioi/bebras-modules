@@ -369,20 +369,21 @@ function LogicController(nbTestCases, maxInstructions) {
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
+          var blockDesc;
           if(this._mainContext.docGenerator) {
-            var blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock])
+            blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock])
           } else {
             var blockName = blockList[iBlock];
-            var blockDesc = this._mainContext.strings.description[blockName];
+            blockDesc = this._mainContext.strings.description[blockName];
             if (!blockDesc) {
               var funcName = this._mainContext.strings.code[blockName];
               if (!funcName) {
                 funcName = blockName;
               }
-              blockDesc = funcName + '()';
+              blockDesc = '<code>' + funcName + '()</code>';
             }
           }
-          pythonHtml += '<li><code>' + blockDesc + '</code></li>';
+          pythonHtml += '<li>' + blockDesc + '</li>';
         }
 
         // Handle constants as well
@@ -406,46 +407,36 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
 
-    var elifIdx = pflInfos.allowed.indexOf('elif');
-    if(elifIdx >= 0) {
-      pflInfos.allowed.splice(elifIdx, 1);
-    }
-    elifIdx = pflInfos.forbidden.indexOf('elif');
-    if(elifIdx >= 0) {
-      pflInfos.forbidden.splice(elifIdx, 1);
-    }
+    function processForbiddenList(list, word) {
+      var elifIdx = list.indexOf('elif');
+      if(elifIdx >= 0) {
+        list.splice(elifIdx, 1);
+      }
 
-    var listsIdx = pflInfos.allowed.indexOf('list_brackets');
-    if(listsIdx >= 0) {
-      pflInfos.allowed[listsIdx] = 'crochets [ ]';
-    }
-    listsIdx = pflInfos.forbidden.indexOf('list_brackets');
-    if(listsIdx >= 0) {
-      pflInfos.forbidden[listsIdx] = 'crochets [ ]';
-    }
+      var bracketsWords = { list_brackets: 'crochets [ ]', dict_brackets: 'accolades { }' };
+      for(var bracketsCode in bracketsWords) {
+        var bracketsIdx = list.indexOf(bracketsCode);
+        if(bracketsIdx >= 0) {
+          list[bracketsIdx] = bracketsWords[bracketsCode];
+        }
+      }
 
-    var listsIdx = pflInfos.allowed.indexOf('dict_brackets');
-    if(listsIdx >= 0) {
-      pflInfos.allowed[listsIdx] = 'accolades { }';
+      if(list.length == 1) {
+        pythonHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
+      } else if (list.length > 0) {
+        pythonHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
+      }  
     }
-    listsIdx = pflInfos.forbidden.indexOf('dict_brackets');
-    if(listsIdx >= 0) {
-      pflInfos.forbidden[listsIdx] = 'accolades { }';
-    }
-
-    if(pflInfos.allowed.length == 1) {
-      pythonHtml += '<p>Le mot-clé suivant est autorisé : <code>' + pflInfos.allowed[0] + '</code>.</p>';
-    } else if (pflInfos.allowed.length > 0) {
-      pythonHtml += '<p>Les mots-clés suivants sont autorisés : <code>' + pflInfos.allowed.join('</code>, <code>') + '</code>.</p>';
-    }
-    if(pflInfos.forbidden.length == 1) {
-      pythonHtml += '<p>Le mot-clé suivant est interdit : <code>' + pflInfos.forbidden[0] + '</code>.</p>';
-    } else if(pflInfos.forbidden.length > 0) {
-      pythonHtml += '<p>Les mots-clés suivants sont interdits : <code>' + pflInfos.forbidden.join('</code>, <code>') + '</code>.</p>';
-    }
+    processForbiddenList(pflInfos.allowed, 'autorisé');
+    processForbiddenList(pflInfos.forbidden, 'interdit');
 
     pythonHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python ou utiliser un moteur de recherche pendant le concours.</p>';
     pythonDiv.html(pythonHtml);
+
+    var controller = this;
+    pythonDiv.on('click', 'code', function() {
+      controller._aceEditor.insert(this.innerHTML);
+    });
   };
 
   this.toggleSize = function () {
