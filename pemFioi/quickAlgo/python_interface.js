@@ -381,6 +381,9 @@ function LogicController(nbTestCases, maxInstructions) {
                 funcName = blockName;
               }
               blockDesc = '<code>' + funcName + '()</code>';
+            } else if (blockDesc.indexOf('</code>') < 0) {
+              var funcNameEnd = blockDesc.indexOf(')') + 1;
+              blockDesc = '<code>' + blockDesc.substring(0, funcNameEnd) + '</code>' + blockDesc.substring(funcNameEnd);
             }
           }
           pythonHtml += '<li>' + blockDesc + '</li>';
@@ -423,7 +426,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
       if(list.length == 1) {
         pythonHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
-      } else if (list.length > 0) {
+      } else if(list.length > 0) {
         pythonHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
       }  
     }
@@ -435,7 +438,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var controller = this;
     pythonDiv.on('click', 'code', function() {
-      controller._aceEditor.insert(this.innerHTML);
+      controller._aceEditor && controller._aceEditor.insert(this.innerHTML);
     });
   };
 
