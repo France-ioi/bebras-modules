@@ -405,7 +405,7 @@ function LogicController(nbTestCases, maxInstructions) {
     }
 
     if(availableConsts.length) {
-      pythonHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code></p>';
+      pythonHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
     }
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);

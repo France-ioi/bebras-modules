@@ -22,8 +22,8 @@ with the Bebras resources and to submit your work, but you can also simply downl
    click on the ‘Clone or download’ button and select the link ‘Download ZIP’.
    Once it is downloaded, unzip your `bebras-modules` folder.
 
-   Download the zipped [bebras-modules](https://github.com/France-ioi/bebras-modules) repository the same way.
-   Then put the extracted directory inside the `bebras-tasks` main folder and name it `modules`.
+   Download the zipped [bebras-modules](https://github.com/France-ioi/bebras-modules) repository the same way,
+   then put the extracted directory inside the `bebras-tasks` main folder and name it `modules`.
    The `bebras-modules` downloaded directory (should be `bebras-modules-master`) must be put
    as a `modules` folder inside the `bebras-tasks` directory, i.e. it must be renamed to simply `modules`
    and replace the initially present `modules` folder in the `bebras-tasks` directory.
@@ -40,9 +40,9 @@ For instance, your new file will be named `blocklyMyLib_lib.js`.
 
 In the file, you’ll see the following sections with the given identifiers:
 1. Display strings: `localLanguageStrings`
-2. Basic variables: `context`, `strings`, `context.template`
-3. Context management functions: `reset`, `resetDisplay`, `updateScale`, `unload`
-4. Your library’s functions: `context.template.something`
+2. Basic initializations: `context`, `strings`, `context.template`
+3. Context management functions: `context.{funcName}` (`reset`, `resetDisplay`, `updateScale`, `unload`)
+4. Your library’s functions: `context.template.{funcName}`
 5. Block definitions: `context.customBlocks`, `context.provideBlocklyColours`
 6. Python constant definitions: `context.customConstants`
 
