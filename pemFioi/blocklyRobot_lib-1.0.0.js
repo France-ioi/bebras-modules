@@ -139,6 +139,28 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      chticode_abs: {
+         fr: {
+            label: {
+               
+            },
+             messages: {
+               successPickedAllWithdrawables: "Bravo, votre robot a réussi la mission !",
+               failureReachExit: "Votre robot n'a pas atteint la case verte."
+            }
+         }
+      },
+      chticode_rel: {
+         fr: {
+            label: {
+               
+            },
+             messages: {
+               successReachExit: "Bravo, votre robot a atteint la case verte !",
+               failureReachExit: "Votre robot n'a pas atteint la case verte."
+            }
+         }
+      },
       cones: {
          fr: {
             label: {
@@ -407,69 +429,6 @@ var getContext = function(display, infos, curLevel) {
                }
             },
             {
-               name: "onPurple",
-               strings: {
-                  fr: {
-                     label: "carte violette",
-                     code: "surViolet",
-                     description: "surViolet(): Le robot est-il sur une carte violette ?"
-                  }
-               },
-               category: "robot",
-               type: "sensors",
-               block: {
-                  name: "onPurple",
-                  yieldsValue: true
-               },
-               func: function(callback) {
-                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
-                  this.callCallback(callback, this.isOn(function(obj) {return obj.isPurple===true;}));
-               }
-            },
-            {
-               name: "onOrange",
-               strings: {
-                  fr: {
-                     label: "carte orange",
-                     code: "surOrange",
-                     description: "surOrange(): Le robot est-il sur une carte orange ?"
-                  }
-               },
-               category: "robot",
-               type: "sensors",
-               block: {
-                  name: "onOrange",
-                  yieldsValue: true
-               },
-               func: function(callback) {
-                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
-                  this.callCallback(callback, this.isOn(function(obj) {return obj.isOrange===true;}));
-               }
-            },
-            {
-               name: "onGreen",
-               strings: {
-                  fr: {
-                     label: "carte verte",
-                     code: "surVert",
-                     description: "surviolet(): Le robot est-il sur une carte verte ?"
-                  }
-               },
-               category: "robot",
-               type: "sensors",
-               block: {
-                  name: "onGreen",
-                  yieldsValue: true
-               },
-               func: function(callback) {
-                  if(!this.isOn(function(obj) {return obj.isWithdrawable===true || obj.isContainer===true;}))
-                     throw(strings.messages.nothingToLookAt);
-                  this.callCallback(callback, this.isOn(function(obj) {return obj.isGreen===true;}));
-               }
-            },
-            {
                name: "onQuadrille",
                strings: {
                   fr: {
@@ -537,50 +496,40 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#abeaf4",
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
-            purple: { num: 2, img: "purple.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isPurple === true; }, zOrder: 0 },
-            green: { num: 3, img: "green.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isGreen === true; }, zOrder: 0 },
-            orange: { num: 4, img: "orange.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isOrange === true; }, zOrder: 0 },
+            square: { num: 2, img: "purple.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isSquare === true; }, zOrder: 0 },
+            round: { num: 3, img: "green.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isRound === true; }, zOrder: 0 },
+            triangle: { num: 4, img: "orange.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isTriangle === true; }, zOrder: 0 },
             dotted: { num: 5, img: "dotted.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isDotted === true; }, zOrder: 0 },
             striped: { num: 6, img: "striped.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isStriped === true; }, zOrder: 0 },
             quadrille: { num: 7, img: "quadrille.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isQuadrille === true; }, zOrder: 0 },
-            roundPurpleQuadrille: { img: "roundPurpleQuadrille.png", side: 60, isWithdrawable: true, isRound: true, isPurple: true, isQuadrille: true, zOrder: 1 },
-            squarePurpleQuadrille: { img: "squarePurpleQuadrille.png", side: 60, isWithdrawable: true, isSquare: true, isPurple: true, isQuadrille: true, zOrder: 1 },
-            trianglePurpleQuadrille: { img: "trianglePurpleQuadrille.png", side: 60, isWithdrawable: true, isTriangle: true, isPurple: true, isQuadrille: true, zOrder: 1 },
-            roundOrangeQuadrille: { img: "roundOrangeQuadrille.png", side: 60, isWithdrawable: true, isRound: true, isOrange: true, isQuadrille: true, zOrder: 1 },
-            squareOrangeQuadrille: { img: "squareOrangeQuadrille.png", side: 60, isWithdrawable: true, isSquare: true, isOrange: true, isQuadrille: true, zOrder: 1 },
-            triangleOrangeQuadrille: { img: "triangleOrangeQuadrille.png", side: 60, isWithdrawable: true, isTriangle: true, isOrange: true, isQuadrille: true, zOrder: 1 },
-            roundGreenQuadrille: { img: "roundGreenQuadrille.png", side: 60, isWithdrawable: true, isRound: true, isGreen: true, isQuadrille: true, zOrder: 1 },
-            squareGreenQuadrille: { img: "squareGreenQuadrille.png", side: 60, isWithdrawable: true, isSquare: true, isGreen: true, isQuadrille: true, zOrder: 1 },
-            triangleGreenQuadrille: { img: "triangleGreenQuadrille.png", side: 60, isWithdrawable: true, isTriangle: true, isGreen: true, isQuadrille: true, zOrder: 1 },
-            roundPurpleStriped: { img: "roundPurpleStriped.png", side: 60, isWithdrawable: true, isRound: true, isPurple: true, isStriped: true, zOrder: 1 },
-            squarePurpleStriped: { img: "squarePurpleStriped.png", side: 60, isWithdrawable: true, isSquare: true, isPurple: true, isStriped: true, zOrder: 1 },
-            trianglePurpleStriped: { img: "trianglePurpleStriped.png", side: 60, isWithdrawable: true, isTriangle: true, isPurple: true, isStriped: true, zOrder: 1 },
-            roundOrangeStriped: { img: "roundOrangeStriped.png", side: 60, isWithdrawable: true, isRound: true, isOrange: true, isStriped: true, zOrder: 1 },
-            squareOrangeStriped: { img: "squareOrangeStriped.png", side: 60, isWithdrawable: true, isSquare: true, isOrange: true, isStriped: true, zOrder: 1 },
-            triangleOrangeStriped: { img: "triangleOrangeStriped.png", side: 60, isWithdrawable: true, isTriangle: true, isOrange: true, isStriped: true, zOrder: 1 },
-            roundGreenStriped: { img: "roundGreenStriped.png", side: 60, isWithdrawable: true, isRound: true, isGreen: true, isStriped: true, zOrder: 1 },
-            squareGreenStriped: { img: "squareGreenStriped.png", side: 60, isWithdrawable: true, isSquare: true, isGreen: true, isStriped: true, zOrder: 1 },
-            triangleGreenStriped: { img: "triangleGreenStriped.png", side: 60, isWithdrawable: true, isTriangle: true, isGreen: true, isStriped: true, zOrder: 1 },
-            roundPurpleDotted: { img: "roundPurpleDotted.png", side: 60, isWithdrawable: true, isRound: true, isPurple: true, isDotted: true, zOrder: 1 },
-            squarePurpleDotted: { img: "squarePurpleDotted.png", side: 60, isWithdrawable: true, isSquare: true, isPurple: true, isDotted: true, zOrder: 1 },
-            trianglePurpleDotted: { img: "trianglePurpleDotted.png", side: 60, isWithdrawable: true, isTriangle: true, isPurple: true, isDotted: true, zOrder: 1 },
-            roundOrangeDotted: { img: "roundOrangeDotted.png", side: 60, isWithdrawable: true, isRound: true, isOrange: true, isDotted: true, zOrder: 1 },
-            squareOrangeDotted: { img: "squareOrangeDotted.png", side: 60, isWithdrawable: true, isSquare: true, isOrange: true, isDotted: true, zOrder: 1 },
-            triangleOrangeDotted: { img: "triangleOrangeDotted.png", side: 60, isWithdrawable: true, isTriangle: true, isOrange: true, isDotted: true, zOrder: 1 },
-            roundGreenDotted: { img: "roundGreenDotted.png", side: 60, isWithdrawable: true, isRound: true, isGreen: true, isDotted: true, zOrder: 1 },
-            squareGreenDotted: { img: "squareGreenDotted.png", side: 60, isWithdrawable: true, isSquare: true, isGreen: true, isDotted: true, zOrder: 1 },
-            triangleGreenDotted: { img: "triangleGreenDotted.png", side: 60, isWithdrawable: true, isTriangle: true, isGreen: true, isDotted: true, zOrder: 1 },
+            roundQuadrille: { img: "roundQuadrille.png", side: 60, isWithdrawable: true, isRound: true, isQuadrille: true, zOrder: 1 },
+            squareQuadrille: { img: "squareQuadrille.png", side: 60, isWithdrawable: true, isSquare: true, isQuadrille: true, zOrder: 1 },
+            triangleQuadrille: { img: "triangleQuadrille.png", side: 60, isWithdrawable: true, isTriangle: true, isQuadrille: true, zOrder: 1 },
+            roundStriped: { img: "roundStriped.png", side: 60, isWithdrawable: true, isRound: true, isStriped: true, zOrder: 1 },
+            squareStriped: { img: "squareStriped.png", side: 60, isWithdrawable: true, isSquare: true, isStriped: true, zOrder: 1 },
+            triangleStriped: { img: "triangleStriped.png", side: 60, isWithdrawable: true, isTriangle: true, isStriped: true, zOrder: 1 },
+            roundDotted: { img: "roundDotted.png", side: 60, isWithdrawable: true, isRound: true, isDotted: true, zOrder: 1 },
+            squareDotted: { img: "squareDotted.png", side: 60, isWithdrawable: true, isSquare: true, isDotted: true, zOrder: 1 },
+            triangleDotted: { img: "triangleDotted.png", side: 60, isWithdrawable: true, isTriangle: true, isDotted: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
-      chticode: {
+      chticode_abs: {
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true },
+            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
-            gem: { num: 3, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
-            green: { num: 3, color: "#b5e61d", side: 60, isExit: true}
+            green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0 },
+            gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkBothReachAndCollect
+      },
+      chticode_rel: {
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
+            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
+            green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
+         },
+         checkEndCondition: robotEndConditions.checkReachExit
       },
       cones: {
          bagInit: {
@@ -607,75 +556,77 @@ var getContext = function(display, infos, curLevel) {
       dominoes: {
          newBlocks: [
            {
-             name: "onYellow",
+             name: "onCross",
              strings: {
                fr: {
-                 label: "sur du jaune",
-                 code: "surJaune",
-                 description: "surJaune(): Le robot est-il sur du jaune ?"
+                 label: "sur croix",
+                 code: "surCroix",
+                 description: "surCroix(): Le robot est-il sur une croix ?"
                }
              },
              category: "robot",
              type: "sensors",
              block: {
-               name: "onYellow",
+               name: "onCross",
                yieldsValue: true
              },
              func: function(callback) {
-               this.callCallback(callback, this.isOn(function(obj) {return obj.isYellow===true;}));
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isCross===true;}));
              }
            },
            {
-             name: "onOrange",
+             name: "onStar",
              strings: {
                fr: {
-                 label: "sur du orange",
-                 code: "surOrange",
-                 description: "surOrange(): Le robot est-il sur du orange ?"
+                 label: "sur étoile",
+                 code: "surEtoile",
+                 description: "surEtoile(): Le robot est-il sur une étoile ?"
                }
              },
              category: "robot",
              type: "sensors",
              block: {
-               name: "onOrange",
+               name: "onStar",
                yieldsValue: true
              },
              func: function(callback) {
-               this.callCallback(callback, this.isOn(function(obj) {return obj.isOrange===true;}));
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isStar===true;}));
              }
            },
            {
-             name: "onBlue",
+             name: "onSquare",
              strings: {
                fr: {
-                 label: "sur du bleu",
-                 code: "surBleu",
-                 description: "surBleu(): Le robot est-il sur du bleu ?"
+                 label: "sur carré",
+                 code: "surCarre",
+                 description: "surCarre(): Le robot est-il sur du bleu ?"
                }
              },
              category: "robot",
              type: "sensors",
              block: {
-               name: "onBlue",
+               name: "onSquare",
                yieldsValue: true
              },
              func: function(callback) {
-               this.callCallback(callback, this.isOn(function(obj) {return obj.isBlue===true;}));
+               this.callCallback(callback, this.isOn(function(obj) {return obj.isSquare===true;}));
              }
            }
          ],
+         noBorders: true,
          backgroundColor: "#a40e0e",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
-            YY: { num: 2, img: "YY.png", side: 60, isWithdrawable: true, isYellow: true, zOrder: 1 },
-            YO: { num: 3, img: "YO.png", side: 60, isWithdrawable: true, isYellow: true, isOrange: true, zOrder: 1 },
-            YB: { num: 4, img: "YB.png", side: 60, isWithdrawable: true, isYellow: true, isBlue: true, zOrder: 1 },
-            OY: { num: 5, img: "OY.png", side: 60, isWithdrawable: true, isOrange: true, isYellow: true, zOrder: 1 },
-            OO: { num: 6, img: "OO.png", side: 60, isWithdrawable: true, isOrange: true, zOrder: 1 },
-            OB: { num: 7, img: "OB.png", side: 60, isWithdrawable: true, isOrange: true, isBlue: true, zOrder: 1 },
-            BY: { num: 8, img: "BY.png", side: 60, isWithdrawable: true, isBlue: true, isYellow: true, zOrder: 1 },
-            BO: { num: 9, img: "BO.png", side: 60, isWithdrawable: true, isBlue: true, isOrange: true, zOrder: 1 },
-            BB: { num: 10, img: "BB.png", side: 60, isWithdrawable: true, isBlue: true, zOrder: 1 },
+            contour: { num: 1, img: "contour.png", side: 60, zOrder: 0 },
+            GG: { num: 2, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
+            GO: { num: 3, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
+            GB: { num: 4, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
+            OG: { num: 5, img: "OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
+            OO: { num: 6, img: "OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
+            OB: { num: 7, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
+            BG: { num: 8, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
+            BO: { num: 9, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
+            BB: { num: 10, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
             board_background: { num: 11, color: "#ffffff", side: 60, zOrder: 0 },
             board: {num: 12, side: 60, isWritable: true, zOrder: 1 }
          }
@@ -690,10 +641,31 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
       },
       help: {
+         newBlocks: [
+            {
+               name: "onGreen",
+               strings: {
+                  fr: {
+                     label: "sur la case verte",
+                     code: "surCaseVerte",
+                     description: "surCaseVerte(): Le robot est-il sur la case verte ?"
+                  }
+               },
+               category: "robot",
+               type: "sensors",
+               block: {
+                  name: "onGreen",
+                  yieldsValue: true
+               },
+               func: function(callback) {
+                  this.callCallback(callback, this.isOn(function(obj) {return obj.isGreen===true;}));
+               }
+            },
+         ],
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
-            green: { num: 3, img: "green.png", side: 60, isExit: true}
+            green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true}
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -703,6 +675,7 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true,  zOrder: 2 },
             hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
+
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
@@ -750,6 +723,7 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 60, nbStates: 9, isRobot: true, offsetX: 3, zOrder: 2 },
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
+
             box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 }            
          },
@@ -969,6 +943,46 @@ var getContext = function(display, infos, curLevel) {
          var robot = this.getRobot();
          var coords = this.coordsInFront(3);
          this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeEast",
+      type: "sensors",
+      block: { name: "gridEdgeEast", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.col == this.nbCols - 1));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeWest",
+      type: "sensors",
+      block: { name: "gridEdgeWest", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.col == 0));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeNorth",
+      type: "sensors",
+      block: { name: "gridEdgeNorth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.row == 0));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeSouth",
+      type: "sensors",
+      block: { name: "gridEdgeSouth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, (robot.row == this.nbRows - 1));
       }
    });
    
@@ -1292,6 +1306,8 @@ var getContext = function(display, infos, curLevel) {
             cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
             if(infos.backgroundColor)
                cells[iRow][iCol].attr({'fill': infos.backgroundColor});
+            if(infos.noBorders)
+               cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
          }
       }
       if(infos.showLabels) {
@@ -1534,7 +1550,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.tryToBeOn = function(row, col) {
-      if(!context.isInGrid(row, col) || (context.tiles[row][col] == 0)) {
+      if(!context.isInGrid(row, col) || (context.tiles[row][col] == -1)) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.leavesGrid);
