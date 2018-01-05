@@ -541,7 +541,8 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             cone: { num: 3, img: "cone.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
-            contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 }
+            contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 },
+            fixed_cone: { num: 5, img: "cone.png", side: 60, isObstacle: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -617,18 +618,18 @@ var getContext = function(display, infos, curLevel) {
          backgroundColor: "#a40e0e",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 65, nbStates: 9, isRobot: true, offsetX: -2, offsetY: -2, zOrder: 2 },
-            contour: { num: 1, img: "contour.png", side: 60, zOrder: 0 },
-            GG: { num: 2, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
-            GO: { num: 3, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
-            GB: { num: 4, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
-            OG: { num: 5, img: "OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
-            OO: { num: 6, img: "OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
-            OB: { num: 7, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
-            BG: { num: 8, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
-            BO: { num: 9, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
-            BB: { num: 10, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
-            board_background: { num: 11, color: "#ffffff", side: 60, zOrder: 0 },
-            board: {num: 12, side: 60, isWritable: true, zOrder: 1 }
+            contour: { num: 2, img: "contour.png", side: 60, zOrder: 0 },
+            GG: { num: 3, img: "GG.png", side: 60, isWithdrawable: true, isCross: true, zOrder: 1 },
+            GO: { num: 4, img: "GO.png", side: 60, isWithdrawable: true, isCross: true, isStar: true, zOrder: 1 },
+            GB: { num: 5, img: "GB.png", side: 60, isWithdrawable: true, isCross: true, isSquare: true, zOrder: 1 },
+            OG: { num: 6, img: "OG.png", side: 60, isWithdrawable: true, isStar: true, isCross: true, zOrder: 1 },
+            OO: { num: 7, img: "OO.png", side: 60, isWithdrawable: true, isStar: true, zOrder: 1 },
+            OB: { num: 8, img: "OB.png", side: 60, isWithdrawable: true, isStar: true, isSquare: true, zOrder: 1 },
+            BG: { num: 9, img: "BG.png", side: 60, isWithdrawable: true, isSquare: true, isCross: true, zOrder: 1 },
+            BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
+            BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
+            board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
+            board: {num: 13, side: 60, isWritable: true, zOrder: 1 }
          }
       },
       gems: {
