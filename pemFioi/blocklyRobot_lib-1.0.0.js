@@ -1304,9 +1304,11 @@ var getContext = function(display, infos, curLevel) {
          cells[iRow] = [];
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
-            if(infos.backgroundColor)
+            if(context.tiles[iRow][iCol] == 0)
+               cells[iRow][iCol].attr({'stroke-width': '0'});
+            if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
                cells[iRow][iCol].attr({'fill': infos.backgroundColor});
-            if(infos.noBorders)
+            if(infos.noBorders && context.tiles[iRow][iCol] != 0)
                cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
          }
       }
@@ -1550,7 +1552,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.tryToBeOn = function(row, col) {
-      if(!context.isInGrid(row, col) || (context.tiles[row][col] == -1)) {
+      if(!context.isInGrid(row, col) || (context.tiles[row][col] == 0)) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.leavesGrid);
