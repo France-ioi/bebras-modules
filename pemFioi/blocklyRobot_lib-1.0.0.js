@@ -702,6 +702,7 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
+            marker_white: { num: 4, img: "marker_white.png", isContainer: true, isFake: true, side: 60, zOrder: 0 },
             paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { side: 60, zOrder: 1 }
          },
@@ -1304,11 +1305,9 @@ var getContext = function(display, infos, curLevel) {
          cells[iRow] = [];
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
-            if(context.tiles[iRow][iCol] == 0)
-               cells[iRow][iCol].attr({'stroke-width': '0'});
-            if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
+            if(infos.backgroundColor)
                cells[iRow][iCol].attr({'fill': infos.backgroundColor});
-            if(infos.noBorders && context.tiles[iRow][iCol] != 0)
+            if(infos.noBorders)
                cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
          }
       }
@@ -1552,7 +1551,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.tryToBeOn = function(row, col) {
-      if(!context.isInGrid(row, col) || (context.tiles[row][col] == 0)) {
+      if(!context.isInGrid(row, col) || (context.tiles[row][col] == -1)) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.leavesGrid);
@@ -1937,7 +1936,7 @@ var robotEndConditions = {
       var solved = true;
       for(var row = 0;row < context.nbRows;row++) {
          for(var col = 0;col < context.nbCols;col++) {
-            var containers = context.getItemsOn(row, col, function(obj) { return obj.isContainer === true });
+            var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
             if(containers.length != 0) {
                var container = containers[0];
                if(container.containerSize == undefined && container.containerFilter == undefined) {
