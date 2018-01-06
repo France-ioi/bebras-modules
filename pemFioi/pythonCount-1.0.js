@@ -55,8 +55,9 @@ function pythonCount(text) {
 }
 
 var pythonForbiddenBlocks = {
-   'logic': {
+    'logic': {
       'controls_if': ['if', 'else', 'elif'],
+      'controls_if_else': ['if', 'else', 'elif'],
       'logic_negate': ['not'],
       'logic_operation': ['and', 'or']
     },
