@@ -550,7 +550,8 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
-            green: { num: 3, color: "#b5e61d", side: 60, isExit: true}
+            green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
+            number: { num: 4, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
