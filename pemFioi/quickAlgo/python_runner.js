@@ -496,18 +496,24 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onStepError = function (message) {
+    // We always get there, even on a success
     this.stop();
 
-    message = '' + message
+    message = '' + message;
 
     // Skulpt doesn't support well NoneTypes
     if(message.indexOf("TypeError: Cannot read property") > -1 && message.indexOf("undefined") > -1) {
       message = message.replace(/^.* line/, "TypeError: NoneType value used in operation on line");
     }
 
-    message = "<span class='success'>" + message + "</span>";
+    // Transform message depending on whether we successfully
+    if(this.context.success) {
+      message = "<span style='color:green;font-weight:bold'>" + message + "</span>";
+    } else {
+      message = this.context.messagePrefixFailure + message;
+    }
 
-    this.messageCallback(this.context.messagePrefixFailure + message);
+    this.messageCallback(message);
   };
 
   this._setBreakpoint = function (bp, isTemporary) {
