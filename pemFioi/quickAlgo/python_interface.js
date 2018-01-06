@@ -339,7 +339,12 @@ function LogicController(nbTestCases, maxInstructions) {
   this.updateTaskIntro = function () {
     var pythonDiv = $('#taskIntro .pythonIntro');
     if(pythonDiv.length == 0) {
-      pythonDiv = $('<div class="pythonIntro"></div>').appendTo('#taskIntro');
+      pythonDiv = $('<hr />'
+        + '<div class="pythonIntro">'
+        + '  <div class="pythonIntroSimple"></div>'
+        + '  <div class="pythonIntroFull"></div>'
+        + '  <div class="pythonIntroBtn"></div>'
+        + '</div>').appendTo('#taskIntro');
     }
 
     if(this._mainContext.infos.noPythonHelp) {
@@ -347,25 +352,28 @@ function LogicController(nbTestCases, maxInstructions) {
        return;
     }
 
-    var pythonHtml = '<hr />';
+    var fullHtml = '';
+    var simpleHtml = '';
 
     var availableModules = this.getAvailableModules();
     if(availableModules.length) {
-      pythonHtml += '<p>Votre programme doit commencer par ';
-      pythonHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
-      pythonHtml += ' :</p>'
+      fullHtml += '<p>Votre programme doit commencer par ';
+      fullHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
+      fullHtml += ' :</p>'
                  +  '<p><code>'
                  +  'from ' + availableModules[0] + ' import *';
       for(var i=1; i < availableModules.length; i++) {
-        pythonHtml += '\nfrom ' + availableModules[i] + ' import *';
+        fullHtml += '\nfrom ' + availableModules[i] + ' import *';
       }
-      pythonHtml += '</code></p>'
+      fullHtml += '</code></p>'
                  +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
                  +  '<ul>';
+      simpleHtml += 'Fonctions disponibles : ';
 
       var availableConsts = [];
 
       // Generate list of functions available
+      var simpleElements = [];
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
@@ -380,14 +388,18 @@ function LogicController(nbTestCases, maxInstructions) {
               if (!funcName) {
                 funcName = blockName;
               }
-              blockDesc = '<code>' + funcName + '()</code>';
+              funcName += '()';
+              blockDesc = '<code>' + funcName + '</code>';
             } else if (blockDesc.indexOf('</code>') < 0) {
               var funcNameEnd = blockDesc.indexOf(')') + 1;
-              blockDesc = '<code>' + blockDesc.substring(0, funcNameEnd) + '</code>' + blockDesc.substring(funcNameEnd);
+              var funcName = blockDesc.substring(0, funcNameEnd);
+              blockDesc = '<code>' + funcName + '</code>' + blockDesc.substring(funcNameEnd);
             }
           }
-          pythonHtml += '<li>' + blockDesc + '</li>';
+          fullHtml += '<li>' + blockDesc + '</li>';
+          simpleElements.push(funcName);
         }
+        simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
 
         // Handle constants as well
         if(this._mainContext.customConstants && this._mainContext.customConstants[generatorName]) {
@@ -401,11 +413,12 @@ function LogicController(nbTestCases, maxInstructions) {
           }
         }
       }
-      pythonHtml += '</ul>';
+      fullHtml += '</ul>';
     }
 
     if(availableConsts.length) {
-      pythonHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
+      fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
+      simpleHtml += '<br />Constantes disponibles : <code>' + availableConsts.join('</code>, <code>') + '</code>.';
     }
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
@@ -425,21 +438,41 @@ function LogicController(nbTestCases, maxInstructions) {
       }
 
       if(list.length == 1) {
-        pythonHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
+        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
       } else if(list.length > 0) {
-        pythonHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
-      }  
+        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
+      }
+      return list;
     }
-    processForbiddenList(pflInfos.allowed, 'autorisé');
+    var pflAllowed = processForbiddenList(pflInfos.allowed, 'autorisé');
     processForbiddenList(pflInfos.forbidden, 'interdit');
+    simpleHtml += '<br />Mots-clés disponibles : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
 
-    pythonHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
-    pythonDiv.html(pythonHtml);
+    fullHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
+
+    $('.pythonIntroSimple').html(simpleHtml);
+    $('.pythonIntroFull').html(fullHtml);
+
+    this.collapseTaskIntro(true);
 
     var controller = this;
     pythonDiv.on('click', 'code', function() {
       controller._aceEditor && controller._aceEditor.insert(this.innerHTML);
     });
+  };
+
+  this.collapseTaskIntro = function(collapse) {
+    var that = this;
+    var div = $('.pythonIntroBtn').html('');
+    if(collapse) {
+      $('<a>Plus de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(false); });
+      $('.pythonIntroFull').hide();
+      $('.pythonIntroSimple').show();
+    } else {
+      $('<a>Moins de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(true); });
+      $('.pythonIntroFull').show();
+      $('.pythonIntroSimple').hide();
+    }
   };
 
   this.toggleSize = function () {
