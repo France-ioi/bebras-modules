@@ -168,7 +168,12 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "sur une case marquée",
                obstacleInFront: "plot devant"
             },
-             messages: {
+            code: {
+               dropObject: "deposerPlot",
+               onContainer: "surCaseMarquee",
+               obstacleInFront: "plotDevant"
+            },
+            messages: {
                successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
                failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
             }
@@ -186,7 +191,10 @@ var getContext = function(display, infos, curLevel) {
       dominoes: {
          fr: {
             label: {
-               "withdrawObject": "ramasser le domino",
+               withdrawObject: "ramasser le domino",
+            },
+            code: {
+               withdrawObject: "ramasserDomino"
             },
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
@@ -202,6 +210,12 @@ var getContext = function(display, infos, curLevel) {
                onObject: "sur une bille",
                onContainer: "sur un trou",
             },
+            code: {
+               withdrawObject: "ramasserBille",
+               dropObject: "deposerBille",
+               onObject: "surBille",
+               onContainer: "surTrou",
+            },   
             messages: {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
@@ -215,6 +229,9 @@ var getContext = function(display, infos, curLevel) {
             label: {
                obstacleInFront: "astéroïde devant"
             },
+            code: {
+               obstacleInFront: "astéroideDevant"
+            },
             messages: {
                obstacle: "Attention à l'astéroïde !"
             }
@@ -226,6 +243,11 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "peindre la case",
                onContainer: "sur une case marquée",
                readNumber: "nombre sur la case",
+             },
+             code: {
+                dropObject: "peindreCase",
+                onContainer: "surCaseMarquee",
+                readNumber: "nombreSurCase",
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
@@ -253,6 +275,13 @@ var getContext = function(display, infos, curLevel) {
                   obstacleInFront: "mur devant",
                   readNumber: "nombre sur la case"
                },
+               code: {
+                  pushObject: "pousserCaisse",
+                  onContainer: "surCaseMarquee",
+                  pushableInFront: "caisseDevant",
+                  obstacleInFront: "murDevant",
+                  readNumber: "nombreSurCase"
+               },   
                messages: {
                   successContainersFilled: "Bravo, les caisses sont bien rangées !",
                   failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
@@ -551,7 +580,7 @@ var getContext = function(display, infos, curLevel) {
             red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
-            number: { num: 4, side: 60, zOrder: 1 }
+            number: { num: 5, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
