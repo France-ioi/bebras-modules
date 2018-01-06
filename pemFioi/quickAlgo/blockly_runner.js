@@ -12,7 +12,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.nbActions = 0;
       runner.scratchMode = context.blocklyHelper ? context.blocklyHelper.scratchMode : false;
       runner.delayFactory = new DelayFactory();
-      runner.contextReset = false;
+      runner.resetDone = false;
 
       // Iteration limits
       runner.maxIter = 400000;
@@ -206,7 +206,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runSyncBlock = function() {
-         runner.contextReset = false;
+         runner.resetDone = false;
          runner.stepInProgress = true;
          // Handle the callback from last highlightBlock
          if(runner.nextCallback) {
@@ -365,9 +365,10 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.reset = function() {
-         if(runner.contextReset) { return; }
+         if(runner.resetDone) { return; }
          context.reset();
-         runner.contextReset = true;
+         runner.stop();
+         runner.resetDone = true;
       };
 
       context.runner = runner;
