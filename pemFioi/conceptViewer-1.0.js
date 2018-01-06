@@ -162,7 +162,7 @@ var conceptViewer = {
 }
 
 // TODO :: temporary values for now
-var baseUrl = 'https://static-items.algorea.org/files/checkouts/c1212c2f48bf3944a7a9ad2c48a33206/ProgrammingYoung/Help/index.html';
+var baseUrl = 'http://static3.castor-informatique.fr/help/';
 
 var testConcepts = [
     {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
