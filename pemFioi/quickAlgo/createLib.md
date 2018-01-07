@@ -38,8 +38,8 @@ ready to be used for a new library. You can create your library as a copy of thi
 replacing `Template` with the name of your library in the filename.
 For instance, your new file will be named `blocklyMyLib_lib.js`.
 
-In the file, you’ll see the following sections with the given identifiers:
-1. Display strings: `localLanguageStrings`
+In the file, you’ll see the following sections, all inside a `getContext` function, with the given identifiers:
+1. Localized strings: `localLanguageStrings`
 2. Basic initializations: `context`, `strings`, `context.template`
 3. Context management functions: `context.{funcName}` (`reset`, `resetDisplay`, `updateScale`, `unload`)
 4. Your library’s functions: `context.template.{funcName}`
