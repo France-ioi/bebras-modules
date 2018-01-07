@@ -377,27 +377,24 @@ function LogicController(nbTestCases, maxInstructions) {
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
-          var blockDesc;
-          if(this._mainContext.docGenerator) {
-            blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock])
+          var blockDesc = '', funcProto = '';
+          if (this._mainContext.docGenerator) {
+            blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock]);
           } else {
             var blockName = blockList[iBlock];
             blockDesc = this._mainContext.strings.description[blockName];
             if (!blockDesc) {
-              var funcName = this._mainContext.strings.code[blockName];
-              if (!funcName) {
-                funcName = blockName;
-              }
-              funcName += '()';
-              blockDesc = '<code>' + funcName + '</code>';
+              funcProto = (this._mainContext.strings.code[blockName] || blockName) + '()';
+              blockDesc = '<code>' + funcProto + '</code>';
             } else if (blockDesc.indexOf('</code>') < 0) {
-              var funcNameEnd = blockDesc.indexOf(')') + 1;
-              var funcName = blockDesc.substring(0, funcNameEnd);
-              blockDesc = '<code>' + funcName + '</code>' + blockDesc.substring(funcNameEnd);
+              var funcProtoEnd = blockDesc.indexOf(')') + 1;
+              funcProto = blockDesc.substring(0, funcProtoEnd);
+              blockDesc = '<code>' + funcProto + '</code>' + blockDesc.substring(funcProtoEnd);
             }
           }
+          funcProto = funcProto || blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
           fullHtml += '<li>' + blockDesc + '</li>';
-          simpleElements.push(funcName);
+          simpleElements.push(funcProto);
         }
         simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
 
@@ -459,7 +456,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var controller = this;
     pythonDiv.on('click', 'code', function() {
-      controller._aceEditor && controller._aceEditor.insert(this.innerHTML);
+      controller._aceEditor && controller._aceEditor.insert(this.textContent);
     });
   };
 
