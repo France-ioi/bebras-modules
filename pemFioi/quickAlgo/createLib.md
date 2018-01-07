@@ -84,7 +84,120 @@ with the three effectless blocks.
 
 ## Program your first block
 
-…
+Firstly, you should add data in your `context.myLib` variable. Your blocks will register internally
+their effect on this data so that it can be checked for the task’s validation.
+
+Then create the function that will realize the action of your block.
+It must be a member of `context.myLib` and must have an additional `callback` parameter.
+The callback must be called at the end of your function for quickAlgo to work. Inside this function:
+* alter the data inside `context.myLib`;
+* if `context.display` is available, do the necessary display changes in the `$('#grid')`;
+* call the callback with `context.waitDelay(callback)`.
+
+Your block must eventually be listed in the `context.customBlocks` object with its prototype.
+Just imitate the given examples: your function should be included in a namespace
+(usually the name of your library) and a category, and may have parameters and a return value.
+
+As an example, the code below show parts of an `amicable` library that has a block which checks
+if two given numbers are amicable and sets a variable to `false` if they are not.
+It uses colored text as a graphic result for the user.
+
+```js
+context.amicable = {
+   allAmicable: true,
+   testedPairs: 0
+};
+
+context.reset = function(taskInfos) {
+   context.amicable.allAmicable = true;
+   context.amicable.testedPairs = 0;
+   if (context.display) context.resetDisplay();
+}
+
+context.resetDisplay = function() {
+   $('#grid').empty();
+   context.blocklyHelper.updateSize();
+   context.updateScale();
+}
+
+// ...
+
+context.amicable.testPair = function(nb1, nb2, callback) {
+   var divisSum1 = 0, divisSum2 = 0;
+   for (var divis = 2; divis &lt; Math.floor(Math.max(nb1, nb2) / 2); divis++) {
+      if (nb1 % divis == 0) divisSum1 += divis;
+      if (nb2 % divis == 0) divisSum2 += divis;
+   }
+   if (divisSum1 != divisSum2) context.amicable.allAmicable = false;
+   context.amicable.testedPairs++;
+
+   if (context.display) {
+      $('#grid').append(
+         divisSum1 == divisSum2 ?
+            $('<div>').css('color', 'green').text(nb1 + " and " + nb2 + " are amicable.") :
+            $('<div>').css('color', 'red').text(nb1 + " and " + nb2 + " are not amicable!"));
+   }
+
+   context.waitDelay(callback);
+}
+
+// ...
+
+context.customBlocks = {
+   amicable: {
+      testing: [
+         { name: 'testPair', params: [null, null] }
+      ]
+   }
+};
+```
+
+For the block to be usable in your task, you must add it in `task.js`,
+in `subTask.gridInfos.includeBlocks.generatedBlocks` as `namespace: ["block"]`.
+In the case of the `testPair` block of the `amicable` library it results in:
+```js
+subTask.gridInfos = {
+   // ...
+   includeBlocks: {
+      // ...
+      generatedBlocks: {
+         amicable: ["testPair"]
+      }
+      // ...
+   }
+   // ...
+};
+```
+
+Additionnally, you may specify a color for the category (for `testPair` it’s `testing`)
+in the `context.provideBlocklyColours` function.
+
+Finally, in `localLanguageStrings`, you must specify texts for Blockly and Python.
+Continuing with our example:
+```js
+var localLanguageStrings = {
+   en: {
+      label: {
+         testPair: "test if %1 and %2 are amicable"
+      },
+      code: {
+         testPair: "testPair"
+      }
+   }
+};
+```
+* `label` is for the block. `%1`, `%2`, etc. are the positions of the parameters.
+* `code` is the function name in Python.
+
+Now, you should have a fully functional block.
+
+Summary of the steps:
+1. Initialize the necessary data in the `context.myLib` variable.
+2. Create the function as a member of `context.myLib`.
+3. List the block in `context.customBlocks` inside `namespace.category`.
+4. Add it in `task.js` in `subTask.gridInfos.includeBlocks.generatedBlocks` inside `namespace`.
+5. Optionally specify a color for the category in `context.provideBlocklyColours`.
+6. Put the localized strings in `localLanguageStrings`.
 
 ## Manage the display
 
