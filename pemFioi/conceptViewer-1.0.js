@@ -162,7 +162,15 @@ var conceptViewer = {
 }
 
 // TODO :: temporary values for now
-var baseUrl = 'http://static3.castor-informatique.fr/help/';
+
+// Specific configuration to go through the domain itself if there's a 'p=1'
+// argument or we are on concours2.castor-informatique.fr
+var baseUrl = window.location.protocol + '//'
+    + ((window.location.search.indexOf('p=1') > -1
+        || window.location.hostname == 'concours2.castor-informatique.fr')
+       ? window.location.host : 'static4.castor-informatique.fr')
+    + '/help/index.html';
+
 
 var testConcepts = [
     {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
