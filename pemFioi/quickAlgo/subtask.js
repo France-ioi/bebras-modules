@@ -68,6 +68,19 @@ var initBlocklySubTask = function(subTask, language) {
       displayHelper.timeoutMinutes = 30;
 
       var curIncludeBlocks = extractLevelSpecific(this.context.infos.includeBlocks, curLevel);
+
+      // Load concepts into conceptViewer; must be done before loading
+      // Blockly/Scratch, as scratch-mode will modify includeBlocks
+      if(this.display && subTask.levelGridInfos.conceptViewer) {
+         // TODO :: testConcepts is temporary-ish
+         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, testConcepts);
+         if(subTask.levelGridInfos.conceptViewer.length) {
+            concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
+         }
+         concepts = window.conceptsFill(concepts, testConcepts);
+         window.conceptViewer.loadConcepts(concepts);
+      }
+
       this.blocklyHelper.setIncludeBlocks(curIncludeBlocks);
 
       var blocklyOptions = {
@@ -78,16 +91,6 @@ var initBlocklySubTask = function(subTask, language) {
 
       if(this.display) {
          window.quickAlgoInterface.initTestSelector(this.nbTestCases);
-
-         // TODO :: testConcepts is temporary-ish
-         if(subTask.levelGridInfos.conceptViewer) {
-            var concepts = window.getConceptsFromBlocks(curIncludeBlocks, testConcepts);
-            if(subTask.levelGridInfos.conceptViewer.length) {
-               concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
-            }
-            concepts = window.conceptsFill(concepts, testConcepts);
-            window.conceptViewer.loadConcepts(concepts);
-         }
       }
 
       subTask.changeTest(0);
