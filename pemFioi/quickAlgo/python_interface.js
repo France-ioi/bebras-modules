@@ -446,7 +446,9 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     var pflAllowed = processForbiddenList(pflInfos.allowed, 'autorisé');
     processForbiddenList(pflInfos.forbidden, 'interdit');
-    simpleHtml += '<br />Mots-clés disponibles : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
+    if(pflAllowed.length) {
+      simpleHtml += '<br />Mots-clés autorisés : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
+    }
 
     fullHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
 
