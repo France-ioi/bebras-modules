@@ -94,7 +94,7 @@ The callback must be called at the end of your function for quickAlgo to work. I
 * if `context.display` is available, do the necessary display changes in the `$('#grid')`;
 * call the callback with `context.waitDelay(callback)`.
 
-Your block must eventually be listed in the `context.customBlocks` object with its prototype.
+Your block must eventually be listed in the `context.customBlocks` object with prototype information.
 Just imitate the given examples: your function should be included in a namespace
 (usually the name of your library) and a category, and may have parameters and a return value.
 
@@ -124,7 +124,7 @@ context.resetDisplay = function() {
 
 context.amicable.testPair = function(nb1, nb2, callback) {
    var divisSum1 = 0, divisSum2 = 0;
-   for (var divis = 2; divis &lt; Math.floor(Math.max(nb1, nb2) / 2); divis++) {
+   for (var divis = 2; divis < Math.floor(Math.max(nb1, nb2) / 2); divis++) {
       if (nb1 % divis == 0) divisSum1 += divis;
       if (nb2 % divis == 0) divisSum2 += divis;
    }
@@ -154,7 +154,7 @@ context.customBlocks = {
 
 For the block to be usable in your task, you must add it in `task.js`,
 in `subTask.gridInfos.includeBlocks.generatedBlocks` as `namespace: ["block"]`.
-In the case of the `testPair` block of the `amicable` library it results in:
+In the case of the `testPair` block of the `amicable` library it looks like:
 ```js
 subTask.gridInfos = {
    // ...
@@ -186,7 +186,7 @@ var localLanguageStrings = {
    }
 };
 ```
-* `label` is for the block. `%1`, `%2`, etc. are the positions of the parameters.
+* `label` is for the block. `%1`, `%2`, etc. are required placeholders for the parameters.
 * `code` is the function name in Python.
 
 Now, you should have a fully functional block.
@@ -197,7 +197,7 @@ Summary of the steps:
 3. List the block in `context.customBlocks` inside `namespace.category`.
 4. Add it in `task.js` in `subTask.gridInfos.includeBlocks.generatedBlocks` inside `namespace`.
 5. Optionally specify a color for the category in `context.provideBlocklyColours`.
-6. Put the localized strings in `localLanguageStrings`.
+6. Put localized strings in `localLanguageStrings`.
 
 ## Manage the display
 
