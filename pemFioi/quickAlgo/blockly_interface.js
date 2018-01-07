@@ -116,6 +116,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
             }
+
+            // Clean events if the previous unload wasn't done properly
+            Blockly.removeEvents();
+
+            // Inject Blockly
             this.workspace = Blockly.inject(this.divId, wsConfig);
 
             // Start checking whether it's hidden, to sort out contents
