@@ -90,12 +90,12 @@ var conceptViewer = {
     this.loadNavigation();
   },
 
-  show: function (initConcept=true) {
+  show: function (initConcept) {
     // Display the conceptViewer
     this.load();
     $('#conceptViewer').fadeIn(500);
 
-    if (this.shownConcept && initConcept) {
+    if (this.shownConcept && (initConcept || typeof initConcept == 'undefined')) {
       this.showConcept(this.shownConcept);
     }
   },
@@ -107,7 +107,7 @@ var conceptViewer = {
     $('#conceptViewer .viewerContent').attr('src', '');
   },
 
-  showConcept: function (concept, show=true) {
+  showConcept: function (concept, show) {
     // Show a specific concept
     // Either a concept object can be given, either a concept ID can be given
     // directly
@@ -126,7 +126,7 @@ var conceptViewer = {
     }
     if (conceptUrl) {
       this.shownConcept = conceptId;
-      if(show) { this.show(false); }
+      if(show || typeof show == 'undefined') { this.show(false); }
 
       var language = $('#conceptViewer .languageSelect').val();
       var urlSplit = conceptUrl.split('#');
