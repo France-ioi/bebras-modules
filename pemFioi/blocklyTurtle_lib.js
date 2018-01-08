@@ -80,7 +80,64 @@ var getContext = function(display, infos) {
          categories: {
             turtle: "Tortue"
          },
-         startingBlockName: "Programme de la tortue"
+         label: {
+            move: "avancer",
+            moveamount: "gehe %1 Schritte",
+            moveamountvalue: "gehe %1 Schritte",
+            turnleft: "tourner vers la droite ↺",
+            turnright: "tourner vers la gauche ↻",
+            turnleftamount: "tourner de %1° vers la gauche ↺",
+            turnrightamount: "tourner de %1° vers la droite ↻",
+            turnleftamountvalue: "drehe um %1 nach links ↺",
+            turnrightamountvalue: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_noround: "drehe um %1 Grad nach links ↺",
+            turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
+            turnleftamountvalue_options: "drehe um %1 nach links ↺",
+            turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turneitheramount: "drehe um %1° nach %2",
+            turneitheramountvalue: "drehe um %1 nach %2",
+            penup: "hebe Stift ab",
+            pendown: "setze Stift auf",
+            peneither: "%1",
+            colour2: "setze Farbe",
+            colourvalue: "mettre la couleur %1",
+            turn: "drehe (Grad) ",
+            alert: "messagebox",
+            log: "logge",
+            inputvalue: "Eingabewert"
+         },
+         code: {
+            move: "avancer",
+            moveamount: "geheSchritte",
+            moveamountvalue: "geheSchritte",
+            turnleft: "tournerGauche",
+            turnright: "tournerDroite",
+            turnleftamount: "dreheLinksGrad",
+            turnrightamount: "dreheRechtsGrad",
+            turnleftamountvalue: "dreheLinksGrad",
+            turnrightamountvalue: "dreheRechtsGrad",
+            turnleftamountvalue_noround: "dreheLinksGrad",
+            turnrightamountvalue_noround: "dreheRechtsGrad",
+            turnleftamountvalue_options: "dreheLinksGrad",
+            turnrightamountvalue_options: "dreheRechtsGrad",
+            turneitheramountvalue: "dreheGrad",
+            penup: "stiftHoch",
+            pendown: "stiftRunter",
+            peneither: "stift",
+            colour2: "setzeFarbe",
+            colourvalue: "mettreCouleur",
+            turn: "drehe",
+            alert: "alert",
+            log: "log",
+            inputvalue: "eingabewert"
+         },
+         description: {
+         },
+         startingBlockName: "Programme de la tortue",
+         messages: {
+            paintingWrong: "La tortue n'a pas tout dessiné correctement.",
+            paintingCorrect: "Bravo! La tortue a tout dessiné correctement."
+         }
       },
       de: {
          categories: {
