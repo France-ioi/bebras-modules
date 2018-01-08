@@ -367,6 +367,12 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    task.unload = function(callback) {
       var instances = [];
       var iSeed;
+
+      if (typeof Blockly !== 'undefined') { // TEMPORARY, to replace with a global unload function provided by the task
+         removeBlockly();
+      }
+
+
       if (levels) {
          for(var iLevel in gradingTasks) {
             for(iSeed in gradingTasks[iLevel]) {
@@ -386,9 +392,6 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          callback();
       });
 
-      if (typeof Blockly !== 'undefined') { // TEMPORARY, to replace with a global unload function provided by the task
-         removeBlockly();
-      }
    };
 
    function gradeAnswerInner(gradingTask, answer, minScore, maxScore, callback) {
