@@ -1750,9 +1750,13 @@ var getContext = function(display, infos, curLevel) {
       context.bag.push(withdrawable);
       
       if(context.display) {
-         context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
+         if (infos.actionDelay > 0) {
+            context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
+               withdrawable.element.remove();
+            }, infos.actionDelay);
+         } else {
             withdrawable.element.remove();
-         }, infos.actionDelay);
+         }
       }
    };
    
@@ -1774,7 +1778,7 @@ var getContext = function(display, infos, curLevel) {
          object.row = item.row;
          object.col = item.col;
          var itemsOn = context.getItemsOn(item.row, item.col);
-         var maxi = 0;
+         var maxi = object.zOrder;
          for(var item in itemsOn) {
             if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
                maxi = itemsOn[item].zOrder;
