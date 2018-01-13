@@ -47,7 +47,7 @@ var getContext = function(display, infos, curLevel) {
                onNumber: "sur un nombre",
                onWritable: "sur un tableau",
                writeNumber: "écrire le nombre",
-               readNumber: "lire le nombre",
+               readNumber: "nombre sur la case",
                pushObject: "pousser l'objet",
                pushableInFront: "poussable devant"
             },
@@ -83,7 +83,7 @@ var getContext = function(display, infos, curLevel) {
                onNumber: "surNombre",
                onWritable: "surTableau",
                writeNumber: "ecrireNombre",
-               readNumber: "lireNombre",
+               readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
                pushableInFront: "poussableDevant"
             },
