@@ -34,6 +34,17 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
    return {
       allBlocksAllowed: [],
+
+      getRemainingCapacity: function(workspace) {
+         // Get the number of blocks allowed
+         var remaining = workspace.remainingCapacity(this.maxBlocks+1);
+         if(this.maxBlocks && remaining == Infinity) {
+            // Blockly won't return anything as we didn't set a limit
+            remaining = this.maxBlocks+1 - workspace.getAllBlocks().length;
+         }
+         return remaining;
+      },
+
       getCodeFromXml: function(xmlText, language) {
          try {
            var xml = Blockly.Xml.textToDom(xmlText)
@@ -64,7 +75,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(codeWorkspace.remainingCapacity(this.maxBlocks+1) < (this.scratchMode ? 0 : 1000)) {
+         if(this.getRemainingCapacity(codeWorkspace) < 0) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }

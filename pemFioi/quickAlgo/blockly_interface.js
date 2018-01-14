@@ -102,11 +102,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             wsConfig.comments = true;
             wsConfig.scrollbars = true;
             wsConfig.trashcan = true;
-            if (maxBlocks != undefined) {
-               // Add 1 to compensate for the starting block
-               // Add 1000 to allow for a larger block limit
-               wsConfig.maxBlocks = maxBlocks + 1001;
-            }
             if (options.readOnly) {
                wsConfig.readOnly = true;
             }
@@ -238,10 +233,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(isBlockEvent) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                // Update the remaining blocks display
-               var remaining = this.workspace.remainingCapacity(maxBlocks+1);
-               if(!this.scratchMode) {
-                  remaining -= 1000; // Remove the 1000 added to the limit earlier
-               }
+               var remaining = this.getRemainingCapacity(this.workspace);
                var optLimitBlocks = {
                   maxBlocks: maxBlocks,
                   remainingBlocks: Math.abs(remaining)
@@ -550,7 +542,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
          that.highlightPause = false;
-         if(that.workspace.remainingCapacity(maxBlocks+1) < (this.scratchMode ? 0 : 1000)) {
+         if(that.getRemainingCapacity(that.workspace) < 0) {
             $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
             return;
          }
