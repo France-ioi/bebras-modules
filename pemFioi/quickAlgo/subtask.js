@@ -84,8 +84,9 @@ var initBlocklySubTask = function(subTask, language) {
       this.blocklyHelper.setIncludeBlocks(curIncludeBlocks);
 
       var blocklyOptions = {
-         readOnly: !!subTask.taskParams.readOnly
-         };
+         readOnly: !!subTask.taskParams.readOnly,
+         defaultCode: subTask.defaultCode
+      };
 
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 

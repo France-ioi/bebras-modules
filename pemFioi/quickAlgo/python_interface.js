@@ -56,8 +56,12 @@ function LogicController(nbTestCases, maxInstructions) {
   this.load = function (language, display, nbTestCases, _options) {
     this._nbTestCases = nbTestCases;
     this._loadBasicEditor();
+    
     if(this._aceEditor && ! this._aceEditor.getValue()) {
-      this._aceEditor.setValue(this.getDefaultContent());
+      if(_options.defaultCode !== undefined)
+         this._aceEditor.setValue(_options.defaultCode);
+      else
+         this._aceEditor.setValue(this.getDefaultContent());
     }
   };
 
