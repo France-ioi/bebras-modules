@@ -1,9 +1,13 @@
 
 
-var makeTurtle = function() {
+var makeTurtle = function(coords) {
    this.reset = function(stepsize) {
       this.x = 150;
       this.y = 150;
+      if(coords !== undefined) {
+         this.x = coords.x;
+         this.y = coords.y;
+      }
       this.stepsize = 1;
       this.direction = 0;
       this.paint = true;
@@ -82,22 +86,24 @@ var getContext = function(display, infos) {
          },
          label: {
             move: "avancer",
-            moveamount: "gehe %1 Schritte",
-            moveamountvalue: "gehe %1 Schritte",
+            moveamount: "avancer de %1 pas",
+            movebackamount: "reculer de %1 pas",
+            moveamountvalue: "avancer de %1 pas",
+            movebackamountvalue: "reculer de %1 pas",
             turnleft: "tourner vers la droite ↺",
             turnright: "tourner vers la gauche ↻",
             turnleftamount: "tourner de %1° vers la gauche ↺",
             turnrightamount: "tourner de %1° vers la droite ↻",
-            turnleftamountvalue: "drehe um %1 nach links ↺",
-            turnrightamountvalue: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue: "tourner de %1 vers la gauche ↺",
+            turnrightamountvalue: "tourner de %1 vers la droite ↻",
             turnleftamountvalue_noround: "drehe um %1 Grad nach links ↺",
             turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
             turnleftamountvalue_options: "drehe um %1 nach links ↺",
             turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
-            turneitheramount: "drehe um %1° nach %2",
-            turneitheramountvalue: "drehe um %1 nach %2",
-            penup: "hebe Stift ab",
-            pendown: "setze Stift auf",
+            turneitheramount: "tourner de %1° vers la %2",
+            turneitheramountvalue: "tourner de %1 vers la %2",
+            penup: "lever le pinceau",
+            pendown: "baisser le pinceau",
             peneither: "%1",
             colour2: "setze Farbe",
             colourvalue: "mettre la couleur %1",
@@ -108,24 +114,26 @@ var getContext = function(display, infos) {
          },
          code: {
             move: "avancer",
-            moveamount: "geheSchritte",
-            moveamountvalue: "geheSchritte",
+            moveamount: "avancer",
+            movebackamount: "reculer",
+            moveamountvalue: "avancer",
+            movebackamountvalue: "reculer",
             turnleft: "tournerGauche",
             turnright: "tournerDroite",
             turnleftamount: "dreheLinksGrad",
             turnrightamount: "dreheRechtsGrad",
-            turnleftamountvalue: "dreheLinksGrad",
-            turnrightamountvalue: "dreheRechtsGrad",
+            turnleftamountvalue: "gauche",
+            turnrightamountvalue: "droite",
             turnleftamountvalue_noround: "dreheLinksGrad",
             turnrightamountvalue_noround: "dreheRechtsGrad",
             turnleftamountvalue_options: "dreheLinksGrad",
             turnrightamountvalue_options: "dreheRechtsGrad",
-            turneitheramountvalue: "dreheGrad",
-            penup: "stiftHoch",
-            pendown: "stiftRunter",
+            turneitheramountvalue: "tourner",
+            penup: "leverPinceau",
+            pendown: "baisserPinceau",
             peneither: "stift",
             colour2: "setzeFarbe",
-            colourvalue: "mettreCouleur",
+            colourvalue: "couleur",
             turn: "drehe",
             alert: "alert",
             log: "log",
@@ -146,7 +154,9 @@ var getContext = function(display, infos) {
          label: {
             move: "gehe",
             moveamount: "gehe %1 Schritte",
+            movebackamount: "gehe zurück %1 Schritte",
             moveamountvalue: "gehe %1 Schritte",
+            movebackamountvalue: "gehe zurück %1 Schritte",
             turnleft: "drehe nach links ↺",
             turnright: "drehe nach rechts ↻",
             turnleftamount: "drehe um %1° nach links ↺",
@@ -172,7 +182,9 @@ var getContext = function(display, infos) {
          code: {
             move: "gehe",
             moveamount: "geheSchritte",
+            movebackamount: "geheZuruckSchritte",
             moveamountvalue: "geheSchritte",
+            movebackamountvalue: "geheZuruckSchritte",
             turnleft: "dreheLinks",
             turnright: "dreheRechts",
             turnleftamount: "dreheLinksGrad",
@@ -215,8 +227,8 @@ var getContext = function(display, infos) {
    var texts = [];
    var scale = 1;
    var paper;
-
-   context.turtle = {displayTurtle : new makeTurtle, displaySolutionTurtle : new makeTurtle, invisibleTurtle : new makeTurtle, invisibleSolutionTurtle : new makeTurtle};
+   
+   context.turtle = {displayTurtle : new makeTurtle(infos.coords), displaySolutionTurtle : new makeTurtle(infos.coords), invisibleTurtle : new makeTurtle(infos.coords), invisibleSolutionTurtle : new makeTurtle(infos.coords)};
 
    switch (infos.blocklyColourTheme) {
       case "bwinf":
@@ -254,6 +266,13 @@ var getContext = function(display, infos) {
    };
 
    context.reset = function(gridInfos) {
+      if(gridInfos === undefined) {
+         gridInfos = context.defaultGridInfos;
+      }
+      else {
+         context.defaultGridInfos = gridInfos;
+      }
+      
       if (context.display && gridInfos) {
          context.resetDisplay();
 
@@ -295,7 +314,7 @@ var getContext = function(display, infos) {
    };
 
    context.resetDisplay = function() {
-      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.1;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.2;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='turtle.svg' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
+      $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' src='turtle.svg' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
       
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
@@ -333,6 +352,19 @@ var getContext = function(display, infos) {
       context.waitDelay(callback);
    }
    
+   context.turtle.movebackamount = function(param, callback) {
+      if (typeof callback == "undefined") {
+         callback = param;
+         param = 0;
+      }
+         
+      callOnAllTurtles(function(turtle) {
+         turtle.move(-param);
+      });
+      
+      context.waitDelay(callback);
+   }
+   
    // DEPRECATED
    context.turtle.turn = function(param, callback) {
       callOnAllTurtles(function(turtle) {
@@ -351,15 +383,14 @@ var getContext = function(display, infos) {
             degree = 0;
          }
       }
-
+   
       callOnAllTurtles(function(turtle) {
-         if (direction == "l") {
+         if (direction.search('l') != -1) {
             turtle.turn(degree);
          }
          else {
             turtle.turn(-degree);
          }
-            
       });
       
       context.waitDelay(callback);
@@ -404,6 +435,7 @@ var getContext = function(display, infos) {
    };
 
    context.turtle.moveamountvalue = context.turtle.moveamount;
+   context.turtle.movebackamountvalue = context.turtle.movebackamount;
    context.turtle.turnleftamountvalue = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue = context.turtle.turnrightamount;
    context.turtle.turneitheramountvalue = context.turtle.turneitheramount;
@@ -432,7 +464,9 @@ var getContext = function(display, infos) {
          turtle: [
             { name: "move" },
             { name: "moveamount", params: [null]},
-            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 2}]}},
+            { name: "movebackamount", params: [null]},
+            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 5}]}},
+            { name: "movebackamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": 5}]}},
             { name: "turnleft" },
             { name: "turnright" },
             { name: "turn",      params: [null]},
@@ -453,7 +487,7 @@ var getContext = function(display, infos) {
             { name: "turneitheramountvalue", blocklyJson: {"args0": [
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["links ↺","'l'"],["rechts ↻","'r'"]]}]}},
+                [["gauche ↺","'l'"],["droite ↻","'r'"]]}]}}, // mis les parametres en français mais bug, TODO gérer les deux langues
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
