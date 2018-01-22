@@ -272,14 +272,14 @@ var getContext = function(display, infos, curLevel) {
                   pushObject: "pousser la caisse",
                   onContainer: "sur une case marquée",
                   pushableInFront: "caisse devant",
-                  obstacleInFront: "mur devant",
+                  obstacleInFront: "obstacle devant",
                   readNumber: "nombre sur la case"
                },
                code: {
                   pushObject: "pousserCaisse",
                   onContainer: "surCaseMarquee",
                   pushableInFront: "caisseDevant",
-                  obstacleInFront: "murDevant",
+                  obstacleInFront: "obstacleDevant",
                   readNumber: "nombreSurCase"
                },   
                messages: {
@@ -571,7 +571,8 @@ var getContext = function(display, infos, curLevel) {
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             cone: { num: 3, img: "cone.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
             contour: { num: 4, img: "contour.png", side: 60, zOrder: 1 },
-            fixed_cone: { num: 5, img: "cone.png", side: 60, isObstacle: true, zOrder: 1 }
+            fixed_cone: { num: 5, img: "cone.png", side: 60, isObstacle: true, zOrder: 1 },
+            number: { num: 6, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -788,7 +789,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       for(var param in contextParams[name]) {
-         if(infos.param === undefined) {
+         if(infos[param] === undefined) {
             infos[param] = contextParams[name][param];
          }
       }
