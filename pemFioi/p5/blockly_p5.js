@@ -129,7 +129,7 @@ var getContext = function(display, infos) {
                         // TODO: check how this work
                         setTimeout(function() {
                             context.waitDelay(callback);
-                        }, arguments[0])
+                        }, Math.min(10000, arguments[0]))
                     } else {
                         player && player[block.name].apply(player, arguments);
                         callback()
