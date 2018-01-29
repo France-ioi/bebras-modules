@@ -127,8 +127,9 @@ var getContext = function(display, infos) {
                     var callback = arguments[arguments.length - 1]
                     if(block.name == 'sleep') {
                         // TODO: check how this work
-                        context.delayFactory.createTimeout('sleep' + Math.random(), function() {}, arguments[0]);
-                        context.waitDelay(callback);
+                        setTimeout(function() {
+                            context.waitDelay(callback);
+                        }, arguments[0])
                     } else {
                         player && player[block.name].apply(player, arguments);
                         callback()
