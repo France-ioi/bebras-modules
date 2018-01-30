@@ -11,10 +11,9 @@ function PlayerP5(options) {
         visualize_bars: true,
         visualization_fps: 20,
         visualization_smoothing: 0.3,
-        visualization_resolution: 32, // Must be a power of two between 16 and 1024.
+        visualization_resolution: 64, // Must be a power of two between 16 and 1024.
         visualization_stroke_color: '#333333',
-        visualization_fill_color: '#990000',
-        visualization_background_color: '#ffffff'
+        visualization_fill_color: '#990000'
     }
 
     var options = (function() {
@@ -64,68 +63,101 @@ function PlayerP5(options) {
 
 
 
+
+    function Visualizator() {
+
+        var canvas = document.createElement('canvas');
+        canvas.width = options.width;
+        canvas.height = options.height;
+        options.parent.appendChild(canvas);
+
+        var context = canvas.getContext('2d');
+        context.strokeStyle = options.visualization_stroke_color;
+
+        var fft = new p5.FFT(options.visualization_smoothing, options.visualization_resolution);
+
+
+        // waveform
+        function renderWave(y, height) {
+            var waveform = fft.waveform();
+            var dx = Math.round(options.width / waveform.length);
+            var wave_amp = height * 0.5;
+            var wave_y = y + wave_amp;
+
+            function dy(i) {
+                return wave_y + wave_amp * waveform[i];
+            }
+            context.beginPath();
+            context.moveTo(0, dy(0))
+            for(var i=1; i<waveform.length; i++) {
+                context.lineTo(i*dx, dy(i))
+            }
+            context.stroke();
+        }
+
+
+        // spectrum bars
+        function getSpectrum() {
+            var spectrum = fft.analyze();
+            for(var i=0; i<spectrum.length; i++) {
+                spectrum[i] = spectrum[i]/255;
+            }
+            return spectrum;
+        }
+
+        function renderBars(y, height) {
+            var spectrum = getSpectrum();
+            context.fillStyle = options.visualization_fill_color;
+            context.lineWidth = 1;
+            var bar_width = Math.round(options.width / spectrum.length);
+            var bar_height, bar_x, bar_y;
+            for(var i=0; i<spectrum.length; i++) {
+                bar_height = height * spectrum[i];
+                bar_x = i * bar_width;
+                bar_y = y + height - bar_height;
+                context.fillRect(bar_x, bar_y, bar_width, bar_height);
+                context.strokeRect(bar_x, bar_y, bar_width, bar_height);
+            }
+        }
+
+        var rendering = false;
+        var div_y = Math.round(options.height * 0.5);
+        var wave_height = options.visualize_bars ? div_y  : options.height;
+        var bars_y = (options.visualize_wave ? div_y : 0) + 1;  //hide border
+        var bars_height = options.visualize_wave ? options.height - bars_y  : options.height;
+
+
+        function render() {
+            if(rendering) return;
+            rendering = true;
+            context.clearRect(0, 0, options.width, options.height);
+            options.visualize_wave && renderWave(0, wave_height);
+            options.visualize_bars && renderBars(bars_y, bars_height);
+            rendering = false;
+        }
+
+        var interval = setInterval(render, options.visualization_fps ? 1000/options.visualization_fps : 100);
+
+
+        this.destroy = function() {
+            clearInterval(interval);
+            options.parent.removeChild(canvas)
+            context = null
+            canvas = null
+            fft = null;
+        }
+    }
+
+
+
     // init channels
     var channels = [];
     for(var i=0; i<options.channels; i++) {
         channels[i] = new SignalChannel();
     }
-
-
     // init visualization
-    var canvas = document.createElement('canvas');
-    canvas.width = options.width;
-    canvas.height = options.height;
-    options.parent.appendChild(canvas);
-    var context = canvas.getContext('2d');
-    context.strokeStyle = options.visualization_stroke_color;
+    var visualizator = new Visualizator();
 
-    var fft = new p5.FFT(options.visualization_smoothing, options.visualization_resolution);
-
-    function visualizeBars(spectrum) {
-        context.fillStyle = options.visualization_fill_color;
-        context.lineWidth = 1;
-        var dx = Math.round(options.width / spectrum.length);
-        for(var i=0; i<spectrum.length; i++) {
-            var dy = options.height * spectrum[i] * 0.5;
-            context.fillRect(i * dx, 1 + options.height - dy, dx, dy);
-            context.rect(i * dx, 1 + options.height - dy, dx, dy);
-            context.stroke();
-        }
-    }
-
-
-
-    function visualizeWave(spectrum) {
-        var dx = Math.round(options.width / spectrum.length);
-        var h = options.height * 0.25;
-        function dy(i) {
-            return h * (1 - spectrum[i]);
-        }
-        context.beginPath();
-        context.moveTo(0, dy(0))
-        for(var i=1; i<spectrum.length; i++) {
-            context.lineTo(i*dx, dy(i))
-        }
-        context.stroke();
-    }
-    //visualizeWave([0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]);
-
-
-    var visualization_rendering = false;
-    var visualization_interval = setInterval(function() {
-        if(visualization_rendering) return;
-        visualization_rendering = true;
-        var spectrum = fft.analyze();
-        for(var i=0; i<spectrum.length; i++) {
-            spectrum[i] = spectrum[i]/255;
-        }
-
-        context.fillStyle = options.visualization_background_color;
-        context.fillRect(0, 0, options.width, options.height);
-        options.visualize_bars && visualizeBars(spectrum);
-        options.visualize_wave && visualizeWave(spectrum);
-        visualization_rendering = false;
-    }, 1000/options.visualization_fps);
 
 
 
@@ -157,10 +189,7 @@ function PlayerP5(options) {
         for(var i=0; i<options.channels; i++) {
             channels[i].stop();
         }
-        clearInterval(visualization_interval);
-        options.parent.removeChild(canvas)
-        context = null
-        canvas = null
+        visualizator.destroy();
     }
 
 }
