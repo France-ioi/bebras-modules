@@ -15,8 +15,8 @@ var getContext = function(display, infos) {
             code: {
                 playSignal: 'playSignal',
                 playRecord: 'playRecord',
-                playStop: 'playStop',
-                sleep: 'sleep'
+                sleep: 'sleep',
+                playStop: 'playStop'
             },
             description: {
                 playSignal: 'playSignal(canal, type, frequency, amplitude) \n' +
@@ -37,13 +37,16 @@ var getContext = function(display, infos) {
                 'square': 'carré',
                 'noise': 'bruit'
             },
-            messages: {}
+            messages: {
+                'loading': 'Loading file...'
+            }
         }
     }
 
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(p5_strings)
     var player;
+    var delay = infos.actionDelay;
 
     context.reset = function(taskInfos) {
         if(!context.display) return
@@ -51,6 +54,9 @@ var getContext = function(display, infos) {
         player = new PlayerP5({
             parent: $('#grid')[0]
         })
+        if(!$('#p5_message')[0]) {
+            $('<div id="p5_message"></div>').insertAfter($('#grid'));
+        }
     }
 
 
@@ -58,8 +64,8 @@ var getContext = function(display, infos) {
     context.updateScale = function() {}
     context.resetDisplay = function() {}
     context.unload = function() {}
-    context.changeDelay = function() {
-        console.log(arguments)
+    context.changeDelay = function(actionDelay) {
+        delay = actionDelay;
     }
 
 
@@ -92,21 +98,58 @@ var getContext = function(display, infos) {
     }
 
 
-    context.p5 = {}
+
+
+
+    context.p5 = {
+
+        playSignal: function(channel, type, frequency, amplitude, callback) {
+            player.initSignal(channel, type, frequency, amplitude);
+            callback();
+        },
+
+        playRecord: function(url, frequency, callback) {
+            var onLoadProgress = function(progress) {
+                $('#p5_message').text(strings.messages.loading);
+            }
+            var onLoadEnd = function() {
+                $('#p5_message').text('');
+                context.waitDelay(callback);
+            }
+            player.initRecord(url, frequency, onLoadProgress, onLoadEnd);
+        },
+
+
+        sleep: function(ms, callback) {
+            var rate = delay / 200;
+            if(!rate) {
+                player.stop();
+                return callback();
+            }
+            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * rate;
+            player.play(rate);
+            setTimeout(function() {
+                player.stop();
+                context.waitDelay(callback);
+            }, ms)
+        },
+
+        playStop: function() {
+            player.stop();
+        }
+    }
+
 
     for (var category in context.customBlocks.p5) {
         for (var iBlock = 0; iBlock < context.customBlocks.p5[category].length; iBlock++) {
             (function() {
                 var block = context.customBlocks.p5[category][iBlock];
-                //var params = [];
                 if (block.params) {
                     block.blocklyJson = { inputsInline: true, args0: {} }
                     var blockArgs = block.blocklyJson.args0;
                     block.blocklyXml = '<block type="' + block.name + '">';
                     for (var iParam = 0; iParam < block.params.length; iParam++) {
-                        //params[iParam] = block.params[iParam];
                         var paramData = typeData[block.params[iParam]] || { bType: 'input_value' };
-
                         blockArgs[iParam] = { type: paramData.bType, name: "PARAM_" + iParam }
                         if(paramData.bType == 'field_dropdown') {
                             var options = [];
@@ -116,26 +159,12 @@ var getContext = function(display, infos) {
                             }
                             blockArgs[iParam].options = options;
                         }
-
                         block.blocklyXml +=
                             '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
                             '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
                             '</shadow></value>';
                     }
                     block.blocklyXml += '</block>';
-                }
-
-                context.p5[block.name] = function() {
-                    var callback = arguments[arguments.length - 1]
-                    if(block.name == 'sleep') {
-                        // TODO: check how this work
-                        setTimeout(function() {
-                            context.waitDelay(callback);
-                        }, Math.min(10000, arguments[0]))
-                    } else {
-                        player && player[block.name].apply(player, arguments);
-                        callback()
-                    }
                 }
            })();
         }
