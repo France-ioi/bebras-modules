@@ -58,7 +58,9 @@ var getContext = function(display, infos) {
     context.updateScale = function() {}
     context.resetDisplay = function() {}
     context.unload = function() {}
-
+    context.changeDelay = function() {
+        console.log(arguments)
+    }
 
 
     context.customBlocks = {
