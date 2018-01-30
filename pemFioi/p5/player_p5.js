@@ -26,9 +26,11 @@ function PlayerP5(options) {
 
 
 
+    // play waveforms or noise
     function SignalChannel() {
 
         var generator = null;
+        var freq;
 
         function initGenerator(type, frequency, amplitude) {
             if(amplitude < 0 || amplitude > 1) {
@@ -42,24 +44,85 @@ function PlayerP5(options) {
                 }
                 generator = new p5.Oscillator();
                 generator.setType(type);
-                generator.freq(frequency);
+                freq = frequency;
             }
             generator.amp(amplitude);
         }
 
 
-        this.play = function(type, frequency, amplitude) {
-            this.stop();
+        this.init = function(type, frequency, amplitude) {
             initGenerator(type, frequency, amplitude);
+        }
+
+
+        this.play = function(rate) {
+            if(!generator) return;
+            generator.freq(freq * rate);
             generator.start();
         }
 
 
         this.stop = function() {
             generator && generator.stop();
+        }
+
+
+        this.destroy = function() {
+            this.stop();
             generator = null;
         }
     }
+
+
+
+    // play file
+    function FileChannel() {
+
+        var file = null;
+        var filter = null;
+
+        this.init = function(url, frequency, onLoadProgress, onLoadEnd) {
+            if(frequency < options.min_frequency || frequency > options.max_frequency) {
+                throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
+            }
+            file = new p5.SoundFile(
+                url,
+                onLoadEnd,
+                function() {
+                    throw new Error('Can not load ' + url);
+                },
+                onLoadProgress
+            );
+            file.disconnect();
+            filter = new p5.LowPass()
+            filter.freq(frequency);
+            file.connect(filter);
+        }
+
+
+        this.play = function(rate) {
+            if(!file) return;
+            file.playMode('sustain');
+            file.rate(1 / (rate || 1))
+            file.play();
+        }
+
+
+        this.stop = function() {
+            file && file.pause();
+        }
+
+
+        this.destroy = function() {
+            this.stop();
+            file = null;
+            filter = null;
+        }
+    }
+
+
+
+
 
 
 
@@ -123,7 +186,7 @@ function PlayerP5(options) {
         var rendering = false;
         var div_y = Math.round(options.height * 0.5);
         var wave_height = options.visualize_bars ? div_y  : options.height;
-        var bars_y = (options.visualize_wave ? div_y : 0) + 1;  //hide border
+        var bars_y = (options.visualize_wave ? div_y : 0) + 1;  // +1 to hide border
         var bars_height = options.visualize_wave ? options.height - bars_y  : options.height;
 
 
@@ -155,6 +218,9 @@ function PlayerP5(options) {
     for(var i=0; i<options.channels; i++) {
         channels[i] = new SignalChannel();
     }
+    // and last channel for file
+    channels[i] = new FileChannel();
+
     // init visualization
     var visualizator = new Visualizator();
 
@@ -163,31 +229,39 @@ function PlayerP5(options) {
 
 
     // interface
-    this.playSignal = function(channel, type, frequency, amplitude) {
+    this.initSignal = function(channel, type, frequency, amplitude) {
         channel = channel - 1;
         if(channel < 0 || channel > options.channels) {
             throw new Error('Channel is out of range [1..' + options.channels + ']');
         }
         channels[channel].stop();
-        channels[channel].play(type, frequency, amplitude);
+        channels[channel].init(type, frequency, amplitude);
     }
 
 
-    this.playRecord = function(url, frequency) {
-        //TODO
+    this.initRecord = function(url, frequency, onLoadProgress, onLoadEnd) {
+        channels[channels.length - 1].init(url, frequency, onLoadProgress, onLoadEnd);
     }
 
 
-    this.playStop = function(url, frequency) {
-        for(var i=0; i<options.channels; i++) {
+    this.play = function(rate) {
+        for(var i=0; i<channels.length; i++) {
+            channels[i].stop();
+            channels[i].play(rate);
+        }
+    }
+
+
+    this.stop = function() {
+        for(var i=0; i<channels.length; i++) {
             channels[i].stop();
         }
     }
 
 
     this.destroy = function() {
-        for(var i=0; i<options.channels; i++) {
-            channels[i].stop();
+        for(var i=0; i<channels.length; i++) {
+            channels[i].destroy();
         }
         visualizator.destroy();
     }
