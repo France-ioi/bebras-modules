@@ -41,6 +41,14 @@ var getContext = function(display, infos) {
             messages: {
                 'loading': 'Loading file...',
                 'load_error': 'Error occurred during loading file.'
+            },
+            ui: {
+                'mic': 'Enable microphone',
+                'files': 'Add audio files...',
+                'caption': 'Audio files list',
+                'hint': 'Use file number as param for playRecord function',
+                'add': 'Add',
+                'incompatible_browser': 'Incompatible browser'
             }
         }
     }
@@ -50,29 +58,68 @@ var getContext = function(display, infos) {
     var player;
     var delay = infos.actionDelay;
 
+
     context.reset = function(taskInfos) {
         if(!context.display) return
+
         player && player.destroy()
         player = new PlayerP5({
-            parent: $('#grid')[0]
+            parent: $('#grid')[0],
+            filesRepository: function(n) {
+                var el = $('#p5_files_modal').find('input[type=file]')[0];
+                return el ? el.files[n] : null;
+            }
         })
-        //player.toggleMicrophone(true);
+
         if(!$('#p5_message')[0]) {
             $('<div id="p5_message"></div>').insertAfter($('#grid'));
         }
         if(!$('#p5_controls')[0]) {
             var html =
                 '<div id="p5_controls" style="text-align: left;">' +
-                    '<label><input type="checkbox" id="p5_microphone"/>Enable microphone</label>' +
-                    '<button class="btn btn-xs" style="float: right">Add audio files...</button>' +
+                    '<label><input type="checkbox" id="p5_microphone"/>' + strings.ui.mic + '</label>' +
+                    '<button class="btn btn-xs" style="float: right" onclick="$(`#p5_files_modal`).show()">' + strings.ui.files + '</button>' +
                 '</div>';
             $('#testSelector').prepend($(html))
             $('#p5_microphone').click(function() {
                 player.toggleMicrophone($(this).prop('checked'));
             })
-            //$(html).insertBefore($('#grid'));
         }
         player.toggleMicrophone($('#p5_microphone').prop('checked'));
+
+        if(!$('#p5_files_modal')[0]) {
+
+            var inner_html;
+            if(window.File && window.FileReader && window.FileList && window.Blob) {
+                inner_html =
+                    '<p>' + strings.ui.hint + '</p>' +
+                    '<ol id="p5_files"></ol>' +
+                    '<input type="file" class="btn" multiple accept=".mp3" title="' + strings.ui.add + '">';
+            } else {
+                inner_html =
+                    '<p>' + strings.ui.incompatible_browser + '</p>';
+            }
+            var html =
+                '<div id="p5_files_modal" class="modalWrapper">' +
+                    '<div class="modal">' +
+                        '<button type="button" class="btn close" onclick="$(`#p5_files_modal`).hide()">x</button>' +
+                        '<p><b>' + strings.ui.caption + '</b></p>' +
+                        inner_html
+                    '</div>' +
+                '</div>';
+            $('#taskContent').append($(html));
+
+            $('#p5_files_modal').find('input[type=file]').change(function() {
+                var html = '';
+                for(var i = 0, f; f = this.files[i]; i++) {
+                    html += '<li>' + f.name + '</li>'
+                }
+                $('#p5_files').html(html);
+                player.setFiles(this.files);
+            })
+        }
+
+
     }
 
 
@@ -162,6 +209,7 @@ var getContext = function(display, infos) {
 
         playStop: function() {
             player.stop();
+            callback();
         }
     }
 

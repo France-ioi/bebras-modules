@@ -13,7 +13,8 @@ function PlayerP5(options) {
         visualization_smoothing: 0.3,
         visualization_resolution: 64, // Must be a power of two between 16 and 1024.
         visualization_stroke_color: '#333333',
-        visualization_fill_color: '#990000'
+        visualization_fill_color: '#990000',
+        filesRepository: null
     }
 
     var options = (function() {
@@ -58,9 +59,10 @@ function PlayerP5(options) {
 
 
         this.play = function(rate) {
-            if(!generator) return;
-            freq !== null && generator.freq(freq * rate);
-            generator.start();
+            if(generator) {
+                freq !== null && generator.freq(freq * rate);
+                generator.start();
+            }
         }
 
 
@@ -258,6 +260,8 @@ function PlayerP5(options) {
     }
 
 
+    // init
+    var playing = false;
 
     // init channels
     var channels = [];
@@ -284,14 +288,19 @@ function PlayerP5(options) {
 
 
     this.initRecord = function(url, frequency, onLoadProgress, onLoadEnd) {
-        channels[channels.length - 1].init(url, frequency, onLoadProgress, onLoadEnd);
+        var file = parseInt(url, 10) == url && options.filesRepository ? options.filesRepository(url - 1) : url;
+        if(!file) {
+            throw new Error('Wrong file param');
+        }
+        channels[channels.length - 1].init(file, frequency, onLoadProgress, onLoadEnd);
     }
 
 
-    var playing = false;
+
+
 
     this.play = function(rate) {
-        if(playing) return;
+        //if(playing) return;
         playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {
@@ -314,9 +323,8 @@ function PlayerP5(options) {
         visualizator.toggleMicrophone(enabled);
     }
 
-
-    this.disableMic = function() {
-        visualizator.disableMic();
+    this.setFiles = function(list) {
+        files = list;
     }
 
 

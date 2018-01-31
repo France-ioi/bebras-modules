@@ -189,9 +189,10 @@ input[type=button] {
 	float: right;
 }
 
-/* Save or load Modal */
-#saveOrLoadModal {
-    z-index: 100;
+/* Modal popup */
+.modalWrapper {
+    display: none;
+    z-index: 1000;
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -201,7 +202,7 @@ input[type=button] {
 	background-color: rgba(0,0,0,0.7);
 	transition: all 250ms;
 }
-#saveOrLoadModal .modal {
+.modalWrapper .modal {
 	width: 800px;
 	margin: 0 auto;
 	background: #fff;
@@ -210,7 +211,7 @@ input[type=button] {
 	padding: 20px;
 	position: relative;
 }
-#saveOrLoadModal .btn.close {
+.modalWrapper .btn.close {
 	border: none;
 	font-weight: bold;
 	font-size: 24px;
