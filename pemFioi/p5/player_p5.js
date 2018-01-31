@@ -30,7 +30,7 @@ function PlayerP5(options) {
     function SignalChannel() {
 
         var generator = null;
-        var freq;
+        var freq = null;
 
         function initGenerator(type, frequency, amplitude) {
             if(amplitude < 0 || amplitude > 1) {
@@ -38,12 +38,14 @@ function PlayerP5(options) {
             }
             if(type == 'noise') {
                 generator = new p5.Noise('white');
+                freq = null;
             } else {
                 if(frequency < options.min_frequency || frequency > options.max_frequency) {
                     throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
                 }
                 generator = new p5.Oscillator();
                 generator.setType(type);
+                generator.freq(frequency);
                 freq = frequency;
             }
             generator.amp(amplitude);
@@ -57,7 +59,7 @@ function PlayerP5(options) {
 
         this.play = function(rate) {
             if(!generator) return;
-            generator.freq(freq * rate);
+            freq !== null && generator.freq(freq * rate);
             generator.start();
         }
 
@@ -137,6 +139,14 @@ function PlayerP5(options) {
 
         var fft = new p5.FFT(options.visualization_smoothing, options.visualization_resolution);
 
+        var microphone = null;
+        var microphone_enabled = false;
+        var playback_render = false;
+
+
+        function getFFT() {
+            return !playback_render && microphone_fft ? microphone_fft : fft;
+        }
 
         // waveform
         function renderWave(y, height) {
@@ -190,32 +200,56 @@ function PlayerP5(options) {
 
         function render() {
             if(rendering) return;
-            rendering = true;
-            context.clearRect(0, 0, options.width, options.height);
-            options.visualize_wave && renderWave(0, wave_height);
-            options.visualize_bars && renderBars(bars_y, bars_height);
-            rendering = false;
+            if(playback_render || microphone) {
+                rendering = true;
+                context.clearRect(0, 0, options.width, options.height);
+                options.visualize_wave && renderWave(0, wave_height);
+                options.visualize_bars && renderBars(bars_y, bars_height);
+                rendering = false;
+            }
         }
 
 
+        var interval = setInterval(
+            render,
+            options.visualization_fps ? 1000/options.visualization_fps : 100
+        );
 
-        var interval;
 
         this.start = function() {
-            interval = setInterval(
-                render,
-                options.visualization_fps ? 1000/options.visualization_fps : 100
-            );
+            playback_render = true;
+            fft.setInput();
         }
 
+
         this.stop = function() {
-            clearInterval(interval);
-            rendering = false;
+            playback_render = false;
+            this.refreshMicrophoneInput();
+        }
+
+
+        this.refreshMicrophoneInput = function() {
+            if(microphone_enabled) {
+                if(!microphone) {
+                    microphone = new p5.AudioIn()
+                    microphone.start();
+                }
+                fft.setInput(microphone);
+            } else {
+                microphone = null;
+                fft.setInput();
+            }
+        }
+
+
+        this.toggleMicrophone = function(enabled) {
+            microphone_enabled = enabled;
+            this.refreshMicrophoneInput();
         }
 
         this.destroy = function() {
-
-            this.stop();
+            clearInterval(interval);
+            this.toggleMicrophone(false);
             options.parent.removeChild(canvas)
             context = null
             canvas = null
@@ -235,9 +269,6 @@ function PlayerP5(options) {
 
     // init visualization
     var visualizator = new Visualizator();
-
-
-
 
 
     // interface
@@ -270,6 +301,16 @@ function PlayerP5(options) {
         for(var i=0; i<channels.length; i++) {
             channels[i].stop();
         }
+    }
+
+
+    this.toggleMicrophone = function(enabled) {
+        visualizator.toggleMicrophone(enabled);
+    }
+
+
+    this.disableMic = function() {
+        visualizator.disableMic();
     }
 
 

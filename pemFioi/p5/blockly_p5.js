@@ -55,9 +55,23 @@ var getContext = function(display, infos) {
         player = new PlayerP5({
             parent: $('#grid')[0]
         })
+        //player.toggleMicrophone(true);
         if(!$('#p5_message')[0]) {
             $('<div id="p5_message"></div>').insertAfter($('#grid'));
         }
+        if(!$('#p5_controls')[0]) {
+            var html =
+                '<div id="p5_controls" style="text-align: left;">' +
+                    '<label><input type="checkbox" id="p5_microphone"/>Enable microphone</label>' +
+                    '<button class="btn btn-xs" style="float: right">Add audio files...</button>' +
+                '</div>';
+            $('#testSelector').prepend($(html))
+            $('#p5_microphone').click(function() {
+                player.toggleMicrophone($(this).prop('checked'));
+            })
+            //$(html).insertBefore($('#grid'));
+        }
+        player.toggleMicrophone($('#p5_microphone').prop('checked'));
     }
 
 
