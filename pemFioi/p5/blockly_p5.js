@@ -38,7 +38,8 @@ var getContext = function(display, infos) {
                 'noise': 'bruit'
             },
             messages: {
-                'loading': 'Loading file...'
+                'loading': 'Loading file...',
+                'load_error': 'Error occurred during loading file.'
             }
         }
     }
@@ -116,7 +117,10 @@ var getContext = function(display, infos) {
                 $('#p5_message').text('');
                 context.waitDelay(callback);
             }
-            player.initRecord(url, frequency, onLoadProgress, onLoadEnd);
+            var onLoadError = function() {
+                $('#p5_message').text(strings.messages.load_error);
+            }
+            player.initRecord(url, frequency, onLoadEnd, onLoadError, onLoadProgress);
         },
 
 

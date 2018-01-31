@@ -81,16 +81,14 @@ function PlayerP5(options) {
         var file = null;
         var filter = null;
 
-        this.init = function(url, frequency, onLoadProgress, onLoadEnd) {
+        this.init = function(url, frequency, onLoadEnd, onLoadError, onLoadProgress) {
             if(frequency < options.min_frequency || frequency > options.max_frequency) {
                 throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
             }
             file = new p5.SoundFile(
                 url,
                 onLoadEnd,
-                function() {
-                    throw new Error('Can not load ' + url);
-                },
+                onLoadError,
                 onLoadProgress
             );
             file.disconnect();
