@@ -328,10 +328,14 @@ function PlayerP5(options) {
     }
 
 
-    this.destroy = function() {
+    this.destroyChannels = function() {
         for(var i=0; i<channels.length; i++) {
             channels[i].destroy();
         }
+    }
+
+    this.destroy = function() {
+        this.destroyChannels();
         visualizator.destroy();
     }
 
