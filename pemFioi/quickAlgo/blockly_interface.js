@@ -24,7 +24,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       hidden: false,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
-      startingBlock: true, 
+      startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       unloaded: false,
       quickAlgoInterface: window.quickAlgoInterface,
@@ -62,7 +62,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             $("submitBtn").html("<img src='" + this.mediaUrl + "icons/event_whenflagclicked.svg' height='32px' width='32px' style='vertical-align: middle;'>" + $("submitBtn").html());
          }
       },
-      
+
       loadContext: function (mainContext) {
          this.mainContext = mainContext;
          this.createGeneratorsAndBlocks();
@@ -131,7 +131,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if (toolboxNode.length != 0) {
                toolboxNode.html(xml);
             }
-            
+
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             this.workspace.addChangeListener(this.onChange.bind(this));
             this.onChange();
@@ -313,7 +313,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          $(".language_blockly, .language_javascript").hide();
          $(".language_" + this.languages[this.player]).show();
-         
+
          var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv");
          $("#selectLanguage").val(this.languages[this.player]);
          if (this.languages[this.player] == "blockly") {
@@ -358,7 +358,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var xml = Blockly.Xml.textToDom(example);
             this.cleanBlockIds(xml);
 
-            
+
 
             // Remove robot_start
             if(xml.children.length == 1 && xml.children[0].getAttribute('type') == 'robot_start') {
@@ -530,7 +530,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                return;
             }
          }
-            
+
          this.savePrograms();
 
          var codes = [];
@@ -553,7 +553,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.mainContext.runner.initCodes(codes);
       },
 
-      
+
       run: function () {
          this.initRun();
          this.mainContext.runner.run();

@@ -271,6 +271,7 @@ function PlayerP5(options) {
     var visualizator = new Visualizator();
 
 
+
     // interface
     this.initSignal = function(channel, type, frequency, amplitude) {
         channel = channel - 1;
@@ -287,7 +288,11 @@ function PlayerP5(options) {
     }
 
 
+    var playing = false;
+
     this.play = function(rate) {
+        if(playing) return;
+        playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {
             channels[i].stop();
@@ -297,6 +302,7 @@ function PlayerP5(options) {
 
 
     this.stop = function() {
+        playing = false;
         visualizator.stop();
         for(var i=0; i<channels.length; i++) {
             channels[i].stop();

@@ -77,7 +77,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
          return value;
       };
-      
+
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             runner.stackCount = 0;
@@ -120,7 +120,7 @@ function initBlocklyRunner(context, messageCallback) {
                handler.apply(this, arguments);
             };
          };
-         
+
          for (var objectName in context.customBlocks) {
             for (var category in context.customBlocks[objectName]) {
                for (var iBlock in context.customBlocks[objectName][category]) {
@@ -136,13 +136,13 @@ function initBlocklyRunner(context, messageCallback) {
                   } else {
                      var handler = blockInfo.handler;
                   }
-                  
+
                   interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
                }
-            }            
+            }
          }
-         
-         
+
+
          /*for (var objectName in context.generators) {
             for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
                var generator = context.generators[objectName][iGen];
@@ -153,7 +153,7 @@ function initBlocklyRunner(context, messageCallback) {
 
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
-            
+
             if (context.display) {
                if(!runner.scratchMode) {
                   context.blocklyHelper.workspace.traceOn(true);
@@ -164,7 +164,7 @@ function initBlocklyRunner(context, messageCallback) {
                   highlightPause = true;
                }
             }
-            
+
             // We always execute directly the first highlightBlock
             if(runner.firstHighlight || !runner.stepMode) {
                runner.firstHighlight = false;
@@ -183,7 +183,7 @@ function initBlocklyRunner(context, messageCallback) {
 
          // Add an API function to report a value.
          interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
-        
+
       };
 
       runner.stop = function() {
@@ -237,6 +237,7 @@ function initBlocklyRunner(context, messageCallback) {
                      context.curSteps[iInterpreter].withoutAction++;
                   }
                }
+
                if (!context.programEnded[iInterpreter]) {
                   if (context.curSteps[iInterpreter].total >= runner.maxIter) {
                      isRunning[iInterpreter] = false;
@@ -248,6 +249,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
          } catch (e) {
+            context.onExecutionEnd && context.onExecutionEnd();
             runner.stepInProgress = false;
 
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
@@ -269,7 +271,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
                message = runner.strings.uninitializedVar + ' ' + varName;
             }
-            
+
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
                if (context.success) {
                   message = context.messagePrefixSuccess + message;
@@ -278,7 +280,7 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
             if (context.success) {
-               message = "<span style='color:green;font-weight:bold'>" + message + "</span>"; 
+               message = "<span style='color:green;font-weight:bold'>" + message + "</span>";
                if (context.linkBack) {
                   //message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
