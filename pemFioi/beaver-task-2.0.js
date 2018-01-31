@@ -188,10 +188,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       else {
          // TODO is this the desired behavior? It is from beaver-task-1.0.
          var currentState = {};
-         mainTask.getAnswerObject(function(displayedAnswer) {
-            currentState.displayedAnswer = displayedAnswer;
-            callback(JSON.stringify(currentState));
-         });
+         var displayedAnswer = mainTask.getAnswerObject();
+         currentState.displayedAnswer = displayedAnswer;
+         callback(JSON.stringify(currentState));
       }
    };
    
