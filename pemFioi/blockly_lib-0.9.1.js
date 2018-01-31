@@ -414,7 +414,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                       "    <div id='blocklyDiv' class='language_blockly'></div>" +
                                       "    <textarea id='program' class='language_javascript' style='width:100%;height:100%;display:none'></textarea>" +
                                       "  </div>" +
-                                      "  <div id='saveOrLoadModal' style='display:none'></div>\n");
+                                      "  <div id='saveOrLoadModal' class='modalWrapper'></div>\n");
 
          var saveOrLoadModal = "<div class='modal'>" +
                                "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +

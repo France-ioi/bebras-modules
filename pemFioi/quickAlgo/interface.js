@@ -26,7 +26,7 @@ var quickAlgoInterface = {
          "  <div id='capacity'></div>" +
          "</div>" +
          "<div id='languageInterface'></div>" +
-         "<div id='saveOrLoadModal' style='display:none'></div>\n");
+         "<div id='saveOrLoadModal' class='modalWrapper'></div>\n");
 
       // Upper right load buttons
       $("#editorButtons").html(
