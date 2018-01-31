@@ -496,6 +496,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onStepError = function (message) {
+    context.onExecutionEnd && context.onExecutionEnd();
     // We always get there, even on a success
     this.stop();
 
