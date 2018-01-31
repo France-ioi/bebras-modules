@@ -300,7 +300,7 @@ function PlayerP5(options) {
 
 
     this.play = function(rate) {
-        //if(playing) return;
+        if(playing) return;
         playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {

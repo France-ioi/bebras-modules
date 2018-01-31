@@ -169,11 +169,13 @@ var getContext = function(display, infos) {
     context.p5 = {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
+            player.stop();
             player.initSignal(channel, type, frequency, amplitude);
             callback();
         },
 
         playRecord: function(url, frequency, callback) {
+            player.stop();
             var onLoadProgress = function(progress) {
                 $('#p5_message').text(strings.messages.loading);
             }
