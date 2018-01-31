@@ -1,5 +1,6 @@
 var getContext = function(display, infos) {
 
+
     var p5_strings = {
         fr: {
             categories: {
@@ -113,7 +114,9 @@ var getContext = function(display, infos) {
     }
 
 
-
+    context.onExecutionEnd = function() {
+        player.stop();
+    }
 
 
     context.p5 = {
@@ -147,8 +150,12 @@ var getContext = function(display, infos) {
             }
             var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * rate;
             player.play(rate);
+
+            var self = this;
             setTimeout(function() {
-                player.stop();
+                if(context.runner && context.runner.stepMode) {
+                    player.stop();
+                }
                 context.waitDelay(callback);
             }, ms)
         },

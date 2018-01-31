@@ -88,7 +88,7 @@ var localLanguageStrings = {
       saveProgram: "Enregistrer",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
-      previousTestcase: "Précédent", 
+      previousTestcase: "Précédent",
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
@@ -159,7 +159,7 @@ var localLanguageStrings = {
       saveProgram: "Save",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
-      previousTestcase: "Previous", 
+      previousTestcase: "Previous",
       nextTestcase: "Next",
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
@@ -231,7 +231,7 @@ var localLanguageStrings = {
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
-      previousTestcase: " < ", 
+      previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
@@ -303,7 +303,7 @@ var localLanguageStrings = {
       saveProgram: "Shrani",
       limitBlocks: "{remainingBlocks} kock izmed {maxBlocks} imaš še na voljo.",
       limitBlocksOver: "{remainingBlocks} kock preko meje {maxBlocks} kock, ki so na voljo.",
-      previousTestcase: "Nazaj", 
+      previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
       errorEmptyProgram: "Program je prazen! Poveži kocke.",
@@ -382,7 +382,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       prevWidth: 0,
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
-      startingBlock: true, 
+      startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
 
       glowingBlock: null,
@@ -426,8 +426,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                                "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
                                "</div>";
          $("#saveOrLoadModal").html(saveOrLoadModal);
-         
-        
+
+
          // Buttons from buttonsAndMessages
          var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="width: 438px; padding: 1px;">';
          var placementNames = ['graderMessage', 'validate', 'saved'];
@@ -441,7 +441,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          if(!$('#displayHelper_cancel').length) {
             $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
          }
-         
+
          var gridButtonsAfter = '';
          gridButtonsAfter += "<div id='testSelector' style='width: 420px;'></div>"
                            + "<button type='button' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
@@ -452,7 +452,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                            + addTaskHTML;
          $("#gridButtonsAfter").html(gridButtonsAfter);
       },
-      
+
       load: function(language, display, nbTestCases, options) {
          if(this.scratchMode) {
             this.fixScratch();
@@ -469,9 +469,9 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          }
          else { // merge translations
             $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-         }         
+         }
          this.strings = window.languageStrings;
-         
+
          if (display) {
             this.loadHtml(nbTestCases);
             this.addExtraBlocks();
@@ -503,7 +503,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (toolboxNode.length != 0) {
                toolboxNode.html(xml);
             }
-            
+
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             var that = this;
             function onchange(event) {
@@ -525,7 +525,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   if(that.scratchMode) {
                      that.glowBlock(null);
                   }
-                  
+
                   that.resetTestScores(nbTestCases);
                }
             }
@@ -713,7 +713,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          $(".language_blockly, .language_javascript").hide();
          $(".language_" + this.languages[this.player]).show();
-         
+
          var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv");
          $("#selectLanguage").val(this.languages[this.player]);
          if (this.languages[this.player] == "blockly") {
@@ -913,7 +913,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       },
       completeBlockJson: function(block, objectName, categoryName, context) {
          // Needs context object solely for the language strings. Maybe change that …
-         
+
          if (typeof block.blocklyJson == "undefined") {
             block.blocklyJson =  {};
          }
@@ -958,7 +958,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   type: "input_value",
                   name: "PARAM_" + iParam
                }
-                  
+
                if (block.params[iParam] != null) {
                   param.check = block.params[iParam]; // Should be a string!
                }
@@ -1003,19 +1003,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
                if ("blocks" in colours &&  block.name in colours.blocks) {
-                  block.blocklyJson.colour = colours.blocks[block.name];                  
+                  block.blocklyJson.colour = colours.blocks[block.name];
                }
                else if ("categories" in colours) {
                   if (categoryName in colours.categories) {
-                     block.blocklyJson.colour = colours.categories[categoryName];                     
+                     block.blocklyJson.colour = colours.categories[categoryName];
                   }
                   else if ("_default" in colours.categories) {
-                     block.blocklyJson.colour = colours.categories["_default"];                     
+                     block.blocklyJson.colour = colours.categories["_default"];
                   }
                }
-            }            
+            }
          }
-      }, 
+      },
       completeBlockXml: function(block) {
          if (typeof block.blocklyXml == "undefined" || block.blocklyXml == "") {
             block.blocklyXml = "<block type='" + block.name + "'></block>";
@@ -1030,14 +1030,14 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
          var output = blockInfo.blocklyJson.output;
-         
+
          for (var language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {
                // Prevent the function name to be used as a variable
                Blockly[language].addReservedWords(code);
                function setCodeGeneratorForLanguage(language) {
                   blockInfo.codeGenerators[language] = function(block) {
-                     var params = "";               
+                     var params = "";
 
                      /* There are three kinds of input: value_input, statement_input and dummy_input,
                         We should definitely consider value_input here and not consider dummy_input here.
@@ -1075,7 +1075,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      // Add reportValue to show the value in step-by-step mode
                      var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
 
-                     if (typeof output == "undefined") {                     
+                     if (typeof output == "undefined") {
                         return callCode + ";\n";
                      }
                      else {
@@ -1087,7 +1087,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
          }
       },
-      
+
       applyCodeGenerators: function(block) {
          for (var language in block.codeGenerators) {
             Blockly[language][block.name] = block.codeGenerators[language];
@@ -1112,7 +1112,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             console.err(block.name + ".blocklyInit is defined but not a function");
          }
       },
-      
+
       createSimpleGenerator: function(label, code, type, nbParams) {
          var jsDefinitions = this.definitions['javascript'] ? this.definitions['javascript'] : [];
          var pyDefinitions = this.definitions['python'] ? this.definitions['python'] : [];
@@ -1120,7 +1120,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          // Prevent the function name to be used as a variable
          Blockly.JavaScript.addReservedWords(code);
          Blockly.Python.addReservedWords(code);
-         
+
          Blockly.JavaScript[label] = function(block) {
             for (var iDef=0; iDef < jsDefinitions.length; iDef++) {
                var def = jsDefinitions[iDef];
@@ -1182,7 +1182,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          };
       },
 
-      createSimpleGeneratorsAndBlocks: function() { 
+      createSimpleGeneratorsAndBlocks: function() {
          for (var genName in this.simpleGenerators) {
             for (var iGen = 0; iGen < this.simpleGenerators[genName].length; iGen++) {
                var generator = this.simpleGenerators[genName][iGen];
@@ -1255,7 +1255,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          return strCode;
       },
 
-      
+
       getDefaultColours: function() {
          var colours = {
             categories: {
@@ -1276,7 +1276,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          if (typeof this.mainContext.provideBlocklyColours == "function") {
             var providedColours = this.mainContext.provideBlocklyColours();
-            
+
             for (var group in providedColours) {
                if (!(group in colours)) {
                   colours[group] = {};
@@ -1286,10 +1286,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                }
             }
          }
-         
+
          if (typeof provideBlocklyColours == "function") {
             var providedColours = provideBlocklyColours();
-            
+
             for (var group in providedColours) {
                if (!(group in colours)) {
                   colours[group] = {};
@@ -1302,7 +1302,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          return colours;
       },
-      
+
 
       getStdBlocks: function() {
          return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
@@ -1311,68 +1311,68 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
       getStdBlocklyBlocks: function() {
          return {
             input: [
-               { 
-                  name: "input_num", 
+               {
+                  name: "input_num",
                   blocklyXml: "<block type='input_num'></block>"
                },
-               { 
-                  name: "input_char", 
+               {
+                  name: "input_char",
                   blocklyXml: "<block type='input_char'></block>"
                },
-               { 
-                  name: "input_word", 
+               {
+                  name: "input_word",
                   blocklyXml: "<block type='input_word'></block>"
                },
-               { 
-                  name: "input_line", 
+               {
+                  name: "input_line",
                   blocklyXml: "<block type='input_line'></block>"
                }
             ],
             logic: [
                {
                   name: "controls_if",
-                  blocklyXml: "<block type='controls_if'></block>"                     
+                  blocklyXml: "<block type='controls_if'></block>"
                },
-               { 
+               {
                   name: "controls_if_else",
                   blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
                   excludedByDefault: this.mainContext.showIfMutator
                },
-               { 
-                  name: "logic_compare", 
+               {
+                  name: "logic_compare",
                   blocklyXml: "<block type='logic_compare'></block>"
                },
-               { 
-                  name: "logic_operation", 
+               {
+                  name: "logic_operation",
                   blocklyXml: "<block type='logic_operation'></block>"
                },
-               { 
-                  name: "logic_negate", 
+               {
+                  name: "logic_negate",
                   blocklyXml: "<block type='logic_negate'></block>"
                },
-               { 
-                  name: "logic_boolean", 
+               {
+                  name: "logic_boolean",
                   blocklyXml: "<block type='logic_boolean'></block>"
                },
-               { 
-                  name: "logic_boolean", 
+               {
+                  name: "logic_boolean",
                   blocklyXml: "<block type='logic_null'></block>",
                   excludedByDefault: true
                },
-               { 
-                  name: "logic_boolean", 
+               {
+                  name: "logic_boolean",
                   blocklyXml: "<block type='logic_ternary'></block>",
                   excludedByDefault: true
                }
             ],
             loops: [
-               { 
-                  name: "controls_repeat", 
+               {
+                  name: "controls_repeat",
                   blocklyXml: "<block type='controls_repeat'></block>",
                   excludedByDefault: true
                },
-               { 
-                  name: "controls_repeat_ext", 
+               {
+                  name: "controls_repeat_ext",
                   blocklyXml: "<block type='controls_repeat_ext'>" +
                               "  <value name='TIMES'>" +
                               "    <shadow type='math_number'>" +
@@ -1381,8 +1381,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "  </value>" +
                               "</block>"
                },
-               { 
-                  name: "controls_repeat_ext_noShadow", 
+               {
+                  name: "controls_repeat_ext_noShadow",
                   blocklyXml: "<block type='controls_repeat_ext'></block>",
                   excludedByDefault: true
                },
@@ -1396,17 +1396,17 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                    "  </value>" +
                    "</block>"
                },
-               { 
-                  name: "controls_whileUntil", 
+               {
+                  name: "controls_whileUntil",
                   blocklyXml: "<block type='controls_whileUntil'></block>"
                },
-               { 
-                  name: "controls_untilWhile", 
+               {
+                  name: "controls_untilWhile",
                   blocklyXml: "<block type='controls_whileUntil'><field name='MODE'>UNTIL</field></block>",
                   excludedByDefault: true
                },
-               { 
-                  name: "controls_for", 
+               {
+                  name: "controls_for",
                   blocklyXml: "<block type='controls_for'>" +
                               "  <value name='FROM'>" +
                               "    <shadow type='math_number'>" +
@@ -1425,8 +1425,8 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "  </value>" +
                               "</block>"
                },
-               { 
-                  name: "controls_for_noShadow", 
+               {
+                  name: "controls_for_noShadow",
                   blocklyXml: "<block type='controls_for'></block>",
                   excludedByDefault: true
                },
@@ -1450,38 +1450,38 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                    "  </value>" +
                    "</block>"
                },
-               { 
+               {
                   name: "controls_forEach",
                   blocklyXml: "<block type='controls_forEach'></block>",
                   excludedByDefault: true
                },
-               { 
-                  name: "controls_flow_statements", 
+               {
+                  name: "controls_flow_statements",
                   blocklyXml: "<block type='controls_flow_statements'></block>"
                }
             ],
             math: [
-               { 
-                  name: "math_number", 
+               {
+                  name: "math_number",
                   blocklyXml: "<block type='math_number' gap='32'></block>"
                },
                {
-                  name: "math_arithmetic", 
+                  name: "math_arithmetic",
                   blocklyXml: "<block type='math_arithmetic'>" +
                               "  <value name='A'>" +
                               "    <shadow type='math_number'>" +
                               "      <field name='NUM'>1</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "  <value name='B'>" + 
-                              "    <shadow type='math_number'>" + 
-                              "      <field name='NUM'>1</field>" + 
-                              "    </shadow>" + 
-                              "  </value>" + 
+                              "  <value name='B'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
                               "</block>"
                },
                {
-                  name: "math_arithmetic_noShadow", 
+                  name: "math_arithmetic_noShadow",
                   blocklyXml: "<block type='math_arithmetic'></block>",
                   excludedByDefault: true
                },
@@ -1501,7 +1501,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true
                },
                {
-                  name: "math_extra_single", 
+                  name: "math_extra_single",
                   blocklyXml: "<block type='math_extra_single'>" +
                               "  <value name='NUM'>" +
                               "    <shadow type='math_number'>" +
@@ -1512,28 +1512,28 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true
                },
                {
-                  name: "math_extra_single_noShadow", 
+                  name: "math_extra_single_noShadow",
                   blocklyXml: "<block type='math_extra_single'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "math_extra_double", 
+                  name: "math_extra_double",
                   blocklyXml: "<block type='math_extra_double'>" +
                               "  <value name='A'>" +
                               "    <shadow type='math_number'>" +
                               "      <field name='NUM'>1</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              "  <value name='B'>" + 
-                              "    <shadow type='math_number'>" + 
-                              "      <field name='NUM'>1</field>" + 
-                              "    </shadow>" + 
-                              "  </value>" + 
+                              "  <value name='B'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>1</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
                               "</block>",
                   excludedByDefault: true
                },
                {
-                  name: "math_extra_double", 
+                  name: "math_extra_double",
                   blocklyXml: "<block type='math_extra_double'></block>",
                   excludedByDefault: true
                },
@@ -1569,7 +1569,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "math_number_property_noShadow", 
+                  name: "math_number_property_noShadow",
                   blocklyXml: "<block type='math_number_property'></block>",
                   excludedByDefault: true
                },
@@ -1584,7 +1584,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "math_round_noShadow", 
+                  name: "math_round_noShadow",
                   blocklyXml: "<block type='math_round'></block>",
                   excludedByDefault: true
                },
@@ -1609,7 +1609,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "math_modulo_noShadow", 
+                  name: "math_modulo_noShadow",
                   blocklyXml: "<block type='math_modulo'></block>",
                   excludedByDefault: true
                },
@@ -1668,19 +1668,19 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             ],
             texts: [
                {
-                  name: "text", 
+                  name: "text",
                   blocklyXml: "<block type='text'></block>"
                },
                {
-                  name: "text_join", 
+                  name: "text_join",
                   blocklyXml: "<block type='text_join'></block>"
                },
                {
-                  name: "text_append", 
+                  name: "text_append",
                   blocklyXml: "<block type='text_append'></block>"
                },
                {
-                  name: "text_length", 
+                  name: "text_length",
                   blocklyXml: "<block type='text_length'>" +
                               "  <value name='VALUE'>" +
                               "    <shadow type='text'>" +
@@ -1690,12 +1690,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_length_noShadow", 
+                  name: "text_length_noShadow",
                   blocklyXml: "<block type='text_length'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_isEmpty", 
+                  name: "text_isEmpty",
                   blocklyXml: "<block type='text_isEmpty'>" +
                               "  <value name='VALUE'>" +
                               "    <shadow type='text'>" +
@@ -1705,12 +1705,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_isEmpty_noShadow", 
+                  name: "text_isEmpty_noShadow",
                   blocklyXml: "<block type='text_isEmpty'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_indexOf", 
+                  name: "text_indexOf",
                   blocklyXml: "<block type='text_indexOf'>" +
                               "  <value name='VALUE'>" +
                               "    <block type='variables_get'>" +
@@ -1725,12 +1725,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_indexOf_noShadow", 
+                  name: "text_indexOf_noShadow",
                   blocklyXml: "<block type='text_indexOf'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_charAt", 
+                  name: "text_charAt",
                   blocklyXml: "<block type='text_charAt'>" +
                               "  <value name='VALUE'>" +
                               "    <block type='variables_get'>" +
@@ -1740,13 +1740,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_charAt_noShado", 
+                  name: "text_charAt_noShado",
                   blocklyXml: "<block type='text_charAt'></block>",
                   excludedByDefault: true
-                  
+
                },
                {
-                  name: "text_getSubstring", 
+                  name: "text_getSubstring",
                   blocklyXml: "<block type='text_getSubstring'>" +
                               "  <value name='STRING'>" +
                               "    <block type='variables_get'>" +
@@ -1756,12 +1756,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_getSubstring_noShadow", 
+                  name: "text_getSubstring_noShadow",
                   blocklyXml: "<block type='text_getSubstring'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_changeCase", 
+                  name: "text_changeCase",
                   blocklyXml: "<block type='text_changeCase'>" +
                               "  <value name='TEXT'>" +
                               "    <shadow type='text'>" +
@@ -1771,12 +1771,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_changeCase_noShadow", 
+                  name: "text_changeCase_noShadow",
                   blocklyXml: "<block type='text_changeCase'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_trim", 
+                  name: "text_trim",
                   blocklyXml: "<block type='text_trim'>" +
                               "  <value name='TEXT'>" +
                               "    <shadow type='text'>" +
@@ -1786,11 +1786,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "text_trim_noShadow", 
+                  name: "text_trim_noShadow",
                   blocklyXml: "<block type='text_trim'></block>"
                },
                {
-                  name: "text_print", 
+                  name: "text_print",
                   blocklyXml: "<block type='text_print'>" +
                               "  <value name='TEXT'>" +
                               "    <shadow type='text'>" +
@@ -1801,12 +1801,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true
                },
                {
-                  name: "text_print_noShadow", 
+                  name: "text_print_noShadow",
                   blocklyXml: "<block type='text_print'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "text_prompt_ext", 
+                  name: "text_prompt_ext",
                   blocklyXml: "<block type='text_prompt_ext'>" +
                               "  <value name='TEXT'>" +
                               "    <shadow type='text'>" +
@@ -1817,24 +1817,24 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   excludedByDefault: true
                },
                {
-                  name: "text_prompt_ext_noShadow", 
+                  name: "text_prompt_ext_noShadow",
                   blocklyXml: "<block type='text_prompt_ext'></block>",
                   excludedByDefault: true
                }
             ],
             lists: [
                {
-                  name: "lists_create_with_empty", 
+                  name: "lists_create_with_empty",
                   blocklyXml: "<block type='lists_create_with'>" +
                               "  <mutation items='0'></mutation>" +
                               "</block>"
                },
                {
-                  name: "lists_create_with", 
+                  name: "lists_create_with",
                   blocklyXml: "<block type='lists_create_with'></block>"
                },
                {
-                  name: "lists_repeat", 
+                  name: "lists_repeat",
                   blocklyXml: "<block type='lists_repeat'>" +
                               "  <value name='NUM'>" +
                               "    <shadow type='math_number'>" +
@@ -1844,15 +1844,15 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_length", 
+                  name: "lists_length",
                   blocklyXml: "<block type='lists_length'></block>"
                },
                {
-                  name: "lists_isEmpty", 
+                  name: "lists_isEmpty",
                   blocklyXml: "<block type='lists_isEmpty'></block>"
                },
                {
-                  name: "lists_indexOf", 
+                  name: "lists_indexOf",
                   blocklyXml: "<block type='lists_indexOf'>" +
                               "  <value name='VALUE'>" +
                               "    <block type='variables_get'>" +
@@ -1862,7 +1862,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_getIndex", 
+                  name: "lists_getIndex",
                   blocklyXml: "<block type='lists_getIndex'>" +
                               "  <value name='VALUE'>" +
                               "    <block type='variables_get'>" +
@@ -1872,7 +1872,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_setIndex", 
+                  name: "lists_setIndex",
                   blocklyXml: "<block type='lists_setIndex'>" +
                               "  <value name='LIST'>" +
                               "    <block type='variables_get'>" +
@@ -1882,7 +1882,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_getSublist", 
+                  name: "lists_getSublist",
                   blocklyXml: "<block type='lists_getSublist'>" +
                               "  <value name='LIST'>" +
                               "    <block type='variables_get'>" +
@@ -1892,11 +1892,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_sort", 
+                  name: "lists_sort",
                   blocklyXml: "<block type='lists_sort'></block>"
                },
                {
-                  name: "lists_split", 
+                  name: "lists_split",
                   blocklyXml: "<block type='lists_split'>" +
                               "  <value name='DELIM'>" +
                               "    <shadow type='text'>" +
@@ -1906,21 +1906,21 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "lists_append", 
+                  name: "lists_append",
                   blocklyXml: "<block type='lists_append'></block>"
                }
             ],
             colour: [
                {
-                  name: "colour_picker", 
+                  name: "colour_picker",
                   blocklyXml: "<block type='colour_picker'></block>"
                },
                {
-                  name: "colour_random", 
+                  name: "colour_random",
                   blocklyXml: "<block type='colour_random'></block>"
                },
                {
-                  name: "colour_rgb", 
+                  name: "colour_rgb",
                   blocklyXml: "<block type='colour_rgb'>" +
                               "  <value name='RED'>" +
                               "    <shadow type='math_number'>" +
@@ -1940,12 +1940,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "colour_rgb_noShadow", 
+                  name: "colour_rgb_noShadow",
                   blocklyXml: "<block type='colour_rgb'></block>",
                   excludedByDefault: true
                },
                {
-                  name: "colour_blend", 
+                  name: "colour_blend",
                   blocklyXml: "<block type='colour_blend'>" +
                               "  <value name='COLOUR1'>" +
                               "    <shadow type='colour_picker'>" +
@@ -1965,22 +1965,22 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                               "</block>"
                },
                {
-                  name: "colour_blend_noShadow", 
+                  name: "colour_blend_noShadow",
                   blocklyXml: "<block type='colour_blend'></block>",
                   excludedByDefault: true
                }
             ],
             dicts: [
-               { 
-                  name: "dict_get_literal", 
+               {
+                  name: "dict_get_literal",
                   blocklyXml: "<block type='dict_get_literal'></block>"
                },
-               { 
-                  name: "dict_keys", 
+               {
+                  name: "dict_keys",
                   blocklyXml: "<block type='dict_keys'></block>"
                },
-               { 
-                  name: "dicts_create_with", 
+               {
+                  name: "dicts_create_with",
                   blocklyXml: "<block type='dicts_create_with'></block>"
                }
             ],
@@ -1997,12 +1997,12 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   name: "control_if",
                   blocklyXml: "<block type='control_if'></block>"
                },
-               { 
+               {
                   name: "control_if_else",
                   blocklyXml: "<block type='control_if_else'></block>"
                },
-               { 
-                  name: "control_repeat", 
+               {
+                  name: "control_repeat",
                   blocklyXml: "<block type='control_repeat'>" +
                               "  <value name='TIMES'>" +
                               "    <shadow type='math_number'>" +
@@ -2051,7 +2051,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   blocksXml: [],
                   colour: colours.blocks[blockName]
                };
-            }            
+            }
             categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
          }
 
@@ -2076,7 +2076,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             includedBlocks: {get: true, set: true, incr: true},
             shortList: true
          };
-         
+
          for (var blockType in this.includeBlocks.generatedBlocks) {
             this.addBlocksAndCategories(this.includeBlocks.generatedBlocks[blockType], this.mainContext.customBlocks[blockType], categoriesInfos);
          }
@@ -2116,7 +2116,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             if (!(blocks instanceof Array)) { // just for now, maintain backwards compatibility
                blocks = blocks.blocks;
             }
-            
+
             for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
                if (!(blocks[iBlock].excludedByDefault)) {
                   categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
@@ -2155,7 +2155,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
             }
          }
 
-         var xmlString = "";         
+         var xmlString = "";
          for (var categoryName in categoriesInfos) {
             var categoryInfo = categoriesInfos[categoryName];
             if (this.includeBlocks.groupByCategory) {
@@ -2165,7 +2165,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                   if (typeof(colour) == "undefined") {
                      colour = colours.categories._default;
                   }
-               }               
+               }
                xmlString += "<category "
                           + " name='" + this.strings.categories[categoryName] + "'"
                           + " colour='" + colour + "'"
@@ -2186,10 +2186,10 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          (function (strings) {
             xmlString = xmlString.replace(/{(\w+)}/g, function(m, p1) {return strings[p1]}); // taken from blockly/demo/code
          })(this.strings);
-         
+
          return xmlString;
       },
-      
+
 
       addExtraBlocks: function() {
          var that = this;
@@ -2198,7 +2198,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          Blockly.Blocks['controls_untilWhile'] = Blockly.Blocks['controls_whileUntil'];
          Blockly.JavaScript['controls_untilWhile'] = Blockly.JavaScript['controls_whileUntil'];
          Blockly.Python['controls_untilWhile'] = Blockly.Python['controls_whileUntil'];
-         
+
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -2322,13 +2322,13 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
          } else {
             if (!(this.mainContext.showIfMutator)) {
-               var old = Blockly.Blocks.controls_if.init; 
+               var old = Blockly.Blocks.controls_if.init;
                Blockly.Blocks.controls_if.init = function() {
-                  old.call(this);  
+                  old.call(this);
                   this.setMutator(undefined)
                };
             }
-            
+
             Blockly.Blocks['robot_start'] = {
               init: function() {
                 this.appendDummyInput()
@@ -2418,7 +2418,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                return;
             }
          }
-            
+
          this.savePrograms();
 
          var codes = [];
@@ -2442,7 +2442,7 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
          this.mainContext.runner.initCodes(codes);
       },
 
-      
+
       run: function () {
          this.initRun();
          this.mainContext.runner.run();
@@ -2491,7 +2491,7 @@ function initBlocklyRunner(context, messageCallback, language) {
          }
          return value;
       };
-      
+
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             context.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
@@ -2529,7 +2529,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                handler.apply(this, arguments);
             };
          };
-         
+
          for (var objectName in context.customBlocks) {
             for (var category in context.customBlocks[objectName]) {
                for (var iBlock in context.customBlocks[objectName][category]) {
@@ -2545,13 +2545,13 @@ function initBlocklyRunner(context, messageCallback, language) {
                   } else {
                      var handler = blockInfo.handler;
                   }
-                  
+
                   interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
                }
-            }            
+            }
          }
-         
-         
+
+
          /*for (var objectName in context.generators) {
             for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
                var generator = context.generators[objectName][iGen];
@@ -2562,7 +2562,7 @@ function initBlocklyRunner(context, messageCallback, language) {
 
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
-            
+
             if (context.display) {
                if(!runner.scratchMode) {
                   context.blocklyHelper.workspace.traceOn(true);
@@ -2573,7 +2573,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                   highlightPause = true;
                }
             }
-            
+
             // We always execute directly the first highlightBlock
             if(runner.firstHighlight || !runner.stepMode) {
                runner.firstHighlight = false;
@@ -2592,7 +2592,7 @@ function initBlocklyRunner(context, messageCallback, language) {
 
          // Add an API function to report a value.
          interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
-        
+
       };
 
       runner.stop = function() {
@@ -2607,7 +2607,7 @@ function initBlocklyRunner(context, messageCallback, language) {
             Blockly.DropDownDiv.hide();
             context.blocklyHelper.glowBlock(null);
          }
-         
+
          context.reset();
       };
 
@@ -2639,7 +2639,7 @@ function initBlocklyRunner(context, messageCallback, language) {
             runner.nextCallback();
             runner.nextCallback = null;
          }
-         
+
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                context.curRobot = iInterpreter;
@@ -2673,7 +2673,7 @@ function initBlocklyRunner(context, messageCallback, language) {
             }
          } catch (e) {
             runner.stepInProgress = false;
-            
+
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
                isRunning[iInterpreter] = false;
             }
@@ -2692,7 +2692,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                }
                message = strings.uninitializedVar + ' ' + varName;
             }
-            
+
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
                if (context.success) {
                   message = context.messagePrefixSuccess + message;
@@ -2701,7 +2701,7 @@ function initBlocklyRunner(context, messageCallback, language) {
                }
             }
             if (context.success) {
-               message = "<span style='color:green;font-weight:bold'>" + message + "</span>"; 
+               message = "<span style='color:green;font-weight:bold'>" + message + "</span>";
                if (context.linkBack) {
                   //message += "<br/><span onclick='window.parent.backToList()' style='font-weight:bold;cursor:pointer;text-decoration:underline;color:blue'>Retour à la liste des questions</span>";
                }
@@ -2907,7 +2907,7 @@ var initBlocklySubTask = function(subTask, language) {
    if (language == undefined) {
       language = "fr";
    }
-   
+
    subTask.loadLevel = function(curLevel) {
       subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
 
@@ -2949,7 +2949,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       this.blocklyHelper.mainContext = this.context;
-      this.blocklyHelper.createGeneratorsAndBlocks(); 
+      this.blocklyHelper.createGeneratorsAndBlocks();
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
@@ -2962,7 +2962,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.display) {
          this.blocklyHelper.initTestSelector(this.nbTestCases);
       }
-      
+
       subTask.changeTest(0);
    };
 
@@ -3022,7 +3022,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.getAnswerObject(); // to fill this.answer;
 
       $('#displayHelper_graderMessage').html('<div style="margin: .2em 0; color: red; font-weight: bold;">' + languageStrings.gradingInProgress + '</div>');
-      
+
       this.getGrade(function(result) {
          $('#displayHelper_graderMessage').html("");
          subTask.context.display = true;
