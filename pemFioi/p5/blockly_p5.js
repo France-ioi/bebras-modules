@@ -61,7 +61,10 @@ var getContext = function(display, infos) {
 
     context.reset = function(taskInfos) {
         if(!context.display) return
-
+        if(player) {
+            player.destroyChannels();
+            return;
+        }
         player && player.destroy()
         player = new PlayerP5({
             parent: $('#grid')[0],
