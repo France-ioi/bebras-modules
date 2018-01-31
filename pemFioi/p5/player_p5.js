@@ -197,11 +197,25 @@ function PlayerP5(options) {
             rendering = false;
         }
 
-        var interval = setInterval(render, options.visualization_fps ? 1000/options.visualization_fps : 100);
 
+
+        var interval;
+
+        this.start = function() {
+            interval = setInterval(
+                render,
+                options.visualization_fps ? 1000/options.visualization_fps : 100
+            );
+        }
+
+        this.stop = function() {
+            clearInterval(interval);
+            rendering = false;
+        }
 
         this.destroy = function() {
-            clearInterval(interval);
+
+            this.stop();
             options.parent.removeChild(canvas)
             context = null
             canvas = null
@@ -243,6 +257,7 @@ function PlayerP5(options) {
 
 
     this.play = function(rate) {
+        visualizator.start();
         for(var i=0; i<channels.length; i++) {
             channels[i].stop();
             channels[i].play(rate);
@@ -251,6 +266,7 @@ function PlayerP5(options) {
 
 
     this.stop = function() {
+        visualizator.stop();
         for(var i=0; i<channels.length; i++) {
             channels[i].stop();
         }

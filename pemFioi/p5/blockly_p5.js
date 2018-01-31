@@ -118,7 +118,8 @@ var getContext = function(display, infos) {
                 context.waitDelay(callback);
             }
             var onLoadError = function() {
-                $('#p5_message').text(strings.messages.load_error);
+                $('#p5_message').text('');
+                $('#errors').text(strings.messages.load_error);
             }
             player.initRecord(url, frequency, onLoadEnd, onLoadError, onLoadProgress);
         },
