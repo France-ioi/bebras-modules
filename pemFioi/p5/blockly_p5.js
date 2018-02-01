@@ -169,7 +169,6 @@ var getContext = function(display, infos) {
         }
 
         files = new FilesRepository($('#taskContent'));
-$(`#p5_files_modal`).show()
         player = new PlayerP5({
             parent: $('#grid')[0],
             filesRepository: files.getFile
@@ -190,14 +189,6 @@ $(`#p5_files_modal`).show()
             })
         }
         player.toggleMicrophone($('#p5_microphone').prop('checked'));
-
-
-        if(!$('#p5_files_modal')[0]) {
-
-
-        }
-
-
     }
 
 
