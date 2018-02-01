@@ -53,25 +53,126 @@ var getContext = function(display, infos) {
         }
     }
 
+
+    function FilesRepository(parent) {
+
+        var browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
+
+
+        function initModal() {
+            if($('#p5_files_modal')[0]) return;
+            var inner_html;
+            if(browser_compatible) {
+                inner_html =
+                    '<p>' + strings.ui.hint + '</p>' +
+                    '<table id="p5_files"></table>' +
+                    '<div id="p5_inputs"></div>'
+
+            } else {
+                inner_html =
+                    '<p>' + strings.ui.incompatible_browser + '</p>';
+            }
+            var html =
+                '<div id="p5_files_modal" class="modalWrapper">' +
+                    '<div class="modal">' +
+                        '<button type="button" class="btn close" onclick="$(`#p5_files_modal`).hide()">x</button>' +
+                        '<p><b>' + strings.ui.caption + '</b></p>' +
+                        inner_html
+                    '</div>' +
+                '</div>';
+            $(parent).append($(html));
+        }
+
+
+        function enumerateFiles() {
+            $('#p5_files > tbody > tr').each(function(idx, tr) {
+                $(tr).find('td:nth-child(1)').text(idx + 1 + '. ');
+            })
+        }
+
+
+        function addFilesGroup(files, group_idx) {
+            var html = '';
+            for(var i = 0, f; f = files[i]; i++) {
+                html += '<tr group_idx="' + group_idx + '"><td></td><td>' + f.name + '</td>';
+                if(i==0) {
+                    html +=
+                        '<td rowspan="' + files.length + '">' +
+                            '<button type="button" class="btn close">x</button>' +
+                        '</td>';
+                }
+                html += '</tr>';
+            }
+            var tr = $(html);
+            tr.find('button.close').click(function() {
+                $('#p5_files > tbody > tr[group_idx=' +  group_idx + ']').remove();
+                $('#p5_inputs > input[group_idx=' +  group_idx + ']').remove();
+                enumerateFiles();
+            })
+            $('#p5_files').append(tr);
+            enumerateFiles();
+        }
+
+
+        var group_idx = 0;
+
+        function addInput() {
+            group_idx ++;
+            var input = $('<input group_idx="' + group_idx + '" type="file" class="btn" multiple accept=".mp3" title="' + strings.ui.add + '"/>');
+            $('#p5_inputs').append(input);
+            input.change(function() {
+                if(!this.files.length) return;
+                addFilesGroup(this.files, group_idx);
+                $(this).hide();
+                addInput();
+            })
+        }
+
+
+
+        // interface
+        this.getFile = function(n) {
+            var p = 0;
+            var inputs = $('#p5_inputs > input[type=file]');
+            for(var i=0, input; input = inputs[i]; i++) {
+                if(n >= p && n < p + input.files.length) {
+                    return input.files[n - p];
+                }
+                p += input.files.length;
+            }
+            return null;
+        }
+
+
+        // init
+        initModal();
+        if(!browser_compatible) return;
+        addInput();
+
+    }
+
+
+
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(p5_strings)
     var player;
     var delay = infos.actionDelay;
+    var files;
 
 
     context.reset = function(taskInfos) {
         if(!context.display) return
+
         if(player) {
             player.destroyChannels();
             return;
         }
-        player && player.destroy()
+
+        files = new FilesRepository($('#taskContent'));
+$(`#p5_files_modal`).show()
         player = new PlayerP5({
             parent: $('#grid')[0],
-            filesRepository: function(n) {
-                var el = $('#p5_files_modal').find('input[type=file]')[0];
-                return el ? el.files[n] : null;
-            }
+            filesRepository: files.getFile
         })
 
         if(!$('#p5_message')[0]) {
@@ -90,36 +191,10 @@ var getContext = function(display, infos) {
         }
         player.toggleMicrophone($('#p5_microphone').prop('checked'));
 
+
         if(!$('#p5_files_modal')[0]) {
 
-            var inner_html;
-            if(window.File && window.FileReader && window.FileList && window.Blob) {
-                inner_html =
-                    '<p>' + strings.ui.hint + '</p>' +
-                    '<ol id="p5_files"></ol>' +
-                    '<input type="file" class="btn" multiple accept=".mp3" title="' + strings.ui.add + '">';
-            } else {
-                inner_html =
-                    '<p>' + strings.ui.incompatible_browser + '</p>';
-            }
-            var html =
-                '<div id="p5_files_modal" class="modalWrapper">' +
-                    '<div class="modal">' +
-                        '<button type="button" class="btn close" onclick="$(`#p5_files_modal`).hide()">x</button>' +
-                        '<p><b>' + strings.ui.caption + '</b></p>' +
-                        inner_html
-                    '</div>' +
-                '</div>';
-            $('#taskContent').append($(html));
 
-            $('#p5_files_modal').find('input[type=file]').change(function() {
-                var html = '';
-                for(var i = 0, f; f = this.files[i]; i++) {
-                    html += '<li>' + f.name + '</li>'
-                }
-                $('#p5_files').html(html);
-                player.setFiles(this.files);
-            })
         }
 
 

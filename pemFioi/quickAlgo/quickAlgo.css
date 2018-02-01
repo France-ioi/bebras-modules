@@ -189,6 +189,14 @@ input[type=button] {
 	float: right;
 }
 
+.btn.close {
+	border: none;
+	font-weight: bold;
+    font-size: 24px;
+    line-height: 18px;
+	color: #a7a6a6;
+}
+
 /* Modal popup */
 .modalWrapper {
     display: none;
@@ -211,15 +219,11 @@ input[type=button] {
 	padding: 20px;
 	position: relative;
 }
-.modalWrapper .btn.close {
-	border: none;
-	font-weight: bold;
-	font-size: 24px;
+.modalWrapper .modal>.btn.close {
+	line-height: 1em;
 	position: absolute;
 	top: 0px;
-	right: 0px;
-	color: #a7a6a6;
-	line-height: 1em;
+    right: 0px;
 }
 .blocklyFlyoutBackground {
     fill-opacity: 1 !important;

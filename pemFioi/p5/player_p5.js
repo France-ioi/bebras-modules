@@ -323,10 +323,6 @@ function PlayerP5(options) {
         visualizator.toggleMicrophone(enabled);
     }
 
-    this.setFiles = function(list) {
-        files = list;
-    }
-
 
     this.destroyChannels = function() {
         for(var i=0; i<channels.length; i++) {
