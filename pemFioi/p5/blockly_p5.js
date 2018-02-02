@@ -278,7 +278,7 @@ var getContext = function(display, infos) {
             }, ms)
         },
 
-        playStop: function() {
+        playStop: function(callback) {
             player.stop();
             callback();
         }
