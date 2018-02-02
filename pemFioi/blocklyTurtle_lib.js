@@ -496,7 +496,7 @@ var getContext = function(display, infos) {
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
                {"type": "field_dropdown", "name": "PARAM_0", "options":
-                [["hebe Stift ab","'up'"],["setze Stift auf","'down'"]]}]}},
+                [["hebe Stift ab","up"],["setze Stift auf","down"]]}]}},
             { name: "colour2", params: [null]},
             { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
          ],
