@@ -205,7 +205,7 @@ Summary of the steps:
 
 ## Check end conditions
 
-… (with and without display)
+… (must work without display)
 
 ## Define advanced blocks
 
