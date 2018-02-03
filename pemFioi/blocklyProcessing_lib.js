@@ -1168,7 +1168,7 @@ var getContext = function(display, infos) {
 
    context.processing = {
       internalInstance: new Processing(),
-      ops: [],
+      ops: [], // This should actually be removed, we should draw directly
       state: {
          scale: 1,
          hideInitialDrawing: false
