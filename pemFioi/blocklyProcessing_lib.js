@@ -2395,7 +2395,7 @@ var processingEndConditions = {
             context.processing.internalInstance.color(0xFF00FF00),
             initialPixels,
             finalPixels
-         )
+         );
       }
 
       if (options.checkAllFiguresConnected) {
@@ -2403,7 +2403,7 @@ var processingEndConditions = {
             context.processing.internalInstance.color(context.constants.BACKGROUND),
             finalPixels,
             context.processing.getCanvasSize().width
-         )
+         );
       }
 
       if (options.checkBackgroundCovered) {
@@ -2412,7 +2412,7 @@ var processingEndConditions = {
             initialPixels,
             finalPixels,
             options.checkBackgroundCovered
-         )
+         );
       }
 
       throw(window.languageStrings.messages.taskCompleted);
@@ -2427,7 +2427,7 @@ var processingEndConditions = {
          toAvoid,
          initialPixels,
          finalPixels
-      )
+      );
       if (!success[0] && !success[1]) {
          throw(window.languageStrings.messages.redNotCoveredGreenCovered || '');
       } else if (!success[0]) {
@@ -2480,7 +2480,7 @@ var processingEndConditions = {
          var old_root = links[ll];
          if (old_root) {
             if (new_root == old_root) return;
-            for (var i=0; i<links.length; i++) {
+            for (var i = 0; i < links.length; i++) {
                if (links[i] == old_root) {
                   links[i] = new_root;
                }
@@ -2491,8 +2491,8 @@ var processingEndConditions = {
       }
 
       var n = 0;
-      var fl,ft;
-      for (var i=0; i<pixels.getLength(); i++) {
+      var fl, ft;
+      for (var i = 0; i < pixels.getLength(); i++) {
          if (pixels.getPixel(i) === bg) continue;
          ll = i - 1 >= 0 ? labels[i - 1] : 0;
          lt = i - width >= 0 ? labels[i - width] : 0;
@@ -2510,14 +2510,14 @@ var processingEndConditions = {
          }
       }
       var v;
-      for (var i=0; i<labels.length; i++) {
+      for (var i = 0; i < labels.length; i++) {
          if (v = links[labels[i]]) {
             labels[i] = v;
          }
       }
       var count = 0;
       var is_counted = {};
-      for (var i=0; i<labels.length; i++) {
+      for (var i = 0; i < labels.length; i++) {
          v = labels[i];
          if (!v || is_counted[v]) continue;
          is_counted[v] = true;
@@ -2530,7 +2530,7 @@ var processingEndConditions = {
 
    ckeckBackgroundCovered: function(background, initialPixels, finalPixels, options) {
       var initial = processingEndConditions.getCoveredPixelsCount(background, initialPixels),
-         final = processingEndConditions.getCoveredPixelsCount(background, finalPixels);
+         final = processingEndConditions.getCoveredPixelsCount(background, finalPixels),
          delta = Math.abs(final - initial);
       if (delta < options.threshold) return;
       var score = Math.max(0, options.initial_score + options.threshold - delta * options.score_lost);
@@ -2547,7 +2547,7 @@ var processingEndConditions = {
 
    getCoveredPixelsCount: function(bg, pixels) {
       var res = 0;
-      for (var i=0; i<pixels.getLength(); i++) {
+      for (var i = 0; i < pixels.getLength(); i++) {
          if (pixels.getPixel(i) !== bg) {
             res++;
          }
