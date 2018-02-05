@@ -59,7 +59,7 @@ var getContext = function(display, infos) {
             var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
             map = new Map(options);
         }
-        map.clear();
+        map.clearMap();
     }
 
 
