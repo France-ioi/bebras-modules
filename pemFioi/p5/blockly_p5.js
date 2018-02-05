@@ -282,7 +282,7 @@ var getContext = function(display, infos) {
             var self = this;
             setTimeout(function() {
                 if(context.runner && context.runner.stepMode) {
-                    player.stop();
+                    player.pause();
                 }
                 context.waitDelay(callback);
             }, ms)
