@@ -73,6 +73,10 @@ function PlayerP5(options) {
         }
 
 
+        this.pause = function() {
+            generator && generator.stop();
+        }
+
         this.stop = function() {
             generator && generator.stop();
         }
@@ -108,26 +112,32 @@ function PlayerP5(options) {
             filter = new p5.LowPass()
             filter.freq(frequency);
             file.connect(filter);
+            file.playMode('sustain');
         }
 
 
         this.play = function(rate) {
             if(!file || !rate) return;
-            file.playMode('sustain');
+//console.log('file.play')
             file.rate(rate)
             file.play();
         }
 
 
         this.stop = function() {
-            if(file) {
-                file.stop();
-            }
+//console.log('file.stop')
+            file && file.stop();
+        }
+
+
+        this.pause = function() {
+//console.log('file.pause')
+            file && file.pause();
         }
 
 
         this.destroy = function() {
-            file && file.stop();
+            this.stop();
             file = null;
             filter = null;
         }
@@ -299,6 +309,7 @@ function PlayerP5(options) {
 
 
     this.initRecord = function(url, frequency, onLoadProgress, onLoadEnd) {
+//console.log('player.initRecord');
         var file = parseInt(url, 10) == url && options.filesRepository ? options.filesRepository(url - 1) : url;
         if(!file) {
             throw new Error('Wrong file param');
@@ -308,6 +319,7 @@ function PlayerP5(options) {
 
 
     this.changeRate = function(rate) {
+//console.log('player.changeRate');
         if(!playing) return;
         for(var i=0; i<channels.length; i++) {
             channels[i].play(rate);
@@ -316,17 +328,29 @@ function PlayerP5(options) {
 
 
     this.play = function(rate) {
+//console.log('player.play');
         if(playing) return;
         playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {
-            channels[i].stop();
+            //channels[i].stop();
             channels[i].play(rate);
         }
     }
 
 
+    this.pause = function() {
+//console.log('player.pause');
+        playing = false;
+        visualizator.stop();
+        for(var i=0; i<channels.length; i++) {
+            channels[i].pause();
+        }
+    }
+
+
     this.stop = function() {
+//console.log('player.stop');
         playing = false;
         visualizator.stop();
         for(var i=0; i<channels.length; i++) {
@@ -341,12 +365,14 @@ function PlayerP5(options) {
 
 
     this.destroyChannels = function() {
+console.log('player.destroyChannels');
         for(var i=0; i<channels.length; i++) {
             channels[i].destroy();
         }
     }
 
     this.destroy = function() {
+console.log('player.destroy');
         this.destroyChannels();
         visualizator.destroy();
     }
