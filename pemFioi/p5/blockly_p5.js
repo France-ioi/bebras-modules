@@ -148,9 +148,7 @@ var getContext = function(display, infos) {
         initModal();
         if(!browser_compatible) return;
         addInput();
-
     }
-
 
 
     var context = quickAlgoContext(display, infos)
@@ -235,6 +233,19 @@ var getContext = function(display, infos) {
     }
 
 
+
+
+    function delayToRate(delay) {
+        if(delay >= 200) {
+            return 1;
+        } else if(delay >= 50) {
+            return 2;
+        } else if(delay >= 5) {
+            return 4;
+        }
+        return 0;
+    }
+
     context.p5 = {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
@@ -261,12 +272,12 @@ var getContext = function(display, infos) {
 
 
         sleep: function(ms, callback) {
-            var rate = delay / 200;
+            var rate = delayToRate(delay);
             if(!rate) {
                 player.stop();
                 return callback();
             }
-            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * rate;
+            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * (delay / 200);
             player.play(rate);
 
             var self = this;
