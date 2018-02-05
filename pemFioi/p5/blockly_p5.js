@@ -211,7 +211,7 @@ var getContext = function(display, infos) {
         player && player.changeRate(delayToRate(actionDelay))
     }
     context.onExecutionEnd = function() {
-        player.stop();
+        player.destroyChannels();
     }
 
 
@@ -254,7 +254,7 @@ var getContext = function(display, infos) {
         },
 
         playRecord: function(url, frequency, callback) {
-            player.stop();
+            player.pause();
             var onLoadProgress = function(progress) {
                 $('#p5_message').text(strings.messages.loading);
             }
@@ -273,13 +273,11 @@ var getContext = function(display, infos) {
         sleep: function(ms, callback) {
             var rate = delayToRate(delay);
             if(!rate) {
-                player.stop();
+                player.pause();
                 return callback();
             }
-            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * (delay / 200);
             player.play(rate);
-
-            var self = this;
+            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * (delay / 200);
             setTimeout(function() {
                 if(context.runner && context.runner.stepMode) {
                     player.pause();
