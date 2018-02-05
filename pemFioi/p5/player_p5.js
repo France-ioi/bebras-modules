@@ -74,7 +74,6 @@ function PlayerP5(options) {
 
 
         this.stop = function() {
-            //generator && generator.amp(0);
             generator && generator.stop();
         }
 
@@ -318,7 +317,7 @@ function PlayerP5(options) {
         playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {
-            //channels[i].stop();
+            channels[i].stop();
             channels[i].play(rate);
         }
     }
