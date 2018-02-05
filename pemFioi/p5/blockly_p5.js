@@ -248,7 +248,7 @@ var getContext = function(display, infos) {
     context.p5 = {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
-            player.stop();
+            player.pause();
             player.initSignal(channel, type, frequency, amplitude);
             callback();
         },
