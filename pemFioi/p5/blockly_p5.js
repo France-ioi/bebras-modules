@@ -190,12 +190,28 @@ var getContext = function(display, infos) {
     }
 
 
+    function delayToRate(delay) {
+        if(delay >= 200) {
+            return 1;
+        } else if(delay >= 50) {
+            return 2;
+        } else if(delay >= 5) {
+            return 4;
+        }
+        return 0;
+    }
+
+
     context.setScale = function(scale) {}
     context.updateScale = function() {}
     context.resetDisplay = function() {}
     context.unload = function() {}
     context.changeDelay = function(actionDelay) {
         delay = actionDelay;
+        player && player.changeRate(delayToRate(actionDelay))
+    }
+    context.onExecutionEnd = function() {
+        player.stop();
     }
 
 
@@ -228,23 +244,6 @@ var getContext = function(display, infos) {
     }
 
 
-    context.onExecutionEnd = function() {
-        player.stop();
-    }
-
-
-
-
-    function delayToRate(delay) {
-        if(delay >= 200) {
-            return 1;
-        } else if(delay >= 50) {
-            return 2;
-        } else if(delay >= 5) {
-            return 4;
-        }
-        return 0;
-    }
 
     context.p5 = {
 

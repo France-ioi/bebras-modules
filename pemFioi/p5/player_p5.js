@@ -31,6 +31,7 @@ function PlayerP5(options) {
     function SignalChannel() {
 
         var generator = null;
+        var generator_type = null;
         var freq = null;
 
         function initGenerator(type, frequency, amplitude) {
@@ -38,13 +39,19 @@ function PlayerP5(options) {
                 throw new Error('Amplitude is out of range [0..1]');
             }
             if(type == 'noise') {
-                generator = new p5.Noise('white');
+                if(generator_type !== type) {
+                    generator = new p5.Noise('white');
+                    generator_type = type;
+                }
                 freq = null;
             } else {
                 if(frequency < options.min_frequency || frequency > options.max_frequency) {
                     throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
                 }
-                generator = new p5.Oscillator();
+                if(generator_type !== type) {
+                    generator = new p5.Oscillator();
+                    generator_type = type;
+                }
                 generator.setType(type);
                 generator.freq(frequency);
                 freq = frequency;
@@ -67,6 +74,7 @@ function PlayerP5(options) {
 
 
         this.stop = function() {
+            //generator && generator.amp(0, 0.1);
             generator && generator.stop();
         }
 
@@ -74,6 +82,7 @@ function PlayerP5(options) {
         this.destroy = function() {
             this.stop();
             generator = null;
+            generator_type = null;
         }
     }
 
@@ -296,7 +305,12 @@ function PlayerP5(options) {
     }
 
 
-
+    this.changeRate = function(rate) {
+        if(!playing) return;
+        for(var i=0; i<channels.length; i++) {
+            channels[i].play(rate);
+        }
+    }
 
 
     this.play = function(rate) {
@@ -304,7 +318,7 @@ function PlayerP5(options) {
         playing = true;
         visualizator.start();
         for(var i=0; i<channels.length; i++) {
-            channels[i].stop();
+            //channels[i].stop();
             channels[i].play(rate);
         }
     }
