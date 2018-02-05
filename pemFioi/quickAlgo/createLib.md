@@ -49,6 +49,12 @@ In the file, you’ll see the following sections, all inside a `getContext` func
 Many comments (`// end-line` or `/* multi-line */`) provide information about those elements.
 You can of course remove them whenever they are useless for you.
 
+The `getContext` function receives parameters:
+* `infos` is the `subTask.gridInfos` defined in the task;
+* `display` is a boolean which indicates if the context should be displayed in the DOM or is internal.
+
+The object returned by the `quickAlgoContext` function has both variables as members `infos` and `display`.
+
 You should start by changing every occurrence of the word `template` to the name of your library.
 
 Then you must specify an importing rule for your library:
@@ -99,7 +105,7 @@ Just imitate the given examples: your function should be included in a namespace
 (usually the name of your library) and a category, and may have parameters and a return value.
 
 As an example, the code below show parts of an `amicable` library that has a block which checks
-if two given numbers are amicable and sets a variable to `false` if they are not.
+if two given numbers are amicable and sets a global variable to `false` if they are not.
 It uses colored text as a graphic result for the user.
 
 ```js
@@ -205,7 +211,45 @@ Summary of the steps:
 
 ## Check end conditions
 
-… (with and without display)
+Your library should provide functions that are outside of the context
+to check if a context has reached the winning state or an invalid state.
+Such functions should throw the relevant message to the user, with the `throw` keyword.
+
+For the amicable library, we could have the following function:
+```js
+var amicableCheckEndConditions = {
+   checkAllAmicable: function(context, lastTurn) {
+      if (!context.amicable.allAmicable) {
+         throw("You gave a pair that is not composed of amicable numbers!");
+      } else if (lastTurn) {
+         throw("All numbers have been tested and they’re all amicable.");
+      }
+      return true;
+   }
+};
+```
+
+The `lastTurn` parameter is a boolean which indicates if the checking
+is done after all blocks have been run.
+
+If the function has nothing to say, it should return `true`.
+
+The function you use in your task must be specified in `task.js`, in `subTask.gridInfos.checkEndCondition`:
+```js
+subTask.gridInfos = {
+   // ...
+   checkEndEveryTurn: true,
+   checkEndCondition: amicableCheckEndConditions.checkAllAmicable
+   // ...
+};
+```
+
+The `checkEndEveryTurn` controls whether the program should be checked for each block.
+If it’s `false`, the `lastTurn` parameter given to the checking function will always be `true`.
+
+Note that the checking function might receive a context that has no display,
+so you should not scan the display to do your checking.
+All the data which has to be checked must be stored within variables that a display-less context has.
 
 ## Define advanced blocks
 
