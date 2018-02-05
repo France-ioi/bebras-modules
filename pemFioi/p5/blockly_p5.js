@@ -289,7 +289,7 @@ var getContext = function(display, infos) {
         },
 
         playStop: function(callback) {
-            player.stop();
+            player.destroyChannels();
             callback();
         }
     }
