@@ -91,7 +91,10 @@ var importableModules = function () {
       'p5': {src: modulesPath+"/pemFioi/p5/p5.js", id: "p5"},
       'p5.sound': {src: modulesPath+"/pemFioi/p5/p5.sound.js", id: "p5.sound"},
       'player_p5': {src: modulesPath+"/pemFioi/p5/player_p5.js", id: "player_p5"},
-      'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"}
+      'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
+
+      'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
+      'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"}
    }
 }
 
