@@ -40,6 +40,7 @@ function PlayerP5(options) {
             }
             if(type == 'noise') {
                 if(generator_type !== type) {
+                    this.stop();
                     generator = new p5.Noise('white');
                     generator_type = type;
                 }
@@ -49,6 +50,7 @@ function PlayerP5(options) {
                     throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
                 }
                 if(generator_type !== type) {
+                    this.stop();
                     generator = new p5.Oscillator();
                     generator_type = type;
                 }
@@ -96,9 +98,12 @@ function PlayerP5(options) {
 
         var file = null;
         var filter = null;
+        var playing = false;
+
 
         this.init = function(url, frequency, onLoadEnd, onLoadError, onLoadProgress) {
-            file && file.stop();
+            this.destroy();
+            file = null;
             if(frequency < options.min_frequency || frequency > options.max_frequency) {
                 throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
             }
@@ -112,32 +117,39 @@ function PlayerP5(options) {
             filter = new p5.LowPass()
             filter.freq(frequency);
             file.connect(filter);
-            file.playMode('sustain');
+            file.playMode('restart');
         }
 
 
         this.play = function(rate) {
             if(!file || !rate) return;
-//console.log('file.play')
             file.rate(rate)
-            file.play();
+//console.log('file.play', playing)
+            if(!playing)  {
+                playing = true;
+                file.play();
+            }
+
         }
 
 
         this.stop = function() {
 //console.log('file.stop')
+            playing = false;
             file && file.stop();
         }
 
 
         this.pause = function() {
 //console.log('file.pause')
+            playing = false;
             file && file.pause();
         }
 
 
         this.destroy = function() {
             this.stop();
+//console.log('destroy')
             file = null;
             filter = null;
         }
@@ -283,7 +295,6 @@ function PlayerP5(options) {
 
     // init
     var playing = false;
-
     // init channels
     var channels = [];
     for(var i=0; i<options.channels; i++) {
@@ -303,7 +314,6 @@ function PlayerP5(options) {
         if(channel < 0 || channel > options.channels) {
             throw new Error('Channel is out of range [1..' + options.channels + ']');
         }
-        channels[channel].stop();
         channels[channel].init(type, frequency, amplitude);
     }
 
@@ -365,14 +375,14 @@ function PlayerP5(options) {
 
 
     this.destroyChannels = function() {
-console.log('player.destroyChannels');
+//console.log('player.destroyChannels');
         for(var i=0; i<channels.length; i++) {
             channels[i].destroy();
         }
     }
 
     this.destroy = function() {
-console.log('player.destroy');
+//console.log('player.destroy');
         this.destroyChannels();
         visualizator.destroy();
     }
