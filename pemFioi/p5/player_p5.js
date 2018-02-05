@@ -59,8 +59,8 @@ function PlayerP5(options) {
 
 
         this.play = function(rate) {
-            if(generator) {
-                freq !== null && generator.freq(freq * rate);
+            if(generator && rate > 0) {
+                freq !== null && generator.freq(Math.min(24000, freq * rate));
                 generator.start();
             }
         }
@@ -103,9 +103,9 @@ function PlayerP5(options) {
 
 
         this.play = function(rate) {
-            if(!file) return;
+            if(!file || !rate) return;
             file.playMode('sustain');
-            file.rate(1 / (rate || 1))
+            file.rate(rate)
             file.play();
         }
 
