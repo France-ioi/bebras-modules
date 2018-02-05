@@ -94,6 +94,7 @@ function PlayerP5(options) {
         var filter = null;
 
         this.init = function(url, frequency, onLoadEnd, onLoadError, onLoadProgress) {
+            file && file.stop();
             if(frequency < options.min_frequency || frequency > options.max_frequency) {
                 throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
             }
@@ -119,12 +120,14 @@ function PlayerP5(options) {
 
 
         this.stop = function() {
-            file && file.pause();
+            if(file) {
+                file.stop();
+            }
         }
 
 
         this.destroy = function() {
-            this.stop();
+            file && file.stop();
             file = null;
             filter = null;
         }
