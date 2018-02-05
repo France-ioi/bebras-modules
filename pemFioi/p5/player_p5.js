@@ -74,7 +74,7 @@ function PlayerP5(options) {
 
 
         this.stop = function() {
-            //generator && generator.amp(0, 0.1);
+            //generator && generator.amp(0);
             generator && generator.stop();
         }
 
