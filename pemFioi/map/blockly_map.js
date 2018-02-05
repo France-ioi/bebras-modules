@@ -55,8 +55,11 @@ var getContext = function(display, infos) {
 
     context.reset = function(taskInfos) {
         if(!context.display || map) return
-        var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
-        map = new Map(options);
+        if(!map) {
+            var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
+            map = new Map(options);
+        }
+        map.clear();
     }
 
 
