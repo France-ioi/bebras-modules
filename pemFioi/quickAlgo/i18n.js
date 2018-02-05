@@ -79,7 +79,7 @@ var localLanguageStrings = {
       gradingInProgress: "Évaluation en cours",
       textVariable: "texte",
       listVariable: "liste",
-      scaleDrawing: "Scale 2X"
+      scaleDrawing: "Zoom ×2"
    },
    en: {
       categories: {
@@ -155,7 +155,7 @@ var localLanguageStrings = {
       gradingInProgress: "Grading in process",
       textVariable: "text",
       listVariable: "list",
-      scaleDrawing: "Scale 2X"
+      scaleDrawing: "Scale 2×"
    },
    de: {
       categories: {
@@ -233,7 +233,7 @@ var localLanguageStrings = {
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
       textVariable: "Text",
       listVariable: "Liste",
-      scaleDrawing: "Scale 2X"
+      scaleDrawing: "Scale 2×"
    },
    es: {
       categories: {

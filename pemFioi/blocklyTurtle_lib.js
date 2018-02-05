@@ -100,6 +100,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
             turnleftamountvalue_options: "drehe um %1 nach links ↺",
             turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_moreoptions: "drehe um %1 nach links ↺",
+            turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turneitheramount: "tourner de %1° vers la %2",
             turneitheramountvalue: "tourner de %1 vers la %2",
             penup: "lever le pinceau",
@@ -128,6 +130,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "dreheRechtsGrad",
             turnleftamountvalue_options: "dreheLinksGrad",
             turnrightamountvalue_options: "dreheRechtsGrad",
+            turnleftamountvalue_moreoptions: "dreheLinksGrad",
+            turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turneitheramountvalue: "tourner",
             penup: "leverPinceau",
             pendown: "baisserPinceau",
@@ -167,6 +171,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
             turnleftamountvalue_options: "drehe um %1 nach links ↺",
             turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_moreoptions: "drehe um %1 nach links ↺",
+            turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
             penup: "hebe Stift ab",
@@ -195,6 +201,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_noround: "dreheRechtsGrad",
             turnleftamountvalue_options: "dreheLinksGrad",
             turnrightamountvalue_options: "dreheRechtsGrad",
+            turnleftamountvalue_moreoptions: "dreheLinksGrad",
+            turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turneitheramountvalue: "dreheGrad",
             penup: "stiftHoch",
             pendown: "stiftRunter",
@@ -447,6 +455,8 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_noround = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_options = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_options = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_moreoptions = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_moreoptions = context.turtle.turnrightamount;
    
 
    context.turtle.colour2 = function(colour, callback) {
@@ -483,7 +493,11 @@ var getContext = function(display, infos) {
             { name: "turnleftamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
                 ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
             { name: "turnrightamountvalue_options", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
-                ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
+               ["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["180 °","180"]]}]}},
+            { name: "turnleftamountvalue_moreoptions", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+               ["15 °","15"],["18 °","18"],["30 °","30"],["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["150 °","150"],["162 °","162"],["165 °","165"],["180 °","180"]]}]}},
+            { name: "turnrightamountvalue_moreoptions", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+               ["15 °","15"],["18 °","18"],["30 °","30"],["36 °","36"],["45 °","45"],["60 °","60"],["72 °","72"],["90 °","90"],["108 °","108"],["120 °","120"],["135 °","135"],["144 °","144"],["150 °","150"],["162 °","162"],["165 °","165"],["180 °","180"]]}]}},
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
