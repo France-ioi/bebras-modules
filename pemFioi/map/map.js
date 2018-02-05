@@ -16,11 +16,12 @@ function Map(options) {
         background_color: {r: 255, g: 255, b: 255},
         text_color: {r: 255, g: 255, b: 255},
         pin_file: null,
-        pin_scale: 0.5,
+        pin_scale: 0.385,
         map_file: null,
-        map_lng_left: -4.85,
-        map_lng_right: 9.65,
-        map_lat_bottom: 41.7,
+        map_lng_left: 0,
+        map_lng_right: 0,
+        map_lat_top: 0,
+        map_lat_bottom: 0,
         unit: 'km'
     }
 
@@ -75,7 +76,6 @@ function Map(options) {
         function rgba(colors, opacity) {
             return 'rgba(' + colors.r + ',' + colors.g + ',' + colors.b + ',' + opacity + ')';
         }
-
 
 
         this.clear = function() {
@@ -304,6 +304,22 @@ function Map(options) {
     }
 
 
+    // params checking
+
+    function validateLng(lng) {
+        console.error(lng, options.map_lng_left, options.map_lng_right)
+        if(lng < options.map_lng_left || lng > options.map_lng_right) {
+            throw new Error('Location longitude is outside of the map')
+        }
+    }
+
+    function validateLat(lat) {
+        console.error(lat, options.map_lat_top, options.map_lat_bottom)
+        if(lat > options.map_lat_top || lat < options.map_lat_bottom) {
+            throw new Error('Location latitude is outside of the map')
+        }
+    }
+
 
 
     // interface
@@ -314,11 +330,17 @@ function Map(options) {
 
 
     this.addLocation = function(longitude, latitude, label) {
+        validateLng(longitude);
+        validateLat(latitude);
         renderer.pin(longitude, latitude, label);
     },
 
 
     this.addRoad = function(longitude1, latitude1, longitude2, latitude2, opacity) {
+        validateLng(longitude1);
+        validateLat(latitude1);
+        validateLng(longitude2);
+        validateLat(latitude2);
         renderer.line(longitude1, latitude1, longitude2, latitude2, opacity);
     },
 
