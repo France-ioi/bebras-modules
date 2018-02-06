@@ -342,6 +342,7 @@ $(document).ready(function() {
    var hasPlatform = false;
    try {
        hasPlatform = (inIframe() && (typeof parent.TaskProxyManager !== 'undefined') && (typeof parent.generating == 'undefined' || parent.generating === true));
+       var testEdge = parent.TaskProxyManager; // generates an exception on edge when in a platform (parent not available)
    } catch(ex) {
        // iframe from files:// url are considered cross-domain by Chrome
        if(location.protocol !== 'file:') {
