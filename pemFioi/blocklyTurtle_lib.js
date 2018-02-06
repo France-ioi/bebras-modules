@@ -81,6 +81,10 @@ var makeTurtle = function(coords) {
 var getContext = function(display, infos) {
    var localLanguageStrings = {
       fr: {
+         turnleft: "droite ↺",
+         turnright: "gauche ↻",
+         penup: "lever le pinceau",
+         pendown: "baisser le pinceau",
          categories: {
             turtle: "Tortue"
          },
@@ -132,6 +136,7 @@ var getContext = function(display, infos) {
             turnrightamountvalue_options: "dreheRechtsGrad",
             turnleftamountvalue_moreoptions: "dreheLinksGrad",
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
+            turneitheramount: "tourner",
             turneitheramountvalue: "tourner",
             penup: "leverPinceau",
             pendown: "baisserPinceau",
@@ -152,6 +157,10 @@ var getContext = function(display, infos) {
          }
       },
       de: {
+         left: "links ↺",
+         right: "rechts ↻",
+         penup: "hebe Stift ab",
+         pendown: "setze Stift auf",
          categories: {
             turtle: "Schildkröte"
          },
@@ -203,6 +212,7 @@ var getContext = function(display, infos) {
             turnrightamountvalue_options: "dreheRechtsGrad",
             turnleftamountvalue_moreoptions: "dreheLinksGrad",
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
+            turneitheramount: "dreheGrade",
             turneitheramountvalue: "dreheGrad",
             penup: "stiftHoch",
             pendown: "stiftRunter",
@@ -501,16 +511,16 @@ var getContext = function(display, infos) {
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["links ↺","'l'"],["rechts ↻","'r'"]]}]}},
+                 [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
             { name: "turneitheramountvalue", blocklyJson: {"args0": [
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
-                [["gauche ↺","'l'"],["droite ↻","'r'"]]}]}}, // mis les parametres en français mais bug, TODO gérer les deux langues
+                 [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
                {"type": "field_dropdown", "name": "PARAM_0", "options":
-                [["hebe Stift ab","up"],["setze Stift auf","down"]]}]}},
+                 [[localLanguageStrings[window.stringsLanguage]["penup"],"up"],[localLanguageStrings[window.stringsLanguage]["pendown"],"down"]]}]}},
             { name: "colour2", params: [null]},
             { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
          ],
