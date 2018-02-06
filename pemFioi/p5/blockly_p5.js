@@ -287,7 +287,7 @@ var getContext = function(display, infos) {
                 if(context.runner && context.runner.stepMode) {
                     player.pause();
                 }
-                context.waitDelay(callback);
+                context.callCallback(callback);
             }, ms)
         },
 
