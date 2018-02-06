@@ -277,7 +277,7 @@ var getContext = function(display, infos) {
                 player.pause();
                 return callback();
             }
-            var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * (delay / 200);
+            var ms = Math.min(10000, parseInt(ms, 10) || 0) * (delay / 200);
             if(!ms) {
                 return callback();
             }
