@@ -151,10 +151,23 @@ var getContext = function(display, infos) {
     }
 
 
+    function delayToRate(delay) {
+        if(delay >= 200) {
+            return 1;
+        } else if(delay >= 50) {
+            return 2;
+        } else if(delay >= 5) {
+            return 4;
+        }
+        return 0;
+    }
+
+
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(p5_strings)
     var player;
     var delay = infos.actionDelay;
+    var rate = delayToRate(delay);
     var files;
 
 
@@ -162,7 +175,7 @@ var getContext = function(display, infos) {
         if(!context.display) return
 
         if(player) {
-            player.destroyChannels();
+            player.resetChannels();
             return;
         }
 
@@ -190,16 +203,6 @@ var getContext = function(display, infos) {
     }
 
 
-    function delayToRate(delay) {
-        if(delay >= 200) {
-            return 1;
-        } else if(delay >= 50) {
-            return 2;
-        } else if(delay >= 5) {
-            return 4;
-        }
-        return 0;
-    }
 
 
     context.setScale = function(scale) {}
@@ -208,10 +211,11 @@ var getContext = function(display, infos) {
     context.unload = function() {}
     context.changeDelay = function(actionDelay) {
         delay = actionDelay;
-        player && player.changeRate(delayToRate(actionDelay))
+        rate = delayToRate(delay);
+        player && player.setRate(rate)
     }
     context.onExecutionEnd = function() {
-        player.destroyChannels();
+        player.resetChannels();
     }
 
 
@@ -248,13 +252,11 @@ var getContext = function(display, infos) {
     context.p5 = {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
-            player.pause();
             player.initSignal(channel, type, frequency, amplitude);
             callback();
         },
 
         playRecord: function(url, frequency, callback) {
-            player.pause();
             var onLoadProgress = function(progress) {
                 $('#p5_message').text(strings.messages.loading);
             }
@@ -271,13 +273,16 @@ var getContext = function(display, infos) {
 
 
         sleep: function(ms, callback) {
-            var rate = delayToRate(delay);
             if(!rate) {
                 player.pause();
                 return callback();
             }
-            player.play(rate);
             var ms = Math.min(10000, parseInt(arguments[0], 10) || 0) * (delay / 200);
+            if(!ms) {
+                return callback();
+            }
+            player.setRate(rate);
+            player.play();
             setTimeout(function() {
                 if(context.runner && context.runner.stepMode) {
                     player.pause();
@@ -287,7 +292,7 @@ var getContext = function(display, infos) {
         },
 
         playStop: function(callback) {
-            player.destroyChannels();
+            player.resetChannels();
             callback();
         }
     }
