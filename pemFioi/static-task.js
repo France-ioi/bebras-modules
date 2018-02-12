@@ -33,9 +33,8 @@ task.updateToken = function(token, success, error) {
 task.getHeight = function(success, error) {
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-    console.log(h, parseInt($("body").outerHeight(true)))
     success(h);
-   //success(parseInt($("body").outerHeight(true)));
+    //success(parseInt($("body").outerHeight(true)));
 };
 
 task.unload = function(success, error) {
