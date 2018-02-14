@@ -111,7 +111,9 @@ var getContext = function(display, infos, curLevel) {
                successNumbersWritten: "Bravo, votre robot a écrit les bons nombres !",
                failureNumbersWritten: "Votre robot n'a pas écrit les bons nombres !",
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
-               failureWhilePushing: "Le robot ne peut pas pousser cet objet !"
+               failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
+               failureDropObject: "On ne peut pas poser de plateforme ici",
+               failureNotEnoughPlatform: "Pas assez de plateformes"
             },
             startingBlockName: "Programme du robot"
          }
@@ -202,6 +204,22 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      gears: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser la roue dentée",
+               dropObject: "déposer la roue dentée"
+            },
+            code: {
+               withdrawObject: "ramasserRoue",
+               dropObject: "deposerRoue"
+            },
+            messages: {
+               successContainersFilled: "Bravo, la machine est prête à fonctionner !",
+               failureContainersFilled: "Le robot n'a pas replacé toutes les roues dentées au bon endroit."
+            }
+         }
+      },
       marbles: {
          fr: {
             label: {
@@ -258,6 +276,8 @@ var getContext = function(display, infos, curLevel) {
       rocket: {
          fr: {
             label: {
+               obstacleRight: "asteroïde à droite",
+               obstacleInFront: "asteroïde devant",
             },
             messages: {
                successReachExit: "Bravo, le robot a rejoint la fusée !",
@@ -382,8 +402,8 @@ var getContext = function(display, infos, curLevel) {
          ],
          backgroundColor: "#d3e7b6",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 65, nbStates: 1, isRobot: true, offsetX: -5, zOrder: 2 },
-            cell: {num: 1, color: "#d3e7b6", side: 60, isObstacle: true },
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
+            cell: {num: 1, color: "#d3e7b6", side: 60, isObstacle: true, zOrder: 0 },
             box: { num: 3, img: "box.png", side: 60, isExit: true },
             leftArrow: { num: 4, img: "leftArrow.png", side: 60, forwardsLeft: true, zOrder: 0},
             rightArrow: { num: 5, img: "rightArrow.png", side: 60, forwardsRight: true, zOrder: 0},
@@ -524,7 +544,7 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          backgroundColor: "#abeaf4",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
             square: { num: 2, img: "purple.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isSquare === true; }, zOrder: 0 },
             round: { num: 3, img: "green.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isRound === true; }, zOrder: 0 },
             triangle: { num: 4, img: "orange.png", side: 60, isContainer: true, containerFilter: function(obj) { return obj.isTriangle === true; }, zOrder: 0 },
@@ -545,7 +565,7 @@ var getContext = function(display, infos, curLevel) {
       },
       chticode_abs: {
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0 },
             gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
@@ -578,7 +598,7 @@ var getContext = function(display, infos, curLevel) {
       },
       course: {
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true },
+            red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
             number: { num: 5, side: 60, zOrder: 1 }
@@ -663,6 +683,71 @@ var getContext = function(display, infos, curLevel) {
             board: {num: 13, side: 60, isWritable: true, zOrder: 1 }
          }
       },
+      gears: {
+         newBlocks: [
+           {
+             name: "dropPlatformInFront",
+             strings: {
+               fr: {
+                 label: "ajouter une plateforme devant",
+                 code: "ajouterPlateformeDevant"
+               }
+             },
+             category: "robot",
+             type: "actions",
+             block: {
+               name: "dropPlatformInFront"
+             },
+             func: function(callback) {
+               if(this.nbPlatforms == 0)
+                  throw(window.languageStrings.messages.failureNotEnoughPlatform);
+               coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
+               if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+                  throw(window.languageStrings.messages.failureDropObject);
+               }
+               this.nbPlatforms -= 1;
+               this.dropObject({type: "platform"}, coords);
+               this.callCallback(callback);
+             }
+           },
+            {
+             name: "dropPlatformAbove",
+             strings: {
+               fr: {
+                 label: "ajouter une plateforme au-dessus",
+                 code: "ajouterPlateformeAuDessus"
+               }
+             },
+             category: "robot",
+             type: "actions",
+             block: {
+               name: "dropPlatformAbove"
+             },
+             func: function(callback) {
+               if(this.nbPlatforms == 0)
+                  throw(window.languageStrings.messages.failureNotEnoughPlatform);
+               coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
+               if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
+                  throw(window.languageStrings.messages.failureDropObject);
+               }
+               this.nbPlatforms -= 1;
+               this.dropObject({type: "platform"}, coords);
+               this.callCallback(callback);
+             }
+           }
+         ],
+         backgroundColor: "#afafb3",
+         hasGravity: true,
+         bagSize: 1,
+         containerSize: 1,
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, offsetY: 3, zOrder: 3 },
+            platform: { num: 2, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
+            gears: { num: 4, img: "gears.png", side: 60, isContainer: true, zOrder: 1},
+            wheel: { num:5, img: "wheel.png", side: 60, isWithdrawable: true, zOrder: 2}
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
+      },
       gems: {
          backgroundColor: "#e6b5d3",
          itemTypes: {
@@ -705,7 +790,7 @@ var getContext = function(display, infos, curLevel) {
          bagSize: 1,
          backgroundColor: "#dadada",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true,  zOrder: 2 },
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
             hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
 
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
@@ -726,13 +811,35 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
       },
       paint: {
+         newBlocks: [
+            {
+               name: "onPaint",
+               strings: {
+                  fr: {
+                     label: "peinture sur la case",
+                     code: "surPeinture",
+                     description: "surPeinture(): Le robot est-il sur une case déjà peinte ?"
+                  }
+               },
+               category: "robot",
+               type: "sensors",
+               block: {
+                  name: "onPaint",
+                  yieldsValue: true
+               },
+               func: function(callback) {
+                  this.callCallback(callback, this.isOn(function(obj) {return obj.isPaint===true;}));
+               }
+            }
+         ],
          bagInit: {
            count: 200,
            type: "paint"
          },
          backgroundColor: "#ffbf5e",
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 60, nbStates: 1, isRobot: true, zOrder: 2 },
+            red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
+            initialPaint: { num: 2, color: "#2e1de5", side: 60, isPaint: true, zOrder: 1 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             marker_white: { num: 4, img: "marker_white.png", isContainer: true, isFake: true, side: 60, zOrder: 0 },
             paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
@@ -746,7 +853,8 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, zOrder: 2 },
             stars: { num: 3, img: "stars.png", side: 60, zOrder: 0},
             obstacle: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
-            rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 }         
+            rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
+            number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -789,7 +897,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       for(var param in contextParams[name]) {
-         if(infos[param] === undefined) {
+         if(infos[param] === undefined || param == "newBlocks") {
             infos[param] = contextParams[name][param];
          }
       }
@@ -1163,6 +1271,26 @@ var getContext = function(display, infos, curLevel) {
       }
    });
    
+   infos.newBlocks.push({
+      name: "dropInFront",
+      type: "actions",
+      block: { name: "dropInFront" },
+      func: function(callback) {
+         this.drop(1, this.coordsInFront());
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropAbove",
+      type: "actions",
+      block: { name: "dropAbove" },
+      func: function(callback) {
+         this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
+         this.callCallback(callback);
+      }
+   });
+   
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1263,6 +1391,7 @@ var getContext = function(display, infos, curLevel) {
          context.nbRows = context.tiles.length;
          context.nbCols = context.tiles[0].length;
       }
+      context.nbPlatforms = infos.nbPlatforms;
       context.items = [];
       context.lost = false;
       context.success = false;
@@ -1424,6 +1553,7 @@ var getContext = function(display, infos, curLevel) {
          return 0;
       });
       for(var iItem = 0;iItem < cellItems.length;iItem++) {
+         if(cellItems[iItem].element)
          cellItems[iItem].element.toFront();
       }
    };
@@ -1541,6 +1671,14 @@ var getContext = function(display, infos, curLevel) {
    
    context.getRobot = function() {
       return context.items[context.getRobotId()];
+   };
+   
+   context.getInfo = function(name) {
+      return infos[name];
+   };
+   
+   context.setInfo = function(name, value) {
+      infos[name] = value;
    };
    
    context.hasOn = function(row, col, filter) {
@@ -1761,14 +1899,17 @@ var getContext = function(display, infos, curLevel) {
       }
    };
    
-   context.drop = function(count, filter) {
+   context.drop = function(count, coords, filter) {
       if(count === undefined) {
          count = 1;
       }
       if(filter === undefined) {
          filter = function(obj) { return true; };
       }
-      var item = context.getRobot();
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
       
       for(var i = 0;i < count;i++) {
          if(context.bag.length == 0) {
@@ -1776,9 +1917,9 @@ var getContext = function(display, infos, curLevel) {
          }
          
          var object = context.bag.pop();
-         object.row = item.row;
-         object.col = item.col;
-         var itemsOn = context.getItemsOn(item.row, item.col);
+         object.row = coords.row;
+         object.col = coords.col;
+         var itemsOn = context.getItemsOn(coords.row, coords.col);
          var maxi = object.zOrder;
          for(var item in itemsOn) {
             if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
@@ -1792,7 +1933,33 @@ var getContext = function(display, infos, curLevel) {
             redisplayItem(object);
          }
       }
-   }
+   };
+   
+   context.dropObject = function(object, coords) {
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
+      
+      if(!context.isInGrid(coords.row, coords.col)) {
+         throw(window.languageStrings.messages.failureDropObject);
+         return;
+      }
+      
+      object.row = coords.row;
+      object.col = coords.col;
+      var itemsOn = context.getItemsOn(coords.row, coords.col);
+      var maxi = object.zOrder;
+      for(var item in itemsOn) {
+         if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+            maxi = itemsOn[item].zOrder;
+         }
+      }
+      object.zOrder = maxi + 0.000001;
+      context.items.push(object);
+      
+      resetItem(object);
+   };
    
    context.turnLeft = function(callback) {
       var robot = context.getRobot();
@@ -1816,7 +1983,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       }
       if(infos.hasGravity) {
-         context.fall(item, coords.row, coords.col, callback);
+         context.fall(robot, coords.row, coords.col, callback);
       }
       else {
          context.nbMoves++;
