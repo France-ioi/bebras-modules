@@ -19,3 +19,11 @@ img.beaver {
   -ms-user-select: text;
   user-select: auto;
 }
+
+
+code {
+  border: 1px solid black;
+  white-space: nowrap;
+  padding: 0px 2px;
+  margin: 0px 2px;
+}
