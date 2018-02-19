@@ -79,7 +79,9 @@ var localLanguageStrings = {
       gradingInProgress: "Évaluation en cours",
       textVariable: "texte",
       listVariable: "liste",
-      scaleDrawing: "Zoom ×2"
+      scaleDrawing: "Zoom ×2",
+      loopRepeat: "repeat",
+      loopDo: "do"
    },
    en: {
       categories: {
@@ -155,7 +157,9 @@ var localLanguageStrings = {
       gradingInProgress: "Grading in process",
       textVariable: "text",
       listVariable: "list",
-      scaleDrawing: "Scale 2×"
+      scaleDrawing: "Scale 2×",
+      loopRepeat: "repeat",
+      loopDo: "do"
    },
    de: {
       categories: {
@@ -233,7 +237,9 @@ var localLanguageStrings = {
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
       textVariable: "Text",
       listVariable: "Liste",
-      scaleDrawing: "Scale 2×"
+      scaleDrawing: "Scale 2×",
+      loopRepeat: "widerhole",
+      loopDo: "mache"
    },
    es: {
       categories: {
@@ -304,7 +310,9 @@ var localLanguageStrings = {
       wrongAnswer: 'Wrong answer',
       resultsNoSuccess: "You passed none of the tests.",
       resultsPartialSuccess: "You passed only {nbSuccess} test(s) of {nbTests}.",
-      gradingInProgress: "Evaluación en curso"
+      gradingInProgress: "Evaluación en curso",
+      loopRepeat: "repeat",
+      loopDo: "do"
    },
    sl: {
       categories: {
@@ -375,7 +383,9 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Opravljen(ih) {nbSuccess} test(ov) od {nbTests}.",
       gradingInProgress: "Ocenjevanje poteka",
       textVariable: "besedilo",
-      listVariable: "tabela"
+      listVariable: "tabela",
+      loopRepeat: "repeat",
+      loopDo: "do"
    }
 };
 
