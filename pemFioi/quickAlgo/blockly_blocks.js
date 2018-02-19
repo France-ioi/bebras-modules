@@ -589,6 +589,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             ],
             loops: [
                {
+                  name: "controls_loop",
+                  blocklyXml: "<block type='controls_loop'></block>",
+                  excludedByDefault: true
+               },
+               {
                   name: "controls_repeat",
                   blocklyXml: "<block type='controls_repeat'></block>",
                   excludedByDefault: true
@@ -1800,6 +1805,26 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
              var code = "Math.max(" + arg1 + ", " + arg2 + ")";
            }
            return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+         };
+
+         Blockly.Blocks['controls_loop'] = {
+           init: function() {
+             this.appendDummyInput()
+             .appendField(that.strings.loopRepeat);
+             this.appendStatementInput("inner_blocks")
+             .setCheck(null)
+             .appendField(that.strings.loopDo);
+             this.setPreviousStatement(true, null);
+             this.setNextStatement(true, null);
+             this.setColour(that.getDefaultColours().categories["loops"])
+             this.setTooltip("");
+             this.setHelpUrl("");
+           }
+         }
+         Blockly.JavaScript['controls_loop'] = function(block) {
+           var statements = Blockly.JavaScript.statementToCode(block, 'inner_blocks');
+           var code = 'while(true){\n' + statements + '}\n';
+           return code;
          };
 
 
