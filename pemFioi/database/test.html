@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="database.js"></script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            function print(label, text) {
+                var el = document.createElement('strong');
+                el.innerHTML = label;
+                document.body.appendChild(el);
+                var el = document.createElement('pre');
+                el.innerHTML = text;
+                document.body.appendChild(el);
+            }
+
+
+            var params = {
+                columnNames: [
+                    'id', 'name', 'date'
+                ],
+                // string, number, date, image
+                columnTypes: [
+                    'number', 'string', 'date'
+                ],
+                records: [], //list of records
+            }
+            params.records = [
+                [ 1, 'eeee', '2018-01-01' ],
+                [ 2, 'bbbb', '2019-01-01' ],
+                [ 3, 'cccc', '2020-01-01' ],
+                [ 4, 'bbbb', '2021-01-01' ],
+            ]
+            var table = Table(params);
+
+            var dump = db.displayTable(table);
+            print("db.displayTable(table)", dump)
+
+            var dump = db.displayTable(table, ['name', 'id']);
+            print("db.displayTable(table, ['name', 'id'])", dump)
+
+            var dump = table.selectByColumn('name', 'bbb2').dump();
+            print("table.selectByColumn('name', 'bbb2')", dump)
+
+            var dump = table.selectByFunction(function(record) {
+                return record.id > 2;
+            }).dump();
+            print("table.selectByFunction", dump)
+
+            var dump = table.updateWhere(
+                function(record) {
+                    return record.id > 2;
+                },
+                function(record) {
+                    return Object.assign({}, record, {
+                        name: 'updated'
+                    })
+                }
+            ).dump();
+            print("table.updateWhere", dump)
+
+            var dump = table.insertRecord({
+                id: 5,
+                name: 'dddd',
+                date: '2022-01-01'
+            }).dump();
+            print("table.insertRecord", dump)
+
+            var dump = table.sortByColumn('id', 'desk').dump();
+            print("table.sortByColumn('id', 'desk')", dump)
+
+            var dump = table.sortByColumn('name', 'ask').dump();
+            print("table.sortByColumn('name', 'ask')", dump)
+
+            var dump = table.sortByFunction(function(a, b) {
+                return a.name > b.name ? 1 : -1;
+            }).dump();
+            print("table.sortByFunction", dump)
+        </script>
+    </body>
+</html>
