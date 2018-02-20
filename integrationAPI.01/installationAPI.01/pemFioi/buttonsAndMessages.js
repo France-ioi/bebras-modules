@@ -184,7 +184,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "reload the validated answer",
          difficultyWarning: "<strong>Warning:</strong> solving this version takes time.<br/>You would solve the 2 or 3 star versions of other tasks more quickly.",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+         enemyWarning: "<strong>Warning:</strong> in this challenge, the computer will make sure you don't find the solution by chance."
       },
       de: {
          version: "Version",
@@ -322,7 +322,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "The contest being over, your answer was not saved. You may {0}.",
          reloadSubmittedAnswer: "اعد تحميل الإجابة المحققة",
          difficultyWarning: "تنبيه: حل هذه النسخة سوف يستغرق وقت كثير. الإفضل أن تبدأ في حل مسائل أخرى",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+         enemyWarning: "تحذير: في هذه المسألة سيمنعك الكمبيوتر من إيجاد الحل عن طريق الصدفة. فكر جيداً"
       },
       es: {
          version: "Versión",

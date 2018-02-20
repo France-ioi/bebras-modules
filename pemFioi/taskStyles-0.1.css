@@ -282,6 +282,7 @@ h1 .stars {
 #popupMessage img.beaver {
    position: absolute;
    width: 90px;
+   left: 0px;
 }
 #popupMessage img.messageArrow {
    position: absolute;
