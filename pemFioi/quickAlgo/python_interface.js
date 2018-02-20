@@ -341,6 +341,7 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.updateTaskIntro = function () {
+    if(!this._mainContext.display) { return; }
     var pythonDiv = $('#taskIntro .pythonIntro');
     if(pythonDiv.length == 0) {
       pythonDiv = $('<hr />'

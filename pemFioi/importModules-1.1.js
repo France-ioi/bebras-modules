@@ -205,6 +205,10 @@ function importModules(modulesList) {
 
          var modClass = curModule.classStr ? curModule.classStr : 'module';
          var modSrc = curModule.src;
+         if(QueryString.v) {
+            // Add v= parameters to the URLs
+            modSrc += (modSrc.indexOf('?') > -1 ? '&' : '?') + 'v=' + QueryString.v;
+         }
          var modId = curModule.id ? curModule.id : moduleName;
          if(curModule.type == 'stylesheet') {
             modulesStr += '<link class="'+modClass+'" rel="stylesheet" type="text/css" href="'+modSrc+'" id="'+modId+'">';
