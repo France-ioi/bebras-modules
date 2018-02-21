@@ -471,6 +471,8 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_options = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_moreoptions = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_moreoptions = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_europe = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_europe = context.turtle.turnrightamount;
    
 
    context.turtle.colour2 = function(colour, callback) {
