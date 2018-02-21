@@ -50,7 +50,7 @@ Many comments (`// end-line` or `/* multi-line */`) provide information about th
 You can of course remove them whenever they are useless for you.
 
 The `getContext` function receives parameters:
-* `infos` is the `subTask.gridInfos` defined in the task;
+* `infos` is an object which provides specific information about the task (`subTask.gridInfos` in `task.js`);
 * `display` is a boolean which indicates if the context should be displayed in the DOM or is internal.
 
 The object returned by the `quickAlgoContext` function has both variables as members `infos` and `display`.
@@ -267,7 +267,7 @@ The function you use in your task must be specified in `task.js`, in `subTask.gr
 subTask.gridInfos = {
    // ...
    checkEndEveryTurn: true,
-   checkEndCondition: amicableCheckEndConditions.checkAllAmicable
+   checkEndCondition: amicableCheckEndConditions.checkAllAmicable,
    // ...
 };
 ```
@@ -276,8 +276,8 @@ The `checkEndEveryTurn` controls whether the program should be checked for each 
 If it’s `false`, the `lastTurn` parameter given to the checking function will always be `true`.
 
 Note that the checking function might receive a context that has no display,
-so you should not scan the display to do your checking.
-All the data which has to be checked must be stored within variables that a display-less context has.
+so you should not scan the display to do your checking. Everything that has to be checked
+must be stored within variables that a display-less context has.
 
 ## Define advanced blocks
 
