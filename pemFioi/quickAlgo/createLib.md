@@ -90,44 +90,44 @@ with the three effectless blocks.
 
 ## Program your first block
 
+As an example, we’ll give parts of an `amicable` library that has a block which checks
+if two given numbers are amicable and sets a global variable to `false` if they are not.
+
+### Global data initialization
+
 Firstly, you should add data in your `context.myLib` variable. Your blocks will register internally
 their effect on this data so that it can be checked for the task’s validation.
 
-Then create the function that will realize the action of your block.
-It must be a member of `context.myLib` and must have an additional `callback` parameter.
-The callback must be called at the end of your function for quickAlgo to work. Inside this function:
-* alter the data inside `context.myLib`;
-* if `context.display` is available, do the necessary display changes in the `$('#grid')`;
-* call the callback with `context.waitDelay(callback)`.
-
-Your block must eventually be listed in the `context.customBlocks` object with prototype information.
-Just imitate the given examples: your function should be included in a namespace
-(usually the name of your library) and a category, and may have parameters and a return value.
-
-As an example, the code below show parts of an `amicable` library that has a block which checks
-if two given numbers are amicable and sets a global variable to `false` if they are not.
-It uses colored text as a graphic result for the user.
+In our example, we need two variables: `allAmicable` which is our boolean flag
+and `testedPairs` which saves how many pairs of numbers have been tested.
 
 ```js
 context.amicable = {
    allAmicable: true,
-   testedPairs: 0
+   testedPairs: 0,
 };
+```
 
+The variables must be reassigned their initial value in the `context.reset` function:
+```js
 context.reset = function(taskInfos) {
    context.amicable.allAmicable = true;
    context.amicable.testedPairs = 0;
    if (context.display) context.resetDisplay();
 }
+```
 
-context.resetDisplay = function() {
-   $('#grid').empty();
-   context.blocklyHelper.updateSize();
-   context.updateScale();
-}
+### The block’s function
 
-// ...
+Now you can create the function that will realize the action of your block.
+It must be a member of `context.myLib` and must have an additional `callback` parameter.
+The callback must be called at the end of your function for quickAlgo to work,
+this way: `context.waitDelay(callback)`.
 
+If the display is available, the function should do the necessary display changes
+before calling the callback. We’ll treat this just after.
+
+```js
 context.amicable.testPair = function(nb1, nb2, callback) {
    var divisSum1 = 0, divisSum2 = 0;
    for (var divis = 2; divis < Math.floor(Math.max(nb1, nb2) / 2); divis++) {
@@ -138,23 +138,57 @@ context.amicable.testPair = function(nb1, nb2, callback) {
    context.amicable.testedPairs++;
 
    if (context.display) {
-      $('#grid').append(
-         divisSum1 == divisSum2 ?
-            $('<div>').css('color', 'green').text(nb1 + " and " + nb2 + " are amicable.") :
-            $('<div>').css('color', 'red').text(nb1 + " and " + nb2 + " are not amicable!"));
+      // ...
    }
 
    context.waitDelay(callback);
 }
+```
 
-// ...
+### Displaying the block’s effect
 
+The display must be initialized in the `context.resetDisplay` function.
+A HTML element whose ID is `grid` is provided by quickAlgo as an area for displaying.
+Here, we simply empty the element.
+
+```js
+context.resetDisplay = function() {
+   $('#grid').empty();
+   context.blocklyHelper.updateSize();
+   context.updateScale();
+}
+```
+
+Our `testPair` block shows the result of the test as colored text.
+
+```js
+context.amicable.testPair = function(nb1, nb2, callback) {
+   // ...
+
+   if (context.display) {
+      var right = divisSum1 == divisSum2;
+      $('#grid').append(
+         $('<div>').css('color', right ? 'green' : 'red')
+            .text(nb1 + " and " + nb2 + (right ? " are amicable." : "are not amicable!")));
+   }
+
+   context.waitDelay(callback);
+}
+```
+
+### Lists of blocks
+
+Your block must be listed in the `context.customBlocks` object with prototype information.
+Just imitate the given examples: your function should be included in a namespace
+(usually the name of your library) and a category, and may have parameters and a return value.
+
+```js
 context.customBlocks = {
    amicable: {
       testing: [
-         { name: 'testPair', params: [null, null] }
-      ]
-   }
+         { name: 'testPair', params: [null, null] },
+      ],
+   },
 };
 ```
 
@@ -167,7 +201,7 @@ subTask.gridInfos = {
    includeBlocks: {
       // ...
       generatedBlocks: {
-         amicable: ["testPair"]
+         amicable: ["testPair"],
       }
       // ...
    }
@@ -175,11 +209,10 @@ subTask.gridInfos = {
 };
 ```
 
-Additionnally, you may specify a color for the category (for `testPair` it’s `testing`)
-in the `context.provideBlocklyColours` function.
+### Localization and color
 
-Finally, in `localLanguageStrings`, you must specify texts for Blockly and Python.
-Continuing with our example:
+In `localLanguageStrings`, you must specify texts for Blockly and Python,
+at least in the `label` and `code` parts:
 ```js
 var localLanguageStrings = {
    en: {
@@ -195,15 +228,10 @@ var localLanguageStrings = {
 * `label` is for the block. `%1`, `%2`, etc. are required placeholders for the parameters.
 * `code` is the function name in Python.
 
-Now, you should have a fully functional block.
+Additionnally, you may specify a color for the category (for `testPair` it’s `testing`)
+in the `context.provideBlocklyColours` function.
 
-Summary of the steps:
-1. Initialize the necessary data in the `context.myLib` variable.
-2. Create the function as a member of `context.myLib`.
-3. List the block in `context.customBlocks` inside `namespace.category`.
-4. Add it in `task.js` in `subTask.gridInfos.includeBlocks.generatedBlocks` inside `namespace`.
-5. Optionally specify a color for the category in `context.provideBlocklyColours`.
-6. Put localized strings in `localLanguageStrings`.
+Now, your block should be fully functional and usable in your sample task.
 
 ## Manage the display
 
