@@ -1731,3 +1731,5 @@ var getContext = function(display, infos, curLevel) {
 
    return context;
 };
+
+quickAlgoLibraries.register('robot', getContext);

@@ -2065,3 +2065,5 @@ var robotEndConditions = {
       }
    }
 };
+
+quickAlgoLibraries.register('robot', getContext);

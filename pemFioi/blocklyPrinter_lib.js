@@ -286,3 +286,5 @@ var getContext = function(display, infos) {
    
    return context;
 }
+
+quickAlgoLibraries.register('printer', getContext);

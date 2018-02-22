@@ -2558,7 +2558,7 @@ var processingEndConditions = {
 
 };
 
-
+quickAlgoLibraries.register('processing', getContext);
 
 /*
 pdebug = {

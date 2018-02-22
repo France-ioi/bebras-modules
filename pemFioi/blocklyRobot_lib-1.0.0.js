@@ -2271,3 +2271,5 @@ var robotEndFunctionGenerator = {
       };
    }
 };
+
+quickAlgoLibraries.register('robot', getContext);

@@ -46,7 +46,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
 
-      this.context = getContext(this.display, subTask.levelGridInfos, curLevel);
+      this.context = quickAlgoLibraries.getContext(this.display, subTask.levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;

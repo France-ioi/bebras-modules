@@ -177,3 +177,6 @@ var getContext = function(display, infos, curLevel) {
    // Don't forget to return our newly created context!
    return context;
 }
+
+// Register the library; change "template" by the name of your library in lowercase
+quickAlgoLibraries.register('template', getContext);
