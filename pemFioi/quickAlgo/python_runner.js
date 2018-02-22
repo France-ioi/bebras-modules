@@ -26,12 +26,13 @@ function PythonInterpreter(context, msgCallback) {
   this._timeouts = [];
   this._editorMarker = null;
   this.availableModules = [];
+  this._argumentsByBlock = {};
 
   var that = this;
 
-  this._skulptifyHandler = function (name, generatorName, blockName, minArgs, maxArgs, type) {
+  this._skulptifyHandler = function (name, generatorName, blockName, type) {
     var handler = '';
-    handler += "\tSk.builtin.pyCheckArgs('" + name + "', arguments, " + minArgs + ", " + maxArgs + ");";
+    handler += "\tcurrentPythonContext.runner.checkArgs('" + name + "', '" + generatorName + "', '" + blockName + "', arguments);";
 
     handler += "\n\tvar susp = new Sk.misceval.Suspension();";
     handler += "\n\tvar result = Sk.builtin.none.none$;";
@@ -86,14 +87,10 @@ function PythonInterpreter(context, msgCallback) {
               type: typeName};
             var variants = blockInfo.variants ? blockInfo.variants : (blockInfo.params ? [blockInfo.params] : []);
             if(variants.length) {
-              var minArgs = variants[0].length;
-              var maxArgs = minArgs;
-              for(var i=1; i < variants.length; i++) {
-                minArgs = Math.min(minArgs, variants[i].length);
-                maxArgs = Math.max(maxArgs, variants[i].length);
+              blocksInfos[blockInfo.name].nbsArgs = [];
+              for(var i=0; i < variants.length; i++) {
+                blocksInfos[blockInfo.name].nbsArgs.push(variants[i].length);
               }
-              blocksInfos[blockInfo.name].minArgs = minArgs;
-              blocksInfos[blockInfo.name].maxArgs = maxArgs;
             }
           }
         }
@@ -104,21 +101,24 @@ function PythonInterpreter(context, msgCallback) {
         var blockList = this.context.infos.includeBlocks.generatedBlocks[generatorName];
         if(!blockList.length) { continue; }
         var modContents = "var $builtinmodule = function (name) {\n\nvar mod = {};\nmod.__package__ = Sk.builtin.none.none$;\n";
+        if(!this._argumentsByBlock[generatorName]) {
+          this._argumentsByBlock[generatorName] = {};
+        }
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
           var blockName = blockList[iBlock];
           var code = this.context.strings.code[blockName];
           if (typeof(code) == "undefined") {
             code = blockName;
           }
-          var maxArgs = blocksInfos[blockName] ? blocksInfos[blockName].maxArgs : 0;
-          var minArgs = blocksInfos[blockName] ? blocksInfos[blockName].minArgs : maxArgs;
+          var nbsArgs = blocksInfos[blockName] ? (blocksInfos[blockName].nbsArgs ? blocksInfos[blockName].nbsArgs : []) : [];
           var type = blocksInfos[blockName] ? blocksInfos[blockName].type : 'actions';
 
           if(type == 'actions') {
             this._hasActions = true;
           }
 
-          modContents += this._skulptifyHandler(code, generatorName, blockName, minArgs, maxArgs, type);
+          this._argumentsByBlock[generatorName][blockName] = nbsArgs;
+          modContents += this._skulptifyHandler(code, generatorName, blockName, nbsArgs, type);
         }
 
         // TODO :: allow selection of constants available in a task
@@ -141,6 +141,40 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
+  this.checkArgs = function (name, generatorName, blockName, args) {
+    // Check the number of arguments corresponds to a variant of the function
+    if(!this._argumentsByBlock[generatorName] || !this._argumentsByBlock[generatorName][blockName]) {
+      console.error("Couldn't find the number of arguments for " + generatorName + "/" + blockName + ".");
+      return;
+    }
+    var nbsArgs = this._argumentsByBlock[generatorName][blockName];
+    if(nbsArgs.length == 0) {
+      // This function doesn't have arguments
+      if(args.length > 0) {
+        msg = name + "() takes no arguments (" + args.length + " given)";
+        throw new Sk.builtin.TypeError(msg);
+      }
+    } else if(nbsArgs.indexOf(args.length) == -1) {
+      var minArgs = nbsArgs[0];
+      var maxArgs = nbsArgs[0];
+      for(var i=1; i < nbsArgs.length; i++) {
+        minArgs = Math.min(minArgs, nbsArgs[i]);
+        maxArgs = Math.max(maxArgs, nbsArgs[i]);
+      }
+      if (minArgs === maxArgs) {
+        msg = name + "() takes exactly " + minArgs + " arguments";
+      } else if (args.length < minArgs) {
+        msg = name + "() takes at least " + minArgs + " arguments";
+      } else if (args.length > maxArgs){
+        msg = name + "() takes at most " + maxArgs + " arguments";
+      } else {
+        msg = name + "() doesn't have a variant accepting this number of arguments";
+      }
+      msg += " (" + args.length + " given)";
+      throw new Sk.builtin.TypeError(msg);
+    }
+  };
+
   this.waitDelay = function (callback, value, delay) {
     this._paused = true;
     if (delay > 0) {
@@ -150,6 +184,17 @@ function PythonInterpreter(context, msgCallback) {
     } else {
       this.noDelay(callback, value);
     }
+  };
+
+  this.waitEvent = function (callback, target, eventName, func) {
+    this._paused = true;
+    var listenerFunc = null;
+    var that = this;
+    listenerFunc = function(e) {
+      target.removeEventListener(eventName, listenerFunc);
+      that.noDelay(callback, func(e));
+    };
+    target.addEventListener(eventName, listenerFunc);
   };
 
   this.noDelay = function (callback, value) {
@@ -173,7 +218,11 @@ function PythonInterpreter(context, msgCallback) {
     var type = typeof data;
     var result = {v: data}; // Emulate a Skulpt object as default
     if (type === 'number') {
-      result = new Sk.builtin.int_(data);
+      if(Math.floor(data) == data) { // isInteger isn't supported by IE
+        result = new Sk.builtin.int_(data);
+      } else {
+        result = new Sk.builtin.float_(data);
+      }
     } else if (type === 'string') {
       result = new Sk.builtin.str(data);
     } else if (type === 'boolean') {
