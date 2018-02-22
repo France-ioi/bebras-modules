@@ -184,6 +184,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turnleftamountvalue_europe: "drehe um %1 nach links ↺",
             turnrightamountvalue_europe: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_nikolaus: "drehe um %1 nach links ↺",
+            turnrightamountvalue_nikolaus: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
             penup: "hebe Stift ab",
@@ -216,6 +218,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turnleftamountvalue_europe: "dreheLinksGrad",
             turnrightamountvalue_europe: "dreheRechtsGrad",
+            turnleftamountvalue_nikolaus: "dreheLinksGrad",
+            turnrightamountvalue_nikolaus: "dreheRechtsGrad",
             turneitheramount: "dreheGrade",
             turneitheramountvalue: "dreheGrad",
             penup: "stiftHoch",
@@ -473,6 +477,8 @@ var getContext = function(display, infos) {
    context.turtle.turnrightamountvalue_moreoptions = context.turtle.turnrightamount;
    context.turtle.turnleftamountvalue_europe = context.turtle.turnleftamount;
    context.turtle.turnrightamountvalue_europe = context.turtle.turnrightamount;
+   context.turtle.turnleftamountvalue_nikolaus = context.turtle.turnleftamount;
+   context.turtle.turnrightamountvalue_nikolaus = context.turtle.turnrightamount;
    
 
    context.turtle.colour2 = function(colour, callback) {
@@ -518,6 +524,10 @@ var getContext = function(display, infos) {
               ["15 °","15"],["30 °","30"],["75 °","75"],["90 °","90"],["105 °","105"],["144 °","144"],["162 °","162"],["180 °","180"]]}]}},
             { name: "turnrightamountvalue_europe", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
               ["15 °","15"],["30 °","30"],["75 °","75"],["90 °","90"],["105 °","105"],["144 °","144"],["162 °","162"],["180 °","180"]]}]}},
+            { name: "turnleftamountvalue_nikolaus", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["36.9 °","36.86989"],["53.1 °","53.13010"],["73.7 °","73.73979"],["90 °","90"],["106.3 °","106.26020"],["126.9 °","126.86989"],["143.1 °","143.13010"],["180 °","180"]]}]}},
+            { name: "turnrightamountvalue_nikolaus", blocklyJson: {"args0": [{"type": "field_dropdown", "name": "PARAM_0", "options": [
+              ["36.9 °","36.86989"],["53.1 °","53.13010"],["73.7 °","73.73979"],["90 °","90"],["106.3 °","106.26020"],["126.9 °","126.86989"],["143.1 °","143.13010"],["180 °","180"]]}]}},
             { name: "turneitheramount", blocklyJson: {"args0": [
                {"type": "input_value", "name": "PARAM_0"},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
