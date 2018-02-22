@@ -350,6 +350,7 @@ goog.require('Blockly.Msg');
 /** @export */ Blockly.Msg.TEXT_INDEXOF_HELPURL = "http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Farsubex.htm";
 /** @export */ Blockly.Msg.TEXT_INDEXOF_OPERATOR_FIRST = "suche erstes Auftreten des Begriffs";
 /** @export */ Blockly.Msg.TEXT_INDEXOF_OPERATOR_LAST = "suche letztes Auftreten des Begriffs";
+/** @export */ Blockly.Msg.TEXT_INDEXOF_INPUT_INTEXT = "im Text";
 /** @export */ Blockly.Msg.TEXT_INDEXOF_TITLE = "im Text %1 %2 %3";
 /** @export */ Blockly.Msg.TEXT_INDEXOF_TOOLTIP = "Findet das erste / letzte Auftreten eines Suchbegriffs in einem Text.  Gibt die Position des Begriffs zurück oder %1 falls der Suchbegriff nicht gefunden wurde.";
 /** @export */ Blockly.Msg.TEXT_ISEMPTY_HELPURL = "https://github.com/google/blockly/wiki/Text#checking-for-empty-text";  // untranslated
