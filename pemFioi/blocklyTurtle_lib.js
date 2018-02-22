@@ -551,3 +551,5 @@ var getContext = function(display, infos) {
 
    return context;
 }
+
+quickAlgoLibraries.register('turtle', getContext);

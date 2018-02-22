@@ -1067,3 +1067,5 @@ var getRobotGridContext = function(display, infos, curLevel) {
 
    return context;
 }
+
+quickAlgoLibraries.register('robot', getContext);
