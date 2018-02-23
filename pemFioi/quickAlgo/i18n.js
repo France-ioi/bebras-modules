@@ -238,7 +238,7 @@ var localLanguageStrings = {
       textVariable: "Text",
       listVariable: "Liste",
       scaleDrawing: "Scale 2×",
-      loopRepeat: "widerhole",
+      loopRepeat: "wiederhole",
       loopDo: "mache"
    },
    es: {
