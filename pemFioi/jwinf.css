@@ -27,3 +27,13 @@ code {
   padding: 0px 2px;
   margin: 0px 2px;
 }
+
+
+samp::before { 
+    content: "„";
+}
+
+samp::after { 
+    content: "“";
+}
+
