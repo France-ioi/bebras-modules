@@ -154,9 +154,17 @@ var getContext = function(display, infos) {
                     block.blocklyXml += '</block>';
                 }
                 context.map[block.name] = function() {
-                    var callback = arguments[arguments.length - 1]
-                    var res = map[block.name].apply(map, arguments)
-                    callback(res)
+                    var callback = arguments[arguments.length - 1];
+                    if(map) {
+                        if(block.hasHandler) {
+                            // This function knows how to take care of the callback
+                            map[block.name].apply(map, arguments);
+                        } else {
+                            context.runner.noDelay(callback, map[block.name].apply(map, arguments));
+                        }
+                    } else {
+                        callback();
+                    }
                 }
            })();
         }
