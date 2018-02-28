@@ -160,7 +160,7 @@ function SimpleDraw(options) {
 
     this.waitForClick = function(callback) {
         if(options.context.display) {
-            $('#errors').text('Please click on the canvas.'); // TODO :: translation system?
+            $('#errors').text(options.context.strings.messages.clickCanvas); // TODO :: translation system?
             options.context.runner.waitEvent(callback, canvas, 'click', function(e) {
                 var rect = canvas.getBoundingClientRect();
                 click_coordinates.x = itx(e.clientX - rect.left);
