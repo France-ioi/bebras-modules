@@ -154,9 +154,9 @@ var quickAlgoLibraries = {
 
   getMergedContext: function() {
     // Make a context merged from multiple contexts
-    if(this.mergedMode.displayed && this.order.indexOf(mergedMode.displayed) > -1) {
-      this.order.splice(this.order.indexOf(mergedMode.displayed), 1);
-      this.order.unshift(mergedMode.displayed);
+    if(this.mergedMode.displayed && this.order.indexOf(this.mergedMode.displayed) > -1) {
+      this.order.splice(this.order.indexOf(this.mergedMode.displayed), 1);
+      this.order.unshift(this.mergedMode.displayed);
     }
     var that = this;
 
@@ -169,9 +169,9 @@ var quickAlgoLibraries = {
       context.conceptList = [];
 
       var subContexts = [];
-      for(var i=0; i < that.order.length; i++) {
+      for(var scIdx=0; scIdx < that.order.length; scIdx++) {
         // Only the first context gets display = true
-        var newContext = that.libs[that.order[i]](display && (i == 0), infos);
+        var newContext = that.libs[that.order[scIdx]](display && (scIdx == 0), infos);
         subContexts.push(newContext);
 
         // Merge objects
@@ -181,34 +181,58 @@ var quickAlgoLibraries = {
         mergeIntoArray(context.conceptList, newContext.conceptList);
 
         // Merge namespaces
-        // TODO :: deep merge if multiple contexts define the same namespaces?
         for(var namespace in newContext.customBlocks) {
-          if(context[namespace]) { continue; }
-          context[namespace] = newContext[namespace];
+          if(!context[namespace]) { context[namespace] = {}; }
+          for(var category in newContext.customBlocks[namespace]) {
+            var blockList = newContext.customBlocks[namespace][category];
+            for(var i=0; i < blockList.length; i++) {
+              var name = blockList[i].name;
+              if(name && !context[namespace][name] && newContext[namespace][name]) {
+                context[namespace][name] = function(nc, func) {
+                  return function() {
+                    context.propagate(nc);
+                    func.apply(nc, arguments);
+                    };
+                }(newContext, newContext[namespace][name]);
+              }
+            }
+          }
         }
       }
 
       var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
+      // Propagate properties to the subcontexts
+      context.propagate = function(subContext) {
+        var properties = ['raphaelFactory', 'delayFactory', 'blocklyHelper', 'runner'];
+        for(var i=0; i < properties.length; i++) {
+          subContext[properties[i]] = context[properties[i]];
+        }
+      }
+
       // Merge functions
       context.reset = function(taskInfos) {
         for(var i=0; i < subContexts.length; i++) {
+          context.propagate(subContexts[i]);
           subContexts[i].reset(taskInfos);
         }
       };
       context.resetDisplay = function() {
         for(var i=0; i < subContexts.length; i++) {
+          context.propagate(subContexts[i]);
           subContexts[i].resetDisplay();
         }
       };
       context.updateScale = function() {
         for(var i=0; i < subContexts.length; i++) {
+          context.propagate(subContexts[i]);
           subContexts[i].updateScale();
         }
       };
       context.unload = function() {
         for(var i=subContexts.length-1; i >= 0; i--) {
           // Do the unload in reverse order
+          context.propagate(subContexts[i]);
           subContexts[i].unload();
         }
       };
@@ -218,6 +242,23 @@ var quickAlgoLibraries = {
           mergeIntoObject(colours, subContexts[i].provideBlocklyColours());
         }
         return colours;
+      };
+
+      // Fetch some other data / functions some contexts have
+      for(var i=0; i < subContexts.length; i++) {
+        for(var prop in subContexts[i]) {
+          if(typeof context[prop] != 'undefined') { continue; }
+          if(typeof subContexts[i][prop] == 'function') {
+            context[prop] = function(sc, func) {
+              return function() {
+                context.propagate(sc);
+                func.apply(sc, arguments);
+              }
+            }(subContexts[i], subContexts[i][prop]);
+          } else {
+            context[prop] = subContexts[i][prop];
+          }
+        }
       };
 
       return context;
