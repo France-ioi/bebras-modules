@@ -3,8 +3,8 @@ var getContext = function(display, infos) {
     var simple_draw_strings = {
         fr: {
             categories: {
-                draw: 'Tracé',
-                control: 'Contrôle'
+                draw: 'Draw',
+                control: 'Control'
             },
             label: {
                 setPoint: 'setPoint(%1,%2,%3)',
