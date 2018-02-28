@@ -4,8 +4,8 @@ var getContext = function(display, infos) {
     var p5_strings = {
         fr: {
             categories: {
-                sound: 'Sound',
-                control: 'Control'
+                sound: 'Son',
+                control: 'Contrôle'
             },
             label: {
                 playSignal: 'playSignal(%1, %2, %3, %4)',
