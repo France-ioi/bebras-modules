@@ -73,7 +73,13 @@ var initBlocklySubTask = function(subTask, language) {
       // Blockly/Scratch, as scratch-mode will modify includeBlocks
       if(this.display && subTask.levelGridInfos.conceptViewer) {
          // TODO :: testConcepts is temporary-ish
-         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, testConcepts);
+         if(this.context.conceptList) {
+            var allConcepts = testConcepts.concat(this.context.conceptList);
+         } else {
+            var allConcepts = testConcepts;
+         }
+
+         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts);
          if(subTask.levelGridInfos.conceptViewer.length) {
             concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
          }

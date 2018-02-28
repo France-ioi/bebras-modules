@@ -53,6 +53,16 @@ var getContext = function(display, infos) {
     var map;
 
 
+    var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/index.html';
+    context.conceptList = [
+        {id: 'map_introduction', name: 'La proglet gogleMap', url: conceptBaseUrl+'#map_introduction'},
+        {id: 'map_mapDisplay', name: 'Affichage sur la carte', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_geoData', name: 'Donnés géographiques', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_geoComputing', name: 'Manipulations géographiques', url: conceptBaseUrl+'#map_geoComputing'}
+        ];
+
+
     context.reset = function(taskInfos) {
         if(!context.display || map) return
         if(!map) {
@@ -149,4 +159,11 @@ var getContext = function(display, infos) {
     }
 
     return context;
+}
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('map', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['map', getContext]);
 }
