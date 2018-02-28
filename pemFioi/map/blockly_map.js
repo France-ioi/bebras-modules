@@ -3,7 +3,8 @@ var getContext = function(display, infos) {
     var map_strings = {
         fr: {
             categories: {
-                map: 'Carte'
+                sound: 'Sound',
+                control: 'Control'
             },
             label: {
                 clearMap: 'clearMap()',
