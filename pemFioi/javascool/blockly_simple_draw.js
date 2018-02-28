@@ -1,13 +1,61 @@
 var getContext = function(display, infos) {
 
     var simple_draw_strings = {
+        en: {
+            categories: {
+                draw: 'Draw',
+                control: 'Control'
+            },
+            label: {
+                setPoint: 'setPoint(%1, %2, %3)',
+                addString: 'addString(%1, %2, %3, %4)',
+                addLine: 'addLine(%1, %2, %3, %4, %5)',
+                addCircle: 'addCircle(%1, %2, %3, %4)',
+                waitForClick: 'waitForClick()',
+                getX: 'getX()',
+                getY: 'getY()',
+                reset: 'reset()',
+                resetSize: 'resetSize(%1, %2)'
+            },
+            code: {
+                setPoint: 'setPoint',
+                addString: 'addString',
+                addLine: 'addLine',
+                addCircle: 'addCircle',
+                waitForClick: 'waitForClick',
+                getX: 'getX',
+                getY: 'getY',
+                reset: 'reset',
+                resetSize: 'resetSize',
+            },
+            description: {
+                setPoint: 'setPoint(x, y, c) Add point (x,y) to a curve identified by c (there is one curve per color).\n' +
+                    'Each curve is a sequence of points connected by segments.\n'+
+                    'x is a float between -width and width\n'+
+                    'y is a float between -height and height\n '+
+                    'c identifies the color as well as the curve to which the point is added.',
+                addString: 'addString(x, y, s, c) Adds the string s at position x,y with color c',
+                addLine: 'addLine(x1, y1, x2, y2, c) Adds a line between the points (x1, y1) and (x2, y1) with color c',
+                addCircle: 'addCircle(x, y, r, c) Adds a circle of center (x,y), radius r with color c',
+                waitForClick: 'waitForClick() Waits for a click and then stores the coordinates x and y of the click',
+                getX: 'getX() Returns the X coordinate of last click waited for with waitForClick',
+                getY: 'getY() Returns the Y coordinate of last click waited for with waitForClick',
+                reset: 'reset() Erases everything. Width and height are set back to 1 (the default value)',
+                resetSize: 'resetSize(w,h)  Erases everything. Width is set to w, height is set to h',
+            },
+            startingBlockName: "Program",
+            messages: {
+                clickCanvas: 'Please click on the canvas'
+            }
+        },
         fr: {
+            // TODO :: translate
             categories: {
                 draw: 'Tracé',
                 control: 'Contrôle'
             },
             label: {
-                setPoint: 'setPoint(%1,%2,%3)',
+                setPoint: 'setPoint(%1, %2, %3)',
                 addString: 'addString(%1, %2, %3, %4)',
                 addLine: 'addLine(%1, %2, %3, %4, %5)',
                 addCircle: 'addCircle(%1, %2, %3, %4)',
@@ -44,7 +92,9 @@ var getContext = function(display, infos) {
                 resetSize: 'resetSize(w,h)  Erases everything. Width is set to w, height is set to h',
             },
             startingBlockName: "Programme",
-            messages: {}
+            messages: {
+                clickCanvas: 'Veuillez cliquer sur la zone de dessin'
+            }
         }
     }
 
