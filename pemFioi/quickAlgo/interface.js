@@ -75,12 +75,14 @@ var quickAlgoInterface = {
       }
 
       var gridButtonsAfter = scaleControl
-        + "<div id='testSelector'></div>"
-        + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
-        + this.strings.submitProgram
-        + "</button><br/>"
-        + "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
-        + addTaskHTML;
+        + "<div id='testSelector'></div>";
+      if(!this.context || !this.context.infos || !this.context.infos.hideValidate) {
+         gridButtonsAfter += ''   
+            + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+            + this.strings.submitProgram
+            + "</button><br/>";
+      }
+      gridButtonsAfter += "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>" + addTaskHTML;
       $("#gridButtonsAfter").html(gridButtonsAfter);
       $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
