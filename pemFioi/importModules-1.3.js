@@ -45,6 +45,8 @@ var importableModules = function () {
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
       'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
 
+      'blockly-maths': {src: modulesPath+"/pemFioi/blocklyMaths_lib.js", id: "blocklyMaths_lib"},
+
       'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},
       'quickAlgo_i18n': {src: modulesPath+"/pemFioi/quickAlgo/i18n.js", id: "quickAlgo_i18n"},
       'quickAlgo_interface': {src: modulesPath+"/pemFioi/quickAlgo/interface.js", id: "quickAlgo_interface"},
