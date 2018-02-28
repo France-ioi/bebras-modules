@@ -37,6 +37,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
       getRemainingCapacity: function(workspace) {
          // Get the number of blocks allowed
+         if(!this.maxBlocks) { return Infinity; }
          var remaining = workspace.remainingCapacity(this.maxBlocks+1);
          if(this.maxBlocks && remaining == Infinity) {
             // Blockly won't return anything as we didn't set a limit
@@ -1918,7 +1919,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       fixScratch: function() {
-         // Store the maxBlocks information somehwere, as Scratch ignores it
+         // Store the maxBlocks information somewhere, as Scratch ignores it
          Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
          // Translate requested Blocks from Blockly to Scratch blocks
