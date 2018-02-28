@@ -57,9 +57,14 @@ var getContext = function(display, infos) {
         + 'static4.castor-informatique.fr/help/index.html';
     context.conceptList = [
         {id: 'map_introduction', name: 'La proglet gogleMap', url: conceptBaseUrl+'#map_introduction'},
-        {id: 'map_mapDisplay', name: 'Affichage sur la carte', url: conceptBaseUrl+'#map_mapDisplay'},
-        {id: 'map_geoData', name: 'Donnés géographiques', url: conceptBaseUrl+'#map_geoData'},
-        {id: 'map_geoComputing', name: 'Manipulations géographiques', url: conceptBaseUrl+'#map_geoComputing'}
+        {id: 'map_clearMap', name: 'Effacer la carte', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_addLocation', name: 'Mettre en évidence un point de la carte', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_addRoad', name: 'Tracer une ligne droite', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_getLatitude', name: 'Table des latitudes', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_getLongitude', name: 'Table des longitudes', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_getNeighbors', name: 'Table des voisins', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_geoDistance', name: 'Distance entre deux points', url: conceptBaseUrl+'#map_geoComputing'},
+        {id: 'map_shortestPath', name: 'Chemin entre deux villes', url: conceptBaseUrl+'#map_geoComputing'}
         ];
 
 
