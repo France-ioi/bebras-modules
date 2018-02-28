@@ -230,3 +230,10 @@ var quickAlgoLibraries = {
     this.order.push(name);
   }
 };
+
+// Initialize with contexts loaded before
+if(window.quickAlgoLibrariesList) {
+  for(var i=0; i<quickAlgoLibrariesList.length; i++) {
+    quickAlgoLibraries.register(quickAlgoLibrariesList[i][0], quickAlgoLibrariesList[i][1]);
+  }
+}
