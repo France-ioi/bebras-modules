@@ -562,4 +562,9 @@ var getContext = function(display, infos) {
    return context;
 }
 
-quickAlgoLibraries.register('turtle', getContext);
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('turtle', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['turtle', getContext]);
+}
