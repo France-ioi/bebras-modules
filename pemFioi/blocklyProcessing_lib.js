@@ -2558,12 +2558,7 @@ var processingEndConditions = {
 
 };
 
-if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('processing', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['processing', getContext]);
-}
+quickAlgoLibraries.register('processing', getContext);
 
 /*
 pdebug = {

@@ -248,20 +248,6 @@ function getConceptsFromBlocks(includeBlocks, allConcepts) {
     }
   }
 
-  if(includeBlocks.generatedBlocks) {
-    for(var genName in includeBlocks.generatedBlocks) {
-      if(allConceptsById[genName + '_introduction']) {
-        concepts.push(allConceptsById[genName + '_introduction']);
-      }
-      for(var i=0; i<includeBlocks.generatedBlocks[genName].length; i++) {
-        var conceptRef = genName + '_' + includeBlocks.generatedBlocks[genName][i];
-        if(allConceptsById[conceptRef]) {
-          concepts.push(allConceptsById[conceptRef]);
-        }
-      }
-    }
-  }
-
   return concepts;
 }
 

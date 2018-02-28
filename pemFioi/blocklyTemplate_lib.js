@@ -179,9 +179,4 @@ var getContext = function(display, infos, curLevel) {
 }
 
 // Register the library; change "template" by the name of your library in lowercase
-if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('template', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['template', getContext]);
-}
+quickAlgoLibraries.register('template', getContext);
