@@ -106,10 +106,3 @@ var getContext = function(display, infos) {
 
     return context;
 }
-
-if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('database', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['database', getContext]);
-}

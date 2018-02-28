@@ -1068,9 +1068,4 @@ var getRobotGridContext = function(display, infos, curLevel) {
    return context;
 }
 
-if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('robot', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['robot', getContext]);
-}
+quickAlgoLibraries.register('robot', getContext);

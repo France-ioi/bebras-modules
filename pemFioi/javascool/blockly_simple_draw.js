@@ -52,20 +52,6 @@ var getContext = function(display, infos) {
     var strings = context.setLocalLanguageStrings(simple_draw_strings)
     var draw;
 
-    var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
-    context.conceptList = [
-        {id: 'javascool_introduction', name: 'La proglet algoDeMaths', url: conceptBaseUrl+'#javascool_introduction'},
-        {id: 'javascool_setPoint', name: 'Tracer des points', url: conceptBaseUrl+'#javascool_setPoint'},
-        {id: 'javascool_reset', name: 'Effacer la courbe', url: conceptBaseUrl+'#javascool_reset'},
-        {id: 'javascool_reset_largeur_hauteur', name: "Changer l'échelle horizontale et verticale", url: conceptBaseUrl+'#javascool_reset_largeur_hauteur'},
-        {id: 'javascool_addString', name: 'Ajouter une étiquette', url: conceptBaseUrl+'#javascool_addString'},
-        {id: 'javascool_addLine', name: 'Ajouter une ligne', url: conceptBaseUrl+'#javascool_addLine'},
-        {id: 'javascool_addCircle', name: 'Ajouter un cercle', url: conceptBaseUrl+'#javascool_addCircle'},
-        {id: 'javascool_getX', name: 'Réticule', url: conceptBaseUrl+'#javascool_get'},
-        {id: 'javascool_notes', name: 'Exemples algoDeMaths', url: conceptBaseUrl+'#javascool_notes'}
-        ];
-
     context.reset = function(taskInfos) {
         if(!context.display) return
         draw && draw.destroy()
@@ -170,9 +156,4 @@ var getContext = function(display, infos) {
     return context;
 }
 
-if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('draw', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['draw', getContext]);
-}
+quickAlgoLibraries.register('draw', getContext);
