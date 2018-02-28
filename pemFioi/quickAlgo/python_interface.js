@@ -403,7 +403,6 @@ function LogicController(nbTestCases, maxInstructions) {
           fullHtml += '<li>' + blockDesc + '</li>';
           simpleElements.push(funcProto);
         }
-        simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
 
         // Handle constants as well
         if(this._mainContext.customConstants && this._mainContext.customConstants[generatorName]) {
@@ -417,6 +416,7 @@ function LogicController(nbTestCases, maxInstructions) {
           }
         }
       }
+      simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
       fullHtml += '</ul>';
     }
 
