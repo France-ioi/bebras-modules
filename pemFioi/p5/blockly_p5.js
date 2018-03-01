@@ -44,111 +44,19 @@ var getContext = function(display, infos) {
             },
             ui: {
                 'mic': 'Enable microphone',
-                'files': 'Add audio files...',
-                'caption': 'Audio files list',
-                'hint': 'Use file number as param for playRecord function',
-                'add': 'Add',
-                'incompatible_browser': 'Incompatible browser'
+                'btn_files_repository': 'Add audio files...',
+                'files_repository': {
+                    'caption': 'Audio files list',
+                    'hint': 'Use file number as param for playRecord function',
+                    'add': 'Add',
+                    'incompatible_browser': 'Incompatible browser'
+                }
             }
         }
     }
 
 
-    function FilesRepository(parent) {
 
-        var browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
-
-
-        function initModal() {
-            if($('#p5_files_modal')[0]) return;
-            var inner_html;
-            if(browser_compatible) {
-                inner_html =
-                    '<p>' + strings.ui.hint + '</p>' +
-                    '<table id="p5_files"></table>' +
-                    '<div id="p5_inputs"></div>'
-
-            } else {
-                inner_html =
-                    '<p>' + strings.ui.incompatible_browser + '</p>';
-            }
-            var html =
-                '<div id="p5_files_modal" class="modalWrapper">' +
-                    '<div class="modal">' +
-                        '<button type="button" class="btn close" onclick="$(`#p5_files_modal`).hide()">x</button>' +
-                        '<p><b>' + strings.ui.caption + '</b></p>' +
-                        inner_html
-                    '</div>' +
-                '</div>';
-            $(parent).append($(html));
-        }
-
-
-        function enumerateFiles() {
-            $('#p5_files > tbody > tr').each(function(idx, tr) {
-                $(tr).find('td:nth-child(1)').text(idx + 1 + '. ');
-            })
-        }
-
-
-        function addFilesGroup(files, group_idx) {
-            var html = '';
-            for(var i = 0, f; f = files[i]; i++) {
-                html += '<tr group_idx="' + group_idx + '"><td></td><td>' + f.name + '</td>';
-                if(i==0) {
-                    html +=
-                        '<td rowspan="' + files.length + '">' +
-                            '<button type="button" class="btn close">x</button>' +
-                        '</td>';
-                }
-                html += '</tr>';
-            }
-            var tr = $(html);
-            tr.find('button.close').click(function() {
-                $('#p5_files > tbody > tr[group_idx=' +  group_idx + ']').remove();
-                $('#p5_inputs > input[group_idx=' +  group_idx + ']').remove();
-                enumerateFiles();
-            })
-            $('#p5_files').append(tr);
-            enumerateFiles();
-        }
-
-
-        var group_idx = 0;
-
-        function addInput() {
-            group_idx ++;
-            var input = $('<input group_idx="' + group_idx + '" type="file" class="btn" multiple accept=".mp3" title="' + strings.ui.add + '"/>');
-            $('#p5_inputs').append(input);
-            input.change(function() {
-                if(!this.files.length) return;
-                addFilesGroup(this.files, group_idx);
-                $(this).hide();
-                addInput();
-            })
-        }
-
-
-
-        // interface
-        this.getFile = function(n) {
-            var p = 0;
-            var inputs = $('#p5_inputs > input[type=file]');
-            for(var i=0, input; input = inputs[i]; i++) {
-                if(n >= p && n < p + input.files.length) {
-                    return input.files[n - p];
-                }
-                p += input.files.length;
-            }
-            return null;
-        }
-
-
-        // init
-        initModal();
-        if(!browser_compatible) return;
-        addInput();
-    }
 
 
     function delayToRate(delay) {
@@ -179,11 +87,16 @@ var getContext = function(display, infos) {
             return;
         }
 
-        files = new FilesRepository($('#taskContent'));
+        files = new FilesRepository({
+            extensions: '.mp3',
+            parent: $('#taskContent'),
+            strings: strings.ui.files_repository
+        });
+
         player = new PlayerP5({
             parent: $('#grid')[0],
             filesRepository: files.getFile
-        })
+        });
 
         if(!$('#p5_message')[0]) {
             $('<div id="p5_message"></div>').insertAfter($('#grid'));
@@ -192,11 +105,14 @@ var getContext = function(display, infos) {
             var html =
                 '<div id="p5_controls" style="text-align: left;">' +
                     '<label><input type="checkbox" id="p5_microphone"/>' + strings.ui.mic + '</label>' +
-                    '<button class="btn btn-xs" style="float: right" onclick="$(`#p5_files_modal`).show()">' + strings.ui.files + '</button>' +
+                    '<button class="btn btn-xs" style="float: right" id="p5_files">' + strings.ui.btn_files_repository + '</button>' +
                 '</div>';
             $('#testSelector').prepend($(html))
             $('#p5_microphone').click(function() {
                 player.toggleMicrophone($(this).prop('checked'));
+            })
+            $('#p5_files').click(function() {
+                files.show();
             })
         }
         player.toggleMicrophone($('#p5_microphone').prop('checked'));
@@ -217,36 +133,6 @@ var getContext = function(display, infos) {
     context.onExecutionEnd = function() {
         player.resetChannels();
     }
-
-
-    context.customBlocks = {
-        p5: {
-            sound: [
-                { name: 'playSignal',
-                    params: ['Number', 'WaveType', 'Number', 'Number'],
-                    params_names: ['canal', 'type', 'frequency', 'amplitude']
-                },
-                { name: 'playRecord',
-                    params: ['String', 'Number'],
-                    params_names: ['url', 'frequency']
-                }
-            ],
-            control: [
-                { name: 'sleep',
-                    params: ['Number'],
-                    params_names: ['time']
-                },
-                { name: 'playStop' }
-            ]
-        }
-    }
-
-    var typeData = {
-        'Number': { bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
-        'String': { bType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
-        'WaveType': { bType: 'field_dropdown', options: [ 'sine', 'triangle', 'sawtooth', 'square', 'noise' ]}
-    }
-
 
 
     context.p5 = {
@@ -298,35 +184,42 @@ var getContext = function(display, infos) {
     }
 
 
-    for (var category in context.customBlocks.p5) {
-        for (var iBlock = 0; iBlock < context.customBlocks.p5[category].length; iBlock++) {
-            (function() {
-                var block = context.customBlocks.p5[category][iBlock];
-                if (block.params) {
-                    block.blocklyJson = { inputsInline: true, args0: {} }
-                    var blockArgs = block.blocklyJson.args0;
-                    block.blocklyXml = '<block type="' + block.name + '">';
-                    for (var iParam = 0; iParam < block.params.length; iParam++) {
-                        var paramData = typeData[block.params[iParam]] || { bType: 'input_value' };
-                        blockArgs[iParam] = { type: paramData.bType, name: "PARAM_" + iParam }
-                        if(paramData.bType == 'field_dropdown') {
-                            var options = [];
-                            for(var iValue=0; iValue<paramData.options.length; iValue++) {
-                                var v = paramData.options[iValue];
-                                options.push([strings.constantLabel[v] || v, v]);
-                            }
-                            blockArgs[iParam].options = options;
-                        }
-                        block.blocklyXml +=
-                            '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
-                            '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
-                            '</shadow></value>';
-                    }
-                    block.blocklyXml += '</block>';
+    context.customBlocks = {
+        p5: {
+            sound: [
+                { name: 'playSignal',
+                    params: ['Number', 'WaveType', 'Number', 'Number'],
+                    params_names: ['canal', 'type', 'frequency', 'amplitude']
+                },
+                { name: 'playRecord',
+                    params: ['String', 'Number'],
+                    params_names: ['url', 'frequency']
                 }
-           })();
+            ],
+            control: [
+                { name: 'sleep',
+                    params: ['Number'],
+                    params_names: ['time']
+                },
+                { name: 'playStop' }
+            ]
         }
     }
+
+
+    var typeData = {
+        'Number': { bType: 'input_value', vType: 'math_number', fName: 'NUM', defVal: 0 },
+        'String': { bType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
+        'WaveType': { bType: 'field_dropdown', defVal: 'sine', options: [
+            [ strings.constantLabel.sine, 'sine'],
+            [ strings.constantLabel.triangle, 'triangle'],
+            [ strings.constantLabel.sawtooth, 'sawtooth'],
+            [ strings.constantLabel.square, 'square'],
+            [ strings.constantLabel.noise, 'noise']
+        ]}
+    }
+
+    BlocksHelper.convertBlocks(context, 'p5', typeData);
 
     return context;
 }

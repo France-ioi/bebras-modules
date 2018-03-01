@@ -94,7 +94,14 @@ var importableModules = function () {
       'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
 
       'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
-      'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"}
+      'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"},
+
+      'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
+      'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
+      'database_css': {type: "stylesheet", src: modulesPath+"/pemFioi/database/styles.css", id: "database_css"},
+
+      'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
+      'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"}
    }
 }
 
