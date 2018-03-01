@@ -1238,6 +1238,27 @@ var getContext = function(display, infos) {
       }
    };
 
+   var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/index.html';
+   context.conceptList = [
+      {id: 'processing_introduction', name: 'Processing - introduction', url: conceptBaseUrl+'#processing_introduction'},
+      {id: 'processing_environment', name: 'Environnement', url: conceptBaseUrl+'#processing_environment'},
+      {id: 'processing_shape_2D', name: 'Formes - 2D', url: conceptBaseUrl+'#processing_shape_2D'},
+      {id: 'processing_shape_curves', name: 'Formes - courbes', url: conceptBaseUrl+'#processing_shape_curves'},
+      {id: 'processing_shape_attributes', name: 'Formes - ellipse', url: conceptBaseUrl+'#processing_shape_attributes'},
+      {id: 'processing_shape_vertex', name: 'Formes - sommets', url: conceptBaseUrl+'#processing_shape_vertex'},
+      {id: 'processing_shape_other', name: 'Formes - autres', url: conceptBaseUrl+'#processing_shape_other'},
+      {id: 'processing_coordinates', name: 'Effets - coordonnées', url: conceptBaseUrl+'#processing_coordinates'},
+      {id: 'processing_color_setting', name: 'Couleurs - réglages', url: conceptBaseUrl+'#processing_color_setting'},
+      {id: 'processing_image_displaying', name: 'Couleurs - création et lecture', url: conceptBaseUrl+'#processing_image_displaying'},
+      {id: 'processing_image_textures', name: 'Images - affichage', url: conceptBaseUrl+'#processing_image_textures'},
+      {id: 'processing_image_pixels', name: 'Images - pixels', url: conceptBaseUrl+'#processing_image_pixels'},
+      {id: 'processing_rendering', name: 'Rendu', url: conceptBaseUrl+'#processing_rendering'},
+      {id: 'processing_typography_display', name: 'Typographie - affichage', url: conceptBaseUrl+'#processing_typography_display'},
+      {id: 'processing_typography_attributes', name: 'Typographie - attributs', url: conceptBaseUrl+'#processing_typography_attributes'},
+      {id: 'processing_typography_measures', name: 'Typographie - mesures', url: conceptBaseUrl+'#processing_typography_measures'},
+      {id: 'processing_constants', name: '', url: conceptBaseUrl+'#processing_constants'},
+   ];
 
 
    function initGraphics2D(pg, forceInitialDrawing) {
