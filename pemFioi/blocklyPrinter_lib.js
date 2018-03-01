@@ -286,3 +286,10 @@ var getContext = function(display, infos) {
    
    return context;
 }
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('printer', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['printer', getContext]);
+}

@@ -782,7 +782,9 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
-            green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true}
+            green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true},
+            number: { num: 4, side: 60, zOrder: 1 },
+            board: {num: 5, side: 60, isWritable: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -864,7 +866,6 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
-
             box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 }            
          },
@@ -1345,11 +1346,17 @@ var getContext = function(display, infos, curLevel) {
    var paper;
    
    if(infos.leftMargin === undefined) {
-      infos.leftMargin = 0;
+      infos.leftMargin = 10;
+   }
+   if(infos.rightMargin === undefined) {
+      infos.rightMargin = 10;
+   }
+   if(infos.bottomMargin === undefined) {
+      infos.bottomMargin = 10;
    }
    if(infos.topMargin === undefined) {
       if(infos.showLabels) {
-         infos.topMargin = 0;
+         infos.topMargin = 10;
       }
       else {
          infos.topMargin = infos.cellSide / 2;
@@ -1595,7 +1602,7 @@ var getContext = function(display, infos, curLevel) {
          newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
+      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
       
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
@@ -1630,33 +1637,23 @@ var getContext = function(display, infos, curLevel) {
       }
       
       var cellItems = [];
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         cellItems[iRow] = [];
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            cellItems[iRow][iCol] = [];
-         }
-      }
       
       for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
          var item = context.items[iItem];
-         cellItems[item.row][item.col].push(item);
+         cellItems.push(item);
       }
       
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            cellItems[iRow][iCol].sort(function(itemA, itemB) {
-               if(itemA.zOrder < itemB.zOrder) {
-                  return -1;
-               }
-               if(itemA.zOrder > itemB.zOrder) {
-                  return 1;
-               }
-               return 0;
-            });
-            for(var iItem = 0;iItem < cellItems[iRow][iCol].length;iItem++) {
-               cellItems[iRow][iCol][iItem].element.toFront();
-            }
+      cellItems.sort(function(itemA, itemB) {
+         if(itemA.zOrder < itemB.zOrder) {
+            return -1;
          }
+         if(itemA.zOrder > itemB.zOrder) {
+            return 1;
+         }
+         return 0;
+      });
+      for(var iItem = 0;iItem < cellItems.length;iItem++) {
+         cellItems[iItem].element.toFront();
       }
    };
    
@@ -2208,6 +2205,7 @@ var robotEndConditions = {
    }
 };
 
+
 var robotEndFunctionGenerator = {
    allFilteredPicked: function(filter) {
       return function(context, lastTurn) {
@@ -2271,3 +2269,5 @@ var robotEndFunctionGenerator = {
       };
    }
 };
+
+quickAlgoLibraries.register('robot', getContext);

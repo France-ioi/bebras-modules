@@ -231,7 +231,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
-            if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
+            if(maxBlocks && (eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete)) {
                // Update the remaining blocks display
                var remaining = this.getRemainingCapacity(this.workspace);
                var optLimitBlocks = {

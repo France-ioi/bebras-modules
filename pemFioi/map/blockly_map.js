@@ -3,8 +3,7 @@ var getContext = function(display, infos) {
     var map_strings = {
         fr: {
             categories: {
-                sound: 'Sound',
-                control: 'Control'
+                map: 'Carte'
             },
             label: {
                 clearMap: 'clearMap()',
@@ -51,6 +50,21 @@ var getContext = function(display, infos) {
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(map_strings)
     var map;
+
+
+    var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/index.html';
+    context.conceptList = [
+        {id: 'map_introduction', name: 'La proglet gogleMap', url: conceptBaseUrl+'#map_introduction'},
+        {id: 'map_clearMap', name: 'Effacer la carte', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_addLocation', name: 'Mettre en évidence un point de la carte', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_addRoad', name: 'Tracer une ligne droite', url: conceptBaseUrl+'#map_mapDisplay'},
+        {id: 'map_getLatitude', name: 'Table des latitudes', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_getLongitude', name: 'Table des longitudes', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_getNeighbors', name: 'Table des voisins', url: conceptBaseUrl+'#map_geoData'},
+        {id: 'map_geoDistance', name: 'Distance entre deux points', url: conceptBaseUrl+'#map_geoComputing'},
+        {id: 'map_shortestPath', name: 'Chemin entre deux villes', url: conceptBaseUrl+'#map_geoComputing'}
+        ];
 
 
     context.reset = function(taskInfos) {
@@ -140,13 +154,28 @@ var getContext = function(display, infos) {
                     block.blocklyXml += '</block>';
                 }
                 context.map[block.name] = function() {
-                    var callback = arguments[arguments.length - 1]
-                    var res = map[block.name].apply(map, arguments)
-                    callback(res)
+                    var callback = arguments[arguments.length - 1];
+                    if(map) {
+                        if(block.hasHandler) {
+                            // This function knows how to take care of the callback
+                            map[block.name].apply(map, arguments);
+                        } else {
+                            context.runner.noDelay(callback, map[block.name].apply(map, arguments));
+                        }
+                    } else {
+                        callback();
+                    }
                 }
            })();
         }
     }
 
     return context;
+}
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('map', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['map', getContext]);
 }

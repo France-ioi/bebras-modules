@@ -46,7 +46,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
 
-      this.context = getContext(this.display, subTask.levelGridInfos, curLevel);
+      this.context = quickAlgoLibraries.getContext(this.display, subTask.levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
@@ -73,7 +73,13 @@ var initBlocklySubTask = function(subTask, language) {
       // Blockly/Scratch, as scratch-mode will modify includeBlocks
       if(this.display && subTask.levelGridInfos.conceptViewer) {
          // TODO :: testConcepts is temporary-ish
-         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, testConcepts);
+         if(this.context.conceptList) {
+            var allConcepts = testConcepts.concat(this.context.conceptList);
+         } else {
+            var allConcepts = testConcepts;
+         }
+
+         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts);
          if(subTask.levelGridInfos.conceptViewer.length) {
             concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
          }

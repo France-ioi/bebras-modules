@@ -8,7 +8,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * Class properties
    */
   this._nbTestCases = nbTestCases;
-  this._maxInstructions = maxInstructions || undefined;
+  this._maxInstructions = maxInstructions || null;
   this.language = 'python';
   this._textFile = null;
   this._extended = false;
@@ -281,7 +281,7 @@ function LogicController(nbTestCases, maxInstructions) {
     $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
     var that = this;
     var onEditorChange = function () {
-      if(!maxInstructions || !that._aceEditor) { return; }
+      if(!that._aceEditor) { return; }
 
       if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
         that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
@@ -297,19 +297,21 @@ function LogicController(nbTestCases, maxInstructions) {
         return;
       }
 
-      var remaining = maxInstructions - pythonCount(code);
-      var optLimitElements = {
-         maxBlocks: maxInstructions,
-         remainingBlocks: Math.abs(remaining)
-         };
-      var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
-      $('#capacity').html(strLimitElements.format(optLimitElements));
-      if(remaining == 0) {
-         quickAlgoInterface.blinkRemaining(4);
-      } else if(remaining < 0) {
-         quickAlgoInterface.blinkRemaining(5, true);
-      } else {
-         quickAlgoInterface.blinkRemaining(0);
+      if(maxInstructions) {
+        var remaining = maxInstructions - pythonCount(code);
+        var optLimitElements = {
+          maxBlocks: maxInstructions,
+          remainingBlocks: Math.abs(remaining)
+        };
+        var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
+        $('#capacity').html(strLimitElements.format(optLimitElements));
+        if(remaining == 0) {
+           quickAlgoInterface.blinkRemaining(4);
+        } else if(remaining < 0) {
+           quickAlgoInterface.blinkRemaining(5, true);
+        } else {
+           quickAlgoInterface.blinkRemaining(0);
+        }
       }
 
       // Interrupt any ongoing execution
@@ -401,7 +403,6 @@ function LogicController(nbTestCases, maxInstructions) {
           fullHtml += '<li>' + blockDesc + '</li>';
           simpleElements.push(funcProto);
         }
-        simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
 
         // Handle constants as well
         if(this._mainContext.customConstants && this._mainContext.customConstants[generatorName]) {
@@ -415,6 +416,7 @@ function LogicController(nbTestCases, maxInstructions) {
           }
         }
       }
+      simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
       fullHtml += '</ul>';
     }
 

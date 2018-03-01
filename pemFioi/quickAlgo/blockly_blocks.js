@@ -37,6 +37,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
       getRemainingCapacity: function(workspace) {
          // Get the number of blocks allowed
+         if(!this.maxBlocks) { return Infinity; }
          var remaining = workspace.remainingCapacity(this.maxBlocks+1);
          if(this.maxBlocks && remaining == Infinity) {
             // Blockly won't return anything as we didn't set a limit
@@ -1713,6 +1714,21 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.JavaScript['controls_untilWhile'] = Blockly.JavaScript['controls_whileUntil'];
          Blockly.Python['controls_untilWhile'] = Blockly.Python['controls_whileUntil'];
 
+         Blockly.Blocks['math_angle'] = {
+            init: function() {
+               this.setOutput(true, 'Number');
+               this.appendDummyInput()
+                   .appendField(new Blockly.FieldAngle(90), "ANGLE");
+               this.setColour(Blockly.Blocks.math.HUE);
+            }
+         };
+         Blockly.JavaScript['math_angle'] = function(block) {
+           return ['' + block.getFieldValue('ANGLE'), Blockly.JavaScript.ORDER_FUNCTION_CALL];
+         };
+         Blockly.Python['math_angle'] = function(block) {
+           return ['' + block.getFieldValue('ANGLE'), Blockly.Python.ORDER_FUNCTION_CALL];
+         };
+
          Blockly.Blocks['math_extra_single'] = {
            /**
             * Block for advanced math operators with single operand.
@@ -1903,7 +1919,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       fixScratch: function() {
-         // Store the maxBlocks information somehwere, as Scratch ignores it
+         // Store the maxBlocks information somewhere, as Scratch ignores it
          Blockly.Workspace.prototype.maxBlocks = function () { return maxBlocks; };
 
          // Translate requested Blocks from Blockly to Scratch blocks

@@ -1,6 +1,7 @@
 function SimpleDraw(options) {
 
     var defaults = {
+        context: null,
         parent: document.body,
         width: 400,
         height: 400,
@@ -39,39 +40,51 @@ function SimpleDraw(options) {
     canvas.height = options.height
     options.parent.appendChild(canvas)
 
-    var context = canvas.getContext('2d')
-    context.font = options.font
+    var canvasContext = canvas.getContext('2d')
+    canvasContext.font = options.font
     clear()
 
 
     // private
 
     function clear() {
-        context.fillStyle = options.colors.background
-        context.fillRect(0, 0, options.width, options.height)
-        context.strokeStyle = options.colors.axis
+        canvasContext.fillStyle = options.colors.background
+        canvasContext.fillRect(0, 0, options.width, options.height)
+        canvasContext.strokeStyle = options.colors.axis
         var ch = Math.round(0.5 * options.height)
-        context.beginPath()
-        context.moveTo(0, ch)
-        context.lineTo(options.width, ch)
-        context.stroke()
+        canvasContext.beginPath()
+        canvasContext.moveTo(0, ch)
+        canvasContext.lineTo(options.width, ch)
+        canvasContext.stroke()
         var cw = Math.round(0.5 * options.width)
-        context.beginPath()
-        context.moveTo(cw, 0)
-        context.lineTo(cw, options.height)
-        context.stroke()
+        canvasContext.beginPath()
+        canvasContext.moveTo(cw, 0)
+        canvasContext.lineTo(cw, options.height)
+        canvasContext.stroke()
     }
 
 
     function tx(x) {
+        // Translate x in -1..1 to a coordinate on the canvas
         var r = 0.5 * options.width
         return Math.round(r * (1 + x / options.scale_x))
     }
 
+    function itx(x) {
+        // Translate x in 0..width to a -1..1
+        return (x / (0.5 * options.width) - 1) * options.scale_x;
+    }
+
 
     function ty(y) {
+        // Translate y in -1..1 to a coordinate on the canvas
         var r = 0.5 * options.height
         return Math.round(r * (1 - y / options.scale_y))
+    }
+
+    function ity(y) {
+        // Translate y in 0..height to a -1..1
+        return (- 1 - y / (0.5 * options.height)) * options.scale_y;
     }
 
     function tr(r) {
@@ -82,8 +95,8 @@ function SimpleDraw(options) {
 
     function color(idx) {
         var c = options.palette[idx] ? options.palette[idx] : options.palette[0]
-        context.fillStyle = c
-        context.strokeStyle = c
+        canvasContext.fillStyle = c
+        canvasContext.strokeStyle = c
     }
 
     // drawing
@@ -101,24 +114,24 @@ function SimpleDraw(options) {
 
     this.addString = function(x, y, s, c) {
         color(c)
-        context.fillText(s, tx(x), ty(y))
+        canvasContext.fillText(s, tx(x), ty(y))
     }
 
 
     this.addLine = function(x1, y1, x2, y2, c) {
         color(c)
-        context.beginPath()
-        context.moveTo(tx(x1), ty(y1))
-        context.lineTo(tx(x2), ty(y2))
-        context.stroke()
+        canvasContext.beginPath()
+        canvasContext.moveTo(tx(x1), ty(y1))
+        canvasContext.lineTo(tx(x2), ty(y2))
+        canvasContext.stroke()
     }
 
 
     this.addCircle = function(x, y, r, c) {
         color(c)
-        context.beginPath()
-        context.arc(tx(x), tx(y), tr(r), 0, 2 * Math.PI)
-        context.stroke()
+        canvasContext.beginPath()
+        canvasContext.arc(tx(x), tx(y), tr(r), 0, 2 * Math.PI)
+        canvasContext.stroke()
     }
 
 
@@ -140,18 +153,25 @@ function SimpleDraw(options) {
     // mouse
 
     var click_coordinates = {
-        x: null,
-        y: null
+        x: 0,
+        y: 0
     }
+    var waiting_for_click = null;
 
     this.waitForClick = function(callback) {
-        canvas.addEventListener('click', function(e) {
-            click_coordinates = {
-                x: e.clientX,
-                y: e.clientY
-            }
-            callback && callback(e.clientX, e.clientY)
-        })
+        if(options.context.display) {
+            $('#errors').text(options.context.strings.messages.clickCanvas); // TODO :: translation system?
+            options.context.runner.waitEvent(callback, canvas, 'click', function(e) {
+                var rect = canvas.getBoundingClientRect();
+                click_coordinates.x = itx(e.clientX - rect.left);
+                click_coordinates.y = ity(rect.top - e.clientY);
+            });
+        } else {
+            // Assume all clicks are in the center
+            click_coordinates.x = 0;
+            click_coordinates.y = 0;
+            options.context.runner.noDelay(callback);
+        }
     }
 
 
@@ -161,7 +181,7 @@ function SimpleDraw(options) {
 
 
     this.getY = function() {
-        return click_coordinates.x
+        return click_coordinates.y
     }
 
 
@@ -170,7 +190,7 @@ function SimpleDraw(options) {
 
     this.destroy = function() {
         options.parent.removeChild(canvas)
-        context = null
+        canvasContext = null
         canvas = null
     }
 }

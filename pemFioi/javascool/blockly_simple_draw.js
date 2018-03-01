@@ -1,16 +1,19 @@
 var getContext = function(display, infos) {
 
     var simple_draw_strings = {
-        fr: {
+        en: {
             categories: {
                 draw: 'Draw',
                 control: 'Control'
             },
             label: {
-                setPoint: 'setPoint(%1,%2,%3)',
+                setPoint: 'setPoint(%1, %2, %3)',
                 addString: 'addString(%1, %2, %3, %4)',
                 addLine: 'addLine(%1, %2, %3, %4, %5)',
                 addCircle: 'addCircle(%1, %2, %3, %4)',
+                waitForClick: 'waitForClick()',
+                getX: 'getX()',
+                getY: 'getY()',
                 reset: 'reset()',
                 resetSize: 'resetSize(%1, %2)'
             },
@@ -19,6 +22,9 @@ var getContext = function(display, infos) {
                 addString: 'addString',
                 addLine: 'addLine',
                 addCircle: 'addCircle',
+                waitForClick: 'waitForClick',
+                getX: 'getX',
+                getY: 'getY',
                 reset: 'reset',
                 resetSize: 'resetSize',
             },
@@ -31,11 +37,64 @@ var getContext = function(display, infos) {
                 addString: 'addString(x, y, s, c) Adds the string s at position x,y with color c',
                 addLine: 'addLine(x1, y1, x2, y2, c) Adds a line between the points (x1, y1) and (x2, y1) with color c',
                 addCircle: 'addCircle(x, y, r, c) Adds a circle of center (x,y), radius r with color c',
+                waitForClick: 'waitForClick() Waits for a click and then stores the coordinates x and y of the click',
+                getX: 'getX() Returns the X coordinate of last click waited for with waitForClick',
+                getY: 'getY() Returns the Y coordinate of last click waited for with waitForClick',
+                reset: 'reset() Erases everything. Width and height are set back to 1 (the default value)',
+                resetSize: 'resetSize(w,h)  Erases everything. Width is set to w, height is set to h',
+            },
+            startingBlockName: "Program",
+            messages: {
+                clickCanvas: 'Please click on the canvas'
+            }
+        },
+        fr: {
+            // TODO :: translate
+            categories: {
+                draw: 'Tracé',
+                control: 'Contrôle'
+            },
+            label: {
+                setPoint: 'setPoint(%1, %2, %3)',
+                addString: 'addString(%1, %2, %3, %4)',
+                addLine: 'addLine(%1, %2, %3, %4, %5)',
+                addCircle: 'addCircle(%1, %2, %3, %4)',
+                waitForClick: 'waitForClick()',
+                getX: 'getX()',
+                getY: 'getY()',
+                reset: 'reset()',
+                resetSize: 'resetSize(%1, %2)'
+            },
+            code: {
+                setPoint: 'setPoint',
+                addString: 'addString',
+                addLine: 'addLine',
+                addCircle: 'addCircle',
+                waitForClick: 'waitForClick',
+                getX: 'getX',
+                getY: 'getY',
+                reset: 'reset',
+                resetSize: 'resetSize',
+            },
+            description: {
+                setPoint: 'setPoint(x, y, c) Add point (x,y) to a curve identified by c (there is one curve per color).\n' +
+                    'Each curve is a sequence of points connected by segments.\n'+
+                    'x is a float between -width and width\n'+
+                    'y is a float between -height and height\n '+
+                    'c identifies the color as well as the curve to which the point is added.',
+                addString: 'addString(x, y, s, c) Adds the string s at position x,y with color c',
+                addLine: 'addLine(x1, y1, x2, y2, c) Adds a line between the points (x1, y1) and (x2, y1) with color c',
+                addCircle: 'addCircle(x, y, r, c) Adds a circle of center (x,y), radius r with color c',
+                waitForClick: 'waitForClick() Waits for a click and then stores the coordinates x and y of the click',
+                getX: 'getX() Returns the X coordinate of last click waited for with waitForClick',
+                getY: 'getY() Returns the Y coordinate of last click waited for with waitForClick',
                 reset: 'reset() Erases everything. Width and height are set back to 1 (the default value)',
                 resetSize: 'resetSize(w,h)  Erases everything. Width is set to w, height is set to h',
             },
             startingBlockName: "Programme",
-            messages: {}
+            messages: {
+                clickCanvas: 'Veuillez cliquer sur la zone de dessin'
+            }
         }
     }
 
@@ -43,11 +102,26 @@ var getContext = function(display, infos) {
     var strings = context.setLocalLanguageStrings(simple_draw_strings)
     var draw;
 
+    var conceptBaseUrl = window.location.protocol + '//'
+        + 'static4.castor-informatique.fr/help/index.html';
+    context.conceptList = [
+        {id: 'javascool_introduction', name: 'La proglet algoDeMaths', url: conceptBaseUrl+'#javascool_introduction'},
+        {id: 'javascool_setPoint', name: 'Tracer des points', url: conceptBaseUrl+'#javascool_setPoint'},
+        {id: 'javascool_reset', name: 'Effacer la courbe', url: conceptBaseUrl+'#javascool_reset'},
+        {id: 'javascool_reset_largeur_hauteur', name: "Changer l'échelle horizontale et verticale", url: conceptBaseUrl+'#javascool_reset_largeur_hauteur'},
+        {id: 'javascool_addString', name: 'Ajouter une étiquette', url: conceptBaseUrl+'#javascool_addString'},
+        {id: 'javascool_addLine', name: 'Ajouter une ligne', url: conceptBaseUrl+'#javascool_addLine'},
+        {id: 'javascool_addCircle', name: 'Ajouter un cercle', url: conceptBaseUrl+'#javascool_addCircle'},
+        {id: 'javascool_getX', name: 'Réticule', url: conceptBaseUrl+'#javascool_get'},
+        {id: 'javascool_notes', name: 'Exemples algoDeMaths', url: conceptBaseUrl+'#javascool_notes'}
+        ];
+
     context.reset = function(taskInfos) {
         if(!context.display) return
         draw && draw.destroy()
         //$('#grid').empty()
         draw = new SimpleDraw({
+            context: context,
             parent: $('#grid')[0]
         })
     }
@@ -56,7 +130,9 @@ var getContext = function(display, infos) {
     context.setScale = function(scale) {}
     context.updateScale = function() {}
     context.resetDisplay = function() {}
-    context.unload = function() {}
+    context.unload = function() {
+        draw && draw.destroy();
+    }
 
 
 
@@ -81,6 +157,9 @@ var getContext = function(display, infos) {
                 },
             ],
             control: [
+                { name: 'waitForClick', hasHandler: true },
+                { name: 'getX', yieldsValue: true},
+                { name: 'getY', yieldsValue: true},
                 { name: 'reset' },
                 { name: "resetSize",
                     params: ['Number', 'Number'],
@@ -120,9 +199,17 @@ var getContext = function(display, infos) {
                 }
 
                 context.javascool[block.name] = function() {
-                    var callback = arguments[arguments.length - 1]
-                    draw && draw[block.name].apply(draw, arguments)
-                    callback()
+                    var callback = arguments[arguments.length - 1];
+                    if(draw) {
+                        if(block.hasHandler) {
+                            // This function knows how to take care of the callback
+                            draw[block.name].apply(draw, arguments);
+                        } else {
+                            context.runner.noDelay(callback, draw[block.name].apply(draw, arguments));
+                        }
+                    } else {
+                        callback();
+                    }
                 }
 
            })();
@@ -131,4 +218,11 @@ var getContext = function(display, infos) {
 
 
     return context;
+}
+
+if(window.quickAlgoLibraries) {
+   quickAlgoLibraries.register('draw', getContext);
+} else {
+   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+   window.quickAlgoLibrariesList.push(['draw', getContext]);
 }
