@@ -91,6 +91,16 @@ function initBlocklyRunner(context, messageCallback) {
          }
       };
 
+      runner.waitEvent = function(callback, target, eventName, func) {
+         runner.stackCount = 0;
+         var listenerFunc = null;
+         listenerFunc = function(e) {
+            target.removeEventListener(eventName, listenerFunc);
+            runner.noDelay(callback, func(e));
+         };
+         target.addEventListener(eventName, listenerFunc);
+      };
+
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value != undefined) {
