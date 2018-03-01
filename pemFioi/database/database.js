@@ -33,24 +33,68 @@ function DatabaseHelper(options) {
 
 
 
-    // render
+    // render table
+    this.formatValue = function(value, type) {
+        if(value === null) {
+            return 'NULL';
+        }
+        switch(type) {
+            case 'number':
+            case 'string':
+            case 'date':
+                return value;
+            case 'image':
+                return '<img style="height: ' + options.render_row_height + '" src="' + value + '"/>'
+        }
+        return '';
+    }
+
+
 
     this.renderTable = function(table, reference_table) {
-        var dump = table.dump();
-        var html = '<div class="database"><table>';
-        var is_header = true;
-        for(var i=0, row; row = dump[i]; i++) {
+        var html = '<div class="database">';
+
+        var rows = table.params().records;
+        if(rows.length > options.render_max_rows) {
+            rows = rows.slice(0, options.render_max_rows);
+            html += 'Only the first ' + options.render_max_rows + ' records are displayed';
+        }
+
+        html +=
+            '<table><tr><th>' +
+            table.params().columnNames.join('</th><th>') +
+            '</th></tr>';
+
+        var reference_rows = reference_table ? reference_table.params().records : null;
+        var valid_value = true;
+        var valid_all = true;
+        var types = table.params().columnTypes;
+        for(var i=0, row; row = rows[i]; i++) {
             html += '<tr>';
-            if(is_header) {
-                html += '<th style="height: ' + options.row_height + '">' + row.join('</th><th>') + '</th>';
-                is_header = false;
-            } else {
-                html += '<td style="height: ' + options.row_height + '">' + row.join('</td><td>') + '</td>';
+            for(var j=0; j<row.length; j++) {
+                var value = row[j];
+                if(reference_rows) {
+                    valid_value = valid_value && reference_rows[i] && reference_rows[i][j] === value;
+                }
+                valid_all = valid_all && valid_value;
+                html +=
+                    '<td style="height: ' + options.render_row_height +
+                    '" class="' + (valid_value ? 'valid' : 'invalid') + '">' +
+                    this.formatValue(value, types[j]) +
+                    '</td>';
+
             }
             html += '</tr>';
         }
+
         html += '</table></div>';
         options.parent.html(html);
+        if(reference_rows && reference_rows.length != rows.length) {
+            throw new Error('Some results are missing or extra records added');
+        }
+        if(!valid_all) {
+            throw new Error('Incorrect results');
+        }
     }
 
 
@@ -63,6 +107,11 @@ function DatabaseHelper(options) {
 
 
     this.validateDisplay = function(reference_table) {
+        if(!this.table) return;
+        if(this.table.params().columnNames.length != reference_table.params().columnNames.length) {
+            throw new Error('Incorrect results');
+        }
+
         var res = this.renderTable(this.table, reference_table);
         if(res !== true) {
             throw new Error(res);
@@ -70,6 +119,8 @@ function DatabaseHelper(options) {
     }
 
 
+
+    // render map
 
     this.displayTableOnMap = function(table, callback) {
         //TODO
