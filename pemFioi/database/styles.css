@@ -1,5 +1,8 @@
+#database_controls {
+    height: 25px;
+}
+
 .database {
-    margin-top: 20px;
     width: 400px;
     height: 400px;
     overflow: auto;
@@ -23,4 +26,8 @@
     text-overflow: ellipsis;
     overflow: hidden;
     max-width: 200px;
+}
+
+.database td.invalid {
+    background: #FFAAAA;
 }

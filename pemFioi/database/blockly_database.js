@@ -116,13 +116,22 @@ var getContext = function(display, infos) {
 
 
         var html =
-            '<div id="db_controls" style="text-align: left;">' +
+            '<div id="database_controls">' +
                 '<button class="btn btn-xs" style="float: right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
             '</div>';
         $('#testSelector').prepend($(html))
         $('#btn_files').click(function() {
             files.show();
         })
+
+        /*
+        for testing purpose
+        context.database.loadTable('test_table', function(table, callback) {
+            context.database.displayTable(table, null, function() {
+                context.expectTable('valid_table')
+            });
+        })
+        */
     }
 
 
@@ -213,10 +222,14 @@ var getContext = function(display, infos) {
         },
 
         displayTable: function(table, columns, callback) {
-            var columns_arr = Array.from(columns.properties);
-            db_helper.displayTable(
-                table.selectColumns(columns_arr)
-            )
+            if(columns) {
+                var columns_arr = Array.from(columns.properties);
+                db_helper.displayTable(
+                    table.selectColumns(columns_arr)
+                )
+            } else {
+                db_helper.displayTable(table);
+            }
             callback();
         },
 
