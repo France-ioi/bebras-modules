@@ -265,7 +265,6 @@ var getContext = function(display, infos) {
     }
 
 
-<<<<<<< HEAD
 
     context.customBlocks = {
         database: {
@@ -346,40 +345,6 @@ var getContext = function(display, infos) {
                 { name: 'displayTableOnMap',
                     params: ['Block', 'String','String', 'String'],
                     params_names: ['table', 'nameColumn', 'longitudeColumn', 'latitudeColumn'],
-=======
-    context.database = {}
-
-    for (var category in context.customBlocks.map) {
-        for (var iBlock = 0; iBlock < context.customBlocks.map[category].length; iBlock++) {
-            (function() {
-                var block = context.customBlocks.map[category][iBlock];
-                if (block.params) {
-                    block.blocklyJson = { inputsInline: true, args0: {} }
-                    var blockArgs = block.blocklyJson.args0;
-                    block.blocklyXml = '<block type="' + block.name + '">';
-                    for (var iParam = 0; iParam < block.params.length; iParam++) {
-                        var paramData = typeData[block.params[iParam]] || { bType: 'input_value' };
-                        blockArgs[iParam] = { type: paramData.bType, name: "PARAM_" + iParam }
-                        block.blocklyXml +=
-                            '<value name="PARAM_' + iParam + '"><shadow type="' + paramData.vType + '">' +
-                            '<field name="' + paramData.fName + '">' + paramData.defVal + '</field>' +
-                            '</shadow></value>';
-                    }
-                    block.blocklyXml += '</block>';
-                }
-                context.map[block.name] = function() {
-                    var callback = arguments[arguments.length - 1];
-                    if(map) {
-                        if(block.hasHandler) {
-                            // This function knows how to take care of the callback
-                            map[block.name].apply(map, arguments);
-                        } else {
-                            context.runner.noDelay(callback, map[block.name].apply(map, arguments));
-                        }
-                    } else {
-                        callback();
-                    }
->>>>>>> 302713d082fe0abd3a8a714d5867b181d630c177
                 }
             ]
         }
