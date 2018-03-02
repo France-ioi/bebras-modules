@@ -5,10 +5,10 @@ function DatabaseHelper(options) {
         csv_delimiter: ';',
         render_row_height: '20px',
         render_max_rows: 10,
-        parent: null
+        parent: document.body
     }
 
-    options = Object.assign(defaults, options || {})
+    var options = Object.assign(defaults, options || {})
 
 
     this.loadCsv = function(file, types, callback) {
@@ -105,26 +105,24 @@ function DatabaseHelper(options) {
     }
 
 
+    // render map
 
-    this.validateDisplay = function(reference_table) {
+    this.displayTableOnMap = function(table, callback) {
+        console.log(table.params())
+        //TODO
+        callback();
+    }
+
+
+    this.validateResult = function(reference_table) {
         if(!this.table) return;
         if(this.table.params().columnNames.length != reference_table.params().columnNames.length) {
             throw new Error('Incorrect results');
         }
-
-        var res = this.renderTable(this.table, reference_table);
-        if(res !== true) {
-            throw new Error(res);
+        if(this.table.params().records.length != reference_table.params().records.length) {
+            throw new Error('Some results are missing or extra records added');
         }
-    }
-
-
-
-    // render map
-
-    this.displayTableOnMap = function(table, callback) {
-        //TODO
-        callback();
+        this.renderTable(this.table, reference_table);
     }
 
 }
