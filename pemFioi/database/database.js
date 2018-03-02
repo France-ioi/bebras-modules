@@ -89,9 +89,6 @@ function DatabaseHelper(options) {
 
         html += '</table></div>';
         options.parent.html(html);
-        if(reference_rows && reference_rows.length != rows.length) {
-            throw new Error('Some results are missing or extra records added');
-        }
         if(!valid_all) {
             throw new Error('Incorrect results');
         }
@@ -119,8 +116,8 @@ function DatabaseHelper(options) {
         if(this.table.params().columnNames.length != reference_table.params().columnNames.length) {
             throw new Error('Incorrect results');
         }
-        if(this.table.params().records.length != reference_table.params().records.length) {
-            throw new Error('Some results are missing or extra records added');
+        if(this.table.params().records.length < reference_table.params().records.length) {
+            throw new Error('Some results are missing.');
         }
         this.renderTable(this.table, reference_table);
     }
