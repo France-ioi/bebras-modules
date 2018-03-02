@@ -93,7 +93,7 @@ function LogicController(nbTestCases, maxInstructions) {
       display("Le mot-clé "+forbidden+" est interdit ici !");
       return false;
     }
-    if(pythonCount(code) > maxInstructions) {
+    if(maxInstructions && pythonCount(code) > maxInstructions) {
       display("Vous utilisez trop d'éléments Python !");
       return false;
     }
