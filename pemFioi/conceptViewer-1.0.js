@@ -205,7 +205,7 @@ function conceptsFill(baseConcepts, allConcepts) {
   for(var c=0; c<allConcepts.length; c++) {
     var fullConcept = allConcepts[c];
     if(baseConceptsById[fullConcept.id]) {
-      var curConcept = baseConceptsById[fullConcept.id]; 
+      var curConcept = baseConceptsById[fullConcept.id];
       if(!curConcept.name) {
         curConcept.name = fullConcept.name;
       }
@@ -224,37 +224,55 @@ function conceptsFill(baseConcepts, allConcepts) {
   return concepts;
 }
 
-function getConceptsFromBlocks(includeBlocks, allConcepts) {
-  if(!includeBlocks.standardBlocks) { return []; }
+function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
+  if(!includeBlocks) { return []; }
 
-  var allConceptsById = {};
-  for(var c = 0; c<allConcepts.length; c++) {
-    allConceptsById[allConcepts[c].id] = allConcepts[c];
-  }
-
-  var concepts = ['language'];
-  if(includeBlocks.standardBlocks.includeAll) {
+  if(includeBlocks.standardBlocks) {
+    var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
-      if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
-        concepts.push(allConcepts[c]);
-      }
+      allConceptsById[allConcepts[c].id] = allConcepts[c];
     }
-  } else if(includeBlocks.standardBlocks.singleBlocks) {
-    for(var b = 0; b<includeBlocks.standardBlocks.singleBlocks.length; b++) {
-      var blockName = includeBlocks.standardBlocks.singleBlocks[b];
-      if(allConceptsById['blockly_'+blockName]) {
-        concepts.push(allConceptsById['blockly_'+blockName]);
+
+    var concepts = ['language'];
+    if(includeBlocks.standardBlocks.includeAll) {
+      for(var c = 0; c<allConcepts.length; c++) {
+        if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
+          concepts.push(allConcepts[c]);
+        }
+      }
+    } else if(includeBlocks.standardBlocks.singleBlocks) {
+      for(var b = 0; b<includeBlocks.standardBlocks.singleBlocks.length; b++) {
+        var blockName = includeBlocks.standardBlocks.singleBlocks[b];
+        if(allConceptsById['blockly_'+blockName]) {
+          concepts.push(allConceptsById['blockly_'+blockName]);
+        }
       }
     }
   }
 
   if(includeBlocks.generatedBlocks) {
     for(var genName in includeBlocks.generatedBlocks) {
+      var categoriesByBlocks = {};
+      var includedCategories = [];
+      if(context && context.customBlocks && context.customBlocks[genName]) {
+        for(var catName in context.customBlocks[genName]) {
+          var categoryConceptName = genName + '_' + catName;
+          if(!allConceptsById[categoryConceptName]) { continue; }
+          var blockList = context.customBlocks[genName][catName];
+          for(var i=0; i<blockList.length; i++) {
+            categoriesByBlocks[blockList[i].name] = categoryConceptName;
+          }
+        }
+      }
       if(allConceptsById[genName + '_introduction']) {
         concepts.push(allConceptsById[genName + '_introduction']);
       }
       for(var i=0; i<includeBlocks.generatedBlocks[genName].length; i++) {
-        var conceptRef = genName + '_' + includeBlocks.generatedBlocks[genName][i];
+        var blockName = includeBlocks.generatedBlocks[genName][i];
+        if(categoriesByBlocks[blockName] && includedCategories.indexOf(categoriesByBlocks[blockName]) == -1) {
+          concepts.push(allConceptsById[categoriesByBlocks[blockName]]);
+        }
+        var conceptRef = genName + '_' + blockName;
         if(allConceptsById[conceptRef]) {
           concepts.push(allConceptsById[conceptRef]);
         }
@@ -269,7 +287,7 @@ function getConceptsFromTask(allConcepts) {
   if(typeof taskSettings === 'undefined') { return; }
 
   var baseConcepts = ['taskplatform'];
- 
+
   if(taskSettings.conceptViewer.length) {
     baseConcepts = baseConcepts.concat(taskSettings.conceptViewer);
   }
