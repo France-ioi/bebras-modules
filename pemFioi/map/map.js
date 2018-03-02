@@ -307,16 +307,20 @@ function Map(options) {
     // params checking
 
     function validateLng(lng) {
-        console.error(lng, options.map_lng_left, options.map_lng_right)
+        if(isNaN(lng)) {
+            throw new Error('Longitude is not a number')
+        }
         if(lng < options.map_lng_left || lng > options.map_lng_right) {
-            throw new Error('Location longitude is outside of the map')
+            throw new Error('Longitude is outside of the map')
         }
     }
 
     function validateLat(lat) {
-        console.error(lat, options.map_lat_top, options.map_lat_bottom)
+        if(isNaN(lat)) {
+            throw new Error('Latitude is not a number')
+        }
         if(lat > options.map_lat_top || lat < options.map_lat_bottom) {
-            throw new Error('Location latitude is outside of the map')
+            throw new Error('Latitude is outside of the map')
         }
     }
 
@@ -326,14 +330,14 @@ function Map(options) {
 
     this.clearMap = function() {
         renderer.clear();
-    },
+    }
 
 
     this.addLocation = function(longitude, latitude, label) {
         validateLng(longitude);
         validateLat(latitude);
         renderer.pin(longitude, latitude, label);
-    },
+    }
 
 
     this.addRoad = function(longitude1, latitude1, longitude2, latitude2, opacity) {
@@ -342,7 +346,7 @@ function Map(options) {
         validateLng(longitude2);
         validateLat(latitude2);
         renderer.line(longitude1, latitude1, longitude2, latitude2, opacity);
-    },
+    }
 
 
     this.geoDistance = function(longitude1, latitude1, longitude2, latitude2) {
@@ -353,22 +357,22 @@ function Map(options) {
             lng: longitude2,
             lat: latitude2
         }])[0].distance;
-    },
+    }
 
 
     this.getLatitude = function(cityName) {
         return this.findCity(cityName).lat;
-    },
+    }
 
 
     this.getLongitude = function(cityName) {
         return this.findCity(cityName).lng;
-    },
+    }
 
 
     this.getNeighbors = function(cityName) {
         return this.findNeighbors();
-    },
+    }
 
 
     this.shortestPath = function(cityName1, cityName2) {

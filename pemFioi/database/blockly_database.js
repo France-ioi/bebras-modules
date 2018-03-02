@@ -124,14 +124,23 @@ var getContext = function(display, infos) {
             files.show();
         })
 
+
+        //test html render
         /*
-        for testing purpose
         context.database.loadTable('test_table', function(table, callback) {
             context.database.displayTable(table, null, function() {
                 context.expectTable('valid_table')
             });
         })
+
+        //test map render
+        context.database.loadTable('test_table2', function(table, callback) {
+            context.database.displayTableOnMap(table, 'city', 'lat', 'lng', function() {
+                context.expectTable('valid_table2')
+            });
+        })
         */
+
     }
 
 
@@ -146,7 +155,9 @@ var getContext = function(display, infos) {
     context.expectTable = function(name) {
         if(name in task_tables) {
             var table = Table(task_tables[name]);
-            db_helper.validateDisplay(table);
+            db_helper.validateResult(table);
+        } else {
+            console.error('Undefined table: ' + name)
         }
     }
 
@@ -269,7 +280,7 @@ var getContext = function(display, infos) {
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
             db_helper.displayTableOnMap(
-                table.selectColumns(nameColumn, longitudeColumn, latitudeColumn),
+                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
                 function() {
                     context.waitDelay(callback);
                 }
@@ -385,8 +396,8 @@ var getContext = function(display, infos) {
 }
 
 if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('database', getContext);
+    quickAlgoLibraries.register('database', getContext);
 } else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['database', getContext]);
+    if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+    window.quickAlgoLibrariesList.push(['database', getContext]);
 }
