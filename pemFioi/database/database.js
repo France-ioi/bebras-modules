@@ -74,7 +74,7 @@ function DatabaseHelper(options) {
             for(var j=0; j<row.length; j++) {
                 var value = row[j];
                 if(reference_rows) {
-                    valid_value = valid_value && reference_rows[i] && reference_rows[i][j] === value;
+                    valid_value = reference_rows[i] && reference_rows[i][j] === value;
                 }
                 valid_all = valid_all && valid_value;
                 html +=
