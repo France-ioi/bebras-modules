@@ -1,7 +1,7 @@
 var getContext = function(display, infos) {
 
     var language_strings = {
-        fr: {
+        en: {
             categories: {
                 database: 'Database'
             },
@@ -111,7 +111,7 @@ var getContext = function(display, infos) {
         db_helper = new DatabaseHelper(
             Object.assign({
                 parent: $('#grid')
-            }, infos.databaseOptions)
+            }, infos.databaseConfig)
         );
 
 
@@ -125,21 +125,26 @@ var getContext = function(display, infos) {
         })
 
 
-        //test html render
         /*
+        //test html render
         context.database.loadTable('test_table', function(table, callback) {
             context.database.displayTable(table, null, function() {
                 context.expectTable('valid_table')
             });
         })
-
+*/
+/*
         //test map render
-        context.database.loadTable('test_table2', function(table, callback) {
-            context.database.displayTableOnMap(table, 'city', 'lat', 'lng', function() {
-                context.expectTable('valid_table2')
-            });
-        })
-        */
+        setTimeout(function() {
+            context.database.loadTable('test_table2', function(table, callback) {
+                context.database.displayTableOnMap(table, 'city', 'lng', 'lat', function() {
+                    context.expectTable('valid_table2');
+                });
+
+            })
+        }, 500)
+*/
+
 
     }
 
@@ -263,6 +268,7 @@ var getContext = function(display, infos) {
         },
 
         displayRecord: function(record, callback) {
+            console.log(arguments)
             var res = {
                 columnNames: Object.keys(record),
                 records: [
@@ -281,10 +287,8 @@ var getContext = function(display, infos) {
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
             db_helper.displayTableOnMap(
                 table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
-                function() {
-                    context.waitDelay(callback);
-                }
             );
+            callback();
         }
     }
 

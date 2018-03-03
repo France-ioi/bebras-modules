@@ -2,13 +2,71 @@ function DatabaseHelper(options) {
 
     var defaults = {
         date_format: 'YYYY-MM-DD',
+
         csv_delimiter: ';',
+        parent: document.body,
+
+        // html renderer
         render_row_height: '20px',
         render_max_rows: 10,
-        parent: document.body
+
+        // map renderer
+        width: 400,
+        height: 400,
+        background_color: {r: 255, g: 255, b: 255},
+        text_color: {r: 48, g: 81, b: 171},
+        mistake_color: {r: 170, g: 49, b: 51},
+        font_size: 10,
+        pin_file: null,
+        pin_file_mistake: null,
+        pin_scale: 0.385,
+        map_file: null,
+        map_lng_left: 0,
+        map_lng_right: 0,
+        map_lat_top: 0,
+        map_lat_bottom: 0
+
     }
 
     var options = Object.assign(defaults, options || {})
+
+    var renderers = {
+        html: new TableRendererHtml(options),
+        map: new TableRendererMap(options)
+    }
+    var last_renderer = null;
+    var last_table = null;
+
+
+    this.displayTable = function(table) {
+        last_table = table;
+        renderers.map.hide();
+        renderers.html.displayTable(table);
+        last_renderer = 'html';
+    }
+
+
+    this.displayTableOnMap = function(table) {
+        last_table = table;
+        renderers.html.hide();
+        renderers.map.displayTable(table);
+        last_renderer = 'map';
+    }
+
+
+    this.validateResult = function(reference_table) {
+        if(!last_table) return;
+        if(last_table.params().columnNames.length != reference_table.params().columnNames.length) {
+            throw new Error('Incorrect results');
+        }
+        if(last_table.params().records.length < reference_table.params().records.length) {
+            throw new Error('Some results are missing.');
+        }
+        var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
+        if(!valid_all) {
+            throw new Error('Incorrect results');
+        }
+    }
 
 
     this.loadCsv = function(file, types, callback) {
@@ -29,11 +87,21 @@ function DatabaseHelper(options) {
             callback(Table(res));
         }
         reader.readAsText(file);
-    },
+    }
+
+}
 
 
 
-    // render table
+
+function TableRendererHtml(options) {
+
+
+    var container = $('<div class="database">');
+    container.hide();
+    options.parent.append(container);
+
+
     this.formatValue = function(value, type) {
         if(value === null) {
             return 'NULL';
@@ -51,8 +119,8 @@ function DatabaseHelper(options) {
 
 
 
-    this.renderTable = function(table, reference_table) {
-        var html = '<div class="database">';
+    this.displayTable = function(table, reference_table) {
+        var html = '';
 
         var rows = table.params().records;
         if(rows.length > options.render_max_rows) {
@@ -87,42 +155,180 @@ function DatabaseHelper(options) {
             html += '</tr>';
         }
 
-        html += '</table></div>';
-        options.parent.html(html);
-        if(!valid_all) {
-            throw new Error('Incorrect results');
-        }
+        html += '</table>';
+        container.html(html);
+        container.show();
+        return valid_all;
     }
 
 
-
-    this.displayTable = function(table) {
-        this.table = table;
-        this.renderTable(table);
-    }
-
-
-    // render map
-
-    this.displayTableOnMap = function(table, callback) {
-        console.log(table.params())
-        //TODO
-        callback();
-    }
-
-
-    this.validateResult = function(reference_table) {
-        if(!this.table) return;
-        if(this.table.params().columnNames.length != reference_table.params().columnNames.length) {
-            throw new Error('Incorrect results');
-        }
-        if(this.table.params().records.length < reference_table.params().records.length) {
-            throw new Error('Some results are missing.');
-        }
-        this.renderTable(this.table, reference_table);
+    this.hide = function() {
+        container.hide();
     }
 
 }
+
+
+
+if(typeof(Number.prototype.toRad) === "undefined") {
+    Number.prototype.toRad = function() {
+        return this * Math.PI / 180;
+    }
+}
+
+function TableRendererMap(options) {
+
+    var container = $('<div>');
+    container.hide();
+    options.parent.append(container);
+
+
+    function Renderer() {
+
+        function ImageLoader(src, onLoad) {
+            var loaded = false;
+            var img = new Image();
+            img.src = src;
+            img.onload = function() {
+                loaded = true;
+                onLoad && onLoad();
+            }
+            img.onerror = function() {
+                console.error('Error loading image: ' + src);
+            }
+            this.get = function() {
+                return loaded ? img : null;
+            }
+        }
+
+
+        function CoordinatesConverter() {
+            var map_lat_bottomRad = options.map_lat_bottom.toRad()
+            var mapLngDelta = (options.map_lng_right - options.map_lng_left)
+            var worldMapWidth = ((options.width / mapLngDelta) * 360) / (2 * Math.PI)
+            var mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(map_lat_bottomRad)) / (1 - Math.sin(map_lat_bottomRad))))
+
+            this.x = function(lng) {
+                return (lng - options.map_lng_left) * (options.width / mapLngDelta);
+            }
+
+            this.y = function(lat) {
+                var latitudeRad = lat.toRad()
+                return options.height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - mapOffsetY)
+            }
+        }
+
+
+        function rgba(colors, opacity) {
+            return 'rgba(' + colors.r + ',' + colors.g + ',' + colors.b + ',' + opacity + ')';
+        }
+
+
+        this.clear = function() {
+            var img = images.map.get();
+            if(img) {
+                context.drawImage(img, 0, 0, options.width, options.height)
+            } else {
+                context.fillStyle = rgba(options.background_color, 1);
+                context.fillRect(0, 0, options.width, options.height)
+            }
+        }
+
+
+        this.pin = function(lng, lat, label, valid) {
+            var x = coordinates.x(lng);
+            var y = coordinates.y(lat);
+
+            var img = valid ? images.pin.get() : images.pin_mistake.get();
+            var w = options.pin_scale * img.width;
+            var h = options.pin_scale * img.height;
+            if(img) {
+                context.drawImage(img, x - w * 0.5, y - h, w, h);
+            }
+
+            var tw = context.measureText(label).width + 2;
+            context.fillStyle = rgba(options.background_color, 1);
+            context.fillRect(
+                x - 0.5 * tw,
+                y,
+                tw,
+                options.font_size + 2
+            );
+            context.fillStyle = rgba(valid ? options.text_color : options.mistake_color, 1);
+            context.fillText(label, x, y + 10)
+
+        }
+
+        // init
+        var images = {
+            map: new ImageLoader(options.map_file, this.clear.bind(this)),
+            pin: new ImageLoader(options.pin_file),
+            pin_mistake: new ImageLoader(options.pin_file_mistake)
+        }
+        var coordinates = new CoordinatesConverter();
+
+        var canvas = document.createElement('canvas');
+        canvas.width = options.width;
+        canvas.height = options.height;
+
+        container.append($(canvas))
+        var context = canvas.getContext('2d');
+
+        context.textAlign = 'center';
+        context.font = options.font_size + 'px sans-serif';
+    }
+
+
+    function validateLng(lng) {
+        if(isNaN(lng)) {
+            throw new Error('Longitude is not a number')
+        }
+        if(lng < options.map_lng_left || lng > options.map_lng_right) {
+            throw new Error('Longitude is outside of the map')
+        }
+    }
+
+    function validateLat(lat) {
+        if(isNaN(lat)) {
+            throw new Error('Latitude is not a number')
+        }
+        if(lat > options.map_lat_top || lat < options.map_lat_bottom) {
+            throw new Error('Latitude is outside of the map')
+        }
+    }
+
+
+    // interface
+    this.displayTable = function(table, reference_table) {
+        renderer.clear();
+        var rows = table.params().records;
+
+        var valid_value = true;
+        var valid_all = true;
+
+        var reference_rows = reference_table ? reference_table.params().records : null;
+        for(var i=0, row; row=rows[i]; i++) {
+            if(reference_rows) {
+                valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+            }
+            valid_all = valid_all && valid_value;
+            validateLng(row[1]);
+            validateLat(row[2]);
+            renderer.pin(row[1], row[2], row[0], valid_value);
+        }
+        container.show();
+        return valid_all;
+    }
+
+
+    this.hide = function() {
+        container.hide();
+    }
+
+    // init
+    var renderer = new Renderer();
+}
+
 
 
 
