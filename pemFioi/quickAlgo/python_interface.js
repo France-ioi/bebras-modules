@@ -290,14 +290,12 @@ function LogicController(nbTestCases, maxInstructions) {
 
       var code = that._aceEditor.getValue();
 
+      // Handle capacity display
       var forbidden = pythonForbidden(code, that.includeBlocks);
       if(forbidden) {
         $('#capacity').html("Mot-clé interdit utilisé : "+forbidden);
         quickAlgoInterface.blinkRemaining(5, true);
-        return;
-      }
-
-      if(maxInstructions) {
+      } else if(maxInstructions) {
         var remaining = maxInstructions - pythonCount(code);
         var optLimitElements = {
           maxBlocks: maxInstructions,
@@ -312,6 +310,8 @@ function LogicController(nbTestCases, maxInstructions) {
         } else {
            quickAlgoInterface.blinkRemaining(0);
         }
+      } else {
+        $('#capacity').html('');
       }
 
       // Interrupt any ongoing execution
