@@ -11,6 +11,7 @@ var getContext = function(display, infos) {
                 getRecords: 'getRecords(%1)',
                 selectByColumn: 'selectByColumn(%1, %2, %3)',
                 selectByFunction: 'selectByFunction(%1, %2)',
+                selectTopRows: 'selectTopRows(%1, %2)',
                 getColumn: 'getColumn(%1, %2)',
                 sortByColumn: 'sortByColumn(%1, %2, %3)',
                 sortByFunction: 'sortByFunction(%1, %2)',
@@ -29,6 +30,7 @@ var getContext = function(display, infos) {
                 getRecords: 'getRecords',
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
                 getColumnL: 'getColumn',
                 sortByColumn: 'sortByColumn',
                 sortByFunction: 'sortByFunction',
@@ -47,6 +49,7 @@ var getContext = function(display, infos) {
                 getRecords: 'getRecords',
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
                 getColumnL: 'getColumn',
                 sortByColumn: 'sortByColumn',
                 sortByFunction: 'sortByFunction',
@@ -205,6 +208,12 @@ var getContext = function(display, infos) {
             );
         },
 
+        selectTopRows: function(table, amount, callback) {
+            callback(
+                table.selectTopRows(amount)
+            );
+        },
+
         getColumn: function(record, columnName, callback) {
             if(columnName in record) {
                 callback(record[columnName]);
@@ -320,6 +329,11 @@ var getContext = function(display, infos) {
                 { name: 'selectByFunction',
                     params: ['Block', 'String'],
                     params_names: ['table', 'filterFunction'],
+                    yieldsValue: true
+                },
+                { name: 'selectTopRows',
+                    params: ['Block', 'Number'],
+                    params_names: ['table', 'amount'],
                     yieldsValue: true
                 },
                 { name: 'getColumn',
