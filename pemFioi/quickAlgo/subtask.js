@@ -79,7 +79,7 @@ var initBlocklySubTask = function(subTask, language) {
             var allConcepts = testConcepts;
          }
 
-         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts);
+         var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts, this.context);
          if(subTask.levelGridInfos.conceptViewer.length) {
             concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
          }
