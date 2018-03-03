@@ -278,6 +278,16 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.getGrade = function(callback, display) {
+      if(subTask.context.infos && subTask.context.infos.hideValidate) {
+         // There's no validation
+         callback({
+            message: '',
+            successRate: 1,
+            iTestCase: 0 
+            });
+         return;
+      }     
+
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
       code = subTask.blocklyHelper.getFullCode(code);
