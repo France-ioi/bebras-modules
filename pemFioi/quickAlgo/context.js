@@ -204,7 +204,7 @@ var quickAlgoLibraries = {
 
       // Propagate properties to the subcontexts
       context.propagate = function(subContext) {
-        var properties = ['raphaelFactory', 'delayFactory', 'blocklyHelper', 'runner'];
+        var properties = ['raphaelFactory', 'delayFactory', 'blocklyHelper', 'display', 'runner'];
         for(var i=0; i < properties.length; i++) {
           subContext[properties[i]] = context[properties[i]];
         }
