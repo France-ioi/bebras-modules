@@ -236,8 +236,9 @@ var getContext = function(display, infos) {
    context.customBlocks = {
       printer: {
          print: [
-            { name: "print", params: [null]},
-            { name: "print_end", params: [null, null], blocklyJson: {inputsInline: true}}
+            // TODO : variants is not properly supported yet, once supported properly, print and print_end should be merged
+            { name: "print", params: [null], variants: [[null], [null, null]]},
+            { name: "print_end", params: [null, null], variants: [[null], [null, null]], blocklyJson: {inputsInline: true}}
          ],
          read:  [
             { name: "read", yieldsValue: true },
