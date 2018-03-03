@@ -247,6 +247,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                } else {
                   quickAlgoInterface.blinkRemaining(0); // reset
                }
+            } else if (!maxBlocks) {
+               $('#capacity').html('');
             }
 
             if(!this.resetDisplay) {
