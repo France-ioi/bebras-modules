@@ -1,3 +1,8 @@
+var conceptViewerUrlFunction = function(url) {
+  if(!window.modulesPath) { return url; }
+  return url.replace(/.....?:\/\/static4.castor-informatique.fr\/help\//, modulesPath + '../../LanguagesHelp/');
+};
+
 var conceptViewer = {
   concepts: {},
   loaded: false,
@@ -75,10 +80,10 @@ var conceptViewer = {
       return;
     } else if (defaultUrl) {
       // else show the default concept
-      $('#conceptViewer .viewerContent').attr('src', defaultUrl);
+      this.loadUrl(defaultUrl);
     } else {
       // else show nothing
-      $('#conceptViewer .viewerContent').attr('src', '');
+      this.loadUrl('');
       this.shownConcept = null;
     }
   },
@@ -104,7 +109,7 @@ var conceptViewer = {
     // Hide the conceptViewer
     this.load();
     $('#conceptViewer').fadeOut(500);
-    $('#conceptViewer .viewerContent').attr('src', '');
+    this.loadUrl('');
   },
 
   showConcept: function (concept, show) {
@@ -137,13 +142,21 @@ var conceptViewer = {
       }
       conceptUrl = urlSplit.join('#');
 
-      $('#conceptViewer .viewerContent').attr('src', conceptUrl);
+      this.loadUrl(conceptUrl);
       $('#conceptViewer .navigationContent ul a').removeClass('highlight');
       $('#conceptViewer .navigationContent ul a[data-id='+conceptId+']').addClass('highlight');
       return true;
     } else {
       return false;
     }
+  },
+
+  loadUrl: function (url) {
+    // Load an URL into the iframe
+    if(window.conceptViewerUrlFunction) {
+      url = window.conceptViewerUrlFunction(url);
+    }
+    $('#conceptViewer .viewerContent').attr('src', url);
   },
 
   hasConcept: function (conceptName) {
