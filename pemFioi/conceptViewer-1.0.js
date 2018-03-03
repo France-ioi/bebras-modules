@@ -1,8 +1,3 @@
-var conceptViewerUrlFunction = function(url) {
-  if(!window.modulesPath) { return url; }
-  return url.replace(/.....?:\/\/static4.castor-informatique.fr\/help\//, modulesPath + '../../LanguagesHelp/');
-};
-
 var conceptViewer = {
   concepts: {},
   loaded: false,
