@@ -112,7 +112,7 @@ var getContext = function(display, infos) {
         {id: 'javascool_addString', name: 'Ajouter une étiquette', url: conceptBaseUrl+'#javascool_addString'},
         {id: 'javascool_addLine', name: 'Ajouter une ligne', url: conceptBaseUrl+'#javascool_addLine'},
         {id: 'javascool_addCircle', name: 'Ajouter un cercle', url: conceptBaseUrl+'#javascool_addCircle'},
-        {id: 'javascool_getX', name: 'Réticule', url: conceptBaseUrl+'#javascool_get'},
+        {id: 'javascool_get', name: 'Clics', url: conceptBaseUrl+'#javascool_get'},
         {id: 'javascool_notes', name: 'Exemples algoDeMaths', url: conceptBaseUrl+'#javascool_notes'}
         ];
 
