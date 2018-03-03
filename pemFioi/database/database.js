@@ -557,6 +557,13 @@ function Table(params) {
         },
 
 
+        selectTopRows: function(amount) {
+            var res = cloneParams();
+            res.records = params.records.slice(0, amount);
+            return Table(res);
+        },
+
+
         updateWhere: function(filterFunction, updateFunction) {
             var res = cloneParams();
             res.records = params.records.map(function(row) {
@@ -615,5 +622,4 @@ function Table(params) {
         }
 
     }
-
 }
