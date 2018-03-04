@@ -211,8 +211,8 @@ var initBlocklySubTask = function(subTask, language) {
 //      this.context.runner.stop();
    };
 
-   subTask.loadExample = function() {
-      subTask.blocklyHelper.loadExample(subTask.levelGridInfos.example);
+   subTask.loadExample = function(exampleObj) {
+      subTask.blocklyHelper.loadExample(exampleObj ? exampleObj : subTask.levelGridInfos.example);
    };
 
    subTask.getDefaultStateObject = function() {
