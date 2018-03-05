@@ -32,6 +32,7 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programme",
          messages: {
+            inputPrompt: "Veuillez écrire une entrée pour le programme.",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
             tooFewChars: "Ligne trop courte : ligne ",
