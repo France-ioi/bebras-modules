@@ -44,7 +44,7 @@ var getContext = function(display, infos) {
                 displayTableOnMap: 'displayTableOnMap'
             },
             description: {
-                loadTable: 'loadTable',
+/*                loadTable: 'loadTable',
                 loadTableFromCsv: 'loadTableFromCsv',
                 getRecords: 'getRecords',
                 selectByColumn: 'selectByColumn',
@@ -60,7 +60,7 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord',
                 unionTables: 'unionTables',
                 displayRecord: 'displayRecord',
-                displayTableOnMap: 'displayTableOnMap'
+                displayTableOnMap: 'displayTableOnMap'*/
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -258,9 +258,7 @@ var getContext = function(display, infos) {
 
         loadTable: function(name, callback) {
             if(!task_tables[name]) throw new Error(strings.messages.tableNotFound + name);
-            callback(
-                Table(task_tables[name])
-            );
+            context.runner.noDelay(callback, Table(task_tables[name]));
         },
 
 
@@ -268,66 +266,48 @@ var getContext = function(display, infos) {
             var file = files.getFile(fileNumber - 1);
             var types_arr = Array.from(types.properties);
             db_helper.loadCsv(file, types_arr, function(table) {
-                context.waitDelay(function() {
-                    callback(table)
-                });
+                context.runner.noDelay(callback, table);
             });
         },
 
         getRecords: function(table, callback) {
-            callback(
-                table.getRecords()
-            );
+            context.runner.noDelay(callback, table.getRecords());
         },
 
         selectByColumn: function(table, columnName, value, callback) {
-            callback(
-                table.selectByColumn(columnName, value)
-            );
+            context.runner.noDelay(callback, table.selectByColumn(columnName, value));
         },
 
         selectByFunction: function(table, filterFunction, callback) {
-            callback(
-                table.selectByFunction(filterFunction)
-            );
+            context.runner.noDelay(callback, table.selectByFunction(filterFunction));
         },
 
         selectTopRows: function(table, amount, callback) {
-            callback(
-                table.selectTopRows(amount)
-            );
+            context.runner.noDelay(callback, table.selectTopRows(amount));
         },
 
         getColumn: function(record, columnName, callback) {
             if(columnName in record) {
-                callback(record[columnName]);
+                context.runner.noDelay(callback, record[columnName]);
             } else {
                 throw new Error('Column ' + columnName + ' not found');
             }
         },
 
         sortByColumn: function(table, columnName, direction, callback) {
-            callback(
-                table.sortByColumn(columnName, direction)
-            );
+            context.runner.noDelay(callback, table.sortByColumn(columnName, direction));
         },
 
         sortByFunction: function(table, compareFunction, callback) {
-            callback(
-                table.sortByFunction(compareFunction)
-            )
+            context.runner.noDelay(callback, table.sortByFunction(compareFunction));
         },
 
         selectColumns: function(table, columns, callback) {
-            callback(
-                table.selectColumns(columns)
-            )
+            context.runner.noDelay(callback, table.selectColumns(columns));
         },
 
         joinTables: function(table1, column1, table2, column2, type, callback) {
-            callback(
-                table1.join(column1, table2, column2, type)
-            )
+            context.runner.noDelay(callback, table1.join(column1, table2, column2, type));
         },
 
         displayTable: function(table, columns, callback) {
@@ -343,37 +323,30 @@ var getContext = function(display, infos) {
         },
 
         updateWhere: function(table, filterFunction, updateFunction, callback) {
-            callback(
-                table.updateWhere(filterFunction, updateFunction)
-            );
+            context.runner.noDelay(callback, table.updateWhere(filterFunction, updateFunction));
         },
 
         insertRecord: function(table, record, callback) {
-            callback(
-                table.insertRecord(record)
-            );
+            context.runner.noDelay(callback, table.insertRecord(record));
         },
 
         unionTables: function(table1, table2, callback) {
-            callback(
-                table1.union(table2)
-            );
+            context.runner.noDelay(callback, table1.union(table2));
         },
 
         displayRecord: function(record, callback) {
-            console.log(arguments)
             var res = {
                 columnNames: Object.keys(record),
                 records: [
                     Object.values(record),
                 ]
             }
-            res.columnTypes = Array.apply(null, Array(length)).map(function() {
+            res.columnTypes = Array.apply(null, Array(res.records[0].length)).map(function() {
                 return 'string';
             })
             var table = Table(res)
             db_helper.displayTable(table);
-            callback();
+            context.runner.noDelay(callback);
         },
 
 
@@ -381,7 +354,7 @@ var getContext = function(display, infos) {
             db_helper.displayTableOnMap(
                 table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
             );
-            callback();
+            context.runner.noDelay(callback);
         }
     }
 
