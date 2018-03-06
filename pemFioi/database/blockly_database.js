@@ -84,6 +84,90 @@ var getContext = function(display, infos) {
                     'incompatible_browser': 'Incompatible browser'
                 }
             }
+        },
+        fr: {
+            categories: {
+                database: 'Base de données'
+            },
+            label: {
+                loadTable: 'loadTable(%1)',
+                loadTableFromCsv: 'loadTableFromCsv(%1, %2)',
+                getRecords: 'getRecords(%1)',
+                selectByColumn: 'selectByColumn(%1, %2, %3)',
+                selectByFunction: 'selectByFunction(%1, %2)',
+                selectTopRows: 'selectTopRows(%1, %2)',
+                getColumn: 'getColumn(%1, %2)',
+                sortByColumn: 'sortByColumn(%1, %2, %3)',
+                sortByFunction: 'sortByFunction(%1, %2)',
+                selectColumns: 'selectColumns(%1, %2)',
+                joinTables: 'joinTables(%1, %2, %3, %4, %5)',
+                displayTable: 'displayTable(%1, %2)',
+                updateWhere: 'updateWhere(%1, %2, %3)',
+                insertRecord: 'insertRecord(%1, %2)',
+                unionTables: 'unionTables(%1, %2)',
+                displayRecord: 'displayRecord(%1)',
+                displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)'
+            },
+            code: {
+                loadTable: 'loadTable',
+                loadTableFromCsv: 'loadTableFromCsv',
+                getRecords: 'getRecords',
+                selectByColumn: 'selectByColumn',
+                selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
+                getColumnL: 'getColumn',
+                sortByColumn: 'sortByColumn',
+                sortByFunction: 'sortByFunction',
+                selectColumns: 'selectColumns',
+                joinTables: 'joinTables',
+                displayTable: 'displayTable',
+                updateWhere: 'updateWhere',
+                insertRecord: 'insertRecord',
+                unionTables: 'unionTables',
+                displayRecord: 'displayRecord',
+                displayTableOnMap: 'displayTableOnMap'
+            },
+            description: {
+                loadTable: 'loadTable',
+                loadTableFromCsv: 'loadTableFromCsv',
+                getRecords: 'getRecords',
+                selectByColumn: 'selectByColumn',
+                selectByFunction: 'selectByFunction',
+                selectTopRows: 'selectTopRows',
+                getColumnL: 'getColumn',
+                sortByColumn: 'sortByColumn',
+                sortByFunction: 'sortByFunction',
+                selectColumns: 'selectColumns',
+                joinTables: 'joinTables',
+                displayTable: 'displayTable',
+                updateWhere: 'updateWhere',
+                insertRecord: 'insertRecord',
+                unionTables: 'unionTables',
+                displayRecord: 'displayRecord',
+                displayTableOnMap: 'displayTableOnMap'
+            },
+            startingBlockName: "Programme",
+            constantLabel: {
+                asc: 'asc',
+                desc: 'desc',
+                inner: 'inner',
+                outer: 'outer',
+                left: 'left',
+                right: 'right'
+            },
+            messages: {
+                tableNotFound: 'Table non trouvée: ',
+                invalidResult: ''
+            },
+            ui: {
+                'btn_files_repository': 'Ajouter des CSV...',
+                'files_repository': {
+                    'caption': 'Liste de fichiers CSV',
+                    'hint': 'Utiliser le numéro de fichier comme paramètre de la fonction loadTableFromCsv. Seuls les fichiers CSV utilisant ; comme délimiteur de champs sont acceptés.',
+                    'add': 'Ajouter',
+                    'incompatible_browser': 'Navigateur incompatible avec cette fonctionnalité'
+                }
+            }
         }
     }
 
