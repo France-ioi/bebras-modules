@@ -227,6 +227,12 @@ function PythonInterpreter(context, msgCallback) {
       result = new Sk.builtin.str(data);
     } else if (type === 'boolean') {
       result = new Sk.builtin.bool(data);
+    } else if (typeof data.length != 'undefined') {
+      var skl = [];
+      for(var i = 0; i < data.length; i++) {
+        skl.push(this._createPrimitive(data[i]));
+      }
+      result = new Sk.builtin.list(skl);
     }
     return result;
   };
