@@ -49,7 +49,11 @@ var getContext = function(display, infos, curLevel) {
                writeNumber: "écrire le nombre",
                readNumber: "nombre sur la case",
                pushObject: "pousser l'objet",
-               pushableInFront: "poussable devant"
+               pushableInFront: "poussable devant",
+               shoot: "tirer au laser dans la direction %1",
+               shoot_noShadow: "tirer au laser dans la direction %1",
+               shootCondition: "retour départ tir direction %1",
+               shootCondition_noShadow: "retour départ tir direction %1"
             },
             code: {
                row: "ligneRobot",
@@ -85,7 +89,11 @@ var getContext = function(display, infos, curLevel) {
                writeNumber: "ecrireNombre",
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
-               pushableInFront: "poussableDevant"
+               pushableInFront: "poussableDevant",
+               shoot: "tirerLaser",
+               shoot_noShadow: "tirerLaser",
+               shootCondition: "tirerCondition",
+               shootCondition_noShadow: "tirerCondition"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -113,7 +121,10 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser de plateforme ici",
-               failureNotEnoughPlatform: "Pas assez de plateformes"
+               failureNotEnoughPlatform: "Pas assez de plateformes",
+               failureLights: "Il reste des spots à allumer.",
+               successLights: "Bravo, votre robot a allumé tous les spots !",
+               failureLaser: "Le robot doit se trouver sur une borne laser pour pouvoir tirer !"
             },
             startingBlockName: "Programme du robot"
          }
@@ -577,6 +588,7 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -14, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
+            gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -784,9 +796,24 @@ var getContext = function(display, infos, curLevel) {
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isGreen: true, isExit: true},
             number: { num: 4, side: 60, zOrder: 1 },
-            board: {num: 5, side: 60, isWritable: true, zOrder: 1 }
+            board: {num: 5, side: 60, isWritable: true, zOrder: 1 },
+            object: {num: 6, img: "object.png", side : 40, isWithdrawable: true, autoWithdraw: true, offsetX: 10, offsetY: -10, zOrder: 1}
          },
          checkEndCondition: robotEndConditions.checkReachExit
+      },
+      laser: {
+         backgroundColor: "#33237a",
+         itemTypes: {
+            green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2, isOpaque: true },
+            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, isOpaque: true },
+            light: { num: 3, img: "off_spot.png", states: ["off_spot.png", "on_spot.png"], isLight: true, isObstacle: true, state: 0, side: 60 },
+            launcher: { num: 5, img: "launcher.png", isLaser: true, side: 60 },
+            mirrorN: { num: 6, img: "mirrorN.png", isMirror: true, mirrorFunction: function(dir) { return (14 - dir) % 8; }, side: 60 },
+            mirrorZ: { num: 7, img: "mirrorZ.png", isMirror: true, mirrorFunction: function(dir) { return (10 - dir) % 8; }, side: 60 },
+            mirrorH: { num: 8, img: "mirrorH.png", isMirror: true, mirrorFunction: function(dir) { return (12 - dir) % 8; }, side: 60 },
+            mirrorI: { num: 9, img: "mirrorI.png", isMirror: true, mirrorFunction: function(dir) { return (8 - dir) % 8; }, side: 60 },
+         },
+         checkEndCondition: robotEndConditions.checkLights
       },
       marbles: {
          bagSize: 1,
@@ -1292,6 +1319,153 @@ var getContext = function(display, infos, curLevel) {
       }
    });
    
+   infos.newBlocks.push({
+      name: "shoot_noShadow",
+      type: "actions",
+      block: { 
+         name: "shoot_noShadow", 
+         params: [null]
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shoot",
+      type: "actions",
+      block: { name: "shoot", blocklyXml: "<block type='shoot_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shootCondition_noShadow",
+      type: "actions",
+      block: { 
+         name: "shootCondition_noShadow", 
+         params: [null],
+         yieldsValue: true
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+            this.waitDelay(callback, retour);
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+            this.callCallback(callback);
+         }
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shootCondition",
+      type: "actions",
+      block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+            this.waitDelay(callback, retour);
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+            this.callCallback(callback);
+         }
+      }
+   });
+   
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -1574,8 +1748,8 @@ var getContext = function(display, infos, curLevel) {
       var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
       var y = (infos.cellSide * item.row + infos.topMargin) * scale;
       var itemType = infos.itemTypes[item.type];
-      if(itemType.img) {
-         item.element = paper.image(imgPrefix + itemType.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      if(item.img) {
+         item.element = paper.image(imgPrefix + item.img, x, y, item.side * item.nbStates * scale, item.side * scale);
       }
       else if(item.value !== undefined) {
          item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
@@ -2099,6 +2273,74 @@ var getContext = function(display, infos, curLevel) {
       
       context.forward(callback);
    };
+   
+   context.shoot = function(lig, col, dir) {
+      dir = dir % 8;
+      var dirs = [
+         [-1, 0],
+         [-1, 1],
+         [0, 1],
+         [1, 1],
+         [1, 0],
+         [1, -1],
+         [0, -1],
+         [-1, -1]
+      ];
+      
+      var lights = context.getItemsOn(lig, col, function(obj) {
+         return obj.isLight === true;
+      });
+      
+      for(var light in lights) {
+         lights[light].state = 1;
+         lights[light].img = lights[light].states[lights[light].state];
+         if(context.display)
+            redisplayItem(lights[light]);
+      }
+      
+      var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
+      var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
+      
+      var taille = infos.cellSide;
+      
+      var findRobot = false;
+      
+      var plig = lig + dirs[dir][0];
+      var pcol = col + dirs[dir][1];
+      if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
+         taille /= 2;
+         
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+      }
+      else {
+         var pdir = dir;
+         var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
+         if(mirrors.length != 0) {
+            pdir = mirrors[0].mirrorFunction(dir);
+         }
+         
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+         
+         if(context.shoot(plig, pcol, pdir)) {
+            findRobot = true;
+         }
+      }
+      
+      var dx = (taille * dirs[dir][1]) * scale;
+      var dy = (taille * dirs[dir][0]) * scale;
+      
+      if(context.display && paper != undefined) {
+         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+         
+         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
+         
+         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+            segment.remove();
+         }, infos.actionDelay * 2);
+      }
+      
+      return findRobot;
+   };
       
    return context;
 };
@@ -2189,6 +2431,7 @@ var robotEndConditions = {
             for(var col = 0;col < context.nbCols;col++) {
                if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
                   solved = false;
+                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
                }
             }
          }
@@ -2201,6 +2444,25 @@ var robotEndConditions = {
       if(lastTurn) {
          context.success = false;
          throw(window.languageStrings.messages.failureReachExit);
+      }
+   },
+   checkLights: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
+               solved = false;
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successLights);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureLights);
       }
    }
 };
