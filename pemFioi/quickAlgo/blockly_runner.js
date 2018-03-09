@@ -38,7 +38,7 @@ function initBlocklyRunner(context, messageCallback) {
          var itp = interpreters[0];
          if(itp.isa(value, itp.ARRAY)) {
             var strs = [];
-            for(var i = 0; i < value.length; i++) {
+            for(var i = 0; i < value.properties.length; i++) {
                strs[i] = runner.valueToString(value.properties[i]);
             }
             return '['+strs.join(', ')+']';
@@ -104,7 +104,12 @@ function initBlocklyRunner(context, messageCallback) {
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value != undefined) {
-            primitive = interpreters[context.curRobot].createPrimitive(value);
+            if(typeof value.length != 'undefined') {
+               // It's an array, create a primitive out of it
+               primitive = interpreters[context.curRobot].nativeToPseudo(value);
+            } else {
+               primitive = value;
+            }
          }
          if (runner.stackCount > 100) {
             runner.stackCount = 0;
@@ -122,6 +127,23 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.initInterpreter = function(interpreter, scope) {
+         // Wrapper for async functions
+         var createAsync = function(func) {
+            return function() {
+               var args = [];
+               for(var i=0; i < arguments.length-1; i++) {
+                  // TODO :: Maybe JS-Interpreter has a better way of knowing?
+                  if(arguments[i].isObject) {
+                     args.push(interpreter.pseudoToNative(arguments[i]));
+                  } else {
+                     args.push(arguments[i]);
+                  }
+               }
+               args.push(arguments[arguments.length-1]);
+               func.apply(func, args);
+               };
+         };
+
          var makeHandler = function(runner, handler) {
             // For commands belonging to the "actions" category, we count the
             // number of actions to put a limit on steps without actions
@@ -147,7 +169,7 @@ function initBlocklyRunner(context, messageCallback) {
                      var handler = blockInfo.handler;
                   }
 
-                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(handler));
+                  interpreter.setProperty(scope, code, interpreter.createAsyncFunction(createAsync(handler)));
                }
             }
          }
@@ -159,7 +181,7 @@ function initBlocklyRunner(context, messageCallback) {
                interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
             }
          }*/
-         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(context.program_end));
+         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(createAsync(context.program_end)));
 
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
@@ -189,7 +211,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
 
          // Add an API function for highlighting blocks.
-         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(highlightBlock));
+         interpreter.setProperty(scope, 'highlightBlock', interpreter.createAsyncFunction(createAsync(highlightBlock)));
 
          // Add an API function to report a value.
          interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
