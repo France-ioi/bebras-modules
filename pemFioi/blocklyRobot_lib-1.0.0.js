@@ -40,6 +40,7 @@ var getContext = function(display, infos, curLevel) {
                gridEdgeNorth: "bord de la grille en haut",
                gridEdgeSouth: "bord de la grille en bas",
                platformInFront: "plateforme devant",
+               platformAbove: "plateforme au-dessus",
                withdrawObject: "ramasser l'objet",
                dropObject: "déposer l'objet",
                onObject: "sur un objet",
@@ -80,6 +81,7 @@ var getContext = function(display, infos, curLevel) {
                gridEdgeNorth: "bordGrilleHaut",
                gridEdgeSouth: "bordGrilleBas",
                platformInFront: "plateformeDevant",
+               platformAbove: "plateformeDessus",
                withdrawObject: "ramasserObjet",
                dropObject: "deposerObjet",
                onObject: "surObjet",
@@ -100,7 +102,7 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Le robot essaie de se déplacer sur un obstacle !",
                nothingToPickUp: "Il n'y a rien à ramasser !",
                nothingToLookAt: "Il n'y a ni carte ni conteneur sur cette case",
-               falls: "Le robot se jette dans le vide",
+               falls: "Le robot va se jeter dans le vide !",
                willFallAndCrash: "Le robot va tomber de haut et s'écraser !",
                jumpOutsideGrid: "Le robot essaie de sauter en dehors de la grille !",
                jumpObstacleBlocking: "Le robot essaie de sauter mais il y a un obstacle qui le bloque",
@@ -112,7 +114,9 @@ var getContext = function(display, infos, curLevel) {
                successPickedAllWithdrawables: "Bravo, votre robot a tout ramassé !",
                failurePickedAllWithdrawables: "Votre robot n'a pas tout ramassé.",
                successContainersFilled: "Bravo, votre robot a rempli tous les conteneurs",
-               failureContainersFilled: "Votre robot n'a pas rempli tous les conteneurs",
+               failureContainersFilled: "Il y a un objet hors des conteneurs",
+               failureContainersFilledLess: "Votre robot n'a pas rempli tous les conteneurs",
+               failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
                failureUnfilteredObject: "Votre robot a ramassé un objet invalide",
                failureWriteHere: "Votre robot ne peut pas écrire ici !",
                failureReadHere: "Il n'y a pas de nombre écrit ici !",
@@ -120,7 +124,8 @@ var getContext = function(display, infos, curLevel) {
                failureNumbersWritten: "Votre robot n'a pas écrit les bons nombres !",
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
-               failureDropObject: "On ne peut pas poser de plateforme ici",
+               failureDropObject: "On ne peut pas poser d'objet ici",
+               failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
                successLights: "Bravo, votre robot a allumé tous les spots !",
@@ -148,7 +153,9 @@ var getContext = function(display, infos, curLevel) {
             },
              messages: {
                successContainersFilled: "Bravo, votre robot a rangé les cartes au bon endroit !",
-               failureContainersFilled: "Il y a encore des cartes mal rangées."
+               failureContainersFilled: "Il y a des cartes mal rangées",
+               failureContainersFilledLess: "Il y a encore des cartes à ranger.",
+               failureContainersFilledBag: "Votre robot doit déposer sa carte."
             }
          }
       },
@@ -219,15 +226,20 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser la roue dentée",
-               dropObject: "déposer la roue dentée"
+               dropObject: "accrocher la roue dentée",
+               onObject: "sur une roue dentée"
             },
             code: {
                withdrawObject: "ramasserRoue",
-               dropObject: "deposerRoue"
+               dropObject: "deposerRoue",
+               onObject: "surRoueDentee"
             },
             messages: {
                successContainersFilled: "Bravo, la machine est prête à fonctionner !",
-               failureContainersFilled: "Le robot n'a pas replacé toutes les roues dentées au bon endroit."
+               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille."
             }
          }
       },
@@ -249,7 +261,9 @@ var getContext = function(display, infos, curLevel) {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
                successContainersFilled: "Bravo, vous avez rangé les billes !",
-               failureContainersFilled: "Les billes ne sont pas toutes bien rangées !"
+               failureContainersFilled: "Les billes ne sont pas toutes bien rangées.",
+               failureContainersFilledLess: "Il reste une bille à ranger.",
+               failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
             }
          }
       },
@@ -280,7 +294,9 @@ var getContext = function(display, infos, curLevel) {
              },
              messages: {
                successContainersFilled: "Bravo, votre robot a peint le motif !",
-               failureContainersFilled: "Le robot n'a pas peint les bonnes cases."
+               failureContainersFilled: "Votre robot n'a pas peint les bonnes cases.",
+               failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
+               failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
          }  
       },
@@ -701,8 +717,8 @@ var getContext = function(display, infos, curLevel) {
              name: "dropPlatformInFront",
              strings: {
                fr: {
-                 label: "ajouter une plateforme devant",
-                 code: "ajouterPlateformeDevant"
+                 label: "construire une plateforme devant",
+                 code: "construirePlateformeDevant"
                }
              },
              category: "robot",
@@ -713,7 +729,7 @@ var getContext = function(display, infos, curLevel) {
              func: function(callback) {
                if(this.nbPlatforms == 0)
                   throw(window.languageStrings.messages.failureNotEnoughPlatform);
-               coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
+               var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
                if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
                   throw(window.languageStrings.messages.failureDropObject);
                }
@@ -726,8 +742,8 @@ var getContext = function(display, infos, curLevel) {
              name: "dropPlatformAbove",
              strings: {
                fr: {
-                 label: "ajouter une plateforme au-dessus",
-                 code: "ajouterPlateformeAuDessus"
+                 label: "construire une plateforme au-dessus",
+                 code: "construirePlateformeAuDessus"
                }
              },
              category: "robot",
@@ -738,7 +754,7 @@ var getContext = function(display, infos, curLevel) {
              func: function(callback) {
                if(this.nbPlatforms == 0)
                   throw(window.languageStrings.messages.failureNotEnoughPlatform);
-               coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
+               var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
                if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
                   throw(window.languageStrings.messages.failureDropObject);
                }
@@ -748,7 +764,7 @@ var getContext = function(display, infos, curLevel) {
              }
            }
          ],
-         backgroundColor: "#afafb3",
+         backgroundColor: "#cccccc",
          hasGravity: true,
          bagSize: 1,
          containerSize: 1,
@@ -1201,6 +1217,15 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "platformInFront", yieldsValue: true },
       func: function(callback) {
          this.callCallback(callback, this.platformInFront());
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "platformAbove",
+      type: "sensors",
+      block: { name: "platformAbove", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.platformAbove());
       }
    });
    
@@ -2113,7 +2138,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(!context.isInGrid(coords.row, coords.col)) {
-         throw(window.languageStrings.messages.failureDropObject);
+         throw(window.languageStrings.messages.failureDropOutside);
          return;
       }
       
@@ -2169,7 +2194,7 @@ var getContext = function(display, infos, curLevel) {
          context.waitDelay(callback);
       }
       if(infos.hasGravity) {
-         context.fall(item, coords.row, coords.col, callback);
+         context.fall(robot, coords.row, coords.col, callback);
       }
       else {
          context.nbMoves++;
@@ -2224,6 +2249,11 @@ var getContext = function(display, infos, curLevel) {
    context.platformInFront = function() {
       var coords = context.coordsInFront();
       return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
+   };
+   
+   context.platformAbove = function() {
+      var robot = context.getRobot();
+      return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
    };
    
    context.writeNumber = function(row, col, value) {
@@ -2378,6 +2408,13 @@ var robotEndConditions = {
    },
    checkContainersFilled: function(context, lastTurn) {
       var solved = true;
+      
+      var messages = [
+         window.languageStrings.messages.failureContainersFilled,
+         window.languageStrings.messages.failureContainersFilledLess,
+         window.languageStrings.messages.failureContainersFilledBag
+      ];
+      var message = 2;
       for(var row = 0;row < context.nbRows;row++) {
          for(var col = 0;col < context.nbCols;col++) {
             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
@@ -2394,14 +2431,17 @@ var robotEndConditions = {
                
                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length < container.containerSize) {
                   solved = false;
+                  message = Math.min(message, 1);
                }
                if(container.containerFilter != undefined) {
                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
                      solved = false;
+                     message = Math.min(message, 0);
                   }
                   for(var item in context.bag) {
                      if(filter(context.bag[item])) {
                         solved = false;
+                        message = Math.min(message, 2);
                      }
                   }
                }
@@ -2409,6 +2449,7 @@ var robotEndConditions = {
             else {
                if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
                   solved = false;
+                  message = Math.min(message, 0);
                }
             }
          }
@@ -2420,7 +2461,7 @@ var robotEndConditions = {
       }
       if(lastTurn) {
          context.success = false;
-         throw(window.languageStrings.messages.failureContainersFilled);
+         throw(messages[message]);
       }
    },
    checkBothReachAndCollect: function(context, lastTurn) {
