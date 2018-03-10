@@ -30,7 +30,7 @@ function PythonInterpreter(context, msgCallback) {
 
   var that = this;
 
-  this._skulptifyHandler = function (name, generatorName, blockName, type) {
+  this._skulptifyHandler = function (name, generatorName, blockName, nbArgs, type) {
     var handler = '';
     handler += "\tcurrentPythonContext.runner.checkArgs('" + name + "', '" + generatorName + "', '" + blockName + "', arguments);";
 
