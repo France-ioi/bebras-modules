@@ -118,6 +118,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Votre robot n'a pas rempli tous les conteneurs",
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
                failureUnfilteredObject: "Votre robot a ramassé un objet invalide",
+               failureTooManyMoves: "Votre robot a effectué trop de déplacements.",
                failureWriteHere: "Votre robot ne peut pas écrire ici !",
                failureReadHere: "Il n'y a pas de nombre écrit ici !",
                successNumbersWritten: "Bravo, votre robot a écrit les bons nombres !",
@@ -2448,6 +2449,12 @@ var robotEndConditions = {
          window.languageStrings.messages.failureContainersFilledBag
       ];
       var message = 2;
+      if (context.infos.maxMoves != undefined) {
+         if (context.nbMoves > context.infos.maxMoves) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
+         }
+      }
       for(var row = 0;row < context.nbRows;row++) {
          for(var col = 0;col < context.nbCols;col++) {
             var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
