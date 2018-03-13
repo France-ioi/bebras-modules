@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="database.js"></script>
+    </head>
+    <body>
+        <style>
+            table, th, td {
+                border: 1px solid #999999;
+                border-collapse: collapse;
+                padding: 2px;
+            }
+        </style>
+
+        <script type="text/javascript">
+
+            function tableToHTML(table) {
+                var params = table.params();
+                var html =
+                    '<table>' +
+                    '<tr><th>' + params.columnNames.join('</th><th>') + '</th></tr>';
+
+                for(var i=0, row; row = params.records[i]; i++) {
+                    html += '<tr><td>' + row.join('</td><td>') + '</td></tr>';
+                }
+                html += '</table>';
+                return html;
+            }
+
+
+            function print(label, table) {
+                var el = document.createElement('h2');
+                el.innerHTML = label;
+                document.body.appendChild(el);
+                var el = document.createElement('div');
+                el.innerHTML = tableToHTML(table);
+                document.body.appendChild(el);
+            }
+
+
+            function createTestTable(columns, types, records) {
+                var params = {
+                    columnNames: columns,
+                    columnTypes: types,
+                    records: records
+                }
+                return Table(params);
+            }
+
+
+            var table = createTestTable(
+                ['id', 'name', 'date'],
+                ['number', 'string', 'date'],
+                [
+                    [ 1, 'eeee', '2018-01-01' ],
+                    [ 2, 'bbbb', '2019-01-01' ],
+                    [ 3, 'cccc', '2020-01-01' ],
+                    [ 4, 'bbbb', '2021-01-01' ],
+                ]
+            );
+
+            print(
+                "table.selectByColumn: name=='bbbb'",
+                table.selectByColumn('name', 'bbbb')
+            )
+
+            print(
+                "table.selectByFunction: id > 2",
+                table.selectByFunction(function(record) {
+                    return record.id > 2;
+                })
+            )
+
+            print(
+                "table.updateWhere set name=updated where id > 2",
+                table.updateWhere(
+                    function(record) {
+                        return record.id > 2;
+                    },
+                    function(record) {
+                        return Object.assign({}, record, {
+                            name: 'updated'
+                        })
+                    }
+                )
+            )
+
+            print(
+                "table.insertRecord dddd",
+                table.insertRecord({
+                    id: 5,
+                    name: 'dddd',
+                    date: '2022-01-01'
+                })
+            )
+
+            print(
+                "table.sortByColumn('id', 'desk')",
+                table.sortByColumn('id', 'desk')
+            )
+
+            print(
+                "table.sortByColumn('name', 'ask')",
+                table.sortByColumn('name', 'ask')
+            )
+
+            print(
+                "table.sortByFunction",
+                table.sortByFunction(function(a, b) {
+                    return a.name > b.name ? 1 : -1;
+                })
+            )
+
+
+            var table2 = createTestTable(
+                ['id', 'name', 'date'],
+                ['number', 'string', 'date'],
+                [
+                    [ 1, 'aaaa2', '2018-01-01' ],
+                    [ 2, 'bbbb2', '2019-01-01' ],
+                    [ 10, 'cccc2', '2019-01-01' ],
+                ]
+            );
+            print(
+                "table.union",
+                table.union(table2)
+            );
+
+
+            var table2 = createTestTable(
+                ['id', 'name', 'description'],
+                ['number', 'string', 'string'],
+                [
+                    [ 1, 'aaaa2', 'description 1' ],
+                    [ null, 'bbbb2', 'description 2' ],
+                    [ 10, 'cccc2', 'description 10' ],
+                ]
+            );
+
+            print(
+                "table.leftJoin table2 on id",
+                table.join('id', table2, 'id', 'left')
+            );
+
+            print(
+                "table.rightJoin table2 on id",
+                table.join('id', table2, 'id', 'right')
+            );
+
+            print(
+                "table.innerJoin table2 on id",
+                table.join('id', table2, 'id', 'inner')
+            );
+
+            print(
+                "table.outerJoin table2 on id",
+                table.join('id', table2, 'id', 'outer')
+            );
+
+        </script>
+    </body>
+</html>

@@ -77,7 +77,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
          if (!sampleResource) {
             sampleResource = {
                type: 'sample',
-               name: sampleName,
+               name: sampleName
             };
             samplesResources[type][sampleName] = sampleResource;
          }
@@ -224,10 +224,27 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
             var fileName = sources[groupName][iSource];
             if (!urlMode) {
                waiting++;
-               $.get("sources/" + groupName + "-" + fileName)
-                  .done(sourceDone(groupName, fileName, type, subtype))
-                  .fail(fetchFail("sources/" + groupName + "-" + fileName))
-                  .always(fetchAlways);
+               var recTry = function(filelist, groupName, fileName, type, subtype) {
+                  if(!filelist.length) {
+                     fetchFail("sources:" + groupName + "-" + fileName)();
+                     fetchAlways();
+                     return;
+                  }
+                  $.get(filelist.shift())
+                     .done(function(answer) {
+                           sourceDone(groupName, fileName, type, subtype)(answer);
+                           fetchAlways();
+                        })
+                     .fail(function() {
+                           recTry(filelist, groupName, fileName, type, subtype);
+                        });
+               };
+               var filelist = [
+                  "sources/" + groupName + "-" + fileName,
+                  groupName + "-" + fileName,
+                  fileName
+                  ];
+               recTry(filelist, groupName, fileName, type, subtype);
             } else {
                resource.answerVersions.push({
                   params: {

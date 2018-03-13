@@ -1,0 +1,39 @@
+
+
+#tabsMenu .li {
+    background: rgba(155, 177, 27, 0.47);
+}
+
+
+#taskIntro {
+    font-weight:normal;
+}
+
+img.beaver {
+    content:url("../img/jwinf-fox.jpg");
+}
+
+* {
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  -ms-user-select: text;
+  user-select: auto;
+}
+
+
+code {
+  border: 1px solid black;
+  white-space: nowrap;
+  padding: 0px 2px;
+  margin: 0px 2px;
+}
+
+
+samp::before { 
+    content: "„";
+}
+
+samp::after { 
+    content: "“";
+}
+

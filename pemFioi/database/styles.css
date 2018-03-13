@@ -1,0 +1,33 @@
+#database_controls {
+    height: 25px;
+}
+
+.database {
+    width: 400px;
+    height: 400px;
+    overflow: auto;
+}
+
+.database table {
+    width: 100%;
+    border: 1px solid #999999;
+    border-collapse: collapse;
+}
+
+.database th,
+.database td {
+    border: 1px solid #999999;
+    border-collapse: collapse;
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 200px;
+}
+
+.database td.invalid {
+    background: #FFAAAA;
+}

@@ -1,0 +1,436 @@
+body.blockly > *,
+body > * {
+	width: auto;
+}
+
+@media screen and (max-width: 1199px) {
+	#task {
+		padding: 0 10px;
+	}
+}
+#taskContent {
+	clear: both;
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+#taskContent::before,
+#taskContent::after {
+	content: " ";
+	display: table;
+}
+#gridContainer,
+#blocklyLibContent,
+#blocklyContainer {
+	box-sizing: border-box;
+}
+.scaleDrawingControl {
+    display: none;
+}
+@media screen and (min-width: 1025px) {
+	#taskIntro {
+		float: none;
+		max-width: 1000px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	#gridContainer {
+        float: left;
+        width: 430px;
+    }
+	#blocklyLibContent {
+		float: right;
+		width: calc(100% - 440px);
+    }
+    .scaleDrawingControl {
+        display: block;
+    }
+    .gridContainerScaled {
+        width: 630px !important;
+    }
+
+    .blocklyLibContentScaled {
+        width: calc(100% - 640px) !important;
+    }
+}
+#blocklyContainer {
+	overflow: hidden;
+	height: 600px;
+	border: 1px solid #8d9daa;
+	width: 100%;
+	position: relative;
+}
+#blocklyDiv {
+	height: 100%;
+	width: 100%;
+}
+
+#testCaseName {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+#messages {
+	padding-top:10px;
+    min-height: 28px;
+}
+
+#errors .testError {
+	color: red;
+}
+
+.blocklyToolboxDiv {
+    background-color: #ddd !important;
+}
+
+/*
+	Run test speed selector
+	Rip-off of bootstrap btn and btn-group rules
+*/
+#selectSpeed {
+	margin-bottom: 20px;
+}
+.btn,
+input[type=button] {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	-ms-touch-action: manipulation;
+	touch-action: manipulation;
+	cursor: pointer;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	background-image: none;
+	border: 1px solid transparent;
+	border-radius: 4px;
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+}
+.btn-group {
+	position: relative;
+	display: inline-block;
+	vertical-align: middle;
+}
+.btn-group-vertical>.btn,
+.btn-group>.btn {
+	position: relative;
+	float: left;
+}
+.btn-group .btn+.btn,
+.btn-group .btn+.btn-group,
+.btn-group .btn-group+.btn,
+.btn-group .btn-group+.btn-group {
+	margin-left: -1px;
+}
+.btn-group>.btn:first-child {
+	margin-left: 0;
+}
+.btn-group>.btn:first-child:not(:last-child) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.btn-group>.btn:last-child:not(:first-child) {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+.btn-group>.btn:not(:first-child):not(:last-child) {
+	border-radius: 0;
+}
+.btn-group>.btn.active,
+.btn-group>.btn:active,
+.btn-group>.btn:focus,
+.btn-group>.btn:hover {
+	z-index: 2;
+}
+.btn.btn-xs {
+    padding: 1px 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+}
+
+.btn-primary {
+	color: #fff;
+	background-color: #337ab7;
+	border-color: #2e6da4;
+}
+.btn-primary:hover {
+	color: #fff;
+	background-color: #286090;
+	border-color: #204d74;
+}
+.btn-default {
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+}
+.btn-default:hover {
+	color: #333;
+	background-color: #e6e6e6;
+	border-color: #adadad;
+}
+.btn-icon {
+	font-family: 'Courier New', Inconsolata, 'Roboto Mono', 'PT Mono', 'Ubuntu', monospace;
+}
+#blocklyTopToolbar span {
+	float: left;
+	padding-top: 14px;
+}
+#editorButtons {
+	float: right;
+}
+
+.btn.close {
+	border: none;
+	font-weight: bold;
+    font-size: 24px;
+    line-height: 18px;
+	color: #a7a6a6;
+}
+
+/* Modal popup */
+.modalWrapper {
+    display: none;
+    z-index: 1000;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: #777;
+	background-color: rgba(0,0,0,0.7);
+	transition: all 250ms;
+}
+.modalWrapper .modal {
+	width: 800px;
+	margin: 0 auto;
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	padding: 20px;
+	position: relative;
+}
+.modalWrapper .modal>.btn.close {
+	line-height: 1em;
+	position: absolute;
+	top: 0px;
+    right: 0px;
+}
+.blocklyFlyoutBackground {
+    fill-opacity: 1 !important;
+}
+.blocklyDropDownDiv {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    display: none;
+    border: 1px solid;
+    border-radius: 4px;
+    box-shadow: 0px 0px 8px 1px rgba(0, 0, 0, .3);
+    padding: 4px;
+    -webkit-user-select: none;
+}
+.blocklyDropDownContent {
+    max-height: 300px;
+    overflow: auto;
+}
+.blocklyDropDownArrow {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    z-index: -1;
+    background-color: inherit;
+    border-color: inherit;
+}
+.blocklyDropDownButton {
+    display: inline-block;
+    float: left;
+    padding: 0;
+    margin: 4px;
+    border-radius: 4px;
+    outline: none;
+    border: 1px solid;
+    transition: box-shadow .1s;
+    cursor: pointer;
+}
+.blocklyDropDownButtonHover {
+    box-shadow: 0px 0px 0px 4px rgba(0,0,0,0.1);
+}
+.blocklyDropDownButton:active {
+    box-shadow: 0px 0px 0px 6px rgba(0,0,0,0.1);
+}
+.blocklyDropDownButton > img {
+    width: 80%;
+    height: 80%;
+    margin-top: 5%
+}
+.blocklyDropDownPlaceholder {
+    display: inline-block;
+    float: left;
+    padding: 0;
+    margin: 4px;
+}
+.arrowTop {
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-top-left-radius: 4px;
+    border-color: inherit;
+}
+.arrowBottom {
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    border-bottom-right-radius: 4px;
+    border-color: inherit;
+}
+.valueReportBox {
+    min-width: 50px;
+    max-width: 300px;
+    max-height: 200px;
+    overflow: auto;
+    word-wrap: break-word;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: .8em;
+}
+.aceHighlight {
+   position: absolute;
+   background: rgba(100, 100, 200, 0.5);
+   z-index: 20;
+}
+#capacity {
+    display: inline;
+}
+.capacityRed {
+    background-color: #E77471;
+    color: black;
+}
+#testSelector {
+    padding-left: 10px;
+}
+.testResult {
+    position: relative;
+    left: 10px;
+    top: -2px;
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 50px;
+    color: #FFFFFF;
+    width: 250px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.testResult.testSuccess {
+    background-color: green;
+}
+.testResult.testPartial {
+    background-color: orange;
+}
+.testResult.testFailure {
+    background-color: red;
+}
+.testResultIcon {
+    display: inline-block;
+    min-width: 16px;
+}
+.panel {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.panel-body {
+  padding: 5px;
+}
+.panel-heading {
+  padding-top: 3px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 21px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+  text-align: left;
+  min-height: 21px;
+  line-height: 21px;
+}
+.panel-group {
+  margin-bottom: 20px;
+}
+.panel-group .panel {
+  margin-bottom: 0;
+  border-radius: 4px;
+}
+.panel-group .panel + .panel {
+  margin-top: 5px;
+}
+.panel-group .panel-heading {
+  border-bottom: 0;
+}
+.panel-default {
+  border-color: #dddddd;
+}
+.panel-default > .panel-heading {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #dddddd;
+}
+.panel-body:before,
+.panel-body:after {
+  content: " ";
+  display: table;
+}
+.panel-body:after {
+  clear: both;
+}
+#testSelector .panel.currentTest {
+  border-color: #2991d6;
+}
+#testSelector .panel-heading {
+  border: 1px solid #8bc4e9;
+  background-color: #ddedf8;
+  position: relative;
+}
+#testSelector .panel-heading:hover {
+  cursor: pointer;
+  border: 1px solid #000000;
+}
+#testSelector .panel-heading::after {
+  content: "\25bc";
+  position: absolute;
+  right: 10px;
+  top: 3px;
+}
+#testSelector .currentTest .panel-heading {
+  background-color: #a1cfed;
+  border-color: transparent;
+  color: #333;
+}
+#testSelector .currentTest .panel-heading:hover {
+  cursor: default;
+  border-color: transparent;
+}
+#testSelector .currentTest .panel-heading::after {
+  content: normal;
+}

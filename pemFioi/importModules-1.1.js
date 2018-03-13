@@ -6,6 +6,7 @@ var importableModules = function () {
    // Wait to have modulesPath defined before executing the function
    return {
       'jquery-1.7.1': {src: modulesPath+"/ext/jquery/1.7/jquery.min.js", id: "http://code.jquery.com/jquery-1.7.1.min.js"},
+      'jquery-ui.touch-punch': {src: modulesPath+"/ext/jquery-ui/jquery.ui.touch-punch.min.js", id: "jquery.ui.touch-punch.min.js"},
       'JSON-js': {src: modulesPath+"/ext/json/json2.min.js", id: "https://github.com/douglascrockford/JSON-js"},
       'raphael-2.2.1': {src: modulesPath+"/ext/raphael/2.2.1/raphael.min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1/raphael.min.js"},
       'beaver-task-2.0': {src: modulesPath+"/pemFioi/beaver-task-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beaver-task-2.0.js"},
@@ -13,17 +14,35 @@ var importableModules = function () {
       'raphaelFactory-1.0': {src: modulesPath+"/pemFioi/raphaelFactory-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelFactory-1.0.js"},
       'delayFactory-1.0': {src: modulesPath+"/pemFioi/delayFactory-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/delayFactory-1.0.js"},
       'simulationFactory-1.0': {src: modulesPath+"/pemFioi/simulationFactory-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulationFactory-1.0.js"},
-      'platform-pr': {class: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
-      'buttonsAndMessages': {class: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
       'beav-1.0': {src: modulesPath+"/pemFioi/beav-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beav-1.0.js"},
-      'installationAPI.01': {class: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
-      'miniPlatform': {class: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
+      'raphael-2.1': {src: modulesPath+"/ext/raphael/2.1/raphael-min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"},
+      'simulation-2.0': {src: modulesPath+"/pemFioi/simulation-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simulation-2.0.js"},
+      'raphaelButton-1.0': {src: modulesPath+"/pemFioi/raphaelButton-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/raphaelButton-1.0.js"},
+      'graph-1.0': {src: modulesPath+"/pemFioi/graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-1.0.js"},
+      'visual-graph-1.0': {src: modulesPath+"/pemFioi/visual-graph-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/visual-graph-1.0.js"},
+      'graph-mouse-1.0': {src: modulesPath+"/pemFioi/graph-mouse-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.0.js"},
+      'crane-1.0': {src: modulesPath+"/pemFioi/crane-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/crane-1.0.js"},
+      'grid-1.0': {src: modulesPath+"/pemFioi/grid-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/grid-1.0.js"},
+      'drag_lib-2.0': {src: modulesPath+"/pemFioi/drag_lib-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/drag_lib-2.0.js"},
+      'randomGenerator-1.0': {src: modulesPath+"/pemFioi/randomGenerator-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/randomGenerator-1.0.js"},
+      'simpleKeyboard-1.0': {src: modulesPath+"/pemFioi/simpleKeyboard-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simpleKeyboard-1.0.js"},
+
+      'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
+      'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
+      'installationAPI.01': {classStr: "remove", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/installation.js"},
+      'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
+
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
+      'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
+
+      'conceptDisplay-1.0': {src: modulesPath+"/pemFioi/conceptDisplay-1.0.js", id: "concept_display"},
+      'conceptViewer-1.0': {src: modulesPath+"/pemFioi/conceptViewer-1.0.js", id: "concept_viewer"},
+      'conceptViewer_css-1.0': {type: "stylesheet", src: modulesPath+"/pemFioi/conceptViewer-1.0.css", id: "concept_viewer_css"},
 
       'blockly': {src: modulesPath+"/ext/blockly/blockly_compressed.js", id: "blockly"},
       'blockly_blocks': {src: modulesPath+"/ext/blockly/blocks_compressed.js", id: "blockly_blocks"},
@@ -34,33 +53,59 @@ var importableModules = function () {
       'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
       'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},
       'blockly_fioi': {src: modulesPath+"/ext/blockly-fioi/fioi-blockly.min.js", id: "blockly_fioi"},
-      'blockly_lib': {src: modulesPath+"/pemFioi/blockly_lib-0.9.1.js", id: "blockly_lib"},
-      'blockly_lib_css': {type: "stylesheet", src: modulesPath+"/pemFioi/blockly_lib.css", id: "blockly_lib_css"},
-      
-      'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
+
+      'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"},
+      'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-0.9.1.js", id: "blocklyRobot_lib"}, // for BWINF legacy
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
       'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
+      'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
+      'blockly-template': {src: modulesPath+"/pemFioi/blocklyTemplate_lib.js", id: "blocklyTemplate_lib"},
+      'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
+
+      'blockly-isndraw': {src: modulesPath+"/pemFioi/blocklyIsnDraw_lib.js", id: "blocklyIsnDraw_lib"},
+      'blockly-maths': {src: modulesPath+"/pemFioi/blocklyMaths_lib.js", id: "blocklyMaths_lib"},
+      'blockly-printer-2.0': {src: modulesPath+"/pemFioi/blocklyPrinter_lib-2.0.js", id: "blocklyPrinter_lib-2.0"},
+
+      'quickAlgo_utils': {src: modulesPath+"/pemFioi/quickAlgo/utils.js", id: "quickAlgo_utils"},
+      'quickAlgo_i18n': {src: modulesPath+"/pemFioi/quickAlgo/i18n.js", id: "quickAlgo_i18n"},
+      'quickAlgo_interface': {src: modulesPath+"/pemFioi/quickAlgo/interface.js", id: "quickAlgo_interface"},
+      'quickAlgo_blockly_blocks': {src: modulesPath+"/pemFioi/quickAlgo/blockly_blocks.js", id: "quickAlgo_blockly_blocks"},
+      'quickAlgo_blockly_interface': {src: modulesPath+"/pemFioi/quickAlgo/blockly_interface.js", id: "quickAlgo_blockly_interface"},
+      'quickAlgo_blockly_runner': {src: modulesPath+"/pemFioi/quickAlgo/blockly_runner.js", id: "quickAlgo_blockly_runner"},
+      'quickAlgo_python_interface': {src: modulesPath+"/pemFioi/quickAlgo/python_interface.js", id: "quickAlgo_python_interface"},
+      'quickAlgo_python_runner': {src: modulesPath+"/pemFioi/quickAlgo/python_runner.js", id: "quickAlgo_python_runner"},
+      'quickAlgo_subtask': {src: modulesPath+"/pemFioi/quickAlgo/subtask.js", id: "quickAlgo_subtask"},
+      'quickAlgo_context': {src: modulesPath+"/pemFioi/quickAlgo/context.js", id: "quickAlgo_context"},
+      'quickAlgo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/quickAlgo/quickAlgo.css", id: "quickAlgo_css"},
 
       'scratch': {src: modulesPath+"/ext/scratch/blockly_compressed_vertical.js", id: "scratch"},
       'scratch_blocks_common': {src: modulesPath+"/ext/scratch/blocks_compressed.js", id: "scratch_blocks_common"},
       'scratch_blocks': {src: modulesPath+"/ext/scratch/blocks_compressed_vertical.js", id: "scratch_blocks"},
       'scratch_fixes': {src: modulesPath+"/ext/scratch/fixes.js", id: "scratch_fixes"},
+      'scratch_procedures': {src: modulesPath+"/ext/scratch/procedures.js", id: "scratch_procedures"},
 
       'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
-      'skulpt': {src: modulesPath+"ext/skulpt/skulpt.min.js", id: "skulpt"},
+      'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo.min.js", id: "skulpt_quickAlgo"},
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
-      'python_index': {src: modulesPath+"pemFioi/code-editor/index.js", id: "python_index"},
-      'python_constants': {src: modulesPath+"pemFioi/code-editor/components/constants.js", id: "python_constants"},
-      'python_dom_utils': {src: modulesPath+"pemFioi/code-editor/utilities/DOM-utils.js", id: "python_dom_utils"},
-      'python_localization_utils': {src: modulesPath+"pemFioi/code-editor/utilities/localization-utils.js", id: "python_localization_utils"},
-      'python_shared_utils': {src: modulesPath+"pemFioi/code-editor/utilities/shared-utils.js", id: "python_shared_utils"},
-      'python_blockly': {src: modulesPath+"pemFioi/code-editor/controllers/blockly.js", id: "python_blockly"},
-      'python_logic': {src: modulesPath+"pemFioi/code-editor/controllers/logic.js", id: "python_logic"},
-      'python_css': {type: "stylesheet", src: modulesPath+"pemFioi/code-editor/stylesheets/ui.css", id: "python_css"},
-      'python_subtask': {src: modulesPath+"pemFioi/code-editor/controllers/subtask.js", id: "python_subtask"},
-      'python_python': {src: modulesPath+"pemFioi/code-editor/components/python.js", id: "python_python"}
+      'simple_draw': {src: modulesPath+"/pemFioi/javascool/simple_draw.js", id: "simple_draw"},
+      'blockly_simple_draw': {src: modulesPath+"/pemFioi/javascool/blockly_simple_draw.js", id: "blockly_simple_draw"},
+
+      'p5': {src: modulesPath+"/pemFioi/p5/p5.js", id: "p5"},
+      'p5.sound': {src: modulesPath+"/pemFioi/p5/p5.sound.js", id: "p5.sound"},
+      'player_p5': {src: modulesPath+"/pemFioi/p5/player_p5.js", id: "player_p5"},
+      'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
+
+      'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
+      'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"},
+
+      'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
+      'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
+      'database_css': {type: "stylesheet", src: modulesPath+"/pemFioi/database/styles.css", id: "database_css"},
+
+      'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
+      'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"}
    }
 }
 
@@ -76,8 +121,15 @@ var languageScripts = function () {
          'blockly_python',
          'blockly_' + strLang,
          'blockly_fioi',
-         'blockly_lib',
-         'blockly_lib_css',
+         'quickAlgo_utils',
+         'quickAlgo_i18n',
+         'quickAlgo_interface',
+         'quickAlgo_blockly_blocks',
+         'quickAlgo_blockly_interface',
+         'quickAlgo_blockly_runner',
+         'quickAlgo_subtask',
+         'quickAlgo_context',
+         'quickAlgo_css'
       ],
       scratch: [
          'acorn',
@@ -87,30 +139,35 @@ var languageScripts = function () {
          'scratch_blocks',
          'blockly_javascript',
          'blockly_python',
-         'scratch_fixes',
          'blockly_' + strLang,
-         'blockly_lib',
-         'blockly_lib_css',
-         'blocklyRobot_lib'
+         'blockly_fioi',
+         'scratch_fixes',
+         'scratch_procedures',
+         'quickAlgo_utils',
+         'quickAlgo_i18n',
+         'quickAlgo_interface',
+         'quickAlgo_blockly_blocks',
+         'quickAlgo_blockly_interface',
+         'quickAlgo_blockly_runner',
+         'quickAlgo_subtask',
+         'quickAlgo_context',
+         'quickAlgo_css'
       ],
       python: [
          'python_count',
          'ace',
          'ace_python',
-         'skulpt',
+         'skulpt_quickAlgo',
          'skulpt_stdlib',
          'skulpt_debugger',
-         'python_index',
-         'python_constants',
-         'python_dom_utils',
-         'python_localization_utils',
-         'python_shared_utils',
-         'python_blockly',
-         'python_logic',
-         'python_css',
-         'python_subtask',
-         'python_python',
-         'blocklyRobot_lib'
+         'quickAlgo_utils',
+         'quickAlgo_i18n',
+         'quickAlgo_interface',
+         'quickAlgo_python_interface',
+         'quickAlgo_python_runner',
+         'quickAlgo_subtask',
+         'quickAlgo_context',
+         'quickAlgo_css'
       ]
    }
 }
@@ -118,7 +175,7 @@ var languageScripts = function () {
 
 // from http://stackoverflow.com/questions/979975/
 var QueryString = function () {
-  // This function is anonymous, is executed immediately and 
+  // This function is anonymous, is executed immediately and
   // the return value is assigned to QueryString!
   var query_string = {};
   var query = window.location.search.substring(1);
@@ -136,7 +193,7 @@ var QueryString = function () {
     } else {
       query_string[pair[0]].push(decodeURIComponent(pair[1]));
     }
-  } 
+  }
   return query_string;
 }();
 
@@ -157,8 +214,12 @@ function importModules(modulesList) {
             importedModules[moduleName] = true;
          }
 
-         var modClass = curModule.class ? curModule.class : 'module';
+         var modClass = curModule.classStr ? curModule.classStr : 'module';
          var modSrc = curModule.src;
+         if(QueryString.v) {
+            // Add v= parameters to the URLs
+            modSrc += (modSrc.indexOf('?') > -1 ? '&' : '?') + 'v=' + QueryString.v;
+         }
          var modId = curModule.id ? curModule.id : moduleName;
          if(curModule.type == 'stylesheet') {
             modulesStr += '<link class="'+modClass+'" rel="stylesheet" type="text/css" href="'+modSrc+'" id="'+modId+'">';

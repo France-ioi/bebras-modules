@@ -76,7 +76,10 @@ if (!isCrossDomain()) {
          return platform.parent_platform.askHint(platformToken, success, error);
       },
       updateHeight: function(height, success, error) {
-         return platform.parent_platform.updateHeight(height, success, error);
+         return platform.parent_platform.updateDisplay({height: height}, success, error);
+      },
+      updateDisplay: function(data, success, error) {
+         return platform.parent_platform.updateDisplay(data, success, error);
       },
       getTaskParams: function(key, defaultValue, success, error) {
          return platform.parent_platform.getTaskParams(key, defaultValue, success, error);
@@ -211,10 +214,14 @@ if (!isCrossDomain()) {
       });
    };
    platform.updateHeight = function(height, success, error) {
+      // Legacy
+      platform.updateDisplay({height: height}, success, error);
+   };
+   platform.updateDisplay = function(data, success, error) {
       if (!success) success = function(){};
       if (!error) error = function() {console.error(arguments);};
-      platform.chan.call({method: "platform.updateHeight",
-         params: height,
+      platform.chan.call({method: "platform.updateDisplay",
+         params: data,
          error: error,
          success: success
       });

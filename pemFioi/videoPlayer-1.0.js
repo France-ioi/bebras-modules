@@ -6,7 +6,7 @@ function getFioiPlayer() {
         currentSeek: 0,
         duration: 0,
         loaded: false,
-        stay: false,
+        endReset: false,
         ended: false,
 
         targetDiv: null,
@@ -120,7 +120,7 @@ function getFioiPlayer() {
                 play: playFunc,
                 pause: $.noop,
                 step: playFunc,
-                seek: playFunc,
+                seek: playFunc
                 };
             this.players.push(newPlayer);
             newIdx = this.players.indexOf(newPlayer);
@@ -213,18 +213,24 @@ function getFioiPlayer() {
             }
             this.isPlaying = false;
             $(this.targetDiv).find('#play-pause-glyph').addClass('glyphicon-play').removeClass('glyphicon-pause');
-            $(this.targetDiv).find('#play-pause-ctn').show();
+            if(!this.ended) {
+                $(this.targetDiv).find('#play-pause-ctn').show();
+            }
         },
 
         stop: function(ending) {
-            this.pause();
-            var fioiPlayer = this;
-            if(ending && this.stay) {
+            if(ending && !this.endReset) {
                 this.ended = true;
                 this.progressBar.value = this.progressBar.max;
+                var lastPlayer = this.players[this.players.length-1];
+                if(lastPlayer.animation) {
+                   lastPlayer.animation(lastPlayer.duration + 60);
+                }
             } else {
+                var fioiPlayer = this;
                 setTimeout(function() { fioiPlayer.seek(0); }, 100);
             }
+            this.pause();
         },
 
         step: function() {
@@ -289,14 +295,15 @@ function bindVttReader(url, selector) {
         }
         for(idx=curIdx; idx<vttCues.length; idx++) {
             if(vttCues[idx].startTime > t) {
-                selected.html('');
-                return;
+                break;
             } else if(vttCues[idx].endTime > t) {
                 selected.html(vttCues[idx].text.replace(/\n/g, '<br>'));
+                selected.show();
                 return;
             }
         }
         selected.html('');
+        selected.hide();
     };
 }
 
@@ -417,8 +424,8 @@ playerApp.directive('fioiVideoPlayer', function() {
         var newId = elem.attr('data-id');
         newFioiPlayer.bind($('#'+newId));
 
-        if(elem.attr('data-stay')) {
-            newFioiPlayer.stay = true;
+        if(elem.attr('data-end-reset')) {
+            newFioiPlayer.endReset = true;
         }
 
         var videoAttrs = getVideoHtmlAttrs($(elem));

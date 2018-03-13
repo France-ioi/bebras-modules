@@ -11,7 +11,7 @@ function Simulation(id, delayFactory) {
       step.addEntryAllParents({
          name: "simulation$$$",
          action: {
-            onExec: function(duration, params, callback) {
+            onExec: function(params, duration, callback) {
                that.playing = false;
                that.stepIndex++;
                if (that.autoPlaying) {
@@ -93,7 +93,14 @@ function Simulation(id, delayFactory) {
       }
 
       this.expediting = true;
-      this.steps[this.stepIndex].setExpedite(true);
+      
+      if(this.steps.length > this.stepIndex) {
+         this.steps[this.stepIndex].setExpedite(true);
+      }
+   };
+
+   this.isOnLastStep = function() {
+      return this.stepIndex === this.steps.length - 1;
    };
 
    this.clear = function() {
@@ -218,9 +225,13 @@ function SimulationAction(onExec, params, duration, useTimeout) {
 
 }
 
+var _simulationCallbackCounter = 0;
+
 function SimulationEntryRunner(entry, delayFactory, callback) {
+   var that = this;
    var _SIMULATION_TIMEOUT_PREFIX = "$simulation$";
    var _SIMULATION_TIMEOUT_DELAY_PREFIX = "$simulation-delay$";
+   var _SIMULATION_CALLBACK_DELAY_PREFIX = "$simulation-callback$";
    this.name = entry.name;
    this.onExec = entry.action.onExec;
    this.params = entry.action.params;
@@ -234,7 +245,6 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
 
    this.execute = function(expedite){
       this.executing = true;
-      var that = this;
       var delay = this.delay;
       var duration = this.duration;
       if(expedite) {
@@ -250,19 +260,19 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
 
          var onFinish = function() {
             //console.log("Entry: finishing " + that.name);
-            that.stop();
+            that.sensitiveStop(expedite);
          };
 
+         //console.log("Entry: registering animation for " + that.name);
+         that.actingObject = that.onExec(that.params, duration, onFinish);
          if (that.useTimeout) {
-            //console.log("Entry: registering timeout for " + that.name);
-            that.actingObject = that.onExec(that.params, onFinish);
-
-            if(!expedite) {
+            if(expedite || duration === 0) {
+               onFinish();
+            }
+            else {
+               //console.log("Entry: registering timeout for " + that.name);
                delayFactory.create(_SIMULATION_TIMEOUT_PREFIX + that.name, onFinish, duration);
             }
-         } else {
-            //console.log("Entry: registering animation for " + that.name);
-            that.actingObject = that.onExec(that.params, duration, onFinish);
          }
       };
 
@@ -274,16 +284,41 @@ function SimulationEntryRunner(entry, delayFactory, callback) {
    };
 
    this.stop = function() {
-      if (!(this.executing)) {
+      if (!(that.executing)) {
          return;
       }
-      this.executing = false;
-      delayFactory.destroy(_SIMULATION_TIMEOUT_PREFIX + this.name);
-      delayFactory.destroy(_SIMULATION_TIMEOUT_DELAY_PREFIX + this.name);
-      if (this.actingObject && this.actingObject.stop) {
-         this.actingObject.stop();
+      that.executing = false;
+      delayFactory.destroy(_SIMULATION_TIMEOUT_PREFIX + that.name);
+      delayFactory.destroy(_SIMULATION_TIMEOUT_DELAY_PREFIX + that.name);
+      delayFactory.destroy(_SIMULATION_CALLBACK_DELAY_PREFIX + that.name);
+      if (that.actingObject && that.actingObject.stop) {
+         that.actingObject.stop();
       }
-      this.actingObject = null;
-      this.callback();
+      that.actingObject = null;
+      that.callback();
+   };
+
+   /* 
+    * Stop this entry, but if expediting is enabled,
+    * use a timeout of 0 instead, every 100 times.
+    * This prevents stack overflow in long simulations.
+    */
+   this.sensitiveStop = function(expedite) {
+      if(!expedite) {
+         this.stop();
+         return;
+      }
+
+      _simulationCallbackCounter++;
+      // console.log(_simulationCallbackCounter);
+      if(_simulationCallbackCounter > 100) {
+         _simulationCallbackCounter = 0;
+         // console.log("stop with delay");
+         delayFactory.create(_SIMULATION_CALLBACK_DELAY_PREFIX + this.name, this.stop, 0);
+      }
+      else {
+         // console.log("stop without delay");
+         this.stop();
+      }
    };
 }

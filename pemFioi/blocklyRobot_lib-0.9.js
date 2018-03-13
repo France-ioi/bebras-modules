@@ -17,6 +17,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser la bille",
             dropTransportable: "déposer la bille",
             onTransportable: "sur une bille",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "sur un trou",
             transportableShape: "forme de l'objet",
             transportableColor: "couleur de l'objet",
@@ -60,7 +66,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "attendre",
@@ -78,6 +84,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasser",
             dropTransportable: "deposer",
             onTransportable: "surObjet",
+            onRoundObject: "surRond",
+            onSquareObject: "surCarre",
+            onTriangleObject: "surTriangle",
+            onDottedObject: "surObjetPoints",
+            onFullObject: "surObjetPlein",
+            onStripedObject: "surObjetRaye",
             onHole: "surTrou",
             transportableShape: "formeObjet",
             transportableColor: "couleurObjet",
@@ -121,13 +133,19 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
-         description: { 
+         description: {
                 platformAbove: "plateformeAuDessus() : y a-t-il une plateforme au dessus du robot ?",
                 obstacleInFront: "obstacleDevant() : y a-t-il un obstacle devant le robot ?",
                 onHole: "surTrou() : le robot est-il sur un trou ?",
                 onTransportable: "surObjet() : le robot est-il sur un objet ramassable ?",
+                onRoundObject: "surRond() : le robot est-il sur un objet rond ?",
+                onSquareObject: "surCarre() : le robot est-il sur un objet carré ?",
+                onTriangleObject: "surTriangle() : le robot est-il sur un objet triangle ?",
+                onDottedObject: "surObjetPoints() : le robot est-il sur un objet rempli de points ?",
+                onFullObject: "surObjetPlein() : le robot est-il sur un objet plein ?",
+                onStripedObject: "surObjetRaye() : le robot est-il sur un objet rayé ?",
                 paintOnCell: "peintureSurCase() : la case du robot est-elle peinte ?",
                 gridEdgeInFront: "bordGrilleDevant() : le robot est-il devant le bord de la grille ?",
                 gridEdgeEast: "bordGrilleGauche() : le bord de la grille est-il juste à gauche du robot ?",
@@ -176,6 +194,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "Murmel aufheben",
             dropTransportable: "Murmel ablegen",
             onTransportable: "auf einer Murmel",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "auf einem Loch",
             transportableShape: "forme de l'objet",
             transportableColor: "couleur de l'objet",
@@ -219,7 +243,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombre total d'objets à transporter",
             exists: "il existe un objet à transporter ",
             trans_row: "ligne de l'objet à transporter",
-            trans_col: "colonne d'objet à transporter",
+            trans_col: "colonne d'objet à transporter"
          },
          code: {
             wait: "warte",
@@ -237,6 +261,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "ramasserTransportable",
             dropTransportable: "deposerTransportable",
             onTransportable: "surTransportable",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "surTrou",
             transportableShape: "formeObjet",
             transportableColor: "couleurObjet",
@@ -280,7 +310,7 @@ var getContext = function(display, infos, curLevel) {
             number: "nombreTransportables",
             exists: "existeTransportable",
             trans_row: "ligneTransportable",
-            trans_col: "colonneTransportable",
+            trans_col: "colonneTransportable"
          },
          description: {
          },
@@ -317,6 +347,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "recoger la bola",
             dropTransportable: "dejar caer la bola",
             onTransportable: "sobre una bola",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "sobre un agujero",
             transportableShape: "forma del objeto",
             transportableColor: "color del objeto",
@@ -360,7 +396,7 @@ var getContext = function(display, infos, curLevel) {
             number: "número total de objetos a transportar",
             exists: "existe un objeto a transportar ",
             trans_row: "fila del objeto a transportar",
-            trans_col: "columna del objeto a transportar",
+            trans_col: "columna del objeto a transportar"
          },
          code: {
             wait: "esperar",
@@ -378,6 +414,12 @@ var getContext = function(display, infos, curLevel) {
             pickTransportable: "recoger",
             dropTransportable: "soltar",
             onTransportable: "sobreObjeto",
+            onRoundObject: "sur un objet rond",
+            onSquareObject: "sur un objet carré",
+            onTriangleObject: "sur un objet triangle",
+            onDottedObject: "sur un objet rempli de points",
+            onFullObject: "sur un objet plein",
+            onStripedObject: "sur un objet rayé",
             onHole: "sobreAgujero",
             transportableShape: "formaObjeto",
             transportableColor: "colorObjeto",
@@ -421,9 +463,9 @@ var getContext = function(display, infos, curLevel) {
             number: "numeroTransportables",
             exists: "existeTransportable",
             trans_row: "filaTransportable",
-            trans_col: "columnaTransportable",
+            trans_col: "columnaTransportable"
          },
-         description: { 
+         description: {
                 platformAbove: "plataformaArriba() : ¿hay una plataforma arriba del robot?",
                 obstacleInFront: "obstáculoAdelante() : ¿hay un obstáculo adelante del robot?",
                 onHole: "sobreAgujero() : ¿se encuentra el robot sobre un agujero?",
@@ -457,10 +499,32 @@ var getContext = function(display, infos, curLevel) {
          droppedAllItems: "¡Bien hecho! ¡Ha soltado todos los objetos!",
          obstacleOnCell: "Hay un obstáculo en esta casilla",
          platformOnCell: "Ya hay una plataforma sobre esta casilla"
-      },
+      }
    };
+
+   function replaceStringsRec(source, dest) {
+      if ((typeof source != "object") || (typeof dest != "object")) {
+         return;
+      }
+      for (var key1 in source) {
+         if (dest[key1] != undefined) {
+            if (typeof dest[key1] == "object") {
+               replaceStringsRec(source[key1], dest[key1]);
+            } else {
+               dest[key1] = source[key1];
+            }
+         }
+      }
+   }
+
    var strings = languageStrings[stringsLanguage];
-   
+   if (infos.languageStrings != undefined) {
+      if (infos.languageStrings.blocklyRobot_lib != undefined) {
+         var infosStrings = infos.languageStrings.blocklyRobot_lib;
+         replaceStringsRec(infosStrings, strings);
+      }
+   }
+
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
@@ -485,7 +549,7 @@ var getContext = function(display, infos, curLevel) {
       display: display,
       infos: infos,
       robot: {},
-      strings: strings,
+      strings: strings
    };
 
    context.changeDelay = function(newDelay) {
@@ -630,7 +694,7 @@ var getContext = function(display, infos, curLevel) {
       var platforms = context.getItems(robot.row - 1, robot.col, {category: "platform"});
       context.runner.noDelay(callback, (platforms.length > 0));
    };
-         
+
    context.robot.gridEdgeInFront = function(callback) {
       var coords = getCoordsInFront(0);
       gridEdgeCoord(coords.row, coords.col, callback);
@@ -948,7 +1012,7 @@ var getContext = function(display, infos, curLevel) {
       if (itemsUnder.length == 0) {
          context.callCallback(callback);
       } else {
-         itemsUnder[0].type = value.data;
+         itemsUnder[0].type = value;
          if (context.display) {
             redisplayItem(itemsUnder[0]);
          }
@@ -969,7 +1033,7 @@ var getContext = function(display, infos, curLevel) {
       var item = context.getRobotItem(context.curRobot);
       context.callCallback(callback, item.row + 1);
    };
-   
+
    var findTransportable = function(id) {
       var transportables = context.getItems(undefined, undefined, {isTransportable: true});
       for (var iItem = 1; iItem < transportables.length; iItem++) {
@@ -1013,6 +1077,42 @@ var getContext = function(display, infos, curLevel) {
       var robot = context.getRobotItem(context.curRobot);
       var transportables = context.getItems(robot.row, robot.col, {isTransportable: true});
       context.callCallback(callback, (transportables.length != 0));
+   };
+
+   context.robot.onRoundObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isRound: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onSquareObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isSquare: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onTriangleObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isTriangle: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onFullObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isFull: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onDottedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isDotted: true});
+      context.callCallback(callback, (objects.length != 0));
+   };
+
+   context.robot.onStripedObject = function(callback) {
+      var robot = context.getRobotItem(context.curRobot);
+      var objects = context.getItems(robot.row, robot.col, {isStriped: true});
+      context.callCallback(callback, (objects.length != 0));
    };
 
    context.robot.onHole = function(callback) {
@@ -1138,7 +1238,7 @@ var getContext = function(display, infos, curLevel) {
          callback();
       });
    };
-   
+
    var dirNames = ["E", "S", "O", "N"];
    context.robot.dir = function(callback) {
       var item = context.getRobotItem(context.curRobot);
@@ -1217,11 +1317,11 @@ var getContext = function(display, infos, curLevel) {
       [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
       [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
-   
+
    context.customBlocks = {
       robot: {
          actions: {
-            blocks: [  
+            blocks: [
                { name: "paint" },
                { name: "paintGrey" },
                { name: "forward" },
@@ -1240,23 +1340,29 @@ var getContext = function(display, infos, curLevel) {
                { name: "dropTransportable" },
                { name: "writeNumber", params: [null] },
                { name: "addPlatformAbove",   yieldsValue: false },
-               { name: "addPlatformInFront",   yieldsValue: false },
+               { name: "addPlatformInFront",   yieldsValue: false }
             ]
          },
          sensors: {
             blocks: [
                { name: "onTransportable",    yieldsValue: true },
+               { name: "onRoundObject",      yieldsValue: true },
+               { name: "onSquareObject",     yieldsValue: true },
+               { name: "onTriangleObject",   yieldsValue: true },
+               { name: "onDottedObject",     yieldsValue: true },
+               { name: "onStripedObject",    yieldsValue: true },
+               { name: "onFullObject",       yieldsValue: true },
                { name: "onHole",             yieldsValue: true },
                { name: "transportableShape", yieldsValue: true },
                { name: "transportableColor", yieldsValue: true },
                { name: "transportableRed",   yieldsValue: true },
                { name: "transportableBlue",  yieldsValue: true },
                { name: "transportableSquare", yieldsValue: true },
-               
+
                { name: "greenCell",          yieldsValue: true },
                { name: "brownCell",          yieldsValue: true },
                { name: "markedCell",         yieldsValue: true },
-               
+
                { name: "obstacleInFront",    yieldsValue: true },
                { name: "obstacleRight",      yieldsValue: true },
                { name: "obstacleLeft",       yieldsValue: true },
@@ -1264,7 +1370,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "obstacleWest",       yieldsValue: true },
                { name: "obstacleNorth",      yieldsValue: true },
                { name: "obstacleSouth",      yieldsValue: true },
-               
+
                { name: "paintInFront",       yieldsValue: true },
                { name: "paintOnCell",        yieldsValue: true },
                { name: "paintNorth",         yieldsValue: true },
@@ -1296,7 +1402,7 @@ var getContext = function(display, infos, curLevel) {
                { name: "trans_col",    yieldsValue: true,   params: [null],   handler: context.transportable_col }
             ]
          }
-      },      
+      },
       debug: {
          debug: {
              blocks: [{ name: "alert", params: [null], handler: context.debug_alert }]
@@ -1410,7 +1516,7 @@ var getContext = function(display, infos, curLevel) {
                resetItem({
                   row: iRow,
                   col: iCol,
-                  type: itemTypeByNum[itemTypeNum],
+                  type: itemTypeByNum[itemTypeNum]
                });
             }
          }
@@ -1568,7 +1674,7 @@ var getContext = function(display, infos, curLevel) {
       if (item.dir != undefined) {
 //         var dirToState = [3, 0, 1, 2];
          var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale); 
+         x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
       if (!itemType.img) {
@@ -1625,3 +1731,5 @@ var getContext = function(display, infos, curLevel) {
 
    return context;
 };
+
+quickAlgoLibraries.register('robot', getContext);

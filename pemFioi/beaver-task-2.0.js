@@ -34,12 +34,18 @@ task.getViews = function(callback) {
     // all beaver tasks have the same views
     var views = {
         task: {},
-        solution: {},
         hints: {requires: "task"},
         forum: {requires: "task"},
         editor: {requires: "task"},
         submission: {requires: "task"}
     };
+
+    // Only declare the solution view if there's actually one
+    var solution = $('#solution').html();
+    if(solution && $.trim('' + solution)) {
+        views.solution = {};
+    }
+
     callback(views);
 };
 
@@ -94,7 +100,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             callback();
          }
       };
-      if(levels) {
+      if(levels || subTask.assumeLevels) {
          subTask.unloadLevel(doUnload);
       }
       else {
@@ -143,10 +149,14 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          mainTask.taskParams = taskParams;
          mainTaskParams = taskParams;
          task.displayedSubTask = mainTask;
-         if(levels) {
+         if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
-               defaultLevel = levels[0];
+               if(mainTask.assumeLevels) {
+                  defaultLevel = "easy";
+               } else {
+                  defaultLevel = levels[0];
+               }
             }
             
             // The objects levelAnswers and levelStates are indexed by level names.
@@ -156,7 +166,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
                level: defaultLevel
             };
             mainTask.loadLevel(state.level, null, views);
-            displayHelper.setupLevels(null, reloadWithCallbacks);
+            if(levels) {
+               displayHelper.setupLevels(null, reloadWithCallbacks);
+            }
             callback();
          }
          else {
@@ -167,7 +179,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getState = function(callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Update state to reflect latest user interaction.
          state.levelStates[state.level] = mainTask.getStateObject();
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
@@ -176,10 +188,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       else {
          // TODO is this the desired behavior? It is from beaver-task-1.0.
          var currentState = {};
-         mainTask.getAnswer(function(displayedAnswer) {
-            currentState.displayedAnswer = displayedAnswer;
-            callback(JSON.stringify(currentState));
-         });
+         var displayedAnswer = mainTask.getAnswerObject();
+         currentState.displayedAnswer = displayedAnswer;
+         callback(JSON.stringify(currentState));
       }
    };
    
@@ -190,8 +201,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.reloadAnswer = function(strAnswer, callback) {
-      if(hasJustLoaded) {
-         // If this is the first time we reload an answer, jump to the first level that can gain points.
+      if(hasJustLoaded && levels) {
+         // If this is the first time we reload an answer, jump to the first
+         // level that can gain points, if there are levels.
          hasJustLoaded = false;
          task.gradeAnswer(strAnswer, null, function(score, message) {
             var maxScores = displayHelper.getLevelsMaxScores();
@@ -225,7 +237,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.reloadAnswerObject = function(newAnswers, callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          if (!newAnswers) {
             state.levelAnswers = {};
          }
@@ -284,13 +296,16 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
 
    task.reloadStateObject = function(newState, callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Recreate the task to reflect the new state.
          state = newState;
+         if(!state.levelStates) { state.levelStates = {}; }
+         if(!state.levelAnswers) { state.levelAnswers = {}; }
+         if(!state.level) { state.level = 'easy'; }
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
-            mainTask = createTask(true);
+            mainTask = createTask(false);
             mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
             mainTask.loadLevel(level, levelState);
@@ -326,7 +341,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
 
    task.getAnswer = function(callback) {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          // Update answer to reflect latest user interaction.
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
          callback(JSON.stringify(state.levelAnswers));
@@ -339,7 +354,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    };
    
    task.getAnswerObject = function() {
-      if(levels) {
+      if(levels || mainTask.assumeLevels) {
          state.levelAnswers[state.level] = mainTask.getAnswerObject();
          return state.levelAnswers;
       }
@@ -351,6 +366,12 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    task.unload = function(callback) {
       var instances = [];
       var iSeed;
+
+      if (typeof Blockly !== 'undefined') { // TEMPORARY, to replace with a global unload function provided by the task
+         removeBlockly();
+      }
+
+
       if (levels) {
          for(var iLevel in gradingTasks) {
             for(iSeed in gradingTasks[iLevel]) {
@@ -370,15 +391,15 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          callback();
       });
 
-      if (typeof Blockly !== 'undefined') { // TEMPORARY, to replace with a global unload function provided by the task
-         removeBlockly();
-      }
    };
 
    function gradeAnswerInner(gradingTask, answer, minScore, maxScore, callback) {
       gradingTask.isGrading = true;
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
+      }
+      if(!levels && mainTask.assumeLevels && answer.easy) {
+         answer = answer.easy;
       }
       gradingTask.reloadAnswerObject(answer);
       gradingTask.getGrade(function(result) {
@@ -528,6 +549,58 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    grader.gradeTask = task.gradeAnswer;
    task.gradeTask = grader.gradeTask;
 }
+
+/************************************************************************
+ * Utilities
+ ************************************************************************/
+
+function extractLevelSpecific(item, level) {
+   if ((typeof item != "object") || $.isArray(item)) {
+      return item;
+   }
+   if (item.shared === undefined) {
+      if (item[level] === undefined) {
+         var newItem = {};
+         for (var prop in item) {
+            newItem[prop] = extractLevelSpecific(item[prop], level);
+         }
+         return newItem;
+      }
+      return extractLevelSpecific(item[level], level);
+   }
+   if ($.isArray(item.shared)) {
+      var newItem = [];
+      for (var iElem = 0; iElem < item.shared.length; iElem++) {
+         newItem.push(extractLevelSpecific(item.shared[iElem], level));
+      }
+      if (item[level] != undefined) {
+         if (!$.isArray(item[level])) {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var iElem = 0; iElem < item[level].length; iElem++) {
+            newItem.push(extractLevelSpecific(item[level][iElem], level));
+         }
+      }
+      return newItem;
+   }
+   if (typeof item.shared == "object") {
+      var newItem = {};
+      for (var prop in item.shared) {
+         newItem[prop] = extractLevelSpecific(item.shared[prop], level);
+      }
+      if (item[level] != undefined) {
+         if (typeof item[level] != "object") {
+            console.error("Incompatible types when merging shared and " + level);
+         }
+         for (var prop in item[level]) {
+            newItem[prop] = extractLevelSpecific(item[level][prop], level);
+         }
+      }
+      return newItem;
+   }
+   console.error("Invalid type for shared property");
+}
+
 
 $('document').ready(function() {
    platform.initWithTask(window.task);
