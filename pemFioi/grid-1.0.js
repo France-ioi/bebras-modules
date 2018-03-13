@@ -124,6 +124,11 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var gridPos = that.paperPosToGridPos(paperPosition);
       event.data.row = gridPos.row;
       event.data.col = gridPos.col;
+
+      if(!that.table[gridPos.row]) {
+         throw "Grid bad cell. Row=" + gridPos.row + " Col=" + gridPos.col;
+      }
+
       event.data.cell = that.table[gridPos.row][gridPos.col];
       that.clickHandler(event);
    };
@@ -281,6 +286,23 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       var cell = this.table[row][col];
       for (var iContent = 0; iContent < contents.length; iContent++) {
          cell.push(contents[iContent]);
+      }
+
+      if(this.overlay) {
+         this.overlay.toFront();
+      }
+   };
+
+   this.setAllCells = function(cellFiller, data) {
+      if(!data) {
+         data = {};
+      }
+      for(var row = 0; row < rows; row++) {
+         for(var col = 0; col < cols; col++) {
+            data.row = row;
+            data.col = col;
+            this.setCell(cellFiller, data);
+         }
       }
    };
 
@@ -476,6 +498,15 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       if(this.dragSelection) {
          this.dragSelection.remove();
          this.dragSelection = null;
+      }
+   };
+
+   this.linesToBack = function() {
+      for (var iRow = 0; iRow <= this.rows; iRow++) {
+         this.horizontalLines[iRow].toBack();
+      }
+      for (var iCol = 0; iCol <= this.cols; iCol++) {
+         this.verticalLines[iCol].toBack();
       }
    };
 

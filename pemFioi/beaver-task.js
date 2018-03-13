@@ -28,12 +28,15 @@ task.getViews = function(callback) {
     // all beaver tasks have the same views
     var views = {
         task: {},
-        solution: {},
         hints: {requires: "task"},
         forum: {requires: "task"},
         editor: {requires: "task"},
         submission: {requires: "task"}
     };
+    var soldiv = $('#solution');
+    if(soldiv.length && $.trim(soldiv.text())) {
+        views.solution = {};
+    }
     callback(views);
 };
 

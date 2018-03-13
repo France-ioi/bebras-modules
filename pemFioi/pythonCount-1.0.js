@@ -55,8 +55,9 @@ function pythonCount(text) {
 }
 
 var pythonForbiddenBlocks = {
-   'logic': {
+    'logic': {
       'controls_if': ['if', 'else', 'elif'],
+      'controls_if_else': ['if', 'else', 'elif'],
       'logic_negate': ['not'],
       'logic_operation': ['and', 'or']
     },
@@ -83,13 +84,14 @@ var pythonForbiddenBlocks = {
       'lists_append': ['list', 'set', 'list_brackets']
     },
     'functions': {
-      'procedures_def': ['def']
+      'procedures_defnoreturn': ['def'],
+      'procedures_defreturn': ['def']
     }
 };
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'def'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', 'def', 'break', 'continue'];
    var allowed = []
 
    if(!includeBlocks) {
@@ -106,15 +108,12 @@ function pythonForbiddenLists(includeBlocks) {
       }
    };
 
-   if(includeBlocks && includeBlocks.standardBlocks) {
-      if(includeBlocks.standardBlocks.includeAll) {
-         return false;
-      }
+   if(includeBlocks && includeBlocks.standardBlocks && !includeBlocks.standardBlocks.includeAll) {
       if(includeBlocks.standardBlocks.wholeCategories) {
          for(var c=0; c<includeBlocks.standardBlocks.wholeCategories.length; c++) {
             var categoryName = includeBlocks.standardBlocks.wholeCategories[c];
             if(pythonForbiddenBlocks[categoryName]) {
-               for(blockName in pythonForbiddenBlocks[categoryName]) {
+               for(var blockName in pythonForbiddenBlocks[categoryName]) {
                   removeForbidden(pythonForbiddenBlocks[categoryName][blockName]);
                }
             }
@@ -162,6 +161,13 @@ function pythonForbidden(code, includeBlocks) {
          if(re.exec(code)) {
             // Forbidden keyword found
             return 'crochets [ ]'; // TODO :: i18n ?
+         }
+      } else if(forbidden[i] == 'dict_brackets') {
+         // Special pattern for lists
+         var re = /[\{\}]/;
+         if(re.exec(code)) {
+            // Forbidden keyword found
+            return 'accolades { }'; // TODO :: i18n ?
          }
       } else {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');

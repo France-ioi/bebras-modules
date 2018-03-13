@@ -18,12 +18,16 @@ function conceptDisplay() {
   $('body > div').hide();
   targetDiv.show();
   if(lang) {
-    var langDivs = targetDiv.find('[data-lang='+lang+']');
+    var allLangDivs = targetDiv.find('[data-lang]');
+    var langDivs = allLangDivs.filter(function(i, e) {
+      var langs = e.getAttribute('data-lang').split(' ');
+      return langs.indexOf(lang) != -1;
+      });
     if(langDivs.length) {
-      targetDiv.find('[data-lang]').hide();
+      allLangDivs.hide();
       langDivs.show();
     } else {
-      targetDiv.find('[data-lang]').show();
+      allLangDivs.show();
     }
   }
 }

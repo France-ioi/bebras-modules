@@ -221,6 +221,25 @@ function VisualGraph(id, paper, graph, graphDrawer, autoDraw, vertexVisualInfo, 
       return [];
    };
 
+   this.elementToFront = function(id) {
+      var raphaels = this.getRaphaelsFromID(id);
+      for(var iElement in raphaels) {
+         raphaels[iElement].toFront();
+      }
+   };
+
+   this.setPaper = function(paper) {
+      this.paper = paper;
+   };
+
+   this.setDrawer = function(graphDrawer) {
+      this.graphDrawer = graphDrawer;
+   };
+
+   this.getGraph = function() {
+      return this.graph;
+   };
+
    this.toJSON = function() {
       return JSON.stringify({
          vertexVisualInfo: this.vertexVisualInfo,
@@ -243,24 +262,36 @@ VisualGraph.fromJSON = function(visualGraphStr, id, paper, graph, graphDrawer, a
    return new VisualGraph(id, paper, graph, graphDrawer, autoDraw, visualInfo.vertexVisualInfo, visualInfo.edgeVisualInfo);
 };
 
-function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
+function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexMover, thickMode, innerLineAttr) {
    this.circleAttr = circleAttr;
    this.lineAttr = lineAttr;
    this.init = function(paper, graph, visualGraph) {
       this.paper = paper;
       this.graph = graph;
       this.visualGraph = visualGraph;
+      this.customElements = {};
+      this.originalPositions = {};
    };
    this.drawVertex = function(id, info, visualInfo) {
       var pos = this._getVertexPosition(visualInfo);
+      this.originalPositions[id] = pos;
+
       var result = [this.paper.circle(pos.x, pos.y).attr(this.circleAttr)];
       if(vertexDrawer) {
-         result = result.concat(vertexDrawer(id, info, pos.x, pos.y));
+         var raphaels = vertexDrawer(id, info, pos.x, pos.y);
+         this._addCustomElements(id, raphaels);
+         result = result.concat(raphaels);
       }
       return result;
    };
    this.drawEdge = function(id, vertex1, vertex2, vertex1Info, vertex2Info, vertex1VisualInfo, vertex2VisualInfo, edgeInfo, edgeVisualInfo) {
-      return [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
+      if(thickMode) {
+         var path = this._getThickEdgePath(vertex1, vertex2);
+         return [this.paper.path(path).attr(this.lineAttr).toBack(), this.paper.path(path).attr(innerLineAttr)];
+      }
+      else {
+         return [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
+      }
    };
    this._getVertexPosition = function(visualInfo) {
       if(visualInfo.x === undefined || visualInfo.x === null) {
@@ -275,6 +306,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
    this.getVertexPosition = function(id) {
       return this._getVertexPosition(this.visualGraph.getVertexVisualInfo(id));
    };
+   this._addCustomElements = function(id, raphaels) {
+      // Save original attributes. This allows us to move the object later by transformation.
+      this.customElements[id] = [];
+      for(var iElement in raphaels) {
+         var raphael = raphaels[iElement];
+         this.customElements[id].push({
+            raphael: raphael,
+            originalAttrs: $.extend(true, {}, raphael.attrs)
+         });
+      }
+   };
    this.moveVertex = function(id, x, y) {
       var info = this.visualGraph.getVertexVisualInfo(id);
       info.x = x;
@@ -284,6 +326,14 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
          cx: x,
          cy: y
       });
+
+      // Move the custom Raphael objects.
+      if(vertexMover) {
+         vertexMover(id, raphaels, x, y);
+      }
+      if(autoMove) {
+         this._moveCustomElements(id, x, y);
+      }
 
       var childrenIDs = this.graph.getChildren(id);
       for(var iChild in childrenIDs) {
@@ -296,15 +346,39 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
          }
       }
    };
+   this._moveCustomElements = function(id, x, y) {
+      var elements = this.customElements[id];
+      var transformation = ["T", x - this.originalPositions[id].x, y - this.originalPositions[id].y];
+      for(var iElement in elements) {
+         var element = elements[iElement];
+         // Paths get transformed using Raphael.transformPath,
+         // for compatibility. Other objects get transformed normally.
+         if(element.raphael.type === "path") {
+            element.raphael.attr({path: Raphael.transformPath(element.originalAttrs.path, transformation)});
+         }
+         else {
+            element.raphael.transform(transformation);
+         }
+      }
+   };
    this.refreshEdgePosition = function(vertex1, vertex2) {
       var edges = this.graph.getEdgesFrom(vertex1, vertex2);
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
-      var newPath = this._getEdgePath(vertex1, vertex2);
+      var newPath;
+      if(thickMode) {
+         newPath = this._getThickEdgePath(vertex1, vertex2);
+      }
+      else {
+         newPath = this._getEdgePath(vertex1, vertex2);
+      }
       for(var iEdge in edges) {
          var edgeID = edges[iEdge];
          var raphaels = this.visualGraph.getRaphaelsFromID(edgeID);
          raphaels[0].attr("path", newPath);
+         if(thickMode) {
+            raphaels[1].attr("path", newPath);
+         }
       }
    };
    this._getEdgePath = function(vertex1, vertex2) {
@@ -352,6 +426,12 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
          return ["M", x2, y2, "L", x1 + w, y1 + h];
       }
    };
+   this._getThickEdgePath = function(vertex1, vertex2) {
+      var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
+      var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
+      var x1 = info1.x, y1 = info1.y, x2 = info2.x, y2 = info2.y;
+      return ["M", x1, y1, "L", x2, y2];
+   };
    this.setCircleAttr = function(circleAttr) {
       this.circleAttr = circleAttr;
    };
@@ -365,7 +445,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
       }
       var edges = this.graph.getAllEdges();
       for(var iEdge in edges) {
-         this.visualGraph.getRaphaelsFromID(edges[iEdge])[0].attr(this.lineAttr);
+         var raphaels = this.visualGraph.getRaphaelsFromID(edges[iEdge]);
+         raphaels[0].attr(this.lineAttr);
+         if(thickMode) {
+            raphaels[1].attr(innerLineAttr);
+         }
       }
    };
    this.getDistanceFromVertex = function(id, xPos, yPos) {
@@ -384,12 +468,23 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer) {
       // In modern browsers the path is an array and we can get the endpoints
       // directly. In old browsers it may be a comma separated string.
       if($.isArray(edgePath)) {
-         x1 = parseInt(edgePath[0][1]);
-         y1 = parseInt(edgePath[0][2]);
-         x2 = parseInt(edgePath[1][1]);
-         y2 = parseInt(edgePath[1][2]);
+         if($.isArray(edgePath[0])) {
+            // Path a 2D array: [["M", x1, y1], ["L", x2, y2]]
+            x1 = parseInt(edgePath[0][1]);
+            y1 = parseInt(edgePath[0][2]);
+            x2 = parseInt(edgePath[1][1]);
+            y2 = parseInt(edgePath[1][2]);
+         }
+         else {
+            // Path is an array: ["M", x1, y1, "L", x2, y2]
+            x1 = parseInt(edgePath[1]);
+            y1 = parseInt(edgePath[2]);
+            x2 = parseInt(edgePath[4]);
+            y2 = parseInt(edgePath[5]);
+         }
       }
       else {
+         // Path is a string: "M,x1,y1,L,x2,y2"
          var parts = edgePath.split(",");
          x1 = parseInt(parts[1]);
          y1 = parseInt(parts[2]);

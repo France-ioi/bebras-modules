@@ -32,7 +32,7 @@ var stdAnsTypes = {
    updateHeight: function(height) {
       if (stdAnsTypes.lastSentHeight != height) {
          stdAnsTypes.lastSentHeight = height;
-         platform.updateHeight(height, function() {});
+         platform.updateDisplay({height: height}, function() {});
       }
    },
 

@@ -23,7 +23,8 @@ window.implementGetResources = function(task) {
       res.task_modules = [];
       res.solution_modules = [];
       res.grader_modules = [];
-      if (!'hints' in res) {
+      if (!res.hints) {
+         res.hints = [];
          $('.hint').each(function(index) {
             res.hints[res.hints.length] = [{type: 'html', content: $(this).html() }];
             $(this).attr('hint-Num', res.hints.length-1);
@@ -144,6 +145,14 @@ window.implementGetResources = function(task) {
             }
          });
          fillImages($(this).html(), images, res.hints[hintnum]);
+      });
+
+      // Links
+      $('iframe').each(function () {
+        var curUrl = $(this).attr('src');
+        if(curUrl.indexOf('://') == -1 && curUrl.charAt(0) != '/') {
+          res.files.push({ type: this.tagName, url: $(this).attr('src') });
+        }
       });
 
       // Other resources
