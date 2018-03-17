@@ -1099,11 +1099,11 @@ Blockly.JavaScript['text'] = function(block) {
   // Text value. Output an integer if the content is an int, as Scratch is
   // ambiguous on these fields.
   var val = block.getFieldValue('TEXT');
-  if(val.search(/^\d+$/) < 0) {
+  if(val.search(/^-?\d+\.?\d*$/) < 0) {
     // string
     var code = Blockly.JavaScript.quote_(val);
   } else {
-    // int
+    // float
     var code = val;
   }
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -1271,11 +1271,11 @@ Blockly.Python['data_changevariableby'] = function(block) {
 
 Blockly.Python['text'] = function(block) {
   var val = block.getFieldValue('TEXT');
-  if(val.search(/^\d+$/) < 0) {
+  if(val.search(/^-?\d+\.?\d*$/) < 0) {
     // string
     var code = Blockly.Python.quote_(val);
   } else {
-    // int
+    // float
     var code = val;
   }
   return [code, Blockly.Python.ORDER_ATOMIC];
