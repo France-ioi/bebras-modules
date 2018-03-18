@@ -400,9 +400,9 @@ var getContext = function(display, infos, curLevel) {
                obstacleInFront: "fleurDevant"
             },
             messages: {
-					successContainersFilled: "Bravo, votre robot est un bon jardinier !",
+               successContainersFilled: "Bravo, votre robot est un bon jardinier !",
                failureContainersFilled: "Votre robot a semé hors des zones de terre.",
-					failureContainersFilledLess: "Il reste de la terre vide de fleur !"
+               failureContainersFilledLess: "Il reste de la terre vide de fleur !"
             }
          },
 
@@ -1049,10 +1049,18 @@ var getContext = function(display, infos, curLevel) {
       },
       course: {
          itemTypes: {
-            red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true },
-            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
-            green: { num: 3, color: "#b5e61d", side: 60, isExit: true},
-            number: { num: 5, side: 60, zOrder: 1 }
+            red_robot: { img: "red_robot.png", side: 70, nbStates: 1, offsetX: -5, offsetY: 5, isRobot: true, zOrder: 2 },
+            obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
+            green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0},
+            number: { num: 5, side: 60, zOrder: 1 },
+            top_horizontal_closed_door: { num: 6, img: "top_horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            bottom_horizontal_closed_door: { num: 7, img: "bottom_horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            left_vertical_closed_door: { num: 8, img: "left_vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            right_vertical_closed_door: { num: 9, img: "right_vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            top_horizontal_open_door: { num: 10, img: "top_horizontal_open_door.png", side: 60, zOrder: 1},
+            bottom_horizontal_open_door: { num: 11, img: "bottom_horizontal_open_door.png", side: 60, zOrder: 1},
+            left_vertical_open_door: { num: 12, img: "left_vertical_open_door.png", side: 60, zOrder: 1},
+            right_vertical_open_door: { num: 13, img: "right_vertical_open_door.png", side: 60, zOrder: 1},
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -1353,8 +1361,9 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             stars: { num: 3, img: "stars.png", side: 60, zOrder: 0},
-            obstacle: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
+            asteroide: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
             rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
+            obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
             number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
