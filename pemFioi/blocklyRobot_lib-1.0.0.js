@@ -942,6 +942,8 @@ var getContext = function(display, infos, curLevel) {
             asteroide: { num: 4, img: "asteroide.png", side: 60, isObstacle: true, zOrder: 1 },
             rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
             obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
+            objet1: { num: 7, img: "objet1.png", side: 60, isWithdrawable: true, zOrder: 1 },
+            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
             number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
