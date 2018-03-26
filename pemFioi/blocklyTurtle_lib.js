@@ -351,11 +351,11 @@ var getContext = function(display, infos) {
    context.resetDisplay = function() {
       var turtleFileName = "turtle.svg";
       
-      if ($("#turtleImg") != null) {
+      if ($("#turtleImg").length > 0) {
          turtleFileName = $("#turtleImg").attr("src");
       }
       var turtleUpFileName = "turtle.svg";
-      if ($("#turtleUpImg") != null) {
+      if ($("#turtleUpImg").length > 0) {
          turtleUpFileName = $("#turtleUpImg").attr("src");
       }
       $("#grid").html("<div id='output'  style='height: 300px;width: 300px;border: solid 2px;margin: 12px;position:relative;background-color:white;'> <img id='drawinggrid' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'><canvas id='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas><canvas id='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas><img id='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img></div>")
