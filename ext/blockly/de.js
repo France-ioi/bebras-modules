@@ -315,6 +315,8 @@ goog.require('Blockly.Msg');
 /** @export */ Blockly.Msg.RENAME_VARIABLE = "Variable umbenennen …";
 /** @export */ Blockly.Msg.RENAME_VARIABLE_TITLE = "Alle \"%1\" Variablen umbenennen in:";
 /** @export */ Blockly.Msg.TEXT_APPEND_HELPURL = "https://github.com/google/blockly/wiki/Text#text-modification";  // untranslated
+/** @export */ Blockly.Msg.TEXT_APPEND_APPENDTEXT = "Text anhängen";
+/** @export */ Blockly.Msg.TEXT_APPEND_TO = "an";
 /** @export */ Blockly.Msg.TEXT_APPEND_TITLE = "zu %1 Text %2 anhängen";
 /** @export */ Blockly.Msg.TEXT_APPEND_TOOLTIP = "Text an die Variable \"%1\" anhängen.";
 /** @export */ Blockly.Msg.TEXT_CHANGECASE_HELPURL = "https://github.com/google/blockly/wiki/Text#adjusting-text-case";  // untranslated
@@ -326,10 +328,10 @@ goog.require('Blockly.Msg');
 /** @export */ Blockly.Msg.TEXT_CHARAT_FROM_END = "nimm von hinten";
 /** @export */ Blockly.Msg.TEXT_CHARAT_FROM_START = "nimm";
 /** @export */ Blockly.Msg.TEXT_CHARAT_HELPURL = "http://publib.boulder.ibm.com/infocenter/lnxpcomp/v8v101/index.jsp?topic=%2Fcom.ibm.xlcpp8l.doc%2Flanguage%2Fref%2Farsubex.htm";
+/** @export */ Blockly.Msg.TEXT_CHARAT_INPUT_INTEXT = "im Text";
 /** @export */ Blockly.Msg.TEXT_CHARAT_LAST = "nimm letzten";
 /** @export */ Blockly.Msg.TEXT_CHARAT_RANDOM = "nimm zufälligen";
 /** @export */ Blockly.Msg.TEXT_CHARAT_TAIL = "Buchstaben";
-/** @export */ Blockly.Msg.TEXT_CHARAT_TITLE = "im Text %1 %2";
 /** @export */ Blockly.Msg.TEXT_CHARAT_TOOLTIP = "Extrahiert einen Buchstaben von einer bestimmten Position.";
 /** @export */ Blockly.Msg.TEXT_COUNT_HELPURL = "https://github.com/google/blockly/wiki/Text#counting-substrings";
 /** @export */ Blockly.Msg.TEXT_COUNT_MESSAGE0 = "zähle %1 in %2";
