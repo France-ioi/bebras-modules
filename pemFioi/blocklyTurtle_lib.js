@@ -175,9 +175,9 @@ var getContext = function(display, infos) {
          label: {
             move: "gehe",
             moveamount: "gehe %1 Schritte",
-            movebackamount: "gehe zurück %1 Schritte",
+            movebackamount: "gehe %1 Schritte zurück",
             moveamountvalue: "gehe %1 Schritte",
-            movebackamountvalue: "gehe zurück %1 Schritte",
+            movebackamountvalue: "gehe %1 Schritte zurück",
             turnleft: "drehe nach links ↺",
             turnright: "drehe nach rechts ↻",
             turnleftamount: "drehe um %1° nach links ↺",
@@ -209,9 +209,9 @@ var getContext = function(display, infos) {
          code: {
             move: "gehe",
             moveamount: "geheSchritte",
-            movebackamount: "geheZuruckSchritte",
+            movebackamount: "geheZurueckSchritte",
             moveamountvalue: "geheSchritte",
-            movebackamountvalue: "geheZuruckSchritte",
+            movebackamountvalue: "geheZurueckSchritte",
             turnleft: "dreheLinks",
             turnright: "dreheRechts",
             turnleftamount: "dreheLinksGrad",
