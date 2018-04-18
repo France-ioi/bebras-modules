@@ -815,15 +815,15 @@ var getContext = function(display, infos, curLevel) {
                categories: {
                   logic: 100,
                   loops: 180,
-                  math: 220,
-                  text: 250,
-                  lists: 60,
-                  colour: 310,
-                  variables: 340,
-                  functions: 20,
+                  math: 230,
+                  text: 60,
+                  lists: 40,
+                  colour: 20,
+                  variables: 330,
+                  functions: 290,
                   actions: 260,
-                  sensors: 340,
-                  _default: 280
+                  sensors: 200,
+                  _default: 0
                },
                blocks: {}
             };

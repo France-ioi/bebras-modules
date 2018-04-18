@@ -272,13 +272,15 @@ var getContext = function(display, infos) {
                categories: {
                   logic: 100,
                   loops: 180,
-                  math: 220,
-                  texts: 250,
-                  lists: 60,
-                  colour: 60,
-                  turtle: 310,
-                  turtleInput: 20,
-                  _default: 280
+                  math: 230,
+                  texts: 60,
+                  lists: 40,
+                  colour: 20,
+                  variables: 330,
+                  functions: 290,
+                  turtle: 260,
+                  turtleInput: 200,
+                  _default: 0
                },
                blocks: {}
             };
