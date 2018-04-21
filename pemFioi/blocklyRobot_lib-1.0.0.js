@@ -9,6 +9,12 @@ var getContext = function(display, infos, curLevel) {
          code: {},
          messages: {},
          description: {}
+      },
+      es: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
       }
    };
    
@@ -133,6 +139,127 @@ var getContext = function(display, infos, curLevel) {
                failureLaser: "Le robot doit se trouver sur une borne laser pour pouvoir tirer !"
             },
             startingBlockName: "Programme du robot"
+         },
+
+         es: {
+            label: {
+               row: "fila del robot",
+               col: "columna del robot",
+               north: "avanzar hacia arriba",
+               south: "avanzar hacia abajo",
+               east: "avanzar hacia la derecha",
+               west: "avanzar hacia la izquierda",
+               left: "girar a la izquierda",
+               right: "girar a la derecha",
+               turnAround: "dar media vuelta",
+               forward: "avanzar",
+               backwards: "retroceder",
+               jump: "saltar",
+               obstacleInFront: "obstáculo adelante",
+               obstacleEast: "obstáculo a la derecha",
+               obstacleWest: "obstáculo a la izquierda",
+               obstacleNorth: "obstáculo arriba",
+               obstacleSouth: "obstáculo abajo",
+               obstacleRight: "obstáculo a la derecha",
+               obstacleLeft: "obstáculo a la izquierda",
+               gridEdgeEast: "borde de la cuadrícula a la derecha",
+               gridEdgeWest: "borde de la cuadrícula a la izquierda",
+               gridEdgeNorth: "borde de la cuadrícula arriba",
+               gridEdgeSouth: "borde de la cuadrícula abajo",
+               platformInFront: "plataforma adelante",
+               platformAbove: "plataforma arriba",
+               withdrawObject: "recoger el objeto",
+               dropObject: "soltar el objeto",
+               onObject: "sobre un objeto",
+               onContainer: "sobre un contenedor",
+               onNumber: "sobre un número",
+               onWritable: "sobre un cuadro",
+               writeNumber: "escribir el número",
+               readNumber: "número en la casilla",
+               pushObject: "empujar el objeto",
+               pushableInFront: "objeto empujable adelante",
+               shoot: "disparar el láser en la dirección %1",
+               shoot_noShadow: "disparar el laser en la dirección %1",
+               shootCondition: "dirección del tiro de retorno %1",
+               shootCondition_noShadow: "dirección del tiro de retorno %1"
+            },
+            code: {
+               row: "filaRobot",
+               col: "columnaRobot",
+               north: "arriba",
+               south: "abajo",
+               east: "derecha",
+               west: "izquierda",
+               left: "girarIzquierda",
+               right: "girarDerecha",
+               turnAround: "mediaVuelta",
+               forward: "avanzar",
+               backwards: "retroceder",
+               jump: "saltar",
+               obstacleInFront: "obstaculoAdelante",
+               obstacleRight: "obstaculoDerechaRel",
+               obstacleLeft: "obstaculoIzquierdaRel",
+               obstacleEast: "obstaculoDerecha",
+               obstacleWest: "obstaculoIzquierda",
+               obstacleNorth: "obstaculoArriba",
+               obstacleSouth: "obstaculoAbajo",
+               gridEdgeEast: "bordeCuadriculaDerecha",
+               gridEdgeWest: "bordeCuadriculaIzquierda",
+               gridEdgeNorth: "bordeCuadriculaArriba",
+               gridEdgeSouth: "bordeCuadriculaAbajo",
+               platformInFront: "plataformaAdelante",
+               platformAbove: "plataformaArriba",
+               withdrawObject: "recogerObjeto",
+               dropObject: "soltarObjeto",
+               onObject: "sobreObjeto",
+               onContainer: "sobreContenedor",
+               onNumber: "sobreNumero",
+               onWritable: "sobreCuadro",
+               writeNumber: "escribirNumero",
+               readNumber: "leerNumero",
+               pushObject: "empujarObjeto",
+               pushableInFront: "empujableAdelante",
+               shoot: "dispararLaser",
+               shoot_noShadow: "dispararLaser",
+               shootCondition: "condicionDisparo",
+               shootCondition_noShadow: "condicionDisparo"
+            },
+            messages: {
+               leavesGrid: "¡El robot salió de la cuadrícula!",
+               obstacle: "¡El robot intenta moverse sobre un obstáculo!",
+               nothingToPickUp: "No hay algo para recoger",
+               nothingToLookAt: "No hay carta ni contenedor en esta casilla",
+               falls: "¡El robot va a caer al vacío!",
+               willFallAndCrash: "¡El robot va a caer y chocar!",
+               jumpOutsideGrid: "¡El robot intenta saltar fuera de la cuadrícula!",
+               jumpObstacleBlocking: "El robot intenta saltar pero hay un obstáculo que lo bloquea",
+               jumpNoPlatform: "¡El robot intenta saltar pero no hay una plataforma arriba!",
+               tooManyObjects: "¡El robot intenta transportar demasiados objetos al mismo tiempo!",
+               emptyBag: "El robot intenta soltar un objeto, ¡pero no carga nada!",
+               successReachExit: "Bravo, ¡su robot a llegado a la salida!",
+               failureReachExit: "Su robot no ha llegado a la salida.",
+               successPickedAllWithdrawables: "Bravo, su robot ha recogido todo!",
+               failurePickedAllWithdrawables: "Su robot no ha recogido todo.",
+               successContainersFilled: "Bravo, su robot ha llenado todos los contenedores",
+               failureContainersFilled: "Hay un objeto fuera de los contenedores",
+               failureContainersFilledLess: "Su robot no ha llenado todos los contenedores",
+               failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
+               failureUnfilteredObject: "Su robot ha recogido un objeto inválido",
+               failureTooManyMoves: "Su robot ha realizado demasiados desplazamientos.",
+               failureWriteHere: "¡Su robot no puede escribir aquí!",
+               failureReadHere: "¡No hay un número aquí!",
+               successNumbersWritten: "Bravo, su robot ha escrito los números correctos!",
+               failureNumbersWritten: "Su robot no ha escrito los números correctos!",
+               failureNothingToPush: "¡No hay un objeto que empujar!",
+               failureWhilePushing: "¡El robot no puede empujar este objeto!",
+               failureDropObject: "No es posible poner el objeto aquí",
+               failureDropOutside: "Su robot intenta poner un objeto fuera de la cuadrícula",
+               failureNotEnoughPlatform: "No hay suficiente plataforma",
+               failureLights: "Aún faltan lugares que iluminar.",
+               successLights: "Bravo, ¡su robot ha iluminado todos los lugares!",
+               failureLaser: "¡El robot debe encontrarse sobre una terminal láser para poder disparar!"
+            },
+            startingBlockName: "Programa del robot"
          }
       },
       arrows: {
@@ -142,7 +269,15 @@ var getContext = function(display, infos, curLevel) {
                successReachExit: "Bravo, votre robot a récupéré le coffre !",
                failureReachExit: "Votre robot s'est perdu en chemin."
             }
-         }   
+         },
+
+         es: {
+            messages: {
+               obstacle: "¡El robot va a salirse del camino marcado!",
+               successReachExit: "Bravo, ¡su robot ha recuperado el cofre!",
+               failureReachExit: "Su robot se perdió en el camino."
+            }
+         }  
       },
       cards: {
          fr: {
@@ -158,6 +293,21 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Il y a encore des cartes à ranger.",
                failureContainersFilledBag: "Votre robot doit déposer sa carte."
             }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger la carta",
+               dropObject: "soltar la carta",
+               onObject: "sobre una carta",
+               onContainer: "en un sitio de depósito",
+            },
+             messages: {
+               successContainersFilled: "Bravo, su robot ha ordenado las cartas en un buen lugar!",
+               failureContainersFilled: "Hay cartas ordenadas incorrectamente.",
+               failureContainersFilledLess: "Aún quedan cartas sin ordenar.",
+               failureContainersFilledBag: "Su robot debe depositar su carta."
+            }
          }
       },
       chticode_abs: {
@@ -169,6 +319,16 @@ var getContext = function(display, infos, curLevel) {
                successPickedAllWithdrawables: "Bravo, votre robot a réussi la mission !",
                failureReachExit: "Votre robot n'a pas atteint la case verte."
             }
+         },
+
+         es: {
+            label: {
+               
+            },
+             messages: {
+               successPickedAllWithdrawables: "Bravo, ¡su robot ha completado la misión!",
+               failureReachExit: "Su robot no llegó a la casilla verde."
+            }
          }
       },
       chticode_rel: {
@@ -179,6 +339,16 @@ var getContext = function(display, infos, curLevel) {
              messages: {
                successReachExit: "Bravo, votre robot a atteint la case verte !",
                failureReachExit: "Votre robot n'a pas atteint la case verte."
+            }
+         },
+
+         es: {
+            label: {
+               
+            },
+             messages: {
+               successReachExit: "Bravo, ¡su robot llegó a la casilla verde!",
+               failureReachExit: "Su robot no ha llegado a la casilla verde."
             }
          }
       },
@@ -197,6 +367,23 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
                failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+            }
+         },
+
+         es: {
+            label: {
+               dropObject: "soltar un cono",
+               onContainer: "sobre una casilla marcada",
+               obstacleInFront: "cono adelante"
+            },
+            code: {
+               dropObject: "soltarCono",
+               onContainer: "sobreCasillaMarcada",
+               obstacleInFront: "conoAdelante"
+            },
+            messages: {
+               successContainersFilled: "Bravo, ¡Su robot ha puesto los conos en las casillas correctas!",
+               failureContainersFilled: "Aún hay conos en lugares incorrectos."
             }
          }
       },   
@@ -217,6 +404,24 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Votre robot a semé hors des zones de terre.",
                failureContainersFilledLess: "Il reste de la terre vide de fleur !"
             }
+         },
+
+         es: {
+            label: {
+               dropObject: "sembrar una semilla",
+               onContainer: "tierra en la casilla",
+               obstacleInFront: "flor adelante"
+            },
+            code: {
+               dropObject: "sembrarSemilla",
+               onContainer: "tierraEnCasilla",
+               obstacleInFront: "florAdelante"
+            },
+            messages: {
+               successContainersFilled: "Bravo, ¡el robot es un gran jardinero!",
+               failureContainersFilled: "El robot ha sembrado fuera de las casillas con tierra",
+               failureContainersFilledLess: "¡Aún hay tierra sin flores!"
+            }
          }
       },   
       course: {
@@ -225,6 +430,14 @@ var getContext = function(display, infos, curLevel) {
                successReachExit: "Bravo, le robot a atteint la case verte !",
                failureReachExit: "Le robot n'est pas arrivé sur la case verte.",
                obstacle: "Le robot tente de foncer dans un mur !"
+            }
+         },
+
+         es: {
+            messages: {
+               successReachExit: "Bravo, ¡El robot llegó a la casilla verde!",
+               failureReachExit: "El robot no llegó a la casilla verde.",
+               obstacle: "¡El robot intenta traspasar un muro!"
             }
          }
       },
@@ -239,6 +452,18 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                "successPickedAllWithdrawables": "Bravo, le robot a ramassé tous les dominos demandés !",
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
+            }
+         },
+         es: {
+            label: {
+               withdrawObject: "recoger el dominó",
+            },
+            code: {
+               withdrawObject: "recogerDomino"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Bravo, ¡el robot recogió todos los dominó requeridos!",
+               "failurePickedAllWithdrawables": "El robot no recogió todos los dominó requeridos."
             }
          }
       },
@@ -261,6 +486,26 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
                failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille."
             }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger el engranaje",
+               dropObject: "soltar el engranaje",
+               onObject: "sobre engranaje"
+            },
+            code: {
+               withdrawObject: "recogerEngranaje",
+               dropObject: "soltarEngranaje",
+               onObject: "sobreEngranaje"
+            },
+            messages: {
+               successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
+               failureContainersFilled: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
+               failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
+               failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
+            } 
          }
       },
       marbles: {
@@ -285,6 +530,29 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Il reste une bille à ranger.",
                failureContainersFilledBag: "Il faut déposer la bille dans le trou !",
             }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger la bola",
+               dropObject: "soltar la bola",
+               onObject: "sobre una bola",
+               onContainer: "sobre un agujero",
+            },
+            code: {
+               withdrawObject: "recogerBola",
+               dropObject: "soltarBola",
+               onObject: "sobreBola",
+               onContainer: "sobreAgujero",
+            },   
+            messages: {
+               emptyBag: "¡El robot no carga ninguna bola!",
+               tooManyObjects: "¡El robot ya está cargando una bola!",
+               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
+               failureContainersFilled: "Hay bolas en lugares incorrectos.",
+               failureContainersFilledLess: "Aún falta colocar una bola.",
+               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
+            }
          }
       },
       objects_in_space: {
@@ -297,6 +565,18 @@ var getContext = function(display, infos, curLevel) {
             },
             messages: {
                obstacle: "Attention à l'astéroïde !"
+            }
+         },
+
+         es: {
+            label: {
+               obstacleInFront: "asteroide adelante"
+            },
+            code: {
+               obstacleInFront: "asteroideAdelante"
+            },
+            messages: {
+               obstacle: "¡Cuidado con el asteroide!"
             }
          }
       },
@@ -318,6 +598,25 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Votre robot n'a pas peint toutes les cases marquées.",
                failureContainersFilledBag: "Votre robot n'a pas posé tous les objets",
              }
+         },
+
+         es: {
+             label: {
+               dropObject: "pintar la casilla",
+               onContainer: "sobre una casilla marcada",
+               readNumber: "número en la casilla",
+             },
+             code: {
+                dropObject: "pintarCasilla",
+                onContainer: "sobreCasillaMarcada",
+                readNumber: "númeroEnCasilla",
+             },
+             messages: {
+               successContainersFilled: "Bravo, ¡su robot ha pintado el patrón!",
+               failureContainersFilled: "El robot no pintó las casillas correctas.",
+               failureContainersFilledLess: "Su robot no ha pintado todas las casillas marcadas.",
+               failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
+             }
          }  
       },
       rocket: {
@@ -331,32 +630,68 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Le robot est perdu dans l'espace. Recommencez pour l'aider à rejoindre la fusée.",
                obstacle: "Attention à l'astéroïde !"
             }
+         },
+
+         es: {
+            label: {
+               obstacleRight: "asteroide a la derecha",
+               obstacleInFront: "asteroide adelante",
+            },
+            messages: {
+               successReachExit: "Bravo, ¡el robot llegó al cohete!",
+               failureReachExit: "El robot está perdido en el espacio. Vuelva a comenzar para ayudarle a llegar al cohete.",
+               obstacle: "¡Cuidado con el asteroide!"
+            }
          }
       },
       sokoban: {
          fr: {
-               label: {
-                  pushObject: "pousser la caisse",
-                  onContainer: "sur une case marquée",
-                  pushableInFront: "caisse devant",
-                  obstacleInFront: "obstacle devant",
-                  readNumber: "nombre sur la case"
-               },
-               code: {
-                  pushObject: "pousserCaisse",
-                  onContainer: "surCaseMarquee",
-                  pushableInFront: "caisseDevant",
-                  obstacleInFront: "obstacleDevant",
-                  readNumber: "nombreSurCase"
-               },   
-               messages: {
-                  successContainersFilled: "Bravo, les caisses sont bien rangées !",
-                  failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
-                  failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
-                  failureWhilePushing: "Le robot ne peut pas pousser ici !",
-                  obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
-               }
+            label: {
+               pushObject: "pousser la caisse",
+               onContainer: "sur une case marquée",
+               pushableInFront: "caisse devant",
+               obstacleInFront: "obstacle devant",
+               readNumber: "nombre sur la case"
+            },
+            code: {
+               pushObject: "pousserCaisse",
+               onContainer: "surCaseMarquee",
+               pushableInFront: "caisseDevant",
+               obstacleInFront: "obstacleDevant",
+               readNumber: "nombreSurCase"
+            },   
+            messages: {
+               successContainersFilled: "Bravo, les caisses sont bien rangées !",
+               failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
+               failureNothingToPush: "Il n'y a pas de caisse à pousser ici !",
+               failureWhilePushing: "Le robot ne peut pas pousser ici !",
+               obstacle: "Le robot essaie de foncer dans un mur ou dans une caisse !"
             }
+         },
+
+         es: {
+            label: {
+               pushObject: "empujar la caja",
+               onContainer: "sobre una casilla marcada",
+               pushableInFront: "caja adelante",
+               obstacleInFront: "obstáculo adelante",
+               readNumber: "número en la casilla"
+            },
+            code: {
+               pushObject: "empujarCaja",
+               onContainer: "sobreCasillaMarcada",
+               pushableInFront: "cajaAdelante",
+               obstacleInFront: "obstáculoAdelante",
+               readNumber: "númeroEnCasilla"
+            },   
+            messages: {
+               successContainersFilled: "Bravo, ¡las cajas están bien ordenadas!",
+               failureContainersFilled: "Aún hay cajas que no están en su lugar.",
+               failureNothingToPush: "¡Aquí no hay caja para empujar!",
+               failureWhilePushing: "¡El robot no puede empujar aquí!",
+               obstacle: "El robot intenta traspasar un muro o una caja!"
+            }
+         }
       },
    };
    
@@ -377,6 +712,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers la droite",
                      code: "surFlecheDroite",
                      description: "surFlecheDroite(): Le robot est-il sur une flèche vers la droite ?"
+                  },
+                  es: {
+                     label: "sobre una flecha hacia la derecha",
+                     code: "sobreFlechaHaciaLaDerecha",
+                     description: "sobreFlechaHaciaLaDerecha(): ¿Se encuentra el robot sobre una flecha hacia la derecha?"
                   }
                },
                category: "robot",
@@ -396,6 +736,12 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers la gauche",
                      code: "surFlecheGauche",
                      description: "surFlecheGauche(): Le robot est-il sur une flèche vers la gauche ?"
+                  },
+
+                  es: {
+                     label: "sobre una flecha hacia la izquierda",
+                     code: "sobreFlechaHaciaLaIzquierda",
+                     description: "sobreFlechaHaciaLaIzquierda(): ¿Se encuentra el robot sobre una flecha hacia la izquierda?"
                   }
                },
                category: "robot",
@@ -415,6 +761,12 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers le haut",
                      code: "surFlecheHaut",
                      description: "surFlecheHaut(): Le robot est-il sur une flèche vers le haut ?"
+                  },
+
+                  es: {
+                     label: "sobre una flecha hacia arriba",
+                     code: "sobreFlechaHaciaArriba",
+                     description: "sobreFlechaHaciaArriba(): ¿Se encuentra el robot sobre una flecha hacia arriba?"
                   }
                },
                category: "robot",
@@ -434,6 +786,12 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur une flèche vers le bas",
                      code: "surFlecheBas",
                      description: "surFlecheBas(): Le robot est-il sur une flèche vers le bas ?"
+                  },
+
+                  es: {
+                     label: "sobre una flecha hacia abajo",
+                     code: "sobreFlechaHaciaAbajo",
+                     description: "sobreFlechaHaciaAbajo(): ¿Se encuentra el robot sobre una flecha hacia abajo?"
                   }
                },
                category: "robot",
@@ -468,6 +826,12 @@ var getContext = function(display, infos, curLevel) {
                      label: "rond sur la carte",
                      code: "rondCarte",
                      description: "rondCarte(): Le robot est-il sur une carte qui contient un rond ?"
+                  },
+
+                  es: {
+                     label: "círculo sobre la carta",
+                     code: "círculoCarta",
+                     description: "círculoCarta(): ¿está el robot sobre una carta que contiene un círculo?"
                   }
                },
                category: "robot",
@@ -489,6 +853,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "carré sur la carte",
                      code: "carreCarte",
                      description: "carreCarte(): Le robot est-il sur une carte qui contient un carré ?"
+                  },
+                  es: {
+                     label: "cuadrado sobre la carta",
+                     code: "cuadradoCarta",
+                     description: "cuadradoCarta(): ¿está el robot sobre una carta que contiene un cuadrado?"
                   }
                },
                category: "robot",
@@ -510,6 +879,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "triangle sur la carte",
                      code: "triangleCarte",
                      description: "rondCarte(): Le robot est-il sur une carte qui contient un triangle ?"
+                  },
+                  es: {
+                     label: "triángulo sobre la carta",
+                     code: "triánguloCarta",
+                     description: "triánguloCarta(): ¿está el robot sobre una carta que contiene un triángulo?"
                   }
                },
                category: "robot",
@@ -531,6 +905,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "motif quadrillé",
                      code: "surQuadrille",
                      description: "surQuadrille(): Le robot est-il sur une carte quadrillée ?"
+                  },
+                  es: {
+                     label: "patrón cuadriculado",
+                     code: "sobreCudarícula",
+                     description: "sobreCudarícula(): ¿Está el robot sobre una carta cuadriculada?"
                   }
                },
                category: "robot",
@@ -552,6 +931,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "motif rayé",
                      code: "surRaye",
                      description: "surRaye(): Le robot est-il sur une carte rayée ?"
+                  },
+                  es: {
+                     label: "patrón rayado",
+                     code: "sobreRayado",
+                     description: "sobreRayado(): ¿Está el robot sobre una carta rayada?"
                   }
                },
                category: "robot",
@@ -573,6 +957,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "motif à pois",
                      code: "surPois",
                      description: "surPois(): Le robot est-il sur une carte à pois ?"
+                  },
+                  es: {
+                     label: "patrón con puntos",
+                     code: "sobrePuntos",
+                     description: "sobrePuntos(): ¿Está el robot sobre una carta con puntos?"
                   }
                },
                category: "robot",
@@ -684,6 +1073,11 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur croix",
                  code: "surCroix",
                  description: "surCroix(): Le robot est-il sur une croix ?"
+               },
+               es: {
+                 label: "sobre cruz",
+                 code: "sobreCruz",
+                 description: "sobreCruz(): ¿Se encuentra el robot sobre una cruz?"
                }
              },
              category: "robot",
@@ -703,6 +1097,11 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur étoile",
                  code: "surEtoile",
                  description: "surEtoile(): Le robot est-il sur une étoile ?"
+               },
+               es: {
+                 label: "sobre estrella",
+                 code: "sobreEstrella",
+                 description: "sobreEstrella(): ¿Se encuentra el robot sobre una estrella?"
                }
              },
              category: "robot",
@@ -722,6 +1121,11 @@ var getContext = function(display, infos, curLevel) {
                  label: "sur carré",
                  code: "surCarre",
                  description: "surCarre(): Le robot est-il sur du bleu ?"
+               },
+               es: {
+                 label: "sobre cuadrado",
+                 code: "sobreCuadrado",
+                 description: "sobreCuadrado(): ¿Se encuentra el robot sobre un cuadrado?"
                }
              },
              category: "robot",
@@ -761,6 +1165,10 @@ var getContext = function(display, infos, curLevel) {
                fr: {
                  label: "construire une plateforme devant",
                  code: "construirePlateformeDevant"
+               },
+               es: {
+                  label: "Construir una plataforma adelante",
+                  code: "construirPlataformaAdelante"
                }
              },
              category: "robot",
@@ -786,6 +1194,10 @@ var getContext = function(display, infos, curLevel) {
                fr: {
                  label: "construire une plateforme au-dessus",
                  code: "construirePlateformeAuDessus"
+               },
+               es: {
+                  label: "Construir una plataforma arriba",
+                  code: "construirPlataformaArriba"
                }
              },
              category: "robot",
@@ -836,6 +1248,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "sur la case verte",
                      code: "surCaseVerte",
                      description: "surCaseVerte(): Le robot est-il sur la case verte ?"
+                  },
+                  es: {
+                     label: "sobre la casilla verde",
+                     code: "sobreCasillaVerde",
+                     description: "sobreCasillaVerde(): ¿Se encuentra el robot sobre la casilla verde?"
                   }
                },
                category: "robot",
@@ -906,6 +1323,11 @@ var getContext = function(display, infos, curLevel) {
                      label: "peinture sur la case",
                      code: "surPeinture",
                      description: "surPeinture(): Le robot est-il sur une case déjà peinte ?"
+                  },
+                  es: {
+                     label: "casilla pintada",
+                     code: "casillaPintada",
+                     description: "casillaPintada(): ¿El robot se encuentra sobre una casilla pintada?"
                   }
                },
                category: "robot",
