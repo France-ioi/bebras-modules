@@ -353,7 +353,7 @@ window.displayHelper = {
          outOf: " de ",
          tryToDoBetterOrChangeTask: "Intente nuevamente para obtener una mejor puntuación, o pase a la siguiente pregunta.",
          tryToDoBetterOrMoveToNextLevel: "Intente nuevamente para obtener una mejor puntuación, o pase una versión más difícil.",
-         bestPossibleScoreCongrats: "Este es la mejor puntuación posible en este tema, ¡felicitaciones!",
+         bestPossibleScoreCongrats: "Esta es la mejor puntuación posible en este problema, ¡felicitaciones!",
          forMorePointsMoveToNextLevel: "Para obtener más puntos, pase a una versión más difícil.",
          youDidBetterBefore: "Realizó un mejor trabajo antes.",
          scoreStays2: "Su puntuación se mantiene igual.",
@@ -391,7 +391,7 @@ window.displayHelper = {
          answerNotSavedContestOver: "El concurso está terminando y su respuesta no ha sido guardada. Usted puede {0}.",
          reloadSubmittedAnswer: "recargar la respuesta que ha enviado",
          difficultyWarning: "<strong>Advertencia:</strong> resolver esta versión toma tiempo.<br/>Usted puede resolver más rápidamente las versiones de 2 y 3 estrellas de otros problemas.",
-         enemyWarning: "<strong>Attention :</strong> dans ce défi, l'ordinateur vous empêchera de trouver la solution par hasard."
+         enemyWarning: "<strong>Advertencia:</strong> en este desafío, la computadora se asegurará que no encuentre la respuesta por casualidad."
       },
       sl: {
          version: "Stopnja",
