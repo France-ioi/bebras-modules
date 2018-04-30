@@ -69,8 +69,8 @@
    var miniPlatformWrapping = {
       beaver: {
          'header' : '\
-            <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
-               <table style="width:770px;margin: 10px auto;">\
+            <div id="miniPlatformHeader">\
+               <table>\
                   <td><img src="../../modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span style="font-size:32px;">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
