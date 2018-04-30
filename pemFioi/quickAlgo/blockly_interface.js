@@ -221,6 +221,38 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          $('#errors').html('');
       },
 
+      getCapacityText: function() {
+         var remaining = 1;
+         var text = '';
+         if(maxBlocks) {
+            // Update the remaining blocks display
+            remaining = this.getRemainingCapacity(this.workspace);
+            var optLimitBlocks = {
+               maxBlocks: maxBlocks,
+               remainingBlocks: Math.abs(remaining)
+            };
+            var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
+            text = strLimitBlocks.format(optLimitBlocks);
+         }
+
+         if(remaining < 0) {
+            quickAlgoInterface.blinkRemaining(5, true);
+            return text;
+         }
+
+         // We're over the block limit, is there any block used too often?
+         var limited = this.findLimited(this.workspace);
+         if(limited) {
+            quickAlgoInterface.blinkRemaining(5, true);
+            return this.strings.limitedBlock+' '+limited+'.';
+         } else if(remaining == 0) {
+            quickAlgoInterface.blinkRemaining(4);
+         } else {
+            quickAlgoInterface.blinkRemaining(0); // reset
+         }
+         return text;
+      },
+
       onChange: function(event) {
          var eventType = event ? event.constructor : null;
 
@@ -231,24 +263,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
-            if(maxBlocks && (eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete)) {
-               // Update the remaining blocks display
-               var remaining = this.getRemainingCapacity(this.workspace);
-               var optLimitBlocks = {
-                  maxBlocks: maxBlocks,
-                  remainingBlocks: Math.abs(remaining)
-               };
-               var strLimitBlocks = remaining < 0 ? this.strings.limitBlocksOver : this.strings.limitBlocks;
-               $('#capacity').html(strLimitBlocks.format(optLimitBlocks));
-               if(remaining == 0) {
-                  quickAlgoInterface.blinkRemaining(4);
-               } else if(remaining < 0) {
-                  quickAlgoInterface.blinkRemaining(5, true);
-               } else {
-                  quickAlgoInterface.blinkRemaining(0); // reset
-               }
-            } else if (!maxBlocks) {
-               $('#capacity').html('');
+            if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
+               $('#capacity').html(this.getCapacityText());
             }
 
             if(!this.resetDisplay) {
@@ -546,6 +562,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          that.highlightPause = false;
          if(that.getRemainingCapacity(that.workspace) < 0) {
             $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            return;
+         }
+         var limited = that.findLimited(that.workspace);
+         if(limited) {
+            $("#errors").html('<span class="testError">'+this.strings.limitedBlock+' '+limited+'.</span>');
             return;
          }
          if(!this.scratchMode) {

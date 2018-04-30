@@ -35,6 +35,77 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    return {
       allBlocksAllowed: [],
 
+      checkConstraints: function(workspace) {
+         // Check we satisfy constraints
+         return this.getRemainingCapacity(workspace) >= 0 && !this.findLimited(workspace);
+      },
+
+      makeLimitedUsesPointers: function() {
+         // Make the list of pointers for each block to the limitedUses it
+         // appears in
+         if(this.limitedPointers && this.limitedPointers.limitedUses === this.mainContext.infos.limitedUses) { return; }
+         this.limitedPointers = {
+            // Keep in memory the limitedUses these limitedPointers were made for
+            limitedUses: this.mainContext.infos.limitedUses
+            };
+         for(var i=0; i < this.mainContext.infos.limitedUses.length; i++) {
+            var curLimit = this.mainContext.infos.limitedUses[i];
+            if(this.scratchMode) {
+                // Convert block list to Scratch
+                var blocks = [];
+                for(var j=0; j < curLimit.blocks.length; j++) {
+                    var curBlock = curLimit.blocks[j];
+                    if(!blocklyToScratch.singleBlocks[curBlock]) { continue; }
+                    for(var k=0; k < blocklyToScratch.singleBlocks[curBlock].length; k++) {
+                        if(blocks.indexOf(blocklyToScratch.singleBlocks[curBlock]) >= 0) { continue; }
+                        blocks.push(blocklyToScratch.singleBlocks[curBlock]);
+                    }
+                }
+            } else {
+                var blocks = curLimit.blocks;
+            }
+
+            for(var j=0; j < blocks.length; j++) {
+                var block = blocks[j];
+                if(!this.limitedPointers[block]) {
+                    this.limitedPointers[block] = [];
+                }
+                this.limitedPointers[block].push(i);
+            }
+         }
+      },
+
+      findLimited: function(workspace) {
+         // Check we don't use blocks with limited uses too much
+         // Returns false if there's none, else the name of the first block
+         // found which is over the limit
+         if(!this.mainContext.infos.limitedUses) { return false; }
+         this.makeLimitedUsesPointers();
+
+         var workspaceBlocks = workspace.getAllBlocks();
+         var usesCount = {};
+
+         for(var i = 0; i < workspaceBlocks.length; i++) {
+            var blockType = workspaceBlocks[i].type;
+            if(!this.limitedPointers[blockType]) { continue; }
+            for(var j = 0; j < this.limitedPointers[blockType].length; j++) {
+                // Each pointer is a position in the limitedUses array that
+                // this block appears in
+                var pointer = this.limitedPointers[blockType][j];
+                if(!usesCount[pointer]) { usesCount[pointer] = 0; }
+                usesCount[pointer]++;
+
+                // Exceeded the number of uses
+                if(usesCount[pointer] > this.mainContext.infos.limitedUses[pointer].nbUses) {
+                    return blockType;
+                }
+            }
+         }
+
+         // All blocks are under the use limit
+         return false;
+      },
+
       getRemainingCapacity: function(workspace) {
          // Get the number of blocks allowed
          if(!this.maxBlocks) { return Infinity; }
@@ -76,7 +147,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
-         if(this.getRemainingCapacity(codeWorkspace) < 0) {
+         if(!this.checkConstraints(codeWorkspace)) {
             // Safeguard: avoid generating code when we use too many blocks
             return 'throw "'+this.strings.tooManyBlocks+'";';
          }

@@ -68,6 +68,7 @@ var localLanguageStrings = {
       allTests: "Tous les tests : ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
       tooManyBlocks: "Vous utilisez trop de blocs !",
+      limitedBlock: "Vous utilisez trop souvent un bloc à utilisation limitée :",
       uninitializedVar: "Variable non initialisée :",
       valueTrue: 'vrai',
       valueFalse: 'faux',
@@ -146,6 +147,7 @@ var localLanguageStrings = {
       allTests: "All tests: ",
       errorEmptyProgram: "Le programme est vide ! Connectez des blocs.",
       tooManyBlocks: "You use too many blocks!",
+      limitedBlock: "You use too many of a limited use block:",
       uninitializedVar: "Uninitialized variable:",
       valueTrue: 'true',
       valueFalse: 'false',
@@ -225,8 +227,9 @@ var localLanguageStrings = {
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
-      emptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.", // TODO :: translate this one and next 9
+      emptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
       tooManyBlocks: "Du benutzt zu viele Bausteine!",
+      limitedBlock: "You use too many of a limited use block:", // TODO
       uninitializedVar: "Nicht initialisierte Variable:",
       valueTrue: 'wahr',
       valueFalse: 'unwahr',
@@ -307,6 +310,7 @@ var localLanguageStrings = {
       errorEmptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
       emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
       tooManyBlocks: "¡Utiliza demasiados bloques!",
+      limitedBlock: "You use too many of a limited use block:", // TODO
       uninitializedVar: "Variable no inicializada:",
       valueTrue: 'verdadero',
       valueFalse: 'falso',
@@ -381,6 +385,7 @@ var localLanguageStrings = {
       allTests: "Vsi testi: ",
       errorEmptyProgram: "Program je prazen! Poveži kocke.",
       tooManyBlocks: "Uporabljaš preveč kock!",
+      limitedBlock: "You use too many of a limited use block:", // TODO
       uninitializedVar: "Spremenljivka ni določena:",
       valueTrue: 'resnično',
       valueFalse: 'neresnično',
