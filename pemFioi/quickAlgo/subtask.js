@@ -162,6 +162,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.submit = function() {
+      this.stop();
       this.context.display = false;
       this.getAnswerObject(); // to fill this.answer;
 
