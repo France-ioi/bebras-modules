@@ -1235,7 +1235,8 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             gem: { num: 3, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
-            obstacle: { num: 4, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
+            obstacle: { num: 4, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
+            number: { num: 5, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
       },
