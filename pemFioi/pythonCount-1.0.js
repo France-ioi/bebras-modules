@@ -181,3 +181,59 @@ function pythonForbidden(code, includeBlocks) {
    // No forbidden keyword found
    return false;
 }
+
+function pythonFindLimited(code, limitedUses) {
+   var limitedPointers = {};
+   var usesCount = {};
+   for(var i=0; i < limitedUses.length; i++) {
+      var curLimit = limitedUses[i];
+      var pythonKeys = [];
+      for(var b=0; b<curLimit.blocks.length; b++) {
+         var blockName = curLimit.blocks[b];
+         for(var categoryName in pythonForbiddenBlocks) {
+            if(!pythonForbiddenBlocks[categoryName][blockName]) { continue; }
+            for(var j=0; j < pythonForbiddenBlocks[categoryName][blockName].length; j++) {
+               var pyKey = pythonForbiddenBlocks[categoryName][blockName][j];
+               if(pythonKeys.indexOf(pyKey) >= 0) { continue; }
+               pythonKeys.push(pyKey);
+            }
+         }
+      }
+
+      for(var j=0; j < pythonKeys.length; j++) {
+          var pyKey = pythonKeys[j];
+          if(!limitedPointers[pyKey]) {
+              limitedPointers[pyKey] = [];
+          }
+          limitedPointers[pyKey].push(i);
+      }
+   }
+
+   for(var pyKey in limitedPointers) {
+      if(pyKey == 'list_brackets') {
+         var re = /[\[\]]/g;
+      } else if(pyKey == 'dict_brackets') {
+         var re = /[\{\}]/g;
+      } else {
+         var re = new RegExp('(^|\\W)'+pyKey+'(\\W|$)', 'g');
+      }
+      var count = (code.match(re) || []).length;
+
+      for(var i = 0; i < limitedPointers[pyKey].length; i++) {
+         var pointer = limitedPointers[pyKey][i];
+         if(!usesCount[pointer]) { usesCount[pointer] = 0; }
+         usesCount[pointer] += count;
+         if(usesCount[pointer] > limitedUses[pointer].nbUses) {
+            if(pyKey == 'list_brackets') {
+               return 'crochets [ ]'; // TODO :: i18n ?
+            } else if(pyKey == 'dict_brackets') {
+               return 'accolades { }'; // TODO :: i18n ?
+            } else {
+               return pyKey;
+            }
+         }
+      }
+   }
+
+   return false;
+}
