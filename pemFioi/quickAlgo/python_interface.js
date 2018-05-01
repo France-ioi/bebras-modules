@@ -97,6 +97,10 @@ function LogicController(nbTestCases, maxInstructions) {
       display("Vous utilisez trop d'éléments Python !");
       return false;
     }
+    var limited = this.findLimited(code);
+    if(limited) {
+      display("Vous utilisez trop souvent un mot-clé à utilisation limitée : "+limited+'.');
+    }
     if(pythonCount(code) <= 0) {
       display("Vous ne pouvez pas valider un programme vide !");
       return false;
@@ -196,7 +200,7 @@ function LogicController(nbTestCases, maxInstructions) {
             var xml = Blockly.Xml.textToDom(code);
             that.programs[0][that.player].blockly = code;
           } catch (e) {
-            $("#errors").html(that.strings.invalidContent);
+            $("#errors").html(that._strings.invalidContent);
           }
           that.languages[that.player] = "blockly";
         } else {
@@ -208,7 +212,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
       reader.readAsText(file);
     } else {
-      $("#errors").html(this.strings.unknownFileType);
+      $("#errors").html(this._strings.unknownFileType);
     }
   };
   this.saveProgram = function () {
@@ -277,6 +281,47 @@ function LogicController(nbTestCases, maxInstructions) {
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
   };
+
+  this.findLimited = function(code) {
+    return pythonFindLimited(code, this._mainContext.infos.limitedUses);
+  };
+
+  this.getCapacityText = function() {
+    // Handle capacity display
+    var code = this._aceEditor.getValue();
+
+    var forbidden = pythonForbidden(code, this.includeBlocks);
+    if(forbidden) {
+      quickAlgoInterface.blinkRemaining(5, true);
+      return "Mot-clé interdit utilisé : "+forbidden;
+    }
+    var text = '';
+    var remaining = 1;
+    if(maxInstructions) {
+      remaining = maxInstructions - pythonCount(code);
+      var optLimitElements = {
+        maxBlocks: maxInstructions,
+        remainingBlocks: Math.abs(remaining)
+      };
+      var strLimitElements = remaining < 0 ? this._strings.limitElementsOver : this._strings.limitElements;
+      text = strLimitElements.format(optLimitElements);
+    }
+    if(remaining < 0) {
+      quickAlgoInterface.blinkRemaining(5, true);
+      return text;
+    }
+    var limited = this.findLimited(code);
+    if(limited) {
+      quickAlgoInterface.blinkRemaining(5, true);
+      return "Vous utilisez trop souvent un mot-clé à utilisation limitée : "+limited+'.';
+    } else if(remaining == 0) {
+       quickAlgoInterface.blinkRemaining(4);
+    } else {
+       quickAlgoInterface.blinkRemaining(0);
+    }
+    return text;
+  };
+
   this._bindEditorEvents = function () {
     $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
     var that = this;
@@ -288,31 +333,7 @@ function LogicController(nbTestCases, maxInstructions) {
         that._mainContext.runner._editorMarker = null;
       }
 
-      var code = that._aceEditor.getValue();
-
-      // Handle capacity display
-      var forbidden = pythonForbidden(code, that.includeBlocks);
-      if(forbidden) {
-        $('#capacity').html("Mot-clé interdit utilisé : "+forbidden);
-        quickAlgoInterface.blinkRemaining(5, true);
-      } else if(maxInstructions) {
-        var remaining = maxInstructions - pythonCount(code);
-        var optLimitElements = {
-          maxBlocks: maxInstructions,
-          remainingBlocks: Math.abs(remaining)
-        };
-        var strLimitElements = remaining < 0 ? that._strings.limitElementsOver : that._strings.limitElements;
-        $('#capacity').html(strLimitElements.format(optLimitElements));
-        if(remaining == 0) {
-           quickAlgoInterface.blinkRemaining(4);
-        } else if(remaining < 0) {
-           quickAlgoInterface.blinkRemaining(5, true);
-        } else {
-           quickAlgoInterface.blinkRemaining(0);
-        }
-      } else {
-        $('#capacity').html('');
-      }
+      $('#capacity').html(that.getCapacityText());
 
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {
