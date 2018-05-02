@@ -183,6 +183,7 @@ function pythonForbidden(code, includeBlocks) {
 }
 
 function pythonFindLimited(code, limitedUses) {
+   if(!code || !limitedUses) { return false; }
    var limitedPointers = {};
    var usesCount = {};
    for(var i=0; i < limitedUses.length; i++) {

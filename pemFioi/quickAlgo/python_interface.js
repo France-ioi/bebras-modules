@@ -283,7 +283,11 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.findLimited = function(code) {
-    return pythonFindLimited(code, this._mainContext.infos.limitedUses);
+    if(this._mainContext.infos.limitedUses) {
+      return pythonFindLimited(code, this._mainContext.infos.limitedUses);
+    } else {
+      return false;
+    }
   };
 
   this.getCapacityText = function() {
