@@ -244,7 +244,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          var limited = this.findLimited(this.workspace);
          if(limited) {
             quickAlgoInterface.blinkRemaining(5, true);
-            return this.strings.limitedBlock+' '+limited+'.';
+            return this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".';
          } else if(remaining == 0) {
             quickAlgoInterface.blinkRemaining(4);
          } else {
@@ -566,7 +566,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          var limited = that.findLimited(that.workspace);
          if(limited) {
-            $("#errors").html('<span class="testError">'+this.strings.limitedBlock+' '+limited+'.</span>');
+            $("#errors").html('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {

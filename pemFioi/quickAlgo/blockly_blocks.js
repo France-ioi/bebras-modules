@@ -35,6 +35,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    return {
       allBlocksAllowed: [],
 
+      getBlockLabel: function(type) {
+         // Fetch user-friendly name for the block
+         var msg = this.mainContext.strings.label[type];
+         // TODO :: Names for Blockly/Scratch blocks
+         return msg ? msg : type;
+      },
+
       checkConstraints: function(workspace) {
          // Check we satisfy constraints
          return this.getRemainingCapacity(workspace) >= 0 && !this.findLimited(workspace);
