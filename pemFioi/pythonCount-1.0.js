@@ -182,7 +182,7 @@ function pythonForbidden(code, includeBlocks) {
    return false;
 }
 
-function pythonFindLimited(code, limitedUses) {
+function pythonFindLimited(code, limitedUses, blockToCode) {
    if(!code || !limitedUses) { return false; }
    var limitedPointers = {};
    var usesCount = {};
@@ -191,9 +191,14 @@ function pythonFindLimited(code, limitedUses) {
       var pythonKeys = [];
       for(var b=0; b<curLimit.blocks.length; b++) {
          var blockName = curLimit.blocks[b];
+         if(blockToCode[blockName]) {
+            if(pythonKeys.indexOf(blockToCode[blockName]) >= 0) { continue; }
+            pythonKeys.push(blockToCode[blockName]);
+         }
          for(var categoryName in pythonForbiddenBlocks) {
-            if(!pythonForbiddenBlocks[categoryName][blockName]) { continue; }
-            for(var j=0; j < pythonForbiddenBlocks[categoryName][blockName].length; j++) {
+            var targetKeys = pythonForbiddenBlocks[categoryName][blockName];
+            if(!targetKeys) { continue; }
+            for(var j=0; j < targetKeys.length; j++) {
                var pyKey = pythonForbiddenBlocks[categoryName][blockName][j];
                if(pythonKeys.indexOf(pyKey) >= 0) { continue; }
                pythonKeys.push(pyKey);

@@ -99,7 +99,7 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     var limited = this.findLimited(code);
     if(limited) {
-      display("Vous utilisez trop souvent un mot-clé à utilisation limitée : "+limited+'.');
+      display('Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".');
     }
     if(pythonCount(code) <= 0) {
       display("Vous ne pouvez pas valider un programme vide !");
@@ -284,7 +284,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.findLimited = function(code) {
     if(this._mainContext.infos.limitedUses) {
-      return pythonFindLimited(code, this._mainContext.infos.limitedUses);
+      return pythonFindLimited(code, this._mainContext.infos.limitedUses, this._mainContext.strings.code);
     } else {
       return false;
     }
@@ -317,7 +317,7 @@ function LogicController(nbTestCases, maxInstructions) {
     var limited = this.findLimited(code);
     if(limited) {
       quickAlgoInterface.blinkRemaining(5, true);
-      return "Vous utilisez trop souvent un mot-clé à utilisation limitée : "+limited+'.';
+      return 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".';
     } else if(remaining == 0) {
        quickAlgoInterface.blinkRemaining(4);
     } else {
