@@ -70,18 +70,18 @@ var pythonForbiddenBlocks = {
       'controls_untilWhile': ['while']
     },
     'lists': {
-      'lists_create_with_empty': ['list', 'set', 'list_brackets'],
-      'lists_create_with': ['list', 'set', 'list_brackets'],
-      'lists_repeat' : ['list', 'set', 'list_brackets'],
-      'lists_length' : ['list', 'set', 'list_brackets'],
-      'lists_isEmpty' : ['list', 'set', 'list_brackets'],
-      'lists_indexOf' : ['list', 'set', 'list_brackets'],
-      'lists_getIndex': ['list', 'set', 'list_brackets'],
-      'lists_setIndex': ['list', 'set', 'list_brackets'],
-      'lists_getSublist': ['list', 'set', 'list_brackets'],
-      'lists_sort' : ['list', 'set', 'list_brackets'],
-      'lists_split' : ['list', 'set', 'list_brackets'],
-      'lists_append': ['list', 'set', 'list_brackets']
+      'lists_create_with_empty': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_create_with': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_repeat' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_length' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_isEmpty' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_indexOf' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_getIndex': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_setIndex': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_getSublist': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_sort' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_split' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
+      'lists_append': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__']
     },
     'functions': {
       'procedures_defnoreturn': ['def'],
@@ -91,7 +91,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', 'def', 'break', 'continue'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'def', 'break', 'continue'];
    var allowed = []
 
    if(!includeBlocks) {
