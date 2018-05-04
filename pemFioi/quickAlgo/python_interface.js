@@ -56,7 +56,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this.load = function (language, display, nbTestCases, _options) {
     this._nbTestCases = nbTestCases;
     this._loadBasicEditor();
-    
+
     if(this._aceEditor && ! this._aceEditor.getValue()) {
       if(_options.defaultCode !== undefined)
          this._aceEditor.setValue(_options.defaultCode);
@@ -67,6 +67,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.unload = function () {
     this.stop();
+    this._unbindEditorEvents();
   };
 
   this.unloadLevel = this.unload;
@@ -326,8 +327,12 @@ function LogicController(nbTestCases, maxInstructions) {
     return text;
   };
 
+  this._removeDropDownDiv = function() {
+    $('.blocklyDropDownDiv').remove();
+  }
+
   this._bindEditorEvents = function () {
-    $('body').on('click', function () { $('.blocklyDropDownDiv').remove(); });
+    $('body').on('click', this._removeDropDownDiv);
     var that = this;
     var onEditorChange = function () {
       if(!that._aceEditor) { return; }
@@ -352,6 +357,10 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
+
+  this._unbindEditorEvents = function () {
+    $('body').off('click', this._removeDropDownDiv);
+  }
 
   this.getAvailableModules = function () {
     if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
@@ -379,6 +388,7 @@ function LogicController(nbTestCases, maxInstructions) {
         + '</div>').appendTo('#taskIntro');
     }
 
+    pythonDiv.off('click', 'code');
     if(this._mainContext.infos.noPythonHelp) {
        pythonDiv.html('');
        return;
