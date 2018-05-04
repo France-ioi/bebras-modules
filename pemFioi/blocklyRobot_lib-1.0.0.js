@@ -54,7 +54,7 @@ var getContext = function(display, infos, curLevel) {
                onNumber: "sur un nombre",
                onWritable: "sur un tableau",
                writeNumber: "écrire le nombre",
-               readNumber: "nombre sur la case",
+               readNumber: "nombre de la case",
                pushObject: "pousser l'objet",
                pushableInFront: "poussable devant",
                shoot: "tirer au laser dans la direction %1",
@@ -585,7 +585,7 @@ var getContext = function(display, infos, curLevel) {
              label: {
                dropObject: "peindre la case",
                onContainer: "sur une case marquée",
-               readNumber: "nombre sur la case",
+               readNumber: "nombre de la case",
              },
              code: {
                 dropObject: "peindreCase",
@@ -651,7 +651,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "sur une case marquée",
                pushableInFront: "caisse devant",
                obstacleInFront: "obstacle devant",
-               readNumber: "nombre sur la case"
+               readNumber: "nombre de la case"
             },
             code: {
                pushObject: "pousserCaisse",
