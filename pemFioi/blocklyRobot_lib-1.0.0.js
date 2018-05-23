@@ -53,6 +53,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "sur un conteneur",
                onNumber: "sur un nombre",
                onWritable: "sur un tableau",
+               onLauncher: "sur un lanceur laser",
                writeNumber: "écrire le nombre",
                readNumber: "nombre de la case",
                pushObject: "pousser l'objet",
@@ -94,6 +95,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "surConteneur",
                onNumber: "surNombre",
                onWritable: "surTableau",
+               onLauncher: "surLanceur",
                writeNumber: "ecrireNombre",
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
@@ -902,7 +904,7 @@ var getContext = function(display, infos, curLevel) {
                name: "onQuadrille",
                strings: {
                   fr: {
-                     label: "motif quadrillé",
+                     label: "sur un motif quadrillé",
                      code: "surQuadrille",
                      description: "surQuadrille(): Le robot est-il sur une carte quadrillée ?"
                   },
@@ -928,7 +930,7 @@ var getContext = function(display, infos, curLevel) {
                name: "onStriped",
                strings: {
                   fr: {
-                     label: "motif rayé",
+                     label: "sur un motif rayé",
                      code: "surRaye",
                      description: "surRaye(): Le robot est-il sur une carte rayée ?"
                   },
@@ -954,7 +956,7 @@ var getContext = function(display, infos, curLevel) {
                name: "onDotted",
                strings: {
                   fr: {
-                     label: "motif à pois",
+                     label: "sur un motif à pois",
                      code: "surPois",
                      description: "surPois(): Le robot est-il sur une carte à pois ?"
                   },
@@ -1282,7 +1284,7 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2, isOpaque: true },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, isOpaque: true },
-            light: { num: 3, img: "off_spot.png", states: ["off_spot.png", "on_spot.png"], isLight: true, isObstacle: true, state: 0, side: 60 },
+            light: { num: 3, img: "off_spot.png", states: ["off_spot.png", "on_spot.png"], isLight: true, state: 0, side: 60 },
             launcher: { num: 5, img: "launcher.png", isLaser: true, side: 60 },
             mirrorN: { num: 6, img: "mirrorN.png", isMirror: true, mirrorFunction: function(dir) { return (14 - dir) % 8; }, side: 60 },
             mirrorZ: { num: 7, img: "mirrorZ.png", isMirror: true, mirrorFunction: function(dir) { return (10 - dir) % 8; }, side: 60 },
@@ -1353,7 +1355,9 @@ var getContext = function(display, infos, curLevel) {
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             marker_white: { num: 4, img: "marker_white.png", isContainer: true, isFake: true, side: 60, zOrder: 0 },
             paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
-            number: { side: 60, zOrder: 1 }
+            number: { side: 60, zOrder: 1 },
+            board_background: { num: 5, color: "#ffffff", side: 60, zOrder: 0 },
+            board: { side: 60, isWritable: true, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -1741,6 +1745,15 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "onNumber", yieldsValue: true },
       func: function(callback) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
+      }
+   });
+	
+	infos.newBlocks.push({
+      name: "onLauncher",
+      type: "sensors",
+      block: { name: "onLauncher", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
       }
    });
    
