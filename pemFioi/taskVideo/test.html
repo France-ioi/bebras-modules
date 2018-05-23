@@ -25,17 +25,32 @@
     <script>
         $(document).ready(function() {
             $("#video1").taskVideo({
-                videoId: "XN5NXT0g1lg",
+                video_id: "XN5NXT0g1lg",
                 width: '500px',
                 introduction: 'Introduction text',
                 conclusion: 'Conclusion text',
-                sections: 2,
-                display_state: true,
-                playerVars: {
+                sections: [
+                    {
+                        title: 'Section 1',
+                        description: 'Description text 1',
+                        parts: 2,
+                        start: 0,
+                        end: 7.5
+                    },
+                    {
+                        title: 'Section 2',
+                        description: 'Description text 2',
+                        start: 7.5,
+                        end: 15
+                    }
+                ],
+                //sections: 2,
+                show_viewed: true,
+                youtube: {
+                    rel: 0,
                     autoplay: 1,
-                    //start:
-                    //end:
-                    //rel:
+                    //start: 2,
+                    //end: 10
                     //hl:
                 }
             })

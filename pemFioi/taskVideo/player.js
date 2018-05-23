@@ -1,9 +1,3 @@
-/*
-
-    player -> watcher -> sections
-*/
-
-
 (function($) {
 
     var player;
@@ -53,9 +47,13 @@
 
         data: [],
         active: null,
+        visible: true,
+        show_viewed: true,
 
-        generateSections: function(amount) {
-            var duration = player.getDuration() / amount;
+        generateSections: function(amount, start, end) {
+            if(!start) start = 0;
+            if(!end) end = player.getDuration();
+            var duration = (end - start) / amount;
             var res = [];
             for(var i=0; i<amount; i++) {
                 res.push({
@@ -79,31 +77,30 @@
 
         init: function(player, config, parent) {
             this.active = null;
+            this.show_viewed = !!config.show_viewed;
             if(!config.sections) {
+                this.visible = false;
                 this.data = this.generateSections(1);
             } else if(Number.isInteger(config.sections)) {
+                this.visible = false;
                 this.data = this.generateSections(config.sections);
             } else {
+                this.visible = true;
                 this.data = config.sections.slice();
                 for(var i=0,section; section = this.data[i]; i++) {
                     section.viewed = false;
+                    var parts_amount = Number.isInteger(section.parts) ? section.parts : 1;
+                    var part_duraton = (section.end - section.start) / parts_amount;
+
                     section.parts = [];
-                    var part_duraton = (section.end - section.start) / section.parts;
-                    for(var j=0; j<section.parts; j++) {
-                        section.parts[i] = {
-                            vieved: false,
+                    for(var j=0; j<parts_amount; j++) {
+                        section.parts[j] = {
+                            viewed: false,
                             start: section.start + j * part_duraton,
                             end: section.start + (j + 1) * part_duraton
                         }
                     }
-                    /*
-                    .fill.call(
-                        { length: section.parts },
-                        { vieved: false }
-                    );
-                    */
                 }
-
             }
             this.render(parent, function(time) {
                 player.seekTo(time);
@@ -113,6 +110,7 @@
 
 
         render: function(parent, onClick) {
+            if(!this.visible) return;
             var that = this;
             function makeClickCallback(idx) {
                 return function() {
@@ -133,9 +131,10 @@
 
 
         refresh: function() {
+            if(!this.visible) return;
             for(var i=0,section; section = this.data[i]; i++) {
                 section.element.toggleClass('active', i === this.active);
-                section.element.toggleClass('viewed', section.viewed);
+                section.element.toggleClass('viewed', this.show_viewed && section.viewed);
             }
         },
 
@@ -278,17 +277,17 @@
         if(window.stringsLanguage) {
             defaults.hl = window.stringsLanguage;
         }
-        var playerVars = Object.assign(defaults, config.playerVars);
+        var youtube = Object.assign(defaults, config.youtube);
 
 
         return new YT.Player(parent, {
-            videoId: config.videoId,
+            videoId: config.video_id,
             height: '100%',
             width: '100%',
             enablejsapi: 1,
             origin: null, // ??
             host: 'https://www.youtube.com',
-            playerVars: playerVars,
+            playerVars: youtube,
             events: {
                 'onReady': function(e) {
                     sections.init(player, config, template.get('sections'));
