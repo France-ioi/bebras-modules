@@ -1,0 +1,36 @@
+.task-video .introduction {
+    margin-bottom: 20px;
+}
+
+.task-video .video {
+
+}
+
+.task-video .sections .section {
+    cursor: pointer;
+    padding: 5px 0;
+}
+
+.task-video .sections .section:hover,
+.task-video .sections .active {
+    background: #DEF;
+}
+
+.task-video .sections .section .title {
+    font-weight: bold;
+}
+
+.task-video .sections .viewed .title:after {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 12px;
+    border: solid #060;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+    margin-left: 10px;
+}
+
+.task-video .conclusion {
+    margin-top: 20px;
+}
