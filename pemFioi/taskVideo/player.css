@@ -16,8 +16,12 @@
     background: #DEF;
 }
 
-.task-video .sections .section .title {
+.task-video .section .title {
     font-weight: bold;
+}
+
+.task-video .section .description {
+    color: #999;
 }
 
 .task-video .sections .viewed .title:after {
