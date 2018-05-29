@@ -41,6 +41,14 @@ var getContext = function(display, infos) {
             tooManyLines: "Trop de lignes en sortie",
             correctOutput: "La sortie est correcte !",
             moreThan100Moves: "La sortie est correcte, mais vous l'avez produite en plus de 100 étapes…"
+         },
+         errorStr: {
+            intro: "La sortie de votre programme est fausse, à la ligne ",
+            expected: " :<br>Attendu: \"<b>",
+            answer: "</b>\",<br>Votre réponse: \"<b>",
+            introChar: "</b>\".<br>(Premier caractère erroné à la colonne ",
+            expectedChar: "; attendu: \"<b>",
+            answerChar: "</b>\", votre réponse: \"<b>"
          }
       },
       de: {
@@ -72,6 +80,14 @@ var getContext = function(display, infos) {
             tooManyLines: "Zu viele Zeilen ausgegeben",
             correctOutput: "Die Ausgabe ist richtig!",
             moreThan100Moves: "Die Ausgabe ist richtig, aber du hast mehr als 100 Schritte benötigt …"
+         },
+         errorStr: {
+            intro: "Das Programm hat nicht alle Zeilen richtig ausgegeben.; in Zeile ",
+            expected: ":<br>Erwartet: \"<b>",
+            answer: "</b>\",<br>deine Ausgabe: \"<b>",
+            introChar: "</b>\".<br>(Erstes falsches Zeichen in Spalte ",
+            expectedChar: "; erwartet: \"<b>",
+            answerChar: "</b>\", deine Ausgabe: \"<b>"
          }
       },
       none: {
@@ -173,6 +189,13 @@ var getContext = function(display, infos) {
          value = "";
       }
 
+      if(value && value.length) {
+         for(var i=0; i < value.length; i++) {
+            if(typeof value[i].v != 'undefined') {
+               value[i] = value[i].v;
+            }
+         }
+      }
       context.printer.output_text += value + end;
       context.updateScale();
       
@@ -273,13 +296,19 @@ var getContext = function(display, infos) {
          for (iChar = 0; iChar < expectedLine.length && iChar < actualLine.length; iChar++) {
             if (actualLine[iChar] != expectedLine[iChar]) {
                this.success = false;
-               var errorstring = "Das Programm hat nicht alle Zeilen richtig ausgegeben.; in Zeile " +
-                                      (iLine + 1) + ":<br>Erwartet: \"<b>" +
-                                      escapeHtml(expectedLine) + "</b>\",<br>deine Ausgabe: \"<b>" +
-                                 escapeHtml(actualLine) + "</b>\".<br>(Erstes falsches Zeichen in Spalte " +
-                                      (iChar + 1) + "; erwartet: \"<b>" +
-                                      escapeHtml(expectedLine[iChar]) + "</b>\", deine Ausgabe: \"<b>" +
-                                 escapeHtml(actualLine[iChar]) + "</b>\".)"
+               var errorstring = (
+                  strings.errorStr.intro
+                  + (iLine + 1)
+                  + strings.errorStr.expected
+                  + escapeHtml(expectedLine)
+                  + strings.errorStr.answer
+                  + escapeHtml(actualLine)
+                  + strings.errorStr.introChar
+                  + (iChar + 1)
+                  + strings.errorStr.expectedChar
+                  + escapeHtml(expectedLine[iChar])
+                  + strings.errorStr.answerChar
+                  + escapeHtml(actualLine[iChar]) + '</b>"');
                throw(errorstring); // add line info iLine + 1, add char info iChar + 1
             }
          }

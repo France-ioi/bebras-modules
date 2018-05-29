@@ -108,7 +108,11 @@ function pythonForbiddenLists(includeBlocks) {
       }
    };
 
-   if(includeBlocks && includeBlocks.standardBlocks && !includeBlocks.standardBlocks.includeAll) {
+   if(includeBlocks && includeBlocks.standardBlocks) {
+      if(includeBlocks.standardBlocks.includeAll) {
+         // Everything is allowed
+         return {forbidden: [], allowed: forbidden};
+      }
       if(includeBlocks.standardBlocks.wholeCategories) {
          for(var c=0; c<includeBlocks.standardBlocks.wholeCategories.length; c++) {
             var categoryName = includeBlocks.standardBlocks.wholeCategories[c];
