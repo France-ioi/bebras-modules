@@ -235,20 +235,22 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             text = strLimitBlocks.format(optLimitBlocks);
          }
 
+         var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining : function() {};
+
          if(remaining < 0) {
-            quickAlgoInterface.blinkRemaining(5, true);
+            blinkRemaining(5, true);
             return text;
          }
 
          // We're over the block limit, is there any block used too often?
          var limited = this.findLimited(this.workspace);
          if(limited) {
-            quickAlgoInterface.blinkRemaining(5, true);
+            blinkRemaining(5, true);
             return this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".';
          } else if(remaining == 0) {
-            quickAlgoInterface.blinkRemaining(4);
+            blinkRemaining(4);
          } else {
-            quickAlgoInterface.blinkRemaining(0); // reset
+            blinkRemaining(0); // reset
          }
          return text;
       },
@@ -277,7 +279,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          // Refresh the toolbox for new procedures (same with variables
          // but it's already handled correctly there)
-         if(this.scratchMode && this.includeBlocks.groupByCategory) {
+         if(this.scratchMode && this.includeBlocks.groupByCategory && this.workspace.toolbox_) {
             this.workspace.toolbox_.refreshSelection();
          }
       },
