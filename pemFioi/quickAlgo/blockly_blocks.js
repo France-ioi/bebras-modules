@@ -1579,7 +1579,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
 
-         if('wholeCategories' in this.includeBlocks.generatedBlocks) {
+         if(this.includeBlocks.generatedBlocks && 'wholeCategories' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.wholeCategories) {
               var categories = this.includeBlocks.generatedBlocks.wholeCategories[blockType];
               for(var i=0; i<categories.length; i++) {
@@ -1599,7 +1599,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               }
             }
          }
-         if('singleBlocks' in this.includeBlocks.generatedBlocks) {
+         if(this.includeBlocks.generatedBlocks && 'singleBlocks' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.singleBlocks) {
               this.addBlocksAndCategories(
                 this.includeBlocks.generatedBlocks.singleBlocks[blockType],
