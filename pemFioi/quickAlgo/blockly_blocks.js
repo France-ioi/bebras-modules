@@ -20,13 +20,20 @@ var blocklyToScratch = {
       'logic_boolean': [],
       'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
       'logic_operation': ['operator_and', 'operator_or'],
+      'text': [],
+      'text_append': [],
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
       'math_change': ['data_changevariableby'],
       'math_number': [],
       'variables_get': ['data_variable'],
       'variables_set': ['data_setvariableto']
-    }
+   },
+   wholeCategories: {
+      'loops': 'control',
+      'logic': 'operator',
+      'math': 'operator'
+   }
 };
 
 function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
@@ -1641,8 +1648,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
          var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
+         var handledCategories = [];
          for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
             var categoryName = wholeCategories[iCategory];
+            if(this.scratchMode && !this.includeBlocks.standardBlocks.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
+               categoryName = blocklyToScratch.wholeCategories[categoryName];
+            }
+
+            if(handledCategories.indexOf(categoryName) != -1) { continue; }
+            handledCategories.push(categoryName);
+
             if (!(categoryName in categoriesInfos)) {
                categoriesInfos[categoryName] = {
                   blocksXml: []
