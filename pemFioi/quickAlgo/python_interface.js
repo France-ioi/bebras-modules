@@ -23,6 +23,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this._startingBlock = true;
   this._visible = true;
   this._strings = window.languageStrings;
+  this._options = {};
   this.includeBlocks = null;
 
   this.loadContext = function (mainContext) {
@@ -53,13 +54,14 @@ function LogicController(nbTestCases, maxInstructions) {
     this.language = e.value;
   };
 
-  this.load = function (language, display, nbTestCases, _options) {
+  this.load = function (language, display, nbTestCases, options) {
     this._nbTestCases = nbTestCases;
+    this._options = options;
     this._loadBasicEditor();
 
     if(this._aceEditor && ! this._aceEditor.getValue()) {
-      if(_options.defaultCode !== undefined)
-         this._aceEditor.setValue(_options.defaultCode);
+      if(options.defaultCode !== undefined)
+         this._aceEditor.setValue(options.defaultCode);
       else
          this._aceEditor.setValue(this.getDefaultContent());
     }
@@ -278,6 +280,7 @@ function LogicController(nbTestCases, maxInstructions) {
   };
   this._loadAceEditor = function () {
     this._aceEditor = ace.edit('python-workspace');
+    this._aceEditor.setOption('readOnly', !!this._options.readOnly);
     this._aceEditor.$blockScrolling = Infinity;
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
