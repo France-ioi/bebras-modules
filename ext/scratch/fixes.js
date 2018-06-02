@@ -1283,11 +1283,11 @@ Blockly.Python['text'] = function(block) {
 
 Blockly.Python['operators'] = function(block) {
   var nameToOp = {
-    'operator_add': {op: '+', varname: 'NUM', order: Blockly.Python.ORDER_ADDITION},
-    'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_SUBTRACTION},
-    'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATION},
-    'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_DIVISION},
-    'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_EQUALITY},
+    'operator_add': {op: '+', varname: 'NUM', order: Blockly.Python.ORDER_ADDITIVE},
+    'operator_subtract': {op: '-', varname: 'NUM', order: Blockly.Python.ORDER_ADDITIVE},
+    'operator_multiply': {op: '*', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
+    'operator_divide': {op: '/', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
+    'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_and': {op: 'and', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_AND},
