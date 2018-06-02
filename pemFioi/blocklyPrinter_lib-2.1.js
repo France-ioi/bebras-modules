@@ -203,7 +203,7 @@ var getContext = function(display, infos) {
       // Fix display of arrays
       if(value && value.length && typeof value == 'object') {
          for(var i=0; i < value.length; i++) {
-            if(typeof value[i].v != 'undefined') {
+            if(value[i] && typeof value[i].v != 'undefined') {
                // When used inside Skulpt (Python mode)
                value[i] = value[i].v;
             }

@@ -191,7 +191,7 @@ var getContext = function(display, infos) {
 
       if(value && value.length) {
          for(var i=0; i < value.length; i++) {
-            if(typeof value[i].v != 'undefined') {
+            if(value[i] && typeof value[i].v != 'undefined') {
                value[i] = value[i].v;
             }
          }
