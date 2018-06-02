@@ -109,7 +109,7 @@ function pythonForbiddenLists(includeBlocks) {
    };
 
    if(includeBlocks && includeBlocks.standardBlocks) {
-      if(includeBlocks.standardBlocks.includeAll) {
+      if(includeBlocks.standardBlocks.includeAll || includeBlocks.standardBlocks.includeAllPython) {
          // Everything is allowed
          return {forbidden: [], allowed: forbidden};
       }
