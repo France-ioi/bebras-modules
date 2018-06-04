@@ -404,7 +404,8 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                successContainersFilled: "Bravo, votre robot est un bon jardinier !",
                failureContainersFilled: "Votre robot a semé hors des zones de terre.",
-               failureContainersFilledLess: "Il reste de la terre vide de fleur !"
+               failureContainersFilledLess: "Il reste de la terre vide de fleur !",
+					obstacle: "Attention à la fleur !",
             }
          },
 
