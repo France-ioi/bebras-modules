@@ -1549,7 +1549,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   colour: colours.blocks[blockName]
                };
             }
-            categoriesInfos[categoryName].blocksXml.push(blockXmlInfo.xml);
+            var blockXml = blockXmlInfo.xml;
+            if(categoriesInfos[categoryName].blocksXml.indexOf(blockXml) == -1) {
+               categoriesInfos[categoryName].blocksXml.push(blockXml);
+            }
             this.allBlocksAllowed.push(blockName);
          }
 
