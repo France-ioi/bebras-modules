@@ -153,9 +153,12 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.linkBack = false;
    };
 
-   subTask.run = function() {
+   subTask.run = function(callback) {
       initBlocklyRunner(subTask.context, function(message, success) {
          $("#errors").html('<span class="testError">'+message+'</span>');
+         if(callback) {
+            callback(message, success);
+         }
       });
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);

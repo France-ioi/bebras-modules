@@ -131,6 +131,17 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return remaining;
       },
 
+      isEmpty: function(workspace) {
+         // Check if workspace is empty
+         if(!workspace) { workspace = this.workspace; }
+         var blocks = workspace.getAllBlocks();
+         if(blocks.length == 1) {
+            return blocks[0].type == 'robot_start';
+         } else {
+            return blocks.length == 0;
+         }
+      },
+
       getCodeFromXml: function(xmlText, language) {
          try {
            var xml = Blockly.Xml.textToDom(xmlText)
