@@ -111,6 +111,8 @@ var getContext = function(display, infos) {
    var cells = [];
    var texts = [];
    var scale = 1;
+   var firstLineHighlight = null;
+   var libOptions = infos.libOptions ? infos.libOptions : {};
 
    context.printer = {
       input_text : "",
@@ -172,11 +174,24 @@ var getContext = function(display, infos) {
    context.resetDisplay = function() {
       this.delayFactory.destroyAll();
 
-      $("#grid").html("<div style='width:400px; margin:0; padding: 0; overflow:hidden;text-align:left;'><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>Output:</div><pre id='output' style='margin:0px;'>a</pre></div><div style='width:175px;height:200px;padding:5px; margin:5px; border: 1px solid black;overflow-y:auto;float:right;'><div style='font-size:small'>Input:</div><pre id='input' style='margin:0px;'>a</pre></div><div>")
-      
-      
+      $("#grid").html(
+         '<div style="width: 400px; margin: 0; padding: 0; overflow: hidden; text-align: left;">' +
+         '  <div style="width: 175px; height: 200px; padding: 5px; margin: 5px; border: 1px solid black; overflow-y: auto; float: right;">' +
+         '    <div style="font-size:small">Output:</div>' +
+         '    <pre id="output" style="margin:0px;">a</pre>' +
+         '  </div>' +
+         '  <div style="width: 175px; height: 200px; padding: 5px; margin: 5px; border: 1px solid black; overflow-y: auto; float: right;">' +
+         '    <div style="font-size:small">Input:</div>' +
+         (libOptions.highlightRead ? '    <pre id="inputHighlight" style="margin: 0px; background-color: lightgray;"></pre>' : '') +
+         '    <pre id="input" style="margin:0px; border-top: 1px solid black;">a</pre>' +
+         '  </div>' +
+         '</div>')
+
       $("#output").html("");
       $("#input").html("");
+      $("#inputHighlight").html("");
+      firstLineHighlight = null;
+
       context.blocklyHelper.updateSize();
       context.updateScale();
    };
@@ -241,6 +256,9 @@ var getContext = function(display, infos) {
             result = context.printer.input_text.substring(0,index);
             context.printer.input_text = context.printer.input_text.substring(index+1);
          }
+      }
+      if(libOptions.highlightRead) {
+         firstLineHighlight = result;
       }
       context.updateScale();
       return result;
@@ -319,6 +337,7 @@ var getContext = function(display, infos) {
       }
       $("#output").text(context.printer.output_text);
       $("#input").text(context.printer.input_text);
+      $("#inputHighlight").text(firstLineHighlight ? firstLineHighlight : '');
    };
 
    context.checkOutputHelper = function() {
