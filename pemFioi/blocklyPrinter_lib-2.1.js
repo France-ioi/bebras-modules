@@ -182,8 +182,8 @@ var getContext = function(display, infos) {
          '  </div>' +
          '  <div style="width: 175px; height: 200px; padding: 5px; margin: 5px; border: 1px solid black; overflow-y: auto; float: right;">' +
          '    <div style="font-size:small">Input:</div>' +
-         (libOptions.highlightRead ? '    <pre id="inputHighlight" style="margin: 0px; background-color: lightgray;"></pre>' : '') +
-         '    <pre id="input" style="margin:0px; border-top: 1px solid black;">a</pre>' +
+         (libOptions.highlightRead ? '    <pre id="inputHighlight" style="margin: 0px; background-color: lightgray; border-bottom: 1px solid black;"></pre>' : '') +
+         '    <pre id="input" style="margin: 0px;">a</pre>' +
          '  </div>' +
          '</div>')
 
