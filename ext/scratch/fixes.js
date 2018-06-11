@@ -1019,7 +1019,9 @@ Blockly.JavaScript['data_replaceitemoflist'] = function(block) {
   var value = Blockly.JavaScript.valueToCode(block, 'ITEM',
       Blockly.JavaScript.ORDER_ASSIGNMENT) || 'null';
   var at = Blockly.JavaScript.getAdjusted(block, 'INDEX');
-  return varName + '[' + at + '] = ' + value + ';\n';
+  code = 'if(' + at + ' > 1000000) { throw "List index > 1000000"; }\n';
+  code += varName + '[' + at + '] = ' + value + ';\n';
+  return code;
 };
 
 
@@ -1228,6 +1230,8 @@ Blockly.Python['data_replaceitemoflist'] = function(block) {
 
   Blockly.Python.definitions_['lists_assignIndex'] = '' +
     'def assignIndex(l, i, x):\n' +
+    '    if i > 1000000:\n' +
+    '        raise IndexError("list index > 1000000")\n' +
     '    n = len(l)\n' +
     '    if i >= n:\n' +
     '        l.extend([None]*(i-n+1))\n' +
