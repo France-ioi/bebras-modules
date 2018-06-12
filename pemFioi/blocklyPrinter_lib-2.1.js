@@ -33,6 +33,7 @@ var getContext = function(display, infos) {
          startingBlockName: "Programme",
          messages: {
             inputPrompt: "Veuillez écrire une entrée pour le programme.",
+            inputEmpty: "Votre programme a essayé de lire l'entrée alors qu'il n'y avait plus aucune ligne à lire !",
             outputWrong: "Votre programme n'a pas traité correctement toutes les lignes.",
             outputCorrect: "Bravo ! Votre programme a traité correctement toutes les lignes.",
             tooFewChars: "Ligne trop courte : ligne ",
@@ -80,6 +81,8 @@ var getContext = function(display, infos) {
          },
          startingBlockName: "Programm",
          messages: {
+            inputPrompt: "Please input a line for the program.", // TODO :: translate two lines
+            inputEmpty: "Your program tried to read the input while there is no line left to read!",
             outputWrong: "Das Programm hat nicht alle Zeilen richtig ausgegeben.",
             outputCorrect: "Bravo! Das Programm hat alle Zeilen richtig ausgegeben.",
             tooFewChars: "Zeile zu kurz: Zeile ",
@@ -249,6 +252,9 @@ var getContext = function(display, infos) {
          var index = context.printer.input_text.indexOf('\n');
          
          if (index < 0) {
+            if(!context.printer.input_text) {
+                throw strings.messages.inputEmpty;
+            }
             result = context.printer.input_text;
             context.printer.input_text = "";
          }
