@@ -14,6 +14,7 @@ var localLanguageStrings = {
          dicts: "Dictionnaires",
          input: "Entrées",
          lists: "Listes",
+         tables: "Tableaux",
          logic: "Logique",
          loops: "Boucles",
          control: "Contrôles",

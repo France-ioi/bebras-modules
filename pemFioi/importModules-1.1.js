@@ -33,6 +33,7 @@ var importableModules = function () {
       'miniPlatform': {classStr: "remove", src: modulesPath+"/integrationAPI.01/official/miniPlatform.js"},
 
       'acorn': {src: modulesPath+"/ext/js-interpreter/acorn.js", id: "acorn"},
+      'acorn-walk': {src: modulesPath+"/ext/acorn/walk.js", id: "acorn-walk"},
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
@@ -116,6 +117,7 @@ var languageScripts = function () {
    return {
       blockly: [
          'acorn',
+         'acorn-walk',
          'interpreter',
          'blockly',
          'blockly_blocks',
@@ -135,6 +137,7 @@ var languageScripts = function () {
       ],
       scratch: [
          'acorn',
+         'acorn-walk',
          'interpreter',
          'scratch',
          'scratch_blocks_common',
