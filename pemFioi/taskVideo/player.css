@@ -1,5 +1,5 @@
 .task-video .introduction {
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
 .task-video .video {
@@ -36,5 +36,5 @@
 }
 
 .task-video .conclusion {
-    margin-top: 20px;
+    margin: 20px 0;
 }
