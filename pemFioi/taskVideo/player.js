@@ -1,7 +1,8 @@
 (function($) {
 
     var player;
-
+    var ready = false;
+    var state_cache;
 
     // load youtube IFrame Player API
     var apiLoader = {
@@ -183,6 +184,14 @@
         },
 
 
+        setViewed: function(viewed) {
+            for(var i=0,section; section=this.data[i]; i++) {
+                section.viewed = viewed.indexOf(i) !== -1;
+            }
+            this.refresh();
+        },
+
+
         destroy: function() {
             $.each(this.data, function(i, section) {
                 section.element.remove();
@@ -242,7 +251,7 @@
 
 
         destroy: function() {
-            this.elements.wrapper.remove();
+            this.elements.wrapper && this.elements.wrapper.remove();
             this.elements = {};
         }
     }
@@ -273,6 +282,7 @@
     // player init
 
     function createPlayer(parent, config) {
+        ready = false;
         var defaults = {}
         if(window.stringsLanguage) {
             defaults.hl = window.stringsLanguage;
@@ -291,6 +301,11 @@
             events: {
                 'onReady': function(e) {
                     sections.init(player, config, template.get('sections'));
+                    ready = true;
+                    if(state_cache) {
+                        stateHandler(state_cache);
+                        delete(state_cache);
+                    }
                 },
                 'onStateChange': function(e) {
                     if(e.data === YT.PlayerState.PLAYING) {
@@ -316,7 +331,33 @@
     }
 
 
-
+    function stateHandler(state) {
+        
+        if(!ready) {
+            //console.error('Player not ready');
+            return null;
+        }
+       
+        if(state) {
+            if('viewed' in state) {
+                sections.setViewed(state.viewed);
+            }
+            if('timestamp' in state) {
+                player.seekTo(state.timestamp);
+            }
+            if('playing' in state && state.playing) {
+                player.playVideo();
+            } else {
+                player.pauseVideo();
+            }
+        } else {
+            return {
+                timestamp: player.getCurrentTime(),
+                playing: player.getPlayerState() === YT.PlayerState.PLAYING,
+                viewed: sections.getViewed()
+            }
+        }
+    }
 
     // jQuery plugin interface
 
@@ -336,21 +377,26 @@
     }
 
 
-    $.fn.taskVideo.info = function() {
-        if(!player) {
-            console.error('Player not ready');
-            return null;
-        }
-        return {
-            timestamp: player.getCurrentTime(),
-            viewed: sections.getViewed()
+    $.fn.taskVideo.ready = function() {
+        return ready;
+    }
+
+
+    $.fn.taskVideo.state = function(state) {
+        if(ready) {
+            return stateHandler(state);
+        } else if(state !== undefined) {
+            state_cache = state;
+        } else {
+            return state_cache;
         }
     }
 
 
     $.fn.taskVideo.destroy = function() {
-        watcher.destroy();
-        player.destroy();
+        delete(state_cache);
+        watchDog.stop();
+        player && player.destroy();
         player = null;
         template.destroy();
     }

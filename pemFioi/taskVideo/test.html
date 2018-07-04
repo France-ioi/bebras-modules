@@ -18,10 +18,10 @@
     <div id="video1"></div>
     <br><hr><br>
     <div>
-        <button id="btn1_get_data">Get data</button>
+        <button id="btn1_get_data">Get state</button>
         <button id="btn1_destroy">Destroy</button>
     </div>
-    <pre id="info1"></pre>
+    <pre id="state1"></pre>
     <script>
         $(document).ready(function() {
             $("#video1").taskVideo({
@@ -48,15 +48,15 @@
                 show_viewed: true,
                 youtube: {
                     rel: 0,
-                    autoplay: 1,
+                    autoplay: 0,
                     //start: 2,
                     //end: 10
                     //hl:
                 }
             })
             $('#btn1_get_data').click(function() {
-                var info = $("#test").taskVideo.info();
-                $('#info1').html(JSON.stringify(info, null, 2));
+                var state = $("#test").taskVideo.state();
+                $('#state1').html(JSON.stringify(state, null, 2));
             })
             $('#btn1_destroy').click(function() {
                 $("#test").taskVideo.destroy();
