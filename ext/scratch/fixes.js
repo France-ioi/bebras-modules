@@ -1228,19 +1228,21 @@ Blockly.Python['data_replaceitemoflist'] = function(block) {
     var varName = 'unnamed_variable'; // Block is still loading
   }
 
-  Blockly.Python.definitions_['lists_assignIndex'] = '' +
+  // TODO :: make it an option
+/*  Blockly.Python.definitions_['lists_assignIndex'] = '' +
     'def assignIndex(l, i, x):\n' +
     '    if i > 1000000:\n' +
     '        raise IndexError("list index > 1000000")\n' +
     '    n = len(l)\n' +
     '    if i >= n:\n' +
     '        l.extend([None]*(i-n+1))\n' +
-    '    l[i] = x\n';
+    '    l[i] = x\n';*/
 
   var value = Blockly.Python.valueToCode(block, 'ITEM',
       Blockly.Python.ORDER_ASSIGNMENT) || 'null';
   var at = Blockly.Python.getAdjustedInt(block, 'INDEX');
-  return 'assignIndex(' + varName + ', ' + at + ', ' + value + ')\n';
+//  return 'assignIndex(' + varName + ', ' + at + ', ' + value + ')\n';
+  return varName + '[' + at + '] = ' + value + '\n';
 }
 
 Blockly.Python['data_variable'] = function(block) {
