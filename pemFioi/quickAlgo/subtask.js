@@ -267,6 +267,7 @@ var initBlocklySubTask = function(subTask, language) {
          if(this.context.runner) {
             this.context.runner.stop();
          }
+         $('#errors').html('');
          initContextForLevel(newTest);
          if(subTask.context.display) {
             window.quickAlgoInterface.updateTestSelector(newTest);
@@ -355,6 +356,8 @@ var initBlocklySubTask = function(subTask, language) {
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
             if(display) {
                window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
+               subTask.changeTestTo(iWorstTestCase);
+               $('#error').html(subTask.testCaseResults[subTask.iTestCase]);
             }
             if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {
                if(subTask.nbTestCases == 1) {
