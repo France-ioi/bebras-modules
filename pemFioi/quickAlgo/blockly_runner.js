@@ -133,7 +133,7 @@ function initBlocklyRunner(context, messageCallback) {
                var args = [];
                for(var i=0; i < arguments.length-1; i++) {
                   // TODO :: Maybe JS-Interpreter has a better way of knowing?
-                  if(arguments[i].isObject) {
+                  if(typeof arguments[i] != 'undefined' && arguments[i].isObject) {
                      args.push(interpreter.pseudoToNative(arguments[i]));
                   } else {
                      args.push(arguments[i]);
@@ -302,6 +302,10 @@ function initBlocklyRunner(context, messageCallback) {
                   }
                }
                message = runner.strings.uninitializedVar + ' ' + varName;
+            }
+
+            if(message.indexOf('undefined') != -1) {
+               message += '. ' + runner.strings.undefinedMsg;
             }
 
             if ((context.nbTestCases != undefined) && (context.nbTestCases > 1)) {
