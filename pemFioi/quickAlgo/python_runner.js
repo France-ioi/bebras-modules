@@ -562,6 +562,10 @@ function PythonInterpreter(context, msgCallback) {
       message = message.replace(/^.* line/, "TypeError: NoneType value used in operation on line");
     }
 
+    if(message.indexOf('undefined') > -1) {
+      message += '. ' + window.languageStrings.undefinedMsg;
+    }
+
     // Transform message depending on whether we successfully
     if(this.context.success) {
       message = "<span style='color:green;font-weight:bold'>" + message + "</span>";
