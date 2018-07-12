@@ -297,10 +297,11 @@ function LogicController(nbTestCases, maxInstructions) {
   this.getCapacityText = function() {
     // Handle capacity display
     var code = this._aceEditor.getValue();
+    var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining.bind(window.quickAlgoInterface) : function() {};
 
     var forbidden = pythonForbidden(code, this.includeBlocks);
     if(forbidden) {
-      quickAlgoInterface.blinkRemaining(5, true);
+      blinkRemaining(5, true);
       return "Mot-clé interdit utilisé : "+forbidden;
     }
     var text = '';
@@ -315,17 +316,17 @@ function LogicController(nbTestCases, maxInstructions) {
       text = strLimitElements.format(optLimitElements);
     }
     if(remaining < 0) {
-      quickAlgoInterface.blinkRemaining(5, true);
+      blinkRemaining(5, true);
       return text;
     }
     var limited = this.findLimited(code);
     if(limited) {
-      quickAlgoInterface.blinkRemaining(5, true);
+      blinkRemaining(5, true);
       return 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".';
     } else if(remaining == 0) {
-       quickAlgoInterface.blinkRemaining(4);
+       blinkRemaining(4);
     } else {
-       quickAlgoInterface.blinkRemaining(0);
+       blinkRemaining(0);
     }
     return text;
   };
