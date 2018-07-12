@@ -235,7 +235,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             text = strLimitBlocks.format(optLimitBlocks);
          }
 
-         var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining : function() {};
+         var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining.bind(window.quickAlgoInterface) : function() {};
 
          if(remaining < 0) {
             blinkRemaining(5, true);
