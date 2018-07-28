@@ -18,7 +18,6 @@
     height: 90%;
     background-color: #FFFFFF;
     border: 4px solid;
-    padding: 4px;
 }
 
 #conceptViewer .exit {
@@ -42,6 +41,7 @@
     height: 100%;
     overflow: auto;
     border-right: 2px solid;
+    padding: 4px;
 }
 
 #conceptViewer .navigation .highlight {
