@@ -241,6 +241,7 @@ function fillResources(FIOITaskMetaData, PEMInstallationAPIObject, callback, url
                };
                var filelist = [
                   "sources/" + groupName + "-" + fileName,
+                  "sources/" + fileName,
                   groupName + "-" + fileName,
                   fileName
                   ];
