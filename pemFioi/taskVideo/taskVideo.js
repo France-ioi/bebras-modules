@@ -4,8 +4,21 @@ function taskVideo(data, grader) {
 
         var player;
         var level;
+        var answer;
 
-        subTask.resetDisplay = function() {};
+        subTask.resetDisplay = function() {
+            if(subTask.display) {
+                $('#taskContent').taskVideo.destroy();
+                $('#taskContent').taskVideo(data[level], {
+                    onPlaybackEnd: function() {
+                        platform.validate('done');
+                    }
+                });
+            }
+            if(answer) {
+                $('#taskContent').taskVideo.state(answer);
+            }
+        };
 
 
         subTask.getStateObject = function() {
@@ -14,8 +27,7 @@ function taskVideo(data, grader) {
 
 
         subTask.reloadAnswerObject = function(answerObj) {
-            //console.log('reloadAnswerObject', answerObj)
-            $('#taskContent').taskVideo.state(answerObj);
+            answer = answerObj;
         };
 
 
@@ -25,20 +37,21 @@ function taskVideo(data, grader) {
 
 
         subTask.getDefaultAnswerObject = function() {
-            return {};
+            return {
+                viewed: [],
+                timestamp: 0,
+                playing: false
+            };
         };
 
 
         subTask.loadLevel = function(curLevel) {
             level = curLevel;
-            if(subTask.display) {
-                $('#taskContent').taskVideo.destroy();
-                $('#taskContent').taskVideo(data[curLevel]);
-            }
         };
 
 
         subTask.unloadLevel = function(callback) {
+            $('#taskContent').taskVideo.destroy();
             callback();
         };
 
