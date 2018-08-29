@@ -332,10 +332,10 @@ var getContext = function(display, infos) {
             { name: "print_end", params: [null, null], variants: [[null], [null, null]], anyArgs: true, blocklyJson: {inputsInline: true}}
          ],
          read:  [
-            { name: "read", yieldsValue: true },
-            { name: "readInteger", yieldsValue: true },
-            { name: "readFloat", yieldsValue: true },
-            { name: "eof", yieldsValue: true }
+         { name: "read", yieldsValue: true, blocklyJson: {output: "String"} },
+            { name: "readInteger", yieldsValue: true, blocklyJson: {output: "Number"} },
+            { name: "readFloat", yieldsValue: true, blocklyJson: {output: "Number"} },
+            { name: "eof", yieldsValue: true, blocklyJson: {output: "Boolean"}}
          ],
          manipulate: [
             { name: "charToNumber", params: ["String"], yieldsValue: true, blocklyJson: {output: "Number"}},
