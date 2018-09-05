@@ -1,5 +1,5 @@
 body {
-  padding: 40px 0 0;
+  padding: 0;
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
@@ -14,13 +14,11 @@ img {
 #choose-view {
   margin-top: 0 !important;
 }
+
+
+/* header */
 #miniPlatformHeader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
   height: 40px;
-  width: 100%;
   background-color: #fff;
   overflow: hidden;
 }
@@ -35,30 +33,46 @@ img {
   margin: 0;
   vertical-align: top;
 }
+
+
+
+
 #tabsContainer {
-  position: fixed;
-  top: 40px;
-  width: 100%;
-  z-index: 1;
 }
 #tabsMenu {
-  display: flex;
+  overflow: hidden;
+  border-bottom: 1px solid #33B5E5;
+}
+#tabsMenu .stars {
+  vertical-align: middle;
 }
 #tabsMenu .li {
-  flex: 1 1 0;
+  float: left;
+  width: 33.33%;
   text-align: center;
-  background-color: #ccc;
+  background-color: #E0E0E0;
+  cursor: pointer;
+  padding: 5px;
 }
+#tabsMenu .li a,
+#tabsMenu .li a:hover {
+  text-decoration: none;
+  color: #000;
+  outline: 0;
+}
+
 #tabsMenu .li.current {
-  background-color: #eee;
+  background-color: #33B5E5;
 }
 #taskContent {
-  margin-top: 22px;
-  display: flex;
-  flex-direction: row;
+  position: absolute;
+  top: 71px;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 #introGrid {
-  display: flex;
+
 }
 #taskIntro {
   padding: 5px 10px;
@@ -74,9 +88,71 @@ img {
 #testSelector .tabs .testTab {
   background-color: #efefef;
   flex: 1 0 auto;
+  cursor: pointer;
 }
 #testSelector .tabs .testTab.currentTest {
   background-color: #fff;
+}
+
+
+#languageInterface {
+  position: absolute;
+  top: 30px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#editorBar {
+  height: 30px;
+  background-color: #666666;
+}
+
+
+.speedSlider {
+  position: relative;
+  height: 40px;
+}
+
+.speedSlider input {
+  margin: 20px 0 0 0;
+  padding: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  outline: none;
+}
+
+.speedSlider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+.speedSlider input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+.speedSlider span {
+  position: absolute;
+  top: 0;
+}
+
+.speedSlider span.speedSlower {
+  left: 0;
+}
+
+.speedSlider span.speedFaster {
+  right: 0;
 }
 
 /*
@@ -87,42 +163,99 @@ img {
 /* mode instructions */
 .mode-instructions button[data-mode=instructions],
 .mode-instructions #blocklyLibContent,
-.mode-instructions .selectSpeed {
+.mode-instructions .speedControls {
   display: none;
 }
 .mode-instructions #taskContent {
-  max-height: calc(100vh - 80px);
+
 }
 .mode-instructions #introGrid {
-  display: flex;
+
 }
 .mode-instructions #taskIntro {
-  order: 2;
-  /*max-height: calc(100vh - 80px);*/
+  position: absolute;
+  left: 410px;
+  height: 100%;
   overflow: auto;
 }
 .mode-instructions #gridContainer {
-  order: 1;
-  border: 1px solid #000;
+  width: 410px;
 }
+
+
+
 /* mode player */
 .mode-player button[data-mode=player] {
   display: none;
 }
+
+.mode-player #introGrid {
+  left: 0;
+  width: 420px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+}
+
 .mode-player #taskIntro {
-  order: 1;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 370px;
+  overflow: auto;
 }
+
 .mode-player #gridContainer {
-  order: 2;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 60px;
+  height: 290px;
 }
+
+
+.mode-player .speedControls {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 420px;
+  height: 50px;
+}
+
+
+.mode-player .speedControls .speedSlider {
+  width: 140px;
+  margin: 0 10px;
+  float: left;
+}
+
+
+.mode-player .speedControls .btn-group {
+  float: left;
+}
+
 .mode-player #blocklyLibContent {
-  flex: 1 1 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 420px;
+  right: 0;
 }
+
+
+
 /* mode editor */
 .mode-editor button[data-mode=editor],
-.mode-editor #introGrid {
+.mode-editor #introGrid,
+.mode-editor .speedControls {
   display: none;
 }
+
+
+
+
+
 
 #modeSelector {
   background-color: #fff;
@@ -192,8 +325,12 @@ img {
    padding: 5px 18px 5px 18px;
    margin-bottom: 0.5em;
 }
+
+
 @media screen and (orientation: landscape) { /* horizontal screen layout */
 
+
+/*
   .mode-instructions #taskContent {
     flex-direction: row;
   }
@@ -220,10 +357,29 @@ img {
   .mode-player #gridContainer {
     align-self: center;
   }
+  */
 }
 
 @media screen and (orientation: portrait) { /* vertical screen layout */
 
+  .mode-instructions #gridContainer {
+    top: 0;
+    height: 360px;
+  }
+
+  .mode-instructions #grid {
+    margin: 0 auto;
+  }
+
+  .mode-instructions #taskIntro {
+    top: 380px;
+    left: 0;
+    bottom: 0;
+    height: auto;
+  }
+
+
+/*
   body #task {
     padding: 0;
     margin: 0;
@@ -246,8 +402,10 @@ img {
     overflow: auto;
     flex: 0 1 33vw;
   }
+  */
 }
 @media screen and (max-width: 480px) {
+  /*
   #miniPlatformHeader h1 {
     font-size: 16px;
     line-height: 1;
@@ -258,8 +416,12 @@ img {
   .mode-player #taskIntro {
     display: none;
   }
+  */
 }
 @media screen and (max-height: 480px) {
+  /*
   .mode-player #taskIntro {
     display: none;
   }
+  */
+}
