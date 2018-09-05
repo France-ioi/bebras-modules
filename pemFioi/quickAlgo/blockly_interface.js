@@ -116,7 +116,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             Blockly.removeEvents();
 
             // Inject Blockly
-            this.workspace = Blockly.inject(this.divId, wsConfig);
+            window.blocklyWorkspace = this.workspace = Blockly.inject(this.divId, wsConfig);
 
             // Start checking whether it's hidden, to sort out contents
             // automatically when it's displayed

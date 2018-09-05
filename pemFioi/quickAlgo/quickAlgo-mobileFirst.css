@@ -9,8 +9,6 @@ body > * {
 }
 #taskContent {
   clear: both;
-  position: relative;
-  width: 100%;
 }
 #taskContent::before,
 #taskContent::after {
@@ -22,19 +20,36 @@ body > * {
 #blocklyContainer {
   box-sizing: border-box;
 }
+
+#editorMenuContainer {
+  float: right;
+}
+
+#fullscreenButton {
+  float: right;
+}
+
+#editorMenu {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  z-index: 100;
+}
+
 .scaleDrawingControl {
     display: none;
 }
 #blocklyContainer {
   overflow: hidden;
-  height: 600px;
+  height: 100%;
   border: 1px solid #8d9daa;
   width: 100%;
   position: relative;
 }
 #blocklyDiv {
+  position: absolute;
   height: 100%;
-  width: 100%;
+  width: auto;
 }
 
 #testCaseName {
@@ -283,6 +298,8 @@ input[type=button] {
 }
 #capacity {
     display: inline;
+    line-height: 30px;
+    padding-left: 10px;
 }
 .capacityRed {
     background-color: #E77471;
