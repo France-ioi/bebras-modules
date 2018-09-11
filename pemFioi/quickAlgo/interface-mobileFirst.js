@@ -165,9 +165,9 @@ var quickAlgoInterface = {
     setOptions: function(opt) {
         // Load options from the task
         $('#editorMenu div[rel=example]').toggle(opt.hasExample);
-        $('#editorMenu div[rel=save]').toggle(opt.hideSaveOrLoad);
-        $('#editorMenu div[rel=load]').toggle(opt.hideSaveOrLoad);
-        $('#editorMenu div[rel=best-answer]').toggle(opt.hideLoadBestAnswer);
+        $('#editorMenu div[rel=save]').toggle(!opt.hideSaveOrLoad);
+        $('#editorMenu div[rel=load]').toggle(!opt.hideSaveOrLoad);
+        $('#editorMenu div[rel=best-answer]').toggle(!opt.hideLoadBestAnswer);
 
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);

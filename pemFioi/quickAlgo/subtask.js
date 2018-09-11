@@ -57,7 +57,8 @@ var initBlocklySubTask = function(subTask, language) {
            hideSaveOrLoad: subTask.levelGridInfos.hideSaveOrLoad,
            hasExample: subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language],
            conceptViewer: subTask.levelGridInfos.conceptViewer,
-           conceptViewerLang: this.blocklyHelper.language
+           conceptViewerLang: this.blocklyHelper.language,
+           hideLoadBestAnswer: subTask.levelGridInfos.hideLoadBestAnswer
            });
       }
 
@@ -288,10 +289,10 @@ var initBlocklySubTask = function(subTask, language) {
          callback({
             message: '',
             successRate: 1,
-            iTestCase: 0 
+            iTestCase: 0
             });
          return;
-      }     
+      }
 
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
