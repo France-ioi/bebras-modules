@@ -74,15 +74,16 @@ var quickAlgoInterface = {
                 "<div id='editorMenuContainer'>" +
                     "<button type='button' id='toggleEditorMenu'>≡</button>" +
                     "<div id='editorMenu'>" +
-                        "<div rel='save'>" + this.strings.saveProgram + "</div>" +
+                        "<div rel='example' class='item'>" + this.strings.loadExample + "</div>" +
+                        "<div rel='save' class='item'>" + this.strings.saveProgram + "</div>" +
                         "<span id='saveUrl'></span>" +
-                        "<div rel='restart'>" + this.strings.reloadProgram + "</div>" +
-                        "<div>" +
+                        "<div rel='restart' class='item'>" + this.strings.reloadProgram + "</div>" +
+                        "<div rel='load' class='item'>" +
                             "<input type='file' id='task-upload-file' " +
                             "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
                             this.strings.restart +
                         "</div>" +
-                        "<div rel='best-answer'>" + this.strings.loadBestAnswer+ "</div>" +
+                        "<div rel='best-answer' class='item'>" + this.strings.loadBestAnswer+ "</div>" +
                     "</div>" +
                 "</div>" +
                 "</div>" +
@@ -94,6 +95,7 @@ var quickAlgoInterface = {
             self.toggleFullscreen();
         });
 
+
         $('#toggleEditorMenu').click(function() {
             var el = $('#editorMenu');
             if(el.is(":visible")) {
@@ -102,6 +104,10 @@ var quickAlgoInterface = {
                 $('#editorMenu div[rel=best-answer]').toggle(!!displayHelper.savedAnswer);
                 el.show();
             }
+        });
+
+        $('#editorMenu div[rel=example]').click(function(e) {
+            task.displayedSubTask.loadExample()
         });
 
         $('#editorMenu div[rel=save]').click(function(e) {
@@ -157,18 +163,12 @@ var quickAlgoInterface = {
 
 
     setOptions: function(opt) {
-        console.log('setOptions')
         // Load options from the task
-        if(opt.hideSaveOrLoad) {
-            $('#saveOrLoadBtn').hide();
-        } else {
-            $('#saveOrLoadBtn').show();
-        }
-        if(opt.hasExample) {
-            $('#loadExampleBtn').show();
-        } else {
-            $('#loadExampleBtn').hide();
-        }
+        $('#editorMenu div[rel=example]').toggle(opt.hasExample);
+        $('#editorMenu div[rel=save]').toggle(opt.hideSaveOrLoad);
+        $('#editorMenu div[rel=load]').toggle(opt.hideSaveOrLoad);
+        $('#editorMenu div[rel=best-answer]').toggle(opt.hideLoadBestAnswer);
+
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);
             $('#displayHelpBtn').show();
@@ -177,6 +177,10 @@ var quickAlgoInterface = {
         }
     },
 
+
+    devMode: function() {
+        $('#editorMenu .item').show();
+    },
 
     onScaleDrawingChange: function(e) {
         console.log('onScaleDrawingChange')
