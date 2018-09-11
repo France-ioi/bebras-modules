@@ -53,91 +53,106 @@ var quickAlgoInterface = {
 
 
     loadInterface: function(context) {
-        console.log('loadInterface')
-      // Load quickAlgo interface into the DOM
-      var self = this;
-      this.context = context;
-      this.strings = window.languageStrings;
+            console.log('loadInterface')
+        // Load quickAlgo interface into the DOM
+        var self = this;
+        this.context = context;
+        this.strings = window.languageStrings;
 
-      var gridHtml = "<center>";
-      gridHtml += "<div id='gridButtonsBefore'></div>";
-      gridHtml += "<div id='grid'></div>";
-      gridHtml += "<div id='gridButtonsAfter'></div>";
-      gridHtml += "</center>";
-      $("#gridContainer").html(gridHtml)
+        var gridHtml = "<center>";
+        gridHtml += "<div id='gridButtonsBefore'></div>";
+        gridHtml += "<div id='grid'></div>";
+        gridHtml += "<div id='gridButtonsAfter'></div>";
+        gridHtml += "</center>";
+        $("#gridContainer").html(gridHtml)
 
-      $("#blocklyLibContent").html(
-         "<div id='editorBar'>" +
-         "  <div id='capacity'></div>" +
-         "<button type='button' id='fullscreenButton'>[+]</button>" +
-         "  <div id='editorMenuContainer'><button type='button' id='toggleEditorMenu'>≡</button><div id='editorMenu' style='display:none'></div></div>" +
-         "</div>" +
-         "<div id='languageInterface'></div>" +
-         "<div id='saveOrLoadModal' class='modalWrapper'></div>\n");
+        $("#blocklyLibContent").html(
+            "<div id='editorBar'>" +
+                "<div id='capacity'></div>" +
+                "<button type='button' id='fullscreenButton'>[+]</button>" +
+                "<button type='button' id='displayHelpBtn' onclick='conceptViewer.show()'>?</button>" +
+                "<div id='editorMenuContainer'>" +
+                    "<button type='button' id='toggleEditorMenu'>≡</button>" +
+                    "<div id='editorMenu'>" +
+                        "<div rel='save'>" + this.strings.saveProgram + "</div>" +
+                        "<span id='saveUrl'></span>" +
+                        "<div rel='restart'>" + this.strings.reloadProgram + "</div>" +
+                        "<div>" +
+                            "<input type='file' id='task-upload-file' " +
+                            "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
+                            this.strings.restart +
+                        "</div>" +
+                        "<div rel='best-answer'>" + this.strings.loadBestAnswer+ "</div>" +
+                    "</div>" +
+                "</div>" +
+                "</div>" +
+            "<div id='languageInterface'></div>"
+        );
+
 
         $('#fullscreenButton').click(function() {
             self.toggleFullscreen();
-        })
-
-      // load editor menu
-        $("#editorMenuContainer button").on( "click", function() {
-            $("#editorMenu").toggle();
         });
-        $("#editorMenu").html(
-         "<button type='button' id='displayHelpBtn' class='btn btn-xs btn-default' style='display: none;' onclick='conceptViewer.show()'>" +
-         "?" +
-         "</button>&nbsp;" +
-         "<button type='button' id='loadExampleBtn' class='btn btn-xs btn-default' style='display: none;' onclick='task.displayedSubTask.loadExample()'>" +
-         this.strings.loadExample +
-         "</button>&nbsp;" +
-         "<button type='button' id='saveOrLoadBtn' class='btn btn-xs btn-default' onclick='quickAlgoInterface.saveOrLoad()'>" +
-         this.strings.saveOrLoadButton +
-         "</button>");
 
-      var saveOrLoadModal = "<div class='modal'>" +
-                            "    <p><b>" + this.strings.saveOrLoadProgram + "</b></p>\n" +
-                            "    <button type='button' class='btn' onclick='task.displayedSubTask.blocklyHelper.saveProgram()' >" + this.strings.saveProgram +
-                            "</button><span id='saveUrl'></span>\n" +
-                            "    <p>" + this.strings.avoidReloadingOtherTask + "</p>\n" +
-                            "    <p>" + this.strings.reloadProgram + " <input type='file' id='input' " +
-                            "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(\"#input\"))'></p>\n" +
-                            "    <button type='button' class='btn close' onclick='closeModal(`saveOrLoadModal`)' >x</button>"
-                            "</div>";
-      $("#saveOrLoadModal").html(saveOrLoadModal);
+        $('#toggleEditorMenu').click(function() {
+            var el = $('#editorMenu');
+            if(el.is(":visible")) {
+                el.hide();
+            } else {
+                $('#editorMenu div[rel=best-answer]').toggle(!!displayHelper.savedAnswer);
+                el.show();
+            }
+        });
 
-      // Buttons from buttonsAndMessages
-      var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
-      var placementNames = ['graderMessage', 'validate', 'saved'];
-      for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
-         var placement = 'displayHelper_' + placementNames[iPlacement];
-         if ($('#' + placement).length === 0) {
-            addTaskHTML += '<div id="' + placement + '"></div>';
-         }
-      }
-      addTaskHTML += '</div>';
-      /*
-      if(!$('#displayHelper_cancel').length) {
-         $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
-      }
-   */
-      var scaleControl = '';
-      if(context.display && context.infos.buttonScaleDrawing) {
-        var scaleControl = '<div class="scaleDrawingControl">' +
-            '<label for="scaleDrawing"><input id="scaleDrawing" type="checkbox">' +
-            this.strings.scaleDrawing +
-            '</label>' +
-            '</div>';
-      }
+        $('#editorMenu div[rel=save]').click(function(e) {
+            $('#editorMenu').hide();
+            task.displayedSubTask.blocklyHelper.saveProgram();
+        });
 
-      var gridButtonsAfter = scaleControl
-        + "<div id='testSelector'></div>"
-        //+ "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
-        //+ this.strings.submitProgram
-        //+ "</button><br/>"
-        //+ "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
-        + addTaskHTML;
-      $("#gridButtonsAfter").html(gridButtonsAfter);
-      $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
+        $('#editorMenu div[rel=restart]').click(function(e) {
+            $('#editorMenu').hide();
+            displayHelper.restartAll();
+        });
+
+        $('#editorMenu div[rel=best-answer]').click(function(e) {
+            $('#editorMenu').hide();
+            displayHelper.retrieveAnswer();
+        });
+
+
+        // Buttons from buttonsAndMessages
+        var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
+        var placementNames = ['graderMessage', 'validate', 'saved'];
+        for (var iPlacement = 0; iPlacement < placementNames.length; iPlacement++) {
+            var placement = 'displayHelper_' + placementNames[iPlacement];
+            if ($('#' + placement).length === 0) {
+                addTaskHTML += '<div id="' + placement + '"></div>';
+            }
+        }
+        addTaskHTML += '</div>';
+        /*
+        if(!$('#displayHelper_cancel').length) {
+            $('body').append($('<div class="contentCentered" style="margin-top: 15px;"><div id="displayHelper_cancel"></div></div>'));
+        }
+    */
+        var scaleControl = '';
+        if(context.display && context.infos.buttonScaleDrawing) {
+            var scaleControl = '<div class="scaleDrawingControl">' +
+                '<label for="scaleDrawing"><input id="scaleDrawing" type="checkbox">' +
+                this.strings.scaleDrawing +
+                '</label>' +
+                '</div>';
+        }
+
+        var gridButtonsAfter = scaleControl
+            + "<div id='testSelector'></div>"
+            //+ "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+            //+ this.strings.submitProgram
+            //+ "</button><br/>"
+            //+ "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
+            + addTaskHTML;
+        $("#gridButtonsAfter").html(gridButtonsAfter);
+        $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
 
 
@@ -327,11 +342,6 @@ var quickAlgoInterface = {
         $("#testTab"+newCurTest).addClass('currentTest');
         $("#task").append($('#messages'));
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
-    },
-
-    saveOrLoad: function () {
-        console.log('saveOrLoad')
-        $("#saveOrLoadModal").show();
     },
 
 
