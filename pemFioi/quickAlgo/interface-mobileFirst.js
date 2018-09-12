@@ -267,8 +267,7 @@ var quickAlgoInterface = {
         });
 
         $('#playerControls .end').click(function() {
-            var speed = self.playbackSpeeds[self.playbackSpeeds.length - 1];
-            task.displayedSubTask.changeSpeed(speed);
+            task.displayedSubTask.changeSpeed(0);
             $('#playPause').removeClass('play').addClass('pause');
         });
     },
