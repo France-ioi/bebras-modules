@@ -11,10 +11,15 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+#task {
+  min-width: 480px;
+  min-height: 480px;
+}
+
 #choose-view {
   margin-top: 0 !important;
 }
-
 
 /* header */
 #miniPlatformHeader {
@@ -64,6 +69,8 @@ img {
 #tabsMenu .li.current {
   background-color: #33B5E5;
 }
+
+
 #taskContent {
   position: absolute;
   top: 71px;
@@ -72,7 +79,7 @@ img {
   right: 0;
 }
 #introGrid {
-
+overflow: hidden;
 }
 #taskIntro {
   padding: 5px 10px;
@@ -161,7 +168,8 @@ img {
 /* speed slider  */
 .speedSlider {
   position: relative;
-  height: 40px;
+  height: 45px;
+  overflow: hidden;
 }
 
 .speedSlider input {
@@ -483,6 +491,16 @@ img {
 
 
 @media screen and (max-width: 800px) {
+
+  #miniPlatformHeader  {
+    font-size: 10px;
+  }
+
+  #miniPlatformHeader h1 {
+    font-size: 12px;
+  }
+
+
   .mode-player #taskIntro {
     display: none;
   }
@@ -495,10 +513,6 @@ img {
 
 
 @media screen and (max-width: 600px) {
-
-  #miniPlatformHeader h1 {
-    font-size: 12px;
-  }
 
   #miniPlatformHeader .platform {
     font-size: 16px;
@@ -515,9 +529,6 @@ img {
 
 @media screen and (max-width: 480px) {
 
-  #miniPlatformHeader  {
-    font-size: 10px;
-  }
 
   .mode-player #introGrid {
     height: 300px;
