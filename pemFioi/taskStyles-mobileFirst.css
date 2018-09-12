@@ -191,7 +191,7 @@ overflow: hidden;
   height: 18px;
   border-radius: 50%;
   border: 1px solid #000;
-  cursor: pointer;
+  cursor: default;
   background: #fff;
 }
 
@@ -200,13 +200,14 @@ overflow: hidden;
   height: 18px;
   border-radius: 50%;
   border: 1px solid #000;
-  cursor: pointer;
+  cursor: default;
   background: #fff;
 }
 
 .speedSlider span {
   position: absolute;
   top: 0;
+  cursor: pointer;
 }
 
 .speedSlider span.speedSlower {
