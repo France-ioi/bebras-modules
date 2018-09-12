@@ -208,7 +208,7 @@ var quickAlgoInterface = {
 
 
 
-    playbackSpeeds: [200, 100, 50],
+    playbackSpeeds: [200, 175, 150, 125, 100, 75, 50, 25],
 
     initPlaybackControls: function() {
         var self = this;
@@ -227,15 +227,22 @@ var quickAlgoInterface = {
                     '<div class="icon end"></div>' +
                 '</div>' +
             '</div>';
-
         $('#task').find('.speedControls').remove();
         $('#task').append(speedControls);
 
         $('#speedSlider').on('input change', function(e) {
             var speed = self.playbackSpeeds[$(this).val()];
             task.displayedSubTask.setSpeed(speed);
-
         });
+        $('.speedSlower').click(function() {
+            var el = $('#speedSlider');
+            el.val(Math.max(el.val() - 1, 0));
+        });
+        $('.speedFaster').click(function() {
+            var el = $('#speedSlider');
+            el.val(Math.min(el.val() + 1, self.playbackSpeeds.length - 1));
+        });
+
 
         $('#playerControls .stop').click(function() {
             task.displayedSubTask.stop();
