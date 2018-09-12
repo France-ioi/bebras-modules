@@ -152,9 +152,9 @@ var quickAlgoInterface = {
 
         var gridButtonsAfter = scaleControl
             + "<div id='testSelector'></div>"
-            + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
-            + this.strings.submitProgram
-            + "</button><br/>"
+            //+ "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
+            //+ this.strings.submitProgram
+            //+ "</button><br/>"
             + "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
             + addTaskHTML;
         $("#gridButtonsAfter").html(gridButtonsAfter);
@@ -236,11 +236,11 @@ var quickAlgoInterface = {
         });
         $('.speedSlower').click(function() {
             var el = $('#speedSlider');
-            el.val(Math.max(el.val() - 1, 0));
+            el.val(Math.max(parseInt(el.val(), 10) - 1, 0));
         });
         $('.speedFaster').click(function() {
             var el = $('#speedSlider');
-            el.val(Math.min(el.val() + 1, self.playbackSpeeds.length - 1));
+            el.val(Math.min(1 + parseInt(el.val(), 10), self.playbackSpeeds.length - 1));
         });
 
 
