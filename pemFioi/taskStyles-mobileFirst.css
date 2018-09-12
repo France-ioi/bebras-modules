@@ -165,13 +165,15 @@ img {
 }
 
 .speedSlider input {
-  margin: 20px 0 0 0;
+  margin: 30px 0 20px 0;
   padding: 0;
   width: 100%;
   -webkit-appearance: none;
   appearance: none;
-  height: 20px;
+  height: 1px;
   outline: none;
+  border: 0;
+  background:  #000;
 }
 
 .speedSlider input::-webkit-slider-thumb {
@@ -182,6 +184,7 @@ img {
   border-radius: 50%;
   border: 1px solid #000;
   cursor: pointer;
+  background: #fff;
 }
 
 .speedSlider input::-moz-range-thumb {
@@ -190,6 +193,7 @@ img {
   border-radius: 50%;
   border: 1px solid #000;
   cursor: pointer;
+  background: #fff;
 }
 
 .speedSlider span {
