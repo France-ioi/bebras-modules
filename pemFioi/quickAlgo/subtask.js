@@ -238,6 +238,27 @@ var initBlocklySubTask = function(subTask, language) {
       }
    };
 
+   // used in new playback controls with speed slider
+   subTask.setSpeed = function(speed) {
+    this.context.changeDelay(speed);
+   };
+
+   // used in new playback controls with speed slider
+   subTask.pause = function() {
+    if(this.context.runner) {
+      this.context.runner.stepMode = true;
+    }
+   };
+
+   // used in new playback controls with speed slider
+   subTask.play = function() {
+    if ((this.context.runner == undefined) || !this.context.runner.isRunning()) {
+      this.run();
+    } else if (this.context.runner.stepMode) {
+      this.context.runner.run();
+    }
+   };
+
    subTask.getAnswerObject = function() {
       this.blocklyHelper.savePrograms();
 
