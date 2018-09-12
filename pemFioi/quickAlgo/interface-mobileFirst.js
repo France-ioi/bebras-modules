@@ -208,13 +208,64 @@ var quickAlgoInterface = {
 
 
 
-    speeds: [200, 50, 5, 0],
+    playbackSpeeds: [200, 100, 50],
 
-    setSpeedIdx: function(idx) {
-        var speed = this.speeds[idx];
-        task.displayedSubTask.changeSpeed(speed);
-        $('#speedSlider').val(idx);
+    initPlaybackControls: function() {
+        var self = this;
+
+        var speedControls =
+            '<div class="speedControls">' +
+                '<div class="speedSlider">' +
+                    '<span class="speedSlower">' + this.strings.speedSliderSlower + '</span>' +
+                    '<input type="range" min="0" max="' + (this.playbackSpeeds.length - 1).toString() + '" value="0" class="slider" id="speedSlider">' +
+                    '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
+                '</div>' +
+                '<div id="playerControls">' +
+                    '<div class="icon stop"></div>' +
+                    '<div id="playPause" class="icon play"></div>' +
+                    '<div class="icon step"></div>' +
+                    '<div class="icon end"></div>' +
+                '</div>' +
+            '</div>';
+
+        $('#task').find('.speedControls').remove();
+        $('#task').append(speedControls);
+
+        $('#speedSlider').on('input change', function(e) {
+            var speed = self.playbackSpeeds[$(this).val()];
+            task.displayedSubTask.setSpeed(speed);
+
+        });
+
+        $('#playerControls .stop').click(function() {
+            task.displayedSubTask.stop();
+            $('#playPause').removeClass('pause').addClass('play');
+        });
+
+        $('#playPause').click(function(e) {
+            if($(this).hasClass('play')) {
+                var speed = self.playbackSpeeds[$('#speedSlider').val()];
+                task.displayedSubTask.setSpeed(speed);
+                task.displayedSubTask.play();
+                $(this).removeClass('play').addClass('pause');
+            } else {
+                task.displayedSubTask.pause();
+                $(this).removeClass('pause').addClass('play');
+            }
+        })
+
+        $('#playerControls .step').click(function() {
+            $('#playPause').removeClass('pause').addClass('play');
+            task.displayedSubTask.step();
+        });
+
+        $('#playerControls .end').click(function() {
+            var speed = self.playbackSpeeds[self.playbackSpeeds.length - 1];
+            task.displayedSubTask.changeSpeed(speed);
+            $('#playPause').removeClass('play').addClass('pause');
+        });
     },
+
 
 
     initTestSelector: function (nbTestCases) {
@@ -234,83 +285,7 @@ var quickAlgoInterface = {
 
         this.updateTestSelector(0);
         this.resetTestScores();
-
-
-
-        // Create Player buttons to play the tests
-        // TODO: move out of initTestSelector(), load only once
-
-
-
-        var buttons = [
-            {cls: 'speedStop', label: this.strings.stopProgram, tooltip: this.strings.stopProgramDesc, onclick: 'task.displayedSubTask.stop()'},
-            {cls: 'speedStep', label: this.strings.stepProgram, tooltip: this.strings.stepProgramDesc, onclick: 'task.displayedSubTask.step()'},
-            {cls: 'speedSlow', label: this.strings.slowSpeed, tooltip: this.strings.slowSpeedDesc, onclick: 'quickAlgoInterface.setSpeedIdx(0)'},
-            {cls: 'speedMedium', label: this.strings.mediumSpeed, tooltip: this.strings.mediumSpeedDesc, onclick: 'quickAlgoInterface.setSpeedIdx(1)'},
-            {cls: 'speedFast', label: this.strings.fastSpeed, tooltip: this.strings.fastSpeedDesc, onclick: 'quickAlgoInterface.setSpeedIdx(2)'},
-            {cls: 'speedLudicrous', label: this.strings.ludicrousSpeed, tooltip: this.strings.ludicrousSpeedDesc, onclick: 'quickAlgoInterface.setSpeedIdx(3)'}
-        ];
-
-        var selectSpeed =
-            '<div class="speedControls">' +
-            '<div class="speedSlider">' +
-            '<span class="speedSlower">' + this.strings.speedSliderSlower + '</span>' +
-            '<input type="range" min="0" max="3" value="0" class="slider" id="speedSlider">' +
-            '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
-            '</div>' +
-            '<div class="btn-group">';
-        for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
-            var btn = buttons[btnIdx];
-            selectSpeed += "<button type='button' class='"+btn.cls+" btn btn-default btn-icon'>"+btn.label+" </button>";
-        }
-        selectSpeed += "</div></div>";
-
-
-        var selectSpeedClickHandler = function () {
-            var thisBtn = $(this);
-            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
-                var btnInfo = buttons[btnIdx];
-                if(thisBtn.hasClass(btnInfo.cls)) {
-                $('#tooltip').html(btnInfo.tooltip + '<br>');
-                eval(btnInfo.onclick);
-                break;
-                }
-            }
-        };
-        var selectSpeedHoverHandler = function () {
-            var thisBtn = $(this);
-            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
-                var btnInfo = buttons[btnIdx];
-                if(thisBtn.hasClass(btnInfo.cls)) {
-                $('#tooltip').html(btnInfo.tooltip + '<br>');
-                break;
-                }
-            }
-        };
-        var selectSpeedHoverClear = function () {
-            // Only clear #tooltip if the tooltip was for this button
-            var thisBtn = $(this);
-            for(var btnIdx = 0; btnIdx < buttons.length; btnIdx++) {
-                var btnInfo = buttons[btnIdx];
-                if(thisBtn.hasClass(btnInfo.cls)) {
-                if($('#tooltip').html() == btnInfo.tooltip + '<br>') {
-                    $('#tooltip').html('');
-                }
-                break;
-                }
-            }
-        };
-
-        // TODO :: better display functions for #errors
-        $('#task').find('.speedControls').remove();
-        $('#task').append(selectSpeed);
-        $('.speedControls button').click(selectSpeedClickHandler);
-        $('.speedControls button').hover(selectSpeedHoverHandler, selectSpeedHoverClear);
-
-
-        $('#speedSlider').on('input change', function(e) {
-            self.setSpeedIdx($(this).val());
-        });
+        this.initPlaybackControls();
     },
 
 
@@ -363,47 +338,37 @@ var quickAlgoInterface = {
 
 $(document).ready(function() {
 
-    function wrapIntroAndGrid() {
-        $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
-    }
-
-
     function createModeSelectorButtons() {
         $("#task").append('\
-        <div id="modeSelector">\
-            <button type="button" data-mode="instructions" id="mode-instructions">Instructions</button>\
-            <button type="button" data-mode="player" id="mode-player">Player</button>\
-            <button type="button" data-mode="editor" id="mode-editor">Editor</button>\
-        </div>');
+            <div id="modeSelector">\
+                <div id="mode-instructions" class="icon"></div>\
+                <div id="mode-player" class="icon"></div>\
+                <div id="mode-editor" class="icon"></div>\
+            </div>');
+
+        $('#modeSelector div').click(function() {
+            selectMode($(this).attr('id'));
+        })
     }
 
+    var oldMode = null;
 
-    function selectMode() {
-        var modeClass = '';
-        var oldModeClass = 'mode-instructions';
-        $("#modeSelector button").on( "click", function() {
-            var selectedMode = $(this).data('mode');
-            modeClass = 'mode-' + selectedMode;
-            if (oldModeClass !== modeClass) {
-                $("#task").removeClass(oldModeClass);
-                $("#task").addClass(modeClass);
-            }
-            oldModeClass = modeClass;
-            quickAlgoInterface.onResize();
-        });
+    function selectMode(mode) {
+        if(mode === oldMode) return;
+        $('#task').removeClass(oldMode).addClass(mode);
+        $('#' + mode).hide();
+        if(oldMode) {
+            $('#' + oldMode).show();
+        }
+        oldMode = mode;
     }
 
+    $("#task h1").appendTo($("#miniPlatformHeader table td").first());
+    $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
 
-    function buildPage() {
-        $("#task h1").appendTo($("#miniPlatformHeader table td").first());
-        wrapIntroAndGrid();
-        $("#task").addClass('mode-instructions');
-        createModeSelectorButtons();
-        selectMode();
-    }
+    createModeSelectorButtons();
+    selectMode('mode-instructions');
 
-
-    buildPage();
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
     quickAlgoInterface.onResize();
 });
