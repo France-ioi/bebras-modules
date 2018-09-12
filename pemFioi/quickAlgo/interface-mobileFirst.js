@@ -329,6 +329,7 @@ var quickAlgoInterface = {
         var blocklyDiv = document.getElementById('blocklyDiv');
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
         blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+        console.log(blocklyArea.offsetWidth, blocklyArea.offsetHeight)
         Blockly.svgResize(window.blocklyWorkspace);
     }
 };
@@ -361,6 +362,7 @@ $(document).ready(function() {
             $('#' + oldMode).show();
         }
         oldMode = mode;
+        quickAlgoInterface.onResize();
     }
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
