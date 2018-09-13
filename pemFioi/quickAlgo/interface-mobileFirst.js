@@ -208,7 +208,14 @@ var quickAlgoInterface = {
 
 
 
-    playbackSpeeds: [200, 175, 150, 125, 100, 75, 50, 25],
+    stepDelayMin: 25,
+    stepDelayMax: 250,
+
+    refreshStepDelay: function() {
+        var v = parseInt($('#speedSlider').val(), 10),
+            delay = this.stepDelayMin + this.stepDelayMax - v;
+        task.displayedSubTask.setStepDelay(delay);
+    },
 
     initPlaybackControls: function() {
         var self = this;
@@ -217,7 +224,7 @@ var quickAlgoInterface = {
             '<div class="speedControls">' +
                 '<div class="speedSlider">' +
                     '<span class="speedSlower">' + this.strings.speedSliderSlower + '</span>' +
-                    '<input type="range" min="0" max="' + (this.playbackSpeeds.length - 1).toString() + '" value="0" class="slider" id="speedSlider">' +
+                    '<input type="range" min="0" max="' + (this.stepDelayMax - this.stepDelayMin) + '" value="0" class="slider" id="speedSlider">' +
                     '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
                 '</div>' +
                 '<div id="playerControls">' +
@@ -231,16 +238,23 @@ var quickAlgoInterface = {
         $('#task').append(speedControls);
 
         $('#speedSlider').on('input change', function(e) {
-            var speed = self.playbackSpeeds[$(this).val()];
-            task.displayedSubTask.setSpeed(speed);
+            self.refreshStepDelay();
         });
         $('.speedSlower').click(function() {
-            var el = $('#speedSlider');
-            el.val(Math.max(parseInt(el.val(), 10) - 1, 0));
+            var el = $('#speedSlider'),
+                maxVal = parseInt(el.attr('max'), 10),
+                delta = Math.floor(maxVal / 10),
+                newVal = parseInt(el.val(), 10) - delta;
+            el.val(Math.max(newVal, 0));
+            self.refreshStepDelay();
         });
         $('.speedFaster').click(function() {
-            var el = $('#speedSlider');
-            el.val(Math.min(1 + parseInt(el.val(), 10), self.playbackSpeeds.length - 1));
+            var el = $('#speedSlider'),
+                maxVal = parseInt(el.attr('max'), 10),
+                delta = Math.floor(maxVal / 10),
+                newVal = parseInt(el.val(), 10) + delta;
+            el.val(Math.min(newVal, maxVal));
+            self.refreshStepDelay();
         });
 
 
@@ -251,8 +265,7 @@ var quickAlgoInterface = {
 
         $('#playPause').click(function(e) {
             if($(this).hasClass('play')) {
-                var speed = self.playbackSpeeds[$('#speedSlider').val()];
-                task.displayedSubTask.setSpeed(speed);
+                self.refreshStepDelay();
                 task.displayedSubTask.play();
                 $(this).removeClass('play').addClass('pause');
             } else {
@@ -267,7 +280,8 @@ var quickAlgoInterface = {
         });
 
         $('#playerControls .end').click(function() {
-            task.displayedSubTask.changeSpeed(0);
+            task.displayedSubTask.setStepDelay(0);
+            task.displayedSubTask.play();
             $('#playPause').removeClass('play').addClass('pause');
         });
     },
@@ -375,7 +389,8 @@ $(document).ready(function() {
     $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
 
     createModeSelectorButtons();
-    selectMode('mode-instructions');
+    //selectMode('mode-instructions');
+    selectMode('mode-player');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
     quickAlgoInterface.onResize();

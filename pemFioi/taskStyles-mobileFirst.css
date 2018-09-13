@@ -551,3 +551,16 @@ overflow: hidden;
     bottom: 5px;
   }
 }
+
+/* hide blockly toolbox for low res */
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+}
