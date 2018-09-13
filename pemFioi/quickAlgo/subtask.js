@@ -239,8 +239,8 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    // used in new playback controls with speed slider
-   subTask.setSpeed = function(speed) {
-    this.context.changeDelay(speed);
+   subTask.setStepDelay = function(delay) {
+    this.context.changeDelay(delay);
    };
 
    // used in new playback controls with speed slider
