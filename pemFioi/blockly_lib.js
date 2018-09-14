@@ -484,7 +484,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
                      var xml = Blockly.Xml.textToDom(code);
                      that.programs[that.player].blockly = code;
                   } catch(e) {
-                     $("#errors").html(that.strings.invalidContent);
+                     if(window.quickAlgoInterface) {
+                      window.quickAlgoInterface.displayError(that.strings.invalidContent);
+                     } else {
+                      $("#errors").html(that.strings.invalidContent);
+                     }
                   }
                   that.languages[that.player] = "blockly";
                } else {
@@ -497,7 +501,11 @@ function getBlocklyHelper(maxBlocks, nbTestCases) {
 
             reader.readAsText(file);
          } else {
-            $("#errors").html(this.strings.unknownFileType);
+            if(window.quickAlgoInterface) {
+              window.quickAlgoInterface.displayError(that.strings.unknownFileType);
+             } else {
+              $("#errors").html(that.strings.unknownFileType);
+             }
          }
       },
 
@@ -1725,7 +1733,11 @@ var initBlocklySubTask = function(subTask) {
 
    subTask.run = function() {
       initBlocklyRunner(subTask.context, function(message, success) {
-         $("#errors").html(message);
+        if(window.quickAlgoInterface) {
+          window.quickAlgoInterface.displayError(message);
+         } else {
+          $("#errors").html(message);
+         }
       });
       initContextForLevel(subTask.iTestCase);
       subTask.blocklyHelper.run(subTask.context);
@@ -1738,7 +1750,11 @@ var initBlocklySubTask = function(subTask) {
          subTask.context.display = true;
          subTask.changeSpeed();
          initBlocklyRunner(subTask.context, function(message, success) {
-            $("#errors").html(message);
+            if(window.quickAlgoInterface) {
+             window.quickAlgoInterface.displayError(message);
+            } else {
+             $("#errors").html(message);
+            }
             platform.validate("done");
          });
          subTask.changeTest(result.iTestCase - subTask.iTestCase);

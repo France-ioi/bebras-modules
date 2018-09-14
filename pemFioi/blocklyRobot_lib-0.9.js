@@ -1281,7 +1281,11 @@ var getContext = function(display, infos, curLevel) {
       this.delayFactory.destroyAll();
       this.raphaelFactory.destroyAll();
       paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-      $("#errors").html("");
+      if(window.quickAlgoInterface) {
+            window.quickAlgoInterface.displayError(null);
+      } else {
+            $("#errors").html('');
+      }
       resetBoard();
 //      context.blocklyHelper.updateSize();
       resetItems();

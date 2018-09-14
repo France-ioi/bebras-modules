@@ -53,7 +53,6 @@ var quickAlgoInterface = {
 
 
     loadInterface: function(context) {
-            console.log('loadInterface')
         // Load quickAlgo interface into the DOM
         var self = this;
         this.context = context;
@@ -155,7 +154,7 @@ var quickAlgoInterface = {
             //+ "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
             //+ this.strings.submitProgram
             //+ "</button><br/>"
-            + "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
+            //+ "<div id='messages'><span id='tooltip'></span><span id='errors'></span></div>"
             + addTaskHTML;
         $("#gridButtonsAfter").html(gridButtonsAfter);
         $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
@@ -349,8 +348,23 @@ var quickAlgoInterface = {
         var blocklyDiv = document.getElementById('blocklyDiv');
         blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
         blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
-        console.log(blocklyArea.offsetWidth, blocklyArea.offsetHeight)
         Blockly.svgResize(window.blocklyWorkspace);
+    },
+
+
+
+    displayError: function(message) {
+        $('#errorModal').remove();
+        if(!message) return;
+        var html =
+            '<div id="errorModal" class="modalWrapper">' +
+            '<div class="modal modalError">' +
+            '<button type="button" class="btn close" onclick="closeModal(`errorModal`)">x</button>' +
+            '<p>' + message + '</p>' +
+            '</div>' +
+            '</div>';
+        $(document.body).append($(html));
+        $("#errorModal").show();
     }
 };
 
