@@ -218,7 +218,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.quickAlgoInterface) {
             this.quickAlgoInterface.resetTestScores();
          }
-         $('#errors').html('');
+         this.displayError('');
       },
 
       getCapacityText: function() {
@@ -438,7 +438,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                      that.programs[that.player].blockly = code;
                      that.languages[that.player] = "blockly";
                   } catch(e) {
-                     $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
+                     that.displayError('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
                } else {
                   that.programs[that.player].javascript = code;
@@ -450,7 +450,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
             reader.readAsText(file);
          } else {
-            $("#errors").html('<span class="testError">'+this.strings.unknownFileType+'</span>');
+            that.displayError('<span class="testError">'+this.strings.unknownFileType+'</span>');
          }
       },
 
@@ -546,7 +546,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               $("#errors").html('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
+               that.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
                return;
             }
          }
@@ -563,12 +563,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          that.highlightPause = false;
          if(that.getRemainingCapacity(that.workspace) < 0) {
-            $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            that.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
             return;
          }
          var limited = that.findLimited(that.workspace);
          if(limited) {
-            $("#errors").html('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
+            that.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {
@@ -589,6 +589,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.initRun();
          }
          this.mainContext.runner.step();
+      },
+
+
+      displayError: function(message) {
+        if(this.quickAlgoInterface) {
+            this.quickAlgoInterface.displayError(message);
+         } else {
+            $('#errors').html(message);
+         }
       }
    }
 }

@@ -156,7 +156,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.run = function(callback) {
       initBlocklyRunner(subTask.context, function(message, success) {
-         $("#errors").html('<span class="testError">'+message+'</span>');
+        window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
          if(callback) {
             callback(message, success);
          }
@@ -177,7 +177,7 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.context.display = true;
          subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
-            $("#errors").html('<span class="testError">'+message+'</span>');
+            window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
             platform.validate("done");
          });
          subTask.changeTest(result.iTestCase - subTask.iTestCase);
@@ -192,7 +192,7 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.changeDelay(200);
       if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
         initBlocklyRunner(subTask.context, function(message, success) {
-           $("#errors").html('<span class="testError">'+message+'</span>');
+          window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
         });
         initContextForLevel(subTask.iTestCase);
       }
@@ -203,7 +203,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.context.runner) {
          this.context.runner.stop();
       }
-      $('#errors').html('');
+      window.quickAlgoInterface.displayError(null);
       this.context.reset();
    };
 
@@ -289,7 +289,7 @@ var initBlocklySubTask = function(subTask, language) {
          if(this.context.runner) {
             this.context.runner.stop();
          }
-         $('#errors').html('');
+         window.quickAlgoInterface.displayError(null);
          initContextForLevel(newTest);
          if(subTask.context.display) {
             window.quickAlgoInterface.updateTestSelector(newTest);

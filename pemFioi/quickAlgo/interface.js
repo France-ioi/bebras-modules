@@ -77,7 +77,7 @@ var quickAlgoInterface = {
       var gridButtonsAfter = scaleControl
         + "<div id='testSelector'></div>";
       if(!this.context || !this.context.infos || !this.context.infos.hideValidate) {
-         gridButtonsAfter += ''   
+         gridButtonsAfter += ''
             + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
             + this.strings.submitProgram
             + "</button><br/>";
@@ -239,5 +239,9 @@ var quickAlgoInterface = {
 
    saveOrLoad: function () {
       $("#saveOrLoadModal").show();
-   }
+   },
+
+  displayError: function(message) {
+    message ? $('#errors').html(message) : $('#errors').empty();
+  }
 };

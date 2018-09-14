@@ -161,7 +161,11 @@ var getContext = function(display, infos) {
             }
             var onLoadError = function() {
                 $('#p5_message').text('');
-                $('#errors').text(strings.messages.load_error);
+                if(window.quickAlgoInterface) {
+                    window.quickAlgoInterface.displayError(strings.messages.load_error);
+                } else {
+                    $("#errors").html(strings.messages.load_error);
+                }
             }
             player.initRecord(url, frequency, onLoadEnd, onLoadError, onLoadProgress);
         },

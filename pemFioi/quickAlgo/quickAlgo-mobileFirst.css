@@ -239,6 +239,9 @@ input[type=button] {
   background-color: #777;
   background-color: rgba(0,0,0,0.7);
   transition: all 250ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .modalWrapper .modal {
   width: 800px;
@@ -249,11 +252,19 @@ input[type=button] {
   padding: 20px;
   position: relative;
 }
+
+.modalWrapper .modalError {
+  background: #fdd;
+  border: 1px solid #caa;
+  color: #600;
+}
 .modalWrapper .modal>.btn.close {
   line-height: 1em;
   position: absolute;
   top: 0px;
-    right: 0px;
+  right: 0px;
+  border: none;
+  background: none;
 }
 .blocklyFlyoutBackground {
     fill-opacity: 1 !important;
