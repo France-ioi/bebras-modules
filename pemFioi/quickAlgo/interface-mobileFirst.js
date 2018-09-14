@@ -105,6 +105,12 @@ var quickAlgoInterface = {
             }
         });
 
+        $(document).click(function(e) {
+            if($(e.target).attr('id') != 'toggleEditorMenu') {
+                $('#editorMenu').hide();
+            }
+        });
+
         $('#editorMenu div[rel=example]').click(function(e) {
             task.displayedSubTask.loadExample()
         });
