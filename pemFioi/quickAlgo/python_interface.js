@@ -370,7 +370,11 @@ function LogicController(nbTestCases, maxInstructions) {
          that._mainContext.reset();
       }
 
-      window.quickAlgoInterface.displayError(null);
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(null);
+      } else {
+        $("#errors").html('');
+      }
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();
