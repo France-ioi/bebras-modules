@@ -144,7 +144,7 @@ var localLanguageStrings = {
       saveOrLoadButton: "Load / save",
       saveOrLoadProgram: "Save or reload your code:",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
-      reloadProgram: "Reload:",
+      reloadProgram: "Reload",
       restart: "Restart",
       loadBestAnswer: "Load best answer",
       saveProgram: "Save",

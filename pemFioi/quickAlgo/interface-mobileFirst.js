@@ -76,11 +76,11 @@ var quickAlgoInterface = {
                         "<div rel='example' class='item'>" + this.strings.loadExample + "</div>" +
                         "<div rel='save' class='item'>" + this.strings.saveProgram + "</div>" +
                         "<span id='saveUrl'></span>" +
-                        "<div rel='restart' class='item'>" + this.strings.reloadProgram + "</div>" +
+                        "<div rel='restart' class='item'>" + this.strings.restart + "</div>" +
                         "<div rel='load' class='item'>" +
                             "<input type='file' id='task-upload-file' " +
                             "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
-                            this.strings.restart +
+                            this.strings.reloadProgram +
                         "</div>" +
                         "<div rel='best-answer' class='item'>" + this.strings.loadBestAnswer+ "</div>" +
                     "</div>" +
