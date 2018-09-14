@@ -395,6 +395,14 @@ $(document).ready(function() {
         if(oldMode) {
             $('#' + oldMode).show();
         }
+        if(mode == 'mode-instructions') {
+            $('#taskIntro .short').hide();
+            $('#taskIntro .long').show();
+        }
+        if(mode == 'mode-player') {
+            $('#taskIntro .short').show();
+            $('#taskIntro .long').hide();
+        }
         oldMode = mode;
         quickAlgoInterface.onResize();
     }
