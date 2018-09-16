@@ -55,7 +55,7 @@ var getContext = function(display, infos) {
     var conceptBaseUrl = window.location.protocol + '//'
         + 'static4.castor-informatique.fr/help/index.html';
     context.conceptList = [
-        {id: 'map_introduction', name: 'La proglet gogleMap', url: conceptBaseUrl+'#map_introduction'},
+        {id: 'map_introduction', name: 'La proglet gogleMaps', url: conceptBaseUrl+'#map_introduction'},
         {id: 'map_clearMap', name: 'Effacer la carte', url: conceptBaseUrl+'#map_mapDisplay'},
         {id: 'map_addLocation', name: 'Mettre en évidence un point de la carte', url: conceptBaseUrl+'#map_mapDisplay'},
         {id: 'map_addRoad', name: 'Tracer une ligne droite', url: conceptBaseUrl+'#map_mapDisplay'},
