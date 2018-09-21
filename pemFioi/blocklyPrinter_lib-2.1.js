@@ -22,7 +22,7 @@ var getContext = function(display, infos) {
          },
          code: {
             print: "print",
-            print_end: "print",
+            print_end: "print_end",
             read: "input",
             readInteger: "lireEntier",
             readFloat: "lireDecimal",
@@ -204,18 +204,9 @@ var getContext = function(display, infos) {
       }
    };
 
-   context.printer.print = function() {
-      var value = arguments[0];
-      var callback = arguments[arguments.length-1];
-      var end = arguments.length > 2 ? '' + arguments[1] : "\n";
-
+   context.printer.commonPrint = function(args, end, callback) {
       if (context.lost) {
          return;
-      }
-
-      if (typeof callback == "undefined") {
-         callback = value;
-         value = "";
       }
 
       // Fix display of arrays
@@ -233,13 +224,28 @@ var getContext = function(display, infos) {
          return value;
       }
 
-      context.printer.output_text += valueToStr(value) + end;
+      var text = '';
+      for(var i=0; i < args.length; i++) {
+         text += (i > 0 ? ' ' : '') + valueToStr(args[i]);
+      }
+
+      context.printer.output_text += text + end;
       context.updateScale();
       
       context.waitDelay(callback);
    }
 
-   context.printer.print_end = context.printer.print;
+   context.printer.print = function() {
+      context.printer.commonPrint(Array.prototype.slice.call(arguments, 0, -1), "\n", arguments[arguments.length-1]);
+   }
+
+   context.printer.print_end = function() {
+      if(arguments.length > 1) {
+         context.printer.commonPrint(Array.prototype.slice.call(arguments, 0, -2), arguments[arguments.length-2], arguments[arguments.length-1]);
+      } else {
+         context.printer.commonPrint([], "\n", arguments[arguments.length-1]);
+      }
+   }
 
    context.printer.commonRead = function() {
       if(context.taskInfos.freeInput && context.display) {
@@ -322,8 +328,8 @@ var getContext = function(display, infos) {
       printer: {
          print: [
             // TODO : variants is not properly supported yet, once supported properly, print and print_end should be merged
-            { name: "print", params: [null], variants: [[null], [null, null]]},
-            { name: "print_end", params: [null, null], variants: [[null], [null, null]], blocklyJson: {inputsInline: true}}
+            { name: "print", params: [null], variants: [[null], [null, null]], anyArgs: true},
+            { name: "print_end", params: [null, null], variants: [[null], [null, null]], anyArgs: true, blocklyJson: {inputsInline: true}}
          ],
          read:  [
             { name: "read", yieldsValue: true },
