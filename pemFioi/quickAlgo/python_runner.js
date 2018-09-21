@@ -85,9 +85,13 @@ function PythonInterpreter(context, msgCallback) {
             blocksInfos[blockInfo.name] = {
               nbArgs: 0, // handled below
               type: typeName};
+            blocksInfos[blockInfo.name].nbsArgs = [];
+            if(blockInfo.anyArgs) {
+              // Allows to specify the function can accept any number of arguments
+              blocksInfos[blockInfo.name].nbsArgs.push(Infinity);
+            }
             var variants = blockInfo.variants ? blockInfo.variants : (blockInfo.params ? [blockInfo.params] : []);
             if(variants.length) {
-              blocksInfos[blockInfo.name].nbsArgs = [];
               for(var i=0; i < variants.length; i++) {
                 blocksInfos[blockInfo.name].nbsArgs.push(variants[i].length);
               }
@@ -154,7 +158,7 @@ function PythonInterpreter(context, msgCallback) {
         msg = name + "() takes no arguments (" + args.length + " given)";
         throw new Sk.builtin.TypeError(msg);
       }
-    } else if(nbsArgs.indexOf(args.length) == -1) {
+    } else if(nbsArgs.indexOf(args.length) == -1 && nbsArgs.indexOf(Infinity) == -1) {
       var minArgs = nbsArgs[0];
       var maxArgs = nbsArgs[0];
       for(var i=1; i < nbsArgs.length; i++) {
@@ -175,12 +179,23 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
+  this._setTimeout = function(func, time) {
+    var timeoutId = null;
+    var that = this;
+    function wrapper() {
+      var idx = that._timeouts.indexOf(timeoutId);
+      if(idx > -1) { that._timeouts.splice(idx, 1); }
+      func();
+    }
+    timeoutId = window.setTimeout(wrapper, time);
+    this._timeouts.push(timeoutId);
+  }
+
   this.waitDelay = function (callback, value, delay) {
     this._paused = true;
     if (delay > 0) {
       var _noDelay = this.noDelay.bind(this, callback, value);
-      var timeoutId = window.setTimeout(_noDelay, delay);
-      this._timeouts.push(timeoutId);
+      this._setTimeout(_noDelay, delay);
     } else {
       this.noDelay(callback, value);
     }
@@ -207,8 +222,7 @@ function PythonInterpreter(context, msgCallback) {
     }
     this._paused = false;
     callback(primitive);
-    var timeoutId = window.setTimeout(this._continue.bind(this), 10);
-    this._timeouts.push(timeoutId);
+    this._setTimeout(this._continue.bind(this), 10);
   };
 
   this._createPrimitive = function (data) {
@@ -348,8 +362,7 @@ function PythonInterpreter(context, msgCallback) {
       this._paused = this._stepInProgress;
       this.stepMode = false;
     }
-    var timeoutId = window.setTimeout(this._continue.bind(this), 100);
-    this._timeouts.push(timeoutId);
+    this._setTimeout(this._continue.bind(this), 100);
   };
 
   this.runCodes = function(codes) {
@@ -464,6 +477,7 @@ function PythonInterpreter(context, msgCallback) {
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
+    this._timeouts = [];
     this.removeEditorMarker();
     if(Sk.runQueue) {
       for (var i=0; i<Sk.runQueue.length; i++) {
@@ -545,8 +559,9 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this._onStepSuccess = function (){
-    this._stepInProgress = false;
+  this._onStepSuccess = function () {
+    // If there are still timeouts, there's still a step in progress
+    this._stepInProgress = !!this._timeouts.length;
     this._continue();
   };
 
