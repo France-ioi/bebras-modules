@@ -11,7 +11,6 @@
  * Untouched parts from beaver-task-1.0.
  ************************************************************************/
 
-
 var task = {};
 
 task.showViews = function(views, callback) {
@@ -176,6 +175,32 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             mainTask.load(views, callback);
          }
       });
+      var getUrlParameter = function (sParam) {
+          var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+              sURLVariables = sPageURL.split('&'),
+              sParameterName,
+              i;
+
+          for (i = 0; i < sURLVariables.length; i++) {
+              sParameterName = sURLVariables[i].split('=');
+
+              if (sParameterName[0] === sParam) {
+                  return sParameterName[1] === undefined ? true : sParameterName[1];
+              }
+          }
+      };
+
+      var forcedLevel = getUrlParameter("level");
+      if (forcedLevel != undefined) {
+         for (var iLevel = 0; iLevel < levels.length; iLevel++) {
+            if (forcedLevel != levels[iLevel]) {
+               $("#tab_" + levels[iLevel]).hide();
+            } else {
+               $("#tab_" + levels[iLevel]).show();
+            }
+         }
+         displayHelper.setLevel(forcedLevel);
+      }
    };
    
    task.getState = function(callback) {
