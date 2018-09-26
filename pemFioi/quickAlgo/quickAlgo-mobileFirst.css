@@ -2,11 +2,9 @@ body.blockly > *,
 body > * {
   width: auto;
 }
-
-@media screen and (max-width: 1199px) {
-  #task {
-  }
-}
+/*****************
+  LAYOUT
+*****************/
 #taskContent {
   position: absolute;
   top: 71px;
@@ -24,104 +22,18 @@ body > * {
 #blocklyContainer {
   box-sizing: border-box;
 }
+/*****************
+  TASK DESCRIPTION
+*****************/
 #introGrid {
   overflow: hidden;
 }
 #taskIntro {
   padding: 5px 10px;
 }
-
-
-#editorMenuContainer {
-  float: right;
-}
-
-#editorMenu {
-  position: absolute;
-  right: 80px;
-  top: 30px;
-  z-index: 99;
-  display: none;
-  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.6);
-}
-
-
-#editorMenu div {
-  cursor: pointer;
-  background: #282828;
-  color: #F5F5F5;
-  padding: 10px 20px;
-  border-bottom: 1px solid #717171;
-  position: relative;
-}
-
-#editorMenu #saveUrl {
-  display: none;
-}
-
-#editorMenu div:last-child {
-  border: 0;
-}
-
-#editorMenu div:hover {
-  background: #F5F5F5;
-  color: #282828;
-}
-
-
-#editorMenu input[type=file] {
-  cursor: pointer;
-  position: absolute;
-  height: 100%;
-  width: 100%;
-  opacity: 0;
-  -moz-opacity: 0;
-  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
-}
-
-#fullscreenButton {
-  float: right;
-}
-
-#displayHelpBtn {
-  float: right;
-}
-
-
-.scaleDrawingControl {
-    display: none;
-}
-#blocklyContainer {
-  overflow: hidden;
-  height: 100%;
-  border: 1px solid #8d9daa;
-  width: 100%;
-  position: relative;
-}
-#blocklyDiv {
-  position: absolute;
-  height: 100%;
-  width: 100%;
-}
-
-#testCaseName {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-#messages {
-  padding-top:10px;
-    min-height: 28px;
-}
-
-#errors .testError {
-  color: red;
-}
-
-.blocklyToolboxDiv {
-    background-color: #ddd !important;
-}
-
+/*****************
+  TASK GRID & TESTS
+*****************/
 /*
   Run test speed selector
   Rip-off of bootstrap btn and btn-group rules
@@ -219,6 +131,302 @@ input[type=button] {
 }
 .btn-icon {
   font-family: 'Courier New', Inconsolata, 'Roboto Mono', 'PT Mono', 'Ubuntu', monospace;
+}
+#testSelector {
+    padding-left: 10px;
+}
+.testResult {
+    position: relative;
+    left: 10px;
+    top: -2px;
+    padding: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 50px;
+    color: #FFFFFF;
+    width: 250px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.testResult.testSuccess {
+    background-color: green;
+}
+.testResult.testPartial {
+    background-color: orange;
+}
+.testResult.testFailure {
+    background-color: red;
+}
+.testResultIcon {
+    display: inline-block;
+    min-width: 16px;
+}
+.panel {
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.panel-body {
+  padding: 5px;
+}
+.panel-heading {
+  padding-top: 3px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 21px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.panel-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 16px;
+  color: inherit;
+  text-align: left;
+  min-height: 21px;
+  line-height: 21px;
+}
+.panel-group {
+  margin-bottom: 20px;
+}
+.panel-group .panel {
+  margin-bottom: 0;
+  border-radius: 4px;
+}
+.panel-group .panel + .panel {
+  margin-top: 5px;
+}
+.panel-group .panel-heading {
+  border-bottom: 0;
+}
+.panel-default {
+  border-color: #dddddd;
+}
+.panel-default > .panel-heading {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #dddddd;
+}
+.panel-body:before,
+.panel-body:after {
+  content: " ";
+  display: table;
+}
+.panel-body:after {
+  clear: both;
+}
+
+#testSelector .panel.currentTest {
+  border-color: #2991d6;
+}
+#testSelector .panel-heading {
+  border: 1px solid #8bc4e9;
+  background-color: #ddedf8;
+  position: relative;
+}
+#testSelector .panel-heading:hover {
+  cursor: pointer;
+  border: 1px solid #000000;
+}
+#testSelector .panel-heading::after {
+  content: "\25bc";
+  position: absolute;
+  right: 10px;
+  top: 3px;
+}
+#testSelector .currentTest .panel-heading {
+  background-color: #a1cfed;
+  border-color: transparent;
+  color: #333;
+}
+#testSelector .currentTest .panel-heading:hover {
+  cursor: default;
+  border-color: transparent;
+}
+#testSelector .currentTest .panel-heading::after {
+  content: normal;
+}
+
+#gridButtonsAfter #testSelector {
+  padding: 0;
+}
+#testSelector .tabs{
+  display: flex;
+  background-color: #ccc;
+}
+#testSelector .tabs .testTab {
+  background-color: #efefef;
+  flex: 1 0 auto;
+  cursor: pointer;
+}
+#testSelector .tabs .testTab.currentTest {
+  background-color: #fff;
+}
+/* playback */
+#playerControls {
+  height: 36px;
+  margin-top: 2px;
+}
+
+#playerControls .icon {
+  float: left;
+  margin-right: 9px;
+
+}
+
+#playerControls .icon:last-child {
+  margin: 0;
+}
+
+
+/* speed slider  */
+.speedSlider {
+  position: relative;
+  height: 45px;
+  overflow: hidden;
+}
+
+.speedSlider input {
+  margin: 30px 0 20px 0;
+  padding: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1px;
+  outline: none;
+  border: 0;
+  background:  #000;
+}
+
+.speedSlider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: default;
+  background: #fff;
+}
+
+.speedSlider input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: default;
+  background: #fff;
+}
+
+.speedSlider span {
+  position: absolute;
+  top: 0;
+  cursor: pointer;
+}
+
+.speedSlider span.speedSlower {
+  left: 0;
+}
+
+.speedSlider span.speedFaster {
+  right: 0;
+}
+/*****************
+  CODE EDITOR
+*****************/
+#editorMenuContainer {
+  float: right;
+}
+
+#editorMenu {
+  position: absolute;
+  right: 80px;
+  top: 30px;
+  z-index: 99;
+  display: none;
+  box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.6);
+}
+
+
+#editorMenu div {
+  cursor: pointer;
+  background: #282828;
+  color: #F5F5F5;
+  padding: 10px 20px;
+  border-bottom: 1px solid #717171;
+  position: relative;
+}
+
+#editorMenu #saveUrl {
+  display: none;
+}
+
+#editorMenu div:last-child {
+  border: 0;
+}
+
+#editorMenu div:hover {
+  background: #F5F5F5;
+  color: #282828;
+}
+
+
+#editorMenu input[type=file] {
+  cursor: pointer;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  -moz-opacity: 0;
+  filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
+}
+
+#fullscreenButton {
+  float: right;
+}
+
+#displayHelpBtn {
+  float: right;
+}
+
+
+.scaleDrawingControl {
+    display: none;
+}
+#blocklyContainer {
+  overflow: hidden;
+  height: 100%;
+  border: 1px solid #8d9daa;
+  width: 100%;
+  position: relative;
+}
+#blocklyDiv {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+#testCaseName {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#messages {
+  padding-top:10px;
+    min-height: 28px;
+}
+
+#errors .testError {
+  color: red;
+}
+
+.blocklyToolboxDiv {
+    background-color: #ddd !important;
 }
 #blocklyTopToolbar span {
   float: left;
@@ -359,6 +567,27 @@ input[type=button] {
    background: rgba(100, 100, 200, 0.5);
    z-index: 20;
 }
+#languageInterface {
+  position: absolute;
+  top: 30px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+#editorBar {
+  height: 30px;
+  background-color: #666666;
+}
+/*****************
+  UTILITY STRIP
+*****************/
+@media screen and (max-width: 1199px) {
+  #task {
+  }
+}
+
+
 #capacity {
     display: inline;
     line-height: 30px;
@@ -367,141 +596,6 @@ input[type=button] {
 .capacityRed {
     background-color: #E77471;
     color: black;
-}
-#testSelector {
-    padding-left: 10px;
-}
-.testResult {
-    position: relative;
-    left: 10px;
-    top: -2px;
-    padding: 3px;
-    padding-left: 5px;
-    padding-right: 5px;
-    border-radius: 50px;
-    color: #FFFFFF;
-    width: 250px;
-    font-size: 12px;
-    font-weight: 500;
-}
-.testResult.testSuccess {
-    background-color: green;
-}
-.testResult.testPartial {
-    background-color: orange;
-}
-.testResult.testFailure {
-    background-color: red;
-}
-.testResultIcon {
-    display: inline-block;
-    min-width: 16px;
-}
-.panel {
-  margin-bottom: 20px;
-  background-color: #ffffff;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-.panel-body {
-  padding: 5px;
-}
-.panel-heading {
-  padding-top: 3px;
-  padding-bottom: 4px;
-  padding-left: 10px;
-  padding-right: 10px;
-  height: 21px;
-  border-bottom: 1px solid transparent;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-}
-.panel-title {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 16px;
-  color: inherit;
-  text-align: left;
-  min-height: 21px;
-  line-height: 21px;
-}
-.panel-group {
-  margin-bottom: 20px;
-}
-.panel-group .panel {
-  margin-bottom: 0;
-  border-radius: 4px;
-}
-.panel-group .panel + .panel {
-  margin-top: 5px;
-}
-.panel-group .panel-heading {
-  border-bottom: 0;
-}
-.panel-default {
-  border-color: #dddddd;
-}
-.panel-default > .panel-heading {
-  color: #333333;
-  background-color: #f5f5f5;
-  border-color: #dddddd;
-}
-.panel-body:before,
-.panel-body:after {
-  content: " ";
-  display: table;
-}
-.panel-body:after {
-  clear: both;
-}
-
-#testSelector .panel.currentTest {
-  border-color: #2991d6;
-}
-#testSelector .panel-heading {
-  border: 1px solid #8bc4e9;
-  background-color: #ddedf8;
-  position: relative;
-}
-#testSelector .panel-heading:hover {
-  cursor: pointer;
-  border: 1px solid #000000;
-}
-#testSelector .panel-heading::after {
-  content: "\25bc";
-  position: absolute;
-  right: 10px;
-  top: 3px;
-}
-#testSelector .currentTest .panel-heading {
-  background-color: #a1cfed;
-  border-color: transparent;
-  color: #333;
-}
-#testSelector .currentTest .panel-heading:hover {
-  cursor: default;
-  border-color: transparent;
-}
-#testSelector .currentTest .panel-heading::after {
-  content: normal;
-}
-
-#gridButtonsAfter #testSelector {
-  padding: 0;
-}
-#testSelector .tabs{
-  display: flex;
-  background-color: #ccc;
-}
-#testSelector .tabs .testTab {
-  background-color: #efefef;
-  flex: 1 0 auto;
-  cursor: pointer;
-}
-#testSelector .tabs .testTab.currentTest {
-  background-color: #fff;
 }
 
 
@@ -602,88 +696,9 @@ input[type=button] {
 
 
 
-#languageInterface {
-  position: absolute;
-  top: 30px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-#editorBar {
-  height: 30px;
-  background-color: #666666;
-}
-
-/* playback */
-#playerControls {
-  height: 36px;
-  margin-top: 2px;
-}
-
-#playerControls .icon {
-  float: left;
-  margin-right: 9px;
-
-}
-
-#playerControls .icon:last-child {
-  margin: 0;
-}
 
 
-/* speed slider  */
-.speedSlider {
-  position: relative;
-  height: 45px;
-  overflow: hidden;
-}
 
-.speedSlider input {
-  margin: 30px 0 20px 0;
-  padding: 0;
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 1px;
-  outline: none;
-  border: 0;
-  background:  #000;
-}
-
-.speedSlider input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
-}
-
-.speedSlider input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
-}
-
-.speedSlider span {
-  position: absolute;
-  top: 0;
-  cursor: pointer;
-}
-
-.speedSlider span.speedSlower {
-  left: 0;
-}
-
-.speedSlider span.speedFaster {
-  right: 0;
-}
 
 
 @media screen and (orientation: landscape) { /* horizontal screen layout */
