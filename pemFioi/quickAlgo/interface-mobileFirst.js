@@ -425,20 +425,17 @@ var quickAlgoInterface = {
 };
 
 
-
-
 $(document).ready(function() {
-
-    $("#task h1").appendTo($("#miniPlatformHeader table td").first());
-    $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
 
     $('head').append('<link rel="stylesheet"\
     href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"\
     integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"\
     crossorigin="anonymous">');
 
+    $("#task h1").appendTo($("#miniPlatformHeader table td").first());
+    $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
+
     quickAlgoInterface.createModeSelectorButtons();
-    //selectMode('mode-instructions');
     quickAlgoInterface.selectMode('mode-player');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
