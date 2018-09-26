@@ -362,9 +362,9 @@ var quickAlgoInterface = {
         var self = this;
         $("#task").append('\
             <div id="modeSelector">\
-                <div id="mode-instructions" class="icon"></div>\
-                <div id="mode-player" class="icon"></div>\
-                <div id="mode-editor" class="icon"></div>\
+                <div id="mode-player"><span class="fas fa-play"></span></div>\
+                <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
+                <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
             </div>');
 
         $('#modeSelector div').click(function() {
