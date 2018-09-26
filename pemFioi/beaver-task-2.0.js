@@ -105,6 +105,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             callback();
          };
          levels = null;
+         // TODO: this shouldn't be needed here, but blocklyHelper.setLevel is not called anymore
+         $('.' + forcedLevel).show();
       }
    }
 
