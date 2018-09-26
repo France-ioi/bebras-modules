@@ -369,16 +369,14 @@ var quickAlgoInterface = {
 
         $('#modeSelector div').click(function() {
             self.selectMode($(this).attr('id'));
+            $(this).siblings('div').removeClass('active');
+            $(this).addClass('active');
         })
     },
 
     selectMode: function(mode) {
         if(mode === this.curMode) return;
         $('#task').removeClass(this.curMode).addClass(mode);
-        $('#' + mode).hide();
-        if(this.curMode) {
-            $('#' + this.curMode).show();
-        }
         if(mode == 'mode-instructions') {
             $('#taskIntro .short').hide();
             $('#taskIntro .long').show();
