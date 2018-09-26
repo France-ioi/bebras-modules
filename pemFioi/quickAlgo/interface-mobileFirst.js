@@ -235,10 +235,10 @@ var quickAlgoInterface = {
                     '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
                 '</div>' +
                 '<div id="playerControls">' +
-                    '<div class="icon stop"></div>' +
-                    '<div id="playPause" class="icon play"></div>' +
-                    '<div class="icon step"></div>' +
-                    '<div class="icon end"></div>' +
+                    '<div class="icon backToFirst"><span class="fas fa-fast-backward"></span></div>' +
+                    '<div class="icon playPause play"><span class="fas fa-play-circle"></span></div>' +
+                    '<div class="icon nextStep"><span class="fas fa-step-forward"></span></div>' +
+                    '<div class="icon goToEnd"><span class="fas fa-fast-forward"></span></div>' +
                 '</div>' +
             '</div>';
         $('#task').find('.speedControls').remove();
@@ -264,13 +264,13 @@ var quickAlgoInterface = {
             self.refreshStepDelay();
         });
 
-
-        $('#playerControls .stop').click(function() {
+        $('#playerControls .backToFirst').click(function() {
             task.displayedSubTask.stop();
-            self.setPlayPause(false);
+            task.displayedSubTask.play();
+            self.setPlayPause(true);
         });
 
-        $('#playPause').click(function(e) {
+        $('#playerControls .playPause').click(function(e) {
             if($(this).hasClass('play')) {
                 self.refreshStepDelay();
                 task.displayedSubTask.play();
@@ -281,23 +281,25 @@ var quickAlgoInterface = {
             }
         })
 
-        $('#playerControls .step').click(function() {
+        $('#playerControls .nextStep').click(function() {
             self.setPlayPause(false);
             task.displayedSubTask.step();
         });
 
-        $('#playerControls .end').click(function() {
+        $('#playerControls .goToEnd').click(function() {
             task.displayedSubTask.setStepDelay(0);
             task.displayedSubTask.play();
-            self.setPlayPause(true);
+            self.setPlayPause(false);
         });
     },
 
     setPlayPause: function(isPlaying) {
         if(isPlaying) {
-            $('#playPause').removeClass('play').addClass('pause');
+            $('#playerControls .playPause').html('<span class="fas fa-pause-circle"></span>');
+            $('#playerControls .playPause').removeClass('play').addClass('pause');
         } else {
-            $('#playPause').removeClass('pause').addClass('play');
+            $('#playerControls .playPause').html('<span class="fas fa-play-circle"></span>');
+            $('#playerControls .playPause').removeClass('pause').addClass('play');
         }
     },
 
@@ -429,6 +431,11 @@ $(document).ready(function() {
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
     $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
+
+    $('head').append('<link rel="stylesheet"\
+    href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"\
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"\
+    crossorigin="anonymous">');
 
     quickAlgoInterface.createModeSelectorButtons();
     //selectMode('mode-instructions');
