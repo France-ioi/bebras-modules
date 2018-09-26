@@ -21,26 +21,6 @@ img {
   margin-top: 0 !important;
 }
 
-/* header */
-#miniPlatformHeader {
-  height: 40px;
-  background-color: #fff;
-  overflow: hidden;
-}
-#miniPlatformHeader img {
-  max-height: 35px;
-  width: auto;
-}
-#miniPlatformHeader h1 {
-  display: inline-block;
-  line-height: 40px;
-  font-size: 16px;
-  margin: 0;
-  vertical-align: top;
-}
-#miniPlatformHeader .platform {
-  font-size: 32px;
-}
 
 #tabsContainer {
 }
@@ -493,15 +473,6 @@ overflow: hidden;
 
 @media screen and (max-width: 800px) {
 
-  #miniPlatformHeader  {
-    font-size: 10px;
-  }
-
-  #miniPlatformHeader h1 {
-    font-size: 12px;
-  }
-
-
   .mode-player #taskIntro {
     display: none;
   }
@@ -514,10 +485,6 @@ overflow: hidden;
 
 
 @media screen and (max-width: 600px) {
-
-  #miniPlatformHeader .platform {
-    font-size: 16px;
-  }
 
   .mode-player #taskIntro {
     height: 320px;
