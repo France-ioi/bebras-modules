@@ -350,6 +350,8 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
+    $('head').append('<link rel="stylesheet"type="text/css" \
+    href="../../modules//integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
          window.task_token = new TaskToken({
             id: taskMetaData.id,
