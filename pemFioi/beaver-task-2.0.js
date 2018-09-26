@@ -90,6 +90,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
 
    var forcedLevel = getUrlParameter("level");
    if (forcedLevel != undefined) {
+      defaultLevel = forcedLevel;
       var oldInitSubTask = initSubTask;
       var savedLevels = levels;
       initSubTask = function(subTask) {
