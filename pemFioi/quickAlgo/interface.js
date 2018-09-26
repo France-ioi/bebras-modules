@@ -237,11 +237,18 @@ var quickAlgoInterface = {
       $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
    },
 
+   unloadLevel: function() {
+      // Called when level is unloaded
+      this.resetTestScores();
+   },
+
    saveOrLoad: function () {
       $("#saveOrLoadModal").show();
    },
 
-  displayError: function(message) {
-    message ? $('#errors').html(message) : $('#errors').empty();
-  }
+   displayError: function(message) {
+      message ? $('#errors').html(message) : $('#errors').empty();
+   },
+
+   setPlayPause: function(isPlaying) {} // Does nothing
 };
