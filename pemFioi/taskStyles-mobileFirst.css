@@ -22,32 +22,50 @@ img {
 }
 
 
+
+/*****************
+  LEVEL SELECTOR
+*****************/
 #tabsContainer {
+  display: flex;
+  justify-content: center;
 }
 #tabsMenu {
+  flex: 0 0 auto;
   overflow: hidden;
-  border-bottom: 1px solid #33B5E5;
-}
-#tabsMenu .stars {
-  vertical-align: middle;
+  display: flex;
+  background-color: #4a90e2;
+  border-radius: 8px 8px 0px 0px;
 }
 #tabsMenu .li {
-  float: left;
-  width: 33.33%;
+  flex: 1 0 0;
   text-align: center;
-  background-color: #E0E0E0;
+  white-space: nowrap;
   cursor: pointer;
-  padding: 5px;
+}
+#tabsMenu .li:not(.current) {
+  background-color: rgba(0,0,0,0.2);
+}
+#tabsMenu .li.current + .li {
+  border-radius: 0px 0px 0px 8px;
+}
+#tabsMenu .li:not(.current) + .li:not(.current) {
+  border-left: 1px solid #000;
 }
 #tabsMenu .li a,
 #tabsMenu .li a:hover {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
   text-decoration: none;
-  color: #000;
-  outline: 0;
+  color: #fff;
+  padding: 5px 20px;
 }
-
-#tabsMenu .li.current {
-  background-color: #33B5E5;
+#tabsMenu .stars {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
 
