@@ -7,6 +7,7 @@ var quickAlgoInterface = {
     strings: {},
     nbTestCases: 0,
     delayFactory: new DelayFactory(),
+    curMode: null,
 
     fullscreen: false,
 
@@ -105,6 +106,7 @@ var quickAlgoInterface = {
             }
         });
 
+        // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
         $(document).click(function(e) {
             if($(e.target).attr('id') != 'toggleEditorMenu') {
                 $('#editorMenu').hide();
@@ -265,33 +267,39 @@ var quickAlgoInterface = {
 
         $('#playerControls .stop').click(function() {
             task.displayedSubTask.stop();
-            $('#playPause').removeClass('pause').addClass('play');
+            self.setPlayPause(false);
         });
 
         $('#playPause').click(function(e) {
             if($(this).hasClass('play')) {
                 self.refreshStepDelay();
                 task.displayedSubTask.play();
-                $(this).removeClass('play').addClass('pause');
+                self.setPlayPause(true);
             } else {
                 task.displayedSubTask.pause();
-                $(this).removeClass('pause').addClass('play');
+                self.setPlayPause(false);
             }
         })
 
         $('#playerControls .step').click(function() {
-            $('#playPause').removeClass('pause').addClass('play');
+            self.setPlayPause(false);
             task.displayedSubTask.step();
         });
 
         $('#playerControls .end').click(function() {
             task.displayedSubTask.setStepDelay(0);
             task.displayedSubTask.play();
-            $('#playPause').removeClass('play').addClass('pause');
+            self.setPlayPause(true);
         });
     },
 
-
+    setPlayPause: function(isPlaying) {
+        if(isPlaying) {
+            $('#playPause').removeClass('play').addClass('pause');
+        } else {
+            $('#playPause').removeClass('pause').addClass('play');
+        }
+    },
 
     initTestSelector: function (nbTestCases) {
         var self = this;
@@ -348,6 +356,46 @@ var quickAlgoInterface = {
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },
 
+    createModeSelectorButtons: function() {
+        var self = this;
+        $("#task").append('\
+            <div id="modeSelector">\
+                <div id="mode-instructions" class="icon"></div>\
+                <div id="mode-player" class="icon"></div>\
+                <div id="mode-editor" class="icon"></div>\
+            </div>');
+
+        $('#modeSelector div').click(function() {
+            self.selectMode($(this).attr('id'));
+        })
+    },
+
+    selectMode: function(mode) {
+        if(mode === this.curMode) return;
+        $('#task').removeClass(this.curMode).addClass(mode);
+        $('#' + mode).hide();
+        if(this.curMode) {
+            $('#' + this.curMode).show();
+        }
+        if(mode == 'mode-instructions') {
+            $('#taskIntro .short').hide();
+            $('#taskIntro .long').show();
+        }
+        if(mode == 'mode-player') {
+            $('#taskIntro .short').show();
+            $('#taskIntro .long').hide();
+        }
+        this.curMode = mode;
+        this.onResize();
+    },
+
+    unloadLevel: function() {
+        // Called when level is unloaded
+        this.resetTestScores();
+        if(this.curMode == 'mode-editor') {
+           this.selectMode('mode-player');
+        }
+    },
 
     onResize: function(e) {
         var blocklyArea = document.getElementById('blocklyContainer');
@@ -379,46 +427,12 @@ var quickAlgoInterface = {
 
 $(document).ready(function() {
 
-    function createModeSelectorButtons() {
-        $("#task").append('\
-            <div id="modeSelector">\
-                <div id="mode-instructions" class="icon"></div>\
-                <div id="mode-player" class="icon"></div>\
-                <div id="mode-editor" class="icon"></div>\
-            </div>');
-
-        $('#modeSelector div').click(function() {
-            selectMode($(this).attr('id'));
-        })
-    }
-
-    var oldMode = null;
-
-    function selectMode(mode) {
-        if(mode === oldMode) return;
-        $('#task').removeClass(oldMode).addClass(mode);
-        $('#' + mode).hide();
-        if(oldMode) {
-            $('#' + oldMode).show();
-        }
-        if(mode == 'mode-instructions') {
-            $('#taskIntro .short').hide();
-            $('#taskIntro .long').show();
-        }
-        if(mode == 'mode-player') {
-            $('#taskIntro .short').show();
-            $('#taskIntro .long').hide();
-        }
-        oldMode = mode;
-        quickAlgoInterface.onResize();
-    }
-
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
     $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
 
-    createModeSelectorButtons();
+    quickAlgoInterface.createModeSelectorButtons();
     //selectMode('mode-instructions');
-    selectMode('mode-player');
+    quickAlgoInterface.selectMode('mode-player');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
     quickAlgoInterface.onResize();

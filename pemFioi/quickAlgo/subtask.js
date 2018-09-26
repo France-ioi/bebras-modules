@@ -121,7 +121,9 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.unloadLevel = function(callback) {
-      window.quickAlgoInterface.resetTestScores();
+      if(this.display) {
+         window.quickAlgoInterface.unloadLevel();
+      }
       this.context.unload();
       this.blocklyHelper.unloadLevel();
       callback();
@@ -378,7 +380,10 @@ var initBlocklySubTask = function(subTask, language) {
             subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
             if(display) {
                window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
-               subTask.changeTestTo(iWorstTestCase);
+               if(subTask.testCaseResults[subTask.iTestCase] > worstRate) {
+                  // Change test case only if it's worse than the current one
+                  subTask.changeTestTo(iWorstTestCase);
+               }
                $('#error').html(subTask.testCaseResults[subTask.iTestCase]);
             }
             if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {

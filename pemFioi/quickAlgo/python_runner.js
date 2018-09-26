@@ -588,6 +588,9 @@ function PythonInterpreter(context, msgCallback) {
       message = this.context.messagePrefixFailure + message;
     }
 
+    if(window.quickAlgoInterface) {
+      window.quickAlgoInterface.setPlayPause(false);
+    }
     this.messageCallback(message);
   };
 
