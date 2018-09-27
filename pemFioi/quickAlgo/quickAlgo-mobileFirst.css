@@ -2,26 +2,31 @@ body.blockly > *,
 body > * {
   width: auto;
 }
-/*****************
-  LAYOUT
-*****************/
-#taskContent {
-  position: absolute;
-  top: 71px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-#taskContent::before,
-#taskContent::after {
-  content: " ";
-  display: table;
-}
-#gridContainer,
-#blocklyLibContent,
-#blocklyContainer {
+* {
   box-sizing: border-box;
 }
+
+/*****************
+  LAYOUT
+  The layout is constructed with mobile first in mind,
+  so the rules will change from a certain breakpoint, not up to it.
+  mobiles portrait: 480x800px
+  mobiles landscape: 800x480px
+  tablets portrait: 600x1024px
+  tablets landscape: 1024x600px
+*****************/
+
+#tabsContainer {
+}
+#taskContent {
+  position: static !important;
+}
+#blocklyContainer {
+}
+#blocklyLibContent {
+}
+
+
 /* mode player */
 
 .mode-player #introGrid {
@@ -148,7 +153,6 @@ body > * {
   TASK DESCRIPTION
 *****************/
 #introGrid {
-  overflow: hidden;
 }
 #taskIntro {
   padding: 5px 10px;
@@ -521,16 +525,9 @@ input[type=button] {
     display: none;
 }
 #blocklyContainer {
-  overflow: hidden;
-  height: 100%;
-  border: 1px solid #8d9daa;
-  width: 100%;
   position: relative;
 }
 #blocklyDiv {
-  position: absolute;
-  height: 100%;
-  width: 100%;
 }
 
 #testCaseName {
@@ -690,11 +687,6 @@ input[type=button] {
    z-index: 20;
 }
 #languageInterface {
-  position: absolute;
-  top: 30px;
-  bottom: 0;
-  left: 0;
-  right: 0;
 }
 
 #editorBar {
@@ -721,13 +713,19 @@ input[type=button] {
 }
 
 
-#modeSelector {
+#taskToolbar {
   position: fixed;
   bottom: 0;
   right: 0;
   padding: 7px;
   background: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
 }
+#modeSelector {}
 #modeSelector div {
   float: left;
 }
