@@ -70,7 +70,6 @@ var quickAlgoInterface = {
             "<div id='editorBar'>" +
                 "<div id='capacity'></div>" +
                 "<button type='button' id='fullscreenButton'>[+]</button>" +
-                "<button type='button' id='displayHelpBtn' onclick='conceptViewer.show()'>?</button>" +
                 "<div id='editorMenuContainer'>" +
                     "<button type='button' id='toggleEditorMenu'>≡</button>" +
                     "<div id='editorMenu'>" +
@@ -358,14 +357,19 @@ var quickAlgoInterface = {
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },
 
-    createModeSelectorButtons: function() {
+
+    createModeTaskToolbar: function() {
         var self = this;
-        $("#task").append('\
-            <div id="modeSelector">\
-                <div id="mode-player"><span class="fas fa-play"></span></div>\
-                <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
-                <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
-            </div>');
+            $("#task").append('\
+                <div id="taskToolbar">\
+                    <div id="modeSelector">\
+                        <div id="mode-player"><span class="fas fa-play"></span></div>\
+                        <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
+                        <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
+                    </div>\
+                    <button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">?</button>\
+                </div>\
+            ');
 
         $('#modeSelector div').click(function() {
             self.selectMode($(this).attr('id'));
@@ -431,9 +435,10 @@ $(document).ready(function() {
     crossorigin="anonymous">');
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
-    $('#taskIntro, #gridContainer').wrapAll("<div id='introGrid'></div>");
+    $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
 
-    quickAlgoInterface.createModeSelectorButtons();
+    quickAlgoInterface.createModeTaskToolbar();
+    $(".speedControls").prependTo($("#taskToolbar"));
     quickAlgoInterface.selectMode('mode-player');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
