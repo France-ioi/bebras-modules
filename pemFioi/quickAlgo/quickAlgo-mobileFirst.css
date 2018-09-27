@@ -22,6 +22,128 @@ body > * {
 #blocklyContainer {
   box-sizing: border-box;
 }
+/* mode player */
+
+.mode-player #introGrid {
+}
+.mode-player #taskIntro {
+  display: none;
+}
+.mode-player #blocklyLibContent {
+}
+.mode-player #grid {
+  overflow: auto;
+  max-width: 100vw;
+}
+
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+
+  .mode-player #introGrid {
+  }
+  .mode-player #taskIntro {
+  }
+  .mode-player #gridContainer {
+  }
+  .mode-player #blocklyLibContent {
+    position: relative;
+  }
+}
+
+@media screen and (orientation: portrait) { /* vertical screen layout */
+
+  .mode-player #introGrid {
+  }
+  .mode-player #taskIntro {
+  }
+  .mode-player #gridContainer {
+  }
+  .mode-player #blocklyLibContent {
+  }
+  .mode-player .speedControls {
+  }
+}
+
+@media screen and (max-width: 800px) {
+
+  .mode-player #taskIntro {
+  }
+  .mode-player #gridContainer {
+  }
+}
+
+@media screen and (max-width: 600px) {
+
+  .mode-player #taskIntro {
+  }
+  .mode-player .speedControls {
+  }
+}
+
+@media screen and (max-width: 480px) {
+
+  .mode-player #introGrid {
+  }
+  .mode-player #gridContainer {
+  }
+  .mode-player #blocklyLibContent {
+  }
+  .mode-player .speedControls {
+  }
+}
+/* hide blockly toolbox for low res */
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+}
+/* mode instructions */
+.mode-instructions #blocklyLibContent,
+.mode-instructions .speedControls {
+  display: none;
+}
+.mode-instructions #taskContent {
+
+}
+.mode-instructions #introGrid {
+
+}
+.mode-instructions #taskIntro {
+  left: 410px;
+  height: 100%;
+  overflow: auto;
+}
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+
+  .mode-instructions #gridContainer {
+    width: 410px;
+  }
+}
+@media screen and (orientation: portrait) { /* vertical screen layout */
+
+  .mode-instructions #gridContainer {
+    top: 0;
+    height: 360px;
+  }
+  .mode-instructions #grid {
+    margin: 0 auto;
+  }
+  .mode-instructions #taskIntro {
+    top: 380px;
+    left: 0;
+    bottom: 0;
+    height: auto;
+  }
+  .mode-instructions #gridContainer {
+    margin: 0 auto;
+  }
+}
+
 /*****************
   TASK DESCRIPTION
 *****************/
@@ -623,245 +745,3 @@ input[type=button] {
 }
 
 
-/*****************
-  SCREENSIZE BASED LAYOUT
-*****************/
-
-/* mode instructions */
-.mode-instructions button[data-mode=instructions],
-.mode-instructions #blocklyLibContent,
-.mode-instructions .speedControls {
-  display: none;
-}
-.mode-instructions #taskContent {
-
-}
-.mode-instructions #introGrid {
-
-}
-.mode-instructions #taskIntro {
-  position: absolute;
-  left: 410px;
-  height: 100%;
-  overflow: auto;
-}
-
-/* mode player */
-.mode-player button[data-mode=player] {
-  display: none;
-}
-
-.mode-player #introGrid {
-  position: absolute;
-}
-
-.mode-player #taskIntro {
-  position: absolute;
-  overflow: auto;
-}
-
-.mode-player #gridContainer {
-  position: absolute;
-}
-
-
-.mode-player .speedControls {
-  position: absolute;
-}
-
-
-.mode-player .speedControls .speedSlider {
-  width: 140px;
-  margin: 0 10px;
-  float: left;
-}
-
-
-.mode-player .speedControls .btn-group {
-  float: left;
-}
-
-.mode-player #blocklyLibContent {
-  position: absolute;
-}
-
-
-
-/* mode editor */
-.mode-editor button[data-mode=editor],
-.mode-editor #introGrid,
-.mode-editor .speedControls {
-  display: none;
-}
-
-
-
-
-
-
-
-
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-
-  .mode-player #introGrid {
-    left: 0;
-    width: 420px;
-    top: 0;
-    height: 100%;
-  }
-
-  .mode-player #taskIntro {
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 370px;
-  }
-
-  .mode-player #gridContainer {
-    left: 0;
-    width: 100%;
-    bottom: 60px;
-    height: 290px;
-  }
-
-  .mode-player #blocklyLibContent {
-    top: 0;
-    bottom: 0;
-    left: 420px;
-    right: 0;
-  }
-
-  .mode-player .speedControls {
-    left: 0;
-    bottom: 0;
-    width: 420px;
-    height: 50px;
-  }
-
-  .mode-instructions #gridContainer {
-    width: 410px;
-  }
-
-}
-
-
-@media screen and (orientation: portrait) { /* vertical screen layout */
-
-  .mode-player #introGrid {
-    width: 100%;
-    height: 420px;
-  }
-
-
-  .mode-player #taskIntro {
-    left: 0;
-    right: 420px;
-    top: 0;
-    height: 360px;
-  }
-
-  .mode-player #gridContainer {
-    width: 420px;
-    right: 0;
-    top: 0;
-    height: 100%;
-  }
-
-  .mode-player #blocklyLibContent {
-    top: 420px;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .mode-player .speedControls {
-    left: 0;
-    top: 440px;
-    right: 420px;
-  }
-
-
-  .mode-instructions #gridContainer {
-    top: 0;
-    height: 360px;
-  }
-
-  .mode-instructions #grid {
-    margin: 0 auto;
-  }
-
-  .mode-instructions #taskIntro {
-    top: 380px;
-    left: 0;
-    bottom: 0;
-    height: auto;
-  }
-
-  .mode-instructions #gridContainer {
-    margin: 0 auto;
-  }
-
-}
-
-
-
-@media screen and (max-width: 800px) {
-
-  .mode-player #taskIntro {
-    display: none;
-  }
-
-  .mode-player #gridContainer {
-    top: 0;
-  }
-}
-
-
-
-@media screen and (max-width: 600px) {
-
-  .mode-player #taskIntro {
-    height: 320px;
-  }
-
-  .mode-player .speedControls {
-    top: 400px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-
-
-  .mode-player #introGrid {
-    height: 300px;
-  }
-
-  .mode-player #gridContainer {
-    position: relative;
-    width: 100%;
-  }
-
-  .mode-player #blocklyLibContent {
-    top: 300px;
-    bottom: 55px;
-  }
-
-  .mode-player .speedControls {
-    right: 80px;
-    top: auto;
-    bottom: 5px;
-  }
-}
-
-/* hide blockly toolbox for low res */
-@media screen and (max-width: 800px) and (orientation: landscape) {
-  .mode-player .blocklyToolboxDiv {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 480px) and (orientation: portrait) {
-  .mode-player .blocklyToolboxDiv {
-    display: none;
-  }
-}
