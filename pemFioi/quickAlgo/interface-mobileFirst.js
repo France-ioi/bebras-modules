@@ -218,7 +218,7 @@ var quickAlgoInterface = {
     stepDelayMax: 250,
 
     refreshStepDelay: function() {
-        var v = parseInt($('#speedSlider').val(), 10),
+        var v = parseInt($('#speedCursor').val(), 10),
             delay = this.stepDelayMin + this.stepDelayMax - v;
         task.displayedSubTask.setStepDelay(delay);
     },
@@ -228,9 +228,11 @@ var quickAlgoInterface = {
 
         var speedControls =
             '<div class="speedControls">' +
-                '<div class="speedSlider">' +
+                '<div id="speedSlider">' +
                     '<span class="speedSlower">' + this.strings.speedSliderSlower + '</span>' +
-                    '<input type="range" min="0" max="' + (this.stepDelayMax - this.stepDelayMin) + '" value="0" class="slider" id="speedSlider">' +
+                    '<input type="range" min="0" max="' +
+                        (this.stepDelayMax - this.stepDelayMin) +
+                        '" value="0" class="slider" id="speedCursor">' +
                     '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
                 '</div>' +
                 '<div id="playerControls">' +
@@ -243,11 +245,11 @@ var quickAlgoInterface = {
         $('#task').find('.speedControls').remove();
         $('#task').append(speedControls);
 
-        $('#speedSlider').on('input change', function(e) {
+        $('#speedCursor').on('input change', function(e) {
             self.refreshStepDelay();
         });
         $('.speedSlower').click(function() {
-            var el = $('#speedSlider'),
+            var el = $('#speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) - delta;
@@ -255,7 +257,7 @@ var quickAlgoInterface = {
             self.refreshStepDelay();
         });
         $('.speedFaster').click(function() {
-            var el = $('#speedSlider'),
+            var el = $('#speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) + delta;
