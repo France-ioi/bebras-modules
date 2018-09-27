@@ -12,11 +12,6 @@ img {
   height: auto;
 }
 
-#task {
-  min-width: 480px;
-  min-height: 480px;
-}
-
 #choose-view {
   margin-top: 0 !important;
 }
