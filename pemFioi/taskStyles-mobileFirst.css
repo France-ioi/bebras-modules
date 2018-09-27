@@ -61,6 +61,16 @@ img {
   color: #fff;
   padding: 5px 20px;
 }
+@media screen and (max-width: 480px) {
+  #tabsMenu .levelLabel {
+    display: inline-block;
+    text-overflow: clip;
+    white-space: nowrap;
+    overflow: hidden;
+    width: calc(100vw / 3 - 100px);
+    vertical-align: middle;
+  }
+}
 #tabsMenu .stars {
   display: inline-block;
   margin-left: 5px;
