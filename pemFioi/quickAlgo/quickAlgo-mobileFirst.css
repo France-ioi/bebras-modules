@@ -407,13 +407,13 @@ input[type=button] {
 
 
 /* speed slider  */
-.speedSlider {
+#speedSlider {
   position: relative;
   height: 45px;
   overflow: hidden;
 }
 
-.speedSlider input {
+#speedSlider input {
   margin: 30px 0 20px 0;
   padding: 0;
   width: 100%;
@@ -425,7 +425,7 @@ input[type=button] {
   background:  #000;
 }
 
-.speedSlider input::-webkit-slider-thumb {
+#speedSlider input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
@@ -436,7 +436,7 @@ input[type=button] {
   background: #fff;
 }
 
-.speedSlider input::-moz-range-thumb {
+#speedSlider input::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -445,17 +445,17 @@ input[type=button] {
   background: #fff;
 }
 
-.speedSlider span {
+#speedSlider span {
   position: absolute;
   top: 0;
   cursor: pointer;
 }
 
-.speedSlider span.speedSlower {
+#speedSlider span.speedSlower {
   left: 0;
 }
 
-.speedSlider span.speedFaster {
+#speedSlider span.speedFaster {
   right: 0;
 }
 /*****************
