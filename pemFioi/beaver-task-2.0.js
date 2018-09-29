@@ -72,46 +72,31 @@ task.getMetaData = function(callback) {
 // TODO We update the grader below, if the task has levels. Is this line necessary?
 var grader = grader ? grader : {};
 
+function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+var forcedLevel = getUrlParameter("level");
+
 function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) { 
-      var getUrlParameter = function (sParam) {
-       var sPageURL = decodeURIComponent(window.location.search.substring(1)),
-           sURLVariables = sPageURL.split('&'),
-           sParameterName,
-           i;
-
-       for (i = 0; i < sURLVariables.length; i++) {
-           sParameterName = sURLVariables[i].split('=');
-
-           if (sParameterName[0] === sParam) {
-               return sParameterName[1] === undefined ? true : sParameterName[1];
-           }
-       }
-   };
-
-   var forcedLevel = getUrlParameter("level");
    if (forcedLevel != undefined) {
-      defaultLevel = forcedLevel;
       var oldInitSubTask = initSubTask;
-      var savedLevels = levels;
-      initSubTask = function(subTask) {
-         oldInitSubTask(subTask);
-         for (var iLevel = 0; iLevel < savedLevels.length; iLevel++) {
-            if (forcedLevel != savedLevels[iLevel]) {
-               subTask.data[savedLevels[iLevel]] = undefined;
-            }            
-         }
-         subTask.load = function(views, callback) {
-            subTask.loadLevel(forcedLevel);
-            callback();
-         };
-         levels = [forcedLevel];
-         // TODO: what follows shouldn't be needed here, but blocklyHelper.setLevel is not called anymore
-         $('.' + forcedLevel).show();
-         displayHelper.taskLevel = forcedLevel;
+      if (forcedLevel) {
+         levels = null;
       }
    }
-
-   
+  
    
    // Create a subTask instance, possibly operating on an existing object.
    function createTask(displayFlag) {
@@ -191,7 +176,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
-               if(mainTask.assumeLevels) {
+               if (forcedLevel) {
+                  defaultLevel = forcedLevel;
+               } else if(mainTask.assumeLevels) {
                   defaultLevel = "easy";
                } else {
                   defaultLevel = levels[0];
@@ -206,7 +193,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             };
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
-               displayHelper.setupLevels(forcedLevel, reloadWithCallbacks);
+               displayHelper.setupLevels(null, reloadWithCallbacks);
             }
             callback();
          }
@@ -252,6 +239,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             }
             else if(score >= maxScores.easy) {
                level = "medium";
+            }
+            if (forcedLevel != null) {
+               level = forcedLevel;
             }
             var newAnswer = null;
             if(strAnswer && strAnswer !== '') {
@@ -340,7 +330,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          state = newState;
          if(!state.levelStates) { state.levelStates = {}; }
          if(!state.levelAnswers) { state.levelAnswers = {}; }
-         if(!state.level) { state.level = 'easy'; }
+         if(!state.level) {
+            if (forcedLevel != null) {
+               state.level = forcedLevel;
+            } else {
+               state.level = 'easy';
+            }
+         }
          var level = state.level;
          var levelState = state.levelStates[level];
          destroyTask(mainTask, function() {
@@ -437,7 +433,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
       }
-      if(!levels && mainTask.assumeLevels && answer.easy) {
+      if (forcedLevel != null) {
+         answer = answer[forcedLevel];
+      } else if(!levels && mainTask.assumeLevels && answer.easy) {
          answer = answer.easy;
       }
       gradingTask.reloadAnswerObject(answer);
