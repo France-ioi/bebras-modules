@@ -7,8 +7,18 @@ var initBlocklySubTask = function(subTask, language) {
    // Blockly tasks need to always have the level-specific behavior from
    // beaver-task-2.0
    subTask.assumeLevels = true;
-
-   if (subTask.data["medium"] == undefined) {
+   
+   if (forcedLevel != null) {
+      for (var level in subTask.data) {
+         if (forcedLevel != level) {
+            subTask.data[level] = undefined;
+         }            
+      }
+      subTask.load = function(views, callback) {
+         subTask.loadLevel(forcedLevel);
+         callback();
+      };
+   } else if (subTask.data["medium"] == undefined) {
       subTask.load = function(views, callback) {
          subTask.loadLevel("easy");
          callback();
