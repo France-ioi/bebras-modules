@@ -104,9 +104,10 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             subTask.loadLevel(forcedLevel);
             callback();
          };
-         levels = null;
-         // TODO: this shouldn't be needed here, but blocklyHelper.setLevel is not called anymore
+         levels = [forcedLevel];
+         // TODO: what follows shouldn't be needed here, but blocklyHelper.setLevel is not called anymore
          $('.' + forcedLevel).show();
+         displayHelper.taskLevel = forcedLevel;
       }
    }
 
@@ -205,7 +206,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             };
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
-               displayHelper.setupLevels(null, reloadWithCallbacks);
+               displayHelper.setupLevels(forcedLevel, reloadWithCallbacks);
             }
             callback();
          }
