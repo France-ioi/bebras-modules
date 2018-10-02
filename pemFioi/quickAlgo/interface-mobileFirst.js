@@ -369,7 +369,7 @@ var quickAlgoInterface = {
                         <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
                         <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
                     </div>\
-                    <button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">?</button>\
+                    <button type="button" id="displayHelpBtn" onclick="conceptViewer.show()"><span class="fas fa-question"></span></button>\
                 </div>\
             ');
 

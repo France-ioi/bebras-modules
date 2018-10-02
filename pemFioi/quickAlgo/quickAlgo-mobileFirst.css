@@ -28,7 +28,18 @@ body > * {
 
 
 /* mode player */
-
+.mode-player#task {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  height: calc(100vh - 40px);
+}
+.mode-player #taskContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  flex: 2 0 0;
+}
 .mode-player #introGrid {
 }
 .mode-player #taskIntro {
@@ -36,65 +47,13 @@ body > * {
 }
 .mode-player #blocklyLibContent {
 }
-.mode-player #grid {
-  overflow: auto;
-  max-width: 100vw;
-}
 
 @media screen and (orientation: landscape) { /* horizontal screen layout */
-
-  .mode-player #introGrid {
-  }
-  .mode-player #taskIntro {
-  }
-  .mode-player #gridContainer {
-  }
   .mode-player #blocklyLibContent {
     position: relative;
   }
 }
 
-@media screen and (orientation: portrait) { /* vertical screen layout */
-
-  .mode-player #introGrid {
-  }
-  .mode-player #taskIntro {
-  }
-  .mode-player #gridContainer {
-  }
-  .mode-player #blocklyLibContent {
-  }
-  .mode-player .speedControls {
-  }
-}
-
-@media screen and (max-width: 800px) {
-
-  .mode-player #taskIntro {
-  }
-  .mode-player #gridContainer {
-  }
-}
-
-@media screen and (max-width: 600px) {
-
-  .mode-player #taskIntro {
-  }
-  .mode-player .speedControls {
-  }
-}
-
-@media screen and (max-width: 480px) {
-
-  .mode-player #introGrid {
-  }
-  .mode-player #gridContainer {
-  }
-  .mode-player #blocklyLibContent {
-  }
-  .mode-player .speedControls {
-  }
-}
 /* hide blockly toolbox for low res */
 @media screen and (max-width: 800px) and (orientation: landscape) {
   .mode-player .blocklyToolboxDiv {
@@ -160,6 +119,10 @@ body > * {
 /*****************
   TASK GRID & TESTS
 *****************/
+#grid {
+  overflow: auto;
+  max-width: 100vw;
+}
 /*
   Run test speed selector
   Rip-off of bootstrap btn and btn-group rules
@@ -395,14 +358,11 @@ input[type=button] {
 }
 /* playback */
 #playerControls {
-  height: 36px;
-  margin-top: 2px;
 }
 
 #playerControls .icon {
   float: left;
   margin-right: 9px;
-
 }
 
 #playerControls .icon:last-child {
@@ -411,14 +371,9 @@ input[type=button] {
 
 
 /* speed slider  */
-#speedSlider {
-  position: relative;
-  height: 45px;
-  overflow: hidden;
-}
 
-#speedSlider input {
-  margin: 30px 0 20px 0;
+#speedSlider #speedCursor {
+  margin: 20px 0 0px 0;
   padding: 0;
   width: 100%;
   -webkit-appearance: none;
@@ -426,10 +381,10 @@ input[type=button] {
   height: 1px;
   outline: none;
   border: 0;
-  background:  #000;
+  background: #000;
 }
 
-#speedSlider input::-webkit-slider-thumb {
+#speedSlider #speedCursor::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 18px;
@@ -440,7 +395,7 @@ input[type=button] {
   background: #fff;
 }
 
-#speedSlider input::-moz-range-thumb {
+#speedSlider #speedCursor::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
@@ -455,13 +410,20 @@ input[type=button] {
   cursor: pointer;
 }
 
-#speedSlider span.speedSlower {
+.mode-player #speedSlider {
+  position: absolute;
+  top: -36px;
+  width: 100%;
   left: 0;
+  padding: 10px;
+}
+.mode-player #speedSlider span.speedSlower {
+  left: 10px;
+}
+.mode-player #speedSlider span.speedFaster {
+  right: 10px;
 }
 
-#speedSlider span.speedFaster {
-  right: 0;
-}
 /*****************
   CODE EDITOR
 *****************/
@@ -714,7 +676,7 @@ input[type=button] {
 
 
 #taskToolbar {
-  position: fixed;
+  position: relative;
   bottom: 0;
   right: 0;
   padding: 7px;
@@ -724,22 +686,15 @@ input[type=button] {
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
+  flex: 0 0 auto;
 }
 #modeSelector {}
 #modeSelector div {
-  float: left;
+  display: inline-block;
 }
-#modeSelector #mode-editor {
-  background-position: -323px 0;
-  width: 36px;
-}
-#modeSelector #mode-player {
-  background-position: -361px 0;
-  width: 36px;
-}
-#modeSelector #mode-instructions {
-  background-position: -284px 0;
-  width: 36px;
+#modeSelector .active {
+  color: #ccc;
+  cursor: not-allowed;
 }
 
 
