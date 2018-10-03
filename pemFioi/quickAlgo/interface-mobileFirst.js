@@ -10,6 +10,7 @@ var quickAlgoInterface = {
     curMode: null,
 
     fullscreen: false,
+    hasHelp: false,
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -177,9 +178,9 @@ var quickAlgoInterface = {
 
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);
-            $('#displayHelpBtn').show();
+            hasHelp = true;
         } else {
-            $('#displayHelpBtn').hide();
+            hasHelp = false;
         }
     },
 
@@ -361,6 +362,8 @@ var quickAlgoInterface = {
 
 
     createModeTaskToolbar: function() {
+        var displayHelpBtn = hasHelp ? '<button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">\
+            <span class="fas fa-question"></span></button>' : '';
         var self = this;
             $("#task").append('\
                 <div id="taskToolbar">\
@@ -368,9 +371,9 @@ var quickAlgoInterface = {
                         <div id="mode-player"><span class="fas fa-play"></span></div>\
                         <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
                         <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
-                    </div>\
-                    <button type="button" id="displayHelpBtn" onclick="conceptViewer.show()"><span class="fas fa-question"></span></button>\
-                </div>\
+                    </div>'
+                    + displayHelpBtn +
+                '</div>\
             ');
 
         $('#modeSelector div').click(function() {
