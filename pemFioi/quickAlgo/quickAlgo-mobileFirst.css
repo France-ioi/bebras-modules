@@ -8,6 +8,12 @@ body > * {
 * {
   box-sizing: border-box;
 }
+#task {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  height: calc(100vh - 40px);
+}
 
 
 /*****************
@@ -21,6 +27,7 @@ body > * {
 *****************/
 #taskContent {
   position: static !important;
+  flex: 2 0 0;
 }
 
 /* speed slider  */
@@ -65,17 +72,10 @@ body > * {
 /*****************
   MODE PLAYER
 *****************/
-.mode-player#task {
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
-  height: calc(100vh - 40px);
-}
 .mode-player #taskContent {
   display: flex;
   flex-direction: column;
   justify-content: stretch;
-  flex: 2 0 0;
 }
 .mode-player #taskIntro {
   display: none;
@@ -207,6 +207,17 @@ body > * {
   .mode-instructions #gridContainer {
     margin: 0 auto;
   }
+}
+
+/*****************
+  MODE EDITOR
+*****************/
+
+.mode-editor #introGrid {
+  display: none;
+}
+.mode-editor .speedControls {
+  display: none;
 }
 
 /*****************
