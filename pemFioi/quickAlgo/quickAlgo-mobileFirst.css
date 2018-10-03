@@ -1,3 +1,6 @@
+html, body {
+  height: 100%;
+}
 body.blockly > *,
 body > * {
   width: auto;
@@ -5,6 +8,7 @@ body > * {
 * {
   box-sizing: border-box;
 }
+
 
 /*****************
   LAYOUT
@@ -15,19 +19,52 @@ body > * {
   tablets portrait: 600x1024px
   tablets landscape: 1024x600px
 *****************/
-
-#tabsContainer {
-}
 #taskContent {
   position: static !important;
 }
-#blocklyContainer {
+
+/* speed slider  */
+#speedSlider {
+  background: #4a90e2;
 }
-#blocklyLibContent {
+#speedSlider #speedCursor {
+  margin: 20px 0 0px 0;
+  padding: 0;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 1px;
+  outline: none;
+  border: 0;
+  background: #000;
+}
+#speedSlider #speedCursor::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: default;
+  background: #fff;
+}
+#speedSlider #speedCursor::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #000;
+  cursor: default;
+  background: #fff;
+}
+#speedSlider span {
+  position: absolute;
+  top: 0;
+  cursor: pointer;
 }
 
-
-/* mode player */
+/*****************
+  MODE PLAYER
+*****************/
 .mode-player#task {
   display: flex;
   flex-direction: column;
@@ -40,17 +77,81 @@ body > * {
   justify-content: stretch;
   flex: 2 0 0;
 }
-.mode-player #introGrid {
-}
 .mode-player #taskIntro {
   display: none;
 }
-.mode-player #blocklyLibContent {
-}
 
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-  .mode-player #blocklyLibContent {
+.mode-player #speedSlider {
+  position: absolute;
+  top: -36px;
+  width: 100%;
+  left: 0;
+  padding: 10px;
+}
+.mode-player #speedSlider span.speedSlower {
+  left: 10px;
+}
+.mode-player #speedSlider span.speedFaster {
+  right: 10px;
+}
+@media screen and (orientation: landscape) {
+  .mode-player #taskContent {
+    flex-direction: row;
+  }
+  .mode-player #introGrid {
+    flex: 0 0 50%;
+    display: flex;
+    flex-direction: column;
+  }
+  .mode-player #gridContainer {
+    flex: 0 0 50%;
+  }
+  .mode-player #blocklyDiv {
+    width: auto;
+    height: auto;
+  }
+  .mode-player #speedSlider {
     position: relative;
+    display: inline-block;
+    top: auto;
+    width: auto;
+    left: auto;
+    vertical-align: bottom;
+    padding: 0 10px 5px;
+  }
+  .mode-player #speedSlider span {
+    font-size: 12px;
+  }
+  .mode-player #playerControls {
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
+@media screen and (min-width: 600px) and (orientation: portrait) {
+  .mode-player #introGrid {
+    display: flex;
+    justify-content: stretch;
+    flex: 1 1 0;
+  }
+  .mode-player #taskIntro {
+    display: block;
+    flex: 1 1 50%;
+  }
+  .mode-player #blocklyLibContent {
+    flex-grow: 1;
+  }
+  .mode-player #languageInterface,
+  .mode-player #blocklyContainer,
+  .mode-player #blocklyDiv,
+  .mode-player #injectionDiv,
+  .blocklySvg,
+  .blocklyWorkspace {
+    height: 100% !important;
+  }
+}
+@media screen and (min-width: 800px) and (orientation: landscape) {
+  .mode-player #taskIntro {
+    display: block;
   }
 }
 
@@ -111,10 +212,9 @@ body > * {
 /*****************
   TASK DESCRIPTION
 *****************/
-#introGrid {
-}
 #taskIntro {
   padding: 5px 10px;
+  overflow: auto;
 }
 /*****************
   TASK GRID & TESTS
@@ -346,15 +446,15 @@ input[type=button] {
 }
 #testSelector .tabs{
   display: flex;
-  background-color: #ccc;
+  background-color: #4a90e2;
 }
 #testSelector .tabs .testTab {
-  background-color: #efefef;
   flex: 1 0 auto;
   cursor: pointer;
+  color: #fff;
 }
-#testSelector .tabs .testTab.currentTest {
-  background-color: #fff;
+#testSelector .tabs .testTab:not(.currentTest) {
+  background-color: rgba(0,0,0,0.2);
 }
 /* playback */
 #playerControls {
@@ -370,59 +470,9 @@ input[type=button] {
 }
 
 
-/* speed slider  */
 
-#speedSlider #speedCursor {
-  margin: 20px 0 0px 0;
-  padding: 0;
-  width: 100%;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 1px;
-  outline: none;
-  border: 0;
-  background: #000;
-}
 
-#speedSlider #speedCursor::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
-}
 
-#speedSlider #speedCursor::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
-}
-
-#speedSlider span {
-  position: absolute;
-  top: 0;
-  cursor: pointer;
-}
-
-.mode-player #speedSlider {
-  position: absolute;
-  top: -36px;
-  width: 100%;
-  left: 0;
-  padding: 10px;
-}
-.mode-player #speedSlider span.speedSlower {
-  left: 10px;
-}
-.mode-player #speedSlider span.speedFaster {
-  right: 10px;
-}
 
 /*****************
   CODE EDITOR
@@ -479,7 +529,9 @@ input[type=button] {
 }
 
 #displayHelpBtn {
-  float: right;
+  border: 0;
+  background-color: transparent;
+  color: #fff;
 }
 
 
@@ -653,7 +705,7 @@ input[type=button] {
 
 #editorBar {
   height: 30px;
-  background-color: #666666;
+  background-color: #ccc;
 }
 /*****************
   UTILITY STRIP
@@ -680,13 +732,17 @@ input[type=button] {
   bottom: 0;
   right: 0;
   padding: 7px;
-  background: #fff;
+  background: #4a90e2;
+  color: #fff;
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-end;
   flex: 0 0 auto;
+}
+#taskToolbar .fas {
+  font-size: 24px;
 }
 #modeSelector {}
 #modeSelector div {
