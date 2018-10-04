@@ -8,14 +8,14 @@ var initBlocklySubTask = function(subTask, language) {
    // beaver-task-2.0
    subTask.assumeLevels = true;
    
-   if (forcedLevel != null) {
+   if (window.forcedLevel != null) {
       for (var level in subTask.data) {
-         if (forcedLevel != level) {
+         if (window.forcedLevel != level) {
             subTask.data[level] = undefined;
          }            
       }
       subTask.load = function(views, callback) {
-         subTask.loadLevel(forcedLevel);
+         subTask.loadLevel(window.forcedLevel);
          callback();
       };
    } else if (subTask.data["medium"] == undefined) {
