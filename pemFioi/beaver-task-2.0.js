@@ -87,12 +87,12 @@ function getUrlParameter(sParam) {
     }
 };
 
-var forcedLevel = getUrlParameter("level");
+window.forcedLevel = getUrlParameter("level");
 
 function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) { 
-   if (forcedLevel != undefined) {
+   if (window.forcedLevel !== undefined) {
       var oldInitSubTask = initSubTask;
-      if (forcedLevel) {
+      if (window.forcedLevel) {
          levels = null;
       }
    }
@@ -176,8 +176,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
-               if (forcedLevel) {
-                  defaultLevel = forcedLevel;
+               if (window.forcedLevel) {
+                  defaultLevel = window.forcedLevel;
                } else if(mainTask.assumeLevels) {
                   defaultLevel = "easy";
                } else {
@@ -240,8 +240,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             else if(score >= maxScores.easy) {
                level = "medium";
             }
-            if (forcedLevel != null) {
-               level = forcedLevel;
+            if (window.forcedLevel != null) {
+               level = window.forcedLevel;
             }
             var newAnswer = null;
             if(strAnswer && strAnswer !== '') {
@@ -331,8 +331,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(!state.levelStates) { state.levelStates = {}; }
          if(!state.levelAnswers) { state.levelAnswers = {}; }
          if(!state.level) {
-            if (forcedLevel != null) {
-               state.level = forcedLevel;
+            if (window.forcedLevel != null) {
+               state.level = window.forcedLevel;
             } else {
                state.level = 'easy';
             }
@@ -433,8 +433,8 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
       }
-      if (forcedLevel != null) {
-         answer = answer[forcedLevel];
+      if (window.forcedLevel != null) {
+         answer = answer[window.forcedLevel];
       } else if(!levels && mainTask.assumeLevels && answer.easy) {
          answer = answer.easy;
       }
