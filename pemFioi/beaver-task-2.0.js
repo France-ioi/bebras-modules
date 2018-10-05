@@ -178,6 +178,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             if(defaultLevel === null || defaultLevel === undefined) {
                if (window.forcedLevel) {
                   defaultLevel = window.forcedLevel;
+                  $("." + window.forcedLevel).show(); // TODO: why is it needed here?
                } else if(mainTask.assumeLevels) {
                   defaultLevel = "easy";
                } else {
