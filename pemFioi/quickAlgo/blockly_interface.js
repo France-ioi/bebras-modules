@@ -499,6 +499,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.wasPortrait = isPortrait;
             $('#blocklyDiv').height($('#blocklyLibContent').height() - 34);
             $('#blocklyDiv').width($('#blocklyLibContent').width() - 4);
+            if (this.trashInToolbox) {
+               Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+            }
+            Blockly.svgResize(this.workspace);
+            return;
          }
          var panelWidth = 500;
          if (this.languages[this.player] == "blockly") {
