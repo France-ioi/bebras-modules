@@ -166,14 +166,31 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.linkBack = false;
    };
 
-   subTask.run = function(callback) {
+   subTask.initRun = function(callback) {
       initBlocklyRunner(subTask.context, function(message, success) {
-        window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
-         if(callback) {
-            callback(message, success);
+         function handleResults(results) {
+            subTask.context.display = true;
+            if(callback) {
+               callback(message, success);
+            } else if(results.successRate >= 1) {
+               // All tests passed, request validate from the platform
+               platform.validate("done");
+            }
+            if(results.successRate < 1) {
+               // Display the execution message as it won't be shown through
+               // validate
+               window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
+            }
          }
+         // Launch an evaluation after the execution
+         subTask.context.display = false;
+         subTask.getGrade(handleResults, true, subTask.iTestCase);
       });
       initContextForLevel(subTask.iTestCase);
+   };
+
+   subTask.run = function(callback) {
+      subTask.initRun(callback);
       subTask.blocklyHelper.run(subTask.context);
    };
 
@@ -187,7 +204,6 @@ var initBlocklySubTask = function(subTask, language) {
       this.getGrade(function(result) {
          $('#displayHelper_graderMessage').html("");
          subTask.context.display = true;
-         subTask.context.changeDelay(200);
          initBlocklyRunner(subTask.context, function(message, success) {
             window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
             platform.validate("done");
@@ -202,12 +218,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.step = function () {
       subTask.context.changeDelay(200);
-      if(!subTask.context.runner || subTask.context.runner.nbRunning() <= 0) {
-        initBlocklyRunner(subTask.context, function(message, success) {
-          window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
-        });
-        initContextForLevel(subTask.iTestCase);
-      }
+      this.initRun();
       subTask.blocklyHelper.step(subTask.context);
    };
 
@@ -241,9 +252,9 @@ var initBlocklySubTask = function(subTask, language) {
       return this.state;
    };
 
-   subTask.changeSpeed =  function(speed) {
+   subTask.changeSpeed = function(speed) {
       this.context.changeDelay(speed);
-      if ((this.context.runner == undefined) || !this.context.runner.isRunning()) {
+      if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
          this.run();
       } else if (this.context.runner.stepMode) {
          this.context.runner.run();
@@ -264,7 +275,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.play = function() {
-    if ((this.context.runner == undefined) || !this.context.runner.isRunning()) {
+    if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
       this.run();
     } else if (this.context.runner.stepMode) {
       this.context.runner.run();
@@ -279,7 +290,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.reloadAnswerObject = function(answerObj) {
-      if(typeof answerObj === "undefined") {
+      if(typeof answerObj == "undefined") {
         this.answer = this.getDefaultAnswerObject();
       } else {
         this.answer = answerObj;
@@ -316,7 +327,9 @@ var initBlocklySubTask = function(subTask, language) {
       }
    };
 
-   subTask.getGrade = function(callback, display) {
+   subTask.getGrade = function(callback, display, mainTestCase) {
+      // mainTest : set to indicate the first iTestCase to test (typically,
+      // current iTestCase) before others; test will then stop if the 
       if(subTask.context.infos && subTask.context.infos.hideValidate) {
          // There's no validation
          callback({
@@ -327,6 +340,7 @@ var initBlocklySubTask = function(subTask, language) {
          return;
       }
 
+      var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
       var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
       code = subTask.blocklyHelper.getFullCode(code);
@@ -339,23 +353,114 @@ var initBlocklySubTask = function(subTask, language) {
             successRate: 0,
             iTestCase: 0
          };
+         subTask.context.changeDelay(oldDelay);
          callback(results);
          return;
       }
 
       var codes = [code]; // We only ever send one code to grade
-      subTask.iTestCase = 0;
+      var oldTestCase = subTask.iTestCase;
 
 /*      var levelResultsCache = window.taskResultsCache[this.level];
 
       if(levelResultsCache[code]) {
          // We already have a cached result for that
          window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
+         subTask.context.changeDelay(oldDelay);
          callback(levelResultsCache[code].results);
          return;
       }*/
 
+      function startEval() {
+         // Start evaluation on iTestCase
+         initContextForLevel(subTask.iTestCase);
+         subTask.testCaseResults[subTask.iTestCase] = {evaluating: true};
+         if(display) {
+            window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
+         }
+         subTask.context.runner.runCodes(codes);
+      }
+
+      function postEval() {
+         // Behavior after an eval
+         if(typeof mainTestCase == 'undefined') {
+            // Normal behavior : evaluate all tests
+            subTask.iTestCase++;
+            if (subTask.iTestCase < subTask.nbTestCases) {
+               startEval();
+               return;
+            }
+         } else if(subTask.testCaseResults[subTask.iTestCase].successRate >= 1) {
+            // A mainTestCase is defined, evaluate mainTestCase first then the
+            // others until a test fails
+            if(subTask.iTestCase == mainTestCase && subTask.iTestCase != 0) {
+               subTask.iTestCase = 0;
+               startEval();
+               return;
+            }
+            subTask.iTestCase++;
+            if(subTask.iTestCase == mainTestCase) { subTask.iTestCase++ }; // Already done
+            if (subTask.iTestCase < subTask.nbTestCases) {
+               startEval();
+               return;
+            }
+         }
+
+         // All evaluations done, tally results
+         subTask.iTestCase = oldTestCase;
+         if(typeof mainTestCase == 'undefined') {
+            var iWorstTestCase = 0;
+            var worstRate = 1;
+         } else {
+            // Priority to the mainTestCase if worst test case
+            var iWorstTestCase = mainTestCase;
+            var worstRate = subTask.testCaseResults[mainTestCase].successRate;
+            // Change back to the mainTestCase
+         }
+         var nbSuccess = 0;
+         for (var iCase = 0; iCase < subTask.nbTestCases; iCase++) {
+            var sr = subTask.testCaseResults[iCase] ? subTask.testCaseResults[iCase].successRate : 0;
+            if(sr >= 1) {
+               nbSuccess++;
+            }
+            if(sr < worstRate) {
+               worstRate = sr;
+               iWorstTestCase = iCase;
+            }
+         }
+         subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
+         if(display) {
+            window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
+         }
+         if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {
+            if(subTask.nbTestCases == 1) {
+               var msg = subTask.testCaseResults[iWorstTestCase].message;
+            } else if(nbSuccess > 0) {
+               var msg = languageStrings.resultsPartialSuccess.format({
+                  nbSuccess: nbSuccess,
+                  nbTests: subTask.nbTestCases
+                  });
+            } else {
+               var msg = languageStrings.resultsNoSuccess;
+            }
+            var results = {
+               message: msg,
+               successRate: subTask.testCaseResults[iWorstTestCase].successRate,
+               iTestCase: iWorstTestCase
+            };
+         } else {
+            var results = subTask.testCaseResults[iWorstTestCase];
+         }
+         /*levelResultsCache[code] = {
+            results: results,
+            fullResults: subTask.testCaseResults
+            };*/
+         subTask.context.changeDelay(oldDelay);
+         callback(results);
+      }
+
       initBlocklyRunner(subTask.context, function(message, success) {
+         // Record grade from this evaluation into testCaseResults
          var computeGrade = function(context, message) {
             var rate = 0;
             if (context.success) {
@@ -370,63 +475,18 @@ var initBlocklySubTask = function(subTask, language) {
             computeGrade = subTask.levelGridInfos.computeGrade;
          }
          subTask.testCaseResults[subTask.iTestCase] = computeGrade(subTask.context, message)
-         subTask.iTestCase++;
-         if (subTask.iTestCase < subTask.nbTestCases) {
-            initContextForLevel(subTask.iTestCase);
-            subTask.context.runner.runCodes(codes);
-         } else {
-            var iWorstTestCase = 0;
-            var worstRate = 1;
-            var nbSuccess = 0;
-            for (var iCase = 0; iCase < subTask.nbTestCases; iCase++) {
-               if (subTask.testCaseResults[iCase].successRate >= 1) {
-                  nbSuccess++;
-               }
-               if (subTask.testCaseResults[iCase].successRate < worstRate) {
-                  worstRate = subTask.testCaseResults[iCase].successRate;
-                  iWorstTestCase = iCase;
-               }
-            }
-            subTask.testCaseResults[iWorstTestCase].iTestCase = iWorstTestCase;
-            if(display) {
-               window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
-               if(subTask.testCaseResults[subTask.iTestCase] > worstRate) {
-                  // Change test case only if it's worse than the current one
-                  subTask.changeTestTo(iWorstTestCase);
-               }
-               $('#error').html(subTask.testCaseResults[subTask.iTestCase]);
-            }
-            if(subTask.testCaseResults[iWorstTestCase].successRate < 1) {
-               if(subTask.nbTestCases == 1) {
-                  var msg = subTask.testCaseResults[iWorstTestCase].message;
-               } else if(nbSuccess > 0) {
-                  var msg = languageStrings.resultsPartialSuccess.format({
-                     nbSuccess: nbSuccess,
-                     nbTests: subTask.nbTestCases
-                     });
-               } else {
-                  var msg = languageStrings.resultsNoSuccess;
-               }
-               var results = {
-                  message: msg,
-                  successRate: subTask.testCaseResults[iWorstTestCase].successRate,
-                  iTestCase: iWorstTestCase
-               };
-            } else {
-               var results = subTask.testCaseResults[iWorstTestCase];
-            }
-            /*levelResultsCache[code] = {
-               results: results,
-               fullResults: subTask.testCaseResults
-               };*/
-            callback(results);
-         }
+         postEval();
       });
-      subTask.iTestCase = 0;
+
+      subTask.iTestCase = typeof mainTestCase != 'undefined' ? mainTestCase : 0;
       subTask.testCaseResults = [];
-      initContextForLevel(subTask.iTestCase);
+      for(var i=0; i < subTask.iTestCase; i++) {
+         // Fill testCaseResults up to the first iTestCase
+         subTask.testCaseResults.push(null);
+      }
       subTask.context.linkBack = true;
       subTask.context.messagePrefixSuccess = window.languageStrings.allTests;
-      subTask.context.runner.runCodes(codes);
+
+      startEval();
    };
 }
