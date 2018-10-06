@@ -25,6 +25,13 @@ body > * {
   justify-content: stretch;
 }
 
+/************************
+  DISPLAY HELPER ELEMENTS
+*************************/
+#displayHelperAnswering {
+  display: none;
+}
+
 /*****************
   TASK DESCRIPTION
 *****************/
@@ -45,9 +52,7 @@ body > * {
     padding-left: 10px;
 }
 .testResult {
-    position: relative;
-    left: 10px;
-    top: -2px;
+    margin-left: 10px;
     padding: 3px;
     padding-left: 5px;
     padding-right: 5px;
@@ -66,6 +71,9 @@ body > * {
 .testResult.testFailure {
     background-color: red;
 }
+.testResult.testEvaluating {
+    background-color: purple;
+}
 .testResultIcon {
     display: inline-block;
     min-width: 16px;
@@ -77,11 +85,18 @@ body > * {
 #testSelector .tabs {
   display: flex;
   background-color: #4a90e2;
+  min-height: 24px;
+  line-height: 24px;
 }
 #testSelector .tabs .testTab {
   flex: 1 0 auto;
   cursor: pointer;
   color: #fff;
+  padding: 2px;
+}
+#testSelector .tabs .testTab.currentTest {
+  /* TODO :: find something more obvious */
+  border-bottom: 2px solid black;
 }
 #testSelector .tabs .testTab:not(.currentTest) {
   background-color: rgba(0,0,0,0.2);
@@ -91,12 +106,12 @@ body > * {
 #playerControls {
 }
 
-#playerControls .icon {
+#taskToolbar .icon {
   float: left;
   margin-right: 9px;
 }
 
-#playerControls .icon:last-child {
+#taskToolbar .icon:last-child {
   margin: 0;
 }
 
@@ -179,15 +194,15 @@ body > * {
 #editorMenu {
   position: absolute;
   right: 80px;
-  top: 30px;
+  bottom: 30px;
   z-index: 99;
   display: none;
   box-shadow: 0 0 6px 0 rgba(0, 0, 0, 0.6);
+  background-color: #4A90E2;
 }
 #editorMenu div {
   cursor: pointer;
-  background: #282828;
-  color: #F5F5F5;
+  color: #FFF;
   padding: 10px 20px;
   border-bottom: 1px solid #717171;
   position: relative;
@@ -205,6 +220,8 @@ body > * {
 #editorMenu input[type=file] {
   cursor: pointer;
   position: absolute;
+  top: 0px;
+  left: 0px;
   height: 100%;
   width: 100%;
   opacity: 0;
@@ -277,6 +294,11 @@ body > * {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+#blocklyDiv {
+    width: 100%;
+    height: 100%;
 }
 
 .blocklyFlyoutBackground {
@@ -393,7 +415,7 @@ body > * {
   cursor: not-allowed;
 }
 
-#displayHelpBtn {
+#displayHelpBtn, #toggleEditorMenu {
   border: 0;
   background-color: transparent;
   color: #fff;
@@ -412,7 +434,7 @@ body > * {
 
 .mode-player #speedSlider {
   position: absolute;
-  top: -36px;
+  top: -38px;
   width: 100%;
   left: 0;
   padding: 10px;
@@ -435,10 +457,6 @@ body > * {
   .mode-player #gridContainer {
     flex: 0 0 50%;
   }
-  .mode-player #blocklyDiv {
-    width: auto;
-    height: auto;
-  }
   .mode-player #speedSlider {
     position: relative;
     display: inline-block;
@@ -455,6 +473,9 @@ body > * {
     display: inline-block;
     vertical-align: bottom;
   }
+  .mode-player #blocklyLibContent {
+    width: 50%;
+  }
 }
 @media screen and (min-width: 600px) and (orientation: portrait) {
   .mode-player #introGrid {
@@ -467,7 +488,6 @@ body > * {
     flex: 1 1 50%;
   }
   .mode-player #languageInterface,
-  .mode-player #blocklyDiv,
   .mode-player #injectionDiv,
   .blocklySvg,
   .blocklyWorkspace {
