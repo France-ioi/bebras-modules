@@ -184,6 +184,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       reload: function() {
          // Reload Blockly editor
+         this.reloading = true;
          this.savePrograms();
          var programs = this.programs;
          this.unloadLevel();
@@ -191,6 +192,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.load(this.locale, true, this.nbTestCases, this.options);
          this.programs = programs;
          this.loadPrograms();
+         this.reloading = false;
       },
 
       hiddenCheck: function() {
@@ -215,7 +217,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.scratchMode) {
             this.glowBlock(null);
          }
-         if(this.quickAlgoInterface) {
+         if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
          this.displayError('');
@@ -487,14 +489,24 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.updateSize();
       },
 
-      updateSize: function() {
+      updateSize: function(force) {
+         if(window.experimentalSize) {
+            // Temporary test
+            var isPortrait = $(window).width() <= $(window).height();
+            if(isPortrait && !this.wasPortrait) {
+               this.reload();
+            }
+            this.wasPortrait = isPortrait;
+            $('#blocklyDiv').height($('#blocklyLibContent').height() - 34);
+            $('#blocklyDiv').width($('#blocklyLibContent').width() - 4);
+         }
          var panelWidth = 500;
          if (this.languages[this.player] == "blockly") {
             panelWidth = $("#blocklyDiv").width() - 10;
          } else {
             panelWidth = $("#program").width() + 20;
          }
-         if (panelWidth != this.prevWidth) {
+         if (force || panelWidth != this.prevWidth) {
             if (this.languages[this.player] == "blockly") {
                if (this.trashInToolbox) {
                   Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
@@ -595,6 +607,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       displayError: function(message) {
         if(this.quickAlgoInterface) {
             this.quickAlgoInterface.displayError(message);
+            this.quickAlgoInterface.setPlayPause(false);
          } else {
             $('#errors').html(message);
          }

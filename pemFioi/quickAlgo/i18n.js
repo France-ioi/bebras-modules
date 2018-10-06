@@ -78,6 +78,7 @@ var localLanguageStrings = {
       undefinedMsg: "Cela peut venir d'un accès à un indice hors d'une liste, ou d'une variable non définie.",
       valueTrue: 'vrai',
       valueFalse: 'faux',
+      evaluatingAnswer: 'Évaluation en cours',
       correctAnswer: 'Réponse correcte',
       partialAnswer: 'Réponse améliorable',
       wrongAnswer: 'Réponse incorrecte',
@@ -162,6 +163,7 @@ var localLanguageStrings = {
       undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.",
       valueTrue: 'true',
       valueFalse: 'false',
+      evaluatingAnswer: 'Evaluation in progress',
       correctAnswer: 'Correct answer',
       partialAnswer: 'Partial answer',
       wrongAnswer: 'Wrong answer',
@@ -248,6 +250,7 @@ var localLanguageStrings = {
       uninitializedVar: "Nicht initialisierte Variable:",
       valueTrue: 'wahr',
       valueFalse: 'unwahr',
+      evaluatingAnswer: 'Evaluation in progress', // TODO
       correctAnswer: 'Richtige Antwort',
       partialAnswer: 'Teilweise richtige Antwort',
       wrongAnswer: 'Falsche Antwort',
@@ -333,6 +336,7 @@ var localLanguageStrings = {
       uninitializedVar: "Variable no inicializada:",
       valueTrue: 'verdadero',
       valueFalse: 'falso',
+      evaluatingAnswer: 'Evaluation in progress', // TODO
       correctAnswer: 'Respuesta correcta',
       partialAnswer: 'Respuesta parcial',
       wrongAnswer: 'Respuesta Incorrecta',
@@ -412,6 +416,7 @@ var localLanguageStrings = {
       uninitializedVar: "Spremenljivka ni določena:",
       valueTrue: 'resnično',
       valueFalse: 'neresnično',
+      evaluatingAnswer: 'Evaluation in progress', // TODO
       correctAnswer: 'Pravilni odgovor',
       partialAnswer: 'Delni odgovor',
       wrongAnswer: 'Napačen odgovor',

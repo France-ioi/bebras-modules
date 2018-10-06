@@ -72,21 +72,9 @@ var quickAlgoInterface = {
                 "<div id='capacity'></div>" +
                 "<button type='button' id='fullscreenButton'>[+]</button>" +
                 "<div id='editorMenuContainer'>" +
-                    "<button type='button' id='toggleEditorMenu'>≡</button>" +
-                    "<div id='editorMenu'>" +
-                        "<div rel='example' class='item'>" + this.strings.loadExample + "</div>" +
-                        "<div rel='save' class='item'>" + this.strings.saveProgram + "</div>" +
-                        "<span id='saveUrl'></span>" +
-                        "<div rel='restart' class='item'>" + this.strings.restart + "</div>" +
-                        "<div rel='load' class='item'>" +
-                            "<input type='file' id='task-upload-file' " +
-                            "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
-                            this.strings.reloadProgram +
-                        "</div>" +
-                        "<div rel='best-answer' class='item'>" + this.strings.loadBestAnswer+ "</div>" +
-                    "</div>" +
+//                    "<button type='button' id='toggleEditorMenu'>≡</button>" +
                 "</div>" +
-                "</div>" +
+            "</div>" +
             "<div id='languageInterface'></div>"
         );
 
@@ -96,23 +84,7 @@ var quickAlgoInterface = {
         });
 
 
-        $('#toggleEditorMenu').click(function() {
-            var el = $('#editorMenu');
-            if(el.is(":visible")) {
-                el.hide();
-            } else {
-                $('#editorMenu div[rel=best-answer]').toggle(!!displayHelper.savedAnswer);
-                el.show();
-            }
-        });
-
         // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
-        $(document).click(function(e) {
-            if($(e.target).attr('id') != 'toggleEditorMenu') {
-                $('#editorMenu').hide();
-            }
-        });
-
         $('#editorMenu div[rel=example]').click(function(e) {
             task.displayedSubTask.loadExample()
         });
@@ -166,8 +138,27 @@ var quickAlgoInterface = {
             + addTaskHTML;
         $("#gridButtonsAfter").html(gridButtonsAfter);
         $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
-   },
 
+        this.createModeTaskToolbar();
+    },
+
+    toggleEditorMenu: function(forceState) {
+        var el = $('#editorMenu');
+        if(el.is(":visible") || forceState === false) {
+            el.hide();
+            $(document).off('click', quickAlgoInterface.hideEditorMenuOnClick);
+        } else {
+            $('#editorMenu div[rel=best-answer]').toggle(!!displayHelper.savedAnswer);
+            el.show();
+            $(document).on('click', quickAlgoInterface.hideEditorMenuOnClick);
+        };
+    },
+
+    hideEditorMenuOnClick: function(e) {
+        if(!($(e.target).parents('#toggleEditorMenu').length)) {
+            quickAlgoInterface.toggleEditorMenu(false);
+        }
+    },
 
     setOptions: function(opt) {
         // Load options from the task
@@ -178,9 +169,9 @@ var quickAlgoInterface = {
 
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);
-            hasHelp = true;
+            this.hasHelp = true;
         } else {
-            hasHelp = false;
+            this.hasHelp = false;
         }
     },
 
@@ -244,7 +235,7 @@ var quickAlgoInterface = {
                 '</div>' +
             '</div>';
         $('#task').find('.speedControls').remove();
-        $('#task').append(speedControls);
+        $('#taskToolbar').prepend(speedControls);
 
         $('#speedCursor').on('input change', function(e) {
             self.refreshStepDelay();
@@ -268,8 +259,8 @@ var quickAlgoInterface = {
 
         $('#playerControls .backToFirst').click(function() {
             task.displayedSubTask.stop();
-            task.displayedSubTask.play();
-            self.setPlayPause(true);
+//            task.displayedSubTask.play();
+//            self.setPlayPause(true);
         });
 
         $('#playerControls .playPause').click(function(e) {
@@ -330,17 +321,17 @@ var quickAlgoInterface = {
         console.log('updateTestScores')
         // Display test results
         for(var iTest=0; iTest<testScores.length; iTest++) {
-            if(testScores[iTest].successRate >= 1) {
-                var icon = '<span class="testResultIcon" style="color: green">✔</span>';
-                var label = '<span class="testResult testSuccess">'+this.strings.correctAnswer+'</span>';
+            if(!testScores[iTest]) { continue; }
+            if(testScores[iTest].evaluating) {
+                var icon = '<span class="testResultIcon fas fa-spinner fa-spin" title="'+this.strings.evaluatingAnswer+'"></span>';
+            } else if(testScores[iTest].successRate >= 1) {
+                var icon = '<span class="testResultIcon" style="color: #00FF00;" title="'+this.strings.correctAnswer+'">✔</span>';
             } else if(testScores[iTest].successRate > 0) {
-                var icon = '<span class="testResultIcon" style="color: orange">✖</span>';
-                var label = '<span class="testResult testPartial">'+this.strings.partialAnswer+'</span>';
+                var icon = '<span class="testResultIcon" style="color: orange" title="'+this.strings.partialAnswer+'">✖</span>';
             } else {
-                var icon = '<span class="testResultIcon" style="color: red">✖</span>';
-                var label = '<span class="testResult testFailure">'+this.strings.wrongAnswer+'</span>';
+                var icon = '<span class="testResultIcon" style="color: red" title="'+this.strings.wrongAnswer+'">✖</span>';
             }
-            $('#testTab'+iTest+' .testTitle').html(icon+' Test '+(iTest+1)+' '+label);
+            $('#testTab'+iTest+' .testTitle').html(icon+' Test '+(iTest+1));
         }
     },
 
@@ -362,19 +353,37 @@ var quickAlgoInterface = {
 
 
     createModeTaskToolbar: function() {
-        var displayHelpBtn = hasHelp ? '<button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">\
+        if($('#taskToolbar').length) { return; }
+        var displayHelpBtn = this.hasHelp ? '<button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">\
             <span class="fas fa-question"></span></button>' : '';
         var self = this;
-            $("#task").append('\
-                <div id="taskToolbar">\
-                    <div id="modeSelector">\
-                        <div id="mode-player"><span class="fas fa-play"></span></div>\
-                        <div id="mode-instructions"><span class="fas fa-file-alt"></span></div>\
-                        <div id="mode-editor"><span class="fas fa-pencil-alt"></span></div>\
-                    </div>'
-                    + displayHelpBtn +
-                '</div>\
-            ');
+        $("#task").append('' +
+            '<div id="taskToolbar">' +
+                "<div id='editorMenu'>" +
+                    "<div rel='example' class='item'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
+                    "<span id='saveUrl'></span>" +
+                    "<div rel='restart' class='item'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
+                    "<div rel='save' class='item'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
+                    "<div rel='load' class='item'>" +
+                        "<input type='file' id='task-upload-file' " +
+                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
+                        "<span class='fas fa-upload'></span> " +
+                        this.strings.reloadProgram +
+                    "</div>" +
+                    "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
+                "</div>" +
+                '<div id="toggleEditorMenu" class="icon"><span class="fas fa-file-code"></span></div>' +
+                '<div id="modeSelector">' +
+                    '<div id="mode-player" class="icon"><span class="fas fa-play"></span></div>' +
+                    '<div id="mode-instructions" class="icon"><span class="fas fa-file-alt"></span></div>' +
+                    '<div id="mode-editor" class="icon"><span class="fas fa-pencil-alt"></span></div>' +
+                '</div>'
+                + displayHelpBtn +
+            '</div>');
+
+        $('#toggleEditorMenu').click(function() {
+            self.toggleEditorMenu();
+        });
 
         $('#modeSelector div').click(function() {
             self.selectMode($(this).attr('id'));
@@ -383,7 +392,7 @@ var quickAlgoInterface = {
 
     selectMode: function(mode) {
         if(mode === this.curMode) return;
-        $('#modeSelector #' + mode).siblings('div').removeClass('active');
+        $('#modeSelector').children('div').removeClass('active');
         $('#modeSelector #' + mode).addClass('active');
         $('#task').removeClass(this.curMode).addClass(mode);
         if(mode == 'mode-instructions') {
@@ -402,6 +411,7 @@ var quickAlgoInterface = {
         // Called when level is unloaded
         this.resetTestScores();
         if(this.curMode == 'mode-editor') {
+           // Don't stay in editor mode as it can cause task display issues
            this.selectMode('mode-player');
         }
     },
@@ -421,7 +431,7 @@ var quickAlgoInterface = {
         if(!message) return;
         var html =
             '<div id="errorModal" class="modalWrapper">' +
-            '<div class="modal modalError">' +
+            '<div class="modal">' +
             '<button type="button" class="btn close" onclick="closeModal(`errorModal`)">x</button>' +
             '<p>' + message + '</p>' +
             '</div>' +
@@ -442,8 +452,6 @@ $(document).ready(function() {
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
     $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
 
-    quickAlgoInterface.createModeTaskToolbar();
-    $(".speedControls").prependTo($("#taskToolbar"));
     quickAlgoInterface.selectMode('mode-player');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);

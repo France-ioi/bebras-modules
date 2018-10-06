@@ -209,6 +209,7 @@ var quickAlgoInterface = {
    updateTestScores: function (testScores) {
       // Display test results
       for(var iTest=0; iTest<testScores.length; iTest++) {
+         if(!testScores[iTest]) { continue; }
          if(testScores[iTest].successRate >= 1) {
             var icon = '<span class="testResultIcon" style="color: green">✔</span>';
             var label = '<span class="testResult testSuccess">'+this.strings.correctAnswer+'</span>';
