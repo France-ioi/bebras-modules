@@ -160,7 +160,12 @@ function SimpleDraw(options) {
 
     this.waitForClick = function(callback) {
         if(options.context.display) {
-            $('#errors').text(options.context.strings.messages.clickCanvas); // TODO :: translation system?
+            if(window.quickAlgoInterface) {
+                window.quickAlgoInterface.displayError(options.context.strings.messages.clickCanvas);
+            } else {
+                $("#errors").html(options.context.strings.messages.clickCanvas);
+            }
+
             options.context.runner.waitEvent(callback, canvas, 'click', function(e) {
                 var rect = canvas.getBoundingClientRect();
                 click_coordinates.x = itx(e.clientX - rect.left);

@@ -116,7 +116,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             Blockly.removeEvents();
 
             // Inject Blockly
-            this.workspace = Blockly.inject(this.divId, wsConfig);
+            window.blocklyWorkspace = this.workspace = Blockly.inject(this.divId, wsConfig);
 
             // Start checking whether it's hidden, to sort out contents
             // automatically when it's displayed
@@ -184,6 +184,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       reload: function() {
          // Reload Blockly editor
+         this.reloading = true;
          this.savePrograms();
          var programs = this.programs;
          this.unloadLevel();
@@ -191,6 +192,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.load(this.locale, true, this.nbTestCases, this.options);
          this.programs = programs;
          this.loadPrograms();
+         this.reloading = false;
       },
 
       hiddenCheck: function() {
@@ -215,10 +217,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.scratchMode) {
             this.glowBlock(null);
          }
-         if(this.quickAlgoInterface) {
+         if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
-         $('#errors').html('');
+         this.displayError('');
       },
 
       getCapacityText: function() {
@@ -438,7 +440,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                      that.programs[that.player].blockly = code;
                      that.languages[that.player] = "blockly";
                   } catch(e) {
-                     $("#errors").html('<span class="testError">'+that.strings.invalidContent+'</span>');
+                     that.displayError('<span class="testError">'+that.strings.invalidContent+'</span>');
                   }
                } else {
                   that.programs[that.player].javascript = code;
@@ -450,7 +452,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
             reader.readAsText(file);
          } else {
-            $("#errors").html('<span class="testError">'+this.strings.unknownFileType+'</span>');
+            that.displayError('<span class="testError">'+this.strings.unknownFileType+'</span>');
          }
       },
 
@@ -487,14 +489,29 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.updateSize();
       },
 
-      updateSize: function() {
+      updateSize: function(force) {
+         if(window.experimentalSize) {
+            // Temporary test
+            var isPortrait = $(window).width() <= $(window).height();
+            if(isPortrait && !this.wasPortrait) {
+               this.reload();
+            }
+            this.wasPortrait = isPortrait;
+            $('#blocklyDiv').height($('#blocklyLibContent').height() - 34);
+            $('#blocklyDiv').width($('#blocklyLibContent').width() - 4);
+            if (this.trashInToolbox) {
+               Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
+            }
+            Blockly.svgResize(this.workspace);
+            return;
+         }
          var panelWidth = 500;
          if (this.languages[this.player] == "blockly") {
             panelWidth = $("#blocklyDiv").width() - 10;
          } else {
             panelWidth = $("#program").width() + 20;
          }
-         if (panelWidth != this.prevWidth) {
+         if (force || panelWidth != this.prevWidth) {
             if (this.languages[this.player] == "blockly") {
                if (this.trashInToolbox) {
                   Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
@@ -546,7 +563,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               $("#errors").html('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
+               that.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
                return;
             }
          }
@@ -563,12 +580,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          that.highlightPause = false;
          if(that.getRemainingCapacity(that.workspace) < 0) {
-            $("#errors").html('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+            that.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
             return;
          }
          var limited = that.findLimited(that.workspace);
          if(limited) {
-            $("#errors").html('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
+            that.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {
@@ -589,6 +606,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.initRun();
          }
          this.mainContext.runner.step();
+      },
+
+
+      displayError: function(message) {
+        if(this.quickAlgoInterface) {
+            this.quickAlgoInterface.displayError(message);
+            this.quickAlgoInterface.setPlayPause(false);
+         } else {
+            $('#errors').html(message);
+         }
       }
    }
 }

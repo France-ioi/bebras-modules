@@ -157,7 +157,13 @@ function LogicController(nbTestCases, maxInstructions) {
     var code = codes[0];
 
     // Abort if code is not valid
-    if(!this.checkCode(code, function(err) { $('#errors').html(err); })) {
+    if(!this.checkCode(code, function(err) {
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(err);
+      } else {
+        $('#errors').html(err);
+      }
+    })) {
        return;
     }
 
@@ -203,7 +209,12 @@ function LogicController(nbTestCases, maxInstructions) {
             var xml = Blockly.Xml.textToDom(code);
             that.programs[0][that.player].blockly = code;
           } catch (e) {
-            $("#errors").html(that._strings.invalidContent);
+
+            if(window.quickAlgoInterface) {
+              window.quickAlgoInterface.displayError(that._strings.invalidContent);
+            } else {
+              $("#errors").html(that._strings.invalidContent);
+            }
           }
           that.languages[that.player] = "blockly";
         } else {
@@ -215,7 +226,12 @@ function LogicController(nbTestCases, maxInstructions) {
 
       reader.readAsText(file);
     } else {
-      $("#errors").html(this._strings.unknownFileType);
+
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(this._strings.unknownFileType);
+      } else {
+        $("#errors").html(this._strings.unknownFileType);
+      }
     }
   };
   this.saveProgram = function () {
@@ -354,7 +370,11 @@ function LogicController(nbTestCases, maxInstructions) {
          that._mainContext.reset();
       }
 
-      $('#errors').html('');
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayError(null);
+      } else {
+        $("#errors").html('');
+      }
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();

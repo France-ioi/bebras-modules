@@ -281,7 +281,7 @@
 
     // player init
 
-    function createPlayer(parent, config) {
+    function createPlayer(parent, config, events) {
         ready = false;
         var defaults = {}
         if(window.stringsLanguage) {
@@ -313,6 +313,9 @@
                     } else {
                         watchDog.stop();
                     }
+                    if(e.data === YT.PlayerState.ENDED && events.onPlaybackEnd) {
+                        events.onPlaybackEnd();
+                    }
                 },
                 'onError': function(e) {
                     console.log('onError', e.data)
@@ -332,12 +335,12 @@
 
 
     function stateHandler(state) {
-        
+
         if(!ready) {
             //console.error('Player not ready');
             return null;
         }
-       
+
         if(state) {
             if('viewed' in state) {
                 sections.setViewed(state.viewed);
@@ -361,7 +364,7 @@
 
     // jQuery plugin interface
 
-    $.fn.taskVideo = function(params) {
+    $.fn.taskVideo = function(params, events) {
         var that = this;
         var config = makeConfig(params)
         apiLoader.load(function() {
@@ -370,8 +373,7 @@
             template.html('conclusion', config['conclusion']);
             template.width('wrapper', config.width);
             template.height('video', config.height);
-            player = createPlayer(template.get('video')[0], config);
-
+            player = createPlayer(template.get('video')[0], config, events);
         });
         return this;
     }

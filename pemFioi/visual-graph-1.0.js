@@ -231,6 +231,9 @@ function VisualGraph(id, paper, graph, graphDrawer, autoDraw, vertexVisualInfo, 
    this.setPaper = function(paper) {
       this.paper = paper;
    };
+   this.getPaper = function() {
+      return this.paper;
+   };
 
    this.setDrawer = function(graphDrawer) {
       this.graphDrawer = graphDrawer;
@@ -284,6 +287,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       return result;
    };
+   this.setDrawVertex = function(fct) {
+      this.drawVertex = fct;
+   };
    this.drawEdge = function(id, vertex1, vertex2, vertex1Info, vertex2Info, vertex1VisualInfo, vertex2VisualInfo, edgeInfo, edgeVisualInfo) {
       if(thickMode) {
          var path = this._getThickEdgePath(vertex1, vertex2);
@@ -292,6 +298,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       else {
          return [this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack()];
       }
+   };
+   this.setDrawEdge = function(fct) {
+      this.drawEdge = fct;
    };
    this._getVertexPosition = function(visualInfo) {
       if(visualInfo.x === undefined || visualInfo.x === null) {

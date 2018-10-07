@@ -4,48 +4,63 @@ function taskVideo(data, grader) {
 
         var player;
         var level;
-    
-        subTask.resetDisplay = function() {};
-    
-        
+        var answer;
+
+        subTask.resetDisplay = function() {
+            if(subTask.display) {
+                $('#taskContent').taskVideo.destroy();
+                $('#taskContent').taskVideo(data[level], {
+                    onPlaybackEnd: function() {
+                        platform.validate('done');
+                    }
+                });
+            }
+            if(answer) {
+                $('#taskContent').taskVideo.state(answer);
+            }
+        };
+
+
         subTask.getStateObject = function() {
             return {};
         };
-    
-        
+
+
         subTask.reloadAnswerObject = function(answerObj) {
-            //console.log('reloadAnswerObject', answerObj)
-            $('#taskContent').taskVideo.state(answerObj);
+            answer = answerObj;
         };
-      
-    
+
+
         subTask.getAnswerObject = function() {
             return $('#taskContent').taskVideo.state();
         };
-    
-    
+
+
         subTask.getDefaultAnswerObject = function() {
-            return {};
+            return {
+                viewed: [],
+                timestamp: 0,
+                playing: false
+            };
         };
-    
-    
+
+
         subTask.loadLevel = function(curLevel) {
             level = curLevel;
-            $('#taskContent').taskVideo.destroy();
-            $('#taskContent').taskVideo(data[curLevel]);
-        };    
-    
-    
+        };
+
+
         subTask.unloadLevel = function(callback) {
+            $('#taskContent').taskVideo.destroy();
             callback();
         };
-      
-    
+
+
         subTask.getGrade = function(callback) {
             var state = $('#taskContent').taskVideo.state();
             callback(grader(level, state));
         };
-    
+
     }
 
 
