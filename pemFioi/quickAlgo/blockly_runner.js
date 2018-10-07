@@ -322,6 +322,9 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
             runner.delayFactory.destroyAll();
+            if(window.quickAlgoInterface) {
+               window.quickAlgoInterface.setPlayPause(false);
+            }
             setTimeout(function() { messageCallback(message); }, 0);
          }
       };

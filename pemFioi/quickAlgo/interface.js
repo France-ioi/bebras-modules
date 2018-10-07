@@ -77,7 +77,7 @@ var quickAlgoInterface = {
       var gridButtonsAfter = scaleControl
         + "<div id='testSelector'></div>";
       if(!this.context || !this.context.infos || !this.context.infos.hideValidate) {
-         gridButtonsAfter += ''   
+         gridButtonsAfter += ''
             + "<button type='button' id='submitBtn' class='btn btn-primary' onclick='task.displayedSubTask.submit()'>"
             + this.strings.submitProgram
             + "</button><br/>";
@@ -209,6 +209,7 @@ var quickAlgoInterface = {
    updateTestScores: function (testScores) {
       // Display test results
       for(var iTest=0; iTest<testScores.length; iTest++) {
+         if(!testScores[iTest]) { continue; }
          if(testScores[iTest].successRate >= 1) {
             var icon = '<span class="testResultIcon" style="color: green">✔</span>';
             var label = '<span class="testResult testSuccess">'+this.strings.correctAnswer+'</span>';
@@ -237,7 +238,18 @@ var quickAlgoInterface = {
       $("#testPanel"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
    },
 
+   unloadLevel: function() {
+      // Called when level is unloaded
+      this.resetTestScores();
+   },
+
    saveOrLoad: function () {
       $("#saveOrLoadModal").show();
-   }
+   },
+
+   displayError: function(message) {
+      message ? $('#errors').html(message) : $('#errors').empty();
+   },
+
+   setPlayPause: function(isPlaying) {} // Does nothing
 };

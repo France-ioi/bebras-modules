@@ -1,5 +1,5 @@
 body {
-  padding: 40px 0 0;
+  padding: 0;
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
@@ -11,127 +11,67 @@ img {
   max-width: 100%;
   height: auto;
 }
+
 #choose-view {
   margin-top: 0 !important;
 }
-#miniPlatformHeader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  height: 40px;
-  width: 100%;
-  background-color: #fff;
-  overflow: hidden;
-}
-#miniPlatformHeader img {
-  max-height: 35px;
-  width: auto;
-}
-#miniPlatformHeader h1 {
-  display: inline-block;
-  line-height: 40px;
-  font-size: 16px;
-  margin: 0;
-  vertical-align: top;
-}
+
+
+/*****************
+  LEVEL SELECTOR
+*****************/
 #tabsContainer {
-  position: fixed;
-  top: 40px;
-  width: 100%;
-  z-index: 1;
+  display: flex;
+  justify-content: center;
 }
 #tabsMenu {
+  flex: 0 0 auto;
+  overflow: hidden;
   display: flex;
+  background-color: #4a90e2;
+  border-radius: 8px 8px 0px 0px;
 }
 #tabsMenu .li {
-  flex: 1 1 0;
+  flex: 1 0 0;
   text-align: center;
-  background-color: #ccc;
+  white-space: nowrap;
+  cursor: pointer;
 }
-#tabsMenu .li.current {
-  background-color: #eee;
+#tabsMenu .li:not(.current) {
+  background-color: rgba(0,0,0,0.2);
 }
-#taskContent {
-  margin-top: 22px;
-  display: flex;
-  flex-direction: row;
+#tabsMenu .li.current + .li {
+  border-radius: 0px 0px 0px 8px;
 }
-#introGrid {
-  display: flex;
+#tabsMenu .li:not(.current) + .li:not(.current) {
+  border-left: 1px solid #000;
 }
-#taskIntro {
-  padding: 5px 10px;
+#tabsMenu .li a,
+#tabsMenu .li a:hover {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  padding: 5px 20px;
 }
-
-#gridButtonsAfter #testSelector {
-  padding: 0;
+@media screen and (max-width: 480px) {
+  #tabsMenu .levelLabel {
+    display: inline-block;
+    text-overflow: clip;
+    white-space: nowrap;
+    overflow: hidden;
+    width: calc(100vw / 3 - 100px);
+    vertical-align: middle;
+  }
 }
-#testSelector .tabs{
-  display: flex;
-  background-color: #ccc;
-}
-#testSelector .tabs .testTab {
-  background-color: #efefef;
-  flex: 1 0 auto;
-}
-#testSelector .tabs .testTab.currentTest {
-  background-color: #fff;
-}
-
-/*
-*
-* Mode specific display
-*
-*/
-/* mode instructions */
-.mode-instructions button[data-mode=instructions],
-.mode-instructions #blocklyLibContent,
-.mode-instructions .selectSpeed {
-  display: none;
-}
-.mode-instructions #taskContent {
-  max-height: calc(100vh - 80px);
-}
-.mode-instructions #introGrid {
-  display: flex;
-}
-.mode-instructions #taskIntro {
-  order: 2;
-  /*max-height: calc(100vh - 80px);*/
-  overflow: auto;
-}
-.mode-instructions #gridContainer {
-  order: 1;
-  border: 1px solid #000;
-}
-/* mode player */
-.mode-player button[data-mode=player] {
-  display: none;
-}
-.mode-player #taskIntro {
-  order: 1;
-}
-.mode-player #gridContainer {
-  order: 2;
-}
-.mode-player #blocklyLibContent {
-  flex: 1 1 0;
-}
-/* mode editor */
-.mode-editor button[data-mode=editor],
-.mode-editor #introGrid {
-  display: none;
+#tabsMenu .stars {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
-#modeSelector {
-  background-color: #fff;
-  box-shadow: 3px 3px 8px #333;
-  position: fixed;
-  bottom: 3px;
-  right: 3px;
-  padding: 10px;
-}
 
 #popupMessage {
    display: none;
@@ -192,74 +132,4 @@ img {
    padding: 5px 18px 5px 18px;
    margin-bottom: 0.5em;
 }
-@media screen and (orientation: landscape) { /* horizontal screen layout */
 
-  .mode-instructions #taskContent {
-    flex-direction: row;
-  }
-  .mode-instructions #gridContainer {
-    flex: 0 0 400px;
-    align-self: center;
-  }
-  .mode-instructions #gridContainer > * {
-  }
-  .mode-player #introGrid {
-    flex-direction: column;
-  }
-  .mode-player #taskContent {
-    flex-direction: row;
-  }
-  .mode-player #introGrid {
-    flex-direction: column;
-    flex: 0 0 40vh;
-  }
-  .mode-player #taskIntro {
-    flex: 0 0 20vh;
-    overflow: auto;
-  }
-  .mode-player #gridContainer {
-    align-self: center;
-  }
-}
-
-@media screen and (orientation: portrait) { /* vertical screen layout */
-
-  body #task {
-    padding: 0;
-    margin: 0;
-  }
-  .mode-instructions #taskIntro {
-    width: 100vw;
-  }
-  .mode-instructions #introGrid {
-    flex-direction: column;
-  }
-  .mode-player #taskContent {
-    flex-direction: column;
-  }
-  .mode-player #introGrid {
-    flex-direction: row;
-    flex: 0 0 30vh;
-  }
-  .mode-player #taskIntro {
-    max-height: 100%;
-    overflow: auto;
-    flex: 0 1 33vw;
-  }
-}
-@media screen and (max-width: 480px) {
-  #miniPlatformHeader h1 {
-    font-size: 16px;
-    line-height: 1;
-  }
-  #miniPlatformHeader * {
-   font-size: 16px !important;
-  }
-  .mode-player #taskIntro {
-    display: none;
-  }
-}
-@media screen and (max-height: 480px) {
-  .mode-player #taskIntro {
-    display: none;
-  }
