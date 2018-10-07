@@ -291,7 +291,7 @@ must be stored within variables that a display-less context has.
 
 ### Custom blocks
 
-… (link to Blockly doc)
+… ([https://developers.google.com/blockly/guides/create-custom-blocks/overview](link to Blockly doc))
 
 ## Texts and translations
 
