@@ -44,7 +44,7 @@ var importableModules = function () {
       'blocklyRobot_lib': {src: modulesPath+"/pemFioi/blocklyRobot_lib-1.0.0.js", id: "blocklyRobot_lib"},
       'blockly-robot': {src: modulesPath+"/pemFioi/blocklyRobot_lib-1.0.0.js", id: "blocklyRobot_lib"}, // for BWINF legacy
       'blockly-printer': {src: modulesPath+"/pemFioi/blocklyPrinter_lib.js", id: "blocklyPrinter_lib"},
-      'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib-2.0.js", id: "blocklyTurtle_lib"},
+      'blockly-turtle': {src: modulesPath+"/pemFioi/blocklyTurtle_lib.js", id: "blocklyTurtle_lib"},
       'jwinf_css': {type: "stylesheet", src: modulesPath+"/pemFioi/jwinf.css", id: "jwinf_css"}, // for BWINF
 
       'blockly-isndraw': {src: modulesPath+"/pemFioi/blocklyIsnDraw_lib.js", id: "blocklyIsnDraw_lib"},
