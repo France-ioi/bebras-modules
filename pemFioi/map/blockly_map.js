@@ -13,7 +13,8 @@ var getContext = function(display, infos) {
                 getLatitude: 'getLatitude(%1)',
                 getLongitude: 'getLongitude(%1)',
                 getNeighbors: 'getNeighbors(%1)',
-                shortestPath: 'shortestPath(%1, %2)'
+                shortestPath: 'shortestPath(%1, %2)',
+                echo: 'afficher(%1)'
             },
             code: {
                 clearMap: 'clearMap',
@@ -24,6 +25,7 @@ var getContext = function(display, infos) {
                 getLongitude: 'getLongitude',
                 getNeighbors: 'getNeighbors',
                 shortestPath: 'shortestPath',
+                echo: 'afficher'
             },
             description: {
                 clearMap: 'Delete everything from the map (roads and locations)',
@@ -34,6 +36,7 @@ var getContext = function(display, infos) {
                 getLongitude: 'Returns the longitude of the city',
                 getNeighbors: 'Returns the list of neighbors of the city',
                 shortestPath: 'Returns the shortest path between the two cities, using geoDistance',
+                echo: 'Afficher'
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -50,7 +53,7 @@ var getContext = function(display, infos) {
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(map_strings)
     var map;
-
+    var logger;
 
     var conceptBaseUrl = window.location.protocol + '//'
         + 'static4.castor-informatique.fr/help/index.html';
@@ -68,10 +71,13 @@ var getContext = function(display, infos) {
 
 
     context.reset = function(taskInfos) {
-        if(!context.display || map) return
+        if(!context.display) return
         if(!map) {
             var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
             map = new Map(options);
+            logger = new Logger({
+                parent: $('#gridContainer')
+            });
         }
         map.clearMap();
     }
@@ -114,7 +120,7 @@ var getContext = function(display, infos) {
                     params_names: ['cityName']
                 },
                 { name: 'getLongitude',
-                yieldsValue: true,
+                  yieldsValue: true,
                     params: ['String'],
                     params_names: ['cityName']
                 },
@@ -126,13 +132,22 @@ var getContext = function(display, infos) {
                 { name: 'shortestPath',
                     params: ['String', 'String'],
                     params_names: ['cityName1', 'cityName2']
+                },
+                { name: 'echo',
+                    params: ['String'],
+                    params_names: ['longitude', 'latitude', 'label']
                 }
             ]
         }
     }
 
 
-    context.map = {}
+    context.map = {
+        echo: function(msg, callback) {
+            logger.put(msg);
+            callback();
+        }
+    }
 
 
     for (var category in context.customBlocks.map) {
@@ -152,6 +167,9 @@ var getContext = function(display, infos) {
                             '</shadow></value>';
                     }
                     block.blocklyXml += '</block>';
+                }
+                if(context.map[block.name]) {
+                    return;
                 }
                 context.map[block.name] = function() {
                     var callback = arguments[arguments.length - 1];
