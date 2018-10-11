@@ -133,9 +133,7 @@ function Map(options) {
 
 
     // distance calculator
-
-    function GeoDistance() {
-        // https://github.com/nwhite89/GeoDistance/blob/master/index.js
+    function GeoDistance(unit) {
 
         function getEarthRadius() {
             var earthRadius = {
@@ -145,58 +143,26 @@ function Map(options) {
                 'metres': 6371000,
                 'feet': 20902231
             };
-            return earthRadius[options.unit] || earthRadius['km'];
+            return earthRadius[unit] || earthRadius['km'];
         }
 
+        var r = getEarthRadius(unit)
 
-        this.retrieveDistance = function (data) {
-            var earthRadius = getEarthRadius(),
-                decimals = 2,
-                dLat = data.dLat,
-                dLng = data.dLng,
-                toLat = data.toLat,
-                toLng = data.toLng,
-                fromLat = data.fromLat,
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180)
+        }
 
-                a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.sin(dLng / 2) * Math.sin(dLng / 2) * Math.cos(toLat) *
-                    Math.cos(fromLat),
-                b = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)),
-                c = earthRadius * b,
-                d = (Math.round(c * Math.pow (10, decimals)) /
-                    Math.pow(10, decimals)) * 1000;
-
-            return d;
-        };
-
-
-        this.getDistance = function(from, to) {
-            var fromObj = from,
-                toObj = to.slice(0),
-                earthRadius = getEarthRadius(),
-                fromLng = parseFloat(fromObj.lng),
-                fromLat = parseFloat(fromObj.lat);
-
-            fromLat = fromLat.toRad();
-            for (var i = to.length - 1; i >= 0; i--) {
-                var lngLat = toObj[i],
-                    toLat = parseFloat(lngLat.lat),
-                    toLng = parseFloat(lngLat.lng),
-                    dLat = (fromLat - toLat).toRad(),
-                    dLng = (fromLng - toLng).toRad(),
-                    data = {
-                        earthRadius: earthRadius,
-                        dLat: dLat,
-                        dLng: dLng,
-                        toLng: toLng,
-                        fromLat: fromLat
-                    };
-
-                data.toLat = toLat.toRad();
-                toObj[i].distance = this.retrieveDistance(data);
-            }
-            return toObj;
-        };
+        // haversine formula
+        this.getDistance = function(lng1, lat1, lng2, lat2) {
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lng2 - lng1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return r * c;
+        }
     }
 
 
@@ -350,13 +316,11 @@ function Map(options) {
 
 
     this.geoDistance = function(longitude1, latitude1, longitude2, latitude2) {
-        return geo.getDistance({
-            lng: longitude1,
-            lat: latitude1
-        }, [{
-            lng: longitude2,
-            lat: latitude2
-        }])[0].distance;
+        validateLng(longitude1);
+        validateLat(latitude1);
+        validateLng(longitude2);
+        validateLat(latitude2);
+        return geo.getDistance(longitude1, latitude1, longitude2, latitude2);
     }
 
 
@@ -371,7 +335,7 @@ function Map(options) {
 
 
     this.getNeighbors = function(cityName) {
-        return this.findNeighbors();
+        return this.findNeighbors(cityName);
     }
 
 
@@ -386,8 +350,9 @@ function Map(options) {
     // init
 
     var renderer = new Renderer();
-    var geo = new GeoDistance();
+    var geo = new GeoDistance(options.unit);
     var graph = new Graph();
+
     for(var i=0,city1; city1=this.cities[i]; i++) {
         var neighbors = this.findNeighbors(city1.name);
         if(!neighbors.length) {
@@ -395,10 +360,11 @@ function Map(options) {
         }
         var edges = {};
         for(var j=0,city2; city2=neighbors[j]; j++) {
-            edges[city2.name] = this.geoDistance(city1.lng, city1.lat, city2.lng, city2.lat);
+            edges[city2.name] = geo.getDistance(city1.lng, city1.lat, city2.lng, city2.lat);
         }
         graph.addVertex(city1.name, edges);
     }
+
 }
 
 

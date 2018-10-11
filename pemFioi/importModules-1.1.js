@@ -109,10 +109,11 @@ var importableModules = function () {
 
       'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
       'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
+      'logger': {src: modulesPath+"/pemFioi/shared/logger.js", id: "logger"},
 
       'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
-      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"}  
+      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"}
    }
 }
 

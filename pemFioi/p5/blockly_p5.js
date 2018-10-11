@@ -11,13 +11,15 @@ var getContext = function(display, infos) {
                 playSignal: 'playSignal(%1, %2, %3, %4)',
                 playRecord: 'playRecord(%1, %2)',
                 playStop: 'playStop()',
-                sleep: 'sleep(%1)'
+                sleep: 'sleep(%1)',
+                echo: 'echo(%1)'
             },
             code: {
                 playSignal: 'playSignal',
                 playRecord: 'playRecord',
                 sleep: 'sleep',
-                playStop: 'playStop'
+                playStop: 'playStop',
+                echo: 'echo'
             },
             description: {
                 playSignal: 'playSignal(canal, type, frequency, amplitude) \n' +
@@ -28,7 +30,8 @@ var getContext = function(display, infos) {
                 playRecord: 'playRecord(url, frequency) Url : a string: the url of the sound to play\n' +
                     'Frequency : frequency to be used for a low pass filter (frequencies above should be removed)',
                 playStop: 'playStop()',
-                sleep: 'sleep(time) Time: time in ms during which the program should wait, but still play the sounds'
+                sleep: 'sleep(time) Time: time in ms during which the program should wait, but still play the sounds',
+                echo: 'echo(value) : print value'
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -77,15 +80,17 @@ var getContext = function(display, infos) {
     var delay = infos.actionDelay;
     var rate = delayToRate(delay);
     var files;
+    var logger;
 
     var conceptBaseUrl = window.location.protocol + '//'
         + 'static4.castor-informatique.fr/help/index.html';
-    context.conceptList = [
+
+        context.conceptList = [
         {id: 'p5_introduction', name: 'La proglet exploSonore', url: conceptBaseUrl+'#p5_introduction'},
         {id: 'p5_playSignal', name: 'Lancer un signal prédéfini', url: conceptBaseUrl+'#p5_playSignal'},
         {id: 'p5_playRecord', name: 'Lancer un signal enregistré', url: conceptBaseUrl+'#p5_playRecord'},
         {id: 'p5_playStop', name: 'Arrêter une émission sonore', url: conceptBaseUrl+'#p5_playStop'}
-        ];
+    ];
 
 
     context.reset = function(taskInfos) {
@@ -105,6 +110,10 @@ var getContext = function(display, infos) {
         player = new PlayerP5({
             parent: $('#grid')[0],
             filesRepository: files.getFile
+        });
+
+        logger = new Logger({
+            parent: $('#gridContainer')
         });
 
         if(!$('#p5_message')[0]) {
@@ -193,6 +202,11 @@ var getContext = function(display, infos) {
         playStop: function(callback) {
             player.resetChannels();
             callback();
+        },
+
+        echo: function(msg, callback) {
+            logger.put(msg);
+            callback();
         }
     }
 
@@ -214,7 +228,11 @@ var getContext = function(display, infos) {
                     params: ['Number'],
                     params_names: ['time']
                 },
-                { name: 'playStop' }
+                { name: 'playStop' },
+                { name: 'echo',
+                    params: ['String'],
+                    params_names: ['msg']
+                },
             ]
         }
     }
