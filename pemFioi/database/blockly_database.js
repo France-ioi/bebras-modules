@@ -162,10 +162,10 @@ var getContext = function(display, infos) {
             ui: {
                 'btn_files_repository': 'Ajouter des CSV...',
                 'files_repository': {
-                    'caption': 'Liste de fichiers CSV',
-                    'hint': 'Utiliser le numéro de fichier comme paramètre de la fonction loadTableFromCsv. Seuls les fichiers CSV utilisant ; comme délimiteur de champs sont acceptés.',
+                    'caption': 'Liste des fichiers CSV',
+                    'hint': 'Utilisez le numéro de fichier comme paramètre de la fonction loadTableFromCsv. Seuls les fichiers CSV utilisant ; comme délimiteur sont acceptés.',
                     'add': 'Ajouter',
-                    'incompatible_browser': 'Navigateur incompatible avec cette fonctionnalité'
+                    'incompatible_browser': 'Navigateur incompatible'
                 }
             }
         }

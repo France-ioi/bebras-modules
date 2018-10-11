@@ -2,10 +2,10 @@ var getContext = function(display, infos) {
 
 
     var p5_strings = {
-        fr: {
+        en: {
             categories: {
-                sound: 'Son',
-                control: 'Contrôle'
+                sound: 'Sound',
+                control: 'Controls'
             },
             label: {
                 playSignal: 'playSignal(%1, %2, %3, %4)',
@@ -33,7 +33,7 @@ var getContext = function(display, infos) {
                 sleep: 'sleep(time) Time: time in ms during which the program should wait, but still play the sounds',
                 echo: 'echo(value) : print value'
             },
-            startingBlockName: "Programme",
+            startingBlockName: "Program",
             constantLabel: {
                 'sine': 'sinus',
                 'triangle': 'triangle',
@@ -53,6 +53,60 @@ var getContext = function(display, infos) {
                     'hint': 'Use file number as param for playRecord function',
                     'add': 'Add',
                     'incompatible_browser': 'Incompatible browser'
+                }
+            }
+        },
+        fr: {
+            categories: {
+                sound: 'Son',
+                control: 'Contrôle'
+            },
+            label: {
+                playSignal: 'playSignal(%1, %2, %3, %4)',
+                playRecord: 'playRecord(%1, %2)',
+                playStop: 'playStop()',
+                sleep: 'sleep(%1)',
+                echo: 'echo(%1)'
+            },
+            code: {
+                playSignal: 'playSignal',
+                playRecord: 'playRecord',
+                sleep: 'sleep',
+                playStop: 'playStop',
+                echo: 'echo'
+            },
+            description: {
+                playSignal : 'playSignal(canal, type, frequence, amplitude)\n' +
+                    'Canal : 1, 2 ou 3 (jusqu\'à 3 signaux peuvent être joués simultanément)\n' +
+                    'Type : "sinus" - onde sinusoïdale, "carré" - onde carrée, "scie"- onde en dents de scie, "bruit": bruit blanc\n' +
+                    'Frequence: en Hertz, de 100 à 8000\n' +
+                    'Amplitude : de 0 (silence) à 1 (volume maximal)',
+                playRecord: 'playRecord(url, frequence) Url : une chaîne, l\'url du son à jouer\n' +
+                    'Frequency : fréquence à utiliser pour un filtre passe bas (les fréquences plus élevées seront retirées)',
+                playStop: 'playStop()',
+                sleep: 'sleep( duree ) : Duree : durée en ms pendant laquelle le programme doit attendre, tout en continuant à jouer les sons',
+                echo: 'echo(value) : affiche la valeur'
+            },
+            startingBlockName: "Programme",
+            constantLabel: {
+                'sine': 'sinus',
+                'triangle': 'triangle',
+                'sawtooth': 'scie',
+                'square': 'carré',
+                'noise': 'bruit'
+            },
+            messages: {
+                'loading': 'Chargement du fichier',
+                'load_error': 'Une erreur s\'est produite lors du chargement du fichier.'
+            },
+            ui: {
+                'mic': 'Activer le micro',
+                'btn_files_repository': 'Ajouter des fichiers audio...',
+                'files_repository': {
+                    'caption': 'Liste des fichiers audio',
+                    'hint': 'Utilisez le numéro de fichier comme paramètre de la fonction playRecord',
+                    'add': 'Ajouter',
+                    'incompatible_browser': 'Navigateur incompatible'
                 }
             }
         }
