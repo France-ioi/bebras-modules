@@ -674,6 +674,24 @@ window.displayHelper = {
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
+         function updateLayout() {
+            $('#valider').appendTo($('#displayHelper_validate'));
+           if(window.innerWidth >= 1200) {
+             $('#task').addClass('largeScreen');
+             $('#displayHelperAnswering').appendTo($('#zone_1'));
+           }
+           else {
+             $('#task').removeClass('largeScreen');
+             if ($('#showSolutionButton')) {
+               $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
+             }
+             else {
+               $('#displayHelperAnswering').appendTo($('#task'));
+             }
+           }
+         }
+         $(document).ready(function() {updateLayout();});
+         $(window).resize(function () {updateLayout();});         
       } catch(e) {
       }
    },
