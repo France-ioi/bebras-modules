@@ -653,6 +653,7 @@ window.displayHelper = {
             }
             self.updateStarsAtLevel(curLevel);
          }
+         self.updateLayout();
       }, 100);
 
       $('#tabsContainer').after('<div id="popupMessage"></div>');
@@ -727,7 +728,6 @@ window.displayHelper = {
       var state = task.getStateObject();
       state.level = newLevel;
       this.taskLevel = newLevel;
-      this.updateLayout();
       var self = this;
       
       var afterReload = function() {
