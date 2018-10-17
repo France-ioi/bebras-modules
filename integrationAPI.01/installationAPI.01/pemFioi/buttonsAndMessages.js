@@ -33,6 +33,7 @@ window.displayHelper = {
    thresholdMedium: 120,
    timeoutMinutes: 5,
    avatarType: "beaver",
+   bUseFullWidth: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -669,29 +670,34 @@ window.displayHelper = {
       }
       drawStars('stars_' + iLevel, iLevel + 2, 18, rate, mode);
    },
+
+   updateLayout: function() {
+      if (!this.bUseFullWidth) {
+         return
+      }
+      $('#valider').appendTo($('#displayHelper_validate'));
+      if(window.innerWidth >= 1200) {
+          $('#task').addClass('largeScreen');
+          $('#displayHelperAnswering').appendTo($('#zone_1'));
+      }
+      else {
+         $('#task').removeClass('largeScreen');
+         if ($('#showSolutionButton')) {
+            $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
+         }
+         else {
+            $('#displayHelperAnswering').appendTo($('#task'));
+         }
+     }
+   },
    
    useFullWidth: function() {
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
-         function updateLayout() {
-            $('#valider').appendTo($('#displayHelper_validate'));
-           if(window.innerWidth >= 1200) {
-             $('#task').addClass('largeScreen');
-             $('#displayHelperAnswering').appendTo($('#zone_1'));
-           }
-           else {
-             $('#task').removeClass('largeScreen');
-             if ($('#showSolutionButton')) {
-               $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
-             }
-             else {
-               $('#displayHelperAnswering').appendTo($('#task'));
-             }
-           }
-         }
-         $(document).ready(function() {updateLayout();});
-         $(window).resize(function () {updateLayout();});         
+         $(document).ready(function () {displayHelper.updateLayout();});
+         $(window).resize(function () {displayHelper.updateLayout();});
+         this.bUseFullWidth = true;
       } catch(e) {
       }
    },
