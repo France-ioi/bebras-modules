@@ -669,6 +669,14 @@ window.displayHelper = {
       }
       drawStars('stars_' + iLevel, iLevel + 2, 18, rate, mode);
    },
+   
+   useFullWidth: function() {
+      // TODO: find a clean way to do this
+      try {
+         $('#question-iframe', window.parent.document).css('width', '100%');
+      } catch(e) {
+      }
+   },
 
    // Deprecated: use directly levelsMaxScores instead
    getLevelsMaxScores: function() {
