@@ -727,6 +727,7 @@ window.displayHelper = {
       var state = task.getStateObject();
       state.level = newLevel;
       this.taskLevel = newLevel;
+      this.updateLayout();
       var self = this;
       
       var afterReload = function() {
@@ -734,7 +735,6 @@ window.displayHelper = {
          self.refreshMessages = true;
          self.checkAnswerChanged();
          self.stopShowingResult();
-   
          if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
             self.showPopupMessage(self.strings.lockedLevel, 'lock');
          } else if (!self.hasSolution) {
