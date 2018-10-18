@@ -158,8 +158,8 @@ var getContext = function(display, infos) {
             },
             messages: {
                 table_not_found: 'Table non trouvée: ',
-                incorrect_results: 'Incorrect results',
-                some_results_missing: 'Some results are missing'
+                incorrect_results: 'Résultats incorrects',
+                some_results_missing: 'Il manque une partie des résultats'
             },
             ui: {
                 'btn_files_repository': 'Ajouter des CSV...',
