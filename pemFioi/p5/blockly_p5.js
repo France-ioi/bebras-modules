@@ -250,12 +250,12 @@ var getContext = function(display, infos) {
             }
             player.setRate(rate);
             player.play();
-            setTimeout(function() {
+            context.runner.waitDelay(function() {
                 if(context.runner && context.runner.stepMode) {
                     player.pause();
                 }
                 context.callCallback(callback);
-            }, ms)
+            }, undefined, ms)
         },
 
         playStop: function(callback) {
