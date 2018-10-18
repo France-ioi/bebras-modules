@@ -87,7 +87,6 @@ var getContext = function(display, infos) {
     context.updateScale = function() {}
     context.resetDisplay = function() {}
     context.unload = function() {}
-    context.changeDelay = function(actionDelay) {}
     context.onExecutionEnd = function() {}
 
 
@@ -174,12 +173,7 @@ var getContext = function(display, infos) {
                 context.map[block.name] = function() {
                     var callback = arguments[arguments.length - 1];
                     if(map) {
-                        if(block.hasHandler) {
-                            // This function knows how to take care of the callback
-                            map[block.name].apply(map, arguments);
-                        } else {
-                            context.runner.noDelay(callback, map[block.name].apply(map, arguments));
-                        }
+                        context.waitDelay(callback, map[block.name].apply(map, arguments))
                     } else {
                         callback();
                     }
@@ -192,8 +186,8 @@ var getContext = function(display, infos) {
 }
 
 if(window.quickAlgoLibraries) {
-   quickAlgoLibraries.register('map', getContext);
-} else {
-   if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
-   window.quickAlgoLibrariesList.push(['map', getContext]);
-}
+    quickAlgoLibraries.register('map', getContext);
+ } else {
+    if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
+    window.quickAlgoLibrariesList.push(['map', getContext]);
+ }

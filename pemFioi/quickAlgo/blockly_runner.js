@@ -289,7 +289,7 @@ function initBlocklyRunner(context, messageCallback) {
                context.programEnded[iInterpreter] = true;
             }
 
-            var message = e.toString();
+            var message = e.message || e.toString();
 
             // Translate "Unknown identifier" message
             if(message.substring(0, 20) == "Unknown identifier: ") {

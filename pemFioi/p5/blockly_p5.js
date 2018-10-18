@@ -211,7 +211,8 @@ var getContext = function(display, infos) {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
             player.initSignal(channel, type, frequency, amplitude);
-            callback();
+            context.waitDelay(callback);
+            //callback();
         },
 
         playRecord: function(url, frequency, callback) {
@@ -237,11 +238,15 @@ var getContext = function(display, infos) {
         sleep: function(ms, callback) {
             if(!rate) {
                 player.pause();
-                return callback();
+                context.waitDelay(callback);
+                return;
+                //return callback();
             }
             var ms = Math.min(10000, parseInt(ms, 10) || 0) * (delay / 200);
             if(!ms) {
-                return callback();
+                context.waitDelay(callback);
+                return;
+                //return callback();
             }
             player.setRate(rate);
             player.play();
@@ -255,12 +260,14 @@ var getContext = function(display, infos) {
 
         playStop: function(callback) {
             player.resetChannels();
-            callback();
+            context.waitDelay(callback);
+            //callback();
         },
 
         echo: function(msg, callback) {
             logger.put(msg);
-            callback();
+            context.waitDelay(callback);
+            //callback();
         }
     }
 
