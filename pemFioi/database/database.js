@@ -55,17 +55,17 @@ function DatabaseHelper(options) {
 
 
     this.validateResult = function(reference_table) {
-        if(!last_table) return;
-        if(last_table.params().columnNames.length != reference_table.params().columnNames.length) {
-            throw new Error('Incorrect results');
+        if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
+            return 'incorrect_results';
         }
         if(last_table.params().records.length < reference_table.params().records.length) {
-            throw new Error('Some results are missing.');
+            return 'some_results_missing';
         }
         var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
         if(!valid_all) {
-            throw new Error('Incorrect results');
+            return 'incorrect_results';
         }
+        return true;
     }
 
 

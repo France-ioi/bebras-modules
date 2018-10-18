@@ -72,8 +72,9 @@ var getContext = function(display, infos) {
                 right: 'right'
             },
             messages: {
-                tableNotFound: 'Table not found: ',
-                invalidResult: ''
+                table_not_found: 'Table not found: ',
+                incorrect_results: 'Incorrect results',
+                some_results_missing: 'Some results are missing'
             },
             ui: {
                 'btn_files_repository': 'Add CSV files...',
@@ -156,8 +157,9 @@ var getContext = function(display, infos) {
                 right: 'right'
             },
             messages: {
-                tableNotFound: 'Table non trouvée: ',
-                invalidResult: ''
+                table_not_found: 'Table non trouvée: ',
+                incorrect_results: 'Incorrect results',
+                some_results_missing: 'Some results are missing'
             },
             ui: {
                 'btn_files_repository': 'Ajouter des CSV...',
@@ -180,14 +182,12 @@ var getContext = function(display, infos) {
     var ready = false;
 
     context.reset = function(taskInfos) {
-        if(!context.display) return;
+        if(!context.display || ready) return;
+        ready = true;
 
         if(taskInfos) {
             task_tables = taskInfos.tables || {};
         }
-
-        if(ready) return;
-        ready = true;
 
         files = new FilesRepository({
             extensions: '.csv',
@@ -212,13 +212,15 @@ var getContext = function(display, infos) {
         })
 
 
-        /*
+/*
         //test html render
-        context.database.loadTable('test_table', function(table, callback) {
-            context.database.displayTable(table, null, function() {
-                context.expectTable('valid_table')
-            });
-        })
+        setTimeout(function() {
+            context.database.loadTable('test_table', function(table, callback) {
+                context.database.displayTable(table, null, function() {
+                    context.expectTable('valid_table')
+                });
+            })
+        }, 1500);
 */
 /*
         //test map render
@@ -240,16 +242,21 @@ var getContext = function(display, infos) {
     context.updateScale = function() {}
     context.resetDisplay = function() {}
     context.unload = function() {}
-    context.changeDelay = function(actionDelay) {}
-    context.onExecutionEnd = function() {}
 
 
     context.expectTable = function(name) {
         if(name in task_tables) {
             var table = Table(task_tables[name]);
-            db_helper.validateResult(table);
+            var status = db_helper.validateResult(table);
+            if(status === true) {
+                context.success = true;
+                return;
+            }
+            context.success = false;
+            throw new Error(strings.messages[status]);
         } else {
-            console.error('Undefined table: ' + name)
+            context.success = false;
+            console.error('Table not found: ' + name)
         }
     }
 
@@ -257,81 +264,80 @@ var getContext = function(display, infos) {
     context.database = {
 
         loadTable: function(name, callback) {
-            if(!task_tables[name]) throw new Error(strings.messages.tableNotFound + name);
-            context.runner.noDelay(callback, Table(task_tables[name]));
+            if(!task_tables[name]) throw new Error(strings.messages.table_not_found + name);
+            context.waitDelay(callback, Table(task_tables[name]));
         },
 
 
         loadTableFromCsv: function(fileNumber, types, callback) {
             var file = files.getFile(fileNumber - 1);
-            var types_arr = Array.from(types.properties);
+            var types_arr = Array.from(types);
             db_helper.loadCsv(file, types_arr, function(table) {
-                context.runner.noDelay(callback, table);
+                context.waitDelay(callback, table);
             });
         },
 
         getRecords: function(table, callback) {
-            context.runner.noDelay(callback, table.getRecords());
+            context.waitDelay(callback, table.getRecords());
         },
 
         selectByColumn: function(table, columnName, value, callback) {
-            context.runner.noDelay(callback, table.selectByColumn(columnName, value));
+            context.waitDelay(callback, table.selectByColumn(columnName, value));
         },
 
         selectByFunction: function(table, filterFunction, callback) {
-            context.runner.noDelay(callback, table.selectByFunction(filterFunction));
+            context.waitDelay(callback, table.selectByFunction(filterFunction));
         },
 
         selectTopRows: function(table, amount, callback) {
-            context.runner.noDelay(callback, table.selectTopRows(amount));
+            context.waitDelay(callback, table.selectTopRows(amount));
         },
 
         getColumn: function(record, columnName, callback) {
             if(columnName in record) {
-                context.runner.noDelay(callback, record[columnName]);
+                context.waitDelay(callback, record[columnName]);
             } else {
                 throw new Error('Column ' + columnName + ' not found');
             }
         },
 
         sortByColumn: function(table, columnName, direction, callback) {
-            context.runner.noDelay(callback, table.sortByColumn(columnName, direction));
+            context.waitDelay(callback, table.sortByColumn(columnName, direction));
         },
 
         sortByFunction: function(table, compareFunction, callback) {
-            context.runner.noDelay(callback, table.sortByFunction(compareFunction));
+            context.waitDelay(callback, table.sortByFunction(compareFunction));
         },
 
         selectColumns: function(table, columns, callback) {
-            context.runner.noDelay(callback, table.selectColumns(columns));
+            context.waitDelay(callback, table.selectColumns(columns));
         },
 
         joinTables: function(table1, column1, table2, column2, type, callback) {
-            context.runner.noDelay(callback, table1.join(column1, table2, column2, type));
+            context.waitDelay(callback, table1.join(column1, table2, column2, type));
         },
 
         displayTable: function(table, columns, callback) {
             if(columns) {
-                var columns_arr = Array.from(columns.properties);
                 db_helper.displayTable(
-                    table.selectColumns(columns_arr)
+                    table.selectColumns(Array.from(columns))
                 )
             } else {
                 db_helper.displayTable(table);
             }
-            callback();
+            context.waitDelay(callback);
         },
 
         updateWhere: function(table, filterFunction, updateFunction, callback) {
-            context.runner.noDelay(callback, table.updateWhere(filterFunction, updateFunction));
+            context.waitDelay(callback, table.updateWhere(filterFunction, updateFunction));
         },
 
         insertRecord: function(table, record, callback) {
-            context.runner.noDelay(callback, table.insertRecord(record));
+            context.waitDelay(callback, table.insertRecord(record));
         },
 
         unionTables: function(table1, table2, callback) {
-            context.runner.noDelay(callback, table1.union(table2));
+            context.waitDelay(callback, table1.union(table2));
         },
 
         displayRecord: function(record, callback) {
@@ -346,7 +352,7 @@ var getContext = function(display, infos) {
             })
             var table = Table(res)
             db_helper.displayTable(table);
-            context.runner.noDelay(callback);
+            context.waitDelay(callback);
         },
 
 
@@ -354,7 +360,7 @@ var getContext = function(display, infos) {
             db_helper.displayTableOnMap(
                 table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
             );
-            context.runner.noDelay(callback);
+            context.waitDelay(callback);
         }
     }
 

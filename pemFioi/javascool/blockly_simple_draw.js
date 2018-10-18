@@ -205,7 +205,7 @@ var getContext = function(display, infos) {
                             // This function knows how to take care of the callback
                             draw[block.name].apply(draw, arguments);
                         } else {
-                            context.runner.noDelay(callback, draw[block.name].apply(draw, arguments));
+                            context.waitDelay(callback, draw[block.name].apply(draw, arguments))
                         }
                     } else {
                         callback();
