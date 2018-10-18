@@ -33,6 +33,7 @@ window.displayHelper = {
    thresholdMedium: 120,
    timeoutMinutes: 5,
    avatarType: "beaver",
+   bUseFullWidth: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
@@ -652,6 +653,7 @@ window.displayHelper = {
             }
             self.updateStarsAtLevel(curLevel);
          }
+         self.updateLayout();
       }, 100);
 
       $('#tabsContainer').after('<div id="popupMessage"></div>');
@@ -668,6 +670,37 @@ window.displayHelper = {
          mode = 'useless';
       }
       drawStars('stars_' + iLevel, iLevel + 2, 18, rate, mode);
+   },
+
+   updateLayout: function() {
+      if (!this.bUseFullWidth) {
+         return
+      }
+      $('#valider').appendTo($('#displayHelper_validate'));
+      if(window.innerWidth >= 1200) {
+          $('#task').addClass('largeScreen');
+          $('#displayHelperAnswering').appendTo($('#zone_1'));
+      }
+      else {
+         $('#task').removeClass('largeScreen');
+         if ($('#showSolutionButton')) {
+            $('#displayHelperAnswering').insertBefore($('#showSolutionButton'));
+         }
+         else {
+            $('#displayHelperAnswering').appendTo($('#task'));
+         }
+     }
+   },
+   
+   useFullWidth: function() {
+      // TODO: find a clean way to do this
+      try {
+         $('#question-iframe', window.parent.document).css('width', '100%');
+         $(document).ready(function () {displayHelper.updateLayout();});
+         $(window).resize(function () {displayHelper.updateLayout();});
+         this.bUseFullWidth = true;
+      } catch(e) {
+      }
    },
 
    // Deprecated: use directly levelsMaxScores instead
@@ -702,7 +735,6 @@ window.displayHelper = {
          self.refreshMessages = true;
          self.checkAnswerChanged();
          self.stopShowingResult();
-   
          if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
             self.showPopupMessage(self.strings.lockedLevel, 'lock');
          } else if (!self.hasSolution) {

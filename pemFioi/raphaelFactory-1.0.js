@@ -27,6 +27,18 @@ function RaphaelFactory() {
       });
    };
 
+   this.pauseAnimate = function(name) {
+      if (this.animations[name]) {
+         this.animations[name].pause();
+      }
+   };
+
+    this.resumeAnimate = function(name) {
+      if (this.animations[name]) {
+         this.animations[name].resume();
+      }
+   };
+   
    this.stopAnimate = function(name) {
       if (this.animations[name]) {
          this.animations[name].stop();
