@@ -212,6 +212,15 @@ function PythonInterpreter(context, msgCallback) {
     target.addEventListener(eventName, listenerFunc);
   };
 
+  this.waitCallback = function (callback, value) {
+    // Returns a callback to be called once we can continue the execution
+    this._paused = true;
+    var that = this;
+    return function() {
+      that.noDelay(callback, value);
+    };
+  };
+
   this.noDelay = function (callback, value) {
     var primitive = this._createPrimitive(value);
     if (primitive !== Sk.builtin.none.none$) {
