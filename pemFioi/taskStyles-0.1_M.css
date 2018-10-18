@@ -342,3 +342,107 @@ h1 .stars {
 #choose-view .choose-view-button {
    margin: 0 10px;
 }
+
+
+#task {
+	width: 770px;
+	margin: 0 auto;
+}
+#task.largeScreen {
+	width: 1200px;
+}
+#taskContent:after {
+    content: " ";
+    display: table;
+    clear: both;
+}
+#zone_1, #zone_2,
+.zone_1, .zone_2 {
+	margin: 0 auto;
+}
+#zone_2,
+.zone_2 {
+	width: 770px;
+}
+.largeScreen #zone_1,
+.largeScreen #zone_2
+{
+	vertical-align: top;
+	box-sizing: content-box;
+	float: left;
+}
+.largeScreen #zone_1 {
+	width: 430px;
+}
+.consigne {
+	padding: 10px;
+}
+.
+#displayHelperAnswering {
+	padding: 10px;
+}
+
+.exemple
+{
+	margin: auto;
+	margin-top: 10px;
+	text-align: center;
+	border: 1px solid black;
+	border-radius: 1px;
+	width: 290px;
+}
+
+.grille, .boutons_sujet
+{
+	display: inline-block;
+	vertical-align: middle;
+	margin: auto;
+}
+
+.boutons_sujet
+{
+	margin-top: 20px; 
+}
+
+
+.objectif
+{
+	display: inline-block;
+	vertical-align: top;
+	margin: auto;
+	margin-top: 20px;
+}
+
+
+.container_inverse
+{
+	display: inline-block;
+	width: 100%;
+}
+
+/* css présent à l'origine dans tous les sujets et déplacé ci-dessous */
+
+#anim_container
+{
+	text-align: center;
+}
+
+#anim_container table {
+	margin: auto;
+}
+
+#anim {
+	display: inline-block;
+	margin-top: 20px;
+}
+
+#feedback {
+	height: 1em;
+	margin-top: 0.5em;
+	margin-bottom: 0.1em;
+	text-align: center;
+	font-weight: bold;
+	color: red; 
+}
+
+#showSolutionButton {margin-top: 24px;}
