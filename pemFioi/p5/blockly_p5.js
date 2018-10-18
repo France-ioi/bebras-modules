@@ -219,9 +219,11 @@ var getContext = function(display, infos) {
             var onLoadProgress = function(progress) {
                 $('#p5_message').text(strings.messages.loading);
             }
+
+            var cb = context.runner.waitCallback(callback);
             var onLoadEnd = function() {
                 $('#p5_message').text('');
-                context.waitDelay(callback);
+                cb();
             }
             var onLoadError = function() {
                 $('#p5_message').text('');
