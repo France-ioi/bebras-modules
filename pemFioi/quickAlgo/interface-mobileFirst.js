@@ -86,21 +86,22 @@ var quickAlgoInterface = {
 
         // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
         $('#editorMenu div[rel=example]').click(function(e) {
+            self.closeEditorMenu();
             task.displayedSubTask.loadExample()
         });
 
         $('#editorMenu div[rel=save]').click(function(e) {
-            $('#editorMenu').hide();
+            self.closeEditorMenu();
             task.displayedSubTask.blocklyHelper.saveProgram();
         });
 
         $('#editorMenu div[rel=restart]').click(function(e) {
-            $('#editorMenu').hide();
+            self.closeEditorMenu();
             displayHelper.restartAll();
         });
 
         $('#editorMenu div[rel=best-answer]').click(function(e) {
-            $('#editorMenu').hide();
+            self.closeEditorMenu();
             displayHelper.retrieveAnswer();
         });
 
@@ -140,26 +141,49 @@ var quickAlgoInterface = {
         $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
 
         this.createModeTaskToolbar();
+        this.createEditorMenu();
     },
 
-    toggleEditorMenu: function(forceState) {
-        var el = $('#editorMenu');
-        if(el.is(":visible") || forceState === false) {
-            el.hide();
-            $(document).off('click', quickAlgoInterface.hideEditorMenuOnClick);
-        } else {
-            $('#editorMenu div[rel=best-answer]').toggle(!!displayHelper.savedAnswer);
-            el.show();
-            $(document).on('click', quickAlgoInterface.hideEditorMenuOnClick);
-        };
+    createEditorMenu: function() {
+        if($('#editorMenu').length) { return; }
+        var self = this;
+        $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
+        $("body").append('' +
+            "<div id='editorMenu'>" +
+                "<div class='editorMenuHeader'>" +
+                    "<div id='closeEditorMenu'><span class='fas fa-times'></span></div>" +
+                    "<div>Menu</div>" +
+                "</div>" +
+                "<div class='editorActions'>" +
+                    "<div rel='example' class='item'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
+                    "<div rel='restart' class='item'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
+                    "<div rel='save' class='item'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
+                    "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
+                    "<div rel='load' class='item'>" +
+                        "<input type='file' id='task-upload-file' " +
+                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
+                        "<span class='fas fa-upload'></span> " +
+                        this.strings.reloadProgram +
+                    "</div>" +
+                "</div>" +
+                "<span id='saveUrl'></span>" +
+            "</div>"
+        );
+        $('#openEditorMenu').click(function() {
+            self.openEditorMenu();
+        });
+        $("#closeEditorMenu").click(function() {
+            self.closeEditorMenu();
+        });
     },
 
-    hideEditorMenuOnClick: function(e) {
-        if(!($(e.target).parents('#toggleEditorMenu').length)) {
-            quickAlgoInterface.toggleEditorMenu(false);
-        }
-    },
+    openEditorMenu: function() {
+        $('body').animate({left: '-50%'}, 500);
 
+    },
+    closeEditorMenu: function() {
+        $('body').animate({left: '0'}, 500);
+    },
     setOptions: function(opt) {
         // Load options from the task
         $('#editorMenu div[rel=example]').toggle(opt.hasExample);
@@ -359,20 +383,6 @@ var quickAlgoInterface = {
         var self = this;
         $("#task").append('' +
             '<div id="taskToolbar">' +
-                "<div id='editorMenu'>" +
-                    "<div rel='example' class='item'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
-                    "<span id='saveUrl'></span>" +
-                    "<div rel='restart' class='item'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
-                    "<div rel='save' class='item'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
-                    "<div rel='load' class='item'>" +
-                        "<input type='file' id='task-upload-file' " +
-                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
-                        "<span class='fas fa-upload'></span> " +
-                        this.strings.reloadProgram +
-                    "</div>" +
-                    "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
-                "</div>" +
-                '<div id="toggleEditorMenu" class="icon"><span class="fas fa-file-code"></span></div>' +
                 '<div id="modeSelector">' +
                     '<div id="mode-player" class="icon"><span class="fas fa-play"></span></div>' +
                     '<div id="mode-instructions" class="icon"><span class="fas fa-file-alt"></span></div>' +
@@ -380,10 +390,6 @@ var quickAlgoInterface = {
                 '</div>'
                 + displayHelpBtn +
             '</div>');
-
-        $('#toggleEditorMenu').click(function() {
-            self.toggleEditorMenu();
-        });
 
         $('#modeSelector div').click(function() {
             self.selectMode($(this).attr('id'));
