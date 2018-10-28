@@ -724,6 +724,11 @@ window.displayHelper = {
       $('#tab_' + newLevel).addClass('current');
       $('.' + newLevel).show();
 
+      // Add prev and next classes to .current direct siblings
+      $('#tabsMenu .li').removeClass('prev next');
+      $('#tabsMenu .li.current').prev().addClass('prev');
+      $('#tabsMenu .li.current').next().addClass('next');
+
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;

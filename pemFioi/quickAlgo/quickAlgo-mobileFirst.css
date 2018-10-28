@@ -14,13 +14,13 @@ body {
   overflow-x: hidden;
 }
 #openEditorMenu {
-  position: absolute;
-  right: 0;
+  position: relative;
   background-color: #4a4a4a;
   padding: 8px 13px;
   border-radius: 5px 0 0 5px;
   color: #fff;
   cursor: pointer;
+  order: 1;
 }
 #openEditorMenu::before,
 #openEditorMenu::after {
