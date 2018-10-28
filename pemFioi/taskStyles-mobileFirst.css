@@ -3,6 +3,7 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
+  background-color: #f1f2f7;
 }
 * {
   box-sizing: border-box;
@@ -21,15 +22,26 @@ img {
   LEVEL SELECTOR
 *****************/
 #tabsContainer {
+  position: relative;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 #tabsMenu {
-  flex: 0 0 auto;
-  overflow: hidden;
+  flex: 1 1 0;
   display: flex;
-  background-color: #4a90e2;
-  border-radius: 8px 8px 0px 0px;
+  align-items: center;
+}
+#tabsMenu a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  color: #4a90e2;
+  text-decoration: none;
+}
+#tabsMenu .stars {
+  margin-left: 5px;
 }
 #tabsMenu .li {
   flex: 1 0 0;
@@ -37,42 +49,110 @@ img {
   white-space: nowrap;
   cursor: pointer;
 }
-#tabsMenu .li:not(.current) {
-  background-color: rgba(0,0,0,0.2);
+#tabsMenu .li:not(.current) a {
+  color: #9b9b9b;
 }
-#tabsMenu .li.current + .li {
-  border-radius: 0px 0px 0px 8px;
-}
-#tabsMenu .li:not(.current) + .li:not(.current) {
-  border-left: 1px solid #000;
-}
-#tabsMenu .li a,
-#tabsMenu .li a:hover {
-  display: block;
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: #fff;
-  padding: 5px 20px;
-}
-@media screen and (max-width: 480px) {
-  #tabsMenu .levelLabel {
-    display: inline-block;
-    text-overflow: clip;
-    white-space: nowrap;
-    overflow: hidden;
-    width: calc(100vw / 3 - 100px);
-    vertical-align: middle;
+
+@media screen and (max-width:680px) and (orientation: portrait) {
+  #tabsMenu {
+    background-color: #fff;
+    border-radius: 5px 5px 0 0;
+    margin: 0 10px;
+    padding: 4px 0;
+    position: relative;
+  }
+  #tabsMenu::before,
+  #tabsMenu::after {
+    content: " ";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+  }
+  #tabsMenu::before {
+    border-radius: 50% 0;
+    box-shadow: 10px 0px 0 #fff;
+    bottom: 0;
+    left: -20px;
+  }
+  #tabsMenu::after {
+    border-radius: 0 50%;
+    box-shadow: -10px 0px 0 #fff;
+    bottom: 0;
+    right: -20px;
+  }
+  #tabsMenu .li {
+    display: none;
+  }
+  #tabsMenu .li.current {
+    flex: 1 0 0;
+    display: block;
+  }
+  #tabsMenu .li.prev,
+  #tabsMenu .li.next {
+    flex: 0 1 3em;
+    display: block;
+    text-align: center;
+    cursor: pointer;
+  }
+  #tabsMenu .li.prev a::before,
+  #tabsMenu .li.next a::before {
+    font-family: 'FontAwesome';
+    font-size: 32px;
+  }
+  #tabsMenu .li.prev a::before {
+    content: "\f104";
+  }
+  #tabsMenu .li.next a::before {
+    content: "\f105";
+  }
+  #tabsMenu .li.prev a span,
+  #tabsMenu .li.next a span {
+    display: none;
   }
 }
-#tabsMenu .stars {
-  display: inline-block;
-  margin-left: 5px;
-  vertical-align: middle;
+@media screen and (min-width: 681px) {
+  #tabsMenu a {
+    padding: 10px 0;
+  }
+  #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
+    border-right-width: 2px;
+    border-right-style: solid;
+    -webkit-border-image:
+      -webkit-linear-gradient(rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
+    -moz-border-image:
+      -moz-linear-gradient(rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
+    -o-border-image:
+      -o-linear-gradient(rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
+    border-image:
+      linear-gradient(to bottom, rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
+  }
+  #tabsMenu .li.current {
+    background-color: #fff;
+    border-radius: 5px 5px 0 0;
+    position: relative;
+  }
+  #tabsMenu .li.current::before,
+  #tabsMenu .li.current::after {
+    content: " ";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+  }
+  #tabsMenu .li.current::before {
+    border-radius: 50% 0;
+    box-shadow: 10px 0px 0 #fff;
+    bottom: 0;
+    left: -20px;
+  }
+  #tabsMenu .li.current::after {
+    border-radius: 0 50%;
+    box-shadow: -10px 0px 0 #fff;
+    bottom: 0;
+    right: -20px;
+  }
 }
-
-
 #popupMessage {
    display: none;
 }
