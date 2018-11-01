@@ -205,60 +205,137 @@ body {
   background-color: rgba(0,0,0,0.2);
 }
 
-/* playback */
+/*****************
+  PLAYER CONTROLS
+*****************/
 #playerControls {
+  display: inline-flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 10px;
+  vertical-align: bottom;
+  background-color: rgba(0,0,0,0.3);
+  box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
+  border-radius:15px;
 }
-
-#taskToolbar .icon {
-  float: left;
-  margin-right: 9px;
+.speedControls .icon span {
+  padding: 5px 10px;
 }
-
-#taskToolbar .icon:last-child {
-  margin: 0;
+@media screen and (max-width: 480px) {
+  #mode-player.displaySpeedSlider #playerControls,
+  #mode-player.displaySpeedSlider > span.far,
+  #mode-player.displaySpeedSlider > span.fas {
+    display: none;
+  }
+  #mode-player:not(.displaySpeedSlider) #speedSlider {
+    display: none;
+  }
 }
+@media screen and (min-width: 481px) {
+  .icon.displaySpeedSlider,
+  .icon.hideSpeedSlider {
+    display: none;
+  }
+}
+/*****************
+  SPEED CONTROLS
+*****************/
 
-/* speed controls  */
-.speedControls {
-  flex: 1 1 0;
+#taskToolbar .mode:not(.active) .speedControls {
+  display: none;
+}
+#taskToolbar .mode .speedControls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 #speedSlider {
-  background: #4a90e2;
+  background-color: rgba(0,0,0,0.3);
+  box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
+  border-radius:15px;
+  display: flex;
 }
-#speedSlider #speedCursor {
-  margin: 20px 0 0px 0;
-  padding: 0;
-  width: 100%;
+#speedCursor {
   -webkit-appearance: none;
   appearance: none;
-  height: 1px;
+  background-color: transparent;
+  width: 100px;
+  margin-top: 6px;
+}
+/* Chrome */
+#speedCursor::-webkit-slider-runnable-track {
+  background-color: rgba(0,0,0,0.3);
+  width: 100px;
+  height: 5px;
+  border-radius: 5px;
+  margin-top: -6px;
+}
+#speedCursor::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: none;
+  height: 20px;
+  width: 28px;
+  border-radius: 100px;
+  background-color: #4a90e2;
+  margin-top: -7px;
+  cursor: ew-resize;
+}
+#speedCursor:focus {
   outline: none;
-  border: 0;
-  background: #000;
 }
-#speedSlider #speedCursor::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
+#speedCursor:focus::-webkit-slider-runnable-track {
+  background-color: rgba(0,0,0,0.3);
 }
-#speedSlider #speedCursor::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid #000;
-  cursor: default;
-  background: #fff;
+/* Firefox */
+#speedCursor::-moz-range-track {
+  height: 5px;
+  background-color: rgba(0,0,0,0.3);
+  border: none;
+  border-radius: 5px;
 }
-#speedSlider span {
-  position: absolute;
-  top: 0;
-  cursor: pointer;
+#speedCursor::-moz-range-thumb {
+  border: none;
+  height: 20px;
+  width: 28px;
+  border-radius: 100px;
+  background-color: #4a90e2;
+  cursor: ew-resize;
 }
+
+/* Edge / IE10+ */
+#speedCursor::-ms-track {
+  width: 100px;
+  height: 5px;
+  background: transparent;
+  /*leave room for the larger thumb to overflow with a transparent border */
+  border-color: transparent;
+  border-width: 6px 0;
+  /*remove default tick marks*/
+  color: transparent;
+}
+#speedCursor::-ms-fill-lower {
+  background: #f5a623;
+  border-radius: 5px;
+}
+#speedCursor::-ms-fill-upper {
+  background: rgba(0,0,0,0.3);
+  border-radius: 5px;
+}
+#speedCursor::-ms-thumb {
+  border: none;
+  height: 20px;
+  width: 28px;
+  border-radius: 100px;
+  background: #4a90e2;
+  cursor: ew-resize;
+}
+#speedCursor:focus::-ms-fill-lower {
+  background: #f5a623;
+}
+#speedCursor:focus::-ms-fill-upper {
+  background: rgba(0,0,0,0.3);
+}
+
 
 /*****************
   CODE EDITOR
@@ -454,31 +531,62 @@ body {
   TASK TOOLBAR
 *****************/
 #taskToolbar {
-  position: relative;
-  bottom: 0;
-  right: 0;
-  padding: 7px;
-  background: #4a90e2;
-  color: #fff;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: flex-end;
   flex: 0 0 auto;
+  z-index: 1;
+  box-shadow: 0 1px 1px rgba(255,255,255,0.1) inset;
 }
-#taskToolbar .fas {
-  font-size: 24px;
+#taskToolbar .fas,
+#taskToolbar .far {
+  font-size: 18px;
 }
-#modeSelector {}
-#modeSelector div {
-  display: inline-block;
+#modeSelector {
+  display: flex;
 }
-#modeSelector .active {
-  color: #ccc;
-  cursor: not-allowed;
+#modeSelector .mode {
+  flex: 0 1 51px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: #4a4a4a;
+  color: #fff;
+}
+#modeSelector .mode#mode-editor {
+  justify-content: space-between;
+}
+#modeSelector .mode:not(.active) {
+  justify-content: center;
+}
+#modeSelector .mode.active {
+  background: #4a90e2;
+  flex: 2 0 auto;
+}
+#modeSelector .mode:not(.active) + .mode:not(.active) {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 1px 0px 0px 0px #000 inset;
+}
+#modeSelector #mode-editor.mode #displayHelpBtn {
+  background-color: rgba(0,0,0,0.3);
+  border-radius: 50%;
+  padding: 6px 9px;
+  font-size: 13px;
+  margin-top: -4px;
+  margin-bottom: -3px;
+}
+#modeSelector #mode-editor.mode:not(.active) #displayHelpBtn {
+  display: none;
+}
+#modeSelector #mode-editor.mode #displayHelpBtn .fas {
+  font-size: 13px;
 }
 
+#modeSelector .mode .label {
+  text-transform: uppercase;
+  margin-left: 10px;
+  font-weight: bold;
+}
+#modeSelector .mode:not(.active) .label {
+  display: none;
+}
 #displayHelpBtn {
   border: 0;
   background-color: transparent;
@@ -496,19 +604,7 @@ body {
   display: none;
 }
 
-.mode-player #speedSlider {
-  position: absolute;
-  top: -38px;
-  width: 100%;
-  left: 0;
-  padding: 10px;
-}
-.mode-player #speedSlider span.speedSlower {
-  left: 10px;
-}
-.mode-player #speedSlider span.speedFaster {
-  right: 10px;
-}
+
 @media screen and (orientation: landscape) {
   .mode-player #taskContent {
     flex-direction: row;
@@ -520,22 +616,6 @@ body {
   }
   .mode-player #gridContainer {
     flex: 0 0 50%;
-  }
-  .mode-player #speedSlider {
-    position: relative;
-    display: inline-block;
-    top: auto;
-    width: auto;
-    left: auto;
-    vertical-align: bottom;
-    padding: 0 10px 5px;
-  }
-  .mode-player #speedSlider span {
-    font-size: 12px;
-  }
-  .mode-player #playerControls {
-    display: inline-block;
-    vertical-align: bottom;
   }
   .mode-player #blocklyLibContent {
     width: 50%;
@@ -580,8 +660,7 @@ body {
 /*****************
   MODE INSTRUCTIONS
 *****************/
-.mode-instructions #blocklyLibContent,
-.mode-instructions .speedControls {
+.mode-instructions #blocklyLibContent {
   display: none;
 }
 .mode-instructions #taskContent {
@@ -603,8 +682,5 @@ body {
   MODE EDITOR
 *****************/
 .mode-editor #introGrid {
-  display: none;
-}
-.mode-editor .speedControls {
   display: none;
 }

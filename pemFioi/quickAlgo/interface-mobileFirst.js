@@ -244,22 +244,25 @@ var quickAlgoInterface = {
 
         var speedControls =
             '<div class="speedControls">' +
-                '<div id="speedSlider">' +
-                    '<span class="speedSlower">' + this.strings.speedSliderSlower + '</span>' +
-                    '<input type="range" min="0" max="' +
-                        (this.stepDelayMax - this.stepDelayMin) +
-                        '" value="0" class="slider" id="speedCursor">' +
-                    '<span class="speedFaster">' + this.strings.speedSliderFaster + '</span>' +
-                '</div>' +
                 '<div id="playerControls">' +
                     '<div class="icon backToFirst"><span class="fas fa-fast-backward"></span></div>' +
                     '<div class="icon playPause play"><span class="fas fa-play-circle"></span></div>' +
                     '<div class="icon nextStep"><span class="fas fa-step-forward"></span></div>' +
                     '<div class="icon goToEnd"><span class="fas fa-fast-forward"></span></div>' +
+                    '<div class="icon displaySpeedSlider"><span class="fas fa-tachometer-alt"></span></div>' +
+                '</div>' +
+                '<div id="speedSlider">' +
+                    '<span class="icon hideSpeedSlider"><span class="fas fa-tachometer-alt"></span></span>' +
+                    '<span class="icon speedSlower"><span class="fas fa-walking"></span></span>' +
+                    '<input type="range" min="0" max="' +
+                        (this.stepDelayMax - this.stepDelayMin) +
+                        '" value="0" class="slider" id="speedCursor"/>' +
+                    '<span class="icon speedFaster"><span class="fas fa-running"></span></span>' +
                 '</div>' +
             '</div>';
         $('#task').find('.speedControls').remove();
-        $('#taskToolbar').prepend(speedControls);
+        // place speed controls depending on layout
+        $('#mode-player').append(speedControls);
 
         $('#speedCursor').on('input change', function(e) {
             self.refreshStepDelay();
@@ -308,6 +311,14 @@ var quickAlgoInterface = {
             task.displayedSubTask.play();
             self.setPlayPause(false);
         });
+
+        $('#playerControls .displaySpeedSlider').click(function() {
+            $('#mode-player').addClass('displaySpeedSlider');
+        });
+
+        $('#speedSlider .hideSpeedSlider').click(function() {
+           $('#mode-player').removeClass('displaySpeedSlider');
+        });
     },
 
     setPlayPause: function(isPlaying) {
@@ -329,7 +340,10 @@ var quickAlgoInterface = {
         var testTabs = '<div class="tabs">';
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
             if(this.nbTestCases > 1) {
-                testTabs += '  <div id="testTab'+iTest+'" class="testTab" onclick="task.displayedSubTask.changeTestTo('+iTest+')"><span class="testTitle"></span></div>';
+                testTabs += '' +
+                    '<div id="testTab'+iTest+'" class="testTab" onclick="task.displayedSubTask.changeTestTo('+iTest+')">' +
+                        '<span class="testTitle"></span>' +
+                    '</div>';
             }
         }
         testTabs += "</div>";
@@ -384,11 +398,18 @@ var quickAlgoInterface = {
         $("#task").append('' +
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
-                    '<div id="mode-player" class="icon"><span class="fas fa-play"></span></div>' +
-                    '<div id="mode-instructions" class="icon"><span class="fas fa-file-alt"></span></div>' +
-                    '<div id="mode-editor" class="icon"><span class="fas fa-pencil-alt"></span></div>' +
-                '</div>'
-                + displayHelpBtn +
+                    '<div id="mode-instructions" class="mode">' +
+                        '<span><span class="far fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
+                    '</div>' +
+                    '<div id="mode-editor" class="mode">' +
+                        '<span><span class="fas fa-pencil-alt"></span>' +
+                        '<span class="label ToTranslate">Éditeur</span></span>' +
+                        displayHelpBtn +
+                    '</div>' +
+                    '<div id="mode-player" class="mode">' +
+                        '<span class="far fa-play-circle"></span>' +
+                    '</div>' +
+                '</div>' +
             '</div>');
 
         $('#modeSelector div').click(function() {
@@ -401,14 +422,15 @@ var quickAlgoInterface = {
         $('#modeSelector').children('div').removeClass('active');
         $('#modeSelector #' + mode).addClass('active');
         $('#task').removeClass(this.curMode).addClass(mode);
-        if(mode == 'mode-instructions') {
+        $('#mode-player').removeClass('displaySpeedSlider'); // there should be a better way to achieve this
+        /*if(mode == 'mode-instructions') {
             $('#taskIntro .short').hide();
             $('#taskIntro .long').show();
         }
         if(mode == 'mode-player') {
             $('#taskIntro .short').show();
             $('#taskIntro .long').hide();
-        }
+        }*/
         this.curMode = mode;
         this.onResize();
     },
