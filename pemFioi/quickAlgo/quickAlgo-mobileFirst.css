@@ -95,7 +95,8 @@ body {
 #editorMenu .editorActions div:first-child {
   border-top: none;
 }
-#editorMenu .editorActions div span.fas {
+#editorMenu .editorActions div span.fas,
+#editorMenu .editorActions div span.far {
   font-size: 48px;
 }
 #editorMenu #saveUrl {
@@ -112,6 +113,7 @@ body {
   -moz-opacity: 0;
   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
+
 /*****************
   LAYOUT
 *****************/
