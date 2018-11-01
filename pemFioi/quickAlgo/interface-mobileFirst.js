@@ -361,13 +361,22 @@ var quickAlgoInterface = {
         for(var iTest=0; iTest<testScores.length; iTest++) {
             if(!testScores[iTest]) { continue; }
             if(testScores[iTest].evaluating) {
-                var icon = '<span class="testResultIcon fas fa-spinner fa-spin" title="'+this.strings.evaluatingAnswer+'"></span>';
+                var icon = '<span class="testResultIcon testEvaluating fas fa-spinner fa-spin" title="'+this.strings.evaluatingAnswer+'"></span>';
             } else if(testScores[iTest].successRate >= 1) {
-                var icon = '<span class="testResultIcon" style="color: #00FF00;" title="'+this.strings.correctAnswer+'">✔</span>';
+                var icon = '\
+                    <span class="testResultIcon testSuccess" title="'+this.strings.correctAnswer+'">\
+                        <span class="fas fa-check"></span>\
+                    </span>';
             } else if(testScores[iTest].successRate > 0) {
-                var icon = '<span class="testResultIcon" style="color: orange" title="'+this.strings.partialAnswer+'">✖</span>';
+                var icon = '\
+                    <span class="testResultIcon testPartial" title="'+this.strings.partialAnswer+'">\
+                        <span class="fas fa-times"></span>\
+                    </span>';
             } else {
-                var icon = '<span class="testResultIcon" style="color: red" title="'+this.strings.wrongAnswer+'">✖</span>';
+                var icon = '\
+                    <span class="testResultIcon testFailure" title="'+this.strings.wrongAnswer+'">\
+                        <span class="fas fa-times"></span>\
+                    </span>';
             }
             $('#testTab'+iTest+' .testTitle').html(icon+' Test '+(iTest+1));
         }
