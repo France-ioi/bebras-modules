@@ -473,9 +473,9 @@ var quickAlgoInterface = {
 $(document).ready(function() {
 
     $('head').append('<link rel="stylesheet"\
-    href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"\
-    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"\
-    crossorigin="anonymous">');
+        href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"\
+        integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"\
+        crossorigin="anonymous">');
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
     $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
