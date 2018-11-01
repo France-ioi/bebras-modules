@@ -180,8 +180,19 @@ body {
     background-color: purple;
 }
 .testResultIcon {
-    display: inline-block;
-    min-width: 16px;
+  display: inline-block;
+  width: 21px;
+  height: 21px;
+  line-height: 21px;
+}
+.testResultIcon.testSuccess span {
+  background: #b8e986;
+  border-radius: 100%;
+  color: #fff;
+}
+.testResultIcon.testPartial,
+.testResultIcon.testFailure {
+  color: #ff001f;
 }
 
 #gridButtonsAfter #testSelector {
@@ -189,22 +200,26 @@ body {
 }
 #testSelector .tabs {
   display: flex;
-  background-color: #4a90e2;
   min-height: 24px;
   line-height: 24px;
+  background-color: #f1f2f7;
+  text-align: center;
 }
 #testSelector .tabs .testTab {
   flex: 1 0 auto;
   cursor: pointer;
-  color: #fff;
   padding: 2px;
+  text-transform: uppercase;
 }
-#testSelector .tabs .testTab.currentTest {
-  /* TODO :: find something more obvious */
-  border-bottom: 2px solid black;
+#testSelector .testTab.currentTest {
+  box-shadow: 0 1px 0 0px #ccc;
+  color: #4a90e2;
+  border-radius: 0 0 10px 10px;
+  background-color: #fff;
 }
 #testSelector .tabs .testTab:not(.currentTest) {
-  background-color: rgba(0,0,0,0.2);
+  box-shadow: 0 1px 0 0px #ccc inset;
+  color: #ababac;
 }
 
 /*****************
