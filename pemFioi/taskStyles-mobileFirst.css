@@ -31,6 +31,7 @@ img {
   flex: 1 1 0;
   display: flex;
   align-items: center;
+  margin-right: 10px;
 }
 #tabsMenu a {
   display: flex;
