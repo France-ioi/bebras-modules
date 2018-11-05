@@ -437,7 +437,6 @@ function PythonInterpreter(context, msgCallback) {
     // Show a popup displaying the value of a block in step-by-step mode
     if(origValue === undefined
         || (origValue && origValue.constructor === Sk.builtin.func)
-        || value === undefined
         || !this._editorMarker
         || !context.display
         || !this.stepMode) {
