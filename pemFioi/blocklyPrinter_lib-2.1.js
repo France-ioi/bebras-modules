@@ -219,7 +219,7 @@ var getContext = function(display, infos) {
                }
                value[i] = valueToStr(value[i]);
             }
-            return '[' + value + ']';
+            return '[' + value.join(', ') + ']';
          }
          return value;
       }

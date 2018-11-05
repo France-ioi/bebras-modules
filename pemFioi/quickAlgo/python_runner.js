@@ -435,7 +435,8 @@ function PythonInterpreter(context, msgCallback) {
 
   this.reportValue = function (origValue, varName) {
     // Show a popup displaying the value of a block in step-by-step mode
-    if(origValue.constructor === Sk.builtin.func
+    if(origValue === undefined
+        || (origValue && origValue.constructor === Sk.builtin.func)
         || value === undefined
         || !this._editorMarker
         || !context.display
