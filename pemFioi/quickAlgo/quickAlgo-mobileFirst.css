@@ -656,46 +656,19 @@ h2.sectionTitle .icon {
 .mode-player #taskIntro {
   display: none;
 }
+.mode-player #introGrid {
+  flex: 1 0 40%;
+  display: flex;
+}
+.mode-player #gridContainer{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.mode-player #blocklyLibContent {
+  flex: 1 1 60%;
+}
 
-
-@media screen and (orientation: landscape) {
-  .mode-player #taskContent {
-    flex-direction: row;
-  }
-  .mode-player #introGrid {
-    flex: 0 0 50%;
-    display: flex;
-    flex-direction: column;
-  }
-  .mode-player #gridContainer {
-    flex: 0 0 50%;
-  }
-  .mode-player #blocklyLibContent {
-    width: 50%;
-  }
-}
-@media screen and (min-width: 600px) and (orientation: portrait) {
-  .mode-player #introGrid {
-    display: flex;
-    justify-content: stretch;
-    flex: 1 1 0;
-  }
-  .mode-player #taskIntro {
-    display: block;
-    flex: 1 1 50%;
-  }
-  .mode-player #languageInterface,
-  .mode-player #injectionDiv,
-  .blocklySvg,
-  .blocklyWorkspace {
-    height: 100% !important;
-  }
-}
-@media screen and (min-width: 800px) and (orientation: landscape) {
-  .mode-player #taskIntro {
-    display: block;
-  }
-}
 
 /* hide blockly toolbox for low res */
 @media screen and (max-width: 800px) and (orientation: landscape) {
@@ -721,9 +694,17 @@ h2.sectionTitle .icon {
 .mode-instructions #introGrid {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 .mode-instructions #taskIntro {
   order: 2;
+  flex: 1 1 60%;
+}
+.mode-instructions #gridContainer {
+  flex: 1 1 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 @media screen and (orientation: landscape) { /* horizontal screen layout */
   .mode-instructions #introGrid {
@@ -736,4 +717,7 @@ h2.sectionTitle .icon {
 *****************/
 .mode-editor #introGrid {
   display: none;
+}
+#gridContainer {
+  background-color: #fff;
 }
