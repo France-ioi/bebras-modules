@@ -105,6 +105,7 @@ var initBlocklySubTask = function(subTask, language) {
          defaultCode: subTask.defaultCode
       };
 
+      // TODO :: find a way to load the blocklyHelper a bit later for the mobile interface
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 
       if(this.display) {
@@ -112,13 +113,6 @@ var initBlocklySubTask = function(subTask, language) {
       }
 
       subTask.changeTest(0);
-
-      // TODO :: find a way to not have to do that?
-      if(subTask.blocklyHelper.reload) {
-         setTimeout(function() {
-            subTask.blocklyHelper.reload();
-            }, 100);
-      }
    };
 
    subTask.updateScale = function() {
