@@ -568,7 +568,15 @@ h2.sectionTitle .icon {
 #taskToolbar {
   flex: 0 0 auto;
   z-index: 1;
-  box-shadow: 0 1px 1px rgba(255,255,255,0.1) inset;
+  position: relative;
+}
+#taskToolbar::after {
+  content: " ";
+  position: absolute;
+  top: 0;
+  width: 100%;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.8) inset;
+  height: 2px;
 }
 #taskToolbar .fas,
 #taskToolbar .far {
@@ -584,6 +592,7 @@ h2.sectionTitle .icon {
   padding: 15px;
   background-color: #4a4a4a;
   color: #fff;
+  position: relative;
 }
 #modeSelector .mode#mode-editor {
   justify-content: space-between;
@@ -594,6 +603,15 @@ h2.sectionTitle .icon {
 #modeSelector .mode.active {
   background: #4a90e2;
   flex: 2 0 auto;
+}
+#modeSelector .mode.active::before {
+  content: " ";
+  position: absolute;
+  top: 0;
+  left: 16px;
+  border: 5px solid transparent;
+  border-top-color: #f1f2f7;
+  z-index: 1;
 }
 #modeSelector .mode:not(.active) + .mode:not(.active) {
   border-left: 1px solid rgba(255, 255, 255, 0.1);
