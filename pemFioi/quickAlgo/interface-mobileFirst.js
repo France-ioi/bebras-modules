@@ -142,6 +142,7 @@ var quickAlgoInterface = {
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
+        this.addTaskintroTitle();
     },
 
     createEditorMenu: function() {
@@ -442,6 +443,12 @@ var quickAlgoInterface = {
         }*/
         this.curMode = mode;
         this.onResize();
+    },
+
+    addTaskintroTitle: function() {
+        if($('#taskIntro .sectionTitle').length) { return; }
+        // add title to taskIntro ; may vary depending on screen size.
+        $('#taskIntro').prepend("<h2 class='sectionTitle'><span class='fas fa-book icon'></span>Énoncé</h2>");
     },
 
     unloadLevel: function() {
