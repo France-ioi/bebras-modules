@@ -60,11 +60,10 @@ var quickAlgoInterface = {
         this.context = context;
         this.strings = window.languageStrings;
 
-        var gridHtml = "<center>";
+        var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
         gridHtml += "<div id='grid'></div>";
         gridHtml += "<div id='gridButtonsAfter'></div>";
-        gridHtml += "</center>";
         $("#gridContainer").html(gridHtml)
 
         $("#blocklyLibContent").html(
