@@ -98,7 +98,7 @@ img {
   }
   #tabsMenu .li.prev a::before,
   #tabsMenu .li.next a::before {
-    font-family: 'FontAwesome';
+    font-family: FontAwesome;
     font-size: 32px;
   }
   #tabsMenu .li.prev a::before {

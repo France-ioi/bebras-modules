@@ -97,7 +97,7 @@ body {
 }
 #editorMenu .editorActions div span.fas,
 #editorMenu .editorActions div span.far {
-  font-size: 48px;
+  font-size: 32px;
 }
 #editorMenu #saveUrl {
   display: none;
@@ -418,7 +418,7 @@ h2.sectionTitle .icon {
 /* Editor Bar */
 #editorBar {
   height: 30px;
-  background-color: #ccc;
+  background-color: #fff;
 }
 #capacity {
   display: inline;
