@@ -685,7 +685,7 @@ h2.sectionTitle .icon {
   display: none;
 }
 .mode-player #introGrid {
-  flex: 1 0 40%;
+  flex: 1 1;
   display: flex;
 }
 .mode-player #gridContainer{
@@ -694,7 +694,7 @@ h2.sectionTitle .icon {
   justify-content: space-between;
 }
 .mode-player #blocklyLibContent {
-  flex: 1 1 60%;
+  flex: 2 1;
 }
 
 

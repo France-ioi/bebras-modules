@@ -463,7 +463,9 @@ var quickAlgoInterface = {
         var blocklyArea = document.getElementById('blocklyContainer');
         var blocklyDiv = document.getElementById('blocklyDiv');
         var toolbarDiv = document.getElementById('taskToolbar');
-        blocklyDiv.style.height = (toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top) + 'px';
+        var heightBeforeToolbar = toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top;
+        var heightBeforeWindow = window.innerHeight - blocklyArea.getBoundingClientRect().top - 60
+        blocklyDiv.style.height = Math.min(heightBeforeToolbar, heightBeforeWindow) + 'px';
         Blockly.svgResize(window.blocklyWorkspace);
     },
 
