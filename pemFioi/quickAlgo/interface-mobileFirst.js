@@ -455,7 +455,7 @@ var quickAlgoInterface = {
         this.resetTestScores();
         if(this.curMode == 'mode-editor') {
            // Don't stay in editor mode as it can cause task display issues
-           this.selectMode('mode-player');
+           this.selectMode('mode-instructions');
         }
     },
 
@@ -496,7 +496,7 @@ $(document).ready(function() {
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
     $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
 
-    quickAlgoInterface.selectMode('mode-player');
+    quickAlgoInterface.selectMode('mode-instructions');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
     quickAlgoInterface.onResize();
