@@ -469,7 +469,24 @@ var quickAlgoInterface = {
         Blockly.svgResize(window.blocklyWorkspace);
     },
 
+    displayError: function(message) {
+        $('#errorMessage').remove();
+        if(!message) return;
+        var html =
+            '<div id="errorMessage">' +
+                '<button type="button" class="btn close" onclick="closeModal(`errorMessage`)">'+
+                    '<span class="fas fa-times"></span>'+
+                '</button>' +
+                '<div class="messageWrapper">' +
+                    '<span class="icon fas fa-bell"></span>' +
+                    '<p class="message">' + message + '</p>' +
+                '</div>' +
+            '</div>';
+        $("#taskToolbar").append($(html));
+        $("#errorMessage").show();
+    }
 
+    /*
     displayError: function(message) {
         $('#errorModal').remove();
         if(!message) return;
@@ -483,6 +500,7 @@ var quickAlgoInterface = {
         $(document.body).append($(html));
         $("#errorModal").show();
     }
+    */
 };
 
 

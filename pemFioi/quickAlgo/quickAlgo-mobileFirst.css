@@ -644,6 +644,53 @@ h2.sectionTitle .icon {
   display: none;
 }
 
+/************************
+  DISPLAY ERROR MESSAGES
+*************************/
+#errorMessage {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #f5a623;
+  color: #fff;
+  font-weight: bold;
+  z-index: 1;
+  border-radius: 5px 5px 0 0;
+  box-shadow: 0px 0px 0 2px #fff;
+}
+#errorMessage .messageWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+#errorMessage .messageWrapper .icon {
+  width: 28px;
+  margin: 0 10px;
+  line-height: 28px;
+  text-align: center;
+  color: #fff;
+  background-color: rgba(0,0,0,0.20);
+  border-radius: 50%;
+}
+#errorMessage .messageWrapper .message {
+  flex: 1 1 auto;
+  margin: 0;
+}
+#errorMessage .btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  color: rgba(0,0,0,0.20);
+}
+#errorMessage .btn span {
+  font-size: 16px;
+}
 .modalWrapper {
   display: none;
   z-index: 1000;
