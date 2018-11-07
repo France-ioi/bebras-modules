@@ -89,10 +89,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.nbTestCases = nbTestCases;
          this.options = options;
 
+         this.addExtraBlocks();
+         this.createSimpleGeneratorsAndBlocks();
+
          if (display) {
             this.loadHtml(nbTestCases);
-            this.addExtraBlocks();
-            this.createSimpleGeneratorsAndBlocks();
             var xml = this.getToolboxXml();
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
@@ -192,6 +193,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.load(this.locale, true, this.nbTestCases, this.options);
          this.programs = programs;
          this.loadPrograms();
+         if(window.quickAlgoInterface) {
+            quickAlgoInterface.onResize();
+         }
          this.reloading = false;
       },
 

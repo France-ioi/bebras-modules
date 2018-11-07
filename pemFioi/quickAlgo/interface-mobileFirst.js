@@ -462,11 +462,10 @@ var quickAlgoInterface = {
     onResize: function(e) {
         var blocklyArea = document.getElementById('blocklyContainer');
         var blocklyDiv = document.getElementById('blocklyDiv');
-        blocklyDiv.style.width = blocklyArea.offsetWidth + 'px';
-        blocklyDiv.style.height = blocklyArea.offsetHeight + 'px';
+        var toolbarDiv = document.getElementById('taskToolbar');
+        blocklyDiv.style.height = (toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top) + 'px';
         Blockly.svgResize(window.blocklyWorkspace);
     },
-
 
 
     displayError: function(message) {

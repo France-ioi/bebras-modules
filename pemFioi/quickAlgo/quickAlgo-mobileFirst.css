@@ -616,6 +616,7 @@ h2.sectionTitle .icon {
   flex: 0 1 51px;
   display: flex;
   align-items: center;
+  min-height: 58px;
   padding: 15px;
   background-color: #4a4a4a;
   color: #fff;
