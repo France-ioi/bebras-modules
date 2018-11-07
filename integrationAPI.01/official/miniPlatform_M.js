@@ -39,6 +39,28 @@
          'canReadSolution': "You can now read the solution at the bottom of this page.",
          'gradeAnswer': 'Test grader'
       },
+      fi: {
+         'task': 'Task',
+         'submission': 'Submission',
+         'solution': 'Solution',
+         'editor': 'Edit',
+         'hints': 'Hints',
+         'showSolution': 'Show solution',
+         'yourScore': "Your score:",
+         'canReadSolution': "You can now read the solution at the bottom of this page.",
+         'gradeAnswer': 'Test grader'
+      },
+      sv: {
+         'task': 'Task',
+         'submission': 'Submission',
+         'solution': 'Solution',
+         'editor': 'Edit',
+         'hints': 'Hints',
+         'showSolution': 'Show solution',
+         'yourScore': "Your score:",
+         'canReadSolution': "You can now read the solution at the bottom of this page.",
+         'gradeAnswer': 'Test grader'
+      },
       de: {
          'task': 'Aufgabe',
          'submission': 'Abgabe',
