@@ -114,6 +114,9 @@ var quickAlgoInterface = {
       this.context.setScale(scaled ? 2 : 1);
    },
 
+   onResize: function() {
+   },
+
    blinkRemaining: function(times, red) {
       var capacity = $('#capacity');
       if(times % 2 == 0) {
