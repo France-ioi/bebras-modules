@@ -245,21 +245,21 @@ h2.sectionTitle .icon {
   background: transparent;
 }
 #testSelector .testTab.currentTest::before {
-  top: -4px;
+  top: -3px;
   border-radius: 0 70%;
   box-shadow: 0px 1px 0 #ccc inset;
   left: -10px;
   z-index: 1;
-  border-top: 4px solid #fff;
+  border-top: 3px solid #fff;
   border-right: 6px solid #fff;
 }
 #testSelector .testTab.currentTest::after {
-  top: -4px;
+  top: -3px;
   border-radius: 70% 0;
   box-shadow: 0px 1px 0 #ccc inset;
   right: -10px;
   z-index: 1;
-  border-top: 4px solid #fff;
+  border-top: 3px solid #fff;
   border-left: 6px solid #fff;
 }
 #testSelector .tabs .testTab:not(.currentTest) {
