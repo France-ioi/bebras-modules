@@ -12,7 +12,9 @@ img {
   max-width: 100%;
   height: auto;
 }
-
+#miniPlatformHeader {
+  background-color: transparent !important;
+}
 #choose-view {
   margin-top: 0 !important;
 }
