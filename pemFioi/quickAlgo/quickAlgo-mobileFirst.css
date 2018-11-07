@@ -166,10 +166,10 @@ h2.sectionTitle .icon {
 /*****************
   TASK GRID & TESTS
 *****************/
-
 #grid {
   overflow: auto;
   max-width: 100vw;
+  padding: 2em 0px;
 }
 #testSelector {
     padding-left: 10px;
@@ -406,13 +406,13 @@ h2.sectionTitle .icon {
 #blocklyContainer,
 .injectionDiv,
 .blocklySvg {
-  height: 100%;
 }
 #blocklyContainer {
   position: relative;
 }
 #blocklyLibContent {
-  flex-grow: 1;
+  flex-grow: 0;
+  width: 100%;
 }
 
 /* Editor Bar */
@@ -499,10 +499,7 @@ h2.sectionTitle .icon {
   cursor: pointer;
 }
 
-#blocklyDiv {
-    width: 100%;
-    height: 100%;
-}
+
 
 .blocklyFlyoutBackground {
     fill-opacity: 1 !important;
@@ -681,20 +678,21 @@ h2.sectionTitle .icon {
 .mode-player #taskContent {
   flex-direction: column;
 }
+.mode-player #introGrid {
+  flex: 1 0 auto;
+  display: flex;
+}
 .mode-player #taskIntro {
   display: none;
 }
-.mode-player #introGrid {
-  flex: 1 1;
-  display: flex;
-}
-.mode-player #gridContainer{
+.mode-player #gridContainer {
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 .mode-player #blocklyLibContent {
-  flex: 2 1;
+  flex: 1 1 auto;
 }
 
 
@@ -726,10 +724,10 @@ h2.sectionTitle .icon {
 }
 .mode-instructions #taskIntro {
   order: 2;
-  flex: 1 1 60%;
+  flex: 1 1 auto;
 }
 .mode-instructions #gridContainer {
-  flex: 1 1 40%;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -748,4 +746,8 @@ h2.sectionTitle .icon {
 }
 #gridContainer {
   background-color: #fff;
+}
+#blocklyDiv {
+    width: 100%;
+    height: 100%;
 }
