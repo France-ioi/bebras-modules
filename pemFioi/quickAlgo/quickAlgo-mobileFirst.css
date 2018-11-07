@@ -1,5 +1,12 @@
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-size: 12px;
+  position: relative;
+  overflow-x: hidden;
 }
 body.blockly > *,
 body > * {
@@ -8,11 +15,10 @@ body > * {
 * {
   box-sizing: border-box;
 }
-body {
-  font-size: 12px;
-  position: relative;
-  overflow-x: hidden;
-}
+
+/*****************
+  EDITOR MENU
+*****************/
 #openEditorMenu {
   position: relative;
   background-color: #4a4a4a;
@@ -114,9 +120,9 @@ body {
   filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);
 }
 
-/*****************
-  LAYOUT
-*****************/
+/************************
+  LAYOUT & GENERIC ELEMENTS
+*************************/
 #task {
   display: flex;
   flex-direction: column;
@@ -146,12 +152,6 @@ h2.sectionTitle .icon {
   vertical-align: text-bottom;
   margin-right: 10px;
 }
-/************************
-  DISPLAY HELPER ELEMENTS
-*************************/
-#displayHelperAnswering {
-  display: none;
-}
 
 /*****************
   TASK DESCRIPTION
@@ -161,7 +161,6 @@ h2.sectionTitle .icon {
   overflow: auto;
   color: #9b9b9b;
 }
-
 
 /*****************
   TASK GRID & TESTS
@@ -299,10 +298,10 @@ h2.sectionTitle .icon {
     display: none;
   }
 }
+
 /*****************
   SPEED CONTROLS
 *****************/
-
 #taskToolbar .mode:not(.active) .speedControls {
   display: none;
 }
@@ -365,7 +364,6 @@ h2.sectionTitle .icon {
   background-color: #4a90e2;
   cursor: ew-resize;
 }
-
 /* Edge / IE10+ */
 #speedCursor::-ms-track {
   width: 100px;
@@ -404,11 +402,6 @@ h2.sectionTitle .icon {
 /*****************
   CODE EDITOR
 *****************/
-#languageInterface,
-#blocklyContainer,
-.injectionDiv,
-.blocklySvg {
-}
 #blocklyContainer {
   position: relative;
 }
@@ -432,7 +425,6 @@ h2.sectionTitle .icon {
   color: black;
 }
 
-
 #fullscreenButton {
   float: right;
 }
@@ -453,55 +445,6 @@ h2.sectionTitle .icon {
 .blocklyToolboxDiv {
     background-color: #ddd !important;
 }
-
-#conceptViewer .exit {
-  cursor: pointer;
-}
-
-/* Modal popup */
-.modalWrapper {
-  display: none;
-  z-index: 1000;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: #777;
-  background-color: rgba(0,0,0,0.7);
-  transition: all 250ms;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modalWrapper .modal {
-  width: 800px;
-  margin: 0 auto;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 20px;
-  position: relative;
-}
-.modalWrapper .modalError {
-  background: #fdd;
-  border: 1px solid #caa;
-  color: #600;
-}
-.modalWrapper .modal>.btn.close {
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 1em;
-  color: #a7a6a6;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-
 
 .blocklyFlyoutBackground {
     fill-opacity: 1 !important;
@@ -672,7 +615,54 @@ h2.sectionTitle .icon {
   color: #fff;
 }
 
+/************************
+  DISPLAY HELPER ELEMENTS
+*************************/
+#displayHelperAnswering {
+  display: none;
+}
 
+.modalWrapper {
+  display: none;
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #777;
+  background-color: rgba(0,0,0,0.7);
+  transition: all 250ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modalWrapper .modal {
+  width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 20px;
+  position: relative;
+}
+.modalWrapper .modalError {
+  background: #fdd;
+  border: 1px solid #caa;
+  color: #600;
+}
+.modalWrapper .modal>.btn.close {
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1em;
+  color: #a7a6a6;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
 /*****************
   MODE PLAYER
 *****************/
@@ -751,4 +741,10 @@ h2.sectionTitle .icon {
 #blocklyDiv {
     width: 100%;
     height: 100%;
+}
+/************************
+  MODAL POPUPS
+*************************/
+#conceptViewer .exit {
+  cursor: pointer;
 }
