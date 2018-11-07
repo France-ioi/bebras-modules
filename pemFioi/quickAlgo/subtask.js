@@ -105,11 +105,11 @@ var initBlocklySubTask = function(subTask, language) {
          defaultCode: subTask.defaultCode
       };
 
-      // TODO :: find a way to load the blocklyHelper a bit later for the mobile interface
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 
       if(this.display) {
          window.quickAlgoInterface.initTestSelector(this.nbTestCases);
+         window.quickAlgoInterface.onResize();
       }
 
       subTask.changeTest(0);
