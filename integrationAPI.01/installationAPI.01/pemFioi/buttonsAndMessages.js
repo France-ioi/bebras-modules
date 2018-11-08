@@ -290,7 +290,7 @@ window.displayHelper = {
          youDidBetterBefore: "Sait aiemmin enemmän pisteitä.",
          scoreStays2: "Pistemääräsi säilyy samana.",
          reloadBestAnswer: "Palauta paras aiempi vastauksesi.",
-         validate: "Laske",
+         validate: "Tarkista vastaus",
          restart: "Aloita alusta",
          harderLevelSolved: "Varoitus: olet jo ratkaissut vaikeamman version tästä tehtävästä. Tämän helpomman version ratkaiseminen ei voi korottaa pistemäärääsi.",
          showLevelAnyway: "Siirry joka tapauksessa.",
