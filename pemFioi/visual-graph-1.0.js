@@ -502,11 +502,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2));
    };
-   
+
    function distanceSquared(x1, y1, x2, y2) {
       return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
    }
-   
+
    function distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2) {
       // Use algorithm for distance between point and segment.
       // See: https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment/1501725#1501725

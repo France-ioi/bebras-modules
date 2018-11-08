@@ -62,14 +62,14 @@ Beav.Array.make = function(nb, initValue) {
    var t = [];
    for (var i = 0; i < nb; i++)
       t[i] = initValue;
-   return t;                  
+   return t;
 };
 
 Beav.Array.init = function(nb, initFct) {
    var t = [];
    for (var i = 0; i < nb; i++)
       t.push(initFct(i));
-   return t;                  
+   return t;
 };
 
 Beav.Array.indexOf = function(t, v, eq) {
@@ -117,7 +117,7 @@ Beav.Array.stableSort = function(t, compFct) {
    };
    var msort = function msort(i, j) {
       var size = j - i;
-      if (size < 2) 
+      if (size < 2)
          return;
       var k = i + Math.floor(size/2);
       msort(i, k);
@@ -155,7 +155,7 @@ Beav.Matrix.init = function(nbRows, nbCols, initFct) {
       }
       m.push(t);
    }
-   return m;                  
+   return m;
 };
 
 Beav.Matrix.map = function(m, mapFct) {
@@ -166,7 +166,7 @@ Beav.Matrix.map = function(m, mapFct) {
          r[x][y] = mapFct(m[x][y], x, y, m);
       }
    }
-   return r;                  
+   return r;
 };
 
 Beav.Matrix.copy = function(m) {
@@ -210,13 +210,13 @@ Beav.Matrix3D.init = function(nbX, nbY, nbZ, initFct) {
       for (var y = 0; y < nbY; y++) {
          var r = [];
          for (var z = 0; z < nbZ; z++) {
-            r.push(initFct(x, y, z));   
+            r.push(initFct(x, y, z));
          }
          t.push(r);
       }
       m.push(t);
    }
-   return m;                  
+   return m;
 };
 
 Beav.Matrix3D.map = function(m, mapFct) {
@@ -230,7 +230,7 @@ Beav.Matrix3D.map = function(m, mapFct) {
          }
       }
    }
-   return r;                  
+   return r;
 };
 
 Beav.Matrix3D.copy = function(m) {
@@ -270,12 +270,12 @@ Beav.Matrix3D.filterCount = function(m, selectFct) {
 /**********************************************************************************/
 /* Exception */
 
-/* Mechanism for having user exceptions that cannot be confused 
-   with JavaScript builtin exceptions. 
+/* Mechanism for having user exceptions that cannot be confused
+   with JavaScript builtin exceptions.
 
    To throw the exception myExn, do:
 
-      Beav.Exception.throw(myExn);         
+      Beav.Exception.throw(myExn);
 
    To catch only user exceptions, do:
 
@@ -311,6 +311,16 @@ Beav.Exception.extract = function(exn) {
 */
 
 /**********************************************************************************/
+/* Navigator */
+
+Beav.Navigator = new Object();
+
+Beav.Navigator.isIE8 = function() {
+  return Beav.Array.indexOf(navigator.appVersion, "MSIE 8.") != -1;
+}
+
+
+/**********************************************************************************/
 /* Dom */
 
 Beav.Dom = new Object();
@@ -331,7 +341,7 @@ Beav.Html = new Object();
 // Escape the html characters in a string
 Beav.Html.escape = function(stringToEncode) {
    var entityMap = {
-      "&": "&amp;", 
+      "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
       '"': '&quot;',
@@ -339,7 +349,7 @@ Beav.Html.escape = function(stringToEncode) {
       "/": '&#x2F;' };
    return String(stringToEncode).replace(/[&<>"'\/]/g, function (s) {
       return entityMap[s];
-   }); 
+   });
 };
 
 
