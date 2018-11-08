@@ -1110,7 +1110,7 @@ window.displayHelper = {
             };
             self.submittedAnswer = strAnswer;
             if (self.showScore) {
-               self.updateScore(strAnswer, false, refresh);
+               self.updateScore(strAnswer, false, refresh, (mode == "silent"));
             } else {
                self.savedAnswer = strAnswer;
                refresh();
@@ -1119,7 +1119,7 @@ window.displayHelper = {
       }
    },
 
-   updateScore: function(strAnswer, allLevels, callback) {
+   updateScore: function(strAnswer, allLevels, callback, silentMode) {
       var self = this;
       function refresh() {
          self.refreshMessages = true;
@@ -1135,16 +1135,18 @@ window.displayHelper = {
          });
       } else {
          this.updateScoreOneLevel(strAnswer, this.taskLevel, function() {
-            if (self.hasLevels) {
-               self.showValidatePopup(self.taskLevel);
-            } else {
-               self.showValidatePopup();
+            if (!silentMode) {
+               if (self.hasLevels) {
+                  self.showValidatePopup(self.taskLevel);
+               } else {
+                  self.showValidatePopup();
+               }
+               callback();
             }
-            callback();
-         });
+         }, silentMode);
       }
    },
-   updateScoreOneLevel: function(strAnswer, gradedLevel, callback) {
+   updateScoreOneLevel: function(strAnswer, gradedLevel, callback, silentMode) {
       var self = this;
       this.graderMessage = this.strings.gradingInProgress;
       task.getLevelGrade(strAnswer, null, function(score, message) {
@@ -1171,6 +1173,9 @@ window.displayHelper = {
                self.savedAnswer = strAnswer;
                self.graderScore = score;
             }
+         }
+         if (silentMode) {
+            message = "";
          }
          if (message !== undefined) {
             self.graderMessage = message;
@@ -1371,7 +1376,11 @@ window.displayHelper = {
       }
       if (!answerExists) {
          if (this.levelsScores[this.taskLevel] > 0) {
-            showRetrieveAnswer = true;
+            if (this.hideScoreDetails) {
+               message = this.strings.scoreObtained + ' <span id="answerScore">' + this.levelsScores[this.taskLevel] + " " + strPoint + " " + this.strings.outOf + " " + maxScoreLevel + ".</span><br/>";;
+            } else {
+               showRetrieveAnswer = true;
+            }
          } else {
             message += this.strings.noPointsForLevel;
          }
@@ -1381,7 +1390,8 @@ window.displayHelper = {
             strPoint = this.strings.points;
          }
          message = this.strings.scoreObtained + ' <span id="answerScore">' + this.submittedScore + " " + strPoint + " " + this.strings.outOf + " " + maxScoreLevel + ".</span><br/>";
-         if (this.hasSolution) {
+         if (this.hideScoreDetails) {
+         } else if (this.hasSolution) {
             message += this.strings.contestOverAnswerNotSaved;
             if (this.prevSavedScore !== undefined) {
                showRetrieveAnswer = true;
