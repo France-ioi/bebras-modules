@@ -1141,8 +1141,8 @@ window.displayHelper = {
                } else {
                   self.showValidatePopup();
                }
-               callback();
             }
+            callback();
          }, silentMode);
       }
    },
