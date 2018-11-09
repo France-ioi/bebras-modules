@@ -157,6 +157,7 @@ img {
     right: -20px;
   }
 }
+
 #popupMessage {
    display: none;
 }
@@ -173,32 +174,22 @@ img {
    height: 100%;
    width: 100%;
    background-color: gray;
-   background: rgba(0, 0, 0, .6);
+   background: rgba(241, 242, 247, .9);
 }
 #popupMessage.floatingMessage .container {
    min-height: 100px;
-   margin: 2%;
-   border: 2px solid black;
-   background: white;
+   margin: 0 2%;
+   border-radius: 5px;
+   background: #fff;
+   color:#787878;
+   padding: 20px;
+   top: 50%;
+   transform: translate(0,-50%);
 }
-#popupMessage img.beaver {
-   position: absolute;
-   width: 90px;
-   left: 0px;
-}
-#popupMessage img.messageArrow {
-   position: absolute;
-   z-index: 1;
-   left: 100px;
-   top: 16px;
+#popupMessage.floatingMessage .container img {
+  display: none;
 }
 #popupMessage .message {
-   margin-left: 115px;
-   padding: 8px;
-   max-width: 500px;
-   border: 2px solid black;
-   border-radius: 8px;
-   text-align: justify;
 }
 #popupMessage p {
    margin: .5em 0 0;
@@ -212,8 +203,21 @@ img {
 }
 #popupMessage button {
    margin-top: 1em;
-   margin-left: 200px;
-   padding: 5px 18px 5px 18px;
-   margin-bottom: 0.5em;
+   padding: 7px 20px;
+   background-color: #4a90e2;
+   color: #fff;
+   border-radius: 100px;
+   border: none;
+   box-shadow: none;
+   font-weight: bold;
+   text-transform: uppercase;
+   font-size: 12px;
+   margin: 2em auto 0;
+   display: block;
 }
-
+#popupMessage button.buttonYes::before {
+  content: "\f00c";
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  margin-right: 10px;
+}
