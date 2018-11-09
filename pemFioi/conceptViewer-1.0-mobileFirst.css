@@ -48,3 +48,71 @@
 #conceptViewer .viewerContent h2 {
     color: #4a90e2;
 }
+#conceptViewer .showNavigationContent,
+#conceptViewer #showNavigationContent {
+    display: none;
+}
+@media screen and (max-width: 480px) and (orientation: portrait) {
+    #conceptViewer .navigationLanguage,
+    #conceptViewer .navigationContent {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+
+    #conceptViewer .navigationContent {
+        position: relative;
+    }
+    #conceptViewer .showNavigationContent {
+        display: block;
+        background-color: #4a90e2;
+        color: #fff;
+        line-height: 20px;
+        padding: 5px 20px;
+        border-radius: 50px;
+        position: relative;
+        margin-left: 50px;
+    }
+    #conceptViewer .showNavigationContent::before {
+        content: "\f03a";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        font-size: 20px;
+        margin: 0 15px;
+        color: #4a90e2;
+        position: absolute;
+        left: -55px;
+    }
+    #conceptViewer .showNavigationContent::after {
+        content: "\f107";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 10px;
+    }
+    #conceptViewer .navigationContent ul {
+        position: absolute;
+        width: calc(100% - 4px);
+        list-style-type: none;
+        background-color: #fff;
+        margin: 0;
+        padding: 0;
+        left: 2px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity linear 150ms 25ms;
+    }
+    #conceptViewer #showNavigationContent:checked + ul {
+        visibility: visible;
+        opacity: 1;
+    }
+    #conceptViewer .navigationContent ul li a {
+        line-height: 2em;
+        padding: 0 20px;
+        display: block;
+    }
+    #conceptViewer .navigationContent ul li.selected a {
+        background-color: #4a90e2;
+        color: #fff;
+    }
+}

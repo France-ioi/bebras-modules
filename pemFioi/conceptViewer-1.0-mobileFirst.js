@@ -55,15 +55,18 @@ var conceptViewer = {
 
   loadNavigation: function () {
 
-    var navContent = "<ul>";
+    var navContent = "\
+      <label for='showNavigationContent' class='showNavigationContent'>Sélectionnez une rubrique…</label>\
+      <input type='checkbox' id='showNavigationContent' role='button'>\
+      <ul>";
     var defaultUrl = null;
     for (var i=0; i<this.concepts.length; i++) {
       var curConcept = this.concepts[i];
       if(curConcept.isDefault) {
         defaultUrl = curConcept.url;
       }
-      navContent += '<li>'
-                  + '  <a onclick="conceptViewer.showConcept(\''+curConcept.id+'\');" data-id="'+curConcept.id+'">'
+      navContent += '<li data-id="'+curConcept.id+'">'
+                  + '  <a onclick="conceptViewer.showConcept(\''+curConcept.id+'\');">'
                   + curConcept.name
                   + '  </a></li>';
     }
@@ -138,8 +141,9 @@ var conceptViewer = {
       conceptUrl = urlSplit.join('#');
 
       this.loadUrl(conceptUrl);
-      $('#conceptViewer .navigationContent ul a').removeClass('highlight');
-      $('#conceptViewer .navigationContent ul a[data-id='+conceptId+']').addClass('highlight');
+      $('#conceptViewer .navigationContent ul li').removeClass('selected');
+      $('#conceptViewer .navigationContent ul li[data-id='+conceptId+']').addClass('selected');
+      $('#showNavigationContent').prop('checked', false);
       return true;
     } else {
       return false;
