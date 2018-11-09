@@ -316,7 +316,7 @@ Beav.Exception.extract = function(exn) {
 Beav.Navigator = new Object();
 
 Beav.Navigator.isIE8 = function() {
-  return Beav.Array.indexOf(navigator.appVersion, "MSIE 8.") != -1;
+  return navigator.appVersion.indexOf("MSIE 8.") != -1;
 }
 
 
