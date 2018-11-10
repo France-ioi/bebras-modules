@@ -327,9 +327,9 @@ h1 .stars {
 #displayHelper_cancel {
    display: inline-block;
 }
-#displayHelper_validate > [value="Valider"],
-#displayHelper_cancel > [value="Recommencer"] {
-   margin: 0 10px;
+#displayHelper_validate > input,
+#displayHelper_cancel > input {
+   margin: 0 20px;
    width: 9em;
 }
 #displayHelper_saved {
