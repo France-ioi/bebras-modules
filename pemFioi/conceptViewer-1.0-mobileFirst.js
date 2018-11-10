@@ -17,7 +17,7 @@ var conceptViewer = {
 
     conceptViewer.selectedLanguage = lang;
     var navLanguage = '\
-      <label for="showNavigationLanguage">Sélectionnez un langage…</label>\
+      <label for="showNavigationLanguage" class="showNavigationLanguage">Sélectionnez un langage…</label>\
       <input type="checkbox" id="showNavigationLanguage" role="button">\
       <ul>';
     for(var i=0; i<allLangs.length; i++) {
@@ -59,6 +59,8 @@ var conceptViewer = {
 
     $('#conceptViewer .navigationLanguage ul li').click(function(){
       conceptViewer.selectedLanguage = $(this).data('id');
+      $('#conceptViewer .navigationLanguage ul li').removeClass('selected');
+      $(this).addClass('selected');
       conceptViewer.languageChanged();
     });
   },
