@@ -1087,6 +1087,19 @@ window.displayHelper = {
          });
       }
    },
+   
+   setValidateString: function(str) {
+      this.customValidateString = str;
+      $("#displayHelper_validate > input").val(str);      
+   },
+   
+   callValidate: function() {
+      if (this.customValidate != undefined) {
+         this.customValidate();
+      } else {
+         platform.validate("none", function() {});
+      }
+   },
 
    validate: function(mode) {
       this.stoppedShowingResult = false;
@@ -1446,11 +1459,15 @@ window.displayHelper = {
    },
    // TODO: rename function below to getFullFeedbackValidate, assuming it is not called from outside this file
    getFullFeedbackValidateMessage: function(taskMode, disabledStr) {
+      var strValidate = this.strings.validate;
+      if (this.customValidateString != undefined) {
+         strValidate = this.customValidateString;
+      }
       switch (taskMode) {
          case 'saved_unchanged':
             if (this.graderMessage !== "") {
                if (!this.hideValidateButton && !this.hasSolution) {
-                  return '<input type="button" value="' + this.strings.validate + '" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
                      disabledStr + '/>';
                }
             }
@@ -1462,7 +1479,7 @@ window.displayHelper = {
                   return '<input type="button" value="' + this.strings.gradeThisAnswer + '" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  return '<input type="button" value="' + this.strings.validate + '" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
                      disabledStr + '/>';
                }
             }
@@ -1474,7 +1491,7 @@ window.displayHelper = {
                      disabledStr + '/>';
                } else {
                   // was: “Valider votre nouvelle réponse”
-                  return '<input type="button" value="' + this.strings.validate + '" onclick="platform.validate(\'done\', function(){});" ' +
+                  return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
                      disabledStr + '/>';
                }
             }
