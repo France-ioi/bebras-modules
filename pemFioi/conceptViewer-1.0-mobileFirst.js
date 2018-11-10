@@ -2,6 +2,7 @@ var conceptViewer = {
   concepts: {},
   loaded: false,
   shownConcept: null,
+  selectedLanguage: null,
 
   load: function (lang) {
     // Load the conceptViewer into the DOM
@@ -13,14 +14,21 @@ var conceptViewer = {
       {id: 'scratch', lbl: 'Scratch'},
       {id: 'python', lbl: 'Python'}
       ];
-    var langOptions = '';
+
+    conceptViewer.selectedLanguage = lang;
+    var navLanguage = '\
+      <label for="showNavigationLanguage">Sélectionnez un langage…</label>\
+      <input type="checkbox" id="showNavigationLanguage" role="button">\
+      <ul>';
     for(var i=0; i<allLangs.length; i++) {
-      langOptions += '<option value="' + allLangs[i].id + '"';
+      navLanguage += '<li data-id="'+ allLangs[i].id + '"';
       if((!lang && i == 0) || allLangs[i].id == lang) {
-        langOptions += ' selected';
+        navLanguage +=  ' class="selected"';
       }
-      langOptions += '>' + allLangs[i].lbl + '</option>';
+      navLanguage += '><span>' + allLangs[i].lbl + '</span>';
+      navLanguage += '</li>';
     }
+    navLanguage += '</ul>';
 
     $('body').append(''
       + '<div id="conceptViewer" style="display: none;">'
@@ -31,10 +39,7 @@ var conceptViewer = {
       + '   </div>'
       + '     <div class="navigation">'
       + '      <div class="navigationLanguage">'
-      + '        <label>Sélectionnez un langage…</label>'
-      + '        <select class="languageSelect" onchange="conceptViewer.languageChanged();">'
-      + langOptions
-      + '        </select>'
+      + navLanguage
       + '      </div>'
       + '      <div class="navigationContent"></div>'
       + '    </div>'
@@ -51,6 +56,11 @@ var conceptViewer = {
       }
     });
     this.loaded = true;
+
+    $('#conceptViewer .navigationLanguage ul li').click(function(){
+      conceptViewer.selectedLanguage = $(this).data('id');
+      conceptViewer.languageChanged();
+    });
   },
 
   loadNavigation: function () {
@@ -131,7 +141,7 @@ var conceptViewer = {
       this.shownConcept = conceptId;
       if(show || typeof show == 'undefined') { this.show(false); }
 
-      var language = $('#conceptViewer .languageSelect').val();
+      var language = conceptViewer.selectedLanguage;
       var urlSplit = conceptUrl.split('#');
       if(urlSplit[1]) {
         urlSplit[urlSplit.length-1] = language+'-'+urlSplit[urlSplit.length-1];
@@ -169,6 +179,7 @@ var conceptViewer = {
   },
 
   languageChanged: function () {
+    $('#showNavigationLanguage').prop('checked', false);
     this.loadNavigation();
   }
 }
