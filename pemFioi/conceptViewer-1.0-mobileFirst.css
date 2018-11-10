@@ -34,26 +34,74 @@
 #conceptViewer .navigation {
 }
 
-#conceptViewer .navigation .highlight {
-}
 
-#conceptViewer .viewer {
+#conceptViewer .navigationLanguage {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding: 10px;
 }
-
-#conceptViewer .viewerContent { /* iframe */
-    width: 100%;
-    height: 100%;
-    border: none;
+#conceptViewer .navigationLanguage {
+    position: relative;
 }
-#conceptViewer .viewerContent h2 {
+#conceptViewer .showNavigationLanguage {
+    display: block;
+    background-color: #4a90e2;
+    color: #fff;
+    line-height: 20px;
+    padding: 5px 20px;
+    border-radius: 50px;
+    position: relative;
+    margin-left: 50px;
+}
+#conceptViewer .showNavigationLanguage::before {
+    content: "\f121";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 20px;
+    margin: 0 15px;
     color: #4a90e2;
+    position: absolute;
+    left: -55px;
 }
+#conceptViewer .showNavigationLanguage::after {
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    right: 10px;
+}
+#conceptViewer .navigationLanguage ul {
+    position: absolute;
+    width: calc(100% - 4px);
+    list-style-type: none;
+    background-color: #fff;
+    margin: 0;
+    padding: 0;
+    left: 2px;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity linear 150ms 25ms;
+    z-index: 1;
+}
+#conceptViewer #showNavigationLanguage:checked + ul {
+    visibility: visible;
+    opacity: 1;
+}
+#conceptViewer .navigationLanguage ul li {
+    line-height: 2em;
+    padding: 0 20px;
+    display: block;
+}
+#conceptViewer .navigationLanguage ul li.selected {
+    background-color: #4a90e2;
+    color: #fff;
+}
+#conceptViewer #showNavigationLanguage,
 #conceptViewer .showNavigationContent,
 #conceptViewer #showNavigationContent {
     display: none;
 }
 @media screen and (max-width: 480px) and (orientation: portrait) {
-    #conceptViewer .navigationLanguage,
     #conceptViewer .navigationContent {
         border-bottom: 1px solid rgba(0,0,0,0.1);
         padding: 10px;
@@ -115,4 +163,11 @@
         background-color: #4a90e2;
         color: #fff;
     }
+}
+#conceptViewer .viewer {
+}
+#conceptViewer .viewerContent { /* iframe */
+    width: 100%;
+    height: 100%;
+    border: none;
 }
