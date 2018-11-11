@@ -115,7 +115,7 @@ img {
     display: none;
   }
 }
-@media screen and (min-width: 681px) {
+@media screen and (min-width: 480px) {
   #tabsMenu a {
     padding: 10px 0;
   }
