@@ -37,6 +37,7 @@ var conceptViewer = {
       + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>Aide</h2>'
       + '     <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
       + '   </div>'
+      + '   <div class="panel-body">'
       + '     <div class="navigation">'
       + '      <div class="navigationLanguage">'
       + navLanguage
@@ -46,6 +47,7 @@ var conceptViewer = {
       + '    <div class="viewer">'
       + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
       + '    </div>'
+      + '   </div>'
       + '  </div>'
       + '</div>');
 
@@ -77,10 +79,9 @@ var conceptViewer = {
       if(curConcept.isDefault) {
         defaultUrl = curConcept.url;
       }
-      navContent += '<li data-id="'+curConcept.id+'">'
-                  + '  <a onclick="conceptViewer.showConcept(\''+curConcept.id+'\');">'
+      navContent += '<li data-id="'+curConcept.id+'" onclick="conceptViewer.showConcept(\''+curConcept.id+'\');">'
                   + curConcept.name
-                  + '  </a></li>';
+                  + '  </li>';
     }
     navContent += "</ul>";
     $('#conceptViewer .navigationContent').html(navContent);
