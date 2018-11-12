@@ -50,6 +50,11 @@ body > * {
   cursor: pointer;
   order: 1;
 }
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+  #openEditorMenu {
+    align-self: flex-end;
+  }
+}
 #openEditorMenu::before,
 #openEditorMenu::after {
   content: " ";
@@ -80,6 +85,12 @@ body > * {
   color: #FFF;
   z-index: 99;
 }
+@media screen and (min-width: 768px) {
+  #editorMenu {
+    width: 250px;
+    right: -250px;
+  }
+}
 #editorMenu .editorMenuHeader {
   position: absolute;
   top: 0;
@@ -89,6 +100,11 @@ body > * {
   z-index: 1;
   text-transform: uppercase;
   font-weight: bold;
+}
+@media screen and (min-width: 768px) {
+  #editorMenu .editorMenuHeader {
+    position: static;
+  }
 }
 #editorMenu #closeEditorMenu {
   position: absolute;
@@ -105,6 +121,17 @@ body > * {
   flex-direction: column;
   justify-content: space-between;
 }
+@media screen and (orientation: landscape) and (min-width: 480px) and (max-width: 768px) {
+  #editorMenu .editorActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+@media screen and (min-width: 768px) {
+  #editorMenu .editorActions {
+    height: auto;
+  }
+}
 #editorMenu .editorActions div {
   flex: 1 1 0;
   padding: 20px;
@@ -116,6 +143,17 @@ body > * {
   border-top: 1px solid #5c5c5c;
   cursor: pointer;
   text-align: center;
+}
+@media screen and (orientation: landscape) and (min-width: 480px) and (max-width: 768px) {
+  #editorMenu .editorActions div {
+    border-right: 1px solid #5c5c5c;
+    flex: 1 1 50%;
+  }
+}
+@media screen and (min-width: 768px) {
+  #editorMenu .editorActions div {
+    flex: 1 1 auto;
+  }
 }
 #editorMenu .editorActions div:hover {
   color:#4a90e2;

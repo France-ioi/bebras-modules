@@ -178,7 +178,8 @@ var quickAlgoInterface = {
     },
 
     openEditorMenu: function() {
-        $('body').animate({left: '-50%'}, 500);
+        var menuWidth = $('#editorMenu').css('width');
+        $('body').animate({left: '-' + menuWidth}, 500);
 
     },
     closeEditorMenu: function() {
