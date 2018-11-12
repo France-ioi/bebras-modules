@@ -8,6 +8,19 @@
     overflow: auto;
     background: rgba(241, 242, 247, .9);
 }
+#conceptViewer .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 90%;
+    height: 90%;
+    background-color: #fff;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+}
 #conceptViewer .panel-heading {
     display: flex;
     justify-content: space-between;
@@ -19,21 +32,14 @@
     font-size: 18px;
     color: #4a90e2;
 }
-#conceptViewer .content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 90%;
-    height: 90%;
-    background-color: #fff;
-    border-radius: 5px;
+#conceptViewer .panel-body {
+    display: flex;
+    justify-content: stretch;
+    height: 100%;
 }
-
-
 #conceptViewer .navigation {
+    border-right: 1px solid rgba(0,0,0,0.1);
 }
-
 
 #conceptViewer .navigationLanguage {
     border-bottom: 1px solid rgba(0,0,0,0.1);
@@ -61,6 +67,14 @@
     color: #4a90e2;
     position: absolute;
     left: -55px;
+}
+@media screen and (orientation: landscape) and (max-width: 768px) {
+    #conceptViewer .showNavigationLanguage {
+        margin-left: 0;
+    }
+    #conceptViewer .showNavigationLanguage::before {
+        content: normal;
+    }
 }
 #conceptViewer .showNavigationLanguage::after {
     content: "\f107";
@@ -91,8 +105,23 @@
     line-height: 2em;
     padding: 0 20px;
     display: block;
+    cursor: pointer;
 }
 #conceptViewer .navigationLanguage ul li.selected {
+    background-color: #4a90e2;
+    color: #fff;
+}
+#conceptViewer .navigationContent ul {
+    list-style-type: none;
+    margin: 1em 0 0;
+    padding: 0;
+}
+#conceptViewer .navigationContent ul li {
+    line-height: 3em;
+    padding: 0 20px;
+    cursor: pointer;
+}
+#conceptViewer .navigationContent ul li.selected {
     background-color: #4a90e2;
     color: #fff;
 }
@@ -102,11 +131,16 @@
     display: none;
 }
 @media screen and (max-width: 480px) and (orientation: portrait) {
+    #conceptViewer .panel-body {
+        display: block;
+    }
+    #conceptViewer .navigation {
+        border: none;
+    }
     #conceptViewer .navigationContent {
         border-bottom: 1px solid rgba(0,0,0,0.1);
         padding: 10px;
     }
-
     #conceptViewer .navigationContent {
         position: relative;
     }
@@ -154,14 +188,8 @@
         visibility: visible;
         opacity: 1;
     }
-    #conceptViewer .navigationContent ul li a {
+    #conceptViewer .navigationContent ul li {
         line-height: 2em;
-        padding: 0 20px;
-        display: block;
-    }
-    #conceptViewer .navigationContent ul li.selected a {
-        background-color: #4a90e2;
-        color: #fff;
     }
 }
 #conceptViewer .viewer {
