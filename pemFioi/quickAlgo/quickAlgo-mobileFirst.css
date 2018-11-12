@@ -183,18 +183,6 @@ body > * {
 /************************
   LAYOUT & GENERIC ELEMENTS
 *************************/
-#task {
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
-  height: calc(100vh - 40px);
-}
-#taskContent {
-  flex: 2 0 0;
-  position: static !important;
-  display: flex;
-  justify-content: stretch;
-}
 h2.sectionTitle {
   font-size: 22px;
   font-weight: lighter;
@@ -213,6 +201,128 @@ h2.sectionTitle .icon {
   margin-right: 10px;
 }
 
+#task {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  height: calc(100vh - 40px);
+}
+#taskContent {
+  flex: 2 0 0;
+  position: static !important;
+  display: flex;
+  justify-content: stretch;
+}
+
+.mode-player #taskContent {
+  flex-direction: column;
+}
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+  #taskContent {
+    background-color: #fff;
+  }
+  .mode-player #taskContent {
+    flex-direction: row;
+  }
+}
+/* Introgrid */
+.mode-player #introGrid {
+  flex: 1 0 auto;
+  display: flex;
+}
+.mode-instructions #introGrid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+  .mode-player #introGrid {
+    min-width: 0;
+    flex: 0 0 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .mode-instructions #introGrid {
+    flex-direction: row;
+  }
+  #gridContainer #gridButtonsAfter {
+    padding-bottom: 5px;
+  }
+}
+/* taskIntro */
+.mode-player #taskIntro {
+  display: none;
+}
+.mode-instructions #taskIntro {
+  order: 2;
+  flex: 1 1 auto;
+}
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+
+  #taskIntro {
+    background-color: #f1f2f7;
+    padding: 15px;
+    overflow: auto;
+    border-radius: 5px 5px 0 0;
+    margin: 10px 10px 0 10px;
+  }
+}
+/* task grid */
+#gridContainer {
+  background-color: #fff;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+}
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+  .mode-instructions #gridContainer {
+    min-width: 0;
+    flex: 0 0 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+/* code editor */
+
+@media screen and (orientation: landscape) { /* horizontal screen layout */
+  .mode-player #blocklyLibContent {
+    flex: 0 1 50%;
+    min-width: 0;
+    margin: 10px 10px 0 10px;
+  }
+}
+/* hide blockly toolbox for low res */
+@media screen and (max-width: 800px) and (orientation: landscape) {
+  .mode-player .blocklyToolboxDiv,
+  .mode-player #editorBar {
+    display: none;
+  }
+}
+@media screen and (max-width: 480px) and (orientation: portrait) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+
+}
+.mode-instructions #blocklyLibContent {
+  display: none;
+}
+
+/*****************
+  MODE EDITOR
+*****************/
+.mode-editor #introGrid {
+  display: none;
+}
+#blocklyDiv {
+    width: 100%;
+    height: 100%;
+}
+
 /*****************
   TASK DESCRIPTION
 *****************/
@@ -225,9 +335,10 @@ h2.sectionTitle .icon {
 /*****************
   TASK GRID & TESTS
 *****************/
+
 #grid {
   overflow: auto;
-  max-width: 100vw;
+  max-width: 100%;
   padding: 2em 0px;
 }
 #testSelector {
@@ -271,7 +382,9 @@ h2.sectionTitle .icon {
 .testResultIcon.testFailure {
   color: #ff001f;
 }
-
+#gridContainer #gridButtonsAfter {
+  background-color: #f1f2f7;
+}
 #gridButtonsAfter #testSelector {
   padding: 0;
 }
@@ -279,7 +392,6 @@ h2.sectionTitle .icon {
   display: flex;
   min-height: 24px;
   line-height: 24px;
-  background-color: #f1f2f7;
   text-align: center;
 }
 #testSelector .tabs .testTab {
@@ -771,85 +883,8 @@ h2.sectionTitle .icon {
   background: none;
   cursor: pointer;
 }
-/*****************
-  MODE PLAYER
-*****************/
-.mode-player #taskContent {
-  flex-direction: column;
-}
-.mode-player #introGrid {
-  flex: 1 0 auto;
-  display: flex;
-}
-.mode-player #taskIntro {
-  display: none;
-}
-.mode-player #gridContainer {
-  flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-.mode-player #blocklyLibContent {
-  flex: 1 1 auto;
-}
 
 
-/* hide blockly toolbox for low res */
-@media screen and (max-width: 800px) and (orientation: landscape) {
-  .mode-player .blocklyToolboxDiv {
-    display: none;
-  }
-}
-
-@media screen and (max-width: 480px) and (orientation: portrait) {
-  .mode-player .blocklyToolboxDiv {
-    display: none;
-  }
-}
-
-/*****************
-  MODE INSTRUCTIONS
-*****************/
-.mode-instructions #blocklyLibContent {
-  display: none;
-}
-.mode-instructions #taskContent {
-}
-.mode-instructions #introGrid {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-.mode-instructions #taskIntro {
-  order: 2;
-  flex: 1 1 auto;
-}
-.mode-instructions #gridContainer {
-  flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-  .mode-instructions #introGrid {
-    flex-direction: row;
-  }
-}
-
-/*****************
-  MODE EDITOR
-*****************/
-.mode-editor #introGrid {
-  display: none;
-}
-#gridContainer {
-  background-color: #fff;
-}
-#blocklyDiv {
-    width: 100%;
-    height: 100%;
-}
 /************************
   MODAL POPUPS
 *************************/
