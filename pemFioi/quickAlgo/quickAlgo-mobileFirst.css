@@ -213,62 +213,14 @@ h2.sectionTitle .icon {
   display: flex;
   justify-content: stretch;
 }
-
-.mode-player #taskContent {
-  flex-direction: column;
-}
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-  #taskContent {
-    background-color: #fff;
-  }
-  .mode-player #taskContent {
-    flex-direction: row;
-  }
-}
-/* Introgrid */
-.mode-player #introGrid {
-  flex: 1 0 auto;
+#introGrid {
   display: flex;
 }
-.mode-instructions #introGrid {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+#taskIntro {
+  padding: 10px 20px;
+  overflow: auto;
+  color: #9b9b9b;
 }
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-  .mode-player #introGrid {
-    min-width: 0;
-    flex: 0 0 50%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  .mode-instructions #introGrid {
-    flex-direction: row;
-  }
-  #gridContainer #gridButtonsAfter {
-    padding-bottom: 5px;
-  }
-}
-/* taskIntro */
-.mode-player #taskIntro {
-  display: none;
-}
-.mode-instructions #taskIntro {
-  order: 2;
-  flex: 1 1 auto;
-}
-@media screen and (orientation: landscape) { /* horizontal screen layout */
-
-  #taskIntro {
-    background-color: #f1f2f7;
-    padding: 15px;
-    overflow: auto;
-    border-radius: 5px 5px 0 0;
-    margin: 10px 10px 0 10px;
-  }
-}
-/* task grid */
 #gridContainer {
   background-color: #fff;
   flex: 1 0 auto;
@@ -277,7 +229,62 @@ h2.sectionTitle .icon {
   justify-content: space-between;
   width: 100%;
 }
-@media screen and (orientation: landscape) { /* horizontal screen layout */
+/* Low res display */
+@media screen and (orientation: portrait) and (max-width: 480px) {
+  .mode-player .blocklyToolboxDiv {
+    display: none;
+  }
+}
+
+@media screen and (orientation:portrait) and (max-width: 767px),
+       screen and (orientation: landscape) and (max-width: 812px) {
+  .mode-player #taskContent {
+    flex-direction: column;
+  }
+  .mode-player #introGrid {
+    flex: 1 0 auto;
+  }
+  .mode-instructions #introGrid {
+    flex-direction: column;
+    width: 100%;
+  }
+  .mode-instructions #taskIntro {
+    order: 2;
+    flex: 1 1 auto;
+  }
+  .mode-player #taskIntro,
+  .mode-instructions #blocklyLibContent,
+  .mode-editor #introGrid {
+    display: none;
+  }
+}
+
+@media screen and (orientation: landscape) and (max-width: 812px) { /* horizontal screen layout */
+  #taskContent {
+    background-color: #fff;
+  }
+  .mode-player #taskContent {
+    flex-direction: row;
+  }
+  .mode-player #introGrid {
+    min-width: 0;
+    flex: 0 0 50%;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .mode-instructions #introGrid {
+    flex-direction: row;
+  }
+  #taskIntro {
+    background-color: #f1f2f7;
+    padding: 15px;
+    overflow: auto;
+    border-radius: 5px 5px 0 0;
+    margin: 10px 10px 0 10px;
+  }
+  #gridContainer #gridButtonsAfter {
+    padding-bottom: 5px;
+  }
   .mode-instructions #gridContainer {
     min-width: 0;
     flex: 0 0 50%;
@@ -285,57 +292,30 @@ h2.sectionTitle .icon {
     flex-direction: column;
     justify-content: space-between;
   }
-}
-/* code editor */
-
-@media screen and (orientation: landscape) { /* horizontal screen layout */
   .mode-player #blocklyLibContent {
     flex: 0 1 50%;
     min-width: 0;
     margin: 10px 10px 0 10px;
   }
-}
-/* hide blockly toolbox for low res */
-@media screen and (max-width: 800px) and (orientation: landscape) {
   .mode-player .blocklyToolboxDiv,
   .mode-player #editorBar {
     display: none;
   }
 }
-@media screen and (max-width: 480px) and (orientation: portrait) {
-  .mode-player .blocklyToolboxDiv {
-    display: none;
+
+@media screen and (orientation: portrait) and (min-width: 768px),
+       screen and (orientation: landscape) and (min-width: 813px) {
+  #taskContent {
+    flex-direction: column;
   }
-
-}
-.mode-instructions #blocklyLibContent {
-  display: none;
-}
-
-/*****************
-  MODE EDITOR
-*****************/
-.mode-editor #introGrid {
-  display: none;
-}
-#blocklyDiv {
-    width: 100%;
-    height: 100%;
-}
-
-/*****************
-  TASK DESCRIPTION
-*****************/
-#taskIntro {
-  padding: 10px 20px;
-  overflow: auto;
-  color: #9b9b9b;
+  #introGrid {
+    flex-direction: row;
+  }
 }
 
 /*****************
   TASK GRID & TESTS
 *****************/
-
 #grid {
   overflow: auto;
   max-width: 100%;
@@ -579,8 +559,11 @@ h2.sectionTitle .icon {
   position: relative;
 }
 #blocklyLibContent {
-  flex-grow: 0;
   width: 100%;
+}
+#blocklyDiv {
+    width: 100%;
+    height: 100%;
 }
 
 /* Editor Bar */
