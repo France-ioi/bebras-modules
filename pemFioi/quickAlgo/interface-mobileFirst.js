@@ -265,7 +265,7 @@ var quickAlgoInterface = {
             '</div>';
         $('#task').find('.speedControls').remove();
         // place speed controls depending on layout
-        if (screen.width <= 812) {
+        if (screen.width <= 767 || (screen.width <= 812 && screen.width >= screen.height)) {
             $('#mode-player').append(speedControls);
         } else {
             $('#introGrid').append(speedControls);
