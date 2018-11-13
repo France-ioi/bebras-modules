@@ -489,7 +489,11 @@ var quickAlgoInterface = {
                     '<p class="message">' + message + '</p>' +
                 '</div>' +
             '</div>';
-        $("#taskToolbar").append($(html));
+        if (screen.width <= 767 || (screen.width <= 812 && screen.width >= screen.height)) {
+            $("#taskToolbar").append($(html));
+        } else {
+            $(".speedControls").append($(html));
+        }
         $("#errorMessage").show();
     }
 
