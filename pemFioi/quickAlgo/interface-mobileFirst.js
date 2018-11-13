@@ -139,6 +139,8 @@ var quickAlgoInterface = {
         $("#gridButtonsAfter").html(gridButtonsAfter);
         $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
 
+        $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
+
         this.createModeTaskToolbar();
         this.createEditorMenu();
         this.addTaskintroTitle();
@@ -263,7 +265,11 @@ var quickAlgoInterface = {
             '</div>';
         $('#task').find('.speedControls').remove();
         // place speed controls depending on layout
-        $('#mode-player').append(speedControls);
+        if (screen.width <= 812) {
+            $('#mode-player').append(speedControls);
+        } else {
+            $('#introGrid').append(speedControls);
+        }
 
         $('#speedCursor').on('input change', function(e) {
             self.refreshStepDelay();
@@ -513,7 +519,6 @@ $(document).ready(function() {
         crossorigin="anonymous">');
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
-    $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
 
     quickAlgoInterface.selectMode('mode-instructions');
 
