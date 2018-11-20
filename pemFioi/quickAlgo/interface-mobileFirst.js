@@ -265,7 +265,14 @@ var quickAlgoInterface = {
             '</div>';
         $('#task').find('.speedControls').remove();
         // place speed controls depending on layout
-        if (screen.width <= 767 || (screen.width <= 812 && screen.width >= screen.height)) {
+        // speed controls in taskToolbar on mobiles
+        // in intro on portrait tablets
+        // in introGrid on other layouts (landscape tablets and desktop)
+
+        if (
+            screen.width < screen.height && screen.width < 600 && screen.height < 1024 ||
+            screen.width >= screen.height && screen.height < 600 && screen.height < 1024
+            ) {
             $('#mode-player').append(speedControls);
         } else {
             $('#introGrid').append(speedControls);
