@@ -14,6 +14,7 @@ img {
 }
 #miniPlatformHeader {
   background-color: transparent !important;
+  flex: 0 0 40px;
 }
 #choose-view {
   margin-top: 0 !important;
