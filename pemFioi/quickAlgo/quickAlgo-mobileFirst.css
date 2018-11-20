@@ -243,8 +243,8 @@ h2.sectionTitle .icon {
 }
 
 @media
-  screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1025px),
-  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Mobiles */
+  screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1023px),
+  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1023px) { /* Mobiles */
   .mode-player #taskContent {
     flex-direction: column;
   }
@@ -328,9 +328,11 @@ h2.sectionTitle .icon {
     z-index: 2;
   }
 }
+@media /* Tablets landscape and desktop */
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (min-width: 1024px) { /* Tablets and desktop */
+  screen and (min-width: 1024px) {
+}
 @media /* Tablets and desktop */
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
