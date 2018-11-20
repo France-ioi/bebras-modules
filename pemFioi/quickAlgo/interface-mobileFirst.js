@@ -270,8 +270,10 @@ var quickAlgoInterface = {
         // in introGrid on other layouts (landscape tablets and desktop)
 
         if (
-            screen.width < screen.height && screen.width < 600 && screen.height < 1024 ||
-            screen.width >= screen.height && screen.height < 600 && screen.height < 1024
+            (screen.width < screen.height && screen.width < 600 && screen.height < 1024) ||
+            (screen.width >= screen.height && screen.height < 600 && screen.width < 1024) ||
+            (window.innerWidth < window.height && window.innerWidth < 600 && window.innerHeight < 1024) ||
+            (window.innerWidth >= window.innerHeight && window.innerHeight < 600 && window.innerWidth < 1024)
             ) {
             $('#mode-player').append(speedControls);
         } else {
