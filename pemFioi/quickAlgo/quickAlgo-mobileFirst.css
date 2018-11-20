@@ -85,12 +85,6 @@ body > * {
   color: #FFF;
   z-index: 99;
 }
-@media screen and (min-width: 768px) {
-  #editorMenu {
-    width: 250px;
-    right: -250px;
-  }
-}
 #editorMenu .editorMenuHeader {
   position: absolute;
   top: 0;
@@ -101,7 +95,15 @@ body > * {
   text-transform: uppercase;
   font-weight: bold;
 }
-@media screen and (min-width: 768px) {
+
+@media
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) { /* Tablets and desktop */
+  #editorMenu {
+    width: 250px;
+    right: -250px;
+  }
   #editorMenu .editorMenuHeader {
     position: static;
   }
@@ -120,17 +122,7 @@ body > * {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-@media screen and (orientation: landscape) and (min-width: 480px) and (max-width: 768px) {
-  #editorMenu .editorActions {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-}
-@media screen and (min-width: 768px) {
-  #editorMenu .editorActions {
-    height: auto;
-  }
+  text-transform: uppercase;
 }
 #editorMenu .editorActions div {
   flex: 1 1 0;
@@ -144,26 +136,43 @@ body > * {
   cursor: pointer;
   text-align: center;
 }
-@media screen and (orientation: landscape) and (min-width: 480px) and (max-width: 768px) {
-  #editorMenu .editorActions div {
-    border-right: 1px solid #5c5c5c;
-    flex: 1 1 50%;
+@media
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) { /* Tablets and desktop */
+  #editorMenu .editorActions {
+    height: auto;
   }
-}
-@media screen and (min-width: 768px) {
   #editorMenu .editorActions div {
     flex: 1 1 auto;
   }
 }
+#editorMenu .editorActions div:first-child {
+  border-top-width: 0;
+}
 #editorMenu .editorActions div:hover {
   color:#4a90e2;
-}
-#editorMenu .editorActions div:first-child {
-  border-top: none;
 }
 #editorMenu .editorActions div span.fas,
 #editorMenu .editorActions div span.far {
   font-size: 32px;
+}
+@media screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Landscape mobiles */
+  #editorMenu .editorActions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  #editorMenu .editorActions div {
+    flex: 1 1 50%;
+    padding: 20px 0;
+    font-size: 10px;
+    border-right: 1px solid #5c5c5c;
+    border-bottom: 1px solid #5c5c5c;
+    margin-bottom: -1px;
+  }
+  #editorMenu .editorActions div:first-child {
+    border-top-width: 1px;
+  }
 }
 #editorMenu #saveUrl {
   display: none;
@@ -229,15 +238,16 @@ h2.sectionTitle .icon {
   justify-content: space-between;
   width: 100%;
 }
-/* Low res display */
-@media screen and (orientation: portrait) and (max-width: 480px) {
+
+@media screen and (orientation: portrait) and (max-width: 480px) { /* Low res display */
   .mode-player .blocklyToolboxDiv {
     display: none;
   }
 }
 
-@media screen and (orientation:portrait) and (max-width: 767px),
-       screen and (orientation: landscape) and (max-width: 812px) {
+@media
+  screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1025px),
+  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Mobiles */
   .mode-player #taskContent {
     flex-direction: column;
   }
@@ -257,9 +267,13 @@ h2.sectionTitle .icon {
   .mode-editor #introGrid {
     display: none;
   }
+  .mode-player .blocklyToolboxDiv,
+  .mode-player #editorBar {
+    display: none;
+  }
 }
 
-@media screen and (orientation: landscape) and (max-width: 812px) { /* horizontal screen layout */
+@media screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Landscape mobiles */
   #taskContent {
     background-color: #fff;
   }
@@ -297,19 +311,25 @@ h2.sectionTitle .icon {
     min-width: 0;
     margin: 10px 10px 0 10px;
   }
-  .mode-player .blocklyToolboxDiv,
-  .mode-player #editorBar {
-    display: none;
-  }
 }
 
-@media screen and (orientation: portrait) and (min-width: 768px),
-       screen and (orientation: landscape) and (min-width: 813px) {
+@media
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) { /* Tablets and desktop */
   #taskContent {
     flex-direction: column;
   }
   #introGrid {
     flex-direction: row;
+  }
+  #taskIntro {
+    flex: 1 1 50%;
+    background-color: #fff;
+    z-index: 2;
+  }
+  #gridContainer {
+    flex: 1 1 50%;
   }
 }
 
@@ -435,7 +455,9 @@ h2.sectionTitle .icon {
 .speedControls .icon span {
   padding: 5px 10px;
 }
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 480px) { /* Portrait mobiles and low res display */
+  /* toggle player controls and tab icon, and speed slider visibility */
+
   #mode-player.displaySpeedSlider #playerControls,
   #mode-player.displaySpeedSlider > span.far,
   #mode-player.displaySpeedSlider > span.fas {
@@ -555,6 +577,26 @@ h2.sectionTitle .icon {
 /*****************
   CODE EDITOR
 *****************/
+/* Hide elements on editor fullscreen */
+@media
+  screen and (display-mode: fullscreen) and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (display-mode: fullscreen) and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (display-mode: fullscreen) and (min-width: 1024px) { /* Tablets and desktop */
+  #introGrid,
+  #taskToolbar {
+    display: none;
+  }
+}
+@media
+  screen and (display-mode: fullscreen) and (orientation: portrait) and (max-width: 599px) and (max-height: 1025px),
+  screen and (display-mode: fullscreen) and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Mobiles */
+  #miniPlatformHeader,
+  #tabsContainer,
+  #introGrid,
+  #taskToolbar {
+    display: none;
+  }
+}
 #blocklyContainer {
   position: relative;
 }
@@ -690,6 +732,17 @@ h2.sectionTitle .icon {
 /*****************
   TASK TOOLBAR
 *****************/
+@media
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) { /* Tablets and desktop */
+/* Hide task toolbar for tablets and desktop,
+  but keep element as it is used to calculate other elements position in JS */
+  #taskToolbar {
+    visibility: hidden;
+    height: 0;
+  }
+}
 #taskToolbar {
   flex: 0 0 auto;
   z-index: 1;
