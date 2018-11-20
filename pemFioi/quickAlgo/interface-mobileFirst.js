@@ -139,11 +139,11 @@ var quickAlgoInterface = {
         $("#gridButtonsAfter").html(gridButtonsAfter);
         $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
 
-        $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
         this.addTaskintroTitle();
+        this.wrapIntroAndGrid();
     },
 
     createEditorMenu: function() {
@@ -405,7 +405,6 @@ var quickAlgoInterface = {
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },
 
-
     createModeTaskToolbar: function() {
         if($('#taskToolbar').length) { return; }
         var displayHelpBtn = this.hasHelp ? '<button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">\
@@ -495,6 +494,11 @@ var quickAlgoInterface = {
             $(".speedControls").append($(html));
         }
         $("#errorMessage").show();
+    },
+
+    wrapIntroAndGrid: function() {
+        if ($('#introGrid').length) { return; }
+        $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
     }
 
     /*
