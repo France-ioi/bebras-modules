@@ -234,6 +234,8 @@ h2.sectionTitle .icon {
   background-color: #fff;
   flex: 1 0 auto;
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 @media screen and (orientation: portrait) and (max-width: 480px) { /* Low res display */
@@ -322,10 +324,11 @@ h2.sectionTitle .icon {
     left: 0;
     width: 50%;
     padding-top: 10px;
+    border-top: 3px solid #fff;
     display: flex;
     justify-content: space-evenly;
     background-color: #f1f2f7;
-    z-index: 2;
+    box-shadow: 0 1px 0 0px #ccc inset;
   }
 }
 @media /* Tablets landscape and desktop */
@@ -345,7 +348,7 @@ h2.sectionTitle .icon {
   #taskIntro {
     flex: 1 0 50%;
     background-color: #fff;
-    z-index: 2;
+    overflow: visible;
   }
   #gridContainer {
     flex: 1 0 50%;
@@ -411,7 +414,6 @@ h2.sectionTitle .icon {
 }
 #testSelector .tabs {
   display: flex;
-  min-height: 24px;
   line-height: 24px;
   text-align: center;
 }
@@ -458,6 +460,14 @@ h2.sectionTitle .icon {
 #testSelector .tabs .testTab:not(.currentTest) {
   box-shadow: 0 1px 0 0px #ccc inset;
   color: #ababac;
+}
+@media /* Tablets and desktop */
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) {
+  #testSelector .tabs .testTab {
+    line-height: 36px;
+  }
 }
 
 /*****************
