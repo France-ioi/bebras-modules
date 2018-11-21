@@ -633,7 +633,7 @@ h2.sectionTitle .icon {
   .speedControls {
     display: flex;
     justify-content: space-around;
-    padding: 10px 0;
+    padding: 10px;
   }
   #introGrid #playerControls,
   #introGrid #speedSlider {
@@ -671,6 +671,14 @@ h2.sectionTitle .icon {
     border-radius: 5px;
     font-size: 18px;
     color: #4a4a4a;
+  }
+}
+@media /* Tablets portrait */
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px) {
+      .speedControls {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 10px;
   }
 }
 
