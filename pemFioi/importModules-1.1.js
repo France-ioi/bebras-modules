@@ -113,7 +113,16 @@ var importableModules = function () {
 
       'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
-      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"}
+      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
+
+      // Bundles
+      'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
+      'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
+      'js-interpreter': {src: modulesPath+"bundles/js-interpreter.js", id: "bundle-js-interpreter"},
+      'blockly-base': {src: modulesPath+"bundles/blockly-base.js", id: "bundle-blockly-base"},
+      'scratch-base': {src: modulesPath+"bundles/scratch-base.js", id: "bundle-scratch-base"},
+      'quickAlgo-all-blockly': {src: modulesPath+"bundles/quickAlgo-all-blockly.js", id: "bundle-quickAlgo-all-blockly"},
+      'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"}
    }
 }
 
@@ -182,6 +191,19 @@ var languageScripts = function () {
    }
 }
 
+var bundledModules = function () {
+   // List of bundles and which modules they include
+   // How to import the bundles is defined in importableModules
+   return [
+      {name: 'bebras-base', included: ['jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'beaver-task-2.0', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0']},
+      {name: 'bebras-interface', included: ['platform-pr', 'buttonsAndMessages', 'beav-1.0', 'installationAPI.01', 'miniPlatform']},
+      {name: 'js-interpreter', included: ['acorn', 'acorn-walk', 'interpreter']},
+      {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
+      {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
+      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
+      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
+   ];
+};
 
 // from http://stackoverflow.com/questions/979975/
 var QueryString = function () {
@@ -208,10 +230,47 @@ var QueryString = function () {
 }();
 
 
+function getBundles(modulesList) {
+   // Check modulesList for modules which are already bundled together
+
+   // For now, only do it if useBundles is true
+   if(!window.useBundles) { return modulesList; }
+
+   if(typeof bundledModules == 'function') {
+      bundledModules = bundledModules();
+   }
+   for(var iBundle in bundledModules) {
+      var bundleIncludes = bundledModules[iBundle].included;
+      var newModulesList = modulesList.slice();
+      var isFirst = true;
+      var ok = true;
+      for(var iMod in bundleIncludes) {
+         var idx = newModulesList.indexOf(bundleIncludes[iMod]);
+         if(idx == -1) {
+            ok = false;
+            break;
+         }
+         if(isFirst) {
+            // Include the name of the bundle to include instead
+            newModulesList.splice(idx, 1, bundledModules[iBundle].name);
+            isFirst = false;
+         } else {
+            newModulesList.splice(idx, 1);
+         }
+      }
+      if(ok) {
+         modulesList = newModulesList;
+      }
+   }
+   return modulesList;
+}
+
+
 function importModules(modulesList) {
    if(typeof importableModules == 'function') {
       importableModules = importableModules();
    };
+   modulesList = getBundles(modulesList);
    var modulesStr = '';
    for(var iMod in modulesList) {
       var moduleName = modulesList[iMod];
