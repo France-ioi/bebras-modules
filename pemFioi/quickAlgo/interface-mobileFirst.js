@@ -43,10 +43,10 @@ var quickAlgoInterface = {
     toggleFullscreen: function() {
         this.fullscreen = !this.fullscreen;
         if(this.fullscreen) {
-            $('#fullscreenButton').html('[-]');
+            $('#fullscreenButton').html('<i class="fas fa-compress"></i>');
             this.enterFullscreen();
         } else {
-            $('#fullscreenButton').html('[+]');
+            $('#fullscreenButton').html('<i class="fas fa-expand"></i>');
             this.exitFullscreen();
         }
         this.onResize();
@@ -64,15 +64,14 @@ var quickAlgoInterface = {
         gridHtml += "<div id='gridButtonsBefore'></div>";
         gridHtml += "<div id='grid'></div>";
         gridHtml += "<div id='gridButtonsAfter'></div>";
-        $("#gridContainer").html(gridHtml)
+        $("#gridContainer").html(gridHtml);
 
+        var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
         $("#blocklyLibContent").html(
             "<div id='editorBar'>" +
                 "<div id='capacity'></div>" +
-                "<button type='button' id='fullscreenButton'>[+]</button>" +
-                "<div id='editorMenuContainer'>" +
-//                    "<button type='button' id='toggleEditorMenu'>≡</button>" +
-                "</div>" +
+                "<button type='button' id='fullscreenButton'><i class='fas fa-expand'></i></button>" +
+                displayHelpBtn +
             "</div>" +
             "<div id='languageInterface'></div>"
         );
@@ -413,11 +412,14 @@ var quickAlgoInterface = {
         $("#task").append($('#messages'));
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },
-
+    displayHelpBtn: function() {
+        var helpBtn = '<button type="button" class="displayHelpBtn" onclick="conceptViewer.show()">\
+            <span class="fas fa-question"></span></button>';
+        return helpBtn;
+    },
     createModeTaskToolbar: function() {
         if($('#taskToolbar').length) { return; }
-        var displayHelpBtn = this.hasHelp ? '<button type="button" id="displayHelpBtn" onclick="conceptViewer.show()">\
-            <span class="fas fa-question"></span></button>' : '';
+        var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
         var self = this;
         $("#task").append('' +
             '<div id="taskToolbar">' +
