@@ -1274,6 +1274,8 @@ window.displayHelper = {
          }
       }
       var self = this;
+      // Offer an option to stay on the task instead of forcing nextTask
+      var noButtonText = actionNext == "nextTask" ? this.strings.no : null;
       this.showPopupMessage(fullMessage, 'blanket', buttonText,
          function() {
             // TODO: replace with something compatible with the API.
@@ -1287,7 +1289,7 @@ window.displayHelper = {
                platform.validate("nextImmediate");
             }
          },
-         null,
+         noButtonText,
          avatarMood
       );
    },
