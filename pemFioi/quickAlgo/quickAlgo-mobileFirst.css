@@ -502,6 +502,9 @@ h2.sectionTitle .icon {
   box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
   border-radius:15px;
 }
+.speedControls {
+  position: relative;
+}
 .speedControls .icon span {
   padding: 5px 10px;
 }
@@ -627,13 +630,19 @@ h2.sectionTitle .icon {
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
   screen and (min-width: 1024px) {
+  .speedControls {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+  }
   #introGrid #playerControls,
   #introGrid #speedSlider {
     display: inline-flex;
+    justify-content: space-around;
     background-color: transparent;
     border-radius: 0;
     box-shadow: none;
-    width: auto;
+    width: 100%;
     margin: 0;
   }
   #introGrid #playerControls .icon {
