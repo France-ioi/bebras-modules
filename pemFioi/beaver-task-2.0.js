@@ -91,7 +91,6 @@ window.forcedLevel = getUrlParameter("level");
 
 function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) { 
    if (window.forcedLevel !== undefined) {
-      var oldInitSubTask = initSubTask;
       if (window.forcedLevel) {
          levels = null;
       }
@@ -194,7 +193,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             };
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
-               displayHelper.setupLevels(null, reloadWithCallbacks);
+               displayHelper.setupLevels(null, reloadWithCallbacks, levels);
             }
             callback();
          }
@@ -234,12 +233,11 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          hasJustLoaded = false;
          task.gradeAnswer(strAnswer, null, function(score, message) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            var level = "easy";
-            if(score >= maxScores.medium) {
-               level = "hard";
-            }
-            else if(score >= maxScores.easy) {
-               level = "medium";
+            var level = levels[0];
+            for(var i=1; i < levels.length; i++) {
+               if(score >= maxScores[levels[i-1]]) {
+                  level = levels[i];
+               }
             }
             if (window.forcedLevel != null) {
                level = window.forcedLevel;
@@ -546,11 +544,10 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          
          if(levels) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            var minScores = {
-               easy: 0,
-               medium: maxScores.easy,
-               hard: maxScores.medium
-            };
+            var minScores = {};
+            for(var i=0; i < levels.length; i++) {
+                minScores[levels[i]] = i > 0 ? maxScores[levels[i-1]] : 0;
+            }
             var levelAnswers = parsedAnswer;
             var scores = {};
             var messages = {};

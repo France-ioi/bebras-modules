@@ -29,22 +29,26 @@ window.displayHelper = {
    stoppedShowingResult: false,
    previousMessages: {},
    popupMessageShown: false,
+
+   thresholds: {},
+   // Legacy settings for old tasks ; new ones are expected to use thresholds
    thresholdEasy: 60,
    thresholdMedium: 120,
+
    timeoutMinutes: 5,
    avatarType: "beaver",
    bUseFullWidth: false,
 
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
-   unlockedLevels: 3,
+   unlockedLevels: 4,
    neverHadHard: false,
    showMultiversionNotice: false,
-   levelsScores: { easy: 0, medium: 0, hard: 0 },
-   levelsRanks: { easy: 0, medium: 1, hard: 2 },
-   prevLevelsScores: { easy: 0, medium: 0, hard: 0 },
-   levels: ['easy', 'medium', 'hard'],
    taskLevel: '',
+
+   // Defaults
+   levels: ['easy', 'medium', 'hard'],
+   maxStars: 4,
 
    formatTranslation: function(s, args) { return s.replace(/\{([^}]+)\}/g, function(_, match){ return args[match]; }); },
 
@@ -680,15 +684,31 @@ window.displayHelper = {
       this.unlockedLevels = 3;
       this.neverHadHard = false;
       this.showMultiversionNotice = false;
-      this.levelsScores = { easy: 0, medium: 0, hard: 0 };
-      this.prevLevelsScores = { easy: 0, medium: 0, hard: 0 };
       this.taskLevel = '';
+      this.initLevelVars();
       return true;
    },
 
-   setupLevels: function(initLevel, reloadWithCallbacks) {
+   initLevelVars: function() {
+      var defaultLevelsRanks = { very_easy: 1, easy: 2, medium: 3, hard: 4 };
+      this.levelsRanks = {};
+      this.levelsScores = {};
+      this.prevLevelsScores = {};
+      for(var i=0; i < this.levels.length; i++) {
+         var levelName = this.levels[i];
+         if(typeof this.levelsRanks[levelName] == 'undefined') {
+            this.levelsRanks[levelName] = defaultLevelsRanks[levelName];
+         }
+         this.levelsScores[levelName] = 0;
+         this.prevLevelsScores[levelName] = 0;
+      }
+   },
+
+   setupLevels: function(initLevel, reloadWithCallbacks, levels) {
       this.reloadWithCallbacks = reloadWithCallbacks;
       this.initLanguage();
+      if(levels) { this.levels = levels; }
+      this.initLevelVars();
       if (!initLevel) {
          if (!this.taskParams) {
             var self = this;
@@ -746,11 +766,12 @@ window.displayHelper = {
       }
 
       var maxScore = taskParams.maxScore !== undefined ? taskParams.maxScore : 40;
-      this.levelsMaxScores = {
-         easy: (this.pointsAsStars ? maxScore / 2 : Math.round(maxScore / 2)),
-         medium: (this.pointsAsStars ? maxScore * 3 / 4 : Math.round(maxScore * 3 / 4)),
-         hard: maxScore
-      };
+      this.levelsMaxScores = {};
+      for(var i=0; i < this.levels.length; i++) {
+         var levelName = this.levels[i];
+         var levelMaxScore = maxScore * this.levelsRanks[levelName] / this.maxStars;
+         this.levelsMaxScores[levelName] = this.pointsAsStars ? levelMaxScore : Math.round(levelMaxScore);
+      }
    },
    setupLevelsTabs: function() {
       var scoreHTML;
@@ -759,7 +780,7 @@ window.displayHelper = {
          var titleStarContainers = [];
          scoreHTML = '<span></span><span id="titleStars"></span>';
          $('#task > h1').append(scoreHTML);
-         drawStars('titleStars', 4, 24, 0, 'normal');
+         drawStars('titleStars', this.maxStars, 24, 0, 'normal');
       } else {
          // Disabled: doesn't work with new tabs layout.
          //scoreHTML = '<div class="bestScore">Score retenu : <span id="bestScore">0</span> sur ' + maxScores.hard + '</div>';
@@ -799,7 +820,8 @@ window.displayHelper = {
 
    updateStarsAtLevel: function(level) {
       var rate = this.levelsScores[level] / this.levelsMaxScores[level];
-      var iLevel = this.levelsRanks[level];
+      var iLevel = this.levels.indexOf(level);
+      var starsIdx = this.levelsRanks[level];
       var mode = 'normal';
       if (iLevel >= this.unlockedLevels) {
          mode = 'locked';
@@ -807,7 +829,7 @@ window.displayHelper = {
       if (this.graderScore > this.levelsMaxScores[level]) {
          mode = 'useless';
       }
-      drawStars('stars_' + iLevel, iLevel + 2, 18, rate, mode);
+      drawStars('stars_' + starsIdx, starsIdx, 18, rate, mode);
    },
 
    updateLayout: function() {
@@ -1141,11 +1163,17 @@ window.displayHelper = {
       }
       if (allLevels) {
          // TODO: make sure the grader doesn't evaluate each level at each call (most do right now!)
-         self.updateScoreOneLevel(strAnswer, "easy", function() {
-            self.updateScoreOneLevel(strAnswer, "medium", function() {
-               self.updateScoreOneLevel(strAnswer, "hard", refresh);
-            });
-         });
+         var levelsToDo = this.levels.slice();
+         var updateNextScore = null;
+         updateNextScore = function() {
+            var nextLevel = levelsToDo.shift();
+            if(nextLevel) {
+               self.updateScoreOneLevel(strAnswer, nextLevel, updateNextScore);
+            } else {
+               refresh();
+            }
+         }
+         updateNextScore();
       } else {
          this.updateScoreOneLevel(strAnswer, this.taskLevel, function() {
             if (!silentMode) {
@@ -1207,7 +1235,7 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          this.updateStarsAtLevel(gradedLevel);
-         drawStars('titleStars', 4, 24, this.graderScore / maxScores.hard, 'normal');
+         drawStars('titleStars', this.maxStars, 24, this.graderScore / maxScores.hard, 'normal');
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
@@ -1257,20 +1285,27 @@ window.displayHelper = {
          avatarMood = "success";
          buttonText = this.strings.moveOn;
          fullMessage += "<br/><br/>";
-         if (gradedLevel == "hard") {
-            actionNext = "nextTask";
-            fullMessage += this.strings.solvedMoveOn;
-         } else {
-            if ((gradedLevel == "medium") && (secondsSinceLoaded < this.thresholdMedium)) {
-               actionNext = "hard";
-               fullMessage += this.strings.tryHardLevel;
-            } else if ((gradedLevel == "easy") && (secondsSinceLoaded < this.thresholdEasy)) {
-               actionNext = "medium";
-               fullMessage += this.strings.tryMediumLevel;
+         var levelIdx = this.levels.indexOf(gradedLevel);
+         var nextLevel = levelIdx > -1 && levelIdx < this.levels.length-1 ? this.levels[levelIdx+1] : null;
+         if(nextLevel) {
+            // Offer to try next task if the user solved this difficulty slowly
+            var threshold = this.thresholds[gradedLevel];
+            if(!threshold) {
+                if(gradedLevel == "medium") { threshold = this.thresholdMedium; }
+                else if(gradedLevel == "easy") { threshold = this.thresholdEasy; }
+            }
+            if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
+               actionNext = nextLevel;
+               if(gradedLevel == "easy") { fullMessage += this.strings.tryMediumLevel; }
+               if(gradedLevel == "medium") { fullMessage += this.strings.tryHardLevel; }
             } else {
                actionNext = "nextTask";
                fullMessage += this.strings.tryNextTask;
             }
+         } else {
+            // Solved the last level, move on
+            actionNext = "nextTask";
+            fullMessage += this.strings.solvedMoveOn;
          }
       }
       var self = this;
@@ -1283,10 +1318,10 @@ window.displayHelper = {
                $(parent.document).scrollTop(0);
             } catch (e) {
             }
-            if ((actionNext == "medium") || (actionNext == "hard")) {
-               self.setLevel(actionNext);
-            } else if (actionNext == "nextTask") {
+            if (actionNext == "nextTask") {
                platform.validate("nextImmediate");
+            } else if(self.levels.indexOf(actionNext) != -1) {
+               self.setLevel(actionNext);
             }
          },
          noButtonText,
@@ -1571,7 +1606,7 @@ window.displayHelper = {
          }
       }
       if (this.pointsAsStars && $('#answerScore').length) {
-         drawStars('answerScore', this.levelsRanks[this.taskLevel] + 2, 20,
+         drawStars('answerScore', this.levelsRanks[this.taskLevel], 20,
             this.levelsScores[this.taskLevel] / this.levelsMaxScores[this.taskLevel], 'normal');
       }
       window.task.getHeight(function(height) {
