@@ -131,7 +131,7 @@
 }
 @media screen and (max-width: 480px) and (orientation: portrait) {
     #conceptViewer .panel-body {
-        display: block;
+        flex-direction: column;
     }
     #conceptViewer .navigation {
         border: none;
