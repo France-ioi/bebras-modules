@@ -190,7 +190,13 @@ img {
 #popupMessage.floatingMessage .container img {
   display: none;
 }
-#popupMessage .message {
+@media /* Tablets and desktop */
+  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
+  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
+  screen and (min-width: 1024px) {
+  #popupMessage .message {
+    font-size: 14px;
+  }
 }
 #popupMessage p {
    margin: .5em 0 0;
