@@ -10,11 +10,10 @@
 }
 #conceptViewer .content {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 90%;
-    height: 90%;
+    top: calc(51% - (90vh / 2));
+    left: calc(50% - (90vw / 2));
+    width: 90vw;
+    height: 90vh;
     background-color: #fff;
     border-radius: 5px;
     display: flex;
@@ -193,6 +192,7 @@
     }
 }
 #conceptViewer .viewer {
+    flex-grow: 1;
 }
 #conceptViewer .viewerContent { /* iframe */
     width: 100%;
