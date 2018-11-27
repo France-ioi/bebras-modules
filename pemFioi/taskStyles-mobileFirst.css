@@ -48,7 +48,6 @@ img {
   margin-left: 5px;
 }
 #tabsMenu .li {
-  flex: 1 0 0;
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
@@ -119,6 +118,9 @@ img {
 @media screen and (min-width: 480px) {
   #tabsMenu a {
     padding: 10px 0;
+  }
+  #tabsMenu .li {
+    padding: 0 40px;
   }
   #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
     border-right-width: 2px;
