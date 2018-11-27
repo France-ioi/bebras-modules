@@ -96,10 +96,10 @@ body > * {
   font-weight: bold;
 }
 
-@media
+@media /* Tablets and desktop */
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (min-width: 1024px) { /* Tablets and desktop */
+  screen and (min-width: 1024px) {
   #editorMenu {
     width: 250px;
     right: -250px;
@@ -136,10 +136,10 @@ body > * {
   cursor: pointer;
   text-align: center;
 }
-@media
+@media /* Tablets and desktop */
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (min-width: 1024px) { /* Tablets and desktop */
+  screen and (min-width: 1024px) {
   #editorMenu .editorActions {
     height: auto;
   }
@@ -245,9 +245,9 @@ h2.sectionTitle .icon {
   }
 }
 
-@media
+@media /* Mobiles */
   screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1023px),
-  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1023px) { /* Mobiles */
+  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1023px) {
   .mode-player #taskContent {
     flex-direction: column;
   }
@@ -686,18 +686,18 @@ h2.sectionTitle .icon {
   CODE EDITOR
 *****************/
 /* Hide elements on editor fullscreen */
-@media
+@media /* Tablets and desktop */
   screen and (display-mode: fullscreen) and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (display-mode: fullscreen) and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (display-mode: fullscreen) and (min-width: 1024px) { /* Tablets and desktop */
+  screen and (display-mode: fullscreen) and (min-width: 1024px) {
   #introGrid,
   #taskToolbar {
     display: none;
   }
 }
-@media
+@media /* Mobiles */
   screen and (display-mode: fullscreen) and (orientation: portrait) and (max-width: 599px) and (max-height: 1025px),
-  screen and (display-mode: fullscreen) and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Mobiles */
+  screen and (display-mode: fullscreen) and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) {
   #miniPlatformHeader,
   #tabsContainer,
   #introGrid,
@@ -872,10 +872,10 @@ h2.sectionTitle .icon {
   z-index: 1;
   position: relative;
 }
-@media
+@media /* Tablets and desktop */
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (min-width: 1024px) { /* Tablets and desktop */
+  screen and (min-width: 1024px) {
 /* Hide task toolbar for tablets and desktop,
   but keep element as it is used to calculate other elements position in JS */
   #taskToolbar {
