@@ -719,6 +719,8 @@ h2.sectionTitle .icon {
     width: auto;
     flex: 1 1 auto;
     min-width: 0;
+    background: #fff;
+    padding-top: 10px;
   }
 }
 #blocklyDiv {
