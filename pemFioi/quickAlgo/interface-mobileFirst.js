@@ -70,8 +70,10 @@ var quickAlgoInterface = {
         $("#blocklyLibContent").html(
             "<div id='editorBar'>" +
                 "<div id='capacity'></div>" +
+                "<div class='buttons'>" +
                 "<button type='button' id='fullscreenButton'><i class='fas fa-expand'></i></button>" +
                 displayHelpBtn +
+                "</div>" +
             "</div>" +
             "<div id='languageInterface'></div>"
         );
