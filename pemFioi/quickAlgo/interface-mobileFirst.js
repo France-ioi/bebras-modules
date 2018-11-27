@@ -492,8 +492,8 @@ var quickAlgoInterface = {
         $('#errorMessage').remove();
         if(!message) return;
         var html =
-            '<div id="errorMessage">' +
-                '<button type="button" class="btn close" onclick="closeModal(`errorMessage`)">'+
+            '<div id="errorMessage" onclick="closeModal(`errorMessage`)">' +
+                '<button type="button" class="btn close">'+
                     '<span class="fas fa-times"></span>'+
                 '</button>' +
                 '<div class="messageWrapper">' +
