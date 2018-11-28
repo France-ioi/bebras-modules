@@ -1097,6 +1097,19 @@ h2.sectionTitle .icon {
   cursor: pointer;
 }
 
+/************************
+  LONG INTRODUCTION
+*************************/
+#taskIntroLong {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+#taskIntroLong.displayIntroLong {
+  display: block;
+}
 
 /************************
   MODAL POPUPS
