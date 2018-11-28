@@ -539,10 +539,9 @@ var quickAlgoInterface = {
 
 $(document).ready(function() {
 
-    $('head').append('<link rel="stylesheet"\
-        href="https://use.fontawesome.com/releases/v5.4.2/css/all.css"\
-        integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"\
-        crossorigin="anonymous">');
+    $('head').append('\
+        <link rel="stylesheet"\
+        href="../../modules/fonts/fontAwesome/css/all.css">');
 
     $("#task h1").appendTo($("#miniPlatformHeader table td").first());
 
