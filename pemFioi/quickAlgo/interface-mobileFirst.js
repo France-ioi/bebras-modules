@@ -433,7 +433,7 @@ var quickAlgoInterface = {
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
                     '<div id="mode-instructions" class="mode">' +
-                        '<span><span class="far fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
+                        '<span><span class="fas fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
                     '</div>' +
                     '<div id="mode-editor" class="mode">' +
                         '<span><span class="fas fa-pencil-alt"></span>' +
@@ -441,7 +441,7 @@ var quickAlgoInterface = {
                         displayHelpBtn +
                     '</div>' +
                     '<div id="mode-player" class="mode">' +
-                        '<span class="far fa-play-circle"></span>' +
+                        '<span class="fas fa-play"></span>' +
                     '</div>' +
                 '</div>' +
             '</div>');
