@@ -56,6 +56,7 @@ var quickAlgoInterface = {
 
 
     loadInterface: function(context) {
+        ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
         var self = this;
         this.context = context;
@@ -144,7 +145,7 @@ var quickAlgoInterface = {
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
-        this.addTaskintroTitle();
+        this.setupTaskIntro();
         this.wrapIntroAndGrid();
     },
 
@@ -468,10 +469,59 @@ var quickAlgoInterface = {
         this.onResize();
     },
 
-    addTaskintroTitle: function() {
-        if($('#taskIntro .sectionTitle').length) { return; }
-        // add title to taskIntro ; may vary depending on screen size.
-        $('#taskIntro').prepend("<h2 class='sectionTitle'><span class='fas fa-book icon'></span>Énoncé</h2>");
+    setupTaskIntro: function() {
+        var self = this;
+        if ($('#taskIntro').hasClass('hasLongIntro')) {
+            // if long version of introduction exists, append its content to #blocklyLibContent
+            // with proper title and close button
+            // add titles
+            // add display long version button
+            var taskIntroContent = $('#taskIntro').html();
+            var introLong = '' +
+                '<div id="taskIntroLong" style="display:none;" class="panel">' +
+                    '<div class="panel-heading">'+
+                        '<h2 class="sectionTitle"><i class="fas fa-search-plus"></i>Détail de la mission</h2>' +
+                        '<button type="button" class="closeLongIntro"><i class="fas fa-times"></i></button>' +
+                    '</div><div class="panel-body">' +
+                        taskIntroContent +
+                    '</div>' +
+                '<div>';
+            $('#blocklyLibContent').append(introLong);
+            if (! $('#taskIntro .sectionTitle').length) {
+                var renderTaskIntro = '' +
+                    '<h2 class="sectionTitle longIntroTitle">' +
+                        '<span class="fas fa-book icon"></span>Énoncé' +
+                    '</h2>' +
+                    '<h2 class="sectionTitle shortIntroTitle">' +
+                        '<span class="fas fa-book icon"></span>Votre mission' +
+                    '</h2>' +
+                    taskIntroContent +
+                    '<button type="button" class="showLongIntro"><span class="fas fa-plus icon"></span>Plus de détails</button>';
+                $('#taskIntro').html(renderTaskIntro);
+            }
+        }
+        else {
+            if (! $('#taskIntro .sectionTitle').length) {
+                $('#taskIntro').prepend('\
+                    <h2 class="sectionTitle longIntroTitle">\
+                        <span class="fas fa-book icon"></span>Énoncé\
+                    </h2>');
+            }
+        }
+        $('#taskIntro .showLongIntro').click(function(e) {
+            $('#taskIntroLong').hasClass('displayIntroLong') ? self.closeLongIntro() : self.openLongIntro();
+        });
+        $('#taskIntroLong .closeLongIntro').click(function(e) {
+            self.closeLongIntro();
+        });
+    },
+
+    openLongIntro: function() {
+        $('#taskIntroLong').addClass('displayIntroLong');
+    },
+
+    closeLongIntro: function() {
+        $('#taskIntroLong').removeClass('displayIntroLong');
     },
 
     unloadLevel: function() {
