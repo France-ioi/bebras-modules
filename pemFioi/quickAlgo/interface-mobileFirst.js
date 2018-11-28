@@ -11,6 +11,7 @@ var quickAlgoInterface = {
 
     fullscreen: false,
     hasHelp: false,
+    editorMenuIsOpen: false,
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -164,7 +165,10 @@ var quickAlgoInterface = {
                     "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
                     "<div rel='load' class='item'>" +
                         "<input type='file' id='task-upload-file' " +
-                        "onchange='task.displayedSubTask.blocklyHelper.handleFiles(this.files);resetFormElement($(this));$(\"#editorMenu\").hide();'>" +
+                        "onchange='\
+                            task.displayedSubTask.blocklyHelper.handleFiles(this.files);\
+                            resetFormElement($(this));\
+                            $(\"#editorMenu\").hide();'>" +
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
@@ -173,7 +177,7 @@ var quickAlgoInterface = {
             "</div>"
         );
         $('#openEditorMenu').click(function() {
-            self.openEditorMenu();
+            self.editorMenuIsOpen ? self.closeEditorMenu() : self.openEditorMenu();
         });
         $("#closeEditorMenu").click(function() {
             self.closeEditorMenu();
@@ -181,11 +185,12 @@ var quickAlgoInterface = {
     },
 
     openEditorMenu: function() {
+        this.editorMenuIsOpen = true;
         var menuWidth = $('#editorMenu').css('width');
         $('body').animate({left: '-' + menuWidth}, 500);
-
     },
     closeEditorMenu: function() {
+        this.editorMenuIsOpen = false;
         $('body').animate({left: '0'}, 500);
     },
     setOptions: function(opt) {
