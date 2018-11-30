@@ -12,6 +12,7 @@ var quickAlgoInterface = {
     fullscreen: false,
     hasHelp: false,
     editorMenuIsOpen: false,
+    taskIntroContent: '',
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -471,19 +472,23 @@ var quickAlgoInterface = {
 
     setupTaskIntro: function() {
         var self = this;
-        if ($('#taskIntro').hasClass('hasLongIntro')) {
+        if (! this.taskIntroContent.length ) {
+            this.taskIntroContent = $('#taskIntro').html();
+        }
+        var hasLong = $('#taskIntro').find('.long');
+        if (hasLong) {
+            $('#taskIntro').addClass('hasLongIntro');
             // if long version of introduction exists, append its content to #blocklyLibContent
             // with proper title and close button
             // add titles
             // add display long version button
-            var taskIntroContent = $('#taskIntro').html();
             var introLong = '' +
                 '<div id="taskIntroLong" style="display:none;" class="panel">' +
                     '<div class="panel-heading">'+
-                        '<h2 class="sectionTitle"><i class="fas fa-search-plus"></i>Détail de la mission</h2>' +
-                        '<button type="button" class="closeLongIntro"><i class="fas fa-times"></i></button>' +
+                        '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>Détail de la mission</h2>' +
+                        '<button type="button" class="closeLongIntro exit"><i class="fas fa-times"></i></button>' +
                     '</div><div class="panel-body">' +
-                        taskIntroContent +
+                        this.taskIntroContent +
                     '</div>' +
                 '<div>';
             $('#blocklyLibContent').append(introLong);
@@ -495,7 +500,7 @@ var quickAlgoInterface = {
                     '<h2 class="sectionTitle shortIntroTitle">' +
                         '<span class="fas fa-book icon"></span>Votre mission' +
                     '</h2>' +
-                    taskIntroContent +
+                    this.taskIntroContent +
                     '<button type="button" class="showLongIntro"><span class="fas fa-plus icon"></span>Plus de détails</button>';
                 $('#taskIntro').html(renderTaskIntro);
             }
@@ -509,7 +514,7 @@ var quickAlgoInterface = {
             }
         }
         $('#taskIntro .showLongIntro').click(function(e) {
-            $('#taskIntroLong').hasClass('displayIntroLong') ? self.closeLongIntro() : self.openLongIntro();
+            self.openLongIntro();
         });
         $('#taskIntroLong .closeLongIntro').click(function(e) {
             self.closeLongIntro();
