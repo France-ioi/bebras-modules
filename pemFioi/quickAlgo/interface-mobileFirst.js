@@ -245,7 +245,7 @@ var quickAlgoInterface = {
     stepDelayMax: 250,
 
     refreshStepDelay: function() {
-        var v = parseInt($('#speedCursor').val(), 10),
+        var v = parseInt($('.speedCursor').val(), 10),
             delay = this.stepDelayMin + this.stepDelayMax - v;
         task.displayedSubTask.setStepDelay(delay);
     },
@@ -255,19 +255,19 @@ var quickAlgoInterface = {
 
         var speedControls =
             '<div class="speedControls">' +
-                '<div id="playerControls">' +
+                '<div class="playerControls">' +
                     '<div class="icon backToFirst"><span class="fas fa-fast-backward"></span></div>' +
                     '<div class="icon playPause play"><span class="fas fa-play-circle"></span></div>' +
                     '<div class="icon nextStep"><span class="fas fa-step-forward"></span></div>' +
                     '<div class="icon goToEnd"><span class="fas fa-fast-forward"></span></div>' +
                     '<div class="icon displaySpeedSlider"><span class="fas fa-tachometer-alt"></span></div>' +
                 '</div>' +
-                '<div id="speedSlider">' +
+                '<div class="speedSlider">' +
                     '<span class="icon hideSpeedSlider"><span class="fas fa-tachometer-alt"></span></span>' +
                     '<span class="icon speedSlower"><span class="fas fa-walking"></span></span>' +
                     '<input type="range" min="0" max="' +
                         (this.stepDelayMax - this.stepDelayMin) +
-                        '" value="0" class="slider" id="speedCursor"/>' +
+                        '" value="0" class="slider speedCursor"/>' +
                     '<span class="icon speedFaster"><span class="fas fa-running"></span></span>' +
                 '</div>' +
             '</div>';
@@ -277,22 +277,14 @@ var quickAlgoInterface = {
         // in intro on portrait tablets
         // in introGrid on other layouts (landscape tablets and desktop)
 
-        if (
-            (screen.width < screen.height && screen.width < 600 && screen.height < 1024) ||
-            (screen.width >= screen.height && screen.height < 600 && screen.width < 1024) ||
-            (window.innerWidth < window.height && window.innerWidth < 600 && window.innerHeight < 1024) ||
-            (window.innerWidth >= window.innerHeight && window.innerHeight < 600 && window.innerWidth < 1024)
-            ) {
-            $('#mode-player').append(speedControls);
-        } else {
-            $('#introGrid').append(speedControls);
-        }
+        $('#mode-player').append(speedControls);
+        $('#introGrid').append(speedControls);
 
-        $('#speedCursor').on('input change', function(e) {
+        $('.speedCursor').on('input change', function(e) {
             self.refreshStepDelay();
         });
         $('.speedSlower').click(function() {
-            var el = $('#speedCursor'),
+            var el = $('.speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) - delta;
@@ -300,7 +292,7 @@ var quickAlgoInterface = {
             self.refreshStepDelay();
         });
         $('.speedFaster').click(function() {
-            var el = $('#speedCursor'),
+            var el = $('.speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) + delta;
@@ -308,13 +300,13 @@ var quickAlgoInterface = {
             self.refreshStepDelay();
         });
 
-        $('#playerControls .backToFirst').click(function() {
+        $('.playerControls .backToFirst').click(function() {
             task.displayedSubTask.stop();
 //            task.displayedSubTask.play();
 //            self.setPlayPause(true);
         });
 
-        $('#playerControls .playPause').click(function(e) {
+        $('.playerControls .playPause').click(function(e) {
             if($(this).hasClass('play')) {
                 self.refreshStepDelay();
                 task.displayedSubTask.play();
@@ -325,7 +317,7 @@ var quickAlgoInterface = {
             }
         })
 
-        $('#playerControls .nextStep').click(function() {
+        $('.playerControls .nextStep').click(function() {
             self.setPlayPause(false);
             task.displayedSubTask.step();
         });
@@ -336,22 +328,22 @@ var quickAlgoInterface = {
             self.setPlayPause(false);
         });
 
-        $('#playerControls .displaySpeedSlider').click(function() {
+        $('.playerControls .displaySpeedSlider').click(function() {
             $('#mode-player').addClass('displaySpeedSlider');
         });
 
-        $('#speedSlider .hideSpeedSlider').click(function() {
+        $('.speedSlider .hideSpeedSlider').click(function() {
            $('#mode-player').removeClass('displaySpeedSlider');
         });
     },
 
     setPlayPause: function(isPlaying) {
         if(isPlaying) {
-            $('#playerControls .playPause').html('<span class="fas fa-pause-circle"></span>');
-            $('#playerControls .playPause').removeClass('play').addClass('pause');
+            $('.playerControls .playPause').html('<span class="fas fa-pause-circle"></span>');
+            $('.playerControls .playPause').removeClass('play').addClass('pause');
         } else {
-            $('#playerControls .playPause').html('<span class="fas fa-play-circle"></span>');
-            $('#playerControls .playPause').removeClass('pause').addClass('play');
+            $('.playerControls .playPause').html('<span class="fas fa-play-circle"></span>');
+            $('.playerControls .playPause').removeClass('pause').addClass('play');
         }
     },
 
@@ -552,7 +544,7 @@ var quickAlgoInterface = {
         $('#errorMessage').remove();
         if(!message) return;
         var html =
-            '<div id="errorMessage" onclick="closeModal(`errorMessage`)">' +
+            '<div class="errorMessage">' +
                 '<button type="button" class="btn close">'+
                     '<span class="fas fa-times"></span>'+
                 '</button>' +
@@ -561,12 +553,12 @@ var quickAlgoInterface = {
                     '<p class="message">' + message + '</p>' +
                 '</div>' +
             '</div>';
-        if (screen.width <= 767 || (screen.width <= 812 && screen.width >= screen.height)) {
-            $("#taskToolbar").append($(html));
-        } else {
-            $(".speedControls").append($(html));
-        }
-        $("#errorMessage").show();
+        $("#taskToolbar").append($(html));
+        $("#introGrid .speedControls").append($(html));
+        $(".errorMessage").show();
+        $(".errorMessage").click(function(e) {
+            $(e.currentTarget).hide();
+        });
     },
 
     wrapIntroAndGrid: function() {

@@ -492,7 +492,7 @@ h2.sectionTitle .icon {
 /*****************
   PLAYER CONTROLS
 *****************/
-#playerControls {
+.playerControls {
   display: inline-flex;
   justify-content: space-between;
   width: 100%;
@@ -511,12 +511,12 @@ h2.sectionTitle .icon {
 @media screen and (max-width: 480px) { /* Portrait mobiles and low res display */
   /* toggle player controls and tab icon, and speed slider visibility */
 
-  #mode-player.displaySpeedSlider #playerControls,
+  #mode-player.displaySpeedSlider .playerControls,
   #mode-player.displaySpeedSlider > span.far,
   #mode-player.displaySpeedSlider > span.fas {
     display: none;
   }
-  #mode-player:not(.displaySpeedSlider) #speedSlider {
+  #mode-player:not(.displaySpeedSlider) .speedSlider {
     display: none;
   }
 }
@@ -530,6 +530,9 @@ h2.sectionTitle .icon {
 /*****************
   SPEED CONTROLS
 *****************/
+#introGrid .speedControls {
+  display: none;
+}
 #taskToolbar .mode:not(.active) .speedControls {
   display: none;
 }
@@ -540,13 +543,13 @@ h2.sectionTitle .icon {
   margin-top: -4px;
   margin-bottom: -4px;
 }
-#speedSlider {
+.speedSlider {
   background-color: rgba(0,0,0,0.3);
   box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
   border-radius:15px;
   display: flex;
 }
-#speedCursor {
+.speedCursor {
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;
@@ -554,14 +557,14 @@ h2.sectionTitle .icon {
   margin-top: 6px;
 }
 /* Chrome */
-#speedCursor::-webkit-slider-runnable-track {
+.speedCursor::-webkit-slider-runnable-track {
   background-color: rgba(0,0,0,0.3);
   width: 100px;
   height: 5px;
   border-radius: 5px;
   margin-top: -6px;
 }
-#speedCursor::-webkit-slider-thumb {
+.speedCursor::-webkit-slider-thumb {
   -webkit-appearance: none;
   border: none;
   height: 20px;
@@ -571,20 +574,20 @@ h2.sectionTitle .icon {
   margin-top: -7px;
   cursor: ew-resize;
 }
-#speedCursor:focus {
+.speedCursor:focus {
   outline: none;
 }
-#speedCursor:focus::-webkit-slider-runnable-track {
+.speedCursor:focus::-webkit-slider-runnable-track {
   background-color: rgba(0,0,0,0.3);
 }
 /* Firefox */
-#speedCursor::-moz-range-track {
+.speedCursor::-moz-range-track {
   height: 5px;
   background-color: rgba(0,0,0,0.3);
   border: none;
   border-radius: 5px;
 }
-#speedCursor::-moz-range-thumb {
+.speedCursor::-moz-range-thumb {
   border: none;
   height: 20px;
   width: 28px;
@@ -593,7 +596,7 @@ h2.sectionTitle .icon {
   cursor: ew-resize;
 }
 /* Edge / IE10+ */
-#speedCursor::-ms-track {
+.speedCursor::-ms-track {
   width: 100px;
   height: 5px;
   background: transparent;
@@ -603,15 +606,15 @@ h2.sectionTitle .icon {
   /*remove default tick marks*/
   color: transparent;
 }
-#speedCursor::-ms-fill-lower {
+.speedCursor::-ms-fill-lower {
   background: #f5a623;
   border-radius: 5px;
 }
-#speedCursor::-ms-fill-upper {
+.speedCursor::-ms-fill-upper {
   background: rgba(0,0,0,0.3);
   border-radius: 5px;
 }
-#speedCursor::-ms-thumb {
+.speedCursor::-ms-thumb {
   border: none;
   height: 20px;
   width: 28px;
@@ -619,10 +622,10 @@ h2.sectionTitle .icon {
   background: #4a90e2;
   cursor: ew-resize;
 }
-#speedCursor:focus::-ms-fill-lower {
+.speedCursor:focus::-ms-fill-lower {
   background: #f5a623;
 }
-#speedCursor:focus::-ms-fill-upper {
+.speedCursor:focus::-ms-fill-upper {
   background: rgba(0,0,0,0.3);
 }
 
@@ -630,13 +633,13 @@ h2.sectionTitle .icon {
   screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
   screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
   screen and (min-width: 1024px) {
-  .speedControls {
+  #introGrid .speedControls {
     display: flex;
     justify-content: space-around;
     padding: 10px;
   }
-  #introGrid #playerControls,
-  #introGrid #speedSlider {
+  #introGrid .playerControls,
+  #introGrid .speedSlider {
     display: inline-flex;
     justify-content: space-around;
     background-color: transparent;
@@ -645,27 +648,27 @@ h2.sectionTitle .icon {
     width: 100%;
     margin: 0;
   }
-  #introGrid #playerControls .icon {
+  #introGrid .playerControls .icon {
     margin-right: 5px;
   }
-  #introGrid #playerControls .icon span {
+  #introGrid .playerControls .icon span {
     padding: 0;
     border-radius: 50%;
     line-height: 30px;
     width: 30px;
     text-align: center;
   }
-  #introGrid #playerControls .icon:not(.playPause) span {
+  #introGrid .playerControls .icon:not(.playPause) span {
     color: #fff;
     background-color: #4a90e2;
     font-size: 14px;
   }
-  #introGrid #playerControls .icon.playPause span {
+  #introGrid .playerControls .icon.playPause span {
     color: #4a90e2;
     background-color: #fff;
     font-size: 30px;
   }
-  #introGrid #speedSlider {
+  #introGrid .speedSlider {
     background-color: rgba(0,0,0,0.10);
     box-shadow: 1px 1px 0 0 rgba(0,0,0,0.10) inset ;
     border-radius: 5px;
@@ -1011,7 +1014,7 @@ h2.sectionTitle .icon {
 /************************
   DISPLAY ERROR MESSAGES
 *************************/
-#errorMessage {
+.errorMessage {
   position: absolute;
   top: 0;
   right: 0;
@@ -1024,13 +1027,13 @@ h2.sectionTitle .icon {
   border-radius: 5px 5px 0 0;
   box-shadow: 0px 0px 0 2px #fff;
 }
-#errorMessage .messageWrapper {
+.errorMessage .messageWrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 100%;
 }
-#errorMessage .messageWrapper .icon {
+.errorMessage .messageWrapper .icon {
   width: 28px;
   margin: 0 10px;
   line-height: 28px;
@@ -1039,11 +1042,11 @@ h2.sectionTitle .icon {
   background-color: rgba(0,0,0,0.20);
   border-radius: 50%;
 }
-#errorMessage .messageWrapper .message {
+.errorMessage .messageWrapper .message {
   flex: 1 1 auto;
   margin: 0;
 }
-#errorMessage .btn {
+.errorMessage .btn {
   position: absolute;
   top: 4px;
   right: 4px;
@@ -1052,7 +1055,7 @@ h2.sectionTitle .icon {
   box-shadow: none;
   color: rgba(0,0,0,0.20);
 }
-#errorMessage .btn span {
+.errorMessage .btn span {
   font-size: 16px;
 }
 .modalWrapper {
