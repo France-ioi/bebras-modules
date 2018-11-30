@@ -29,6 +29,12 @@ body {
   position: relative;
   overflow-x: hidden;
   font-family: 'Titillium Web', Arial, Helvetica, sans-serif;
+  color: #9b9b9b;
+}
+@media screen and (min-width: 1024px) {
+  body {
+    font-size: 14px;
+  }
 }
 body.blockly > *,
 body > * {
@@ -53,6 +59,11 @@ body > * {
 @media screen and (orientation: landscape) { /* horizontal screen layout */
   #openEditorMenu {
     align-self: flex-end;
+  }
+}
+@media screen and (min-width: 1024px) {
+  #openEditorMenu {
+    align-self: end;
   }
 }
 #openEditorMenu::before,
@@ -322,6 +333,8 @@ h2.sectionTitle .icon {
   #introGrid {
     position: relative;
     margin-bottom: 10px;
+    flex: 1 0 auto;
+
   }
   #introGrid .speedControls {
     position: absolute;
@@ -339,6 +352,7 @@ h2.sectionTitle .icon {
     flex: 1 0 50%;
     background-color: #fff;
     overflow: visible;
+    padding-bottom: 50px;
   }
   #gridContainer {
     flex: 1 0 50%;
@@ -794,6 +808,7 @@ h2.sectionTitle .icon {
     margin-bottom: 10px;
   }
 }
+@media screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) { /* Landscape mobiles */
   #editorBar .displayHelpBtn {
     display: none;
   }
