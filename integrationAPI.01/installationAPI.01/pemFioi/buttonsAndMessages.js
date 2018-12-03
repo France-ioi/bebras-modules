@@ -690,7 +690,7 @@ window.displayHelper = {
    },
 
    initLevelVars: function() {
-      var defaultLevelsRanks = { very_easy: 1, easy: 2, medium: 3, hard: 4 };
+      var defaultLevelsRanks = { basic: 1, easy: 2, medium: 3, hard: 4 };
       this.levelsRanks = {};
       this.levelsScores = {};
       this.prevLevelsScores = {};
