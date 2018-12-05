@@ -752,6 +752,9 @@ h2.sectionTitle .icon {
 #editorBar .buttons button {
   cursor: pointer;
 }
+.buttons button > span {
+  min-width: 12px;
+}
 @media /* Portrait mobiles */
   screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1023px) {
     #editorBar {
