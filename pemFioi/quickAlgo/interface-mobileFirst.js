@@ -45,18 +45,33 @@ var quickAlgoInterface = {
     toggleFullscreen: function() {
         this.fullscreen = !this.fullscreen;
         if(this.fullscreen) {
-            $('#fullscreenButton').html('<i class="fas fa-compress"></i>');
             this.enterFullscreen();
         } else {
-            $('#fullscreenButton').html('<i class="fas fa-expand"></i>');
             this.exitFullscreen();
         }
         this.onResize();
     },
 
+    updateFullscreenState: function() {
+        if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreen || document.webkitIsFullScreen) {
+            this.fullscreen = true;
+            $('#fullscreenButton').html('<i class="fas fa-compress"></i>');
+        } else {
+            this.fullscreen = false;
+            $('#fullscreenButton').html('<i class="fas fa-expand"></i>');
+        }
+    },
 
+    registerFullscreenEvents: function() {
+        if(this.fullscreenEvents) { return; }
+        document.addEventListener("fullscreenchange", this.updateFullscreenState.bind(this));
+        document.addEventListener("webkitfullscreenchange", this.updateFullscreenState.bind(this));
+        document.addEventListener("mozfullscreenchange", this.updateFullscreenState.bind(this));
+        document.addEventListener("MSFullscreenChange", this.updateFullscreenState.bind(this));
+        this.fullscreenEvents = true;
+    },
 
-    loadInterface: function(context) {
+    loadInterface: function(context, level) {
         ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
         var self = this;
@@ -74,7 +89,7 @@ var quickAlgoInterface = {
             "<div id='editorBar'>" +
                 "<div id='capacity'></div>" +
                 "<div class='buttons'>" +
-                "<button type='button' id='fullscreenButton'><i class='fas fa-expand'></i></button>" +
+                "<button type='button' id='fullscreenButton'><span class='fas fa-expand'></span></button>" +
                 displayHelpBtn +
                 "</div>" +
             "</div>" +
@@ -146,8 +161,14 @@ var quickAlgoInterface = {
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
-        this.setupTaskIntro();
+        this.setupTaskIntro(level);
         this.wrapIntroAndGrid();
+        this.checkFonts();
+        this.registerFullscreenEvents();
+        var that = this;
+        setTimeout(function() {
+            that.onResize();
+            }, 0);
     },
 
     createEditorMenu: function() {
@@ -462,7 +483,7 @@ var quickAlgoInterface = {
         this.onResize();
     },
 
-    setupTaskIntro: function() {
+    setupTaskIntro: function(level) {
         var self = this;
         if (! this.taskIntroContent.length ) {
             this.taskIntroContent = $('#taskIntro').html();
@@ -511,6 +532,12 @@ var quickAlgoInterface = {
         $('#taskIntroLong .closeLongIntro').click(function(e) {
             self.closeLongIntro();
         });
+        if(level) {
+            for(var otherLevel in displayHelper.levelsRanks) {
+                $('.' + otherLevel).hide();
+            }
+            $('.' + level).show();
+        }
     },
 
     openLongIntro: function() {
@@ -535,8 +562,12 @@ var quickAlgoInterface = {
         var blocklyDiv = document.getElementById('blocklyDiv');
         var toolbarDiv = document.getElementById('taskToolbar');
         var heightBeforeToolbar = toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top;
-        var heightBeforeWindow = window.innerHeight - blocklyArea.getBoundingClientRect().top - 60
-        blocklyDiv.style.height = Math.min(heightBeforeToolbar, heightBeforeWindow) + 'px';
+        var heightBeforeWindow = window.innerHeight - blocklyArea.getBoundingClientRect().top - 10;
+        if($('#taskToolbar').is(':visible')) {
+            blocklyDiv.style.height = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)) + 'px';
+        } else {
+            blocklyDiv.style.height = Math.floor(heightBeforeWindow) + 'px';
+        }
         Blockly.svgResize(window.blocklyWorkspace);
     },
 
@@ -564,6 +595,21 @@ var quickAlgoInterface = {
     wrapIntroAndGrid: function() {
         if ($('#introGrid').length) { return; }
         $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
+    },
+
+    checkFonts: function() {
+        // Check if local fonts loaded properly, else use a CDN
+        // (issue mostly happens when opening a task locally in Firefox)
+        if(!document.fonts) { return; }
+        document.fonts.ready.then(function() {
+            if(!document.fonts.check('12px "Titillium Web"')) {
+                // Load fonts from CDN
+                $('head').append(''
+                    + '<link href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,700" rel="stylesheet">'
+                    + '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">'
+                    );
+            }
+        });
     }
 
     /*
@@ -595,5 +641,4 @@ $(document).ready(function() {
     quickAlgoInterface.selectMode('mode-instructions');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
-    quickAlgoInterface.onResize();
 });
