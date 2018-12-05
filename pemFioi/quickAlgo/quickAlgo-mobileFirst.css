@@ -680,7 +680,9 @@ h2.sectionTitle .icon {
   #introGrid .playerControls .icon.playPause span {
     color: #4a90e2;
     background-color: #fff;
-    font-size: 30px;
+    font-size: 40px;
+    width: 40px;
+    vertical-align: middle;
   }
   #introGrid .speedSlider {
     background-color: rgba(0,0,0,0.10);
@@ -1125,15 +1127,19 @@ h2.sectionTitle .icon {
   display: none;
 }
 button.showLongIntro {
-  color: #fff;
-  background-color: #4a90e2;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
   border-radius: 50px;
-  width: 100%;
-  border: none;
   box-shadow: none;
-  padding: 8px 15px;
+  padding: 8px 15px 8px 40px;
   position: relative;
   cursor: pointer;
+  display: none;
+  background: #fff;
+  float: right;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 12px;
   display: none;
 }
 button.showLongIntro .icon {

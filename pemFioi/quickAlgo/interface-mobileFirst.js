@@ -514,7 +514,7 @@ var quickAlgoInterface = {
                         '<span class="fas fa-book icon"></span>Votre mission' +
                     '</h2>' +
                     this.taskIntroContent +
-                    '<button type="button" class="showLongIntro"><span class="fas fa-plus icon"></span>Plus de détails</button>';
+                    '<button type="button" class="showLongIntro"><span class="fas fa-plus-circle icon"></span>Plus de détails</button>';
                 $('#taskIntro').html(renderTaskIntro);
             }
         }
