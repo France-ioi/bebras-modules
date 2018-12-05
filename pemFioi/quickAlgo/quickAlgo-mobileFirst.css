@@ -257,8 +257,8 @@ h2.sectionTitle .icon {
 }
 
 @media /* Mobiles */
-  screen and (orientation: portrait) and (max-width: 599px) and (max-height: 1023px),
-  screen and (orientation: landscape) and (max-height: 599px) and (max-width: 1023px) {
+  screen and (orientation: portrait) and (max-width: 799px) and (max-height: 1023px),
+  screen and (orientation: landscape) and (max-height: 799px) and (max-width: 1023px) {
   .mode-player #taskContent {
     flex-direction: column;
   }
@@ -338,7 +338,7 @@ h2.sectionTitle .icon {
   }
   #introGrid .speedControls {
     position: absolute;
-    bottom: 0;
+    bottom: -10px;
     left: 0;
     width: 50%;
     padding-top: 10px;
@@ -380,14 +380,6 @@ h2.sectionTitle .icon {
     padding: 2em;
   }
 }
-@media /* Tablets and desktop */
-  screen and (orientation: landscape) and (min-width: 800px) and (min-height: 600px),
-  screen and (orientation: portrait) and (min-width: 600px) and (min-height: 800px),
-  screen and (min-width: 1024px) {
-
-
-}
-
 
 /*****************
   TASK GRID & TESTS
@@ -397,6 +389,7 @@ h2.sectionTitle .icon {
   max-width: 100%;
   padding: 2em 0px;
   flex-grow: 1;
+  z-index: 2;
 }
 #testSelector {
     padding-left: 10px;
@@ -715,8 +708,8 @@ h2.sectionTitle .icon {
   }
 }
 @media /* Mobiles */
-  screen and (display-mode: fullscreen) and (orientation: portrait) and (max-width: 599px) and (max-height: 1025px),
-  screen and (display-mode: fullscreen) and (orientation: landscape) and (max-height: 599px) and (max-width: 1024px) {
+  screen and (display-mode: fullscreen) and (orientation: portrait) and (max-width: 799px) and (max-height: 1023px),
+  screen and (display-mode: fullscreen) and (orientation: landscape) and (max-height: 799px) and (max-width: 1023px) {
   #miniPlatformHeader,
   #tabsContainer,
   #introGrid,
