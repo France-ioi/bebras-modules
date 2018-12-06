@@ -2424,7 +2424,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       if (this.display) {
-        window.quickAlgoInterface.loadInterface(this.context);
+        window.quickAlgoInterface.loadInterface(this.context, curLevel);
         window.quickAlgoInterface.setOptions({
            hideSaveOrLoad: subTask.levelGridInfos.hideSaveOrLoad,
            hasExample: subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language],
