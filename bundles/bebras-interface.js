@@ -291,6 +291,7 @@ window.displayHelper = {
 
    // Defaults
    levels: ['easy', 'medium', 'hard'],
+   levelsIdx: { easy: 0, medium: 1, hard: 2 },
    maxStars: 4,
 
    formatTranslation: function(s, args) { return s.replace(/\{([^}]+)\}/g, function(_, match){ return args[match]; }); },
@@ -950,7 +951,13 @@ window.displayHelper = {
    setupLevels: function(initLevel, reloadWithCallbacks, levels) {
       this.reloadWithCallbacks = reloadWithCallbacks;
       this.initLanguage();
-      if(levels) { this.levels = levels; }
+      if(levels) {
+         this.levels = levels;
+         this.levelsIdx = {};
+         for(var i = 0; i < this.levels.length; i++) {
+            this.levelsIdx[this.levels[i]] = i;
+         }
+      }
       this.initLevelVars();
       if (!initLevel) {
          if (!this.taskParams) {
@@ -1063,7 +1070,7 @@ window.displayHelper = {
 
    updateStarsAtLevel: function(level) {
       var rate = this.levelsScores[level] / this.levelsMaxScores[level];
-      var iLevel = this.levels.indexOf(level);
+      var iLevel = this.levelsIdx[level];
       var starsIdx = this.levelsRanks[level];
       var mode = 'normal';
       if (iLevel >= this.unlockedLevels) {
@@ -1528,8 +1535,8 @@ window.displayHelper = {
          avatarMood = "success";
          buttonText = this.strings.moveOn;
          fullMessage += "<br/><br/>";
-         var levelIdx = this.levels.indexOf(gradedLevel);
-         var nextLevel = levelIdx > -1 && levelIdx < this.levels.length-1 ? this.levels[levelIdx+1] : null;
+         var levelIdx = this.levelsIdx[gradedLevel];
+         var nextLevel = levelIdx !== undefined && levelIdx < this.levels.length-1 ? this.levels[levelIdx+1] : null;
          if(nextLevel) {
             // Offer to try next task if the user solved this difficulty slowly
             var threshold = this.thresholds[gradedLevel];
@@ -1563,7 +1570,7 @@ window.displayHelper = {
             }
             if (actionNext == "nextTask") {
                platform.validate("nextImmediate");
-            } else if(self.levels.indexOf(actionNext) != -1) {
+            } else if(self.levelsIdx[actionNext] !== undefined) {
                self.setLevel(actionNext);
             }
          },
