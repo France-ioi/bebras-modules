@@ -559,14 +559,20 @@ var quickAlgoInterface = {
 
     onResize: function(e) {
         var blocklyArea = document.getElementById('blocklyContainer');
+        if(!blocklyArea) { return; }
         var blocklyDiv = document.getElementById('blocklyDiv');
         var toolbarDiv = document.getElementById('taskToolbar');
-        var heightBeforeToolbar = toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top;
+        var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top : Infinity;
         var heightBeforeWindow = window.innerHeight - blocklyArea.getBoundingClientRect().top - 10;
         if($('#taskToolbar').is(':visible')) {
             blocklyDiv.style.height = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)) + 'px';
         } else {
             blocklyDiv.style.height = Math.floor(heightBeforeWindow) + 'px';
+        }
+        if($('#miniPlatformHeader').length) {
+            $('#task').css('height', 'calc(100vh - 40px)');
+        } else {
+            $('#task').css('height', '');
         }
         Blockly.svgResize(window.blocklyWorkspace);
     },
@@ -651,4 +657,9 @@ $(document).ready(function() {
     quickAlgoInterface.selectMode('mode-instructions');
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
+
+    window.task.getHeight = function(callback) {
+        quickAlgoInterface.onResize();
+        callback(720);
+    }
 });
