@@ -658,8 +658,21 @@ $(document).ready(function() {
 
     window.addEventListener('resize', quickAlgoInterface.onResize, false);
 
-    window.task.getHeight = function(callback) {
-        quickAlgoInterface.onResize();
-        callback(720);
+    // Set up task calls
+    if(window.task) {
+        // Add autoHeight = true to metadata sent back
+        var beaverGetMetaData = window.task.getMetaData;
+        window.task.getMetaData = function(callback) {
+            beaverGetMetaData(function(res) {
+                res.autoHeight = true;
+                callback(res);
+            });
+        }
+
+        // If platform still calls getHeight despite autoHeight set to true,
+        // send back a fixed height of 720px to avoid infinite expansion
+        window.task.getHeight = function(callback) {
+            callback(720);
+        }
     }
 });
