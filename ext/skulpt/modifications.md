@@ -14,3 +14,8 @@ compile.js, to modify the Store cases for each operation.
 
 A diff between skulpt.min.js and skulpt.quickAlgo.min.js (at the time of the
 creation of this file) can help seeing those changes.
+
+
+The debugger has also been modified to fix a bug with step-by-step while using
+user-defined functions : the line 257 has been added to pass the return value
+to the children.
