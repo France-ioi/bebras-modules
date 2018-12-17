@@ -204,7 +204,7 @@ body > * {
 *************************/
 h2.sectionTitle {
   font-size: 22px;
-  font-weight: lighter;
+  font-weight: 100;
   color: #4a90e2;
   margin: 0;
 }
@@ -240,7 +240,6 @@ h2.sectionTitle .icon {
 #taskIntro {
   padding: 10px 20px;
   overflow: auto;
-  color: #9b9b9b;
 }
 #gridContainer {
   background-color: #fff;
@@ -661,7 +660,7 @@ h2.sectionTitle .icon {
 #introGrid .playerControls .icon:not(.playPause) span {
   color: #fff;
   background-color: #4a90e2;
-  font-size: 14px;
+  font-size: 16px;
 }
 #introGrid .playerControls .icon.playPause span {
   color: #4a90e2;
@@ -1113,6 +1112,17 @@ h2.sectionTitle .icon {
 /************************
   INTRODUCTION
 *************************/
+#taskIntro,
+#taskIntroLong {
+  color: #787878;
+  font-weight: bold;
+}
+#taskIntro h2.sectionTitle,
+#taskIntroLong h2.sectionTitle {
+  font-size: 22px;
+  font-weight: 100;
+  color: #4a90e2;
+}
 #taskIntro .shortIntroTitle {
   display: none;
 }
