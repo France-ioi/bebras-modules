@@ -250,8 +250,8 @@ h2.sectionTitle .icon {
 }
 
 @media screen and (orientation: portrait) and (max-width: 480px) { /* Low res display */
-  .mode-player .blocklyToolboxDiv {
-    display: none;
+  .mode-player .blocklyToolboxDiv, .mode-player .blocklyFlyout, .mode-player .blocklyTrash {
+    display: none !important;
   }
 }
 
@@ -278,8 +278,10 @@ h2.sectionTitle .icon {
     display: none;
   }
   .mode-player .blocklyToolboxDiv,
+  .mode-player .blocklyFlyout,
+  .mode-player .blocklyTrash,
   .mode-player #editorBar {
-    display: none;
+    display: none !important;
   }
 }
 
