@@ -176,7 +176,7 @@ var quickAlgoInterface = {
         var self = this;
         $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
         $("body").append('' +
-            "<div id='editorMenu'>" +
+            "<div id='editorMenu' style='display: none;'>" +
                 "<div class='editorMenuHeader'>" +
                     "<div id='closeEditorMenu'><span class='fas fa-times'></span></div>" +
                     "<div>Menu</div>" +
@@ -210,11 +210,14 @@ var quickAlgoInterface = {
     openEditorMenu: function() {
         this.editorMenuIsOpen = true;
         var menuWidth = $('#editorMenu').css('width');
+        $('#editorMenu').css('display','block');
         $('body').animate({left: '-' + menuWidth}, 500);
     },
     closeEditorMenu: function() {
         this.editorMenuIsOpen = false;
-        $('body').animate({left: '0'}, 500);
+        $('body').animate({left: '0'}, 500, function() {
+            $('#editorMenu').css('display','none')
+        });
     },
     setOptions: function(opt) {
         // Load options from the task
