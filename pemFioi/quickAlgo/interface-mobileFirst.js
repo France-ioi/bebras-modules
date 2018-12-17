@@ -10,6 +10,8 @@ var quickAlgoInterface = {
     curMode: null,
 
     fullscreen: false,
+    lastHeight: null,
+    checkHeightInterval: null,
     hasHelp: false,
     editorMenuIsOpen: false,
     taskIntroContent: '',
@@ -165,6 +167,9 @@ var quickAlgoInterface = {
         this.wrapIntroAndGrid();
         this.checkFonts();
         this.registerFullscreenEvents();
+        if(!this.checkHeightInterval) {
+            this.checkHeightInterval = setInterval(this.checkHeight.bind(this), 1000);
+        }
         var that = this;
         setTimeout(function() {
             that.onResize();
@@ -586,8 +591,16 @@ var quickAlgoInterface = {
         Blockly.svgResize(window.blocklyWorkspace);
     },
 
+    checkHeight: function() {
+        var browserHeight = document.documentElement.clientHeight;
+        if(this.lastHeight !== null && this.lastHeight != browserHeight) {
+            this.onResize();
+        }
+        this.lastHeight = browserHeight;
+    },
+
     displayError: function(message) {
-        $('#errorMessage').remove();
+        $('.errorMessage').remove();
         if(!message) return;
         var html =
             '<div class="errorMessage">' +
