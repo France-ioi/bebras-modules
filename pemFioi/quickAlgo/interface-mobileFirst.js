@@ -465,6 +465,7 @@ var quickAlgoInterface = {
 
         $('#modeSelector div').click(function() {
             self.selectMode($(this).attr('id'));
+            self.onResize();
         })
     },
 
