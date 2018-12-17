@@ -561,19 +561,23 @@ var quickAlgoInterface = {
     },
 
     onResize: function(e) {
+        // 100% and 100vh work erratically on some mobile browsers (Safari on
+        // iOS) because of the toolbar
+        $('body').css('height', window.innerHeight);
+
         var blocklyArea = document.getElementById('blocklyContainer');
         if(!blocklyArea) { return; }
         var blocklyDiv = document.getElementById('blocklyDiv');
         var toolbarDiv = document.getElementById('taskToolbar');
         var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top : Infinity;
         var heightBeforeWindow = window.innerHeight - blocklyArea.getBoundingClientRect().top - 10;
-        if($('#taskToolbar').is(':visible')) {
+        if($('#taskToolbar').is(':visible') && window.innerHeight < window.innerWidth) {
             blocklyDiv.style.height = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)) + 'px';
         } else {
             blocklyDiv.style.height = Math.floor(heightBeforeWindow) + 'px';
         }
         if($('#miniPlatformHeader').length) {
-            $('#task').css('height', 'calc(100vh - 40px)');
+            $('#task').css('height', (window.innerHeight - 40) + 'px');
         } else {
             $('#task').css('height', '');
         }
