@@ -104,8 +104,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
          'quickAlgo_context',
-         'quickAlgo_css',
-         'blocklyRobot_lib'
+         'quickAlgo_css'
       ],
       scratch: [
          'acorn',
@@ -128,8 +127,7 @@ var languageScripts = function () {
          'quickAlgo_blockly_runner',
          'quickAlgo_subtask',
          'quickAlgo_context',
-         'quickAlgo_css',
-         'blocklyRobot_lib'
+         'quickAlgo_css'
       ],
       python: [
          'python_count',
@@ -145,8 +143,7 @@ var languageScripts = function () {
          'quickAlgo_python_runner',
          'quickAlgo_subtask',
          'quickAlgo_context',
-         'quickAlgo_css',
-         'blocklyRobot_lib'
+         'quickAlgo_css'
       ]
    }
 }
