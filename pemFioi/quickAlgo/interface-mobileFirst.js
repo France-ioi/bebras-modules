@@ -654,8 +654,11 @@ var quickAlgoInterface = {
         // (issue mostly happens when opening a task locally in Firefox)
         if(!document.fonts) { return; }
         document.fonts.ready.then(function() {
-            if(!document.fonts.check('12px "Titillium Web"')) {
-                if(window.modulesPath) {
+            // iOS will always return true to document.fonts.check
+            var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
+
+            if(iOS || !document.fonts.check('12px "Titillium Web"')) {
+                if(!iOS && window.modulesPath) {
                     // Load fonts from CSS files with embedded fonts
                     if(window.embeddedFontsAdded) { return; }
                     $('head').append(''
@@ -665,6 +668,7 @@ var quickAlgoInterface = {
                     window.embeddedFontsAdded = true;
                 } else {
                     // Load fonts from CDN
+                    // (especially for iOS on which the embed doesn't work)
                     $('head').append(''
                         + '<link href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,700" rel="stylesheet">'
                         + '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">'
