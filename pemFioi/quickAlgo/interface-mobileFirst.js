@@ -28,6 +28,8 @@ var quickAlgoInterface = {
         } else if(el.msRequestFullscreen) {
             el.msRequestFullscreen();
         }
+        this.fullscreen = true;
+        this.updateFullscreenElements();
     },
 
 
@@ -42,6 +44,8 @@ var quickAlgoInterface = {
         } else if(el.msExitFullscreen) {
             el.msExitFullscreen();
         }
+        this.fullscreen = false;
+        this.updateFullscreenElements();
     },
 
 
@@ -61,9 +65,18 @@ var quickAlgoInterface = {
     updateFullscreenState: function() {
         if(document.fullscreenElement || document.msFullscreenElement || document.mozFullScreen || document.webkitIsFullScreen) {
             this.fullscreen = true;
-            $('#fullscreenButton').html('<i class="fas fa-compress"></i>');
         } else {
             this.fullscreen = false;
+        }
+        this.updateFullscreenElements();
+    },
+
+    updateFullscreenElements: function() {
+        if(this.fullscreen) {
+            $('body').addClass('fullscreen');
+            $('#fullscreenButton').html('<i class="fas fa-compress"></i>');
+        } else {
+            $('body').removeClass('fullscreen');
             $('#fullscreenButton').html('<i class="fas fa-expand"></i>');
         }
     },

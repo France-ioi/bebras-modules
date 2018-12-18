@@ -699,24 +699,11 @@ h2.sectionTitle .icon {
 /*****************
   CODE EDITOR
 *****************/
-/* Hide elements on editor fullscreen */
-@media /* Tablets and desktop */
-  screen and (display-mode: fullscreen) and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
-  screen and (display-mode: fullscreen) and (min-width: 960px) and (orientation: landscape) {
-  #introGrid,
-  #taskToolbar {
-    display: none;
-  }
-}
-@media /* Mobiles */
-  screen and (display-mode: fullscreen) and (max-width: 600px) and (orientation: portrait),
-  screen and (display-mode: fullscreen) and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
-  #miniPlatformHeader,
-  #tabsContainer,
-  #introGrid,
-  #taskToolbar {
-    display: none;
-  }
+body.fullscreen #miniPlatformHeader,
+body.fullscreen #tabsContainer,
+body.fullscreen #introGrid,
+body.fullscreen #taskToolbar {
+  display: none;
 }
 #blocklyContainer {
   position: relative;
