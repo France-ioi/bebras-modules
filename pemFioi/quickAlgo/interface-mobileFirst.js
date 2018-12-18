@@ -366,7 +366,7 @@ var quickAlgoInterface = {
             task.displayedSubTask.step();
         });
 
-        $('#playerControls .goToEnd').click(function() {
+        $('.playerControls .goToEnd').click(function() {
             task.displayedSubTask.setStepDelay(0);
             task.displayedSubTask.play();
             self.setPlayPause(false);
