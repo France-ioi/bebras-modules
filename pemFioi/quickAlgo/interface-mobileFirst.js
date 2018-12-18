@@ -558,7 +558,7 @@ var quickAlgoInterface = {
             this.longIntroShown = false;
         } else {
             $('#taskIntroLong').addClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>Moins de détails</button>');
+            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>Masquer les détails</button>');
             this.longIntroShown = true;
         }
     },
