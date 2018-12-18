@@ -698,7 +698,14 @@ $(document).ready(function() {
         <link rel="stylesheet"\
         href="../../modules/fonts/fontAwesome/css/all.css">');
 
-    $("#task h1").appendTo($("#miniPlatformHeader table td").first());
+    var taskTitleTarget = $("#miniPlatformHeader table td").first();
+    if(taskTitleTarget.length) {
+        // Put title in miniPlatformHeader
+        $("#task h1").appendTo(taskTitleTarget);
+    } else {
+        // Remove title, the platform displays it
+        $("#task h1").remove();
+    }
 
     quickAlgoInterface.selectMode('mode-instructions');
 
