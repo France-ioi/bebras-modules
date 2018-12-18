@@ -52,7 +52,10 @@ var quickAlgoInterface = {
         } else {
             this.exitFullscreen();
         }
-        this.onResize();
+        var that = this;
+        setTimeout(function() {
+            that.onResize();
+        }, 500);
     },
 
     updateFullscreenState: function() {
