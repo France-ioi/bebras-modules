@@ -262,7 +262,6 @@ var quickAlgoInterface = {
     },
 
     onScaleDrawingChange: function(e) {
-        console.log('onScaleDrawingChange')
         var scaled = $(e.target).prop('checked');
         $("#gridContainer").toggleClass('gridContainerScaled', scaled);
         $("#blocklyLibContent").toggleClass('blocklyLibContentScaled', scaled);
@@ -271,7 +270,6 @@ var quickAlgoInterface = {
 
 
     blinkRemaining: function(times, red) {
-        console.log('blinkRemaining')
         var capacity = $('#capacity');
         if(times % 2 == 0) {
             capacity.removeClass('capacityRed');
@@ -395,7 +393,6 @@ var quickAlgoInterface = {
 
     initTestSelector: function (nbTestCases) {
         var self = this;
-        console.log('initTestSelector')
         // Create the DOM for the tests display
         this.nbTestCases = nbTestCases;
 
@@ -418,7 +415,6 @@ var quickAlgoInterface = {
 
 
     updateTestScores: function (testScores) {
-        console.log('updateTestScores')
         // Display test results
         for(var iTest=0; iTest<testScores.length; iTest++) {
             if(!testScores[iTest]) { continue; }
@@ -445,7 +441,6 @@ var quickAlgoInterface = {
     },
 
     resetTestScores: function () {
-        console.log('resetTestScores')
         // Reset test results display
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
             $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
@@ -453,7 +448,6 @@ var quickAlgoInterface = {
     },
 
     updateTestSelector: function (newCurTest) {
-        console.log('updateTestSelector')
         $("#testSelector .testTab").removeClass('currentTest');
         $("#testTab"+newCurTest).addClass('currentTest');
         $("#task").append($('#messages'));
@@ -677,22 +671,6 @@ var quickAlgoInterface = {
             }
         });
     }
-
-    /*
-    displayError: function(message) {
-        $('#errorModal').remove();
-        if(!message) return;
-        var html =
-            '<div id="errorModal" class="modalWrapper">' +
-            '<div class="modal">' +
-            '<button type="button" class="btn close" onclick="closeModal(`errorModal`)">x</button>' +
-            '<p>' + message + '</p>' +
-            '</div>' +
-            '</div>';
-        $(document.body).append($(html));
-        $("#errorModal").show();
-    }
-    */
 };
 
 
