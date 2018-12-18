@@ -588,7 +588,9 @@ var quickAlgoInterface = {
         } else {
             $('#task').css('height', '');
         }
+
         Blockly.svgResize(window.blocklyWorkspace);
+        task.displayedSubTask.updateScale();
     },
 
     checkHeight: function() {

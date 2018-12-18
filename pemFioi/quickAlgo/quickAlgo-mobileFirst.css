@@ -236,6 +236,7 @@ h2.sectionTitle .icon {
 }
 #introGrid {
   display: flex;
+  flex: 1 1 40%;
 }
 #taskIntro {
   padding: 10px 20px;
@@ -243,7 +244,7 @@ h2.sectionTitle .icon {
 }
 #gridContainer {
   background-color: #fff;
-  flex: 1 0 auto;
+  flex: 1 1 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -358,7 +359,7 @@ h2.sectionTitle .icon {
     padding-bottom: 50px;
   }
   #gridContainer {
-    flex: 1 0 50%;
+    flex: 1 1 50%;
     min-width: 0;
   }
 }
@@ -369,7 +370,7 @@ h2.sectionTitle .icon {
   }
   #taskIntro {
     background-color: #fff;
-    flex: 1 1 auto;
+    flex: 1 0 auto;
   }
   #gridContainer {
     background-color: transparent;
@@ -377,7 +378,6 @@ h2.sectionTitle .icon {
   #gridContainer #grid {
     background-color: #fff;
     flex: 1 1 auto;
-    padding: 2em;
   }
 }
 
@@ -385,11 +385,11 @@ h2.sectionTitle .icon {
   TASK GRID & TESTS
 *****************/
 #grid {
-  overflow-x: auto;
-  max-width: 100%;
-  padding: 2em 0px;
-  flex-grow: 1;
-  z-index: 2;
+    overflow-x: auto;
+    max-width: 100%;
+    flex-grow: 1;
+    z-index: 2;
+    padding: 6px;
 }
 #testSelector {
     padding-left: 10px;
@@ -510,6 +510,7 @@ h2.sectionTitle .icon {
 }
 .speedControls {
   position: relative;
+  flex-shrink: 0;
 }
 .speedControls .icon span {
   padding: 5px 10px;
@@ -722,6 +723,7 @@ h2.sectionTitle .icon {
 }
 #blocklyLibContent {
   width: 100%;
+  flex: 1 1 60%;
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),

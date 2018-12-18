@@ -116,8 +116,12 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.updateScale = function() {
-      this.context.updateScale();
-      this.blocklyHelper.updateSize();
+      setTimeout(function() {
+         try {
+            subTask.context.updateScale();
+            subTask.blocklyHelper.updateSize();
+         } catch(e) {}
+         }, 0);
    };
 
    var resetScores = function() {
