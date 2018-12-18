@@ -1938,10 +1938,12 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var newCellSide;
+      var areaWidth = Math.min(400, Math.max(200, $('#grid').width()-24));
+      var areaHeight = Math.min(600, Math.max(150, $('#grid').height()-24));
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
+         newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       } else {
          newCellSide = 0;
       }

@@ -2404,11 +2404,13 @@ var getContext = function(display, infos, curLevel) {
       if(paper == null) {
          return;
       }
+      var areaWidth = Math.min(400, Math.max(200, $('#grid').width()-24));
+      var areaHeight = Math.min(600, Math.max(150, $('#grid').height()-24));
       var newCellSide = 0;
       if(context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(infos.cellSide, Math.min(400 / (context.nbCols + marginAsCols), 600 / (context.nbRows + marginAsRows)));
+         newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
       paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
