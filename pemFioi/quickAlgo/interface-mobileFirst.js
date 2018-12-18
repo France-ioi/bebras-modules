@@ -14,6 +14,7 @@ var quickAlgoInterface = {
     checkHeightInterval: null,
     hasHelp: false,
     editorMenuIsOpen: false,
+    longIntroShown: false,
     taskIntroContent: '',
 
     enterFullscreen: function() {
@@ -497,7 +498,7 @@ var quickAlgoInterface = {
         if (! this.taskIntroContent.length ) {
             this.taskIntroContent = $('#taskIntro').html();
         }
-        var hasLong = $('#taskIntro').find('.long');
+        var hasLong = $('#taskIntro').find('.long').length;
         if (hasLong) {
             $('#taskIntro').addClass('hasLongIntro');
             // if long version of introduction exists, append its content to #blocklyLibContent
@@ -514,6 +515,9 @@ var quickAlgoInterface = {
                     '</div>' +
                 '<div>';
             $('#blocklyLibContent').append(introLong);
+            $('#taskIntroLong .closeLongIntro').click(function(e) {
+                self.toggleLongIntro(false);
+            });
             if (! $('#taskIntro .sectionTitle').length) {
                 var renderTaskIntro = '' +
                     '<h2 class="sectionTitle longIntroTitle">' +
@@ -523,24 +527,22 @@ var quickAlgoInterface = {
                         '<span class="fas fa-book icon"></span>Votre mission' +
                     '</h2>' +
                     this.taskIntroContent +
-                    '<button type="button" class="showLongIntro"><span class="fas fa-plus-circle icon"></span>Plus de détails</button>';
+                    '<button type="button" class="showLongIntro"></button>';
                 $('#taskIntro').html(renderTaskIntro);
+                $('#taskIntro .showLongIntro').click(function(e) {
+                    self.toggleLongIntro();
+                });
             }
+            self.toggleLongIntro(false);
         }
         else {
             if (! $('#taskIntro .sectionTitle').length) {
-                $('#taskIntro').prepend('\
-                    <h2 class="sectionTitle longIntroTitle">\
-                        <span class="fas fa-book icon"></span>Énoncé\
-                    </h2>');
+                $('#taskIntro').prepend('' +
+                    '<h2 class="sectionTitle longIntroTitle">' +
+                        '<span class="fas fa-book icon"></span>Énoncé' +
+                    '</h2>');
             }
         }
-        $('#taskIntro .showLongIntro').click(function(e) {
-            self.openLongIntro();
-        });
-        $('#taskIntroLong .closeLongIntro').click(function(e) {
-            self.closeLongIntro();
-        });
         if(level) {
             for(var otherLevel in displayHelper.levelsRanks) {
                 $('.' + otherLevel).hide();
@@ -549,12 +551,16 @@ var quickAlgoInterface = {
         }
     },
 
-    openLongIntro: function() {
-        $('#taskIntroLong').addClass('displayIntroLong');
-    },
-
-    closeLongIntro: function() {
-        $('#taskIntroLong').removeClass('displayIntroLong');
+    toggleLongIntro: function(forceNewState) {
+        if(forceNewState === false || this.longIntroShown) {
+            $('#taskIntroLong').removeClass('displayIntroLong');
+            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>Plus de détails</button>');
+            this.longIntroShown = false;
+        } else {
+            $('#taskIntroLong').addClass('displayIntroLong');
+            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>Moins de détails</button>');
+            this.longIntroShown = true;
+        }
     },
 
     unloadLevel: function() {
