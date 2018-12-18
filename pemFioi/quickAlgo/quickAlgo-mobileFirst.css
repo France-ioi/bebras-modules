@@ -1120,6 +1120,7 @@ h2.sectionTitle .icon {
 #taskIntroLong {
   color: #787878;
   font-weight: bold;
+  font-size: 16px;
 }
 #taskIntro h2.sectionTitle,
 #taskIntroLong h2.sectionTitle {
