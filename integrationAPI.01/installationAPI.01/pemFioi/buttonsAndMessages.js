@@ -984,7 +984,7 @@ window.displayHelper = {
       if(mode == 'input') {
          popupHtml += '<input id="popupInput" type="text" value="' + (defaultText ? defaultText : '') + '"></input>';
       }
-      popupHtml += buttonYes + buttonNo + '</div>';
+      popupHtml += '<div class="buttonsWrapper">' + buttonYes + buttonNo + '</div></div>';
       $('#popupMessage').html(popupHtml).show();
       if(mode == 'input') {
          $('#popupInput').focus();
