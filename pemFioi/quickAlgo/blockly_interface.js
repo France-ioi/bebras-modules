@@ -98,7 +98,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
                sounds: false,
-               media: this.mediaUrl
+               media: this.mediaUrl,
+               zoom: { startScale: 1 }
             };
             wsConfig.comments = true;
             wsConfig.scrollbars = true;
@@ -106,8 +107,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if (options.readOnly) {
                wsConfig.readOnly = true;
             }
+            if (options.zoom) {
+               wsConfig.zoom.controls = !!options.zoom.controls;
+               wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
+            }
             if (this.scratchMode) {
-               wsConfig.zoom = { startScale: 0.75 };
+               wsConfig.zoom.startScale = wsConfig.zoom.startScale * 0.75;
             }
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
