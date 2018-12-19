@@ -201,6 +201,9 @@ var quickAlgoInterface = {
         var self = this;
         if(!$('#openEditorMenu').length) {
             $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
+            $('#openEditorMenu').click(function() {
+                self.editorMenuIsOpen ? self.closeEditorMenu() : self.openEditorMenu();
+            });
         }
         if($('#editorMenu').length) { return; }
         $("body").append('' +
@@ -227,9 +230,6 @@ var quickAlgoInterface = {
                 "<span id='saveUrl'></span>" +
             "</div>"
         );
-        $('#openEditorMenu').click(function() {
-            self.editorMenuIsOpen ? self.closeEditorMenu() : self.openEditorMenu();
-        });
         $("#closeEditorMenu").click(function() {
             self.closeEditorMenu();
         });
