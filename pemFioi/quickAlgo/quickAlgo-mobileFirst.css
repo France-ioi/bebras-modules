@@ -263,7 +263,7 @@ h2.sectionTitle .icon {
     flex-direction: column;
   }
   .mode-player #introGrid {
-    flex: 1 0 auto;
+    flex: 1 0 40%;
   }
   .mode-instructions #introGrid {
     flex-direction: column;
@@ -314,15 +314,18 @@ h2.sectionTitle .icon {
   #gridContainer #gridButtonsAfter {
     padding-bottom: 5px;
   }
+  .mode-instructions #introGrid {
+    flex: 1 0 40%;
+  }
   .mode-instructions #gridContainer {
     min-width: 0;
-    flex: 0 0 50%;
+    flex: 0 0 40%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
   .mode-player #blocklyLibContent {
-    flex: 0 1 50%;
+    flex: 0 0 60%;
     min-width: 0;
     margin: 10px 10px 0 10px;
   }
@@ -367,6 +370,7 @@ h2.sectionTitle .icon {
   screen and (min-width: 855px) and (orientation: landscape) {
   #introGrid {
     flex-direction: column;
+    max-width: 40%;
   }
   #taskIntro {
     background-color: #fff;
@@ -713,14 +717,14 @@ body.fullscreen #taskToolbar {
 }
 #blocklyLibContent {
   width: 100%;
-  flex: 1 1 60%;
+  flex: 1 0 60%;
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape) {
   #blocklyLibContent {
     width: auto;
-    flex: 1 1 auto;
+    flex: 1 0 60%;
     min-width: 0;
     background: #fff;
     padding-top: 10px;
