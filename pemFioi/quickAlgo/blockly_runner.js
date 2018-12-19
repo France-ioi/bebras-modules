@@ -195,14 +195,16 @@ function initBlocklyRunner(context, messageCallback) {
             id = id ? id.toString() : '';
 
             if (context.display) {
-               if(!runner.scratchMode) {
-                  context.blocklyHelper.workspace.traceOn(true);
-                  context.blocklyHelper.workspace.highlightBlock(id);
-                  highlightPause = true;
-               } else {
-                  context.blocklyHelper.glowBlock(id);
-                  highlightPause = true;
-               }
+               try {
+                  if(!runner.scratchMode) {
+                     context.blocklyHelper.workspace.traceOn(true);
+                     context.blocklyHelper.workspace.highlightBlock(id);
+                     highlightPause = true;
+                  } else {
+                     context.blocklyHelper.glowBlock(id);
+                     highlightPause = true;
+                  }
+               } catch(e) {}
             }
 
             // We always execute directly the first highlightBlock
