@@ -3,29 +3,30 @@ var conceptViewer = {
   loaded: false,
   shownConcept: null,
   selectedLanguage: null,
+  allLangs: [
+    {id: 'blockly', lbl: 'Blockly'},
+    {id: 'scratch', lbl: 'Scratch'},
+    {id: 'python', lbl: 'Python'}
+    ],
 
   load: function (lang) {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
     // TODO :: allow changing list of languages
-    var allLangs = [
-      {id: 'blockly', lbl: 'Blockly'},
-      {id: 'scratch', lbl: 'Scratch'},
-      {id: 'python', lbl: 'Python'}
-      ];
-
     conceptViewer.selectedLanguage = lang;
     var navLanguage = '\
-      <label for="showNavigationLanguage" class="showNavigationLanguage">Sélectionnez un langage…</label>\
+      <label for="showNavigationLanguage" id="showNavigationLanguageLabel" class="showNavigationLanguage">Sélectionnez un langage…</label>\
       <input type="checkbox" id="showNavigationLanguage" role="button">\
       <ul>';
-    for(var i=0; i<allLangs.length; i++) {
-      navLanguage += '<li data-id="'+ allLangs[i].id + '"';
-      if((!lang && i == 0) || allLangs[i].id == lang) {
+    var curLangLbl = null;
+    for(var i=0; i<this.allLangs.length; i++) {
+      navLanguage += '<li data-id="'+ this.allLangs[i].id + '"';
+      if((!lang && i == 0) || this.allLangs[i].id == lang) {
         navLanguage +=  ' class="selected"';
+        curLangLbl = this.allLangs[i].lbl;
       }
-      navLanguage += '><span>' + allLangs[i].lbl + '</span>';
+      navLanguage += '><span>' + this.allLangs[i].lbl + '</span>';
       navLanguage += '</li>';
     }
     navLanguage += '</ul>';
@@ -50,6 +51,10 @@ var conceptViewer = {
       + '   </div>'
       + '  </div>'
       + '</div>');
+
+    if(curLangLbl) {
+       $('#showNavigationLanguageLabel').text(curLangLbl);
+    }
 
     var that = this;
     $('#conceptViewer').on('click', function (event) {
@@ -183,6 +188,12 @@ var conceptViewer = {
 
   languageChanged: function () {
     $('#showNavigationLanguage').prop('checked', false);
+    for(var i=0; i<this.allLangs.length; i++) {
+      if(this.allLangs[i].id == conceptViewer.selectedLanguage) {
+        $('#showNavigationLanguageLabel').text(this.allLangs[i].lbl);
+        break;
+      }
+    }
     this.loadNavigation();
   }
 }
