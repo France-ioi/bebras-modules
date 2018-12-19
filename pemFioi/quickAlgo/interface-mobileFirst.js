@@ -194,9 +194,11 @@ var quickAlgoInterface = {
     },
 
     createEditorMenu: function() {
-        if($('#editorMenu').length) { return; }
         var self = this;
-        $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
+        if(!$('#openEditorMenu').length) {
+            $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
+        }
+        if($('#editorMenu').length) { return; }
         $("body").append('' +
             "<div id='editorMenu' style='display: none;'>" +
                 "<div class='editorMenuHeader'>" +
