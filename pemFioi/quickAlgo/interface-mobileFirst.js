@@ -115,10 +115,14 @@ var quickAlgoInterface = {
             "<div id='languageInterface'></div>"
         );
 
-
-        $('#fullscreenButton').click(function() {
-            self.toggleFullscreen();
-        });
+        var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
+        if(iOS) {
+            $('#fullscreenButton').remove();
+        } else {
+            $('#fullscreenButton').click(function() {
+                self.toggleFullscreen();
+            });
+        }
 
 
         // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
