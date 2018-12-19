@@ -105,6 +105,17 @@ var initBlocklySubTask = function(subTask, language) {
          defaultCode: subTask.defaultCode
       };
 
+      // Handle zoom options
+      var zoomOptions = {
+         controls: false,
+         scale: this.context.infos.maxInstructions > 20 ? 1 : 1.1
+         };
+      if(this.context.infos && this.context.infos.zoom) {
+         zoomOptions.controls = !!this.context.infos.zoom.controls;
+         zoomOptions.scale = (typeof this.context.infos.zoom.scale != 'undefined') ? this.context.infos.zoom.scale : zoomOptions.scale;
+      }
+      blocklyOptions.zoom = zoomOptions;
+
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 
       if(this.display) {
