@@ -347,7 +347,7 @@ h2.sectionTitle .icon {
     position: absolute;
     bottom: -10px;
     left: 0;
-    width: 50%;
+    width: 40%; /* Must be the same width as the task intro */
     padding-top: 10px;
     border-top: 3px solid #fff;
     display: flex;
@@ -356,13 +356,12 @@ h2.sectionTitle .icon {
     box-shadow: 0 1px 0 0px #ccc inset;
   }
   #taskIntro {
-    flex: 0 1 auto;
+    flex: 1 1 40%;
     background-color: #fff;
-    overflow: scroll;
     padding-bottom: 50px;
   }
   #gridContainer {
-    flex: 1 0 auto;
+    flex: 1 0 60%;
     min-width: 0;
   }
 }
