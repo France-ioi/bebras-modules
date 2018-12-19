@@ -1938,8 +1938,8 @@ var getContext = function(display, infos, curLevel) {
          return;
       }
       var newCellSide;
-      var areaWidth = Math.min(400, Math.max(200, $('#grid').width()-24));
-      var areaHeight = Math.min(600, Math.max(150, $('#grid').height()-24));
+      var areaWidth = Math.max(200, $('#grid').width()-24);
+      var areaHeight = Math.max(150, $('#grid').height()-24);
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
