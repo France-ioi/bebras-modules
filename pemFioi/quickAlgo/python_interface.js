@@ -562,6 +562,12 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     this._prevWidth = panelWidth;
   };
+  this.resetDisplay = function () {
+    if(this._mainContext.runner) {
+      console.log('ok');
+      this._mainContext.runner.removeEditorMarker();
+    }
+  };
 }
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
