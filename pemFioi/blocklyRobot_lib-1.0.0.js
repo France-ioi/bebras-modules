@@ -2404,8 +2404,13 @@ var getContext = function(display, infos, curLevel) {
       if(paper == null) {
          return;
       }
-      var areaWidth = Math.max(200, $('#grid').width()-24);
-      var areaHeight = Math.max(150, $('#grid').height()-24);
+      if(window.quickAlgoResponsive) {
+         var areaWidth = Math.max(200, $('#grid').width()-24);
+         var areaHeight = Math.max(150, $('#grid').height()-24);
+      } else {
+         var areaWidth = 400;
+         var areaHeight = 600;
+      }
       var newCellSide = 0;
       if(context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
