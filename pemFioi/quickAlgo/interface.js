@@ -89,16 +89,9 @@ var quickAlgoInterface = {
 
    setOptions: function(opt) {
       // Load options from the task
-      if(opt.hideSaveOrLoad) {
-         $('#saveOrLoadBtn').hide();
-      } else {
-         $('#saveOrLoadBtn').show();
-      }
-      if(opt.hasExample) {
-         $('#loadExampleBtn').show();
-      } else {
-         $('#loadExampleBtn').hide();
-      }
+      var hideControls = opt.hideControls ? opt.hideControls : {};
+      $('#saveOrLoadBtn').toggle(!hideControls.saveOrLoad);
+      $('#loadExampleBtn').toggle(!!opt.hasExample);
       if(opt.conceptViewer) {
          conceptViewer.load(opt.conceptViewerLang);
          $('#displayHelpBtn').show();
