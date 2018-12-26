@@ -1937,15 +1937,18 @@ var getContext = function(display, infos, curLevel) {
       if (paper == null) {
          return;
       }
-      var newCellSide;
-      var areaWidth = Math.max(200, $('#grid').width()-24);
-      var areaHeight = Math.max(150, $('#grid').height()-24);
+      var newCellSide = 0;
+      if(window.quickAlgoResponsive) {
+         var areaWidth = Math.max(200, $('#grid').width()-24);
+         var areaHeight = Math.max(150, $('#grid').height()-24);
+      } else {
+         var areaWidth = 400;
+         var areaHeight = 600;
+      }
       if (context.nbCols && context.nbRows) {
          var marginAsCols = infos.leftMargin / infos.cellSide;
          var marginAsRows = infos.topMargin / infos.cellSide;
          newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
-      } else {
-         newCellSide = 0;
       }
       scale = newCellSide / infos.cellSide;
       paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);

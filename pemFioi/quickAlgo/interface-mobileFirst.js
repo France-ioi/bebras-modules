@@ -692,6 +692,7 @@ var quickAlgoInterface = {
     }
 };
 
+window.quickAlgoResponsive = true;
 
 $(document).ready(function() {
 
