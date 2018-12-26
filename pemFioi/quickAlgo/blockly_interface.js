@@ -219,14 +219,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.hiddenCheckTimeout = setTimeout(this.hiddenCheck.bind(this), 500);
       },
 
-      resetDisplayFct: function() {
+      onChangeResetDisplayFct: function() {
          if(this.mainContext.runner) {
             this.mainContext.runner.reset();
          }
          if(this.scratchMode) {
             this.glowBlock(null);
-         } else if(Blockly.selected) {
-            Blockly.selected.unselect();
          }
          if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
@@ -234,10 +232,19 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.displayError('');
       },
 
+      onChangeResetDisplay: function() {
+         // This function will replace itself with the debounced onChangeResetDisplayFct
+         this.onChangeResetDisplay = debounce(this.onChangeResetDisplayFct.bind(this), 500, false);
+         this.onChangeResetDisplayFct();
+      },
+
       resetDisplay: function() {
-         // This function will replace itself with the debounced resetDisplayFct
-         this.resetDisplay = debounce(this.resetDisplayFct.bind(this), 500, false);
-         this.resetDisplayFct();
+         if(this.scratchMode) {
+            this.glowBlock(null);
+         } else if(Blockly.selected) {
+            // Do not execute that while the user is moving blocks around
+            Blockly.selected.unselect();
+         }
       },
 
       getCapacityText: function() {
@@ -287,7 +294,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                $('#capacity').html(this.getCapacityText());
             }
-            this.resetDisplay();
+            this.onChangeResetDisplay();
          } else {
             Blockly.svgResize(this.workspace);
          }
