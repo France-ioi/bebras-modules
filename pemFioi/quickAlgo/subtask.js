@@ -30,7 +30,13 @@ var initBlocklySubTask = function(subTask, language) {
    }
 
    subTask.loadLevel = function(curLevel) {
-      subTask.levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
+      var levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
+      subTask.levelGridInfos = levelGridInfos;
+
+      // Convert legacy options
+      if(!levelGridInfos.hideControls) { levelGridInfos.hideControls = {}; }
+      levelGridInfos.hideControls.saveOrLoad = !!levelGridInfos.hideSaveOrLoad;
+      levelGridInfos.hideControls.loadBestAnswer = !!levelGridInfos.hideLoadBestAnswers;
 
       subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
       subTask.answer = null;
@@ -56,7 +62,7 @@ var initBlocklySubTask = function(subTask, language) {
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
 
-      this.context = quickAlgoLibraries.getContext(this.display, subTask.levelGridInfos, curLevel);
+      this.context = quickAlgoLibraries.getContext(this.display, levelGridInfos, curLevel);
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
@@ -64,11 +70,10 @@ var initBlocklySubTask = function(subTask, language) {
       if (this.display) {
         window.quickAlgoInterface.loadInterface(this.context, curLevel);
         window.quickAlgoInterface.setOptions({
-           hideSaveOrLoad: subTask.levelGridInfos.hideSaveOrLoad,
-           hasExample: subTask.levelGridInfos.example && subTask.levelGridInfos.example[subTask.blocklyHelper.language],
-           conceptViewer: subTask.levelGridInfos.conceptViewer,
+           hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
+           conceptViewer: levelGridInfos.conceptViewer,
            conceptViewerLang: this.blocklyHelper.language,
-           hideLoadBestAnswer: subTask.levelGridInfos.hideLoadBestAnswer
+           hideControls: levelGridInfos.hideControls,
            });
       }
 
@@ -82,7 +87,7 @@ var initBlocklySubTask = function(subTask, language) {
 
       // Load concepts into conceptViewer; must be done before loading
       // Blockly/Scratch, as scratch-mode will modify includeBlocks
-      if(this.display && subTask.levelGridInfos.conceptViewer) {
+      if(this.display && levelGridInfos.conceptViewer) {
          // TODO :: testConcepts is temporary-ish
          if(this.context.conceptList) {
             var allConcepts = testConcepts.concat(this.context.conceptList);
@@ -91,8 +96,8 @@ var initBlocklySubTask = function(subTask, language) {
          }
 
          var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts, this.context);
-         if(subTask.levelGridInfos.conceptViewer.length) {
-            concepts = concepts.concat(subTask.levelGridInfos.conceptViewer);
+         if(levelGridInfos.conceptViewer.length) {
+            concepts = concepts.concat(levelGridInfos.conceptViewer);
          }
          concepts = window.conceptsFill(concepts, allConcepts);
          window.conceptViewer.loadConcepts(concepts);

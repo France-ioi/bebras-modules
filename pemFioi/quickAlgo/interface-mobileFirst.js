@@ -247,12 +247,23 @@ var quickAlgoInterface = {
             $('#editorMenu').css('display','none')
         });
     },
+
     setOptions: function(opt) {
         // Load options from the task
-        $('#editorMenu div[rel=example]').toggle(opt.hasExample);
-        $('#editorMenu div[rel=save]').toggle(!opt.hideSaveOrLoad);
-        $('#editorMenu div[rel=load]').toggle(!opt.hideSaveOrLoad);
-        $('#editorMenu div[rel=best-answer]').toggle(!opt.hideLoadBestAnswer);
+        // We use a class 'interfaceToggled' as using jquery's .toggle(true)
+        // would force an element to display, even if the layout wants it
+        // hidden. Using a class ensures we don't break the elements' display
+        // property from the layout
+        var hideControls = opt.hideControls ? opt.hideControls : {};
+        $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !opt.hasExample);
+        $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
+        $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
+        $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
+        $('div.speedSlider').toggleClass('interfaceToggled', !!hideControls.speedSlider);
+        $('div.displaySpeedSlider').toggleClass('interfaceToggled', !!hideControls.speedSlider);
+        $('div.backToFirst').toggleClass('interfaceToggled', !!hideControls.backToFirst);
+        $('div.nextStep').toggleClass('interfaceToggled', !!hideControls.nextStep);
+        $('div.goToEnd').toggleClass('interfaceToggled', !!hideControls.goToEnd);
 
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);
@@ -321,7 +332,9 @@ var quickAlgoInterface = {
                     '<span class="icon speedFaster"><span class="fas fa-running"></span></span>' +
                 '</div>' +
             '</div>';
-        $('#task').find('.speedControls').remove();
+        if($('#task .speedControls').length) {
+            return;
+        }
         // place speed controls depending on layout
         // speed controls in taskToolbar on mobiles
         // in intro on portrait tablets
