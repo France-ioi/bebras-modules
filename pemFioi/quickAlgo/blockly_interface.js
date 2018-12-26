@@ -225,11 +225,19 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          if(this.scratchMode) {
             this.glowBlock(null);
+         } else if(Blockly.selected) {
+            Blockly.selected.unselect();
          }
          if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
          this.displayError('');
+      },
+
+      resetDisplay: function() {
+         // This function will replace itself with the debounced resetDisplayFct
+         this.resetDisplay = debounce(this.resetDisplayFct.bind(this), 500, false);
+         this.resetDisplayFct();
       },
 
       getCapacityText: function() {
@@ -278,10 +286,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(isBlockEvent) {
             if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
                $('#capacity').html(this.getCapacityText());
-            }
-
-            if(!this.resetDisplay) {
-               this.resetDisplay = debounce(this.resetDisplayFct.bind(this), 500, false);
             }
             this.resetDisplay();
          } else {
