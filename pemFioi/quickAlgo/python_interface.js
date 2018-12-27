@@ -568,6 +568,7 @@ function LogicController(nbTestCases, maxInstructions) {
       this._mainContext.runner.removeEditorMarker();
     }
   };
+  this.reload = function () {};
 }
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
