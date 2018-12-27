@@ -56,9 +56,8 @@ var quickAlgoInterface = {
         } else {
             this.exitFullscreen();
         }
-        var that = this;
         setTimeout(function() {
-            that.onResize();
+            quickAlgoInterface.onResize();
         }, 500);
     },
 
@@ -93,7 +92,6 @@ var quickAlgoInterface = {
     loadInterface: function(context, level) {
         ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
-        var self = this;
         this.context = context;
         this.strings = window.languageStrings;
 
@@ -120,29 +118,29 @@ var quickAlgoInterface = {
             $('#fullscreenButton').remove();
         } else {
             $('#fullscreenButton').click(function() {
-                self.toggleFullscreen();
+                quickAlgoInterface.toggleFullscreen();
             });
         }
 
 
         // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
         $('#editorMenu div[rel=example]').click(function(e) {
-            self.closeEditorMenu();
+            quickAlgoInterface.closeEditorMenu();
             task.displayedSubTask.loadExample()
         });
 
         $('#editorMenu div[rel=save]').click(function(e) {
-            self.closeEditorMenu();
+            quickAlgoInterface.closeEditorMenu();
             task.displayedSubTask.blocklyHelper.saveProgram();
         });
 
         $('#editorMenu div[rel=restart]').click(function(e) {
-            self.closeEditorMenu();
+            quickAlgoInterface.closeEditorMenu();
             displayHelper.restartAll();
         });
 
         $('#editorMenu div[rel=best-answer]').click(function(e) {
-            self.closeEditorMenu();
+            quickAlgoInterface.closeEditorMenu();
             displayHelper.retrieveAnswer();
         });
 
@@ -191,18 +189,16 @@ var quickAlgoInterface = {
         if(!this.checkHeightInterval) {
             this.checkHeightInterval = setInterval(this.checkHeight.bind(this), 1000);
         }
-        var that = this;
         setTimeout(function() {
-            that.onResize();
+            quickAlgoInterface.onResize();
             }, 0);
     },
 
     createEditorMenu: function() {
-        var self = this;
         if(!$('#openEditorMenu').length) {
             $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
             $('#openEditorMenu').click(function() {
-                self.editorMenuIsOpen ? self.closeEditorMenu() : self.openEditorMenu();
+                quickAlgoInterface.editorMenuIsOpen ? quickAlgoInterface.closeEditorMenu() : quickAlgoInterface.openEditorMenu();
             });
         }
         if($('#editorMenu').length) { return; }
@@ -231,7 +227,7 @@ var quickAlgoInterface = {
             "</div>"
         );
         $("#closeEditorMenu").click(function() {
-            self.closeEditorMenu();
+            quickAlgoInterface.closeEditorMenu();
         });
     },
 
@@ -273,6 +269,9 @@ var quickAlgoInterface = {
         }
     },
 
+    bindBlocklyHelper: function(blocklyHelper) {
+        this.blocklyHelper = blocklyHelper;
+    },
 
     devMode: function() {
         $('#editorMenu .item').show();
@@ -294,9 +293,8 @@ var quickAlgoInterface = {
             capacity.addClass('capacityRed');
         }
         if(times > (red ? 1 : 0)) {
-            var that = this;
             this.delayFactory.destroy('blinkRemaining');
-            this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 200);
+            this.delayFactory.createTimeout('blinkRemaining', function() { quickAlgoInterface.blinkRemaining(times - 1, red); }, 200);
         }
     },
 
@@ -312,8 +310,6 @@ var quickAlgoInterface = {
     },
 
     initPlaybackControls: function() {
-        var self = this;
-
         var speedControls =
             '<div class="speedControls">' +
                 '<div class="playerControls">' +
@@ -344,7 +340,7 @@ var quickAlgoInterface = {
         $('#introGrid').append(speedControls);
 
         $('.speedCursor').on('input change', function(e) {
-            self.refreshStepDelay();
+            quickAlgoInterface.refreshStepDelay();
         });
         $('.speedSlower').click(function() {
             var el = $('.speedCursor'),
@@ -352,7 +348,7 @@ var quickAlgoInterface = {
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) - delta;
             el.val(Math.max(newVal, 0));
-            self.refreshStepDelay();
+            quickAlgoInterface.refreshStepDelay();
         });
         $('.speedFaster').click(function() {
             var el = $('.speedCursor'),
@@ -360,35 +356,35 @@ var quickAlgoInterface = {
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) + delta;
             el.val(Math.min(newVal, maxVal));
-            self.refreshStepDelay();
+            quickAlgoInterface.refreshStepDelay();
         });
 
         $('.playerControls .backToFirst').click(function() {
             task.displayedSubTask.stop();
 //            task.displayedSubTask.play();
-//            self.setPlayPause(true);
+//            quickAlgoInterface.setPlayPause(true);
         });
 
         $('.playerControls .playPause').click(function(e) {
             if($(this).hasClass('play')) {
-                self.refreshStepDelay();
+                quickAlgoInterface.refreshStepDelay();
                 task.displayedSubTask.play();
-                self.setPlayPause(true);
+                quickAlgoInterface.setPlayPause(true);
             } else {
                 task.displayedSubTask.pause();
-                self.setPlayPause(false);
+                quickAlgoInterface.setPlayPause(false);
             }
         })
 
         $('.playerControls .nextStep').click(function() {
-            self.setPlayPause(false);
+            quickAlgoInterface.setPlayPause(false);
             task.displayedSubTask.step();
         });
 
         $('.playerControls .goToEnd').click(function() {
             task.displayedSubTask.setStepDelay(0);
             task.displayedSubTask.play();
-            self.setPlayPause(false);
+            quickAlgoInterface.setPlayPause(false);
         });
 
         $('.playerControls .displaySpeedSlider').click(function() {
@@ -411,7 +407,6 @@ var quickAlgoInterface = {
     },
 
     initTestSelector: function (nbTestCases) {
-        var self = this;
         // Create the DOM for the tests display
         this.nbTestCases = nbTestCases;
 
@@ -480,7 +475,6 @@ var quickAlgoInterface = {
     createModeTaskToolbar: function() {
         if($('#taskToolbar').length) { return; }
         var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
-        var self = this;
         $("#task").append('' +
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
@@ -499,8 +493,8 @@ var quickAlgoInterface = {
             '</div>');
 
         $('#modeSelector div').click(function() {
-            self.selectMode($(this).attr('id'));
-            self.onResize();
+            quickAlgoInterface.selectMode($(this).attr('id'));
+            quickAlgoInterface.onResize();
         })
     },
 
@@ -510,20 +504,14 @@ var quickAlgoInterface = {
         $('#modeSelector #' + mode).addClass('active');
         $('#task').removeClass(this.curMode).addClass(mode);
         $('#mode-player').removeClass('displaySpeedSlider'); // there should be a better way to achieve this
-        /*if(mode == 'mode-instructions') {
-            $('#taskIntro .short').hide();
-            $('#taskIntro .long').show();
+        if(mode != 'mode-instructions' && this.blocklyHelper) {
+            this.blocklyHelper.reload();
         }
-        if(mode == 'mode-player') {
-            $('#taskIntro .short').show();
-            $('#taskIntro .long').hide();
-        }*/
         this.curMode = mode;
         this.onResize();
     },
 
     setupTaskIntro: function(level) {
-        var self = this;
         if (! this.taskIntroContent.length ) {
             this.taskIntroContent = $('#taskIntro').html();
         }
@@ -545,7 +533,7 @@ var quickAlgoInterface = {
                 '<div>';
             $('#blocklyLibContent').append(introLong);
             $('#taskIntroLong .closeLongIntro').click(function(e) {
-                self.toggleLongIntro(false);
+                quickAlgoInterface.toggleLongIntro(false);
             });
             if (! $('#taskIntro .sectionTitle').length) {
                 var renderTaskIntro = '' +
@@ -559,10 +547,10 @@ var quickAlgoInterface = {
                     '<button type="button" class="showLongIntro"></button>';
                 $('#taskIntro').html(renderTaskIntro);
                 $('#taskIntro .showLongIntro').click(function(e) {
-                    self.toggleLongIntro();
+                    quickAlgoInterface.toggleLongIntro();
                 });
             }
-            self.toggleLongIntro(false);
+            quickAlgoInterface.toggleLongIntro(false);
         }
         else {
             if (! $('#taskIntro .sectionTitle').length) {
@@ -612,7 +600,7 @@ var quickAlgoInterface = {
         var blocklyDiv = document.getElementById('blocklyDiv');
         var toolbarDiv = document.getElementById('taskToolbar');
         var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top : Infinity;
-        var heightBeforeWindow = browserHeight - blocklyArea.getBoundingClientRect().top - 10;
+        var heightBeforeWindow = browserHeight - blocklyArea.getBoundingClientRect().top - 2;
         if($('#taskToolbar').is(':visible') && window.innerHeight < window.innerWidth) {
             blocklyDiv.style.height = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)) + 'px';
         } else {
