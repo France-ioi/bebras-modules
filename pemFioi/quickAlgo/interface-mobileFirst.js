@@ -595,6 +595,7 @@ var quickAlgoInterface = {
         var browserHeight = document.documentElement.clientHeight;
         $('body').css('height', browserHeight);
 
+        // Determine right size for Blockly
         var blocklyArea = document.getElementById('blocklyContainer');
         if(!blocklyArea) { return; }
         var blocklyDiv = document.getElementById('blocklyDiv');
@@ -612,8 +613,14 @@ var quickAlgoInterface = {
             $('#task').css('height', '');
         }
 
+        // Resize Blockly elements
         Blockly.svgResize(window.blocklyWorkspace);
         task.displayedSubTask.updateScale();
+
+        // Check size and hide overflow if less than 5 pixels, to avoid big
+        // scrollbars when the layout is just slightly off for some reason
+        $('body').css('overflow-x', document.documentElement.scrollWidth - document.documentElement.clientWidth < 5 ? 'hidden' : '');
+        $('body').css('overflow-y', document.documentElement.scrollHeight - document.documentElement.clientHeight < 5 ? 'hidden' : '');
     },
 
     checkHeight: function() {
