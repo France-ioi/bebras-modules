@@ -111,15 +111,22 @@ var initBlocklySubTask = function(subTask, language) {
       };
 
       // Handle zoom options
+      var maxInstructions = this.context.infos.maxInstructions ? this.context.infos.maxInstructions : Infinity;
       var zoomOptions = {
          controls: false,
-         scale: this.context.infos.maxInstructions > 20 ? 1 : 1.1
+         scale: maxInstructions > 20 ? 1 : 1.1
          };
       if(this.context.infos && this.context.infos.zoom) {
          zoomOptions.controls = !!this.context.infos.zoom.controls;
          zoomOptions.scale = (typeof this.context.infos.zoom.scale != 'undefined') ? this.context.infos.zoom.scale : zoomOptions.scale;
       }
       blocklyOptions.zoom = zoomOptions;
+
+      // Handle scroll
+      blocklyOptions.scrollbars = maxInstructions > 10;
+      if(typeof this.context.infos.scrollbars != 'undefined') {
+         blocklyOptions.scrollbars = this.context.infos.scrollbars;
+      }
 
       this.blocklyHelper.load(stringsLanguage, this.display, this.data[curLevel].length, blocklyOptions);
 

@@ -97,16 +97,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var xml = this.getToolboxXml();
             var wsConfig = {
                toolbox: "<xml>"+xml+"</xml>",
+               comments: true,
                sounds: false,
+               trashcan: true,
                media: this.mediaUrl,
                zoom: { startScale: 1 }
             };
-            wsConfig.comments = true;
-            wsConfig.scrollbars = true;
-            wsConfig.trashcan = true;
-            if (options.readOnly) {
-               wsConfig.readOnly = true;
-            }
+            wsConfig.scrollbars = typeof options.scrollbars != 'undefined' ? !!options.scrollbars : true;
+            wsConfig.readOnly = !!options.readOnly;
             if (options.zoom) {
                wsConfig.zoom.controls = !!options.zoom.controls;
                wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
