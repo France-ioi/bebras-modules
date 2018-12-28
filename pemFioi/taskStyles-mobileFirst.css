@@ -184,7 +184,10 @@ img {
 }
 #popupMessage.floatingMessage .container {
    min-height: 100px;
-   margin: 0 2%;
+   width: 94%;
+   max-width: 1000px;
+   margin-left: auto;
+   margin-right: auto;
    border-radius: 5px;
    background: #fff;
    color:#787878;
@@ -193,14 +196,10 @@ img {
    transform: translate(0,-50%);
 }
 #popupMessage.floatingMessage .container img {
-  display: none;
+   display: none;
 }
-@media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
-  screen and (min-width: 960px) and (orientation: landscape) {
-  #popupMessage .message {
-    font-size: 14px;
-  }
+#popupMessage .message {
+   font-size: 18px;
 }
 #popupMessage p {
    margin: .5em 0 0;
@@ -225,7 +224,7 @@ img {
    box-shadow: none;
    font-weight: bold;
    text-transform: uppercase;
-   font-size: 12px;
+   font-size: 14px;
    cursor: pointer;
 }
 #popupMessage button.buttonYes::before {
