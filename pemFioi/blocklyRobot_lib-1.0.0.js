@@ -603,12 +603,14 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "ramasser la roue dentée",
                dropObject: "accrocher la roue dentée",
-               onObject: "sur une roue dentée"
+               onObject: "sur une roue dentée",
+               onContainer: "sur des engrenages"
             },
             code: {
                withdrawObject: "ramasserRoue",
                dropObject: "deposerRoue",
-               onObject: "surRoueDentee"
+               onObject: "surRoueDentee",
+               onContainer: "surEngrenages"
             },
             messages: {
                successContainersFilled: "Bravo, la machine est prête à fonctionner !",
@@ -623,12 +625,14 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "recoger el engranaje",
                dropObject: "soltar el engranaje",
-               onObject: "sobre engranaje"
+               onObject: "sobre engranaje",
+               onContainer: "sur des engrenages"
             },
             code: {
                withdrawObject: "recogerEngranaje",
                dropObject: "soltarEngranaje",
-               onObject: "sobreEngranaje"
+               onObject: "sobreEngranaje",
+               onContainer: "surEngrenages"
             },
             messages: {
                successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
@@ -1349,7 +1353,7 @@ var getContext = function(display, infos, curLevel) {
              }
            }
          ],
-         backgroundColor: "#cccccc",
+         backgroundColor: "#f2f1e3",
          hasGravity: true,
          bagSize: 1,
          containerSize: 1,
