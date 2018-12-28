@@ -17,6 +17,8 @@ var quickAlgoInterface = {
     longIntroShown: false,
     taskIntroContent: '',
 
+    blocklyHelper: null,
+
     enterFullscreen: function() {
         var el = document.documentElement;
         if(el.requestFullscreen) {
@@ -215,10 +217,7 @@ var quickAlgoInterface = {
                     "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
                     "<div rel='load' class='item'>" +
                         "<input type='file' id='task-upload-file' " +
-                        "onchange='\
-                            task.displayedSubTask.blocklyHelper.handleFiles(this.files);\
-                            resetFormElement($(this));\
-                            $(\"#editorMenu\").hide();'>" +
+                        "onchange='quickAlgoInterface.loadPrograms(this)'>" +
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
@@ -242,6 +241,12 @@ var quickAlgoInterface = {
         $('body').animate({left: '0'}, 500, function() {
             $('#editorMenu').css('display','none')
         });
+    },
+
+    loadPrograms: function(formElement) {
+        this.blocklyHelper.handleFiles(formElement.files);
+        resetFormElement($(formElement));
+        this.closeEditorMenu();
     },
 
     setOptions: function(opt) {
