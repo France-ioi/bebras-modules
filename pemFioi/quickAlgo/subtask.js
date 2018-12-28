@@ -75,6 +75,7 @@ var initBlocklySubTask = function(subTask, language) {
            conceptViewerLang: this.blocklyHelper.language,
            hideControls: levelGridInfos.hideControls,
            });
+        window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }
 
       this.blocklyHelper.loadContext(this.context);
