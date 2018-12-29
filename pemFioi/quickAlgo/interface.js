@@ -104,6 +104,14 @@ var quickAlgoInterface = {
       }
    },
 
+   appendTaskIntro: function(html) {
+      $('#taskIntro').append(html);
+   },
+
+   toggleLongIntro: function(forceNewState) {
+      // For compatibility with new interface
+   },
+
    onScaleDrawingChange: function(e) {
       var scaled = $(e.target).prop('checked');
       $("#gridContainer").toggleClass('gridContainerScaled', scaled);

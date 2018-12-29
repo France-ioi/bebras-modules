@@ -406,21 +406,21 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.updateTaskIntro = function () {
     if(!this._mainContext.display) { return; }
-    var pythonDiv = $('#taskIntro .pythonIntro');
-    if(pythonDiv.length == 0) {
-      pythonDiv = $('<hr />'
-        + '<div class="pythonIntro">'
+    if($('.pythonIntro').length == 0) {
+      quickAlgoInterface.appendTaskIntro('<hr class="long .pythonIntroElement" />'
+        + '<div class="pythonIntro pythonIntroElement long">'
         + '  <div class="pythonIntroSimple"></div>'
         + '  <div class="pythonIntroFull"></div>'
         + '  <div class="pythonIntroBtn"></div>'
-        + '</div>').appendTo('#taskIntro');
+        + '</div>');
     }
 
-    pythonDiv.off('click', 'code');
+    $('.pythonIntro').off('click', 'code');
     if(this._mainContext.infos.noPythonHelp) {
-       pythonDiv.html('');
+       $('.pythonIntroElement').hide();
        return;
     }
+    $('.pythonIntroElement').show();
 
     var fullHtml = '';
     var simpleHtml = '';
@@ -525,8 +525,9 @@ function LogicController(nbTestCases, maxInstructions) {
     this.collapseTaskIntro(true);
 
     var controller = this;
-    pythonDiv.on('click', 'code', function() {
+    $('.pythonIntro').on('click', 'code', function() {
       controller._aceEditor && controller._aceEditor.insert(this.textContent);
+      quickAlgoInterface.toggleLongIntro(false);
     });
   };
 

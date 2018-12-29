@@ -783,7 +783,7 @@ body.fullscreen #taskToolbar {
     align-items: flex-start;
   }
   #capacity {
-    padding-right: 10px;
+    margin-right: 5px;
   }
   #editorBar #fullscreenButton,
   #editorBar .displayHelpBtn {
@@ -813,10 +813,13 @@ body.fullscreen #taskToolbar {
   line-height: 30px;
   color: #787878;
   text-align: center;
+  padding-right: 5px;
 }
 .capacityRed {
-  background-color: #E77471;
+  background-color: #FF9794;
   color: black;
+  padding-left: 5px;
+  border-radius: 5px;
 }
 
 .scaleDrawingControl {
@@ -1167,10 +1170,15 @@ button.showLongIntro .icon {
   bottom: 0;
   left: 0;
   background-color: #fff;
-  z-index: 2;
+  z-index: 30;
 }
 #taskIntroLong.displayIntroLong {
   display: block !important;
+}
+.pythonIntroBtn {
+  color: #4D87CE;
+  font-weight: bold;
+  text-decoration: none;
 }
 .panel-heading {
   display: flex;
