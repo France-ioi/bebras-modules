@@ -331,6 +331,7 @@ var initBlocklySubTask = function(subTask, language) {
       if (this.answer != undefined) {
          this.blocklyHelper.loadPrograms();
       }
+      window.quickAlgoInterface.updateBestAnswerStatus();
    };
 
    subTask.getDefaultAnswerObject = function() {
@@ -489,6 +490,7 @@ var initBlocklySubTask = function(subTask, language) {
             };*/
          subTask.context.changeDelay(oldDelay);
          callback(results);
+         window.quickAlgoInterface.updateBestAnswerStatus();
       }
 
       initBlocklyRunner(subTask.context, function(message, success) {

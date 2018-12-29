@@ -150,6 +150,10 @@ body > * {
   cursor: pointer;
   text-align: center;
 }
+#editorMenu .editorActions div.editorActionDisabled,
+#editorMenu .editorActions div.editorActionDisabled:hover {
+  color: #707070;
+}
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape) {
