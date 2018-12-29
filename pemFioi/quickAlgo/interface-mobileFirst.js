@@ -96,6 +96,7 @@ var quickAlgoInterface = {
         // Load quickAlgo interface into the DOM
         this.context = context;
         this.strings = window.languageStrings;
+        this.level = level;
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
@@ -157,6 +158,7 @@ var quickAlgoInterface = {
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
+        this.updateBestAnswerStatus();
         this.setupTaskIntro(level);
         this.wrapIntroAndGrid();
         this.checkFonts();
@@ -184,13 +186,13 @@ var quickAlgoInterface = {
                     "<div rel='example' class='item' onclick='quickAlgoInterface.editorBtn(\"example\");'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
                     "<div rel='restart' class='item' onclick='quickAlgoInterface.editorBtn(\"restart\");'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
                     "<div rel='save' class='item' onclick='quickAlgoInterface.editorBtn(\"save\");'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
-                    "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
                     "<div rel='load' class='item'>" +
                         "<input type='file' id='task-upload-file' " +
                         "onchange='quickAlgoInterface.loadPrograms(this)'>" +
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
+                    "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
                 "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
@@ -445,6 +447,12 @@ var quickAlgoInterface = {
         $("#task").append($('#messages'));
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },
+
+    updateBestAnswerStatus: function() {
+        this.hasBestAnswer = window.displayHelper && window.displayHelper.hasSavedAnswer();
+        $('.editorActions div[rel=best-answer]').toggleClass('editorActionDisabled', !this.hasBestAnswer);
+    },
+
     displayHelpBtn: function() {
         var helpBtn = '<button type="button" class="displayHelpBtn" onclick="conceptViewer.show()">\
             <span class="fas fa-question"></span></button>';
