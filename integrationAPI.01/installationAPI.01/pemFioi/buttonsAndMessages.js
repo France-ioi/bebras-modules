@@ -88,6 +88,7 @@ window.displayHelper = {
          youDidBetterBefore: "Vous aviez fait mieux avant.",
          scoreStays2: "Votre score reste le même.",
          reloadBestAnswer: "Rechargez votre meilleure réponse.",
+         noAnswerSaved: "Aucune réponse actuellement enregistrée pour cette version.",
          validate: "Valider",
          restart: "Recommencer",
          harderLevelSolved: "Attention : vous avez déjà résolu une version plus difficile. Vous ne pourrez pas gagner de points supplémentaires avec cette version.",
@@ -157,6 +158,7 @@ window.displayHelper = {
          youDidBetterBefore: "You did better before.",
          scoreStays2: "Your score stays the same.",
          reloadBestAnswer: "Reload your best answer.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Validate",
          restart: "Restart",
          harderLevelSolved: "Warning: you already solved a harder version of this task. You won't be able to obtain extra points with this version.",
@@ -226,6 +228,7 @@ window.displayHelper = {
          youDidBetterBefore: "Det gick bättre tidigare.",
          scoreStays2: "Din poäng ändras inte.",
          reloadBestAnswer: "Ladda in ditt bästa svar.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Kontrollera svaret",
          restart: "Börja om",
          harderLevelSolved: "Varning: du har redan löst en svårare version av den här uppgiften. Du kommer inte kunna få mer poäng med den här versionen.",
@@ -295,6 +298,7 @@ window.displayHelper = {
          youDidBetterBefore: "Sait aiemmin enemmän pisteitä.",
          scoreStays2: "Pistemääräsi säilyy samana.",
          reloadBestAnswer: "Palauta paras aiempi vastauksesi.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Tarkista vastaus",
          restart: "Aloita alusta",
          harderLevelSolved: "Varoitus: olet jo ratkaissut vaikeamman version tästä tehtävästä. Tämän helpomman version ratkaiseminen ei voi korottaa pistemäärääsi.",
@@ -364,6 +368,7 @@ window.displayHelper = {
          youDidBetterBefore: "Du hast dich verbessern.",
          scoreStays2: "Dein Punktestand bleibt gleich.",
          reloadBestAnswer: "Deine beste Antwort wieder laden.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Überprüfen",
          restart: "Neustarten",
          harderLevelSolved: "Achtung: Du hast schon eine schwerere Version gelöst. Du kannst mit dieser Version keine zusätzlichen Punkte bekommen.",
@@ -433,6 +438,7 @@ window.displayHelper = {
          youDidBetterBefore: "لقد قمت بها أفضل من هذا في وقت سابق",
          scoreStays2: "ما زالت نقاطك كما هي",
          reloadBestAnswer: "اعد تحميل إجابتك الأفضل",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "تحقق",
          restart: "ابدأ من جديد",
          harderLevelSolved: "لقد قمت بحل المستوى الأصعب في هذا السؤال, لن تتمكن من الحصول على درجات أعلى في هذا السؤال",
@@ -502,6 +508,7 @@ window.displayHelper = {
          youDidBetterBefore: "Realizó un mejor trabajo antes.",
          scoreStays2: "Su puntuación se mantiene igual.",
          reloadBestAnswer: "Recargar su mejor respuesta.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Validar",
          restart: "Reiniciar",
          harderLevelSolved: "Atención: ya ha resuelto una versión más difícil. No puede ganar puntos extra con esta versión.",
@@ -571,6 +578,7 @@ window.displayHelper = {
          youDidBetterBefore: "Rešitev je boljša od prejšnje.",
          scoreStays2: "Tvoj rezultat ostaja enak.",
          reloadBestAnswer: "Znova naloži najboljšo rešitev.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Preveri",
          restart: "Začni znova",
          harderLevelSolved: "Opozorilo: Rešil(-a) si že težjo stopnjo te naloge. S to stopnjo ne boš dobil(-a) dodatnih točk.",
@@ -1624,22 +1632,39 @@ window.displayHelper = {
       });
    },
 
-   // Loads previously saved answer
-   retrieveAnswer: function() {
+   getSavedAnswer: function() {
+      // Gets the previously saved answer
       var retrievedAnswer;
       if (this.hasLevels) {
          var retrievedAnswerObj = task.getAnswerObject();
-         var savedAnswerObj = $.parseJSON(this.savedAnswer);
-         retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
-         retrievedAnswer = JSON.stringify(retrievedAnswerObj);
+         var savedAnswerObj = this.savedAnswer && $.parseJSON(this.savedAnswer);
+         if(savedAnswerObj) {
+            retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
+            retrievedAnswer = retrievedAnswerObj[this.taskLevel] && JSON.stringify(retrievedAnswerObj);
+         } else {
+            retrievedAnswer = null;
+         }
       } else {
          retrievedAnswer = this.savedAnswer;
+      }
+      return retrievedAnswer;
+   },
+   retrieveAnswer: function() {
+      // Loads previously saved answer
+      var retrievedAnswer = this.getSavedAnswer();
+      if(!retrievedAnswer) {
+         this.showPopupMessage(this.strings.noAnswerSaved, 'blanket', this.strings.alright, null, null, "warning");
+         return;
       }
       var self = displayHelper;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
          self.updateScore(self.savedAnswer, false, function() {});
       });
+   },
+   hasSavedAnswer: function() {
+      // Returns whether a saved answer exists
+      return !!this.getSavedAnswer();
    },
 
    sendBestScore: function(callback, scores, messages) {
