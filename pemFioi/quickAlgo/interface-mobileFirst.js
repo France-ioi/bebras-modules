@@ -558,30 +558,39 @@ var quickAlgoInterface = {
 
     onResize: function(e) {
         // 100% and 100vh work erratically on some mobile browsers (Safari on
-        // iOS) because of the toolbar
+        // iOS) because of the toolbar, so we set directly the height as pixels
         var browserHeight = document.documentElement.clientHeight;
         $('body').css('height', browserHeight);
 
-        // Determine right size for Blockly
-        var blocklyArea = document.getElementById('blocklyContainer');
-        if(!blocklyArea) { return; }
-        var blocklyDiv = document.getElementById('blocklyDiv');
-        var toolbarDiv = document.getElementById('taskToolbar');
-        var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - blocklyArea.getBoundingClientRect().top : Infinity;
-        var heightBeforeWindow = browserHeight - blocklyArea.getBoundingClientRect().top - 2;
-        if($('#taskToolbar').is(':visible') && window.innerHeight < window.innerWidth) {
-            blocklyDiv.style.height = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)) + 'px';
-        } else {
-            blocklyDiv.style.height = Math.floor(heightBeforeWindow) + 'px';
-        }
         if($('#miniPlatformHeader').length) {
             $('#task').css('height', (browserHeight - 40) + 'px');
         } else {
             $('#task').css('height', '');
         }
 
-        // Resize Blockly elements
-        Blockly.svgResize(window.blocklyWorkspace);
+        // Determine right size for editor
+        var languageArea = document.getElementById('blocklyContainer');
+        if(!languageArea) { return; }
+        var toolbarDiv = document.getElementById('taskToolbar');
+        var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - languageArea.getBoundingClientRect().top : Infinity;
+        var heightBeforeWindow = browserHeight - languageArea.getBoundingClientRect().top - 2;
+        if($('#taskToolbar').is(':visible') && window.innerHeight < window.innerWidth) {
+            var targetHeight = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow));
+            $('#blocklyContainer').height(Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)));
+        } else {
+            var targetHeight = Math.floor(heightBeforeWindow);
+        }
+
+        if($('#blocklyDiv').length) {
+            $('#blocklyDiv').height(targetHeight);
+        } else {
+            $('#blocklyContainer').height(targetHeight);
+        }
+
+        // Resize editor elements
+        if(this.blocklyHelper) {
+            this.blocklyHelper.onResize();
+        }
         task.displayedSubTask.updateScale();
 
         // Check size and hide overflow if less than 5 pixels, to avoid big

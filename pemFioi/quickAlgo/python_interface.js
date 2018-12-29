@@ -294,6 +294,10 @@ function LogicController(nbTestCases, maxInstructions) {
       this._bindEditorEvents();
     }
   };
+  this.onResize = function() {
+    // On resize function to be called by the interface
+    this._aceEditor.resize();
+  };
   this._loadAceEditor = function () {
     this._aceEditor = ace.edit('python-workspace');
     this._aceEditor.setOption('readOnly', !!this._options.readOnly);
