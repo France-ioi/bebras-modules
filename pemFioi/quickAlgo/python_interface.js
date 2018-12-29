@@ -527,7 +527,11 @@ function LogicController(nbTestCases, maxInstructions) {
     $('.pythonIntroSimple').html(simpleHtml);
     $('.pythonIntroFull').html(fullHtml);
 
-    this.collapseTaskIntro(true);
+    // Display the full details in the responsive version
+    this.collapseTaskIntro(!window.quickAlgoResponsive);
+    if(window.quickAlgoResponsive) {
+        $('.pythonIntroBtn').hide();
+    }
 
     var controller = this;
     $('.pythonIntroSimple, .pythonIntroFull').on('click', 'code', function() {
