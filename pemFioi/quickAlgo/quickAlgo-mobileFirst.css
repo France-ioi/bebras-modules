@@ -778,7 +778,7 @@ body.fullscreen #taskToolbar {
     top: 10px;
     right: 0;
     padding-top: 10px;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     align-items: flex-start;
   }
@@ -809,17 +809,24 @@ body.fullscreen #taskToolbar {
     display: none;
   }
 }
+#languageInterface {
+  position: relative;
+}
 #capacity {
   line-height: 30px;
+  background-color: white;
+  background-color: rgba(255, 255, 255, 0.85);
   color: #787878;
   text-align: center;
+  padding-left: 5px;
   padding-right: 5px;
+  border-radius: 5px;
 }
-.capacityRed {
+#capacity.capacityRed {
   background-color: #FF9794;
+  background-color: rgba(255, 150, 150, 0.85);
   color: black;
   padding-left: 5px;
-  border-radius: 5px;
 }
 
 .scaleDrawingControl {

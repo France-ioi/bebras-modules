@@ -290,8 +290,13 @@ function LogicController(nbTestCases, maxInstructions) {
       $('#languageInterface').html(
         this._loadEditorWorkSpace()
       );
+      if(window.quickAlgoResponsive) {
+        $('#blocklyLibContent').prepend('<div class="pythonIntroSimple"></div>');
+        $('#editorBar').prependTo('#languageInterface');
+      }
       this._loadAceEditor();
       this._bindEditorEvents();
+      this.updateTaskIntro();
     }
   };
   this.onResize = function() {
@@ -525,7 +530,7 @@ function LogicController(nbTestCases, maxInstructions) {
     this.collapseTaskIntro(true);
 
     var controller = this;
-    $('.pythonIntro').on('click', 'code', function() {
+    $('.pythonIntroSimple, .pythonIntroFull').on('click', 'code', function() {
       controller._aceEditor && controller._aceEditor.insert(this.textContent);
       quickAlgoInterface.toggleLongIntro(false);
     });
@@ -536,12 +541,12 @@ function LogicController(nbTestCases, maxInstructions) {
     var div = $('.pythonIntroBtn').html('');
     if(collapse) {
       $('<a>Plus de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(false); });
-      $('.pythonIntroFull').hide();
-      $('.pythonIntroSimple').show();
+      $('.pythonIntro .pythonIntroFull').hide();
+      $('.pythonIntro .pythonIntroSimple').show();
     } else {
       $('<a>Moins de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(true); });
-      $('.pythonIntroFull').show();
-      $('.pythonIntroSimple').hide();
+      $('.pythonIntro .pythonIntroFull').show();
+      $('.pythonIntro .pythonIntroSimple').hide();
     }
   };
 
