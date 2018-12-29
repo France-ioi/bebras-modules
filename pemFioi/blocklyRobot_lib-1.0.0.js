@@ -604,20 +604,22 @@ var getContext = function(display, infos, curLevel) {
                withdrawObject: "ramasser la roue dentée",
                dropObject: "accrocher la roue dentée",
                onObject: "sur une roue dentée",
-               onContainer: "sur des engrenages"
+               onContainer: "sur une machine"
             },
             code: {
                withdrawObject: "ramasserRoue",
                dropObject: "deposerRoue",
                onObject: "surRoueDentee",
-               onContainer: "surEngrenages"
+               onContainer: "surMachine"
             },
             messages: {
-               successContainersFilled: "Bravo, la machine est prête à fonctionner !",
+               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
                failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
                failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
                failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
-               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille."
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !",
             }
          },
 
@@ -626,13 +628,13 @@ var getContext = function(display, infos, curLevel) {
                withdrawObject: "recoger el engranaje",
                dropObject: "soltar el engranaje",
                onObject: "sobre engranaje",
-               onContainer: "sur des engrenages"
+               onContainer: "sur une mac"
             },
             code: {
                withdrawObject: "recogerEngranaje",
                dropObject: "soltarEngranaje",
                onObject: "sobreEngranaje",
-               onContainer: "surEngrenages"
+               onContainer: "surMachine"
             },
             messages: {
                successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
