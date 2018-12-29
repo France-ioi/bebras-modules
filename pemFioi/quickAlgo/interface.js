@@ -87,6 +87,10 @@ var quickAlgoInterface = {
       $('#scaleDrawing').change(this.onScaleDrawingChange.bind(this));
    },
 
+   bindBlocklyHelper: function(blocklyHelper) {
+      this.blocklyHelper = blocklyHelper;
+   },
+
    setOptions: function(opt) {
       // Load options from the task
       var hideControls = opt.hideControls ? opt.hideControls : {};
