@@ -108,7 +108,7 @@ var quickAlgoInterface = {
             "<div id='editorBar'>" +
                 "<div id='capacity'></div>" +
                 "<div class='buttons'>" +
-                "<button type='button' id='fullscreenButton'><span class='fas fa-expand'></span></button>" +
+                "<button type='button' id='fullscreenButton' onclick='quickAlgoInterface.toggleFullscreen();'><span class='fas fa-expand'></span></button>" +
                 displayHelpBtn +
                 "</div>" +
             "</div>" +
@@ -118,34 +118,7 @@ var quickAlgoInterface = {
         var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
         if(iOS) {
             $('#fullscreenButton').remove();
-        } else {
-            $('#fullscreenButton').click(function() {
-                quickAlgoInterface.toggleFullscreen();
-            });
         }
-
-
-        // TODO :: something cleaner (add when editorMenu is opened, remove when closed?)
-        $('#editorMenu div[rel=example]').click(function(e) {
-            quickAlgoInterface.closeEditorMenu();
-            task.displayedSubTask.loadExample()
-        });
-
-        $('#editorMenu div[rel=save]').click(function(e) {
-            quickAlgoInterface.closeEditorMenu();
-            task.displayedSubTask.blocklyHelper.saveProgram();
-        });
-
-        $('#editorMenu div[rel=restart]').click(function(e) {
-            quickAlgoInterface.closeEditorMenu();
-            displayHelper.restartAll();
-        });
-
-        $('#editorMenu div[rel=best-answer]').click(function(e) {
-            quickAlgoInterface.closeEditorMenu();
-            displayHelper.retrieveAnswer();
-        });
-
 
         // Buttons from buttonsAndMessages
         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
@@ -198,23 +171,20 @@ var quickAlgoInterface = {
 
     createEditorMenu: function() {
         if(!$('#openEditorMenu').length) {
-            $("#tabsContainer").append("<div id='openEditorMenu' class='icon'><span class='fas fa-bars'></span></div>");
-            $('#openEditorMenu').click(function() {
-                quickAlgoInterface.editorMenuIsOpen ? quickAlgoInterface.closeEditorMenu() : quickAlgoInterface.openEditorMenu();
-            });
+            $("#tabsContainer").append("<div id='openEditorMenu' class='icon' onclick='quickAlgoInterface.toggleEditorMenu();'><span class='fas fa-bars'></span></div>");
         }
         if($('#editorMenu').length) { return; }
         $("body").append('' +
             "<div id='editorMenu' style='display: none;'>" +
                 "<div class='editorMenuHeader'>" +
-                    "<div id='closeEditorMenu'><span class='fas fa-times'></span></div>" +
+                    "<div id='closeEditorMenu' onclick='quickAlgoInterface.closeEditorMenu();'><span class='fas fa-times'></span></div>" +
                     "<div>Menu</div>" +
                 "</div>" +
                 "<div class='editorActions'>" +
-                    "<div rel='example' class='item'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
-                    "<div rel='restart' class='item'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
-                    "<div rel='save' class='item'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
-                    "<div rel='best-answer' class='item'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
+                    "<div rel='example' class='item' onclick='quickAlgoInterface.editorBtn(\"example\");'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
+                    "<div rel='restart' class='item' onclick='quickAlgoInterface.editorBtn(\"restart\");'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
+                    "<div rel='save' class='item' onclick='quickAlgoInterface.editorBtn(\"save\");'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
+                    "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
                     "<div rel='load' class='item'>" +
                         "<input type='file' id='task-upload-file' " +
                         "onchange='quickAlgoInterface.loadPrograms(this)'>" +
@@ -225,11 +195,15 @@ var quickAlgoInterface = {
                 "<span id='saveUrl'></span>" +
             "</div>"
         );
-        $("#closeEditorMenu").click(function() {
-            quickAlgoInterface.closeEditorMenu();
-        });
     },
 
+    toggleEditorMenu: function() {
+        if(this.editorMenuIsOpen) {
+            this.closeEditorMenu();
+        } else {
+            this.openEditorMenu();
+        }
+    },
     openEditorMenu: function() {
         this.editorMenuIsOpen = true;
         var menuWidth = $('#editorMenu').css('width');
@@ -241,6 +215,20 @@ var quickAlgoInterface = {
         $('body').animate({left: '0'}, 500, function() {
             $('#editorMenu').css('display','none')
         });
+    },
+
+    editorBtn: function(btn) {
+        // Handle an editor button press
+        this.closeEditorMenu();
+        if(btn == 'example') {
+            task.displayedSubTask.loadExample()
+        } else if(btn == 'save') {
+            task.displayedSubTask.blocklyHelper.saveProgram();
+        } else if(btn == 'restart') {
+            displayHelper.restartAll();
+        } else if(btn == 'best-answer') {
+            displayHelper.retrieveAnswer();
+        }
     },
 
     loadPrograms: function(formElement) {
@@ -318,19 +306,19 @@ var quickAlgoInterface = {
         var speedControls =
             '<div class="speedControls">' +
                 '<div class="playerControls">' +
-                    '<div class="icon backToFirst"><span class="fas fa-fast-backward"></span></div>' +
-                    '<div class="icon playPause play"><span class="fas fa-play-circle"></span></div>' +
-                    '<div class="icon nextStep"><span class="fas fa-step-forward"></span></div>' +
-                    '<div class="icon goToEnd"><span class="fas fa-fast-forward"></span></div>' +
-                    '<div class="icon displaySpeedSlider"><span class="fas fa-tachometer-alt"></span></div>' +
+                    '<div class="icon backToFirst" onclick="quickAlgoInterface.playerControls(\'backToFirst\');"><span class="fas fa-fast-backward"></span></div>' +
+                    '<div class="icon playPause play" onclick="quickAlgoInterface.playerControls(\'playPause\');"><span class="fas fa-play-circle"></span></div>' +
+                    '<div class="icon nextStep" onclick="quickAlgoInterface.playerControls(\'nextStep\');"><span class="fas fa-step-forward"></span></div>' +
+                    '<div class="icon goToEnd" onclick="quickAlgoInterface.playerControls(\'goToEnd\');"><span class="fas fa-fast-forward"></span></div>' +
+                    '<div class="icon displaySpeedSlider" onclick="quickAlgoInterface.playerControls(\'displaySpeedSlider\');"><span class="fas fa-tachometer-alt"></span></div>' +
                 '</div>' +
                 '<div class="speedSlider">' +
-                    '<span class="icon hideSpeedSlider"><span class="fas fa-tachometer-alt"></span></span>' +
-                    '<span class="icon speedSlower"><span class="fas fa-walking"></span></span>' +
+                    '<span class="icon hideSpeedSlider" onclick="quickAlgoInterface.playerControls(\'hideSpeedSlider\');"><span class="fas fa-tachometer-alt"></span></span>' +
+                    '<span class="icon speedSlower" onclick="quickAlgoInterface.playerControls(\'speedSlower\');"><span class="fas fa-walking"></span></span>' +
                     '<input type="range" min="0" max="' +
                         (this.stepDelayMax - this.stepDelayMin) +
-                        '" value="0" class="slider speedCursor"/>' +
-                    '<span class="icon speedFaster"><span class="fas fa-running"></span></span>' +
+                        '" value="0" class="slider speedCursor" oninput="quickAlgoInterface.refreshStepDelay();" onchange="quickAlgoInterface.refreshStepDelay();"/>' +
+                    '<span class="icon speedFaster" onclick="quickAlgoInterface.playerControls(\'speedFaster\');"><span class="fas fa-running"></span></span>' +
                 '</div>' +
             '</div>';
         if($('#task .speedControls').length) {
@@ -343,62 +331,47 @@ var quickAlgoInterface = {
 
         $('#mode-player').append(speedControls);
         $('#introGrid').append(speedControls);
+    },
 
-        $('.speedCursor').on('input change', function(e) {
-            quickAlgoInterface.refreshStepDelay();
-        });
-        $('.speedSlower').click(function() {
+    playerControls: function(ctrl) {
+        if(ctrl == 'backToFirst') {
+            task.displayedSubTask.stop();
+            this.setPlayPause(false);
+        } else if(ctrl == 'playPause') {
+            if($('.playerControls .playPause').hasClass('play')) {
+                this.refreshStepDelay();
+                this.setPlayPause(true);
+                task.displayedSubTask.play();
+            } else {
+                this.setPlayPause(false);
+                task.displayedSubTask.pause();
+            }
+        } else if(ctrl == 'nextStep') {
+            this.setPlayPause(false);
+            task.displayedSubTask.step();
+        } else if(ctrl == 'goToEnd') {
+            task.displayedSubTask.setStepDelay(0);
+            task.displayedSubTask.play();
+            this.setPlayPause(false);
+        } else if(ctrl == 'displaySpeedSlider') {
+            $('#mode-player').addClass('displaySpeedSlider');
+        } else if(ctrl == 'hideSpeedSlider') {
+           $('#mode-player').removeClass('displaySpeedSlider');
+        } else if(ctrl == 'speedSlower') {
             var el = $('.speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) - delta;
             el.val(Math.max(newVal, 0));
             quickAlgoInterface.refreshStepDelay();
-        });
-        $('.speedFaster').click(function() {
+        } else if(ctrl == 'speedFaster') {
             var el = $('.speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
                 delta = Math.floor(maxVal / 10),
                 newVal = parseInt(el.val(), 10) + delta;
             el.val(Math.min(newVal, maxVal));
             quickAlgoInterface.refreshStepDelay();
-        });
-
-        $('.playerControls .backToFirst').click(function() {
-            task.displayedSubTask.stop();
-//            task.displayedSubTask.play();
-//            quickAlgoInterface.setPlayPause(true);
-        });
-
-        $('.playerControls .playPause').click(function(e) {
-            if($(this).hasClass('play')) {
-                quickAlgoInterface.refreshStepDelay();
-                task.displayedSubTask.play();
-                quickAlgoInterface.setPlayPause(true);
-            } else {
-                task.displayedSubTask.pause();
-                quickAlgoInterface.setPlayPause(false);
-            }
-        })
-
-        $('.playerControls .nextStep').click(function() {
-            quickAlgoInterface.setPlayPause(false);
-            task.displayedSubTask.step();
-        });
-
-        $('.playerControls .goToEnd').click(function() {
-            task.displayedSubTask.setStepDelay(0);
-            task.displayedSubTask.play();
-            quickAlgoInterface.setPlayPause(false);
-        });
-
-        $('.playerControls .displaySpeedSlider').click(function() {
-            $('#mode-player').addClass('displaySpeedSlider');
-        });
-
-        $('.speedSlider .hideSpeedSlider').click(function() {
-           $('#mode-player').removeClass('displaySpeedSlider');
-        });
+        }
     },
 
     setPlayPause: function(isPlaying) {
@@ -483,24 +456,19 @@ var quickAlgoInterface = {
         $("#task").append('' +
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
-                    '<div id="mode-instructions" class="mode">' +
+                    '<div id="mode-instructions" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-instructions\');">' +
                         '<span><span class="fas fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
                     '</div>' +
-                    '<div id="mode-editor" class="mode">' +
+                    '<div id="mode-editor" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-editor\');">' +
                         '<span><span class="fas fa-pencil-alt"></span>' +
                         '<span class="label ToTranslate">Éditeur</span></span>' +
                         displayHelpBtn +
                     '</div>' +
-                    '<div id="mode-player" class="mode">' +
+                    '<div id="mode-player" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-player\');">' +
                         '<span class="fas fa-play"></span>' +
                     '</div>' +
                 '</div>' +
             '</div>');
-
-        $('#modeSelector div').click(function() {
-            quickAlgoInterface.selectMode($(this).attr('id'));
-            quickAlgoInterface.onResize();
-        })
     },
 
     selectMode: function(mode) {
@@ -531,15 +499,12 @@ var quickAlgoInterface = {
                 '<div id="taskIntroLong" style="display:none;" class="panel">' +
                     '<div class="panel-heading">'+
                         '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>Détail de la mission</h2>' +
-                        '<button type="button" class="closeLongIntro exit"><i class="fas fa-times"></i></button>' +
+                        '<button type="button" class="closeLongIntro exit" onclick="quickAlgoInterface.toggleLongIntro(false);"><i class="fas fa-times"></i></button>' +
                     '</div><div class="panel-body">' +
                         this.taskIntroContent +
                     '</div>' +
                 '<div>';
             $('#blocklyLibContent').append(introLong);
-            $('#taskIntroLong .closeLongIntro').click(function(e) {
-                quickAlgoInterface.toggleLongIntro(false);
-            });
             if (! $('#taskIntro .sectionTitle').length) {
                 var renderTaskIntro = '' +
                     '<h2 class="sectionTitle longIntroTitle">' +
@@ -549,11 +514,8 @@ var quickAlgoInterface = {
                         '<span class="fas fa-book icon"></span>Votre mission' +
                     '</h2>' +
                     this.taskIntroContent +
-                    '<button type="button" class="showLongIntro"></button>';
+                    '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
                 $('#taskIntro').html(renderTaskIntro);
-                $('#taskIntro .showLongIntro').click(function(e) {
-                    quickAlgoInterface.toggleLongIntro();
-                });
             }
             quickAlgoInterface.toggleLongIntro(false);
         }
