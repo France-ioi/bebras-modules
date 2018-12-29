@@ -202,6 +202,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.reloading = false;
       },
 
+      onResize: function() {
+         // onResize function to be called by the interface
+         Blockly.svgResize(this.workspace);
+      },
+
       hiddenCheck: function() {
          // Check whether the Blockly editor is hidden
          var visible = $('#'+this.divId).is(':visible');
