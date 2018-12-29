@@ -619,7 +619,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
                failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
                failureDropObject: "Il y a déjà une plateforme ici !",
-               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
             }
          },
 
@@ -628,7 +628,7 @@ var getContext = function(display, infos, curLevel) {
                withdrawObject: "recoger el engranaje",
                dropObject: "soltar el engranaje",
                onObject: "sobre engranaje",
-               onContainer: "sur une mac"
+               onContainer: "sur une machine"
             },
             code: {
                withdrawObject: "recogerEngranaje",
@@ -1744,7 +1744,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "gridEdgeEast", yieldsValue: true },
       func: function(callback) {
          var robot = this.getRobot();
-         this.callCallback(callback, (robot.col == this.nbCols - 1));
+         this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
       }
    });
    
@@ -1754,7 +1754,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "gridEdgeWest", yieldsValue: true },
       func: function(callback) {
          var robot = this.getRobot();
-         this.callCallback(callback, (robot.col == 0));
+         this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
       }
    });
    
@@ -1764,7 +1764,7 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "gridEdgeNorth", yieldsValue: true },
       func: function(callback) {
          var robot = this.getRobot();
-         this.callCallback(callback, (robot.row == 0));
+         this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
       }
    });
    
@@ -1774,50 +1774,10 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "gridEdgeSouth", yieldsValue: true },
       func: function(callback) {
          var robot = this.getRobot();
-         this.callCallback(callback, (robot.row == this.nbRows - 1));
+         this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
       }
    });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeEast",
-      type: "sensors",
-      block: { name: "gridEdgeEast", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, (robot.col == this.nbCols - 1));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeWest",
-      type: "sensors",
-      block: { name: "gridEdgeWest", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, (robot.col == 0));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeNorth",
-      type: "sensors",
-      block: { name: "gridEdgeNorth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, (robot.row == 0));
-      }
-   });
-   
-   infos.newBlocks.push({
-      name: "gridEdgeSouth",
-      type: "sensors",
-      block: { name: "gridEdgeSouth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, (robot.row == this.nbRows - 1));
-      }
-   });
-   
+      
    infos.newBlocks.push({
       name: "platformInFront",
       type: "sensors",
@@ -2536,13 +2496,17 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.isInGrid = function(row, col) {
-      if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols)
+      if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
          return false;
+      }
+      if (context.tiles[row][col] == 0) {
+         return false;
+      }
       return true;
    };
    
    context.tryToBeOn = function(row, col) {
-      if(!context.isInGrid(row, col) || (context.tiles[row][col] == 0)) {
+      if(!context.isInGrid(row, col)) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.leavesGrid);
