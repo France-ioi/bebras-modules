@@ -518,14 +518,12 @@ var quickAlgoInterface = {
                 $('#taskIntro').html(renderTaskIntro);
             }
             quickAlgoInterface.toggleLongIntro(false);
-        }
-        else {
-            if (! $('#taskIntro .sectionTitle').length) {
-                $('#taskIntro').prepend('' +
-                    '<h2 class="sectionTitle longIntroTitle">' +
-                        '<span class="fas fa-book icon"></span>Énoncé' +
-                    '</h2>');
-            }
+        } else {
+            $('#taskIntro').html(
+                '<h2 class="sectionTitle longIntroTitle">' +
+                    '<span class="fas fa-book icon"></span>Énoncé' +
+                '</h2>' +
+                this.taskIntroContent);
         }
         if(level) {
             for(var otherLevel in displayHelper.levelsRanks) {
@@ -540,6 +538,7 @@ var quickAlgoInterface = {
             this.taskIntroContent = $('#taskIntro').html();
         }
         this.taskIntroContent += html;
+        $('#taskIntro').html(this.taskIntroContent);
         this.setupTaskIntro();
     },
 
@@ -582,7 +581,8 @@ var quickAlgoInterface = {
         var toolbarDiv = document.getElementById('taskToolbar');
         var heightBeforeToolbar = toolbarDiv ? toolbarDiv.getBoundingClientRect().top - languageArea.getBoundingClientRect().top : Infinity;
         var heightBeforeWindow = browserHeight - languageArea.getBoundingClientRect().top - 2;
-        if($('#taskToolbar').is(':visible') && window.innerHeight < window.innerWidth) {
+        if($('#taskToolbar').is(':visible')) {
+            // TODO :: why did we have a condition window.innerHeight < window.innerWidth ?
             var targetHeight = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow));
             $('#blocklyContainer').height(Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)));
         } else {

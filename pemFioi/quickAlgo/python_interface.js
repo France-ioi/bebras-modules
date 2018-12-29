@@ -407,7 +407,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this.updateTaskIntro = function () {
     if(!this._mainContext.display) { return; }
     if($('.pythonIntro').length == 0) {
-      quickAlgoInterface.appendTaskIntro('<hr class="long .pythonIntroElement" />'
+      quickAlgoInterface.appendTaskIntro('<hr class="pythonIntroElement long" />'
         + '<div class="pythonIntro pythonIntroElement long">'
         + '  <div class="pythonIntroSimple"></div>'
         + '  <div class="pythonIntroFull"></div>'
@@ -417,10 +417,10 @@ function LogicController(nbTestCases, maxInstructions) {
 
     $('.pythonIntro').off('click', 'code');
     if(this._mainContext.infos.noPythonHelp) {
-       $('.pythonIntroElement').hide();
+       $('.pythonIntroElement').css('display', 'none');
        return;
     }
-    $('.pythonIntroElement').show();
+    $('.pythonIntroElement').css('display', '');
 
     var fullHtml = '';
     var simpleHtml = '';
