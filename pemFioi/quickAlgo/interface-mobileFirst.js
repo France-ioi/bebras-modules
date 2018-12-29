@@ -15,7 +15,7 @@ var quickAlgoInterface = {
     hasHelp: false,
     editorMenuIsOpen: false,
     longIntroShown: false,
-    taskIntroContent: '',
+    taskIntroContent: null,
 
     blocklyHelper: null,
 
@@ -485,7 +485,7 @@ var quickAlgoInterface = {
     },
 
     setupTaskIntro: function(level) {
-        if (! this.taskIntroContent.length ) {
+        if(this.taskIntroContent === null) {
             this.taskIntroContent = $('#taskIntro').html();
         }
         var hasLong = $('#taskIntro').find('.long').length;
@@ -533,6 +533,14 @@ var quickAlgoInterface = {
             }
             $('.' + level).show();
         }
+    },
+
+    appendTaskIntro: function(html) {
+        if(this.taskIntroContent === null) {
+            this.taskIntroContent = $('#taskIntro').html();
+        }
+        this.taskIntroContent += html;
+        this.setupTaskIntro();
     },
 
     toggleLongIntro: function(forceNewState) {
