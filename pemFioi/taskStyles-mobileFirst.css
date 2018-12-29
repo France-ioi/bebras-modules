@@ -233,3 +233,7 @@ img {
   font-weight: 900;
   margin-right: 10px;
 }
+.pythonIntroSimple code, .pythonIntroFull code {
+  cursor: pointer;
+  color: #4D87CE;
+}
