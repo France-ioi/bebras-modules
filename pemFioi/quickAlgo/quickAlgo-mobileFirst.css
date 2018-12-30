@@ -51,6 +51,9 @@ body > * {
 /*****************
   EDITOR MENU
 *****************/
+#tabsContainer.noLevelTabs {
+  justify-content: flex-end;
+}
 #openEditorMenu {
   position: relative;
   background-color: #4a4a4a;
@@ -67,7 +70,7 @@ body > * {
 }
 @media screen and (min-width: 1024px) {
   #openEditorMenu {
-    align-self: end;
+    align-self: flex-end;
   }
 }
 #openEditorMenu::before,
