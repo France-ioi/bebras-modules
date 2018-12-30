@@ -74,6 +74,7 @@ var initBlocklySubTask = function(subTask, language) {
            conceptViewer: levelGridInfos.conceptViewer,
            conceptViewerLang: this.blocklyHelper.language,
            hideControls: levelGridInfos.hideControls,
+           introMaxHeight: levelGridInfos.introMaxHeight
            });
         window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }

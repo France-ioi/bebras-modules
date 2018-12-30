@@ -159,6 +159,7 @@ var quickAlgoInterface = {
 
         this.createModeTaskToolbar();
         this.createEditorMenu();
+        this.updateInterfaceCss();
         this.updateBestAnswerStatus();
         this.setupTaskIntro(level);
         this.wrapIntroAndGrid();
@@ -250,6 +251,7 @@ var quickAlgoInterface = {
         // property from the layout
         $.extend(this.options, opt);
         this.updateControlsDisplay();
+        this.updateInterfaceCss();
 
         if(opt.conceptViewer) {
             conceptViewer.load(opt.conceptViewerLang);
@@ -270,6 +272,15 @@ var quickAlgoInterface = {
         $('div.backToFirst').toggleClass('interfaceToggled', !!hideControls.backToFirst);
         $('div.nextStep').toggleClass('interfaceToggled', !!hideControls.nextStep);
         $('div.goToEnd').toggleClass('interfaceToggled', !!hideControls.goToEnd);
+    },
+
+    updateInterfaceCss: function() {
+        $('style#quickAlgoInterface').remove();
+        var taskIntroMaxHeight = this.options.introMaxHeight ? this.options.introMaxHeight : '33%';
+        $('head').append('' +
+            '<style id="quickAlgoInterface">' +
+            '@media screen and (min-width: 855px) and (orientation: landscape) { #taskIntro { max-height: '+taskIntroMaxHeight+'; }}' +
+            '</style>');
     },
 
     bindBlocklyHelper: function(blocklyHelper) {
