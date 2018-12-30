@@ -83,3 +83,11 @@ Possible keys :
 * `controls` (boolean, default `false`) : display zoom buttons
 * `scale` (float, default `1`, or `1.1` if `maxInstructions <= 20`) : zoom
 scale as a multiplier (`1` is the normal scale)
+
+For example:
+```
+zoom: {
+   controls: true,
+   scale: 0.5
+},
+```
