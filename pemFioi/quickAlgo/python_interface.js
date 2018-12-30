@@ -24,6 +24,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this._visible = true;
   this._strings = window.languageStrings;
   this._options = {};
+  this._readOnly = false;
   this.includeBlocks = null;
 
   this.loadContext = function (mainContext) {
@@ -160,6 +161,7 @@ function LogicController(nbTestCases, maxInstructions) {
     if(!this.checkCode(code, function(err) {
       if(window.quickAlgoInterface) {
         window.quickAlgoInterface.displayError(err);
+        window.quickAlgoInterface.setPlayPause(false);
       } else {
         $('#errors').html(err);
       }
@@ -583,6 +585,20 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
   this.reload = function () {};
+  this.setReadOnly = function(newState) {
+    // setReadOnly called by quickAlgoInterface
+
+    // TODO :: should we actually set the readOnly flag?
+    return;
+
+    if(!!newState == this._readOnly) { return; }
+    this._readOnly = !!newState;
+
+    // options.readOnly has priority
+    if(this._options.readOnly) { return; }
+
+    this._aceEditor.setOption('readOnly', this._readOnly);
+  };
 }
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {

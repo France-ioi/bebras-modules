@@ -27,6 +27,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       unloaded: false,
+      readOnly: false,
       quickAlgoInterface: window.quickAlgoInterface,
 
       glowingBlock: null,
@@ -104,7 +105,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                zoom: { startScale: 1 }
             };
             wsConfig.scrollbars = typeof options.scrollbars != 'undefined' ? !!options.scrollbars : true;
-            wsConfig.readOnly = !!options.readOnly;
+            wsConfig.readOnly = !!options.readOnly || this.readOnly;
             if (options.zoom) {
                wsConfig.zoom.controls = !!options.zoom.controls;
                wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
@@ -200,6 +201,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             quickAlgoInterface.onResize();
          }
          this.reloading = false;
+      },
+
+      setReadOnly: function(newState) {
+         if(!!newState == this.readOnly) { return; }
+         this.readOnly = !!newState;
+
+         // options.readOnly has priority
+         if(this.options.readOnly) { return; }
+
+         this.reload();
       },
 
       onResize: function() {
@@ -586,7 +597,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                } // There can be multiple robot_start blocks sometimes
             }
             if(!robotStartHasChildren) {
-               that.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
+               this.displayError('<span class="testError">' + window.languageStrings.errorEmptyProgram + '</span>');
                return;
             }
          }
@@ -601,19 +612,19 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             }
             codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
          }
-         that.highlightPause = false;
-         if(that.getRemainingCapacity(that.workspace) < 0) {
-            that.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
+         this.highlightPause = false;
+         if(this.getRemainingCapacity(that.workspace) < 0) {
+            this.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
             return;
          }
-         var limited = that.findLimited(that.workspace);
+         var limited = this.findLimited(this.workspace);
          if(limited) {
-            that.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".</span>');
+            this.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {
-            that.workspace.traceOn(true);
-            that.workspace.highlightBlock(null);
+            this.workspace.traceOn(true);
+            this.workspace.highlightBlock(null);
          }
          this.mainContext.runner.initCodes(codes);
       },

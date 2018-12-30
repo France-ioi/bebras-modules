@@ -16,8 +16,8 @@ var quickAlgoInterface = {
     editorMenuIsOpen: false,
     longIntroShown: false,
     taskIntroContent: null,
-
     blocklyHelper: null,
+    editorReadOnly: false,
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -575,6 +575,7 @@ var quickAlgoInterface = {
         // 100% and 100vh work erratically on some mobile browsers (Safari on
         // iOS) because of the toolbar, so we set directly the height as pixels
         var browserHeight = document.documentElement.clientHeight;
+        var browserWidth = document.documentElement.clientWidth;
         $('body').css('height', browserHeight);
 
         if($('#miniPlatformHeader').length) {
@@ -603,6 +604,14 @@ var quickAlgoInterface = {
             $('#blocklyContainer').height(targetHeight);
         }
 
+        // Check whether we should set readOnly mode
+        this.readOnly = this.curMode == 'mode-player' &&
+            ((browserWidth <= browserHeight && browserWidth < 767) ||
+             (browserWidth > browserHeight && browserWidth >= 480 && browserWidth <= 854));
+        if(this.blocklyHelper) {
+            this.blocklyHelper.setReadOnly(this.readOnly);
+        }
+
         // Resize editor elements
         if(this.blocklyHelper) {
             this.blocklyHelper.onResize();
@@ -611,8 +620,8 @@ var quickAlgoInterface = {
 
         // Check size and hide overflow if less than 5 pixels, to avoid big
         // scrollbars when the layout is just slightly off for some reason
-        $('body').css('overflow-x', document.documentElement.scrollWidth - document.documentElement.clientWidth < 5 ? 'hidden' : '');
-        $('body').css('overflow-y', document.documentElement.scrollHeight - document.documentElement.clientHeight < 5 ? 'hidden' : '');
+        $('body').css('overflow-x', document.documentElement.scrollWidth - browserWidth < 5 ? 'hidden' : '');
+        $('body').css('overflow-y', document.documentElement.scrollHeight - browserHeight < 5 ? 'hidden' : '');
     },
 
     checkHeight: function() {
@@ -626,8 +635,9 @@ var quickAlgoInterface = {
     displayError: function(message) {
         $('.errorMessage').remove();
         if(!message) return;
+        var id = Math.random();
         var html =
-            '<div class="errorMessage">' +
+            '<div class="errorMessage" data-id="'+id+'">' +
                 '<button type="button" class="btn close">'+
                     '<span class="fas fa-times"></span>'+
                 '</button>' +
@@ -640,7 +650,9 @@ var quickAlgoInterface = {
         $("#introGrid .speedControls").append($(html));
         $(".errorMessage").show();
         $(".errorMessage").click(function(e) {
-            $(e.currentTarget).hide();
+            var targetId = e.currentTarget.getAttribute('data-id');
+            $(e.currentTarget).remove();
+            $(".errorMessage[data-id='"+targetId+"']").remove();
         });
     },
 
@@ -698,7 +710,9 @@ $(document).ready(function() {
 
     quickAlgoInterface.selectMode('mode-instructions');
 
-    window.addEventListener('resize', quickAlgoInterface.onResize, false);
+    window.addEventListener('resize', function() {
+        quickAlgoInterface.onResize();
+        }, false);
 
     // Set up task calls
     if(window.task) {
