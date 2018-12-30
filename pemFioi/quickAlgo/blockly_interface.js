@@ -608,7 +608,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          var limited = that.findLimited(that.workspace);
          if(limited) {
-            that.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockName(limited)+'".</span>');
+            that.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".</span>');
             return;
          }
          if(!this.scratchMode) {

@@ -93,7 +93,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          // Check we don't use blocks with limited uses too much
          // Returns false if there's none, else the name of the first block
          // found which is over the limit
-         if(!this.mainContext.info || !this.mainContext.infos.limitedUses) { return false; }
+         if(!this.mainContext.infos || !this.mainContext.infos.limitedUses) { return false; }
          this.makeLimitedUsesPointers();
 
          var workspaceBlocks = workspace.getAllBlocks();
