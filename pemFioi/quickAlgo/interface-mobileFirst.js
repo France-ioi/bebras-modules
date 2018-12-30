@@ -18,6 +18,7 @@ var quickAlgoInterface = {
     taskIntroContent: null,
     blocklyHelper: null,
     editorReadOnly: false,
+    options: {},
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -172,6 +173,7 @@ var quickAlgoInterface = {
     },
 
     createEditorMenu: function() {
+        $('#tabsContainer').toggleClass('noLevelTabs', !displayHelper.hasLevels);
         if(!$('#openEditorMenu').length) {
             $("#tabsContainer").append("<div id='openEditorMenu' class='icon' onclick='quickAlgoInterface.toggleEditorMenu();'><span class='fas fa-bars'></span></div>");
         }
@@ -197,6 +199,7 @@ var quickAlgoInterface = {
                 "<span id='saveUrl'></span>" +
             "</div>"
         );
+        this.updateControlsDisplay();
     },
 
     toggleEditorMenu: function() {
@@ -245,8 +248,20 @@ var quickAlgoInterface = {
         // would force an element to display, even if the layout wants it
         // hidden. Using a class ensures we don't break the elements' display
         // property from the layout
-        var hideControls = opt.hideControls ? opt.hideControls : {};
-        $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !opt.hasExample);
+        $.extend(this.options, opt);
+        this.updateControlsDisplay();
+
+        if(opt.conceptViewer) {
+            conceptViewer.load(opt.conceptViewerLang);
+            this.hasHelp = true;
+        } else {
+            this.hasHelp = false;
+        }
+    },
+
+    updateControlsDisplay: function() {
+        var hideControls = this.options.hideControls ? this.options.hideControls : {};
+        $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !this.options.hasExample);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
@@ -255,13 +270,6 @@ var quickAlgoInterface = {
         $('div.backToFirst').toggleClass('interfaceToggled', !!hideControls.backToFirst);
         $('div.nextStep').toggleClass('interfaceToggled', !!hideControls.nextStep);
         $('div.goToEnd').toggleClass('interfaceToggled', !!hideControls.goToEnd);
-
-        if(opt.conceptViewer) {
-            conceptViewer.load(opt.conceptViewerLang);
-            this.hasHelp = true;
-        } else {
-            this.hasHelp = false;
-        }
     },
 
     bindBlocklyHelper: function(blocklyHelper) {
@@ -333,6 +341,7 @@ var quickAlgoInterface = {
 
         $('#mode-player').append(speedControls);
         $('#introGrid').append(speedControls);
+        this.updateControlsDisplay();
     },
 
     playerControls: function(ctrl) {
@@ -496,6 +505,15 @@ var quickAlgoInterface = {
         if(this.taskIntroContent === null) {
             this.taskIntroContent = $('#taskIntro').html();
         }
+        $('#taskIntro').html(this.taskIntroContent);
+        if(level) {
+            for(var otherLevel in displayHelper.levelsRanks) {
+                if(otherLevel == level) { continue; }
+                $('#taskIntro .' + otherLevel).remove();
+            }
+            $('#taskIntro .' + level).show();
+        }
+        var levelIntroContent = $('#taskIntro').html();
         var hasLong = $('#taskIntro').find('.long').length;
         if (hasLong) {
             $('#taskIntro').addClass('hasLongIntro');
@@ -509,35 +527,28 @@ var quickAlgoInterface = {
                         '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>Détail de la mission</h2>' +
                         '<button type="button" class="closeLongIntro exit" onclick="quickAlgoInterface.toggleLongIntro(false);"><i class="fas fa-times"></i></button>' +
                     '</div><div class="panel-body">' +
-                        this.taskIntroContent +
+                        levelIntroContent +
                     '</div>' +
                 '<div>';
             $('#blocklyLibContent').append(introLong);
-            if (! $('#taskIntro .sectionTitle').length) {
-                var renderTaskIntro = '' +
-                    '<h2 class="sectionTitle longIntroTitle">' +
-                        '<span class="fas fa-book icon"></span>Énoncé' +
-                    '</h2>' +
-                    '<h2 class="sectionTitle shortIntroTitle">' +
-                        '<span class="fas fa-book icon"></span>Votre mission' +
-                    '</h2>' +
-                    this.taskIntroContent +
-                    '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
-                $('#taskIntro').html(renderTaskIntro);
-            }
+            var renderTaskIntro = '' +
+                '<h2 class="sectionTitle longIntroTitle">' +
+                    '<span class="fas fa-book icon"></span>Énoncé' +
+                '</h2>' +
+                '<h2 class="sectionTitle shortIntroTitle">' +
+                    '<span class="fas fa-book icon"></span>Votre mission' +
+                '</h2>' +
+                levelIntroContent +
+                '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
+            $('#taskIntro').html(renderTaskIntro);
+            $('#taskIntro .long').remove();
             quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
                 '<h2 class="sectionTitle longIntroTitle">' +
                     '<span class="fas fa-book icon"></span>Énoncé' +
                 '</h2>' +
-                this.taskIntroContent);
-        }
-        if(level) {
-            for(var otherLevel in displayHelper.levelsRanks) {
-                $('.' + otherLevel).hide();
-            }
-            $('.' + level).show();
+                levelIntroContent);
         }
     },
 
