@@ -258,12 +258,6 @@ h2.sectionTitle .icon {
   flex-direction: column;
 }
 
-@media screen and (orientation: portrait) and (max-width: 480px) { /* Low res display */
-  .mode-player .blocklyToolboxDiv, .mode-player .blocklyFlyout, .mode-player .blocklyTrash {
-    display: none !important;
-  }
-}
-
 @media /* Mobiles */
   screen and (max-width: 767px) and (orientation: portrait),
   screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
@@ -286,9 +280,6 @@ h2.sectionTitle .icon {
   .mode-editor #introGrid {
     display: none;
   }
-  .mode-player .blocklyToolboxDiv,
-  .mode-player .blocklyFlyout,
-  .mode-player .blocklyTrash,
   .mode-player #editorBar {
     display: none !important;
   }
