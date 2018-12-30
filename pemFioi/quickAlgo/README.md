@@ -65,6 +65,13 @@ Possible keys (all booleans) :
 * `nextStep` : Hides the `>|` step button
 * `goToEnd` : Hides the `>|` "go to end" button
 
+### introMaxHeight
+
+Type : string, default `"33%"`
+
+Allows to change the max height the task intro can take in the "desktop" layout
+of the responsive interface.
+
 ### scrollbars
 
 Type : boolean, default `true`, or `false` if `maxInstructions <= 10`.
