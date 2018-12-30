@@ -1636,9 +1636,9 @@ window.displayHelper = {
       // Gets the previously saved answer
       var retrievedAnswer;
       if (this.hasLevels) {
-         var retrievedAnswerObj = task.getAnswerObject();
          var savedAnswerObj = this.savedAnswer && $.parseJSON(this.savedAnswer);
          if(savedAnswerObj) {
+            var retrievedAnswerObj = task.getAnswerObject();
             retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
             retrievedAnswer = retrievedAnswerObj[this.taskLevel] && JSON.stringify(retrievedAnswerObj);
          } else {
@@ -1664,7 +1664,15 @@ window.displayHelper = {
    },
    hasSavedAnswer: function() {
       // Returns whether a saved answer exists
-      return !!this.getSavedAnswer();
+      if (this.hasLevels) {
+         var savedAnswerObj = this.savedAnswer && $.parseJSON(this.savedAnswer);
+         if(savedAnswerObj) {
+            return !!savedAnswerObj[this.taskLevel];
+         }
+      } else {
+         return !!this.savedAnswer;
+      }
+      return false;
    },
 
    sendBestScore: function(callback, scores, messages) {
