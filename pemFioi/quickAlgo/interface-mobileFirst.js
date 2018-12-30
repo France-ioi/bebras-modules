@@ -509,7 +509,7 @@ var quickAlgoInterface = {
         if(level) {
             for(var otherLevel in displayHelper.levelsRanks) {
                 if(otherLevel == level) { continue; }
-                $('#taskIntro .' + otherLevel).remove();
+                $('#taskIntro .' + otherLevel).not('.'+level).remove();
             }
             $('#taskIntro .' + level).show();
         }
