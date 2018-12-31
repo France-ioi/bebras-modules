@@ -102,9 +102,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                sounds: false,
                trashcan: true,
                media: this.mediaUrl,
+               scrollbars: true,
                zoom: { startScale: 1 }
             };
-            wsConfig.scrollbars = typeof options.scrollbars != 'undefined' ? !!options.scrollbars : true;
+
+            if(typeof options.scrollbars != 'undefined') { wsConfig.scrollbars = !!options.scrollbars; }
+            // IE <= 10 needs scrollbars
+            if(navigator.userAgent.indexOf("MSIE") > -1) { wsConfig.scrollbars = true; }
+
             wsConfig.readOnly = !!options.readOnly || this.readOnly;
             if (options.zoom) {
                wsConfig.zoom.controls = !!options.zoom.controls;
