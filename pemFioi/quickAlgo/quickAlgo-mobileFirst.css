@@ -376,7 +376,6 @@ h2.sectionTitle .icon {
   #taskIntro {
     background-color: #fff;
     flex: 1 0 auto;
-    max-height: 33%;
   }
   #gridContainer {
     background-color: transparent;
@@ -1133,9 +1132,6 @@ body.fullscreen #taskToolbar {
   font-weight: 100;
   color: #4a90e2;
 }
-#taskIntro .shortIntroTitle {
-  display: none;
-}
 button.showLongIntro {
   color: #4a90e2;
   border: 1px solid #4a90e2;
@@ -1158,11 +1154,9 @@ button.showLongIntro .icon {
   top: 10px;
 }
 @media screen and (min-width: 1024px) {
-  #taskIntro .longIntroTitle,
   #taskIntro .long {
     display: none;
   }
-  #taskIntro .shortIntroTitle,
   button.showLongIntro {
     display: block;
   }
