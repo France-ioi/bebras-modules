@@ -33,7 +33,7 @@ body {
 }
 @media screen and (min-width: 1024px) {
   body {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 body.blockly > *,
@@ -739,7 +739,11 @@ body.fullscreen #taskToolbar {
 }
 
 /* Editor Bar */
+#editorBar {
+  pointer-events: none;
+}
 #editorBar .buttons button {
+  pointer-events: auto;
   cursor: pointer;
 }
 .buttons button > span {
@@ -818,6 +822,7 @@ body.fullscreen #taskToolbar {
   padding-left: 5px;
   padding-right: 5px;
   border-radius: 5px;
+  pointer-events: none;
 }
 #capacity.capacityRed {
   background-color: #FF9794;
