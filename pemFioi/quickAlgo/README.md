@@ -58,6 +58,7 @@ interface.)
 
 Possible keys (all booleans) :
 
+* `restart` : Hides the "restart" button
 * `saveOrLoad` : Hides the program save and load buttons
 * `loadBestAnswer` : Hides the "load your best answer" button
 * `speedSlider` : Hides the speed slider

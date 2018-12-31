@@ -86,7 +86,7 @@ var localLanguageStrings = {
       resultsPartialSuccess: "Vous avez validé seulement {nbSuccess} test(s) sur {nbTests}.",
       gradingInProgress: "Évaluation en cours",
       introTitle: "Votre mission",
-      introDetailsTitle: "Détail de la mission",
+      introDetailsTitle: "Détails de la mission",
       textVariable: "texte",
       listVariable: "liste",
       scaleDrawing: "Zoom ×2",
