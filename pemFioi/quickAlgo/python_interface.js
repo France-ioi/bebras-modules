@@ -321,15 +321,13 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
 
-  this.getCapacityText = function() {
+  this.getCapacityInfo = function() {
     // Handle capacity display
     var code = this._aceEditor.getValue();
-    var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining.bind(window.quickAlgoInterface) : function() {};
 
     var forbidden = pythonForbidden(code, this.includeBlocks);
     if(forbidden) {
-      blinkRemaining(5, true);
-      return "Mot-clé interdit utilisé : "+forbidden;
+      return {text: "Mot-clé interdit utilisé : "+forbidden, invalid: true, type: 'forbidden'};
     }
     var text = '';
     var remaining = 1;
@@ -343,19 +341,15 @@ function LogicController(nbTestCases, maxInstructions) {
       text = strLimitElements.format(optLimitElements);
     }
     if(remaining < 0) {
-      blinkRemaining(5, true);
-      return text;
+      return {text: text, invalid: true, type: 'capacity'};
     }
     var limited = this.findLimited(code);
     if(limited) {
-      blinkRemaining(5, true);
-      return 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".';
+      return {text: 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".', invalid: true, type: 'limited'};
     } else if(remaining == 0) {
-       blinkRemaining(4);
-    } else {
-       blinkRemaining(0);
+      return {text: text, warning: true, type: 'capacity'};
     }
-    return text;
+    return {text: text, type: 'capacity'};
   };
 
   this._removeDropDownDiv = function() {
@@ -373,7 +367,11 @@ function LogicController(nbTestCases, maxInstructions) {
         that._mainContext.runner._editorMarker = null;
       }
 
-      $('#capacity').html(that.getCapacityText());
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
+      } else {
+        $('#capacity').html(that.getCapacityInfo().text);
+      }
 
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {

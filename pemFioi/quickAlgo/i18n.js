@@ -68,6 +68,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       limitElements: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitElementsOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
+      capacityWarning: "Attention : votre programme est invalide car il utilise trop de blocs. Faites attention à la limite de blocs affichée en haut à droite de l'éditeur.",
       previousTestcase: "Précédent",
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
@@ -155,6 +156,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
       limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       previousTestcase: "Previous",
       nextTestcase: "Next",
       allTests: "All tests: ",
@@ -244,6 +246,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
       limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
@@ -332,6 +335,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
       limitElements: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.", // TODO :: translate from "blocks" to "elements" (next string as well)
       limitElementsOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
@@ -415,6 +419,7 @@ var localLanguageStrings = {
       saveProgram: "Shrani",
       limitBlocks: "{remainingBlocks} kock izmed {maxBlocks} imaš še na voljo.",
       limitBlocksOver: "{remainingBlocks} kock preko meje {maxBlocks} kock, ki so na voljo.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
