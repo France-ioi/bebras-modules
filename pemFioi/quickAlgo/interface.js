@@ -129,12 +129,24 @@ var quickAlgoInterface = {
       } else {
          capacity.addClass('capacityRed');
       }
+      this.delayFactory.destroy('blinkRemaining');
       if(times > (red ? 1 : 0)) {
          var that = this;
-         this.delayFactory.destroy('blinkRemaining');
-         this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 200);
+         this.delayFactory.createTimeout('blinkRemaining', function() { that.blinkRemaining(times - 1, red); }, 400);
       }
    },
+
+   displayCapacity: function(info) {
+      $('#capacity').html(info.text ? info.text : '');
+      if(info.invalid) {
+         this.blinkRemaining(11, true);
+      } else if(info.warning) {
+         this.blinkRemaining(6);
+      } else {
+         this.blinkRemaining(0);
+      }
+   },
+
 
    initTestSelector: function (nbTestCases) {
       // Create the DOM for the tests display (typically on the left side)

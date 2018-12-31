@@ -261,7 +261,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
       },
 
-      getCapacityText: function() {
+      getCapacityInfo: function() {
          var remaining = 1;
          var text = '';
          if(maxBlocks) {
@@ -275,24 +275,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             text = strLimitBlocks.format(optLimitBlocks);
          }
 
-         var blinkRemaining = window.quickAlgoInterface ? window.quickAlgoInterface.blinkRemaining.bind(window.quickAlgoInterface) : function() {};
-
          if(remaining < 0) {
-            blinkRemaining(5, true);
-            return text;
+            return {text: text, invalid: true, type: 'capacity'};
          }
 
          // We're over the block limit, is there any block used too often?
          var limited = this.findLimited(this.workspace);
          if(limited) {
-            blinkRemaining(5, true);
-            return this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".';
+            return {text: this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".', invalid: true, type: 'limited'};
          } else if(remaining == 0) {
-            blinkRemaining(4);
-         } else {
-            blinkRemaining(0); // reset
+            return {text: text, warning: true, type: 'capacity'};
          }
-         return text;
+         return {text: text, type: 'capacity'};
       },
 
       onChange: function(event) {
@@ -305,8 +299,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
-            if(eventType === Blockly.Events.Create || eventType === Blockly.Events.Delete) {
-               $('#capacity').html(this.getCapacityText());
+            if(window.quickAlgoInterface) {
+               window.quickAlgoInterface.displayCapacity(this.getCapacityInfo());
+            } else {
+               $('#capacity').html(this.getCapacityInfo().text);
             }
             this.onChangeResetDisplay();
          } else {

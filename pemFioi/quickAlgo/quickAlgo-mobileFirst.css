@@ -286,6 +286,10 @@ h2.sectionTitle .icon {
   .mode-player #editorBar {
     display: none !important;
   }
+  .mode-instructions .errorMessage,
+  .mode-player .errorMessage.errorMessageLock {
+    display: none;
+  }
 }
 
 @media /* Landscape mobiles */
@@ -1079,6 +1083,12 @@ body.fullscreen #taskToolbar {
 }
 .errorMessage .btn span {
   font-size: 16px;
+}
+.errorMessage.errorMessageLock {
+  background-color: #FF9794;
+}
+.errorMessage.errorMessageLock .btn {
+  display: none;
 }
 .modalWrapper {
   display: none;

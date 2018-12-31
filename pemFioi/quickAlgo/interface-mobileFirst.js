@@ -19,6 +19,7 @@ var quickAlgoInterface = {
     blocklyHelper: null,
     editorReadOnly: false,
     options: {},
+    capacityPopupDisplayed: {},
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -311,12 +312,42 @@ var quickAlgoInterface = {
         } else {
             capacity.addClass('capacityRed');
         }
+        this.delayFactory.destroy('blinkRemaining');
         if(times > (red ? 1 : 0)) {
-            this.delayFactory.destroy('blinkRemaining');
-            this.delayFactory.createTimeout('blinkRemaining', function() { quickAlgoInterface.blinkRemaining(times - 1, red); }, 200);
+            this.delayFactory.createTimeout('blinkRemaining', function() { quickAlgoInterface.blinkRemaining(times - 1, red); }, 400);
         }
     },
 
+    displayCapacity: function(info) {
+        // Display remaining capacity
+        // Accepts an info item with optional keys :
+        // -text : Text to display
+        // -warning : Display as a warning
+        // -invalid : Display as invalid (program can't be executed)
+        // -type : Type of the text displayed (capacity, forbidden, limited)
+
+        if(!info.text) { return; }
+        $('#capacity').html(info.text);
+
+        if(info.invalid) {
+            this.blinkRemaining(11, true);
+
+            // Lock player controls
+            this.displayError(info.text, true);
+
+            if(displayHelper && info.type == 'capacity' && !this.capacityPopupDisplayed[info.type]) {
+                // Display warning (only for capacity-type messages)
+                displayHelper.showPopupMessage(this.strings.capacityWarning, 'blanket', displayHelper.strings.alright, null, null, "warning");
+                this.capacityPopupDisplayed[info.type] = true;
+            }
+        } else if(info.warning) {
+            this.blinkRemaining(6);
+            this.displayError(null, true);
+        } else {
+            this.blinkRemaining(0);
+            this.displayError(null, true);
+        }
+    },
 
 
     stepDelayMin: 25,
@@ -656,12 +687,17 @@ var quickAlgoInterface = {
         this.lastHeight = browserHeight;
     },
 
-    displayError: function(message) {
-        $('.errorMessage').remove();
+    displayError: function(message, lock) {
+        if(lock) {
+            $('.errorMessageLock').remove();
+        } else {
+            $('.errorMessage').not('.errorMessageLock').remove();
+        }
         if(!message) return;
+        var divClass = lock ? 'errorMessageLock' : '';
         var id = Math.random();
         var html =
-            '<div class="errorMessage" data-id="'+id+'">' +
+            '<div class="errorMessage '+divClass+'" data-id="'+id+'">' +
                 '<button type="button" class="btn close">'+
                     '<span class="fas fa-times"></span>'+
                 '</button>' +
@@ -672,8 +708,7 @@ var quickAlgoInterface = {
             '</div>';
         $("#taskToolbar").append($(html));
         $("#introGrid .speedControls").append($(html));
-        $(".errorMessage").show();
-        $(".errorMessage").click(function(e) {
+        $(".errorMessage").not('.errorMessageLock').click(function(e) {
             var targetId = e.currentTarget.getAttribute('data-id');
             $(e.currentTarget).remove();
             $(".errorMessage[data-id='"+targetId+"']").remove();
