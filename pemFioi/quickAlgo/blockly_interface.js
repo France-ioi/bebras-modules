@@ -388,6 +388,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.programs[this.player].javascript = $("#program").val();
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
+            this.cleanBlockAttributes(xml);
             this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.player].blocklyJS = this.getCode("javascript");
             //this.programs[this.player].blocklyPython = this.getCode("python");
@@ -398,7 +399,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
-            this.cleanBlockIds(xml);
+            this.cleanBlockAttributes(xml);
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
          $("#program").val(this.programs[this.player].javascript);
@@ -408,9 +409,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          var example = this.scratchMode ? exampleObj.scratch : exampleObj.blockly
          if (this.workspace != null && example) {
             var xml = Blockly.Xml.textToDom(example);
-            this.cleanBlockIds(xml);
-
-
+            this.cleanBlockAttributes(xml);
 
             // Remove robot_start
             if(xml.children.length == 1 && xml.children[0].getAttribute('type') == 'robot_start') {
@@ -464,6 +463,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                if (code[0] == "<") {
                   try {
                      var xml = Blockly.Xml.textToDom(code);
+                     that.cleanBlockAttributes(xml);
                      if(!that.checkBlocksAreAllowed(xml)) {
                         //throw 'not allowed'; // TODO :: do something; for now do nothing as the system might not be complete
                      }

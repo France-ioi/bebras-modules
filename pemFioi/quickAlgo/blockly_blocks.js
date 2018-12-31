@@ -2324,14 +2324,43 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return !(notAllowed.length);
       },
 
-      cleanBlockIds: function(xml) {
-         // Clean up block IDs which contain now forbidden characters
+      cleanBlockAttributes: function(xml) {
+         // Clean up block attributes
          var blockList = xml.getElementsByTagName('block');
+         var minX = Infinity, minY = Infinity;
          for(var i=0; i<blockList.length; i++) {
             var block = blockList[i];
+
+            // Clean up IDs which contain now forbidden characters
             var blockId = block.getAttribute('id');
             if(blockId && (blockId.indexOf('%') != -1 || blockId.indexOf('$') != -1 || blockId.indexOf('^') != -1)) {
                block.setAttribute('id', Blockly.genUid());
+            }
+
+            // Clean up read-only attributes
+            if(block.getAttribute('type') != 'robot_start') {
+               block.removeAttribute('deletable');
+               block.removeAttribute('movable');
+               block.removeAttribute('editable');
+            }
+
+            // Get minimum x and y
+            var x = block.getAttribute('x');
+            if(x !== null) { minX = Math.min(minX, parseInt(x)); }
+            var y = block.getAttribute('y');
+            if(y !== null) { minY = Math.min(minY, parseInt(y)); }
+         }
+
+         // Move blocks to start at x=0, y=0
+         for(var i=0; i<blockList.length; i++) {
+            var block = blockList[i];
+            var x = block.getAttribute('x');
+            if(x !== null) {
+                block.setAttribute('x', parseInt(x) - minX);
+            }
+            var y = block.getAttribute('y');
+            if(y !== null) {
+                block.setAttribute('y', parseInt(y) - minY);
             }
          }
       }
