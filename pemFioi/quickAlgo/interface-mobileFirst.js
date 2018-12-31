@@ -335,7 +335,7 @@ var quickAlgoInterface = {
             // Lock player controls
             this.displayError(info.text, true);
 
-            if(displayHelper && info.type == 'capacity' && !this.capacityPopupDisplayed[info.type]) {
+            if(displayHelper && info.popup && info.type == 'capacity' && !this.capacityPopupDisplayed[info.type]) {
                 // Display warning (only for capacity-type messages)
                 displayHelper.showPopupMessage(this.strings.capacityWarning, 'blanket', displayHelper.strings.alright, null, null, "warning");
                 this.capacityPopupDisplayed[info.type] = true;

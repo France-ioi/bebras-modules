@@ -304,10 +304,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             eventType === Blockly.Events.Change) : true;
 
          if(isBlockEvent) {
+            var capacityInfo = this.getCapacityInfo();
             if(window.quickAlgoInterface) {
-               window.quickAlgoInterface.displayCapacity(this.getCapacityInfo());
+               if(eventType === Blockly.Events.Move) {
+                  // Only display popup when we drop the block, not on creation
+                  capacityInfo.popup = true;
+               }
+               window.quickAlgoInterface.displayCapacity(capacityInfo);
             } else {
-               $('#capacity').html(this.getCapacityInfo().text);
+               $('#capacity').html(capacityInfo.text);
             }
             this.onChangeResetDisplay();
          } else {
