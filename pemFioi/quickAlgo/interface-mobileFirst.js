@@ -264,9 +264,14 @@ var quickAlgoInterface = {
     updateControlsDisplay: function() {
         var hideControls = this.options.hideControls ? this.options.hideControls : {};
         $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !this.options.hasExample);
+        $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
+
+        var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
+        $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
+
         $('div.speedSlider').toggleClass('interfaceToggled', !!hideControls.speedSlider);
         $('div.displaySpeedSlider').toggleClass('interfaceToggled', !!hideControls.speedSlider);
         $('div.backToFirst').toggleClass('interfaceToggled', !!hideControls.backToFirst);

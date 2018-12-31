@@ -35,8 +35,8 @@ var initBlocklySubTask = function(subTask, language) {
 
       // Convert legacy options
       if(!levelGridInfos.hideControls) { levelGridInfos.hideControls = {}; }
-      levelGridInfos.hideControls.saveOrLoad = !!levelGridInfos.hideSaveOrLoad;
-      levelGridInfos.hideControls.loadBestAnswer = !!levelGridInfos.hideLoadBestAnswers;
+      levelGridInfos.hideControls.saveOrLoad = levelGridInfos.hideControls.saveOrLoad || !!levelGridInfos.hideSaveOrLoad;
+      levelGridInfos.hideControls.loadBestAnswer = levelGridInfos.hideControls.loadBestAnswer || !!levelGridInfos.hideLoadBestAnswers;
 
       subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
       subTask.answer = null;
