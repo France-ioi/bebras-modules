@@ -535,7 +535,7 @@ var quickAlgoInterface = {
             var introLong = '' +
                 '<div id="taskIntroLong" style="display:none;" class="panel">' +
                     '<div class="panel-heading">'+
-                        '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>Détail de la mission</h2>' +
+                        '<h2 class="sectionTitle"><i class="fas fa-search-plus icon"></i>' + this.strings.introDetailsTitle + '</h2>' +
                         '<button type="button" class="closeLongIntro exit" onclick="quickAlgoInterface.toggleLongIntro(false);"><i class="fas fa-times"></i></button>' +
                     '</div><div class="panel-body">' +
                         levelIntroContent +
@@ -543,11 +543,8 @@ var quickAlgoInterface = {
                 '<div>';
             $('#blocklyLibContent').append(introLong);
             var renderTaskIntro = '' +
-                '<h2 class="sectionTitle longIntroTitle">' +
-                    '<span class="fas fa-book icon"></span>Énoncé' +
-                '</h2>' +
-                '<h2 class="sectionTitle shortIntroTitle">' +
-                    '<span class="fas fa-book icon"></span>Votre mission' +
+                '<h2 class="sectionTitle">' +
+                    '<span class="fas fa-book icon"></span>' + this.strings.introTitle +
                 '</h2>' +
                 levelIntroContent +
                 '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
@@ -556,8 +553,8 @@ var quickAlgoInterface = {
             quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
-                '<h2 class="sectionTitle longIntroTitle">' +
-                    '<span class="fas fa-book icon"></span>Énoncé' +
+                '<h2 class="sectionTitle">' +
+                    '<span class="fas fa-book icon"></span>' + this.strings.introTitle +
                 '</h2>' +
                 levelIntroContent);
         }
