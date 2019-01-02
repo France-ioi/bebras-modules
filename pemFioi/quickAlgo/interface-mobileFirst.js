@@ -38,6 +38,18 @@ var quickAlgoInterface = {
 
 
     exitFullscreen: function() {
+        if(window.iOSDetected) {
+            // iOS tries to extend the iframe if the contents don't fit.
+            // To remedy that, we delete the blockly editor after returning
+            // from fullscreen, and reload it
+            $('#blocklyLibContent').addClass('interfaceToggled');
+            setTimeout(function() {
+                $('#blocklyDiv').html('');
+                $('#blocklyLibContent').removeClass('interfaceToggled');
+                quickAlgoInterface.blocklyHelper.reload();
+                quickAlgoInterface.onResize();
+                }, 500);
+        }
         var el = document;
         if(el.exitFullscreen) {
             el.exitFullscreen();
@@ -117,11 +129,6 @@ var quickAlgoInterface = {
             "</div>" +
             "<div id='languageInterface'></div>"
         );
-
-        var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
-        if(iOS) {
-            $('#fullscreenButton').remove();
-        }
 
         // Buttons from buttonsAndMessages
         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
@@ -726,10 +733,8 @@ var quickAlgoInterface = {
         if(!document.fonts) { return; }
         document.fonts.ready.then(function() {
             // iOS will always return true to document.fonts.check
-            var iOS = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
-
-            if(iOS || !document.fonts.check('12px "Titillium Web"')) {
-                if(!iOS && window.modulesPath) {
+            if(window.iOSDetected || !document.fonts.check('12px "Titillium Web"')) {
+                if(!window.iOSDetected && window.modulesPath) {
                     // Load fonts from CSS files with embedded fonts
                     if(window.embeddedFontsAdded) { return; }
                     $('head').append(''
