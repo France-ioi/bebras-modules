@@ -123,7 +123,7 @@ img {
     padding: 10px 0;
   }
   #tabsMenu .li {
-    padding: 0 40px;
+    padding: 0 30px;
   }
   #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
     border-right-width: 2px;

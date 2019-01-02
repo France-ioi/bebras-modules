@@ -844,7 +844,7 @@ window.displayHelper = {
       if (this.graderScore > this.levelsMaxScores[level]) {
          mode = 'useless';
       }
-      drawStars('stars_' + starsIdx, starsIdx, 18, rate, mode);
+      drawStars('stars_' + starsIdx, starsIdx, 14, rate, mode);
    },
 
    updateLayout: function() {
