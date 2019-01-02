@@ -1182,7 +1182,9 @@ button.showLongIntro .icon {
   left: 15px;
   top: 10px;
 }
-@media screen and (min-width: 1024px) {
+@media
+  screen and (min-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 855px) and (orientation: landscape) {
   #taskIntro .long {
     display: none;
   }
@@ -1199,6 +1201,9 @@ button.showLongIntro .icon {
   left: 0;
   background-color: #fff;
   z-index: 30;
+}
+#taskIntroLong .short {
+  display: none;
 }
 #taskIntroLong.displayIntroLong {
   display: block !important;
