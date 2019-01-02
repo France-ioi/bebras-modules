@@ -206,3 +206,6 @@ function debounce(fn, threshold, wait) {
       timeout = setTimeout(delayed, threshold || 100);
    }
 }
+
+
+window.iOSDetected = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
