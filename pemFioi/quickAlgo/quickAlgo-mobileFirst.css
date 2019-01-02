@@ -433,11 +433,13 @@ h2.sectionTitle .icon {
   width: 21px;
   height: 21px;
   line-height: 21px;
+  margin-right: 6px;
 }
 .testResultIcon.testSuccess span {
   background: #b8e986;
   border-radius: 100%;
   color: #fff;
+  padding: 5px;
 }
 .testResultIcon.testPartial,
 .testResultIcon.testFailure {
@@ -663,6 +665,7 @@ h2.sectionTitle .icon {
 }
 #introGrid .playerControls .icon {
   margin-right: 5px;
+  cursor: pointer;
 }
 #introGrid .playerControls .icon span {
   padding: 0;
@@ -697,6 +700,9 @@ h2.sectionTitle .icon {
   #introGrid .speedControls {
     display: flex;
   }
+  #introGrid .playerControls {
+    justify-content: center;
+  }
 }
 @media /* Tablets portrait */
   screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
@@ -704,6 +710,12 @@ h2.sectionTitle .icon {
     display: flex;
     justify-content: space-around;
     padding: 0 10px;
+  }
+}
+@media /* Tablets landscape and desktop */
+  screen and (min-width: 855px) and (orientation: landscape) {
+  #introGrid .playerControls .icon {
+    margin-right: 10px;
   }
 }
 
@@ -1080,9 +1092,10 @@ body.fullscreen #taskToolbar {
   border: none;
   box-shadow: none;
   color: rgba(0,0,0,0.20);
+  cursor: pointer;
 }
 .errorMessage .btn span {
-  font-size: 16px;
+  font-size: 18px;
 }
 .errorMessage.errorMessageLock {
   background-color: #FF9794;
