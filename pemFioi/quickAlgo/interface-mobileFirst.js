@@ -592,7 +592,6 @@ var quickAlgoInterface = {
                 levelIntroContent +
                 '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
             $('#taskIntro').html(renderTaskIntro);
-            $('#taskIntro .long').remove();
             quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
