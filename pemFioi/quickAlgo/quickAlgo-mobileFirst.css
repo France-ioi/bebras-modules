@@ -280,12 +280,8 @@ h2.sectionTitle .icon {
   }
   .mode-player #taskIntro,
   .mode-instructions #blocklyLibContent,
-  .mode-editor #editorBar,
   .mode-editor #introGrid {
     display: none;
-  }
-  .fullscreen .mode-editor #editorBar {
-    display: flex;
   }
   .mode-player #editorBar {
     display: none !important;
@@ -314,6 +310,12 @@ h2.sectionTitle .icon {
   .mode-instructions #introGrid {
     flex-direction: row;
   }
+  .mode-editor #editorBar {
+    display: none;
+  }
+  .fullscreen .mode-editor #editorBar {
+    display: flex;
+  }
   #taskIntro {
     background-color: #f1f2f7;
     padding: 15px;
@@ -338,6 +340,13 @@ h2.sectionTitle .icon {
     flex: 0 0 60%;
     min-width: 0;
     margin: 10px 10px 0 10px;
+  }
+}
+@media /* Mobiles portrait */
+  screen and (max-width: 767px) and (orientation: portrait) {
+  #mode-editor .capacity,
+  .mode-editor #editorBar .buttons {
+    display: none;
   }
 }
 
