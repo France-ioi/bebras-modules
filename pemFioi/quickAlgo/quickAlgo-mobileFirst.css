@@ -1218,6 +1218,12 @@ button.showLongIntro .icon {
   left: 15px;
   top: 10px;
 }
+#taskIntroLong .panel-body {
+  padding: 20px;
+}
+#taskIntro video {
+  max-width: 100%;
+}
 @media
   screen and (min-width: 1024px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape) {
