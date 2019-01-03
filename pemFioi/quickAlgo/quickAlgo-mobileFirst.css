@@ -586,7 +586,6 @@ h2.sectionTitle .icon {
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;
-  min-width: 100px;
   width: 100%;
   margin-top: 6px;
 }
