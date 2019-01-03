@@ -123,7 +123,7 @@ img {
     padding: 10px 0;
   }
   #tabsMenu .li {
-    padding: 0 30px;
+    padding: 0 20px;
   }
   #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
     border-right-width: 2px;
@@ -163,7 +163,13 @@ img {
     right: -20px;
   }
 }
-
+@media /* Tablets and desktop */
+  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 855px) and (orientation: landscape) {
+  #tabsMenu .li {
+    padding: 0 40px;
+  }
+}
 #popupMessage {
    display: none;
 }
