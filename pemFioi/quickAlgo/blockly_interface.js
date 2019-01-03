@@ -19,6 +19,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       workspace: null,
       prevWidth: 0,
       options: {},
+      initialScale: 1,
       nbTestCases: 1,
       divId: 'blocklyDiv',
       hidden: false,
@@ -27,6 +28,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       unloaded: false,
+      display: false,
       readOnly: false,
       quickAlgoInterface: window.quickAlgoInterface,
 
@@ -93,6 +95,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.addExtraBlocks();
          this.createSimpleGeneratorsAndBlocks();
 
+         this.display = display;
+
          if (display) {
             this.loadHtml(nbTestCases);
             var xml = this.getToolboxXml();
@@ -111,12 +115,16 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(navigator.userAgent.indexOf("MSIE") > -1) { wsConfig.scrollbars = true; }
 
             wsConfig.readOnly = !!options.readOnly || this.readOnly;
-            if (options.zoom) {
+            if(options.zoom) {
                wsConfig.zoom.controls = !!options.zoom.controls;
                wsConfig.zoom.startScale = options.zoom.scale ? options.zoom.scale : 1;
             }
             if (this.scratchMode) {
                wsConfig.zoom.startScale = wsConfig.zoom.startScale * 0.75;
+            }
+            this.initialScale = wsConfig.zoom.startScale;
+            if(wsConfig.zoom.controls && window.blocklyUserScale) {
+               wsConfig.zoom.startScale *= window.blocklyUserScale;
             }
             if(this.trashInToolbox) {
                Blockly.Trashcan.prototype.MARGIN_SIDE_ = $('#blocklyDiv').width() - 110;
@@ -230,7 +238,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.hidden = false;
             // Reload the Blockly editor to remove display issues after
             // being hidden
-            console.log('reload');
             this.reload();
             return; // it will be restarted by reload
          }
@@ -391,6 +398,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.unloaded) {
             console.error('savePrograms called after unload');
             return;
+         }
+
+         // Save zoom
+         if(this.display && this.workspace.scale) {
+             window.blocklyUserScale = this.workspace.scale / this.initialScale;
          }
 
          this.checkRobotStart();
