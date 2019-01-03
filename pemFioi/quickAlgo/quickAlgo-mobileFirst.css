@@ -280,8 +280,12 @@ h2.sectionTitle .icon {
   }
   .mode-player #taskIntro,
   .mode-instructions #blocklyLibContent,
+  .mode-editor #editorBar,
   .mode-editor #introGrid {
     display: none;
+  }
+  .fullscreen .mode-editor #editorBar {
+    display: flex;
   }
   .mode-player #editorBar {
     display: none !important;
@@ -1018,7 +1022,7 @@ body.fullscreen #taskToolbar {
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 1px 0px 0px 0px #000 inset;
 }
-#modeSelector .displayHelpBtn {
+#modeSelector button {
   background-color: rgba(0,0,0,0.3);
   border-radius: 50%;
   padding: 6px 9px;
@@ -1028,10 +1032,16 @@ body.fullscreen #taskToolbar {
   color: #fff;
   border: 0;
 }
-#modeSelector .mode:not(.active) .displayHelpBtn {
+#modeSelector .capacity {
+  margin-right: 6px;
+}
+#modeSelector .mode:not(.active) button {
   display: none;
 }
-#modeSelector .displayHelpBtn .fas {
+#modeSelector .mode:not(.active) .capacity {
+  display: none;
+}
+#modeSelector button .fas {
   font-size: 13px;
 }
 #modeSelector .mode .label {

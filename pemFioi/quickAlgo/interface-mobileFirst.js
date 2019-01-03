@@ -121,7 +121,7 @@ var quickAlgoInterface = {
         var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
         $("#blocklyLibContent").html(
             "<div id='editorBar'>" +
-                "<div id='capacity'></div>" +
+                "<div id='capacity' class='capacity'></div>" +
                 "<div class='buttons'>" +
                 "<button type='button' id='fullscreenButton' onclick='quickAlgoInterface.toggleFullscreen();'><span class='fas fa-expand'></span></button>" +
                 displayHelpBtn +
@@ -313,7 +313,7 @@ var quickAlgoInterface = {
 
 
     blinkRemaining: function(times, red) {
-        var capacity = $('#capacity');
+        var capacity = $('.capacity');
         if(times % 2 == 0) {
             capacity.removeClass('capacityRed');
         } else {
@@ -334,7 +334,7 @@ var quickAlgoInterface = {
         // -type : Type of the text displayed (capacity, forbidden, limited)
 
         if(!info.text) { return; }
-        $('#capacity').html(info.text);
+        $('.capacity').html(info.text);
 
         if(info.invalid) {
             this.blinkRemaining(11, true);
@@ -531,9 +531,15 @@ var quickAlgoInterface = {
                         '<span><span class="fas fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
                     '</div>' +
                     '<div id="mode-editor" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-editor\');">' +
-                        '<span><span class="fas fa-pencil-alt"></span>' +
-                        '<span class="label ToTranslate">Éditeur</span></span>' +
-                        displayHelpBtn +
+                        '<span>' +
+                            '<span class="fas fa-pencil-alt"></span>' +
+                            '<span class="label ToTranslate">Éditeur</span>' +
+                        '</span>' +
+                        '<span>' +
+                            "<span class='capacity'></span>" +
+                            "<button type='button' onclick='quickAlgoInterface.toggleFullscreen();'><span class='fas fa-expand'></span></button>" +
+                            displayHelpBtn +
+                        '</span>' +
                     '</div>' +
                     '<div id="mode-player" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-player\');">' +
                         '<span class="fas fa-play"></span>' +
