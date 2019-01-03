@@ -271,5 +271,9 @@ var quickAlgoInterface = {
       message ? $('#errors').html(message) : $('#errors').empty();
    },
 
+   displayResults: function(mainResults, worstResults) {
+      this.displayError('<span class="testError">'+mainResults.message+'</span>');
+   },
+
    setPlayPause: function(isPlaying) {} // Does nothing
 };

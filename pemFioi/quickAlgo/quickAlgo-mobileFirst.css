@@ -1123,6 +1123,24 @@ body.fullscreen #taskToolbar {
 .errorMessage.errorMessageLock .btn {
   display: none;
 }
+.errorMessage .testResults {
+  padding: 2px 10px;
+  margin: 0px 6px;
+  border-radius: 10px;
+  background-color: white;
+}
+.errorMessage .testSuccess {
+  color: green;
+}
+.errorMessage .testError {
+  color: #FF001F;
+}
+.errorMessage .testLink {
+  color: #4A90E2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
 .modalWrapper {
   display: none;
   z-index: 1000;
