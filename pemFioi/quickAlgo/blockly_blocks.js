@@ -663,7 +663,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "logic_operation",
-                  blocklyXml: "<block type='logic_operation'></block>"
+                  blocklyXml: "<block type='logic_operation' inline='false'></block>"
                },
                {
                   name: "logic_negate",
