@@ -727,6 +727,31 @@ var quickAlgoInterface = {
         });
     },
 
+    makeTestResult: function(results, link) {
+        return '' +
+            '<span class="testResults">' +
+                '<span class="' + (results.successRate < 1 ? 'testError' : 'testSuccess') + '">' +
+                    'Test ' + (results.iTestCase+1) + ' : ' +
+                    (results.successRate < 1 ? 'erreur' : 'validé') +
+                '</span>' +
+                (link ? ' <span class="testLink" onclick="quickAlgoInterface.runTestCase('+results.iTestCase+')">voir</span>' : '') +
+            '</span>';
+    },
+
+    displayResults: function(mainResults, worstResults) {
+        if(mainResults.iTestCase == worstResults.iTestCase) {
+            this.displayError(mainResults.message);
+        } else {
+            this.displayError(this.makeTestResult(mainResults) + this.makeTestResult(worstResults, true));
+        }
+    },
+
+    runTestCase: function(iTestCase) {
+        task.displayedSubTask.changeTestTo(iTestCase);
+        task.displayedSubTask.setStepDelay(0);
+        task.displayedSubTask.run();
+    },
+
     wrapIntroAndGrid: function() {
         if ($('#introGrid').length) { return; }
         $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");

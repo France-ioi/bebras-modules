@@ -197,7 +197,11 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.initRun = function(callback) {
+      var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
+         if(typeof success == 'undefined') {
+            success = subTask.context.success;
+         }
          function handleResults(results) {
             subTask.context.display = true;
             if(callback) {
@@ -209,14 +213,17 @@ var initBlocklySubTask = function(subTask, language) {
             if(results.successRate < 1) {
                // Display the execution message as it won't be shown through
                // validate
-               window.quickAlgoInterface.displayError('<span class="testError">'+message+'</span>');
+               window.quickAlgoInterface.displayResults(
+                  {iTestCase: initialTestCase, message: message, successRate: success ? 1 : 0},
+                  results
+               );
             }
          }
          // Launch an evaluation after the execution
          subTask.context.display = false;
          subTask.getGrade(handleResults, true, subTask.iTestCase);
       });
-      initContextForLevel(subTask.iTestCase);
+      initContextForLevel(initialTestCase);
    };
 
    subTask.run = function(callback) {
