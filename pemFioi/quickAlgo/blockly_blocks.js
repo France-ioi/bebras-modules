@@ -2324,8 +2324,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return !(notAllowed.length);
       },
 
-      cleanBlockAttributes: function(xml) {
+      cleanBlockAttributes: function(xml, origin) {
          // Clean up block attributes
+         if(!origin) {
+            origin = {x: 0, y: 0};
+         }
          var blockList = xml.getElementsByTagName('block');
          var minX = Infinity, minY = Infinity;
          for(var i=0; i<blockList.length; i++) {
@@ -2356,11 +2359,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             var block = blockList[i];
             var x = block.getAttribute('x');
             if(x !== null) {
-                block.setAttribute('x', parseInt(x) - minX);
+                block.setAttribute('x', parseInt(x) - minX + origin.x);
             }
             var y = block.getAttribute('y');
             if(y !== null) {
-                block.setAttribute('y', parseInt(y) - minY);
+                block.setAttribute('y', parseInt(y) - minY + origin.y);
             }
          }
       }
