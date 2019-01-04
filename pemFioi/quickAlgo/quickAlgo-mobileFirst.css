@@ -62,15 +62,16 @@ body > * {
   color: #fff;
   cursor: pointer;
   order: 1;
+  font-size: 12px;
 }
 @media screen and (orientation: landscape) { /* horizontal screen layout */
   #openEditorMenu {
-    align-self: flex-end;
+    /*align-self: flex-end;*/
   }
 }
 @media screen and (min-width: 1024px) {
   #openEditorMenu {
-    align-self: flex-end;
+    /*align-self: flex-end;*/
   }
 }
 #openEditorMenu::before,
@@ -351,7 +352,7 @@ h2.sectionTitle .icon {
   #introGrid {
     position: relative;
     margin-bottom: 10px;
-    flex: 1 0 auto;
+    flex: 1 1 auto;
 
   }
   #introGrid .speedControls {
@@ -748,7 +749,6 @@ body.fullscreen #taskToolbar {
     flex: 1 0 60%;
     min-width: 0;
     background: #fff;
-    padding-top: 10px;
   }
 }
 #blocklyDiv {
@@ -1078,7 +1078,13 @@ body.fullscreen #taskToolbar {
   font-weight: bold;
   z-index: 1;
   border-radius: 5px 5px 0 0;
-  box-shadow: 0px 0px 0 2px #fff;
+}
+@media /* Mobiles */
+  screen and (max-width: 767px) and (orientation: portrait),
+  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
+  .errorMessage {
+    box-shadow: 0px 0px 0 2px #fff;
+  }
 }
 .errorMessage .messageWrapper {
   display: flex;
@@ -1184,8 +1190,8 @@ body.fullscreen #taskToolbar {
 #taskIntro,
 #taskIntroLong {
   color: #787878;
-  font-weight: bold;
-  font-size: 16px;
+  /*font-weight: bold;*/
+  font-size: 18px;
 }
 #taskIntro h2.sectionTitle,
 #taskIntroLong h2.sectionTitle {
@@ -1216,9 +1222,12 @@ button.showLongIntro .icon {
 }
 #taskIntroLong .panel-body {
   padding: 20px;
+  overflow: auto;
+  max-height: calc(100% - 30px - 22px); /* 100% - height of panel-heading */
 }
 #taskIntro video {
   max-width: 100%;
+  margin: 20px auto;
 }
 @media
   screen and (min-width: 1024px) and (orientation: portrait),

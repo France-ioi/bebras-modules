@@ -51,13 +51,16 @@ img {
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
+  font-size: 12px;
 }
 #tabsMenu .li:not(.current) a {
   color: #9b9b9b;
 }
 
 @media /* Portrait mobiles */
+  screen and (max-width: 480px),
   screen and (max-width: 600px) and (orientation: portrait) {
+
   #tabsMenu {
     background-color: #fff;
     border-radius: 5px 5px 0 0;
@@ -103,7 +106,8 @@ img {
   #tabsMenu .li.next a::before {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
-    font-size: 32px;
+    font-size: 22px;
+    line-height: 32px;
   }
   #tabsMenu .li.prev a::before {
     content: "\f104";
@@ -117,7 +121,7 @@ img {
   }
 }
 @media /* all but portrait mobiles */
-    screen and (min-width: 480px) and (orientation: landscape),
+    screen and (min-width: 481px) and (orientation: landscape),
     screen and (min-width: 601px) and (orientation: portrait) {
   #tabsMenu a {
     padding: 10px 0;
@@ -168,6 +172,12 @@ img {
   screen and (min-width: 855px) and (orientation: landscape) {
   #tabsMenu .li {
     padding: 0 40px;
+  }
+}
+@media /* Tablets landscape and desktop */
+  screen and (min-width: 855px) and (orientation: landscape) {
+  #tabsMenu {
+    margin-top: 7px;
   }
 }
 #popupMessage {
