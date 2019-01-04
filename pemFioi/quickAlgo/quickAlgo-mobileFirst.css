@@ -342,14 +342,6 @@ h2.sectionTitle .icon {
     margin: 10px 10px 0 10px;
   }
 }
-@media /* Mobiles portrait */
-  screen and (max-width: 767px) and (orientation: portrait) {
-  #mode-editor .capacity,
-  .mode-editor #editorBar .buttons {
-    display: none;
-  }
-}
-
 @media /* Tablets portrait */
   screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
 
@@ -797,6 +789,10 @@ body.fullscreen #taskToolbar {
       background-color: transparent;
       box-shadow: none;
       line-height: 30px;
+    }
+    #mode-editor .capacity,
+    #mode-editor button {
+      display: none;
     }
 }
 @media /* landscape mobiles, tablets and desktop */
