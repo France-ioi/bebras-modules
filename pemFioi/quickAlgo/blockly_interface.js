@@ -361,6 +361,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          Blockly.Xml.domToWorkspace(xml, this.workspace);
       },
 
+      getOrigin: function() {
+         // Get x/y origin
+         var noScrollbars = typeof this.options.scrollbars != 'undefined' && !this.options.scrollbars;
+         if(this.scratchMode) {
+            return noScrollbars ? {x: 340, y: 20} : {x: 4, y: 20};
+         }
+         if(this.includeBlocks.groupByCategory && noScrollbars) {
+            return {x: 105, y: 2};
+         }
+         return {x: 2, y: 2};
+      },
+
       setPlayer: function(newPlayer) {
          this.player = newPlayer;
          $("#selectPlayer").val(this.player);
@@ -421,7 +433,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
             this.workspace.clear();
-            this.cleanBlockAttributes(xml);
+            this.cleanBlockAttributes(xml, this.getOrigin());
             Blockly.Xml.domToWorkspace(xml, this.workspace);
          }
          $("#program").val(this.programs[this.player].javascript);
@@ -431,20 +443,22 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          var example = this.scratchMode ? exampleObj.scratch : exampleObj.blockly
          if (this.workspace != null && example) {
             var xml = Blockly.Xml.textToDom(example);
-            this.cleanBlockAttributes(xml);
+
+            // Shift to x=200 y=20 + offset
+            if(!this.exampleOffset) { this.exampleOffset = 0; }
+            var origin = this.getOrigin();
+            origin.x += 200 + this.exampleOffset;
+            origin.y += 20 + this.exampleOffset;
+            // Add an offset of 10 each time, so if someone clicks the button
+            // multiple times the blocks don't stack
+            this.exampleOffset += 10;
 
             // Remove robot_start
             if(xml.children.length == 1 && xml.children[0].getAttribute('type') == 'robot_start') {
                xml = xml.firstChild.firstChild;
             }
 
-            // Shift to x=200 y=20 + offset
-            if(!this.exampleOffset) { this.exampleOffset = 0; }
-            xml.firstChild.setAttribute('x', 200 + this.exampleOffset);
-            xml.firstChild.setAttribute('y', 20 + this.exampleOffset);
-            // Add an offset of 10 each time, so if someone clicks the button
-            // multiple times the blocks don't stack
-            this.exampleOffset += 10;
+            this.cleanBlockAttributes(xml);
 
             Blockly.Xml.domToWorkspace(xml, this.workspace);
 
