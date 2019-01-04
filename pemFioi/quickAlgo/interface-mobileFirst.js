@@ -683,7 +683,9 @@ var quickAlgoInterface = {
         if(this.blocklyHelper) {
             this.blocklyHelper.onResize();
         }
-        task.displayedSubTask.updateScale();
+        if($('#grid').is(':visible')) {
+            task.displayedSubTask.updateScale();
+        }
 
         // Check size and hide overflow if less than 5 pixels, to avoid big
         // scrollbars when the layout is just slightly off for some reason
