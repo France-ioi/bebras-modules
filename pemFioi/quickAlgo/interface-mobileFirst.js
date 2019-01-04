@@ -775,11 +775,14 @@ var quickAlgoInterface = {
                         );
                     window.embeddedFontsAdded = true;
                 } else {
-                    // Load fonts from CDN
+                    // Load fonts from static4
                     // (especially for iOS on which the embed doesn't work)
                     $('head').append(''
-                        + '<link href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,700" rel="stylesheet">'
-                        + '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">'
+                        + '<link rel="stylesheet" href="https://static4.castor-informatique.fr/modules/fonts/titilliumweb.css">'
+                        + '<link rel="stylesheet" href="https://static4.castor-informatique.fr/modules/fonts/fontAwesome/css/all.css">'
+                    // Alternate links to use CDN
+//                        + '<link href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,700" rel="stylesheet">'
+//                        + '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">'
                         );
                 }
             }
