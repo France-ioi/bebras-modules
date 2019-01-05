@@ -18,7 +18,7 @@ var blocklyToScratch = {
       'lists_setIndex': ['data_replaceitemoflist'],
       'logic_negate': ['operator_not'],
       'logic_boolean': [],
-      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt'],
+      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt', 'operator_not'],
       'logic_operation': ['operator_and', 'operator_or'],
       'text': [],
       'text_append': [],
