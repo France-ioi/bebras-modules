@@ -88,6 +88,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.strings.startingBlockName = options.startingBlockName;
          }
 
+         if (options.maxListSize) {
+            FioiBlockly.maxListSize = options.maxListSize;
+         }
+
          this.locale = locale;
          this.nbTestCases = nbTestCases;
          this.options = options;

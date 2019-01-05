@@ -963,21 +963,21 @@ Blockly.JavaScript['operator_not'] = function(block) {
 
 Blockly.JavaScript['data_listrepeat'] = function(block) {
   // Create a list with one element repeated.
-  var functionName = Blockly.JavaScript.provideFunction_(
-      'listsRepeat',
-      ['function ' + Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_ +
-          '(value, n) {',
-       '  var array = [];',
-       '  for (var i = 0; i < n; i++) {',
-       '    array[i] = value;',
-       '  }',
-       '  return array;',
-       '}']);
+  Blockly.JavaScript.externalFunctions['listsRepeat'] = function(value, n) {
+    if(n > FioiBlockly.maxListSize) {
+      throw Blockly.Msg.LISTS_CREATE_WITH_TOO_LARGE.replace('%1', n).replace('%2', FioiBlockly.maxListSize);
+    }
+    var array = [];
+    for (var i = 0; i < n; i++) {
+      array[i] = value;
+    }
+    return array;
+  };
   var element = Blockly.JavaScript.valueToCode(block, 'ITEM',
       Blockly.JavaScript.ORDER_COMMA) || 'null';
   var repeatCount = Blockly.JavaScript.valueToCode(block, 'TIMES',
       Blockly.JavaScript.ORDER_COMMA) || '0';
-  var code = functionName + '(' + element + ', ' + repeatCount + ')';
+  var code = 'listsRepeat(' + element + ', ' + repeatCount + ')';
 
   var blockVarName = block.getFieldValue('LIST');
   if(blockVarName) {
