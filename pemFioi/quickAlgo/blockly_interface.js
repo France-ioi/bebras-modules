@@ -363,14 +363,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       getOrigin: function() {
          // Get x/y origin
-         var noScrollbars = typeof this.options.scrollbars != 'undefined' && !this.options.scrollbars;
-         if(this.scratchMode) {
-            return noScrollbars ? {x: 340, y: 20} : {x: 4, y: 20};
+         if(this.includeBlocks.groupByCategory && typeof this.options.scrollbars != 'undefined' && !this.options.scrollbars) {
+            return this.scratchMode ? {x: 340, y: 20} : {x: 105, y: 2};
          }
-         if(this.includeBlocks.groupByCategory && noScrollbars) {
-            return {x: 105, y: 2};
-         }
-         return {x: 2, y: 2};
+         return this.scratchMode ? {x: 4, y: 20} : {x: 2, y: 2};
       },
 
       setPlayer: function(newPlayer) {
