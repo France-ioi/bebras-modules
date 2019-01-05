@@ -84,8 +84,8 @@ var pythonForbiddenBlocks = {
       'lists_append': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__']
     },
     'functions': {
-      'procedures_defnoreturn': ['def'],
-      'procedures_defreturn': ['def']
+      'procedures_defnoreturn': ['def', 'lambda'],
+      'procedures_defreturn': ['def', 'lambda']
     },
     'variables': {
       'variables_set': ['var_assign']
@@ -94,7 +94,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'break', 'continue'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue'];
    var allowed = []
 
    if(!includeBlocks) {
