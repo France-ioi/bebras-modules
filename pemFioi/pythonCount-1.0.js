@@ -138,6 +138,10 @@ function pythonForbiddenLists(includeBlocks) {
       }
    }
 
+   if(includeBlocks && includeBlocks.variables && includeBlocks.variables.length) {
+      removeForbidden(['var_assign']);
+   }
+
    return {forbidden: forbidden, allowed: allowed};
 }
 
