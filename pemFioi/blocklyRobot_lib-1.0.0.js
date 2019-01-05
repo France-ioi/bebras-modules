@@ -1562,7 +1562,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "row",
       type: "sensors",
-      block: { name: "row", yieldsValue: true },
+      block: { name: "row", yieldsValue: 'int' },
       func: function(callback) {
          this.callCallback(callback, 1 + this.getRobot().row);
       }
@@ -1571,7 +1571,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "col",
       type: "sensors",
-      block: { name: "col", yieldsValue: true },
+      block: { name: "col", yieldsValue: 'int' },
       func: function(callback) {
          this.callCallback(callback, 1 + this.getRobot().col);
       }

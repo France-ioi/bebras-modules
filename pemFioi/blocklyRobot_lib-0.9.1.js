@@ -1636,8 +1636,8 @@ var getContext = function(display, infos, curLevel) {
             { name: "platformInFrontAndBelow", yieldsValue: true },
             { name: "platformAbove",      yieldsValue: true },
             { name: "dir",                yieldsValue: true },
-            { name: "col",                yieldsValue: true },
-            { name: "row",                yieldsValue: true },
+            { name: "col",                yieldsValue: 'int' },
+            { name: "row",                yieldsValue: 'int' },
             { name: "onPill",             yieldsValue: true }
          ]
       },
