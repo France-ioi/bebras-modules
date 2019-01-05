@@ -1223,7 +1223,7 @@ button.showLongIntro .icon {
 #taskIntroLong .panel-body {
   padding: 20px;
   overflow: auto;
-  max-height: calc(100% - 30px - 22px); /* 100% - height of panel-heading */
+  max-height: calc(100% - 62px); /* 100% - height of panel-heading */
 }
 #taskIntro video {
   max-width: 100%;
