@@ -253,3 +253,7 @@ img {
   cursor: pointer;
   color: #4D87CE;
 }
+.pythonIntroSimple code.pflForbidden,
+.pythonIntroFull code.pflForbidden {
+  cursor: not-allowed;
+}

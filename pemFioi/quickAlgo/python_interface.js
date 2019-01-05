@@ -495,13 +495,19 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
 
-    function processForbiddenList(list, word) {
-      var elifIdx = list.indexOf('elif');
-      if(elifIdx >= 0) {
-        list.splice(elifIdx, 1);
+    function processForbiddenList(origList, allowed) {
+      var list = origList.slice();
+
+      var hiddenWords = ['__getitem__', '__setitem__', 'elif'];
+      for(var i = 0; i < hiddenWords.length; i++) {
+        var word = hiddenWords[i];
+        var wIdx = list.indexOf(word);
+        if(wIdx > -1) {
+          list.splice(wIdx, 1);
+        }
       }
 
-      var bracketsWords = { list_brackets: 'crochets [ ]', dict_brackets: 'accolades { }' };
+      var bracketsWords = { list_brackets: 'crochets [ ]+[]', dict_brackets: 'accolades { }+{}', var_assign: 'variables+x =' };
       for(var bracketsCode in bracketsWords) {
         var bracketsIdx = list.indexOf(bracketsCode);
         if(bracketsIdx >= 0) {
@@ -509,17 +515,25 @@ function LogicController(nbTestCases, maxInstructions) {
         }
       }
 
+      var word = allowed ? 'autorisé' : 'interdit';
+      var cls = allowed ? '' : ' class="pflForbidden"';
       if(list.length == 1) {
-        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code>' + list[0] + '</code>.</p>';
+        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code'+cls+'>' + list[0] + '</code>.</p>';
       } else if(list.length > 0) {
-        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code>' + list.join('</code>, <code>') + '</code>.</p>';
+        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code'+cls+'>' + list.join('</code>, <code'+cls+'>') + '</code>.</p>';
       }
       return list;
     }
-    var pflAllowed = processForbiddenList(pflInfos.allowed, 'autorisé');
-    processForbiddenList(pflInfos.forbidden, 'interdit');
+    var pflAllowed = processForbiddenList(pflInfos.allowed, true);
+    processForbiddenList(pflInfos.forbidden, false);
     if(pflAllowed.length) {
       simpleHtml += '<br />Mots-clés autorisés : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
+    }
+
+    if(pflInfos.allowed.indexOf('var_assign') > -1) {
+      fullHtml += '<p>Les variables sont autorisées.</p>';
+    } else {
+      fullHtml += '<p>Les variables sont interdites.</p>';
     }
 
     fullHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
@@ -533,10 +547,28 @@ function LogicController(nbTestCases, maxInstructions) {
         $('.pythonIntroBtn').hide();
     }
 
+    $('.pythonIntroSimple code, .pythonIntroFull code').each(function() {
+      var elem = $(this);
+      var txt = elem.text();
+      var pIdx = txt.indexOf('+');
+      if(pIdx > -1) {
+        var newTxt = txt.substring(0, pIdx);
+        var code = txt.substring(pIdx+1);
+      } else {
+        var newTxt = txt;
+        var code = txt;
+      }
+      elem.attr('data-code', code);
+      elem.text(newTxt);
+    });
+
     var controller = this;
-    $('.pythonIntroSimple, .pythonIntroFull').on('click', 'code', function() {
-      controller._aceEditor && controller._aceEditor.insert(this.textContent);
+    $('.pythonIntroSimple code, .pythonIntroFull code').not('.pflForbidden').on('click', function() {
       quickAlgoInterface.toggleLongIntro(false);
+      if(controller._aceEditor) {
+        controller._aceEditor.insert(this.getAttribute('data-code'));
+        controller._aceEditor.focus();
+      }
     });
   };
 
