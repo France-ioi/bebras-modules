@@ -770,10 +770,9 @@ var quickAlgoInterface = {
     checkFonts: function() {
         // Check if local fonts loaded properly, else use a CDN
         // (issue mostly happens when opening a task locally in Firefox)
-        if(!document.fonts) { return; }
-        document.fonts.ready.then(function() {
+        function checkFontsLoaded() {
             // iOS will always return true to document.fonts.check
-            if(window.iOSDetected || !document.fonts.check('12px "Titillium Web"')) {
+            if(window.iOSDetected || !document.fonts || !document.fonts.check || !document.fonts.check('12px "Titillium Web"')) {
                 if(!window.iOSDetected && window.modulesPath) {
                     // Load fonts from CSS files with embedded fonts
                     if(window.embeddedFontsAdded) { return; }
@@ -794,7 +793,12 @@ var quickAlgoInterface = {
                         );
                 }
             }
-        });
+        };
+        if(document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(checkFontsLoaded);
+        } else {
+            checkFontsLoaded();
+        }
     }
 };
 
