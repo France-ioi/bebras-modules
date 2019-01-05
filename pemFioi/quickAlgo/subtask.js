@@ -109,7 +109,8 @@ var initBlocklySubTask = function(subTask, language) {
 
       var blocklyOptions = {
          readOnly: !!subTask.taskParams.readOnly,
-         defaultCode: subTask.defaultCode
+         defaultCode: subTask.defaultCode,
+         maxListSize: this.context.infos.maxListSize
       };
 
       // Handle zoom options

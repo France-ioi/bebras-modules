@@ -66,20 +66,26 @@ Possible keys (all booleans) :
 * `nextStep` : Hides the `>|` step button
 * `goToEnd` : Hides the `>|` "go to end" button
 
-### introMaxHeight
+#### introMaxHeight
 
 Type : string, default `"33%"`
 
-Allows to change the max height the task intro can take in the "desktop" layout
-of the responsive interface.
+Max height the task intro can take in the "desktop" layout of the responsive
+interface.
 
-### scrollbars
+#### maxListSize
+
+Type : int, default 100
+
+Maximum allowed list size (only supported in Blockly and Scratch).
+
+#### scrollbars
 
 Type : boolean, default `true`, or `false` if `maxInstructions <= 10`.
 
 Displays scrollbars (only supported in Blockly and Scratch).
 
-### zoom
+#### zoom
 
 Type : object
 

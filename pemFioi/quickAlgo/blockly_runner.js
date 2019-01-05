@@ -182,6 +182,11 @@ function initBlocklyRunner(context, messageCallback) {
             }
          }
 
+         if(Blockly.JavaScript.externalFunctions) {
+            for(var name in Blockly.JavaScript.externalFunctions) {
+               interpreter.setProperty(scope, name, interpreter.createNativeFunction(Blockly.JavaScript.externalFunctions[name]));
+            }
+         }
 
          /*for (var objectName in context.generators) {
             for (var iGen = 0; iGen < context.generators[objectName].length; iGen++) {
