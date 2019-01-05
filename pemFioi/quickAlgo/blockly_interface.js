@@ -497,7 +497,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                      var xml = Blockly.Xml.textToDom(code);
                      that.cleanBlockAttributes(xml);
                      if(!that.checkBlocksAreAllowed(xml)) {
-                        //throw 'not allowed'; // TODO :: do something; for now do nothing as the system might not be complete
+                        throw 'not allowed'; // TODO :: check it's working properly
                      }
                      that.programs[that.player].blockly = code;
                      that.languages[that.player] = "blockly";
