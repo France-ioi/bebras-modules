@@ -178,7 +178,7 @@ function pythonForbidden(code, includeBlocks) {
          }
       } else if(forbidden[i] == 'var_assign') {
          // Special pattern for lists
-         var re = /[^=!]=[^=!]/;
+         var re = /[^=!<>]=[^=!<>]/;
          if(re.exec(code)) {
             // Forbidden keyword found
             return 'variables'; // TODO :: i18n ?
