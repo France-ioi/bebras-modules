@@ -242,7 +242,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if (block.yieldsValue) {
                block.blocklyJson.output = null;
                if(this.scratchMode) {
-                   block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   if(block.yieldsValue == 'int') {
+                       block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_ROUND;
+                   } else {
+                       block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
+                   }
                    block.blocklyJson.colour = Blockly.Colours.sensing.primary;
                    block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
                    block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
