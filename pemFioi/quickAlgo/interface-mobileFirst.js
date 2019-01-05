@@ -173,12 +173,16 @@ var quickAlgoInterface = {
         this.wrapIntroAndGrid();
         this.checkFonts();
         this.registerFullscreenEvents();
+        this.onResize();
         if(!this.checkHeightInterval) {
             this.checkHeightInterval = setInterval(this.checkHeight.bind(this), 1000);
         }
         setTimeout(function() {
             quickAlgoInterface.onResize();
-            }, 0);
+            }, 100);
+        setTimeout(function() {
+            quickAlgoInterface.onResize();
+            }, 1000);
     },
 
     createEditorMenu: function() {
@@ -660,7 +664,6 @@ var quickAlgoInterface = {
         if($('#taskToolbar').is(':visible')) {
             // TODO :: why did we have a condition window.innerHeight < window.innerWidth ?
             var targetHeight = Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow));
-            $('#blocklyContainer').height(Math.floor(Math.min(heightBeforeToolbar, heightBeforeWindow)));
         } else {
             var targetHeight = Math.floor(heightBeforeWindow);
         }
@@ -683,7 +686,12 @@ var quickAlgoInterface = {
         if(this.blocklyHelper) {
             this.blocklyHelper.onResize();
         }
-        if($('#grid').is(':visible')) {
+
+        // Resize grid
+        if(browserWidth > browserHeight && browserWidth >= 855 && $('#grid').is(':visible')) {
+            var introGrid = document.getElementById('introGrid');
+            var gridHeight = browserHeight - introGrid.getBoundingClientRect().top - $('#taskIntro').height() - $('.speedControls:visible').height();
+            $('#grid').css('max-height', gridHeight+'px');
             task.displayedSubTask.updateScale();
         }
 
