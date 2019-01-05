@@ -181,7 +181,7 @@ function pythonForbidden(code, includeBlocks) {
          var re = /[^=!<>]=[^=!<>]/;
          if(re.exec(code)) {
             // Forbidden keyword found
-            return 'variables'; // TODO :: i18n ?
+            return '= (assignation de variable)'; // TODO :: i18n ?
          }
       } else {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
