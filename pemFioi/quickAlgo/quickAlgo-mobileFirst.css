@@ -247,6 +247,7 @@ p {
   position: static !important;
   display: flex;
   justify-content: stretch;
+  min-height: 0;
 }
 #introGrid {
   display: flex;
