@@ -590,18 +590,14 @@ var quickAlgoInterface = {
                 '<div>';
             $('#blocklyLibContent').append(introLong);
             var renderTaskIntro = '' +
-                '<h2 class="sectionTitle">' +
-                    '<span class="fas fa-book icon"></span>' + this.strings.introTitle +
-                '</h2>' +
+                '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
                 levelIntroContent +
                 '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
             $('#taskIntro').html(renderTaskIntro);
             quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
-                '<h2 class="sectionTitle">' +
-                    '<span class="fas fa-book icon"></span>' + this.strings.introTitle +
-                '</h2>' +
+                '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
                 levelIntroContent);
         }
     },

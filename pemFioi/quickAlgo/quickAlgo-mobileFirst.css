@@ -231,7 +231,9 @@ h2.sectionTitle .icon {
   vertical-align: text-bottom;
   margin-right: 10px;
 }
-
+p {
+  margin: 0 0 15px 0;
+}
 #task {
   display: flex;
   flex-direction: column;
@@ -1182,12 +1184,26 @@ body.fullscreen #taskToolbar {
   /*font-weight: bold;*/
   font-size: 18px;
 }
-#taskIntro h2.sectionTitle,
+#taskIntro .introTitleIcon {
+  float: left;
+  margin: 0px 15px 9px 0;
+  line-height: 1;
+}
+#taskIntro .introTitleIcon .icon {
+  color: #fff;
+  background-color: #4a90e2;
+  border-radius: 50%;
+  width: 2em;
+  line-height: 2em;
+  text-align: center;
+  font-size: 14px;
+}
 #taskIntroLong h2.sectionTitle {
   font-size: 22px;
   font-weight: 100;
   color: #4a90e2;
 }
+
 button.showLongIntro {
   color: #4a90e2;
   border: 1px solid #4a90e2;
