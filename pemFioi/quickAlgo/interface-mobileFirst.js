@@ -114,7 +114,7 @@ var quickAlgoInterface = {
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
-        gridHtml += "<div id='grid'></div>";
+        gridHtml += "<div class='gridArea'><div id='grid'></div></div>";
         gridHtml += "<div id='gridButtonsAfter'></div>";
         $("#gridContainer").html(gridHtml);
 
