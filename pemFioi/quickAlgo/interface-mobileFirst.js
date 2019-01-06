@@ -646,7 +646,6 @@ var quickAlgoInterface = {
         } else {
             $('#task').css('height', '');
         }
-        console.log(browserHeight);
 
         // Determine right size for editor
         var languageArea = document.getElementById('blocklyContainer');
