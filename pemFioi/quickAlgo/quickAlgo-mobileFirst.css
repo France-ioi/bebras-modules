@@ -262,6 +262,11 @@ p {
   width: 100%;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+#gridWrapper {
+  height: 100%;
+  width: 100%;
 }
 
 @media /* Mobiles */
@@ -279,7 +284,7 @@ p {
   }
   .mode-instructions #taskIntro {
     order: 2;
-    flex: 1 1 auto;
+    flex: 1 1 0;
   }
   .mode-player #taskIntro,
   .mode-instructions #blocklyLibContent,
@@ -462,6 +467,8 @@ p {
 }
 #gridContainer #gridButtonsAfter {
   background-color: #f1f2f7;
+  z-index: 2;
+  border-top: 3px solid #fff;
 }
 #gridButtonsAfter #testSelector {
   padding: 0;
