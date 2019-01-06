@@ -118,13 +118,12 @@ var quickAlgoInterface = {
         gridHtml += "<div id='gridButtonsAfter'></div>";
         $("#gridContainer").html(gridHtml);
 
-        var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
         $("#blocklyLibContent").html(
             "<div id='editorBar'>" +
                 "<div id='capacity' class='capacity'></div>" +
                 "<div class='buttons'>" +
                 "<button type='button' id='fullscreenButton' onclick='quickAlgoInterface.toggleFullscreen();'><span class='fas fa-expand'></span></button>" +
-                displayHelpBtn +
+                "<button type='button' class='displayHelpBtn' onclick='conceptViewer.show()'><span class='fas fa-question'></span></button>" +
                 "</div>" +
             "</div>" +
             "<div id='languageInterface'></div>"
@@ -275,6 +274,7 @@ var quickAlgoInterface = {
 
     updateControlsDisplay: function() {
         var hideControls = this.options.hideControls ? this.options.hideControls : {};
+        $('.displayHelpBtn').toggleClass('interfaceToggled', !this.hasHelp);
         $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !this.options.hasExample);
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
@@ -520,14 +520,8 @@ var quickAlgoInterface = {
         $('.editorActions div[rel=best-answer]').toggleClass('editorActionDisabled', !this.hasBestAnswer);
     },
 
-    displayHelpBtn: function() {
-        var helpBtn = '<button type="button" class="displayHelpBtn" onclick="conceptViewer.show()">\
-            <span class="fas fa-question"></span></button>';
-        return helpBtn;
-    },
     createModeTaskToolbar: function() {
         if($('#taskToolbar').length) { return; }
-        var displayHelpBtn = this.hasHelp ? this.displayHelpBtn() : '';
         $("#task").append('' +
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
@@ -542,7 +536,7 @@ var quickAlgoInterface = {
                         '<span>' +
                             "<span class='capacity'></span>" +
                             "<button type='button' onclick='quickAlgoInterface.toggleFullscreen();'><span class='fas fa-expand'></span></button>" +
-                            displayHelpBtn +
+                            "<button type='button' class='displayHelpBtn' onclick='conceptViewer.show()'><span class='fas fa-question'></span></button>" +
                         '</span>' +
                     '</div>' +
                     '<div id="mode-player" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-player\');">' +
