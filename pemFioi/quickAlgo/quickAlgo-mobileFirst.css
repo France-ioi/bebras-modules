@@ -251,6 +251,7 @@ p {
 #introGrid {
   display: flex;
   flex: 1 1 40%;
+  min-height: 0;
 }
 #taskIntro {
   padding: 10px 20px;
@@ -360,7 +361,6 @@ p {
     position: relative;
     margin-bottom: 10px;
     flex: 1 1 auto;
-
   }
   #introGrid .speedControls {
     position: absolute;
@@ -1248,8 +1248,8 @@ button.showLongIntro .icon {
   max-width: 100%;
   margin: 20px auto;
 }
-@media
-  screen and (min-width: 1024px) and (orientation: portrait),
+@media /* Tablets and desktop */
+  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape) {
   #taskIntro .long {
     display: none;
@@ -1283,7 +1283,7 @@ button.showLongIntro .icon {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 15px 15px 0;
+  padding: 15px;
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .panel-heading .exit {
