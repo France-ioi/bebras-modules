@@ -409,7 +409,8 @@ p {
     flex-grow: 1;
     z-index: 2;
     text-align: center;
-    min-height: 200px;
+    min-height: 150px;
+    min-width: 200px;
 }
 #grid {
     position: absolute;
