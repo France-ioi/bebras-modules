@@ -172,7 +172,9 @@ var quickAlgoInterface = {
         this.wrapIntroAndGrid();
         this.checkFonts();
         this.registerFullscreenEvents();
-        this.onResize();
+        if(!this.curMode || !$('#task').hasClass(this.curMode)) {
+            this.selectMode('mode-instructions');
+        }
         if(!this.checkHeightInterval) {
             this.checkHeightInterval = setInterval(this.checkHeight.bind(this), 1000);
         }
@@ -815,8 +817,6 @@ $(document).ready(function() {
         // Remove title, the platform displays it
         $("#task h1").remove();
     }
-
-    quickAlgoInterface.selectMode('mode-instructions');
 
     window.addEventListener('resize', function() {
         quickAlgoInterface.onResize();
