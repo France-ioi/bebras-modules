@@ -780,10 +780,7 @@ body.fullscreen #taskToolbar {
     #capacity {
       flex-grow: 1;
     }
-    #editorBar .displayHelpBtn {
-      display: none;
-    }
-    #editorBar #fullscreenButton {
+    #editorBar button {
       border: 0;
       background-color: transparent;
       box-shadow: none;
@@ -810,8 +807,7 @@ body.fullscreen #taskToolbar {
   #capacity {
     margin-right: 5px;
   }
-  #editorBar #fullscreenButton,
-  #editorBar .displayHelpBtn {
+  #editorBar button {
     position: relative;
     display: block;
     font-size: 14px;
@@ -826,12 +822,6 @@ body.fullscreen #taskToolbar {
   }
   #editorBar #fullscreenButton {
     margin-bottom: 10px;
-  }
-}
-@media /* Landscape mobiles */
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
-  #editorBar .displayHelpBtn {
-    display: none;
   }
 }
 #languageInterface {
