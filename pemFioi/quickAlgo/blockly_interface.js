@@ -230,9 +230,22 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.reload();
       },
 
-      onResize: function() {
+      onResizeFct: function() {
          // onResize function to be called by the interface
+         if(document.documentElement.clientHeight < 600 || document.documentElement.clientWidth < 800) {
+            FioiBlockly.trashcanScale = 0.75;
+            FioiBlockly.zoomControlsScale = 0.9;
+         } else {
+            FioiBlockly.trashcanScale = 1;
+            FioiBlockly.zoomControlsScale = 1;
+         }
          Blockly.svgResize(this.workspace);
+      },
+
+      onResize: function() {
+         // This function will replace itself with the debounced onResizeFct
+         this.onResize = debounce(this.onResizeFct.bind(this), 500, false);
+         this.onResizeFct();
       },
 
       hiddenCheck: function() {

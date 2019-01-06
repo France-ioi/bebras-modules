@@ -688,6 +688,11 @@ var quickAlgoInterface = {
             var introGrid = document.getElementById('introGrid');
             var gridHeight = browserHeight - introGrid.getBoundingClientRect().top - $('#taskIntro').height() - $('.speedControls:visible').height();
             $('#grid').css('max-height', gridHeight+'px');
+        } else {
+            $('#taskContent').css('max-height', '');
+            $('#grid').css('max-height', '');
+        }
+        if($('#grid').is(':visible')) {
             task.displayedSubTask.updateScale();
         }
 
