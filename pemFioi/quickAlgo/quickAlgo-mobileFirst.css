@@ -263,11 +263,6 @@ p {
   width: 100%;
   display: flex;
   flex-direction: column;
-  position: relative;
-}
-#gridWrapper {
-  height: 100%;
-  width: 100%;
 }
 
 @media /* Mobiles */
@@ -467,8 +462,6 @@ p {
 }
 #gridContainer #gridButtonsAfter {
   background-color: #f1f2f7;
-  z-index: 2;
-  border-top: 3px solid #fff;
 }
 #gridButtonsAfter #testSelector {
   padding: 0;
