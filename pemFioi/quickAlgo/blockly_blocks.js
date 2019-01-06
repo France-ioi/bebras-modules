@@ -69,10 +69,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 var blocks = [];
                 for(var j=0; j < curLimit.blocks.length; j++) {
                     var curBlock = curLimit.blocks[j];
-                    if(!blocklyToScratch.singleBlocks[curBlock]) { continue; }
-                    for(var k=0; k < blocklyToScratch.singleBlocks[curBlock].length; k++) {
-                        if(blocks.indexOf(blocklyToScratch.singleBlocks[curBlock]) >= 0) { continue; }
-                        blocks.push(blocklyToScratch.singleBlocks[curBlock]);
+                    var convBlockList = blocklyToScratch.singleBlocks[curBlock];
+                    if(convBlockList) {
+                        for(var k=0; k < convBlockList.length; k++) {
+                            addInSet(blocks, convBlockList[k]);
+                        }
+                    } else {
+                        addInSet(blocks, curBlock);
                     }
                 }
             } else {
