@@ -678,7 +678,7 @@ var quickAlgoInterface = {
         }
 
         // Resize grid
-        if(browserWidth > browserHeight && browserWidth >= 855 && $('#grid').is(':visible')) {
+/*        if(browserWidth > browserHeight && browserWidth >= 855 && $('#grid').is(':visible')) {
             var tcHeight = browserHeight - document.getElementById('taskContent').getBoundingClientRect().top;
             $('#taskContent').css('max-height', tcHeight + 'px');
             var introGrid = document.getElementById('introGrid');
@@ -687,7 +687,7 @@ var quickAlgoInterface = {
         } else {
             $('#taskContent').css('max-height', '');
             $('#grid').css('max-height', '');
-        }
+        }*/
         if($('#grid').is(':visible')) {
             task.displayedSubTask.updateScale();
         }
