@@ -9,12 +9,11 @@ var conceptViewer = {
     {id: 'python', lbl: 'Python'}
     ],
 
-  load: function (lang) {
+  load: function () {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
     // TODO :: allow changing list of languages
-    conceptViewer.selectedLanguage = lang;
     var navLanguage = '\
       <label for="showNavigationLanguage" id="showNavigationLanguageLabel" class="showNavigationLanguage">Sélectionnez un langage…</label>\
       <input type="checkbox" id="showNavigationLanguage" role="button">\
@@ -22,7 +21,7 @@ var conceptViewer = {
     var curLangLbl = null;
     for(var i=0; i<this.allLangs.length; i++) {
       navLanguage += '<li data-id="'+ this.allLangs[i].id + '"';
-      if((!lang && i == 0) || this.allLangs[i].id == lang) {
+      if((!this.selectedLanguage && i == 0) || this.allLangs[i].id == this.selectedLanguage) {
         navLanguage +=  ' class="selected"';
         curLangLbl = this.allLangs[i].lbl;
       }
@@ -70,6 +69,7 @@ var conceptViewer = {
       $(this).addClass('selected');
       conceptViewer.languageChanged();
     });
+    this.loadNavigation();
   },
 
   loadNavigation: function () {
@@ -106,9 +106,14 @@ var conceptViewer = {
 
   loadConcepts: function (newConcepts) {
     // Load new concept information
-    this.load();
     this.concepts = newConcepts;
-    this.loadNavigation();
+    if(this.loaded) {
+      this.loadNavigation();
+    }
+  },
+
+  selectLanguage: function(lang) {
+    this.selectedLanguage = lang;
   },
 
   show: function (initConcept) {
@@ -195,6 +200,11 @@ var conceptViewer = {
       }
     }
     this.loadNavigation();
+  },
+
+  unload: function() {
+    $('#conceptViewer').remove();
+    this.loaded = false;
   }
 }
 

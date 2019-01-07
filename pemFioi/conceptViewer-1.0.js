@@ -13,6 +13,7 @@ var conceptViewer = {
       {id: 'scratch', lbl: 'Scratch'},
       {id: 'python', lbl: 'Python'}
       ];
+    // TODO :: this.selectedLanguage
     var langOptions = '';
     for(var i=0; i<allLangs.length; i++) {
       langOptions += '<option value="' + allLangs[i].id + '"';
@@ -49,6 +50,7 @@ var conceptViewer = {
       }
     });
     this.loaded = true;
+    this.loadNavigation();
   },
 
   loadNavigation: function () {
@@ -85,9 +87,14 @@ var conceptViewer = {
 
   loadConcepts: function (newConcepts) {
     // Load new concept information
-    this.load();
     this.concepts = newConcepts;
-    this.loadNavigation();
+    if(this.loaded) {
+      this.loadNavigation();
+    }
+  },
+
+  setLanguage: function(lang) {
+    this.selectedLanguage = lang;
   },
 
   show: function (initConcept) {
@@ -166,6 +173,11 @@ var conceptViewer = {
 
   languageChanged: function () {
     this.loadNavigation();
+  },
+
+  unload: function() {
+    $('#conceptViewer').remove();
+    this.loaded = false;
   }
 }
 
