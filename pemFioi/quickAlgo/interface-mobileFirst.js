@@ -267,7 +267,7 @@ var quickAlgoInterface = {
         this.updateInterfaceCss();
 
         if(opt.conceptViewer) {
-            conceptViewer.load(opt.conceptViewerLang);
+            conceptViewer.selectLanguage(opt.conceptViewerLang);
             this.hasHelp = true;
         } else {
             this.hasHelp = false;

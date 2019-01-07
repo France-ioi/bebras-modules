@@ -168,6 +168,9 @@ var initBlocklySubTask = function(subTask, language) {
       }
       this.context.unload();
       this.blocklyHelper.unloadLevel();
+      if(window.conceptViewer) {
+         window.conceptViewer.unload();
+      }
       callback();
    };
 
