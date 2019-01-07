@@ -81,7 +81,7 @@ Maximum allowed list size (only supported in Blockly and Scratch).
 
 #### scrollbars
 
-Type : boolean, default `true`, or `false` if `maxInstructions <= 10`.
+Type : boolean, default `true`
 
 Displays scrollbars (only supported in Blockly and Scratch).
 
