@@ -126,7 +126,8 @@ var initBlocklySubTask = function(subTask, language) {
       blocklyOptions.zoom = zoomOptions;
 
       // Handle scroll
-      blocklyOptions.scrollbars = maxInstructions > 10;
+//      blocklyOptions.scrollbars = maxInstructions > 10;
+      blocklyOptions.scrollbars = true;
       if(typeof this.context.infos.scrollbars != 'undefined') {
          blocklyOptions.scrollbars = this.context.infos.scrollbars;
       }

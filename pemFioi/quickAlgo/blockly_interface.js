@@ -263,6 +263,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       onChangeResetDisplayFct: function() {
+         if(this.unloaded || this.reloading) { return; }
          if(this.mainContext.runner) {
             this.mainContext.runner.reset();
          }
