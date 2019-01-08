@@ -235,7 +235,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             var maxScores = displayHelper.getLevelsMaxScores();
             var level = levels[0];
             for(var i=1; i < levels.length; i++) {
-               if(score >= maxScores[levels[i-1]]) {
+               if(score >= maxScores[levels[i-1]] || (level == 'basic' && levels[i] == 'easy')) {
                   level = levels[i];
                }
             }
