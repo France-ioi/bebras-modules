@@ -436,6 +436,28 @@ Blockly.is3dSupported = function() {
   return Blockly.cache3dSupported_;
 };
 
+// Remove the numpad as it doesn't really work
+Blockly.FieldNumber.prototype.showEditor_ = function() {
+  Blockly.FieldNumber.superClass_.showEditor_.call(this, arguments);
+};
+
+Blockly.FieldTextInput.prototype.oldShowEditor_ = Blockly.FieldTextInput.prototype.showEditor_;
+Blockly.FieldTextInput.prototype.showEditor_ = function() {
+  var mobile =
+      goog.userAgent.MOBILE || goog.userAgent.ANDROID || goog.userAgent.IPAD;
+  if(mobile) {
+     // Display a prompt on mobile, as Blockly does
+     var newValue = prompt
+     var newValue = window.prompt(Blockly.Msg.CHANGE_VALUE_TITLE, this.text_);
+     if (this.sourceBlock_) {
+       newValue = this.callValidator(newValue);
+     }
+     this.setValue(newValue);
+  } else {
+     Blockly.FieldTextInput.prototype.oldShowEditor_.apply(this, arguments);
+  }
+}
+
 
 Blockly.Colours['input'] = {
     'primary': '#891431',
