@@ -28,6 +28,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       startingBlock: true,
       mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
       unloaded: false,
+      reloadForFlyout: 0,
       display: false,
       readOnly: false,
       quickAlgoInterface: window.quickAlgoInterface,
@@ -240,6 +241,17 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             FioiBlockly.zoomControlsScale = 1;
          }
          Blockly.svgResize(this.workspace);
+
+         // Reload Blockly if the flyout is not properly rendered
+         // TODO :: find why it's not properly rendered in the first place
+         if(this.workspace.flyout_ && this.reloadForFlyout < 5) {
+            var flyoutWidthDiff = Math.abs(this.workspace.flyout_.svgGroup_.getBoundingClientRect().width -
+               this.workspace.flyout_.svgBackground_.getBoundingClientRect().width);
+            if(flyoutWidthDiff > 5) {
+               this.reloadForFlyout += 1;
+               this.reload();
+            }
+         }
       },
 
       onResize: function() {
