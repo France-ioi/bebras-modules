@@ -118,7 +118,7 @@ body > * {
 }
 
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #editorMenu {
@@ -180,7 +180,7 @@ body > * {
   color: #707070;
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #editorMenu .editorActions {
@@ -203,7 +203,7 @@ body > * {
   font-size: 32px;
 }
 @media /* Landscape mobiles */
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.99999999999px) and (orientation: landscape) {
   #editorMenu .editorActions {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
@@ -320,8 +320,8 @@ p {
 }
 
 @media /* Mobiles */
-  screen and (max-width: 767px) and (orientation: portrait),
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
+  screen and (max-width: 767.99999999999px) and (orientation: portrait),
+  screen and (min-width: 480px) and (max-width: 854.99999999999px) and (orientation: landscape) {
   .mode-player #taskContent {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -363,7 +363,7 @@ p {
 }
 
 @media /* Landscape mobiles */
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.99999999999px) and (orientation: landscape) {
 
   #taskContent {
     background-color: #fff;
@@ -639,7 +639,7 @@ p {
   color: #ababac;
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #testSelector .tabs .testTab {
@@ -672,7 +672,7 @@ p {
 .speedControls .icon span {
   padding: 5px 10px;
 }
-@media screen and (max-width: 480px) { /* Portrait mobiles and low res display */
+@media screen and (max-width: 480.99999999999px) { /* Portrait mobiles and low res display */
   /* toggle player controls and tab icon, and speed slider visibility */
 
   #mode-player.displaySpeedSlider .playerControls,
@@ -848,7 +848,7 @@ p {
 }
 
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #introGrid .speedControls {
@@ -899,7 +899,7 @@ body.fullscreen #taskToolbar {
         flex: 1 0 60%;
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #blocklyLibContent {
@@ -931,7 +931,7 @@ body.fullscreen #taskToolbar {
   min-width: 12px;
 }
 @media /* Portrait mobiles */
-  screen and (max-width: 767px) and (orientation: portrait) {
+  screen and (max-width: 767.99999999999px) and (orientation: portrait) {
     #editorBar {
       height: 30px;
       background-color: #fff;
@@ -959,8 +959,8 @@ body.fullscreen #taskToolbar {
     }
 }
 @media /* landscape mobiles, tablets and desktop */
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape),
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 480px) and (max-width: 854.99999999999px) and (orientation: landscape),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #editorBar {
@@ -1133,7 +1133,7 @@ body.fullscreen #taskToolbar {
   position: relative;
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
 /* Hide task toolbar for tablets and desktop,
@@ -1262,8 +1262,8 @@ body.fullscreen #taskToolbar {
   border-radius: 5px 5px 0 0;
 }
 @media /* Mobiles */
-  screen and (max-width: 767px) and (orientation: portrait),
-  screen and (min-width: 480px) and (max-width: 854px) and (orientation: landscape) {
+  screen and (max-width: 767.99999999999px) and (orientation: portrait),
+  screen and (min-width: 480px) and (max-width: 854.99999999999px) and (orientation: landscape) {
   .errorMessage {
     box-shadow: 0px 0px 0 2px #fff;
   }
@@ -1440,7 +1440,7 @@ button.showLongIntro .icon {
   margin: 20px auto;
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #taskIntro .long {
