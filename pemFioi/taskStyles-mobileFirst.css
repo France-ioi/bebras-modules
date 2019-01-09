@@ -58,8 +58,8 @@ img {
 }
 
 @media /* Portrait mobiles */
-  screen and (max-width: 480px),
-  screen and (max-width: 600px) and (orientation: portrait) {
+  screen and (max-width: 480.99999999999px),
+  screen and (max-width: 600.99999999999px) and (orientation: portrait) {
 
   #tabsMenu {
     background-color: #fff;
@@ -168,8 +168,9 @@ img {
   }
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape) {
+  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
+  screen and (min-width: 855px) and (orientation: landscape),
+  screen and (min-width: 1025px) {
   #tabsMenu .li {
     padding: 0 40px;
   }
