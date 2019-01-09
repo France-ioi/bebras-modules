@@ -168,7 +168,7 @@ img {
   }
 }
 @media /* Tablets and desktop */
-  screen and (min-width: 768px) and (max-width: 1024.99999999999px) and (orientation: portrait),
+  screen and (min-width: 768px) and (max-width: 1024.9999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
   #tabsMenu .li {
