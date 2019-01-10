@@ -41,6 +41,13 @@ function selectBlock() {
       html += "<option value=\""+blockIndex+"\">"+block+"</option>";
    }
    html += "</select>";
+   html += "<label for=\"person\">Personne (pour les verbes)</label>";
+   html += "<select id=\"person\">";
+   for(var iPerson = 0; iPerson < 6; iPerson++){
+      personText = (iPerson%3 + 1)+" "+((iPerson <=2) ? "S" : "P");
+      html += "<option value=\""+iPerson+"\">"+personText+"</option>";
+   }
+   html += "</select>";
    return html;
 };
 
@@ -77,9 +84,13 @@ function generateWordList(block) {
    var blockLabel = structureTypes[block];
    var batch = batches[blockLabel];
    var plural = (blockLabel.includes("-P")) ? 1 : 0;
+   var dataVerb = $("#person").val();
+   var person = dataVerb%3 + 1;
+   var pluralVerb = (dataVerb <= 2) ? 0 : 1;
+   console.log(person+" "+pluralVerb);
    if(blockLabel === "VT" || blockLabel === "VI"){
       for(var word of batch){
-         text += word[0];
+         text += conjugate(word,person,pluralVerb,"present",Math.random);
          text += "</br>";
       }
    }else{
@@ -421,7 +432,11 @@ function conjugate(verb,person,plural,tense,rng) {
          ending = "e"+ending;
          return infinitive.replace(/er$/,ending);
       }else if(infinitive.endsWith("oyer") || infinitive.endsWith("uyer")){
-         return infinitive.replace(/yer$/,"i"+ending);
+         if(plural && person == 1 || plural && person == 2){
+            return infinitive.replace(/er$/,ending);
+         }else{
+            return infinitive.replace(/yer$/,"i"+ending); 
+         }
       }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive)){
          return infinitive.replace(/er$/,"l"+ending);
       }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive)){
