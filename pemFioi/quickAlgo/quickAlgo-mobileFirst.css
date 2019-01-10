@@ -449,6 +449,8 @@ p {
         -ms-flex-direction: column;
             flex-direction: column;
   }
+  /* introGrid : takes the height it needs up to max-height, but keeps at least
+     min-height so the grid, player and test buttons display correctly */
   #introGrid {
     position: relative;
     margin-bottom: 10px;
@@ -498,6 +500,9 @@ p {
             flex-direction: column;
     max-width: 40%;
   }
+  /* introGrid elements
+     taskIntro takes the height it needs up to max-height (set by
+     quickAlgoInterface) ; then whatever is left goes to gridContainer */
   #taskIntro {
     background-color: #fff;
     -webkit-box-flex: 1;
@@ -510,6 +515,7 @@ p {
         -ms-flex: 1 0 auto;
             flex: 1 0 auto;
   }
+
   #gridContainer .gridArea {
     background-color: #fff;
     -webkit-box-flex: 1;
