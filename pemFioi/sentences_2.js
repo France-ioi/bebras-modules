@@ -35,6 +35,7 @@
                var type = nfpNoDet[Math.trunc(rng() * nfpNoDet.length)];
                var word = type[Math.trunc(rng() * type.length)][1];
                break;
+            case "CO-M-S":
             case "N-M-S":
                person = 3;
                plural = 0;
@@ -48,6 +49,7 @@
                }
                var word = elide(det + " " + noun);
                break;
+            case "CO-F-S":
             case "N-F-S":
                person = 3;
                plural = 0;
@@ -84,6 +86,18 @@
             case "VI":
                var verb = verbs["intransitive"][Math.trunc(rng() * verbs["intransitive"].length)];
                var word = conjugate(verb,person,plural,tense);
+               break;
+            case "VT":
+               var verb = verbs["transitive"][Math.trunc(rng() * verbs["transitive"].length)];
+               var word = conjugate(verb,person,plural,tense);
+               break;
+            case "CO-M-S-noDet":
+               var type = comsNoDet[Math.trunc(rng() * comsNoDet.length)];
+               var word = type[Math.trunc(rng() * type.length)][0];
+               break;
+            case "CO-F-S-noDet":
+               var type = cofsNoDet[Math.trunc(rng() * cofsNoDet.length)];
+               var word = type[Math.trunc(rng() * type.length)][0];
                break;
          }
          sentence += word+" ";
@@ -401,7 +415,39 @@ const structures = [
    ["N-M-P-noDet","VI"],
    ["N-F-P-noDet","VI"],
    ["N-M-P","VI"],
-   ["N-F-P","VI"]
+   ["N-F-P","VI"],
+   ["N-M-S-noDet","VT","CO-M-S-noDet"],
+   ["N-F-S-noDet","VT","CO-M-S-noDet"],
+   ["N-M-S","VT","CO-M-S-noDet"],
+   ["N-F-S","VT","CO-M-S-noDet"],
+   ["N-M-P-noDet","VT","CO-M-S-noDet"],
+   ["N-F-P-noDet","VT","CO-M-S-noDet"],
+   ["N-M-P","VT","CO-M-S-noDet"],
+   ["N-F-P","VT","CO-M-S-noDet"],
+   ["N-M-S-noDet","VT","CO-F-S-noDet"],
+   ["N-F-S-noDet","VT","CO-F-S-noDet"],
+   ["N-M-S","VT","CO-F-S-noDet"],
+   ["N-F-S","VT","CO-F-S-noDet"],
+   ["N-M-P-noDet","VT","CO-F-S-noDet"],
+   ["N-F-P-noDet","VT","CO-F-S-noDet"],
+   ["N-M-P","VT","CO-F-S-noDet"],
+   ["N-F-P","VT","CO-F-S-noDet"],
+   ["N-M-S-noDet","VT","CO-M-S"],
+   ["N-F-S-noDet","VT","CO-M-S"],
+   ["N-M-S","VT","CO-M-S"],
+   ["N-F-S","VT","CO-M-S"],
+   ["N-M-P-noDet","VT","CO-M-S"],
+   ["N-F-P-noDet","VT","CO-M-S"],
+   ["N-M-P","VT","CO-M-S"],
+   ["N-F-P","VT","CO-M-S"],
+   ["N-M-S-noDet","VT","CO-F-S"],
+   ["N-F-S-noDet","VT","CO-F-S"],
+   ["N-M-S","VT","CO-F-S"],
+   ["N-F-S","VT","CO-F-S"],
+   ["N-M-P-noDet","VT","CO-F-S"],
+   ["N-F-P-noDet","VT","CO-F-S"],
+   ["N-M-P","VT","CO-F-S"],
+   ["N-F-P","VT","CO-F-S"]
 ];
 
 
@@ -461,7 +507,7 @@ const determiners = {
    ]
 };
 
-const pronounTypes = ["personal","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
+const pronounTypes = ["personal","personal_2","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
 const subjPronounTypes = ["personal","demonstrative_2","indefinite"];
 const pronouns = {
    // "personal": [  // [name, gender, plural, person]
@@ -473,6 +519,15 @@ const pronouns = {
    //    [ "Nous", 2, 1, 1 ],
    //    [ "Vous", 2, 1, 2 ],
    //    [ "Ils", 1, 1, 3 ],
+   //    [ "Elles", 0, 1, 3 ] ],
+   // "personal_2": [  // [name, gender, plural, person]
+   //    [ "Moi", 2, 0, 1 ],
+   //    [ "Toi", 2, 0, 2 ],
+   //    [ "Lui", 3, 0, 3 ],
+   //    [ "Elle", 0, 0, 3 ],
+   //    [ "Nous", 2, 1, 1 ],
+   //    [ "Vous", 2, 1, 2 ],
+   //    [ "eux", 1, 1, 3 ],
    //    [ "Elles", 0, 1, 3 ] ],
    // "possessive": [   // [name, gender]
    //    ["mien", 1],
@@ -506,11 +561,13 @@ const pronouns = {
    "indefinite": {
       "M": [
          [ "Autrui", "" ],
-         // [ "", "Certains" ],
+         [ "", "Certains" ],
          [ "Chacun", "" ],
          [ "On", "" ],
          // [ "Personne", "" ],
          [ "Quiconque", "" ],
+         [ "N'importe qui", "" ],
+         [ "Tout le monde", "" ],
          [ "Quelque chose", "" ],
          // [ "Rien", "" ],
          [ "Tout", "" ] 
@@ -1221,18 +1278,18 @@ const nfsNoDet = [
    nouns["name"].F,
    nouns["city"],
    pronouns["demonstrative"].F,
-   // pronouns["indefinite"].F.filter(word => word[0] != ""),
-   [["elle"],["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"],["chacune"]]
+   pronouns["indefinite"].F.filter(word => word[0] != ""),
+   [["elle"],["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]]
 ];
 const nmpNoDet = [
-   // pronouns["demonstrative"].M.filter(word => word[1] != ""),
-   // pronouns["indefinite"].M.filter(word => word[1] != ""),
-   [["","ils"],["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"],["","ceux-ci"],["","ceux-là"],["","Certains"]]
+   pronouns["demonstrative"].M.filter(word => word[1] != ""),
+   pronouns["indefinite"].M.filter(word => word[1] != ""),
+   [["","ils"],["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
 ];
 const nfpNoDet = [
    pronouns["demonstrative"].F,
-   // pronouns["indefinite"].F.filter(word => word[1] != ""),
-   [["","elles"],["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"],["","Certaines"]]
+   pronouns["indefinite"].F.filter(word => word[1] != ""),
+   [["","elles"],["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
 ];
 const nms = [
    nouns["job"].M,
@@ -1256,3 +1313,28 @@ const nfp = [
    nouns["animal"].F,
    nouns["plant"].F
 ];
+const comsNoDet = [
+   nouns["name"].M,
+   pronouns["demonstrative"].M,
+   pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque")),
+   [["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]]
+];
+const cofsNoDet = [
+   nouns["name"].F,
+   nouns["city"],
+   pronouns["demonstrative"].F,
+   pronouns["indefinite"].F.filter(word => word[0] != ""),
+   [["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]]
+];
+// const coms = [
+//    nouns["job"].M,
+//    nouns["animal"].M,
+//    nouns["plant"].M,
+//    nouns["country"].M
+// ];
+// const cofs = [
+//    nouns["job"].F,
+//    nouns["animal"].F,
+//    nouns["plant"].F,
+//    nouns["country"].F
+// ];
