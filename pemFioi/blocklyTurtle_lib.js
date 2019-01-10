@@ -16,9 +16,8 @@ var makeTurtle = function(coords) {
          this.drawingContext.clearRect(0, 0, 300, 300);
       if (this.turtle) {
          this.turtle.src = this.turtle.getAttribute("pendown");
-         this.turtle.style.left= this.x - 11 + "px";
-         this.turtle.style.top= this.y - 13 + "px";
          this.turtle.style.transform = "none";
+         this.placeTurtle();
       }
       if (stepsize) {
          this.stepsize = stepsize;
@@ -29,6 +28,7 @@ var makeTurtle = function(coords) {
    this.turn = function(angle) {
       this.direction += angle*Math.PI/180;
       if (this.turtle) {
+         // TODO :: Do we need to put "none" first?
          this.turtle.style.transform = "none";
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
       }
@@ -46,11 +46,8 @@ var makeTurtle = function(coords) {
          this.drawingContext.lineTo(this.x, this.y);
          this.drawingContext.stroke();
       }
-      
-      if (this.turtle) {
-         this.turtle.style.left= this.x - 11 + "px";
-         this.turtle.style.top= this.y - 13 + "px";
-      }
+
+      this.placeTurtle();      
    }
    this.start_painting = function() {
       this.paint = true;
@@ -78,9 +75,17 @@ var makeTurtle = function(coords) {
    }
    this.setTurtle = function(turtle) {
       this.turtle = turtle;
-
-      this.turtle.style.left= this.x - 11 + "px";
-      this.turtle.style.top= this.y - 13 + "px";
+      this.placeTurtle();
+   }
+   this.placeTurtle = function() {
+      if(!this.turtle) { return; }
+      this.turtle.style.left= this.x - 12 + "px";
+      this.turtle.style.top= this.y - 15 + "px";
+   }
+   this.fixTurtle = function() {
+      // Add padding so the turtle styas centered
+      this.turtle.style.paddingRight = '2px';
+      this.turtle.style.paddingBottom = '3px';
    }
 };
 
@@ -364,6 +369,7 @@ var getContext = function(display, infos) {
       
       context.blocklyHelper.updateSize();
       context.turtle.displayTurtle.setTurtle(document.getElementById('turtle'));
+      context.turtle.displayTurtle.fixTurtle(); // TODO :: find a way to define whether the turtle needs fixing or not
       context.turtle.displayTurtle.reset();
       
       context.updateScale(); // does nothing for now 
