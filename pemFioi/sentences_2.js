@@ -1,106 +1,193 @@
 
+function init() {
+   $("#form").html(createForm);
+   initHandlers();
+}
+
+function createForm() {
+   var html = "<h3>Générer des phrases</h3>";
+   html += selectStructures();
+   html += selectSentenceNumber();
+   html += "<button id=\"createSentences\">Générer</button>";
+   html += "<h3>Voir les listes de mot</h3>";
+   html += selectBlock();
+   html += "<button id=\"wordList\">Voir</button>";
+   return html;
+};
+
+function selectStructures() {
+   var html = "<label for=\"structures\">Structure</label>";
+   html += "<select id=\"structures\">";
+   html += "<option value=\"all\">Toutes</option>";
+   for(var structureIndex in structures){
+      var str = "";
+      for(var iBlock in structures[structureIndex]){
+         str += structures[structureIndex][iBlock]
+         if(iBlock != structures[structureIndex].length - 1){
+            str += "+";
+         }
+      }
+      html += "<option value=\""+structureIndex+"\">"+str+"</option>";
+   }
+   html += "</select>";
+   return html;
+};
+
+function selectBlock() {
+   var html = "<label for=\"blocks\">Type</label>";
+   html += "<select id=\"blocks\">";
+   for(var blockIndex in structureTypes){
+      block = structureTypes[blockIndex];
+      html += "<option value=\""+blockIndex+"\">"+block+"</option>";
+   }
+   html += "</select>";
+   return html;
+};
+
+function selectSentenceNumber() {
+   var html = "<label for=\"structures\">Nombre de phrases</label>";
+   html += "<select id=\"nSentences\">";
+   for(var i = 1; i < 21; i++){
+      html += "<option value=\""+i+"\">"+i+"</option>";
+   }
+   html += "</select>";
+   return html;
+};
+
+function initHandlers() {
+   $("#createSentences").off("click");
+   $("#createSentences").click(function(){
+      var struct = $("#structures").val();
+      var n = $("#nSentences").val();
+      var text = generateSentence(n,struct);
+      $("#text").empty();
+      $("#text").append(text);
+   });
+   $("#wordList").off("click");
+   $("#wordList").click(function(){
+      var block = $("#blocks").val();
+      var text = generateWordList(block);
+      $("#text").empty();
+      $("#text").append(text);
+   })
+};
+
+function generateWordList(block) {
+   var text = "";
+   var blockLabel = structureTypes[block];
+   var batch = batches[blockLabel];
+   var plural = (blockLabel.includes("-P")) ? 1 : 0;
+   if(blockLabel === "VT" || blockLabel === "VI"){
+      for(var word of batch){
+         text += word[0];
+         text += "</br>";
+      }
+   }else{
+      for(var subset of batch){
+         for(var word of subset){
+            text += (plural) ? pluralize(word[0],word[1]) : word[0];
+            text += "</br>";
+         }
+      }
+   }
+
+   return text;
+};
+
+function getWord(block,person,plural,tense,rng) {
+   var batch = batches[block];
+   switch(block){
+      case "N-M-S-noDet":
+      case "N-F-S-noDet":
+      case "CO-M-S-noDet":
+      case "CO-F-S-noDet":
+         person = 3;
+         plural = 0;
+         var type = pickOne(batch,rng);
+         var word = pickOne(type,rng)[plural];
+         break;
+      case "N-M-P-noDet":
+      case "N-F-P-noDet":
+         person = 3;
+         plural = 1;
+         var type = pickOne(batch,rng);
+         var word = pickOne(type,rng)[plural];
+         break;
+      case "CO-M-S":
+      case "N-M-S":
+         person = 3;
+         plural = 0;
+         var typeIndex = Math.trunc(rng() * nms.length);
+         var type = nms[typeIndex];
+         var noun = pickOne(type,rng)[0];
+         if(typeIndex === 3){    // if country
+            var det = getDeterminer("M",0,"definite_article",rng);
+         }else{
+            var det = getDeterminer("M",0,"",rng);
+         }
+         var word = elide(det + " " + noun);
+         break;
+      case "CO-F-S":
+      case "N-F-S":
+         person = 3;
+         plural = 0;
+         var typeIndex = Math.trunc(rng() * nfs.length);
+         var type = nfs[typeIndex];
+         var noun = pickOne(type,rng)[0];
+         if(typeIndex === 3){    // if country
+            var det = getDeterminer("F",0,"definite_article",rng);
+         }else{
+            var det = getDeterminer("F",0,"",rng);
+         }
+         var word = elide(det + " " + noun);
+         break;
+      case "N-M-P":
+         person = 3;
+         plural = 1;
+         var type = pickOne(batch,rng);
+         var nounIndex = Math.trunc(rng() * type.length);
+         var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
+         var det = getDeterminer("M",1,"",rng);
+         var word = elide(det + " " + noun);
+         break;
+      case "N-F-P":
+         person = 3;
+         plural = 1;
+         var type = pickOne(batch,rng);
+         var nounIndex = Math.trunc(rng() * type.length);
+         var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
+         var det = getDeterminer("F",1,"",rng);
+         var word = elide(det + " " + noun);
+         break;
+      case "VI":
+      case "VT":
+         var verb = pickOne(batch,rng);
+         var word = conjugate(verb,person,plural,tense);
+         break;
+   }
+   return [word,person,plural];
+}
+
 // module.exports.generate = function (rng, minLength, maxLength, withSpaces) {
-  test = function (rng, minLength, maxLength, withSpaces) {
+  // test = function (rng, minLength, maxLength, withSpaces) {
+function generateSentence(n,struc){
+   var rng = Math.random;
+   var withSpaces = true;
    var curLength = 0;
    var text = "";
-   while (curLength < maxLength - 50) {
+   // while (curLength < maxLength - 50) {
+   for(var iSentence = 0; iSentence < n; iSentence++){
       var sentence = "";
-      var structure = structures[Math.trunc(rng() * structures.length)];
+      // var structure = structures[Math.trunc(rng() * structures.length)];
+      var structure = (struc === "all") ? pickOne(structures,rng) : structures[struc];
       var person = 3;
       var plural = 0;
       var tense = tenses[Math.trunc(rng() * tenses.length)];
       for(var block of structure){
-         switch(block){
-            case "N-M-S-noDet":
-               person = 3;
-               plural = 0;
-               var type = nmsNoDet[Math.trunc(rng() * nmsNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][0];
-               break;
-            case "N-F-S-noDet":
-               person = 3;
-               plural = 0;
-               var type = nfsNoDet[Math.trunc(rng() * nfsNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][0];
-               break;
-            case "N-M-P-noDet":
-               person = 3;
-               plural = 1;
-               var type = nmpNoDet[Math.trunc(rng() * nmpNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][1];
-               break;
-            case "N-F-P-noDet":
-               person = 3;
-               plural = 1;
-               var type = nfpNoDet[Math.trunc(rng() * nfpNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][1];
-               break;
-            case "CO-M-S":
-            case "N-M-S":
-               person = 3;
-               plural = 0;
-               var typeIndex = Math.trunc(rng() * nms.length);
-               var type = nms[typeIndex];
-               var noun = type[Math.trunc(rng() * type.length)][0];
-               if(typeIndex === 3){    // if country
-                  var det = getDeterminer("M",0,"definite_article",rng);
-               }else{
-                  var det = getDeterminer("M",0,"",rng);
-               }
-               var word = elide(det + " " + noun);
-               break;
-            case "CO-F-S":
-            case "N-F-S":
-               person = 3;
-               plural = 0;
-               var typeIndex = Math.trunc(rng() * nfs.length);
-               var type = nfs[typeIndex];
-               var noun = type[Math.trunc(rng() * type.length)][0];
-               if(typeIndex === 3){    // if country
-                  var det = getDeterminer("F",0,"definite_article",rng);
-               }else{
-                  var det = getDeterminer("F",0,"",rng);
-               }
-               var word = elide(det + " " + noun);
-               break;
-            case "N-M-P":
-               person = 3;
-               plural = 1;
-               var typeIndex = Math.trunc(rng() * nmp.length);
-               var type = nmp[typeIndex];
-               var nounIndex = Math.trunc(rng() * type.length);
-               var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-               var det = getDeterminer("M",1,"",rng);
-               var word = elide(det + " " + noun);
-               break;
-            case "N-F-P":
-               person = 3;
-               plural = 1;
-               var typeIndex = Math.trunc(rng() * nfp.length);
-               var type = nfp[typeIndex];
-               var nounIndex = Math.trunc(rng() * type.length);
-               var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-               var det = getDeterminer("F",1,"",rng);
-               var word = elide(det + " " + noun);
-               break;
-            case "VI":
-               var verb = verbs["intransitive"][Math.trunc(rng() * verbs["intransitive"].length)];
-               var word = conjugate(verb,person,plural,tense);
-               break;
-            case "VT":
-               var verb = verbs["transitive"][Math.trunc(rng() * verbs["transitive"].length)];
-               var word = conjugate(verb,person,plural,tense);
-               break;
-            case "CO-M-S-noDet":
-               var type = comsNoDet[Math.trunc(rng() * comsNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][0];
-               break;
-            case "CO-F-S-noDet":
-               var type = cofsNoDet[Math.trunc(rng() * cofsNoDet.length)];
-               var word = type[Math.trunc(rng() * type.length)][0];
-               break;
-         }
-         sentence += word+" ";
+         var word = getWord(block,person,plural,tense,rng);
+         person = word[1];
+         plural = word[2];
+         sentence += word[0]+" ";
       }
       // var subject = createNounGroup(rng);
       // var subjVerb = addVerb(subject,rng);
@@ -113,16 +200,16 @@
       // if(subjVerb[2]){
       //    // var sentence = addComplement(subjVerb,rng);
       // }
-      var sentence = cleanUpSpecialChars(sentence, withSpaces);
-      if (sentence.length > (maxLength - curLength - 20)) {
-         continue;
-      }
-      text += sentence;
-      if (withSpaces) {
-         text += " ";
-      }
+      sentence = cleanUpSpecialChars(sentence, withSpaces);
+      // if (sentence.length > (maxLength - curLength - 20)) {
+      //    continue;
+      // }
+      // text += sentence;
+      // if (withSpaces) {
+      //    text += " ";
+      // }
       curLength += sentence.length;
-      text = "<p>"+text+"</p>";
+      text += "<p>"+sentence+"</p>";
    }
    // var iLastSentence = Math.trunc(rng() * sentences.length);
    // for (var iDelta = 0; iDelta < sentences.length; iDelta++) {
@@ -264,6 +351,7 @@ function pluralize(str,plural) {
 };
 
 function elide(str) {
+   str = cleanUpSpecialChars(str,true);
    str = str.toLowerCase();
    str = " " + str; 
    str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
@@ -314,6 +402,9 @@ function elide(str) {
 
 function conjugate(verb,person,plural,tense,rng) {
    var infinitive = verb[0].toLowerCase();
+   if(tense === "infinitive"){
+      return infinitive;
+   }
    var group = verb[1];
    // var person = subj[3];
    // var plural = subj[2];
@@ -402,11 +493,31 @@ function cleanUpSpecialChars(str, withSpaces) {
     return str.toUpperCase();
 };
 
-// const structureTypes = [
-//    "N-M-S-noDet", // nom masculin singulier sans déterminant
-//    "N-M-S",
-//    "VI"    // verbe intransitif
-// ];
+function pickOne(arr,rng,length) {
+   if(length){
+      var arrLength = length;
+   }else{
+      var arrLength = arr.length;
+   }
+   return arr[Math.trunc(rng() * arrLength)];
+};
+
+const structureTypes = [
+   "N-M-S-noDet", // nom masculin singulier sans déterminant
+   "N-M-S",
+   "N-F-S-noDet", 
+   "N-F-S",
+   "N-M-P-noDet", 
+   "N-M-P",
+   "N-F-P-noDet", 
+   "N-F-P",
+   "VI",    // verbe intransitif
+   "VT",
+   "CO-M-S-noDet",
+   "CO-M-S",
+   "CO-F-S-noDet",
+   "CO-F-S"
+];
 const structures = [
    ["N-M-S-noDet","VI"],
    ["N-F-S-noDet","VI"],
@@ -884,7 +995,76 @@ const nouns = {
          [ "attaché de presse", "attachés de presse" ],
          [ "auteur" ],
          [ "aviateur" ],
-         [ "avocat" ]
+         [ "avocat" ],
+         [ "banquier" ],
+         [ "bibliothécaire" ],
+         [ "bijoutier" ],
+         [ "biologiste" ],
+         [ "boucher" ],
+         [ "boulanger" ],
+         [ "bûcheron" ],
+         [ "caissier" ],
+         [ "capitaine" ],
+         [ "cardiologue" ],
+         [ "carrossier" ],
+         [ "cartographe" ],
+         [ "chanteur" ],
+         [ "charcutier" ],
+         [ "chargé de relations publiques", "chargés de relations publiques" ],
+         [ "charpentier" ],
+         [ "chaudronnier" ],
+         [ "chauffeur" ],
+         [ "chef d'orchestre", "chefs d'orchestre" ],
+         [ "chef de service", "chefs de service" ],
+         [ "chercheur" ],
+         [ "chirurgien" ],
+         [ "chorégraphe" ],
+         [ "coiffeur" ],
+         [ "comédien" ],
+         [ "commissaire" ],
+         [ "comptable" ],
+         [ "concierge" ],
+         [ "conducteur" ],
+         [ "conseiller d'orientation", "conseillers d'orientation" ],
+         [ "consultant" ],
+         [ "contrôleur" ],
+         [ "convoyeur de fonds", "convoyeurs de fonds" ],
+         [ "correcteur" ],
+         [ "costumier" ],
+         [ "coursier" ],
+         [ "couturier" ],
+         [ "cuisinier" ],
+         [ "danseur" ],
+         [ "décorateur" ],
+         [ "déménageur" ],
+         [ "démographe" ],
+         [ "dentiste" ],
+         [ "dépanneur" ],
+         [ "dessinateur" ],
+         [ "détective privé", "détectives privés" ],
+         [ "développeur" ],
+         [ "diététicien" ],
+         [ "directeur" ],
+         [ "docteur" ],
+         [ "documentaliste" ],
+         [ "dompteur" ],
+         [ "douanier" ],
+         [ "ébéniste" ],
+         [ "éboueur" ],
+         [ "écrivain" ],
+         [ "éducateur spécialisé", "éducateurs spécialisés" ],
+         [ "électricien" ],
+         [ "employé" ],
+         [ "enseignant" ],
+         [ "entraîneur" ],
+         [ "épicier" ],
+         [ "ergothérapeute" ],
+         [ "esthéticien" ],
+         [ "ethnologue" ],
+         [ "facteur" ],
+         [ "fermier" ],
+         [ "fleuriste" ],
+         [ "funambule" ],
       ],
       "F": [ // [name,(plural)]
          [ "actrice" ],
@@ -904,7 +1084,64 @@ const nouns = {
          [ "astrologue" ],
          [ "astrophysicienne" ],
          [ "attachée de presse", "attachées de presse" ],
-         [ "avocate" ]
+         [ "avocate" ],
+         [ "banquière" ],
+         [ "bibliothécaire" ],
+         [ "bijoutière" ],
+         [ "biologiste" ],
+         [ "boulangère" ],
+         [ "caissière" ],
+         [ "capitaine" ],
+         [ "cardiologue" ],
+         [ "cartographe" ],
+         [ "chanteuse" ],
+         [ "charcutière" ],
+         [ "chargée de relations publiques", "chargées de relations publiques" ],
+         [ "chef de service", "chefs de service" ],
+         [ "chercheuse" ],
+         [ "chorégraphe" ],
+         [ "coiffeuse" ],
+         [ "comédienne" ],
+         [ "commissaire" ],
+         [ "comptable" ],
+         [ "concierge" ],
+         [ "conductrice" ],
+         [ "conseillère d'orientation", "conseillères d'orientation" ],
+         [ "consultante" ],
+         [ "contrôleuse" ],
+         [ "correctrice" ],
+         [ "costumière" ],
+         [ "couturière" ],
+         [ "cuisinière" ],
+         [ "danseuse" ],
+         [ "décoratrice" ],
+         [ "déménageuse" ],
+         [ "démographe" ],
+         [ "dentiste" ],
+         [ "dépanneuse" ],
+         [ "dessinatrice" ],
+         [ "détective privée", "détectives privées" ],
+         [ "développeuse" ],
+         [ "diététicienne" ],
+         [ "directrice" ],
+         [ "docteur" ],
+         [ "documentaliste" ],
+         [ "dompteuse" ],
+         [ "douanière" ],
+         [ "ébéniste" ],
+         [ "éducatrice spécialisée", "éducatrices spécialisées" ],
+         [ "électricienne" ],
+         [ "employée" ],
+         [ "enseignante" ],
+         [ "entraîneuse" ],
+         [ "épicière" ],
+         [ "ergothérapeute" ],
+         [ "esthéticienne" ],
+         [ "ethnologue" ],
+         [ "femme de chambre", "femmes de chambre" ],
+         [ "fermière" ],
+         [ "fleuriste" ],
+         [ "funambule" ],
       ]
    },
    "animal": {
@@ -1338,3 +1575,20 @@ const cofsNoDet = [
 //    nouns["plant"].F,
 //    nouns["country"].F
 // ];
+
+const batches = {
+   "N-M-S-noDet": nmsNoDet,
+   "N-F-S-noDet": nfsNoDet,
+   "N-M-P-noDet": nmpNoDet,
+   "N-F-P-noDet": nfpNoDet,
+   "N-M-S": nms,
+   "N-F-S": nfs,
+   "N-M-P": nmp,
+   "N-F-P": nfp,
+   "VI": verbs["intransitive"],
+   "VT": verbs["transitive"],
+   "CO-M-S-noDet": comsNoDet,
+   "CO-F-S-noDet": cofsNoDet,
+   "CO-M-S": nms,
+   "CO-F-S": nfs
+};
