@@ -87,7 +87,6 @@ function generateWordList(block) {
    var dataVerb = $("#person").val();
    var person = dataVerb%3 + 1;
    var pluralVerb = (dataVerb <= 2) ? 0 : 1;
-   console.log(person+" "+pluralVerb);
    if(blockLabel === "VT" || blockLabel === "VI"){
       for(var word of batch){
          text += conjugate(word,person,pluralVerb,"present",Math.random);
@@ -438,9 +437,17 @@ function conjugate(verb,person,plural,tense,rng) {
             return infinitive.replace(/yer$/,"i"+ending); 
          }
       }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive)){
-         return infinitive.replace(/er$/,"l"+ending);
+         if(plural && person == 1 || plural && person == 2){
+            return infinitive.replace(/er$/,ending);
+         }else{
+            return infinitive.replace(/er$/,"l"+ending);
+         }
       }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive)){
-         return infinitive.replace(/er$/,"t"+ending);
+         if(plural && person == 1 || plural && person == 2){
+            return infinitive.replace(/er$/,ending);
+         }else{
+            return infinitive.replace(/er$/,"t"+ending);
+         }
       }else{
          return infinitive.replace(/er$/,ending);
       }
