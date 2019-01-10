@@ -1170,7 +1170,14 @@ const nouns = {
          [ "taxidermiste" ],
          [ "technicien" ],
          [ "traducteur" ],
-
+         [ "urbaniste" ],
+         [ "urgentiste" ],
+         [ "vendeur" ],
+         [ "vétérinaire" ],
+         [ "viticulteur" ],
+         [ "volcanologue" ],
+         [ "xylophoniste" ],
+         [ "zoologiste" ]
       ],
       "F": [ // [name,(plural)]
          [ "actrice" ],
@@ -1310,6 +1317,14 @@ const nouns = {
          [ "taxidermiste" ],
          [ "technicienne" ],
          [ "traductrice" ],
+         [ "urbaniste" ],
+         [ "urgentiste" ],
+         [ "vendeuse" ],
+         [ "vétérinaire" ],
+         [ "viticultrice" ],
+         [ "volcanologue" ],
+         [ "xylophoniste" ],
+         [ "zoologiste" ]
       ]
    },
    "animal": {
