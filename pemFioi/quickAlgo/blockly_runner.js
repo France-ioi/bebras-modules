@@ -182,9 +182,25 @@ function initBlocklyRunner(context, messageCallback) {
             }
          }
 
+         var makeNative = function(func) {
+            return function() {
+               var value = func.apply(func, arguments);
+               var primitive = undefined;
+               if (value != undefined) {
+                  if(typeof value.length != 'undefined') {
+                     // It's an array, create a primitive out of it
+                     primitive = interpreters[context.curRobot].nativeToPseudo(value);
+                  } else {
+                     primitive = value;
+                  }
+               }
+               return primitive;
+            };
+         }
+
          if(Blockly.JavaScript.externalFunctions) {
             for(var name in Blockly.JavaScript.externalFunctions) {
-               interpreter.setProperty(scope, name, interpreter.createNativeFunction(Blockly.JavaScript.externalFunctions[name]));
+               interpreter.setProperty(scope, name, interpreter.createNativeFunction(makeNative(Blockly.JavaScript.externalFunctions[name])));
             }
          }
 
