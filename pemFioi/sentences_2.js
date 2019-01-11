@@ -179,7 +179,6 @@ function getWord(block,person,plural,tense,rng) {
 }
 
 // module.exports.generate = function (rng, minLength, maxLength, withSpaces) {
-  // test = function (rng, minLength, maxLength, withSpaces) {
 function generateSentence(n,struc){
    var rng = Math.random;
    var withSpaces = true;
@@ -297,18 +296,9 @@ function generateSentence(n,struc){
 //    return [ subj, subjGender, subjPlural, subjPerson ];
 // };
 
-// function getWord(type,rng) {
-//    switch(type){
-//       case "N-M-S-noDet":
-//          var type = nmsNoDet[rng() * nmsNoDet.length];
-//          var word = type[rng() * type.length][0];
-//          break;
-//    }
-//    return word;
-// };
 
 function getDeterminer(gender,plural,type,rng) {
-   var determinerType = (type) ? type : determinerTypes[Math.trunc(rng() * (determinerTypes.length - 1 + plural))];
+   var determinerType = (type) ? type : pickOne(determinerTypes,rng,(determinerTypes.length - 1 + plural));
    if(determinerType != "numeral_adjective"){
       if(plural){
          var determiner = determiners[determinerType][gender][0][1];
@@ -316,7 +306,7 @@ function getDeterminer(gender,plural,type,rng) {
          var determiner = determiners[determinerType][gender][0][0];
       }
    }else{
-      var determiner = determiners[determinerType][Math.trunc(rng() * determiners[determinerType].length)][0];
+      var determiner = pickOne(determiners[determinerType])[0];
    }
    return determiner;
 };
@@ -371,6 +361,13 @@ function elide(str) {
    str = str.replace(/[ ](ne)[ ]([aeiouy])/gi," n'$2");
    str = str.replace(/[ ]à[ ]le[ ]/gi," au ");
    str = str.replace(/[ ]à[ ]les[ ]/gi," aux ");
+   var words = str.split(" ");
+   for(var word of words){ // élision pour les mots en H
+      if(elisionWithH.includes(word)){
+         str = str.replace(/[ ](le|la)[ ](h[aeiouy])/gi," l'$2");
+         str = str.replace(/[ ](ce)[ ](h[aeiouy])/gi," cet $2");
+      }
+   }
    return str;
 };
 
@@ -608,7 +605,12 @@ const exceptions = [
    [ "acheter", "geler", "haleter", "déceler", "modeler", "ciseler", "congeler", "marteler", "crocheter" ]
 ];
 
-const determinerTypes = ["definite_article","indefinite_article","demonstrative_adjective","numeral_adjective"];
+const determinerTypes = [
+   "definite_article",
+   "indefinite_article",
+   "demonstrative_adjective",
+   "numeral_adjective"
+   ];
 const determiners = {
    "definite_article": {
       "M": [
@@ -1870,6 +1872,21 @@ const verbs = {
       // [ "se faire", 3, 1, "" ]
    ]
  };
+
+const elisionWithH = [
+   "historien",
+   "horticulteur",
+   "horloger",
+   "huissier",
+   "historienne",
+   "horticultrice",
+   "hôtesse de l'air",
+   "hippocampe",
+   "hippopotame",
+   "hirondelle",
+   "hibiscus",
+   "hortensia"
+];
 
 const nmsNoDet = [
    nouns["name"].M,
