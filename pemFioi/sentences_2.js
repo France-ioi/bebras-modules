@@ -1919,7 +1919,7 @@ const nfp = [
 const comsNoDet = [
    nouns["name"].M,
    pronouns["demonstrative"].M,
-   pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque")),
+   pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0] != "")),
    [["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]]
 ];
 const cofsNoDet = [
