@@ -784,7 +784,7 @@ p {
   color: transparent;
 }
 .speedCursor::-ms-fill-lower {
-  background: #f5a623;
+  background: #db8b0a;
   border-radius: 5px;
 }
 .speedCursor::-ms-fill-upper {
@@ -800,7 +800,7 @@ p {
   cursor: ew-resize;
 }
 .speedCursor:focus::-ms-fill-lower {
-  background: #f5a623;
+  background: #db8b0a;
 }
 .speedCursor:focus::-ms-fill-upper {
   background: rgba(0,0,0,0.3);
@@ -1263,7 +1263,7 @@ body.fullscreen #taskToolbar {
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: #f5a623;
+  background-color: #db8b0a;
   color: #fff;
   font-weight: bold;
   z-index: 1;
@@ -1331,7 +1331,7 @@ body.fullscreen #taskToolbar {
 .errorMessage .testSuccess {
   color: green;
 }
-.errorMessage .testError {
+.errorMessage .testResults .testError {
   color: #FF001F;
 }
 .errorMessage .testLink {
