@@ -201,6 +201,16 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.linkBack = false;
    };
 
+   subTask.logActivity = function() {
+      // Sends a validate("log") to the platform if the log GET parameter is set
+      // Performance note : we don't call getAnswerObject, as it's already
+      // called every second by buttonsAndMessages.
+      if(getUrlParameter('log') && subTask.answer != subTask.lastLoggedAnswer) {
+         platform.validate("log");
+         subTask.lastLoggedAnswer = subTask.answer;
+      }
+   };
+
    subTask.initRun = function(callback) {
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
@@ -224,6 +234,8 @@ var initBlocklySubTask = function(subTask, language) {
                );
             }
          }
+         // Log the attempt
+         subTask.logActivity();
          // Launch an evaluation after the execution
          subTask.context.display = false;
          subTask.getGrade(handleResults, true, subTask.iTestCase);
