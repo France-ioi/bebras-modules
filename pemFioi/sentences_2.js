@@ -82,21 +82,28 @@ function initHandlers() {
 function generateWordList(block) {
    var text = "";
    var blockLabel = structureTypes[block];
-   var batch = batches[blockLabel];
-   var plural = (blockLabel.includes("-P")) ? 1 : 0;
-   var dataVerb = $("#person").val();
-   var person = dataVerb%3 + 1;
-   var pluralVerb = (dataVerb <= 2) ? 0 : 1;
-   if(blockLabel === "VT" || blockLabel === "VI"){
-      for(var word of batch){
-         text += conjugate(word,person,pluralVerb,"present",Math.random);
-         text += "</br>";
+   if(set.hasOwnProperty(blockLabel)){
+      for(var subset of set[blockLabel]){
+         var subsetIndex = structureTypes.indexOf(subset);
+         text += generateWordList(subsetIndex);
       }
    }else{
-      for(var subset of batch){
-         for(var word of subset){
-            text += (plural) ? pluralize(word[0],word[1]) : word[0];
+      var batch = batches[blockLabel];
+      var plural = (blockLabel.includes("-P")) ? 1 : 0;
+      var dataVerb = $("#person").val();
+      var person = dataVerb%3 + 1;
+      var pluralVerb = (dataVerb <= 2) ? 0 : 1;
+      if(blockLabel === "VT" || blockLabel === "VI"){
+         for(var word of batch){
+            text += conjugate(word,person,pluralVerb,"present",Math.random);
             text += "</br>";
+         }
+      }else{
+         for(var subset of batch){
+            for(var word of subset){
+               text += (plural) ? pluralize(word[0],word[1]) : word[0];
+               text += "</br>";
+            }
          }
       }
    }
@@ -105,6 +112,9 @@ function generateWordList(block) {
 };
 
 function getWord(block,person,plural,tense,rng) {
+   if(set.hasOwnProperty(block)){
+      block = pickOne(set[block],rng);
+   }
    var batch = batches[block];
    switch(block){
       case "N-M-S-noDet":
@@ -169,6 +179,14 @@ function getWord(block,person,plural,tense,rng) {
          var det = getDeterminer("F",1,"",rng);
          var word = elide(det + " " + noun);
          break;
+      case "1P-S":
+      case "2P-S":
+      case "1P-P":
+      case "2P-P":
+         person = block.charAt(0);
+         plural = block.endsWith("-S") ? 0 : 1;
+         var word = batch[0][0][plural];
+         break;
       case "VI":
       case "VT":
          var verb = pickOne(batch,rng);
@@ -209,6 +227,7 @@ function generateSentence(n,struc){
       // if(subjVerb[2]){
       //    // var sentence = addComplement(subjVerb,rng);
       // }
+      sentence = elide(sentence);
       sentence = cleanUpSpecialChars(sentence, withSpaces);
       // if (sentence.length > (maxLength - curLength - 20)) {
       //    continue;
@@ -364,6 +383,7 @@ function elide(str) {
    var words = str.split(" ");
    for(var word of words){ // élision pour les mots en H
       if(elisionWithH.includes(word)){
+         str = str.replace(/[ ](je)[ ](h[aeiouy])/gi," j'$2");
          str = str.replace(/[ ](le|la)[ ](h[aeiouy])/gi," l'$2");
          str = str.replace(/[ ](ce)[ ](h[aeiouy])/gi," cet $2");
       }
@@ -530,6 +550,12 @@ const structureTypes = [
    "N-M-P",
    "N-F-P-noDet", 
    "N-F-P",
+   "1P-S",
+   "2P-S",
+   "3P-S",
+   "1P-P",
+   "2P-P",
+   "3P-P",
    "VI",    // verbe intransitif
    "VT",
    "CO-M-S-noDet",
@@ -538,46 +564,36 @@ const structureTypes = [
    "CO-F-S"
 ];
 const structures = [
-   ["N-M-S-noDet","VI"],
-   ["N-F-S-noDet","VI"],
-   ["N-M-S","VI"],
-   ["N-F-S","VI"],
-   ["N-M-P-noDet","VI"],
-   ["N-F-P-noDet","VI"],
-   ["N-M-P","VI"],
-   ["N-F-P","VI"],
-   ["N-M-S-noDet","VT","CO-M-S-noDet"],
-   ["N-F-S-noDet","VT","CO-M-S-noDet"],
-   ["N-M-S","VT","CO-M-S-noDet"],
-   ["N-F-S","VT","CO-M-S-noDet"],
-   ["N-M-P-noDet","VT","CO-M-S-noDet"],
-   ["N-F-P-noDet","VT","CO-M-S-noDet"],
-   ["N-M-P","VT","CO-M-S-noDet"],
-   ["N-F-P","VT","CO-M-S-noDet"],
-   ["N-M-S-noDet","VT","CO-F-S-noDet"],
-   ["N-F-S-noDet","VT","CO-F-S-noDet"],
-   ["N-M-S","VT","CO-F-S-noDet"],
-   ["N-F-S","VT","CO-F-S-noDet"],
-   ["N-M-P-noDet","VT","CO-F-S-noDet"],
-   ["N-F-P-noDet","VT","CO-F-S-noDet"],
-   ["N-M-P","VT","CO-F-S-noDet"],
-   ["N-F-P","VT","CO-F-S-noDet"],
-   ["N-M-S-noDet","VT","CO-M-S"],
-   ["N-F-S-noDet","VT","CO-M-S"],
-   ["N-M-S","VT","CO-M-S"],
-   ["N-F-S","VT","CO-M-S"],
-   ["N-M-P-noDet","VT","CO-M-S"],
-   ["N-F-P-noDet","VT","CO-M-S"],
-   ["N-M-P","VT","CO-M-S"],
-   ["N-F-P","VT","CO-M-S"],
-   ["N-M-S-noDet","VT","CO-F-S"],
-   ["N-F-S-noDet","VT","CO-F-S"],
-   ["N-M-S","VT","CO-F-S"],
-   ["N-F-S","VT","CO-F-S"],
-   ["N-M-P-noDet","VT","CO-F-S"],
-   ["N-F-P-noDet","VT","CO-F-S"],
-   ["N-M-P","VT","CO-F-S"],
-   ["N-F-P","VT","CO-F-S"]
+   ["3P-S","VI"],
+   ["3P-P","VI"],
+   ["3P-S","VT","CO-M-S-noDet"],
+   ["3P-P","VT","CO-M-S-noDet"],
+   ["3P-S","VT","CO-F-S-noDet"],
+   ["3P-P","VT","CO-F-S-noDet"],
+   ["3P-S","VT","CO-M-S"],
+   ["3P-P","VT","CO-M-S"],
+   ["3P-S","VT","CO-F-S"],
+   ["3P-P","VT","CO-F-S"],
+   ["1P-S","VI"],
+   ["2P-S","VI"],
+   ["1P-P","VI"],
+   ["2P-P","VI"],
+   ["1P-S","VT","CO-M-S-noDet"],
+   ["2P-S","VT","CO-M-S-noDet"],
+   ["1P-P","VT","CO-M-S-noDet"],
+   ["2P-P","VT","CO-M-S-noDet"],
+   ["1P-S","VT","CO-F-S-noDet"],
+   ["2P-S","VT","CO-F-S-noDet"],
+   ["1P-P","VT","CO-F-S-noDet"],
+   ["2P-P","VT","CO-F-S-noDet"],
+   ["1P-S","VT","CO-M-S"],
+   ["2P-S","VT","CO-M-S"],
+   ["1P-P","VT","CO-M-S"],
+   ["2P-P","VT","CO-M-S"],
+   ["1P-S","VT","CO-F-S"],
+   ["2P-S","VT","CO-F-S"],
+   ["1P-P","VT","CO-F-S"],
+   ["2P-P","VT","CO-F-S"]
 ];
 
 
@@ -645,16 +661,16 @@ const determiners = {
 const pronounTypes = ["personal","personal_2","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
 const subjPronounTypes = ["personal","demonstrative_2","indefinite"];
 const pronouns = {
-   // "personal": [  // [name, gender, plural, person]
-   //    [ "Je", 2, 0, 1 ],
-   //    [ "Tu", 2, 0, 2 ],
-   //    [ "Il", 3, 0, 3 ],
-   //    [ "Il", 1, 0, 3 ],
-   //    [ "Elle", 0, 0, 3 ],
-   //    [ "Nous", 2, 1, 1 ],
-   //    [ "Vous", 2, 1, 2 ],
-   //    [ "Ils", 1, 1, 3 ],
-   //    [ "Elles", 0, 1, 3 ] ],
+/*   "personal": [  // [name, gender, plural, person]
+      [ "Je", 2, 0, 1 ],
+      [ "Tu", 2, 0, 2 ],
+      [ "Il", 3, 0, 3 ],
+      [ "Il", 1, 0, 3 ],
+      [ "Elle", 0, 0, 3 ],
+      [ "Nous", 2, 1, 1 ],
+      [ "Vous", 2, 1, 2 ],
+      [ "Ils", 1, 1, 3 ],
+      [ "Elles", 0, 1, 3 ] ],*/
    // "personal_2": [  // [name, gender, plural, person]
    //    [ "Moi", 2, 0, 1 ],
    //    [ "Toi", 2, 0, 2 ],
@@ -2346,6 +2362,45 @@ const nfp = [
    nouns["animal"].F,
    nouns["plant"].F
 ];
+const p1 = [[["je","nous"]]];
+const p2 = [[["tu","vous"]]];
+// const p3s = [
+//    nouns["name"].M,
+//    nouns["name"].F,
+//    pronouns["demonstrative"].M,
+//    pronouns["demonstrative"].F,
+//    pronouns["indefinite"].M.filter(word => word[0] != ""),
+//    pronouns["indefinite"].F.filter(word => word[0] != ""),
+//    [["il"],["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"],
+//    ["elle"],["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],
+//    nouns["city"],
+//    nouns["job"].M,
+//    nouns["animal"].M,
+//    nouns["plant"].M,
+//    nouns["country"].M,
+//    nouns["job"].F,
+//    nouns["animal"].F,
+//    nouns["plant"].F,
+//    nouns["country"].F
+// ];
+
+// const p3p = [
+//    pronouns["demonstrative"].M.filter(word => word[1] != ""),
+//    pronouns["indefinite"].M.filter(word => word[1] != ""),
+//    pronouns["demonstrative"].F,
+//    pronouns["indefinite"].F.filter(word => word[1] != ""),
+//    [["","ils"],["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"],
+//    ["","elles"],["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],
+//    nouns["job"].M,
+//    nouns["animal"].M,
+//    nouns["plant"].M,
+//    nouns["job"].F,
+//    nouns["animal"].F,
+//    nouns["plant"].F
+// ];
+
+
+
 const comsNoDet = [
    nouns["name"].M,
    pronouns["demonstrative"].M,
@@ -2381,10 +2436,21 @@ const batches = {
    "N-F-S": nfs,
    "N-M-P": nmp,
    "N-F-P": nfp,
+   "1P-S": p1,
+   "2P-S": p2,
+   // "3P-S": p3s,
+   "1P-P": p1,
+   "2P-P": p2,
+   // "3P-P": p3p,
    "VI": verbs["intransitive"],
    "VT": verbs["transitive"],
    "CO-M-S-noDet": comsNoDet,
    "CO-F-S-noDet": cofsNoDet,
    "CO-M-S": nms,
    "CO-F-S": nfs
+};
+
+const set = {
+   "3P-S": ["N-M-S-noDet","N-M-S","N-F-S-noDet","N-F-S"],
+   "3P-P": ["N-M-P-noDet","N-M-P","N-F-P-noDet","N-F-P"]
 };
