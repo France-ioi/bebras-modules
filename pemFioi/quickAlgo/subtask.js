@@ -206,9 +206,9 @@ var initBlocklySubTask = function(subTask, language) {
       // Performance note : we don't call getAnswerObject, as it's already
       // called every second by buttonsAndMessages.
       var logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
-      if(logOption && subTask.answer != subTask.lastLoggedAnswer) {
+      if(logOption && JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
          platform.validate("log");
-         subTask.lastLoggedAnswer = subTask.answer;
+         subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);
       }
    };
 
