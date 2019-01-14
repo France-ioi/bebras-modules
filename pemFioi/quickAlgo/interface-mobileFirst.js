@@ -377,7 +377,7 @@ var quickAlgoInterface = {
             '<div class="speedControls">' +
                 '<div class="playerControls">' +
                     '<div class="icon backToFirst" onclick="quickAlgoInterface.playerControls(\'backToFirst\');"><span class="fas fa-fast-backward"></span></div>' +
-                    '<div class="icon playPause play" onclick="quickAlgoInterface.playerControls(\'playPause\');"><span class="fas fa-play-circle"></span></div>' +
+                    '<div class="icon playPause play" onclick="quickAlgoInterface.playerControls(\'playPause\');"><span class="fas fa-play"></span></div>' +
                     '<div class="icon nextStep" onclick="quickAlgoInterface.playerControls(\'nextStep\');"><span class="fas fa-step-forward"></span></div>' +
                     '<div class="icon goToEnd" onclick="quickAlgoInterface.playerControls(\'goToEnd\');"><span class="fas fa-fast-forward"></span></div>' +
                     '<div class="icon displaySpeedSlider" onclick="quickAlgoInterface.playerControls(\'displaySpeedSlider\');"><span class="fas fa-tachometer-alt"></span></div>' +
@@ -426,8 +426,10 @@ var quickAlgoInterface = {
             this.setPlayPause(false);
         } else if(ctrl == 'displaySpeedSlider') {
             $('#mode-player').addClass('displaySpeedSlider');
+            $('#introGrid .speedControls').addClass('displaySpeedSlider');
         } else if(ctrl == 'hideSpeedSlider') {
            $('#mode-player').removeClass('displaySpeedSlider');
+           $('#introGrid .speedControls').removeClass('displaySpeedSlider');
         } else if(ctrl == 'speedSlower') {
             var el = $('.speedCursor'),
                 maxVal = parseInt(el.attr('max'), 10),
@@ -447,10 +449,10 @@ var quickAlgoInterface = {
 
     setPlayPause: function(isPlaying) {
         if(isPlaying) {
-            $('.playerControls .playPause').html('<span class="fas fa-pause-circle"></span>');
+            $('.playerControls .playPause').html('<span class="fas fa-pause"></span>');
             $('.playerControls .playPause').removeClass('play').addClass('pause');
         } else {
-            $('.playerControls .playPause').html('<span class="fas fa-play-circle"></span>');
+            $('.playerControls .playPause').html('<span class="fas fa-play"></span>');
             $('.playerControls .playPause').removeClass('pause').addClass('play');
         }
     },
@@ -542,7 +544,7 @@ var quickAlgoInterface = {
                         '</span>' +
                     '</div>' +
                     '<div id="mode-player" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-player\');">' +
-                        '<span class="fas fa-play"></span>' +
+                        '<span class="fas fa-play selectIcon"></span>' +
                     '</div>' +
                 '</div>' +
             '</div>');
