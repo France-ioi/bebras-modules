@@ -131,7 +131,7 @@ body > * {
 }
 #editorMenu #closeEditorMenu {
   position: absolute;
-  top: 15px;
+  top: 12px;
   right: 15px;
   cursor: pointer;
 }
@@ -666,23 +666,21 @@ p {
     -ms-flex-pack: justify;
         justify-content: space-between;
   width: 100%;
-  margin: 0 10px;
-  vertical-align: bottom;
-  background-color: rgba(0,0,0,0.3);
-  box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
-  border-radius:15px;
+  align-items: center;
 }
 .speedControls {
   position: relative;
   -ms-flex-negative: 0;
     flex-shrink: 0;
 }
-.speedControls .icon span {
+#introGrid .speedControls .icon span {
   padding: 5px 10px;
 }
+#taskToolbar .speedControls .icon span {
+  padding: 0 10px;
+}
+/* toggle player controls and speed slider visibility */
 @media screen and (max-width: 480.9px) { /* Portrait mobiles and low res display */
-  /* toggle player controls and tab icon, and speed slider visibility */
-
   #mode-player.displaySpeedSlider .playerControls,
   #mode-player.displaySpeedSlider > span.far,
   #mode-player.displaySpeedSlider > span.fas {
@@ -692,9 +690,27 @@ p {
     display: none;
   }
 }
+@media /* Small tablets portrait */
+  screen and (min-width: 768px) and (max-width: 854.999px) and (orientation: portrait) {
+  #introGrid .speedControls.displaySpeedSlider .playerControls,
+  #introGrid .speedControls.displaySpeedSlider > span.far,
+  #introGrid .speedControls.displaySpeedSlider > span.fas {
+    display: none;
+  }
+  #introGrid .speedControls:not(.displaySpeedSlider) .speedSlider {
+    display: none;
+  }
+}
 @media screen and (min-width: 481px) {
-  .icon.displaySpeedSlider,
-  .icon.hideSpeedSlider {
+  #taskToolbar .icon.displaySpeedSlider,
+  #taskToolbar .icon.hideSpeedSlider {
+    display: none;
+  }
+}
+@media /* Some tablets and desktop */
+  screen and (min-width: 855px) {
+  #introGrid .icon.displaySpeedSlider,
+  #introGrid .icon.hideSpeedSlider {
     display: none;
   }
 }
@@ -716,13 +732,9 @@ p {
     -ms-flex-pack: center;
   justify-content: center;
   align-items: center;
-  margin-top: -4px;
   margin-bottom: -4px;
 }
 .speedSlider {
-  background-color: rgba(0,0,0,0.3);
-  box-shadow:inset 0 1px 0 0 rgba(0,0,0,0.50);
-  border-radius:15px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -747,7 +759,7 @@ p {
   height: 20px;
   width: 28px;
   border-radius: 100px;
-  background-color: #4a90e2;
+  background-color: #fff;
   margin-top: -7px;
   cursor: ew-resize;
 }
@@ -769,7 +781,7 @@ p {
   height: 20px;
   width: 28px;
   border-radius: 100px;
-  background-color: #4a90e2;
+  background-color: #fff;
   cursor: ew-resize;
 }
 /* Edge / IE10+ */
@@ -796,7 +808,7 @@ p {
   height: 20px;
   width: 28px;
   border-radius: 100px;
-  background: #4a90e2;
+  background: #fff;
   cursor: ew-resize;
 }
 .speedCursor:focus::-ms-fill-lower {
@@ -809,7 +821,9 @@ p {
 #introGrid .speedControls {
   -ms-flex-pack: distribute;
   justify-content: space-around;
-  padding: 10px;
+  padding: 5px 10px;
+  align-items: center;
+  height: 53px;
 }
 #introGrid .playerControls,
 #introGrid .speedSlider {
@@ -825,7 +839,7 @@ p {
   margin: 0;
 }
 #introGrid .playerControls .icon {
-  margin-right: 5px;
+  margin-right: 15px;
   cursor: pointer;
 }
 #introGrid .playerControls .icon span {
@@ -841,11 +855,13 @@ p {
   font-size: 16px;
 }
 #introGrid .playerControls .icon.playPause span {
-  color: #4a90e2;
-  background-color: #fff;
-  font-size: 40px;
+  color: #fff;
+  background-color: #4a90e2;
+  font-size: 28px;
   width: 40px;
   vertical-align: middle;
+  line-height: 40px;
+  padding-left: 6px;
 }
 #introGrid .speedSlider {
   background-color: rgba(0,0,0,0.10);
@@ -884,7 +900,7 @@ p {
 @media /* Tablets landscape and desktop */
   screen and (min-width: 855px) and (orientation: landscape) {
   #introGrid .playerControls .icon {
-    margin-right: 10px;
+    margin-right: 15px;
   }
 }
 
@@ -1167,10 +1183,14 @@ body.fullscreen #taskToolbar {
 #taskToolbar .far {
   font-size: 18px;
 }
+#taskToolbar .playerControls .fa-play {
+  font-size: 24px;
+}
 #modeSelector {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  line-height: 25px;
 }
 #modeSelector .mode {
   -webkit-box-flex: 0;
@@ -1182,7 +1202,7 @@ body.fullscreen #taskToolbar {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  padding: 15px;
+  padding: 12px;
   background-color: #4a4a4a;
   color: #fff;
   position: relative;
@@ -1246,6 +1266,9 @@ body.fullscreen #taskToolbar {
 #modeSelector .mode:not(.active) .label {
   display: none;
 }
+#modeSelector #mode-player.active .selectIcon {
+  display: none;
+}
 
 /************************
   DISPLAY HELPER ELEMENTS
@@ -1259,10 +1282,10 @@ body.fullscreen #taskToolbar {
 *************************/
 .errorMessage {
   position: absolute;
-  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  padding: 11px 0;
   background-color: #db8b0a;
   color: #fff;
   font-weight: bold;
@@ -1286,7 +1309,6 @@ body.fullscreen #taskToolbar {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  height: 100%;
 }
 .errorMessage .messageWrapper .icon {
   width: 28px;
@@ -1296,6 +1318,7 @@ body.fullscreen #taskToolbar {
   color: #fff;
   background-color: rgba(0,0,0,0.20);
   border-radius: 50%;
+  flex-shrink: 0;
 }
 .errorMessage .messageWrapper .message {
   -webkit-box-flex: 1;
