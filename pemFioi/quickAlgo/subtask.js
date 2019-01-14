@@ -205,7 +205,8 @@ var initBlocklySubTask = function(subTask, language) {
       // Sends a validate("log") to the platform if the log GET parameter is set
       // Performance note : we don't call getAnswerObject, as it's already
       // called every second by buttonsAndMessages.
-      if(getUrlParameter('log') && subTask.answer != subTask.lastLoggedAnswer) {
+      var logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
+      if(logOption && subTask.answer != subTask.lastLoggedAnswer) {
          platform.validate("log");
          subTask.lastLoggedAnswer = subTask.answer;
       }
