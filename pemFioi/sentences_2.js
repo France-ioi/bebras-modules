@@ -374,7 +374,7 @@ function pluralize(str,plural) {
 };
 
 function elide(str) {
-   str = cleanUpSpecialChars(str,true);
+   // str = cleanUpSpecialChars(str,true);
    str = str.toLowerCase();
    str = " " + str; 
    str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
@@ -668,31 +668,15 @@ const pronouns = {
    //    [ "Vous", 2, 1, 2 ],
    //    [ "eux", 1, 1, 3 ],
    //    [ "Elles", 0, 1, 3 ] ],
-   // "possessive": [   // [name, gender]
-   //    ["mien", 1],
-   //    ["mienne", 0],
-   //    ["tien", 1],
-   //    ["tienne", 0],
-   //    ["sien", 1],
-   //    ["sienne", 0],
-   //    ["nôtre", 2],
-   //    ["vôtre", 2],
-   //    ["leur", 2] ],
-   // "demonstrative": [   // [name, gender, plural]
-   //    [ "celui", 1, 0 ],
-   //    [ "celle", 0, 0 ],
-   //    [ "ceux", 1, 1 ],
-   //    [ "celles", 0, 1 ],
-   //    [ "ce", 2, 0 ] ],
    "demonstrative": {
-      "M": [   // [name, plural]
+      "M": [   // [singular, plural]
          [ "celui-ci", "ceux-ci" ],
          [ "celui-là", "ceux-là" ],
          [ "ceci", "" ],
          [ "cela", "" ] ,
          [ "ça", "" ] 
       ],
-      "F": [   // [name, plural]
+      "F": [   // [singular, plural]
          [ "celle-ci", "celles-ci" ],
          [ "celle-là", "celles-là" ],
       ]
@@ -2198,8 +2182,11 @@ const verbs = {
    "transitive": [   // [verb, group, auxiliary, complement]
       [ "abandonner", 1, 0 ],
       [ "abîmer", 1, 0 ],
+      [ "aborder", 1, 0 ],
+      [ "abreuver", 1, 0 ],
       [ "abriter", 1, 0 ],
       [ "absorber", 1, 0 ],
+      [ "accabler", 1, 0 ],
       [ "accélérer", 1, 0 ],
       [ "accentuer", 1, 0 ],
       [ "accepter", 1, 0 ],
@@ -2220,6 +2207,7 @@ const verbs = {
       [ "admirer", 1, 0 ],
       [ "adorer", 1, 0 ],
       [ "aduler", 1, 0 ],
+      [ "aérer", 1, 0 ],
       [ "affamer", 1, 0 ],
       [ "afficher", 1, 0 ],
       [ "affoler", 1, 0 ],
@@ -2271,6 +2259,43 @@ const verbs = {
       [ "ausculter", 1, 0 ],
       [ "automatiser", 1, 0 ],
       [ "avaler", 1, 0 ]
+      [ "bafouer", 1, 0 ],
+      [ "balancer", 1, 0 ],
+      [ "baliser", 1, 0 ],
+      [ "balkaniser", 1, 0 ],
+      [ "balloter", 1, 0 ],
+      [ "banaliser", 1, 0 ],
+      [ "baptiser", 1, 0 ],
+      [ "baratiner", 1, 0 ],
+      [ "barricader", 1, 0 ],
+      [ "bazarder", 1, 0 ],
+      [ "bercer", 1, 0 ],
+      [ "berner", 1, 0 ],
+      [ "bétonner", 1, 0 ],
+      [ "blâmer", 1, 0 ],
+      [ "blesser", 1, 0 ],
+      [ "bloquer", 1, 0 ],
+      [ "boiser", 1, 0 ],
+      [ "bombarder", 1, 0 ],
+      [ "border", 1, 0 ],
+      [ "bosseler", 1, 0 ],
+      [ "boucher", 1, 0 ],
+      [ "bouger", 1, 0 ],
+      [ "bouder", 1, 0 ],
+      [ "bouleverser", 1, 0 ],
+      [ "bousculer", 1, 0 ],
+      [ "boxer", 1, 0 ],
+      [ "boycotter", 1, 0 ],
+      [ "braver", 1, 0 ],
+      [ "bricoler", 1, 0 ],
+      [ "brimer", 1, 0 ],
+      [ "briser", 1, 0 ],
+      [ "broyer", 1, 0 ],
+      [ "brosser", 1, 0 ],
+      [ "brouter", 1, 0 ],
+      [ "brûler", 1, 0 ],
+      [ "brusquer", 1, 0 ],
+      [ "butiner", 1, 0 ],
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
