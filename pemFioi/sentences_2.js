@@ -234,7 +234,13 @@ function getWord(block,person,plural,tense,rng) {
       case "VI":
       case "VT":
          var verb = pickOne(batch,rng);
-         var word = conjugate(verb,person,plural,tense);
+         var negation = Math.trunc(rng() * 2);
+         var verbConj = conjugate(verb,person,plural,tense);
+         if(negation){
+            var word = elide("ne " + verbConj + " pas");
+         }else{
+            var word = verbConj;
+         }
          break;
    }
    return [word,person,plural];
@@ -381,6 +387,7 @@ function elide(str) {
    for(var word of words){ // élision pour les mots en H
       if(elisionWithH.includes(word)){
          str = str.replace(/[ ](je)[ ](h[aeiouy])/gi," j'$2");
+         str = str.replace(/[ ](ne)[ ](h[aeiouy])/gi," n'$2");
          str = str.replace(/[ ](le|la)[ ](h[aeiouy])/gi," l'$2");
          str = str.replace(/[ ](ce)[ ](h[aeiouy])/gi," cet $2");
       }
