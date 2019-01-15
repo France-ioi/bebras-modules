@@ -92,7 +92,8 @@ var localLanguageStrings = {
       listVariable: "liste",
       scaleDrawing: "Zoom ×2",
       loopRepeat: "repeat",
-      loopDo: "do"
+      loopDo: "do",
+      displayVideo: "Afficher la vidéo"
    },
    en: {
       categories: {
@@ -180,7 +181,8 @@ var localLanguageStrings = {
       listVariable: "list",
       scaleDrawing: "Scale 2×",
       loopRepeat: "repeat",
-      loopDo: "do"
+      loopDo: "do",
+      displayVideo: "Display video"
    },
    de: {
       categories: {
@@ -270,7 +272,8 @@ var localLanguageStrings = {
       listVariable: "Liste",
       scaleDrawing: "Scale 2×",
       loopRepeat: "wiederhole",
-      loopDo: "mache"
+      loopDo: "mache",
+      displayVideo: "Display video"
    },
    es: {
       categories: {
@@ -359,7 +362,8 @@ var localLanguageStrings = {
       listVariable: "lista",
       scaleDrawing: "Aumentar 2X",
       loopRepeat: "repetir",
-      loopDo: "hacer"
+      loopDo: "hacer",
+      displayVideo: "Display video"
    },
    sl: {
       categories: {
@@ -441,7 +445,8 @@ var localLanguageStrings = {
       textVariable: "besedilo",
       listVariable: "tabela",
       loopRepeat: "repeat",
-      loopDo: "do"
+      loopDo: "do",
+      displayVideo: "Display video"
    }
 };
 

@@ -1440,23 +1440,24 @@ body.fullscreen #taskToolbar {
   color: #4a90e2;
 }
 
-button.showLongIntro {
+button.showLongIntro, button.videoBtn {
+  position: relative;
   color: #4a90e2;
   border: 1px solid #4a90e2;
   border-radius: 50px;
   box-shadow: none;
   padding: 8px 15px 8px 40px;
-  position: relative;
   cursor: pointer;
-  display: none;
   background: #fff;
-  float: right;
   text-transform: uppercase;
   font-weight: bold;
   font-size: 12px;
-  display: none;
 }
-button.showLongIntro .icon {
+button.showLongIntro {
+  display: none;
+  float: right;
+}
+button.showLongIntro .icon, button.videoBtn .icon {
   position: absolute;
   left: 15px;
   top: 10px;
