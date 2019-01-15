@@ -604,6 +604,7 @@ var quickAlgoInterface = {
                 '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
                 levelIntroContent);
         }
+        this.bindVideoBtns();
     },
 
     appendTaskIntro: function(html) {
@@ -756,6 +757,28 @@ var quickAlgoInterface = {
     wrapIntroAndGrid: function() {
         if ($('#introGrid').length) { return; }
         $("#taskIntro, #gridContainer").wrapAll("<div id='introGrid'></div>");
+    },
+
+    bindVideoBtns: function() {
+        // TODO :: move that out of quickAlgoInterface?
+        $('button.videoBtn').off('click', this.videoBtnHandler);
+        $('button.videoBtn').on('click', this.videoBtnHandler).html('<span class="fas fa-play-circle icon"></span> ' + this.strings.displayVideo);
+    },
+
+    videoBtnHandler: function() {
+        var that = $(this);
+        var video = $('<video controls></video>');
+        $.each(that[0].attributes, function() {
+            if(this.name == 'data-video') {
+                video.attr('src', this.value);
+            } else if(this.name == 'data-style') {
+                video.attr('style', this.value);
+            } else {
+                video.attr(this.name, this.value);
+            }
+        });
+        that.replaceWith(video);
+        video[0].play();
     },
 
     checkFonts: function() {
