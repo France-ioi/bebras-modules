@@ -41,8 +41,8 @@ function selectBlock() {
       html += "<option value=\""+blockIndex+"\">"+block+"</option>";
    }
    html += "</select>";
-   html += "<label for=\"person\">Personne (pour les verbes)</label>";
-   html += "<select id=\"person\">";
+   html += "<label for=\"person\" class=\"person\">Personne + nombre</label>";
+   html += "<select id=\"person\" class=\"person\">";
    for(var iPerson = 0; iPerson < 6; iPerson++){
       personText = (iPerson%3 + 1)+" "+((iPerson <=2) ? "S" : "P");
       html += "<option value=\""+iPerson+"\">"+personText+"</option>";
@@ -62,6 +62,14 @@ function selectSentenceNumber() {
 };
 
 function initHandlers() {
+   $(".person").hide();
+   $("#blocks").change(function(){
+      if(structureTypes[$("#blocks").val()].startsWith("V")){
+         $(".person").show();
+      }else{
+         $(".person").hide();
+      }
+   });
    $("#createSentences").off("click");
    $("#createSentences").click(function(){
       var struct = $("#structures").val();
@@ -86,6 +94,12 @@ function generateWordList(block) {
       for(var subset of set[blockLabel]){
          var subsetIndex = structureTypes.indexOf(subset);
          text += generateWordList(subsetIndex);
+      }
+   }else if(blockLabel.startsWith("adj")){
+      var place = (blockLabel === "adjBefore") ? "before": "after";
+      for(var adj of adjectives[place]){
+         text += adj[0];
+         text += "</br>";
       }
    }else{
       var batch = batches[blockLabel];
@@ -135,53 +149,52 @@ function getWord(block,person,plural,tense,rng) {
          var type = pickOne(batch,rng);
          var word = pickOne(type,rng)[plural];
          break;
-      case "CO-M-S":
+      
       case "N-M-S":
-         person = 3;
-         plural = 0;
-         var typeIndex = Math.trunc(rng() * nms.length);
-         var type = nms[typeIndex];
-         var noun = pickOne(type,rng)[0];
-         if(typeIndex === 3){    // if country
-            var det = getDeterminer("M",0,"definite_article",rng);
-         }else{
-            var det = getDeterminer("M",0,"",rng);
-         }
-         var word = elide(det + " " + noun);
-         break;
-      case "CO-F-S":
+      case "N-M-S-adj":
       case "N-F-S":
+      case "N-F-S-adj":
+      case "CO-M-S":
+      case "CO-F-S":
+      case "CO-M-S-adj":
+      case "CO-F-S-adj":
          person = 3;
          plural = 0;
-         var typeIndex = Math.trunc(rng() * nfs.length);
-         var type = nfs[typeIndex];
+         gender = block.includes("-M-") ? "M" : "F";
+         var typeIndex = Math.trunc(rng() * batch.length);
+         var type = batch[typeIndex];
          var noun = pickOne(type,rng)[0];
          if(typeIndex === 3){    // if country
-            var det = getDeterminer("F",0,"definite_article",rng);
+            var det = getDeterminer(gender,0,"definite_article",rng);
          }else{
-            var det = getDeterminer("F",0,"",rng);
+            var det = getDeterminer(gender,0,"",rng);
          }
-         var word = elide(det + " " + noun);
+         if(block.endsWith("-adj")){
+            var word = addAdjective(noun,det,gender,plural,rng);
+         }else{
+            var word = elide(det + " " + noun);
+         }
          break;
       case "N-M-P":
-      case "CO-M-P":
-         person = 3;
-         plural = 1;
-         var type = pickOne(batch,rng);
-         var nounIndex = Math.trunc(rng() * type.length);
-         var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-         var det = getDeterminer("M",1,"",rng);
-         var word = elide(det + " " + noun);
-         break;
+      case "N-M-P-adj":
       case "N-F-P":
+      case "N-F-P-adj":
+      case "CO-M-P":
       case "CO-F-P":
+      case "CO-M-P-adj":
+      case "CO-F-P-adj":
          person = 3;
          plural = 1;
+         gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng);
          var nounIndex = Math.trunc(rng() * type.length);
          var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-         var det = getDeterminer("F",1,"",rng);
-         var word = elide(det + " " + noun);
+         var det = getDeterminer(gender,1,"",rng);
+         if(block.endsWith("-adj")){
+            var word = addAdjective(noun,det,gender,plural,rng);
+         }else{
+            var word = elide(det + " " + noun);
+         }
          break;
       case "1P-S":
       case "2P-S":
@@ -257,69 +270,6 @@ function generateSentence(n,struc){
    return text;
 }
 
-// function createNounGroup(rng,CO) {
-//    var subj = "";
-//    var subjGender = 0;
-//    var subjPlural = 0;
-//    var subjPerson = 3;
-//    var isPronoun = (CO) ? 0 : Math.trunc(rng() * 2);
-//    if(isPronoun){
-//       var pronounType = subjPronounTypes[Math.trunc(rng() * subjPronounTypes.length)];
-//       var pronoun = pronouns[pronounType][Math.trunc(rng() * pronouns[pronounType].length)];
-//       subj += pronoun[0];
-//       var gender = pronoun[1];
-//       subjPlural = pronoun[2];
-//       if(pronounType === "personal"){
-//          subjPerson = pronoun[3];
-//       }
-//    }else{
-//       var nSubj= Math.trunc(rng() * 3 + 1);
-//       for(var iSubj = 0; iSubj < nSubj; iSubj++){   
-//          var iSubjType = Math.trunc(rng() * 4); // name, job, animal, plant 
-//          var index = Math.trunc(rng() * nouns[nounTypes[iSubjType]].length);
-//          var word = nouns[nounTypes[iSubjType]][index];
-//          if(iSubjType === 0) {
-//             subj += word[0];
-//             var gender = word[1];
-//             var plural = 0;
-//          }else{
-//             var gender = word[1];
-//             var determiner = getDeterminer(gender,rng);
-//             var plural = determiner[1];
-//             subj += determiner[0] + " ";
-//             var wordText = plural ? pluralize(word[0],word[2]) : word[0];
-//             var isAdjective = Math.trunc(rng() * 2);
-//             if(isAdjective){
-//                var adjectiveIndex = Math.trunc(rng() * adjectives.length);
-//                var adjText = getAdjective(adjectiveIndex, gender, plural);
-//                var adjPlace = adjectives[index][2];
-//                if(adjPlace === 0){
-//                   subj += adjText+" "+wordText;
-//                }else{
-//                   subj += wordText+" "+adjText;
-//                }
-//             }else{
-//                subj += wordText;
-//             }
-//          }
-//          if(nSubj > 1){
-//             subjPlural = 1;
-//             if(iSubj < nSubj - 2 ){
-//                subj += ",";
-//             }else if(iSubj == nSubj - 2) {
-//                subj += " et";
-//             }
-//          }
-//          subj += " ";
-//       }
-//    }
-//    subj = elide(subj);
-//    subjGender |= gender;
-//    subjPlural |= plural;
-//    return [ subj, subjGender, subjPlural, subjPerson ];
-// };
-
-
 function getDeterminer(gender,plural,type,rng) {
    var determinerType = (type) ? type : pickOne(determinerTypes,rng,(determinerTypes.length - 1 + plural));
    if(determinerType != "numeral_adjective"){
@@ -334,19 +284,30 @@ function getDeterminer(gender,plural,type,rng) {
    return determiner;
 };
 
-// function getAdjective(index,gender,plural) {
-//    var adj = adjectives[index];
-//    var adjText = adj[0];
-//    if(gender === 0 && adj[1].length < 2){
-//       adjText += adj[1];
-//    }else if(gender === 0 && adj[1].length >= 2){
-//       adjText = adj[1];
-//    }
-//    if(plural){
-//       adjText = pluralize(adjText);
-//    }
-//    return adjText;
-// };
+function getAdjective(place,gender,plural,rng) {
+   var adj = pickOne(adjectives[place],rng);
+   var adjText = adj[0];
+   if(gender === "F" && adj[1].length < 2){
+      adjText += adj[1];
+   }else if(gender === "F" && adj[1].length >= 2){
+      adjText = adj[1];
+   }
+   if(plural){
+      adjText = pluralize(adjText);
+   }
+   return adjText;
+};
+
+function addAdjective(noun,det,gender,plural,rng) {
+   var place = pickOne(adjectiveTypes,rng);
+   var adj = getAdjective(place,gender,plural,rng);
+   if(place && place === "before"){
+      var text = elide(det + " " + adj + " " + noun);
+   }else{
+      var text = elide(det + " " + noun + " " + adj);
+   }
+   return text;
+};
 
 function pluralize(str,plural) {
    str = str.trim();
@@ -374,8 +335,8 @@ function pluralize(str,plural) {
 };
 
 function elide(str) {
-   // str = cleanUpSpecialChars(str,true);
    str = str.toLowerCase();
+   str = str.replace(/[èéêë]/g,"e");
    str = " " + str; 
    str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
    str = str.replace(/[ ](ce)[ ]([aeiouy])/gi," cet $2");
@@ -567,7 +528,9 @@ const structureTypes = [
    "CO-M-P",
    "CO-F-P-noDet",
    "CO-F-P",
-   "CO"
+   "CO",
+   "adjBefore",
+   "adjAfter"
 ];
 const structures = [
    ["3P-S","VI"],
@@ -1398,7 +1361,6 @@ const nouns = {
          [ "Oppossum" ],
          [ "Orang-outan", "Orangs-outans" ],
          [ "Ornithorynque" ],
-         [ "Ouistiti" ],
          [ "Ours", "Ours" ],
          [ "Panda" ],
          [ "Pangolin" ],
@@ -1640,106 +1602,143 @@ const nouns = {
       [ "Brest" ]
    ]
 };
-
-const adjectives = [  // [name,fem,before/after(0/1)]
-   [ "abject", "e", 1 ],
-   [ "abominable", "", 1 ],
-   [ "aborigène", "", 1 ],
-   [ "abrasif", "abrasive", 1 ],
-   [ "abrupt", "e", 1 ],
-   [ "absent", "e", 1 ],
-   [ "absorbant", "e", 1 ],
-   [ "abstrait", "e", 1 ],
-   [ "absurde", "", 1 ],
-   [ "accablant", "e", 1 ],
-   [ "accessoire", "", 1 ],
-   [ "accomodant", "e", 1 ],
-   [ "accompagné", "e", 1 ],
-   [ "accoudé", "e", 1 ],
-   [ "accroupi", "e", 1 ],
-   [ "acceuillant", "e", 1 ],
-   [ "accusateur", "accusatrice", 1 ],
-   [ "accusé", "e", 1 ],
-   [ "acéré", "e", 1 ],
-   [ "acharné", "e", 1 ],
-   [ "achevé", "e", 1 ],
-   [ "acide", "", 1 ],
-   [ "acidulé", "e", 1 ],
-   [ "acoustique", "", 1 ],
-   [ "acquis", "e", 1 ],
-   [ "acquitté", "e", 1 ],
-   [ "actif", "active", 1 ],
-   [ "actionné", "e", 1 ],
-   [ "activiste", "", 1 ],
-   [ "actuel", "actuelle", 1 ],
-   [ "adapté", "e", 1 ],
-   [ "addictif", "addictive", 1 ],
-   [ "adhésif", "adhésive", 1 ],
-   [ "adipeux", "adipeuse", 1 ],
-   [ "admis", "e", 1 ],
-   [ "admissible", "", 1 ],
-   [ "administratif", "administrative", 1 ],
-   [ "adolescent", "e", 1 ],
-   [ "adopté", "e", 1 ],
-   [ "adoré", "e", 1 ],
-   [ "adouci", "e", 1 ],
-   [ "adoucissant", "e", 1 ],
-   [ "adriatique", "", 1 ],
-   [ "absorbant", "e", 1 ],
-   [ "adulte", "", 1 ],
-   [ "aéré", "e", 1 ],
-   [ "aérodynamique", "", 1 ],
-   [ "aéronautique", "", 1 ],
-   [ "aérostatique", "", 1 ],
-   [ "affaibli", "e", 1 ],
-   [ "affaiblissant", "e", 1 ],
-   [ "affairé", "e", 1 ],
-   [ "affamé", "e", 1 ],
-   [ "affirmé", "e", 1 ],
-   [ "affligeant", "e", 1 ],
-   [ "affligé", "e", 1 ],
-   [ "affolant", "e", 1 ],
-   [ "affolé", "e", 1 ],
-   [ "affranchi", "e", 1 ],
-   [ "affreux", "affreuse", 0 ],
-   [ "affûté", "e", 1 ],
-   [ "africain", "e", 1 ],
-   [ "agaçant", "e", 1 ],
-   [ "agacé", "e", 1 ],
-   [ "agenouillé", "e", 1 ],
-   [ "aggloméré", "e", 1 ],
-   [ "agglutiné", "e", 1 ],
-   [ "aggravant", "e", 1 ],
-   [ "aggravé", "e", 1 ],
-   [ "agité", "e", 1 ],
-   [ "agnostique", "", 1 ],
-   [ "agonisant", "e", 1 ],
-   [ "agréable", "", 1 ],
-   [ "agrégé", "e", 1 ],
-   [ "agricole", "", 1 ],
-   [ "aguerri", "e", 1 ],
-   [ "ahuri", "e", 1 ],
-   [ "ahurissant", "e", 1 ],
-   [ "aigre", "", 1 ],
-   [ "aigri", "e", 1 ],
-   [ "aigu", "aigüe", 1 ],
-   [ "aiguisé", "e", 1 ],
-   [ "ailé", "e", 1 ],
-   [ "aimable", "", 0 ],
-   [ "aimanté", "e", 1 ],
-   [ "ajusté", "e", 1 ],
-   [ "alambiqué", "e", 1 ],
-   [ "alarmant", "e", 1 ],
-   [ "alarmé", "e", 1 ],
-   [ "albanais", "e", 1 ],
-   [ "albinos", "", 1 ],
-   [ "alcoolique", "", 1 ],
-   [ "alcoolisé", "e", 1 ],
-   [ "alité", "e", 1 ],
-   [ "allemand", "e", 1 ],
-   [ "allongé", "e", 1 ],
-   [ "alourdi", "e", 1 ],
-];
+const adjectiveTypes = ["before","after"];   // placé avant ou après le nom
+const adjectives = { // [M-S,F-S]
+   "before": [
+      [ "abject", "e" ],
+      [ "abominable", "" ],
+      [ "abrupt", "e" ],
+      [ "absurde", "" ],
+      [ "accablant", "e" ],
+      [ "acceuillant", "e" ],
+      [ "actif", "active" ],
+      [ "actuel", "actuelle" ],
+      [ "addictif", "addictive" ],
+      [ "adhésif", "adhésive" ],
+      [ "adipeux", "adipeuse" ],
+      [ "admissible", "" ],
+      [ "administratif", "administrative" ],
+      [ "adolescent", "e" ],
+      [ "adoucissant", "e" ],
+      [ "adriatique", "" ],
+      [ "absorbant", "e" ],
+      [ "aérodynamique", "" ],
+      [ "aéronautique", "" ],
+      [ "aérostatique", "" ],
+      [ "affaiblissant", "e" ],
+      [ "affligeant", "e" ],
+      [ "affolant", "e" ],
+      [ "affreux", "affreuse" ],
+      [ "agaçant", "e" ],
+      [ "aggravant", "e" ],
+      [ "agonisant", "e" ],
+      [ "agréable", "" ],
+      [ "ahurissant", "e" ],
+      [ "aigre", "" ],
+      [ "aimable", "" ],
+      [ "alarmant", "e" ],
+   ],
+   "after": [
+      [ "abject", "e" ],
+      [ "abominable", "" ],
+      [ "aborigène", "" ],
+      [ "abrasif", "abrasive" ],
+      [ "abrupt", "e" ],
+      [ "absent", "e" ],
+      [ "absorbant", "e" ],
+      [ "abstrait", "e" ],
+      [ "absurde", "" ],
+      [ "accablant", "e" ],
+      [ "accessoire", "" ],
+      [ "accomodant", "e" ],
+      [ "accompagné", "e" ],
+      [ "accoudé", "e" ],
+      [ "accroupi", "e" ],
+      [ "acceuillant", "e" ],
+      [ "accusateur", "accusatrice" ],
+      [ "accusé", "e" ],
+      [ "acéré", "e" ],
+      [ "acharné", "e" ],
+      [ "achevé", "e" ],
+      [ "acide", "" ],
+      [ "acidulé", "e" ],
+      [ "acoustique", "" ],
+      [ "acquis", "e" ],
+      [ "acquitté", "e" ],
+      [ "actif", "active" ],
+      [ "actionné", "e" ],
+      [ "activiste", "" ],
+      [ "actuel", "actuelle" ],
+      [ "adapté", "e" ],
+      [ "addictif", "addictive" ],
+      [ "adhésif", "adhésive" ],
+      [ "adipeux", "adipeuse" ],
+      [ "admis", "e" ],
+      [ "admissible", "" ],
+      [ "administratif", "administrative" ],
+      [ "adolescent", "e" ],
+      [ "adopté", "e" ],
+      [ "adoré", "e" ],
+      [ "adouci", "e" ],
+      [ "adoucissant", "e" ],
+      [ "adriatique", "" ],
+      [ "absorbant", "e" ],
+      [ "adulte", "" ],
+      [ "aéré", "e" ],
+      [ "aérodynamique", "" ],
+      [ "aéronautique", "" ],
+      [ "aérostatique", "" ],
+      [ "affaibli", "e" ],
+      [ "affaiblissant", "e" ],
+      [ "affairé", "e" ],
+      [ "affamé", "e" ],
+      [ "affirmé", "e" ],
+      [ "affligeant", "e" ],
+      [ "affligé", "e" ],
+      [ "affolant", "e" ],
+      [ "affolé", "e" ],
+      [ "affranchi", "e" ],
+      [ "affreux", "affreuse" ],
+      [ "affûté", "e" ],
+      [ "africain", "e" ],
+      [ "agaçant", "e" ],
+      [ "agacé", "e" ],
+      [ "agenouillé", "e" ],
+      [ "aggloméré", "e" ],
+      [ "agglutiné", "e" ],
+      [ "aggravant", "e" ],
+      [ "aggravé", "e" ],
+      [ "agité", "e" ],
+      [ "agnostique", "" ],
+      [ "agonisant", "e" ],
+      [ "agréable", "" ],
+      [ "agrégé", "e" ],
+      [ "agricole", "" ],
+      [ "aguerri", "e" ],
+      [ "ahuri", "e" ],
+      [ "ahurissant", "e" ],
+      [ "aigre", "" ],
+      [ "aigri", "e" ],
+      [ "aigu", "aigüe" ],
+      [ "aiguisé", "e" ],
+      [ "ailé", "e" ],
+      [ "aimable", "" ],
+      [ "aimanté", "e" ],
+      [ "ajusté", "e" ],
+      [ "alambiqué", "e" ],
+      [ "alarmant", "e" ],
+      [ "alarmé", "e" ],
+      [ "albanais", "e" ],
+      [ "albinos", "" ],
+      [ "alcoolique", "" ],
+      [ "alcoolisé", "e" ],
+      [ "alité", "e" ],
+      [ "allemand", "e" ],
+      [ "allongé", "e" ],
+      [ "alourdi", "e" ],
+   ]
+}; 
+   
 const auxiliaryVerbs = ["avoir","être","both"];
 const verbTypes = ["intransitive","transitive","modal"];
 const verbs = {
@@ -1797,7 +1796,7 @@ const verbs = {
       [ "brosser", 1, 0 ],
       [ "brouter", 1, 0 ],
       [ "brûler", 1, 0 ],
-      [ "butiner", 1, 0 ]
+      [ "butiner", 1, 0 ],
       [ "céder", 1, 0 ],
       [ "cabotiner", 1, 0 ],
       [ "cafouiller", 1, 0 ],
@@ -2258,7 +2257,7 @@ const verbs = {
       [ "attraper", 1, 0 ],
       [ "ausculter", 1, 0 ],
       [ "automatiser", 1, 0 ],
-      [ "avaler", 1, 0 ]
+      [ "avaler", 1, 0 ],
       [ "bafouer", 1, 0 ],
       [ "balancer", 1, 0 ],
       [ "baliser", 1, 0 ],
@@ -2296,6 +2295,137 @@ const verbs = {
       [ "brûler", 1, 0 ],
       [ "brusquer", 1, 0 ],
       [ "butiner", 1, 0 ],
+      [ "cacher", 1, 0 ],
+      [ "cadenasser", 1, 0 ],
+      [ "cajoler", 1, 0 ],
+      [ "caler", 1, 0 ],
+      [ "calciner", 1, 0 ],
+      [ "calfeutrer", 1, 0 ],
+      [ "calibrer", 1, 0 ],
+      [ "calmer", 1, 0 ],
+      [ "cambrioler", 1, 0 ],
+      [ "camoufler", 1, 0 ],
+      [ "canaliser", 1, 0 ],
+      [ "canarder", 1, 0 ],
+      [ "capter", 1, 0 ],
+      [ "captiver", 1, 0 ],
+      [ "capturer", 1, 0 ],
+      [ "carboniser", 1, 0 ],
+      [ "caresser", 1, 0 ],
+      [ "caricaturer", 1, 0 ],
+      [ "casser", 1, 0 ],
+      [ "cataloguer", 1, 0 ],
+      [ "catapulter", 1, 0 ],
+      [ "cautionner", 1, 0 ],
+      [ "célébrer", 1, 0 ],
+      [ "censurer", 1, 0 ],
+      [ "centraliser", 1, 0 ],
+      [ "centrer", 1, 0 ],
+      [ "centrifuger", 1, 0 ],
+      [ "chagriner", 1, 0 ],
+      [ "chahuter", 1, 0 ],
+      [ "chambouler", 1, 0 ],
+      [ "changer", 1, 0 ],
+      [ "chanter", 1, 0 ],
+      [ "chaparder", 1, 0 ],
+      [ "charger", 1, 0 ],
+      [ "charmer", 1, 0 ],
+      [ "chasser", 1, 0 ],
+      [ "châtier", 1, 0 ],
+      [ "chatouiller", 1, 0 ],
+      [ "chauffer", 1, 0 ],
+      [ "chercher", 1, 0 ],
+      [ "chevaucher", 1, 0 ],
+      [ "chiffonner", 1, 0 ],
+      [ "chiffrer", 1, 0 ],
+      [ "choquer", 1, 0 ],
+      [ "chorégraphier", 1, 0 ],
+      [ "chronométrer", 1, 0 ],
+      [ "cibler", 1, 0 ],
+      [ "cimenter", 1, 0 ],
+      [ "cirer", 1, 0 ],
+      [ "cisailler", 1, 0 ],
+      [ "civiliser", 1, 0 ],
+      [ "clarifier", 1, 0 ],
+      [ "classer", 1, 0 ],
+      [ "climatiser", 1, 0 ],
+      [ "cloisonner", 1, 0 ],
+      [ "clôturer", 1, 0 ],
+      [ "clouer", 1, 0 ],
+      [ "clouter", 1, 0 ],
+      [ "coder", 1, 0 ],
+      [ "coiffer", 1, 0 ],
+      [ "coincer", 1, 0 ],
+      [ "coller", 1, 0 ],
+      [ "collecter", 1, 0 ],
+      [ "collectionner", 1, 0 ],
+      [ "colmater", 1, 0 ],
+      [ "coloniser", 1, 0 ],
+      [ "colorer", 1, 0 ],
+      [ "colorier", 1, 0 ],
+      [ "combler", 1, 0 ],
+      [ "commander", 1, 0 ],
+      [ "commémorer", 1, 0 ],
+      [ "commercialiser", 1, 0 ],
+      [ "compacter", 1, 0 ],
+      [ "comparer", 1, 0 ],
+      [ "compartimenter", 1, 0 ],
+      [ "compléter", 1, 0 ],
+      [ "complexifier", 1, 0 ],
+      [ "complimenter", 1, 0 ],
+      [ "compliquer", 1, 0 ],
+      [ "compresser", 1, 0 ],
+      [ "comprimer", 1, 0 ],
+      [ "compter", 1, 0 ],
+      [ "concurrencer", 1, 0 ],
+      [ "condamner", 1, 0 ],
+      [ "condenser", 1, 0 ],
+      [ "configurer", 1, 0 ],
+      [ "confronter", 1, 0 ],
+      [ "congeler", 1, 0 ],
+      [ "congédier", 1, 0 ],
+      [ "congratuler", 1, 0 ],
+      [ "connecter", 1, 0 ],
+      [ "conserver", 1, 0 ],
+      [ "considérer", 1, 0 ],
+      [ "consoler", 1, 0 ],
+      [ "consolider", 1, 0 ],
+      [ "consommer", 1, 0 ],
+      [ "consterner", 1, 0 ],
+      [ "constituer", 1, 0 ],
+      [ "consulter", 1, 0 ],
+      [ "consumer", 1, 0 ],
+      [ "contacter", 1, 0 ],
+      [ "contaminer", 1, 0 ],
+      [ "contempler", 1, 0 ],
+      [ "contester", 1, 0 ],
+      [ "contourner", 1, 0 ],
+      [ "contrarier", 1, 0 ],
+      [ "contrebalancer", 1, 0 ],
+      [ "contrecarrer", 1, 0 ],
+      [ "contrôler", 1, 0 ],
+      [ "convoiter", 1, 0 ],
+      [ "convoquer", 1, 0 ],
+      [ "coordonner", 1, 0 ],
+      [ "copier", 1, 0 ],
+      [ "corriger", 1, 0 ],
+      [ "côtoyer", 1, 0 ],
+      [ "coucher", 1, 0 ],
+      [ "couler", 1, 0 ],
+      [ "couper", 1, 0 ],
+      [ "courber", 1, 0 ],
+      [ "courser", 1, 0 ],
+      [ "courtiser", 1, 0 ],
+      [ "couver", 1, 0 ],
+      [ "créer", 1, 0 ],
+      [ "critiquer", 1, 0 ],
+      [ "croiser", 1, 0 ],
+      [ "crypter", 1, 0 ],
+      [ "cryptographier", 1, 0 ],
+      [ "cuisiner", 1, 0 ],
+      [ "culpabiliser", 1, 0 ],
+      [ "cultiver", 1, 0 ],
+
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
@@ -2420,9 +2550,13 @@ const batches = {
    "N-M-P-noDet": nmpNoDet,
    "N-F-P-noDet": nfpNoDet,
    "N-M-S": nms,
+   "N-M-S-adj": nms,
    "N-F-S": nfs,
+   "N-F-S-adj": nfs,
    "N-M-P": nmp,
+   "N-M-P-adj": nmp,
    "N-F-P": nfp,
+   "N-F-P-adj": nfp,
    "1P-S": p1,
    "2P-S": p2,
    "1P-P": p1,
@@ -2433,14 +2567,18 @@ const batches = {
    "CO-F-S-noDet": cofsNoDet,
    "CO-M-S": nms,
    "CO-F-S": nfs,
+   "CO-M-S-adj": nms,
+   "CO-F-S-adj": nfs,
    "CO-M-P-noDet": compNoDet,
    "CO-F-P-noDet": cofpNoDet,
    "CO-M-P": nmp,
-   "CO-F-P": nfp
+   "CO-F-P": nfp,
+   "CO-M-P-adj": nmp,
+   "CO-F-P-adj": nfp
 };
 
 const set = {
-   "3P-S": ["N-M-S-noDet","N-M-S","N-F-S-noDet","N-F-S"],
-   "3P-P": ["N-M-P-noDet","N-M-P","N-F-P-noDet","N-F-P"],
-   "CO": ["CO-M-S-noDet","CO-M-S","CO-F-S-noDet","CO-F-S","CO-M-P-noDet","CO-M-P","CO-F-P-noDet","CO-F-P"]
+   "3P-S": ["N-M-S-noDet","N-M-S","N-M-S-adj","N-F-S-noDet","N-F-S","N-F-S-adj"],
+   "3P-P": ["N-M-P-noDet","N-M-P","N-M-P-adj","N-F-P-noDet","N-F-P","N-F-P-adj"],
+   "CO": ["CO-M-S-noDet","CO-M-S","CO-M-S-adj","CO-F-S-noDet","CO-F-S","CO-F-S-adj","CO-M-P-noDet","CO-M-P","CO-M-P-adj","CO-F-P-noDet","CO-F-P","CO-F-P-adj"]
 };
