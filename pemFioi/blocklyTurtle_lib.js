@@ -527,8 +527,8 @@ var getContext = function(display, infos) {
             { name: "move" },
             { name: "moveamount", params: [null]},
             { name: "movebackamount", params: [null]},
-            { name: "moveamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
-            { name: "movebackamountvalue", blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
+            { name: "moveamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
+            { name: "movebackamountvalue", params: [null], blocklyJson: {"args0": [{"type": "field_number", "name": "PARAM_0", "value": defaultMoveAmount}]}},
             { name: "turnleft" },
             { name: "turnright" },
             { name: "turn",      params: [null]},
@@ -568,7 +568,7 @@ var getContext = function(display, infos) {
                {"type": "field_dropdown", "name": "PARAM_0", "options":
                  [[localLanguageStrings[window.stringsLanguage]["penup"],"up"],[localLanguageStrings[window.stringsLanguage]["pendown"],"down"]]}]}},
             { name: "colour2", params: [null]},
-            { name: "colourvalue", blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
+            { name: "colourvalue", params: [null], blocklyJson: {"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": "#ff0000"}]}}
          ],
          turtleInput: [
             { name: "inputvalue", yieldsValue: true }
