@@ -48,6 +48,16 @@ function selectBlock() {
       html += "<option value=\""+iPerson+"\">"+personText+"</option>";
    }
    html += "</select>";
+   html += "<label for=\"gender\" class=\"adj\">Genre</label>";
+   html += "<select id=\"gender\" class=\"adj\">";
+   html += "<option value=\"M\">M</option>";
+   html += "<option value=\"F\">F</option>";
+   html += "</select>";
+   html += "<label for=\"number\" class=\"adj\">Nombre</label>";
+   html += "<select id=\"number\" class=\"adj\">";
+   html += "<option value=\""+0+"\">S</option>";
+   html += "<option value=\""+1+"\">P</option>";
+   html += "</select>";
    return html;
 };
 
@@ -63,11 +73,17 @@ function selectSentenceNumber() {
 
 function initHandlers() {
    $(".person").hide();
+   $(".adj").hide();
    $("#blocks").change(function(){
       if(structureTypes[$("#blocks").val()].startsWith("V")){
          $(".person").show();
       }else{
          $(".person").hide();
+      }
+      if(structureTypes[$("#blocks").val()].startsWith("adj")){
+         $(".adj").show();
+      }else{
+         $(".adj").hide();
       }
    });
    $("#createSentences").off("click");
@@ -98,7 +114,9 @@ function generateWordList(block) {
    }else if(blockLabel.startsWith("adj")){
       var place = (blockLabel === "adjBefore") ? "before": "after";
       for(var adj of adjectives[place]){
-         text += adj[0];
+         var gender = $("#gender").val();
+         var plural = $("#number").val();
+         text += makeAdjectiveAgree(adj,gender,plural);
          text += "</br>";
       }
    }else{
@@ -286,17 +304,22 @@ function getDeterminer(gender,plural,type,rng) {
 
 function getAdjective(place,gender,plural,rng) {
    var adj = pickOne(adjectives[place],rng);
+   var adjText = makeAdjectiveAgree(adj,gender,plural);
+   return adjText;
+};
+
+function makeAdjectiveAgree(adj,gender,plural){
    var adjText = adj[0];
    if(gender === "F" && adj[1].length < 2){
       adjText += adj[1];
    }else if(gender === "F" && adj[1].length >= 2){
       adjText = adj[1];
    }
-   if(plural){
+   if(plural && plural !== "0"){
       adjText = pluralize(adjText);
    }
    return adjText;
-};
+}
 
 function addAdjective(noun,det,gender,plural,rng) {
    var place = pickOne(adjectiveTypes,rng);
