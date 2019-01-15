@@ -1643,10 +1643,8 @@ const adjectives = { // [M-S,F-S]
       [ "absurde", "" ],
       [ "accablant", "e" ],
       [ "acceuillant", "e" ],
-      [ "actif", "active" ],
       [ "actuel", "actuelle" ],
       [ "addictif", "addictive" ],
-      [ "adhésif", "adhésive" ],
       [ "adipeux", "adipeuse" ],
       [ "adoucissant", "e" ],
       [ "absorbant", "e" ],
@@ -2765,6 +2763,6 @@ const batches = {
 const set = {
    "3P-S": ["N-M-S-noDet","N-M-S","N-M-S-adj","N-F-S-noDet","N-F-S","N-F-S-adj"],
    "3P-P": ["N-M-P-noDet","N-M-P","N-M-P-adj","N-F-P-noDet","N-F-P","N-F-P-adj","double-3P"],
-   "3P": ["N-M-S-noDet","N-M-S","N-M-S-adj","N-F-S-noDet","N-F-S","N-F-S-adj","N-M-P-noDet","N-M-P","N-M-P-adj","N-F-P-noDet","N-F-P","N-F-P-adj"],
+   "3P": ["CO-M-S-noDet","N-M-S","N-M-S-adj","CO-F-S-noDet","N-F-S","N-F-S-adj","CO-M-P-noDet","N-M-P","N-M-P-adj","CO-F-P-noDet","N-F-P","N-F-P-adj"],
    "CO": ["CO-M-S-noDet","CO-M-S","CO-M-S-adj","CO-F-S-noDet","CO-F-S","CO-F-S-adj","CO-M-P-noDet","CO-M-P","CO-M-P-adj","CO-F-P-noDet","CO-F-P","CO-F-P-adj"]
 };
