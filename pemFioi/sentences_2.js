@@ -234,9 +234,9 @@ function getWord(block,person,plural,tense,rng) {
       case "VI":
       case "VT":
          var verb = pickOne(batch,rng);
-         var negation = Math.trunc(rng() * 4);
+         var negation = Math.trunc(rng() * 10);
          var verbConj = conjugate(verb,person,plural,tense);
-         if(negation === 3){
+         if(negation === 0){
             var negationWord = pickOne(negationWords,rng);
             var word = elide("ne " + verbConj + " " + negationWord);
          }else{
@@ -2842,12 +2842,12 @@ const cofsNoDet = [
 ];
 const compNoDet = [
    pronouns["demonstrative"].M.filter(word => word[1] != ""),
-   pronouns["indefinite"].M.filter(word => word[1] != ""),
+   // pronouns["indefinite"].M.filter(word => word[1] != ""),
    [["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
 ];
 const cofpNoDet = [
    pronouns["demonstrative"].F,
-   pronouns["indefinite"].F.filter(word => word[1] != ""),
+   // pronouns["indefinite"].F.filter(word => word[1] != ""),
    [["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
 ];
 // const coms = [
@@ -2899,6 +2899,6 @@ const batches = {
 const set = {
    "3P-S": ["N-M-S-noDet","N-M-S","N-M-S-adj","N-F-S-noDet","N-F-S","N-F-S-adj"],
    "3P-P": ["N-M-P-noDet","N-M-P","N-M-P-adj","N-F-P-noDet","N-F-P","N-F-P-adj","double-3P"],
-   "3P": ["CO-M-S-noDet","N-M-S","N-M-S-adj","CO-F-S-noDet","N-F-S","N-F-S-adj","CO-M-P-noDet","N-M-P","N-M-P-adj","CO-F-P-noDet","N-F-P","N-F-P-adj"],
+   "3P": ["CO-M-S-noDet","N-M-S","N-M-S-adj","CO-F-S-noDet","N-F-S","N-F-S-adj","CO-M-P-noDet","N-M-P","N-M-P-adj","CO-F-P-noDet","N-F-P","N-F-P-adj"],  // pour les groupes de 2 sujets
    "CO": ["CO-M-S-noDet","CO-M-S","CO-M-S-adj","CO-F-S-noDet","CO-F-S","CO-F-S-adj","CO-M-P-noDet","CO-M-P","CO-M-P-adj","CO-F-P-noDet","CO-F-P","CO-F-P-adj"]
 };
