@@ -64,8 +64,8 @@ function selectBlock() {
 function selectSentenceNumber() {
    var html = "<label for=\"structures\">Nombre de phrases</label>";
    html += "<select id=\"nSentences\">";
-   for(var i = 1; i < 21; i++){
-      html += "<option value=\""+i+"\">"+i+"</option>";
+   for(var i = 1; i < 4; i++){
+      html += "<option value=\""+Math.pow(10,i)+"\">"+Math.pow(10,i)+"</option>";
    }
    html += "</select>";
    return html;
@@ -234,9 +234,9 @@ function getWord(block,person,plural,tense,rng) {
       case "VI":
       case "VT":
          var verb = pickOne(batch,rng);
-         var negation = Math.trunc(rng() * 2);
+         var negation = Math.trunc(rng() * 4);
          var verbConj = conjugate(verb,person,plural,tense);
-         if(negation){
+         if(negation === 3){
             var word = elide("ne " + verbConj + " pas");
          }else{
             var word = verbConj;
@@ -2616,6 +2616,126 @@ const verbs = {
       [ "dupliquer", 1, 0 ],
       [ "dynamiser", 1, 0 ],
       [ "dynamiter", 1, 0 ],
+      [ "ébouillanter", 1, 0 ],
+      [ "ébranler", 1, 0 ],
+      [ "écarter", 1, 0 ],
+      [ "échanger", 1, 0 ],
+      [ "échauffer", 1, 0 ],
+      [ "éclabousser", 1, 0 ],
+      [ "éclairer", 1, 0 ],
+      [ "éclater", 1, 0 ],
+      [ "éclipser", 1, 0 ],
+      [ "écouter", 1, 0 ],
+      [ "écraser", 1, 0 ],
+      [ "édifier", 1, 0 ],
+      [ "édulcorer", 1, 0 ],
+      [ "éduquer", 1, 0 ],
+      [ "effacer", 1, 0 ],
+      [ "effleurer", 1, 0 ],
+      [ "effrayer", 1, 0 ],
+      [ "égaler", 1, 0 ],
+      [ "égaliser", 1, 0 ],
+      [ "égarer", 1, 0 ],
+      [ "égratigner", 1, 0 ],
+      [ "éjecter", 1, 0 ],
+      [ "électrifier", 1, 0 ],
+      [ "électrocuter", 1, 0 ],
+      [ "éliminer", 1, 0 ],
+      [ "éloigner", 1, 0 ],
+      [ "emballer", 1, 0 ],
+      [ "embarquer", 1, 0 ],
+      [ "embarrasser", 1, 0 ],
+      [ "embêter", 1, 0 ],
+      [ "embobiner", 1, 0 ],
+      [ "embraser", 1, 0 ],
+      [ "embrasser", 1, 0 ],
+      [ "embrouiller", 1, 0 ],
+      [ "embrumer", 1, 0 ],
+      [ "embusquer", 1, 0 ],
+      [ "emmener", 1, 0 ],
+      [ "emmêler", 1, 0 ],
+      [ "empiler", 1, 0 ],
+      [ "employer", 1, 0 ],
+      [ "empoisonner", 1, 0 ],
+      [ "emprisonner", 1, 0 ],
+      [ "encadrer", 1, 0 ],
+      [ "encercler", 1, 0 ],
+      [ "enchaîner", 1, 0 ],
+      [ "enchanter", 1, 0 ],
+      [ "enchevêtrer", 1, 0 ],
+      [ "encoder", 1, 0 ],
+      [ "encombrer", 1, 0 ],
+      [ "encourager", 1, 0 ],
+      [ "endiguer", 1, 0 ],
+      [ "énerver", 1, 0 ],
+      [ "enfermer", 1, 0 ],
+      [ "enflammer", 1, 0 ],
+      [ "enfoncer", 1, 0 ],
+      [ "enfumer", 1, 0 ],
+      [ "engraisser", 1, 0 ],
+      [ "engueuler", 1, 0 ],
+      [ "enguirlander", 1, 0 ],
+      [ "enivrer", 1, 0 ],
+      [ "enjamber", 1, 0 ],
+      [ "enjoliver", 1, 0 ],
+      [ "enlever", 1, 0 ],
+      [ "ennuyer", 1, 0 ],
+      [ "enraciner", 1, 0 ],
+      [ "enrouler", 1, 0 ],
+      [ "ensabler", 1, 0 ],
+      [ "ensorceler", 1, 0 ],
+      [ "entailler", 1, 0 ],
+      [ "entamer", 1, 0 ],
+      [ "enterrer", 1, 0 ],
+      [ "enthousiasmer", 1, 0 ],
+      [ "entourer", 1, 0 ],
+      [ "entraver", 1, 0 ],
+      [ "entrechoquer", 1, 0 ],
+      [ "entreposer", 1, 0 ],
+      [ "envier", 1, 0 ],
+      [ "envelopper", 1, 0 ],
+      [ "envenimer", 1, 0 ],
+      [ "envoûter", 1, 0 ],
+      [ "épier", 1, 0 ],
+      [ "épargner", 1, 0 ],
+      [ "éparpiller", 1, 0 ],
+      [ "épauler", 1, 0 ],
+      [ "épingler", 1, 0 ],
+      [ "éponger", 1, 0 ],
+      [ "épouvanter", 1, 0 ],
+      [ "épuiser", 1, 0 ],
+      [ "équilibrer", 1, 0 ],
+      [ "érafler", 1, 0 ],
+      [ "éreinter", 1, 0 ],
+      [ "escalader", 1, 0 ],
+      [ "espacer", 1, 0 ],
+      [ "espionner", 1, 0 ],
+      [ "esquiver", 1, 0 ],
+      [ "essayer", 1, 0 ],
+      [ "essoufler", 1, 0 ],
+      [ "essuyer", 1, 0 ],
+      [ "étaler", 1, 0 ],
+      [ "étalonner", 1, 0 ],
+      [ "étiqueter", 1, 0 ],
+      [ "étirer", 1, 0 ],
+      [ "étonner", 1, 0 ],
+      [ "étouffer", 1, 0 ],
+      [ "étrangler", 1, 0 ],
+      [ "étudier", 1, 0 ],
+      [ "évacuer", 1, 0 ],
+      [ "évaluer", 1, 0 ],
+      [ "éveiller", 1, 0 ],
+      [ "éviter", 1, 0 ],
+      [ "exécrer", 1, 0 ],
+      [ "examiner", 1, 0 ],
+      [ "excuser", 1, 0 ],
+      [ "exécuter", 1, 0 ],
+      [ "exorciser", 1, 0 ],
+      [ "expérimenter", 1, 0 ],
+      [ "exposer", 1, 0 ],
+      [ "expulser", 1, 0 ],
+      [ "exterminer", 1, 0 ],
+      [ "extirper", 1, 0 ],
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
@@ -2632,6 +2752,48 @@ const verbs = {
       [ "vouloir", 3, 0, "" ],
       // [ "faire", 3, 0, "" ],
       // [ "se faire", 3, 1, "" ]
+   ]
+ };
+
+const adverbTypes = ["manière","quantité"]
+const adverbs = {
+   "manière": [
+      "admirablement",
+      "ainsi",
+      "aussi",
+      "bien",
+      "doucement",
+      "également",
+      "exprès",
+      "gratuitement",
+      "incognito",
+      "lentement",
+      "mal",
+      "mieux",
+      "pire",
+      "vite"
+   ],
+   "quantité": [
+      "assez",
+      "autrement",
+      "approximativement",
+      "beaucoup",
+      "complètement",
+      "davantage",
+      "divinement",
+      "drôlement",
+      "encore",
+      "entièrement",
+      "insuffisamment",
+      "joliment",
+      "moins",
+      "passablement",
+      "rudement",
+      "suffisamment",
+      "tellement",
+      "tout à fait",
+      "trop",
+      "un peu"
    ]
  };
 
