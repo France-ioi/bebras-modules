@@ -21,9 +21,9 @@ function selectStructures() {
    html += "<option value=\"all\">Toutes</option>";
    for(var structureIndex in structures){
       var str = "";
-      for(var iBlock in structures[structureIndex]){
-         str += structures[structureIndex][iBlock]
-         if(iBlock != structures[structureIndex].length - 1){
+      for(var iBlock in structures[structureIndex][0]){
+         str += structures[structureIndex][0][iBlock]
+         if(iBlock != structures[structureIndex][0].length - 1){
             str += "+";
          }
       }
@@ -257,7 +257,7 @@ function generateSentence(n,struc){
    for(var iSentence = 0; iSentence < n; iSentence++){
       var sentence = "";
       // var structure = structures[Math.trunc(rng() * structures.length)];
-      var structure = (struc === "all") ? pickOne(structures,rng) : structures[struc];
+      var structure = (struc === "all") ? pickOne(structures,rng,false,true) : structures[struc][0];
       var person = 3;
       var plural = 0;
       var tense = tenses[Math.trunc(rng() * tenses.length)];
@@ -498,7 +498,18 @@ function cleanUpSpecialChars(str, withSpaces) {
     return str.toUpperCase();
 };
 
-function pickOne(arr,rng,length) {
+function pickOne(arr,rng,length,weighting) {
+   if(weighting){
+      var weightedArray = [];
+      for(var weightedElement of arr){
+         var element = weightedElement[0];
+         var weight = weightedElement[1];
+         for(var nTimes = 0; nTimes < weight; nTimes++){
+            weightedArray.push(element);
+         }
+      }
+      arr = weightedArray;
+   }
    if(length){
       var arrLength = length;
    }else{
@@ -532,23 +543,22 @@ const structureTypes = [
    "CO-M-P",
    "CO-F-P-noDet",
    "CO-F-P",
-   "CO",
    "adjBefore",
    "adjAfter"
 ];
-const structures = [
-   ["3P-S","VI"],
-   ["3P-P","VI"],
-   ["3P-S","VT","CO"],
-   ["3P-P","VT","CO"],
-   ["1P-S","VI"],
-   ["2P-S","VI"],
-   ["1P-P","VI"],
-   ["2P-P","VI"],
-   ["1P-S","VT","CO"],
-   ["2P-S","VT","CO"],
-   ["1P-P","VT","CO"],
-   ["2P-P","VT","CO"]
+const structures = [ // [structure,weight]
+   [["3P-S","VI"],4],
+   [["3P-P","VI"],4],
+   [["3P-S","VT","CO"],4],
+   [["3P-P","VT","CO"],4],
+   [["1P-S","VI"],1],
+   [["2P-S","VI"],1],
+   [["1P-P","VI"],1],
+   [["2P-P","VI"],1],
+   [["1P-S","VT","CO"],1],
+   [["2P-S","VT","CO"],1],
+   [["1P-P","VT","CO"],1],
+   [["2P-P","VT","CO"],1]
 ];
 
 
