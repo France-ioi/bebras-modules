@@ -121,6 +121,10 @@ function generateWordList(block) {
          text += makeAdjectiveAgree(adj,gender,plural);
          text += "</br>";
       }
+   }else if(blockLabel === "Adv"){
+      for(var adv of adverbs){
+         text += adv+"</br>";
+      }
    }else{
       var batch = batches[blockLabel];
       var plural = (blockLabel.includes("-P")) ? 1 : 0;
@@ -242,6 +246,9 @@ function getWord(block,person,plural,tense,rng) {
          }else{
             var word = verbConj;
          }
+         break;
+      case "Adv":
+         var word = pickOne(batch,rng);
          break;
    }
    return [word,person,plural];
@@ -544,7 +551,8 @@ const structureTypes = [
    "CO-F-P-noDet",
    "CO-F-P",
    "adjBefore",
-   "adjAfter"
+   "adjAfter",
+   "Adv"
 ];
 const structures = [ // [structure,weight]
    [["3P-S","VI"],4],
@@ -558,7 +566,19 @@ const structures = [ // [structure,weight]
    [["1P-S","VT","CO"],1],
    [["2P-S","VT","CO"],1],
    [["1P-P","VT","CO"],1],
-   [["2P-P","VT","CO"],1]
+   [["2P-P","VT","CO"],1],
+   [["3P-S","VI","Adv"],4],
+   [["3P-P","VI","Adv"],4],
+   [["3P-S","VT","Adv","CO"],4],
+   [["3P-P","VT","Adv","CO"],4],
+   [["1P-S","VI","Adv"],1],
+   [["2P-S","VI","Adv"],1],
+   [["1P-P","VI","Adv"],1],
+   [["2P-P","VI","Adv"],1],
+   [["1P-S","VT","Adv","CO"],1],
+   [["2P-S","VT","Adv","CO"],1],
+   [["1P-P","VT","Adv","CO"],1],
+   [["2P-P","VT","Adv","CO"],1]
 ];
 
 
@@ -2757,6 +2777,53 @@ const verbs = {
       [ "fumer", 1, 0 ],
       [ "fusiller", 1, 0 ],
       [ "fusionner", 1, 0 ],
+      [ "galvaniser", 1, 0 ],
+      [ "garder", 1, 0 ],
+      [ "gaspiller", 1, 0 ],
+      [ "geler", 1, 0 ],
+      [ "gêner", 1, 0 ],
+      [ "générer", 1, 0 ],
+      [ "gifler", 1, 0 ],
+      [ "givrer", 1, 0 ],
+      [ "glacer", 1, 0 ],
+      [ "glorifier", 1, 0 ],
+      [ "gommer", 1, 0 ],
+      [ "gonfler", 1, 0 ],
+      [ "goudronner", 1, 0 ],
+      [ "goûter", 1, 0 ],
+      [ "graduer", 1, 0 ],
+      [ "graisser", 1, 0 ],
+      [ "gratiner", 1, 0 ],
+      [ "gratter", 1, 0 ],
+      [ "griffer", 1, 0 ],
+      [ "grignoter", 1, 0 ],
+      [ "griller", 1, 0 ],
+      [ "grillager", 1, 0 ],
+      [ "grouper", 1, 0 ],
+      [ "guetter", 1, 0 ],
+      [ "guillotiner", 1, 0 ],
+      [ "hachurer", 1, 0 ],
+      [ "halluciner", 1, 0 ],
+      [ "handicaper", 1, 0 ],
+      [ "hanter", 1, 0 ],
+      [ "haranguer", 1, 0 ],
+      [ "harceler", 1, 0 ],
+      [ "harmoniser", 1, 0 ],
+      [ "harponner", 1, 0 ],
+      [ "héberger", 1, 0 ],
+      [ "heurter", 1, 0 ],
+      [ "hisser", 1, 0 ],
+      [ "homogénéiser", 1, 0 ],
+      [ "honorer", 1, 0 ],
+      [ "horrifier", 1, 0 ],
+      [ "horripiler", 1, 0 ],
+      [ "huer", 1, 0 ],
+      [ "huiler", 1, 0 ],
+      [ "humaniser", 1, 0 ],
+      [ "humidifier", 1, 0 ],
+      [ "humilier", 1, 0 ],
+      [ "hydrater", 1, 0 ],
+      [ "hypnotiser", 1, 0 ],
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
@@ -2776,47 +2843,49 @@ const verbs = {
    ]
  };
 
-const adverbTypes = ["manière","quantité"]
-const adverbs = {
-   "manière": [
-      "admirablement",
-      "ainsi",
-      "aussi",
-      "bien",
-      "doucement",
-      "également",
-      "exprès",
-      "gratuitement",
-      "incognito",
-      "lentement",
-      "mal",
-      "mieux",
-      "pire",
-      "vite"
-   ],
-   "quantité": [
-      "assez",
-      "autrement",
-      "approximativement",
-      "beaucoup",
-      "complètement",
-      "davantage",
-      "divinement",
-      "drôlement",
-      "encore",
-      "entièrement",
-      "insuffisamment",
-      "joliment",
-      "moins",
-      "passablement",
-      "rudement",
-      "suffisamment",
-      "tellement",
-      "tout à fait",
-      "trop",
-      "un peu"
-   ]
- };
+// const adverbTypes = ["manière","quantité"]
+const adverbs =  [
+   "abominablement",
+   "abruptement",
+   "abusivement",
+   "accidentellement",
+   "activement",
+   "actuellement",
+   "admirablement",
+   "ainsi",
+   "approximativement",
+   "assez",
+   "aussi",
+   "autrement",
+   "beaucoup",
+   "bien",
+   "complètement",
+   "d'abord",
+   "davantage",
+   "divinement",
+   "doucement",
+   "drôlement",
+   "également",
+   "encore",
+   "entièrement",
+   "exprès",
+   "gratuitement",
+   "incognito",
+   "insuffisamment",
+   "joliment",
+   "lentement",
+   "mal",
+   "mieux",
+   "moins",
+   "passablement",
+   "rudement",
+   "suffisamment",
+   "tellement",
+   "tout à fait",
+   "trop",
+   "un peu",
+   "vite"
+];
 
 const elisionWithH = [
    "historien",
@@ -2937,7 +3006,8 @@ const batches = {
    "CO-M-P": nmp,
    "CO-F-P": nfp,
    "CO-M-P-adj": nmp,
-   "CO-F-P-adj": nfp
+   "CO-F-P-adj": nfp,
+   "Adv": adverbs
 };
 
 const set = {
