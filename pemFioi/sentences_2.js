@@ -64,7 +64,7 @@ function selectBlock() {
 function selectSentenceNumber() {
    var html = "<label for=\"structures\">Nombre de phrases</label>";
    html += "<select id=\"nSentences\">";
-   for(var i = 1; i < 4; i++){
+   for(var i = 0; i < 4; i++){
       html += "<option value=\""+Math.pow(10,i)+"\">"+Math.pow(10,i)+"</option>";
    }
    html += "</select>";
@@ -237,7 +237,8 @@ function getWord(block,person,plural,tense,rng) {
          var negation = Math.trunc(rng() * 4);
          var verbConj = conjugate(verb,person,plural,tense);
          if(negation === 3){
-            var word = elide("ne " + verbConj + " pas");
+            var negationWord = pickOne(negationWords,rng);
+            var word = elide("ne " + verbConj + " " + negationWord);
          }else{
             var word = verbConj;
          }
@@ -394,42 +395,6 @@ function elide(str) {
    }
    return str;
 };
-
-// function addVerb(subj,rng) {
-//    var verbType = verbTypes[Math.trunc(rng() * verbTypes.length)];
-//    var verb = verbs[verbType][Math.trunc(rng() * verbs[verbType].length)];
-//    var transitive = (verbType === "transitive") ? 1 : 0;
-//    var complement = verb[3];
-//    if(subj[0].trim() === "personne" || subj[0].trim() === "rien"){
-//       var negation = 1;
-//       var negationWord = "";
-//    }else{
-//       var negation = Math.trunc(rng() * 1.5);
-//       if(negation){
-//          var negationWord = Math.trunc(rng() * 2) ? "pas" : "plus";
-//       }
-//    }
-//    var conjVerb = conjugate(verb,subj,rng);
-//    if(verbType === "modal"){
-//       var secVerbType = verbTypes[Math.trunc(rng() * (verbTypes.length-1))];
-//       var secVerb = verbs[secVerbType][Math.trunc(rng() * verbs[verbType].length)];
-//       var transitive = (secVerbType === "transitive") ? 1 : 0;
-//       var complement = secVerb[3];
-//       if(negation){
-//          var text = subj[0] + " ne " + conjVerb + " " + negationWord + " " + verb[3]+" "+secVerb[0];
-//       }else{
-//          var text = subj[0] + " " + conjVerb + " "+verb[3]+" "+secVerb[0];
-//       }
-//    }else{
-//       if(negation){
-//          var text = subj[0] + " ne " + conjVerb + " " + negationWord;
-//       }else{
-//          var text = subj[0] + " " + conjVerb;
-//       }
-//    }
-//    text = elide(text);
-//    return [ text, transitive, complement ];
-// };
 
 function conjugate(verb,person,plural,tense,rng) {
    var infinitive = verb[0].toLowerCase();
@@ -610,6 +575,8 @@ const allerConj = {
 const exceptions = [
    [ "acheter", "geler", "haleter", "déceler", "modeler", "ciseler", "congeler", "marteler", "crocheter" ]
 ];
+
+const negationWords = ["pas","plus","jamais","pas encore"];
 
 const determinerTypes = [
    "definite_article",
