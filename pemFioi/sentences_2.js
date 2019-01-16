@@ -106,7 +106,9 @@ function initHandlers() {
 function generateWordList(block) {
    var text = "";
    var blockLabel = structureTypes[block];
-   if(set.hasOwnProperty(blockLabel)){
+   if(!blockLabel){
+      return "";
+   }else if(set.hasOwnProperty(blockLabel)){
       for(var subset of set[blockLabel]){
          var subsetIndex = structureTypes.indexOf(subset);
          text += generateWordList(subsetIndex);
@@ -139,7 +141,6 @@ function generateWordList(block) {
          }
       }
    }
-
    return text;
 };
 
