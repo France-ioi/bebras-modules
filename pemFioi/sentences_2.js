@@ -134,7 +134,7 @@ function generateWordList(block) {
          }
       }else{
          for(var subset of batch){
-            for(var word of subset){
+            for(var word of subset[0]){
                text += (plural) ? pluralize(word[0],word[1]) : word[0];
                text += "</br>";
             }
@@ -165,7 +165,7 @@ function getWord(block,person,plural,tense,rng) {
       case "CO-F-S-noDet":
          person = 3;
          plural = 0;
-         var type = pickOne(batch,rng);
+         var type = pickOne(batch,rng,false,true);
          var word = pickOne(type,rng)[plural];
          break;
       case "N-M-P-noDet":
@@ -174,7 +174,7 @@ function getWord(block,person,plural,tense,rng) {
       case "CO-F-P-noDet":
          person = 3;
          plural = 1;
-         var type = pickOne(batch,rng);
+         var type = pickOne(batch,rng,false,true);
          var word = pickOne(type,rng)[plural];
          break;
       
@@ -189,10 +189,9 @@ function getWord(block,person,plural,tense,rng) {
          person = 3;
          plural = 0;
          gender = block.includes("-M-") ? "M" : "F";
-         var typeIndex = Math.trunc(rng() * batch.length);
-         var type = batch[typeIndex];
+         var type = pickOne(batch,rng,false,true);
          var noun = pickOne(type,rng)[0];
-         if(typeIndex === 3){    // if country
+         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre"){    // if country
             var det = getDeterminer(gender,0,"definite_article",rng);
          }else{
             var det = getDeterminer(gender,0,"",rng);
@@ -214,7 +213,7 @@ function getWord(block,person,plural,tense,rng) {
          person = 3;
          plural = 1;
          gender = block.includes("-M-") ? "M" : "F";
-         var type = pickOne(batch,rng);
+         var type = pickOne(batch,rng,false,true);
          var nounIndex = Math.trunc(rng() * type.length);
          var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
          var det = getDeterminer(gender,1,"",rng);
@@ -230,7 +229,7 @@ function getWord(block,person,plural,tense,rng) {
       case "2P-P":
          person = block.charAt(0);
          plural = block.endsWith("-S") ? 0 : 1;
-         var word = batch[0][0][plural];
+         var word = batch[0][0][0][plural];
          break;
       case "VI":
       case "VT":
@@ -1549,7 +1548,7 @@ const nouns = {
          [ "Luxembourg" ],
          [ "Portugal" ]
       ],
-      "F": [   // [name, gender]
+      "F": [   
          [ "Angleterre" ],
          [ "Autriche" ],
          [ "Belgique" ],
@@ -2714,6 +2713,50 @@ const verbs = {
       [ "expulser", 1, 0 ],
       [ "exterminer", 1, 0 ],
       [ "extirper", 1, 0 ],
+      [ "fabriquer", 1, 0 ],
+      [ "faciliter", 1, 0 ],
+      [ "façonner", 1, 0 ],
+      [ "falsifier", 1, 0 ],
+      [ "fasciner", 1, 0 ],
+      [ "fatiguer", 1, 0 ],
+      [ "favoriser", 1, 0 ],
+      [ "féliciter", 1, 0 ],
+      [ "fermer", 1, 0 ],
+      [ "fêter", 1, 0 ],
+      [ "feuilleter", 1, 0 ],
+      [ "figer", 1, 0 ],
+      [ "ficeler", 1, 0 ],
+      [ "filmer", 1, 0 ],
+      [ "finaliser", 1, 0 ],
+      [ "financer", 1, 0 ],
+      [ "fissurer", 1, 0 ],
+      [ "fixer", 1, 0 ],
+      [ "flatter", 1, 0 ],
+      [ "flinguer", 1, 0 ],
+      [ "fluidifier", 1, 0 ],
+      [ "forcer", 1, 0 ],
+      [ "forger", 1, 0 ],
+      [ "former", 1, 0 ],
+      [ "formater", 1, 0 ],
+      [ "fortifier", 1, 0 ],
+      [ "foudroyer", 1, 0 ],
+      [ "fouiller", 1, 0 ],
+      [ "fracasser", 1, 0 ],
+      [ "fracturer", 1, 0 ],
+      [ "fragiliser", 1, 0 ],
+      [ "fragmenter", 1, 0 ],
+      [ "frapper", 1, 0 ],
+      [ "freiner", 1, 0 ],
+      [ "fréquenter", 1, 0 ],
+      [ "frictionner", 1, 0 ],
+      [ "frigorifier", 1, 0 ],
+      [ "froisser", 1, 0 ],
+      [ "frôler", 1, 0 ],
+      [ "frotter", 1, 0 ],
+      [ "frustrer", 1, 0 ],
+      [ "fumer", 1, 0 ],
+      [ "fusiller", 1, 0 ],
+      [ "fusionner", 1, 0 ],
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
@@ -2790,89 +2833,79 @@ const elisionWithH = [
    "hortensia"
 ];
 
-const nmsNoDet = [
-   nouns["name"].M,
-   pronouns["demonstrative"].M,
-   pronouns["indefinite"].M.filter(word => word[0] != ""),
-   [["il"],["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]]
+const nmsNoDet = [   // [subset,weight]
+   [nouns["name"].M,1],
+   [pronouns["demonstrative"].M,1],
+   [pronouns["indefinite"].M.filter(word => word[0] != ""),1],
+   [[["il"]],1],
+   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
 ];
-const nfsNoDet = [
-   nouns["name"].F,
-   nouns["city"],
-   pronouns["demonstrative"].F,
-   pronouns["indefinite"].F.filter(word => word[0] != ""),
-   [["elle"],["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]]
+const nfsNoDet = [   // [subset,weight]
+   [nouns["name"].F,1],
+   [nouns["city"],1],
+   [pronouns["demonstrative"].F,1],
+   [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
+   [[["elle"]],1],
+   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
-const nmpNoDet = [
-   pronouns["demonstrative"].M.filter(word => word[1] != ""),
-   pronouns["indefinite"].M.filter(word => word[1] != ""),
-   [["","ils"],["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
+const nmpNoDet = [   // [subset,weight]
+   [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
+   [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
+   [[["","ils"]],1],
+   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
-const nfpNoDet = [
-   pronouns["demonstrative"].F,
-   pronouns["indefinite"].F.filter(word => word[1] != ""),
-   [["","elles"],["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
+const nfpNoDet = [   // [subset,weight]
+   [pronouns["demonstrative"].F,1],
+   [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
+   [[["","elles"]],1],
+   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
-const nms = [
-   nouns["job"].M,
-   nouns["animal"].M,
-   nouns["plant"].M,
-   nouns["country"].M
+const nms = [  // [subset,weight]
+   [nouns["job"].M,1],
+   [nouns["animal"].M,1],
+   [nouns["plant"].M,1],
+   [nouns["country"].M,1]
 ];
-const nfs = [
-   nouns["job"].F,
-   nouns["animal"].F,
-   nouns["plant"].F,
-   nouns["country"].F
+const nfs = [  // [subset,weight]
+   [nouns["job"].F,1],
+   [nouns["animal"].F,1],
+   [nouns["plant"].F,1],
+   [nouns["country"].F,1]
 ];
-const nmp = [
-   nouns["job"].M,
-   nouns["animal"].M,
-   nouns["plant"].M
+const nmp = [  // [subset,weight]
+   [nouns["job"].M,1],
+   [nouns["animal"].M,1],
+   [nouns["plant"].M,1]
 ];
-const nfp = [
-   nouns["job"].F,
-   nouns["animal"].F,
-   nouns["plant"].F
+const nfp = [  // [subset,weight]
+   [nouns["job"].F,1],
+   [nouns["animal"].F,1],
+   [nouns["plant"].F,1]
 ];
-const p1 = [[["je","nous"]]];
-const p2 = [[["tu","vous"]]];
+const p1 = [[[["je","nous"]]]];
+const p2 = [[[["tu","vous"]]]];
 
-const comsNoDet = [
-   nouns["name"].M,
-   pronouns["demonstrative"].M,
-   pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0] != "")),
-   [["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]]
+const comsNoDet = [  // [subset,weight]
+   [nouns["name"].M,1],
+   [pronouns["demonstrative"].M,1],
+   [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0] != "")),1],
+   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
 ];
-const cofsNoDet = [
-   nouns["name"].F,
-   nouns["city"],
-   pronouns["demonstrative"].F,
-   pronouns["indefinite"].F.filter(word => word[0] != ""),
-   [["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]]
+const cofsNoDet = [  // [subset,weight]
+   [nouns["name"].F,1],
+   [nouns["city"],1],
+   [pronouns["demonstrative"].F,1],
+   [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
+   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
-const compNoDet = [
-   pronouns["demonstrative"].M.filter(word => word[1] != ""),
-   // pronouns["indefinite"].M.filter(word => word[1] != ""),
-   [["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
+const compNoDet = [  // [subset,weight]
+   [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
+   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
-const cofpNoDet = [
-   pronouns["demonstrative"].F,
-   // pronouns["indefinite"].F.filter(word => word[1] != ""),
-   [["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]]
+const cofpNoDet = [  // [subset,weight]
+   [pronouns["demonstrative"].F,1],
+   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
-// const coms = [
-//    nouns["job"].M,
-//    nouns["animal"].M,
-//    nouns["plant"].M,
-//    nouns["country"].M
-// ];
-// const cofs = [
-//    nouns["job"].F,
-//    nouns["animal"].F,
-//    nouns["plant"].F,
-//    nouns["country"].F
-// ];
 
 const batches = {
    "N-M-S-noDet": nmsNoDet,
