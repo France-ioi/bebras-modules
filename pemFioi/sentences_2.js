@@ -121,8 +121,9 @@ function generateWordList(block) {
          text += makeAdjectiveAgree(adj,gender,plural);
          text += "</br>";
       }
-   }else if(blockLabel === "Adv"){
-      for(var adv of adverbs){
+   }else if(blockLabel.startsWith("adv-")){
+      var batch = batches[blockLabel];
+      for(var adv of batch){
          text += adv+"</br>";
       }
    }else{
@@ -237,19 +238,33 @@ function getWord(block,person,plural,tense,rng) {
          break;
       case "VI":
       case "VT":
+      case "VI-neg":
+      case "VT-neg":
+      case "VI-negWithAdv":
+      case "VT-negWithAdv":
          var verb = pickOne(batch,rng);
-         var negation = Math.trunc(rng() * 10);
+         var negation = block.includes("-neg") ? 1 : 0;
          var verbConj = conjugate(verb,person,plural,tense);
-         if(negation === 0){
-            var negationWord = pickOne(negationWords,rng);
+         if(negation){
+            var negationWord = block.endsWith("-negWithAdv") ? "pas" : pickOne(negationWords,rng);
             var word = elide("ne " + verbConj + " " + negationWord);
          }else{
             var word = verbConj;
          }
          break;
-      case "Adv":
+      case "adv-aftVerb":
+      case "adv-aftNegVerb":
+      case "adv-beforeAdj":
          var word = pickOne(batch,rng);
          break;
+      case "VI-str":
+      case "VT-str":
+         var verbStructure = pickOne(verbStructures[block],rng,false,true);
+         var verb = "";
+         for(var subBlock of verbStructure){
+            verb += getWord(subBlock,person,plural,tense,rng)[0]+" ";
+         }
+         var word = verb;
    }
    return [word,person,plural];
 }
@@ -552,34 +567,38 @@ const structureTypes = [
    "CO-F-P",
    "adjBefore",
    "adjAfter",
-   "Adv"
+   "adv-aftVerb",
+   "adv-aftNegVerb",
+   "adv-beforeAdj"
 ];
 const structures = [ // [structure,weight]
-   [["3P-S","VI"],4],
-   [["3P-P","VI"],4],
-   [["3P-S","VT","CO"],4],
-   [["3P-P","VT","CO"],4],
-   [["1P-S","VI"],1],
-   [["2P-S","VI"],1],
-   [["1P-P","VI"],1],
-   [["2P-P","VI"],1],
-   [["1P-S","VT","CO"],1],
-   [["2P-S","VT","CO"],1],
-   [["1P-P","VT","CO"],1],
-   [["2P-P","VT","CO"],1],
-   [["3P-S","VI","Adv"],4],
-   [["3P-P","VI","Adv"],4],
-   [["3P-S","VT","Adv","CO"],4],
-   [["3P-P","VT","Adv","CO"],4],
-   [["1P-S","VI","Adv"],1],
-   [["2P-S","VI","Adv"],1],
-   [["1P-P","VI","Adv"],1],
-   [["2P-P","VI","Adv"],1],
-   [["1P-S","VT","Adv","CO"],1],
-   [["2P-S","VT","Adv","CO"],1],
-   [["1P-P","VT","Adv","CO"],1],
-   [["2P-P","VT","Adv","CO"],1]
+   [["3P-S","VI-str"],4],
+   [["3P-P","VI-str"],4],
+   [["3P-S","VT-str","CO"],4],
+   [["3P-P","VT-str","CO"],4],
+   [["1P-S","VI-str"],1],
+   [["2P-S","VI-str"],1],
+   [["1P-P","VI-str"],1],
+   [["2P-P","VI-str"],1],
+   [["1P-S","VT-str","CO"],1],
+   [["2P-S","VT-str","CO"],1],
+   [["1P-P","VT-str","CO"],1],
+   [["2P-P","VT-str","CO"],1],
 ];
+const verbStructures = {
+   "VI-str": [   // [structure,weight]
+      [["VI"],10],
+      [["VI","adv-aftVerb"],10],
+      [["VI-neg"],1],
+      [["VI-negWithAdv","adv-aftNegVerb"],1]
+   ],
+   "VT-str": [   // [structure,weight]
+      [["VT"],10],
+      [["VT","adv-aftVerb"],10],
+      [["VT-neg"],1],
+      [["VT-negWithAdv","adv-aftNegVerb"],1]
+   ]
+};
 
 
 // const genders = [ "F", "M", "neutral", "undefined"];
@@ -606,7 +625,7 @@ const exceptions = [
    [ "acheter", "geler", "haleter", "déceler", "modeler", "ciseler", "congeler", "marteler", "crocheter" ]
 ];
 
-const negationWords = ["pas","plus","jamais","pas encore"];
+const negationWords = ["pas","plus","jamais"];
 
 const determinerTypes = [
    "definite_article",
@@ -2843,49 +2862,152 @@ const verbs = {
    ]
  };
 
-// const adverbTypes = ["manière","quantité"]
-const adverbs =  [
-   "abominablement",
-   "abruptement",
-   "abusivement",
-   "accidentellement",
-   "activement",
-   "actuellement",
-   "admirablement",
-   "ainsi",
-   "approximativement",
-   "assez",
-   "aussi",
-   "autrement",
-   "beaucoup",
-   "bien",
-   "complètement",
-   "d'abord",
-   "davantage",
-   "divinement",
-   "doucement",
-   "drôlement",
-   "également",
-   "encore",
-   "entièrement",
-   "exprès",
-   "gratuitement",
-   "incognito",
-   "insuffisamment",
-   "joliment",
-   "lentement",
-   "mal",
-   "mieux",
-   "moins",
-   "passablement",
-   "rudement",
-   "suffisamment",
-   "tellement",
-   "tout à fait",
-   "trop",
-   "un peu",
-   "vite"
-];
+const adverbTypes = ["aftVerb","aftNegVerb","beforeAdj"];
+const adverbs =  {
+   "aftVerb": [
+      "abominablement",
+      "abruptement",
+      "abusivement",
+      "accidentellement",
+      "activement",
+      "actuellement",
+      "admirablement",
+      "adroitement",
+      "affreusement",
+      "agréablement",
+      "ainsi",
+      "aléatoirement",
+      "allègrement",
+      "anormalement",
+      "approximativement",
+      "ardemment",
+      "assez",
+      "aussi",
+      "aussitôt",
+      "automatiquement",
+      "autrement",
+      "beaucoup",
+      "bêtement",
+      "bien",
+      "bravement",
+      "brutalement",
+      "bruyamment",
+      "calmement",
+      "certainement",
+      "complètement",
+      "consciemment",
+      "considérablement",
+      "constamment",
+      "continuellement",
+      "courageusement",
+      "curieusement",
+      "d'abord",
+      "dangereusement",
+      "davantage",
+      "délibérément",
+      "désagréablement",
+      "désespérément",
+      "diaboliquement",
+      "différemment",
+      "difficilement",
+      "discrètement",
+      "divinement",
+      "donc",
+      "doucement",
+      "drôlement",
+      "effroyablement",
+      "également",
+      "encore",
+      "enfin",
+      "énormément",
+      "entièrement",
+      "épouvantablement",
+      "équitablement",
+      "étonnament",
+      "étrangement",
+      "évidemment",
+      "exagérément",
+      "exceptionnellement",
+      "exprès",
+      "facilement",
+      "férocement",
+      "finalement",
+      "follement",
+      "fortement",
+      "franchement",
+      "frénétiquement",
+      "furieusement",
+      "gaiement",
+      "généralement",
+      "gentiment",
+      "grandement",
+      "gratuitement",
+      "grossièrement",
+      "habilement",
+      "hardiment",
+      "hargneusement",
+      "hâtivement",
+      "humblement",
+      "illégalement",
+      "immanquablement",
+      "immédiatement",
+      "impatiemment",
+      "impertubablement",
+      "impitoyablement",
+      "incognito",
+      "inconsciemment",
+      "incontestablement",
+      "incroyablement",
+      "indéniablement",
+      "indirectement",
+      "inéluctablement",
+      "inévitablement",
+      "ingénieusement",
+      "injustement",
+      "innocemment",
+      "inopinément",
+      "insidieusement",
+      "instantanément",
+      "instinctivement",
+      "insuffisamment",
+      "intensément",
+      "inutilement",
+      "involontairement",
+      "joliment",
+      "judicieusement",
+      "justement",
+      "laborieusement",
+      "lamentablement",
+      "largement",
+      "lentement",
+      "librement",
+      "littéralement",
+      "longuement",
+      "lourdement",
+      "mal",
+      "mieux",
+      "moins",
+      "passablement",
+      "rudement",
+      "suffisamment",
+      "tellement",
+      "tout à fait",
+      "trop",
+      "un peu",
+      "vite"
+   ],
+   "aftNegVerb": [
+      "assez",
+      "beaucoup",
+      "complètement",
+      "du tout",
+      "encore",
+      "suffisamment",
+      "tellement",
+      "tout à fait"
+   ],
+   "beforeAdj": []
+};
 
 const elisionWithH = [
    "historien",
@@ -2957,14 +3079,14 @@ const p2 = [[[["tu","vous"]]]];
 const comsNoDet = [  // [subset,weight]
    [nouns["name"].M,1],
    [pronouns["demonstrative"].M,1],
-   [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0] != "")),1],
+   [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0].toLowerCase() != "chacun" && word[0] != "")),1],
    [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
 ];
 const cofsNoDet = [  // [subset,weight]
    [nouns["name"].F,1],
    [nouns["city"],1],
    [pronouns["demonstrative"].F,1],
-   [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
+   // [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
    [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
 const compNoDet = [  // [subset,weight]
@@ -2995,6 +3117,10 @@ const batches = {
    "2P-P": p2,
    "VI": verbs["intransitive"],
    "VT": verbs["transitive"],
+   "VI-neg": verbs["intransitive"],
+   "VT-negWithAdv": verbs["transitive"],
+   "VI-negWithAdv": verbs["intransitive"],
+   "VT-neg": verbs["transitive"],
    "CO-M-S-noDet": comsNoDet,
    "CO-F-S-noDet": cofsNoDet,
    "CO-M-S": nms,
@@ -3007,12 +3133,51 @@ const batches = {
    "CO-F-P": nfp,
    "CO-M-P-adj": nmp,
    "CO-F-P-adj": nfp,
-   "Adv": adverbs
+   "adv-aftVerb": adverbs["aftVerb"],
+   "adv-aftNegVerb": adverbs["aftNegVerb"],
+   "adv-beforeAdj": adverbs["beforeAdj"]
 };
 
 const set = {
-   "3P-S": ["N-M-S-noDet","N-M-S","N-M-S-adj","N-F-S-noDet","N-F-S","N-F-S-adj"],
-   "3P-P": ["N-M-P-noDet","N-M-P","N-M-P-adj","N-F-P-noDet","N-F-P","N-F-P-adj","double-3P"],
-   "3P": ["CO-M-S-noDet","N-M-S","N-M-S-adj","CO-F-S-noDet","N-F-S","N-F-S-adj","CO-M-P-noDet","N-M-P","N-M-P-adj","CO-F-P-noDet","N-F-P","N-F-P-adj"],  // pour les groupes de 2 sujets
-   "CO": ["CO-M-S-noDet","CO-M-S","CO-M-S-adj","CO-F-S-noDet","CO-F-S","CO-F-S-adj","CO-M-P-noDet","CO-M-P","CO-M-P-adj","CO-F-P-noDet","CO-F-P","CO-F-P-adj"]
+   "3P-S": [
+      "N-M-S-noDet",
+      "N-M-S",
+      "N-M-S-adj",
+      "N-F-S-noDet",
+      "N-F-S",
+      "N-F-S-adj" ],
+   "3P-P": [
+      "N-M-P-noDet",
+      "N-M-P",
+      "N-M-P-adj",
+      "N-F-P-noDet",
+      "N-F-P",
+      "N-F-P-adj",
+      "double-3P" ],
+   "3P": [  // pour les groupes de 2 sujets
+      "CO-M-S-noDet",
+      "N-M-S",
+      "N-M-S-adj",
+      "CO-F-S-noDet",
+      "N-F-S",
+      "N-F-S-adj",
+      "CO-M-P-noDet",
+      "N-M-P",
+      "N-M-P-adj",
+      "CO-F-P-noDet",
+      "N-F-P",
+      "N-F-P-adj" ],  
+   "CO": [
+      "CO-M-S-noDet",
+      "CO-M-S",
+      "CO-M-S-adj",
+      "CO-F-S-noDet",
+      "CO-F-S",
+      "CO-F-S-adj",
+      "CO-M-P-noDet",
+      "CO-M-P",
+      "CO-M-P-adj",
+      "CO-F-P-noDet",
+      "CO-F-P",
+      "CO-F-P-adj" ]
 };
