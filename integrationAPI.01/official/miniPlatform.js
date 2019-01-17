@@ -132,35 +132,62 @@
 
 
 
-    if(typeof window.signJWT == 'undefined') {
-        window.signJWT = function(data, key) {
-            return null
-        }
+    if(typeof window.jwt == 'undefined') {
+        window.jwt = {
+            sign: function() { return null; },
+            decode: function(token) { return token; }
+            };
     }
 
     function TaskToken(data, key) {
 
         this.data = data
-        this.data.hints_requested = []
+        this.data.sHintsRequested = "[]";
         this.key = key
 
         this.addHintRequest = function(hint_params, callback) {
-            var jh = JSON.stringify(hint_params)
-            var exists = this.data.hints_requested.find(function(h) {
-                return JSON.stringify(h) === jh
-            })
+            try {
+                hint_params = jwt.decode(hint_params).askedHint;
+            } catch(e) {}
+            var hintsReq = JSON.parse(this.data.sHintsRequested);
+            var exists = hintsReq.find(function(h) {
+                return h == hint_params;
+            });
             if(!exists) {
-                this.data.hints_requested.push(hint_params)
+                hintsReq.push(hint_params);
+                this.data.sHintsRequested = JSON.stringify(hintsReq);
             }
-            this.get(callback)
-        },
+            return this.get(callback);
+        }
+
+        this.update = function(newData, callback) {
+            for(var key in newData) {
+                this.data[key] = newData[key];
+            }
+        }
+
+        this.getToken = function(data, callback) {
+            var res = jwt.sign(data, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0);
+            }
+            return res;
+        }
 
         this.get = function(callback) {
-            var res = signJWT(this.data, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            return this.getToken(this.data, callback);
+        }
+
+        this.getAnswerToken = function(answer, callback) {
+            var answerData = {};
+            for(var key in this.data) {
+                answerData[key] = this.data[key];
+            }
+            answerData.sAnswer = answer;
+            return this.getToken(answerData, callback);
         }
     }
 
@@ -168,11 +195,14 @@
     function AnswerToken(key) {
         this.key = key
         this.get = function(answer, callback) {
-            var res = signJWT(answer, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            var res = jwt.sign(answer, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0)
+            }
+            return res;
         }
     }
 
@@ -226,7 +256,7 @@ function miniPlatformPreviewGrade(answer) {
 
 var alreadyStayed = false;
 
-var miniPlatformValidate = function(mode, success, error) {
+var miniPlatformValidate = function(task) { return function(mode, success, error) {
    //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
    if (mode == 'nextImmediate' || mode == 'log') {
       return;
@@ -244,11 +274,20 @@ var miniPlatformValidate = function(mode, success, error) {
    if (mode == 'cancel') {
       alreadyStayed = false;
    }
-   platform.trigger('validate', [mode]);
+   if(platform.registered_objects && platform.registered_objects.length > 0) {
+       platform.trigger('validate', [mode]);
+   } else {
+        // Try to validate
+        task.getAnswer(function(answer) {
+            task.gradeAnswer(answer, task_token.getAnswerToken(answer), function(score, message) {
+                if(success) { success(); }
+                })
+            });
+   }
    if (success) {
       success();
    }
-};
+}};
 
 function getUrlParameter(sParam)
 {
@@ -367,7 +406,10 @@ var chooseView = (function () {
    };
 })();
 
-
+window.task_token = new TaskToken({
+   itemUrl: window.location.href,
+   randomSeed: Math.floor(Math.random() * 10)
+}, demo_key);
 
 
 
@@ -383,16 +425,12 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
-    $('head').append('<link rel="stylesheet"type="text/css" \
-    href="../../modules//integrationAPI.01/official/miniPlatform.css">');
+      $('head').append('<link rel="stylesheet"type="text/css" href="../../modules//integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
-         window.task_token = new TaskToken({
-            id: taskMetaData.id,
-            random_seed: Math.floor(Math.random() * 10)
-         }, demo_key)
+         window.task_token.update({id: taskMetaData.id});
          window.answer_token = new AnswerToken(demo_key)
 
-         platform.validate = miniPlatformValidate;
+         platform.validate = miniPlatformValidate(task);
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
             if(data.views) {
@@ -431,7 +469,6 @@ $(document).ready(function() {
             }
          };
          platform.askHint = function(hint_params, success, error) {
-            success()
              /*
             $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
                if (success) {success();}
@@ -439,6 +476,7 @@ $(document).ready(function() {
             */
             task_token.addHintRequest(hint_params, function(token) {
                 task.updateToken(token, function() {})
+                success(token)
             })
          };
 
