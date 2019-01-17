@@ -255,6 +255,7 @@ function getWord(block,person,plural,tense,rng) {
       case "adv-aftVerb":
       case "adv-aftNegVerb":
       case "adv-beforeAdj":
+      case "adv-locution":
          var word = pickOne(batch,rng);
          break;
       case "VI-str":
@@ -575,7 +576,8 @@ const structureTypes = [
    "adjAfter",
    "adv-aftVerb",
    "adv-aftNegVerb",
-   "adv-beforeAdj"
+   "adv-beforeAdj",
+   "adv-locution"
 ];
 const structures = [ // [structure,weight]
    [["3P-S","VI-str"],4],
@@ -590,6 +592,18 @@ const structures = [ // [structure,weight]
    [["2P-S","VT-str","CO"],1],
    [["1P-P","VT-str","CO"],1],
    [["2P-P","VT-str","CO"],1],
+   [["adv-locution","3P-S","VI-str"],4],
+   [["adv-locution","3P-P","VI-str"],4],
+   [["adv-locution","3P-S","VT-str","CO"],4],
+   [["adv-locution","3P-P","VT-str","CO"],4],
+   [["adv-locution","1P-S","VI-str"],1],
+   [["adv-locution","2P-S","VI-str"],1],
+   [["adv-locution","1P-P","VI-str"],1],
+   [["adv-locution","2P-P","VI-str"],1],
+   [["adv-locution","1P-S","VT-str","CO"],1],
+   [["adv-locution","2P-S","VT-str","CO"],1],
+   [["adv-locution","1P-P","VT-str","CO"],1],
+   [["adv-locution","2P-P","VT-str","CO"],1],
 ];
 const verbStructures = {
    "VI-str": [   // [structure,weight]
@@ -3180,6 +3194,65 @@ const adverbs =  {
       "visiblement",
       "vraiment",
       "vraisemblablement"
+   ],
+   "locution": [  // en début de phrase
+      "à part ça",
+      "à première vue",
+      "à présent",
+      "à priori",
+      "à titre exceptionnel",
+      "à tort ou à raison",
+      "à tous les coups",
+      "à tous moments",
+      "à tout hasard",
+      "à vrai dire",
+      "au contraire",
+      "au demeurant",
+      "au final",
+      "au fur et à mesure",
+      "au même instant",
+      "au préalable",
+      "autant que je sache",
+      "autrement dit",
+      "avant toutes choses",
+      "avec tout le respect que je vous dois",
+      "bien entendu",
+      "bien sûr",
+      "bref",
+      "ce faisant",
+      "ce qui fait que",
+      "ceci dit",
+      "cela dit",
+      "cela dit entre nous",
+      "chemin faisant",
+      "comme d'habitude",
+      "comme il se doit",
+      "comme par enchantement",
+      "contre toute attente",
+      "contre vents et marées",
+      "croyez-le ou non",
+      "d'ailleurs",
+      "dans l'absolu",
+      "dans le fond",
+      "dans l'ensemble",
+      "dans les faits",
+      "dans les grandes lignes",
+      "dans un deuxième temps",
+      "dans un sens",
+      "d'autant plus que",
+      "d'autre part",
+      "de ce fait",
+      "de fil en aiguille",
+      "de toute évidence",
+      "de toute manière",
+      "de toutes façons",
+      "du reste",
+      "en attendant",
+      "en clair",
+      "en d'autres termes",
+      "en définitive",
+      "en désespoir de cause",
+      "en fin de compte"
    ]
 };
 
@@ -3309,7 +3382,8 @@ const batches = {
    "CO-F-P-adj": nfp,
    "adv-aftVerb": adverbs["aftVerb"],
    "adv-aftNegVerb": adverbs["aftNegVerb"],
-   "adv-beforeAdj": adverbs["beforeAdj"]
+   "adv-beforeAdj": adverbs["beforeAdj"],
+   "adv-locution": adverbs["locution"]
 };
 
 const set = {
