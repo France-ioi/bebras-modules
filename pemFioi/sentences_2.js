@@ -41,11 +41,18 @@ function selectBlock() {
       html += "<option value=\""+blockIndex+"\">"+block+"</option>";
    }
    html += "</select>";
-   html += "<label for=\"person\" class=\"person\">Personne + nombre</label>";
-   html += "<select id=\"person\" class=\"person\">";
+   html += "<label for=\"person\" class=\"verb\">Personne + nombre</label>";
+   html += "<select id=\"person\" class=\"verb\">";
    for(var iPerson = 0; iPerson < 6; iPerson++){
       personText = (iPerson%3 + 1)+" "+((iPerson <=2) ? "S" : "P");
       html += "<option value=\""+iPerson+"\">"+personText+"</option>";
+   }
+   html += "</select>";
+   html += "<label for=\"tense\" class=\"verb\">Temps</label>";
+   html += "<select id=\"tense\" class=\"verb\">";
+   for(var iTense = 0; iTense < tenses.length; iTense++){
+      tenseText = tenses[iTense];
+      html += "<option value=\""+iTense+"\">"+tenseText+"</option>";
    }
    html += "</select>";
    html += "<label for=\"gender\" class=\"adj\">Genre</label>";
@@ -72,13 +79,13 @@ function selectSentenceNumber() {
 };
 
 function initHandlers() {
-   $(".person").hide();
+   $(".verb").hide();
    $(".adj").hide();
    $("#blocks").change(function(){
       if(structureTypes[$("#blocks").val()].startsWith("V")){
-         $(".person").show();
+         $(".verb").show();
       }else{
-         $(".person").hide();
+         $(".verb").hide();
       }
       if(structureTypes[$("#blocks").val()].startsWith("adj")){
          $(".adj").show();
@@ -129,12 +136,14 @@ function generateWordList(block) {
    }else{
       var batch = batches[blockLabel];
       var plural = (blockLabel.includes("-P")) ? 1 : 0;
-      var dataVerb = $("#person").val();
-      var person = dataVerb%3 + 1;
-      var pluralVerb = (dataVerb <= 2) ? 0 : 1;
+      var personIndex = $("#person").val();
+      var person = personIndex%3 + 1;
+      var pluralVerb = (personIndex <= 2) ? 0 : 1;
+      var tenseIndex = $("#tense").val();
+      var tense = tenses[tenseIndex];
       if(blockLabel === "VT" || blockLabel === "VI"){
          for(var word of batch){
-            text += conjugate(word,person,pluralVerb,"present",Math.random);
+            text += conjugate(word,person,pluralVerb,tense,Math.random);
             text += "</br>";
          }
       }else{
@@ -283,7 +292,7 @@ function generateSentence(n,struc){
       var structure = (struc === "all") ? pickOne(structures,rng,false,true) : structures[struc][0];
       var person = 3;
       var plural = 0;
-      var tense = tenses[Math.trunc(rng() * tenses.length)];
+      var tense = pickOne(tenses,rng);
       for(var block of structure){
          var word = getWord(block,person,plural,tense,rng);
          person = word[1];
@@ -439,22 +448,23 @@ function conjugate(verb,person,plural,tense,rng) {
       }
    }else if(group === 1){
       var ending = conjugations[group-1][tense][person - 1 + plural * 3];
-      if(infinitive.endsWith("ger") && person === 1 && plural === 1){   // exceptions orthographiques (sans tenir compte de l'accentuation)
+      if((infinitive.endsWith("ger") && tense === "present" && person === 1 && plural === 1) || 
+         (infinitive.endsWith("ger") && tense === "imparfait" && (plural === 0 || (plural === 1 && person === 3)))){   // exceptions orthographiques (sans tenir compte de l'accentuation)
          ending = "e"+ending;
          return infinitive.replace(/er$/,ending);
-      }else if(infinitive.endsWith("oyer") || infinitive.endsWith("uyer")){
+      }else if((infinitive.endsWith("oyer") || infinitive.endsWith("uyer")) && tense === "present"){
          if(plural && person == 1 || plural && person == 2){
             return infinitive.replace(/er$/,ending);
          }else{
             return infinitive.replace(/yer$/,"i"+ending); 
          }
-      }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive)){
+      }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive) && tense === "present"){
          if(plural && person == 1 || plural && person == 2){
             return infinitive.replace(/er$/,ending);
          }else{
             return infinitive.replace(/er$/,"l"+ending);
          }
-      }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive)){
+      }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive) && tense === "present"){
          if(plural && person == 1 || plural && person == 2){
             return infinitive.replace(/er$/,ending);
          }else{
@@ -580,18 +590,18 @@ const structureTypes = [
    "adv-locution"
 ];
 const structures = [ // [structure,weight]
-   [["3P-S","VI-str"],4],
-   [["3P-P","VI-str"],4],
-   [["3P-S","VT-str","CO"],4],
-   [["3P-P","VT-str","CO"],4],
-   [["1P-S","VI-str"],1],
-   [["2P-S","VI-str"],1],
-   [["1P-P","VI-str"],1],
-   [["2P-P","VI-str"],1],
-   [["1P-S","VT-str","CO"],1],
-   [["2P-S","VT-str","CO"],1],
-   [["1P-P","VT-str","CO"],1],
-   [["2P-P","VT-str","CO"],1],
+   [["3P-S","VI-str"],8],
+   [["3P-P","VI-str"],8],
+   [["3P-S","VT-str","CO"],8],
+   [["3P-P","VT-str","CO"],8],
+   [["1P-S","VI-str"],2],
+   [["2P-S","VI-str"],2],
+   [["1P-P","VI-str"],2],
+   [["2P-P","VI-str"],2],
+   [["1P-S","VT-str","CO"],2],
+   [["2P-S","VT-str","CO"],2],
+   [["1P-P","VT-str","CO"],2],
+   [["2P-P","VT-str","CO"],2],
    [["adv-locution","3P-S","VI-str"],4],
    [["adv-locution","3P-P","VI-str"],4],
    [["adv-locution","3P-S","VT-str","CO"],4],
@@ -623,10 +633,12 @@ const verbStructures = {
 
 // const genders = [ "F", "M", "neutral", "undefined"];
 
-const tenses = ["present"];
+const tenses = ["present","imparfait"];
 const conjugations = [
-   { "present": ["e","es","e","ons","ez","ent"] },
-   { "present": ["s","s","t","ssons","ssez","ssent"] }
+   { "present": ["e","es","e","ons","ez","ent"],
+   "imparfait": ["ais","ais","ait","ions","iez","aient"] },
+   { "present": ["s","s","t","ssons","ssez","ssent"],
+   "imparfait": ["ssais","ssais","ssait","ssions","ssiez","ssaient"] }
    ];
 const speConjugations = [
    { "present": ["iens","iens","ient","enons","enez","iennent"] },
@@ -635,8 +647,10 @@ const speConjugations = [
    { "present": ["ois","ois","oit","evons","evez","oivent"] }
 ];
 const auxConjugations = [
-   { "present": ["suis","es","est","sommes","êtes","sont"] },
-   { "present": ["ai","as","a","avons","avez","ont"] }
+   { "present": ["suis","es","est","sommes","êtes","sont"],
+   "imparfait": ["étais","étais","était","étions","étiez","étaient"] },
+   { "present": ["ai","as","a","avons","avez","ont"],
+   "imparfait": ["avais","avais","avait","avions","aviez","avaient"] }
 ];
 const allerConj = {
    "present": ["vais","vas","va","allons","allez","vont"]
@@ -2858,6 +2872,228 @@ const verbs = {
       [ "humilier", 1, 0 ],
       [ "hydrater", 1, 0 ],
       [ "hypnotiser", 1, 0 ],
+      [ "idéaliser", 1, 0 ],
+      [ "identifier", 1, 0 ],
+      [ "ignifuger", 1, 0 ],
+      [ "ignorer", 1, 0 ],
+      [ "imaginer", 1, 0 ],
+      [ "imiter", 1, 0 ],
+      [ "immortaliser", 1, 0 ],
+      [ "impatienter", 1, 0 ],
+      [ "implorer", 1, 0 ],
+      [ "importuner", 1, 0 ],
+      [ "impressionner", 1, 0 ],
+      [ "inactiver", 1, 0 ],
+      [ "incendier", 1, 0 ],
+      [ "incommoder", 1, 0 ],
+      [ "inculper", 1, 0 ],
+      [ "indemniser", 1, 0 ],
+      [ "indigner", 1, 0 ],
+      [ "indisposer", 1, 0 ],
+      [ "infecter", 1, 0 ],
+      [ "influencer", 1, 0 ],
+      [ "informer", 1, 0 ],
+      [ "ingérer", 1, 0 ],
+      [ "inhaler", 1, 0 ],
+      [ "injurier", 1, 0 ],
+      [ "innocenter", 1, 0 ],
+      [ "inquiéter", 1, 0 ],
+      [ "insonoriser", 1, 0 ],
+      [ "inspecter", 1, 0 ],
+      [ "installer", 1, 0 ],
+      [ "instrumentaliser", 1, 0 ],
+      [ "insulter", 1, 0 ],
+      [ "intercepter", 1, 0 ],
+      [ "intéresser", 1, 0 ],
+      [ "interner", 1, 0 ],
+      [ "interpeller", 1, 0 ],
+      [ "interroger", 1, 0 ],
+      [ "intimider", 1, 0 ],
+      [ "intoxiquer", 1, 0 ],
+      [ "intriguer", 1, 0 ],
+      [ "invectiver", 1, 0 ],
+      [ "inviter", 1, 0 ],
+      [ "invoquer", 1, 0 ],
+      [ "irradier", 1, 0 ],
+      [ "irriter", 1, 0 ],
+      [ "isoler", 1, 0 ],
+      [ "jeter", 1, 0 ],
+      [ "jalouser", 1, 0 ],
+      [ "jardiner", 1, 0 ],
+      [ "jauger", 1, 0 ],
+      [ "juger", 1, 0 ],
+      [ "justifier", 1, 0 ],
+      [ "kidnapper", 1, 0 ],
+      [ "lever", 1, 0 ],
+      [ "lier", 1, 0 ],
+      [ "labourer", 1, 0 ],
+      [ "lacérer", 1, 0 ],
+      [ "lâcher", 1, 0 ],
+      [ "laisser", 1, 0 ],
+      [ "laminer", 1, 0 ],
+      [ "lancer", 1, 0 ],
+      [ "lapider", 1, 0 ],
+      [ "laver", 1, 0 ],
+      [ "légaliser", 1, 0 ],
+      [ "légitimer", 1, 0 ],
+      [ "leurrer", 1, 0 ],
+      [ "libérer", 1, 0 ],
+      [ "licencier", 1, 0 ],
+      [ "ligoter", 1, 0 ],
+      [ "liquéfier", 1, 0 ],
+      [ "liquider", 1, 0 ],
+      [ "lisser", 1, 0 ],
+      [ "livrer", 1, 0 ],
+      [ "loger", 1, 0 ],
+      [ "lobotomiser", 1, 0 ],
+      [ "longer", 1, 0 ],
+      [ "lorgner", 1, 0 ],
+      [ "louer", 1, 0 ],
+      [ "lyncher", 1, 0 ],
+      [ "mâcher", 1, 0 ],
+      [ "mâchouiller", 1, 0 ],
+      [ "magnétiser", 1, 0 ],
+      [ "magnifier", 1, 0 ],
+      [ "maîtriser", 1, 0 ],
+      [ "malmener", 1, 0 ],
+      [ "maltraiter", 1, 0 ],
+      [ "manger", 1, 0 ],
+      [ "manipuler", 1, 0 ],
+      [ "manoeuvrer", 1, 0 ],
+      [ "manquer", 1, 0 ],
+      [ "maquiller", 1, 0 ],
+      [ "marier", 1, 0 ],
+      [ "marginaliser", 1, 0 ],
+      [ "martyriser", 1, 0 ],
+      [ "masquer", 1, 0 ],
+      [ "massacrer", 1, 0 ],
+      [ "mastiquer", 1, 0 ],
+      [ "matérialiser", 1, 0 ],
+      [ "matraquer", 1, 0 ],
+      [ "maximiser", 1, 0 ],
+      [ "mécaniser", 1, 0 ],
+      [ "mécontenter", 1, 0 ],
+      [ "médiatiser", 1, 0 ],
+      [ "méduser", 1, 0 ],
+      [ "mélanger", 1, 0 ],
+      [ "menacer", 1, 0 ],
+      [ "menotter", 1, 0 ],
+      [ "mépriser", 1, 0 ],
+      [ "mésestimer", 1, 0 ],
+      [ "mesurer", 1, 0 ],
+      [ "métamorphoser", 1, 0 ],
+      [ "meubler", 1, 0 ],
+      [ "militariser", 1, 0 ],
+      [ "mimer", 1, 0 ],
+      [ "miner", 1, 0 ],
+      [ "miniaturiser", 1, 0 ],
+      [ "minimiser", 1, 0 ],
+      [ "mitrailler", 1, 0 ],
+      [ "mixer", 1, 0 ],
+      [ "modeler", 1, 0 ],
+      [ "moderniser", 1, 0 ],
+      [ "modifier", 1, 0 ],
+      [ "molester", 1, 0 ],
+      [ "momifier", 1, 0 ],
+      [ "monopoliser", 1, 0 ],
+      [ "montrer", 1, 0 ],
+      [ "moquer", 1, 0 ],
+      [ "moraliser", 1, 0 ],
+      [ "motiver", 1, 0 ],
+      [ "mouiller", 1, 0 ],
+      [ "murer", 1, 0 ],
+      [ "museler", 1, 0 ],
+      [ "mutiler", 1, 0 ],
+      [ "mystifier", 1, 0 ],
+      [ "narguer", 1, 0 ],
+      [ "naturaliser", 1, 0 ],
+      [ "navrer", 1, 0 ],
+      [ "négliger", 1, 0 ],
+      [ "nettoyer", 1, 0 ],
+      [ "neutraliser", 1, 0 ],
+      [ "niveler", 1, 0 ],
+      [ "noyer", 1, 0 ],
+      [ "nommer", 1, 0 ],
+      [ "normaliser", 1, 0 ],
+      [ "notifier", 1, 0 ],
+      [ "nuancer", 1, 0 ],
+      [ "nucléariser", 1, 0 ],
+      [ "numériser", 1, 0 ],
+      [ "numéroter", 1, 0 ],
+      [ "obliger", 1, 0 ],
+      [ "obnubiler", 1, 0 ],
+      [ "obséder", 1, 0 ],
+      [ "observer", 1, 0 ],
+      [ "occuper", 1, 0 ],
+      [ "offenser", 1, 0 ],
+      [ "offusquer", 1, 0 ],
+      [ "opérer", 1, 0 ],
+      [ "opprimer", 1, 0 ],
+      [ "optimiser", 1, 0 ],
+      [ "ordonner", 1, 0 ],
+      [ "organiser", 1, 0 ],
+      [ "orienter", 1, 0 ],
+      [ "ornementer", 1, 0 ],
+      [ "ostraciser", 1, 0 ],
+      [ "oublier", 1, 0 ],
+      [ "outrager", 1, 0 ],
+      [ "ovationner", 1, 0 ],
+      [ "oxyder", 1, 0 ],
+      [ "payer", 1, 0 ],
+      [ "pacifier", 1, 0 ],
+      [ "palper", 1, 0 ],
+      [ "paniquer", 1, 0 ],
+      [ "parer", 1, 0 ],
+      [ "parachuter", 1, 0 ],
+      [ "paralléliser", 1, 0 ],
+      [ "paralyser", 1, 0 ],
+      [ "parasiter", 1, 0 ],
+      [ "parfumer", 1, 0 ],
+      [ "parodier", 1, 0 ],
+      [ "partager", 1, 0 ],
+      [ "passionner", 1, 0 ],
+      [ "pasteuriser", 1, 0 ],
+      [ "peigner", 1, 0 ],
+      [ "peiner", 1, 0 ],
+      [ "peinturlurer", 1, 0 ],
+      [ "pénaliser", 1, 0 ],
+      [ "percer", 1, 0 ],
+      [ "percuter", 1, 0 ],
+      [ "perfectionner", 1, 0 ],
+      [ "perforer", 1, 0 ],
+      [ "perfuser", 1, 0 ],
+      [ "permuter", 1, 0 ],
+      [ "persécuter", 1, 0 ],
+      [ "personnaliser", 1, 0 ],
+      [ "persuader", 1, 0 ],
+      [ "perturber", 1, 0 ],
+      [ "peser", 1, 0 ],
+      [ "pétrifier", 1, 0 ],
+      [ "phagocyter", 1, 0 ],
+      [ "photographier", 1, 0 ],
+      [ "piéger", 1, 0 ],
+      [ "piétiner", 1, 0 ],
+      [ "pigmenter", 1, 0 ],
+      [ "piller", 1, 0 ],
+      [ "pilonner", 1, 0 ],
+      [ "piloter", 1, 0 ],
+      [ "piquer", 1, 0 ],
+      [ "pirater", 1, 0 ],
+      [ "pister", 1, 0 ],
+      [ "plier", 1, 0 ],
+      [ "placer", 1, 0 ],
+      [ "plagier", 1, 0 ],
+      [ "planquer", 1, 0 ],
+      [ "plastifier", 1, 0 ],
+      [ "pleurer", 1, 0 ],
+      [ "plomber", 1, 0 ],
+      [ "plumer", 1, 0 ],
+      [ "poignarder", 1, 0 ],
+      [ "poivrer", 1, 0 ],
+      [ "polariser", 1, 0 ],
+      [ "polluer", 1, 0 ],
+      [ "polymériser", 1, 0 ],
+
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
       [ "être", 0, 0, "sur le point de" ],
@@ -3230,7 +3466,7 @@ const adverbs =  {
       "comme par enchantement",
       "contre toute attente",
       "contre vents et marées",
-      "croyez-le ou non",
+      "croyez-le ou non mais",
       "d'ailleurs",
       "dans l'absolu",
       "dans le fond",
@@ -3252,7 +3488,53 @@ const adverbs =  {
       "en d'autres termes",
       "en définitive",
       "en désespoir de cause",
-      "en fin de compte"
+      "en effet",
+      "en fin de compte",
+      "en général",
+      "en l'occurence",
+      "en même temps",
+      "en moyenne",
+      "en outre",
+      "en parallèle",
+      "en particulier",
+      "en plus",
+      "en premier lieu",
+      "en principe",
+      "en réalité",
+      "en résumé",
+      "en somme",
+      "en tout cas",
+      "généralement",
+      "grosso modo",
+      "jour après jour",
+      "jusqu'à lors",
+      "la mort dans l'âme",
+      "la plupart du temps",
+      "l'un dans l'autre",
+      "mais",
+      "malgré tout",
+      "mine de rien",
+      "moyennant quoi",
+      "n'empêche que",
+      "ni vu ni connu",
+      "par ailleurs",
+      "par chance",
+      "par contre",
+      "par exemple",
+      "par la force des choses",
+      "par malheur",
+      "peu à peu",
+      "pour commencer",
+      "pour l'heure",
+      "pour mémoire",
+      "qui plus est",
+      "sans ambages",
+      "sans compter que",
+      "si ça se trouve",
+      "soudain",
+      "tant bien que mal",
+      "toujours est-il que",
+      "une chance que"
    ]
 };
 
