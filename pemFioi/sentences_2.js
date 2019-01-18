@@ -452,20 +452,20 @@ function conjugate(verb,person,plural,tense,rng) {
          (infinitive.endsWith("ger") && tense === "imparfait" && (plural === 0 || (plural === 1 && person === 3)))){   // exceptions orthographiques (sans tenir compte de l'accentuation)
          ending = "e"+ending;
          return infinitive.replace(/er$/,ending);
-      }else if((infinitive.endsWith("oyer") || infinitive.endsWith("uyer")) && tense === "present"){
-         if(plural && person == 1 || plural && person == 2){
+      }else if((infinitive.endsWith("oyer") || infinitive.endsWith("uyer")) && tense !== "imparfait"){
+         if(tense === "present" && plural && (person == 1 || person == 2)){
             return infinitive.replace(/er$/,ending);
          }else{
             return infinitive.replace(/yer$/,"i"+ending); 
          }
-      }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive) && tense === "present"){
-         if(plural && person == 1 || plural && person == 2){
+      }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive) && tense !== "imparfait"){
+         if(tense === "present" && plural && (person == 1 || person == 2)){
             return infinitive.replace(/er$/,ending);
          }else{
             return infinitive.replace(/er$/,"l"+ending);
          }
-      }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive) && tense === "present"){
-         if(plural && person == 1 || plural && person == 2){
+      }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive) && tense !== "imparfait"){
+         if(tense === "present" && plural && (person == 1 || person == 2)){
             return infinitive.replace(/er$/,ending);
          }else{
             return infinitive.replace(/er$/,"t"+ending);
@@ -630,27 +630,36 @@ const verbStructures = {
    ]
 };
 
-
-// const genders = [ "F", "M", "neutral", "undefined"];
-
-const tenses = ["present","imparfait"];
-const conjugations = [
-   { "present": ["e","es","e","ons","ez","ent"],
-   "imparfait": ["ais","ais","ait","ions","iez","aient"] },
-   { "present": ["s","s","t","ssons","ssez","ssent"],
-   "imparfait": ["ssais","ssais","ssait","ssions","ssiez","ssaient"] }
-   ];
-const speConjugations = [
+const tenses = ["present","imparfait","futur"];
+const conjugations = [  // 1er et 2ème groupes
+   { 
+      "present": ["e","es","e","ons","ez","ent"],
+      "imparfait": ["ais","ais","ait","ions","iez","aient"],
+      "futur": ["erai","eras","era","erons","erez","eront"] 
+   },
+   { 
+      "present": ["s","s","t","ssons","ssez","ssent"],
+      "imparfait": ["ssais","ssais","ssait","ssions","ssiez","ssaient"],
+      "futur": ["rai","ras","ra","rons","rez","ront"]   
+   }
+];
+const speConjugations = [  // 3ème groupe
    { "present": ["iens","iens","ient","enons","enez","iennent"] },
    { "present": ["eux","eux","eut","oulons","oulez","eulent"] },
    { "present": ["eux","eux","eut","ouvons","ouvez","euvent"] },
    { "present": ["ois","ois","oit","evons","evez","oivent"] }
 ];
 const auxConjugations = [
-   { "present": ["suis","es","est","sommes","êtes","sont"],
-   "imparfait": ["étais","étais","était","étions","étiez","étaient"] },
-   { "present": ["ai","as","a","avons","avez","ont"],
-   "imparfait": ["avais","avais","avait","avions","aviez","avaient"] }
+   { 
+      "present": ["suis","es","est","sommes","êtes","sont"],
+      "imparfait": ["étais","étais","était","étions","étiez","étaient"],
+      "futur": ["serai","seras","sera","serons","serez","seront"] 
+   },
+   { 
+      "present": ["ai","as","a","avons","avez","ont"],
+      "imparfait": ["avais","avais","avait","avions","aviez","avaient"],
+      "futur": ["aurai","auras","aura","aurons","aurez","auront"] 
+   }
 ];
 const allerConj = {
    "present": ["vais","vas","va","allons","allez","vont"]
@@ -3093,6 +3102,174 @@ const verbs = {
       [ "polariser", 1, 0 ],
       [ "polluer", 1, 0 ],
       [ "polymériser", 1, 0 ],
+      [ "pondérer", 1, 0 ],
+      [ "populariser", 1, 0 ],
+      [ "porter", 1, 0 ],
+      [ "poser", 1, 0 ],
+      [ "posséder", 1, 0 ],
+      [ "pourchasser", 1, 0 ],
+      [ "pousser", 1, 0 ],
+      [ "précéder", 1, 0 ],
+      [ "prédestiner", 1, 0 ],
+      [ "prédeterminer", 1, 0 ],
+      [ "préférer", 1, 0 ],
+      [ "prélever", 1, 0 ],
+      [ "préoccuper", 1, 0 ],
+      [ "préparer", 1, 0 ],
+      [ "présélectionner", 1, 0 ],
+      [ "présenter", 1, 0 ],
+      [ "préserver", 1, 0 ],
+      [ "presser", 1, 0 ],
+      [ "pressuriser", 1, 0 ],
+      [ "priver", 1, 0 ],
+      [ "privilégier", 1, 0 ],
+      [ "professionnaliser", 1, 0 ],
+      [ "programmer", 1, 0 ],
+      [ "prolonger", 1, 0 ],
+      [ "promener", 1, 0 ],
+      [ "propager", 1, 0 ],
+      [ "propulser", 1, 0 ],
+      [ "prospecter", 1, 0 ],
+      [ "protéger", 1, 0 ],
+      [ "provoquer", 1, 0 ],
+      [ "psychanalyser", 1, 0 ],
+      [ "pulvériser", 1, 0 ],
+      [ "purifier", 1, 0 ],
+      [ "questionner", 1, 0 ],
+      [ "quitter", 1, 0 ],
+      [ "rayer", 1, 0 ],
+      [ "rabaisser", 1, 0 ],
+      [ "raboter", 1, 0 ],
+      [ "raccompagner", 1, 0 ],
+      [ "raccorder", 1, 0 ],
+      [ "racheter", 1, 0 ],
+      [ "racketter", 1, 0 ],
+      [ "radiographier", 1, 0 ],
+      [ "raffiner", 1, 0 ],
+      [ "rafistoler", 1, 0 ],
+      [ "raisonner", 1, 0 ],
+      [ "rajouter", 1, 0 ],
+      [ "rallier", 1, 0 ],
+      [ "ramener", 1, 0 ],
+      [ "ramasser", 1, 0 ],
+      [ "ranger", 1, 0 ],
+      [ "rançonner", 1, 0 ],
+      [ "ranimer", 1, 0 ],
+      [ "rappeler", 1, 0 ],
+      [ "rapporter", 1, 0 ],
+      [ "rapprocher", 1, 0 ],
+      [ "raser", 1, 0 ],
+      [ "rassembler", 1, 0 ],
+      [ "rassurer", 1, 0 ],
+      [ "ratisser", 1, 0 ],
+      [ "rattraper", 1, 0 ],
+      [ "ravager", 1, 0 ],
+      [ "ravitailler", 1, 0 ],
+      [ "réactiver", 1, 0 ],
+      [ "réactualiser", 1, 0 ],
+      [ "réadapter", 1, 0 ],
+      [ "réajuster", 1, 0 ],
+      [ "réanimer", 1, 0 ],
+      [ "réarranger", 1, 0 ],
+      [ "rebaptiser", 1, 0 ],
+      [ "rebuter", 1, 0 ],
+      [ "receler", 1, 0 ],
+      [ "recaler", 1, 0 ],
+      [ "réceptionner", 1, 0 ],
+      [ "recharger", 1, 0 ],
+      [ "rechercher", 1, 0 ],
+      [ "réclamer", 1, 0 ],
+      [ "recoller", 1, 0 ],
+      [ "recommander", 1, 0 ],
+      [ "réconcilier", 1, 0 ],
+      [ "réconforter", 1, 0 ],
+      [ "reconnecter", 1, 0 ],
+      [ "recourber", 1, 0 ],
+      [ "recréer", 1, 0 ],
+      [ "recruter", 1, 0 ],
+      [ "reculer", 1, 0 ],
+      [ "récupérer", 1, 0 ],
+      [ "recycler", 1, 0 ],
+      [ "rediffuser", 1, 0 ],
+      [ "redouter", 1, 0 ],
+      [ "redresser", 1, 0 ],
+      [ "rééduquer", 1, 0 ],
+      [ "rééquilibrer", 1, 0 ],
+      [ "réexaminer", 1, 0 ],
+      [ "refléter", 1, 0 ],
+      [ "refouler", 1, 0 ],
+      [ "réfrigérer", 1, 0 ],
+      [ "refouler", 1, 0 ],
+      [ "regarder", 1, 0 ],
+      [ "régénérer", 1, 0 ],
+      [ "regonfler", 1, 0 ],
+      [ "regretter", 1, 0 ],
+      [ "regrouper", 1, 0 ],
+      [ "réhydrater", 1, 0 ],
+      [ "réincarcérer", 1, 0 ],
+      [ "réincorporer", 1, 0 ],
+      [ "réinsérer", 1, 0 ],
+      [ "réinviter", 1, 0 ],
+      [ "rejeter", 1, 0 ],
+      [ "relever", 1, 0 ],
+      [ "relâcher", 1, 0 ],
+      [ "relaxer", 1, 0 ],
+      [ "remanier", 1, 0 ],
+      [ "remarquer", 1, 0 ],
+      [ "remballer", 1, 0 ],
+      [ "rembobiner", 1, 0 ],
+      [ "rembourser", 1, 0 ],
+      [ "remercier", 1, 0 ],
+      [ "remmener", 1, 0 ],
+      [ "remodeler", 1, 0 ],
+      [ "remorquer", 1, 0 ],
+      [ "remplacer", 1, 0 ],
+      [ "remporter", 1, 0 ],
+      [ "remuer", 1, 0 ],
+      [ "rencontrer", 1, 0 ],
+      [ "renfermer", 1, 0 ],
+      [ "renforcer", 1, 0 ],
+      [ "renifler", 1, 0 ],
+      [ "renouveler", 1, 0 ],
+      [ "renseigner", 1, 0 ],
+      [ "rentrer", 1, 0 ],
+      [ "renvoyer", 1, 0 ],
+      [ "renverser", 1, 0 ],
+      [ "réorienter", 1, 0 ],
+      [ "repérer", 1, 0 ],
+      [ "réparer", 1, 0 ],
+      [ "répertorier", 1, 0 ],
+      [ "replier", 1, 0 ],
+      [ "reposer", 1, 0 ],
+      [ "repositionner", 1, 0 ],
+      [ "repousser", 1, 0 ],
+      [ "réprimander", 1, 0 ],
+      [ "reprogrammer", 1, 0 ],
+      [ "répugner", 1, 0 ],
+      [ "réquisitionner", 1, 0 ],
+      [ "respecter", 1, 0 ],
+      [ "responsabiliser", 1, 0 ],
+      [ "ressusciter", 1, 0 ],
+      [ "restaurer", 1, 0 ],
+      [ "retarder", 1, 0 ],
+      [ "retirer", 1, 0 ],
+      [ "retourner", 1, 0 ],
+      [ "rétribuer", 1, 0 ],
+      [ "retrouver", 1, 0 ],
+      [ "révérer", 1, 0 ],
+      [ "revaloriser", 1, 0 ],
+      [ "réveiller", 1, 0 ],
+      [ "réverbérer", 1, 0 ],
+      [ "révolter", 1, 0 ],
+      [ "révulser", 1, 0 ],
+      [ "ridiculiser", 1, 0 ],
+      [ "rigidifier", 1, 0 ],
+      [ "rincer", 1, 0 ],
+      [ "robotiser", 1, 0 ],
+      [ "ronger", 1, 0 ],
+      [ "rudoyer", 1, 0 ],
+      [ "ruiner", 1, 0 ],
+      [ "rythmer", 1, 0 ],
 
    ],
    "modal": [  // [verb,group,aux,complement,(radical)]
