@@ -667,6 +667,7 @@ p {
         justify-content: space-between;
   width: 100%;
   align-items: center;
+  margin-right: 20px;
 }
 .speedControls {
   position: relative;
@@ -677,7 +678,7 @@ p {
   padding: 5px 10px;
 }
 #taskToolbar .speedControls .icon span {
-  padding: 0 10px;
+  padding: 0 12px;
 }
 /* toggle player controls and speed slider visibility */
 @media screen and (max-width: 480.9px) { /* Portrait mobiles and low res display */
@@ -743,9 +744,17 @@ p {
   -webkit-appearance: none;
   appearance: none;
   background-color: transparent;
-  width: 100%;
   margin-top: 6px;
 }
+@media /* Tablets and desktop */
+  screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
+  screen and (min-width: 855px) and (orientation: landscape),
+  screen and (min-width: 1025px) {
+  .speedCursor {
+    width: 100%;
+  }
+}
+
 /* Chrome */
 .speedCursor::-webkit-slider-runnable-track {
   background-color: rgba(0,0,0,0.3);
@@ -836,7 +845,6 @@ p {
   border-radius: 0;
   box-shadow: none;
   width: 100%;
-  margin: 0;
 }
 #introGrid .playerControls .icon {
   margin-right: 15px;
@@ -883,7 +891,7 @@ p {
   #introGrid .playerControls {
     -webkit-box-pack: center;
       -ms-flex-pack: center;
-    justify-content: center;
+    justify-content: space-evenly;
   }
 }
 @media /* Tablets portrait */
