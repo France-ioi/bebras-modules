@@ -82,20 +82,20 @@ function selectSentenceNumber() {
 };
 
 function selectTextLength() {
-   var html = "<label for=\"minLength\">Longueur minimale</label>";
+   var html = "<label for=\"minLength\">Longueur</label>";
    html += "<select id=\"minLength\">";
-   for(var i = 1; i < 10; i++){
-      var min = i * 500;
+   for(var i = 1; i < 5; i++){
+      var min = Math.pow(10,i)*5;
       html += "<option value=\""+min+"\">"+min+"</option>";
    }
    html += "</select>";
-   html += "<label for=\"maxLength\">Longueur maximale</label>";
-   html += "<select id=\"maxLength\">";
-   for(var i = 1; i < 11; i++){
-      var max = i * 500;
-      html += "<option value=\""+max+"\">"+max+"</option>";
-   }
-   html += "</select>";
+   // html += "<label for=\"maxLength\">Longueur maximale</label>";
+   // html += "<select id=\"maxLength\">";
+   // for(var i = 1; i < 5; i++){
+   //    var max = Math.pow(10,i)*5 + 50;
+   //    html += "<option value=\""+max+"\">"+max+"</option>";
+   // }
+   // html += "</select>";
    return html;
 };
 
@@ -120,21 +120,21 @@ function initHandlers() {
       var n = $("#nSentences").val();
       var rng = Math.random;
       var text = generateSentence(rng,n,struct,true);
-      $("#text").empty();
+      $("#text,#freq").empty();
       $("#text").append(text);
    });
    $("#wordList").off("click");
    $("#wordList").click(function(){
       var block = $("#blocks").val();
       var text = generateWordList(block);
-      $("#text").empty();
+      $("#text,#freq").empty();
       $("#text").append(text);
    });
    $("#createText").off("click");
    $("#createText").click(function(){
       var rng = Math.random;
       var min = parseInt($("#minLength").val());
-      var max = parseInt($("#maxLength").val());
+      var max = min + 50;
       if(min > max){
          var newMin = max;
          max = min;
@@ -153,47 +153,77 @@ function getFrequencies(text) {
    var digraphFreq = {};
    text = cleanUpSpecialChars(text,false);
    var nLetters = text.length;
-   for(var letter of text){
-      if(letterFreq[letter]){
-         letterFreq[letter]++;
+   for(var letterIndex in text){
+      if(letterFreq[text.charAt(letterIndex)]){
+         letterFreq[text.charAt(letterIndex)]++;
       }else{
-         letterFreq[letter] = 1;
+         letterFreq[text.charAt(letterIndex)] = 1;
+      }
+      if(letterIndex < nLetters - 1){
+         var digraph = text.charAt(letterIndex)+text.charAt(parseInt(letterIndex) + 1);
+         if(digraphFreq[digraph]){
+            digraphFreq[digraph]++;
+         }else{
+            digraphFreq[digraph] = 1;
+         }
       }
    }
    for(var letter in letterFreq){
       letterFreq[letter] = Math.trunc((letterFreq[letter]*100/nLetters)*100)/100;
    }
-   displayFreq(letterFreq);
+   for(var digraph in digraphFreq){
+      digraphFreq[digraph] = Math.trunc((digraphFreq[digraph]*100/(nLetters - 1))*100)/100;
+   }
+   displayFreq(letterFreq,digraphFreq);
 };
 
-function displayFreq(letterFreq) {
+function displayFreq(letterFreq,digraphFreq) {
    var referenceLetters = {
-      "E": 17.35,
-      "A": 8.2,
-      "S": 7.93,
-      "I": 7.53,
-      "N": 7.17,
-      "T": 6.99,
-      "R": 6.65,
-      "L": 5.92,
-      "U": 5.73,
-      "O": 5.53,
-      "D": 4.01,
-      "C": 3.33,
-      "M": 2.97,
-      "P": 2.92,
-      "V": 1.39,
-      "G": 1.09,
-      "F": 1.08,
-      "Q": 1.04,
-      "H": 0.93,
-      "B": 0.92,
-      "X": 0.47,
-      "J": 0.34,
-      "Y": 0.31,
-      "Z": 0.1,
-      "K": 0.06,
-      "W": 0.03
+      "E": 17.35, "A": 8.2, "S": 7.93, "I": 7.53, "N": 7.17, "T": 6.99, "R": 6.65, "L": 5.92, "U": 5.73, "O": 5.53,
+      "D": 4.01, "C": 3.33, "M": 2.97, "P": 2.92, "V": 1.39, "G": 1.09, "F": 1.08, "Q": 1.04, "H": 0.93, "B": 0.92,
+      "X": 0.47, "J": 0.34, "Y": 0.31, "Z": 0.1, "K": 0.06, "W": 0.03
+   };
+   var referenceDigraphs = {
+      "ES": 3.05, "LE": 2.22, "DE": 2.17, "RE": 2.1, "EN": 2.08, "ON": 1.64, "NT": 1.62, "ER": 1.53, "TE": 1.52, "ET": 1.43,
+      "EL": 1.42, "AN": 1.37, "SE": 1.32, "LA": 1.29, "AI": 1.24, "NE": 1.14, "OU": 1.12, "QU": 1.11, "ME": 1.08, "IT": 1.06,
+      "IE": 1.05, "EM": 1.01, "ED": 1.01, "UR": 1.01, "IS": 0.99, "EC": 0.95, "UE": 0.92, "TI": 0.9, "RA": 0.86, "NS": 0.84,
+      "IN": 0.84, "TA": 0.82, "CE": 0.81, "AR": 0.8, "EE": 0.79, "EU": 0.78, "SA": 0.76, "CO": 0.74, "EP": 0.71, "ND": 0.7,
+      "IL": 0.7, "SS": 0.68, "ST": 0.66, "SI": 0.65, "TR": 0.64, "AL": 0.64, "UN": 0.63, "PA": 0.62, "AU": 0.61, "EA": 0.6,
+      "AT": 0.58, "MA": 0.58, "RI": 0.58, "SD": 0.57, "SO": 0.57, "US": 0.57, "UI": 0.56, "LL": 0.53, "NC": 0.53, "VE": 0.53, 
+      "LI": 0.52, "RO": 0.51, "IO": 0.51, "OR": 0.5, "PE": 0.48, "OI": 0.48, "PR": 0.47, "PO": 0.46, "IR": 0.46, "NA": 0.45, 
+      "UT": 0.44, "TD": 0.44, "CH": 0.44, "OM": 0.43, "SP": 0.43, "SL": 0.42, "DA": 0.42, "AS": 0.42, "MO": 0.41, "AC": 0.4,  
+      "DI": 0.4, "RS": 0.39, "DU": 0.39, "TL": 0.38, "TO": 0.38, "TS": 0.38, "RT": 0.37, "AM": 0.37, "AP": 0.37, "SC": 0.36, 
+      "LO": 0.36, "AV": 0.35, "SU": 0.35, "EV": 0.34, "NO": 0.33, "RL": 0.33, "NI": 0.32, "GE": 0.31, "RD": 0.31, "LU": 0.31,   
+      "NN": 0.3, "HE": 0.29, "PL": 0.28, "IQ": 0.28, "EF": 0.28, "MI": 0.27, "VA": 0.27, "TU": 0.27, "VI": 0.27, "CA": 0.27, 
+      "EQ": 0.26, "CI": 0.26, "TT": 0.26, "IC": 0.25, "UX": 0.25, "MM": 0.25, "OL": 0.24,"AG": 0.24, "VO": 0.24, "EI": 0.24, 
+      "MP": 0.23, "TP": 0.23, "SM": 0.23, "UL": 0.22, "HA": 0.22, "FI": 0.21, "FA": 0.21, "IM": 0.21, "EG": 0.21, "ID": 0.2, 
+      "DO": 0.2, "AD": 0.2, "GR": 0.19, "SQ": 0.19, "AB": 0.19, "BL": 0.18, "UV": 0.18, "IV": 0.18, "NG": 0.18, "TC": 0.17, 
+      "IA": 0.17, "OT": 0.17, "CL": 0.17, "RC": 0.17, "RM": 0.17, "OS": 0.17, "OP": 0.16, "CT": 0.16, "FO": 0.16, "UC": 0.16, 
+      "UP": 0.16, "RR": 0.16, "JE": 0.16, "HO": 0.16, "UD": 0.15, "CR": 0.15, "EB": 0.15, "EO": 0.15, "IF": 0.15, "FR": 0.14, 
+      "RU": 0.14, "UA": 0.14, "NP": 0.14, "IG": 0.14, "BA": 0.14, "BR": 0.14, "OC": 0.14, "CU": 0.14, "FE": 0.13, "UM": 0.13, 
+      "EX": 0.13, "BI": 0.13, "BE": 0.13, "GN": 0.13, "MB": 0.13, "AF": 0.12, "HI": 0.12, "EJ": 0.12, "NF": 0.12, "GI": 0.12, 
+      "PP": 0.12, "GA": 0.11, "FF": 0.11, "PU": 0.11, "BO": 0.11, "SF": 0.11, "SR": 0.11, "LS": 0.11, "TQ": 0.11, "OD": 0.1, 
+      "PH": 0.1, "TM": 0.1, "DR": 0.1, "NU": 0.1, "NV": 0.1, "RN": 0.1, "PI": 0.1, "OB": 0.09, "GU": 0.09, "NL": 0.09, 
+      "OG": 0.09, "JO": 0.09, "IP": 0.09, "TH": 0.08, "RP": 0.08, "SB": 0.08, "JA": 0.08, "NM": 0.08, "SN": 0.08, "YS": 0.08, 
+      "MU": 0.08, "UB": 0.08, "VR": 0.08, "SV": 0.08, "YA": 0.07, "XE": 0.07, "RG": 0.07, "EZ": 0.07, "CC": 0.07, "NQ": 0.07, 
+      "IB": 0.07, "SG": 0.07, "NR": 0.06, "AE": 0.06, "RV": 0.06, "LD": 0.06, "EH": 0.06, "SH": 0.06, "AY": 0.06, "PT": 0.06, 
+      "OY": 0.05, "XP": 0.05, "DS": 0.05, "RQ": 0.05, "TF": 0.05, "FL": 0.05, "YE": 0.05, "SJ": 0.05, "LH": 0.05, "JU": 0.05, 
+      "LT": 0.05, "FU": 0.05, "UF": 0.05, "AQ": 0.05, "IX": 0.05, "PS": 0.05, "TN": 0.05, "XI": 0.05, "GO": 0.05, "UG": 0.04, 
+      "TJ": 0.04, "TV": 0.04, "RB": 0.04, "UO": 0.04, "LQ": 0.04, "SY": 0.04, "AA": 0.04, "TB": 0.04, "HU": 0.04, "AJ": 0.04,
+      "BU": 0.04, "OF": 0.04, "XD": 0.04, "RF": 0.04, "LP": 0.04, "NB": 0.03, "UJ": 0.03, "GL": 0.03, "HY": 0.03, "UU": 0.03, 
+      "LN": 0.03, "XA": 0.03, "LY": 0.03, "NH": 0.03, "XT": 0.03, "XC": 0.03, "NJ": 0.03, "OV": 0.03, "II": 0.03, "LC": 0.03, 
+      "DD": 0.03, "LF": 0.03, "YC": 0.03, "LM": 0.02, "DM": 0.02, "BS": 0.02, "DH": 0.02, "LG": 0.02, "VU": 0.02, "CD": 0.02, 
+      "AH": 0.02, "YP": 0.02, "TY": 0.02, "TG": 0.02, "CS": 0.02, "OQ": 0.02, "XM": 0.02, "LR": 0.02, "ZE": 0.02, "CK": 0.02, 
+      "AO": 0.02, "UQ": 0.02, "CY": 0.02, "WA": 0.02, "KO": 0.02, "XQ": 0.02, "XL": 0.02, "DL": 0.02, "RJ": 0.02, "IJ": 0.02, 
+      "FS": 0.02, "XS": 0.02, "XV": 0.02, "HR": 0.01, "RY": 0.01, "GT": 0.01, "OE": 0.01, "BJ": 0.01, "GM": 0.01, "LV": 0.01, 
+      "HN": 0.01, "IU": 0.01, "EY": 0.01, "XU": 0.01, "NY": 0.01, "KE": 0.01, "AZ": 0.01, "MD": 0.01, "RH": 0.01, "YO": 0.01, 
+      "YR": 0.01, "ZL": 0.01, "ZO": 0.01, "MY": 0.01, "SW": 0.01, "YM": 0.01, "DP": 0.01, "LB": 0.01, "XO": 0.01, "GS": 0.01, 
+      "CQ": 0.01, "RK": 0.01, "OA": 0.01, "MS": 0.01, "OH": 0.01, "ZA": 0.01, "DC": 0.01, "KA": 0.01, "NZ": 0.01, "XF": 0.01, 
+      "DT": 0.01, "PD": 0.01, "YL": 0.01, "ZV": 0.01, "MN": 0.01, "UH": 0.01, "BT": 0.01, "DJ": 0.01, "XX": 0.01, "YD": 0.01, 
+      "EW": 0.01, "OO": 0.01, "XB": 0.01, "ML": 0.01, "GD": 0.01, "YT": 0.01, "EK": 0.01, "ZD": 0.01, "DY": 0.01, "XN": 0.01, 
+      "KI": 0.01, "YN": 0.01, "BB": 0.01, "ZM": 0.01, "CM": 0.01, "AX": 0.01, "CP": 0.01, "LJ": 0.01, "FD": 0.01, "WE": 0.01, 
+      "ZP": 0.01, "UY": 0.01, "YF": 0.01, "AK": 0.01, "HM": 0.01, "ZI": 0.01, "DN": 0.01, "MT": 0.01, "WI": 0.01, "XR": 0.01,
+      "SX": 0.01, "DQ": 0.01
    };
    var table = "<table id=\"letter_freq\"><thead><tr>";
    table += "<th></th>";
@@ -211,6 +241,23 @@ function displayFreq(letterFreq) {
       table += "<td>" + (letterFreq[letter] || 0) + "</td>";
    }
    table += "</tr></table>";
+   table += "<table id=\"digraph_freq\"><thead><tr>";
+   table += "<th></th>";
+   for(var digraph in referenceDigraphs){
+      table += "<th>" + digraph + "</th>";
+   }
+   table += "</tr><tr>";
+   table += "<td>Français</td>";
+   for(var digraph in referenceDigraphs){
+      table += "<td>" + referenceDigraphs[digraph] + "</td>";
+   }
+   table += "</tr><tr>";
+   table += "<td>Texte</td>";
+   for(var digraph in referenceDigraphs){
+      table += "<td>" + (digraphFreq[digraph] || 0) + "</td>";
+   }
+   table += "</tr></table>";
+
    $("#freq").empty();
    $("#freq").append(table);
 };
@@ -402,7 +449,6 @@ function generateText(rng,minLength,maxLength,withSpaces){
 function generateSentence(rng,n,struc,withSpaces,textMode){
    var curLength = 0;
    var text = "";
-   // while (curLength < maxLength - 50) {
    for(var iSentence = 0; iSentence < n; iSentence++){
       var sentence = "";
       var structure = (struc === "all") ? pickOne(structures,rng,false,true) : structures[struc][0];
@@ -691,30 +737,30 @@ const structureTypes = [
    "adv-locution"
 ];
 const structures = [ // [structure,weight]
-   [["3P-S","VI-str"],8],
-   [["3P-P","VI-str"],8],
-   [["3P-S","VT-str","CO"],8],
-   [["3P-P","VT-str","CO"],8],
-   [["1P-S","VI-str"],2],
-   [["2P-S","VI-str"],2],
-   [["1P-P","VI-str"],2],
-   [["2P-P","VI-str"],2],
-   [["1P-S","VT-str","CO"],2],
-   [["2P-S","VT-str","CO"],2],
-   [["1P-P","VT-str","CO"],2],
-   [["2P-P","VT-str","CO"],2],
-   [["adv-locution","3P-S","VI-str"],4],
-   [["adv-locution","3P-P","VI-str"],4],
-   [["adv-locution","3P-S","VT-str","CO"],4],
-   [["adv-locution","3P-P","VT-str","CO"],4],
-   [["adv-locution","1P-S","VI-str"],1],
-   [["adv-locution","2P-S","VI-str"],1],
-   [["adv-locution","1P-P","VI-str"],1],
-   [["adv-locution","2P-P","VI-str"],1],
-   [["adv-locution","1P-S","VT-str","CO"],1],
-   [["adv-locution","2P-S","VT-str","CO"],1],
-   [["adv-locution","1P-P","VT-str","CO"],1],
-   [["adv-locution","2P-P","VT-str","CO"],1],
+   [["3P-S","VI-str"],80],
+   [["3P-P","VI-str"],60],
+   [["3P-S","VT-str","CO"],80],
+   [["3P-P","VT-str","CO"],60],
+   [["1P-S","VI-str"],20],
+   [["2P-S","VI-str"],20],
+   [["1P-P","VI-str"],15],
+   [["2P-P","VI-str"],15],
+   [["1P-S","VT-str","CO"],20],
+   [["2P-S","VT-str","CO"],20],
+   [["1P-P","VT-str","CO"],15],
+   [["2P-P","VT-str","CO"],15],
+   [["adv-locution","3P-S","VI-str"],40],
+   [["adv-locution","3P-P","VI-str"],30],
+   [["adv-locution","3P-S","VT-str","CO"],40],
+   [["adv-locution","3P-P","VT-str","CO"],30],
+   [["adv-locution","1P-S","VI-str"],10],
+   [["adv-locution","2P-S","VI-str"],10],
+   [["adv-locution","1P-P","VI-str"],7],
+   [["adv-locution","2P-P","VI-str"],7],
+   [["adv-locution","1P-S","VT-str","CO"],10],
+   [["adv-locution","2P-S","VT-str","CO"],10],
+   [["adv-locution","1P-P","VT-str","CO"],7],
+   [["adv-locution","2P-P","VT-str","CO"],7],
 ];
 const verbStructures = {
    "VI-str": [   // [structure,weight]
@@ -2867,6 +2913,111 @@ const adjectives = { // [M-S,F-S]
       [ "sourcilleux", "sourcilleuse" ],
       [ "sourd", "e" ],
       [ "spatial", "e" ],
+      [ "spectaculaire", "" ],
+      [ "spectral", "e" ],
+      [ "sphérique", "" ],
+      [ "spirituel", "spirituelle" ],
+      [ "splendide", "" ],
+      [ "squameux", "squameuse" ],
+      [ "squelettique", "" ],
+      [ "statique", "" ],
+      [ "stimulant", "e" ],
+      [ "stoïque", "" ],
+      [ "strident", "e" ],
+      [ "stupéfiant", "e" ],
+      [ "suave", "" ],
+      [ "sublime", "" ],
+      [ "submersible", "" ],
+      [ "subtil", "e" ],
+      [ "subversif", "subversive" ],
+      [ "sud-américain", "e" ],
+      [ "suicidaire", "" ],
+      [ "super", "" ],  //
+      [ "superbe", "" ],   //
+      [ "superflu", "e" ],
+      [ "surnaturel", "surnaturelle" ],
+      [ "surprenant", "e" ],
+      [ "susceptible", "" ],
+      [ "suspect", "e" ],
+      [ "suspicieux", "suspicieuse" ],
+      [ "svelte", "" ],
+      [ "sylvestre", "" ],
+      [ "sympathique", "" ],
+      [ "taciturne", "" ],
+      [ "talentueux", "talentueuse" ],
+      [ "taquin", "e" ],
+      [ "tectonique", "" ],
+      [ "teigneux", "teigneuse" ],
+      [ "tellurique", "" ],
+      [ "tempétueux", "tempétueuse" ],
+      [ "tenace", "" ],
+      [ "tendre", "" ], //
+      [ "ténébreux", "ténébreuse" ],
+      [ "tentaculaire", "" ],
+      [ "terne", "" ],
+      [ "terreux", "terreuse" ],
+      [ "terrible", "" ],
+      [ "terrifiant", "e" ],
+      [ "têtu", "e" ],
+      [ "thaïlandais", "e" ],
+      [ "timide", "" ],
+      [ "titanesque", "" ],
+      [ "tolérant", "e" ],
+      [ "tonitruant", "e" ],
+      [ "tordu", "e" ],
+      [ "tortueux", "tortueuse" ],
+      [ "toxique", "" ],
+      [ "tragique", "" ],
+      [ "tranchant", "e" ],
+      [ "tranquille", "" ],
+      [ "transparent", "e" ],
+      [ "trapu", "e" ],
+      [ "trépidant", "e" ],
+      [ "triangulaire", "" ],
+      [ "tridimensionnel", "tridimensionnelle" ],
+      [ "triste", "" ],
+      [ "truculent", "e" ],
+      [ "tzigane", "" ],
+      [ "tumultueux", "tumultueuse" ],
+      [ "turbulent", "e" ],
+      [ "typique", "" ],
+      [ "ubuesque", "" ],
+      [ "uniforme", "" ],
+      [ "unique", "" ],
+      [ "urbain", "e" ],
+      [ "vaillant", "e" ],
+      [ "valétudinaire", "" ],
+      [ "valeureux", "valeureuse" ],
+      [ "vampirique", "" ],
+      [ "vaniteux", "vaniteuse" ],
+      [ "vaudou", "" ],
+      [ "végétal", "e" ],
+      [ "véloce", "" ],
+      [ "velu", "e" ],
+      [ "vénéneux", "vénéneuse" ],
+      [ "venimeux", "venimeuse" ],
+      [ "verdâtre", "" ],
+      [ "versatile", "" ],
+      [ "vert", "e" ],
+      [ "vertical", "e" ],
+      [ "vertigineux", "vertigineuse" ],
+      [ "veule", "" ],
+      [ "vicieux", "vicieuse" ],
+      [ "vif", "vive" ],
+      [ "vil", "e" ],
+      [ "violet", "violette" ],
+      [ "virtuel", "virtuelle" ],
+      [ "virtuose", "" ],
+      [ "vitreux", "vitreuse" ],
+      [ "vivant", "e" ],
+      [ "volant", "e" ],
+      [ "volcanique", "" ],
+      [ "volubile", "" ],
+      [ "vorace", "" ],
+      [ "vulgaire", "" ],
+      [ "xylophage", "" ],
+      [ "zébré", "e" ],
+      [ "zodiacal", "e" ]
    ]
 }; 
    
