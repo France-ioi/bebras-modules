@@ -530,7 +530,7 @@ function addAdjective(noun,det,gender,plural,rng) {
    if(place && place === "before"){
       var text = elide(det + " " + adj + " " + noun);
    }else{
-      var withAdv = Math.trunc(rng() * 3);
+      var withAdv = Math.trunc(rng() * 6);
       if(withAdv === 0){
          var adv = pickOne(adverbs["beforeAdj"],rng);
       }else{
@@ -764,15 +764,15 @@ const structures = [ // [structure,weight]
 ];
 const verbStructures = {
    "VI-str": [   // [structure,weight]
-      [["VI"],20],
-      [["VI","adv-aftVerb"],10],
-      [["VI-neg"],2],
+      [["VI"],40],
+      [["VI","adv-aftVerb"],5],
+      [["VI-neg"],4],
       [["VI-negWithAdv","adv-aftNegVerb"],1]
    ],
    "VT-str": [   // [structure,weight]
-      [["VT"],20],
-      [["VT","adv-aftVerb"],10],
-      [["VT-neg"],2],
+      [["VT"],40],
+      [["VT","adv-aftVerb"],5],
+      [["VT-neg"],4],
       [["VT-negWithAdv","adv-aftNegVerb"],1]
    ]
 };
