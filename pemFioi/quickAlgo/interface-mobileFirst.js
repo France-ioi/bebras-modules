@@ -530,12 +530,12 @@ var quickAlgoInterface = {
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
                     '<div id="mode-instructions" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-instructions\');">' +
-                        '<span><span class="fas fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
+                        '<span><span class="fas fa-file-alt"></span><span class="label">' + this.strings.instructions + '</span></span>' +
                     '</div>' +
                     '<div id="mode-editor" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-editor\');">' +
                         '<span>' +
                             '<span class="fas fa-pencil-alt"></span>' +
-                            '<span class="label ToTranslate">Éditeur</span>' +
+                            '<span class="label">' + this.strings.editor + '</span>' +
                         '</span>' +
                         '<span>' +
                             "<span class='capacity'></span>" +
@@ -619,11 +619,11 @@ var quickAlgoInterface = {
     toggleLongIntro: function(forceNewState) {
         if(forceNewState === false || this.longIntroShown) {
             $('#taskIntroLong').removeClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>Plus de détails</button>');
+            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>' + this.strings.showDetails + '</button>');
             this.longIntroShown = false;
         } else {
             $('#taskIntroLong').addClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>Masquer les détails</button>');
+            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>' + this.strings.hideDetails + '</button>');
             this.longIntroShown = true;
         }
     },
