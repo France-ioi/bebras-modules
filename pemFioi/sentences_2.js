@@ -142,9 +142,77 @@ function initHandlers() {
          console.log("les valeurs min et max ont été inversées");
       }
       var text = generateText(rng,min,max,true);
+      getFrequencies(text);
       $("#text").empty();
       $("#text").append(text);
    });
+};
+
+function getFrequencies(text) {
+   var letterFreq = {};
+   var digraphFreq = {};
+   text = cleanUpSpecialChars(text,false);
+   var nLetters = text.length;
+   for(var letter of text){
+      if(letterFreq[letter]){
+         letterFreq[letter]++;
+      }else{
+         letterFreq[letter] = 1;
+      }
+   }
+   for(var letter in letterFreq){
+      letterFreq[letter] = Math.trunc((letterFreq[letter]*100/nLetters)*100)/100;
+   }
+   displayFreq(letterFreq);
+};
+
+function displayFreq(letterFreq) {
+   var referenceLetters = {
+      "E": 17.35,
+      "A": 8.2,
+      "S": 7.93,
+      "I": 7.53,
+      "N": 7.17,
+      "T": 6.99,
+      "R": 6.65,
+      "L": 5.92,
+      "U": 5.73,
+      "O": 5.53,
+      "D": 4.01,
+      "C": 3.33,
+      "M": 2.97,
+      "P": 2.92,
+      "V": 1.39,
+      "G": 1.09,
+      "F": 1.08,
+      "Q": 1.04,
+      "H": 0.93,
+      "B": 0.92,
+      "X": 0.47,
+      "J": 0.34,
+      "Y": 0.31,
+      "Z": 0.1,
+      "K": 0.06,
+      "W": 0.03
+   };
+   var table = "<table id=\"letter_freq\"><thead><tr>";
+   table += "<th></th>";
+   for(var letter in referenceLetters){
+      table += "<th>" + letter + "</th>";
+   }
+   table += "</tr><tr>";
+   table += "<td>Français</td>";
+   for(var letter in referenceLetters){
+      table += "<td>" + referenceLetters[letter] + "</td>";
+   }
+   table += "</tr><tr>";
+   table += "<td>Texte</td>";
+   for(var letter in referenceLetters){
+      table += "<td>" + (letterFreq[letter] || 0) + "</td>";
+   }
+   table += "</tr></table>";
+   $("#freq").empty();
+   $("#freq").append(table);
 };
 
 function generateWordList(block) {
@@ -551,23 +619,6 @@ function conjugate(verb,person,plural,tense,rng) {
       return infinitive;
    }
 };
-
-// function addComplement(subjVerb,rng) {
-//    var comp = subjVerb[2];
-//    switch(comp){
-//       case "à+N":
-//          var nounType = nounTypes[Math.trunc(rng() * nounTypes.length)];
-//          var noun = nouns[nounTypes][Math.trunc(rng() * nouns[nounTypes].length)];
-//          if(nounType === "city"){
-//             return subjVerb[0]+" "+"à"+" "+noun[0];
-//          }else if(nounType === "country"){
-//             var determiner = determiners["definite_article"][1 - noun[1]];
-//             var countryName = elide(determiner + " " + noun[0]);
-//             var compText = elide("à" + " " + countryName);
-//             return subjVerb[0]+" "+compText;
-//          }
-//    }
-// };
 
 function cleanUpSpecialChars(str, withSpaces) {
     str = str.replace(/[ÀÁÂÃÄÅ]/g,"A");
@@ -1945,6 +1996,60 @@ const adjectives = { // [M-S,F-S]
       [ "menaçant", "e" ],
       [ "méprisant", "e" ],
       [ "méticuleux", "méticuleuse" ],
+      [ "modeste", "" ],
+      [ "monstrueux", "monstreuse" ],
+      [ "mystérieux", "mystérieuse" ],
+      [ "naïf", "naïve" ],
+      [ "nébuleux", "nébuleuse" ],
+      [ "nerveux", "nerveuse" ],
+      [ "noble", "" ],
+      [ "noir", "e" ],
+      [ "nouveau", "nouvelle" ],
+      [ "obscur", "e" ],
+      [ "odieux", "odieuse" ],   
+      [ "ombrageux", "ombrageuse" ],
+      [ "ondoyant", "e" ],
+      [ "opalescent", "e" ],
+      [ "opiniâtre", "" ],
+      [ "orageux", "orageuse" ],
+      [ "pâle", "" ],
+      [ "paresseux", "paresseuse" ],
+      [ "parfait", "e" ],
+      [ "pathétique", "" ],
+      [ "pauvre", "" ], 
+      [ "pénible", "" ],
+      [ "pernicieux", "pernicieuse" ],
+      [ "petit", "e" ], 
+      [ "pétulant", "e" ],
+      [ "phénoménal", "e" ],
+      [ "polyvalent", "e" ],
+      [ "pompeux", "pompeuse" ],
+      [ "potentiel", "potentielle" ],
+      [ "poudreux", "poudreuse" ],
+      [ "précautionneux", "précautionneuse" ],
+      [ "précieux", "précieuse" ],
+      [ "prestigieux", "prestigieuse" ],
+      [ "prétentieux", "prétentieuse" ],
+      [ "prévisible", "" ],
+      [ "prévoyant", "e" ],
+      [ "primitif", "primitive" ],
+      [ "problématique", "" ],
+      [ "prodigieux", "prodigieuse" ],
+      [ "providentiel", "providentielle" ],
+      [ "prudent", "e" ],
+      [ "puéril", "e" ],
+      [ "rapide", "" ],
+      [ "ravissant", "e" ],
+      [ "rayonnant", "e" ],
+      [ "redoutable", "" ],
+      [ "réel", "réelle" ],
+      [ "remarquable", "" ],
+      [ "répugnant", "e" ],
+      [ "resplendissant", "e" ],
+      [ "rigoureux", "rigoureuse" ],
+      [ "robuste", "" ],
+      [ "séduisant", "e" ],
+      [ "sémillant", "e" ],
    ],
    "after": [
       [ "abject", "e" ],
@@ -2537,7 +2642,231 @@ const adjectives = { // [M-S,F-S]
       [ "minuscule", "" ],
       [ "misanthrope", "" ],
       [ "moche", "" ],
-
+      [ "moderne", "" ], 
+      [ "modeste", "" ],
+      [ "moelleux", "moelleuse" ],
+      [ "monégasque", "" ],
+      [ "monstrueux", "monstreuse" ],
+      [ "morbide", "" ],
+      [ "moribond", "e" ],
+      [ "mou", "molle" ],
+      [ "moyen", "moyenne" ],
+      [ "muet", "muette" ],
+      [ "multicolore", "" ],
+      [ "musclé", "e" ],
+      [ "mystérieux", "mystérieuse" ],
+      [ "mystique", "" ],
+      [ "mythomane", "" ],
+      [ "naïf", "naïve" ],
+      [ "nain", "naine" ],
+      [ "naufragé", "e" ],
+      [ "nébuleux", "nébuleuse" ],
+      [ "nécrophage", "" ],
+      [ "néerlandais", "e" ],
+      [ "négatif", "négative" ],
+      [ "nerveux", "nerveuse" ],
+      [ "neutre", "" ],
+      [ "niais", "e" ],
+      [ "noble", "" ],
+      [ "nocturne", "" ],
+      [ "noir", "e" ],
+      [ "noirâtre", "" ],
+      [ "nordique", "" ],
+      [ "normal", "e" ],
+      [ "nouveau", "nouvelle" ],
+      [ "novice", "" ],
+      [ "nuageux", "nuageuse" ],
+      [ "nucléaire", "" ],
+      [ "numérique", "" ],
+      [ "nyctalope", "" ],
+      [ "obèse", "" ],
+      [ "obscur", "e" ],
+      [ "obséquieux", "obséquieuse" ],
+      [ "obstiné", "e" ],
+      [ "occulte", "" ],
+      [ "occupé", "e" ],
+      [ "océanique", "" ],
+      [ "ocre", "" ],
+      [ "oisif", "oisive" ],
+      [ "ombrageux", "ombrageuse" ],
+      [ "omnivore", "" ],
+      [ "ondoyant", "e" ],
+      [ "onirique", "" ],
+      [ "opalescent", "e" ],
+      [ "opaque", "" ],
+      [ "opiniâtre", "" ],
+      [ "orageux", "orageuse" ],
+      [ "orange", "" ],
+      [ "oriental", "e" ],
+      [ "original", "e" ],
+      [ "orthogonal", "e" ],
+      [ "oscillatoire", "" ],
+      [ "outrecuidant", "e" ],
+      [ "ovale", "" ],
+      [ "pacifique", "" ],
+      [ "pâle", "" ],
+      [ "palmé", "e" ],
+      [ "panoramique", "" ],
+      [ "pantois", "e" ],
+      [ "parallèle", "" ],
+      [ "paranoïaque", "" ],
+      [ "paranormal", "e" ],
+      [ "paresseux", "paresseuse" ],
+      [ "parfait", "e" ],
+      [ "passionné", "e" ],
+      [ "pastoral", "e" ],
+      [ "pathétique", "" ],
+      [ "patibulaire", "" ],
+      [ "pédagogue", "" ],
+      [ "pénible", "" ],
+      [ "perçant", "e" ],
+      [ "perdu", "e" ],
+      [ "performant", "e" ],
+      [ "pernicieux", "pernicieuse" ],
+      [ "perplexe", "" ],
+      [ "persévérant", "e" ],
+      [ "perspicace", "" ],
+      [ "pertinent", "e" ],
+      [ "pessimiste", "" ],
+      [ "pestilentiel", "pestilentielle" ],
+      [ "pétulant", "e" ],
+      [ "peureux", "peureuse" ],
+      [ "phénoménal", "e" ],
+      [ "philosophe", "" ],
+      [ "phosphorescent", "e" ],
+      [ "photogénique", "" ],
+      [ "pictural", "e" ],
+      [ "piquant", "e" ],
+      [ "placide", "" ],
+      [ "plaintif", "plaintive" ],
+      [ "plat", "e" ],
+      [ "pleurnicheur", "pleurnicheuse" ],
+      [ "pneumatique", "" ],
+      [ "poilu", "e" ],
+      [ "polaire", "" ],
+      [ "polonais", "e" ],
+      [ "polycéphale", "" ],
+      [ "polyvalent", "e" ],
+      [ "pompeux", "pompeuse" ],
+      [ "populaire", "" ],
+      [ "portuaire", "" ],
+      [ "positif", "positive" ],
+      [ "possédé", "e" ],
+      [ "potentiel", "potentielle" ],
+      [ "poudreux", "poudreuse" ],
+      [ "pourpre", "" ],
+      [ "pourri", "e" ],
+      [ "précautionneux", "précautionneuse" ],
+      [ "précieux", "précieuse" ],
+      [ "précis", "e" ],
+      [ "précoce", "" ],
+      [ "préglaciaire", "" ],
+      [ "préhistorique", "" ],
+      [ "prémonitoire", "" ],
+      [ "prestigieux", "prestigieuse" ],
+      [ "prétentieux", "prétentieuse" ],
+      [ "prévisible", "" ],
+      [ "prévoyant", "e" ],
+      [ "primitif", "primitive" ],
+      [ "prismatique", "" ],
+      [ "problématique", "" ],
+      [ "prodigieux", "prodigieuse" ],
+      [ "prognathe", "" ],
+      [ "progressiste", "" ],
+      [ "prolixe", "" ],
+      [ "prophétique", "" ],
+      [ "propre", "" ],
+      [ "prosaïque", "" ],
+      [ "provençal", "e" ],
+      [ "providentiel", "providentielle" ],
+      [ "prudent", "e" ],
+      [ "psychotique", "" ],
+      [ "puéril", "e" ],
+      [ "putride", "" ],
+      [ "pyramidal", "e" ],
+      [ "pyrénéen", "pyrénéenne" ],
+      [ "quadratique", "" ],
+      [ "quantique", "" ],
+      [ "québécois", "e" ],
+      [ "rabelaisien", "rabelaisienne" ],
+      [ "rabougri", "e" ],
+      [ "radioactif", "radioactive" ],
+      [ "raisonnable", "" ],
+      [ "rampant", "e" ],
+      [ "ravissant", "e" ],
+      [ "rayonnant", "e" ],
+      [ "rédhibitoire", "" ],
+      [ "redoutable", "" ],
+      [ "réel", "réelle" ],
+      [ "remarquable", "" ],
+      [ "renfrogné", "e" ],
+      [ "renversant", "e" ],
+      [ "reposant", "e" ],
+      [ "repoussant", "e" ],
+      [ "reptilien", "reptilienne" ],
+      [ "répugnant", "e" ],
+      [ "resplendissant", "e" ],
+      [ "retors", "e" ],
+      [ "réverbérant", "e" ],
+      [ "rêveur", "rêveuse" ],
+      [ "rigide", "" ],
+      [ "rigoureux", "rigoureuse" ],
+      [ "robuste", "" ],
+      [ "romanesque", "" ],
+      [ "rose", "" ],
+      [ "rouge", "" ],
+      [ "rougeâtre", "" ],
+      [ "royal", "e" ],
+      [ "runique", "" ],
+      [ "rutilant", "e" ],
+      [ "saccadé", "e" ],
+      [ "sacré", "e" ],
+      [ "sagace", "" ],
+      [ "saisissant", "e" ],
+      [ "saisonnier", "e" ],
+      [ "salutaire", "" ],
+      [ "sanguinaire", "" ],
+      [ "sarcastique", "" ],
+      [ "satanique", "" ],
+      [ "saturnien", "saturnienne" ],
+      [ "saumâtre", "" ],
+      [ "sauvage", "" ],
+      [ "savoureux", "savoureuse" ],
+      [ "scandinave", "" ],
+      [ "sceptique", "" ],
+      [ "schizoïde", "" ],
+      [ "scientifique", "" ],
+      [ "sec", "sèche" ],
+      [ "sédentaire", "" ],
+      [ "séduisant", "e" ],
+      [ "sémillant", "e" ],
+      [ "sénile", "" ],
+      [ "sensationnel", "sensationnelle" ],  // *
+      [ "sensible", "" ],
+      [ "sentimental", "e" ],
+      [ "serein", "e" ],
+      [ "sérieux", "sérieuse" ],
+      [ "sévère", "" ],
+      [ "sibyllin", "e" ],
+      [ "sidéral", "e" ],
+      [ "sidérant", "e" ],
+      [ "silencieux", "silencieuse" ],
+      [ "sincère", "" ],
+      [ "singulier", "e" ],
+      [ "sinistre", "" ],
+      [ "sinueux", "sinueuse" ],
+      [ "sobre", "" ],
+      [ "sociable", "" ],
+      [ "solaire", "" ],
+      [ "solide", "" ],
+      [ "somnambule", "" ],
+      [ "sordide", "" ],
+      [ "soucieux", "soucieuse" ],
+      [ "soupçonneux", "soupçonneuse" ],
+      [ "souple", "" ],
+      [ "sourcilleux", "sourcilleuse" ],
+      [ "sourd", "e" ],
+      [ "spatial", "e" ],
    ]
 }; 
    
