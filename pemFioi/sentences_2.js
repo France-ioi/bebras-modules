@@ -415,7 +415,7 @@ function generateSentence(rng,n,struc,withSpaces,textMode){
          plural = word[2];
          sentence += word[0]+" ";
       }
-      // sentence = elide(sentence);
+      sentence = elide(sentence);
       sentence = cleanUpSpecialChars(sentence, withSpaces);
       // if (sentence.length > (maxLength - curLength - 20)) {
       //    continue;
