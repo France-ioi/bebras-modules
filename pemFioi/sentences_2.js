@@ -151,6 +151,10 @@ function initHandlers() {
 function getFrequencies(text) {
    var letterFreq = {};
    var digraphFreq = {};
+   var wordFreq = {};
+   text = cleanUpSpecialChars(text,true);
+   var words = text.split(" ");
+   var nWords = words.length;
    text = cleanUpSpecialChars(text,false);
    var nLetters = text.length;
    for(var letterIndex in text){
@@ -160,12 +164,19 @@ function getFrequencies(text) {
          letterFreq[text.charAt(letterIndex)] = 1;
       }
       if(letterIndex < nLetters - 1){
-         var digraph = text.charAt(letterIndex)+text.charAt(parseInt(letterIndex) + 1);
+         var digraph = text.charAt(letterIndex) + text.charAt(parseInt(letterIndex) + 1);
          if(digraphFreq[digraph]){
             digraphFreq[digraph]++;
          }else{
             digraphFreq[digraph] = 1;
          }
+      }
+   }
+   for(var word of words){
+      if(wordFreq[word]){
+         wordFreq[word]++;
+      }else{
+         wordFreq[word] = 1;
       }
    }
    for(var letter in letterFreq){
@@ -174,10 +185,29 @@ function getFrequencies(text) {
    for(var digraph in digraphFreq){
       digraphFreq[digraph] = Math.trunc((digraphFreq[digraph]*100/(nLetters - 1))*100)/100;
    }
-   displayFreq(letterFreq,digraphFreq);
+   for(var word in wordFreq){
+      wordFreq[word] = Math.trunc((wordFreq[word]*100/nWords)*100)/100;
+   }
+   wordFreq = sort(wordFreq);
+   displayFreq(letterFreq,digraphFreq,wordFreq);
 };
 
-function displayFreq(letterFreq,digraphFreq) {
+function sort(object) {
+   var sortable = [];
+   var newObject = {};
+   for (var key in object) {
+       sortable.push([key, object[key]]);
+   }
+   sortable.sort(function(a, b) {
+       return b[1] - a[1];
+   });
+   for(var item of sortable){
+      newObject[item[0]] = item[1];
+   }
+   return newObject;
+};
+
+function displayFreq(letterFreq,digraphFreq,wordFreq) {
    var referenceLetters = {
       "E": 17.35, "A": 8.2, "S": 7.93, "I": 7.53, "N": 7.17, "T": 6.99, "R": 6.65, "L": 5.92, "U": 5.73, "O": 5.53,
       "D": 4.01, "C": 3.33, "M": 2.97, "P": 2.92, "V": 1.39, "G": 1.09, "F": 1.08, "Q": 1.04, "H": 0.93, "B": 0.92,
@@ -257,6 +287,18 @@ function displayFreq(letterFreq,digraphFreq) {
       table += "<td>" + (digraphFreq[digraph] || 0) + "</td>";
    }
    table += "</tr></table>";
+   table += "<table id=\"word_freq\"><thead><tr>";
+   table += "<th></th>";
+   for(var word in wordFreq){
+      table += "<th>" + word + "</th>";
+   }
+   table += "</tr><tr>";
+   table += "<td>Texte</td>";
+   for(var word in wordFreq){
+      table += "<td>" + (wordFreq[word] || 0) + "</td>";
+   }
+   table += "</tr></table>";
+
 
    $("#freq").empty();
    $("#freq").append(table);
@@ -677,7 +719,9 @@ function cleanUpSpecialChars(str, withSpaces) {
     str = str.replace(/[Ç]/g,"C");
     str = str.replace(/[ç]/g,"c");
     str = str.replace(/['-]/g," ");
+    str = str.replace(/ {2,}/gi," ");
     str = str.replace(/[^a-zA-Z ]/gi,''); // final clean up
+    str = str.trim();
     if (!withSpaces) {
        str = str.replace(/[ ]/g,"");
     }
