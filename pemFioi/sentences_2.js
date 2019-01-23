@@ -570,6 +570,9 @@ function addAdjective(noun,det,gender,plural,rng) {
    var place = pickOne(adjectiveTypes,rng);
    var adj = getAdjective(place,gender,plural,rng);
    if(place && place === "before"){
+      if(det.toLowerCase() === "des"){
+         det = "de";
+      }
       var text = elide(det + " " + adj + " " + noun);
    }else{
       var withAdv = Math.trunc(rng() * 6);
@@ -5082,6 +5085,7 @@ const adverbs =  {
       "en résumé",
       "en somme",
       "en tout cas",
+      "et",
       "généralement",
       "grosso modo",
       "jour après jour",
