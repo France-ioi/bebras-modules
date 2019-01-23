@@ -575,7 +575,7 @@ function addAdjective(noun,det,gender,plural,rng) {
       }
       var text = elide(det + " " + adj + " " + noun);
    }else{
-      var withAdv = Math.trunc(rng() * 6);
+      var withAdv = Math.trunc(rng() * 20);
       if(withAdv === 0){
          var adv = pickOne(adverbs["beforeAdj"],rng);
       }else{
@@ -785,41 +785,41 @@ const structureTypes = [
 ];
 const structures = [ // [structure,weight]
    [["3P-S","VI-str"],80],
-   [["3P-P","VI-str"],60],
+   [["3P-P","VI-str"],40],
    [["3P-S","VT-str","CO"],80],
-   [["3P-P","VT-str","CO"],60],
+   [["3P-P","VT-str","CO"],40],
    [["1P-S","VI-str"],20],
    [["2P-S","VI-str"],20],
-   [["1P-P","VI-str"],15],
-   [["2P-P","VI-str"],15],
+   [["1P-P","VI-str"],10],
+   [["2P-P","VI-str"],10],
    [["1P-S","VT-str","CO"],20],
    [["2P-S","VT-str","CO"],20],
-   [["1P-P","VT-str","CO"],15],
-   [["2P-P","VT-str","CO"],15],
+   [["1P-P","VT-str","CO"],10],
+   [["2P-P","VT-str","CO"],10],
    [["adv-locution","3P-S","VI-str"],40],
-   [["adv-locution","3P-P","VI-str"],30],
+   [["adv-locution","3P-P","VI-str"],20],
    [["adv-locution","3P-S","VT-str","CO"],40],
-   [["adv-locution","3P-P","VT-str","CO"],30],
+   [["adv-locution","3P-P","VT-str","CO"],20],
    [["adv-locution","1P-S","VI-str"],10],
    [["adv-locution","2P-S","VI-str"],10],
-   [["adv-locution","1P-P","VI-str"],7],
-   [["adv-locution","2P-P","VI-str"],7],
+   [["adv-locution","1P-P","VI-str"],5],
+   [["adv-locution","2P-P","VI-str"],5],
    [["adv-locution","1P-S","VT-str","CO"],10],
    [["adv-locution","2P-S","VT-str","CO"],10],
-   [["adv-locution","1P-P","VT-str","CO"],7],
-   [["adv-locution","2P-P","VT-str","CO"],7],
+   [["adv-locution","1P-P","VT-str","CO"],5],
+   [["adv-locution","2P-P","VT-str","CO"],5],
 ];
 const verbStructures = {
    "VI-str": [   // [structure,weight]
-      [["VI"],40],
+      [["VI"],100],
       [["VI","adv-aftVerb"],5],
-      [["VI-neg"],4],
+      [["VI-neg"],10],
       [["VI-negWithAdv","adv-aftNegVerb"],1]
    ],
    "VT-str": [   // [structure,weight]
-      [["VT"],40],
+      [["VT"],100],
       [["VT","adv-aftVerb"],5],
-      [["VT-neg"],4],
+      [["VT-neg"],10],
       [["VT-negWithAdv","adv-aftNegVerb"],1]
    ]
 };
