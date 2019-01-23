@@ -311,7 +311,7 @@ function generateWordList(block) {
       return "";
    }else if(set.hasOwnProperty(blockLabel)){
       for(var subset of set[blockLabel]){
-         var subsetIndex = structureTypes.indexOf(subset);
+         var subsetIndex = structureTypes.indexOf(subset[0]);
          text += generateWordList(subsetIndex);
       }
    }else if(blockLabel.startsWith("adj")){
@@ -353,6 +353,10 @@ function generateWordList(block) {
 };
 
 function getWord(block,person,plural,tense,rng) {
+   if(set.hasOwnProperty(block)){
+      block = pickOne(set[block],rng,false,true);
+      return getWord(block,person,plural,tense,rng);
+   }
    if(block.startsWith("double-")){
       var word1 = getWord(block.substring(7),person,plural,tense,rng);
       var word2 = getWord(block.substring(7),person,plural,tense,rng);
@@ -360,10 +364,6 @@ function getWord(block,person,plural,tense,rng) {
       person = 3;
       plural = 1;
       return [word,person,plural];
-   }
-   if(set.hasOwnProperty(block)){
-      block = pickOne(set[block],rng);
-      return getWord(block,person,plural,tense,rng);
    }
    var batch = batches[block];
    switch(block){
@@ -5282,44 +5282,48 @@ const batches = {
 
 const set = {
    "3P-S": [
-      "N-M-S-noDet",
-      "N-M-S",
-      "N-M-S-adj",
-      "N-F-S-noDet",
-      "N-F-S",
-      "N-F-S-adj" ],
+      ["N-M-S-noDet",1],
+      ["N-M-S",1],
+      ["N-M-S-adj",1],
+      ["N-F-S-noDet",1],
+      ["N-F-S",1],
+      ["N-F-S-adj",1] 
+   ],
    "3P-P": [
-      "N-M-P-noDet",
-      "N-M-P",
-      "N-M-P-adj",
-      "N-F-P-noDet",
-      "N-F-P",
-      "N-F-P-adj",
-      "double-3P" ],
+      ["N-M-P-noDet",1],
+      ["N-M-P",1],
+      ["N-M-P-adj",1],
+      ["N-F-P-noDet",1],
+      ["N-F-P",1],
+      ["N-F-P-adj",1],
+      ["double-3P",2]   // sujet1 + "et" + sujet2 
+   ],
    "3P": [  // pour les groupes de 2 sujets
-      "CO-M-S-noDet",
-      "N-M-S",
-      "N-M-S-adj",
-      "CO-F-S-noDet",
-      "N-F-S",
-      "N-F-S-adj",
-      "CO-M-P-noDet",
-      "N-M-P",
-      "N-M-P-adj",
-      "CO-F-P-noDet",
-      "N-F-P",
-      "N-F-P-adj" ],  
+      ["CO-M-S-noDet",1],
+      ["N-M-S",1],
+      ["N-M-S-adj",1],
+      ["CO-F-S-noDet",1],
+      ["N-F-S",1],
+      ["N-F-S-adj",1],
+      ["CO-M-P-noDet",1],
+      ["N-M-P",1],
+      ["N-M-P-adj",1],
+      ["CO-F-P-noDet",1],
+      ["N-F-P",1],
+      ["N-F-P-adj",1] 
+   ],  
    "CO": [
-      "CO-M-S-noDet",
-      "CO-M-S",
-      "CO-M-S-adj",
-      "CO-F-S-noDet",
-      "CO-F-S",
-      "CO-F-S-adj",
-      "CO-M-P-noDet",
-      "CO-M-P",
-      "CO-M-P-adj",
-      "CO-F-P-noDet",
-      "CO-F-P",
-      "CO-F-P-adj" ]
+      ["CO-M-S-noDet",1],
+      ["CO-M-S",1],
+      ["CO-M-S-adj",1],
+      ["CO-F-S-noDet",1],
+      ["CO-F-S",1],
+      ["CO-F-S-adj",1],
+      ["CO-M-P-noDet",1],
+      ["CO-M-P",1],
+      ["CO-M-P-adj",1],
+      ["CO-F-P-noDet",1],
+      ["CO-F-P",1],
+      ["CO-F-P-adj",1] 
+   ]
 };
