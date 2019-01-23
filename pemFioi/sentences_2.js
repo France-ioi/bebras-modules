@@ -365,12 +365,19 @@ function getWord(block,person,plural,tense,rng) {
       plural = 1;
       return [word,person,plural];
    }
+   if(block.endsWith("-de")){
+      var word1 = getWord(block+"fArt",person,plural,tense,rng);
+      var word2 = getWord("de+Noun",person,plural,tense,rng);
+      var word = elide(word1[0] + " de " + word2[0]);
+      return [word,word1[1],word1[2]];
+   }
    var batch = batches[block];
    switch(block){
       case "N-M-S-noDet":
       case "N-F-S-noDet":
       case "CO-M-S-noDet":
       case "CO-F-S-noDet":
+      case "de+Noun":
          person = 3;
          plural = 0;
          var type = pickOne(batch,rng,false,true);
@@ -388,18 +395,22 @@ function getWord(block,person,plural,tense,rng) {
       
       case "N-M-S":
       case "N-M-S-adj":
+      case "N-M-S-defArt":
       case "N-F-S":
       case "N-F-S-adj":
+      case "N-F-S-defArt":
       case "CO-M-S":
       case "CO-F-S":
       case "CO-M-S-adj":
       case "CO-F-S-adj":
+      case "CO-M-S-defArt":
+      case "CO-F-S-defArt":
          person = 3;
          plural = 0;
          gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng,false,true);
          var noun = pickOne(type,rng)[0];
-         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre"){    // if country
+         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre" || block.endsWith("-defArt")){    // if country or defArt
             var det = getDeterminer(gender,0,"definite_article",rng);
          }else{
             var det = getDeterminer(gender,0,"",rng);
@@ -412,19 +423,27 @@ function getWord(block,person,plural,tense,rng) {
          break;
       case "N-M-P":
       case "N-M-P-adj":
+      case "N-M-P-defArt":
       case "N-F-P":
       case "N-F-P-adj":
+      case "N-F-P-defArt":
       case "CO-M-P":
       case "CO-F-P":
       case "CO-M-P-adj":
       case "CO-F-P-adj":
+      case "CO-M-P-defArt":
+      case "CO-F-P-defArt":
          person = 3;
          plural = 1;
          gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng,false,true);
          var nounIndex = Math.trunc(rng() * type.length);
          var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-         var det = getDeterminer(gender,1,"",rng);
+         if(block.endsWith("-defArt")){ 
+            var det = getDeterminer(gender,1,"definite_article",rng);
+         }else{
+            var det = getDeterminer(gender,1,"",rng);
+         }
          if(block.endsWith("-adj")){
             var word = addAdjective(noun,det,gender,plural,rng);
          }else{
@@ -469,6 +488,9 @@ function getWord(block,person,plural,tense,rng) {
             verb += getWord(subBlock,person,plural,tense,rng)[0]+" ";
          }
          var word = verb;
+   }
+   if(!word){
+      console.log(block);
    }
    return [word,person,plural];
 }
@@ -615,11 +637,11 @@ function elide(str) {
    str = str.toLowerCase();
    str = str.replace(/[èéêë]/g,"e");
    str = " " + str; 
-   str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
-   str = str.replace(/[ ](ce)[ ]([aeiouy])/gi," cet $2");
-   str = str.replace(/[ ](de)[ ]([aeiouy])/gi," d'$2");
-   str = str.replace(/[ ](je)[ ]([aeiouy])/gi," j'$2");
-   str = str.replace(/[ ](ne)[ ]([aeiouy])/gi," n'$2");
+   str = str.replace(/[ ](le|la)[ ]([aeiou])/gi," l'$2");
+   str = str.replace(/[ ](ce)[ ]([aeiou])/gi," cet $2");
+   str = str.replace(/[ ](de)[ ]([aeiou])/gi," d'$2");
+   str = str.replace(/[ ](je)[ ]([aeiou])/gi," j'$2");
+   str = str.replace(/[ ](ne)[ ]([aeiou])/gi," n'$2");
    str = str.replace(/[ ]à[ ]le[ ]/gi," au ");
    str = str.replace(/[ ]à[ ]les[ ]/gi," aux ");
    var words = str.split(" ");
@@ -762,10 +784,10 @@ const structureTypes = [
    "N-F-P",
    "1P-S",  // 1ère personne su singulier
    "2P-S",
-   "3P-S",  // 3ème personne du singulier, regroupe plusieurs types (cf. array set)
+   // "3P-S",  // 3ème personne du singulier, regroupe plusieurs types (cf. array set)
    "1P-P",
    "2P-P",
-   "3P-P",  // 3ème personne du pluriel, regroupe plusieurs types (cf. array set)
+   // "3P-P",  // 3ème personne du pluriel, regroupe plusieurs types (cf. array set)
    "VI",    // verbe intransitif
    "VT",
    "CO-M-S-noDet",   // complément d'objet direct masculin singulier sans déterminant
@@ -898,6 +920,11 @@ const cofpNoDet = [  // [subset,weight]
    [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
 
+const deNoun = [
+   [nouns["name"].M,1],
+   [nouns["name"].F,1]
+];
+
 const batches = {
    "N-M-S-noDet": nmsNoDet,
    "N-F-S-noDet": nfsNoDet,
@@ -905,12 +932,16 @@ const batches = {
    "N-F-P-noDet": nfpNoDet,
    "N-M-S": nms,
    "N-M-S-adj": nms,
+   "N-M-S-defArt": nms, // N-M-S with definite article (before "de")
    "N-F-S": nfs,
    "N-F-S-adj": nfs,
+   "N-F-S-defArt": nfs, // N-F-S with definite article (before "de")
    "N-M-P": nmp,
    "N-M-P-adj": nmp,
+   "N-M-P-defArt": nmp, // N-M-P with definite article (before "de")
    "N-F-P": nfp,
    "N-F-P-adj": nfp,
+   "N-F-P-defArt": nfp, // N-F-P with definite article (before "de")
    "1P-S": p1,
    "2P-S": p2,
    "1P-P": p1,
@@ -927,33 +958,42 @@ const batches = {
    "CO-F-S": nfs,
    "CO-M-S-adj": nms,
    "CO-F-S-adj": nfs,
+   "CO-M-S-defArt": nms,
+   "CO-F-S-defArt": nfs,
    "CO-M-P-noDet": compNoDet,
    "CO-F-P-noDet": cofpNoDet,
    "CO-M-P": nmp,
    "CO-F-P": nfp,
    "CO-M-P-adj": nmp,
    "CO-F-P-adj": nfp,
+   "CO-M-P-defArt": nmp,
+   "CO-F-P-defArt": nfp,
    "adv-aftVerb": adverbs["aftVerb"],
    "adv-aftNegVerb": adverbs["aftNegVerb"],
    "adv-beforeAdj": adverbs["beforeAdj"],
-   "adv-locution": adverbs["locution"]
+   "adv-locution": adverbs["locution"],
+   "de+Noun": deNoun   // préposition de + nom
 };
 
 const set = {
    "3P-S": [
       ["N-M-S-noDet",1],
       ["N-M-S",1],
+      ["N-M-S-de",1],      // N-M-S + de + ...
       ["N-M-S-adj",1],
       ["N-F-S-noDet",1],
       ["N-F-S",1],
+      ["N-F-S-de",1],
       ["N-F-S-adj",1] 
    ],
    "3P-P": [
       ["N-M-P-noDet",1],
       ["N-M-P",1],
+      ["N-M-P-de",1],
       ["N-M-P-adj",1],
       ["N-F-P-noDet",1],
       ["N-F-P",1],
+      ["N-F-P-de",1],
       ["N-F-P-adj",1],
       ["double-3P",2]   // sujet1 + "et" + sujet2 
    ],
@@ -961,28 +1001,36 @@ const set = {
       ["CO-M-S-noDet",1],
       ["N-M-S",1],
       ["N-M-S-adj",1],
+      ["N-M-S-de",1], 
       ["CO-F-S-noDet",1],
       ["N-F-S",1],
       ["N-F-S-adj",1],
+      ["N-F-S-de",1],
       ["CO-M-P-noDet",1],
       ["N-M-P",1],
       ["N-M-P-adj",1],
+      ["N-M-P-de",1],
       ["CO-F-P-noDet",1],
       ["N-F-P",1],
-      ["N-F-P-adj",1] 
+      ["N-F-P-adj",1],
+      ["N-F-P-de",1] 
    ],  
    "CO": [
       ["CO-M-S-noDet",1],
       ["CO-M-S",1],
       ["CO-M-S-adj",1],
+      ["CO-M-S-de",1],
       ["CO-F-S-noDet",1],
       ["CO-F-S",1],
       ["CO-F-S-adj",1],
+      ["CO-F-S-de",1],
       ["CO-M-P-noDet",1],
       ["CO-M-P",1],
       ["CO-M-P-adj",1],
+      ["CO-M-P-de",1],
       ["CO-F-P-noDet",1],
       ["CO-F-P",1],
-      ["CO-F-P-adj",1] 
+      ["CO-F-P-adj",1]
+      ["CO-F-P-de",1], 
    ]
 };
