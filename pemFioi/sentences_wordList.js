@@ -1,4 +1,4 @@
-const tenses = ["present","imparfait","futur"];
+
 const conjugations = [  // 1er et 2ème groupes
    { 
       "present": ["e","es","e","ons","ez","ent"],
@@ -11,6 +11,9 @@ const conjugations = [  // 1er et 2ème groupes
       "futur": ["rai","ras","ra","rons","rez","ront"]   
    }
 ];
+const pastParticiples = [  // 1er et 2ème groupes
+   "é","i"
+];
 const speConjugations = [  // 3ème groupe
    { "present": ["iens","iens","ient","enons","enez","iennent"] },
    { "present": ["eux","eux","eut","oulons","oulez","eulent"] },
@@ -19,14 +22,14 @@ const speConjugations = [  // 3ème groupe
 ];
 const auxConjugations = [
    { 
-      "present": ["suis","es","est","sommes","êtes","sont"],
-      "imparfait": ["étais","étais","était","étions","étiez","étaient"],
-      "futur": ["serai","seras","sera","serons","serez","seront"] 
-   },
-   { 
       "present": ["ai","as","a","avons","avez","ont"],
       "imparfait": ["avais","avais","avait","avions","aviez","avaient"],
       "futur": ["aurai","auras","aura","aurons","aurez","auront"] 
+   },
+   { 
+      "present": ["suis","es","est","sommes","êtes","sont"],
+      "imparfait": ["étais","étais","était","étions","étiez","étaient"],
+      "futur": ["serai","seras","sera","serons","serez","seront"] 
    }
 ];
 const allerConj = {
@@ -36,7 +39,30 @@ const exceptions = [
    [ "acheter", "geler", "haleter", "déceler", "modeler", "ciseler", "congeler", "marteler", "crocheter" ]
 ];
 
-const negationWords = ["pas","plus","jamais","même pas","même plus","nullement"];
+const negationWords = [
+   "pas",
+   "plus",
+   "jamais",
+   "même pas",
+   "même plus",
+   "nullement",
+   "pas assez",
+   "pas beaucoup",
+   "pas complètement",
+   "pas du tout",
+   "pas encore",
+   "pas sérieusement",
+   "pas suffisamment",
+   "pas tellement",
+   "pas tout à fait",
+   "pas vraiment",
+   "plus assez",
+   "plus beaucoup",
+   "plus du tout",
+   "plus suffisamment",
+   "plus tellement",
+   "plus vraiment"
+   ];
 
 const determinerTypes = [
    "definite_article",
@@ -136,7 +162,7 @@ const pronouns = {
    //    ["laquelle", 0, 0],
    //    ["lesquelles", 0, 1] ]  
 };
-const nounTypes = ["name","job","animal","plant","country","city"];
+const nounTypes = ["name","job","animal","plant","item","country","city"];
 const nouns = {
    "name": { 
       "M": [
@@ -1000,27 +1026,71 @@ const nouns = {
    },   
    "country": {
       "M": [   
+         [ "Afghanistan" ],
+         [ "Brésil" ],
+         [ "Burkina Faso" ],
+         [ "Cambodge" ],
+         [ "Cameroun" ],
+         [ "Canada" ],
+         [ "Chili" ],
+         [ "Congo" ],
+         [ "Costa Rica" ],
          [ "Danemark" ],
+         [ "Gabon" ],
+         [ "Groenland" ],
+         [ "Guatemala" ],
+         [ "Honduras" ],
+         [ "Japon" ],
+         [ "Kazakhstan" ],
+         [ "Kenya" ],
+         [ "Koweït" ],
+         [ "Laos" ],
+         [ "Liban" ],
          [ "Luxembourg" ],
-         [ "Portugal" ]
+         [ "Mali" ],
+         [ "Maroc" ],
+         [ "Mexique" ],
+         [ "Népal" ],
+         [ "Nicaragua" ],
+         [ "Pakistan" ],
+         [ "Pérou" ],
+         [ "Portugal" ],
+         [ "Québec" ],
+         [ "Sénégal" ],
+         [ "Sri Lanka" ],
+         [ "Vietnam" ]
       ],
-      "F": [   
+      "F": [  
+         [ "Afrique du sud" ], 
+         [ "Algérie" ],
+         [ "Allemagne" ],
+         [ "Andorre" ],
          [ "Angleterre" ],
+         [ "Argentine" ],
+         [ "Arménie" ],
+         [ "Australie" ],
          [ "Autriche" ],
          [ "Belgique" ],
+         [ "Birmanie" ],
+         [ "Bolivie" ],
          [ "Bulgarie" ],
+         [ "Chine" ],
+         [ "Colombie" ],
+         [ "Côte d'ivoire" ],
          [ "Croatie" ],
          [ "Tchéquie" ],
          [ "Estonie" ],
          [ "Finlande" ],
          [ "France" ],
-         [ "Allemagne" ],
          [ "Grèce" ],
          [ "Hongrie" ],
+         [ "Inde" ],
+         [ "Indonésie" ],
          [ "Irlande" ],
          [ "Italie" ],
          [ "Lettonie" ],
          [ "Lituanie" ],
+         [ "Malaisie" ],
          [ "Norvège" ],
          [ "Pologne" ],
          [ "Roumanie" ],
@@ -2245,7 +2315,7 @@ const adjectives = { // [M-S,F-S]
 const auxiliaryVerbs = ["avoir","être","both"];
 const verbTypes = ["intransitive","transitive","modal"];
 const verbs = {
-   "intransitive": [ // [verb, group, auxiliary, complement, (radical)]
+   "intransitive": [ // [verb, group, auxiliary]
       [ "abandonner", 1, 0 ],
       [ "abdiquer", 1, 0 ],
       [ "aboyer", 1, 0 ],
@@ -2262,7 +2332,7 @@ const verbs = {
       [ "arriver", 1, 1 ],
       [ "articuler", 1, 0 ],
       [ "assumer", 1, 0 ],
-      [ "atterrir", 2, 2, "" ],
+      [ "atterrir", 2, 0 ],
       [ "avancer", 1, 0 ],
       [ "bâiller", 1, 0 ],
       [ "baragouiner", 1, 0 ],
@@ -2586,7 +2656,7 @@ const verbs = {
       [ "rentrer", 1, 1 ],
       [ "respirer", 1, 0 ],
       [ "ressusciter", 1, 0 ],
-      [ "rester", 1, 0 ],
+      [ "rester", 1, 1 ],
       [ "rêver", 1, 0 ],
       [ "rêvasser", 1, 0 ],
       [ "réviser", 1, 0 ],
@@ -2644,7 +2714,7 @@ const verbs = {
       [ "théoriser", 1, 0 ],
       [ "tintinnabuler", 1, 0 ],
       [ "tituber", 1, 0 ],
-      [ "tomber", 1, 0 ],
+      [ "tomber", 1, 1 ],
       [ "tourbillonner", 1, 0 ],
       [ "tourner", 1, 0 ],
       [ "tournoyer", 1, 0 ],
@@ -4083,18 +4153,18 @@ const adverbs =  {
       "vraiment",
       "vraisemblablement"
    ],
-   "aftNegVerb": [   // après (ne + verbe + pas)
-      "assez",
-      "beaucoup",
-      "complètement",
-      "du tout",
-      "encore",
-      "sérieusement",
-      "suffisamment",
-      "tellement",
-      "tout à fait",
-      "vraiment"
-   ],
+   // "aftNegVerb": [   // après (ne + verbe + pas)
+   //    "assez",
+   //    "beaucoup",
+   //    "complètement",
+   //    "du tout",
+   //    "encore",
+   //    "sérieusement",
+   //    "suffisamment",
+   //    "tellement",
+   //    "tout à fait",
+   //    "vraiment"
+   // ],
    "beforeAdj": [
       "abominablement",
       "abusivement",
