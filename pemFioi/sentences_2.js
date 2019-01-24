@@ -366,9 +366,19 @@ function getWord(block,person,plural,tense,rng) {
       return [word,person,plural];
    }
    if(block.endsWith("-de")){
-      var word1 = getWord(block+"fArt",person,plural,tense,rng);
+      var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,tense,rng);
       var word2 = getWord("de+Noun",person,plural,tense,rng);
-      var word = elide(word1[0] + " de " + word2[0]);
+      var countryM = false;
+      for(var country of nouns["country"].M){
+         if(country[0].toLowerCase() === word2[0].toLowerCase()){
+            countryM = true;
+         }
+      }
+      if(countryM){
+         var word = elide(word1[0] + " du " + word2[0]);
+      }else{
+         var word = elide(word1[0] + " de " + word2[0]);
+      }
       return [word,word1[1],word1[2]];
    }
    var batch = batches[block];
@@ -395,22 +405,22 @@ function getWord(block,person,plural,tense,rng) {
       
       case "N-M-S":
       case "N-M-S-adj":
-      case "N-M-S-defArt":
+      case "N-M-S-beforeDe":
       case "N-F-S":
       case "N-F-S-adj":
-      case "N-F-S-defArt":
+      case "N-F-S-beforeDe":
       case "CO-M-S":
       case "CO-F-S":
       case "CO-M-S-adj":
       case "CO-F-S-adj":
-      case "CO-M-S-defArt":
-      case "CO-F-S-defArt":
+      case "CO-M-S-beforeDe":
+      case "CO-F-S-beforeDe":
          person = 3;
          plural = 0;
          gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng,false,true);
          var noun = pickOne(type,rng)[0];
-         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre" || block.endsWith("-defArt")){    // if country or defArt
+         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre" || block.endsWith("-beforeDe")){    // if country or before "de"
             var det = getDeterminer(gender,0,"definite_article",rng);
          }else{
             var det = getDeterminer(gender,0,"",rng);
@@ -423,23 +433,23 @@ function getWord(block,person,plural,tense,rng) {
          break;
       case "N-M-P":
       case "N-M-P-adj":
-      case "N-M-P-defArt":
+      case "N-M-P-beforeDe":
       case "N-F-P":
       case "N-F-P-adj":
-      case "N-F-P-defArt":
+      case "N-F-P-beforeDe":
       case "CO-M-P":
       case "CO-F-P":
       case "CO-M-P-adj":
       case "CO-F-P-adj":
-      case "CO-M-P-defArt":
-      case "CO-F-P-defArt":
+      case "CO-M-P-beforeDe":
+      case "CO-F-P-beforeDe":
          person = 3;
          plural = 1;
          gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng,false,true);
          var nounIndex = Math.trunc(rng() * type.length);
          var noun = pluralize(type[nounIndex][0],type[nounIndex][1]);
-         if(block.endsWith("-defArt")){ 
+         if(block.endsWith("-beforeDe")){ 
             var det = getDeterminer(gender,1,"definite_article",rng);
          }else{
             var det = getDeterminer(gender,1,"",rng);
@@ -920,9 +930,23 @@ const cofpNoDet = [  // [subset,weight]
    [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
 
+const nmsBeforeDe = [
+   [nouns["job"].M,1],
+   [nouns["animal"].M,1],
+   [nouns["plant"].M,1]
+];
+const nfsBeforeDe = [  // [subset,weight]
+   [nouns["job"].F,1],
+   [nouns["animal"].F,1],
+   [nouns["plant"].F,1]
+];
+
 const deNoun = [
    [nouns["name"].M,1],
-   [nouns["name"].F,1]
+   [nouns["name"].F,1],
+   [nouns["city"],1],
+   [nouns["country"].M,1],
+   [nouns["country"].F,1]
 ];
 
 const batches = {
@@ -932,16 +956,16 @@ const batches = {
    "N-F-P-noDet": nfpNoDet,
    "N-M-S": nms,
    "N-M-S-adj": nms,
-   "N-M-S-defArt": nms, // N-M-S with definite article (before "de")
+   "N-M-S-beforeDe": nmsBeforeDe, // N-M-S with definite article (before "de")
    "N-F-S": nfs,
    "N-F-S-adj": nfs,
-   "N-F-S-defArt": nfs, // N-F-S with definite article (before "de")
+   "N-F-S-beforeDe": nfsBeforeDe, // N-F-S with definite article (before "de")
    "N-M-P": nmp,
    "N-M-P-adj": nmp,
-   "N-M-P-defArt": nmp, // N-M-P with definite article (before "de")
+   "N-M-P-beforeDe": nmsBeforeDe, // N-M-P with definite article (before "de")
    "N-F-P": nfp,
    "N-F-P-adj": nfp,
-   "N-F-P-defArt": nfp, // N-F-P with definite article (before "de")
+   "N-F-P-beforeDe": nfsBeforeDe, // N-F-P with definite article (before "de")
    "1P-S": p1,
    "2P-S": p2,
    "1P-P": p1,
@@ -958,16 +982,16 @@ const batches = {
    "CO-F-S": nfs,
    "CO-M-S-adj": nms,
    "CO-F-S-adj": nfs,
-   "CO-M-S-defArt": nms,
-   "CO-F-S-defArt": nfs,
+   "CO-M-S-beforeDe": nmsBeforeDe,
+   "CO-F-S-beforeDe": nfsBeforeDe,
    "CO-M-P-noDet": compNoDet,
    "CO-F-P-noDet": cofpNoDet,
    "CO-M-P": nmp,
    "CO-F-P": nfp,
    "CO-M-P-adj": nmp,
    "CO-F-P-adj": nfp,
-   "CO-M-P-defArt": nmp,
-   "CO-F-P-defArt": nfp,
+   "CO-M-P-beforeDe": nmsBeforeDe,
+   "CO-F-P-beforeDe": nfsBeforeDe,
    "adv-aftVerb": adverbs["aftVerb"],
    "adv-aftNegVerb": adverbs["aftNegVerb"],
    "adv-beforeAdj": adverbs["beforeAdj"],
