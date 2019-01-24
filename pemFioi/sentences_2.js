@@ -406,15 +406,19 @@ function getWord(block,person,plural,tense,rng) {
       case "N-M-S":
       case "N-M-S-adj":
       case "N-M-S-beforeDe":
+      case "N-M-S-adj-beforeDe":
       case "N-F-S":
       case "N-F-S-adj":
       case "N-F-S-beforeDe":
+      case "N-F-S-adj-beforeDe":
       case "CO-M-S":
       case "CO-F-S":
       case "CO-M-S-adj":
       case "CO-F-S-adj":
       case "CO-M-S-beforeDe":
       case "CO-F-S-beforeDe":
+      case "CO-M-S-adj-beforeDe":
+      case "CO-F-S-adj-beforeDe":
          person = 3;
          plural = 0;
          gender = block.includes("-M-") ? "M" : "F";
@@ -425,7 +429,7 @@ function getWord(block,person,plural,tense,rng) {
          }else{
             var det = getDeterminer(gender,0,"",rng);
          }
-         if(block.endsWith("-adj")){
+         if(block.endsWith("-adj") || block.includes("-adj-")){
             var word = addAdjective(noun,det,gender,plural,rng);
          }else{
             var word = elide(det + " " + noun);
@@ -434,15 +438,19 @@ function getWord(block,person,plural,tense,rng) {
       case "N-M-P":
       case "N-M-P-adj":
       case "N-M-P-beforeDe":
+      case "N-M-P-adj-beforeDe":
       case "N-F-P":
       case "N-F-P-adj":
       case "N-F-P-beforeDe":
+      case "N-F-P-adj-beforeDe":
       case "CO-M-P":
       case "CO-F-P":
       case "CO-M-P-adj":
       case "CO-F-P-adj":
       case "CO-M-P-beforeDe":
       case "CO-F-P-beforeDe":
+      case "CO-M-P-adj-beforeDe":
+      case "CO-F-P-adj-beforeDe":
          person = 3;
          plural = 1;
          gender = block.includes("-M-") ? "M" : "F";
@@ -454,7 +462,7 @@ function getWord(block,person,plural,tense,rng) {
          }else{
             var det = getDeterminer(gender,1,"",rng);
          }
-         if(block.endsWith("-adj")){
+         if(block.endsWith("-adj") || block.includes("-adj-")){
             var word = addAdjective(noun,det,gender,plural,rng);
          }else{
             var word = elide(det + " " + noun);
@@ -647,11 +655,11 @@ function elide(str) {
    str = str.toLowerCase();
    str = str.replace(/[èéêë]/g,"e");
    str = " " + str; 
-   str = str.replace(/[ ](le|la)[ ]([aeiou])/gi," l'$2");
-   str = str.replace(/[ ](ce)[ ]([aeiou])/gi," cet $2");
-   str = str.replace(/[ ](de)[ ]([aeiou])/gi," d'$2");
-   str = str.replace(/[ ](je)[ ]([aeiou])/gi," j'$2");
-   str = str.replace(/[ ](ne)[ ]([aeiou])/gi," n'$2");
+   str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
+   str = str.replace(/[ ](ce)[ ]([aeiouy])/gi," cet $2");
+   str = str.replace(/[ ](de)[ ]([aeiouy])/gi," d'$2");
+   str = str.replace(/[ ](je)[ ]([aeiouy])/gi," j'$2");
+   str = str.replace(/[ ](ne)[ ]([aeiouy])/gi," n'$2");
    str = str.replace(/[ ]à[ ]le[ ]/gi," au ");
    str = str.replace(/[ ]à[ ]les[ ]/gi," aux ");
    var words = str.split(" ");
@@ -957,15 +965,19 @@ const batches = {
    "N-M-S": nms,
    "N-M-S-adj": nms,
    "N-M-S-beforeDe": nmsBeforeDe, // N-M-S with definite article (before "de")
+   "N-M-S-adj-beforeDe": nmsBeforeDe,
    "N-F-S": nfs,
    "N-F-S-adj": nfs,
    "N-F-S-beforeDe": nfsBeforeDe, // N-F-S with definite article (before "de")
+   "N-F-S-adj-beforeDe": nfsBeforeDe,
    "N-M-P": nmp,
    "N-M-P-adj": nmp,
    "N-M-P-beforeDe": nmsBeforeDe, // N-M-P with definite article (before "de")
+   "N-M-P-adj-beforeDe": nmsBeforeDe,
    "N-F-P": nfp,
    "N-F-P-adj": nfp,
    "N-F-P-beforeDe": nfsBeforeDe, // N-F-P with definite article (before "de")
+   "N-F-P-adj-beforeDe": nfsBeforeDe,
    "1P-S": p1,
    "2P-S": p2,
    "1P-P": p1,
@@ -984,6 +996,8 @@ const batches = {
    "CO-F-S-adj": nfs,
    "CO-M-S-beforeDe": nmsBeforeDe,
    "CO-F-S-beforeDe": nfsBeforeDe,
+   "CO-M-S-adj-beforeDe": nmsBeforeDe,
+   "CO-F-S-adj-beforeDe": nfsBeforeDe,
    "CO-M-P-noDet": compNoDet,
    "CO-F-P-noDet": cofpNoDet,
    "CO-M-P": nmp,
@@ -992,6 +1006,8 @@ const batches = {
    "CO-F-P-adj": nfp,
    "CO-M-P-beforeDe": nmsBeforeDe,
    "CO-F-P-beforeDe": nfsBeforeDe,
+   "CO-M-P-adj-beforeDe": nmsBeforeDe,
+   "CO-F-P-adj-beforeDe": nfsBeforeDe,
    "adv-aftVerb": adverbs["aftVerb"],
    "adv-aftNegVerb": adverbs["aftNegVerb"],
    "adv-beforeAdj": adverbs["beforeAdj"],
@@ -1003,58 +1019,70 @@ const set = {
    "3P-S": [
       ["N-M-S-noDet",1],
       ["N-M-S",1],
-      ["N-M-S-de",1],      // N-M-S + de + ...
+      ["N-M-S-de",1],      // groupe (N-M-S + de + nom)
       ["N-M-S-adj",1],
+      ["N-M-S-adj-de",1],
       ["N-F-S-noDet",1],
       ["N-F-S",1],
       ["N-F-S-de",1],
-      ["N-F-S-adj",1] 
+      ["N-F-S-adj",1],
+      ["N-F-S-adj-de",1], 
    ],
    "3P-P": [
       ["N-M-P-noDet",1],
       ["N-M-P",1],
       ["N-M-P-de",1],
       ["N-M-P-adj",1],
+      ["N-M-P-adj-de",1],
       ["N-F-P-noDet",1],
       ["N-F-P",1],
       ["N-F-P-de",1],
       ["N-F-P-adj",1],
+      ["N-F-P-adj-de",1],
       ["double-3P",2]   // sujet1 + "et" + sujet2 
    ],
    "3P": [  // pour les groupes de 2 sujets
       ["CO-M-S-noDet",1],
       ["N-M-S",1],
-      ["N-M-S-adj",1],
       ["N-M-S-de",1], 
+      ["N-M-S-adj",1],
+      ["N-M-S-adj-de",1],
       ["CO-F-S-noDet",1],
       ["N-F-S",1],
-      ["N-F-S-adj",1],
       ["N-F-S-de",1],
+      ["N-F-S-adj",1],
+      ["N-F-S-adj-de",1], 
       ["CO-M-P-noDet",1],
       ["N-M-P",1],
-      ["N-M-P-adj",1],
       ["N-M-P-de",1],
+      ["N-M-P-adj",1],
+      ["N-M-P-adj-de",1],
       ["CO-F-P-noDet",1],
       ["N-F-P",1],
+      ["N-F-P-de",1] ,
       ["N-F-P-adj",1],
-      ["N-F-P-de",1] 
+      ["N-F-P-adj-de",1]
    ],  
    "CO": [
       ["CO-M-S-noDet",1],
       ["CO-M-S",1],
-      ["CO-M-S-adj",1],
       ["CO-M-S-de",1],
+      ["CO-M-S-adj",1],
+      ["CO-M-S-adj-de",1],
       ["CO-F-S-noDet",1],
       ["CO-F-S",1],
-      ["CO-F-S-adj",1],
       ["CO-F-S-de",1],
+      ["CO-F-S-adj",1],
+      ["CO-F-S-adj-de",1],
       ["CO-M-P-noDet",1],
       ["CO-M-P",1],
-      ["CO-M-P-adj",1],
       ["CO-M-P-de",1],
+      ["CO-M-P-adj",1],
+      ["CO-M-P-adj-de",1],
       ["CO-F-P-noDet",1],
       ["CO-F-P",1],
-      ["CO-F-P-adj",1]
-      ["CO-F-P-de",1], 
+      ["CO-F-P-de",1],
+      ["CO-F-P-adj",1],
+      ["CO-F-P-adj-de",1]
    ]
 };
