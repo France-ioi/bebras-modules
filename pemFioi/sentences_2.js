@@ -655,11 +655,11 @@ function elide(str) {
    str = str.toLowerCase();
    str = str.replace(/[èéêë]/g,"e");
    str = " " + str; 
-   str = str.replace(/[ ](le|la)[ ]([aeiouy])/gi," l'$2");
-   str = str.replace(/[ ](ce)[ ]([aeiouy])/gi," cet $2");
-   str = str.replace(/[ ](de)[ ]([aeiouy])/gi," d'$2");
-   str = str.replace(/[ ](je)[ ]([aeiouy])/gi," j'$2");
-   str = str.replace(/[ ](ne)[ ]([aeiouy])/gi," n'$2");
+   str = str.replace(/[ ](le|la)[ ]([aeiouy][^a])/gi," l'$2");
+   str = str.replace(/[ ](ce)[ ]([aeiouy][^a])/gi," cet $2");
+   str = str.replace(/[ ](de)[ ]([aeiouy][^a])/gi," d'$2");
+   str = str.replace(/[ ](je)[ ]([aeiouy][^a])/gi," j'$2");
+   str = str.replace(/[ ](ne)[ ]([aeiouy][^a])/gi," n'$2");
    str = str.replace(/[ ]à[ ]le[ ]/gi," au ");
    str = str.replace(/[ ]à[ ]les[ ]/gi," aux ");
    var words = str.split(" ");
