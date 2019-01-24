@@ -4303,7 +4303,7 @@ const elisionWithH = [
    "herbe",
    "heureux", "heureuse",
    "historien",
-   "honnête",
+   "honnete",
    "horticulteur",
    "horloger",
    "horrible",
