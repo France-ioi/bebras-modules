@@ -337,7 +337,7 @@ function generateWordList(block) {
       var tense = tenses[tenseIndex];
       if(blockLabel === "VT" || blockLabel === "VI"){
          for(var word of batch){
-            text += conjugate(word,person,pluralVerb,tense,Math.random);
+            text += conjugate(word,person,pluralVerb,"M",tense,false,Math.random);
             text += "</br>";
          }
       }else{
@@ -352,22 +352,23 @@ function generateWordList(block) {
    return text;
 };
 
-function getWord(block,person,plural,tense,rng) {
+function getWord(block,person,plural,gender,tense,rng) {
    if(set.hasOwnProperty(block)){
       block = pickOne(set[block],rng,false,true);
-      return getWord(block,person,plural,tense,rng);
+      return getWord(block,person,plural,gender,tense,rng);
    }
    if(block.startsWith("double-")){
-      var word1 = getWord(block.substring(7),person,plural,tense,rng);
-      var word2 = getWord(block.substring(7),person,plural,tense,rng);
+      var word1 = getWord(block.substring(7),person,plural,gender,tense,rng);
+      var word2 = getWord(block.substring(7),person,plural,gender,tense,rng);
       var word = word1[0] + " et " + word2[0];
       person = 3;
       plural = 1;
-      return [word,person,plural];
+      gender = (word1[3] === "F" && word2[3] === "F") ? "F" : "M";
+      return [word,person,plural,gender];
    }
    if(block.endsWith("-de")){
-      var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,tense,rng);
-      var word2 = getWord("de+Noun",person,plural,tense,rng);
+      var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,gender,tense,rng);
+      var word2 = getWord("de+Noun",person,plural,gender,tense,rng);
       var countryM = false;
       for(var country of nouns["country"].M){
          if(country[0].toLowerCase() === word2[0].toLowerCase()){
@@ -379,7 +380,7 @@ function getWord(block,person,plural,tense,rng) {
       }else{
          var word = elide(word1[0] + " de " + word2[0]);
       }
-      return [word,word1[1],word1[2]];
+      return [word,word1[1],word1[2],word1[3]];
    }
    var batch = batches[block];
    switch(block){
@@ -387,22 +388,20 @@ function getWord(block,person,plural,tense,rng) {
       case "N-F-S-noDet":
       case "CO-M-S-noDet":
       case "CO-F-S-noDet":
-      case "de+Noun":
-         person = 3;
-         plural = 0;
-         var type = pickOne(batch,rng,false,true);
-         var word = pickOne(type,rng)[plural];
-         break;
       case "N-M-P-noDet":
       case "N-F-P-noDet":
       case "CO-M-P-noDet":
       case "CO-F-P-noDet":
          person = 3;
-         plural = 1;
+         plural = block.includes("-P-") ? 1 : 0;
+         gender = block.includes("-F-") ? "F" : "M";
          var type = pickOne(batch,rng,false,true);
          var word = pickOne(type,rng)[plural];
          break;
-      
+      case "de+Noun":
+         var type = pickOne(batch,rng,false,true);
+         var word = pickOne(type,rng)[0];
+         break;
       case "N-M-S":
       case "N-M-S-adj":
       case "N-M-S-beforeDe":
@@ -484,16 +483,10 @@ function getWord(block,person,plural,tense,rng) {
       case "VT-negWithAdv":
          var verb = pickOne(batch,rng);
          var negation = block.includes("-neg") ? 1 : 0;
-         var verbConj = conjugate(verb,person,plural,tense);
-         if(negation){
-            var negationWord = block.endsWith("-negWithAdv") ? "pas" : pickOne(negationWords,rng);
-            var word = elide("ne " + verbConj + " " + negationWord);
-         }else{
-            var word = verbConj;
-         }
+         var word = conjugate(verb,person,plural,gender,tense,negation,rng);
          break;
       case "adv-aftVerb":
-      case "adv-aftNegVerb":
+      // case "adv-aftNegVerb":
       case "adv-beforeAdj":
       case "adv-locution":
          var word = pickOne(batch,rng);
@@ -503,14 +496,14 @@ function getWord(block,person,plural,tense,rng) {
          var verbStructure = pickOne(verbStructures[block],rng,false,true);
          var verb = "";
          for(var subBlock of verbStructure){
-            verb += getWord(subBlock,person,plural,tense,rng)[0]+" ";
+            verb += getWord(subBlock,person,plural,gender,tense,rng)[0]+" ";
          }
          var word = verb;
    }
    if(!word){
       console.log(block);
    }
-   return [word,person,plural];
+   return [word,person,plural,gender];
 }
 
 // module.exports.generate = function (rng, minLength, maxLength, withSpaces) {
@@ -536,11 +529,13 @@ function generateSentence(rng,n,struc,withSpaces,textMode){
       var structure = (struc === "all") ? pickOne(structures,rng,false,true) : structures[struc][0];
       var person = 3;
       var plural = 0;
+      var gender = "M";
       var tense = pickOne(tenses,rng);
       for(var block of structure){
-         var word = getWord(block,person,plural,tense,rng);
+         var word = getWord(block,person,plural,gender,tense,rng);
          person = word[1];
          plural = word[2];
+         gender = word[3];
          sentence += word[0]+" ";
       }
       sentence = elide(sentence);
@@ -683,71 +678,97 @@ function elide(str) {
    return str;
 };
 
-function conjugate(verb,person,plural,tense,rng) {
+function conjugate(verb,person,plural,gender,tense,negation,rng) {
    var infinitive = verb[0].toLowerCase();
+   var group = verb[1];
+   var aux = verb[2];
    if(tense === "infinitive"){
       return infinitive;
-   }
-   var group = verb[1];
-   if(group === 0){ // auxiliaires
-      if(infinitive === "être"){
-         return auxConjugations[0][tense][person - 1 + plural * 3];
-      }else{
-         return auxConjugations[1][tense][person - 1 + plural * 3];
+   }else if(tense === "passé_composé"){
+      var auxConj = auxConjugations[aux]["present"][person - 1 + plural * 3];
+      var ending = pastParticiples[group - 1];
+      if(aux && gender === "F"){
+         ending += "e";
       }
+      if(aux && plural){
+         ending += "s";
+      }
+      if(group === 1){
+         var verbPP = infinitive.replace(/er$/,ending);
+      }else if(group === 2){
+         var verbPP = infinitive.replace(/ir$/,ending);
+      }
+      if(negation){
+         var negationWord = block.endsWith("-negWithAdv") ? "pas" : pickOne(negationWords,rng);
+         return elide("ne " + auxConj + " " + negationWord + " " + verbPP);
+      }else{
+         return auxConj + " " + verbPP;
+      }
+   // }else if(group === 0){ // auxiliaires
+   //    if(infinitive === "être"){
+   //       return auxConjugations[0][tense][person - 1 + plural * 3];
+   //    }else{
+   //       return auxConjugations[1][tense][person - 1 + plural * 3];
+   //    }
    }else if(group === 1){
       var ending = conjugations[group-1][tense][person - 1 + plural * 3];
       if((infinitive.endsWith("ger") && tense === "present" && person === 1 && plural === 1) || 
          (infinitive.endsWith("ger") && tense === "imparfait" && (plural === 0 || (plural === 1 && person === 3)))){   // exceptions orthographiques (sans tenir compte de l'accentuation)
          ending = "e"+ending;
-         return infinitive.replace(/er$/,ending);
+         var verbConj = infinitive.replace(/er$/,ending);
       }else if((infinitive.endsWith("oyer") || infinitive.endsWith("uyer")) && tense !== "imparfait"){
          if(tense === "present" && plural && (person == 1 || person == 2)){
-            return infinitive.replace(/er$/,ending);
+            var verbConj = infinitive.replace(/er$/,ending);
          }else{
-            return infinitive.replace(/yer$/,"i"+ending); 
+            var verbConj = infinitive.replace(/yer$/,"i"+ending); 
          }
       }else if(infinitive.endsWith("eler") && !exceptions[0].includes(infinitive) && tense !== "imparfait"){
          if(tense === "present" && plural && (person == 1 || person == 2)){
-            return infinitive.replace(/er$/,ending);
+            var verbConj = infinitive.replace(/er$/,ending);
          }else{
-            return infinitive.replace(/er$/,"l"+ending);
+            var verbConj = infinitive.replace(/er$/,"l"+ending);
          }
       }else if(infinitive.endsWith("eter") && !exceptions[0].includes(infinitive) && tense !== "imparfait"){
          if(tense === "present" && plural && (person == 1 || person == 2)){
-            return infinitive.replace(/er$/,ending);
+            var verbConj = infinitive.replace(/er$/,ending);
          }else{
-            return infinitive.replace(/er$/,"t"+ending);
+            var verbConj = infinitive.replace(/er$/,"t"+ending);
          }
       }else{
-         return infinitive.replace(/er$/,ending);
+         var verbConj = infinitive.replace(/er$/,ending);
       }
    }else if(group === 2){
       var ending = conjugations[group-1][tense][person - 1 + plural * 3];
-      return infinitive.replace(/r$/,ending);
+      var verbConj = infinitive.replace(/r$/,ending);
    }else if(group === 3){
       if(infinitive === "aller"){
-         return allerConj[tense][person - 1 + plural * 3];
+         var verbConj = allerConj[tense][person - 1 + plural * 3];
       }else if(infinitive === "pouvoir"){
          var ending = speConjugations[2][tense][person - 1 + plural * 3];
-         return infinitive.replace(/ouvoir$/,ending);
+         var verbConj = infinitive.replace(/ouvoir$/,ending);
       }else if(infinitive === "vouloir"){
          var ending = speConjugations[1][tense][person - 1 + plural * 3];
-         return infinitive.replace(/ouloir$/,ending);
+         var verbConj = infinitive.replace(/ouloir$/,ending);
       }else if(infinitive === "devoir"){
          var ending = speConjugations[3][tense][person - 1 + plural * 3];
-         return infinitive.replace(/evoir$/,ending);
+         var verbConj = infinitive.replace(/evoir$/,ending);
       }else if(infinitive.endsWith("enir")){
          var ending = speConjugations[0][tense][person - 1 + plural * 3];
-         return infinitive.replace(/enir$/,ending);
+         var verbConj = infinitive.replace(/enir$/,ending);
       }else if(infinitive.endsWith("ir") && !infinitive.endsWith("oir")&& !infinitive.endsWith("courir") ){
          var ending = conjugations[0][tense][person - 1 + plural * 3];
-         return infinitive.replace(/ir$/,ending);
+         var verbConj = infinitive.replace(/ir$/,ending);
       }else{
-         return infinitive;
+         var verbConj = infinitive;
       }
    }else{
-      return infinitive;
+      var verbConj = infinitive;
+   }
+   if(negation){
+      var negationWord = block.endsWith("-negWithAdv") ? "pas" : pickOne(negationWords,rng);
+      return elide("ne " + verbConj + " " + negationWord);
+   }else{
+      return verbConj;
    }
 };
 
@@ -819,31 +840,31 @@ const structureTypes = [
    "adjBefore",
    "adjAfter",
    "adv-aftVerb",
-   "adv-aftNegVerb",
+   // "adv-aftNegVerb",
    "adv-beforeAdj",
    "adv-locution"
 ];
 const structures = [ // [structure,weight]
-   [["3P-S","VI-str"],80],
-   [["3P-P","VI-str"],40],
+   [["3P-S","VI-str"],40],
+   [["3P-P","VI-str"],20],
    [["3P-S","VT-str","CO"],80],
    [["3P-P","VT-str","CO"],40],
-   [["1P-S","VI-str"],20],
-   [["2P-S","VI-str"],20],
-   [["1P-P","VI-str"],10],
-   [["2P-P","VI-str"],10],
+   [["1P-S","VI-str"],10],
+   [["2P-S","VI-str"],10],
+   [["1P-P","VI-str"],5],
+   [["2P-P","VI-str"],5],
    [["1P-S","VT-str","CO"],20],
    [["2P-S","VT-str","CO"],20],
    [["1P-P","VT-str","CO"],10],
    [["2P-P","VT-str","CO"],10],
-   [["adv-locution","3P-S","VI-str"],40],
-   [["adv-locution","3P-P","VI-str"],20],
+   [["adv-locution","3P-S","VI-str"],20],
+   [["adv-locution","3P-P","VI-str"],10],
    [["adv-locution","3P-S","VT-str","CO"],40],
    [["adv-locution","3P-P","VT-str","CO"],20],
-   [["adv-locution","1P-S","VI-str"],10],
-   [["adv-locution","2P-S","VI-str"],10],
-   [["adv-locution","1P-P","VI-str"],5],
-   [["adv-locution","2P-P","VI-str"],5],
+   [["adv-locution","1P-S","VI-str"],5],
+   [["adv-locution","2P-S","VI-str"],5],
+   [["adv-locution","1P-P","VI-str"],3],
+   [["adv-locution","2P-P","VI-str"],3],
    [["adv-locution","1P-S","VT-str","CO"],10],
    [["adv-locution","2P-S","VT-str","CO"],10],
    [["adv-locution","1P-P","VT-str","CO"],5],
@@ -854,15 +875,21 @@ const verbStructures = {
       [["VI"],100],
       [["VI","adv-aftVerb"],5],
       [["VI-neg"],10],
-      [["VI-negWithAdv","adv-aftNegVerb"],1]
+      // [["VI-negWithAdv","adv-aftNegVerb"],1]
    ],
    "VT-str": [   // [structure,weight]
       [["VT"],100],
       [["VT","adv-aftVerb"],5],
       [["VT-neg"],10],
-      [["VT-negWithAdv","adv-aftNegVerb"],1]
+      // [["VT-negWithAdv","adv-aftNegVerb"],1]
    ]
 };
+const tenses = [
+   "present",
+   "imparfait",
+   "futur",
+   "passé_composé"
+];
 
 const nmsNoDet = [   // [subset,weight]
    [nouns["name"].M,1],
@@ -1009,7 +1036,7 @@ const batches = {
    "CO-M-P-adj-beforeDe": nmsBeforeDe,
    "CO-F-P-adj-beforeDe": nfsBeforeDe,
    "adv-aftVerb": adverbs["aftVerb"],
-   "adv-aftNegVerb": adverbs["aftNegVerb"],
+   // "adv-aftNegVerb": adverbs["aftNegVerb"],
    "adv-beforeAdj": adverbs["beforeAdj"],
    "adv-locution": adverbs["locution"],
    "de+Noun": deNoun   // préposition de + nom
