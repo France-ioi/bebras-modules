@@ -501,14 +501,14 @@ var quickAlgoInterface = {
                         <span class="fas fa-times"></span>\
                     </span>';
             }
-            $('#testTab'+iTest+' .testTitle').html(icon+' Test '+(iTest+1));
+            $('#testTab'+iTest+' .testTitle').html(icon+' ' + this.strings.testLabel + ' '+(iTest+1));
         }
     },
 
     resetTestScores: function () {
         // Reset test results display
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
-            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
+            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> ' + this.strings.testLabel + ' '+(iTest+1));
         }
     },
 
@@ -733,10 +733,10 @@ var quickAlgoInterface = {
         return '' +
             '<span class="testResults">' +
                 '<span class="' + (results.successRate < 1 ? 'testError' : 'testSuccess') + '">' +
-                    'Test ' + (results.iTestCase+1) + ' : ' +
-                    (results.successRate < 1 ? 'erreur' : 'validé') +
+                    this.strings.testLabel + ' ' + (results.iTestCase+1) + ' : ' +
+                    (results.successRate < 1 ? this.strings.testError : this.strings.testSuccess) +
                 '</span>' +
-                (link ? ' <span class="testLink" onclick="quickAlgoInterface.runTestCase('+results.iTestCase+')">voir</span>' : '') +
+                (link ? ' <span class="testLink" onclick="quickAlgoInterface.runTestCase('+results.iTestCase+')">' + this.strings.seeTest + '</span>' : '') +
             '</span>';
     },
 
