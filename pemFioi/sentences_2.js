@@ -775,27 +775,39 @@ function elide(str) {
    str = str.replace(/[ ](que)[ ]+([aeiouy][^a])/gi," qu'$2");
    str = str.replace(/[ ]à[ ]+le[ ]/gi," au ");
    str = str.replace(/[ ]à[ ]+les[ ]/gi," aux ");
+   str = str.trim();
    var words = str.split(" ");
-   for(var word of words){ // élision pour les mots en H
+   str = "";
+   for(var wordIndex in words){ // élision pour les mots en H
       // console.log(word);
       var hElide = false;
-      if(elisionWithH.includes(word)){
-         hElide = true
-      }
-      for(var radical of elisionWithHVerb) {
-         if(word.startsWith(radical.replace(/[èéêë]/g,"e"))){
-            hElide = true;
-         }
-      }  
-      if(hElide){
-         str = str.replace(/[ ](je)[ ]+(h[aeiouy])/gi," j'$2");
-         str = str.replace(/[ ](ne)[ ]+(h[aeiouy])/gi," n'$2");
-         str = str.replace(/[ ](le|la)[ ]+(h[aeiouy])/gi," l'$2");
-         str = str.replace(/[ ](ce)[ ]+(h[aeiouy])/gi," cet $2");
-         str = str.replace(/[ ](de)[ ]+(h[aeiouy])/gi," d'$2");
-         str = str.replace(/[ ](que)[ ]+(h[aeiouy])/gi," qu'$2");
+      if(wordIndex > 0 && (elisionWithH.includes(words[wordIndex]) || isHVerb(words[wordIndex]))){
+        words[wordIndex - 1] = elideH( " " + words[wordIndex - 1] + " " + words[wordIndex]);
+        words[wordIndex] = "";
       }
    }
+   for(var word of words){
+      str += word + " ";
+   }
+   return str;
+};
+
+function isHVerb(word) {
+   for(var radical of elisionWithHVerb) {
+      if(word.startsWith(radical)){
+         return true;
+      }
+   }
+   return false;
+};
+
+function elideH(str) {
+   str = str.replace(/[ ](je)[ ]+(h[aeiouy])/gi," j'$2");
+   str = str.replace(/[ ](ne)[ ]+(h[aeiouy])/gi," n'$2");
+   str = str.replace(/[ ](le|la)[ ]+(h[aeiouy])/gi," l'$2");
+   str = str.replace(/[ ](ce)[ ]+(h[aeiouy])/gi," cet $2");
+   str = str.replace(/[ ](de)[ ]+(h[aeiouy])/gi," d'$2");
+   str = str.replace(/[ ](que)[ ]+(h[aeiouy])/gi," qu'$2");
    return str;
 };
 
