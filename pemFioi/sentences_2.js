@@ -514,7 +514,7 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
          break;
       case "VI-str":
       case "VT-str":
-         var verbStructure = pickOne(verbStructures[block],rng,false,true);
+         var verbStructure = (tense === "passé_composé") ? pickOne(verbStructuresWithPC[block],rng,false,true) : pickOne(verbStructures[block],rng,false,true);
          var verb = "";
          for(var subBlock of verbStructure){
             verb += getWord(subBlock,person,plural,gender,tense,rng,coBefore)[0]+" ";
@@ -948,6 +948,16 @@ const verbStructures = {
       [["VT","adv-aftVerb"],5],
       [["VT-neg"],10],
       // [["VT-negWithAdv","adv-aftNegVerb"],1]
+   ]
+};
+const verbStructuresWithPC = {
+   "VI-str": [   // [structure,weight]
+      [["VI"],100],
+      [["VI-neg"],10]
+   ],
+   "VT-str": [   // [structure,weight]
+      [["VT"],100],
+      [["VT-neg"],10]
    ]
 };
 const tenses = [
