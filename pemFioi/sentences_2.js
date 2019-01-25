@@ -444,7 +444,7 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
          gender = block.includes("-M-") ? "M" : "F";
          var type = pickOne(batch,rng,false,true);
          var noun = pickOne(type,rng)[0];
-         if(type[0][0] === "Danemark" || type[0][0] === "Angleterre" || block.endsWith("-beforeDe")){    // if country or before "de"
+         if(isCountry(noun) || block.endsWith("-beforeDe")){    // if country or before "de"
             var det = getDeterminer(gender,0,"definite_article",rng);
          }else{
             var det = getDeterminer(gender,0,"",rng);
@@ -839,6 +839,17 @@ function pickOne(arr,rng,length,weighting) {
    return arr[Math.trunc(rng() * arrLength)];
 };
 
+function isCountry(noun) {
+   for(var gender in nouns["country"]){
+      for(var country of nouns["country"][gender]){
+         if(country[0].toLowerCase() === noun.toLowerCase()){
+            return true;
+         }
+      }
+   }
+   return false;
+};
+
 const structureTypes = [
    "N-M-S-noDet", // nom masculin singulier sans déterminant
    "N-M-S",
@@ -928,9 +939,9 @@ const verbStructures = {
    ]
 };
 const tenses = [
-   // "present",
-   // "imparfait",
-   // "futur",
+   "present",
+   "imparfait",
+   "futur",
    "passé_composé"
 ];
 
