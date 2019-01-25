@@ -4362,7 +4362,7 @@ const adverbs =  {
       "généralement",
       "grosso modo",
       "jour après jour",
-      "jusqu'à lors",
+      "jusqu'alors",
       "la mort dans l'âme",
       "la plupart du temps",
       "l'un dans l'autre",
