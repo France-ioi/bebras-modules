@@ -352,14 +352,14 @@ function generateWordList(block) {
    return text;
 };
 
-function getWord(block,person,plural,gender,tense,rng) {
+function getWord(block,person,plural,gender,tense,rng,coBefore) {
    if(set.hasOwnProperty(block)){
       block = pickOne(set[block],rng,false,true);
-      return getWord(block,person,plural,gender,tense,rng);
+      return getWord(block,person,plural,gender,tense,rng,coBefore);
    }
    if(block.startsWith("double-")){
-      var word1 = getWord(block.substring(7),person,plural,gender,tense,rng);
-      var word2 = getWord(block.substring(7),person,plural,gender,tense,rng);
+      var word1 = getWord(block.substring(7),person,plural,gender,tense,rng,coBefore);
+      var word2 = getWord(block.substring(7),person,plural,gender,tense,rng,coBefore);
       var word = word1[0] + " et " + word2[0];
       person = 3;
       plural = 1;
@@ -367,8 +367,8 @@ function getWord(block,person,plural,gender,tense,rng) {
       return [word,person,plural,gender];
    }
    if(block.endsWith("-de")){
-      var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,gender,tense,rng);
-      var word2 = getWord("de+Noun",person,plural,gender,tense,rng);
+      var word1 = getWord(block.replace(/-de$/,"-beforeDe"),person,plural,gender,tense,rng,coBefore);
+      var word2 = getWord("de+Noun",person,plural,gender,tense,rng,coBefore);
       var countryM = false;
       for(var country of nouns["country"].M){
          if(country[0].toLowerCase() === word2[0].toLowerCase()){
@@ -382,14 +382,35 @@ function getWord(block,person,plural,gender,tense,rng) {
       }
       return [word,word1[1],word1[2],word1[3]];
    }
+   if(block.endsWith("-que")){
+      var mainSubject = getWord(block.replace(/-que$/,"-beforeQue"),person,plural,gender,tense,rng);
+      var structSubRel = pickOne(structuresQue,rng,false,true);
+      var subRel = "";
+      var personSubRel = 3;
+      var pluralSubRel = 0;
+      var genderSubRel = "M";
+      for(var subBlock of structSubRel){
+         var newWord = getWord(subBlock,personSubRel,pluralSubRel,genderSubRel,tense,rng,mainSubject);
+         subRel += newWord[0] + " ";
+         personSubRel = newWord[1];
+         pluralSubRel = newWord[2];
+         genderSubRel = newWord[3];
+      }
+      var word = elide(mainSubject[0] + " que " + subRel);
+      return [word,mainSubject[1],mainSubject[2],mainSubject[3]];  
+   }
    var batch = batches[block];
    switch(block){
       case "N-M-S-noDet":
       case "N-F-S-noDet":
+      case "N-M-S-noDetBeforeQue":
+      case "N-F-S-noDetBeforeQue":
       case "CO-M-S-noDet":
       case "CO-F-S-noDet":
       case "N-M-P-noDet":
       case "N-F-P-noDet":
+      case "N-M-P-noDetBeforeQue":
+      case "N-F-P-noDetBeforeQue":
       case "CO-M-P-noDet":
       case "CO-F-P-noDet":
          person = 3;
@@ -483,7 +504,7 @@ function getWord(block,person,plural,gender,tense,rng) {
       case "VT-negWithAdv":
          var verb = pickOne(batch,rng);
          var negation = block.includes("-neg") ? 1 : 0;
-         var word = conjugate(verb,person,plural,gender,tense,negation,rng);
+         var word = conjugate(verb,person,plural,gender,tense,negation,rng,coBefore);
          break;
       case "adv-aftVerb":
       // case "adv-aftNegVerb":
@@ -496,7 +517,7 @@ function getWord(block,person,plural,gender,tense,rng) {
          var verbStructure = pickOne(verbStructures[block],rng,false,true);
          var verb = "";
          for(var subBlock of verbStructure){
-            verb += getWord(subBlock,person,plural,gender,tense,rng)[0]+" ";
+            verb += getWord(subBlock,person,plural,gender,tense,rng,coBefore)[0]+" ";
          }
          var word = verb;
    }
@@ -646,39 +667,7 @@ function pluralize(str,plural) {
    }
 };
 
-function elide(str) {
-   str = str.toLowerCase();
-   str = str.replace(/[èéêë]/g,"e");
-   str = " " + str; 
-   str = str.replace(/[ ](le|la)[ ]([aeiouy][^a])/gi," l'$2");
-   str = str.replace(/[ ](ce)[ ]([aeiouy][^a])/gi," cet $2");
-   str = str.replace(/[ ](de)[ ]([aeiouy][^a])/gi," d'$2");
-   str = str.replace(/[ ](je)[ ]([aeiouy][^a])/gi," j'$2");
-   str = str.replace(/[ ](ne)[ ]([aeiouy][^a])/gi," n'$2");
-   str = str.replace(/[ ]à[ ]le[ ]/gi," au ");
-   str = str.replace(/[ ]à[ ]les[ ]/gi," aux ");
-   var words = str.split(" ");
-   for(var word of words){ // élision pour les mots en H
-      var hElide = false;
-      if(elisionWithH.includes(word)){
-         hElide = true
-      }
-      for(var radical of elisionWithHVerb) {
-         if(word.startsWith(radical.replace(/[èéêë]/g,"e"))){
-            hElide = true;
-         }
-      }  
-      if(hElide){
-         str = str.replace(/[ ](je)[ ](h[aeiouy])/gi," j'$2");
-         str = str.replace(/[ ](ne)[ ](h[aeiouy])/gi," n'$2");
-         str = str.replace(/[ ](le|la)[ ](h[aeiouy])/gi," l'$2");
-         str = str.replace(/[ ](ce)[ ](h[aeiouy])/gi," cet $2");
-      }
-   }
-   return str;
-};
-
-function conjugate(verb,person,plural,gender,tense,negation,rng) {
+function conjugate(verb,person,plural,gender,tense,negation,rng,coBefore) {
    var infinitive = verb[0].toLowerCase();
    var group = verb[1];
    var aux = verb[2];
@@ -687,10 +676,10 @@ function conjugate(verb,person,plural,gender,tense,negation,rng) {
    }else if(tense === "passé_composé"){
       var auxConj = auxConjugations[aux]["present"][person - 1 + plural * 3];
       var ending = pastParticiples[group - 1];
-      if(aux && gender === "F"){
+      if(aux && gender === "F" || (coBefore && !aux && coBefore[3] === "F")){
          ending += "e";
       }
-      if(aux && plural){
+      if(aux && plural || (coBefore && !aux && coBefore[2])){
          ending += "s";
       }
       if(group === 1){
@@ -770,6 +759,44 @@ function conjugate(verb,person,plural,gender,tense,negation,rng) {
    }else{
       return verbConj;
    }
+};
+
+function elide(str) {
+   // str = cleanUpSpecialChars(str,true);
+   str = str.toLowerCase();
+   str = str.replace(/[èéêë]/g,"e");
+   str = str.replace(/[ôö]/g,"o");
+   str = " " + str; 
+   str = str.replace(/[ ](le|la)[ ]+([aeiouy][^a])/gi," l'$2");
+   str = str.replace(/[ ](ce)[ ]+([aeiouy][^a])/gi," cet $2");
+   str = str.replace(/[ ](de|du)[ ]+([aeiouy][^a])/gi," d'$2");
+   str = str.replace(/[ ](je)[ ]+([aeiouy][^a])/gi," j'$2");
+   str = str.replace(/[ ](ne)[ ]+([aeiouy][^a])/gi," n'$2");
+   str = str.replace(/[ ](que)[ ]+([aeiouy][^a])/gi," qu'$2");
+   str = str.replace(/[ ]à[ ]+le[ ]/gi," au ");
+   str = str.replace(/[ ]à[ ]+les[ ]/gi," aux ");
+   var words = str.split(" ");
+   for(var word of words){ // élision pour les mots en H
+      // console.log(word);
+      var hElide = false;
+      if(elisionWithH.includes(word)){
+         hElide = true
+      }
+      for(var radical of elisionWithHVerb) {
+         if(word.startsWith(radical.replace(/[èéêë]/g,"e"))){
+            hElide = true;
+         }
+      }  
+      if(hElide){
+         str = str.replace(/[ ](je)[ ]+(h[aeiouy])/gi," j'$2");
+         str = str.replace(/[ ](ne)[ ]+(h[aeiouy])/gi," n'$2");
+         str = str.replace(/[ ](le|la)[ ]+(h[aeiouy])/gi," l'$2");
+         str = str.replace(/[ ](ce)[ ]+(h[aeiouy])/gi," cet $2");
+         str = str.replace(/[ ](de)[ ]+(h[aeiouy])/gi," d'$2");
+         str = str.replace(/[ ](que)[ ]+(h[aeiouy])/gi," qu'$2");
+      }
+   }
+   return str;
 };
 
 function cleanUpSpecialChars(str, withSpaces) {
@@ -869,6 +896,22 @@ const structures = [ // [structure,weight]
    [["adv-locution","2P-S","VT-str","CO"],10],
    [["adv-locution","1P-P","VT-str","CO"],5],
    [["adv-locution","2P-P","VT-str","CO"],5],
+   [["3P-S-que","VI-str"],40],
+   [["3P-P-que","VI-str"],20],
+   [["3P-S-que","VT-str","CO"],80],
+   [["3P-P-que","VT-str","CO"],40],
+   [["adv-locution","3P-S-que","VI-str"],20],
+   [["adv-locution","3P-P-que","VI-str"],10],
+   [["adv-locution","3P-S-que","VT-str","CO"],40],
+   [["adv-locution","3P-P-que","VT-str","CO"],20],
+];
+const structuresQue = [ // structures de subordonnée relative suivant "que"
+   [["3P-S","VT-str"],80],
+   [["3P-P","VT-str"],40],
+   [["1P-S","VT-str"],20],
+   [["2P-S","VT-str"],20],
+   [["1P-P","VT-str"],10],
+   [["2P-P","VT-str"],10],
 ];
 const verbStructures = {
    "VI-str": [   // [structure,weight]
@@ -885,9 +928,9 @@ const verbStructures = {
    ]
 };
 const tenses = [
-   "present",
-   "imparfait",
-   "futur",
+   // "present",
+   // "imparfait",
+   // "futur",
    "passé_composé"
 ];
 
@@ -898,6 +941,11 @@ const nmsNoDet = [   // [subset,weight]
    [[["il"]],1],
    [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
 ];
+const nmsNoDetBeforeQue = [   // [subset,weight]
+   [nouns["name"].M,2],
+   [pronouns["demonstrative_2"].M,2],
+   [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"],["Quelque chose"]],1]
+];
 const nfsNoDet = [   // [subset,weight]
    [nouns["name"].F,1],
    [nouns["city"],1],
@@ -906,16 +954,32 @@ const nfsNoDet = [   // [subset,weight]
    [[["elle"]],1],
    [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
+const nfsNoDetBeforeQue = [   // [subset,weight]
+   [nouns["name"].F,1],
+   [nouns["city"],1],
+   [pronouns["demonstrative_2"].F,1],
+   [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
+];
 const nmpNoDet = [   // [subset,weight]
    [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
    [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
    [[["","ils"]],1],
    [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
+const nmpNoDetBeforeQue = [   // [subset,weight]
+   [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
+   [pronouns["indefinite"].M.filter(word => word[1] != ""),1],
+   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+];
 const nfpNoDet = [   // [subset,weight]
    [pronouns["demonstrative"].F,1],
    [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
    [[["","elles"]],1],
+   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+];
+const nfpNoDetBeforeQue = [   // [subset,weight]
+   [pronouns["demonstrative_2"].F,1],
+   [pronouns["indefinite"].F.filter(word => word[1] != ""),1],
    [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
 const nms = [  // [subset,weight]
@@ -987,8 +1051,12 @@ const deNoun = [
 const batches = {
    "N-M-S-noDet": nmsNoDet,
    "N-F-S-noDet": nfsNoDet,
+   "N-M-S-noDetBeforeQue": nmsNoDetBeforeQue,
+   "N-F-S-noDetBeforeQue": nfsNoDetBeforeQue,
    "N-M-P-noDet": nmpNoDet,
    "N-F-P-noDet": nfpNoDet,
+   "N-M-P-noDetBeforeQue": nmpNoDetBeforeQue,
+   "N-F-P-noDetBeforeQue": nfpNoDetBeforeQue,
    "N-M-S": nms,
    "N-M-S-adj": nms,
    "N-M-S-beforeDe": nmsBeforeDe, // N-M-S with definite article (before "de")
@@ -1053,7 +1121,19 @@ const set = {
       ["N-F-S",1],
       ["N-F-S-de",1],
       ["N-F-S-adj",1],
-      ["N-F-S-adj-de",1], 
+      ["N-F-S-adj-de",1] 
+   ],
+   "3P-S-beforeQue": [
+      ["N-M-S-noDetBeforeQue",1],
+      ["N-M-S",1],
+      ["N-M-S-de",1],      // groupe (N-M-S + de + nom)
+      ["N-M-S-adj",1],
+      ["N-M-S-adj-de",1],
+      ["N-F-S-noDetBeforeQue",1],
+      ["N-F-S",1],
+      ["N-F-S-de",1],
+      ["N-F-S-adj",1],
+      ["N-F-S-adj-de",1] 
    ],
    "3P-P": [
       ["N-M-P-noDet",1],
@@ -1062,6 +1142,19 @@ const set = {
       ["N-M-P-adj",1],
       ["N-M-P-adj-de",1],
       ["N-F-P-noDet",1],
+      ["N-F-P",1],
+      ["N-F-P-de",1],
+      ["N-F-P-adj",1],
+      ["N-F-P-adj-de",1],
+      ["double-3P",2]   // sujet1 + "et" + sujet2 
+   ],
+   "3P-P-beforeQue": [
+      ["N-M-P-noDetBeforeQue",1],
+      ["N-M-P",1],
+      ["N-M-P-de",1],
+      ["N-M-P-adj",1],
+      ["N-M-P-adj-de",1],
+      ["N-F-P-noDetBeforeQue",1],
       ["N-F-P",1],
       ["N-F-P-de",1],
       ["N-F-P-adj",1],
