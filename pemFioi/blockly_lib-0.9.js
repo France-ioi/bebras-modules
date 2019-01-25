@@ -248,7 +248,7 @@ var languageStrings = {
          input: "Entradas",
          lists: "Listas",
          logic: "Lógica",
-         loops: "Búcles",
+         loops: "Bucles",
          control: "Control",
          operator: "Operadores",
          math: "Mate",

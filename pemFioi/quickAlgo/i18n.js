@@ -97,7 +97,11 @@ var localLanguageStrings = {
       showDetails: "Plus de détails",
       hideDetails: "Masquer les détails",
       editor: "Éditeur",
-      instructions: "Énoncé"
+      instructions: "Énoncé",
+      testLabel: "Test",
+      testError: "erreur",
+      testSuccess: "validé",
+      seeTest: "voir"
    },
    en: {
       categories: {
@@ -192,7 +196,11 @@ var localLanguageStrings = {
       showDetails: "Show details",
       hideDetails: "Hide details",
       editor: "Editor",
-      instructions: "Instructions"
+      instructions: "Instructions",
+      testLabel: "Test",
+      testError: "error",
+      testSuccess: "valid",
+      seeTest: "see test"
    },
    de: {
       categories: {
@@ -288,7 +296,11 @@ var localLanguageStrings = {
       showDetails: "Show details", // TODO :: translate
       hideDetails: "Hide details",  // TODO :: translate
       editor: "Editor",  // TODO :: translate
-      instructions: "Instructions"  // TODO :: translate
+      instructions: "Instructions",  // TODO :: translate
+      testLabel: "Test", // TODO :: translate
+      testError: "error",  // TODO :: translate
+      testSuccess: "valid",  // TODO :: translate
+      seeTest: "see test"  // TODO :: translate
    },
    es: {
       categories: {
@@ -302,7 +314,7 @@ var localLanguageStrings = {
          lists: "Listas",
          tables: "Tablas",
          logic: "Lógica",
-         loops: "Búcles",
+         loops: "Bucles",
          control: "Control",
          operator: "Operadores",
          math: "Mate",
@@ -383,7 +395,11 @@ var localLanguageStrings = {
       showDetails: "Mostrar más información",
       hideDetails: "Ocultar información",
       editor: "Editor",
-      instructions: "Enunciado"
+      instructions: "Enunciado",
+      testLabel: "Caso",
+      testError: "error",
+      testSuccess: "correcto",
+      seeTest: "ver"
    },
    sl: {
       categories: {
@@ -478,7 +494,11 @@ var localLanguageStrings = {
       showDetails: "Show details", // TODO :: translate
       hideDetails: "Hide details",  // TODO :: translate
       editor: "Editor", // TODO :: translate
-      instructions: "Instructions" // TODO :: translate
+      instructions: "Instructions", // TODO :: translate
+      testLabel: "Test", // TODO :: translate
+      testError: "error",  // TODO :: translate
+      testSuccess: "valid",  // TODO :: translate
+      seeTest: "see test"  // TODO :: translate
    }
 };
 
