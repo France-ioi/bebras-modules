@@ -1,3 +1,74 @@
+var conceptViewerStrings = {
+  fr: {
+    viewerTitle: "Aide",
+    selectLanguage: "Sélectionnez un langage…",
+    selectTopic: "Sélectionnez une rubrique…",
+    concepts: {
+      "taskplatform": 'Résolution des exercices',
+      "language": "Création d'un programme",
+      "blockly_text_print": 'Afficher du texte',
+      "blockly_text_print_noend": 'Afficher consécutivement du texte',
+      "blockly_controls_repeat": 'Boucles de répétition',
+      "blockly_controls_if": 'Conditions si',
+      "blockly_controls_if_else": 'Conditions si/sinon',
+      "blockly_controls_whileUntil": 'Boucles tant que ou jusqu\'à',
+      "blockly_logic_operation": 'Opérateurs logiques',
+      "extra_nested_repeat": 'Boucles imbriquées',
+      "extra_variable": 'Variables',
+      "extra_list": 'Listes',
+      "extra_function": 'Fonctions',
+      "robot_commands": 'Commandes du robot',
+      "arguments": 'Fonctions avec arguments',
+    }
+  },
+  en: {
+    viewerTitle: "Help",
+    selectLanguage: "Select a language…",
+    selectTopic: "Select a topic…",
+    concepts: {
+      "taskplatform": 'Solving exercises',
+      "language": "Program creation",
+      "blockly_text_print": 'Afficher du texte',
+      "blockly_text_print_noend": 'Afficher consécutivement du texte',
+      "blockly_controls_repeat": 'loops: repeat',
+      "blockly_controls_if": 'if conditions',
+      "blockly_controls_if_else": 'if/else conditions',
+      "blockly_controls_whileUntil": 'loops: while/until',
+      "blockly_logic_operation": 'logic operators',
+      "extra_nested_repeat": 'Nested loops',
+      "extra_variable": 'Variables',
+      "extra_list": 'Lists',
+      "extra_function": 'Functions',
+      "robot_commands": 'Robot commands',
+      "arguments": 'Functions with arguments',
+    }
+  },
+  es: {
+    viewerTitle: "Ayuda",
+    selectLanguage: "Seleccione un lenguaje…",
+    selectTopic: "Seleccione un tema…",
+    concepts: {
+      "taskplatform": 'Resolución de ejercicios',
+      "language": "Creación de un programa",
+      "blockly_text_print": 'Impresión de texto',
+      "blockly_text_print_noend": 'Impresión consecutiva de texto',
+      "blockly_controls_repeat": 'Bucles de repetición',
+      "blockly_controls_if": 'Condiciones si',
+      "blockly_controls_if_else": 'Condiciones si/sino',
+      "blockly_controls_whileUntil": 'Bucles mientras y hasta que',
+      "blockly_logic_operation": 'Operadores lógicos',
+      "extra_nested_repeat": 'Bucles anidados',
+      "extra_variable": 'Variables',
+      "extra_list": 'Listas',
+      "extra_function": 'Funciones',
+      "robot_commands": 'Comandos del robot',
+      "arguments": 'Funciones con argumentos',
+    }
+  }
+};
+
+window.stringsLanguage = window.stringsLanguage || "fr";
+
 var conceptViewer = {
   concepts: {},
   loaded: false,
@@ -13,9 +84,11 @@ var conceptViewer = {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
+    this.strings = conceptViewerStrings[window.stringsLanguage] || conceptViewerStrings.fr;
+
     // TODO :: allow changing list of languages
     var navLanguage = '\
-      <label for="showNavigationLanguage" id="showNavigationLanguageLabel" class="showNavigationLanguage">Sélectionnez un langage…</label>\
+      <label for="showNavigationLanguage" id="showNavigationLanguageLabel" class="showNavigationLanguage">' + this.strings.selectLanguage + '</label>\
       <input type="checkbox" id="showNavigationLanguage" role="button">\
       <ul>';
     var curLangLbl = null;
@@ -34,7 +107,7 @@ var conceptViewer = {
       + '<div id="conceptViewer" style="display: none;">'
       + '  <div class="content">'
       + '   <div class="panel-heading">'
-      + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>Aide</h2>'
+      + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
       + '     <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
       + '   </div>'
       + '   <div class="panel-body">'
@@ -75,7 +148,7 @@ var conceptViewer = {
   loadNavigation: function () {
 
     var navContent = "\
-      <label for='showNavigationContent' class='showNavigationContent'>Sélectionnez une rubrique…</label>\
+      <label for='showNavigationContent' class='showNavigationContent'>" + this.strings.selectTopic + "</label>\
       <input type='checkbox' id='showNavigationContent' role='button'>\
       <ul>";
     var defaultUrl = null;
@@ -239,6 +312,8 @@ var testConcepts = [
 
 
 function conceptsFill(baseConcepts, allConcepts) {
+  var conceptNames = (conceptViewerStrings[window.stringsLanguage] || conceptViewerStrings.fr)[
+  "concepts"] || conceptViewerStrings.fr.concepts;
   var concepts = [];
   var baseConceptsById = {};
   for(var b=0; b<baseConcepts.length; b++) {
@@ -253,8 +328,10 @@ function conceptsFill(baseConcepts, allConcepts) {
     var fullConcept = allConcepts[c];
     if(baseConceptsById[fullConcept.id]) {
       var curConcept = baseConceptsById[fullConcept.id];
-      if(!curConcept.name) {
-        curConcept.name = fullConcept.name;
+      if(!conceptNames[curConcept.id]) {
+        curConcept.name = conceptNames[curConcept.id] = conceptNames[fullConcept.id];
+      } else {
+        curConcept.name = conceptNames[curConcept.id];
       }
       if(!curConcept.url) {
         curConcept.url = fullConcept.url;
