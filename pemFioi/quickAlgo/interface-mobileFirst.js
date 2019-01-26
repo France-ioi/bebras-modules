@@ -822,7 +822,7 @@ $(document).ready(function() {
 
     $('head').append('\
         <link rel="stylesheet"\
-        href="../../modules/fonts/fontAwesome/css/all.css">');
+        href="' + (modulesPath?modulesPath:'../../modules') + '/fonts/fontAwesome/css/all.css">');
 
     var taskTitleTarget = $("#miniPlatformHeader table td").first();
     if(taskTitleTarget.length) {
