@@ -244,7 +244,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          // Reload Blockly if the flyout is not properly rendered
          // TODO :: find why it's not properly rendered in the first place
-         if(this.workspace.flyout_ && this.reloadForFlyout < 5) {
+         if(!this.scratchMode && this.workspace.flyout_ && this.reloadForFlyout < 5) {
             var flyoutWidthDiff = Math.abs(this.workspace.flyout_.svgGroup_.getBoundingClientRect().width -
                this.workspace.flyout_.svgBackground_.getBoundingClientRect().width);
             if(flyoutWidthDiff > 5) {
