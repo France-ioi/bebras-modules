@@ -93,7 +93,15 @@ var localLanguageStrings = {
       scaleDrawing: "Zoom ×2",
       loopRepeat: "repeat",
       loopDo: "do",
-      displayVideo: "Afficher la vidéo"
+      displayVideo: "Afficher la vidéo",
+      showDetails: "Plus de détails",
+      hideDetails: "Masquer les détails",
+      editor: "Éditeur",
+      instructions: "Énoncé",
+      testLabel: "Test",
+      testError: "erreur",
+      testSuccess: "validé",
+      seeTest: "voir"
    },
    en: {
       categories: {
@@ -105,6 +113,7 @@ var localLanguageStrings = {
          dicts: "Dictionaries",
          input: "Input",
          lists: "Lists",
+         tables: "Tables",
          logic: "Logic",
          loops: "Loops",
          control: "Controls",
@@ -149,6 +158,7 @@ var localLanguageStrings = {
       saveOrLoadButton: "Load / save",
       saveOrLoadProgram: "Save or reload your code:",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
+      files: "Files",
       reloadProgram: "Reload",
       restart: "Restart",
       loadBestAnswer: "Load best answer",
@@ -182,7 +192,15 @@ var localLanguageStrings = {
       scaleDrawing: "Scale 2×",
       loopRepeat: "repeat",
       loopDo: "do",
-      displayVideo: "Display video"
+      displayVideo: "Display video",
+      showDetails: "Show details",
+      hideDetails: "Hide details",
+      editor: "Editor",
+      instructions: "Instructions",
+      testLabel: "Test",
+      testError: "error",
+      testSuccess: "valid",
+      seeTest: "see test"
    },
    de: {
       categories: {
@@ -194,6 +212,7 @@ var localLanguageStrings = {
          dicts: "Hash-Map",
          input: "Eingabe",
          lists: "Listen",
+         tables: "Tables", // TODO :: translate
          logic: "Logik",
          loops: "Schleifen",
          control: "Steuerung",
@@ -241,22 +260,22 @@ var localLanguageStrings = {
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
-      restart: "Restart",
-      loadBestAnswer: "Load best answer",
+      restart: "Restart",  // TODO :: translate
+      loadBestAnswer: "Load best answer",  // TODO :: translate
       saveProgram: "Speichern",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
       limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",  // TODO :: translate
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
-      emptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
       tooManyBlocks: "Du benutzt zu viele Bausteine!",
       limitedBlock: "You use too many of a limited use block:", // TODO
       uninitializedVar: "Nicht initialisierte Variable:",
+      undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.", // TODO :: translate
       valueTrue: 'wahr',
       valueFalse: 'unwahr',
       evaluatingAnswer: 'Evaluation in progress', // TODO
@@ -266,14 +285,22 @@ var localLanguageStrings = {
       resultsNoSuccess: "Du hast keinen Testfall richtig.",
       resultsPartialSuccess: "Du hast {nbSuccess} von {nbTests} Testfällen richtig.",
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
-      introTitle: "Your mission",
-      introDetailsTitle: "Mission details",
+      introTitle: "Your mission",  // TODO :: translate
+      introDetailsTitle: "Mission details",  // TODO :: translate
       textVariable: "Text",
       listVariable: "Liste",
       scaleDrawing: "Scale 2×",
       loopRepeat: "wiederhole",
       loopDo: "mache",
-      displayVideo: "Display video"
+      displayVideo: "Display video", // TODO :: translate
+      showDetails: "Show details", // TODO :: translate
+      hideDetails: "Hide details",  // TODO :: translate
+      editor: "Editor",  // TODO :: translate
+      instructions: "Instructions",  // TODO :: translate
+      testLabel: "Test", // TODO :: translate
+      testError: "error",  // TODO :: translate
+      testSuccess: "valid",  // TODO :: translate
+      seeTest: "see test"  // TODO :: translate
    },
    es: {
       categories: {
@@ -285,8 +312,9 @@ var localLanguageStrings = {
          dicts: "Diccionarios",
          input: "Entradas",
          lists: "Listas",
+         tables: "Tablas",
          logic: "Lógica",
-         loops: "Búcles",
+         loops: "Bucles",
          control: "Control",
          operator: "Operadores",
          math: "Mate",
@@ -306,8 +334,8 @@ var localLanguageStrings = {
       tooManyIterationsWithoutAction: "¡Su programa se tomó demasiado tiempo para terminar!", // TODO :: change translation
       submitProgram: "Validar el programa",
       runProgram: "Ejecutar el programa",
-      speedSliderSlower: "Slower",
-      speedSliderFaster: "Faster",
+      speedSliderSlower: "Más lento",
+      speedSliderFaster: "Más rápido",
       speed: "Velocidad:",
       stopProgram: "|<",
       stepProgram: "|>",
@@ -331,39 +359,47 @@ var localLanguageStrings = {
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
-      restart: "Restart",
-      loadBestAnswer: "Load best answer",
+      restart: "Reiniciar",
+      loadBestAnswer: "Cargar la mejor respuesta",
       saveProgram: "Guardar",
       limitBlocks: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.",
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
-      limitElements: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.", // TODO :: translate from "blocks" to "elements" (next string as well)
-      limitElementsOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
+      limitElements: "{remainingBlocks} elementos disponibles de {maxBlocks} autorizados.",
+      limitElementsOver: "{remainingBlocks} elementos sobre el límite de {maxBlocks} autorizados.",
+      capacityWarning: "Advertencia: su programa es inválido porque utiliza demasiados bloques. Ponga atención al límite de bloques permitidos mostrados en la parte superior derecha del editor.",
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
       errorEmptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
-      emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
       tooManyBlocks: "¡Utiliza demasiados bloques!",
-      limitedBlock: "You use too many of a limited use block:", // TODO
+      limitedBlock: "Utiliza demasiadas veces un tipo de bloque limitado:",
       uninitializedVar: "Variable no inicializada:",
+      undefinedMsg: "Esto puede ser causado por acceder a un índice fuera de la lista o por una variable no definida.",
       valueTrue: 'verdadero',
       valueFalse: 'falso',
-      evaluatingAnswer: 'Evaluation in progress', // TODO
+      evaluatingAnswer: 'Evaluación en progreso',
       correctAnswer: 'Respuesta correcta',
       partialAnswer: 'Respuesta parcial',
       wrongAnswer: 'Respuesta Incorrecta',
       resultsNoSuccess: "No pasó ninguna prueba.",
       resultsPartialSuccess: "Pasó únicamente {nbSuccess} prueba(s) de {nbTests}.",
       gradingInProgress: "Evaluación en curso",
-      introTitle: "Your mission",
-      introDetailsTitle: "Mission details",
+      introTitle: "Su misión",
+      introDetailsTitle: "Detalles de la misión",
       textVariable: "texto",
       listVariable: "lista",
       scaleDrawing: "Aumentar 2X",
       loopRepeat: "repetir",
       loopDo: "hacer",
-      displayVideo: "Display video"
+      displayVideo: "Mostrar el video",
+      showDetails: "Mostrar más información",
+      hideDetails: "Ocultar información",
+      editor: "Editor",
+      instructions: "Enunciado",
+      testLabel: "Caso",
+      testError: "error",
+      testSuccess: "correcto",
+      seeTest: "ver"
    },
    sl: {
       categories: {
@@ -374,6 +410,7 @@ var localLanguageStrings = {
          dicts: "Slovarji",
          input: "Vnos",
          lists: "Tabele",
+         tables: "Tables", // TODO :: translate
          logic: "Logika",
          loops: "Zanke",
          control: "Nadzor",
@@ -415,15 +452,20 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Ustvari iz Blocklyja",
+      loadExample: "Insert example", // TODO :: translate
+      saveOrLoadButton: "Load / save", // TODO :: translate
       saveOrLoadProgram: "Shrani ali znova naloži kodo:",
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
+      files: "Files", // TODO :: translate
       reloadProgram: "Znova naloži",
-      restart: "Restart",
-      loadBestAnswer: "Load best answer",
+      restart: "Restart",  // TODO :: translate
+      loadBestAnswer: "Load best answer",  // TODO :: translate
       saveProgram: "Shrani",
       limitBlocks: "{remainingBlocks} kock izmed {maxBlocks} imaš še na voljo.",
       limitBlocksOver: "{remainingBlocks} kock preko meje {maxBlocks} kock, ki so na voljo.",
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
+      limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.", // TODO :: translate
+      limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.", // TODO :: translate
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",  // TODO :: translate
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
@@ -431,6 +473,7 @@ var localLanguageStrings = {
       tooManyBlocks: "Uporabljaš preveč kock!",
       limitedBlock: "You use too many of a limited use block:", // TODO
       uninitializedVar: "Spremenljivka ni določena:",
+      undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.", // TODO :: translate
       valueTrue: 'resnično',
       valueFalse: 'neresnično',
       evaluatingAnswer: 'Evaluation in progress', // TODO
@@ -440,13 +483,22 @@ var localLanguageStrings = {
       resultsNoSuccess: "Noben test ni bil opravljen.",
       resultsPartialSuccess: "Opravljen(ih) {nbSuccess} test(ov) od {nbTests}.",
       gradingInProgress: "Ocenjevanje poteka",
-      introTitle: "Your mission",
-      introDetailsTitle: "Mission details",
+      introTitle: "Your mission",  // TODO :: translate
+      introDetailsTitle: "Mission details",  // TODO :: translate
       textVariable: "besedilo",
       listVariable: "tabela",
+      scaleDrawing: "Zoom ×2", // TODO :: translate
       loopRepeat: "repeat",
       loopDo: "do",
-      displayVideo: "Display video"
+      displayVideo: "Display video",  // TODO :: translate
+      showDetails: "Show details", // TODO :: translate
+      hideDetails: "Hide details",  // TODO :: translate
+      editor: "Editor", // TODO :: translate
+      instructions: "Instructions", // TODO :: translate
+      testLabel: "Test", // TODO :: translate
+      testError: "error",  // TODO :: translate
+      testSuccess: "valid",  // TODO :: translate
+      seeTest: "see test"  // TODO :: translate
    }
 };
 
