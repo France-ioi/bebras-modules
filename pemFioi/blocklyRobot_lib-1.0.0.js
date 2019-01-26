@@ -630,13 +630,13 @@ var getContext = function(display, infos, curLevel) {
                withdrawObject: "recoger el engranaje",
                dropObject: "soltar el engranaje",
                onObject: "sobre engranaje",
-               onContainer: "sur une machine"
+               onContainer: "sobre una máquina"
             },
             code: {
                withdrawObject: "recogerEngranaje",
                dropObject: "soltarEngranaje",
                onObject: "sobreEngranaje",
-               onContainer: "surMachine"
+               onContainer: "sobreMaquina"
             },
             messages: {
                successContainersFilled: "Bravo, ¡la máquina está lista para funcionar!",
@@ -1306,7 +1306,7 @@ var getContext = function(display, infos, curLevel) {
                  code: "construirePlateformeDevant"
                },
                es: {
-                  label: "Construir una plataforma adelante",
+                  label: "construir una plataforma adelante",
                   code: "construirPlataformaAdelante"
                }
              },
@@ -1335,7 +1335,7 @@ var getContext = function(display, infos, curLevel) {
                  code: "construirePlateformeAuDessus"
                },
                es: {
-                  label: "Construir una plataforma arriba",
+                  label: "construir una plataforma arriba",
                   code: "construirPlataformaArriba"
                }
              },
