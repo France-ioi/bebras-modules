@@ -501,14 +501,14 @@ var quickAlgoInterface = {
                         <span class="fas fa-times"></span>\
                     </span>';
             }
-            $('#testTab'+iTest+' .testTitle').html(icon+' Test '+(iTest+1));
+            $('#testTab'+iTest+' .testTitle').html(icon+' ' + this.strings.testLabel + ' '+(iTest+1));
         }
     },
 
     resetTestScores: function () {
         // Reset test results display
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
-            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> Test '+(iTest+1));
+            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> ' + this.strings.testLabel + ' '+(iTest+1));
         }
     },
 
@@ -530,12 +530,12 @@ var quickAlgoInterface = {
             '<div id="taskToolbar">' +
                 '<div id="modeSelector">' +
                     '<div id="mode-instructions" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-instructions\');">' +
-                        '<span><span class="fas fa-file-alt"></span><span class="label ToTranslate">Énoncé</span></span>' +
+                        '<span><span class="fas fa-file-alt"></span><span class="label">' + this.strings.instructions + '</span></span>' +
                     '</div>' +
                     '<div id="mode-editor" class="mode" onclick="quickAlgoInterface.selectMode(\'mode-editor\');">' +
                         '<span>' +
                             '<span class="fas fa-pencil-alt"></span>' +
-                            '<span class="label ToTranslate">Éditeur</span>' +
+                            '<span class="label">' + this.strings.editor + '</span>' +
                         '</span>' +
                         '<span>' +
                             "<span class='capacity'></span>" +
@@ -619,11 +619,11 @@ var quickAlgoInterface = {
     toggleLongIntro: function(forceNewState) {
         if(forceNewState === false || this.longIntroShown) {
             $('#taskIntroLong').removeClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>Plus de détails</button>');
+            $('.showLongIntro').html('<span class="fas fa-plus-circle icon"></span>' + this.strings.showDetails + '</button>');
             this.longIntroShown = false;
         } else {
             $('#taskIntroLong').addClass('displayIntroLong');
-            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>Masquer les détails</button>');
+            $('.showLongIntro').html('<span class="fas fa-minus-circle icon"></span>' + this.strings.hideDetails + '</button>');
             this.longIntroShown = true;
         }
     },
@@ -733,10 +733,10 @@ var quickAlgoInterface = {
         return '' +
             '<span class="testResults">' +
                 '<span class="' + (results.successRate < 1 ? 'testError' : 'testSuccess') + '">' +
-                    'Test ' + (results.iTestCase+1) + ' : ' +
-                    (results.successRate < 1 ? 'erreur' : 'validé') +
+                    this.strings.testLabel + ' ' + (results.iTestCase+1) + ' : ' +
+                    (results.successRate < 1 ? this.strings.testError : this.strings.testSuccess) +
                 '</span>' +
-                (link ? ' <span class="testLink" onclick="quickAlgoInterface.runTestCase('+results.iTestCase+')">voir</span>' : '') +
+                (link ? ' <span class="testLink" onclick="quickAlgoInterface.runTestCase('+results.iTestCase+')">' + this.strings.seeTest + '</span>' : '') +
             '</span>';
     },
 
@@ -822,7 +822,7 @@ $(document).ready(function() {
 
     $('head').append('\
         <link rel="stylesheet"\
-        href="../../modules/fonts/fontAwesome/css/all.css">');
+        href="' + (modulesPath?modulesPath:'../../modules') + '/fonts/fontAwesome/css/all.css">');
 
     var taskTitleTarget = $("#miniPlatformHeader table td").first();
     if(taskTitleTarget.length) {

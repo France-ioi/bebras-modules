@@ -508,7 +508,7 @@ window.displayHelper = {
          youDidBetterBefore: "Realizó un mejor trabajo antes.",
          scoreStays2: "Su puntuación se mantiene igual.",
          reloadBestAnswer: "Recargar su mejor respuesta.",
-         noAnswerSaved: "No answer saved so far for this version.",
+         noAnswerSaved: "Aún no hay respuesta guardada para esta versión.",
          validate: "Validar",
          restart: "Reiniciar",
          harderLevelSolved: "Atención: ya ha resuelto una versión más difícil. No puede ganar puntos extra con esta versión.",
