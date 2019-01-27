@@ -73,6 +73,16 @@ Type : string, default `"33%"`
 Max height the task intro can take in the "desktop" layout of the responsive
 interface.
 
+#### includeBlocks
+
+Type : object
+
+Defines which Blockly blocks are allowed for the task. This will be
+automatically translated into blocks for Scratch and authorized syntax for
+Python.
+
+Check section below for more information.
+
 #### maxListSize
 
 Type : int, default 100
@@ -105,3 +115,26 @@ zoom: {
    scale: 0.5
 },
 ```
+
+### includeBlocks options
+
+#### variables
+
+Type : list
+
+Preset a list of variables which will be available to the user. If `'*'` is
+present in this list, or if the category `variables` is allowed through
+`includeBlocks.standardBlocks.wholeCategories`, the user will be able to create
+new variables as well.
+
+#### variablesOnlyBlocks
+
+Type : list, default all allowed
+
+Lists the variable operation blocks to allow among :
+
+* `get` : get the value of a variable
+* `set` : set the value of a variable
+* `incr` : increment the value of a variable by a value
+
+Example : `["get", "set"]`
