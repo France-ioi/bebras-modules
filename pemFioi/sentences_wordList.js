@@ -65,10 +65,10 @@ const negationWords = [
    ];
 
 const determinerTypes = [
-   "definite_article",
-   "indefinite_article",
-   "demonstrative_adjective",
-   "numeral_adjective"
+   ["definite_article",1],
+   ["indefinite_article",2],
+   ["demonstrative_adjective",1],
+   ["numeral_adjective",1]
    ];
 const determiners = {
    "definite_article": {
