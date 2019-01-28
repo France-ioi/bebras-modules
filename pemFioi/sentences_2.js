@@ -407,12 +407,16 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
       case "N-F-S-noDetBeforeQue":
       case "CO-M-S-noDet":
       case "CO-F-S-noDet":
+      case "CO-M-S-noDetBeforeQue":
+      case "CO-F-S-noDetBeforeQue":
       case "N-M-P-noDet":
       case "N-F-P-noDet":
       case "N-M-P-noDetBeforeQue":
       case "N-F-P-noDetBeforeQue":
       case "CO-M-P-noDet":
       case "CO-F-P-noDet":
+      case "CO-M-P-noDetBeforeQue":
+      case "CO-F-P-noDetBeforeQue":
          person = 3;
          plural = block.includes("-P-") ? 1 : 0;
          gender = block.includes("-F-") ? "F" : "M";
@@ -892,7 +896,8 @@ const structureTypes = [
    "adv-aftVerb",
    // "adv-aftNegVerb",
    "adv-beforeAdj",
-   "adv-locution"
+   "adv-locution",
+   "de+Noun" // nom après "de"
 ];
 const structures = [ // [structure,weight]
    [["3P-S","VI-str"],40],
@@ -927,6 +932,22 @@ const structures = [ // [structure,weight]
    [["adv-locution","3P-P-que","VI-str"],10],
    [["adv-locution","3P-S-que","VT-str","CO"],40],
    [["adv-locution","3P-P-que","VT-str","CO"],20],
+   [["3P-S","VT-str","CO-que"],80],
+   [["3P-P","VT-str","CO-que"],40],
+   [["1P-S","VT-str","CO-que"],20],
+   [["2P-S","VT-str","CO-que"],20],
+   [["1P-P","VT-str","CO-que"],10],
+   [["2P-P","VT-str","CO-que"],10],
+   [["adv-locution","3P-S","VT-str","CO-que"],40],
+   [["adv-locution","3P-P","VT-str","CO-que"],20],
+   [["adv-locution","1P-S","VT-str","CO-que"],10],
+   [["adv-locution","2P-S","VT-str","CO-que"],10],
+   [["adv-locution","1P-P","VT-str","CO-que"],5],
+   [["adv-locution","2P-P","VT-str","CO-que"],5],
+   [["3P-S-que","VT-str","CO-que"],80],
+   [["3P-P-que","VT-str","CO-que"],40],
+   [["adv-locution","3P-S-que","VT-str","CO-que"],40],
+   [["adv-locution","3P-P-que","VT-str","CO-que"],20]
 ];
 const structuresQue = [ // structures de subordonnée relative suivant "que"
    [["3P-S","VT-str"],80],
@@ -1046,19 +1067,28 @@ const comsNoDet = [  // [subset,weight]
    [pronouns["indefinite"].M.filter(word => (word[0].toLowerCase() != "on" && word[0].toLowerCase() != "quiconque" && word[0].toLowerCase() != "chacun" && word[0] != "")),1],
    [[["le mien"],["le tien"],["le sien"],["le vôtre"],["le nôtre"],["le leur"]],1]
 ];
+const comsNoDetBeforeQue = nmsNoDetBeforeQue;
 const cofsNoDet = [  // [subset,weight]
    [nouns["name"].F,1],
    [nouns["city"],1],
    [pronouns["demonstrative"].F,1],
-   // [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
    [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
+const cofsNoDetBeforeQue = nfsNoDetBeforeQue;
 const compNoDet = [  // [subset,weight]
    [pronouns["demonstrative"].M.filter(word => word[1] != ""),1],
    [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
+const compNoDetBeforeQue = [   // [subset,weight]
+   [pronouns["demonstrative_2"].M.filter(word => word[1] != ""),1],
+   [[["","les miens"],["","les tiens"],["","les siens"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+];
 const cofpNoDet = [  // [subset,weight]
    [pronouns["demonstrative"].F,1],
+   [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
+];
+const cofpNoDetBeforeQue = [   // [subset,weight]
+   [pronouns["demonstrative_2"].F,1],
    [[["","les miennes"],["","les tiennes"],["","les siennes"],["","les vôtres"],["","les nôtres"],["","les leurs"]],1]
 ];
 
@@ -1118,6 +1148,8 @@ const batches = {
    "VT-neg": verbs["transitive"],
    "CO-M-S-noDet": comsNoDet,
    "CO-F-S-noDet": cofsNoDet,
+   "CO-M-S-noDetBeforeQue": comsNoDetBeforeQue,
+   "CO-F-S-noDetBeforeQue": cofsNoDetBeforeQue,
    "CO-M-S": nms,
    "CO-F-S": nfs,
    "CO-M-S-adj": nms,
@@ -1128,6 +1160,8 @@ const batches = {
    "CO-F-S-adj-beforeDe": nfsBeforeDe,
    "CO-M-P-noDet": compNoDet,
    "CO-F-P-noDet": cofpNoDet,
+   "CO-M-P-noDetBeforeQue": compNoDetBeforeQue,
+   "CO-F-P-noDetBeforeQue": cofpNoDetBeforeQue,
    "CO-M-P": nmp,
    "CO-F-P": nfp,
    "CO-M-P-adj": nmp,
@@ -1233,6 +1267,28 @@ const set = {
       ["CO-M-P-adj",1],
       ["CO-M-P-adj-de",1],
       ["CO-F-P-noDet",1],
+      ["CO-F-P",1],
+      ["CO-F-P-de",1],
+      ["CO-F-P-adj",1],
+      ["CO-F-P-adj-de",1]
+   ],
+   "CO-beforeQue": [
+      ["CO-M-S-noDetBeforeQue",1],
+      ["CO-M-S",1],
+      ["CO-M-S-de",1],
+      ["CO-M-S-adj",1],
+      ["CO-M-S-adj-de",1],
+      ["CO-F-S-noDetBeforeQue",1],
+      ["CO-F-S",1],
+      ["CO-F-S-de",1],
+      ["CO-F-S-adj",1],
+      ["CO-F-S-adj-de",1],
+      ["CO-M-P-noDetBeforeQue",1],
+      ["CO-M-P",1],
+      ["CO-M-P-de",1],
+      ["CO-M-P-adj",1],
+      ["CO-M-P-adj-de",1],
+      ["CO-F-P-noDetBeforeQue",1],
       ["CO-F-P",1],
       ["CO-F-P-de",1],
       ["CO-F-P-adj",1],
