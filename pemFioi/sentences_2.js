@@ -1004,7 +1004,7 @@ const nmsNoDetBeforeQue = [   // [subset,weight]
 ];
 const nfsNoDet = [   // [subset,weight]
    [nouns["name"].F,1],
-   [nouns["city"],1],
+   // [nouns["city"],1],
    [pronouns["demonstrative"].F,1],
    [pronouns["indefinite"].F.filter(word => word[0] != ""),1],
    [[["elle"]],1],
@@ -1012,7 +1012,7 @@ const nfsNoDet = [   // [subset,weight]
 ];
 const nfsNoDetBeforeQue = [   // [subset,weight]
    [nouns["name"].F,1],
-   [nouns["city"],1],
+   // [nouns["city"],1],
    [pronouns["demonstrative_2"].F,1],
    [[["la mienne"],["la tienne"],["la sienne"],["la vôtre"],["la nôtre"],["la leur"]],1]
 ];
