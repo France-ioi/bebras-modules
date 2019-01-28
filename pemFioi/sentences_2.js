@@ -594,7 +594,7 @@ function generateSentence(rng,n,struc,withSpaces,textMode){
 }
 
 function getDeterminer(gender,plural,type,rng) {
-   var determinerType = (type) ? type : pickOne(determinerTypes,rng,(determinerTypes.length - 1 + plural));
+   var determinerType = (type) ? type : pickOne(determinerTypes,rng,(determinerTypes.length - 1 + plural),true);
    if(determinerType != "numeral_adjective"){
       if(plural){
          var determiner = determiners[determinerType][gender][0][1];
@@ -924,30 +924,32 @@ const structures = [ // [structure,weight]
    [["adv-locution","2P-S","VT-str","CO"],10],
    [["adv-locution","1P-P","VT-str","CO"],5],
    [["adv-locution","2P-P","VT-str","CO"],5],
-   [["3P-S-que","VI-str"],40],
-   [["3P-P-que","VI-str"],20],
-   [["3P-S-que","VT-str","CO"],80],
-   [["3P-P-que","VT-str","CO"],40],
-   [["adv-locution","3P-S-que","VI-str"],20],
-   [["adv-locution","3P-P-que","VI-str"],10],
-   [["adv-locution","3P-S-que","VT-str","CO"],40],
-   [["adv-locution","3P-P-que","VT-str","CO"],20],
-   [["3P-S","VT-str","CO-que"],80],
-   [["3P-P","VT-str","CO-que"],40],
-   [["1P-S","VT-str","CO-que"],20],
-   [["2P-S","VT-str","CO-que"],20],
-   [["1P-P","VT-str","CO-que"],10],
-   [["2P-P","VT-str","CO-que"],10],
-   [["adv-locution","3P-S","VT-str","CO-que"],40],
-   [["adv-locution","3P-P","VT-str","CO-que"],20],
-   [["adv-locution","1P-S","VT-str","CO-que"],10],
-   [["adv-locution","2P-S","VT-str","CO-que"],10],
-   [["adv-locution","1P-P","VT-str","CO-que"],5],
-   [["adv-locution","2P-P","VT-str","CO-que"],5],
-   [["3P-S-que","VT-str","CO-que"],80],
-   [["3P-P-que","VT-str","CO-que"],40],
-   [["adv-locution","3P-S-que","VT-str","CO-que"],40],
-   [["adv-locution","3P-P-que","VT-str","CO-que"],20]
+
+   /*** avec subordonnée relative en "que" ***/
+   [["3P-S-que","VI-str"],8],
+   [["3P-P-que","VI-str"],4],
+   [["3P-S-que","VT-str","CO"],16],
+   [["3P-P-que","VT-str","CO"],8],
+   [["adv-locution","3P-S-que","VI-str"],4],
+   [["adv-locution","3P-P-que","VI-str"],2],
+   [["adv-locution","3P-S-que","VT-str","CO"],16],
+   [["adv-locution","3P-P-que","VT-str","CO"],4],
+   [["3P-S","VT-str","CO-que"],16],
+   [["3P-P","VT-str","CO-que"],8],
+   [["1P-S","VT-str","CO-que"],4],
+   [["2P-S","VT-str","CO-que"],4],
+   [["1P-P","VT-str","CO-que"],2],
+   [["2P-P","VT-str","CO-que"],2],
+   [["adv-locution","3P-S","VT-str","CO-que"],8],
+   [["adv-locution","3P-P","VT-str","CO-que"],4],
+   [["adv-locution","1P-S","VT-str","CO-que"],2],
+   [["adv-locution","2P-S","VT-str","CO-que"],2],
+   [["adv-locution","1P-P","VT-str","CO-que"],1],
+   [["adv-locution","2P-P","VT-str","CO-que"],1],
+   [["3P-S-que","VT-str","CO-que"],16],
+   [["3P-P-que","VT-str","CO-que"],8],
+   [["adv-locution","3P-S-que","VT-str","CO-que"],8],
+   [["adv-locution","3P-P-que","VT-str","CO-que"],4]
 ];
 const structuresQue = [ // structures de subordonnée relative suivant "que"
    [["3P-S","VT-str"],80],
