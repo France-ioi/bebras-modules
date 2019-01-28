@@ -658,7 +658,7 @@ function pluralize(str,plural) {
    }
    if(str.endsWith("s") || str.endsWith("x")){
       return str;
-   }else if(str.endsWith("al") && str != "chacal" && str != "banal"){
+   }else if(str.endsWith("al") && str != "chacal" && str != "banal" && str != "narval"){
       return str.replace(/al$/,"aux");
    }else if(str.endsWith("au")){
       return str.replace(/au$/,"aux");
