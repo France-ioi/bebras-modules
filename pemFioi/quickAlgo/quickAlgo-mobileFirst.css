@@ -892,6 +892,10 @@ p {
     -webkit-box-pack: center;
       -ms-flex-pack: center;
     justify-content: space-evenly;
+    flex-basis: 50%;
+  }
+  #introGrid .speedSlider {
+    flex-basis: 50%;
   }
 }
 @media /* Tablets portrait */
