@@ -1,3 +1,31 @@
+if(typeof require != 'undefined') {
+    var {
+        conjugations,
+        pastParticiples,
+        speConjugations,
+        auxConjugations,
+        allerConj,
+        exceptions,
+        negationWords,
+        determinerTypes,
+        determiners,
+        pronounTypes,
+        subjPronounTypes,
+        pronouns,
+        nounTypes,
+        nouns,
+        adjectiveTypes,
+        adjectives,
+        auxiliaryVerbs,
+        verbTypes,
+        verbs,
+        adverbTypes,
+        adverbs,
+        elisionWithH,
+        elisionWithHVerb
+    } = require('./sentences_wordList.js');
+    var block = "";
+}
 
 function init() {
    $("#form").html(createForm);
@@ -531,7 +559,6 @@ function getWord(block,person,plural,gender,tense,rng,coBefore) {
    return [word,person,plural,gender];
 }
 
-// module.exports.generate = function (rng, minLength, maxLength, withSpaces) {
 function generateText(rng,minLength,maxLength,withSpaces){
    var text = "";
    var curLength = 0;
@@ -1297,3 +1324,7 @@ const set = {
       ["CO-F-P-adj-de",1]
    ]
 };
+
+if(typeof exports != 'undefined') {
+    exports.generate = generateText;
+}

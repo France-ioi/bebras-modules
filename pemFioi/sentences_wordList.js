@@ -1,5 +1,6 @@
+(function (exports) {
 
-const conjugations = [  // 1er et 2ème groupes
+exports.conjugations = [  // 1er et 2ème groupes
    { 
       "present": ["e","es","e","ons","ez","ent"],
       "imparfait": ["ais","ais","ait","ions","iez","aient"],
@@ -11,16 +12,16 @@ const conjugations = [  // 1er et 2ème groupes
       "futur": ["rai","ras","ra","rons","rez","ront"]   
    }
 ];
-const pastParticiples = [  // 1er et 2ème groupes
+exports.pastParticiples = [  // 1er et 2ème groupes
    "é","i"
 ];
-const speConjugations = [  // 3ème groupe
+exports.speConjugations = [  // 3ème groupe
    { "present": ["iens","iens","ient","enons","enez","iennent"] },
    { "present": ["eux","eux","eut","oulons","oulez","eulent"] },
    { "present": ["eux","eux","eut","ouvons","ouvez","euvent"] },
    { "present": ["ois","ois","oit","evons","evez","oivent"] }
 ];
-const auxConjugations = [
+exports.auxConjugations = [
    { 
       "present": ["ai","as","a","avons","avez","ont"],
       "imparfait": ["avais","avais","avait","avions","aviez","avaient"],
@@ -32,14 +33,14 @@ const auxConjugations = [
       "futur": ["serai","seras","sera","serons","serez","seront"] 
    }
 ];
-const allerConj = {
+exports.allerConj = {
    "present": ["vais","vas","va","allons","allez","vont"]
 };
-const exceptions = [
+exports.exceptions = [
    [ "acheter", "geler", "haleter", "déceler", "modeler", "ciseler", "congeler", "marteler", "crocheter" ]
 ];
 
-const negationWords = [
+exports.negationWords = [
    "pas",
    "plus",
    "jamais",
@@ -64,13 +65,13 @@ const negationWords = [
    "plus vraiment"
    ];
 
-const determinerTypes = [
+exports.determinerTypes = [
    ["definite_article",1],
    ["indefinite_article",2],
    ["demonstrative_adjective",1],
    ["numeral_adjective",1]
    ];
-const determiners = {
+exports.determiners = {
    "definite_article": {
       "M": [
          [ "le", "les" ]
@@ -101,9 +102,9 @@ const determiners = {
    ]
 };
 
-const pronounTypes = ["personal","personal_2","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
-const subjPronounTypes = ["personal","demonstrative_2","indefinite"];
-const pronouns = {
+exports.pronounTypes = ["personal","personal_2","possessive","demonstrative","demonstrative_2","indefinite","relative","relative_2"];
+exports.subjPronounTypes = ["personal","demonstrative_2","indefinite"];
+exports.pronouns = {
 /*   "personal": [  // [name, gender, plural, person]
       [ "Je", 2, 0, 1 ],
       [ "Tu", 2, 0, 2 ],
@@ -171,8 +172,8 @@ const pronouns = {
    //    ["laquelle", 0, 0],
    //    ["lesquelles", 0, 1] ]  
 };
-const nounTypes = ["name","job","animal","plant","item","country","city"];
-const nouns = {
+exports.nounTypes = ["name","job","animal","plant","item","country","city"];
+exports.nouns = {
    "name": { 
       "M": [
          [ "Achille" ],
@@ -1173,8 +1174,8 @@ const nouns = {
       [ "Vienne" ]       
    ]
 };
-const adjectiveTypes = ["before","after"];   // placé avant ou après le nom
-const adjectives = { // [M-S,F-S]
+exports.adjectiveTypes = ["before","after"];   // placé avant ou après le nom
+exports.adjectives = { // [M-S,F-S]
    "before": [
       [ "abject", "e" ],
       [ "abominable", "" ],
@@ -2341,9 +2342,9 @@ const adjectives = { // [M-S,F-S]
    ]
 }; 
    
-const auxiliaryVerbs = ["avoir","être","both"];
-const verbTypes = ["intransitive","transitive","modal"];
-const verbs = {
+exports.auxiliaryVerbs = ["avoir","être","both"];
+exports.verbTypes = ["intransitive","transitive","modal"];
+exports.verbs = {
    "intransitive": [ // [verb, group, auxiliary]
       [ "abandonner", 1, 0 ],
       [ "abdiquer", 1, 0 ],
@@ -3936,8 +3937,8 @@ const verbs = {
    ]
  };
 
-const adverbTypes = ["aftVerb","aftNegVerb","beforeAdj"];
-const adverbs =  {
+exports.adverbTypes = ["aftVerb","aftNegVerb","beforeAdj"];
+exports.adverbs =  {
    "aftVerb": [
       "abominablement",
       "abruptement",
@@ -4362,7 +4363,7 @@ const adverbs =  {
    ]
 };
 
-const elisionWithH = [
+exports.elisionWithH = [
    "habile",
    "halucinant",
    "halucinante",
@@ -4387,7 +4388,7 @@ const elisionWithH = [
    "humble"
 ];
 
-const elisionWithHVerb = [
+exports.elisionWithHVerb = [
    "hachur",
    "hallucin",
    "harmonis",
@@ -4406,3 +4407,6 @@ const elisionWithHVerb = [
    "hydrat",
    "hypnotis"
 ];
+
+// Make it loadable both in node.js and in a browser
+})(typeof exports == 'undefined' ? window : exports);
