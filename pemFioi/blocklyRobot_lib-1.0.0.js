@@ -2866,7 +2866,7 @@ var getContext = function(display, infos, curLevel) {
          throw(strings.messages.failureReadHere);
       }
       
-      return numbers[0].value;
+      return parseInt(numbers[0].value);
    };
    
    context.pushObject = function(callback) {
