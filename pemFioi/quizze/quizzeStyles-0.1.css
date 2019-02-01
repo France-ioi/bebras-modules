@@ -1,0 +1,155 @@
+@font-face {
+  font-family: 'Titillium Web';
+  src: url('../../fonts/titilliumweb-light.woff2') format('woff2'),
+       url('../../fonts/titilliumweb-light.woff') format('woff'),
+       url('../../fonts/titilliumweb-light.ttf') format('truetype');
+  font-weight: 100;
+}
+@font-face {
+  font-family: 'Titillium Web';
+  src: url('../../fonts/titilliumweb-regular.woff2') format('woff2'),
+       url('../../fonts/titilliumweb-regular.woff') format('woff'),
+       url('../../fonts/titilliumweb-regular.ttf') format('truetype');
+  font-weight: normal;
+}
+@font-face {
+  font-family: 'Titillium Web';
+  src: url('../../fonts/titilliumweb-bold.woff2') format('woff2'),
+       url('../../fonts/titilliumweb-bold.woff') format('woff'),
+       url('../../fonts/titilliumweb-bold.ttf') format('truetype');
+  font-weight: bold;
+}
+#task {
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Titillium Web', Arial, Helvetica, sans-serif;
+  color: #9b9b9b;
+  padding-top: 2em;
+  counter-reset: questions-counter;
+}
+#task .intro,
+#task question,
+#displayHelperAnswering {
+  padding: 20px 60px;
+}
+#task .intro p.dropcap::first-letter {
+  color: #4a90e2;
+  font-size: 2.5em;
+  line-height: 1;
+  padding-right: 15px;
+  padding-top: 5px;
+  float: left;
+}
+#task .intro .introTitle {
+  font-size: 22px;
+  font-weight: 100;
+  color: #4a90e2;
+  margin: 1em 0 0.5em;
+}
+#task question {
+  display: block;
+}
+#task question:nth-child(odd) {
+  background: rgba(74,144,226,0.2);
+}
+#task statement {
+  color: #4a90e2;
+  font-size: 22px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  display: block;
+}
+#task statement::before {
+  counter-increment: questions-counter;
+  content: counter(questions-counter);
+  color: #fff;
+  font-weight: normal;
+  font-size: 18px;
+  background-color: #4a90e2;
+  border-radius: 50%;
+  width: 30px;
+  line-height: 30px;
+  text-align: center;
+  display: inline-block;
+  margin-right: 15px;
+}
+
+
+answer {
+  display: block;
+}
+
+answer.selected {
+  background: #AABBFF;
+}
+
+answer .error {
+}
+
+answer .error-message {
+  color: #993333;
+}
+
+solution {
+  display: block;
+}
+
+answer-group {
+  display: block;
+}
+
+input[type=text] {
+  font-size: 12px;
+  background: #F8F8F8;
+  border: 1px solid #E1E1E1;
+  border-radius: 5px;
+  padding: 6px 12px;
+  width: 100%;
+  color: #555555;
+  font-size: 16px;
+}
+input[type=text]:focus {
+  box-shadow: 0 1px 3px #333 inset;
+}
+::placeholder,
+:placeholder-shown {
+  font-style: italic;
+  opacity: 0.7;
+}
+#displayHelper_saved {
+  border-top: 1px solid #E1E1E1;
+  border-bottom: 1px solid #E1E1E1;
+  padding: 10px 0;
+  font-size: 1rem;
+}
+#displayHelper_validate,
+#displayHelper_cancel {
+  display: inline-block;
+  width: 50%;
+  box-sizing: border-box;
+}
+#displayHelper_validate {
+  padding-right: 20px;
+}
+#displayHelper_cancel {
+  padding-left: 20px;
+}
+#displayHelper_validate input,
+#displayHelper_cancel input {
+  border-radius: 50px;
+  color: #fff;
+  border: none;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  width: 100%;
+  padding: 7px 20px;
+}
+#displayHelper_validate input {
+  background-color: #4a90e2;
+}
+#displayHelper_cancel input {
+  background-color: #9b9b9b;
+}
