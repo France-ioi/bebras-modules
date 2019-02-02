@@ -1327,4 +1327,5 @@ const set = {
 
 if(typeof exports != 'undefined') {
     exports.generate = generateText;
+    exports.generateSentence = generateSentence;
 }
