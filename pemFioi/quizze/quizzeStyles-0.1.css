@@ -124,8 +124,7 @@ answer.selected .answer-code {
   color: #fff;
   background-color: #4a90e2;
 }
-answer.selected .answer-code::before {
-  content: "\f00c";
+answer .answer-code::before {
   font-family: "FontAwesome";
   font-weight: 900;
   position: absolute;
@@ -133,6 +132,10 @@ answer.selected .answer-code::before {
   top: 7px;
   top: calc(50% - 0.5em);
 }
+answer.selected .answer-code::before {
+  content: "\f00c";
+}
+
 /*
 *
 * QUESTION HORIZONTAL LAYOUT: TYPE SINGLE ANSWERS
@@ -173,7 +176,11 @@ question.horizontal answer .answer-code {
   padding: 2px 10px;
 }
 
-/* Switch checkbox */
+/*
+*
+* SWITCH CHECKBOX
+*
+*/
 .answer-switch {
   display: inline-block;
   background: rgba(0,0,0,0.05);
@@ -240,6 +247,7 @@ question.horizontal .answer-switch {
   align-self: center;
 }
 
+
 answer .error {
 }
 
@@ -264,6 +272,11 @@ answer .error-message .icon {
 
 }
 
+/*
+*
+* DISPLAY SOLUTION
+*
+*/
 solution {
   display: block;
   border-top: 1px solid #e1e1e1;
@@ -271,6 +284,32 @@ solution {
 }
 question:nth-child(odd) solution {
   border-color: #d2d2d2;
+}
+.displaySolution answer.correct:not(.selected) .answer-block {
+  border-color: transparent;
+}
+.displaySolution answer.correct:not(.selected) .answer-code::before {
+  color: #4a90e2;
+}
+.displaySolution answer.correct .answer-block {
+  font-weight: bold;
+}
+.displaySolution answer.correct .answer-code::before {
+  content: "\f0a5";
+}
+.displaySolution .horizontal answer.correct .answer-code::before {
+  content: "\f0a6";
+}
+.displaySolution answer.selected:not(.correct) .answer-block {
+  color: #797979;
+  border-color: #ff001f;
+}
+.displaySolution answer.selected:not(.correct) .answer-code {
+  background-color: #ff001f;
+  border-color: #ff001f;
+}
+.displaySolution answer.selected:not(.correct) .answer-code::before {
+  content: "\f00d";
 }
 
 answer-group {
@@ -374,6 +413,7 @@ button,
   border: 0;
   font-weight: normal;
   padding: 0;
+  max-width: none;
 }
 #popupMessage p {
   margin: .5em 0 0;
