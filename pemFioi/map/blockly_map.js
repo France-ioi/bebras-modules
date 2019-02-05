@@ -129,6 +129,7 @@ var getContext = function(display, infos) {
                     params_names: ['cityName']
                 },
                 { name: 'shortestPath',
+                    yieldsValue: true,
                     params: ['String', 'String'],
                     params_names: ['cityName1', 'cityName2']
                 },
