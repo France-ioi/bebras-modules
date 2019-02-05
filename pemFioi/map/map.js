@@ -311,6 +311,7 @@ function Map(options) {
         validateLat(latitude1);
         validateLng(longitude2);
         validateLat(latitude2);
+        opacity = opacity || 1;
         renderer.line(longitude1, latitude1, longitude2, latitude2, opacity);
     }
 
