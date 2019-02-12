@@ -125,7 +125,7 @@ answer.selected .answer-code {
   background-color: #4a90e2;
 }
 answer .answer-code::before {
-  font-family: "FontAwesome";
+  font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
   left: 15px;
@@ -191,11 +191,12 @@ question.horizontal answer .answer-code {
   position: relative;
   right: 0;
   cursor: pointer;
+  align-self: center;
   box-shadow: 0 1px 0 0 #727273 inset;
 }
 .answer-switch::before,
 .answer-switch::after {
-  font-family: "FontAwesome";
+  font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
   top: 7px;
@@ -229,7 +230,7 @@ answer.selected .answer-switch .cursor {
 }
 .answer-switch .cursor::before {
   content: "\f00d";
-  font-family: "FontAwesome";
+  font-family: "Font Awesome 5 Free";
   font-weight: 900;
   position: absolute;
   top: 7px;
