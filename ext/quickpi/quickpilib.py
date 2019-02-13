@@ -2,9 +2,17 @@ import RPi.GPIO as GPIO
 import time
 import smbus
 import math
+import pigpio 
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
+
+button_interrupt_enabled = {}
+button_was_pressed = {}
+servo_object = {}
+servo_last_value = {}
+
+pi = pigpio.pi()
 
 def turnLedOn(pin=5):
   GPIO.setup(pin, GPIO.OUT)
@@ -46,6 +54,31 @@ def waitForButton(button):
 	while not GPIO.input(button):
 		time.sleep(0.01)
 	time.sleep(0.1) # debounce
+
+def buttonWasPressedCallback(button):
+    button_was_pressed[button] = 1
+
+def buttonWasPressed(button):
+    init = False
+    try:
+        init = button_interrupt_enabled[button];
+    except:
+        pass
+
+    if not init:
+        button_interrupt_enabled[button] = True
+        GPIO.setup(button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(button, GPIO.FALLING, callback=buttonWasPressedCallback, bouncetime=300)
+
+    wasPressed = 0
+
+    try:
+        wasPressed = button_was_pressed[button]
+        button_was_pressed[button] = 0
+    except:
+            pass
+
+    return wasPressed
 
 usleep = lambda x: time.sleep(x / 1000000.0)
 
@@ -118,21 +151,46 @@ def displayText(line1, line2=""):
 		count += 1
 		if count == 16:
 			break
+'''
+def setServoAngle(pin, angle):
+    servo = None
+    try:
+        servo = servo_object[pin]
+        print ("found servo object " + str(servo));
+    except:
+        pass
+
+    if servo is None:
+        GPIO.setup(pin, GPIO.OUT)
+        servo = GPIO.PWM(pin, 50)
+        servo_object[pin] = servo
+        servo.start(2.5)
+        print("Creating servo object " + str(servo))
+
+
+    angle = max(min(angle, 180), 0) # normalize the angle to 0-180
+    duty = round((10 / 180 * angle) + 2.5, 1)
+
+    print ("Normalized angle " + str(angle))
+
+    last_value = -1
+    try:
+        last_value = servo_last_value[pin]
+    except:
+        pass
+
+    if last_value != angle:
+        print("Setting angle duty " + str(duty));
+        servo.ChangeDutyCycle(duty)
+#        servo.start(duty)
+        #time.sleep(0.10)
+        #servo.stop()
+        servo_last_value[pin] = angle
+'''
 
 def setServoAngle(pin, angle):
-	GPIO.setup(pin, GPIO.OUT)
-
-	try:
-		servo = GPIO.PWM(pin, 50)
-	except RuntimeError:
-		servo = g_servo
-
-	angle = max(min(angle, 180), 0) # normalize the angle to 0-180
-	duty = round((10 / 180 * angle) + 2.5, 1)
-
-	servo.start(duty)
-	time.sleep(0.55)
-	servo.stop()
+	pulsewidth = (angle * 11.11) + 500
+	pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
 	reg = 0x30 + pin

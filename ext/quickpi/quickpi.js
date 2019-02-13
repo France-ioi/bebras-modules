@@ -1,5 +1,14 @@
 
-var getQuickPiConnection = function (userName) {
+g_instance = null;
+
+var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
+    this.onConnect = _onConnect;
+    this.onDisconnect = _onDisconnect;
+
+    if (g_instance) {
+        return g_instance;
+    }
+
     this.pythonLib = "";
     this.raspiServer = "";
     this.wsSession = null;
@@ -7,8 +16,11 @@ var getQuickPiConnection = function (userName) {
     this.commandMode = false;
     this.userName = userName;
     this.sessionTainted = false;
+    this.connected = false;
+    this.onConnect = _onConnect;
+    this.onDisconnect = _onDisconnect;
 
-    this.connect = function(ipaddress, onConnect, onDisconnect) {
+    this.connect = function(ipaddress) {
         if (this.wsSession != null) {
             return;
         }
@@ -26,6 +38,7 @@ var getQuickPiConnection = function (userName) {
 
             wsSession.send(JSON.stringify(command));
 
+            connected = true;
             onConnect();
         }
 
@@ -34,22 +47,24 @@ var getQuickPiConnection = function (userName) {
                 tempCallback = resultsCallback;
                 resultsCallback = null;
                 tempCallback(evt.data);
-
             }
             //if (evt.data != "none")
             //appendOutput(evt.data + "\n");
         }
 
         this.wsSession.onclose = function () {
-            this.wsSession = null;
-            this.commandMode = false;
-            this.sessionTainted = false;
-            onDisconnect();
+            wsSession = null;
+            commandMode = false;
+            sessionTainted = false;
+            connected = false;
+
+            onDisconnect(this.connect);
+            
         }
     }
 
     this.fetchPythonLib = function(doAfter) {
-        fetch('../../modulesquickpilib.py')
+        fetch('../../modules/ext/quickpi/quickpilib.py')
             .then(function (response) {
                 return response.text();
             })
@@ -57,6 +72,14 @@ var getQuickPiConnection = function (userName) {
                 this.pythonLib = text;
                 doAfter();
             });
+    }
+
+    this.isConnecting = function () {
+        return this.wsSession != null;
+    }
+
+    this.isConnected = function () {
+        return this.connected;
     }
 
     this.executeProgram = function (pythonProgram) {
@@ -145,5 +168,6 @@ var getQuickPiConnection = function (userName) {
     }
 
 
+    g_instance = this;
     return this;
 }
