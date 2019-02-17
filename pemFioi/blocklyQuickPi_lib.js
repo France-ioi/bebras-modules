@@ -11,12 +11,12 @@ var getContext = function(display, infos, curLevel) {
             buttonStateInPort: "Return Button State in port %1",
             waitForButton: "Wait for button",
             buttonWasPressed: "Was button pressed",
-            changeLedState: "Turn led %1 in port %2",
+            changeLedState: "Turn led %2 in port %1",
             displayText: "Display %1 in screen",
             displayLabelAndNumber: "Display %1 in screen",
             readTemperature: "Read Ambient temperature",
             sleep: "Pause program for %1 seconds",
-            setServoAngle: "Set servo to %1 angle in port %2",
+            setServoAngle: "Set servo to %2 angle in port %1",
             readRotaryAngle: "Read state of potentiometer",
          },
          code: {
@@ -102,7 +102,6 @@ var getContext = function(display, infos, curLevel) {
    // A context must have a reset function to get back to the initial state
     context.reset = function (taskInfos) {
         // Do something here
-
         if (!context.offLineMode)
             context.quickPiConnection.startNewSession();
 
@@ -134,7 +133,7 @@ var getContext = function(display, infos, curLevel) {
       //context.blocklyHelper.updateSize();
       //context.updateScale();
 
-       $('#grid').html('Raspberry Pi IP Address <input type="text" id="piaddress" value="192.168.1.31"><button type="button" id="piconnect">Connect!</button><button type="button">Release lock</button>Status: <span id="pistatus">Disconnected</span><div id=virtualSensors></div>');
+       $('#grid').html('<div id="piui" style="background-color: green;">Raspberry Pi IP Address <input type="text" id="piaddress" value="192.168.1.31"><button type="button" id="piconnect">Connect!</button>Status: <span id="pistatus">Disconnected</span></div></div><div id=virtualSensors></div><div><button type="button" id="piinstall">Install!</button></div>');
 
        this.raphaelFactory.destroyAll();
        paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#grid').width() - 24, $('#grid').height() - 24);
@@ -194,27 +193,57 @@ var getContext = function(display, infos, curLevel) {
       context.blocklyHelper.updateSize();
       //context.updateScale();
 
+       context.reconnect = true;
+
        if (context.quickPiConnection.isConnecting()) {
            $('#pistatus').html("Connecting...");
+           $('#piconnect').html("Release");
+           $('#piconnect').attr("disabled", true);
+           $('#piinstall').attr("hidden", true);
+           $('#piui').css('background-color', 'brown');
            context.offLineMode = false;
        }
 
 
        if (context.quickPiConnection.isConnected()) {
            $('#pistatus').html("Connected");
+           $('#piconnect').attr("disabled", false);
+           $('#piinstall').attr("hidden", false);
+           $('#piui').css('background-color', 'green');
+
            context.offLineMode = false;
        }
 
        $('#piconnect').click(function () {
-           
-           var ipaddress = $('#piaddress').val();
-           sessionStorage.raspberryPiIpAddress = ipaddress;
-           context.quickPiConnection.connect(ipaddress);
+           // if in offline mode try to connect
+           if (context.offLineMode) {
+                var ipaddress = $('#piaddress').val();
+                sessionStorage.raspberryPiIpAddress = ipaddress;
+
+                $('#pistatus').html("Connecting...");
+                $('#piconnect').attr("disabled", true);
+                context.quickPiConnection.connect(ipaddress);
+           } else {
+                // IF connected release lock
+                context.reconnect = false;
+                context.quickPiConnection.releaseLock();
+           }
        });
+
+       $('#piinstall').click(function () {
+           python_code = context.blocklyHelper.getCode("python");
+
+           alert(python_code);
+
+            context.quickPiConnection.installProgram(python_code);
+           var a = 1;
+       });
+
 
        if (sessionStorage.autoConnect) {
            if (!context.quickPiConnection.isConnected() &&  !context.quickPiConnection.isConnecting()) {
                $('#pistatus').html("Connecting...");
+               $('#piconnect').attr("disabled", true);
                context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
            }
        }
@@ -226,16 +255,25 @@ var getContext = function(display, infos, curLevel) {
 
         context.offLineMode = false;
         $('#pistatus').html("Connected");
+        $('#piconnect').html("Release");
+        $('#piconnect').attr("disabled", false);
+        $('#piinstall').attr("hidden", false);
+        $('#piui').css('background-color', 'green');
 
         sessionStorage.autoConnect = true;
     }
 
     function raspberryPiDisconnected(wasConnected) {
-        
-        if (wasConnected) {
+        $('#piconnect').html("Connect");
+        $('#piinstall').attr("hidden", true);
+        $('#piui').css('background-color', 'brown');
+
+        if (wasConnected && context.reconnect) {
+            $('#piconnect').attr("disabled", true);
             context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
         } else {
             // If I was never connected don't attempt to autoconnect again
+            $('#piconnect').attr("disabled", false);
             sessionStorage.autoConnect = false;
         }
 
@@ -591,7 +629,7 @@ var getContext = function(display, infos, curLevel) {
                     context.runner.noDelay(callback, button.state);
             }
         } else {
-            context.quickPiConnection.sendCommand("getButtonState(22)", function (returnVal) {
+            context.quickPiConnection.sendCommand("buttonState(22)", function (returnVal) {
                 context.runner.noDelay(callback, returnVal != "0");
             });
         }
@@ -633,18 +671,18 @@ var getContext = function(display, infos, curLevel) {
 
                 button.wasPressed = false;
 
-                context.runner.waitDelay(callback, wasPressed);
+                context.waitDelay(callback, wasPressed);
             }
         } else {
             context.quickPiConnection.sendCommand("buttonWasPressed(" + port + ")", function (returnVal) {
-                context.runner.waitDelay(callback, returnVal != "0");
+                context.waitDelay(callback, returnVal != "0");
             });
         }
 
     };
 
-    context.quickpi.changeLedState = function (state, port, callback) {
-        var command = "setLedState(" + state + "," + port + ")";
+    context.quickpi.changeLedState = function (port, state, callback) {
+        var command = "changeLedState(" + port + "," + state + ")";
 
         changeSensorState("led", "D" + port, state == true);
 
@@ -712,7 +750,7 @@ var getContext = function(display, infos, curLevel) {
                     sensor.state = returnVal;
                 }
 
-                context.runner.waitDelay(callback, returnVal);
+                context.waitDelay(callback, returnVal);
             });
         }
     };
@@ -730,7 +768,14 @@ var getContext = function(display, infos, curLevel) {
         }
     };
 
-    context.quickpi.setServoAngle = function (angle, port, callback) {
+    context.quickpi.qwerty = function () {
+        var command = "readRotaryAngle(4)";
+        context.quickPiConnection.sendCommand(command, function (returnVal) {
+            context.quickpi.qwerty();
+        });
+    }
+
+    context.quickpi.setServoAngle = function (port, angle, callback) {
 
         var command = "setServoAngle(" + port + "," + angle + ")";
 
@@ -743,7 +788,6 @@ var getContext = function(display, infos, curLevel) {
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 context.waitDelay(callback);
             });
-
         }        
     };
 
@@ -753,7 +797,6 @@ var getContext = function(display, infos, curLevel) {
 
         var command = "readRotaryAngle(" + port + ")";
 
-
         if (context.offLineMode) {
             var retVal = 0;
             if (sensor) {
@@ -761,13 +804,15 @@ var getContext = function(display, infos, curLevel) {
             }
             context.waitDelay(callback, retVal);
         } else {
+            context.quickpi.qwerty();
+            /*
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 if (sensor) {
                     sensor.state = returnVal;
                 }
 
-                context.runner.waitDelay(callback, returnVal);
-            });
+                context.waitDelay(callback, returnVal);
+            });*/
         }
     };
 
@@ -812,19 +857,18 @@ var getContext = function(display, infos, curLevel) {
              }*/
             // 5, 16, 18, 22, 24, 26
              {
-                 name: "changeLedState", params: [null], blocklyJson: {
+                 name: "changeLedState", params: ["Number", "Number"], blocklyJson: {
                      "args0": [
-                         { "type": "field_dropdown", "name": "PARAM_0", "options": [["ON", "1"], ["OFF", "0"]] },
-                         {
-                         "type": "field_dropdown", "name": "PARAM_1", "options": [
-                             ["D5", "5"], ["D16", "16"], ["D18", "18"], ["D22", "22"], ["D24", "24"], ["D26", "26"]]
-                         }
-                         
+                        {
+                            "type": "field_dropdown", "name": "PARAM_0", "options": [
+                                ["D5", "5"], ["D16", "16"], ["D18", "18"], ["D22", "22"], ["D24", "24"], ["D26", "26"]]
+                         },
+                         { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },                         
                      ]
                  }
              },
              {
-                 name: "buttonStateInPort", yieldsValue: true, params: [null], blocklyJson: {
+                 name: "buttonStateInPort", yieldsValue: true, params: ["Number"], blocklyJson: {
                      "args0": [
                          {
                          "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -834,7 +878,7 @@ var getContext = function(display, infos, curLevel) {
                  }
              },
              {
-                 name: "buttonWasPressed", yieldsValue: true, params: [null], blocklyJson: {
+                 name: "buttonWasPressed", yieldsValue: true, params: ["Number"], blocklyJson: {
                      "args0": [
                          {
                          "type": "field_dropdown", "name": "PARAM_0", "options": [
@@ -845,7 +889,7 @@ var getContext = function(display, infos, curLevel) {
              },
 
              {
-                 name: "displayText", params: [null], blocklyJson: {
+                 name: "displayText", params: ["String", "String"], blocklyJson: {
                      "args0": [
                          { "type": "field_input", "name": "PARAM_0", "text": "Hello!" },
                          { "type": "field_input", "name": "PARAM_1", "text": "my name is Pablo" },
@@ -854,7 +898,7 @@ var getContext = function(display, infos, curLevel) {
 
              },
              {
-                 name: "displayLabelAndNumber", params: [null], blocklyJson: {
+                 name: "displayLabelAndNumber", params: ["String", "Number"], blocklyJson: {
                      "args0": [
                          { "type": "field_input", "name": "PARAM_0", "text": "Hello!" },
                          { "type": "input_value", "name": "PARAM_1"},
@@ -864,7 +908,7 @@ var getContext = function(display, infos, curLevel) {
              },
              { name: "readTemperature", yieldsValue: true },
              {
-                 name: "sleep", params: [null], blocklyJson: {
+                 name: "sleep", params: ["Number"], blocklyJson: {
                      "args0": [
                          { "type": "field_number", "name": "PARAM_0", "value": 1 },
                      ]
@@ -872,19 +916,19 @@ var getContext = function(display, infos, curLevel) {
 
              },
              {
-                 name: "setServoAngle", params: [null], blocklyJson: {
+                 name: "setServoAngle", params: ["Number", "Number"], blocklyJson: {
                      "args0": [
-                         { "type": "input_value", "name": "PARAM_0" },
                          {
-                             "type": "field_dropdown", "name": "PARAM_1", "options": [
+                             "type": "field_dropdown", "name": "PARAM_0", "options": [
                                  ["D5", "5"], ["D16", "16"], ["D18", "18"], ["D22", "22"], ["D24", "24"], ["D26", "26"]]
-                         }
-                         
+                         },
+                         { "type": "input_value", "name": "PARAM_1" },
+
                      ]
                  }
               },
               {
-                  name: "readRotaryAngle", yieldsValue: true, params: [null], blocklyJson: {
+                  name: "readRotaryAngle", yieldsValue: true, params: ["Number"], blocklyJson: {
                      "args0": [
                          {
                          "type": "field_dropdown", "name": "PARAM_0", "options": [

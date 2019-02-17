@@ -14,61 +14,68 @@ servo_last_value = {}
 
 pi = pigpio.pi()
 
-def turnLedOn(pin=5):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.HIGH)
+def changePinState(pin, state):
+  pin = int(pin)
+  state = int(state)
 
-def turnLedOff(pin=5):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.LOW)
-
-def setLedState(state, pin):
   GPIO.setup(pin, GPIO.OUT)
   if state:
     GPIO.output(pin, GPIO.HIGH)
   else:
     GPIO.output(pin, GPIO.LOW)
 
+def turnLedOn(pin=5):
+	changePinState(pin, 1)
+
+def turnLedOff(pin=5):
+	changePinState(pin, 0)
+
+def changeLedState(pin, state):
+	changePinState(pin, state)
+
 def buzzOn(pin):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.HIGH)
+  changePinState(pin, 1)
 
 def buzzOff(pin):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.LOW)
+  changePinState(pin, 0)
 
 def magnetOn(pin):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.HIGH)
+  changePinState(pin, 1)
 
 def magnetOff(pin):
-  GPIO.setup(pin, GPIO.OUT)
-  GPIO.output(pin, GPIO.LOW)
+  changePinState(pin, 0)
 
-def getButtonState(button):
-	GPIO.setup(button, GPIO.IN)
-	return GPIO.input(button)
+def buttonStateInPort(pin):
+  pin = int(pin)
 
-def waitForButton(button):
-	GPIO.setup(button, GPIO.IN)
-	while not GPIO.input(button):
-		time.sleep(0.01)
-	time.sleep(0.1) # debounce
+  GPIO.setup(pin, GPIO.IN)
+  return GPIO.input(pin)
 
-def buttonWasPressedCallback(button):
-    button_was_pressed[button] = 1
+def buttonState():
+	return buttonStateInPort(22)
 
-def buttonWasPressed(button):
+def waitForButton(pin):
+  pin = int(pin)
+  GPIO.setup(pin, GPIO.IN)
+  while not GPIO.input(pin):
+    time.sleep(0.01)
+  time.sleep(0.1) # debounce
+
+def buttonWasPressedCallback(pin):
+    button_was_pressed[pin] = 1
+
+def buttonWasPressed(pin):
+    pin = int(pin)
     init = False
     try:
-        init = button_interrupt_enabled[button];
+        init = button_interrupt_enabled[pin];
     except:
         pass
 
     if not init:
-        button_interrupt_enabled[button] = True
-        GPIO.setup(button, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(button, GPIO.FALLING, callback=buttonWasPressedCallback, bouncetime=300)
+        button_interrupt_enabled[pin] = True
+        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(pin, GPIO.FALLING, callback=buttonWasPressedCallback, bouncetime=300)
 
     wasPressed = 0
 
@@ -86,6 +93,8 @@ _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
 def getDistance(pin):
+	pin = int(pin)
+
 	GPIO.setup(pin, GPIO.OUT)
 	GPIO.output(pin, GPIO.LOW)
 	usleep(2)
@@ -189,10 +198,15 @@ def setServoAngle(pin, angle):
 '''
 
 def setServoAngle(pin, angle):
+	pin = int(pin)
+	angle = int(angle)
+
 	pulsewidth = (angle * 11.11) + 500
 	pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
+	pin = int(pin)
+
 	reg = 0x30 + pin
 	address = 0x04
 
@@ -220,3 +234,10 @@ def readSoundSensor(pin):
 
 def readlightSensor(pin):
 	return int(readADC(pin) * 100 / 631)
+
+def sleep(sleep_time):
+	sleep_time = float(sleep_time)
+	time.sleep(sleep_time)
+
+def reportBlockValue(id, state):
+	return state

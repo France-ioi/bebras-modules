@@ -1,4 +1,3 @@
-
 g_instance = null;
 
 var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
@@ -97,6 +96,28 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         var command =
         {
             "command": "startRunMode",
+            "program": fullProgram
+        }
+
+        this.wsSession.send(JSON.stringify(command));
+    }
+
+
+    this.installProgram = function (pythonProgram) {
+        if (this.wsSession == null)
+            return;
+
+        if (this.pythonLib === "") {
+            fetchPythonLib(function () { executeProgram(pythonProgram) });
+            return;
+        }
+
+        this.commandMode = false;
+
+        var fullProgram = this.pythonLib + pythonProgram;
+        var command =
+        {
+            "command": "install",
             "program": fullProgram
         }
 
