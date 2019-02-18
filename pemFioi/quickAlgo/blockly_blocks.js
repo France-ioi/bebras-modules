@@ -350,6 +350,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
          var output = blockInfo.blocklyJson.output;
+         var blockParams = blockInfo.params;
 
          for (var language in {JavaScript: null, Python: null}) {
             if (typeof blockInfo.codeGenerators[language] == "undefined") {
@@ -379,7 +380,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                            if (iParam) {
                               params += ", ";
                            }
-                           params += JSON.stringify(block.getFieldValue('PARAM_' + iParam));
+                           var fieldValue = block.getFieldValue('PARAM_' + iParam);
+                           if(blockParams && blockParams[iArgs0] == 'Number') {
+                              params += parseInt(fieldValue);
+                           } else {
+                              params += JSON.stringify(fieldValue);
+                           }
                            iParam += 1;
                         }
                         if (args0[iArgs0].type == "field_colour") {
