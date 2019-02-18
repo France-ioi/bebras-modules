@@ -344,6 +344,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             blockInfo.codeGenerators = {};
          }
 
+         var that = this;
+
          // for closure:
          var args0 = blockInfo.blocklyJson.args0;
          var code = this.mainContext.strings.code[blockInfo.name];
@@ -391,7 +393,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
                      var callCode = code + '(' + params + ')';
                      // Add reportValue to show the value in step-by-step mode
-                     var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
+                     if(that.reportValues) {
+                        var reportedCode = "reportBlockValue('" + block.id + "', " + callCode + ")";
+                     } else {
+                        var reportedCode = callCode;
+                     }
 
                      if (typeof output == "undefined") {
                         return callCode + ";\n";

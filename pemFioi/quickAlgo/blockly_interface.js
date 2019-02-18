@@ -31,6 +31,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       reloadForFlyout: 0,
       display: false,
       readOnly: false,
+      reportValues: true,
       quickAlgoInterface: window.quickAlgoInterface,
 
       glowingBlock: null,
