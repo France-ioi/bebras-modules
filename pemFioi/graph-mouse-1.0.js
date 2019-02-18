@@ -157,7 +157,7 @@ function GraphMouse(graphMouseID, graph, visualGraph) {
    };
 
    this.destroy = function() {
-      this.graph.removeListener(graphMouseID);
+      this.graph.removePostListener(graphMouseID);
       this.removeAll();
    };
 
