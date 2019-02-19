@@ -12,8 +12,7 @@ var getContext = function(display, infos, curLevel) {
             waitForButton: "Wait for button",
             buttonWasPressed: "Was button pressed",
             changeLedState: "Turn led %2 in port %1",
-            displayText: "Display %1 in screen",
-            displayLabelAndNumber: "Display %1 in screen",
+            displayText: "Display in screen Line 1: %1 Line 2: %2",
             readTemperature: "Read Ambient temperature",
             sleep: "Pause program for %1 seconds",
             setServoAngle: "Set servo to %2 angle in port %1",
@@ -29,7 +28,6 @@ var getContext = function(display, infos, curLevel) {
             buttonWasPressed: "buttonWasPressed",
             changeLedState: "changeLedState",
             displayText: "displayText",
-            displayLabelAndNumber: "displayLabelAndNumber",
             readTemperature: "readTemperature",
             sleep: "sleep",
             setServoAngle: "setServoAngle",
@@ -37,19 +35,18 @@ var getContext = function(display, infos, curLevel) {
          },
          description: {
             // Descriptions of the functions in Python (optional)
-            turnLedOn: "Turns on a light connected to Raspberry",
-            turnLedOff: "Turns off a light connected to Raspberry",
-            buttonState: "Returns the state of a button, Pressed means True and not pressed means False",
-            buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
-            waitForButton: "Stops program execution until a button is pressed",
-            buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
-            changeLedState: "Change led state in the given port",
-            displayText: "Display text in LCD screen",
-            displayLabelAndNumber: "Display a label and a number on screen",
-            readTemperature: "Read Ambient temperature",
-            sleep: "pause program execute for a number of seconds",
-            setServoAngle: "Set servo motor to an specified angle",
-            readRotaryAngle: "Read state of potentiometer",
+            turnLedOn: "turnLedOn(): Turns on a light connected to Raspberry",
+            turnLedOff: "turnLedOff(): Turns off a light connected to Raspberry",
+            buttonState: "buttonState(): Returns the state of a button, Pressed means True and not pressed means False",
+            buttonStateInPort: "buttonStateInPort(): Returns the state of a button, Pressed means True and not pressed means False",
+            waitForButton: "waitForButton(): Stops program execution until a button is pressed",
+            buttonWasPressed: "buttonWasPressed(): Returns true if the button has been pressed and will clear the value",
+            changeLedState: "changeLedState(): Change led state in the given port",
+            displayText: "displayText(): Display text in LCD screen",
+            readTemperature: "readTemperature(): Read Ambient temperature",
+            sleep: "sleep(): pause program execute for a number of seconds",
+            setServoAngle: "setServoAngle(): Set servo motor to an specified angle",
+            readRotaryAngle: "readRotaryAngle(): Read state of potentiometer",
          },
          constant: {
             // Translations for constant names (optional)
@@ -73,7 +70,6 @@ var getContext = function(display, infos, curLevel) {
             buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
             changeLedState: "Change led state in the given port",
             displayText: "Display text in LCD screen",
-            displayLabelAndNumber: "Display a label and a number on screen",
             readTemperature: "Read Ambient temperature",
             sleep: "pause program execute for a number of seconds",
             setServoAngle: "Set servo motor to an specified angle",
@@ -231,6 +227,7 @@ var getContext = function(display, infos, curLevel) {
        });
 
        $('#piinstall').click(function () {
+           context.blocklyHelper.reportValues = false;
            python_code = context.blocklyHelper.getCode("python");
 
            alert(python_code);
@@ -629,7 +626,7 @@ var getContext = function(display, infos, curLevel) {
                     context.runner.noDelay(callback, button.state);
             }
         } else {
-            context.quickPiConnection.sendCommand("buttonState(22)", function (returnVal) {
+            context.quickPiConnection.sendCommand("buttonState()", function (returnVal) {
                 context.runner.noDelay(callback, returnVal != "0");
             });
         }
@@ -648,7 +645,7 @@ var getContext = function(display, infos, curLevel) {
                 context.runner.noDelay(callback, button.state);
             }
         } else {
-            context.quickPiConnection.sendCommand("getButtonState(" + port + ")", function (returnVal) {
+            context.quickPiConnection.sendCommand("buttonState(" + port + ")", function (returnVal) {
                 context.runner.noDelay(callback, returnVal != "0");
             });
         }
@@ -716,25 +713,6 @@ var getContext = function(display, infos, curLevel) {
         }
     };
 
-    context.quickpi.displayLabelAndNumber = function (line1, number, callback) {
-        var command = "displayText(\"" + line1 + "\", \"" + number + "\")";
-
-        changeSensorState("screen", "i2c",
-            state = {
-                line1: line1,
-                line2: number
-            }
-        );
-
-        if (context.offLineMode) {
-            context.waitDelay(callback);
-        } else {
-            context.quickPiConnection.sendCommand(command, function (returnVal) {
-                context.waitDelay(callback);
-            });
-        }
-    };
-
     context.quickpi.readTemperature = function (callback) {
         var sensor = findSensor("temperature", "A0");
 
@@ -768,12 +746,6 @@ var getContext = function(display, infos, curLevel) {
         }
     };
 
-    context.quickpi.qwerty = function () {
-        var command = "readRotaryAngle(4)";
-        context.quickPiConnection.sendCommand(command, function (returnVal) {
-            context.quickpi.qwerty();
-        });
-    }
 
     context.quickpi.setServoAngle = function (port, angle, callback) {
 
@@ -891,19 +863,14 @@ var getContext = function(display, infos, curLevel) {
              {
                  name: "displayText", params: ["String", "String"], blocklyJson: {
                      "args0": [
-                         { "type": "field_input", "name": "PARAM_0", "text": "Hello!" },
-                         { "type": "field_input", "name": "PARAM_1", "text": "my name is Pablo" },
+                         { "type": "input_value", "name": "PARAM_0", "text": "Hello!" },
+                         { "type": "input_value", "name": "PARAM_1", "text": "my name is Pablo" },
                      ]
-                 }
-
-             },
-             {
-                 name: "displayLabelAndNumber", params: ["String", "Number"], blocklyJson: {
-                     "args0": [
-                         { "type": "field_input", "name": "PARAM_0", "text": "Hello!" },
-                         { "type": "input_value", "name": "PARAM_1"},
-                     ]
-                 }
+                 },
+                 blocklyXml: "<block type='displayText'>" +
+                                "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Hello!</field> </shadow></value>" + 
+                                "<value name='PARAM_1'><shadow type='text'><field name='TEXT'>Line 2</field> </shadow></value>" +
+                                "</block>"
 
              },
              { name: "readTemperature", yieldsValue: true },
@@ -925,7 +892,10 @@ var getContext = function(display, infos, curLevel) {
                          { "type": "input_value", "name": "PARAM_1" },
 
                      ]
-                 }
+                 },
+                 blocklyXml: "<block type='setServoAngle'>" +
+                 "<value name='PARAM_1'><shadow type='math_number'><field name='TEXT'>Line 2</field> </shadow></value>" +
+                 "</block>"
               },
               {
                   name: "readRotaryAngle", yieldsValue: true, params: ["Number"], blocklyJson: {
