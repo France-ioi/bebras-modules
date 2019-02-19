@@ -235,7 +235,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._createPrimitive = function (data) {
-    if (data === undefined) {
+    if (data === undefined || data === null) {
       return Sk.builtin.none.none$;  // Reuse the same object.
     }
     var type = typeof data;
