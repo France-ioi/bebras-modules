@@ -212,11 +212,11 @@ function PythonInterpreter(context, msgCallback) {
     target.addEventListener(eventName, listenerFunc);
   };
 
-  this.waitCallback = function (callback, value) {
+  this.waitCallback = function (callback) {
     // Returns a callback to be called once we can continue the execution
     this._paused = true;
     var that = this;
-    return function() {
+    return function(value) {
       that.noDelay(callback, value);
     };
   };
