@@ -101,10 +101,10 @@ function initBlocklyRunner(context, messageCallback) {
          target.addEventListener(eventName, listenerFunc);
       };
 
-      runner.waitCallback = function(callback, value) {
+      runner.waitCallback = function(callback) {
          // Returns a callback to be called once we can continue the execution
          runner.stackCount = 0;
-         return function() {
+         return function(value) {
             runner.noDelay(callback, value);
          }
       };
