@@ -230,8 +230,6 @@ var getContext = function(display, infos, curLevel) {
            context.blocklyHelper.reportValues = false;
            python_code = context.blocklyHelper.getCode("python");
 
-           alert(python_code);
-
             context.quickPiConnection.installProgram(python_code);
            var a = 1;
        });
@@ -576,9 +574,9 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback);
         }
         else {
-            context.quickPiConnection.sendCommand("turnLedOn()", function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnLedOn()", cb);
         }      
     };
 
@@ -588,9 +586,9 @@ var getContext = function(display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            context.quickPiConnection.sendCommand("turnLedOff()", function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnLedOff()", cb);
         }
     };
 
@@ -602,15 +600,18 @@ var getContext = function(display, infos, curLevel) {
         } else if (context.offLineMode) {
             button = findSensor("button", "D22");
             if (button) {
+                cb = context.runner.waitCallback(callback);
                 button.onPressed = function () {
-                    context.waitDelay(callback);
+                    cb();
                 }
+            } else {
+                context.waitDelay(callback);
             }
         }
         else {
-            context.quickPiConnection.sendCommand("waitForButton(22)", function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("waitForButton(22)", cb);
         }
     };
 
@@ -626,8 +627,10 @@ var getContext = function(display, infos, curLevel) {
                     context.runner.noDelay(callback, button.state);
             }
         } else {
+            cb = context.runner.waitCallback(callback);
+
             context.quickPiConnection.sendCommand("buttonState()", function (returnVal) {
-                context.runner.noDelay(callback, returnVal != "0");
+                cb(returnVal != "0");
             });
         }
 
@@ -645,8 +648,10 @@ var getContext = function(display, infos, curLevel) {
                 context.runner.noDelay(callback, button.state);
             }
         } else {
+            cb = context.runner.waitCallback(callback);
+
             context.quickPiConnection.sendCommand("buttonState(" + port + ")", function (returnVal) {
-                context.runner.noDelay(callback, returnVal != "0");
+                cb(returnVal != "0");
             });
         }
 
@@ -671,8 +676,9 @@ var getContext = function(display, infos, curLevel) {
                 context.waitDelay(callback, wasPressed);
             }
         } else {
+            cb = context.runner.waitCallback(callback);
             context.quickPiConnection.sendCommand("buttonWasPressed(" + port + ")", function (returnVal) {
-                context.waitDelay(callback, returnVal != "0");
+                cb(returnVal != "0");
             });
         }
 
@@ -686,10 +692,9 @@ var getContext = function(display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            context.quickPiConnection.sendCommand(command, function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
 
+            context.quickPiConnection.sendCommand(command, cb);
         }        
     };
 
@@ -707,9 +712,9 @@ var getContext = function(display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            context.quickPiConnection.sendCommand(command, function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, cb);
         }
     };
 
@@ -723,23 +728,22 @@ var getContext = function(display, infos, curLevel) {
             }
             context.waitDelay(callback, retVal);
         } else {
+            cb = context.runner.waitCallback(callback);
+
             context.quickPiConnection.sendCommand("readTemperature(0)", function (returnVal) {
                 if (sensor) {
                     sensor.state = returnVal;
                 }
 
-                context.waitDelay(callback, returnVal);
+                cb(returnVal);
             });
         }
     };
 
     context.quickpi.sleep = function (time, callback) {
         changeSensorState("sleep", "none", time);
-
         if (context.display) {
-            setTimeout(function () {
-                context.runner.noDelay(callback);
-            }, time * 1000);
+            context.runner.waitDelay(callback, null, time * 1000);
         }
         else {
             context.runner.noDelay(callback);
@@ -757,9 +761,8 @@ var getContext = function(display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            context.quickPiConnection.sendCommand(command, function (returnVal) {
-                context.waitDelay(callback);
-            });
+            cb = context.runner.waitCallback(callback);
+            context.quickPiConnection.sendCommand(command, cb);
         }        
     };
 
@@ -776,15 +779,16 @@ var getContext = function(display, infos, curLevel) {
             }
             context.waitDelay(callback, retVal);
         } else {
-            context.quickpi.qwerty();
-            /*
+
+            cb = context.runner.waitCallback(callback);
+
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 if (sensor) {
                     sensor.state = returnVal;
                 }
 
-                context.waitDelay(callback, returnVal);
-            });*/
+                cb(returnVal);
+            });
         }
     };
 
