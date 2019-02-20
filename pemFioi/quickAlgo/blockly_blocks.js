@@ -2327,6 +2327,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
       },
 
       checkBlocksAreAllowed: function(xml) {
+         if(this.includeBlocks && this.includeBlocks.standardBlocks && this.includeBlocks.standardBlocks.includeAll) { return true; }
          var allowed = this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
          var blockList = xml.getElementsByTagName('block');
          var notAllowed = [];
