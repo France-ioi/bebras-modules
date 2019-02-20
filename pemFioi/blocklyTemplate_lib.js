@@ -98,12 +98,12 @@ var getContext = function(display, infos, curLevel) {
       // For actions, we call the callback through waitDelay, to wait for the
       // end of the display animation associated with the action (here, there's
       // no display animation because it's a template)
-      context.waitDelay(callback);
+      context.runner.waitDelay(callback);
    };
 
    context.template.doNothing = function(callback) {
       // Template of function without argument
-      context.waitDelay(callback);
+      context.runner.waitDelay(callback);
    };
 
    context.template.readSensor = function(callback) {
@@ -115,6 +115,18 @@ var getContext = function(display, infos, curLevel) {
       // as argument for noDelay to pass it to the callback
       context.runner.noDelay(callback, returnVal);
    };
+
+  /*
+   * Each function must end its main execution thread by calling one of :
+   * `context.runner.noDelay(callback, value)` : return value `value`
+   * `context.runner.waitDelay(callback, value, delay)` : return value `value` after `delay` milliseconds
+   * `context.runner.waitEvent(callback, target, eventName, func)` : listen for JavaScript event `eventName` on DOM element `target`, until one event `e` is received, and return `func(e)`
+   * `context.runner.waitCallback(callback)` : returns a callback `cb` ; wait for `cb` to be called with `cb(value)`, and return `value`
+   * If you need to make an asynchronous call, you must still call one of these
+   * functions (for instance waitCallback) ; do not call them inside a
+   * setTimeout or the execution thread may be broken.
+   */
+
 
    /***** Blocks definitions *****/
    /* Here we define all blocks/functions of the library.
