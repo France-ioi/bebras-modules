@@ -12,6 +12,9 @@ button_was_pressed = {}
 servo_object = {}
 servo_last_value = {}
 
+screenLine1 = None
+screenLine2 = None
+
 pi = pigpio.pi()
 
 def changePinState(pin, state):
@@ -80,8 +83,8 @@ def buttonWasPressed(pin):
     wasPressed = 0
 
     try:
-        wasPressed = button_was_pressed[button]
-        button_was_pressed[button] = 0
+        wasPressed = button_was_pressed[pin]
+        button_was_pressed[pin] = 0
     except:
             pass
 
@@ -133,6 +136,15 @@ def getDistance(pin):
 	return distance
 
 def displayText(line1, line2=""):
+	global screenLine1
+	global screenLine2
+	
+	if line1 == screenLine1 and line2 == screenLine2:
+		return
+
+	screenLine1 = line1
+	screenLine2 = line2
+
 	address = 0x3e
 	bus = smbus.SMBus(1)
 
