@@ -2259,7 +2259,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             };
 
          } else {
-            if (!(this.mainContext.showIfMutator)) {
+            if (!(this.mainContext.infos.showIfMutator)) {
                var old = Blockly.Blocks.controls_if.init;
                Blockly.Blocks.controls_if.init = function() {
                   old.call(this);
