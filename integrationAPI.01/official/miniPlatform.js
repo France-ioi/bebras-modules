@@ -104,7 +104,7 @@
          'header' : '\
             <div id="miniPlatformHeader">\
                <table>\
-                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -114,7 +114,7 @@
          'header' : '\
             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
@@ -425,7 +425,7 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
-      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../modules') + '/integrationAPI.01/official/miniPlatform.css">');
+      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
          window.task_token.update({id: taskMetaData.id});
          window.answer_token = new AnswerToken(demo_key)
