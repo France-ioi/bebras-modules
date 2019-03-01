@@ -5,18 +5,34 @@ var getContext = function(display, infos, curLevel) {
       fr: { // French strings
          label: {
             // Labels for the blocks
-            turnLedOn: "Turn Led On",
+            turnLedOn: "Allumer la LED",
+           turnLedOff: "Éteindre la LED",
+           buttonState: "bouton enfoncé",
+           buttonStateInPort: "bouton enfoncé sur le port %1",
+           waitForButton: "Attendre le bouton",
+           buttonWasPressed: "Le bouton a été enfoncé",
+           changeLedState: "Passer la LED à %2 sur le port %1",
+           toggleLedState: "Inverser la LED sur le port %1",
+           displayText: "Afficher à l'écran Ligne 1: %1 Ligne 2: %2",
+           readTemperature: "température ambiante",
+           sleep: "Mettre le programme en pause pendant %1 secondes",
+           setServoAngle: "Mettre le servo à l'angle %2 sur le port %1",
+           readRotaryAngle: "état du potentiomètre",
+           readDistance: "distance lue par le capteur à ultrasons"
+            /*turnLedOn: "Turn Led On",
             turnLedOff: "Turn Led Off",
             buttonState: "Return Button State",
             buttonStateInPort: "Return Button State in port %1",
             waitForButton: "Wait for button",
             buttonWasPressed: "Was button pressed",
             changeLedState: "Turn led %2 in port %1",
+            toggleLedState: "Toggle led state in port %1",
             displayText: "Display in screen Line 1: %1 Line 2: %2",
             readTemperature: "Read Ambient temperature",
             sleep: "Pause program for %1 seconds",
             setServoAngle: "Set servo to %2 angle in port %1",
             readRotaryAngle: "Read state of potentiometer",
+            readDistance: "Read distance using the ultrasonic sensor"*/
          },
          code: {
             // Names of the functions in Python, or Blockly translated in JavaScript
@@ -27,11 +43,13 @@ var getContext = function(display, infos, curLevel) {
             waitForButton: "waitForButton",
             buttonWasPressed: "buttonWasPressed",
             changeLedState: "changeLedState",
+            toggleLedState: "toggleLedState",
             displayText: "displayText",
             readTemperature: "readTemperature",
             sleep: "sleep",
             setServoAngle: "setServoAngle",
             readRotaryAngle: "readRotaryAngle",
+            readDistance: "readDistance",
          },
          description: {
             // Descriptions of the functions in Python (optional)
@@ -42,11 +60,13 @@ var getContext = function(display, infos, curLevel) {
             waitForButton: "waitForButton(): Stops program execution until a button is pressed",
             buttonWasPressed: "buttonWasPressed(): Returns true if the button has been pressed and will clear the value",
             changeLedState: "changeLedState(): Change led state in the given port",
+            toggleLedState: "toggleLedState(): Toggles the led state",
             displayText: "displayText(): Display text in LCD screen",
             readTemperature: "readTemperature(): Read Ambient temperature",
             sleep: "sleep(): pause program execute for a number of seconds",
             setServoAngle: "setServoAngle(): Set servo motor to an specified angle",
             readRotaryAngle: "readRotaryAngle(): Read state of potentiometer",
+            readDistance: "readDistance(): Read distance using ultrasonic sensor"
          },
          constant: {
             // Translations for constant names (optional)
@@ -65,15 +85,17 @@ var getContext = function(display, infos, curLevel) {
             turnLedOn: "Turns on a light connected to Raspberry",
             turnLedOff: "Turns off a light connected to Raspberry",
             buttonState: "Returns the state of a button, Pressed means True and not pressed means False",
-            buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
             waitForButton: "Stops program execution until a button is pressed",
             buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
             changeLedState: "Change led state in the given port",
+            toggleLedState: "If led is on, turns it off, if it's off turns it on",
+            buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
             displayText: "Display text in LCD screen",
             readTemperature: "Read Ambient temperature",
             sleep: "pause program execute for a number of seconds",
             setServoAngle: "Set servo motor to an specified angle",
             readRotaryAngle: "Read state of potentiometer",
+            readDistance: "Read distance using ultrasonic sensor"
          }
       }
    }
@@ -95,19 +117,24 @@ var getContext = function(display, infos, curLevel) {
    var paper;
    context.offLineMode = true;
 
-   // A context must have a reset function to get back to the initial state
-    context.reset = function (taskInfos) {
-        // Do something here
+   context.reset = function (taskInfos) {
         if (!context.offLineMode)
             context.quickPiConnection.startNewSession();
 
         context.currentEventStreamPos = 0;
         context.sensorReturnsPos = 0;
         if (taskInfos != undefined ) {
+            context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
-            
             if (context.autoGrading) {
+
                 context.currentEventStream = new Array(taskInfos.patterRepeat * taskInfos.eventStream.length);
+
+                for (var i = 0; i < context.currentEventStream.length; i++)
+                {
+                    context.currentEventStream[i] = [];
+                }
+
                 context.expectedEventStream = taskInfos.eventStream;
                 context.patterRepeat = taskInfos.patterRepeat;
                 context.failed = false;
@@ -163,7 +190,6 @@ var getContext = function(display, infos, curLevel) {
 
            for (var iStateGroup = 0; iStateGroup < context.expectedEventStream.length; iStateGroup++) {
                var stateGroup = context.expectedEventStream[iStateGroup];
-
                for (var i = 0; i < stateGroup.length; i++) {
                     sensor = findSensor(stateGroup[i].sensorType, stateGroup[i].port);
                     if (sensor)
@@ -175,7 +201,7 @@ var getContext = function(display, infos, curLevel) {
        } else {
            
            var numSensors = infos.quickPiSensors.length;
-           var numColumns = 2;
+           var numColumns = 1;
            var sensorSize = paper.height / numSensors * numColumns * 0.80;
            var sensorsPercolumn = Math.ceil(numSensors / numColumns)
 
@@ -349,9 +375,6 @@ var getContext = function(display, infos, curLevel) {
 
         var percentage = sensorStateToPercent(sensor, state);
 
-        if (percentage == 0)
-            return;
-
         var yposition = ((sensor.drawInfo.y + (sensor.drawInfo.height * percentage)) + (sensor.drawInfo.height * .20)); 
 
         color = "green";
@@ -366,13 +389,15 @@ var getContext = function(display, infos, curLevel) {
             yposition += 4;
         }
 
-        stateline = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
-                                yposition,
-                                "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
-                                yposition]);
+        if (percentage != 0) {
+            stateline = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
+                                    yposition,
+                                    "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
+                                    yposition]);
 
-        stateline.attr({
-            "stroke-width": 5, "stroke" : color });
+            stateline.attr({
+                "stroke-width": 5, "stroke" : color });
+        }
 
         if (type == "wrong") {
             wrongindicator = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
@@ -563,14 +588,49 @@ var getContext = function(display, infos, curLevel) {
                     sensor.state = 0;
                 drawSensor(sensor);
             };            
+        }else if (sensor.type == "range") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (sensor.uparrow)
+                sensor.uparrow.remove();
+
+            if (sensor.downarrow)
+                sensor.downarrow.remove();
+
+            sensor.img = paper.image('../../modules/img/quickpi/range.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+
+            if (sensor.state == null)
+                sensor.state = 0;
+
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
+
+            var arrowsize = sensor.drawInfo.height * .30;
+
+            sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
+            sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
+
+            sensor.uparrow.node.onclick = function () {
+                sensor.state += 1;
+                if (sensor.state > 100)
+                sensor.state = 100;
+                drawSensor(sensor);
+            };
+
+            sensor.downarrow.node.onclick = function () {
+                sensor.state -= 1;
+                if (sensor.state < 0)
+                    sensor.state = 0;
+                drawSensor(sensor);
+            };            
         }
+
 
         if (sensor.portText)
             sensor.portText.remove();
 
         stateFontSize = sensor.drawInfo.height * 0.13;
         portFontSize = sensor.drawInfo.height * 0.20;
-        
         
 
         if (sensor.hasOwnProperty("stateText"))
@@ -585,18 +645,9 @@ var getContext = function(display, infos, curLevel) {
 
     context.registerQuickPiEvent = function(sensorType, port, newState, setInSensor=true) {
         var sensor = findSensor(sensorType, port);
-        if (!sensor) {
-            throw("Sensors is not registered");
+        if (!sensor && port != "none") {
+            throw("Sensor is not registered");
         }
-
-        // Ignore events that don't change states
-        if (sensorType == "sleep")
-        {
-            // Merge multiple sleeps
-        }
-
-        if (sensor.state == newState)
-            return;
 
         if (setInSensor) {
             sensor.state = newState;
@@ -604,31 +655,43 @@ var getContext = function(display, infos, curLevel) {
         }
 
         if (context.currentEventStream != undefined) {
-            context.currentEventStream[context.currentEventStreamPos] = {
+
+            stateChange = {
                 sensorType: sensorType,
                 port: port,
                 state: newState
             };
 
-            var taskStatus = context.quickpi.validateEventStream();
+            var sameEvent = false;
+            if (sensor &&
+                sensor.state == newState)
+            {
+                sameEvent = true;
+            }
+
+            var draw = context.quickpi.insertEvent(stateChange, sameEvent);
+
+            var taskStatus = context.quickpi.validateCurrentEventStreamGroup();
 
             if (context.autoGrading)
             {
+                var type = "actual";
                 if (taskStatus == context.TASK_FAILED)
                 {
-                    drawSensorTimeLineState(sensor, newState, context.currentEventStreamPos, "wrong");
+                    type = "wrong";
                 }
-                else
+
+                if (sensor && draw)
+                    drawSensorTimeLineState(sensor, newState, context.currentEventStreamPos, type);
+
+                // IF we have completed this state group, move into the next one
+                if (taskStatus == context.TASK_SUCCEEDED)
                 {
-                    drawSensorTimeLineState(sensor, newState, context.currentEventStreamPos, "actual");
+                    context.currentEventStreamPos++;
+                    if (context.currentEventStreamPos == context.currentEventStream.length)
+                        context.currentEventStreamPos = 0;        
                 }
             }
-
-            
-
-            context.currentEventStreamPos++;
-            if (context.currentEventStreamPos == context.currentEventStream.length)
-                context.currentEventStreamPos = 0;
         }
     }
 
@@ -637,15 +700,21 @@ var getContext = function(display, infos, curLevel) {
         if (!context.display || context.autoGrading)
         {
             var state = null;
-            sensor = context.expectedEventStream[context.currentEventStreamPos];
+            var found = false;
+            sensorStates = context.expectedEventStream[context.currentEventStreamPos];
 
-            if (sensor.sensorType == sensorType &&
-                sensor.port == port) {
-                state = sensor.state;
-
-                context.registerQuickPiEvent(sensorType, port, state, false);
+            for(var i = 0; i < sensorStates.length; i++)
+            {
+                sensor = sensorStates[i];
+                if (sensor.sensorType == sensorType &&
+                    sensor.port == port) {
+                    state = sensor.state;
+                    context.registerQuickPiEvent(sensorType, port, state, false);
+                    found = true;
+                }
             }
-            else {
+
+            if (!found) {
                 context.failed = true;
                 throw ("Failed expected sequence")
             }
@@ -667,7 +736,73 @@ var getContext = function(display, infos, curLevel) {
         return state;
     }
 
+    context.quickpi.findEventInGroup = function(event, eventGroup) {
+        for (var i = 0; i < eventGroup.length; i++) {
+            if (eventGroup[i].sensorType == event.sensorType &&
+                eventGroup[i].port == event.port) {
+                return eventGroup[i];
+            }
+        }
+
+        return null;
+    }
+
+    context.quickpi.validateEventStreamGroup = function(expected, actual) {
+        var match = context.TASK_SUCCEEDED;
+
+        for (var i = 0; i < actual.length; i++) {
+            var expectedEvent = context.quickpi.findEventInGroup(actual[i], expected);
+
+            if (expectedEvent != null)  {
+                if (expectedEvent.state != actual[i].state) {
+                    match = context.TASK_FAILED;
+                    break;
+                }
+            } else {
+                match = context.TASK_ONGOING;
+            }
+        }
+
+        return match;
+    }
+
+    context.quickpi.insertEvent = function(event, sameState) {
+        var draw = true;
+
+        // Check if there are two sleep calls that need to be merged
+        if (event.sensorType == "sleep" &&
+            context.currentEventStream[context.currentEventStreamPos].length > 0 &&
+            context.currentEventStream[context.currentEventStreamPos][context.currentEventStream[context.currentEventStreamPos].length -1].sensorType == "sleep")  {
+                context.currentEventStream[context.currentEventStreamPos][context.currentEventStream[context.currentEventStreamPos].length - 1].state += event.state;
+        } else {
+            // See if we already have the same event to overwrite
+            var foundEvent = context.quickpi.findEventInGroup(event, context.currentEventStream[context.currentEventStreamPos]);
+            var expectedEvent = context.quickpi.findEventInGroup(event, context.expectedEventStream[context.currentEventStreamPos]);
+
+            if (foundEvent)
+            {
+                foundEvent.state = event.state;
+            } else if (expectedEvent &&
+                       sameState &&
+                       expectedEvent.state != event.state) {
+                draw = false;
+                // Ignore wrong state changes if they aren't really changing the state
+            } else {
+                context.currentEventStream[context.currentEventStreamPos].push(event);
+            }
+        }
+
+        return draw;
+    }
+
+    context.quickpi.validateCurrentEventStreamGroup = function() {
+        return context.quickpi.validateEventStreamGroup(context.currentEventStream[context.currentEventStreamPos],
+                                                        context.expectedEventStream[context.currentEventStreamPos]);
+
+    }
+
     context.quickpi.validateEventStream = function() {
+
         var currentStream = 0;
         var currentPattern = 0;
         var match = context.TASK_SUCCEEDED;
@@ -676,50 +811,12 @@ var getContext = function(display, infos, curLevel) {
             return context.TASK_ONGOING;
         }
 
-        /*
-        currentStream = context.currentEventStreamPos
-        if (currentStream == 0)
-            currentStream = context.currentEventStream.length;
-        currentStream--;
-        */
-
-
-        while (currentStream < context.currentEventStream.length) {
-
-            if (context.currentEventStream[currentStream] == undefined) {
-                match = context.TASK_ONGOING;
+        for (var i = 0; i < context.expectedEventStream.length; i++) {
+            match = context.quickpi.validateEventStreamGroup(context.currentEventStream[i],
+                    context.expectedEventStream[i]);
+            if (match == context.TASK_ONGOING ||
+                match == context.TASK_FAILED)
                 break;
-            }
-
-            if (context.currentEventStream[currentStream].sensorType != context.expectedEventStream[currentPattern].sensorType
-                || context.currentEventStream[currentStream].port != context.expectedEventStream[currentPattern].port) {
-                match = context.TASK_FAILED;
-                break;
-            }
-
-            if (context.currentEventStream[currentStream].sensorType == "led"
-                || context.currentEventStream[currentStream].sensorType == "sleep"
-                || context.currentEventStream[currentStream].sensorType == "button") {
-                if (context.currentEventStream[currentStream].state != context.expectedEventStream[currentPattern].state) {
-                    match = context.TASK_FAILED;
-                    break;
-                }
-            } else if (context.currentEventStream[currentStream].sensorType == "screen") {
-                if (context.currentEventStream[currentStream].state.line1 != context.expectedEventStream[currentPattern].line1
-                    || context.currentEventStream[currentStream].state.line1 != context.expectedEventStream[currentPattern].line2) {
-                    match = context.TASK_FAILED;
-                    break;
-                }
-            } else {
-                match = context.TASK_FAILED
-                break;
-            }
-
-            currentStream++;
-
-            currentPattern++;
-            if (currentPattern == context.expectedEventStream.length)
-                currentPattern = 0;
         }
 
         return match;
@@ -803,12 +900,29 @@ var getContext = function(display, infos, curLevel) {
         } else {
             cb = context.runner.waitCallback(callback);
 
+            context.quickPiConnection.sendCommand("buttonStateInPort(" + port + ")", function (returnVal) {
+                cb(returnVal != "0");
+            });
+        }
+
+    };
+
+    context.quickpi.toggleLedState = function (port, callback) {
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("button", "D" + port);
+
+            context.runner.noDelay(callback, state);
+        } else {
+            cb = context.runner.waitCallback(callback);
+
             context.quickPiConnection.sendCommand("buttonState(" + port + ")", function (returnVal) {
                 cb(returnVal != "0");
             });
         }
 
     };
+
 
     context.quickpi.buttonWasPressed = function (port, callback) {
 
@@ -839,6 +953,22 @@ var getContext = function(display, infos, curLevel) {
         }        
     };
 
+    context.quickpi.toggleLedState = function (port, callback) {
+        var command = "toggleLedState(" + port + ")";
+        var state = context.getSensorState("led", "D" + port);
+
+        context.registerQuickPiEvent("led", "D" + port, !state); 
+
+        if (context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, cb);
+        }        
+    };
+
+
 
     context.quickpi.displayText = function (line1, line2, callback) {
         var command = "displayText(\"" + line1 + "\", \"" + line2 + "\")";
@@ -859,16 +989,16 @@ var getContext = function(display, infos, curLevel) {
         }
     };
 
-    context.quickpi.readTemperature = function (callback) {
+    context.quickpi.readTemperature = function (port, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("temperature", "A0");
+            var state = context.getSensorState("temperature", "A" + port);
 
             context.runner.noDelay(callback, state);
         } else {
             cb = context.runner.waitCallback(callback);
 
-            context.quickPiConnection.sendCommand("readTemperature(0)", function (returnVal) {
-                var sensor = findSensor("temperature", "A0");
+            context.quickPiConnection.sendCommand("readTemperature(" + port + ")", function (returnVal) {
+                var sensor = findSensor("temperature", "A" + port);
                 if (sensor) {
                     sensor.state = returnVal;
                 }
@@ -879,7 +1009,7 @@ var getContext = function(display, infos, curLevel) {
     };
 
     context.quickpi.sleep = function (time, callback) {
-        context.registerQuickPiEvent("sleep", "none", time);
+        context.registerQuickPiEvent("sleep", "none", time, false);
         if (context.display) {
             context.runner.waitDelay(callback, null, time * 1000);
         }
@@ -907,7 +1037,7 @@ var getContext = function(display, infos, curLevel) {
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
-            var state = getSensorState("potentiometer", "A" + port);
+            var state = context.getSensorState("potentiometer", "A" + port);
             context.waitDelay(callback, state);
         } else {
 
@@ -915,6 +1045,29 @@ var getContext = function(display, infos, curLevel) {
 
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 var sensor = findSensor("potentiometer", "A" + port);
+                if (sensor) {
+                    sensor.state = returnVal;
+                }
+
+                cb(returnVal);
+            });
+        }
+    };
+
+    
+    context.quickpi.readDistance = function (port, callback) {
+        var command = "readDistance(" + port + ")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+
+            var state = context.getSensorState("range", "D" + port);
+            context.waitDelay(callback, state);
+        } else {
+
+            cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function (returnVal) {
+                var sensor = findSensor("range", "D" + port);
                 if (sensor) {
                     sensor.state = returnVal;
                 }
@@ -975,15 +1128,28 @@ var getContext = function(display, infos, curLevel) {
                      ]
                  }
              },
+             {
+             name: "readTemperature", yieldsValue: true, params: ["Number"], blocklyJson: {
+                "args0": [
+                    {
+                    "type": "field_dropdown", "name": "PARAM_0", "options": [
+                        ["A0", "0"], ["A2", "2"], ["A4", "4"], ["A6", "6"]]
+                    }
+                ]
+            }
+            },
 
-             { name: "readTemperature", yieldsValue: true },
+
              {
                  name: "sleep", params: ["Number"], blocklyJson: {
                      "args0": [
-                         { "type": "field_number", "name": "PARAM_0", "value": 1 },
+                         { "type": "input_value", "name": "PARAM_0", "value": 1 },
                      ]
                  }
-
+                 ,
+                blocklyXml: "<block type='sleep'>" +
+                "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                "</block>"
              },
               {
                   name: "readRotaryAngle", yieldsValue: true, params: ["Number"], blocklyJson: {
@@ -995,6 +1161,16 @@ var getContext = function(display, infos, curLevel) {
                      ]
                  }
              },
+             {
+                name: "readDistance", yieldsValue: true, params: ["Number"], blocklyJson: {
+                   "args0": [
+                       {
+                       "type": "field_dropdown", "name": "PARAM_0", "options": [
+                           ["D5", "5"], ["D16", "16"], ["D18", "18"], ["D22", "22"], ["D24", "24"], ["D26", "26"]]
+                       }
+                   ]
+               }
+           },
 
          ],
         actions: [
@@ -1011,6 +1187,17 @@ var getContext = function(display, infos, curLevel) {
                     ]
                 }
             },
+            {
+                name: "toggleLedState", params: ["Number"], blocklyJson: {
+                    "args0": [
+                       {
+                           "type": "field_dropdown", "name": "PARAM_0", "options": [
+                               ["D5", "5"], ["D16", "16"], ["D18", "18"], ["D22", "22"], ["D24", "24"], ["D26", "26"]]
+                        },
+                    ]
+                }
+            },
+
             {
                 name: "setServoAngle", params: ["Number", "Number"], blocklyJson: {
                     "args0": [
@@ -1029,13 +1216,13 @@ var getContext = function(display, infos, curLevel) {
              {
                 name: "displayText", params: ["String", "String"], blocklyJson: {
                     "args0": [
-                        { "type": "input_value", "name": "PARAM_0", "text": "Hello!" },
-                        { "type": "input_value", "name": "PARAM_1", "text": "my name is Pablo" },
+                        { "type": "input_value", "name": "PARAM_0", "text": "" },
+                        { "type": "input_value", "name": "PARAM_1", "text": "" },
                     ]
                 },
                 blocklyXml: "<block type='displayText'>" +
-                               "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Hello!</field> </shadow></value>" + 
-                               "<value name='PARAM_1'><shadow type='text'><field name='TEXT'>Line 2</field> </shadow></value>" +
+                               "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" + 
+                               "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                                "</block>"
 
             },

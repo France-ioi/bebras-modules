@@ -36,6 +36,13 @@ def turnLedOff(pin=5):
 def changeLedState(pin, state):
 	changePinState(pin, state)
 
+def toggleLedState(pin):
+	GPIO.setup(pin, GPIO.OUT)
+	if GPIO.input(pin):
+		GPIO.output(pin, GPIO.LOW)
+	else:
+		GPIO.output(pin, GPIO.HIGH)
+
 def buzzOn(pin):
   changePinState(pin, 1)
 
@@ -95,7 +102,7 @@ usleep = lambda x: time.sleep(x / 1000000.0)
 _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
-def getDistance(pin):
+def readDistance(pin):
 	pin = int(pin)
 
 	GPIO.setup(pin, GPIO.OUT)
