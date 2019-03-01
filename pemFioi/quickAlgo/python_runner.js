@@ -280,6 +280,10 @@ function PythonInterpreter(context, msgCallback) {
     });
     Sk.pre = "edoutput";
     Sk.pre = "codeoutput";
+
+    // Disable document library
+    delete Sk.builtinFiles["files"]["src/lib/document.js"];
+
     this.context.callCallback = this.noDelay.bind(this);
   };
 
