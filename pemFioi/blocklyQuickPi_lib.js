@@ -69,10 +69,6 @@ var getContext = function(display, infos, curLevel) {
             readDistance: "readDistance(): Read distance using ultrasonic sensor"
          },
          constant: {
-            // Translations for constant names (optional)
-            /*"ONE": "UN",
-            "TRUEVALUE": "VALEURVRAI",
-            "LIBNAME": "NOMLIB",*/
          },
 
          startingBlockName: "Programme", // Name for the starting block
@@ -121,22 +117,35 @@ var getContext = function(display, infos, curLevel) {
         if (!context.offLineMode)
             context.quickPiConnection.startNewSession();
 
-        context.currentEventStreamPos = 0;
-        context.sensorReturnsPos = 0;
         if (taskInfos != undefined ) {
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
             if (context.autoGrading) {
+                context.gradingInput = taskInfos.intput;
+                context.gradingOutput = taskInfos.output;
+                context.maxTime = 0;
+                context.tickIncrease = 100;
 
-                context.currentEventStream = new Array(taskInfos.patterRepeat * taskInfos.eventStream.length);
+                var mergedArray = context.gradingInput.concat(context.gradingOutput);
 
-                for (var i = 0; i < context.currentEventStream.length; i++)
+                mergedArray.sort(function(a, b) {  return a.time - b.time; });
+
+                context.gradingStates = {};
+
+                for (var i = 0; i < mergedArray.length; i++)
                 {
-                    context.currentEventStream[i] = [];
+                    var state = mergedArray[i];
+                    var key = state.type.toUpperCase() + state.port.toUpperCase();
+
+                    if (!context.gradingStates.hasOwnProperty(key))
+                        context.gradingStates[key] = [];
+
+                    context.gradingStates[key].push(state);
+
+                    if (state.time > context.maxTime)
+                        context.maxTime = state.time;
                 }
 
-                context.expectedEventStream = taskInfos.eventStream;
-                context.patterRepeat = taskInfos.patterRepeat;
                 context.failed = false;
             }
         }
@@ -171,14 +180,17 @@ var getContext = function(display, infos, curLevel) {
            var sensorSize = paper.height / numSensors * 0.80;
            var sensorsPercolumn = Math.ceil(numSensors)
            var currentColumn = 0
+           context.sensorSize = sensorSize * .90;
+
+           context.pixelsPerTime = (paper.width - context.sensorSize) /  context.maxTime;
 
 
-           for (var i = 0; i < infos.quickPiSensors.length; i++) {
-               var sensor = infos.quickPiSensors[i];
+           for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+               var sensor = infos.quickPiSensors[iSensor];
 
                sensor.drawInfo = {
                    x: 0,
-                   y: sensorSize * i,
+                   y: sensorSize * iSensor,
                    width: sensorSize * .90,
                    height: sensorSize * .90
                }
@@ -186,18 +198,27 @@ var getContext = function(display, infos, curLevel) {
                sensor.state = null;
 
                drawSensor(sensor);
-           }
+               drawTimeLine();
 
-           for (var iStateGroup = 0; iStateGroup < context.expectedEventStream.length; iStateGroup++) {
-               var stateGroup = context.expectedEventStream[iStateGroup];
-               for (var i = 0; i < stateGroup.length; i++) {
-                    sensor = findSensor(stateGroup[i].sensorType, stateGroup[i].port);
-                    if (sensor)
-                        drawSensorTimeLineState(sensor, stateGroup[i].state, iStateGroup, "expected");
-                    else
-                        console.log("Reference to not existing sensor");
+               var key = sensor.type.toUpperCase() + sensor.port.toUpperCase();
+               if (context.gradingStates.hasOwnProperty(key))
+               {
+                    var states = context.gradingStates[key];
+                    var startTime = -1;
+                    var lastState = null;
+                    for (var iState = 0; iState < states.length; iState++)
+                    {
+                        var state = states[iState];
+                        if (startTime > 0)
+                        {
+                            drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected");
+                        }
+
+                        startTime = state.time;
+                        lastState = state.state;
+                    }
                }
-            }
+           }
        } else {
            
            var numSensors = infos.quickPiSensors.length;
@@ -207,6 +228,8 @@ var getContext = function(display, infos, curLevel) {
 
            var currentColumn = 0
            var sensorsInColumn = 0;
+
+           context.sensorSize = sensorSize * .90;
 
            for (var i = 0; i < infos.quickPiSensors.length; i++) {
                sensor = infos.quickPiSensors[i];
@@ -369,13 +392,51 @@ var getContext = function(display, infos, curLevel) {
         return retVal;
     }
 
+    function drawTimeLine()
+    {
+        for (var i = 1000; i < context.maxTime; i += 1000)
+        {
+            var x = context.sensorSize + (i * context.pixelsPerTime);
 
-    function drawSensorTimeLineState(sensor, state, stateNumber, type) {
+            paper.text(x + 5, paper.height - context.sensorSize / 2, (i / 1000) + "s");
+
+            paper.path(["M", x,
+                        paper.height - context.sensorSize / 2,
+                        "L", x,
+                        paper.height - context.sensorSize]);
+        }
+
+        paper.path(["M", context.sensorSize,
+                    paper.height - context.sensorSize * 3 / 4,
+                    "L", paper.width,
+                    paper.height - context.sensorSize * 3 / 4]);
+
+    }
+
+    function drawCurrentTime()
+    {
+        var startx = context.sensorSize + (context.currentTime * context.pixelsPerTime);
+
+        
+        if (context.timeLineCurrent)
+        context.timeLineCurrent.remove();
+
+        context.timeLineCurrent = paper.path(["M", startx,
+                                               0,
+                                                "L", startx,
+                                                paper.height]);
+    }
+
+
+    function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
         var stateOffset = 160;
+
+        var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
+        var stateLenght = (endTime - startTime) * context.pixelsPerTime;
 
         var percentage = sensorStateToPercent(sensor, state);
 
-        var yposition = ((sensor.drawInfo.y + (sensor.drawInfo.height * percentage)) + (sensor.drawInfo.height * .20)); 
+        var yposition = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20)); 
 
         color = "green";
         if (type == "expected") {
@@ -385,14 +446,14 @@ var getContext = function(display, infos, curLevel) {
             yposition += 4;
         }
         else if (type == "actual") {
-            color = "green";
+            color = "yellow";
             yposition += 4;
         }
 
         if (percentage != 0) {
-            stateline = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
+            stateline = paper.path(["M", startx,
                                     yposition,
-                                    "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
+                                    "L", startx + stateLenght,
                                     yposition]);
 
             stateline.attr({
@@ -400,6 +461,7 @@ var getContext = function(display, infos, curLevel) {
         }
 
         if (type == "wrong") {
+            /*
             wrongindicator = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
                              sensor.drawInfo.y,
                         "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
@@ -412,7 +474,7 @@ var getContext = function(display, infos, curLevel) {
                             ]);
 
             wrongindicator.attr({
-                "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });
+                "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });*/
         }
     }
 
@@ -643,6 +705,17 @@ var getContext = function(display, infos, curLevel) {
         sensor.portText.attr({ "font-size": portFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold' });
     }
 
+    context.compareSensorState = function(sensorType, state1, state2)
+    {
+        if (sensorType == "screen")
+        {
+            return state1.line1 == state2.line1 &&
+                   state1.line2 == state2.line2;
+        }
+
+        return state1 == state2;
+    }
+
     context.registerQuickPiEvent = function(sensorType, port, newState, setInSensor=true) {
         var sensor = findSensor(sensorType, port);
         if (!sensor && port != "none") {
@@ -654,173 +727,131 @@ var getContext = function(display, infos, curLevel) {
             drawSensor(sensor);
         }
 
-        if (context.currentEventStream != undefined) {
+        if (context.autoGrading && context.gradingStates != undefined) {
+            var type = "actual";
+            var expectedState = context.getSensorExpectedState(sensorType, port);
 
-            stateChange = {
-                sensorType: sensorType,
-                port: port,
-                state: newState
-            };
+            if (sensor) {
+                if (!sensor.lastStateChange)
+                    sensor.lastStateChange = 0;
 
-            var sameEvent = false;
-            if (sensor &&
-                sensor.state == newState)
-            {
-                sameEvent = true;
-            }
-
-            var draw = context.quickpi.insertEvent(stateChange, sameEvent);
-
-            var taskStatus = context.quickpi.validateCurrentEventStreamGroup();
-
-            if (context.autoGrading)
-            {
-                var type = "actual";
-                if (taskStatus == context.TASK_FAILED)
+                if (expectedState != null &&
+                    !context.compareSensorState(sensor.type, expectedState, newState))
                 {
                     type = "wrong";
                 }
 
-                if (sensor && draw)
-                    drawSensorTimeLineState(sensor, newState, context.currentEventStreamPos, type);
-
-                // IF we have completed this state group, move into the next one
-                if (taskStatus == context.TASK_SUCCEEDED)
-                {
-                    context.currentEventStreamPos++;
-                    if (context.currentEventStreamPos == context.currentEventStream.length)
-                        context.currentEventStreamPos = 0;        
-                }
+                drawSensorTimeLineState(sensor, newState, sensor.lastStateChange, context.currentTime, type);
+                sensor.lastStateChange = context.currentTime;
             }
+
+            context.increaseTime(sensor);
         }
     }
 
-    context.getSensorState = function(sensorType, port) {
 
-        if (!context.display || context.autoGrading)
+    context.increaseTime = function(sensor) {
+
+        if (!sensor.lastTimeIncrease) {
+            sensor.lastTimeIncrease = 0;
+        }
+
+        if (sensor.callsInTimeSlot == undefined)
+            sensor.callsInTimeSlot = 0;
+
+        if (sensor.lastTimeIncrease == context.currentTime)
         {
-            var state = null;
-            var found = false;
-            sensorStates = context.expectedEventStream[context.currentEventStreamPos];
-
-            for(var i = 0; i < sensorStates.length; i++)
-            {
-                sensor = sensorStates[i];
-                if (sensor.sensorType == sensorType &&
-                    sensor.port == port) {
-                    state = sensor.state;
-                    context.registerQuickPiEvent(sensorType, port, state, false);
-                    found = true;
-                }
-            }
-
-            if (!found) {
-                context.failed = true;
-                throw ("Failed expected sequence")
-            }
+            sensor.callsInTimeSlot += 1;
         }
         else
         {
-            sensor = findSensor(sensorType, port);
-
-            if (sensor)
-            {
-                return sensor.state;
-            }
-            else
-            {
-                throw("Referenced not existing sensor " + sensorType + " in port " + port);
-            }
+            sensor.lastTimeIncrease = context.currentTime;
+            sensor.callsInTimeSlot = 1;
         }
+
+        if (sensor.callsInTimeSlot > 3) {
+            context.currentTime += context.tickIncrease;
+
+            sensor.lastTimeIncrease = context.currentTime;
+            sensor.callsInTimeSlot = 0;
+        }
+
+        drawCurrentTime();
+    }
+
+    context.getSensorExpectedState = function(type, port)
+    {
+        var state = null;
+        var key = type.toUpperCase() + port.toUpperCase();
+        sensorStates = context.gradingStates[key];
+
+        var lastState;
+        var startTime = -1;
+        for(var i = 0; i < sensorStates.length; i++)
+        {
+            if (startTime > 0)
+            {
+                if (context.currentTime > startTime &&
+                    context.currentTime < sensorStates[i].time)
+                    {                        
+                        state = lastState;
+                        break;
+                    }
+            }
+
+            startTime = sensorStates[i].time;
+            lastState = sensorStates[i].state;
+        }
+
+        // This is the end state
+        if (state == null && context.currentTime > startTime)
+        {
+            state = lastState;
+        }
+
+        /*if (state == null)
+            state = 0;*/
+    
+        return state;
+    }
+
+
+    context.getSensorState = function(sensorType, port) {
+        var state = null;
+
+        if (!context.display || context.autoGrading)
+        {
+            var found = false;
+
+            state = context.getSensorExpectedState(sensorType, port);
+        }
+        
+        sensor = findSensor(sensorType, port);
+        if (!sensor)
+        {
+            throw("Referenced not existing sensor " + sensorType + " in port " + port);
+        }
+
+        if (state == null)
+        {
+            state = sensor.state;
+        }
+        else
+        {
+            sensor.state = state;
+            drawSensor(sensor);
+        }
+
+        if (!sensor.lastStateChange)
+            sensor.lastStateChange = 0;
+
+        drawSensorTimeLineState(sensor, state, sensor.lastStateChange, context.currentTime, "actual");
+        sensor.lastStateChange = context.currentTime;
 
         return state;
     }
 
-    context.quickpi.findEventInGroup = function(event, eventGroup) {
-        for (var i = 0; i < eventGroup.length; i++) {
-            if (eventGroup[i].sensorType == event.sensorType &&
-                eventGroup[i].port == event.port) {
-                return eventGroup[i];
-            }
-        }
 
-        return null;
-    }
-
-    context.quickpi.validateEventStreamGroup = function(expected, actual) {
-        var match = context.TASK_SUCCEEDED;
-
-        for (var i = 0; i < actual.length; i++) {
-            var expectedEvent = context.quickpi.findEventInGroup(actual[i], expected);
-
-            if (expectedEvent != null)  {
-                if (expectedEvent.state != actual[i].state) {
-                    match = context.TASK_FAILED;
-                    break;
-                }
-            } else {
-                match = context.TASK_ONGOING;
-            }
-        }
-
-        return match;
-    }
-
-    context.quickpi.insertEvent = function(event, sameState) {
-        var draw = true;
-
-        // Check if there are two sleep calls that need to be merged
-        if (event.sensorType == "sleep" &&
-            context.currentEventStream[context.currentEventStreamPos].length > 0 &&
-            context.currentEventStream[context.currentEventStreamPos][context.currentEventStream[context.currentEventStreamPos].length -1].sensorType == "sleep")  {
-                context.currentEventStream[context.currentEventStreamPos][context.currentEventStream[context.currentEventStreamPos].length - 1].state += event.state;
-        } else {
-            // See if we already have the same event to overwrite
-            var foundEvent = context.quickpi.findEventInGroup(event, context.currentEventStream[context.currentEventStreamPos]);
-            var expectedEvent = context.quickpi.findEventInGroup(event, context.expectedEventStream[context.currentEventStreamPos]);
-
-            if (foundEvent)
-            {
-                foundEvent.state = event.state;
-            } else if (expectedEvent &&
-                       sameState &&
-                       expectedEvent.state != event.state) {
-                draw = false;
-                // Ignore wrong state changes if they aren't really changing the state
-            } else {
-                context.currentEventStream[context.currentEventStreamPos].push(event);
-            }
-        }
-
-        return draw;
-    }
-
-    context.quickpi.validateCurrentEventStreamGroup = function() {
-        return context.quickpi.validateEventStreamGroup(context.currentEventStream[context.currentEventStreamPos],
-                                                        context.expectedEventStream[context.currentEventStreamPos]);
-
-    }
-
-    context.quickpi.validateEventStream = function() {
-
-        var currentStream = 0;
-        var currentPattern = 0;
-        var match = context.TASK_SUCCEEDED;
-
-        if (!context.autoGrading) {
-            return context.TASK_ONGOING;
-        }
-
-        for (var i = 0; i < context.expectedEventStream.length; i++) {
-            match = context.quickpi.validateEventStreamGroup(context.currentEventStream[i],
-                    context.expectedEventStream[i]);
-            if (match == context.TASK_ONGOING ||
-                match == context.TASK_FAILED)
-                break;
-        }
-
-        return match;
-    }
 
 
    /***** Functions *****/
@@ -1245,11 +1276,6 @@ var getContext = function(display, infos, curLevel) {
    // Constants available in Python
    context.customConstants = {
       quickpi: [
-          /*
-         { name: "ONE", value: 1 },
-         { name: "TRUEVALUE", value: true },
-         { name: "LIBNAME", value: "quickpi" }
-         */
       ]
    };
 
