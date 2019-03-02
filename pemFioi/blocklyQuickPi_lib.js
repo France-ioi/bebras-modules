@@ -125,21 +125,24 @@ var getContext = function (display, infos, curLevel) {
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
                 context.tickIncrease = 100;
+               
+                if (context.gradingInput)
+                    context.gradingStatesByTime = context.gradingInput.concat(context.gradingOutput);
+                else
+                    context.gradingStatesByTime = context.gradingOutput;
 
-                var mergedArray = context.gradingInput.concat(context.gradingOutput);
+                context.gradingStatesByTime.sort(function (a, b) { return a.time - b.time; });
 
-                mergedArray.sort(function (a, b) { return a.time - b.time; });
+                context.gradingStatesBySensor = {};
 
-                context.gradingStates = {};
-
-                for (var i = 0; i < mergedArray.length; i++) {
-                    var state = mergedArray[i];
+                for (var i = 0; i < context.gradingStatesByTime.length; i++) {
+                    var state = context.gradingStatesByTime[i];
                     var key = state.type.toUpperCase() + state.port.toUpperCase();
 
-                    if (!context.gradingStates.hasOwnProperty(key))
-                        context.gradingStates[key] = [];
+                    if (!context.gradingStatesBySensor.hasOwnProperty(key))
+                        context.gradingStatesBySensor[key] = [];
 
-                    context.gradingStates[key].push(state);
+                    context.gradingStatesBySensor[key].push(state);
 
                     if (state.time > context.maxTime)
                         context.maxTime = state.time;
@@ -176,9 +179,8 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.autoGrading) {
             var numSensors = infos.quickPiSensors.length;
-            var sensorSize = paper.height / numSensors * 0.80;
-            var sensorsPercolumn = Math.ceil(numSensors)
-            var currentColumn = 0
+            var sensorSize = Math.min (paper.height / numSensors * 0.80, paper.width / 4);
+
             context.sensorSize = sensorSize * .90;
 
             context.pixelsPerTime = (paper.width - context.sensorSize) / context.maxTime;
@@ -200,8 +202,8 @@ var getContext = function (display, infos, curLevel) {
                 drawTimeLine();
 
                 var key = sensor.type.toUpperCase() + sensor.port.toUpperCase();
-                if (context.gradingStates.hasOwnProperty(key)) {
-                    var states = context.gradingStates[key];
+                if (context.gradingStatesBySensor.hasOwnProperty(key)) {
+                    var states = context.gradingStatesBySensor[key];
                     var startTime = -1;
                     var lastState = null;
                     for (var iState = 0; iState < states.length; iState++) {
@@ -219,7 +221,7 @@ var getContext = function (display, infos, curLevel) {
 
             var numSensors = infos.quickPiSensors.length;
             var numColumns = 1;
-            var sensorSize = paper.height / numSensors * numColumns * 0.80;
+            var sensorSize = Math.min (paper.height / numSensors * numColumns * 0.80, paper.width / 2);
             var sensorsPercolumn = Math.ceil(numSensors / numColumns)
 
             var currentColumn = 0
@@ -423,7 +425,7 @@ var getContext = function (display, infos, curLevel) {
         var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
 
-        var percentage = sensorStateToPercent(sensor, state);
+        var percentage = + state;
 
         var yposition = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
 
@@ -439,7 +441,10 @@ var getContext = function (display, infos, curLevel) {
             yposition += 4;
         }
 
-        if (percentage != 0) {
+        if (sensor.type == "screen") {
+            sensor.stateText = paper.text(startx, yposition, state.line1);
+            sensor.stateText = paper.text(startx, yposition + 10, state.line2);
+        } else if (percentage != 0) {
             stateline = paper.path(["M", startx,
                 yposition,
                 "L", startx + stateLenght,
@@ -722,31 +727,35 @@ var getContext = function (display, infos, curLevel) {
             drawSensor(sensor);
         }
 
-        if (context.autoGrading && context.gradingStates != undefined) {
+        if (context.autoGrading && context.gradingStatesBySensor != undefined) {
             var type = "actual";
             var expectedState = context.getSensorExpectedState(sensorType, port);
 
-            if (!sensor.lastStateChange)
+            if (!sensor.lastStateChange) {
                 sensor.lastStateChange = 0;
-
-            if (expectedState != null &&
-                !context.compareSensorState(sensor.type, expectedState, newState)) {
-                type = "wrong";
-                context.fail = true;
+                sensor.lastState = 0;
             }
 
-            drawSensorTimeLineState(sensor, newState, sensor.lastStateChange, context.currentTime, type);
+            if (context.currentTime >= context.maxTime) {
+                context.success = true;
+                throw ("Bravo ! La sortie est correcte");
+            }
+            else if (expectedState != null &&
+                !context.compareSensorState(sensor.type, expectedState, newState)) {
+                type = "wrong";
+                context.fail = false;
+            }
+
+            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
             sensor.lastStateChange = context.currentTime;
+            sensor.lastState = newState;
 
             if (context.fail) {
                 context.success = false;
                 throw ("Test failed");
             }
-            else if (context.currentTime > context.maxTime) {
-                context.success = true;
-                throw ("Bravo ! La sortie est correcte");
-            }
-            context.increaseTime(sensor);
+            else 
+                context.increaseTime(sensor);
         }
     }
 
@@ -781,13 +790,13 @@ var getContext = function (display, infos, curLevel) {
     context.getSensorExpectedState = function (type, port) {
         var state = null;
         var key = type.toUpperCase() + port.toUpperCase();
-        sensorStates = context.gradingStates[key];
+        sensorStates = context.gradingStatesBySensor[key];
 
         var lastState;
         var startTime = -1;
         for (var i = 0; i < sensorStates.length; i++) {
             if (startTime > 0) {
-                if (context.currentTime > startTime &&
+                if (context.currentTime >= startTime &&
                     context.currentTime < sensorStates[i].time) {
                     state = lastState;
                     break;
@@ -832,14 +841,52 @@ var getContext = function (display, infos, curLevel) {
             drawSensor(sensor);
         }
 
-        if (!sensor.lastStateChange)
+        if (!sensor.lastStateChange) {
             sensor.lastStateChange = 0;
+            sensor.lastState = 0;
+        }
 
-        drawSensorTimeLineState(sensor, state, sensor.lastStateChange, context.currentTime, "actual");
+        drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, "actual");
         sensor.lastStateChange = context.currentTime;
+        sensor.lastState = state;
 
         return state;
     }
+
+    // This will advance grading time to the next button release for waitForButton
+    // will return false if the next event wasn't a button press
+    context.advanceToNextRelease = function(sensorType, port)
+    {
+        var retval = false;
+        var iStates = 0;
+
+        // Advance until current time, ignore everything in the past.
+        while (context.gradingStatesByTime[iStates].time <= context.currentTime)
+            iStates++;
+
+        for (; iStates < context.gradingStatesByTime.length; iStates++)
+        {
+            sensorState = context.gradingStatesByTime[iStates];
+
+            if (sensorState.type == sensorType &&
+                sensorState.port == port) {
+                
+                if (!sensorState.state)
+                {
+                    context.currentTime = sensorState.time;
+                    retval = true;
+                    break;
+                }
+            }
+            else
+            {
+                retval = false;
+                break;
+            }
+        }
+
+        return retval;
+    };
 
 
 
@@ -875,9 +922,12 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.waitForButton = function (callback) {
-        context.registerQuickPiEvent("button", "D22", "wait", false);
+//        context.registerQuickPiEvent("button", "D22", "wait", false);
 
         if (!context.display || context.autoGrading) {
+
+            context.advanceToNextRelease("button", "D22");
+
             context.waitDelay(callback);
         } else if (context.offLineMode) {
             button = findSensor("button", "D22");
@@ -1030,12 +1080,14 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.sleep = function (time, callback) {
-        context.registerQuickPiEvent("sleep", "none", time, false);
-        if (context.display) {
-            context.runner.waitDelay(callback, null, time * 1000);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.currentTime += time * 1000;
+            context.runner.noDelay(callback);
         }
         else {
-            context.runner.noDelay(callback);
+            
+            context.runner.waitDelay(callback, null, time * 1000);
         }
     };
 
@@ -1159,19 +1211,6 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     }
                 },
-
-
-                {
-                    name: "sleep", params: ["Number"], blocklyJson: {
-                        "args0": [
-                            { "type": "input_value", "name": "PARAM_0", "value": 1 },
-                        ]
-                    }
-                    ,
-                    blocklyXml: "<block type='sleep'>" +
-                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
-                        "</block>"
-                },
                 {
                     name: "readRotaryAngle", yieldsValue: true, params: ["Number"], blocklyJson: {
                         "args0": [
@@ -1247,7 +1286,17 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
 
                 },
-
+                {
+                    name: "sleep", params: ["Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", "value": 1 },
+                        ]
+                    }
+                    ,
+                    blocklyXml: "<block type='sleep'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
             ]
         }
         // We can add multiple namespaces by adding other keys to customBlocks.
