@@ -113,6 +113,25 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
+    var checkEndSetupVars = {done: false};
+    function checkEndSetup() {
+        // Setup the checkEnd variables 
+        if(checkEndSetupVars.done) {
+            context.infos.checkEndEveryTurn = checkEndSetupVars.checkEndEveryTurn || (!context.display && !context.autoGrading);
+            return;
+        }
+        checkEndSetupVars.checkEndEveryTurn = context.infos.checkEndEveryTurn;
+        checkEndSetupVars.checkEndCondition = context.infos.checkEndCondition;
+        context.infos.checkEndCondition = function() {
+            if(!context.display && !context.autoGrading) {
+                context.success = true;
+                throw "Manual test validated automatically.";
+            }
+            checkEndSetupVars.checkEndCondition.apply(context.infos, arguments);
+        }
+        checkEndSetupVars.done = true;
+    };
+
     context.reset = function (taskInfos) {
         if (!context.offLineMode)
             context.quickPiConnection.startNewSession();
@@ -149,8 +168,15 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
+        checkEndSetup();
+
         if (context.display) {
             context.resetDisplay();
+        } else {
+            // Initialize success to
+            // -True if it's a manual test (we consider it's always a success)
+            // -False if it's an automatic test (it changes to True if it's a success)
+            context.success = !context.autoGrading;
         }
     };
 
