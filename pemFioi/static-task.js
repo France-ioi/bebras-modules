@@ -31,6 +31,9 @@ task.updateToken = function(token, success, error) {
 };
 
 task.getHeight = function(success, error) {
+    // Note : if the html/body is taking all available height, making an
+    // infinite loop with the platform of height increase, try changing your
+    // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
     success(h);

@@ -220,6 +220,10 @@ var getContext = function(display, infos) {
                value[i] = valueToStr(value[i]);
             }
             return '[' + value.join(', ') + ']';
+         } else if(value === true) {
+            return 'True';
+         } else if(value === false) {
+            return 'False';
          }
          return value;
       }
