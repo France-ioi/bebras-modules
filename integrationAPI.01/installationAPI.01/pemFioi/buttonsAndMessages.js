@@ -973,7 +973,7 @@ window.displayHelper = {
       }
 
       // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
+      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
       if(mode == 'lock') {
          var buttonYes = '';
       } else if (mode == 'input') {
