@@ -109,7 +109,19 @@ var getContext = function (display, infos, curLevel) {
     context.TASK_SUCCEEDED = 1;
     context.TASK_ONGOING = 2;
 
-    context.quickPiConnection = getQuickPiConnection("USERNAMEGOESHERE", raspberryPiConnected, raspberryPiDisconnected);
+    var lockstring;
+    if (sessionStorage.lockstring)
+        lockstring = sessionStorage.lockstring;
+    else {
+        lockstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        sessionStorage.lockstring = lockstring;
+    }
+
+
+
+
+
+    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
     var paper;
     context.offLineMode = true;
 
@@ -225,6 +237,11 @@ var getContext = function (display, infos, curLevel) {
                     border-radius: 16px;
                 ">
                 <button type="button" id="piconnect">Connect!</button>
+                <p>
+
+                <button type="button" id="pigetlist">Get List!</button>
+                <select id=pilist>
+                <select>
             </div>
 
 
@@ -363,6 +380,32 @@ var getContext = function (display, infos, curLevel) {
 
             context.offLineMode = false;
         }
+
+        $('#pigetlist').click(function () {
+            fetch('http://www.france-ioi.org/QuickPi/list.php?school=school1')
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (jsonlist) {
+                var select = document.getElementById("pilist");
+
+                for (var i = 0; i < jsonlist.length; i++) {
+                    var pi = jsonlist[i];
+
+                    var el = document.createElement("option");
+                    el.textContent = jsonlist[i].name;
+                    el.value = jsonlist[i].ip;
+
+                    select.appendChild(el);
+                
+                }
+            });
+        });
+
+
+        $('#pilist').on('change', function () {
+            $("#piaddress").val(this.value);
+        });
 
         $('#piconnect').click(function () {
             // if in offline mode try to connect
@@ -536,6 +579,28 @@ var getContext = function (display, infos, curLevel) {
             paper.height]);
     }
 
+    function isAnalogSensor(sensor, state)
+    {
+        var retval = {
+            analog: false,
+            percentage: 0
+        };
+
+        if (sensor.type == "potentiometer" ||
+            sensor.type == "light") {
+            retval.analog = true;
+            retval.percentage = state / 100;
+        } else if (sensor.type == "servo") {
+            retval.analog = true;
+            retval.percentage = state / 180;
+        } else if (sensor.type == "temperature") {
+            retval.analog = true;
+            retval.percentage = state / 50;
+        }
+
+        return retval;
+    }
+
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
         if (paper == undefined || !context.display)
@@ -546,30 +611,55 @@ var getContext = function (display, infos, curLevel) {
         var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
 
-        var percentage = + state;
 
-        var yposition = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
+        var ypositionmiddle = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
+
+        var ypositiontop = sensor.drawInfo.y
+        var ypositionbottom = sensor.drawInfo.y + sensor.drawInfo.height;
 
         color = "green";
         if (type == "expected") {
             color = "blue";
         } else if (type == "wrong") {
             color = "red";
-            yposition += 4;
+            ypositionmiddle += 4;
         }
         else if (type == "actual") {
             color = "yellow";
-            yposition += 4;
+            ypositionmiddle += 4;
         }
 
-        if (sensor.type == "screen") {
-            sensor.stateText = paper.text(startx, yposition, state.line1);
-            sensor.stateText = paper.text(startx, yposition + 10, state.line2);
+        var isAnalog = isAnalogSensor(sensor, state);       
+        var percentage = + state;
+
+        if (isAnalog.analog)  {
+            var offset = (ypositionbottom - ypositiontop) * isAnalog.percentage;
+
+            if (type == "wrong") {
+                color = "red";
+                ypositionmiddle += 4;
+            }
+            else if (type == "actual") {
+                color = "yellow";
+                ypositionmiddle += 4;
+            }
+
+            stateline = paper.path(["M", startx,
+                ypositiontop + offset,
+                "L", startx + stateLenght,
+                ypositiontop + offset]);
+
+            stateline.attr({
+                "stroke-width": 5, "stroke": color
+            });
+        } else if (sensor.type == "screen") {
+            sensor.stateText = paper.text(startx, ypositionmiddle, state.line1);
+            sensor.stateText = paper.text(startx, ypositionmiddle + 10, state.line2);
         } else if (percentage != 0) {
             stateline = paper.path(["M", startx,
-                yposition,
+                ypositionmiddle,
                 "L", startx + stateLenght,
-                yposition]);
+                ypositionmiddle]);
 
             stateline.attr({
                 "stroke-width": 5, "stroke": color
@@ -917,6 +1007,9 @@ var getContext = function (display, infos, curLevel) {
         var state = null;
         var key = type.toUpperCase() + port.toUpperCase();
         sensorStates = context.gradingStatesBySensor[key];
+
+        if (!sensorStates)
+            return; // Fail??
 
         var lastState;
         var startTime = -1;
