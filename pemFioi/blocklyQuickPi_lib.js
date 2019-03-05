@@ -113,11 +113,36 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
+
+    infos.checkEndEveryTurn = true;
+    infos.checkEndCondition = function (context, lastTurn) {
+        if (context.autoGrading) {
+            for (sensorStates in context.gradingStatesBySensor) {
+                for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
+                    var state = context.gradingStatesBySensor[sensorStates][i];
+
+                    if (state.time < context.currentTime) {
+                        if (!state.hit) {
+                            context.success = false;
+                            throw("Failed");
+                        }
+                    }
+                    else
+                        break;
+                }
+            }
+        }
+    };
+
     context.reset = function (taskInfos) {
         if (!context.offLineMode)
             context.quickPiConnection.startNewSession();
 
         if (taskInfos != undefined) {
+            // Instructions that have been called without
+            // ever getting into a quickpi block
+            context.piLessInstructions = 0;
+
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
             if (context.autoGrading) {
@@ -152,6 +177,13 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
+        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+            var sensor = infos.quickPiSensors[iSensor];
+
+            sensor.lastState = 0;
+            sensor.lastStateChange = 0;
+        }
+
         if (context.display) {
             context.resetDisplay();
         }
@@ -167,10 +199,42 @@ var getContext = function (display, infos, curLevel) {
         //context.blocklyHelper.updateSize();
         //context.updateScale();
 
-        $('#grid').html('<div id="piui" style="background-color: green;">Raspberry Pi IP Address <input type="text" id="piaddress" value="192.168.1.31"><button type="button" id="piconnect">Connect!</button>Status: <span id="pistatus">Disconnected</span></div></div><div id=virtualSensors></div><div><button type="button" id="piinstall">Install!</button></div>');
+        $('#grid').html(`
+            <div id="piui" style="
+                    color: white;
+                    font-weight: bold;
+                    background-color: blue;
+                    border: none;
+                    padding: 10px 16px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+                    cursor: pointer;
+                    border-radius: 20px;
+                ">
+                Raspberry Pi IP Address 
+                <input size="15" type="text" id="piaddress" value="192.168.1.31" style="
+                    border: none;
+                    color: black;
+                    padding: 5px 5px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: inline-block;
+
+                    cursor: pointer;
+                    border-radius: 16px;
+                ">
+                <button type="button" id="piconnect">Connect!</button>
+            </div>
+
+
+            <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;        ">
+            </div>
+            <div><button type="button" id="piinstall">Install!</button></div>`
+        );
 
         this.raphaelFactory.destroyAll();
-        paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#grid').width() - 24, $('#grid').height() - 24);
+        paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#virtualSensors').width(), $('#virtualSensors').height());
 
         var quickPiSensors = infos.quickPiSensors;
         if (!Array.isArray(infos.quickPiSensors)) {
@@ -219,36 +283,62 @@ var getContext = function (display, infos, curLevel) {
             }
         } else {
 
-            var numSensors = infos.quickPiSensors.length;
-            var numColumns = 1;
-            var sensorSize = Math.min (paper.height / numSensors * numColumns * 0.80, paper.width / 2);
-            var sensorsPercolumn = Math.ceil(numSensors / numColumns)
+            var geometry = squareSize(paper.width, paper.height, quickPiSensors.length);
 
-            var currentColumn = 0
-            var sensorsInColumn = 0;
+            context.sensorSize = geometry.size * .10;
 
-            context.sensorSize = sensorSize * .90;
+            var iSensor = 0;
 
-            for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                sensor = infos.quickPiSensors[i];
+            for (var col = 0; col < geometry.cols; col++) {
+                var y = geometry.size * col;
 
-                sensor.drawInfo = {
-                    x: sensorSize * currentColumn * 2,
-                    y: sensorSize * sensorsInColumn,
-                    width: sensorSize * .90,
-                    height: sensorSize * .90
-                }
+                var line = paper.path(["M", 0,
+                             y,
+                            "L", paper.width,
+                            y]);
 
-                sensorsInColumn++;
-                if (sensorsInColumn == sensorsPercolumn) {
-                    currentColumn++;
-                    sensorsInColumn = 0;
-                }
+                line.attr({
+                    "stroke-width": 1, 
+                    "stroke": "lightgrey",
+                    "stroke-linecapstring": "round"
+                });
 
-                sensor.state = null;
+                for (var row = 0; row < geometry.rows; row++) {
+                    var x = paper.width / geometry.rows * row;
+                    var y1 = y + geometry.size / 4;
+                    var y2 = y + geometry.size * 3 / 4;
+    
+    
+                    line = paper.path(["M", x,
+                                 y1,
+                                "L", x,
+                                y2]);
+    
+                    line.attr({
+                        "stroke-width": 1, 
+                        "stroke": "lightgrey",
+                        "stroke-linecapstring": "round"
+                    });
 
-                drawSensor(sensor);
+                    if (infos.quickPiSensors[iSensor]) {
+                        sensor = infos.quickPiSensors[iSensor];
+
+                        sensor.drawInfo = {
+                            x: x,
+                            y: y,
+                            width: geometry.size,
+                            height: geometry.size
+                        }
+       
+                        sensor.state = null;
+        
+                        drawSensor(sensor);
+                    }
+                    iSensor++;
+                }                   
             }
+            
+
         }
 
         context.blocklyHelper.updateSize();
@@ -258,7 +348,6 @@ var getContext = function (display, infos, curLevel) {
         context.offLineMode = true;
 
         if (context.quickPiConnection.isConnecting()) {
-            $('#pistatus').html("Connecting...");
             $('#piconnect').html("Release");
             $('#piconnect').attr("disabled", true);
             $('#piinstall').attr("hidden", true);
@@ -268,7 +357,6 @@ var getContext = function (display, infos, curLevel) {
 
 
         if (context.quickPiConnection.isConnected()) {
-            $('#pistatus').html("Connected");
             $('#piconnect').attr("disabled", false);
             $('#piinstall').attr("hidden", false);
             $('#piui').css('background-color', 'green');
@@ -282,7 +370,6 @@ var getContext = function (display, infos, curLevel) {
                 var ipaddress = $('#piaddress').val();
                 sessionStorage.raspberryPiIpAddress = ipaddress;
 
-                $('#pistatus').html("Connecting...");
                 $('#piconnect').attr("disabled", true);
                 context.quickPiConnection.connect(ipaddress);
             } else {
@@ -303,18 +390,60 @@ var getContext = function (display, infos, curLevel) {
 
         if (sessionStorage.autoConnect) {
             if (!context.quickPiConnection.isConnected() && !context.quickPiConnection.isConnecting()) {
-                $('#pistatus').html("Connecting...");
                 $('#piconnect').attr("disabled", true);
                 context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
             }
         }
     };
 
+    // Straight from stack overflow :)
+    function squareSize(x, y, n) {
+        // Compute number of rows and columns, and cell size
+        var ratio = x / y;
+        var ncols_float = Math.sqrt(n * ratio);
+        var nrows_float = n / ncols_float;
+
+        // Find best option filling the whole height
+        var nrows1 = Math.ceil(nrows_float);
+        var ncols1 = Math.ceil(n / nrows1);
+        while (nrows1 * ratio < ncols1) {
+            nrows1++;
+            ncols1 = Math.ceil(n / nrows1);
+        }
+        var cell_size1 = y / nrows1;
+
+        // Find best option filling the whole width
+        var ncols2 = Math.ceil(ncols_float);
+        var nrows2 = Math.ceil(n / ncols2);
+        while (ncols2 < nrows2 * ratio) {
+            ncols2++;
+            nrows2 = Math.ceil(n / ncols2);
+        }
+        var cell_size2 = x / ncols2;
+
+        // Find the best values
+        var nrows, ncols, cell_size;
+        if (cell_size1 < cell_size2) {
+            nrows = nrows2;
+            ncols = ncols2;
+            cell_size = cell_size2;
+        } else {
+            nrows = nrows1;
+            ncols = ncols1;
+            cell_size = cell_size1;
+        }
+
+        return {
+            rows: nrows,
+            cols: ncols,
+            size: cell_size
+        };
+    }
+
     function raspberryPiConnected() {
         context.quickPiConnection.startNewSession();
 
         context.offLineMode = false;
-        $('#pistatus').html("Connected");
         $('#piconnect').html("Release");
         $('#piconnect').attr("disabled", false);
         $('#piinstall').attr("hidden", false);
@@ -327,7 +456,6 @@ var getContext = function (display, infos, curLevel) {
         $('#piconnect').html("Connect");
         $('#piinstall').attr("hidden", true);
         $('#piui').css('background-color', 'brown');
-        $('#pistatus').html("Disconnected ...");
 
         context.offLineMode = true;
 
@@ -371,22 +499,10 @@ var getContext = function (display, infos, curLevel) {
         return null;
     }
 
-    function sensorStateToPercent(sensor, state) {
-        var retVal = 0;
-        switch (sensor.type) {
-            case "button":
-            case "led":
-                if (state)
-                    retVal = 1;
-                else
-                    retVal = 0;
-                break;
-        }
-
-        return retVal;
-    }
-
     function drawTimeLine() {
+        if (paper == undefined || !context.display)
+            return;
+
         for (var i = 1000; i < context.maxTime; i += 1000) {
             var x = context.sensorSize + (i * context.pixelsPerTime);
 
@@ -406,8 +522,10 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function drawCurrentTime() {
-        var startx = context.sensorSize + (context.currentTime * context.pixelsPerTime);
+        if (paper == undefined || !context.display)
+            return;
 
+        var startx = context.sensorSize + (context.currentTime * context.pixelsPerTime);
 
         if (context.timeLineCurrent)
             context.timeLineCurrent.remove();
@@ -420,6 +538,9 @@ var getContext = function (display, infos, curLevel) {
 
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
+        if (paper == undefined || !context.display)
+            return;
+
         var stateOffset = 160;
 
         var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
@@ -478,10 +599,19 @@ var getContext = function (display, infos, curLevel) {
         var imageOffSet = 50;
         var arrowsOffset = 200;
 
-        var imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .3);
+        var imgw = sensor.drawInfo.width / 2;
+        var imgh = sensor.drawInfo.width / 2;
 
-        var state1x = sensor.drawInfo.x + (sensor.drawInfo.width * 1.3);
-        var state1y = sensor.drawInfo.y + (sensor.drawInfo.height / 2);
+        var imgx = sensor.drawInfo.x;
+        var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2) ;
+
+        var state1x = imgx + imgw;
+        var state1y = imgy + imgh * 2 / 3;
+
+        var portx = imgx + imgw;
+        var porty = imgy + imgh / 3;
+
+        var arrowsize = sensor.drawInfo.height * .20;
 
         if (paper == undefined || !context.display)
             return;
@@ -494,12 +624,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.img = paper.image('../../modules/img/quickpi/ledon.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image('../../modules/img/quickpi/ledon.png', imgx, imgy, imgw, imgh);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
-                sensor.img = paper.image('../../modules/img/quickpi/ledoff.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image('../../modules/img/quickpi/ledoff.png', imgx, imgy, imgw, imgh);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -510,12 +640,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.img = paper.image('../../modules/img/quickpi/buttonon.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image('../../modules/img/quickpi/buttonon.png', imgx, imgy, imgw, imgh);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
-                sensor.img = paper.image('../../modules/img/quickpi/buttonoff.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image('../../modules/img/quickpi/buttonoff.png', imgx, imgy, imgw, imgh);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -559,7 +689,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText2)
                 sensor.stateText2.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/screen.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image('../../modules/img/quickpi/screen.png', imgx, imgy, imgw, imgh);
 
             if (sensor.state) {
                 sensor.stateText = paper.text(state1x, state1y, sensor.state.line1);
@@ -579,13 +709,11 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.state)
                 sensor.state = 25; // FIXME
 
-            sensor.img = paper.image('../../modules/img/quickpi/temperature.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image('../../modules/img/quickpi/temperature.png', imgx, imgy, imgw, imgh);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading) {
-                var arrowsize = sensor.drawInfo.height * .30;
-
                 sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
                 sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
@@ -604,7 +732,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/servo.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image('../../modules/img/quickpi/servo.png', imgx, imgy, imgw, imgh);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -622,7 +750,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.downarrow)
                 sensor.downarrow.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/potentiometer.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image('../../modules/img/quickpi/potentiometer.png', imgx, imgy, imgw, imgh);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -630,9 +758,6 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
             if (!context.autoGrading) {
-
-                var arrowsize = sensor.drawInfo.height * .30;
-
                 sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
                 sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
@@ -660,16 +785,13 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.downarrow)
                 sensor.downarrow.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/range.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image('../../modules/img/quickpi/range.png', imgx, imgy, imgw, imgh);
 
             if (sensor.state == null)
                 sensor.state = 0;
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
             if (!context.autoGrading) {
-
-                var arrowsize = sensor.drawInfo.height * .30;
-
                 sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
                 sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
@@ -693,18 +815,18 @@ var getContext = function (display, infos, curLevel) {
         if (sensor.portText)
             sensor.portText.remove();
 
-        stateFontSize = sensor.drawInfo.height * 0.13;
-        portFontSize = sensor.drawInfo.height * 0.20;
+        stateFontSize = sensor.drawInfo.height * 0.10;
+        portFontSize = sensor.drawInfo.height * 0.10;
 
 
         if (sensor.hasOwnProperty("stateText"))
-            sensor.stateText.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold' });
+            sensor.stateText.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray"  });
 
         if (sensor.hasOwnProperty("stateText2"))
-            sensor.stateText2.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold' });
+            sensor.stateText2.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray"   });
 
-        sensor.portText = paper.text(sensor.drawInfo.x, sensor.drawInfo.y + (sensor.drawInfo.height / 2), sensor.port);
-        sensor.portText.attr({ "font-size": portFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold' });
+        sensor.portText = paper.text(portx, porty, sensor.port);
+        sensor.portText.attr({ "font-size": portFontSize + "px", 'text-anchor': 'start', fill: "lightgray" });
     }
 
     context.compareSensorState = function (sensorType, state1, state2) {
@@ -741,9 +863,13 @@ var getContext = function (display, infos, curLevel) {
                 throw ("Bravo ! La sortie est correcte");
             }
             else if (expectedState != null &&
-                !context.compareSensorState(sensor.type, expectedState, newState)) {
+                !context.compareSensorState(sensor.type, expectedState.state, newState)) {
                 type = "wrong";
                 context.fail = false;
+            }
+            else {
+                if (expectedState != null)
+                    expectedState.hit = true;
             }
 
             drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
@@ -804,16 +930,13 @@ var getContext = function (display, infos, curLevel) {
             }
 
             startTime = sensorStates[i].time;
-            lastState = sensorStates[i].state;
+            lastState = sensorStates[i];
         }
 
         // This is the end state
         if (state == null && context.currentTime > startTime) {
             state = lastState;
         }
-
-        if (state == null)
-            state = 0;
 
         return state;
     }
@@ -823,9 +946,15 @@ var getContext = function (display, infos, curLevel) {
         var state = null;
 
         if (!context.display || context.autoGrading) {
-            var found = false;
+            var stateTime = context.getSensorExpectedState(sensorType, port);
 
-            state = context.getSensorExpectedState(sensorType, port);
+            if (stateTime != null) {
+                stateTime.hit = true;
+                state = stateTime.state;
+            }
+            else {
+                state = 0;
+            }
         }
 
         sensor = findSensor(sensorType, port);
