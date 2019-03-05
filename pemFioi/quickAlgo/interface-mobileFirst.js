@@ -520,7 +520,7 @@ var quickAlgoInterface = {
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
             var testName = this.strings.testLabel + ' '+(iTest+1);
 
-            if (testData[iTest].hasOwnProperty("testName"))
+            if (testData && testData[iTest] && testData[iTest].hasOwnProperty("testName"))
             {
                 testName += "(" + testData[iTest].testName + ")";
             }
