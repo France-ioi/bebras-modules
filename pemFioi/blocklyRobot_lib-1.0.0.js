@@ -700,7 +700,7 @@ var getContext = function(display, infos, curLevel) {
                obstacleInFront: "astéroïde devant"
             },
             code: {
-               obstacleInFront: "astéroideDevant"
+               obstacleInFront: "asteroideDevant"
             },
             messages: {
                obstacle: "Attention à l'astéroïde !"
