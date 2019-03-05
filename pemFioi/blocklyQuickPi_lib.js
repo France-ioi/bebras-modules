@@ -468,6 +468,11 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
+    function getImg(filename) {
+        // Get the path to an image stored in bebras-modules
+        return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
+    }
+
 
     function drawSensor(sensor, state = true) {
         var imageOffSet = 50;
@@ -489,12 +494,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.img = paper.image('../../modules/img/quickpi/ledon.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image(getImg('ledon.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
-                sensor.img = paper.image('../../modules/img/quickpi/ledoff.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image(getImg('ledoff.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -505,12 +510,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.img = paper.image('../../modules/img/quickpi/buttonon.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image(getImg('buttonon.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
-                sensor.img = paper.image('../../modules/img/quickpi/buttonoff.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+                sensor.img = paper.image(getImg('buttonoff.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -554,7 +559,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText2)
                 sensor.stateText2.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/screen.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image(getImg('screen.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             if (sensor.state) {
                 sensor.stateText = paper.text(state1x, state1y, sensor.state.line1);
@@ -574,15 +579,15 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.state)
                 sensor.state = 25; // FIXME
 
-            sensor.img = paper.image('../../modules/img/quickpi/temperature.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image(getImg('temperature.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading) {
                 var arrowsize = sensor.drawInfo.height * .30;
 
-                sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
+                sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
+                sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
 
                 sensor.uparrow.node.onclick = function () {
@@ -599,7 +604,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/servo.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image(getImg('servo.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -617,7 +622,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.downarrow)
                 sensor.downarrow.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/potentiometer.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image(getImg('potentiometer.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -628,8 +633,8 @@ var getContext = function (display, infos, curLevel) {
 
                 var arrowsize = sensor.drawInfo.height * .30;
 
-                sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
+                sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
+                sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
                 sensor.uparrow.node.onclick = function () {
                     sensor.state += 1;
@@ -655,7 +660,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.downarrow)
                 sensor.downarrow.remove();
 
-            sensor.img = paper.image('../../modules/img/quickpi/range.png', imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img = paper.image(getImg('range.png'), imgx, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -665,8 +670,8 @@ var getContext = function (display, infos, curLevel) {
 
                 var arrowsize = sensor.drawInfo.height * .30;
 
-                sensor.uparrow = paper.image('../../modules/img/quickpi/uparrow.png', state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                sensor.downarrow = paper.image('../../modules/img/quickpi/downarrow.png', state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
+                sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
+                sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
 
                 sensor.uparrow.node.onclick = function () {
                     sensor.state += 1;
