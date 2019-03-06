@@ -481,6 +481,8 @@ var quickAlgoInterface = {
 
     updateTestScores: function (testScores) {
         // Display test results
+        var testData = task.displayedSubTask.data[task.displayedSubTask.level];
+
         for(var iTest=0; iTest<testScores.length; iTest++) {
             if(!testScores[iTest]) { continue; }
             if(testScores[iTest].evaluating) {
@@ -501,14 +503,29 @@ var quickAlgoInterface = {
                         <span class="fas fa-times"></span>\
                     </span>';
             }
-            $('#testTab'+iTest+' .testTitle').html(icon+' ' + this.strings.testLabel + ' '+(iTest+1));
+
+            var testName = this.strings.testLabel + ' '+(iTest+1);
+            if (testData[iTest].hasOwnProperty("testName"))
+            {
+                testName += "(" + testData[iTest].testName + ")";
+            }
+            $('#testTab'+iTest+' .testTitle').html(icon+' ' + testName);
         }
     },
 
     resetTestScores: function () {
         // Reset test results display
+        var testData = task.displayedSubTask.data[task.displayedSubTask.level];
+
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
-            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> ' + this.strings.testLabel + ' '+(iTest+1));
+            var testName = this.strings.testLabel + ' '+(iTest+1);
+
+            if (testData && testData[iTest] && testData[iTest].hasOwnProperty("testName"))
+            {
+                testName += "(" + testData[iTest].testName + ")";
+            }
+
+            $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> ' + testName);
         }
     },
 
