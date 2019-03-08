@@ -50,6 +50,7 @@
         active: null,
         visible: true,
         show_viewed: true,
+        callback: null,
 
         generateSections: function(amount, start, end) {
             if(!start) start = 0;
@@ -64,7 +65,7 @@
                     viewed: false,
                     parts: [
                         {
-                            vieved: false,
+                            viewed: false,
                             start: i * duration,
                             end: (i + 1) * duration
                         }
@@ -79,6 +80,7 @@
         init: function(player, config, parent) {
             this.active = null;
             this.show_viewed = !!config.show_viewed;
+            this.callback = config.callback;
             if(!config.sections) {
                 this.visible = false;
                 this.data = this.generateSections(1);
@@ -146,6 +148,7 @@
                     this.setActive(i);
                     var cnt = 0;
                     var refresh = false;
+                    var scoreUpdate = false;
                     for(var j=0,part; part=this.data[i].parts[j]; j++) {
                         if(!part.viewed && time >= part.start && time < part.end) {
                             part.viewed = true;
@@ -154,11 +157,16 @@
                         if(part.viewed) cnt++;
                     }
                     if(cnt && cnt > Math.floor(section.parts.length * 0.5)) {
+                        var wasViewed = section.viewed;
                         section.viewed = true;
-                        refresh = true;
+                        refresh = refresh || !wasViewed;
+                        scoreUpdate = !wasViewed
                     }
                     if(refresh) {
                         this.refresh();
+                    }
+                    if(scoreUpdate && this.callback) {
+                        this.callback();
                     }
                     return;
                 }
@@ -176,9 +184,7 @@
         getViewed: function() {
             var res = [];
             for(var i=0,section; section=this.data[i]; i++) {
-                if(section.viewed) {
-                    res.push(i);
-                }
+                res.push({viewed: !!section.viewed, parts: section.parts});
             }
             return res;
         },
@@ -186,7 +192,15 @@
 
         setViewed: function(viewed) {
             for(var i=0,section; section=this.data[i]; i++) {
-                section.viewed = viewed.indexOf(i) !== -1;
+                var v = viewed[i];
+                if(!v) { continue; }
+                section.viewed = v.viewed;
+                if(section.parts && v.parts) {
+                    for(var j=0, part; part=section.parts[j]; j++) {
+                        if(!v.parts[j]) { continue; }
+                        part.viewed = !!v.parts[j].viewed;
+                    }
+                }
             }
             this.refresh();
         },
@@ -210,10 +224,8 @@
         init: function(parent) {
             this.elements = {
                 wrapper: $('<div class="task-video"></div>'),
-                introduction: $('<div class="introduction"></div>'),
                 video: $('<div class="video"></div>'),
                 sections: $('<div class="sections"></div>'),
-                conclusion: $('<div class="conclusion"></div>'),
             };
             parent.html('');
             parent.append(this.elements.wrapper)
@@ -325,10 +337,11 @@
     }
 
 
-    function makeConfig(params) {
+    function makeConfig(params, callback) {
         var defaults = {
             width: '100%',
-            height: '400px'
+            height: '400px',
+            callback: callback
         }
         return Object.assign(defaults, params);
     }
@@ -342,35 +355,38 @@
         }
 
         if(state) {
-            if('viewed' in state) {
-                sections.setViewed(state.viewed);
+            if('sections' in state) {
+                sections.setViewed(state.sections);
             }
             if('timestamp' in state) {
                 player.seekTo(state.timestamp);
-            }
-            if('playing' in state && state.playing) {
                 player.playVideo();
-            } else {
-                player.pauseVideo();
             }
         } else {
+            var sectionsData = sections.getViewed();
+            var nbViewed = 0;
+            for(var i=0, section; section=sectionsData[i]; i++) {
+                if(section.viewed) { nbViewed += 1; }
+            }
             return {
                 timestamp: player.getCurrentTime(),
                 playing: player.getPlayerState() === YT.PlayerState.PLAYING,
-                viewed: sections.getViewed()
+                viewed: nbViewed,
+                total: sectionsData.length,
+                sections: sectionsData
             }
         }
     }
 
     // jQuery plugin interface
 
-    $.fn.taskVideo = function(params, events) {
+    $.fn.taskVideo = function(params, callback, events) {
         var that = this;
-        var config = makeConfig(params)
+        var config = makeConfig(params, callback);
+        if(!events) { events = {}; }
+        if(callback) { events.onPlaybackEnd = callback; }
         apiLoader.load(function() {
             template.init(that);
-            template.html('introduction', config['introduction']);
-            template.html('conclusion', config['conclusion']);
             template.width('wrapper', config.width);
             template.height('video', config.height);
             player = createPlayer(template.get('video')[0], config, events);
