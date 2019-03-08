@@ -18,6 +18,10 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.connected = false;
     this.onConnect = _onConnect;
     this.onDisconnect = _onDisconnect;
+    this.locked = "";
+    this.pingInterval = null;
+    this.pingsWithoutPong = 0;
+    this.oninstalled = null;
 
     this.connect = function(ipaddress) {
         if (this.wsSession != null) {
@@ -25,6 +29,8 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         }
 
         url = "ws://" + ipaddress + ":5000/api/v1/commands";
+        this.locked = "";
+        this.pingsWithoutPong = 0;
 
         this.wsSession = new WebSocket(url);
 
@@ -39,27 +45,75 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
 
             connected = true;
             onConnect();
+
+            pingInterval = setInterval(function() {
+                var command =
+                {
+                    "command": "ping"
+                }
+
+                if (pingsWithoutPong > 2)
+                {
+                    wsSession.close();
+                    onclose();
+                } else {
+                    pingsWithoutPong++;
+                    wsSession.send(JSON.stringify(command));
+                    lastPingSend = + new Date();
+                }
+
+                }, 1000);
+
         }
 
         this.wsSession.onmessage = function (evt) {
-            if (commandMode && resultsCallback != null) {
-                tempCallback = resultsCallback;
-                resultsCallback = null;
-                tempCallback(evt.data);
+            var message = JSON.parse(evt.data);
+
+            if (message.command == "locked") {
+                locked = message.lockedby;
+            } else if (message.command == "pong") {
+                pingsWithoutPong = 0;
+            } else if (message.command == "installed") {
+
+                if (oninstalled != null)
+                    oninstalled();
+            } else if (message.command == "execLineresult") {
+                if (commandMode && resultsCallback != null) {
+                    tempCallback = resultsCallback;
+                    resultsCallback = null;
+                    tempCallback(message.result);
+                }
             }
-            //if (evt.data != "none")
-            //appendOutput(evt.data + "\n");
         }
 
         this.wsSession.onclose = function () {
-            wsSession = null;
-            commandMode = false;
-            sessionTainted = false;
-            connected = false;
 
-            onDisconnect(this.connect);
-            
+            if (wsSession != null) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+
+                wsSession = null;
+                commandMode = false;
+                sessionTainted = false;
+
+                onDisconnect(connected);
+
+                connected = false;
+            }
         }
+    }
+
+    this.onclose = function() {
+        clearInterval(pingInterval);
+        pingInterval = null;
+
+        wsSession = null;
+        commandMode = false;
+        sessionTainted = false;
+
+        onDisconnect(connected);
+
+        connected = false;
     }
 
     this.fetchPythonLib = function(doAfter) {
@@ -71,6 +125,14 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
                 this.pythonLib = text;
                 doAfter();
             });
+    }
+
+    this.wasLocked = function()
+    {
+        if (this.locked)
+            return true;
+
+        return false;
     }
 
     this.isConnecting = function () {
@@ -103,16 +165,17 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     }
 
 
-    this.installProgram = function (pythonProgram) {
+    this.installProgram = function (pythonProgram, oninstall) {
         if (this.wsSession == null)
             return;
 
         if (this.pythonLib === "") {
-            fetchPythonLib(function () { executeProgram(pythonProgram) });
+            fetchPythonLib(function () { installProgram(pythonProgram, oninstall) });
             return;
         }
 
         this.commandMode = false;
+        this.oninstalled = oninstall;
 
         var fullProgram = this.pythonLib + pythonProgram;
         var command =
@@ -176,6 +239,10 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.sendCommand = function (command, callback) {
 
         if (this.wsSession != null && this.resultsCallback == null) {
+
+            if (!this.commandMode)
+                this.startNewSession();
+
             var command =
             {
                 "command": "execLine",

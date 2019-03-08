@@ -961,6 +961,32 @@ window.displayHelper = {
          }
       }
    },
+
+
+   showPopupDialog: function(message) {
+      if ($('#popupMessage').length == 0) {
+         $('#task').after('<div id="popupMessage"></div>');
+      }
+
+      $('#popupMessage').addClass('floatingMessage');
+
+      // Hack: when in the context of the platform, we need to change the path
+      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
+
+      var popupHtml = '<div class="container">' +
+         '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
+         '<div class="message">' + message + '</div></div>';
+         
+      $('#popupMessage').html(popupHtml).show();
+
+      this.popupMessageShown = true;
+      try {
+         $(parent.document).scrollTop(0);
+      } catch (e) {
+      }
+   },
+
+
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
