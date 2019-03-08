@@ -78,7 +78,7 @@ def buttonWasPressed(pin):
     pin = int(pin)
     init = False
     try:
-        init = button_interrupt_enabled[pin];
+        init = button_interrupt_enabled[pin]
     except:
         pass
 
@@ -179,42 +179,6 @@ def displayText(line1, line2=""):
 		count += 1
 		if count == 16:
 			break
-'''
-def setServoAngle(pin, angle):
-    servo = None
-    try:
-        servo = servo_object[pin]
-        print ("found servo object " + str(servo));
-    except:
-        pass
-
-    if servo is None:
-        GPIO.setup(pin, GPIO.OUT)
-        servo = GPIO.PWM(pin, 50)
-        servo_object[pin] = servo
-        servo.start(2.5)
-        print("Creating servo object " + str(servo))
-
-
-    angle = max(min(angle, 180), 0) # normalize the angle to 0-180
-    duty = round((10 / 180 * angle) + 2.5, 1)
-
-    print ("Normalized angle " + str(angle))
-
-    last_value = -1
-    try:
-        last_value = servo_last_value[pin]
-    except:
-        pass
-
-    if last_value != angle:
-        print("Setting angle duty " + str(duty));
-        servo.ChangeDutyCycle(duty)
-#        servo.start(duty)
-        #time.sleep(0.10)
-        #servo.stop()
-        servo_last_value[pin] = angle
-'''
 
 def setServoAngle(pin, angle):
 	pin = int(pin)
@@ -251,7 +215,7 @@ def readRotaryAngle(pin):
 def readSoundSensor(pin):
 	return int(readADC(pin) / 10)
 
-def readlightSensor(pin):
+def readLightIntensity(pin):
 	return int(readADC(pin) * 100 / 631)
 
 def sleep(sleep_time):

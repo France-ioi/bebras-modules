@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿//"use strict";
 
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
@@ -20,7 +20,8 @@ var getContext = function (display, infos, curLevel) {
                 sleep: "Mettre le programme en pause pendant %1 secondes",
                 setServoAngle: "Mettre le servo à l'angle %2 sur le port %1",
                 readRotaryAngle: "état du potentiomètre",
-                readDistance: "distance lue par le capteur à ultrasons"
+                readDistance: "distance lue par le capteur à ultrasons",
+                readLightIntensity: "Intensité lumineuse",
                 /*turnLedOn: "Turn Led On",
                 turnLedOff: "Turn Led Off",
                 buttonState: "Return Button State",
@@ -52,6 +53,7 @@ var getContext = function (display, infos, curLevel) {
                 setServoAngle: "setServoAngle",
                 readRotaryAngle: "readRotaryAngle",
                 readDistance: "readDistance",
+                readLightIntensity: "readLightIntensity",
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -68,7 +70,8 @@ var getContext = function (display, infos, curLevel) {
                 sleep: "sleep(): pause program execute for a number of seconds",
                 setServoAngle: "setServoAngle(): Set servo motor to an specified angle",
                 readRotaryAngle: "readRotaryAngle(): Read state of potentiometer",
-                readDistance: "readDistance(): Read distance using ultrasonic sensor"
+                readDistance: "readDistance(): Read distance using ultrasonic sensor",
+                readLightIntensity: "readLightIntensity(): Read light intensity",
             },
             constant: {
             },
@@ -93,7 +96,8 @@ var getContext = function (display, infos, curLevel) {
                 sleep: "pause program execute for a number of seconds",
                 setServoAngle: "Set servo motor to an specified angle",
                 readRotaryAngle: "Read state of potentiometer",
-                readDistance: "Read distance using ultrasonic sensor"
+                readDistance: "Read distance using ultrasonic sensor",
+                readLightIntensity: "Read light intensity",
             }
         }
     }
@@ -203,6 +207,7 @@ var getContext = function (display, infos, curLevel) {
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
 
+            sensor.state = null;
             sensor.lastState = 0;
             sensor.lastStateChange = 0;
         }
@@ -216,49 +221,70 @@ var getContext = function (display, infos, curLevel) {
             context.success = !context.autoGrading;
         }
 
-
+        context.liveUpdateCount = 0;
         context.sensorPollInterval = setInterval(function() {
+
             if ((!context.runner || !context.runner.isRunning())
                 && !context.offLineMode) {
 
-                    for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
-                        var sensor = infos.quickPiSensors[iSensor];
+                    if (context.liveUpdateCount == 0) {
+                        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                            var sensor = infos.quickPiSensors[iSensor];
             
-                        updateLiveSensor(sensor);
+                            updateLiveSensor(sensor);
+                        }
                     }
             }
-        }, 1000);
+        }, 200);
+        
     };
 
     function updateLiveSensor(sensor)
     {
         if (sensor.type == "button")
         {
+            context.liveUpdateCount++;
             context.quickPiConnection.sendCommand("buttonStateInPort(" + sensor.port.substring(1) + ")", function (returnVal) {
 
+                context.liveUpdateCount--;
                 sensor.state = returnVal != "0";
                 drawSensor(sensor);
             });
-        } /*else if (sensor.type == "range") {
+        } else if (sensor.type == "range") {
+            context.liveUpdateCount++;
             context.quickPiConnection.sendCommand("readDistance(" + sensor.port.substring(1) + ")", function (returnVal) {
 
+                context.liveUpdateCount--;
                 sensor.state = returnVal;
                 drawSensor(sensor);
             });
 
-        } else */if (sensor.type == "potentiometer") {
+        } else if (sensor.type == "potentiometer") {
+            context.liveUpdateCount++;
             context.quickPiConnection.sendCommand("readRotaryAngle(" + sensor.port.substring(1) + ")", function (returnVal) {
 
+                context.liveUpdateCount--;
                 sensor.state = returnVal;
                 drawSensor(sensor);
             });
 
-        } /*else if (sensor.type == "temperature") {
+        } else if (sensor.type == "temperature") {
+            context.liveUpdateCount++;
             context.quickPiConnection.sendCommand("readTemperature(" + sensor.port.substring(1) + ")", function (returnVal) {
+
+                context.liveUpdateCount--;
                 sensor.state = returnVal;
                 drawSensor(sensor);
             });
-        }*/
+        } else if (sensor.type == "light") {
+            context.liveUpdateCount++;
+            context.quickPiConnection.sendCommand("readLightIntensity(" + sensor.port.substring(1) + ")", function (returnVal) {
+
+                context.liveUpdateCount--;
+                sensor.state = returnVal;
+                drawSensor(sensor);
+            });
+        }
     }
 
 
@@ -343,8 +369,6 @@ var getContext = function (display, infos, curLevel) {
                     width: sensorSize * .90,
                     height: sensorSize * .90
                 }
-
-                sensor.state = null;
 
                 drawSensor(sensor);
                 drawTimeLine();
@@ -435,8 +459,6 @@ var getContext = function (display, infos, curLevel) {
                                 height: geometry.size
                             }
                         }
-
-                        sensor.state = null;
 
                         drawSensor(sensor);
                     }
@@ -928,15 +950,13 @@ var getContext = function (display, infos, curLevel) {
 
 
     function setSlider(sensor, imgx, imgy, imgw, imgh, onsliderchange) {
-        if (sensor.focusrect)
-            sensor.focusrect.remove();
+        removeSlider(sensor);
 
         sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
 
         sensor.focusrect.attr({ "fill": "468DDF", "fill-opacity": 0, "opacity": 0 });
 
         sensor.focusrect.node.onfocus = function () {
-            console.log("on focus");
             var outsiderectx = sensor.drawInfo.x;
             var outsiderecty = sensor.drawInfo.y;
             var outsidewidth = 25;
@@ -1046,11 +1066,23 @@ var getContext = function (display, infos, curLevel) {
         }
 
         sensor.focusrect.node.onblur = function () {
-            console.log("onblur");
             sensor.slider.remove();
             sensor.focusrect.toFront();
         }
+    }
 
+    function removeSlider(sensor)
+    {
+        if (sensor.focusrect)
+            sensor.focusrect.remove();
+
+        if (sensor.slider)
+            sensor.slider.remove();
+    }
+
+    function sensorInConnectedModeError()
+    {
+        window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
     }
 
     function drawSensor(sensor, state = true, juststate = false) {
@@ -1102,7 +1134,7 @@ var getContext = function (display, infos, curLevel) {
                 && !context.offLineMode)
             {
                 var command = "changeLedState(" + sensor.port.substring(1) + "," + (sensor.state ? 1 : 0) +  ")";
-                context.quickPiConnection.sendCommand(command, null);    
+                context.quickPiConnection.sendCommand(command, function(x){});    
             }
 
         } else if (sensor.type == "button") {
@@ -1122,34 +1154,30 @@ var getContext = function (display, infos, curLevel) {
             }
 
             if (!context.autoGrading) {
-                sensor.img.node.ontouchstart = function () {
-                    sensor.state = true;
-                    drawSensor(sensor);
-                };
-
                 sensor.img.node.onmousedown = function () {
-                    sensor.state = true;
-                    drawSensor(sensor);
+                    if (context.offLineMode) {
+                        sensor.state = true;
+                        drawSensor(sensor);
+                    } else
+                        sensorInConnectedModeError()
                 };
+                sensor.img.node.ontouchstart = sensor.img.node.onmousedown;
 
 
                 sensor.img.node.ontouchend = function () {
-                    sensor.state = false;
-                    sensor.wasPressed = true;
-                    drawSensor(sensor);
+                    if (context.offLineMode) {
+                        sensor.state = false;  
+                        sensor.wasPressed = true;
+                        drawSensor(sensor);
 
-                    if (sensor.onPressed)
-                        sensor.onPressed();
+                        if (sensor.onPressed)
+                            sensor.onPressed();
+                    } else
+                        sensorInConnectedModeError()
+
                 }
 
-                sensor.img.node.onmouseup = function () {
-                    sensor.state = false;
-                    sensor.wasPressed = true;
-                    drawSensor(sensor);
-
-                    if (sensor.onPressed)
-                        sensor.onPressed();
-                }
+                sensor.img.node.ontouchend = sensor.img.node.onmouseup;
             }
 
         } else if (sensor.type == "screen") {
@@ -1159,30 +1187,36 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText2)
                 sensor.stateText2.remove();
 
-            imgw = sensor.drawInfo.width / 1.1;
-            imgh = sensor.drawInfo.height / 1.1;
+            imgw = sensor.drawInfo.width / 1.3;
+            imgh = sensor.drawInfo.height / 1.2;
         
-            imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .1);
+            imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .05);
             imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
             portx = imgx + imgw * 1.1;
             porty = imgy + imgh / 3;
     
-        
-
             sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
 
 
 //            paper.rect(sensor.drawInfo.x, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
 
             if (sensor.state) {
-                var statex = imgx + (imgw * .2);
+                var statex = imgx + (imgw * .13);
 
                 var statey = imgy + (imgh * .4);
                 var state2y = statey + (imgh * .2);
 
+                if (sensor.state.line1.length > 16)
+                    sensor.state.line1 = sensor.state.line1.substring(0, 16);
+
+                if (sensor.state.line2.length > 16)
+                sensor.state.line2 = sensor.state.line2.substring(0, 16);
+
                 sensor.stateText = paper.text(statex, statey, sensor.state.line1);
                 sensor.stateText2 = paper.text(statex, state2y, sensor.state.line2);
+
+                sensor.stateText.attr("")
 
             }
         } else if (sensor.type == "temperature") {
@@ -1215,7 +1249,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
-            if (!context.autoGrading) {
+            if (!context.autoGrading && context.offLineMode) {
                 if (!juststate) {
                     setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
                         sensor.state = Math.round(percentage * .60);
@@ -1223,6 +1257,9 @@ var getContext = function (display, infos, curLevel) {
                         drawSensor(sensor, sensor.state, true);
                     });
                 }
+            }
+            else {
+                removeSlider(sensor);
             }
 
         } else if (sensor.type == "servo") {
@@ -1251,14 +1288,15 @@ var getContext = function (display, infos, curLevel) {
                 {
                     sensor.updatetimeout = setTimeout(function() {
                         var command = "setServoAngle(" + sensor.port.substring(1) + "," + sensor.state + ")";
-                        context.quickPiConnection.sendCommand(command, null);    
+                        context.quickPiConnection.sendCommand(command, function(x){});    
 
                         sensor.updatetimeout = null;
                     }, 100);
                 }
             }
 
-            if (!context.autoGrading) {
+            if (!context.autoGrading && !context.offLineMode &&
+                 (!context.runner || !context.runner.isRunning())) {
                 if (!juststate) {
                     setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
                         sensor.state = Math.round(percentage * 1.8);
@@ -1266,6 +1304,8 @@ var getContext = function (display, infos, curLevel) {
                         drawSensor(sensor, sensor.state, true);
                     });
                 }
+            } else {
+                removeSlider(sensor);
             }
         }
         else if (sensor.type == "potentiometer") {
@@ -1283,7 +1323,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
-            if (!context.autoGrading) {
+            if (!context.autoGrading && context.offLineMode) {
                 if (!juststate) {
                     setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
                         sensor.state = Math.round(percentage);
@@ -1291,25 +1331,24 @@ var getContext = function (display, infos, curLevel) {
                         drawSensor(sensor, sensor.state, true);
                     });
                 }
+            } else  {
+                removeSlider(sensor);
             }
 
         } else if (sensor.type == "range") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.uparrow)
-                sensor.uparrow.remove();
-
-            if (sensor.downarrow)
-                sensor.downarrow.remove();
-
             sensor.img = paper.image(getImg('range.png'), imgx, imgy, imgw, imgh);
 
             if (sensor.state == null)
                 sensor.state = 0;
 
+            if (sensor.state >= 10)
+                sensor.state = Math.round(sensor.state);
+
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
-            if (!context.autoGrading) {
+            if (!context.autoGrading && context.offLineMode) {
                 if (!juststate) {
                     setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
                         sensor.state = Math.round(percentage * 5);
@@ -1317,6 +1356,29 @@ var getContext = function (display, infos, curLevel) {
                         drawSensor(sensor, sensor.state, true);
                     });
                 }
+            } else {
+                removeSlider(sensor);
+            }
+        } else if (sensor.type == "light") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            sensor.img = paper.image(getImg('light.png'), imgx, imgy, imgw, imgh);
+
+            if (sensor.state == null)
+                sensor.state = 0;
+
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
+            if (!context.autoGrading && context.offLineMode) {
+                if (!juststate) {
+                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                        sensor.state = Math.round(percentage);
+                
+                        drawSensor(sensor, sensor.state, true);
+                    });
+                }
+            } else {
+                removeSlider(sensor);
             }
         }
 
@@ -1549,7 +1611,7 @@ var getContext = function (display, infos, curLevel) {
             context.waitDelay(callback);
         }
         else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("turnLedOn()", cb);
         }
@@ -1561,7 +1623,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("turnLedOff()", cb);
         }
@@ -1578,7 +1640,7 @@ var getContext = function (display, infos, curLevel) {
         } else if (context.offLineMode) {
             button = findSensor("button", "D22");
             if (button) {
-                cb = context.runner.waitCallback(callback);
+                var cb = context.runner.waitCallback(callback);
                 button.onPressed = function () {
                     cb();
                 }
@@ -1587,7 +1649,7 @@ var getContext = function (display, infos, curLevel) {
             }
         }
         else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("waitForButton(22)", cb);
         }
@@ -1600,7 +1662,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.runner.noDelay(callback, state);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("buttonState()", function (returnVal) {
 
@@ -1622,7 +1684,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.runner.noDelay(callback, state);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("buttonStateInPort(" + port + ")", function (returnVal) {
                 cb(returnVal != "0");
@@ -1638,7 +1700,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.runner.noDelay(callback, state);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("buttonState(" + port + ")", function (returnVal) {
                 cb(returnVal != "0");
@@ -1655,7 +1717,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.runner.noDelay(callback, state);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
             context.quickPiConnection.sendCommand("buttonWasPressed(" + port + ")", function (returnVal) {
                 cb(returnVal != "0");
             });
@@ -1671,7 +1733,7 @@ var getContext = function (display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, cb);
         }
@@ -1686,7 +1748,7 @@ var getContext = function (display, infos, curLevel) {
         if (context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, cb);
         }
@@ -1698,7 +1760,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "displayText(\"" + line1 + "\", \"" + line2 + "\")";
 
         context.registerQuickPiEvent("screen", "i2c",
-            state = {
+            {
                 line1: line1,
                 line2: line2
             }
@@ -1707,7 +1769,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, cb);
         }
@@ -1719,7 +1781,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.runner.noDelay(callback, state);
         } else {
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("readTemperature(" + port + ")", function (returnVal) {
                 var sensor = findSensor("temperature", "A" + port);
@@ -1771,7 +1833,7 @@ var getContext = function (display, infos, curLevel) {
             context.waitDelay(callback, state);
         } else {
 
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 var sensor = findSensor("potentiometer", "A" + port);
@@ -1794,10 +1856,34 @@ var getContext = function (display, infos, curLevel) {
             context.waitDelay(callback, state);
         } else {
 
-            cb = context.runner.waitCallback(callback);
+            var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, function (returnVal) {
                 var sensor = findSensor("range", "D" + port);
+                if (sensor) {
+                    sensor.state = returnVal;
+                }
+
+                cb(returnVal);
+            });
+        }
+    };
+
+    
+
+    context.quickpi.readLightIntensity = function (port, callback) {
+        var command = "readLightIntensity(" + port + ")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+
+            var state = context.getSensorState("light", "A" + port);
+            context.waitDelay(callback, state);
+        } else {
+
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function (returnVal) {
+                var sensor = findSensor("light", "A" + port);
                 if (sensor) {
                     sensor.state = returnVal;
                 }
@@ -1888,7 +1974,16 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     }
                 },
-
+                {
+                    name: "readLightIntensity", yieldsValue: true, params: ["Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": [
+                                    ["A0", "0"], ["A2", "2"], ["A4", "4"], ["A6", "6"]]
+                            }
+                        ]
+                    }
+                },
             ],
             actions: [
                 { name: "turnLedOn" },
