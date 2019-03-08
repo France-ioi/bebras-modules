@@ -79,6 +79,14 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
 
                 if (oninstalled != null)
                     oninstalled();
+
+            } else if (message.command == "startCommandMode") {
+                if (commandQueue.length > 0)
+                {
+                    var command = commandQueue.shift();
+
+                    sendCommand(command.command, command.callback);
+                }
             } else if (message.command == "execLineresult") {
                 if (commandMode && resultsCallback != null) {
                     tempCallback = resultsCallback;
@@ -91,7 +99,6 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
 
                         sendCommand(command.command, command.callback);
                     }
-
                 }
             }
         }
@@ -250,18 +257,25 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.sendCommand = function (command, callback) {
         if (this.wsSession != null) {
             if (this.resultsCallback == null) {
-                if (!this.commandMode)
+                if (!this.commandMode) {
                     this.startNewSession();
 
-                var command =
-                {
-                    "command": "execLine",
-                    "line": command
-                }
+                    this.commandQueue.push ({
+                        command: command,
+                        callback: callback
+                    });    
+                } else { 
 
-                this.sessionTainted = true;
-                this.resultsCallback = callback;
-                this.wsSession.send(JSON.stringify(command));
+                    var command =
+                    {
+                        "command": "execLine",
+                        "line": command
+                    }
+
+                    this.sessionTainted = true;
+                    this.resultsCallback = callback;
+                    this.wsSession.send(JSON.stringify(command));
+                }
             }
             else {
                 this.commandQueue.push ({
