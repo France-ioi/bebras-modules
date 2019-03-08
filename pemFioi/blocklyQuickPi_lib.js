@@ -480,7 +480,7 @@ var getContext = function (display, infos, curLevel) {
                         <label>Sélectionnez un appareil à connecter dans la liste suivante</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><button id=pigetlist>Get list</button></div>
-                            <select id=pilist class="custom-select">
+                            <select id="pilist" class="custom-select" disabled>
                             </select>
                         </div>
                     </div>
@@ -585,6 +585,7 @@ var getContext = function (display, infos, curLevel) {
                     {
                         $('#piaddress').val(jsonlist[i].ip);
                         first = false;
+                        $('#pilist').prop('disabled', false);
                     }
                 }
             }
