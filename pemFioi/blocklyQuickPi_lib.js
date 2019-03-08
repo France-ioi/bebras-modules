@@ -135,7 +135,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndCondition = function (context, lastTurn) {
 
         if (!context.display && !context.autoGrading) {
-            context.success = true;
+            context.success = false;
             throw "Manual test validated automatically.";
         }
 
@@ -154,8 +154,15 @@ var getContext = function (display, infos, curLevel) {
                         break;
                 }
             }
-        } else if (!context.offLineMode) {
-            $('#piinstallcheck').hide();
+        } else {
+            if (!context.offLineMode) {
+                $('#piinstallcheck').hide();
+            }
+
+            if (lastTurn) {
+                context.success = false;
+                throw ("programme terminé");
+            }
         }
     };
 
@@ -1687,6 +1694,12 @@ var getContext = function (display, infos, curLevel) {
             var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand("buttonStateInPort(" + port + ")", function (returnVal) {
+                button = findSensor("button", "D" + port);
+                if (button) {
+                    button.state = returnVal != "0";
+                    drawSensor(button);
+                }
+
                 cb(returnVal != "0");
             });
         }
@@ -1771,7 +1784,9 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
 
-            context.quickPiConnection.sendCommand(command, cb);
+            context.quickPiConnection.sendCommand(command, function() {
+                cb();
+            });
         }
     };
 
