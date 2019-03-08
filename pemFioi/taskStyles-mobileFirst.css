@@ -1,3 +1,6 @@
+html {
+  font-size: 10px;
+}
 body {
   padding: 0;
   margin: 0;
@@ -250,6 +253,102 @@ img {
   font-weight: 900;
   margin-right: 10px;
 }
+
+/* QuickPi connexion popup */
+#popupMessage .connectPi .panel-heading {
+  margin: -20px -20px 0;
+  padding: 20px
+}
+#popupMessage .connectPi .sectionTitle {
+  color: inherit;
+}
+#popupMessage .connectPi .sectionTitle .iconTag {
+  margin-left: -20px; /* panel-heading padding */
+  margin-right: 14px;
+  padding-left: 24px;
+  padding-right: 12px;
+  background-color: #4a90e2;
+  border-left: 2px solid rgba(0,0,0,0.8);
+  border-radius: 0 50px 50px 0;
+}
+#popupMessage .connectPi .sectionTitle .iconTag .icon {
+  width: auto;
+  background-color: transparent;
+  margin-right: 0;
+  line-height: 31px;
+  font-size: 12px;
+}
+#popupMessage .connectPi .panel-body {
+  margin-left: 30px;
+  font-size: 12px;
+}
+#popupMessage .connectPi .panel-body label {
+  display: block;
+  margin-top: 2em;
+}
+#popupMessage .connectPi input,
+#popupMessage .connectPi select {
+  background-color: #f8f8f8;
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  font-size: 16px;
+  height: 36px;
+  line-height: 1.6;
+  color: #555555;
+  border-radius: 5px; 
+}
+#popupMessage .connectPi input {
+  width: 100%;
+  margin: 10px 0 0;
+  display: block;
+  padding: 6px 12px;
+}
+#popupMessage .connectPi select {
+  padding: 6px 12px;
+}
+#popupMessage .connectPi .input-group {
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  width: 100%;
+  margin: 10px 0 0;
+}
+#popupMessage .connectPi .input-group button {
+  border-radius: 5px 0 0 5px;
+  padding: 6px 12px;
+  line-height: 2.4rem;
+}
+#popupMessage .connectPi .input-group .custom-select {
+  position: relative;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  margin-bottom: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+#popupMessage .connectPi .btn {
+  margin: 10px auto 0;
+  border-radius: 50px;
+  padding: 6px 50px;
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 1.5;
+  border: none;
+  font-size: 1.2rem;
+  position: relative;
+  display: block;
+}
+#popupMessage .connectPi .btn .icon {
+  position: absolute;
+  left: 16px;
+  top: 7px;
+  top: calc(50% - 0.5em);
+}
+
 .pythonIntroSimple code, .pythonIntroFull code {
   cursor: pointer;
   color: #4D87CE;

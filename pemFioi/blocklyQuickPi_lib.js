@@ -495,30 +495,35 @@ var getContext = function (display, infos, curLevel) {
         $('#piconnect').click(function () {
 
             window.displayHelper.showPopupDialog(`
-            <div>
-                School key:  <input id="schoolkey" type='text'> <button id=pigetlist>Get list</button>
-            </div>
-            <div>
-                Séléctionnez un appareil á connecter dans la liste suivant:
-            </div>
-            <div>
-                <select id=pilist>
-                </select>
-            </div>
-            <div>
-                ou entrée son adesse IP
-            </div>
-            <div>
-                <input id=piaddress type='text'> 
-            <div>
+            <div class="content connectPi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle"><span class="iconTag"><i class="icon fas fa-list-ul"></i></span>Accès — Sélection IOI — 2018</h2>
+                    <div class="exit" id="picancel"><span class="icon fas fa-times"></span></div>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label>School key:</label>
+                        <input id="schoolkey" type='text'>
+                    </div>
+                    <div class="form-group">
+                        <label>Sélectionnez un appareil à connecter dans la liste suivante</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend"><button id=pigetlist>Get list</button></div>
+                            <select id="pilist" class="custom-select" disabled>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ou entrez son adesse IP</label>
+                        <input id=piaddress type='text'> 
+                    </div>
 
-            <div>
-                <button id="piconnectok">Connecter L'appareil</button>
-                <button id="pirelease">Release</button>
-                <button id="picancel">Cancel</button>
+                    <div>
+                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter L'appareil</button>
+                        <button id="pirelease" class="btn">Release</button>
+                    </div>
+                </div>
             </div>
-            <div>
-                
 
             `);
 
@@ -609,6 +614,7 @@ var getContext = function (display, infos, curLevel) {
                     {
                         $('#piaddress').val(jsonlist[i].ip);
                         first = false;
+                        $('#pilist').prop('disabled', false);
                     }
                 }
             }
