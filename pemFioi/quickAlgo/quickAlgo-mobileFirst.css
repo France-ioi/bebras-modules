@@ -47,7 +47,10 @@ body > * {
 .interfaceToggled {
   display: none !important;
 }
-
+.btn:disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+}
 /*****************
   EDITOR MENU
 *****************/
@@ -865,11 +868,17 @@ p {
 #introGrid .playerControls .icon.playPause span {
   color: #fff;
   background-color: #4a90e2;
-  font-size: 28px;
   width: 40px;
   vertical-align: middle;
   line-height: 40px;
+}
+#introGrid .playerControls .icon.playPause span.fa-play {
+  font-size: 28px;
   padding-left: 6px;
+}
+#introGrid .playerControls .icon.playPause span.fa-pause {
+  font-size: 22px;
+  padding-left: 0px;
 }
 #introGrid .speedSlider {
   background-color: rgba(0,0,0,0.10);
