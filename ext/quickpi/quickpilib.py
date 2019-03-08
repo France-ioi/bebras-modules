@@ -140,7 +140,7 @@ def readDistance(pin):
 
 	distance = ((t2 - t1) * 1000000 / 29 / 2)    # cm
 
-	return distance
+	return round(distance, 1)
 
 def displayText(line1, line2=""):
 	global screenLine1
