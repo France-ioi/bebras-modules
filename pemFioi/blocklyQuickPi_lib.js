@@ -1,4 +1,6 @@
-﻿// This is a template of library for use with quickAlgo.
+﻿"use strict";
+
+// This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
     // Local language strings for each language
     var localLanguageStrings = {
@@ -118,9 +120,6 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-
-
-
     context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
     var connectingInterval = null;
     var disconnectInterval = null;
@@ -216,7 +215,51 @@ var getContext = function (display, infos, curLevel) {
             // -False if it's an automatic test (it changes to True if it's a success)
             context.success = !context.autoGrading;
         }
+
+
+        context.sensorPollInterval = setInterval(function() {
+            if ((!context.runner || !context.runner.isRunning())
+                && !context.offLineMode) {
+
+                    for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                        var sensor = infos.quickPiSensors[iSensor];
+            
+                        updateLiveSensor(sensor);
+                    }
+            }
+        }, 1000);
     };
+
+    function updateLiveSensor(sensor)
+    {
+        if (sensor.type == "button")
+        {
+            context.quickPiConnection.sendCommand("buttonStateInPort(" + sensor.port.substring(1) + ")", function (returnVal) {
+
+                sensor.state = returnVal != "0";
+                drawSensor(sensor);
+            });
+        } /*else if (sensor.type == "range") {
+            context.quickPiConnection.sendCommand("readDistance(" + sensor.port.substring(1) + ")", function (returnVal) {
+
+                sensor.state = returnVal;
+                drawSensor(sensor);
+            });
+
+        } else */if (sensor.type == "potentiometer") {
+            context.quickPiConnection.sendCommand("readRotaryAngle(" + sensor.port.substring(1) + ")", function (returnVal) {
+
+                sensor.state = returnVal;
+                drawSensor(sensor);
+            });
+
+        } /*else if (sensor.type == "temperature") {
+            context.quickPiConnection.sendCommand("readTemperature(" + sensor.port.substring(1) + ")", function (returnVal) {
+                sensor.state = returnVal;
+                drawSensor(sensor);
+            });
+        }*/
+    }
 
 
     // Reset the context's display
@@ -605,8 +648,8 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return {
-            rows: nrows,
-            cols: ncols,
+            rows: ncols,
+            cols: nrows,
             size: cell_size
         };
     }
@@ -716,6 +759,11 @@ var getContext = function (display, infos, curLevel) {
     // anything the context may have created
     context.unload = function () {
         // Do something here
+        if (context.sensorPollInterval)
+        {
+            clearInterval(context.sensorPollInterval);
+        }
+
         if (context.display) {
             // Do something here
         }
@@ -723,7 +771,7 @@ var getContext = function (display, infos, curLevel) {
 
     function findSensor(type, port) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
-            sensor = infos.quickPiSensors[i];
+            var sensor = infos.quickPiSensors[i];
 
             if (sensor.type == type && sensor.port == port)
                 return sensor;
@@ -878,6 +926,133 @@ var getContext = function (display, infos, curLevel) {
         return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
     }
 
+
+    function setSlider(sensor, imgx, imgy, imgw, imgh, onsliderchange) {
+        if (sensor.focusrect)
+            sensor.focusrect.remove();
+
+        sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
+
+        sensor.focusrect.attr({ "fill": "468DDF", "fill-opacity": 0, "opacity": 0 });
+
+        sensor.focusrect.node.onfocus = function () {
+            console.log("on focus");
+            var outsiderectx = sensor.drawInfo.x;
+            var outsiderecty = sensor.drawInfo.y;
+            var outsidewidth = 25;
+            var outsideheight = sensor.drawInfo.height;
+
+            var insidewidth = 5;
+            var insideheight = sensor.drawInfo.height * 0.60;
+
+            var insiderectx = outsiderectx + (outsidewidth / 2) - (insidewidth / 2);
+            var insiderecty = outsiderecty + (outsideheight / 2) - (insideheight / 2);
+
+            var circleradius = (outsidewidth / 2) - 1;
+
+            var pluscirclex = outsiderectx + (outsidewidth / 2);
+            var pluscircley = outsiderecty + circleradius + 1;
+
+            var minuscirclex = pluscirclex;
+            var minuscircley = outsiderecty + outsideheight - circleradius - 1;
+
+
+            paper.setStart();
+
+
+            sensor.sliderrect = paper.rect(outsiderectx, outsiderecty, outsidewidth, outsideheight, outsidewidth / 2);
+            sensor.sliderrect.attr("fill", "#468DDF");
+            sensor.sliderrect.attr("stroke", "#468DDF");
+
+            sensor.sliderrect = paper.rect(insiderectx, insiderecty, insidewidth, insideheight, 2);
+            sensor.sliderrect.attr("fill", "#2E5D94");
+            sensor.sliderrect.attr("stroke", "#2E5D94");
+
+
+            sensor.plusset = paper.set();
+
+            sensor.pluscircle = paper.circle(pluscirclex, pluscircley, circleradius);
+            sensor.pluscircle.attr("fill", "#F5A621");
+            sensor.pluscircle.attr("stroke", "#F5A621");
+
+            sensor.plus = paper.text(pluscirclex, pluscircley, "+");
+            sensor.plus.attr({ fill: "white" });
+            sensor.plus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+            sensor.plusset.push(sensor.pluscircle, sensor.plus);
+
+            sensor.plusset.click(function () {
+                sensor.state += 1;
+                drawSensor(sensor, sensor.state, true);
+            });
+
+
+            sensor.minusset = paper.set();
+
+            sensor.minuscircle = paper.circle(minuscirclex, minuscircley, circleradius);
+            sensor.minuscircle.attr("fill", "#F5A621");
+            sensor.minuscircle.attr("stroke", "#F5A621");
+
+            sensor.minus = paper.text(minuscirclex, minuscircley, "-");
+            sensor.minus.attr({ fill: "white" });
+            sensor.minus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+            sensor.minusset.push(sensor.minuscircle, sensor.minus);
+
+            sensor.minusset.click(function () {
+                sensor.state -= 1;
+                drawSensor(sensor, sensor.state, true);
+            });
+
+
+            var thumbwidth = outsidewidth * .80;
+            var thumbheight = outsidewidth * 1.4;
+            var zero = 0;
+            var scale = (insideheight - thumbheight) / 100;
+
+            var thumby = insiderecty + insideheight - thumbheight - (sensor.state * scale);
+
+            var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
+
+            sensor.thumb = paper.rect(thumbx, thumby, thumbwidth, thumbheight, outsidewidth / 2);
+            sensor.thumb.attr("fill", "#F5A621");
+            sensor.thumb.attr("stroke", "#F5A621");
+
+            sensor.slider = paper.setFinish();
+
+            sensor.thumb.drag(
+                function (dx, dy, x, y, event) {
+
+                    var newy = zero + dy;
+
+                    if (newy < insiderecty)
+                        newy = insiderecty;
+
+                    if (newy > insiderecty + insideheight - thumbheight)
+                        newy = insiderecty + insideheight - thumbheight;
+
+                    sensor.thumb.attr('y', newy);
+
+                    var percentage = 100 - ((newy - insiderecty) / scale);
+                    onsliderchange(percentage);
+
+                },
+                function (x, y, event) {
+                    zero = sensor.thumb.attr('y');
+                },
+                function (event) {
+                }
+            );
+        }
+
+        sensor.focusrect.node.onblur = function () {
+            console.log("onblur");
+            sensor.slider.remove();
+            sensor.focusrect.toFront();
+        }
+
+    }
+
     function drawSensor(sensor, state = true, juststate = false) {
         if (paper == undefined || !context.display)
             return;
@@ -885,7 +1060,7 @@ var getContext = function (display, infos, curLevel) {
         var imgw = sensor.drawInfo.width / 2;
         var imgh = sensor.drawInfo.height / 2;
 
-        var imgx = sensor.drawInfo.x;
+        var imgx = sensor.drawInfo.x + imgw / 3;
         var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
         var state1x = imgx + imgw;
@@ -918,7 +1093,17 @@ var getContext = function (display, infos, curLevel) {
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
+            sensor.img.click(function() {
+                sensor.state = !sensor.state;
+                drawSensor(sensor);
+            })
 
+            if ((!context.runner || !context.runner.isRunning())
+                && !context.offLineMode)
+            {
+                var command = "changeLedState(" + sensor.port.substring(1) + "," + (sensor.state ? 1 : 0) +  ")";
+                context.quickPiConnection.sendCommand(command, null);    
+            }
 
         } else if (sensor.type == "button") {
             if (sensor.stateText)
@@ -974,8 +1159,6 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText2)
                 sensor.stateText2.remove();
 
-            
-
             imgw = sensor.drawInfo.width / 1.1;
             imgh = sensor.drawInfo.height / 1.1;
         
@@ -1019,6 +1202,8 @@ var getContext = function (display, infos, curLevel) {
                 sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
                 sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
 
+
+
                 var scale = imgh / 60;
 
                 sensor.img2.attr({"clip-rect": 
@@ -1028,150 +1213,17 @@ var getContext = function (display, infos, curLevel) {
                                    (scale * sensor.state)
                                     });
 
-                sensor.sliderrect = paper.rect(imgx, imgy, imgw, scale * sensor.scale);
-
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading) {
                 if (!juststate) {
-
-                    sensor.img.node.onfocus = function () {
-                        var outsiderectx = sensor.drawInfo.x;
-                        var outsiderecty = sensor.drawInfo.y;
-                        var outsidewidth = 25;
-                        var outsideheight = sensor.drawInfo.height;
-
-                        var insidewidth = 5;
-                        var insideheight = sensor.drawInfo.height * 0.60;
-
-                        var insiderectx = outsiderectx + (outsidewidth / 2) - (insidewidth / 2) ;
-                        var insiderecty = outsiderecty + (outsideheight / 2) - (insideheight / 2);
-
-                        var circleradius = (outsidewidth / 2) - 1;
-
-                        var pluscirclex = outsiderectx + (outsidewidth / 2);
-                        var pluscircley = outsiderecty + circleradius + 1; 
-
-                        var minuscirclex = pluscirclex;
-                        var minuscircley = outsiderecty + outsideheight - circleradius - 1;
-
-
-                        paper.setStart();
-
-
-                        sensor.sliderrect = paper.rect(outsiderectx, outsiderecty, outsidewidth, outsideheight, outsidewidth / 2);
-                        sensor.sliderrect.attr("fill", "#468DDF");
-                        sensor.sliderrect.attr("stroke", "#468DDF");
-
-                        sensor.sliderrect = paper.rect(insiderectx, insiderecty, insidewidth, insideheight, 2);
-                        sensor.sliderrect.attr("fill", "#2E5D94");
-                        sensor.sliderrect.attr("stroke", "#2E5D94");
-
-                        paper.setStart();
-
-                        sensor.pluscircle = paper.circle(pluscirclex, pluscircley, circleradius);
-                        sensor.pluscircle.attr("fill", "#F5A621");
-                        sensor.pluscircle.attr("stroke", "#F5A621");
-
-                        sensor.plus = paper.text(pluscirclex, pluscircley, "+");
-                        sensor.plus.attr({ fill: "white" });
-                        sensor.plus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-
-                        sensor.plusset = paper.setFinish();
-
-                        sensor.plusset.click(function() {
-                            sensor.state += 1;
-                            drawSensor(sensor, sensor.state, true);
-                        });
-
-
-                        paper.setStart();
-                        sensor.minuscircle = paper.circle(minuscirclex, minuscircley, circleradius);
-                        sensor.minuscircle.attr("fill", "#F5A621");
-                        sensor.minuscircle.attr("stroke", "#F5A621");
-                        
-                        sensor.minus = paper.text(minuscirclex, minuscircley, "-");
-                        sensor.minus.attr({ fill: "white" });
-                        sensor.minus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-
-                        sensor.minusset = paper.setFinish();
-
-
-                        sensor.minusset.click(function() {
-                            sensor.state -= 1;
-                            drawSensor(sensor, sensor.state, true);
-                        });
-
-
-                        var thumbwidth = outsidewidth * .80;
-                        var thumbheight = outsidewidth * 1.4;
-                        var zero = 0;
-                        var scale = (insideheight - thumbheight) / 60;
-
-                        var thumby = insiderecty + insideheight - thumbheight - (sensor.state * scale);
-
-                        var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
-
-                        sensor.thumb = paper.rect(thumbx, thumby, thumbwidth, thumbheight, outsidewidth/2);
-                        sensor.thumb.attr("fill", "#F5A621");
-                        sensor.thumb.attr("stroke", "#F5A621");
-
-                        
-
-                        sensor.thumb.drag(
-                            function (dx, dy, x, y, event) {
-
-                                var newy = zero + dy;
-
-                                if (newy < insiderecty)
-                                    newy = insiderecty;
-
-                                if (newy > insiderecty + insideheight - thumbheight)
-                                    newy = insiderecty + insideheight - thumbheight;
-
-                                sensor.thumb.attr('y', newy);
-
-                                sensor.state = Math.round(60 - ((newy - insiderecty)  / scale));
-
-                                drawSensor(sensor, sensor.state, true);
-                            },
-                            function (x, y, event) {
-                                zero = sensor.thumb.attr('y');
-                            },
-                            function (event) {
-                            }
-                        );
-
-                        sensor.slider = paper.setFinish();
-                    }
+                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                        sensor.state = Math.round(percentage * .60);
+                
+                        drawSensor(sensor, sensor.state, true);
+                    });
                 }
-                sensor.img.node.onblur = function () {
-                    sensor.slider.remove();
-                }
-
-                sensor.img2.node.onfocus = sensor.img.node.onfocus;
-                sensor.img2.node.onblur = sensor.img.node.onblur;
-
             }
-
-
-            /*
-                        if (!context.autoGrading) {
-                            sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                            sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
-            
-            
-                            sensor.uparrow.node.onclick = function () {
-                                sensor.state += 1;
-                                drawSensor(sensor);
-                            };
-            
-                            sensor.downarrow.node.onclick = function () {
-                                sensor.state -= 1;
-                                drawSensor(sensor);
-                            };
-                        }
-            */
 
         } else if (sensor.type == "servo") {
             if (sensor.stateText)
@@ -1191,17 +1243,36 @@ var getContext = function (display, infos, curLevel) {
                 sensor.state = 0;
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "°");
+
+            if ((!context.runner || !context.runner.isRunning())
+                && !context.offLineMode)
+            {
+                if (!sensor.updatetimeout)
+                {
+                    sensor.updatetimeout = setTimeout(function() {
+                        var command = "setServoAngle(" + sensor.port.substring(1) + "," + sensor.state + ")";
+                        context.quickPiConnection.sendCommand(command, null);    
+
+                        sensor.updatetimeout = null;
+                    }, 100);
+                }
+            }
+
+            if (!context.autoGrading) {
+                if (!juststate) {
+                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                        sensor.state = Math.round(percentage * 1.8);
+                
+                        drawSensor(sensor, sensor.state, true);
+                    });
+                }
+            }
         }
         else if (sensor.type == "potentiometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
 
-            if (sensor.uparrow)
-                sensor.uparrow.remove();
-
-            if (sensor.downarrow)
-                sensor.downarrow.remove();
 
             sensor.img = paper.image(getImg('potentiometer.png'), imgx, imgy, imgw, imgh);
 
@@ -1213,23 +1284,15 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
             if (!context.autoGrading) {
-                sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
-
-                sensor.uparrow.node.onclick = function () {
-                    sensor.state += 1;
-                    if (sensor.state > 100)
-                        sensor.state = 100;
-                    drawSensor(sensor);
-                };
-
-                sensor.downarrow.node.onclick = function () {
-                    sensor.state -= 1;
-                    if (sensor.state < 0)
-                        sensor.state = 0;
-                    drawSensor(sensor);
-                };
+                if (!juststate) {
+                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                        sensor.state = Math.round(percentage);
+                
+                        drawSensor(sensor, sensor.state, true);
+                    });
+                }
             }
+
         } else if (sensor.type == "range") {
             if (sensor.stateText)
                 sensor.stateText.remove();
@@ -1245,24 +1308,15 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
-            sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
             if (!context.autoGrading) {
-                sensor.uparrow = paper.image(getImg('uparrow.png'), state1x, sensor.drawInfo.y, arrowsize, arrowsize);
-                sensor.downarrow = paper.image(getImg('downarrow.png'), state1x, sensor.drawInfo.y + sensor.drawInfo.height - arrowsize, arrowsize, arrowsize);
-
-                sensor.uparrow.node.onclick = function () {
-                    sensor.state += 1;
-                    if (sensor.state > 100)
-                        sensor.state = 100;
-                    drawSensor(sensor);
-                };
-
-                sensor.downarrow.node.onclick = function () {
-                    sensor.state -= 1;
-                    if (sensor.state < 0)
-                        sensor.state = 0;
-                    drawSensor(sensor);
-                };
+                if (!juststate) {
+                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                        sensor.state = Math.round(percentage * 5);
+                
+                        drawSensor(sensor, sensor.state, true);
+                    });
+                }
             }
         }
 
@@ -1270,8 +1324,8 @@ var getContext = function (display, infos, curLevel) {
         if (sensor.portText)
             sensor.portText.remove();
 
-        stateFontSize = sensor.drawInfo.height * 0.10;
-        portFontSize = sensor.drawInfo.height * 0.10;
+        var stateFontSize = sensor.drawInfo.height * 0.10;
+        var portFontSize = sensor.drawInfo.height * 0.10;
 
 
         if (sensor.hasOwnProperty("stateText"))
@@ -1423,7 +1477,7 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
-        sensor = findSensor(sensorType, port);
+        var sensor = findSensor(sensorType, port);
         if (!sensor) {
             throw ("Referenced not existing sensor " + sensorType + " in port " + port);
         }
@@ -1692,8 +1746,12 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.setServoAngle = function (port, angle, callback) {
-        context.registerQuickPiEvent("servo", "D" + port, angle);
+        if (angle > 180)
+            angle = 180;
+        else if (angle < 0)
+            angle = 0;
 
+        context.registerQuickPiEvent("servo", "D" + port, angle);
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
