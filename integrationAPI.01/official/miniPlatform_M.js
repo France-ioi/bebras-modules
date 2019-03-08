@@ -472,10 +472,12 @@ $(document).ready(function() {
 
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
-                if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                  $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                } else {
-                  $('body').prepend(miniPlatformWrapping[beaver].header);
+                if(window.displayHelper) {
+                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                  } else {
+                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                  }
                 }
              },
              function(error) {
