@@ -974,11 +974,33 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText2)
                 sensor.stateText2.remove();
 
+            
+
+            imgw = sensor.drawInfo.width / 1.1;
+            imgh = sensor.drawInfo.height / 1.1;
+        
+            imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .1);
+            imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+
+            portx = imgx + imgw * 1.1;
+            porty = imgy + imgh / 3;
+    
+        
+
             sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
 
+
+//            paper.rect(sensor.drawInfo.x, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+
             if (sensor.state) {
-                sensor.stateText = paper.text(state1x, state1y, sensor.state.line1);
-                sensor.stateText2 = paper.text(state1x, state1y + 15, sensor.state.line2);
+                var statex = imgx + (imgw * .2);
+
+                var statey = imgy + (imgh * .4);
+                var state2y = statey + (imgh * .2);
+
+                sensor.stateText = paper.text(statex, statey, sensor.state.line1);
+                sensor.stateText2 = paper.text(statex, state2y, sensor.state.line2);
+
             }
         } else if (sensor.type == "temperature") {
             if (sensor.stateText)
@@ -1034,6 +1056,9 @@ var getContext = function (display, infos, curLevel) {
                         var minuscircley = outsiderecty + outsideheight - circleradius - 1;
 
 
+                        paper.setStart();
+
+
                         sensor.sliderrect = paper.rect(outsiderectx, outsiderecty, outsidewidth, outsideheight, outsidewidth / 2);
                         sensor.sliderrect.attr("fill", "#468DDF");
                         sensor.sliderrect.attr("stroke", "#468DDF");
@@ -1042,21 +1067,41 @@ var getContext = function (display, infos, curLevel) {
                         sensor.sliderrect.attr("fill", "#2E5D94");
                         sensor.sliderrect.attr("stroke", "#2E5D94");
 
+                        paper.setStart();
+
                         sensor.pluscircle = paper.circle(pluscirclex, pluscircley, circleradius);
                         sensor.pluscircle.attr("fill", "#F5A621");
                         sensor.pluscircle.attr("stroke", "#F5A621");
 
                         sensor.plus = paper.text(pluscirclex, pluscircley, "+");
                         sensor.plus.attr({ fill: "white" });
+                        sensor.plus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+                        sensor.plusset = paper.setFinish();
+
+                        sensor.plusset.click(function() {
+                            sensor.state += 1;
+                            drawSensor(sensor, sensor.state, true);
+                        });
 
 
+                        paper.setStart();
                         sensor.minuscircle = paper.circle(minuscirclex, minuscircley, circleradius);
                         sensor.minuscircle.attr("fill", "#F5A621");
                         sensor.minuscircle.attr("stroke", "#F5A621");
                         
-
                         sensor.minus = paper.text(minuscirclex, minuscircley, "-");
                         sensor.minus.attr({ fill: "white" });
+                        sensor.minus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+                        sensor.minusset = paper.setFinish();
+
+
+                        sensor.minusset.click(function() {
+                            sensor.state -= 1;
+                            drawSensor(sensor, sensor.state, true);
+                        });
+
 
                         var thumbwidth = outsidewidth * .80;
                         var thumbheight = outsidewidth * 1.4;
@@ -1089,16 +1134,6 @@ var getContext = function (display, infos, curLevel) {
                                 sensor.state = Math.round(60 - ((newy - insiderecty)  / scale));
 
                                 drawSensor(sensor, sensor.state, true);
-
-                                /*
-                                ly = dy + oy;
-
-                                console.log("ly = " + ly + " oy " + oy + " dy " + dy);
-                                if (ly >= 0 && ly < sensor.drawInfo.height) {
-                                    sensor.thumb.transform('t0' + ',' + ly);
-
-
-                                }*/
                             },
                             function (x, y, event) {
                                 zero = sensor.thumb.attr('y');
@@ -1106,13 +1141,17 @@ var getContext = function (display, infos, curLevel) {
                             function (event) {
                             }
                         );
+
+                        sensor.slider = paper.setFinish();
                     }
                 }
-
                 sensor.img.node.onblur = function () {
-                    sensor.sliderrect.remove();
-                    sensor.thumb.remove();
-                }    
+                    sensor.slider.remove();
+                }
+
+                sensor.img2.node.onfocus = sensor.img.node.onfocus;
+                sensor.img2.node.onblur = sensor.img.node.onblur;
+
             }
 
 
@@ -1138,7 +1177,15 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
+            if (sensor.pale)
+                sensor.pale.remove();
+
+
             sensor.img = paper.image(getImg('servo.png'), imgx, imgy, imgw, imgh);
+
+            sensor.pale = paper.image(getImg('servo-pale.png'), imgx, imgy, imgw, imgh);
+
+            sensor.pale.rotate(sensor.state);
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -1160,6 +1207,8 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state == null)
                 sensor.state = 0;
+
+            sensor.img.rotate(sensor.state * 3.6);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
