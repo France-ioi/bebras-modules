@@ -1552,11 +1552,11 @@ button.showLongIntro .icon, button.videoBtn .icon {
 #taskIntro h2 + ::first-letter {
   float: left;
   color: #4a90e2;
-  font-size: 2.4em;
+  font-size: 48px;
   line-height: 1;
-  padding-top: 4px;
   padding-right: 8px;
   font-weight: lighter;
+  text-transform: uppercase;
 }
 #introControls {
   display: flex;
