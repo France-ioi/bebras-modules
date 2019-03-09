@@ -613,7 +613,9 @@ var quickAlgoInterface = {
             var renderTaskIntro = '' +
                 '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
                 levelIntroContent +
-                '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>';
+                '<div id="introControls">' +
+                    '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>' +
+                '</div>';
             $('#taskIntro').html(renderTaskIntro);
             quickAlgoInterface.toggleLongIntro(false);
         } else {
