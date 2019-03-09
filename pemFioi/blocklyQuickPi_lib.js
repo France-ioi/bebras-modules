@@ -326,7 +326,8 @@ var getContext = function (display, infos, curLevel) {
         if (introControls === null) {
             introControls = piUi + $('#introControls').html();
         }
-        $('#introControls').html(introControls);
+        $('#introControls').html(introControls)
+        $('#taskIntro').addClass('piui');
         $('#grid').html(`
 
             <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;        ">

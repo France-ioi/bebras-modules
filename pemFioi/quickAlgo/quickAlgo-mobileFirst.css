@@ -1546,26 +1546,14 @@ button.showLongIntro .icon, button.videoBtn .icon {
   box-shadow: none;
 }
 /* QuickPi */
-#taskIntro h2 {
-  display: none;
-}
-#taskIntro h2 + ::first-letter {
-  float: left;
-  color: #4a90e2;
-  font-size: 48px;
-  line-height: 1;
-  padding-right: 8px;
-  font-weight: lighter;
-  text-transform: uppercase;
-}
-#introControls {
+.piui #introControls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap-reverse;
   margin-bottom: -10px;
 }
-#introControls .showLongIntro {
+.piui #introControls .showLongIntro {
   align-self: flex-end;
   margin-bottom: 10px;
 }
