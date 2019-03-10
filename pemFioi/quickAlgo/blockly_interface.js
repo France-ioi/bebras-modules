@@ -286,7 +286,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
-         this.displayError('');
+         if(this.keepDisplayedError) {
+            // Do not clear the error this time
+            this.keepDisplayedError = false;
+         } else {
+            this.displayError('');
+         }
       },
 
       onChangeResetDisplay: function() {
@@ -534,6 +539,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                      that.languages[that.player] = "blockly";
                   } catch(e) {
                      that.displayError('<span class="testError">'+that.strings.invalidContent+'</span>');
+                     that.keepDisplayedError = true;
                   }
                } else {
                   that.programs[that.player].javascript = code;
@@ -546,6 +552,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             reader.readAsText(file);
          } else {
             that.displayError('<span class="testError">'+this.strings.unknownFileType+'</span>');
+            that.keepDisplayedError = true;
          }
       },
 

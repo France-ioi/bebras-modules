@@ -325,6 +325,14 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._continue = function () {
+    if (this.context.infos.checkEndEveryTurn) {
+      try {
+        this.context.infos.checkEndCondition(context, false);
+      } catch(e) {
+        this._onStepError(e);
+        return;
+      }
+    }
     if (this._steps >= this._maxIterations) {
       this._onStepError(window.languageStrings.tooManyIterations);
     } else if (this._stepsWithoutAction >= this._maxIterWithoutAction) {

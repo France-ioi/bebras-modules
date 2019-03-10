@@ -85,6 +85,13 @@ function LogicController(nbTestCases, maxInstructions) {
     return code;
   }
 
+  this.getCode = function(language) {
+
+    if (language == "python")
+      return this._aceEditor.getValue();
+    return "";
+  }
+
   this.checkCode = function(code, display) {
     // Check a code before validation; display is a function which will get
     // error messages
