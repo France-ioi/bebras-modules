@@ -25,7 +25,7 @@ var blocklyToScratch = {
       'text_join': ['operator_join'],
       'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
       'math_change': ['data_changevariableby'],
-      'math_number': [],
+      'math_number': ['math_number'],
       'variables_get': ['data_variable'],
       'variables_set': ['data_setvariableto']
    },
@@ -54,7 +54,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             if(arrayContains(this.allBlocksAllowed, name)) { continue; }
             this.allBlocksAllowed.push(name);
             if(blocklyAllowedSiblings[name]) {
-               this.addBlocksAllowed(allowedSiblings[name]);
+               this.addBlocksAllowed(blocklyAllowedSiblings[name]);
             }
          }
       },
