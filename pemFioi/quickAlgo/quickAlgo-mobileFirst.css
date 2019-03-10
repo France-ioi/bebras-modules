@@ -47,7 +47,10 @@ body > * {
 .interfaceToggled {
   display: none !important;
 }
-
+:disabled {
+  background-color: #eee !important;
+  cursor: not-allowed !important;
+}
 /*****************
   EDITOR MENU
 *****************/
@@ -865,11 +868,17 @@ p {
 #introGrid .playerControls .icon.playPause span {
   color: #fff;
   background-color: #4a90e2;
-  font-size: 28px;
   width: 40px;
   vertical-align: middle;
   line-height: 40px;
+}
+#introGrid .playerControls .icon.playPause span.fa-play {
+  font-size: 28px;
   padding-left: 6px;
+}
+#introGrid .playerControls .icon.playPause span.fa-pause {
+  font-size: 22px;
+  padding-left: 0px;
 }
 #introGrid .speedSlider {
   background-color: rgba(0,0,0,0.10);
@@ -1536,7 +1545,39 @@ button.showLongIntro .icon, button.videoBtn .icon {
   background-color: transparent;
   box-shadow: none;
 }
-
+/* QuickPi */
+.piui #introControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap-reverse;
+  margin-bottom: -10px;
+}
+.piui #introControls .showLongIntro {
+  align-self: flex-end;
+  margin-bottom: 10px;
+}
+#piui > * {
+  margin-bottom: 10px;
+}
+#piui .btn {
+  color: #fff;
+  background: #4a90e2;
+  border: none;
+  border-radius: 50px;
+  box-shadow: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 12px;
+}
+#piui .btn span + span {
+  padding-left: 10px;
+}
+.btn#piconnect {
+  background-color: #f5a623;
+}
 /************************
   MODAL POPUPS
 *************************/

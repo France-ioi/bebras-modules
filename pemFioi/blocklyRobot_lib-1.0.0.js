@@ -700,7 +700,7 @@ var getContext = function(display, infos, curLevel) {
                obstacleInFront: "astéroïde devant"
             },
             code: {
-               obstacleInFront: "astéroideDevant"
+               obstacleInFront: "asteroideDevant"
             },
             messages: {
                obstacle: "Attention à l'astéroïde !"
@@ -1192,14 +1192,10 @@ var getContext = function(display, infos, curLevel) {
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0},
             number: { num: 5, side: 60, zOrder: 1 },
-            top_horizontal_closed_door: { num: 6, img: "top_horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            bottom_horizontal_closed_door: { num: 7, img: "bottom_horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            left_vertical_closed_door: { num: 8, img: "left_vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            right_vertical_closed_door: { num: 9, img: "right_vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
-            top_horizontal_open_door: { num: 10, img: "top_horizontal_open_door.png", side: 60, zOrder: 1},
-            bottom_horizontal_open_door: { num: 11, img: "bottom_horizontal_open_door.png", side: 60, zOrder: 1},
-            left_vertical_open_door: { num: 12, img: "left_vertical_open_door.png", side: 60, zOrder: 1},
-            right_vertical_open_door: { num: 13, img: "right_vertical_open_door.png", side: 60, zOrder: 1},
+            horizontal_closed_door: { num: 7, img: "horizontal_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            vertical_closed_door: { num: 8, img: "vertical_closed_door.png", side: 60, isObstacle: true, zOrder: 1 },
+            horizontal_open_door: { num: 11, img: "horizontal_open_door.png", side: 60, zOrder: 1},
+            vertical_open_door: { num: 12, img: "vertical_open_door.png", side: 60, zOrder: 1}
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
