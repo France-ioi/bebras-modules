@@ -1163,7 +1163,7 @@ var getContext = function (display, infos, curLevel) {
                 sensor.img.node.ontouchstart = sensor.img.node.onmousedown;
 
 
-                sensor.img.node.ontouchend = function () {
+                sensor.img.node.onmouseup = function () {
                     if (context.offLineMode) {
                         sensor.state = false;  
                         sensor.wasPressed = true;
