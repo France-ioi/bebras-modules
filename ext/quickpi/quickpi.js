@@ -1,6 +1,6 @@
 g_instance = null;
 
-var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
+var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, pythonLibPath) {
     this.onConnect = _onConnect;
     this.onDisconnect = _onDisconnect;
 
@@ -9,6 +9,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     }
 
     this.pythonLib = "";
+    this.pythonLibPath = pythonLibPath;
     this.raspiServer = "";
     this.wsSession = null;
     this.resultsCallback = null;
@@ -134,7 +135,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     }
 
     this.fetchPythonLib = function(doAfter) {
-        fetch('../../modules/ext/quickpi/quickpilib.py')
+        fetch(this.pythonLibPath)
             .then(function (response) {
                 return response.text();
             })
