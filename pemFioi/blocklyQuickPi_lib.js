@@ -124,7 +124,9 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
+    var pythonLibPath = (window.modulesPath ? window.modulesPath : '../../modules/') + 'ext/quickpi/quickpilib.py';
+
+    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, pythonLibPath);
     var connectingInterval = null;
     var disconnectInterval = null;
     var orange = false;
