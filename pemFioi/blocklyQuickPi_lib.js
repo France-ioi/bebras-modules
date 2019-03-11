@@ -964,7 +964,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function setSlider(sensor, imgx, imgy, imgw, imgh, onsliderchange) {
+    function setSlider(sensor, imgx, imgy, imgw, imgh, onsliderchange, getpercentage) {
         removeSlider(sensor);
 
         sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
@@ -1045,7 +1045,9 @@ var getContext = function (display, infos, curLevel) {
             var zero = 0;
             var scale = (insideheight - thumbheight) / 100;
 
-            var thumby = insiderecty + insideheight - thumbheight - (sensor.state * scale);
+            var percentage = getpercentage ? getpercentage() : sensor.state;
+
+            var thumby = insiderecty + insideheight - thumbheight - (percentage * scale);
 
             var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
 
@@ -1235,8 +1237,8 @@ var getContext = function (display, infos, curLevel) {
 
             }
         } else if (sensor.type == "temperature") {
-            if (sensor.stateText)
-                sensor.stateText.remove();
+               if (sensor.stateText)
+                    sensor.stateText.remove();
 
 
                 if (sensor.uparrow)
@@ -1255,11 +1257,13 @@ var getContext = function (display, infos, curLevel) {
 
                 var scale = imgh / 60;
 
+                var cliph = scale * sensor.state;
+
                 sensor.img2.attr({"clip-rect": 
                                    imgx + "," +
-                                   imgy + "," + 
-                                   (sensor.drawInfo.width) + "," +
-                                   (scale * sensor.state)
+                                   (imgy + imgh - cliph) + "," + 
+                                   (imgw) + "," +
+                                   cliph
                                     });
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
@@ -1270,6 +1274,9 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = Math.round(percentage * .60);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return 100 / 60 * sensor.state;
                     });
                 }
             }
@@ -1317,7 +1324,11 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = Math.round(percentage * 1.8);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return 100 / 180 * sensor.state;
                     });
+
                 }
             } else {
                 removeSlider(sensor);
@@ -1344,7 +1355,11 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = Math.round(percentage);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state;
                     });
+
                 }
             } else  {
                 removeSlider(sensor);
@@ -1359,6 +1374,54 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
+            if (sensor.rangedistance)
+                sensor.rangedistance.remove();
+
+            if (sensor.rangedistancestart)
+                sensor.rangedistancestart.remove();
+
+            if (sensor.rangedistanceend)
+                sensor.rangedistanceend.remove();
+
+            var rangew = imgw * sensor.state * 0.002;
+
+            sensor.rangedistance = paper.path(["M", imgx,
+                    imgy + imgw,
+                    "L", imgx + rangew,
+                    imgy + imgw]);
+
+            var markh = 16;
+
+            sensor.rangedistancestart = paper.path(["M", imgx,
+                    imgy + imgw - (markh / 2),
+                    "L", imgx,
+                    imgy + imgw + (markh / 2)]);
+
+            sensor.rangedistanceend = paper.path(["M", imgx + rangew,
+                    imgy + imgw - (markh / 2),
+                    "L", imgx + rangew,
+                    imgy + imgw + (markh / 2)]);
+
+            sensor.rangedistance.attr({
+                    "stroke-width": 4,
+                    "stroke": "#468DDF",
+                    "stroke-linecapstring": "round"
+            });
+
+            sensor.rangedistancestart.attr({
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
+            });
+
+
+            sensor.rangedistanceend.attr({
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
+            });
+
+
             if (sensor.state >= 10)
                 sensor.state = Math.round(sensor.state);
 
@@ -1369,6 +1432,9 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = Math.round(percentage * 5);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state / 5;
                     });
                 }
             } else {
@@ -1383,6 +1449,19 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
+            if (sensor.state > 50) {
+                sensor.img2 = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+
+                var opacity = (sensor.state - 50) * 0.02;
+                sensor.img2.attr({"opacity": opacity });
+            }
+            else {
+                sensor.img2 = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+
+                var opacity = (50 - sensor.state) * 0.02;
+                sensor.img2.attr({"opacity": opacity });
+            }
+
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
             if (!context.autoGrading && context.offLineMode) {
                 if (!juststate) {
@@ -1390,7 +1469,11 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = Math.round(percentage);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state;
                     });
+
                 }
             } else {
                 removeSlider(sensor);
