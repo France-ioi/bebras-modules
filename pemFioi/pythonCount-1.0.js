@@ -17,6 +17,7 @@ var pythonCountPatterns = [
    {pattern: /^import\s+[^\n\r]+/, block: false}, // import x, y, z
    {pattern: /^for\s+\w+\s+in\s+range/, block: false}, // for i in range(5): is only one block; it's a bit tricky
 
+   {pattern: /^\d+\.\d*/, block: true},
    {pattern: /^\w+/, block: true},
 
    // Strings
@@ -82,6 +83,9 @@ var pythonForbiddenBlocks = {
       'lists_sort' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
       'lists_split' : ['list', 'set', 'list_brackets', '__getitem__', '__setitem__'],
       'lists_append': ['list', 'set', 'list_brackets', '__getitem__', '__setitem__']
+    },
+    'maths': {
+      'math_number': ['math_number']
     },
     'functions': {
       'procedures_defnoreturn': ['def', 'lambda'],
@@ -238,6 +242,8 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
          var re = /[\[\]]/g;
       } else if(pyKey == 'dict_brackets') {
          var re = /[\{\}]/g;
+      } else if(pyKey == 'math_number') {
+         var re = /\W\d+(\.\d*)?/g;
       } else {
          var re = new RegExp('(^|\\W)'+pyKey+'(\\W|$)', 'g');
       }
@@ -248,10 +254,13 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
          if(!usesCount[pointer]) { usesCount[pointer] = 0; }
          usesCount[pointer] += count;
          if(usesCount[pointer] > limitedUses[pointer].nbUses) {
+            // TODO :: i18n ?
             if(pyKey == 'list_brackets') {
-               return 'crochets [ ]'; // TODO :: i18n ?
+               return 'crochets [ ]';
             } else if(pyKey == 'dict_brackets') {
-               return 'accolades { }'; // TODO :: i18n ?
+               return 'accolades { }';
+            } else if(pyKey == 'math_number') {
+               return 'nombres';
             } else {
                return pyKey;
             }

@@ -3,6 +3,7 @@
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
     // Local language strings for each language
+    var introControls = null;
     var localLanguageStrings = {
         fr: { // French strings
             label: {
@@ -295,47 +296,38 @@ var getContext = function (display, infos, curLevel) {
 
     // Reset the context's display
     context.resetDisplay = function () {
-        $('#grid').html(`
-            <div id="piui">                
-                <button  style="
-                        color: white;
-                        font-weight: bold;
-                        background-color: orange;
-                        border: none;
-                        padding: 10px 16px;
-                        text-align: center;
-                        text-decoration: none;
-                        display: inline-block;
-                        cursor: pointer;
-                        border-radius: 20px;"
-                
-                        type="button" id="piconnect">
-                
-                    <span class="fa fa-wifi"></span> <span id="piconnecttext">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
+        // Do something here
+        //$('#grid').html('Display for the library goes here.');
+
+        // Ask the parent to update sizes
+        //context.blocklyHelper.updateSize();
+        //context.updateScale();
+        var piUi = `
+            <div id="piui">
+                <button type="button" id="piconnect" class="btn">
+                    <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
                 </button>
 
                 <span id="piinstallui">
+                    <span class="fa fa-exchange-alt"></span>
+                    <button type="button" id="piinstall" class="btn">
+                        <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
+                    </button>
+                </span>
+            </div>`;
+            
+        var hasIntroControls = $('#taskIntro').find('#introControls').length;
+        if (!hasIntroControls) {
+            $('#taskIntro').append(`<div id="introControls"></div>`);
+        }
+        if (introControls === null) {
+            introControls = piUi + $('#introControls').html();
+        }
+        $('#introControls').html(introControls)
+        $('#taskIntro').addClass('piui');
+        $('#grid').html(`
 
-                <span class="fa fa-exchange-alt">
-                <button style="
-                color: white;
-                font-weight: bold;
-                background-color: #488FE1;
-                border: none;
-                padding: 10px 16px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                cursor: pointer;
-                border-radius: 20px;"
-                
-                type="button" id="piinstall">
-                
-                <span class="fa fa-upload"></span> Installer <span id=piinstallprogresss class="fas fa-spinner fa-spin"></span> <span id="piinstallcheck" class="fa fa-check"></span></button><span>
-            </div>
-
-
-            <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;        ">
+            <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;">
             </div>
             `
             

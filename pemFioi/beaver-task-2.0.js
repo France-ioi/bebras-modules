@@ -590,8 +590,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
  ************************************************************************/
 
 function extractLevelSpecific(item, level) {
-   if ((typeof item != "object") || $.isArray(item)) {
+   if ((typeof item != "object")) {
       return item;
+   }
+   if($.isArray(item)) {
+      return $.map(item, function(val) {
+         return extractLevelSpecific(val, level);
+         });
    }
    if (item.shared === undefined) {
       if (item[level] === undefined) {
