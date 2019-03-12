@@ -34,6 +34,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, python
         this.locked = "";
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
+        this.resultsCallback = null;
 
         this.wsSession = new WebSocket(url);
 
@@ -55,7 +56,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, python
                     "command": "ping"
                 }
 
-                if (pingsWithoutPong > 2)
+                if (pingsWithoutPong > 8)
                 {
                     wsSession.close();
                     onclose();
@@ -114,9 +115,9 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, python
                 commandMode = false;
                 sessionTainted = false;
 
-                onDisconnect(connected);
-
                 connected = false;
+
+                onDisconnect(connected);
             }
         }
     }
@@ -242,6 +243,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, python
             return;
         }
 
+        this.resultsCallback = null;
         this.commandMode = true;
         this.sessionTainted = false;
 
