@@ -128,8 +128,6 @@ var getContext = function (display, infos, curLevel) {
     var pythonLibPath = (window.modulesPath ? window.modulesPath : '../../modules/') + 'ext/quickpi/quickpilib.py';
 
     context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, pythonLibPath);
-    var connectingInterval = null;
-    var disconnectInterval = null;
     var orange = false;
     var paper;
     context.offLineMode = true;
@@ -233,7 +231,6 @@ var getContext = function (display, infos, curLevel) {
 
         context.liveUpdateCount = 0;
         context.sensorPollInterval = setInterval(function() {
-
             if ((!context.runner || !context.runner.isRunning())
                 && !context.offLineMode) {
 
@@ -246,7 +243,6 @@ var getContext = function (display, infos, curLevel) {
                     }
             }
         }, 200);
-        
     };
 
     function updateLiveSensor(sensor)
@@ -309,14 +305,13 @@ var getContext = function (display, infos, curLevel) {
         var piUi = `
             <div id="piui">
                 <button type="button" id="piconnect" class="btn">
-                    <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span>
+                    <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
                 </button>
 
                 <span id="piinstallui">
-
                     <span class="fa fa-exchange-alt"></span>
                     <button type="button" id="piinstall" class="btn">
-                        <span class="fa fa-upload"></span><span>Installer</span><span id="piinstallcheck" class="fa fa-check"></span>
+                        <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
                     </button>
                 </span>
             </div>`;
@@ -332,7 +327,7 @@ var getContext = function (display, infos, curLevel) {
         $('#taskIntro').addClass('piui');
         $('#grid').html(`
 
-            <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;        ">
+            <div id=virtualSensors style="height: 90%; width: 90%; padding: 5px;">
             </div>
             `
             
@@ -463,7 +458,6 @@ var getContext = function (display, infos, curLevel) {
         }
 
         context.blocklyHelper.updateSize();
-        //context.updateScale();
 
         context.releasing = false;
         context.offLineMode = true;
@@ -619,7 +613,12 @@ var getContext = function (display, infos, curLevel) {
             if (context.runner)
                 context.runner.stop();
 
+            context.installing = true;
+            $('#piinstallprogresss').show();
+
             context.quickPiConnection.installProgram(python_code, function() {
+                context.justinstalled = true;
+                $('#piinstallprogresss').hide();
                 $('#piinstallcheck').show();
             });
         });
@@ -678,63 +677,40 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function showasConnected() {
-        if (disconnectInterval)
-            clearTimeout(disconnectInterval);
-
-        if (connectingInterval)
-            clearInterval(connectingInterval);
-
+        $('#piconnectprogress').hide();
         $('#piinstallcheck').hide();
+        $('#piinstallprogresss').hide();        
         $('#piinstallui').show();
-        $('#piconnect').css('background-color', 'green');
+        $('#piconnect').css('background-color', '#F9A423');
+
+        $('#piinstall').css('background-color', "#488FE1");
 
         $('#piconnecttext').hide();
     }
 
     function showasConnecting() {
-        if (disconnectInterval)
-            clearTimeout(disconnectInterval);
-
-        if (connectingInterval)
-            clearInterval(connectingInterval);
-
-        connectingInterval = setInterval(function() {
-            $('#piinstallcheck').hide();
-            if (orange) {
-                $('#piconnect').css('background-color', 'green');
-                orange = false;
-            }
-            else {
-                $('#piconnect').css('background-color', 'orange');
-                orange = true;
-            }
-
-        }, 300);
+        $('#piconnectprogress').show();
+        $('#piinstallcheck').hide();
+        $('#piinstallprogresss').hide();
     }
 
     function showasReleased() {
-        disconnectInterval = setTimeout(function() {
-            if (connectingInterval)
-                clearInterval(connectingInterval);
-
-            $('#piinstallcheck').hide();
-            $('#piinstallui').hide();
-            $('#piconnect').css('background-color', 'orange');
-            $('#piconnecttext').show();
-        }, 1000);
+        $('#piconnectprogress').hide();
+        $('#piinstallcheck').hide();
+        $('#piinstallprogresss').hide();
+        $('#piinstallui').hide();
+        $('#piconnect').css('background-color', '#F9A423');
+        $('#piconnecttext').show();
     }
 
 
     function showasDisconnected() {
-        disconnectInterval = setTimeout(function() {
-            if (connectingInterval)
-                clearInterval(connectingInterval);
-
-            $('#piinstallcheck').hide();
-            $('#piinstall').css('background-color', 'gray');
-            $('#piconnect').css('background-color', 'gray');
-            $('#piconnecttext').hide();
-        }, 1000);
+        $('#piconnectprogress').hide();
+        $('#piinstallcheck').hide();
+        $('#piinstallprogresss').hide();
+        $('#piinstall').css('background-color', 'gray');
+        $('#piconnect').css('background-color', 'gray');
+        $('#piconnecttext').hide();
     }
 
     function raspberryPiConnected() {
@@ -742,14 +718,17 @@ var getContext = function (display, infos, curLevel) {
 
         context.quickPiConnection.startNewSession();
 
+        context.liveUpdateCount = 0;
         context.offLineMode = false;
 
         sessionStorage.autoConnect = "1";
+
+        context.resetDisplay();
     }
 
     function raspberryPiDisconnected(wasConnected) {
 
-        if (context.releasing)
+        if (context.releasing || !wasConnected)
             showasReleased();
         else
             showasDisconnected();
@@ -761,11 +740,14 @@ var getContext = function (display, infos, curLevel) {
         } else {
             // If I was never connected don't attempt to autoconnect again
             sessionStorage.autoConnect = "0";
+            context.resetDisplay();
         }
 
         if (context.quickPiConnection.wasLocked())
         {
             window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
+        } else if (!wasConnected) {
+            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
         }
     }
 
@@ -834,10 +816,46 @@ var getContext = function (display, infos, curLevel) {
         if (context.timeLineCurrent)
             context.timeLineCurrent.remove();
 
+        if (context.timeLineCircle)
+            context.timeLineCircle.remove();
+
+
+        if (context.timeLineTriangle)
+            context.timeLineTriangle.remove();
+
+
         context.timeLineCurrent = paper.path(["M", startx,
             0,
             "L", startx,
             paper.height]);
+
+        context.timeLineCurrent.attr({
+                "stroke-width": 5,
+                "stroke": "#678AB4", 
+                "stroke-linecap": "round"
+        });
+
+        var circleradius = 10;
+        context.timeLineCircle = paper.circle(startx, paper.height - circleradius, 10);
+
+        context.timeLineCircle.attr({
+            "fill": "white",
+            "stroke": "#678AB4"
+        });
+
+        var trianglew = 10;
+        context.timeLineTriangle = paper.path(["M", startx, 0,
+                                               "L", startx + trianglew, 0,
+                                               "L", startx, trianglew,
+                                               "L", startx - trianglew, 0,
+                                               "L", startx, 0
+                                            ]);
+
+        context.timeLineTriangle.attr({
+            "fill": "#678AB4",
+            "stroke": "#678AB4"
+        });
+
     }
 
     function isAnalogSensor(sensor, state) {
@@ -879,14 +897,15 @@ var getContext = function (display, infos, curLevel) {
 
         color = "green";
         if (type == "expected") {
-            color = "blue";
+            color = "lightgrey";
+            strokewidth = 8;
         } else if (type == "wrong") {
             color = "red";
-            ypositionmiddle += 4;
+            strokewidth = 4;
         }
         else if (type == "actual") {
             color = "yellow";
-            ypositionmiddle += 4;
+            strokewidth = 4;
         }
 
         var isAnalog = isAnalogSensor(sensor, state);
@@ -922,7 +941,9 @@ var getContext = function (display, infos, curLevel) {
                 ypositionmiddle]);
 
             stateline.attr({
-                "stroke-width": 5, "stroke": color
+                "stroke-width": strokewidth,
+                "stroke": color, 
+                "stroke-linecap": "round"
             });
         }
 
@@ -950,24 +971,75 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function setSlider(sensor, imgx, imgy, imgw, imgh, onsliderchange) {
+    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max, onsliderchange, getpercentage) {
+        if (juststate) {
+            var percentage = getpercentage();
+
+            thumby = sensor.sliderdata.insiderecty +
+                     sensor.sliderdata.insideheight - 
+                     sensor.sliderdata.thumbheight - 
+                     (percentage * sensor.sliderdata.scale);
+
+            sensor.thumb.attr('y', thumby);
+
+            return;
+        }
+
         removeSlider(sensor);
 
         sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
 
         sensor.focusrect.attr({ "fill": "468DDF", "fill-opacity": 0, "opacity": 0 });
 
-        sensor.focusrect.node.onfocus = function () {
+        sensor.sliderdata = {};
+
+        var actuallydragged;
+
+        sensor.focusrect.drag(
+            function (dx, dy, x, y, event) {
+
+                var newy = sensor.sliderdata.zero + dy;
+
+                if (newy < sensor.sliderdata.insiderecty)
+                    newy = sensor.sliderdata.insiderecty;
+
+                if (newy > sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight)
+                    newy = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight;
+
+                sensor.thumb.attr('y', newy);
+
+                var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+                onsliderchange(percentage);
+
+                actuallydragged++;
+            },
+            function (x, y, event) {
+
+                showSlider();
+                actuallydragged = 0;
+                sensor.sliderdata.zero = sensor.thumb.attr('y');
+            },
+            function (event) {
+                if (actuallydragged > 4) {
+                    hideSlider(sensor);
+                }
+            }
+        );
+        
+        function showSlider() {
+            hideSlider(sensorWithSlider);
+            sensorWithSlider = sensor;
+
             var outsiderectx = sensor.drawInfo.x;
             var outsiderecty = sensor.drawInfo.y;
-            var outsidewidth = 25;
+            var outsidewidth = sensor.drawInfo.width / 6;
             var outsideheight = sensor.drawInfo.height;
 
-            var insidewidth = 5;
-            var insideheight = sensor.drawInfo.height * 0.60;
+            var insidewidth = outsidewidth / 6;
+            sensor.sliderdata.insideheight = sensor.drawInfo.height * 0.60;
 
             var insiderectx = outsiderectx + (outsidewidth / 2) - (insidewidth / 2);
-            var insiderecty = outsiderecty + (outsideheight / 2) - (insideheight / 2);
+            sensor.sliderdata.insiderecty = outsiderecty + (outsideheight / 2) - (sensor.sliderdata.insideheight / 2);
 
             var circleradius = (outsidewidth / 2) - 1;
 
@@ -985,7 +1057,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.sliderrect.attr("fill", "#468DDF");
             sensor.sliderrect.attr("stroke", "#468DDF");
 
-            sensor.sliderrect = paper.rect(insiderectx, insiderecty, insidewidth, insideheight, 2);
+            sensor.sliderrect = paper.rect(insiderectx, sensor.sliderdata.insiderecty, insidewidth, sensor.sliderdata.insideheight, 2);
             sensor.sliderrect.attr("fill", "#2E5D94");
             sensor.sliderrect.attr("stroke", "#2E5D94");
 
@@ -1003,7 +1075,9 @@ var getContext = function (display, infos, curLevel) {
             sensor.plusset.push(sensor.pluscircle, sensor.plus);
 
             sensor.plusset.click(function () {
-                sensor.state += 1;
+                if (sensor.state < max)
+                    sensor.state += 1;
+                
                 drawSensor(sensor, sensor.state, true);
             });
 
@@ -1021,21 +1095,24 @@ var getContext = function (display, infos, curLevel) {
             sensor.minusset.push(sensor.minuscircle, sensor.minus);
 
             sensor.minusset.click(function () {
-                sensor.state -= 1;
+                if (sensor.state > min)
+                    sensor.state -= 1;
+
                 drawSensor(sensor, sensor.state, true);
             });
 
 
             var thumbwidth = outsidewidth * .80;
-            var thumbheight = outsidewidth * 1.4;
-            var zero = 0;
-            var scale = (insideheight - thumbheight) / 100;
+            sensor.sliderdata.thumbheight = outsidewidth * 1.4;
+            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight) / 100;
 
-            var thumby = insiderecty + insideheight - thumbheight - (sensor.state * scale);
+            var percentage = getpercentage ? getpercentage() : sensor.state;
+
+            var thumby = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight - (percentage * sensor.sliderdata.scale);
 
             var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
 
-            sensor.thumb = paper.rect(thumbx, thumby, thumbwidth, thumbheight, outsidewidth / 2);
+            sensor.thumb = paper.rect(thumbx, thumby, thumbwidth, sensor.sliderdata.thumbheight, outsidewidth / 2);
             sensor.thumb.attr("fill", "#F5A621");
             sensor.thumb.attr("stroke", "#F5A621");
 
@@ -1044,32 +1121,30 @@ var getContext = function (display, infos, curLevel) {
             sensor.thumb.drag(
                 function (dx, dy, x, y, event) {
 
-                    var newy = zero + dy;
+                    var newy = sensor.sliderdata.zero + dy;
 
-                    if (newy < insiderecty)
-                        newy = insiderecty;
+                    if (newy < sensor.sliderdata.insiderecty)
+                        newy = sensor.sliderdata.insiderecty;
 
-                    if (newy > insiderecty + insideheight - thumbheight)
-                        newy = insiderecty + insideheight - thumbheight;
+                    if (newy > sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight)
+                        newy = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight;
 
                     sensor.thumb.attr('y', newy);
 
-                    var percentage = 100 - ((newy - insiderecty) / scale);
+                    var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
                     onsliderchange(percentage);
 
                 },
                 function (x, y, event) {
-                    zero = sensor.thumb.attr('y');
+                    sensor.sliderdata.zero = sensor.thumb.attr('y');
+                    
                 },
                 function (event) {
                 }
             );
         }
 
-        sensor.focusrect.node.onblur = function () {
-            sensor.slider.remove();
-            sensor.focusrect.toFront();
-        }
+
     }
 
     function removeSlider(sensor)
@@ -1104,10 +1179,10 @@ var getContext = function (display, infos, curLevel) {
 
         var arrowsize = sensor.drawInfo.height * .20;
 
-        if (sensor.img && !juststate)
+        if (sensor.img)
             sensor.img.remove();
 
-        if (sensor.img2 && !juststate)
+        if (sensor.img2)
             sensor.img2.remove();
 
         if (sensor.type == "led") {
@@ -1221,8 +1296,8 @@ var getContext = function (display, infos, curLevel) {
 
             }
         } else if (sensor.type == "temperature") {
-            if (sensor.stateText)
-                sensor.stateText.remove();
+               if (sensor.stateText)
+                    sensor.stateText.remove();
 
 
                 if (sensor.uparrow)
@@ -1237,27 +1312,28 @@ var getContext = function (display, infos, curLevel) {
                 sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
                 sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
 
-
-
                 var scale = imgh / 60;
+
+                var cliph = scale * sensor.state;
 
                 sensor.img2.attr({"clip-rect": 
                                    imgx + "," +
-                                   imgy + "," + 
-                                   (sensor.drawInfo.width) + "," +
-                                   (scale * sensor.state)
+                                   (imgy + imgh - cliph) + "," + 
+                                   (imgw) + "," +
+                                   cliph
                                     });
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading && context.offLineMode) {
-                if (!juststate) {
-                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60, function(percentage) {
                         sensor.state = Math.round(percentage * .60);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return 100 / 60 * sensor.state;
                     });
-                }
             }
             else {
                 removeSlider(sensor);
@@ -1298,13 +1374,14 @@ var getContext = function (display, infos, curLevel) {
 
             if (!context.autoGrading && !context.offLineMode &&
                  (!context.runner || !context.runner.isRunning())) {
-                if (!juststate) {
-                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180, function(percentage) {
                         sensor.state = Math.round(percentage * 1.8);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return 100 / 180 * sensor.state;
                     });
-                }
             } else {
                 removeSlider(sensor);
             }
@@ -1325,13 +1402,14 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
             if (!context.autoGrading && context.offLineMode) {
-                if (!juststate) {
-                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
                         sensor.state = Math.round(percentage);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state;
                     });
-                }
             } else  {
                 removeSlider(sensor);
             }
@@ -1345,18 +1423,68 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
+            if (sensor.rangedistance)
+                sensor.rangedistance.remove();
+
+            if (sensor.rangedistancestart)
+                sensor.rangedistancestart.remove();
+
+            if (sensor.rangedistanceend)
+                sensor.rangedistanceend.remove();
+
+            var rangew = imgw * sensor.state * 0.002;
+            var centerx = imgx + (imgw / 2);
+
+            sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
+                    imgy + imgw,
+                    "L", centerx + (rangew / 2),
+                    imgy + imgw]);
+
+            var markh = 16;
+
+            sensor.rangedistancestart = paper.path(["M", centerx - (rangew / 2),
+                    imgy + imgw - (markh / 2),
+                    "L", centerx - (rangew / 2),
+                    imgy + imgw + (markh / 2)]);
+
+            sensor.rangedistanceend = paper.path(["M", centerx + (rangew / 2),
+                    imgy + imgw - (markh / 2),
+                    "L", centerx + (rangew / 2),
+                    imgy + imgw + (markh / 2)]);
+
+            sensor.rangedistance.attr({
+                    "stroke-width": 4,
+                    "stroke": "#468DDF",
+                    "stroke-linecapstring": "round"
+            });
+
+            sensor.rangedistancestart.attr({
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
+            });
+
+
+            sensor.rangedistanceend.attr({
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
+            });
+
+
             if (sensor.state >= 10)
                 sensor.state = Math.round(sensor.state);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
             if (!context.autoGrading && context.offLineMode) {
-                if (!juststate) {
-                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500, function(percentage) {
                         sensor.state = Math.round(percentage * 5);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state / 5;
                     });
-                }
             } else {
                 removeSlider(sensor);
             }
@@ -1369,15 +1497,29 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
+            if (sensor.state > 50) {
+                sensor.img2 = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+
+                var opacity = (sensor.state - 50) * 0.02;
+                sensor.img2.attr({"opacity": opacity * .80 });
+            }
+            else {
+                sensor.img2 = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+
+                var opacity = (50 - sensor.state) * 0.02;
+                sensor.img2.attr({"opacity": opacity * .80 });
+            }
+
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
             if (!context.autoGrading && context.offLineMode) {
-                if (!juststate) {
-                    setSlider(sensor, imgx, imgy, imgw, imgh, function(percentage) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
                         sensor.state = Math.round(percentage);
                 
                         drawSensor(sensor, sensor.state, true);
+                    },
+                    function(state) {
+                        return sensor.state;
                     });
-                }
             } else {
                 removeSlider(sensor);
             }
@@ -2090,3 +2232,46 @@ if (window.quickAlgoLibraries) {
     if (!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
     window.quickAlgoLibrariesList.push(['quickpi', getContext]);
 }
+
+var sensorWithSlider = null;
+
+window.addEventListener('click',function(e)
+{
+    var keep = false;
+    e = e || window.event;
+    var target = e.target || e.srcElement;
+
+    if (!sensorWithSlider)
+        return;
+
+    if (sensorWithSlider && sensorWithSlider.focusrect && target == sensorWithSlider.focusrect.node)
+        keep = true;
+
+    if (sensorWithSlider && sensorWithSlider.slider) {
+        sensorWithSlider.slider.forEach(function(element) {
+                if (target == element.node ||
+                    target.parentNode == element.node) {
+                    keep = true;
+                    return false;
+                }
+        });
+
+    }
+
+    if (!keep) {
+        hideSlider(sensorWithSlider);
+    }
+
+}, false);//<-- we'll get to the false in a minute
+
+
+function hideSlider(sensor) {
+    if (!sensor)
+        return;
+
+    if (sensor.slider)
+        sensor.slider.remove();
+    
+    if (sensor.focusrect)
+        sensor.focusrect.toFront();
+};
