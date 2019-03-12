@@ -1545,7 +1545,39 @@ button.showLongIntro .icon, button.videoBtn .icon {
   background-color: transparent;
   box-shadow: none;
 }
-
+/* QuickPi */
+.piui #introControls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap-reverse;
+  margin-bottom: -10px;
+}
+.piui #introControls .showLongIntro {
+  align-self: flex-end;
+  margin-bottom: 10px;
+}
+#piui > * {
+  margin-bottom: 10px;
+}
+#piui .btn {
+  color: #fff;
+  background: #4a90e2;
+  border: none;
+  border-radius: 50px;
+  box-shadow: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 12px;
+}
+#piui .btn span + span {
+  padding-left: 10px;
+}
+.btn#piconnect {
+  background-color: #f5a623;
+}
 /************************
   MODAL POPUPS
 *************************/

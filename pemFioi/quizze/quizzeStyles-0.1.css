@@ -135,7 +135,9 @@ answer .answer-code::before {
 answer.selected .answer-code::before {
   content: "\f00c";
 }
-
+answer.mistake {
+  background: red;
+}
 /*
 *
 * QUESTION HORIZONTAL LAYOUT: TYPE SINGLE ANSWERS
