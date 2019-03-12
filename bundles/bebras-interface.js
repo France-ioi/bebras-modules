@@ -1208,7 +1208,7 @@ window.displayHelper = {
       }
 
       // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../modules/img/';
+      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
       if(mode == 'lock') {
          var buttonYes = '';
       } else if (mode == 'input') {
@@ -2729,7 +2729,7 @@ function fillImages(text, images, res) {
          'header' : '\
             <div id="miniPlatformHeader">\
                <table>\
-                  <td><img src="../../modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="../../../_common/modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -2739,7 +2739,7 @@ function fillImages(text, images, res) {
          'header' : '\
             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="../../modules/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="../../../_common/modules/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
@@ -3009,7 +3009,7 @@ $(document).ready(function() {
    }
    if (!hasPlatform) {
     $('head').append('<link rel="stylesheet"type="text/css" \
-    href="../../modules//integrationAPI.01/official/miniPlatform.css">');
+    href="../../../_common/modules/integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
          window.task_token = new TaskToken({
             id: taskMetaData.id,
