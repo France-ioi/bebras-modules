@@ -438,3 +438,11 @@ button,
   font-weight: 900;
   margin-right: 10px;
 }
+
+
+.btn-validate {
+  cursor: pointer;
+  display: block;
+  margin: 40px auto;
+  background-color: #4a90e2;
+}
