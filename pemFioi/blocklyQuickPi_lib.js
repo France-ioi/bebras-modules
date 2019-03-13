@@ -483,6 +483,12 @@ var getContext = function (display, infos, curLevel) {
                     <div class="exit" id="picancel"><span class="icon fas fa-times"></span></div>
                 </div>
                 <div class="panel-body">
+                    <div>
+                        <input id="piconwifi" type="radio" name="piconmethod" checked>WiFi
+                        <input id="piconusb" type="radio" name="piconmethod" >USB
+                        <input id="piconbt" type="radio" name="piconmethod" >Bluetooth 
+                    </div>
+
                     <div class="form-group">
                         <label>School key:</label>
                         <input id="schoolkey" type='text'>
@@ -490,7 +496,7 @@ var getContext = function (display, infos, curLevel) {
                     <div class="form-group">
                         <label>Sélectionnez un appareil à connecter dans la liste suivante</label>
                         <div class="input-group">
-                            <div class="input-group-prepend"><button id=pigetlist>Get list</button></div>
+                            <div class="input-group-prepend"><button id=pigetlist disabled>Get list</button></div>
                             <select id="pilist" class="custom-select" disabled>
                             </select>
                         </div>
@@ -506,7 +512,6 @@ var getContext = function (display, infos, curLevel) {
                     </div>
                 </div>
             </div>
-
             `);
 
             if (context.offLineMode) {
@@ -559,7 +564,6 @@ var getContext = function (display, infos, curLevel) {
                     $('#pigetlist').attr("disabled", false);
                 else
                     $('#pigetlist').attr("disabled", true);
-
             });
 
 
@@ -574,6 +578,34 @@ var getContext = function (display, infos, curLevel) {
                         populatePiList(jsonlist);
                     });
             });
+
+
+            $('#piconwifi').on('change', function (e) {
+                $('#schoolkey').attr("disabled", false);
+                $('#pigetlist').attr("disabled", false);
+                $('#pilist').attr("disabled", false);
+                $('#piaddress').attr("disabled", false);
+            });
+
+            $('#piconusb').on('change', function (e) {
+                $('#schoolkey').attr("disabled", true);
+                $('#pigetlist').attr("disabled", true);
+                $('#pilist').attr("disabled", true);
+                $('#piaddress').attr("disabled", true);
+
+                $('#piaddress').val("192.168.233.1");
+            });
+
+            $('#piconbt').on('change', function (e) {
+                $('#schoolkey').attr("disabled", true);
+                $('#pigetlist').attr("disabled", true);
+                $('#pilist').attr("disabled", true);
+                $('#piaddress').attr("disabled", true);
+
+                $('#piaddress').val("192.168.233.2");
+            });
+
+
 
             function populatePiList(jsonlist) {
                 sessionStorage.pilist = JSON.stringify(jsonlist);
