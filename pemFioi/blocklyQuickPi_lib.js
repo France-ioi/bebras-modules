@@ -1,5 +1,7 @@
 ﻿//"use strict";
 
+preloadedimages = {}
+
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
     // Local language strings for each language
@@ -1161,6 +1163,15 @@ var getContext = function (display, infos, curLevel) {
         window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
     }
 
+    function preloadImage(path)
+    {
+        if (!preloadedimages[path])
+        {
+            new Image().src = path;
+            preloadedimages[path] = true;
+        }
+    }
+
     function drawSensor(sensor, state = true, juststate = false) {
         if (paper == undefined || !context.display)
             return;
@@ -1191,11 +1202,13 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 sensor.img = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('ledoff.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.img = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('ledon.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -1219,11 +1232,13 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 sensor.img = paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
-
+                preloadImage(getImg('buttonoff.png'))
+                
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.img = paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('buttonon.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -1499,12 +1514,14 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state > 50) {
                 sensor.img2 = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('light-moon.png'))
 
                 var opacity = (sensor.state - 50) * 0.02;
                 sensor.img2.attr({"opacity": opacity * .80 });
             }
             else {
                 sensor.img2 = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('light-sun.png'))
 
                 var opacity = (50 - sensor.state) * 0.02;
                 sensor.img2.attr({"opacity": opacity * .80 });
