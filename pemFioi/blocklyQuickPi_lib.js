@@ -127,9 +127,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    var pythonLibPath = (window.modulesPath ? window.modulesPath : '../../modules/') + 'ext/quickpi/quickpilib.py';
-
-    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, pythonLibPath);
+    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
     var orange = false;
     var paper;
     context.offLineMode = true;
