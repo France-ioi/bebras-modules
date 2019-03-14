@@ -169,7 +169,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.reset = function (taskInfos) {
         if (!context.offLineMode) {
-            $('#piinstallcheck').show();
+            $('#piinstallcheck').hide();
             context.quickPiConnection.startNewSession();
         }
 
@@ -1344,18 +1344,15 @@ var getContext = function (display, infos, curLevel) {
                if (sensor.stateText)
                     sensor.stateText.remove();
 
-
-                if (sensor.uparrow)
-                    sensor.uparrow.remove();
-
-                if (sensor.downarrow)
-                    sensor.downarrow.remove();
+                if (sensor.img3)
+                    sensor.img3.remove();
 
                 if (sensor.state == null)
                     sensor.state = 25; // FIXME
 
                 sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
                 sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
+                sensor.img3= paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
 
                 var scale = imgh / 60;
 
