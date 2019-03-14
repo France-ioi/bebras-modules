@@ -269,6 +269,19 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    this.circleAttr = circleAttr;
    this.lineAttr = lineAttr;
    this.edgeLabelAttr;
+   this.vertexLabelAttr = {
+      "font-size": 15,
+      "font-family": "sans-serif"
+   };
+   this.edgeLabelAttr = {
+      "font-size": 15,
+      "font-family": "sans-serif"
+   };
+   this.edgeClickAreaAttr = {
+      "stroke-width": 10,
+      "stroke": "red",
+      "opacity": 0
+   };
    this.init = function(paper, graph, visualGraph) {
       this.paper = paper;
       this.graph = graph;
@@ -279,14 +292,29 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    this.drawVertex = function(id, info, visualInfo) {
       var pos = this._getVertexPosition(visualInfo);
       this.originalPositions[id] = pos;
-
-      var result = [this.paper.circle(pos.x, pos.y).attr(this.circleAttr)];
+      var label = (info.label) ? info.label : "";
+      var node = this.paper.circle(pos.x, pos.y).attr(this.circleAttr);
+      var labelRaph = this.paper.text(pos.x,pos.y,label).attr(this.vertexLabelAttr);
+      if(info.terminal){
+         var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r - 3);
+         var result = [node,labelRaph,terminalCircle];
+         this._addCustomElements(id, [labelRaph,terminalCircle]);
+      }else{
+         var result = [node,labelRaph];
+         this._addCustomElements(id, [labelRaph]);
+      }
       if(vertexDrawer) {
          var raphaels = vertexDrawer(id, info, pos.x, pos.y);
          this._addCustomElements(id, raphaels);
          result = result.concat(raphaels);
       }
       return result;
+   };
+   this.updateVertex = function(id) {
+      var info = this.graph.getVertexInfo(id);
+      var visualInfo = this.visualGraph.getVertexVisualInfo(id);
+      this.visualGraph._eraseVertex(id);
+      this.drawVertex(id,info,visualInfo);
    };
    this.setDrawVertex = function(fct) {
       this.drawVertex = fct;
@@ -297,8 +325,13 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          return [this.paper.path(path).attr(this.lineAttr).toBack(), this.paper.path(path).attr(innerLineAttr)];
       }
       else {
-         var path = this.paper.path(this._getEdgePath(vertex1, vertex2)).attr(this.lineAttr).toBack();
-         return [path];
+         var clickArea = this.paper.path(this._getEdgePath(vertex1, vertex2, id)).attr(this.edgeClickAreaAttr).toBack();
+         var path = this.paper.path(this._getEdgePath(vertex1, vertex2, id)).attr(this.lineAttr).toBack();
+         var info = this.graph.getEdgeInfo(id);
+         var labelText = info.label || "";
+         var labelPos = this.getLabelPos(id, vertex1, vertex2);
+         var label = this.paper.text(labelPos.x,labelPos.y,labelText).attr(this.edgeLabelAttr);
+         return [clickArea,path,label];
       }
    };
    this.setDrawEdge = function(fct) {
@@ -376,28 +409,41 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.refreshEdgePosition = function(vertex1, vertex2) {
-      var edges = this.graph.getEdgesFrom(vertex1, vertex2);
+      // if(vertex1 !== null && vertex2 !== null){
+         var edges = this.graph.getEdgesFrom(vertex1, vertex2);
+      // }else{
+      //    var edges = [edgeID];
+      // }
+      
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
       var newPath;
-      if(thickMode) {
-         newPath = this._getThickEdgePath(vertex1, vertex2);
-      }
-      else {
-         newPath = this._getEdgePath(vertex1, vertex2);
-      }
+      
       for(var iEdge in edges) {
          var edgeID = edges[iEdge];
          var raphaels = this.visualGraph.getRaphaelsFromID(edgeID);
+         if(thickMode) {
+            newPath = this._getThickEdgePath(vertex1, vertex2);
+         }
+         else {
+            newPath = this._getEdgePath(vertex1, vertex2, edgeID);
+         }
          raphaels[0].attr("path", newPath);
+         raphaels[1].attr("path", newPath);
+         var info = this.graph.getEdgeInfo(edgeID);
+         var labelText = info.label || "";
+         var labelPos = this.getLabelPos(edgeID, vertex1, vertex2);
+         raphaels[2].attr({x:labelPos.x,y:labelPos.y,text:labelText});
          if(thickMode) {
             raphaels[1].attr("path", newPath);
          }
       }
    };
-   this._getEdgePath = function(vertex1, vertex2) {
-      if(this.lineAttr["radius-ratio"] || vertex1 === vertex2){
-         return  this._getCurvedEdgePath(vertex1,vertex2);
+   this._getEdgePath = function(vertex1, vertex2, edgeID) {
+      var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
+      // console.log(edgeVisualInfo);
+      if(edgeVisualInfo["radius-ratio"] || vertex1 === vertex2){
+         return  this._getCurvedEdgePath(vertex1,vertex2,edgeID);
       }
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
@@ -450,15 +496,16 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return ["M", x1, y1, "L", x2, y2];
    };
    
-   this._getCurvedEdgePath = function(vertex1,vertex2) {
+   this._getCurvedEdgePath = function(vertex1,vertex2,edgeID) {
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
+      var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
       var x1 = info1.x, y1 = info1.y, x2 = info2.x, y2 = info2.y;
       var r = this.circleAttr.r;
       var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
-      var R = D*this.lineAttr["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
-      var s = this.lineAttr.sweep || 0;  // sweep flag
-      var l = this.lineAttr["large-arc"] || 0;  // large arc flag  
+      var R = D*edgeVisualInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
+      var s = edgeVisualInfo.sweep || 0;  // sweep flag
+      var l = edgeVisualInfo["large-arc"] || 0;  // large arc flag  
 
       /* Calculation of the coordinates of the target point at the surface of the target vertex */
       var angle = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));
@@ -477,13 +524,15 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          
          var y3 = A*x3 + B;
       }else if(vertex1 === vertex2){
-         angle = this.lineAttr.angle || 0;
-         R = (this.lineAttr["radius-ratio"]) ? this.lineAttr["radius-ratio"]*r : 1.5*r;
+         angle = edgeVisualInfo.angle || 0;
+         R = (edgeVisualInfo["radius-ratio"]) ? edgeVisualInfo["radius-ratio"]*r : 1.5*r;
          x1 = x2 + r*Math.sin(Math.PI*angle/180);
          y1 = y2 + r*Math.cos(Math.PI*angle/180);
          var x3 = x2 - r*Math.sin(Math.PI*angle/180);
          var y3 = y2 - r*Math.cos(Math.PI*angle/180);
          l = 1;
+         edgeVisualInfo.angle = angle;
+         edgeVisualInfo["radius-ratio"] = R/r;
       }else if(y1 === y2){
          var x3 = (x1*x1 + r*r - x2*x2 - Math.pow((r*Math.sin(angle)),2) - Math.pow((D - r*Math.cos(angle)),2))/(2*(x1-x2));
          var a = 1;
@@ -508,7 +557,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var x3 = (s) ? (-b + Math.sqrt(delta))/(2*a) : (-b - Math.sqrt(delta))/(2*a);
          }
       }
-
       return [ "M", x1, y1, "A", R, R, 0, l, s, x3, y3 ]; 
    };
 
@@ -517,6 +565,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    this.setLineAttr = function(lineAttr) {
       this.lineAttr = lineAttr;
+   };
+   this.setVertexLabelAttr = function(attr) {
+      this.vertexLabelAttr = attr;
    };
    this.reapplyAttr = function() {
       var vertices = this.graph.getAllVertices();
@@ -543,35 +594,193 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return distanceFromCenter - this.circleAttr.r;
    };
    this.getDistanceFromEdge = function(id, xPos, yPos) {
-      var edgePath = this.visualGraph.getRaphaelsFromID(id)[0].attrs.path;
-      var x1, y1, x2, y2;
-      // In modern browsers the path is an array and we can get the endpoints
-      // directly. In old browsers it may be a comma separated string.
-      if($.isArray(edgePath)) {
-         if($.isArray(edgePath[0])) {
-            // Path a 2D array: [["M", x1, y1], ["L", x2, y2]]
-            x1 = parseInt(edgePath[0][1]);
-            y1 = parseInt(edgePath[0][2]);
-            x2 = parseInt(edgePath[1][1]);
-            y2 = parseInt(edgePath[1][2]);
+      var vInfo = this.visualGraph.getEdgeVisualInfo(id);
+      if(vInfo["radius-ratio"]){    // if curved edge
+         var vertices = this.graph.getEdgeVertices(id);
+         if(vertices[0] === vertices[1]){    // if loop
+            var R = vInfo["radius-ratio"]*this.circleAttr.r;
+            var angle = vInfo["angle"] || 0;
+            var vertexVisualInfo = this.visualGraph.getVertexVisualInfo(vertices[0]);
+            var xc = vertexVisualInfo.x + R*Math.cos(angle*Math.PI/180);
+            var yc = vertexVisualInfo.y - R*Math.sin(angle*Math.PI/180);
+         }else{
+            var vertex1Pos = this.visualGraph.getVertexVisualInfo(vertices[0]);
+            var vertex2Pos = this.visualGraph.getVertexVisualInfo(vertices[1]);
+            var x1 = vertex1Pos.x;
+            var y1 = vertex1Pos.y;
+            var x2 = vertex2Pos.x;
+            var y2 = vertex2Pos.y;
+            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+            var R = vInfo["radius-ratio"]*D;
+            var s = vInfo.sweep || 0;
+            var l = vInfo["large-arc"] || 0;
+            var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+            var xc = cPos.x;
+            var yc = cPos.y;
+         }
+         var distFromCenter = Math.sqrt(Math.pow((xPos - xc),2) + Math.pow((yPos - yc),2));
+         return Math.abs(distFromCenter - R);  
+      }else{
+         var edgePath = this.visualGraph.getRaphaelsFromID(id)[0].attrs.path;
+         var x1, y1, x2, y2;
+         // In modern browsers the path is an array and we can get the endpoints
+         // directly. In old browsers it may be a comma separated string.
+         if($.isArray(edgePath)) {
+            if($.isArray(edgePath[0])) {
+               // Path a 2D array: [["M", x1, y1], ["L", x2, y2]]
+               x1 = parseInt(edgePath[0][1]);
+               y1 = parseInt(edgePath[0][2]);
+               x2 = parseInt(edgePath[1][1]);
+               y2 = parseInt(edgePath[1][2]);
+            }
+            else {
+               // Path is an array: ["M", x1, y1, "L", x2, y2]
+               x1 = parseInt(edgePath[1]);
+               y1 = parseInt(edgePath[2]);
+               x2 = parseInt(edgePath[4]);
+               y2 = parseInt(edgePath[5]);
+            }
          }
          else {
-            // Path is an array: ["M", x1, y1, "L", x2, y2]
-            x1 = parseInt(edgePath[1]);
-            y1 = parseInt(edgePath[2]);
-            x2 = parseInt(edgePath[4]);
-            y2 = parseInt(edgePath[5]);
+            // Path is a string: "M,x1,y1,L,x2,y2"
+            var parts = edgePath.split(",");
+            x1 = parseInt(parts[1]);
+            y1 = parseInt(parts[2]);
+            x2 = parseInt(parts[4]);
+            y2 = parseInt(parts[5]);
+         }
+         return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2));
+      }
+   };
+
+   this.getLabelPos = function(edgeID,vertex1,vertex2) {
+      if(!vertex1 || !vertex2){
+         var edgeVertices = this.graph.getEdgeVertices(edgeID);
+         vertex1 = edgeVertices[0];
+         vertex2 = edgeVertices[1];
+      }
+      var info = this.graph.getEdgeInfo(edgeID);
+      var vInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
+      var vertex1Pos = this.visualGraph.getVertexVisualInfo(vertex1);
+      var vertex2Pos = this.visualGraph.getVertexVisualInfo(vertex2);
+      var x1 = vertex1Pos.x;
+      var y1 = vertex1Pos.y;
+      var x2 = vertex2Pos.x;
+      var y2 = vertex2Pos.y;
+
+      var label = info.label || "";
+      var labelW = label.length * this.edgeLabelAttr["font-size"];
+      var labelH = this.edgeLabelAttr["font-size"];
+      var margin = 10;
+      var angle;
+      if(x1 === x2){
+         if(y1 > y2){
+            angle = Math.PI/2;
+         }else{
+            angle = -Math.PI/2;
+         }
+      }else{
+         angle = Math.atan((y2 - y1)/(x2 - x1));
+      }
+      if(vInfo["radius-ratio"] || vertex1 ===  vertex2){ // if curved edge
+         if(vertex1 === vertex2){
+            angle = vInfo.angle*Math.PI/180 || 0;
+            var R = this.circleAttr.r*vInfo["radius-ratio"];
+            var xm = x1 + 2*R*Math.cos(angle);
+            var ym = y1 - 2*R*Math.sin(angle);
+            // if(x1 < x2){
+               var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
+               var y = ym + (labelH/2)*Math.cos(angle + Math.PI/2);
+            // }else{
+            //    var x = xm + (labelW/2)*Math.sin(angle);
+            //    var y = ym - (labelH/2 + margin)*Math.cos(angle);
+            // }
+         }else{
+            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+            var R = D*vInfo["radius-ratio"];
+            var s = vInfo["sweep"] || 0;
+            var l = vInfo["large-arc"] || 0;
+            var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+            if(x2 > x1){
+               var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
+               var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
+            }else{
+               var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
+               var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
+            }
+            
+            if(x1 < x2){
+               var x = (s) ? xm + (labelW/2)*Math.sin(angle) : xm - (labelW/2)*Math.sin(angle);
+               var y = (s) ? ym - (labelH/2 + margin)*Math.cos(angle) : ym + (labelH/2 + margin)*Math.cos(angle);
+            }else{
+               var x = (s) ? xm - (labelW/2)*Math.sin(angle) : xm + (labelW/2)*Math.sin(angle);
+               var y = (s) ? ym + (labelH/2 + margin)*Math.cos(angle) : ym - (labelH/2 + margin)*Math.cos(angle);
+            }
+         }
+      }else{
+         var xm = (x2 + x1)/2;
+         var ym = (y2 + y1)/2;
+         if(x1 < x2){
+            var x = xm - (labelW/2)*Math.sin(angle);
+            var y = ym + (labelH/2 + margin)*Math.cos(angle);
+         }else{
+            var x = xm + (labelW/2)*Math.sin(angle);
+            var y = ym - (labelH/2 + margin)*Math.cos(angle);
+         }
+         
+      }
+      return {x:x,y:y};
+   };
+
+   this.getCenterPosition = function(R,s,l,vInfo1,vInfo2) {
+      var x1 = vInfo1.x, y1 = vInfo1.y;
+      var x2 = vInfo2.x, y2 = vInfo2.y;
+      
+      if(y1 !== y2){
+         // parameters of the bisection
+         var A = (x1 - x2)/(y2 - y1);
+         var B = (x2*x2 + y2*y2 - x1*x1 - y1*y1)/(2*(y2 - y1));
+
+         var a = 1 + A*A;
+         var b = 2*(A*B - A*y2 - x2);
+         var c = x2*x2 + y2*y2 + B*B - 2*y2*B - R*R;
+         var delta = b*b - 4*a*c;
+         if(y1 > y2){
+            if(s){
+               var xc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
+            }else{
+               var xc = (l) ? (-b + Math.sqrt(delta))/(2*a) : (-b - Math.sqrt(delta))/(2*a);
+            }
+         }else{
+            if(s){
+               var xc = (l) ? (-b + Math.sqrt(delta))/(2*a) : (-b - Math.sqrt(delta))/(2*a);
+            }else{
+               var xc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
+            }
+         }
+         var yc = A*xc + B;
+      }else{
+         var xc = (x1 + x2)/2;
+
+         var a = 1;
+         var b = -2*y1;
+         var c = y1*y1 + xc*xc + x1*x1 - 2*xc*x1 - R*R;
+         var delta = b*b - 4*a*c;
+         if(x1 < x2){
+            if(s){
+               var yc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
+            }else{
+               var yc = (l) ? (-b + Math.sqrt(delta))/(2*a) : (-b - Math.sqrt(delta))/(2*a);
+            }
+         }else{
+            if(s){
+               var yc = (l) ? (-b + Math.sqrt(delta))/(2*a) : (-b - Math.sqrt(delta))/(2*a);
+            }else{
+               var yc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
+            }
          }
       }
-      else {
-         // Path is a string: "M,x1,y1,L,x2,y2"
-         var parts = edgePath.split(",");
-         x1 = parseInt(parts[1]);
-         y1 = parseInt(parts[2]);
-         x2 = parseInt(parts[4]);
-         y2 = parseInt(parts[5]);
-      }
-      return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2));
+      return {x:xc,y:yc};
    };
 
    function distanceSquared(x1, y1, x2, y2) {
