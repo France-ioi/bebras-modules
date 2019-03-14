@@ -902,7 +902,6 @@ function ArcDragger(settings) {
       }
       
       self.startAngle = self.visualGraph.getEdgeVisualInfo(self.elementID).angle || 0;
-      // console.log(self.startAngle);
 
       self.edgeVertices = self.graph.getEdgeVertices(self.elementID);
       for(var iVertex = 0; iVertex < self.edgeVertices.length; iVertex++){
@@ -950,8 +949,10 @@ function ArcDragger(settings) {
          vInfo["radius-ratio"] = 1.5;
          if(x0 === self.edgeVerticesPos[0].x){
             var angle1 = (y0 < self.edgeVerticesPos[0].y) ? -90 : 90;
-         }else{
+         }else if(x0 > self.edgeVerticesPos[0].x){
             var angle1 = Math.atan((y0 - self.edgeVerticesPos[0].y)/(x0 - self.edgeVerticesPos[0].x))*180/Math.PI;
+         }else{
+            var angle1 = Math.atan((y0 - self.edgeVerticesPos[0].y)/(x0 - self.edgeVerticesPos[0].x))*180/Math.PI + 180;
          }
          if(xMouse === self.edgeVerticesPos[0].x){
             var angle2 = (yMouse < self.edgeVerticesPos[0].y) ? -90 : 90;
