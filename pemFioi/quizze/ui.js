@@ -63,14 +63,16 @@ function QuizzeUI(params) {
     params.parent.find('question').each(function() {
         var question = $(this);
         var answers = question.find('answer');
-        answers.each(function(i) {
-            var answer = $(this);
-            var html = answer_tpl;
-            html = html
-                .replace('%%LABEL%%', answer.html())
-                .replace('%%CODE%%', String.fromCharCode(i + 65));
-            answer.html(html)
-        });
+        if (question.attr("type") !== "input") {
+            answers.each(function(i) {
+                var answer = $(this);
+                var html = answer_tpl;
+                html = html
+                    .replace('%%LABEL%%', answer.html())
+                    .replace('%%CODE%%', String.fromCharCode(i + 65));
+                answer.html(html)
+            });
+        }
         answers.wrapAll('<div class="answers"></div>');
     })
 
