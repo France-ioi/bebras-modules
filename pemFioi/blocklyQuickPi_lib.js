@@ -1,5 +1,7 @@
 ﻿//"use strict";
 
+preloadedimages = {}
+
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
     // Local language strings for each language
@@ -125,9 +127,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    var pythonLibPath = (window.modulesPath ? window.modulesPath : '../../modules/') + 'ext/quickpi/quickpilib.py';
-
-    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, pythonLibPath);
+    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
     var orange = false;
     var paper;
     context.offLineMode = true;
@@ -169,7 +169,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.reset = function (taskInfos) {
         if (!context.offLineMode) {
-            $('#piinstallcheck').show();
+            $('#piinstallcheck').hide();
             context.quickPiConnection.startNewSession();
         }
 
@@ -483,6 +483,12 @@ var getContext = function (display, infos, curLevel) {
                     <div class="exit" id="picancel"><span class="icon fas fa-times"></span></div>
                 </div>
                 <div class="panel-body">
+                    <div>
+                        <input id="piconwifi" type="radio" name="piconmethod" checked>WiFi
+                        <input id="piconusb" type="radio" name="piconmethod" >USB
+                        <input id="piconbt" type="radio" name="piconmethod" >Bluetooth 
+                    </div>
+
                     <div class="form-group">
                         <label>School key:</label>
                         <input id="schoolkey" type='text'>
@@ -490,7 +496,7 @@ var getContext = function (display, infos, curLevel) {
                     <div class="form-group">
                         <label>Sélectionnez un appareil à connecter dans la liste suivante</label>
                         <div class="input-group">
-                            <div class="input-group-prepend"><button id=pigetlist>Get list</button></div>
+                            <div class="input-group-prepend"><button id=pigetlist disabled>Get list</button></div>
                             <select id="pilist" class="custom-select" disabled>
                             </select>
                         </div>
@@ -506,7 +512,6 @@ var getContext = function (display, infos, curLevel) {
                     </div>
                 </div>
             </div>
-
             `);
 
             if (context.offLineMode) {
@@ -559,7 +564,6 @@ var getContext = function (display, infos, curLevel) {
                     $('#pigetlist').attr("disabled", false);
                 else
                     $('#pigetlist').attr("disabled", true);
-
             });
 
 
@@ -574,6 +578,34 @@ var getContext = function (display, infos, curLevel) {
                         populatePiList(jsonlist);
                     });
             });
+
+
+            $('#piconwifi').on('change', function (e) {
+                $('#schoolkey').attr("disabled", false);
+                $('#pigetlist').attr("disabled", false);
+                $('#pilist').attr("disabled", false);
+                $('#piaddress').attr("disabled", false);
+            });
+
+            $('#piconusb').on('change', function (e) {
+                $('#schoolkey').attr("disabled", true);
+                $('#pigetlist').attr("disabled", true);
+                $('#pilist').attr("disabled", true);
+                $('#piaddress').attr("disabled", true);
+
+                $('#piaddress').val("192.168.233.1");
+            });
+
+            $('#piconbt').on('change', function (e) {
+                $('#schoolkey').attr("disabled", true);
+                $('#pigetlist').attr("disabled", true);
+                $('#pilist').attr("disabled", true);
+                $('#piaddress').attr("disabled", true);
+
+                $('#piaddress').val("192.168.233.2");
+            });
+
+
 
             function populatePiList(jsonlist) {
                 sessionStorage.pilist = JSON.stringify(jsonlist);
@@ -1161,6 +1193,15 @@ var getContext = function (display, infos, curLevel) {
         window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
     }
 
+    function preloadImage(path)
+    {
+        if (!preloadedimages[path])
+        {
+            new Image().src = path;
+            preloadedimages[path] = true;
+        }
+    }
+
     function drawSensor(sensor, state = true, juststate = false) {
         if (paper == undefined || !context.display)
             return;
@@ -1191,11 +1232,13 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 sensor.img = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('ledoff.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.img = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('ledon.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -1219,11 +1262,13 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 sensor.img = paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
-
+                preloadImage(getImg('buttonoff.png'))
+                
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.img = paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('buttonon.png'))
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
@@ -1299,18 +1344,15 @@ var getContext = function (display, infos, curLevel) {
                if (sensor.stateText)
                     sensor.stateText.remove();
 
-
-                if (sensor.uparrow)
-                    sensor.uparrow.remove();
-
-                if (sensor.downarrow)
-                    sensor.downarrow.remove();
+                if (sensor.img3)
+                    sensor.img3.remove();
 
                 if (sensor.state == null)
                     sensor.state = 25; // FIXME
 
                 sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
                 sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
+                sensor.img3= paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
 
                 var scale = imgh / 60;
 
@@ -1499,12 +1541,14 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state > 50) {
                 sensor.img2 = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('light-moon.png'))
 
                 var opacity = (sensor.state - 50) * 0.02;
                 sensor.img2.attr({"opacity": opacity * .80 });
             }
             else {
                 sensor.img2 = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+                preloadImage(getImg('light-sun.png'))
 
                 var opacity = (50 - sensor.state) * 0.02;
                 sensor.img2.attr({"opacity": opacity * .80 });
