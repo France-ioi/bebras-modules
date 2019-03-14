@@ -72,6 +72,13 @@ var importableModules = function () {
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
+      // Quizze task
+      'quizze_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quizze/quizzeStyles-0.1.css", id: "quizze_styles"},
+      'quizze_ui': {src: modulesPath+"/pemFioi/quizze/ui.js", id: "quizze_ui"},
+      'quizze_task': {src: modulesPath+"/pemFioi/quizze/task.js", id: "quizze_task"},
+      'quizze_grader': {src: modulesPath+"/pemFioi/quizze/grader.js", id: "quizze_grader"},
+
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
