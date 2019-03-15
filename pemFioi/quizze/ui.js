@@ -166,21 +166,38 @@ function QuizzeUI(params) {
 
     function initQuestionInput(parent) {
 
-        var input = parent.find('answer').find('input');
+        var answer = parent.find('answer');
+        var input = $('<input type="text"/>');
 
-        var validator = input.attr('validator');
+        var format = answer.attr('format') || 'text';
+        var validator;
+        if(format == 'string') {
+            validator = '.+';
+        } else if(format == 'number') {
+            validator = '^[0-9\.]*$';
+        } else if(format == 'regexp') {
+            validator = answer.attr('validator');
+        }
         if(validator) {
             var reg = new RegExp(validator);
             input.on('change', function() {
-                parent.find('answer').removeClass('mistake');
+                answer.removeClass('mistake');
                 var el = $(this);
                 var valid = reg.test(el.val());
                 input.toggleClass('error', !valid);
-                var msg = input.closest('answer').find('.error-message');
-                !valid && !msg.length && input.closest('answer').append('<div class="error-message"><i class="fas fa-bell icon"></i>Wrong format</div>')
+                var msg = answer.find('.error-message');
+                !valid && !msg.length && answer.append(
+                    '<div class="error-message">' +
+                    '<i class="fas fa-bell icon"></i>' +
+                    lang.translate('error_' + format) +
+                    '</div>'
+                );
                 valid && msg && msg.remove();
             });
         }
+
+        input.attr('placeholder', lang.translate('placeholder_' + format));
+        answer.append(input);
 
         return {
             getAnswer: function() {
@@ -192,8 +209,8 @@ function QuizzeUI(params) {
             },
 
             showResult: function(mistakes) {
-                parent.find('answer').removeClass('correct mistake');
-                parent.find('answer').addClass(mistakes === null ? 'correct' : 'mistake');
+                answer.removeClass('correct mistake');
+                answer.addClass(mistakes === null ? 'correct' : 'mistake');
             }
         }
 
