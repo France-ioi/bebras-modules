@@ -1067,7 +1067,7 @@ function GraphEditor(settings) {
       fill: "white",
       "cursor": "pointer"
    };
-   var vertexAttr = settings.vertexAttr; 
+   // var vertexAttr = visualGraph.graphDrawer.circleAttr; 
    var vertexLabelAttr = settings.vertexLabelAttr || defaultVertexlabelAttr;
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
@@ -1110,7 +1110,8 @@ function GraphEditor(settings) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
       }else{
-         attr = vertexAttr;
+         // attr = vertexAttr;
+         attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
       if(visualGraph.getRaphaelsFromID(vertexId)[0]){
@@ -1144,7 +1145,7 @@ function GraphEditor(settings) {
 
    this.addPencil = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var pencilSize = 20;
       var pencilX = vertexPos.x - vertexRadius - 3*pencilSize/4;
       var pencilY = vertexPos.y - vertexRadius - 3*pencilSize/4;
@@ -1173,7 +1174,7 @@ function GraphEditor(settings) {
 
    this.addCross = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var crossSize = 20;
       var crossX = vertexPos.x + vertexRadius;
       var crossY = vertexPos.y - vertexRadius - 3*crossSize/4;
@@ -1233,7 +1234,7 @@ function GraphEditor(settings) {
 
    this.addTerminalIcon = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
       var X = vertexPos.x + vertexRadius;
       var Y = vertexPos.y + vertexRadius;
