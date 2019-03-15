@@ -1,11 +1,5 @@
 function QuizzeUI(params) {
 
-
-
-
-
-
-
     // sys utils
     function error(msg) {
         console.error('Quizze error: ' + msg);
