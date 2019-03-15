@@ -409,11 +409,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
    };
    this.refreshEdgePosition = function(vertex1, vertex2) {
-      // if(vertex1 !== null && vertex2 !== null){
-         var edges = this.graph.getEdgesFrom(vertex1, vertex2);
-      // }else{
-      //    var edges = [edgeID];
-      // }
+      var edges = this.graph.getEdgesFrom(vertex1, vertex2);
       
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
@@ -441,7 +437,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    this._getEdgePath = function(vertex1, vertex2, edgeID) {
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
-      // console.log(edgeVisualInfo);
+
       if(edgeVisualInfo["radius-ratio"] || vertex1 === vertex2){
          return  this._getCurvedEdgePath(vertex1,vertex2,edgeID);
       }
@@ -688,13 +684,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var R = this.circleAttr.r*vInfo["radius-ratio"];
             var xm = x1 + 2*R*Math.cos(angle);
             var ym = y1 - 2*R*Math.sin(angle);
-            // if(x1 < x2){
-               var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
-               var y = ym + (labelH/2)*Math.cos(angle + Math.PI/2);
-            // }else{
-            //    var x = xm + (labelW/2)*Math.sin(angle);
-            //    var y = ym - (labelH/2 + margin)*Math.cos(angle);
-            // }
+            var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
+            var y = ym + (labelH/2)*Math.cos(angle + Math.PI/2);
          }else{
             var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
             var R = D*vInfo["radius-ratio"];

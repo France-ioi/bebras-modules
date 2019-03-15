@@ -706,7 +706,6 @@ function VertexDragAndConnect(settings) {
    };
 
    function onFuzzyClick(elementType, id) {
-      // console.log(elementType);
       if(elementType === "edge") {
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
@@ -789,7 +788,7 @@ function VertexDragAndConnect(settings) {
          self.arcDragger.unselectAll();
       }
       // Click on background or on the selected vertex -  deselect it.
-      if(id === null){// || id === self.selectionParent) {
+      if(id === null){
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
          }
@@ -855,7 +854,7 @@ function ArcDragger(settings) {
    this.vertexThreshold = settings.vertexThreshold || this.visualGraph.graphDrawer.circleAttr.r;
    this.edgeThreshold = settings.edgeThreshold;// || this.visualGraph.graphDrawer.lineAttr["stroke-width"];
    /* for deselection */
-   this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, this.edgeThreshold, false);
+   // this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, this.edgeThreshold, false);
 
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -871,15 +870,11 @@ function ArcDragger(settings) {
       // this.fuzzyClicker.setEnabled(enabled);
    };
 
-   function onFuzzyClick(elementType, id) {
-      console.log(elementType);
-      // if(elementType !== "edge"){
-         // self.unselectAll();
-      // }
-   };
-
-   // this.clickHandler = function(id) {
-   //    console.log("youpi")
+   // function onFuzzyClick(elementType, id) {
+   //    console.log(elementType);
+   //    // if(elementType !== "edge"){
+   //       // self.unselectAll();
+   //    // }
    // };
 
    this.setOnEdgeSelect = function(fct) {
@@ -929,7 +924,6 @@ function ArcDragger(settings) {
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
          
-         // self.visualGraph.setEdgeVisualInfo(vInfo);
          self.onEdgeSelect(self.elementID,info.selected);
          if(!info.selected){
             self.elementID = null;
@@ -1048,11 +1042,8 @@ function GraphEditor(settings) {
    var paperId = settings.paperElementID;
    var graph = settings.graph;
    var visualGraph = settings.visualGraph;
-   // var graphMouse = settings.graphMouse;
-   // var dragThreshold = settings.dragThreshold;
    var onVertexSelect = settings.onVertexSelect;
    var onEdgeSelect = settings.onEdgeSelect;
-   // var onPairSelect = settings.onPairSelect;
    var callback = settings.callback || null;
    
    var defaultSelectedVertexAttr = {
@@ -1071,16 +1062,12 @@ function GraphEditor(settings) {
       "stroke": "none",
       "fill": "blue"
    };
-   // var crossAttr = {
-   //    "stroke": "none",
-   //    "fill": "red"
-   // };
    var overlayAttr = {
       opacity: 0,
       fill: "white",
       "cursor": "pointer"
    };
-   var vertexAttr = settings.vertexAttr; 
+   // var vertexAttr = visualGraph.graphDrawer.circleAttr; 
    var vertexLabelAttr = settings.vertexLabelAttr || defaultVertexlabelAttr;
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
@@ -1105,16 +1092,6 @@ function GraphEditor(settings) {
       callback: settings.callback,
       enabled: false
    });
-   // var edgeSelectorSettings = {
-   //    id: "EdgeSelector",
-   //    graph: graph,
-   //    visualGraph: visualGraph,  
-   //    graphMouse: settings.graphMouse,
-   //    onEdgeSelect: onEdgeSelect,
-   //    callback: settings.callback,
-   //    enabled: false
-   // };
-   // this.edgeSelector = new EdgeSelector(edgeSelectorSettings);
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1125,7 +1102,6 @@ function GraphEditor(settings) {
       self.vertexDragAndConnect.setEnabled(enabled);
       self.vertexCreator.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
-      // self.edgeSelector.setEnabled(enabled);
    };
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
@@ -1134,7 +1110,8 @@ function GraphEditor(settings) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
       }else{
-         attr = vertexAttr;
+         // attr = vertexAttr;
+         attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
       if(visualGraph.getRaphaelsFromID(vertexId)[0]){
@@ -1168,7 +1145,7 @@ function GraphEditor(settings) {
 
    this.addPencil = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var pencilSize = 20;
       var pencilX = vertexPos.x - vertexRadius - 3*pencilSize/4;
       var pencilY = vertexPos.y - vertexRadius - 3*pencilSize/4;
@@ -1197,7 +1174,7 @@ function GraphEditor(settings) {
 
    this.addCross = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var crossSize = 20;
       var crossX = vertexPos.x + vertexRadius;
       var crossY = vertexPos.y - vertexRadius - 3*crossSize/4;
@@ -1257,7 +1234,7 @@ function GraphEditor(settings) {
 
    this.addTerminalIcon = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = vertexAttr.r;
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
       var X = vertexPos.x + vertexRadius;
       var Y = vertexPos.y + vertexRadius;
@@ -1328,13 +1305,8 @@ function GraphEditor(settings) {
             var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
             var xm = x1 + 2*R*Math.cos(angle);
             var ym = y1 - 2*R*Math.sin(angle);
-            // if(x1 < x2){
-               var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
-               var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
-            // }else{
-            //    var x = xm + (labelW/2)*Math.sin(angle);
-            //    var y = ym - (labelH/2 + margin)*Math.cos(angle);
-            // }
+            var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
+            var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
          }else{
             var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
             var R = D*vInfo["radius-ratio"];
@@ -1369,8 +1341,6 @@ function GraphEditor(settings) {
             var x = xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
             var y = ym + (crossSize/2)*Math.cos(angle) - crossSize/2;
          }
-
-         
       }
       return {x:x,y:y};
    };
@@ -1490,7 +1460,6 @@ function GraphEditor(settings) {
          self.edgeTextEditor.remove();
       edgeRaph[2].attr("text",info.label);
       edgeRaph[2].show();
-      // self.arcDragger.unselectAll();
    };
 
    this.createVertex = function(x,y) {
