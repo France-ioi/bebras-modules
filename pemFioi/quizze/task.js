@@ -1,3 +1,38 @@
+var lang = {
+
+    default_language: 'en',
+    language: 'en',
+
+    strings: {
+        en: {
+            'score': 'Score',
+            'grader_msg': 'Your score is ',
+            'validate': 'Validate',
+            'placeholder_text': 'Enter text',
+            'placeholder_number': 'Enter number',
+            'error_number': 'Must be a number',
+            'placeholder_string': 'Enter string',
+            'error_string': 'Must be a string',
+            'placeholder_regexp': 'Enter text',
+            'error_regexp': 'Invalid format'
+        },
+        fr: {}
+    },
+
+    set: function(lng) {
+        this.language = lng;
+    },
+
+    translate: function(key) {
+        if(this.strings[this.language] && this.strings[this.language][key]) {
+            return this.strings[this.language][key];
+        }
+        return this.strings[this.default_language][key] || key;
+    }
+
+}
+
+
 var task_token = {
 
     token: null,
@@ -159,7 +194,7 @@ task.load = function(views, success) {
 
 
         function displayScore(score, max_score) {
-            var msg = 'Score <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
+            var msg = lang.translate('score') + ' <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
             if($('#score').length == 0) {
                 var div = '<div id="score"></div>';
                 $('.taskContent').first().append(div);
@@ -178,7 +213,7 @@ task.load = function(views, success) {
                 );
                 q.showResult(result.mistakes);
                 displayScore(final_score, taskParams.maxScore);
-                callback(final_score, 'Your score is ' + final_score, null);
+                callback(final_score, lang.translate('grader_msg') + final_score, null);
             }
             var token = task_token.get()
             if(token) {
@@ -202,7 +237,7 @@ task.load = function(views, success) {
             return [];
         }
 
-        var btn = $('<button class="btn btn-success btn-validate">Validate</button>');
+        var btn = $('<button class="btn btn-success btn-validate">' + lang.translate('validate') + '</button>');
         btn.on('click', function() {
             platform.validate('done');
         });
@@ -220,3 +255,5 @@ var grader = {
 if(window.platform) {
     platform.initWithTask(task);
 }
+
+lang.set(window.stringsLanguage)
