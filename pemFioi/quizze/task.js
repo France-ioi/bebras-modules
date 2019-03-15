@@ -62,25 +62,36 @@ $('solution').hide();
 $('#solution').hide();
 $('.grader').hide();
 
+
 // grade
+
 function useGraderData(url, answer, callback) {
     if(window.QuizzeGrader && window.QuizzeGrader.data) {
         callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
         return;
     }
-    $.getScript(url)
-        .done(function(script, textStatus ) {
-            try {
-                window.QuizzeGrader.data = eval(script)
 
-            } catch(e) {
-                console.error('Malformed grader data in ' + url);
-                return
+    function onLoad(script) {
+        try {
+            window.QuizzeGrader.data = eval(script)
+        } catch(e) {
+            console.error('Malformed grader data in ' + url);
+            return
+        }
+        callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
+    }
+
+    // $.getScript nor working over file: protocol
+    var req = new XMLHttpRequest();
+    req.open('GET', url, true);
+    req.onreadystatechange = function() {
+        if(req.readyState === 4) {
+            if(req.status === 200 || req.status == 0) {
+                onLoad(req.responseText)
             }
-            callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
-        }).fail(function( jqxhr, settings, exception ) {
-            console.error('Can\'t load grader data: ' + url);
-        });
+        }
+    }
+    req.send(null);
 }
 
 
@@ -114,11 +125,12 @@ task.load = function(views, success) {
     task_token.init()
 
     platform.getTaskParams(null, null, function(taskParams) {
+        var random = parseInt(taskParams.randomSeed, 10) || 0
         var q = QuizzeUI({
             parent: $('#task'),
-            shuffle_questions: 0, //true,
-            shuffle_answers: 0, //true,
-            random: parseInt(taskParams.randomSeed, 10) || 0
+            shuffle_questions: random > 0, // in dev mode always 0 here and shuffle disabled
+            shuffle_answers: random > 0,
+            random: random
         });
 
 
