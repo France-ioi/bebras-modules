@@ -136,7 +136,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndCondition = function (context, lastTurn) {
 
         if (!context.display && !context.autoGrading) {
-            context.success = false;
+            context.success = true;
             throw "Manual test validated automatically.";
         }
 
@@ -149,6 +149,11 @@ var getContext = function (display, infos, curLevel) {
                         if (!state.hit) {
                             context.success = false;
                             throw ("Failed");
+                        } else if (lastTurn)
+                        {
+                            context.success = true;
+                            throw ("programme terminé");
+
                         }
                     }
                     else
@@ -484,17 +489,19 @@ var getContext = function (display, infos, curLevel) {
                 </div>
                 <div class="panel-body">
                     <div>
-                        <input id="piconwifi" type="radio" name="piconmethod" checked>WiFi
-                        <input id="piconusb" type="radio" name="piconmethod" >USB
-                        <input id="piconbt" type="radio" name="piconmethod" >Bluetooth 
+                    <ul>
+                        <li><a href="#" id="piconwifi">WiFi</a></li>
+                        <li><a href="#" id="piconusb">USB</a></li>
+                        <li><a href="#" id="piconbt">Bluetooth</a></li>
+                    </ul>
                     </div>
 
                     <div class="form-group">
-                        <label>School key:</label>
+                        <label id="pischoolkeylabel">School key:</label>
                         <input id="schoolkey" type='text'>
                     </div>
                     <div class="form-group">
-                        <label>Sélectionnez un appareil à connecter dans la liste suivante</label>
+                        <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
                         <div class="input-group">
                             <div class="input-group-prepend"><button id=pigetlist disabled>Get list</button></div>
                             <select id="pilist" class="custom-select" disabled>
@@ -502,7 +509,7 @@ var getContext = function (display, infos, curLevel) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>ou entrez son adesse IP</label>
+                        <label id="piiplabel">ou entrez son adesse IP</label>
                         <input id=piaddress type='text'> 
                     </div>
 
@@ -580,27 +587,42 @@ var getContext = function (display, infos, curLevel) {
             });
 
 
-            $('#piconwifi').on('change', function (e) {
-                $('#schoolkey').attr("disabled", false);
-                $('#pigetlist').attr("disabled", false);
-                $('#pilist').attr("disabled", false);
-                $('#piaddress').attr("disabled", false);
+            $('#piconwifi').click(function () {
+                $('#schoolkey').show();
+                $('#pigetlist').show();
+                $('#pilist').show();
+                $('#piaddress').show();
+
+                $('#piiplabel').show();
+                $('#pischoolkeylabel').show();
+                $('#pilistlabel').show();
+
             });
 
-            $('#piconusb').on('change', function (e) {
-                $('#schoolkey').attr("disabled", true);
-                $('#pigetlist').attr("disabled", true);
-                $('#pilist').attr("disabled", true);
-                $('#piaddress').attr("disabled", true);
+            $('#piconusb').click(function () {
+                $('#schoolkey').hide();
+                $('#pigetlist').hide();
+                $('#pilist').hide();
+                $('#piaddress').hide();
+                
+                $('#piiplabel').hide();
+                $('#pischoolkeylabel').hide();
+                $('#pilistlabel').hide();
+                
 
                 $('#piaddress').val("192.168.233.1");
             });
 
-            $('#piconbt').on('change', function (e) {
-                $('#schoolkey').attr("disabled", true);
-                $('#pigetlist').attr("disabled", true);
-                $('#pilist').attr("disabled", true);
-                $('#piaddress').attr("disabled", true);
+            $('#piconbt').click(function () {
+                $('#schoolkey').hide();
+                $('#pigetlist').hide();
+                $('#pilist').hide();
+                $('#piaddress').hide();
+
+                $('#piiplabel').hide();
+                $('#pischoolkeylabel').hide();
+                $('#pilistlabel').hide();
+
 
                 $('#piaddress').val("192.168.233.2");
             });
@@ -767,6 +789,13 @@ var getContext = function (display, infos, curLevel) {
 
         context.offLineMode = true;
 
+        if (context.quickPiConnection.wasLocked())
+        {
+            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
+        } else if (!context.releasing && !wasConnected) {
+            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
+        }
+
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
             context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
         } else {
@@ -775,12 +804,6 @@ var getContext = function (display, infos, curLevel) {
             context.resetDisplay();
         }
 
-        if (context.quickPiConnection.wasLocked())
-        {
-            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
-        } else if (!wasConnected) {
-            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
-        }
     }
 
 
@@ -821,21 +844,32 @@ var getContext = function (display, infos, curLevel) {
         if (paper == undefined || !context.display)
             return;
 
+        if (context.timelineText)
+            for (var i = 0; i < context.timelineText.length; i++) {
+                context.timelineText[i].remove();
+            }
+
+        context.timelineText = [];
+
         for (var i = 1000; i < context.maxTime; i += 1000) {
             var x = context.sensorSize + (i * context.pixelsPerTime);
 
-            paper.text(x + 5, paper.height - context.sensorSize / 2, (i / 1000) + "s");
+            var timelabel = paper.text(x + 5, paper.height - context.sensorSize / 2, (i / 1000));
 
-            paper.path(["M", x,
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+
+            context.timelineText.push(timelabel);
+
+            /*paper.path(["M", x,
                 paper.height - context.sensorSize / 2,
                 "L", x,
-                paper.height - context.sensorSize]);
+                paper.height - context.sensorSize]);*/
         }
-
+/*
         paper.path(["M", context.sensorSize,
             paper.height - context.sensorSize * 3 / 4,
             "L", paper.width,
-            paper.height - context.sensorSize * 3 / 4]);
+            paper.height - context.sensorSize * 3 / 4]);*/
 
     }
 
@@ -1220,15 +1254,13 @@ var getContext = function (display, infos, curLevel) {
 
         var arrowsize = sensor.drawInfo.height * .20;
 
-        if (sensor.img)
-            sensor.img.remove();
-
-        if (sensor.img2)
-            sensor.img2.remove();
 
         if (sensor.type == "led") {
             if (sensor.stateText)
                 sensor.stateText.remove();
+
+            if (sensor.img)
+                sensor.img.remove();
 
             if (sensor.state) {
                 sensor.img = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
@@ -1260,32 +1292,54 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
+            if (!sensor.buttonon || !sensor.buttonon.paper.canvas)
+                sensor.buttonon = paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.buttonoff || !sensor.buttonoff.paper.canvas)
+                sensor.buttonoff = paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
+
+            sensor.buttonon.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+            sensor.buttonoff.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+
             if (sensor.state) {
-                sensor.img = paper.image(getImg('buttonon.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('buttonoff.png'))
+                sensor.buttonon.attr({"opacity": 1});
+                sensor.buttonoff.attr({"opacity": 0});
                 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
-                sensor.img = paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('buttonon.png'))
+                sensor.buttonon.attr({"opacity": 0});
+                sensor.buttonoff.attr({"opacity": 1});
 
                 if (!context.autoGrading)
                     sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
-            if (!context.autoGrading) {
-                sensor.img.node.onmousedown = function () {
+            if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
+                sensor.buttonon.node.onmousedown = function () {
                     if (context.offLineMode) {
                         sensor.state = true;
                         drawSensor(sensor);
                     } else
                         sensorInConnectedModeError()
                 };
-                sensor.img.node.ontouchstart = sensor.img.node.onmousedown;
+                sensor.buttonon.node.ontouchstart = sensor.buttonon.node.onmousedown;
+
+                sensor.buttonoff.node.onmousedown = sensor.buttonon.node.onmousedown;
+                sensor.buttonoff.node.ontouchstart = sensor.buttonon.node.onmousedown;
 
 
-                sensor.img.node.onmouseup = function () {
+                sensor.buttonon.node.onmouseup = function () {
                     if (context.offLineMode) {
                         sensor.state = false;  
                         sensor.wasPressed = true;
@@ -1298,7 +1352,9 @@ var getContext = function (display, infos, curLevel) {
 
                 }
 
-                sensor.img.node.ontouchend = sensor.img.node.onmouseup;
+                sensor.buttonon.node.ontouchend = sensor.buttonon.node.onmouseup;
+                sensor.buttonoff.node.onmouseup = sensor.buttonon.node.onmouseup;
+                sensor.buttonoff.node.ontouchend = sensor.buttonon.node.onmouseup;
             }
 
         } else if (sensor.type == "screen") {
@@ -1317,10 +1373,15 @@ var getContext = function (display, infos, curLevel) {
             portx = imgx + imgw * 1.1;
             porty = imgy + imgh / 3;
     
-            sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
 
-
-//            paper.rect(sensor.drawInfo.x, sensor.drawInfo.y, sensor.drawInfo.width, sensor.drawInfo.height);
+            sensor.img.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
 
             if (sensor.state) {
                 var statex = imgx + (imgw * .13);
@@ -1344,15 +1405,37 @@ var getContext = function (display, infos, curLevel) {
                if (sensor.stateText)
                     sensor.stateText.remove();
 
-                if (sensor.img3)
-                    sensor.img3.remove();
-
                 if (sensor.state == null)
                     sensor.state = 25; // FIXME
 
-                sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
-                sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
-                sensor.img3= paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
+                if (!sensor.img || !sensor.img.paper.canvas)
+                    sensor.img = paper.image(getImg('temperature-cold.png'), imgx, imgy, imgw, imgh);
+
+                if (!sensor.img2 || !sensor.img2.paper.canvas)
+                    sensor.img2 = paper.image(getImg('temperature-hot.png'), imgx, imgy, imgw, imgh);
+
+                if (!sensor.img3 || !sensor.img3.paper.canvas)
+                    sensor.img3 = paper.image(getImg('temperature-overlay.png'), imgx, imgy, imgw, imgh);
+
+                sensor.img.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                });
+                sensor.img2.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                });
+
+                sensor.img3.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                });
 
                 var scale = imgh / 60;
 
@@ -1378,6 +1461,10 @@ var getContext = function (display, infos, curLevel) {
                     });
             }
             else {
+                sensor.img3.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
 
@@ -1385,13 +1472,36 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.pale)
-                sensor.pale.remove();
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('servo.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.pale || !sensor.pale.paper.canvas)
+                sensor.pale = paper.image(getImg('servo-pale.png'), imgx, imgy, imgw, imgh);
 
 
-            sensor.img = paper.image(getImg('servo.png'), imgx, imgy, imgw, imgh);
+            if (!sensor.center || !sensor.center.paper.canvas)
+                sensor.center = paper.image(getImg('servo-center.png'), imgx, imgy, imgw, imgh);
 
-            sensor.pale = paper.image(getImg('servo-pale.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+            });                
+            sensor.pale.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                        "transform": ""
+            });                
+            sensor.center.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+            });                
 
             sensor.pale.rotate(sensor.state);
 
@@ -1432,14 +1542,31 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('potentiometer.png'), imgx, imgy, imgw, imgh);
 
+            if (!sensor.pale || !sensor.pale.paper.canvas)
+                sensor.pale = paper.image(getImg('potentiometer-pale.png'), imgx, imgy, imgw, imgh);
 
-            sensor.img = paper.image(getImg('potentiometer.png'), imgx, imgy, imgw, imgh);
+            sensor.img.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+            });                
+
+            sensor.pale.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                        "transform": ""
+            });                
 
             if (sensor.state == null)
                 sensor.state = 0;
 
-            sensor.img.rotate(sensor.state * 3.6);
+            sensor.pale.rotate(sensor.state * 3.6);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
@@ -1453,6 +1580,10 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state;
                     });
             } else  {
+                sensor.pale.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
 
@@ -1460,7 +1591,15 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            sensor.img = paper.image(getImg('range.png'), imgx, imgy, imgw, imgh);
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('range.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+            });                            
 
             if (sensor.state == null)
                 sensor.state = 0;
@@ -1474,7 +1613,18 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.rangedistanceend)
                 sensor.rangedistanceend.remove();
 
-            var rangew = imgw * sensor.state * 0.002;
+            var rangew;
+            
+            if (sensor.state < 30)
+            {
+                rangew =  imgw * sensor.state / 100;
+            } else{
+                var firstpart = imgw * 30 / 100;
+                var remaining =  imgw - firstpart;
+
+                rangew = firstpart + (remaining * (sensor.state) * 0.002);
+            }
+
             var centerx = imgx + (imgw / 2);
 
             sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
@@ -1528,30 +1678,56 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state / 5;
                     });
             } else {
+                sensor.img.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
         } else if (sensor.type == "light") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            sensor.img = paper.image(getImg('light.png'), imgx, imgy, imgw, imgh);
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('light.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.moon || !sensor.moon.paper.canvas)
+                sensor.moon = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.sun || !sensor.sun.paper.canvas)
+                sensor.sun = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+            });                            
 
             if (sensor.state == null)
                 sensor.state = 0;
 
             if (sensor.state > 50) {
-                sensor.img2 = paper.image(getImg('light-sun.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('light-moon.png'))
-
                 var opacity = (sensor.state - 50) * 0.02;
-                sensor.img2.attr({"opacity": opacity * .80 });
+                sensor.sun.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                        "opacity": opacity * .80
+                });
+                sensor.moon.attr({"opacity": 0 });
             }
             else {
-                sensor.img2 = paper.image(getImg('light-moon.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('light-sun.png'))
-
                 var opacity = (50 - sensor.state) * 0.02;
-                sensor.img2.attr({"opacity": opacity * .80 });
+                sensor.moon.attr({
+                        "x": imgx,
+                        "y": imgy,
+                        "width": imgw,
+                        "height": imgh,
+                        "opacity": opacity * .80
+                });
+                sensor.sun.attr({"opacity": 0 });
             }
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
@@ -1565,6 +1741,10 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state;
                     });
             } else {
+                sensor.sun.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
         }
@@ -1923,7 +2103,7 @@ var getContext = function (display, infos, curLevel) {
 
         context.registerQuickPiEvent("led", "D" + port, state == true);
 
-        if (context.offLineMode) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -1938,7 +2118,7 @@ var getContext = function (display, infos, curLevel) {
 
         context.registerQuickPiEvent("led", "D" + port, !state);
 
-        if (context.offLineMode) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
