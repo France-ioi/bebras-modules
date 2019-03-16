@@ -784,6 +784,13 @@ var getContext = function (display, infos, curLevel) {
 
         context.offLineMode = true;
 
+        if (context.quickPiConnection.wasLocked())
+        {
+            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
+        } else if (!context.releasing && !wasConnected) {
+            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
+        }
+
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
             context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
         } else {
@@ -792,12 +799,6 @@ var getContext = function (display, infos, curLevel) {
             context.resetDisplay();
         }
 
-        if (context.quickPiConnection.wasLocked())
-        {
-            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
-        } else if (!context.releasing && !wasConnected) {
-            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
-        }
     }
 
 
@@ -1455,6 +1456,10 @@ var getContext = function (display, infos, curLevel) {
                     });
             }
             else {
+                sensor.img3.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
 
@@ -1570,6 +1575,10 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state;
                     });
             } else  {
+                sensor.pale.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
 
@@ -1664,6 +1673,10 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state / 5;
                     });
             } else {
+                sensor.img.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
         } else if (sensor.type == "light") {
@@ -1723,6 +1736,10 @@ var getContext = function (display, infos, curLevel) {
                         return sensor.state;
                     });
             } else {
+                sensor.sun.click(function() {
+                    sensorInConnectedModeError();
+                });
+
                 removeSlider(sensor);
             }
         }
