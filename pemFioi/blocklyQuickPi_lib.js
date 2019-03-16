@@ -136,7 +136,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndCondition = function (context, lastTurn) {
 
         if (!context.display && !context.autoGrading) {
-            context.success = false;
+            context.success = true;
             throw "Manual test validated automatically.";
         }
 
@@ -149,6 +149,11 @@ var getContext = function (display, infos, curLevel) {
                         if (!state.hit) {
                             context.success = false;
                             throw ("Failed");
+                        } else if (lastTurn)
+                        {
+                            context.success = true;
+                            throw ("programme terminé");
+
                         }
                     }
                     else
@@ -2098,7 +2103,7 @@ var getContext = function (display, infos, curLevel) {
 
         context.registerQuickPiEvent("led", "D" + port, state == true);
 
-        if (context.offLineMode) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -2113,7 +2118,7 @@ var getContext = function (display, infos, curLevel) {
 
         context.registerQuickPiEvent("led", "D" + port, !state);
 
-        if (context.offLineMode) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
