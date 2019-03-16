@@ -1599,7 +1599,18 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.rangedistanceend)
                 sensor.rangedistanceend.remove();
 
-            var rangew = imgw * sensor.state * 0.002;
+            var rangew;
+            
+            if (sensor.state < 30)
+            {
+                rangew =  imgw * sensor.state / 100;
+            } else{
+                var firstpart = imgw * 30 / 100;
+                var remaining =  imgw - firstpart;
+
+                rangew = firstpart + (remaining * (sensor.state) * 0.002);
+            }
+
             var centerx = imgx + (imgw / 2);
 
             sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
