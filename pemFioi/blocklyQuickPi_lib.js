@@ -348,19 +348,19 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.autoGrading) {
             var numSensors = infos.quickPiSensors.length;
-            var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 4);
+            var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 10);
 
             context.sensorSize = sensorSize * .90;
 
-            context.pixelsPerTime = (paper.width - context.sensorSize) / context.maxTime;
-
+            context.timelineStartx = context.sensorSize * 3;
+            context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / context.maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
 
                 sensor.drawInfo = {
                     x: 0,
-                    y: sensorSize * iSensor,
+                    y: 10 + (sensorSize * iSensor),
                     width: sensorSize * .90,
                     height: sensorSize * .90
                 }
@@ -373,15 +373,18 @@ var getContext = function (display, infos, curLevel) {
                     var states = context.gradingStatesBySensor[key];
                     var startTime = -1;
                     var lastState = null;
+                    sensor.lastAnalogState = null;
+
                     for (var iState = 0; iState < states.length; iState++) {
                         var state = states[iState];
-                        if (startTime > 0) {
-                            drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected");
-                        }
+
+                        drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected");
 
                         startTime = state.time;
                         lastState = state.state;
                     }
+
+                    sensor.lastAnalogState = null;
                 }
             }
         } else {
@@ -851,33 +854,33 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
-        for (var i = 1000; i < context.maxTime; i += 1000) {
-            var x = context.sensorSize + (i * context.pixelsPerTime);
+        for (var i = 0; i <= context.maxTime; i += 1000) {
+            var x = context.timelineStartx + (i * context.pixelsPerTime);
 
-            var timelabel = paper.text(x + 5, paper.height - context.sensorSize / 2, (i / 1000));
+            var timelabel = paper.text(x, paper.height - context.sensorSize / 2, (i / 1000));
 
-            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
 
             context.timelineText.push(timelabel);
-
-            /*paper.path(["M", x,
+/*
+            paper.path(["M", x,
                 paper.height - context.sensorSize / 2,
                 "L", x,
                 paper.height - context.sensorSize]);*/
         }
 /*
-        paper.path(["M", context.sensorSize,
+        paper.path(["M", context.timelineStartx,
             paper.height - context.sensorSize * 3 / 4,
             "L", paper.width,
-            paper.height - context.sensorSize * 3 / 4]);*/
-
+            paper.height - context.sensorSize * 3 / 4]);
+*/
     }
 
     function drawCurrentTime() {
-        if (paper == undefined || !context.display)
+        if (!paper || !context.display)
             return;
 
-        var startx = context.sensorSize + (context.currentTime * context.pixelsPerTime);
+        var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
 
         if (context.timeLineCurrent)
             context.timeLineCurrent.remove();
@@ -885,10 +888,8 @@ var getContext = function (display, infos, curLevel) {
         if (context.timeLineCircle)
             context.timeLineCircle.remove();
 
-
         if (context.timeLineTriangle)
             context.timeLineTriangle.remove();
-
 
         context.timeLineCurrent = paper.path(["M", startx,
             0,
@@ -952,9 +953,8 @@ var getContext = function (display, infos, curLevel) {
 
         var stateOffset = 160;
 
-        var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
+        var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
-
 
         var ypositionmiddle = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
 
@@ -989,17 +989,85 @@ var getContext = function (display, infos, curLevel) {
                 ypositionmiddle += 4;
             }
 
+            if (sensor.lastAnalogState != null
+                && sensor.lastAnalogState != state) {
+                var oldSsAnalog = isAnalogSensor(sensor, sensor.lastAnalogState);
+
+                var previousOffset = (ypositionbottom - ypositiontop) * oldSsAnalog.percentage;
+
+                var joinline = paper.path(["M", startx,
+                                       ypositiontop + offset,
+                                       "L", startx,
+                                        ypositiontop + previousOffset]);                
+
+                joinline.attr({
+                    "stroke-width": strokewidth,
+                    "stroke": color,
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                });
+
+                paper.text(startx + 15, ypositiontop + offset - 10, state);
+            }
+
+            sensor.lastAnalogState = state == null ? 0 : state;
+
             stateline = paper.path(["M", startx,
                 ypositiontop + offset,
                 "L", startx + stateLenght,
                 ypositiontop + offset]);
 
             stateline.attr({
-                "stroke-width": 5, "stroke": color
+                "stroke-width": strokewidth,
+                 "stroke": color,
+                 "stroke-linejoin": "round",
+                 "stroke-linecap": "round"
             });
         } else if (sensor.type == "screen") {
-            sensor.stateText = paper.text(startx, ypositionmiddle, state.line1);
-            sensor.stateText = paper.text(startx, ypositionmiddle + 10, state.line2);
+            if (state) {
+                sensor.stateText = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+
+                sensor.stateText.attr({
+                    "font": "Font Awesome 5 Free",
+                    "stroke" : color,
+                    "fill": color,
+                    "font-size": (strokewidth * 2) + "px"
+                });
+
+                sensor.stateText.node.style.fontFamily = '"Font Awesome 5 Free"';
+                sensor.stateText.node.style.fontWeight = "bold";
+
+                function showPopup() {
+                    if (!sensor.tooltip)
+                    {
+                        sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + state.line2);   
+
+                        var textDimensions = sensor.tooltipText.getBBox();
+
+                        sensor.tooltip = paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
+                        sensor.tooltip.attr({
+                            "stroke": "black", 
+                            "stroke-width": 2,
+                            "fill": "white",
+                        });
+
+                        sensor.tooltipText.toFront();
+                    }
+                };
+
+                sensor.stateText.click(showPopup);
+
+                sensor.stateText.hover(showPopup, function() {
+                    if (sensor.tooltip) {
+                        sensor.tooltip.remove();
+                        sensor.tooltip = null;
+                    }
+                    if (sensor.tooltipText) {
+                        sensor.tooltipText.remove();
+                        sensor.tooltipText = null;
+                    }
+                });
+            }
         } else if (percentage != 0) {
             stateline = paper.path(["M", startx,
                 ypositionmiddle,
@@ -1009,8 +1077,9 @@ var getContext = function (display, infos, curLevel) {
             stateline.attr({
                 "stroke-width": strokewidth,
                 "stroke": color, 
+                "stroke-linejoin": "round",
                 "stroke-linecap": "round"
-            });
+           });
         }
 
         if (type == "wrong") {
@@ -1029,6 +1098,9 @@ var getContext = function (display, infos, curLevel) {
             wrongindicator.attr({
                 "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });*/
         }
+
+        // Make sure the current time bar is always on top of states
+        drawCurrentTime(sensor);
     }
 
     function getImg(filename) {
@@ -1227,15 +1299,6 @@ var getContext = function (display, infos, curLevel) {
         window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
     }
 
-    function preloadImage(path)
-    {
-        if (!preloadedimages[path])
-        {
-            new Image().src = path;
-            preloadedimages[path] = true;
-        }
-    }
-
     function drawSensor(sensor, state = true, juststate = false) {
         if (paper == undefined || !context.display)
             return;
@@ -1252,34 +1315,71 @@ var getContext = function (display, infos, curLevel) {
         var portx = imgx + imgw;
         var porty = imgy + imgh / 3;
 
-        var arrowsize = sensor.drawInfo.height * .20;
+        var portsize = sensor.drawInfo.height * 0.10;
+        var statesize = sensor.drawInfo.height * 0.10;
+
+        if (context.autoGrading) 
+        {
+            imgw = sensor.drawInfo.width * .80;
+            imgh = sensor.drawInfo.height * .80;
+    
+            imgx = sensor.drawInfo.x + imgw * 0.75;
+            imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+    
+            state1x = imgx + imgw * 1.2;
+            state1y = imgy + (imgh / 2);
+    
+            portx = sensor.drawInfo.x;
+            porty = imgy + (imgh / 2);
+
+            portsize = imgh / 3;
+            statesize = imgh / 2;
+        }
 
 
         if (sensor.type == "led") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.img)
-                sensor.img.remove();
+            if (!sensor.ledon || !sensor.ledon.paper.canvas)
+                sensor.ledon = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
 
-            if (sensor.state) {
-                sensor.img = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('ledoff.png'))
+            if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
+                sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
-            } else {
-                sensor.img = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('ledon.png'))
-
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                if (!context.autoGrading) {
+                    sensor.ledoff.click(function() {
+                        sensor.state = !sensor.state;
+                        drawSensor(sensor);
+                    })    
+                }
             }
 
-            sensor.img.click(function() {
-                sensor.state = !sensor.state;
-                drawSensor(sensor);
-            })
+            sensor.ledon.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+            sensor.ledoff.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+
+            if (sensor.state) {
+                sensor.ledon.attr({"opacity": 1});
+                sensor.ledoff.attr({"opacity": 0});
+                
+                sensor.stateText = paper.text(state1x, state1y, "ON");
+            } else {
+                sensor.ledon.attr({"opacity": 0});
+                sensor.ledoff.attr({"opacity": 1});
+
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+
 
             if ((!context.runner || !context.runner.isRunning())
                 && !context.offLineMode)
@@ -1315,14 +1415,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.buttonon.attr({"opacity": 1});
                 sensor.buttonoff.attr({"opacity": 0});
                 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
+                sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.buttonon.attr({"opacity": 0});
                 sensor.buttonoff.attr({"opacity": 1});
 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
             if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
@@ -1372,6 +1470,23 @@ var getContext = function (display, infos, curLevel) {
 
             portx = imgx + imgw * 1.1;
             porty = imgy + imgh / 3;
+
+            if (context.autoGrading) 
+            {
+                imgw = sensor.drawInfo.width;
+                imgh = sensor.drawInfo.height  * .70;
+        
+                imgx = sensor.drawInfo.x + imgw / 2;
+                imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+        
+                state1x = imgx + imgw;
+                state1y = imgy + (imgh / 2);
+        
+                portx = sensor.drawInfo.x;
+                porty = imgy + (imgh / 2);
+    
+                portsize = imgh / 4;
+            }    
     
             if (!sensor.img || !sensor.img.paper.canvas)
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
@@ -1482,7 +1597,6 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.center || !sensor.center.paper.canvas)
                 sensor.center = paper.image(getImg('servo-center.png'), imgx, imgy, imgw, imgh);
 
-
             sensor.img.attr({
                         "x": imgx,
                         "y": imgy,
@@ -1524,7 +1638,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            if (!context.autoGrading && !context.offLineMode &&
+            if (!context.autoGrading &&
                  (!context.runner || !context.runner.isRunning())) {
                     setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180, function(percentage) {
                         sensor.state = Math.round(percentage * 1.8);
@@ -1614,13 +1728,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.rangedistanceend.remove();
 
             var rangew;
-            
-            if (sensor.state < 30)
-            {
-                rangew =  imgw * sensor.state / 100;
-            } else{
+
+            if (sensor.state < 30) {
+                rangew = imgw * sensor.state / 100;
+            } else {
                 var firstpart = imgw * 30 / 100;
-                var remaining =  imgw - firstpart;
+                var remaining = imgw - firstpart;
 
                 rangew = firstpart + (remaining * (sensor.state) * 0.002);
             }
@@ -1628,26 +1741,26 @@ var getContext = function (display, infos, curLevel) {
             var centerx = imgx + (imgw / 2);
 
             sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
-                    imgy + imgw,
-                    "L", centerx + (rangew / 2),
-                    imgy + imgw]);
+                imgy + imgw,
+                "L", centerx + (rangew / 2),
+                imgy + imgw]);
 
             var markh = 16;
 
             sensor.rangedistancestart = paper.path(["M", centerx - (rangew / 2),
-                    imgy + imgw - (markh / 2),
-                    "L", centerx - (rangew / 2),
-                    imgy + imgw + (markh / 2)]);
+                imgy + imgw - (markh / 2),
+                "L", centerx - (rangew / 2),
+                imgy + imgw + (markh / 2)]);
 
             sensor.rangedistanceend = paper.path(["M", centerx + (rangew / 2),
-                    imgy + imgw - (markh / 2),
-                    "L", centerx + (rangew / 2),
-                    imgy + imgw + (markh / 2)]);
+                imgy + imgw - (markh / 2),
+                "L", centerx + (rangew / 2),
+                imgy + imgw + (markh / 2)]);
 
             sensor.rangedistance.attr({
-                    "stroke-width": 4,
-                    "stroke": "#468DDF",
-                    "stroke-linecapstring": "round"
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
             });
 
             sensor.rangedistancestart.attr({
@@ -1662,7 +1775,6 @@ var getContext = function (display, infos, curLevel) {
                 "stroke": "#468DDF",
                 "stroke-linecapstring": "round"
             });
-
 
             if (sensor.state >= 10)
                 sensor.state = Math.round(sensor.state);
@@ -1753,18 +1865,16 @@ var getContext = function (display, infos, curLevel) {
         if (sensor.portText)
             sensor.portText.remove();
 
-        var stateFontSize = sensor.drawInfo.height * 0.10;
-        var portFontSize = sensor.drawInfo.height * 0.10;
-
 
         if (sensor.hasOwnProperty("stateText"))
-            sensor.stateText.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
 
         if (sensor.hasOwnProperty("stateText2"))
-            sensor.stateText2.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText2.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+
 
         sensor.portText = paper.text(portx, porty, sensor.port);
-        sensor.portText.attr({ "font-size": portFontSize + "px", 'text-anchor': 'start', fill: "lightgray" });
+        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "lightgray" });
     }
 
     context.sensorDoubleWitdh = function (sensor) {
@@ -2496,6 +2606,6 @@ function hideSlider(sensor) {
     if (sensor.slider)
         sensor.slider.remove();
     
-    if (sensor.focusrect)
+    if (sensor.focusrect && sensor.focusrect.paper.canvas)
         sensor.focusrect.toFront();
 };
