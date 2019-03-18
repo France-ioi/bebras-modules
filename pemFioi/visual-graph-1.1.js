@@ -723,6 +723,21 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return {x:x,y:y};
    };
 
+   this.isOnEdgeLabel = function(edgeID,x,y) {
+      var edgeInfo = this.graph.getEdgeInfo(edgeID);
+      if(!edgeInfo.label || edgeInfo.label.length === 0){
+         return false;
+      }
+      var labelPos = this.getLabelPos(edgeID);
+      var fontSize = this.edgeLabelAttr["font-size"] || 15;  
+      var labelH = fontSize;
+      var labelW = edgeInfo.label.length * fontSize;
+      if(x < (labelPos.x + labelW/2) && x > (labelPos.x - labelW/2) && y < (labelPos.y + labelH/2) && y > (labelPos.y - labelH/2)){
+         return true;
+      }
+      return false;    
+   };
+
    this.getCenterPosition = function(R,s,l,vInfo1,vInfo2) {
       var x1 = vInfo1.x, y1 = vInfo1.y;
       var x2 = vInfo2.x, y2 = vInfo2.y;
