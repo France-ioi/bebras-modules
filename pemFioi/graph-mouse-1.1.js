@@ -561,13 +561,13 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       this.callback = fct;
    };
 
-   function eventHandler(xPos, yPos) {
+   function eventHandler(xPos, yPos, event) {
       // Check if vertex was clicked
       // console.log(self.id);
       var vertex = self.getFuzzyVertex(xPos, yPos);
       if(vertex !== null) {
          if(forVertices) {
-            self.callback("vertex", vertex, xPos, yPos);
+            self.callback("vertex", vertex, xPos, yPos, event);
          }
          // Clicking a vertex cancels any other type, regardless of forVertices flag.
          return;
@@ -577,7 +577,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var edge = self.getFuzzyEdge(xPos, yPos);
       if(edge !== null) {
          if(forEdges) {
-            self.callback("edge", edge, xPos, yPos);
+            self.callback("edge", edge, xPos, yPos, event);
          }
          // Clicking an edge cancels the click on the background, regardless of forEdges.
          return;
@@ -586,7 +586,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var edge2 = self.getFuzzyEdgeLabel(xPos, yPos);
       if(edge2 !== null) {
          if(forEdges) {
-            self.callback("edgeLabel", edge2, xPos, yPos);
+            self.callback("edgeLabel", edge2, xPos, yPos, event);
          }
          // Clicking an edge cancels the click on the background, regardless of forEdges.
          return;
@@ -594,7 +594,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
       // Background was clicked.
       if(forBackground) {
-         self.callback(null, null, xPos, yPos);
+         self.callback(null, null, xPos, yPos, event);
       }
    }
    
@@ -911,6 +911,7 @@ function ArcDragger(settings) {
    this.visualGraph = settings.visualGraph;
    this.graphMouse = settings.graphMouse;
    this.onEdgeSelect = settings.onEdgeSelect;
+   this.editEdgeLabel = settings.editEdgeLabel;
    this.elementID = null;
    this.startAngle = 0;
    this.loop = false;
@@ -921,11 +922,11 @@ function ArcDragger(settings) {
    this.callback = settings.callback;
    this.startDragCallback = settings.startDragCallback;
    this.isDragging = false;
-   this.vertexThreshold = settings.vertexThreshold || this.visualGraph.graphDrawer.circleAttr.r;
-   this.edgeThreshold = settings.edgeThreshold;// || this.visualGraph.graphDrawer.lineAttr["stroke-width"];
+   this.vertexThreshold = settings.vertexThreshold || 0;
+   this.edgeThreshold = settings.edgeThreshold || 10;
    this.enabled = false;
    /* for deselection */
-   // this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, this.edgeThreshold, false);
+   // this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, true, true, true, this.vertexThreshold, this.edgeThreshold, false);
 
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -941,15 +942,19 @@ function ArcDragger(settings) {
       // this.fuzzyClicker.setEnabled(enabled);
    };
 
-   // function onFuzzyClick(elementType, id) {
+   // function onFuzzyClick(elementType, id, x, y, event) {
    //    console.log(elementType);
-   //    // if(elementType !== "edge"){
-   //       // self.unselectAll();
-   //    // }
+   //    if(elementType === "edgeLabel"){
+   //       // console.log(event)
+   //       // event.stopPropagation();
+   //    }
    // };
 
    this.setOnEdgeSelect = function(fct) {
       this.onEdgeSelect = fct;
+   };
+   this.setEditEdgeLabel = function(fct) {
+      this.editEdgeLabel= fct;
    };
 
    this.enableEdgesDrag = function() {
@@ -961,12 +966,13 @@ function ArcDragger(settings) {
    };
 
    this.startHandler = function(x, y, event) {
+      
       self.isDragging = false;
       if(self.elementID !== this.data("id")){
          self.unselectAll();
          self.elementID = this.data("id");
       }
-      
+
       self.startAngle = self.visualGraph.getEdgeVisualInfo(self.elementID).angle || 0;
 
       self.edgeVertices = self.graph.getEdgeVertices(self.elementID);
@@ -976,6 +982,7 @@ function ArcDragger(settings) {
       self.loop = (self.edgeVertices[0] === self.edgeVertices[1]) ? true : false;
 
       var paperPos = $("#"+self.paperElementID).position();
+      
       self.originalPosition = {x: (x - paperPos.left), y: (y - paperPos.top)};
       self.distance = Math.sqrt(Math.pow((self.edgeVerticesPos[0].x - self.edgeVerticesPos[1].x),2) + Math.pow((self.edgeVerticesPos[0].y - self.edgeVerticesPos[1].y),2));
       if(self.startDragCallback){
@@ -991,7 +998,14 @@ function ArcDragger(settings) {
          }
          return;
       }
-      if(self.onEdgeSelect){
+      var paperPos = $("#"+self.paperElementID).position();
+      var xMouse = event.pageX - paperPos.left;
+      var yMouse = event.pageY - paperPos.top;
+      if(self.visualGraph.graphDrawer.isOnEdgeLabel(this.data("id"),xMouse,yMouse)){
+         if(self.editEdgeLabel){
+            self.editEdgeLabel(self.elementID);
+         }     
+      }else if(self.onEdgeSelect){
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
          
@@ -1206,7 +1220,7 @@ function GraphEditor(settings) {
       var edge = visualGraph.getRaphaelsFromID(edgeID);
       if(selected){
          edge[1].attr(selectedEdgeAttr);
-         self.editEdgeLabel(edgeID);
+         // self.editEdgeLabel(edgeID);
          self.addEdgeCross(edgeID);
       }else{
          edge[1].attr(visualGraph.graphDrawer.lineAttr);
@@ -1463,6 +1477,7 @@ function GraphEditor(settings) {
          var info = graph.getVertexInfo(vertexId);
          var visualInfo = visualGraph.getVertexVisualInfo(vertexId);
          var label = info.label || "";
+         var fontSize = visualGraph.graphDrawer.edgeLabelAttr["font-size"] || 15;
          var vertexRaph = visualGraph.getRaphaelsFromID(vertexId);
          vertexRaph[1].hide();
          self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
@@ -1471,6 +1486,7 @@ function GraphEditor(settings) {
             position: "absolute",
             left: visualInfo.x,
             top: visualInfo.y,
+            width: label.length * fontSize,
             transform: "translate(-50%,-50%)",
             "text-align": "center",
             background: "none",
@@ -1498,6 +1514,7 @@ function GraphEditor(settings) {
       var info = graph.getEdgeInfo(edgeID);
       var labelPos = visualGraph.graphDrawer.getLabelPos(edgeID);
       var label = info.label || "";
+      var fontSize = visualGraph.graphDrawer.edgeLabelAttr["font-size"] || 15;
       var edgeRaph = visualGraph.getRaphaelsFromID(edgeID);
       edgeRaph[2].hide();
       self.edgeTextEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
@@ -1506,6 +1523,7 @@ function GraphEditor(settings) {
          position: "absolute",
          left: labelPos.x,
          top: labelPos.y,
+         width: label.length * fontSize,
          transform: "translate(-50%,-50%)",
          "text-align": "center",
          background: "none",
@@ -1591,6 +1609,7 @@ function GraphEditor(settings) {
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setStartDragCallback(this.startDragCallback);
+      this.arcDragger.setEditEdgeLabel(this.editEdgeLabel);
    };
    
    this.setDefaultSettings();
