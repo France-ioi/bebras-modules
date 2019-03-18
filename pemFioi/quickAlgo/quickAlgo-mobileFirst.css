@@ -1578,6 +1578,10 @@ button.showLongIntro .icon, button.videoBtn .icon {
 .btn#piconnect {
   background-color: #f5a623;
 }
+html {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+} 
 /************************
   MODAL POPUPS
 *************************/
