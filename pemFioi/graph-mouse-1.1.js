@@ -541,12 +541,13 @@ function EdgeCreator(id, paperElementID, paper, graph, visualGraph, graphMouse, 
    }
 }
 
-function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, forVertices, forEdges, forBackground, vertexThreshold, edgeThreshold, enabled) {
+function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, forVertices, forEdges, forBackground, vertexThreshold, edgeThreshold, enabled, event = "click") {
    var self = this;
    this.id = id;
    this.graph = graph;
    this.visualGraph = visualGraph;
-   this.paperMouse = new PaperMouseEvent(paperElementID, paper, "click", eventHandler, enabled);
+   this.paperMouse = new PaperMouseEvent(paperElementID, paper, event, eventHandler, enabled);
+   this.callback = callback;
    this.enabled = false;
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -556,12 +557,17 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       this.paperMouse.setEnabled(enabled);
    };
 
+   this.setCallback = function(fct) {
+      this.callback = fct;
+   };
+
    function eventHandler(xPos, yPos) {
       // Check if vertex was clicked
+      // console.log(self.id);
       var vertex = self.getFuzzyVertex(xPos, yPos);
       if(vertex !== null) {
          if(forVertices) {
-            callback("vertex", vertex, xPos, yPos);
+            self.callback("vertex", vertex, xPos, yPos);
          }
          // Clicking a vertex cancels any other type, regardless of forVertices flag.
          return;
@@ -571,7 +577,16 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var edge = self.getFuzzyEdge(xPos, yPos);
       if(edge !== null) {
          if(forEdges) {
-            callback("edge", edge, xPos, yPos);
+            self.callback("edge", edge, xPos, yPos);
+         }
+         // Clicking an edge cancels the click on the background, regardless of forEdges.
+         return;
+      }
+
+      var edge2 = self.getFuzzyEdgeLabel(xPos, yPos);
+      if(edge2 !== null) {
+         if(forEdges) {
+            self.callback("edgeLabel", edge2, xPos, yPos);
          }
          // Clicking an edge cancels the click on the background, regardless of forEdges.
          return;
@@ -579,7 +594,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
       // Background was clicked.
       if(forBackground) {
-         callback(null, null, xPos, yPos);
+         self.callback(null, null, xPos, yPos);
       }
    }
    
@@ -603,10 +618,21 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var minDistance = Infinity;
       this.graph.forEachEdge(function(id) {
          var distance = visualGraph.graphDrawer.getDistanceFromEdge(id, xPos, yPos);
-         // console.log(self.id+" "+distance+" "+edgeThreshold);
          if(distance <= edgeThreshold && distance < minDistance) {
             edge = id;
             minDistance = distance;
+         }
+      });
+      return edge;
+   };
+
+   this.getFuzzyEdgeLabel = function(xPos, yPos) {
+      // Look for closest edge.
+      var edge = null;
+      this.graph.forEachEdge(function(id) {
+         var onLabel = visualGraph.graphDrawer.isOnEdgeLabel(id,xPos,yPos);
+         if(onLabel) {
+            edge = id;
          }
       });
       return edge;
@@ -655,7 +681,49 @@ function FuzzyRemover(id, paperElementID, paper, graph, visualGraph, callback, f
    else {
       this.enabled = false;
    }
-}
+};
+
+function VertexCreator(settings) {
+   var self = this;
+   this.id = settings.id;
+   this.paperElementID = settings.paperElementID;
+   this.paper = settings.paper;
+   this.graph = settings.graph;
+   this.visualGraph = settings.visualGraph;
+   this.createVertex = settings.createVertex;
+   this.forVertices = true;
+   this.forEdges = true;
+   this.vertexThreshold = settings.vertexThreshold || 0;
+   this.edgeThreshold = settings.edgeThreshold || 10;
+   this.enabled = false;
+
+   this.fuzzyDblClicker = new FuzzyClicker(this.id + "_fuzzyDblClicker", this.paperElementID, this.paper, this.graph, this.visualGraph, eventHandler, this.forVertices, this.forEdges, true, this.vertexThreshold, this.edgeThreshold, false, "dblclick")
+
+   this.setEnabled = function(enabled) {
+      if(enabled == this.enabled) {
+         return;
+      }
+      this.enabled = enabled;
+
+      this.fuzzyDblClicker.setEnabled(enabled);
+   };
+
+   this.setCreateVertex = function(fct) {
+      this.createVertex = fct;
+   }; 
+
+   function eventHandler(elementType,elementID,x,y) {
+      if(elementType === null)
+         self.createVertex(x,y);
+   };
+
+
+   if(settings.enabled) {
+      this.setEnabled(true);
+   } else {
+      this.enabled = false;
+   }
+};
 
 function VertexDragAndConnect(settings) {
    var self = this;
@@ -715,7 +783,9 @@ function VertexDragAndConnect(settings) {
             this.onEdgeSelect(id);
          }
       }
-      else {
+      else if(elementType === "edgeLabel"){
+         return;
+      }else{
          self.clickHandler(id);
       }
    }
@@ -853,6 +923,7 @@ function ArcDragger(settings) {
    this.isDragging = false;
    this.vertexThreshold = settings.vertexThreshold || this.visualGraph.graphDrawer.circleAttr.r;
    this.edgeThreshold = settings.edgeThreshold;// || this.visualGraph.graphDrawer.lineAttr["stroke-width"];
+   this.enabled = false;
    /* for deselection */
    // this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, this.edgeThreshold, false);
 
@@ -1044,6 +1115,7 @@ function GraphEditor(settings) {
    var visualGraph = settings.visualGraph;
    var onVertexSelect = settings.onVertexSelect;
    var onEdgeSelect = settings.onEdgeSelect;
+   this.createVertex = settings.createVertex;
    var callback = settings.callback || null;
    
    var defaultSelectedVertexAttr = {
@@ -1092,6 +1164,17 @@ function GraphEditor(settings) {
       callback: settings.callback,
       enabled: false
    });
+   this.vertexCreator = new VertexCreator({
+      id:"VertexCreator",
+      paper: settings.paper,
+      paperElementID: settings.paperElementID,
+      graph: graph,
+      visualGraph: visualGraph,  
+      createVertex: this.createVertex,
+      edgeThreshold: settings.edgeThreshold,
+      // callback: settings.callback,
+      enabled: false
+   });
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1129,6 +1212,20 @@ function GraphEditor(settings) {
          edge[1].attr(visualGraph.graphDrawer.lineAttr);
          if(self.edgeCross)
             self.edgeCross.remove();
+      }
+   };
+
+   this.defaultCreateVertex = function(x,y) {
+      var vertexGuid = 0;
+      while(graph.isVertex("v_" + vertexGuid)) {
+         vertexGuid++;
+      }
+      var vertexId = "v_" + vertexGuid;
+      var point = {x: x, y: y};
+      visualGraph.setVertexVisualInfo(vertexId, point);
+      graph.addVertex(vertexId,{label:vertexId});
+      if(callback){
+         callback();
       }
    };
 
@@ -1462,11 +1559,6 @@ function GraphEditor(settings) {
       edgeRaph[2].show();
    };
 
-   this.createVertex = function(x,y) {
-      var vertexId = customCreateVertex(x,y);
-   };
-   this.vertexCreator = new PaperMouseEvent(paperId, paper, "dblclick", this.createVertex, true);
-
    this.startDragCallback = function(ID) {
       var vertices = graph.getAllVertices();
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
@@ -1492,6 +1584,9 @@ function GraphEditor(settings) {
       }
       if(!settings.onEdgeSelect){
          this.arcDragger.setOnEdgeSelect(this.defaultOnEdgeSelect);
+      }
+      if(!settings.createVertex){
+         this.vertexCreator.setCreateVertex(this.defaultCreateVertex);
       }
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
