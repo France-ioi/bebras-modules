@@ -278,7 +278,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       "font-family": "sans-serif"
    };
    this.edgeClickAreaAttr = {
-      "stroke-width": 10,
+      "stroke-width": 20,
       "stroke": "red",
       "opacity": 0
    };
@@ -288,6 +288,27 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       this.visualGraph = visualGraph;
       this.customElements = {};
       this.originalPositions = {};
+   };
+   this.setDrawVertex = function(fct) {
+      this.drawVertex = fct;
+   };
+   this.setDrawEdge = function(fct) {
+      this.drawEdge = fct;
+   };
+   this.setEdgeLabelAttr = function(attr) {
+      this.edgeLabelAttr = attr;
+   };
+   this.setCircleAttr = function(circleAttr) {
+      this.circleAttr = circleAttr;
+   };
+   this.setLineAttr = function(lineAttr) {
+      this.lineAttr = lineAttr;
+   };
+   this.setVertexLabelAttr = function(attr) {
+      this.vertexLabelAttr = attr;
+   };
+   this.setEdgeClickAreaAttr = function(attr) {
+      this.edgeClickAreaAttr = attr;
    };
    this.drawVertex = function(id, info, visualInfo) {
       var pos = this._getVertexPosition(visualInfo);
@@ -316,9 +337,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       this.visualGraph._eraseVertex(id);
       this.drawVertex(id,info,visualInfo);
    };
-   this.setDrawVertex = function(fct) {
-      this.drawVertex = fct;
-   };
+   
    this.drawEdge = function(id, vertex1, vertex2) {
       if(thickMode) {
          var path = this._getThickEdgePath(vertex1, vertex2);
@@ -331,15 +350,10 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var labelText = info.label || "";
          var labelPos = this.getLabelPos(id, vertex1, vertex2);
          var label = this.paper.text(labelPos.x,labelPos.y,labelText).attr(this.edgeLabelAttr);
-         return [clickArea,path,label];
+         return [path,label,clickArea];   // !!!
       }
    };
-   this.setDrawEdge = function(fct) {
-      this.drawEdge = fct;
-   };
-   this.setEdgeLabelAttr = function(attr) {
-      this.edgeLabelAttr = attr;
-   };
+   
    this._getVertexPosition = function(visualInfo) {
       if(visualInfo.x === undefined || visualInfo.x === null) {
          visualInfo.x = 0;
@@ -425,11 +439,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             newPath = this._getEdgePath(vertex1, vertex2, edgeID);
          }
          raphaels[0].attr("path", newPath);
-         raphaels[1].attr("path", newPath);
+         raphaels[2].attr("path", newPath);
          var info = this.graph.getEdgeInfo(edgeID);
          var labelText = info.label || "";
          var labelPos = this.getLabelPos(edgeID, vertex1, vertex2);
-         raphaels[2].attr({x:labelPos.x,y:labelPos.y,text:labelText});
+         raphaels[1].attr({x:labelPos.x,y:labelPos.y,text:labelText});
          if(thickMode) {
             raphaels[1].attr("path", newPath);
          }
@@ -556,15 +570,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return [ "M", x1, y1, "A", R, R, 0, l, s, x3, y3 ]; 
    };
 
-   this.setCircleAttr = function(circleAttr) {
-      this.circleAttr = circleAttr;
-   };
-   this.setLineAttr = function(lineAttr) {
-      this.lineAttr = lineAttr;
-   };
-   this.setVertexLabelAttr = function(attr) {
-      this.vertexLabelAttr = attr;
-   };
+   
    this.reapplyAttr = function() {
       var vertices = this.graph.getAllVertices();
       for(var iVertex in vertices) {
