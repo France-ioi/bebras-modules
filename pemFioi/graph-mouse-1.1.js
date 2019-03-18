@@ -1219,11 +1219,11 @@ function GraphEditor(settings) {
    this.defaultOnEdgeSelect = function(edgeID,selected) {
       var edge = visualGraph.getRaphaelsFromID(edgeID);
       if(selected){
-         edge[1].attr(selectedEdgeAttr);
+         edge[0].attr(selectedEdgeAttr);
          // self.editEdgeLabel(edgeID);
          self.addEdgeCross(edgeID);
       }else{
-         edge[1].attr(visualGraph.graphDrawer.lineAttr);
+         edge[0].attr(visualGraph.graphDrawer.lineAttr);
          if(self.edgeCross)
             self.edgeCross.remove();
       }
@@ -1516,7 +1516,7 @@ function GraphEditor(settings) {
       var label = info.label || "";
       var fontSize = visualGraph.graphDrawer.edgeLabelAttr["font-size"] || 15;
       var edgeRaph = visualGraph.getRaphaelsFromID(edgeID);
-      edgeRaph[2].hide();
+      edgeRaph[1].hide();
       self.edgeTextEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
       $("#"+paperId).css("position","relative");
       self.edgeTextEditor.css({
@@ -1573,8 +1573,8 @@ function GraphEditor(settings) {
       }
       if(self.edgeTextEditor)
          self.edgeTextEditor.remove();
-      edgeRaph[2].attr("text",info.label);
-      edgeRaph[2].show();
+      edgeRaph[1].attr("text",info.label);
+      edgeRaph[1].show();
    };
 
    this.startDragCallback = function(ID) {
@@ -1590,7 +1590,7 @@ function GraphEditor(settings) {
          var edgeRaph = visualGraph.getRaphaelsFromID(edges[iEdge]);
          if(self.edgeTextEditor)
             self.edgeTextEditor.remove();
-         edgeRaph[2].show();
+         edgeRaph[1].show();
          }
       self.arcDragger.unselectAll();
    };
