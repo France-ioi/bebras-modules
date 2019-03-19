@@ -674,6 +674,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var labelW = label.length * this.edgeLabelAttr["font-size"];
       var labelH = this.edgeLabelAttr["font-size"];
       var margin = 10;
+      if(label.length < 2){
+         labelW += margin;
+      }
       var angle;
       if(x1 === x2){
          if(y1 > y2){
@@ -685,7 +688,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          angle = Math.atan((y2 - y1)/(x2 - x1));
       }
       if(vInfo["radius-ratio"] || vertex1 ===  vertex2){ // if curved edge
-         if(vertex1 === vertex2){
+         if(vertex1 === vertex2){   // if loop
             angle = vInfo.angle*Math.PI/180 || 0;
             var R = this.circleAttr.r*vInfo["radius-ratio"];
             var xm = x1 + 2*R*Math.cos(angle);
