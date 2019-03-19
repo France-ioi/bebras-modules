@@ -317,7 +317,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var node = this.paper.circle(pos.x, pos.y).attr(this.circleAttr);
       var labelRaph = this.paper.text(pos.x,pos.y,label).attr(this.vertexLabelAttr);
       if(info.terminal){
-         var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r - 3);
+         var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r + 5);
          var result = [node,labelRaph,terminalCircle];
          this._addCustomElements(id, [labelRaph,terminalCircle]);
       }else{
