@@ -734,6 +734,7 @@ function VertexDragAndConnect(settings) {
    var graphMouse = settings.graphMouse;
    var dragThreshold = settings.dragThreshold;
    this.onVertexSelect = settings.onVertexSelect;
+   this.onPairSelect = settings.onPairSelect;
    this.onEdgeSelect = settings.onEdgeSelect;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
@@ -874,8 +875,8 @@ function VertexDragAndConnect(settings) {
       }
 
       // Finish a new pair.
-      if(settings.onPairSelect) {
-         settings.onPairSelect(self.selectionParent, id);
+      if(self.onPairSelect) {
+         self.onPairSelect(self.selectionParent, id);
       }
       self.onVertexSelect(self.selectionParent, false, true);
       self.selectionParent = null;
@@ -883,6 +884,9 @@ function VertexDragAndConnect(settings) {
 
    this.setOnVertexSelect = function(fct) {
       this.onVertexSelect = fct;
+   };
+   this.setOnPairSelect = function(fct) {
+      this.onPairSelect = fct;
    };
    this.setOnEdgeSelect = function(fct) {
       this.onEdgeSelect = fct;
@@ -1207,7 +1211,6 @@ function GraphEditor(settings) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
       }else{
-         // attr = vertexAttr;
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
@@ -1216,11 +1219,23 @@ function GraphEditor(settings) {
       }   
    };
 
+   this.defaultOnPairSelect = function(id1,id2) {
+      var edgeGuid = 0;
+      while(graph.isEdge("e_" + edgeGuid)) {
+         edgeGuid++;
+      }
+      var edgeID = "e_" + edgeGuid;
+      graph.addEdge(edgeID, id1, id2,{label:edgeID});
+      self.setNewEdgeVisualInfo(edgeID,id1,id2);
+      if(callback){
+         callback();
+      }
+   };
+
    this.defaultOnEdgeSelect = function(edgeID,selected) {
       var edge = visualGraph.getRaphaelsFromID(edgeID);
       if(selected){
          edge[0].attr(selectedEdgeAttr);
-         // self.editEdgeLabel(edgeID);
          self.addEdgeCross(edgeID);
       }else{
          edge[0].attr(visualGraph.graphDrawer.lineAttr);
@@ -1241,6 +1256,87 @@ function GraphEditor(settings) {
       if(callback){
          callback();
       }
+   };
+
+   this.setNewEdgeVisualInfo = function(edgeID,id1,id2) {
+      var edges = graph.getEdgesBetween(id1,id2);
+      if(edges.length <= 1)
+         return;
+      if(id1 === id2){
+         var angle = 0;
+         var validAngle;
+         var increment = 20;
+         var nTry = 0;
+         do{
+            validAngle = true;
+            if(nTry >= 360/increment){
+               increment /= 2;
+               nTry = 0;
+            }
+            for(var iEdge = 0; iEdge < edges.length; iEdge++){
+               if(edges[iEdge] !== edgeID){
+                  var vInfo = visualGraph.getEdgeVisualInfo(edges[iEdge]);
+                  if(vInfo.angle < angle + increment/2 && vInfo.angle > angle - increment/2){
+                     angle = (angle + increment)%360;
+                     validAngle = false;
+                     nTry++;
+                     break;
+                  }
+               }
+            }
+         }while(!validAngle);
+         visualGraph.setEdgeVisualInfo(edgeID,{angle:angle});
+      }else{
+         var validParameters;
+         var parameterSet = [
+            {"sweep":0,"large-arc":0,"radius-ratio":0},
+            {"sweep":0,"large-arc":0,"radius-ratio":1},
+            {"sweep":1,"large-arc":0,"radius-ratio":1},
+            {"sweep":0,"large-arc":0,"radius-ratio":0.75},
+            {"sweep":1,"large-arc":0,"radius-ratio":0.75},
+            {"sweep":0,"large-arc":0,"radius-ratio":0.6},
+            {"sweep":1,"large-arc":0,"radius-ratio":0.6},
+            {"sweep":0,"large-arc":0,"radius-ratio":0.55},
+            {"sweep":1,"large-arc":0,"radius-ratio":0.55},
+            {"sweep":0,"large-arc":0,"radius-ratio":0.51},
+            {"sweep":1,"large-arc":0,"radius-ratio":0.51},
+            {"sweep":0,"large-arc":1,"radius-ratio":0.51},
+            {"sweep":1,"large-arc":1,"radius-ratio":0.51},
+            {"sweep":0,"large-arc":1,"radius-ratio":0.55},
+            {"sweep":1,"large-arc":1,"radius-ratio":0.55},
+            {"sweep":0,"large-arc":1,"radius-ratio":0.6},
+            {"sweep":1,"large-arc":1,"radius-ratio":0.6},
+            {"sweep":0,"large-arc":1,"radius-ratio":0.75},
+            {"sweep":1,"large-arc":1,"radius-ratio":0.75},
+            {"sweep":0,"large-arc":1,"radius-ratio":1},
+            {"sweep":1,"large-arc":1,"radius-ratio":1}
+         ];
+         var nTry = 0;
+         do{
+            validParameters = true;
+            if(nTry === parameterSet.length - 1){
+               nTry = 0;
+               break;
+            }
+            for(var iEdge = 0; iEdge < edges.length; iEdge++){
+               if(edges[iEdge] !== edgeID){
+                  var vInfo = visualGraph.getEdgeVisualInfo(edges[iEdge]);
+                  if(!vInfo["radius-ratio"]){
+                     vInfo["radius-ratio"] = 0;
+                     vInfo["sweep"] = 0;
+                     vInfo["large-arc"] = 0;
+                  }
+                  if(vInfo["radius-ratio"] === parameterSet[nTry]["radius-ratio"] && vInfo["sweep"] === parameterSet[nTry]["sweep"] && vInfo["large-arc"] === parameterSet[nTry]["large-arc"]){
+                     validParameters = false;
+                     nTry++;
+                     break;
+                  }
+               }
+            }
+         }while(!validParameters);
+         visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
+      }
+      visualGraph.graphDrawer.refreshEdgePosition(id1,id2);
    };
 
    this.addIcons = function(vertexId) {
@@ -1267,7 +1363,6 @@ function GraphEditor(settings) {
       visualGraph.pushVertexRaphael(vertexId,self.pencil);
       
       self.pencil.click(function(){
-         // self.editVertexLabel(vertexId)
          self.editLabel(vertexId,"vertex");
       });
    };
@@ -1476,92 +1571,6 @@ function GraphEditor(settings) {
       this.setDefaultSettings();
    };
 
-   // this.editVertexLabel = function(vertexId) {
-   //    // return function() {
-   //       var info = graph.getVertexInfo(vertexId);
-   //       var visualInfo = visualGraph.getVertexVisualInfo(vertexId);
-   //       var label = info.label || "";
-   //       var fontSize = visualGraph.graphDrawer.vertexLabelAttr["font-size"] || 15;
-   //       var vertexRaph = visualGraph.getRaphaelsFromID(vertexId);
-   //       vertexRaph[1].hide();
-   //       self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
-   //       $("#"+paperId).css("position","relative");
-   //       self.textEditor.css({
-   //          position: "absolute",
-   //          left: visualInfo.x,
-   //          top: visualInfo.y,
-   //          width: label.length * fontSize,
-   //          transform: "translate(-50%,-50%)",
-   //          "text-align": "center",
-   //          background: "none",
-   //          border: "none",
-   //          color: vertexLabelAttr.fill,
-   //       });
-   //       self.textEditor.css(vertexLabelAttr);
-   //       $("#"+paperId).append(self.textEditor);
-   //       self.textEditor.focus();
-   //       self.textEditor.keydown(function(){ // resize input when text length changes
-   //          var text = $(this).val();
-   //          if(text.length > 0){
-   //             $(this).css("width",text.length * fontSize);
-   //          }
-   //       });
-   //       self.textEditor.focusout(function(){
-   //          self.writeVertexLabel(vertexId)
-   //       });
-   //       self.textEditor.keypress(function(event){
-   //          if(event.which == 13){
-   //             self.writeVertexLabel(vertexId);
-   //          }
-   //       });
-   //       if(callback){
-   //          callback();
-   //       }
-   //    // }
-   // };
-
-   // this.editEdgeLabel = function(edgeID) {
-   //    var info = graph.getEdgeInfo(edgeID);
-   //    var labelPos = visualGraph.graphDrawer.getLabelPos(edgeID);
-   //    var label = info.label || "";
-   //    var fontSize = visualGraph.graphDrawer.edgeLabelAttr["font-size"] || 15;
-   //    var edgeRaph = visualGraph.getRaphaelsFromID(edgeID);
-   //    edgeRaph[1].hide();
-   //    self.edgeTextEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
-   //    $("#"+paperId).css("position","relative");
-   //    self.edgeTextEditor.css({
-   //       position: "absolute",
-   //       left: labelPos.x,
-   //       top: labelPos.y,
-   //       width: label.length * fontSize,
-   //       transform: "translate(-50%,-50%)",
-   //       "text-align": "center",
-   //       background: "none",
-   //       border: "none",
-   //       color: edgeLabelAttr.fill,
-   //    });
-   //    self.edgeTextEditor.css(edgeLabelAttr);
-   //    $("#"+paperId).append(self.edgeTextEditor);
-   //    self.edgeTextEditor.focus();
-   //    self.edgeTextEditor.keydown(function(){ // resize input when text length changes
-   //       var text = $(this).val();
-   //       if(text.length > 0){
-   //          $(this).css("width",text.length * fontSize);
-   //       }
-   //    });
-   //    self.edgeTextEditor.focusout(function(){
-   //       self.writeEdgeLabel(edgeID)
-   //    });
-   //    self.edgeTextEditor.keypress(function(event){
-   //       if(event.which == 13){
-   //          self.writeEdgeLabel(edgeID);
-   //       }
-   //    });
-   //    if(callback){
-   //       callback();
-   //    }
-   // };
-
    this.editLabel = function(id,type) {
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
@@ -1614,42 +1623,6 @@ function GraphEditor(settings) {
          callback();
       }
    };
-
-   // this.writeVertexLabel = function(vertexId) {
-   //    var info = graph.getVertexInfo(vertexId);
-   //    var visualInfo = visualGraph.getVertexVisualInfo(vertexId);
-   //    var oldLabel = info.label;
-   //    var newLabel = (self.textEditor) ? self.textEditor.val() : null;
-   //    var vertexRaph = visualGraph.getRaphaelsFromID(vertexId);
-   //    if(newLabel && oldLabel !== newLabel){
-   //       info.label = newLabel;
-   //       graph.setVertexInfo(vertexId,info);
-   //    }
-   //    if(self.textEditor)
-   //       self.textEditor.remove();
-   //    vertexRaph[1].attr("text",info.label);
-   //    vertexRaph[1].show();
-   // };
-
-   // this.writeEdgeLabel = function(edgeID) {
-   //    var info = graph.getEdgeInfo(edgeID);
-   //    var oldLabel = info.label;
-   //    var newLabel = (self.edgeTextEditor) ? self.edgeTextEditor.val() : null;
-   //    var edgeRaph = visualGraph.getRaphaelsFromID(edgeID);
-   //    if(newLabel && oldLabel !== newLabel){
-   //       info.label = newLabel;
-   //       graph.setEdgeInfo(edgeID,info);
-   //    }
-   //    if(self.edgeTextEditor)
-   //       self.edgeTextEditor.remove();
-   //    var labelPos = visualGraph.graphDrawer.getLabelPos(edgeID);
-   //    edgeRaph[1].attr({
-   //       text:info.label,
-   //       x: labelPos.x,
-   //       y: labelPos.y
-   //    });
-   //    edgeRaph[1].show();
-   // };
 
    this.writeLabel = function(id,type) {
       if(type === "vertex"){
@@ -1706,6 +1679,9 @@ function GraphEditor(settings) {
       if(!settings.onVertexSelect){
          this.vertexDragAndConnect.setOnVertexSelect(this.defaultOnVertexSelect);
       }
+      if(!settings.onPairSelect){
+         this.vertexDragAndConnect.setOnPairSelect(this.defaultOnPairSelect);
+      }
       if(!settings.onEdgeSelect){
          this.arcDragger.setOnEdgeSelect(this.defaultOnEdgeSelect);
       }
@@ -1715,7 +1691,6 @@ function GraphEditor(settings) {
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setStartDragCallback(this.startDragCallback);
-      // this.arcDragger.setEditEdgeLabel(this.editEdgeLabel);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
    };
    
