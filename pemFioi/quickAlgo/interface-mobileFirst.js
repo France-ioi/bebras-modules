@@ -782,6 +782,8 @@ var quickAlgoInterface = {
         // TODO :: move that out of quickAlgoInterface?
         $('button.videoBtn').off('click', this.videoBtnHandler);
         $('button.videoBtn').on('click', this.videoBtnHandler).html('<span class="fas fa-play-circle icon"></span> ' + this.strings.displayVideo);
+        $('a.videoBtn').off('click', this.videoBtnHandler);
+        $('a.videoBtn').on('click', this.videoBtnHandler);
     },
 
     videoBtnHandler: function() {

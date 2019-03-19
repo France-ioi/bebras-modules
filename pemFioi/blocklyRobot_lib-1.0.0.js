@@ -273,8 +273,8 @@ var getContext = function(display, infos, curLevel) {
          },
          de: {
             label: {
-               row: "Spalte des Roboters",
-               col: "Zeile des Roboters",
+               row: "Zeile des Roboters",
+               col: "Spalte des Roboters",
                north: "gehe nach oben",
                south: "gehe nach unten",
                east: "gehe nach rechts",

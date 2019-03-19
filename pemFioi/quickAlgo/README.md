@@ -38,8 +38,8 @@ Options which are an object or an array can also have a `shared` key when set
 as level-specific options, for instance :
 ```
 hideControls: {
-  easy: {nextStep: true, goToEnd: true},
-  shared: {speedSlider: true}
+   easy: {nextStep: true, goToEnd: true},
+   shared: {speedSlider: true}
 }
 ```
 
@@ -117,6 +117,68 @@ zoom: {
 ```
 
 ### includeBlocks options
+
+Full example of `includeBlocks` :
+
+```
+includeBlocks: {
+   generatedBlocks: {
+      robot: ["south", "east", "west"]
+   },
+   standardBlocks: {
+      includeAll: false,
+      blockSets: ['textBasic'],
+      wholeCategories: ['logic'],
+      singleBlocks: ['lists_repeat', 'lists_getIndex', 'lists_setIndex'],
+      excludedBlocks: ['text_print']
+   },
+   groupByCategory: true,
+   variables: ['index'],
+   variablesOnlyBlocks: ['get', 'incr']
+}
+```
+
+#### generatedBlocks
+
+Type : object
+
+Selects blocks from the currently loaded context / library.
+
+Each key of the object must be a category of blocks from the loaded context, and contain the list of blocks which are allowed from this context.
+
+Example : `{robot: ["south", "east", "west"]}`
+
+#### standardBlocks
+
+Type : object
+
+Selects blocks from the standard Blockly blocks.
+
+Possible keys :
+* `includeAll` (boolean, default `false`) : allow the user to use almost any block. If enabled, this mode gives the user access to coherent set of blocks that should allow to program anything ; all restrictions are disabled.
+* `blockSets` (array of strings) : include block sets. Block sets are shortcuts to a combination of `wholeCategories`, `singleBlocks` and `excludedBlocks` that behave the same as if these were set in `includeBlocks`.
+* `wholeCategories` (array of strings) : include a whole category.
+* `singleBlocks` (array of strings) : include single blocks.
+* `excludedBlocks` (array of strings) : exclude blocks, even if they were included through `blockSets`, `wholeCategories` or `singleBlocks`. This is ignored if `includeAll` is `true`.
+
+Note about `includeAll` and `wholeCategories` : some blocks are excluded by default as to not clutter the list, but can be added manually through `singleBlocks`.
+
+Example :
+```
+{
+   includeAll: false,
+   blockSets: ['textBasic'],
+   wholeCategories: ['logic'],
+   singleBlocks: ['lists_repeat', 'lists_getIndex', 'lists_setIndex'],
+   excludedBlocks: ['text_print']
+}
+```
+
+#### groupByCategory
+
+Type : boolean, default `false`
+
+Displays blocks grouped by category. Mandatory if variables or procedures are allowed.
 
 #### variables
 
