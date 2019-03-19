@@ -100,33 +100,11 @@ $('.grader').hide();
 
 // grade
 
-function useGraderData(url, answer, callback) {
-    if(window.QuizzeGrader && window.QuizzeGrader.data) {
-        callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
-        return;
+function useGraderData(answer, callback) {
+    if(window.QuizzeGrader.grade && window.QuizzeGrader.data) {
+        return callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
     }
-
-    function onLoad(script) {
-        try {
-            window.QuizzeGrader.data = eval(script)
-        } catch(e) {
-            console.error('Malformed grader data in ' + url);
-            return
-        }
-        callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
-    }
-
-    // $.getScript nor working over file: protocol
-    var req = new XMLHttpRequest();
-    req.open('GET', url, true);
-    req.onreadystatechange = function() {
-        if(req.readyState === 4) {
-            if(req.status === 200 || req.status == 0) {
-                onLoad(req.responseText)
-            }
-        }
-    }
-    req.send(null);
+    console.error('Local QuizzeGrader not found');
 }
 
 
@@ -218,8 +196,8 @@ task.load = function(views, success) {
             var token = task_token.get()
             if(token) {
                 useGraderUrl(json.graderUrl, token, answer, onGrade);
-            } else if(json.graderUrl) {
-                useGraderData('grader_data.js', answer, onGrade);
+            } else {
+                useGraderData(answer, onGrade);
             }
         };
 
@@ -247,6 +225,7 @@ task.load = function(views, success) {
     });
 };
 
+window.QuizzeGrader = {}
 
 var grader = {
     gradeTask: task.gradeAnswer
