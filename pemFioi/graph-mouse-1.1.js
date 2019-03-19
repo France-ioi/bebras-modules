@@ -1463,6 +1463,7 @@ function GraphEditor(settings) {
       self.vertexDragAndConnect.setEnabled(false);
       settings.graphMouse = new GraphMouse("mouse", graph, visualGraph);
       self.vertexDragAndConnect = new VertexDragAndConnect(settings);
+      this.arcDragger.setEnabled(false);
       this.arcDragger = new ArcDragger({
          id:"ArcDragger",
          paperElementID: settings.paperElementID,
