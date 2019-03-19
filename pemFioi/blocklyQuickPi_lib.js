@@ -487,38 +487,46 @@ var getContext = function (display, infos, curLevel) {
             window.displayHelper.showPopupDialog(`
             <div class="content connectPi">
                 <div class="panel-heading">
-                    <h2 class="sectionTitle"><span class="iconTag"><i class="icon fas fa-list-ul"></i></span>Accès — Sélection IOI — 2018</h2>
-                    <div class="exit" id="picancel"><span class="icon fas fa-times"></span></div>
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        Accès — Sélection IOI — 2018
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
                 <div class="panel-body">
-                    <div>
-                    <ul>
-                        <li><a href="#" id="piconwifi">WiFi</a></li>
-                        <li><a href="#" id="piconusb">USB</a></li>
-                        <li><a href="#" id="piconbt">Bluetooth</a></li>
-                    </ul>
+                    <div class="switchRadio btn-group" id="piconsel">
+                        <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
+                        <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
+                        <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
                     </div>
-
-                    <div class="form-group">
-                        <label id="pischoolkeylabel">School key:</label>
-                        <input id="schoolkey" type='text'>
-                    </div>
-                    <div class="form-group">
-                        <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend"><button id=pigetlist disabled>Get list</button></div>
-                            <select id="pilist" class="custom-select" disabled>
-                            </select>
+                    <div id="pischoolcon">
+                        <div class="form-group">
+                            <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">Aa</div>
+                                <input type="text" id="schoolkey" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
+                            <div class="input-group">
+                                <button class="input-group-prepend" id=pigetlist disabled>Get list</button>
+                                <select id="pilist" class="custom-select" disabled>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label id="piiplabel">ou entrez son adesse IP</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">123</div>
+                                <input id=piaddress type="text" class="form-control">
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label id="piiplabel">ou entrez son adesse IP</label>
-                        <input id=piaddress type='text'> 
-                    </div>
 
-                    <div>
-                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter L'appareil</button>
-                        <button id="pirelease" class="btn">Release</button>
+                    <div class="inlineButtons">
+                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
+                        <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>Déconnecter</button>
                     </div>
                 </div>
             </div>
@@ -589,44 +597,31 @@ var getContext = function (display, infos, curLevel) {
                     });
             });
 
-
+            // Select device connexion methods
+            $('#piconsel .btn').click(function(){
+                if (! $(this).hasClass('active')) {
+                    $('#piconsel .btn').removeClass('active');
+                    $(this).addClass('active');
+                }
+            });
             $('#piconwifi').click(function () {
-                $('#schoolkey').show();
-                $('#pigetlist').show();
-                $('#pilist').show();
-                $('#piaddress').show();
-
-                $('#piiplabel').show();
-                $('#pischoolkeylabel').show();
-                $('#pilistlabel').show();
+                $(this).addClass('active');
+                $('#pischoolcon').show("slow");
 
             });
 
             $('#piconusb').click(function () {
-                $('#schoolkey').hide();
-                $('#pigetlist').hide();
-                $('#pilist').hide();
-                $('#piaddress').hide();
-                
-                $('#piiplabel').hide();
-                $('#pischoolkeylabel').hide();
-                $('#pilistlabel').hide();
+                $(this).addClass('active');
+                $('#pischoolcon').hide("slow");
                 
 
                 $('#piaddress').val("192.168.233.1");
             });
 
             $('#piconbt').click(function () {
-                $('#schoolkey').hide();
-                $('#pigetlist').hide();
-                $('#pilist').hide();
-                $('#piaddress').hide();
-
-                $('#piiplabel').hide();
-                $('#pischoolkeylabel').hide();
-                $('#pilistlabel').hide();
-
-
+                $(this).addClass('active');
+                $('#pischoolcon').hide("slow");
+                
                 $('#piaddress').val("192.168.233.2");
             });
 

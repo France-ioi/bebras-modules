@@ -47,8 +47,13 @@ body > * {
 .interfaceToggled {
   display: none !important;
 }
-:disabled {
+input:disabled,
+select:disabled {
   background-color: #eee !important;
+  cursor: not-allowed !important;
+}
+button:disabled {
+  background-color: #e3e3e3 !important;
   cursor: not-allowed !important;
 }
 /*****************

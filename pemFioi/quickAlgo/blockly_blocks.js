@@ -3,6 +3,18 @@
         Block generation and configuration logic for the Blockly mode
 */
 
+// Sets of blocks
+var blocklySets = {
+   allDefault: {
+      wholeCategories: ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"]
+      },
+   allJls: {
+      wholeCategories: ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"],
+      excludedBlocks: ['text_eval', 'text_print', 'text_print_noend']
+      }
+   };
+
+
 // Blockly to Scratch translations
 var blocklyToScratch = {
    singleBlocks: {
@@ -41,6 +53,7 @@ var blocklyAllowedSiblings = {
    'controls_if_else': ['controls_if'],
    'lists_create_with_empty': ['lists_create_with']
 }
+
 
 function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
    // TODO :: completely split the logic so it can be a separate object
@@ -1905,6 +1918,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
 
 
+         // *** Blocks from the lib
          if(this.includeBlocks.generatedBlocks && 'wholeCategories' in this.includeBlocks.generatedBlocks) {
             for(var blockType in this.includeBlocks.generatedBlocks.wholeCategories) {
               var categories = this.includeBlocks.generatedBlocks.wholeCategories[blockType];
@@ -1957,24 +1971,55 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             }
          }
 
+
+         // *** Standard blocks
          var stdBlocks = this.getStdBlocks();
 
-         if (this.includeBlocks.standardBlocks.includeAll) {
+         var taskStdInclude = (this.includeBlocks && this.includeBlocks.standardBlocks) || {};
+         var stdInclude = {
+            wholeCategories: [],
+            singleBlocks: [],
+            excludedBlocks: []
+         };
+
+         // Merge all lists into stdInclude
+         if (taskStdInclude.includeAll) {
             if(this.scratchMode) {
-               this.includeBlocks.standardBlocks.wholeCategories = ["control", "input", "lists", "operator", "tables", "texts", "variables", "functions"];
+               stdInclude.wholeCategories = ["control", "input", "lists", "operator", "tables", "texts", "variables", "functions"];
             } else {
-               this.includeBlocks.standardBlocks.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"];
+               stdInclude.wholeCategories = ["input", "logic", "loops", "math", "texts", "lists", "dicts", "tables", "variables", "functions"];
             }
          }
-         var wholeCategories = this.includeBlocks.standardBlocks.wholeCategories || [];
+         mergeIntoArray(stdInclude.wholeCategories, taskStdInclude.wholeCategories || []);
+         mergeIntoArray(stdInclude.singleBlocks, taskStdInclude.singleBlocks || []);
+         mergeIntoArray(stdInclude.excludedBlocks, taskStdInclude.excludedBlocks || []);
+
+         // Add block sets
+         if(taskStdInclude.blockSets) {
+            for(var iSet in taskStdInclude.blockSets) {
+               mergeIntoObject(stdInclude, blocklySets[taskStdInclude.blockSets[iSet]]);
+            }
+         }
+
+         // Prevent from using excludedBlocks if includeAll is set
+         if(taskStdInclude.includeAll) { stdInclude.excludedBlocks = []; }
+
+         // Remove excludedBlocks from singleBlocks
+         for(var iBlock=0; iBlock < stdInclude.singleBlocks; iBlock++) {
+            if(arrayContains(stdInclude.excludedBlocks, stdInclude.singleBlocks[iBlock])) {
+               stdInclude.singleBlocks.splice(iBlock, 1);
+               iBlock--;
+            }
+         }
+
          var handledCategories = [];
-         for (var iCategory = 0; iCategory < wholeCategories.length; iCategory++) {
-            var categoryName = wholeCategories[iCategory];
-            if(this.scratchMode && !this.includeBlocks.standardBlocks.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
+         for (var iCategory = 0; iCategory < stdInclude.wholeCategories.length; iCategory++) {
+            var categoryName = stdInclude.wholeCategories[iCategory];
+            if(this.scratchMode && !taskStdInclude.includeAll && blocklyToScratch.wholeCategories[categoryName]) {
                categoryName = blocklyToScratch.wholeCategories[categoryName];
             }
 
-            if(handledCategories.indexOf(categoryName) != -1) { continue; }
+            if(arrayContains(handledCategories, categoryName)) { continue; }
             handledCategories.push(categoryName);
 
             if (!(categoryName in categoriesInfos)) {
@@ -1996,14 +2041,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               }
 
              for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
-                if (!(blocks[iBlock].excludedByDefault)) {
+                if (!(blocks[iBlock].excludedByDefault) && !arrayContains(stdInclude.excludedBlocks, blocks[iBlock].name)) {
                    categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
                 }
               }
             }
          }
 
-         var singleBlocks = this.includeBlocks.standardBlocks.singleBlocks || [];
+         var singleBlocks = stdInclude.singleBlocks;
          for(var iBlock = 0; iBlock < singleBlocks.length; iBlock++) {
             var blockName = singleBlocks[iBlock];
             if(blockName == 'procedures_defnoreturn') {
@@ -2033,7 +2078,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             categoriesInfos['functions'] = {
                blocksXml: []
             };
-            if(this.scratchMode && singleBlocks.indexOf('math_number') == -1) {
+            if(this.scratchMode && !arrayContains(singleBlocks, 'math_number')) {
                singleBlocks.push('math_number'); // TODO :: temporary
             }
             if(!this.includeBlocks.groupByCategory) {
