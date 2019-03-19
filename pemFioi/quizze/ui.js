@@ -151,11 +151,13 @@ function QuizzeUI(params) {
 
             showResult: function(mistakes) {
                 parent.find('answer').removeClass('correct mistake');
-                parent.find('answer.selected').each(function() {
-                    var el = $(this)
-                    var idx = parseInt(el.attr('answer-index'), 10);
-                    el.addClass(mistakes.indexOf(idx) === -1 ? 'correct' : 'mistake')
-                })
+                if(Array.isArray(mistakes)) {
+                    parent.find('answer.selected').each(function() {
+                        var el = $(this)
+                        var idx = parseInt(el.attr('answer-index'), 10);
+                        el.addClass(mistakes.indexOf(idx) === -1 ? 'correct' : 'mistake')
+                    })
+                }
             }
         }
 
@@ -280,6 +282,7 @@ function QuizzeUI(params) {
         },
 
         showResult: function(mistakes) {
+            mistakes = Array.isArray(mistakes) ? mistakes : [];
             for(var i=0; i<questions.length; i++) {
                 questions[i].showResult(mistakes[i]);
             }
