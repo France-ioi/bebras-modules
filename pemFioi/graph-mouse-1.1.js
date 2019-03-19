@@ -1573,7 +1573,12 @@ function GraphEditor(settings) {
       }
       if(self.edgeTextEditor)
          self.edgeTextEditor.remove();
-      edgeRaph[1].attr("text",info.label);
+      var labelPos = visualGraph.graphDrawer.getLabelPos(edgeID);
+      edgeRaph[1].attr({
+         text:info.label,
+         x: labelPos.x,
+         y: labelPos.y
+         });
       edgeRaph[1].show();
    };
 
