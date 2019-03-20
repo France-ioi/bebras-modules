@@ -1210,7 +1210,17 @@ function GraphEditor(settings) {
       if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
+         $(document).keydown(function(event){
+            if(event.which == 46){  // if press delete
+               graph.removeVertex(vertexId);
+               self.vertexDragAndConnect.selectionParent = null;
+               if(callback){
+                  callback();
+               }
+            }
+         });
       }else{
+         $(document).off("keydown");
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
@@ -1237,7 +1247,16 @@ function GraphEditor(settings) {
       if(selected){
          edge[0].attr(selectedEdgeAttr);
          self.addEdgeCross(edgeID);
+         $(document).keydown(function(event){
+            if(event.which == 46){  // if press delete
+               graph.removeEdge(edgeID);
+               if(callback){
+                  callback();
+               }
+            }
+         });
       }else{
+         $(document).off("keydown");
          edge[0].attr(visualGraph.graphDrawer.lineAttr);
          if(self.edgeCross)
             self.edgeCross.remove();
