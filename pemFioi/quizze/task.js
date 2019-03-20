@@ -95,7 +95,6 @@ task.getDefaultStateObject = function() { return {} }
 
 $('solution').hide();
 $('#solution').hide();
-$('#showSolutionButton').hide();
 $('.grader').hide();
 
 
@@ -149,8 +148,8 @@ task.load = function(views, success) {
 
 
         task.showViews = function(views, callback) {
-            //q.toggleSolutions(!!views.solution);
-            $('#showSolutionButton').toggle(!!views.solution);
+            q.toggleSolutions(!!views.solution);
+            $('#solution').toggle(!!views.solution);
             callback()
         }
 
