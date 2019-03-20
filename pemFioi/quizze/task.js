@@ -172,7 +172,7 @@ task.load = function(views, success) {
 
 
         function displayScore(score, max_score) {
-            var msg = lang.translate('score') + ' <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
+            var msg = '<span class="scoreLabel">' + lang.translate('score') + '</span>' + ' <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
             if($('#score').length == 0) {
                 var div = '<div id="score"></div>';
                 $('.taskContent').first().append(div);
