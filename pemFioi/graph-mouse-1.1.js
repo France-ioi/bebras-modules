@@ -733,6 +733,7 @@ function VertexDragAndConnect(settings) {
    this.visualGraph = settings.visualGraph;
    var graphMouse = settings.graphMouse;
    var dragThreshold = settings.dragThreshold;
+   this.dragLimits = settings.dragLimits;
    this.onVertexSelect = settings.onVertexSelect;
    this.onPairSelect = settings.onPairSelect;
    this.onEdgeSelect = settings.onEdgeSelect;
@@ -837,9 +838,9 @@ function VertexDragAndConnect(settings) {
 
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
-      if(settings.dragLimits) {
-         newX = Math.min(settings.dragLimits.maxX, Math.max(newX, settings.dragLimits.minX));
-         newY = Math.min(settings.dragLimits.maxY, Math.max(newY, settings.dragLimits.minY));
+      if(self.dragLimits) {
+         newX = Math.min(self.dragLimits.maxX, Math.max(newX, self.dragLimits.minX));
+         newY = Math.min(self.dragLimits.maxY, Math.max(newY, self.dragLimits.minY));
       }
       if(settings.snapToLastGoodPosition) {
          var position = {
