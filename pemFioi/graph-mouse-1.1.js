@@ -1136,6 +1136,7 @@ function GraphDragger(settings) {
    this.enabled = false;
    this.mouseInitPos = null;
    this.vertInitPos = null;
+   this.isShiftPressed = false;
    this.callback = settings.callback;
    this.dragMove = new PaperMouseEvent(this.paperElementID, this.paper, "mousemove", onDragMove, false);
    this.dragEnd = new PaperMouseEvent(this.paperElementID, this.paper, "mouseup", onDragEnd, false);
@@ -1145,6 +1146,25 @@ function GraphDragger(settings) {
    this.setEnabled = function(enabled){
       if(enabled == this.enabled) {
          return;
+      }
+      if(enabled){
+         $(window).keydown(function(event){
+            if(event.which == 16){
+               if(!self.isShiftPressed){
+                  self.isShiftPressed = true;
+               }
+            }
+         });
+         $(window).keyup(function(event){
+            if(event.which == 16){
+               if(self.isShiftPressed){
+                  self.isShiftPressed = false;
+               }
+            }
+         });
+      }else{
+         $(window).off("keydown");
+         $(window).off("keyup");
       }
       this.enabled = enabled;
       this.fuzzyClicker.setEnabled(enabled);
@@ -1165,11 +1185,19 @@ function GraphDragger(settings) {
       });
    };
    function onDragMove(x,y,event){
-      var dx = x - self.mouseInitPos.x;
-      var dy = y - self.mouseInitPos.y;
-      $.each(self.vertInitPos, function(index, element) {
-         self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x + dx, element.position.y + dy);
-      });
+      if(self.isShiftPressed){
+         var ratioX = x / self.mouseInitPos.x;
+         var ratioY = y / self.mouseInitPos.y;
+         $.each(self.vertInitPos, function(index, element) {
+            self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x*ratioX, element.position.y*ratioY);
+         });
+      }else{
+         var dx = x - self.mouseInitPos.x;
+         var dy = y - self.mouseInitPos.y;
+         $.each(self.vertInitPos, function(index, element) {
+            self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x + dx, element.position.y + dy);
+         });
+      }
    }
    function onDragEnd(x,y,event){
       self.dragMove.setEnabled(false);
