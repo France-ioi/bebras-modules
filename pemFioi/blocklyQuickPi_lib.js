@@ -81,6 +81,15 @@ var getContext = function (display, infos, curLevel) {
 
             startingBlockName: "Programme", // Name for the starting block
             messages: {
+                sensorNotFound: "Tried to use a non existing sensor.",
+                manualTestSuccess: "Manual test validated automatically.",
+                testSuccess: "Bravo ! La sortie est correcte",
+                wrongState: "Test failed, reached wrong state.",
+                programEnded: "programme terminé.",
+                piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
+                cantConnect: "Impossible de se connecter à l'appareil.",
+                sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
+
             }
         },
         none: {
@@ -132,12 +141,16 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
+    context.onExecutionEnd = function() {
+        
+    };
+
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
         if (!context.display && !context.autoGrading) {
             context.success = true;
-            throw "Manual test validated automatically.";
+            throw (strings.messages.manualTestSuccess);
         }
 
         if (context.autoGrading) {
@@ -148,11 +161,15 @@ var getContext = function (display, infos, curLevel) {
                     if (state.time < context.currentTime) {
                         if (!state.hit) {
                             context.success = false;
-                            throw ("Failed");
+                            throw (strings.messages.wrongState);
                         } else if (lastTurn)
                         {
                             context.success = true;
-                            throw ("programme terminé");
+                            if (context.autoGrading)
+                                context.DoNotGrade = false;
+                            else
+                                context.DoNotGrade = true;
+                            throw (strings.messages.programEnded);
 
                         }
                     }
@@ -167,7 +184,12 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = false;
-                throw ("programme terminé");
+                if (context.autoGrading)
+                    context.DoNotGrade = false;
+                else
+                    context.DoNotGrade = true;
+
+                throw (strings.messages.programEnded);
             }
         }
     };
@@ -186,7 +208,7 @@ var getContext = function (display, infos, curLevel) {
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
             if (context.autoGrading) {
-                context.gradingInput = taskInfos.intput;
+                context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
                 context.tickIncrease = 100;
@@ -789,9 +811,9 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.quickPiConnection.wasLocked())
         {
-            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
+            window.displayHelper.showPopupMessage(strings.messages.piPlocked, 'blanket');
         } else if (!context.releasing && !wasConnected) {
-            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
+            window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
         }
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
@@ -1291,7 +1313,7 @@ var getContext = function (display, infos, curLevel) {
 
     function sensorInConnectedModeError()
     {
-        window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
+        window.displayHelper.showPopupMessage(strings.messages.sensorInOnlineMode, 'blanket');
     }
 
     function drawSensor(sensor, state = true, juststate = false) {
@@ -1892,7 +1914,7 @@ var getContext = function (display, infos, curLevel) {
     context.registerQuickPiEvent = function (sensorType, port, newState, setInSensor = true) {
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
-            throw ("Sensor is not registered");
+            throw (strings.messages.sensorNotFound);
         }
 
         if (setInSensor) {
@@ -1911,7 +1933,8 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.currentTime >= context.maxTime) {
                 context.success = true;
-                throw ("Bravo ! La sortie est correcte");
+                context.DoNotGrade = false;
+                throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
                 !context.compareSensorState(sensor.type, expectedState.state, newState)) {
@@ -1929,7 +1952,8 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.fail) {
                 context.success = false;
-                throw ("La sortie est incorrecte");
+                context.DoNotGrade = false;
+                throw (strings.messages.wrongState);
             }
             else
                 context.increaseTime(sensor);
@@ -2013,7 +2037,7 @@ var getContext = function (display, infos, curLevel) {
 
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
-            throw ("Referenced not existing sensor " + sensorType + " in port " + port);
+            throw (strings.messages.sensorNotFound);
         }
 
         if (state == null) {
@@ -2601,6 +2625,6 @@ function hideSlider(sensor) {
     if (sensor.slider)
         sensor.slider.remove();
     
-    if (sensor.focusrect && sensor.focusrect.paper.canvas)
+    if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas)
         sensor.focusrect.toFront();
 };
