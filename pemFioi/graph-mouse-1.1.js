@@ -860,7 +860,7 @@ function VertexDragAndConnect(settings) {
          self.arcDragger.unselectAll();
       }
       // Click on background or on the selected vertex -  deselect it.
-      if(id === null){
+      if(id === null || id === self.selectionParent){
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
          }
@@ -1155,7 +1155,7 @@ function GraphEditor(settings) {
    };
    var overlayAttr = {
       opacity: 0,
-      fill: "white",
+      fill: "red",
       "cursor": "pointer"
    };
    // var vertexAttr = visualGraph.graphDrawer.circleAttr; 
@@ -1165,7 +1165,8 @@ function GraphEditor(settings) {
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
    var customCreateVertex = settings.createVertex; // must return vertexId
 
-   this.pencil = null;
+   // this.pencil = null;
+   this.loopIcon = null;
    this.cross = null;
    this.edgeCross = null;
    this.terminalIcon = null;
@@ -1211,17 +1212,18 @@ function GraphEditor(settings) {
       if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
-         $(document).keydown(function(event){
-            if(event.which == 46){  // if press delete
-               graph.removeVertex(vertexId);
-               self.vertexDragAndConnect.selectionParent = null;
-               if(callback){
-                  callback();
-               }
-            }
-         });
+         self.editLabel(vertexId,"vertex");
+         // $(document).keydown(function(event){
+         //    if(event.which == 46){  // if press delete
+         //       graph.removeVertex(vertexId);
+         //       self.vertexDragAndConnect.selectionParent = null;
+         //       if(callback){
+         //          callback();
+         //       }
+         //    }
+         // });
       }else{
-         $(document).off("keydown");
+         // $(document).off("keydown");
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
@@ -1360,12 +1362,14 @@ function GraphEditor(settings) {
    };
 
    this.addIcons = function(vertexId) {
-      self.addPencil(vertexId);
+      // self.addPencil(vertexId);
+      self.addLoopIcon(vertexId);
       self.addCross(vertexId);
       self.addTerminalIcon(vertexId);
    };
    this.removeIcons = function() {
-      self.pencil.remove();
+      // self.pencil.remove();
+      self.loopIcon.remove();
       self.cross.remove();
       self.terminalIcon.remove();
    };
@@ -1397,6 +1401,33 @@ function GraphEditor(settings) {
          "L" + x + "," + (y + 3*qSize) +
          "Z" 
          ).attr(iconAttr);
+      var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
+      return paper.set(icon,overlay);
+   };
+
+   this.addLoopIcon = function(vertexId) {
+      var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
+      var size = 20;
+      var X = vertexPos.x - vertexRadius - size;
+      var Y = vertexPos.y - vertexRadius - 3*size/4;
+      if(self.loopIcon){
+         self.loopIcon.remove();
+      }
+      self.loopIcon = self.drawLoopIcon(X,Y,size);
+      visualGraph.pushVertexRaphael(vertexId,self.loopIcon);
+      
+      self.loopIcon.click(function(){
+         self.vertexDragAndConnect.onPairSelect(vertexId,vertexId);
+      });
+   };
+
+   this.drawLoopIcon = function(x,y,size) {
+      var qSize = size/4;
+      var icon = paper.path(
+         "M" + (x + 2*qSize) + "," + y +
+         "A" + size/2 + "," + size/2 + "," + 0 + "," + 1 + "," + 0 + "," + (x + 2*qSize + 0.1) + "," + (y)
+         ).attr({"stroke":iconAttr.fill,"stroke-width":size/5,"arrow-end":"classic-medium-short"});
       var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
       return paper.set(icon,overlay);
    };
