@@ -89,6 +89,10 @@ var getContext = function (display, infos, curLevel) {
                 piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
                 sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
+                cantConnectoToUSB: "Aucun appareil n'est connecté en USB",
+                cantConnectoToBT: "Aucun appareil n'est connecté en Bluetooth",
+                canConnectoToUSB: "Connecté en USB.",
+                canConnectoToBT: "Connecté en Bluetooth.",
 
             }
         },
@@ -711,6 +715,9 @@ var getContext = function (display, infos, curLevel) {
                             </div>
                         </div>
                     </div>
+                    <div panel-body-usbbt>
+                        <label id="piconnectionlabel">Aucun appareil n'est connecté en USB</label>
+                    </div>
 
                     <div class="inlineButtons">
                         <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
@@ -727,6 +734,27 @@ var getContext = function (display, infos, curLevel) {
             else {
                 $('#piconnectok').attr('disabled', true);
                 $('#pirelease').attr('disabled', false);
+            }
+
+            if (context.quickPiConnection.isConnected())
+            {
+                if (sessionStorage.connectionMethod == "USB") {
+                    $('#piconwifi').removeClass('active');
+                    $('#piconusb').addClass('active');
+                    $('#pischoolcon').hide();
+                    $('#piaddress').val("192.168.233.1");
+                
+                    $('#piconnectok').attr('disabled', true);
+                } else if (sessionStorage.connectionMethod == "BT") {
+                    $('#piconwifi').removeClass('active');
+                    $('#piconbt').addClass('active');
+                    $('#pischoolcon').hide();
+                    
+                    $('#piaddress').val("192.168.233.2");
+                    $('#piconnectok').attr('disabled', false);
+
+                    $('#piconnectok').attr('disabled', true);
+                }
             }
 
             if (sessionStorage.pilist) {
@@ -787,33 +815,69 @@ var getContext = function (display, infos, curLevel) {
 
             // Select device connexion methods
             $('#piconsel .btn').click(function(){
-                if (! $(this).hasClass('active')) {
-                    $('#piconsel .btn').removeClass('active');
-                    $(this).addClass('active');
+                if (!context.quickPiConnection.isConnected()) {
+                    if (! $(this).hasClass('active')) {
+                        $('#piconsel .btn').removeClass('active');
+                        $(this).addClass('active');
+                    }
                 }
             });
-            $('#piconwifi').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').show("slow");
 
+            $('#piconwifi').click(function () {
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "WIFI";
+                    $(this).addClass('active');
+                    $('#pischoolcon').show("slow");
+                }
             });
 
             $('#piconusb').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').hide("slow");
-                
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "USB";
+                    $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
 
-                $('#piaddress').val("192.168.233.1");
+                    $(this).addClass('active');
+                    $('#pischoolcon').hide("slow");
+
+                    context.quickPiConnection.isAvailable("192.168.233.1", function(available) {
+                        if (available) {
+                            $('#piconnectok').attr('disabled', false);
+
+                            $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+                        } else {
+                            $('#piconnectok').attr('disabled', true);
+
+                            $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
+                        }
+                    });
+
+                    $('#piaddress').val("192.168.233.1");
+                }
             });
 
             $('#piconbt').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').hide("slow");
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "BT";
+                    $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+
+                    $(this).addClass('active');
+                    $('#pischoolcon').hide("slow");
                 
-                $('#piaddress').val("192.168.233.2");
+                    $('#piaddress').val("192.168.233.2");
+
+                    context.quickPiConnection.isAvailable("192.168.233.2", function(available) {
+                        if (available) {
+                            $('#piconnectok').attr('disabled', false);
+                            $('piconnectionlabel').val(strings.messages.canConnectoToBT)
+                        } else {
+                            $('#piconnectok').attr('disabled', true);
+                            $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                        }
+                    });
+                }
             });
-
-
 
             function populatePiList(jsonlist) {
                 sessionStorage.pilist = JSON.stringify(jsonlist);
