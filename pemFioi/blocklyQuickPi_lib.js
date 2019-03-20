@@ -274,51 +274,217 @@ var getContext = function (display, infos, curLevel) {
 
     function updateLiveSensor(sensor)
     {
-        if (sensor.type == "button")
+        if (findSensorDefinition(sensor).isSensor && findSensorDefinition(sensor).getLiveState)
         {
             context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("buttonStateInPort(" + sensor.port.substring(1) + ")", function (returnVal) {
 
-                context.liveUpdateCount--;
-                sensor.state = returnVal != "0";
-                drawSensor(sensor);
-            });
-        } else if (sensor.type == "range") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readDistance(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-
-        } else if (sensor.type == "potentiometer") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readRotaryAngle(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-
-        } else if (sensor.type == "temperature") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readTemperature(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-        } else if (sensor.type == "light") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readLightIntensity(" + sensor.port.substring(1) + ")", function (returnVal) {
-
+            findSensorDefinition(sensor).getLiveState(sensor.port, function(returnVal) {
                 context.liveUpdateCount--;
                 sensor.state = returnVal;
                 drawSensor(sensor);
             });
         }
+
     }
+
+
+    function findSensorDefinition(sensor)
+    {
+        return sensorDefinitions.find(function(element)
+        {
+            if (sensor.type == element.name)
+                return element;
+        })
+    }
+
+
+    sensorDefinitions = [
+        /******************************** */
+        /*             Actuators          */
+        /**********************************/
+        {
+            name: "led",
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["ledoff.png"],
+            getPercentageFromState: function(state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function(percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function(state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function(state) {
+
+            }
+        },
+        {
+            name: "servo",
+            isAnalog: true,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["servo.png", "servo-pale.png", "servo-center.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 180;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 180);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+        },
+        {
+            name: "screen",
+            isAnalog: false,
+            isSensor: false,
+            doubleWidth: true,
+            portType: "i2c",
+            selectorImages: ["screen.png"],
+            compareState: function(state1, state2)
+            {
+                // Both are null are equal
+                if (state1 == null && state2 == null)
+                    return true;
+
+                // If only one is null they are different
+                if ((state1 == null && state2) ||
+                    (state1 && state2 == null))
+                    return false;
+
+                // Otherwise compare the strings
+                return state1.line1 == state2.line1 &&
+                      state1.line2 == state2.line2;
+            },
+        },
+        /******************************** */
+        /*             sensors            */
+        /**********************************/
+        {
+            name: "button",
+            isAnalog: false,
+            isSensor: true,
+            portType: "D",
+            selectorImages: ["buttonoff.png"],
+            getPercentageFromState: function(state)
+            {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function(percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("buttonStateInPort(" + port.substring(1) + ")", function(retVal) {
+                    callback(retVal != "0");
+                });
+            },
+        },
+        {
+            name: "temperature",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["temperature-hot.png", "tempteature-overlay.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 60;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 60);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readTemperature(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "potentiometer",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["potentiometer.png", "potentiometer-pale.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 100;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readRotaryAngle(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "light",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["light.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 100;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readLightIntensity(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "range",
+            isAnalog: true,
+            isSensor: true,
+            portType: "D",
+            selectorImages: ["range.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 500;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 500);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readDistance(" + port.substring(1) + ")", callback);
+            },
+        },
+    ];
 
 
     // Reset the context's display
@@ -415,7 +581,7 @@ var getContext = function (display, infos, curLevel) {
             var nSensors = quickPiSensors.length;
 
             quickPiSensors.forEach(function (sensor) {
-                if (context.sensorDoubleWitdh(sensor)) {
+                if (findSensorDefinition(sensor).doubleWidth) {
                     hasdoublewitdh = true;
                     nSensors++;
                 }
@@ -460,7 +626,7 @@ var getContext = function (display, infos, curLevel) {
 
                     if (infos.quickPiSensors[iSensor]) {
                         var sensor = infos.quickPiSensors[iSensor];
-                        var doublewitdh = context.sensorDoubleWitdh(sensor);
+                        var doublewitdh = findSensorDefinition(sensor).doubleWidth;
 
                         if (doublewitdh) {
                             row++;
@@ -942,27 +1108,6 @@ var getContext = function (display, infos, curLevel) {
 
     }
 
-    function isAnalogSensor(sensor, state) {
-        var retval = {
-            analog: false,
-            percentage: 0
-        };
-
-        if (sensor.type == "potentiometer" ||
-            sensor.type == "light") {
-            retval.analog = true;
-            retval.percentage = state / 100;
-        } else if (sensor.type == "servo") {
-            retval.analog = true;
-            retval.percentage = state / 180;
-        } else if (sensor.type == "temperature") {
-            retval.analog = true;
-            retval.percentage = state / 50;
-        }
-
-        return retval;
-    }
-
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
         if (paper == undefined || !context.display)
@@ -991,11 +1136,11 @@ var getContext = function (display, infos, curLevel) {
             strokewidth = 4;
         }
 
-        var isAnalog = isAnalogSensor(sensor, state);
+        var isAnalog = findSensorDefinition(sensor).isAnalog;
         var percentage = + state;
 
-        if (isAnalog.analog) {
-            var offset = (ypositionbottom - ypositiontop) * isAnalog.percentage;
+        if (isAnalog) {
+            var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state);
 
             if (type == "wrong") {
                 color = "red";
@@ -1008,9 +1153,9 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.lastAnalogState != null
                 && sensor.lastAnalogState != state) {
-                var oldSsAnalog = isAnalogSensor(sensor, sensor.lastAnalogState);
+                var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState);
 
-                var previousOffset = (ypositionbottom - ypositiontop) * oldSsAnalog.percentage;
+                var previousOffset = (ypositionbottom - ypositiontop) * oldStatePercentage;
 
                 var joinline = paper.path(["M", startx,
                                        ypositiontop + offset,
@@ -1126,9 +1271,9 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max, onsliderchange, getpercentage) {
+    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max) {
         if (juststate) {
-            var percentage = getpercentage();
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
 
             thumby = sensor.sliderdata.insiderecty +
                      sensor.sliderdata.insideheight - 
@@ -1163,8 +1308,10 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.thumb.attr('y', newy);
 
-                var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
-                onsliderchange(percentage);
+                var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+
+                sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                drawSensor(sensor, sensor.state, true);
 
                 actuallydragged++;
             },
@@ -1259,9 +1406,11 @@ var getContext = function (display, infos, curLevel) {
 
             var thumbwidth = outsidewidth * .80;
             sensor.sliderdata.thumbheight = outsidewidth * 1.4;
-            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight) / 100;
+            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight);
 
-            var percentage = getpercentage ? getpercentage() : sensor.state;
+
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+
 
             var thumby = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight - (percentage * sensor.sliderdata.scale);
 
@@ -1286,8 +1435,10 @@ var getContext = function (display, infos, curLevel) {
 
                     sensor.thumb.attr('y', newy);
 
-                    var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
-                    onsliderchange(percentage);
+                    var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+                    sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                    drawSensor(sensor, sensor.state, true);
+    
 
                 },
                 function (x, y, event) {
@@ -1298,8 +1449,6 @@ var getContext = function (display, infos, curLevel) {
                 }
             );
         }
-
-
     }
 
     function removeSlider(sensor)
@@ -1464,7 +1613,6 @@ var getContext = function (display, infos, curLevel) {
                             sensor.onPressed();
                     } else
                         sensorInConnectedModeError()
-
                 }
 
                 sensor.buttonon.node.ontouchend = sensor.buttonon.node.onmouseup;
@@ -1583,14 +1731,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60, function(percentage) {
-                        sensor.state = Math.round(percentage * .60);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return 100 / 60 * sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
             }
             else {
                 sensor.img3.click(function() {
@@ -1657,14 +1798,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (!context.autoGrading &&
                  (!context.runner || !context.runner.isRunning())) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180, function(percentage) {
-                        sensor.state = Math.round(percentage * 1.8);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return 100 / 180 * sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180);
             } else {
                 removeSlider(sensor);
             }
@@ -1702,14 +1836,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
-                        sensor.state = Math.round(percentage);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
             } else  {
                 sensor.pale.click(function() {
                     sensorInConnectedModeError();
@@ -1798,14 +1925,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500, function(percentage) {
-                        sensor.state = Math.round(percentage * 5);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state / 5;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500);
             } else {
                 sensor.img.click(function() {
                     sensorInConnectedModeError();
@@ -1861,14 +1981,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
-                        sensor.state = Math.round(percentage);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
             } else {
                 sensor.sun.click(function() {
                     sensorInConnectedModeError();
@@ -1894,22 +2007,6 @@ var getContext = function (display, infos, curLevel) {
         sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "lightgray" });
     }
 
-    context.sensorDoubleWitdh = function (sensor) {
-        if (sensor.type == "screen")
-            return true;
-
-        return false;
-    }
-
-
-    context.compareSensorState = function (sensorType, state1, state2) {
-        if (sensorType == "screen") {
-            return state1.line1 == state2.line1 &&
-                state1.line2 == state2.line2;
-        }
-
-        return state1 == state2;
-    }
 
     context.registerQuickPiEvent = function (sensorType, port, newState, setInSensor = true) {
         var sensor = findSensor(sensorType, port);
@@ -1937,7 +2034,7 @@ var getContext = function (display, infos, curLevel) {
                 throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
-                !context.compareSensorState(sensor.type, expectedState.state, newState)) {
+                !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
                 type = "wrong";
                 context.fail = false;
             }
