@@ -507,7 +507,7 @@ $(document).ready(function() {
                     platform.trigger('showViews', [{"task": true}]);
                 });
                 if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                  $("#task").append("<center id='showSolutionButton' style='display: none'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
                 }
 
                 // add branded header to platformless task depending on avatarType
