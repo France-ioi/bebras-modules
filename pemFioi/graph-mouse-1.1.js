@@ -1126,6 +1126,64 @@ function ArcDragger(settings) {
    }
 };
 
+function GraphDragger(settings) {
+   var self = this;
+   this.id = settings.id;
+   this.paper = settings.paper;
+   this.paperElementID = settings.paperElementID;
+   this.graph = settings.graph;
+   this.visualGraph = settings.visualGraph;
+   this.enabled = false;
+   this.mouseInitPos = null;
+   this.vertInitPos = null;
+   this.callback = settings.callback;
+   this.dragMove = new PaperMouseEvent(this.paperElementID, this.paper, "mousemove", onDragMove, false);
+   this.dragEnd = new PaperMouseEvent(this.paperElementID, this.paper, "mouseup", onDragEnd, false);
+   this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, 
+      onFuzzyClick, false, false, true, 0, settings.edgeThreshold, false, "mousedown");
+
+   this.setEnabled = function(enabled){
+      if(enabled == this.enabled) {
+         return;
+      }
+      this.enabled = enabled;
+      this.fuzzyClicker.setEnabled(enabled);
+   }
+
+   function onFuzzyClick(elementType, id, x, y, event){
+      self.onDragStart(x,y,event);
+   }
+   this.onDragStart = function(x,y,event){
+      self.mouseInitPos = {x:x,y:y};
+      self.dragMove.setEnabled(true);
+      self.dragEnd.setEnabled(true);
+      self.vertInitPos = $.map(self.graph.getAllVertices(), function(id) {
+         return {
+            id: id,
+            position: self.visualGraph.graphDrawer.getVertexPosition(id)
+         };
+      });
+   };
+   function onDragMove(x,y,event){
+      var dx = x - self.mouseInitPos.x;
+      var dy = y - self.mouseInitPos.y;
+      $.each(self.vertInitPos, function(index, element) {
+         self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x + dx, element.position.y + dy);
+      });
+   }
+   function onDragEnd(x,y,event){
+      self.dragMove.setEnabled(false);
+      self.dragEnd.setEnabled(false);
+      if(self.callback){
+         self.callback();
+      }
+   };
+   
+   if(settings.enabled) {
+      this.setEnabled(true);
+   }
+};
+
 function GraphEditor(settings) {
    var self = this;
    var paper = settings.paper;
@@ -1136,7 +1194,6 @@ function GraphEditor(settings) {
    var onEdgeSelect = settings.onEdgeSelect;
    this.createVertex = settings.createVertex;
    var callback = settings.callback || null;
-   
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
       "stroke-width": 4
@@ -1195,6 +1252,16 @@ function GraphEditor(settings) {
       // callback: settings.callback,
       enabled: false
    });
+   this.graphDragger = new GraphDragger({
+      id: "GraphDragger",
+      paper: settings.paper,
+      paperElementID: settings.paperElementID,
+      graph: graph,
+      visualGraph: visualGraph,  
+      edgeThreshold: settings.edgeThreshold,
+      callback: settings.callback,
+      enabled: false
+   });
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1205,6 +1272,7 @@ function GraphEditor(settings) {
       self.vertexDragAndConnect.setEnabled(enabled);
       self.vertexCreator.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
+      self.graphDragger.setEnabled(enabled);
    };
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
