@@ -170,9 +170,9 @@ var getContext = function (display, infos, curLevel) {
                         {
                             context.success = true;
                             if (context.autoGrading)
-                                context.DoNotGrade = false;
+                                context.doNotStartGrade  = false;
                             else
-                                context.DoNotGrade = true;
+                                context.doNotStartGrade  = true;
                             throw (strings.messages.programEnded);
 
                         }
@@ -189,9 +189,9 @@ var getContext = function (display, infos, curLevel) {
             if (lastTurn) {
                 context.success = false;
                 if (context.autoGrading)
-                    context.DoNotGrade = false;
+                    context.doNotStartGrade  = false;
                 else
-                    context.DoNotGrade = true;
+                    context.doNotStartGrade  = true;
 
                 throw (strings.messages.programEnded);
             }
@@ -2094,7 +2094,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.currentTime >= context.maxTime) {
                 context.success = true;
-                context.DoNotGrade = false;
+                context.doNotStartGrade  = false;
                 throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
@@ -2113,7 +2113,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.fail) {
                 context.success = false;
-                context.DoNotGrade = false;
+                context.doNotStartGrade  = false;
                 throw (strings.messages.wrongState);
             }
             else

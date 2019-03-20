@@ -120,6 +120,21 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         }
     }
 
+    this.isAvailable = function(ipaddress, callback) {
+        url = "ws://" + ipaddress + ":5000/api/v1/commands";
+
+        var websocket = new WebSocket(url);
+
+        websocket.onopen = function () {
+            websocket.onclose = null;
+            websocket.close();
+            callback(true);
+        }
+        websocket.onclose = function () {
+            callback(false);
+        }
+    }
+
     this.onclose = function() {
         clearInterval(pingInterval);
         pingInterval = null;

@@ -239,7 +239,7 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.logActivity();
          // Launch an evaluation after the execution
 
-         if (!subTask.context.DoNotGrade) {
+         if (!subTask.context.doNotStartGrade ) {
             subTask.context.display = false;
             subTask.getGrade(handleResults, true, subTask.iTestCase);
          }
