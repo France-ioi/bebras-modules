@@ -739,6 +739,14 @@ function VertexDragAndConnect(settings) {
    this.onEdgeSelect = settings.onEdgeSelect;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
+
+   this.gridEnabled = false;
+   this.gridX = null;
+   this.gridY = null;
+   this.enabled = false;
+   this.occupiedSnapPositions = {};
+   this.vertexToSnapPosition = {};
+
    this.enabled = false;
    this.selectionParent = null;
    this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, settings.vertexThreshold, settings.edgeThreshold, false);
@@ -754,6 +762,14 @@ function VertexDragAndConnect(settings) {
          this.disableDrag();
       }
       this.fuzzyClicker.setEnabled(enabled);
+   };
+
+   this.setGridEnabled = function(enabled, gridX, gridY) {
+      this.gridEnabled = enabled;
+      if(enabled) {
+         this.gridX = gridX;
+         this.gridY = gridY;
+      }
    };
 
    this.disableDrag = function() {
@@ -838,6 +854,10 @@ function VertexDragAndConnect(settings) {
 
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
+      if(self.gridEnabled) {
+         newX -= (newX % self.gridX);
+         newY -= (newY % self.gridY);
+      }
       if(self.dragLimits) {
          newX = Math.min(self.dragLimits.maxX, Math.max(newX, self.dragLimits.minX));
          newY = Math.min(self.dragLimits.maxY, Math.max(newY, self.dragLimits.minY));
@@ -1256,7 +1276,6 @@ function GraphEditor(settings) {
    this.edgeCross = null;
    this.terminalIcon = null;
    this.textEditor = null;
-   // this.edgeTextEditor = null;
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
       id:"ArcDragger",
@@ -1837,6 +1856,7 @@ function GraphEditor(settings) {
       }
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
+      // this.vertexDragAndConnect.setGridEnabled(true,this.gridX,this.gridY);
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
    };
