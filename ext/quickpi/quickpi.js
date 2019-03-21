@@ -706,9 +706,11 @@ class DHT11:
 
 def readHumidity(pin):
     pin = int(pin)
+    haveold = False
 
     try:
         lasttime = DHT11_last_value[pin]["time"]
+        haveold = True
         if time.time() - lasttime < 2:
             return DHT11_last_value[pin]["humidity"]
     except:
@@ -724,6 +726,8 @@ def readHumidity(pin):
             "humidity": result.humidity
         }
         return result.humidity
+    elif haveold:
+        return DHT11_last_value[pin]["humidity"] 
 
     return 0
     
