@@ -1118,11 +1118,15 @@ function ArcDragger(settings) {
       var side = (x1 < x2) ? 1 : 0;
       if(x1 === x2) {
          if(xMouse > x1){
-            side = 0;
+            side = (y1 > y2) ? 0 : 1;
+         }else{
+            side = (y1 > y2) ? 1 : 0;
          }
       }else if(y1 === y2){
          if(yMouse > y1){
-            side = 0;
+            side = (x1 < x2) ? 0 : 1;
+         }else{
+            side = (x1 < x2) ? 1 : 0;
          }
       }else{
          var a = (y2 - y1)/(x2 - x1);
