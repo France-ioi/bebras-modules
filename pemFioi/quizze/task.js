@@ -231,8 +231,10 @@ var grader = {
     gradeTask: task.gradeAnswer
 };
 
-if(window.platform) {
-    platform.initWithTask(task);
-}
-
 lang.set(window.stringsLanguage)
+
+$(function() {
+    if(window.platform) {
+        platform.initWithTask(task);
+    }
+});
