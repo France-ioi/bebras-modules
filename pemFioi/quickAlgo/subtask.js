@@ -238,8 +238,11 @@ var initBlocklySubTask = function(subTask, language) {
          // Log the attempt
          subTask.logActivity();
          // Launch an evaluation after the execution
-         subTask.context.display = false;
-         subTask.getGrade(handleResults, true, subTask.iTestCase);
+
+         if (!subTask.context.doNotStartGrade ) {
+            subTask.context.display = false;
+            subTask.getGrade(handleResults, true, subTask.iTestCase);
+         }
       });
       initContextForLevel(initialTestCase);
    };
