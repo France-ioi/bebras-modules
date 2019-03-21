@@ -86,7 +86,7 @@ task.getMetaData = function(success, error) {
 };
 
 task.reloadState = function(state, success, error) { success() }
-task.getState = function(success, error) { success({})  }
+task.getState = function(success, error) { success("{}")  }
 task.reloadStateObject = function(obj) { }
 task.getStateObject = function() { return {} }
 task.getDefaultStateObject = function() { return {} }
