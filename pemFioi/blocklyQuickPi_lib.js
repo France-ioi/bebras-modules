@@ -81,6 +81,19 @@ var getContext = function (display, infos, curLevel) {
 
             startingBlockName: "Programme", // Name for the starting block
             messages: {
+                sensorNotFound: "Tried to use a non existing sensor.",
+                manualTestSuccess: "Manual test validated automatically.",
+                testSuccess: "Bravo ! La sortie est correcte",
+                wrongState: "Test failed, reached wrong state.",
+                programEnded: "programme terminé.",
+                piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
+                cantConnect: "Impossible de se connecter à l'appareil.",
+                sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
+                cantConnectoToUSB: "Aucun appareil n'est connecté en USB",
+                cantConnectoToBT: "Aucun appareil n'est connecté en Bluetooth",
+                canConnectoToUSB: "Connecté en USB.",
+                canConnectoToBT: "Connecté en Bluetooth.",
+
             }
         },
         none: {
@@ -132,12 +145,16 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
+    context.onExecutionEnd = function() {
+        
+    };
+
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
         if (!context.display && !context.autoGrading) {
             context.success = true;
-            throw "Manual test validated automatically.";
+            throw (strings.messages.manualTestSuccess);
         }
 
         if (context.autoGrading) {
@@ -148,11 +165,15 @@ var getContext = function (display, infos, curLevel) {
                     if (state.time < context.currentTime) {
                         if (!state.hit) {
                             context.success = false;
-                            throw ("Failed");
+                            throw (strings.messages.wrongState);
                         } else if (lastTurn)
                         {
                             context.success = true;
-                            throw ("programme terminé");
+                            if (context.autoGrading)
+                                context.doNotStartGrade  = false;
+                            else
+                                context.doNotStartGrade  = true;
+                            throw (strings.messages.programEnded);
 
                         }
                     }
@@ -167,7 +188,12 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = false;
-                throw ("programme terminé");
+                if (context.autoGrading)
+                    context.doNotStartGrade  = false;
+                else
+                    context.doNotStartGrade  = true;
+
+                throw (strings.messages.programEnded);
             }
         }
     };
@@ -186,7 +212,7 @@ var getContext = function (display, infos, curLevel) {
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
             if (context.autoGrading) {
-                context.gradingInput = taskInfos.intput;
+                context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
                 context.tickIncrease = 100;
@@ -252,51 +278,217 @@ var getContext = function (display, infos, curLevel) {
 
     function updateLiveSensor(sensor)
     {
-        if (sensor.type == "button")
+        if (findSensorDefinition(sensor).isSensor && findSensorDefinition(sensor).getLiveState)
         {
             context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("buttonStateInPort(" + sensor.port.substring(1) + ")", function (returnVal) {
 
-                context.liveUpdateCount--;
-                sensor.state = returnVal != "0";
-                drawSensor(sensor);
-            });
-        } else if (sensor.type == "range") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readDistance(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-
-        } else if (sensor.type == "potentiometer") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readRotaryAngle(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-
-        } else if (sensor.type == "temperature") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readTemperature(" + sensor.port.substring(1) + ")", function (returnVal) {
-
-                context.liveUpdateCount--;
-                sensor.state = returnVal;
-                drawSensor(sensor);
-            });
-        } else if (sensor.type == "light") {
-            context.liveUpdateCount++;
-            context.quickPiConnection.sendCommand("readLightIntensity(" + sensor.port.substring(1) + ")", function (returnVal) {
-
+            findSensorDefinition(sensor).getLiveState(sensor.port, function(returnVal) {
                 context.liveUpdateCount--;
                 sensor.state = returnVal;
                 drawSensor(sensor);
             });
         }
+
     }
+
+
+    function findSensorDefinition(sensor)
+    {
+        return sensorDefinitions.find(function(element)
+        {
+            if (sensor.type == element.name)
+                return element;
+        })
+    }
+
+
+    sensorDefinitions = [
+        /******************************** */
+        /*             Actuators          */
+        /**********************************/
+        {
+            name: "led",
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["ledoff.png"],
+            getPercentageFromState: function(state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function(percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function(state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function(state) {
+
+            }
+        },
+        {
+            name: "servo",
+            isAnalog: true,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["servo.png", "servo-pale.png", "servo-center.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 180;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 180);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+        },
+        {
+            name: "screen",
+            isAnalog: false,
+            isSensor: false,
+            doubleWidth: true,
+            portType: "i2c",
+            selectorImages: ["screen.png"],
+            compareState: function(state1, state2)
+            {
+                // Both are null are equal
+                if (state1 == null && state2 == null)
+                    return true;
+
+                // If only one is null they are different
+                if ((state1 == null && state2) ||
+                    (state1 && state2 == null))
+                    return false;
+
+                // Otherwise compare the strings
+                return state1.line1 == state2.line1 &&
+                      state1.line2 == state2.line2;
+            },
+        },
+        /******************************** */
+        /*             sensors            */
+        /**********************************/
+        {
+            name: "button",
+            isAnalog: false,
+            isSensor: true,
+            portType: "D",
+            selectorImages: ["buttonoff.png"],
+            getPercentageFromState: function(state)
+            {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function(percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("buttonStateInPort(" + port.substring(1) + ")", function(retVal) {
+                    callback(retVal != "0");
+                });
+            },
+        },
+        {
+            name: "temperature",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["temperature-hot.png", "tempteature-overlay.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 60;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 60);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readTemperature(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "potentiometer",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["potentiometer.png", "potentiometer-pale.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 100;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readRotaryAngle(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "light",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            selectorImages: ["light.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 100;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readLightIntensity(" + port.substring(1) + ")", callback);
+            },
+        },
+        {
+            name: "range",
+            isAnalog: true,
+            isSensor: true,
+            portType: "D",
+            selectorImages: ["range.png"],
+            getPercentageFromState: function(state)
+            {
+                return state / 500;
+            },
+            getStateFromPercentage: function(percentage) {
+                return Math.round(percentage * 500);
+            },
+            compareState: function(state1, state2)
+            {
+                return state1 == state2;
+            },
+            getLiveState: function(port, callback) {
+                context.quickPiConnection.sendCommand("readDistance(" + port.substring(1) + ")", callback);
+            },
+        },
+    ];
 
 
     // Reset the context's display
@@ -348,19 +540,19 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.autoGrading) {
             var numSensors = infos.quickPiSensors.length;
-            var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 4);
+            var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 10);
 
             context.sensorSize = sensorSize * .90;
 
-            context.pixelsPerTime = (paper.width - context.sensorSize) / context.maxTime;
-
+            context.timelineStartx = context.sensorSize * 3;
+            context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / context.maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
 
                 sensor.drawInfo = {
                     x: 0,
-                    y: sensorSize * iSensor,
+                    y: 10 + (sensorSize * iSensor),
                     width: sensorSize * .90,
                     height: sensorSize * .90
                 }
@@ -373,15 +565,18 @@ var getContext = function (display, infos, curLevel) {
                     var states = context.gradingStatesBySensor[key];
                     var startTime = -1;
                     var lastState = null;
+                    sensor.lastAnalogState = null;
+
                     for (var iState = 0; iState < states.length; iState++) {
                         var state = states[iState];
-                        if (startTime > 0) {
-                            drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected");
-                        }
+
+                        drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected");
 
                         startTime = state.time;
                         lastState = state.state;
                     }
+
+                    sensor.lastAnalogState = null;
                 }
             }
         } else {
@@ -390,7 +585,7 @@ var getContext = function (display, infos, curLevel) {
             var nSensors = quickPiSensors.length;
 
             quickPiSensors.forEach(function (sensor) {
-                if (context.sensorDoubleWitdh(sensor)) {
+                if (findSensorDefinition(sensor).doubleWidth) {
                     hasdoublewitdh = true;
                     nSensors++;
                 }
@@ -435,7 +630,7 @@ var getContext = function (display, infos, curLevel) {
 
                     if (infos.quickPiSensors[iSensor]) {
                         var sensor = infos.quickPiSensors[iSensor];
-                        var doublewitdh = context.sensorDoubleWitdh(sensor);
+                        var doublewitdh = findSensorDefinition(sensor).doubleWidth;
 
                         if (doublewitdh) {
                             row++;
@@ -520,6 +715,9 @@ var getContext = function (display, infos, curLevel) {
                             </div>
                         </div>
                     </div>
+                    <div panel-body-usbbt>
+                        <label id="piconnectionlabel">Aucun appareil n'est connecté en USB</label>
+                    </div>
 
                     <div class="inlineButtons">
                         <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
@@ -536,6 +734,27 @@ var getContext = function (display, infos, curLevel) {
             else {
                 $('#piconnectok').attr('disabled', true);
                 $('#pirelease').attr('disabled', false);
+            }
+
+            if (context.quickPiConnection.isConnected())
+            {
+                if (sessionStorage.connectionMethod == "USB") {
+                    $('#piconwifi').removeClass('active');
+                    $('#piconusb').addClass('active');
+                    $('#pischoolcon').hide();
+                    $('#piaddress').val("192.168.233.1");
+                
+                    $('#piconnectok').attr('disabled', true);
+                } else if (sessionStorage.connectionMethod == "BT") {
+                    $('#piconwifi').removeClass('active');
+                    $('#piconbt').addClass('active');
+                    $('#pischoolcon').hide();
+                    
+                    $('#piaddress').val("192.168.233.2");
+                    $('#piconnectok').attr('disabled', false);
+
+                    $('#piconnectok').attr('disabled', true);
+                }
             }
 
             if (sessionStorage.pilist) {
@@ -596,33 +815,69 @@ var getContext = function (display, infos, curLevel) {
 
             // Select device connexion methods
             $('#piconsel .btn').click(function(){
-                if (! $(this).hasClass('active')) {
-                    $('#piconsel .btn').removeClass('active');
-                    $(this).addClass('active');
+                if (!context.quickPiConnection.isConnected()) {
+                    if (! $(this).hasClass('active')) {
+                        $('#piconsel .btn').removeClass('active');
+                        $(this).addClass('active');
+                    }
                 }
             });
-            $('#piconwifi').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').show("slow");
 
+            $('#piconwifi').click(function () {
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "WIFI";
+                    $(this).addClass('active');
+                    $('#pischoolcon').show("slow");
+                }
             });
 
             $('#piconusb').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').hide("slow");
-                
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "USB";
+                    $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
 
-                $('#piaddress').val("192.168.233.1");
+                    $(this).addClass('active');
+                    $('#pischoolcon').hide("slow");
+
+                    context.quickPiConnection.isAvailable("192.168.233.1", function(available) {
+                        if (available) {
+                            $('#piconnectok').attr('disabled', false);
+
+                            $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+                        } else {
+                            $('#piconnectok').attr('disabled', true);
+
+                            $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
+                        }
+                    });
+
+                    $('#piaddress').val("192.168.233.1");
+                }
             });
 
             $('#piconbt').click(function () {
-                $(this).addClass('active');
-                $('#pischoolcon').hide("slow");
+                if (!context.quickPiConnection.isConnected()) {
+                    sessionStorage.connectionMethod = "BT";
+                    $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+
+                    $(this).addClass('active');
+                    $('#pischoolcon').hide("slow");
                 
-                $('#piaddress').val("192.168.233.2");
+                    $('#piaddress').val("192.168.233.2");
+
+                    context.quickPiConnection.isAvailable("192.168.233.2", function(available) {
+                        if (available) {
+                            $('#piconnectok').attr('disabled', false);
+                            $('piconnectionlabel').val(strings.messages.canConnectoToBT)
+                        } else {
+                            $('#piconnectok').attr('disabled', true);
+                            $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                        }
+                    });
+                }
             });
-
-
 
             function populatePiList(jsonlist) {
                 sessionStorage.pilist = JSON.stringify(jsonlist);
@@ -786,9 +1041,9 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.quickPiConnection.wasLocked())
         {
-            window.displayHelper.showPopupMessage("L'appareil est verrouillé. Déverrouillez ou redémarrez", 'blanket');
+            window.displayHelper.showPopupMessage(strings.messages.piPlocked, 'blanket');
         } else if (!context.releasing && !wasConnected) {
-            window.displayHelper.showPopupMessage("Impossible de se connecter à l'appareil", 'blanket');
+            window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
         }
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
@@ -846,33 +1101,33 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
-        for (var i = 1000; i < context.maxTime; i += 1000) {
-            var x = context.sensorSize + (i * context.pixelsPerTime);
+        for (var i = 0; i <= context.maxTime; i += 1000) {
+            var x = context.timelineStartx + (i * context.pixelsPerTime);
 
-            var timelabel = paper.text(x + 5, paper.height - context.sensorSize / 2, (i / 1000));
+            var timelabel = paper.text(x, paper.height - context.sensorSize / 2, (i / 1000));
 
-            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
 
             context.timelineText.push(timelabel);
-
-            /*paper.path(["M", x,
+/*
+            paper.path(["M", x,
                 paper.height - context.sensorSize / 2,
                 "L", x,
                 paper.height - context.sensorSize]);*/
         }
 /*
-        paper.path(["M", context.sensorSize,
+        paper.path(["M", context.timelineStartx,
             paper.height - context.sensorSize * 3 / 4,
             "L", paper.width,
-            paper.height - context.sensorSize * 3 / 4]);*/
-
+            paper.height - context.sensorSize * 3 / 4]);
+*/
     }
 
     function drawCurrentTime() {
-        if (paper == undefined || !context.display)
+        if (!paper || !context.display)
             return;
 
-        var startx = context.sensorSize + (context.currentTime * context.pixelsPerTime);
+        var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
 
         if (context.timeLineCurrent)
             context.timeLineCurrent.remove();
@@ -880,10 +1135,8 @@ var getContext = function (display, infos, curLevel) {
         if (context.timeLineCircle)
             context.timeLineCircle.remove();
 
-
         if (context.timeLineTriangle)
             context.timeLineTriangle.remove();
-
 
         context.timeLineCurrent = paper.path(["M", startx,
             0,
@@ -919,27 +1172,6 @@ var getContext = function (display, infos, curLevel) {
 
     }
 
-    function isAnalogSensor(sensor, state) {
-        var retval = {
-            analog: false,
-            percentage: 0
-        };
-
-        if (sensor.type == "potentiometer" ||
-            sensor.type == "light") {
-            retval.analog = true;
-            retval.percentage = state / 100;
-        } else if (sensor.type == "servo") {
-            retval.analog = true;
-            retval.percentage = state / 180;
-        } else if (sensor.type == "temperature") {
-            retval.analog = true;
-            retval.percentage = state / 50;
-        }
-
-        return retval;
-    }
-
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
         if (paper == undefined || !context.display)
@@ -947,9 +1179,8 @@ var getContext = function (display, infos, curLevel) {
 
         var stateOffset = 160;
 
-        var startx = sensor.drawInfo.width + (startTime * context.pixelsPerTime);
+        var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
-
 
         var ypositionmiddle = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
 
@@ -969,11 +1200,11 @@ var getContext = function (display, infos, curLevel) {
             strokewidth = 4;
         }
 
-        var isAnalog = isAnalogSensor(sensor, state);
+        var isAnalog = findSensorDefinition(sensor).isAnalog;
         var percentage = + state;
 
-        if (isAnalog.analog) {
-            var offset = (ypositionbottom - ypositiontop) * isAnalog.percentage;
+        if (isAnalog) {
+            var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state);
 
             if (type == "wrong") {
                 color = "red";
@@ -984,17 +1215,85 @@ var getContext = function (display, infos, curLevel) {
                 ypositionmiddle += 4;
             }
 
+            if (sensor.lastAnalogState != null
+                && sensor.lastAnalogState != state) {
+                var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState);
+
+                var previousOffset = (ypositionbottom - ypositiontop) * oldStatePercentage;
+
+                var joinline = paper.path(["M", startx,
+                                       ypositiontop + offset,
+                                       "L", startx,
+                                        ypositiontop + previousOffset]);                
+
+                joinline.attr({
+                    "stroke-width": strokewidth,
+                    "stroke": color,
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                });
+
+                paper.text(startx + 15, ypositiontop + offset - 10, state);
+            }
+
+            sensor.lastAnalogState = state == null ? 0 : state;
+
             stateline = paper.path(["M", startx,
                 ypositiontop + offset,
                 "L", startx + stateLenght,
                 ypositiontop + offset]);
 
             stateline.attr({
-                "stroke-width": 5, "stroke": color
+                "stroke-width": strokewidth,
+                 "stroke": color,
+                 "stroke-linejoin": "round",
+                 "stroke-linecap": "round"
             });
         } else if (sensor.type == "screen") {
-            sensor.stateText = paper.text(startx, ypositionmiddle, state.line1);
-            sensor.stateText = paper.text(startx, ypositionmiddle + 10, state.line2);
+            if (state) {
+                sensor.stateText = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+
+                sensor.stateText.attr({
+                    "font": "Font Awesome 5 Free",
+                    "stroke" : color,
+                    "fill": color,
+                    "font-size": (strokewidth * 2) + "px"
+                });
+
+                sensor.stateText.node.style.fontFamily = '"Font Awesome 5 Free"';
+                sensor.stateText.node.style.fontWeight = "bold";
+
+                function showPopup() {
+                    if (!sensor.tooltip)
+                    {
+                        sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + state.line2);   
+
+                        var textDimensions = sensor.tooltipText.getBBox();
+
+                        sensor.tooltip = paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
+                        sensor.tooltip.attr({
+                            "stroke": "black", 
+                            "stroke-width": 2,
+                            "fill": "white",
+                        });
+
+                        sensor.tooltipText.toFront();
+                    }
+                };
+
+                sensor.stateText.click(showPopup);
+
+                sensor.stateText.hover(showPopup, function() {
+                    if (sensor.tooltip) {
+                        sensor.tooltip.remove();
+                        sensor.tooltip = null;
+                    }
+                    if (sensor.tooltipText) {
+                        sensor.tooltipText.remove();
+                        sensor.tooltipText = null;
+                    }
+                });
+            }
         } else if (percentage != 0) {
             stateline = paper.path(["M", startx,
                 ypositionmiddle,
@@ -1004,8 +1303,9 @@ var getContext = function (display, infos, curLevel) {
             stateline.attr({
                 "stroke-width": strokewidth,
                 "stroke": color, 
+                "stroke-linejoin": "round",
                 "stroke-linecap": "round"
-            });
+           });
         }
 
         if (type == "wrong") {
@@ -1024,6 +1324,9 @@ var getContext = function (display, infos, curLevel) {
             wrongindicator.attr({
                 "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });*/
         }
+
+        // Make sure the current time bar is always on top of states
+        drawCurrentTime(sensor);
     }
 
     function getImg(filename) {
@@ -1032,9 +1335,9 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max, onsliderchange, getpercentage) {
+    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max) {
         if (juststate) {
-            var percentage = getpercentage();
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
 
             thumby = sensor.sliderdata.insiderecty +
                      sensor.sliderdata.insideheight - 
@@ -1069,8 +1372,10 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.thumb.attr('y', newy);
 
-                var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
-                onsliderchange(percentage);
+                var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+
+                sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                drawSensor(sensor, sensor.state, true);
 
                 actuallydragged++;
             },
@@ -1165,9 +1470,11 @@ var getContext = function (display, infos, curLevel) {
 
             var thumbwidth = outsidewidth * .80;
             sensor.sliderdata.thumbheight = outsidewidth * 1.4;
-            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight) / 100;
+            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight);
 
-            var percentage = getpercentage ? getpercentage() : sensor.state;
+
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+
 
             var thumby = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight - (percentage * sensor.sliderdata.scale);
 
@@ -1192,8 +1499,10 @@ var getContext = function (display, infos, curLevel) {
 
                     sensor.thumb.attr('y', newy);
 
-                    var percentage = 100 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
-                    onsliderchange(percentage);
+                    var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+                    sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                    drawSensor(sensor, sensor.state, true);
+    
 
                 },
                 function (x, y, event) {
@@ -1204,8 +1513,6 @@ var getContext = function (display, infos, curLevel) {
                 }
             );
         }
-
-
     }
 
     function removeSlider(sensor)
@@ -1219,16 +1526,7 @@ var getContext = function (display, infos, curLevel) {
 
     function sensorInConnectedModeError()
     {
-        window.displayHelper.showPopupMessage("Vous ne pouvez pas agir sur les capteurs en mode connecté.", 'blanket');
-    }
-
-    function preloadImage(path)
-    {
-        if (!preloadedimages[path])
-        {
-            new Image().src = path;
-            preloadedimages[path] = true;
-        }
+        window.displayHelper.showPopupMessage(strings.messages.sensorInOnlineMode, 'blanket');
     }
 
     function drawSensor(sensor, state = true, juststate = false) {
@@ -1247,34 +1545,71 @@ var getContext = function (display, infos, curLevel) {
         var portx = imgx + imgw;
         var porty = imgy + imgh / 3;
 
-        var arrowsize = sensor.drawInfo.height * .20;
+        var portsize = sensor.drawInfo.height * 0.10;
+        var statesize = sensor.drawInfo.height * 0.10;
+
+        if (context.autoGrading) 
+        {
+            imgw = sensor.drawInfo.width * .80;
+            imgh = sensor.drawInfo.height * .80;
+    
+            imgx = sensor.drawInfo.x + imgw * 0.75;
+            imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+    
+            state1x = imgx + imgw * 1.2;
+            state1y = imgy + (imgh / 2);
+    
+            portx = sensor.drawInfo.x;
+            porty = imgy + (imgh / 2);
+
+            portsize = imgh / 3;
+            statesize = imgh / 2;
+        }
 
 
         if (sensor.type == "led") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.img)
-                sensor.img.remove();
+            if (!sensor.ledon || !sensor.ledon.paper.canvas)
+                sensor.ledon = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
 
-            if (sensor.state) {
-                sensor.img = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('ledoff.png'))
+            if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
+                sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
-            } else {
-                sensor.img = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
-                preloadImage(getImg('ledon.png'))
-
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                if (!context.autoGrading) {
+                    sensor.ledoff.click(function() {
+                        sensor.state = !sensor.state;
+                        drawSensor(sensor);
+                    })    
+                }
             }
 
-            sensor.img.click(function() {
-                sensor.state = !sensor.state;
-                drawSensor(sensor);
-            })
+            sensor.ledon.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+            sensor.ledoff.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
+            });
+
+            if (sensor.state) {
+                sensor.ledon.attr({"opacity": 1});
+                sensor.ledoff.attr({"opacity": 0});
+                
+                sensor.stateText = paper.text(state1x, state1y, "ON");
+            } else {
+                sensor.ledon.attr({"opacity": 0});
+                sensor.ledoff.attr({"opacity": 1});
+
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+
 
             if ((!context.runner || !context.runner.isRunning())
                 && !context.offLineMode)
@@ -1310,14 +1645,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.buttonon.attr({"opacity": 1});
                 sensor.buttonoff.attr({"opacity": 0});
                 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
+                sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.buttonon.attr({"opacity": 0});
                 sensor.buttonoff.attr({"opacity": 1});
 
-                if (!context.autoGrading)
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
             if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
@@ -1344,7 +1677,6 @@ var getContext = function (display, infos, curLevel) {
                             sensor.onPressed();
                     } else
                         sensorInConnectedModeError()
-
                 }
 
                 sensor.buttonon.node.ontouchend = sensor.buttonon.node.onmouseup;
@@ -1367,6 +1699,23 @@ var getContext = function (display, infos, curLevel) {
 
             portx = imgx + imgw * 1.1;
             porty = imgy + imgh / 3;
+
+            if (context.autoGrading) 
+            {
+                imgw = sensor.drawInfo.width;
+                imgh = sensor.drawInfo.height  * .70;
+        
+                imgx = sensor.drawInfo.x + imgw / 2;
+                imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+        
+                state1x = imgx + imgw;
+                state1y = imgy + (imgh / 2);
+        
+                portx = sensor.drawInfo.x;
+                porty = imgy + (imgh / 2);
+    
+                portsize = imgh / 4;
+            }    
     
             if (!sensor.img || !sensor.img.paper.canvas)
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
@@ -1446,14 +1795,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
 
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60, function(percentage) {
-                        sensor.state = Math.round(percentage * .60);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return 100 / 60 * sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
             }
             else {
                 sensor.img3.click(function() {
@@ -1476,7 +1818,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (!sensor.center || !sensor.center.paper.canvas)
                 sensor.center = paper.image(getImg('servo-center.png'), imgx, imgy, imgw, imgh);
-
 
             sensor.img.attr({
                         "x": imgx,
@@ -1519,16 +1860,9 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            if (!context.autoGrading && !context.offLineMode &&
+            if (!context.autoGrading &&
                  (!context.runner || !context.runner.isRunning())) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180, function(percentage) {
-                        sensor.state = Math.round(percentage * 1.8);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return 100 / 180 * sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 180);
             } else {
                 removeSlider(sensor);
             }
@@ -1566,14 +1900,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
 
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
-                        sensor.state = Math.round(percentage);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
             } else  {
                 sensor.pale.click(function() {
                     sensorInConnectedModeError();
@@ -1609,13 +1936,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.rangedistanceend.remove();
 
             var rangew;
-            
-            if (sensor.state < 30)
-            {
-                rangew =  imgw * sensor.state / 100;
-            } else{
+
+            if (sensor.state < 30) {
+                rangew = imgw * sensor.state / 100;
+            } else {
                 var firstpart = imgw * 30 / 100;
-                var remaining =  imgw - firstpart;
+                var remaining = imgw - firstpart;
 
                 rangew = firstpart + (remaining * (sensor.state) * 0.002);
             }
@@ -1623,26 +1949,26 @@ var getContext = function (display, infos, curLevel) {
             var centerx = imgx + (imgw / 2);
 
             sensor.rangedistance = paper.path(["M", centerx - (rangew / 2),
-                    imgy + imgw,
-                    "L", centerx + (rangew / 2),
-                    imgy + imgw]);
+                imgy + imgw,
+                "L", centerx + (rangew / 2),
+                imgy + imgw]);
 
             var markh = 16;
 
             sensor.rangedistancestart = paper.path(["M", centerx - (rangew / 2),
-                    imgy + imgw - (markh / 2),
-                    "L", centerx - (rangew / 2),
-                    imgy + imgw + (markh / 2)]);
+                imgy + imgw - (markh / 2),
+                "L", centerx - (rangew / 2),
+                imgy + imgw + (markh / 2)]);
 
             sensor.rangedistanceend = paper.path(["M", centerx + (rangew / 2),
-                    imgy + imgw - (markh / 2),
-                    "L", centerx + (rangew / 2),
-                    imgy + imgw + (markh / 2)]);
+                imgy + imgw - (markh / 2),
+                "L", centerx + (rangew / 2),
+                imgy + imgw + (markh / 2)]);
 
             sensor.rangedistance.attr({
-                    "stroke-width": 4,
-                    "stroke": "#468DDF",
-                    "stroke-linecapstring": "round"
+                "stroke-width": 4,
+                "stroke": "#468DDF",
+                "stroke-linecapstring": "round"
             });
 
             sensor.rangedistancestart.attr({
@@ -1658,20 +1984,12 @@ var getContext = function (display, infos, curLevel) {
                 "stroke-linecapstring": "round"
             });
 
-
             if (sensor.state >= 10)
                 sensor.state = Math.round(sensor.state);
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500, function(percentage) {
-                        sensor.state = Math.round(percentage * 5);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state / 5;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500);
             } else {
                 sensor.img.click(function() {
                     sensorInConnectedModeError();
@@ -1727,14 +2045,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "%");
             if (!context.autoGrading && context.offLineMode) {
-                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100, function(percentage) {
-                        sensor.state = Math.round(percentage);
-                
-                        drawSensor(sensor, sensor.state, true);
-                    },
-                    function(state) {
-                        return sensor.state;
-                    });
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 100);
             } else {
                 sensor.sun.click(function() {
                     sensorInConnectedModeError();
@@ -1748,41 +2059,23 @@ var getContext = function (display, infos, curLevel) {
         if (sensor.portText)
             sensor.portText.remove();
 
-        var stateFontSize = sensor.drawInfo.height * 0.10;
-        var portFontSize = sensor.drawInfo.height * 0.10;
-
 
         if (sensor.hasOwnProperty("stateText"))
-            sensor.stateText.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
 
         if (sensor.hasOwnProperty("stateText2"))
-            sensor.stateText2.attr({ "font-size": stateFontSize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText2.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+
 
         sensor.portText = paper.text(portx, porty, sensor.port);
-        sensor.portText.attr({ "font-size": portFontSize + "px", 'text-anchor': 'start', fill: "lightgray" });
+        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "lightgray" });
     }
 
-    context.sensorDoubleWitdh = function (sensor) {
-        if (sensor.type == "screen")
-            return true;
-
-        return false;
-    }
-
-
-    context.compareSensorState = function (sensorType, state1, state2) {
-        if (sensorType == "screen") {
-            return state1.line1 == state2.line1 &&
-                state1.line2 == state2.line2;
-        }
-
-        return state1 == state2;
-    }
 
     context.registerQuickPiEvent = function (sensorType, port, newState, setInSensor = true) {
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
-            throw ("Sensor is not registered");
+            throw (strings.messages.sensorNotFound);
         }
 
         if (setInSensor) {
@@ -1801,10 +2094,11 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.currentTime >= context.maxTime) {
                 context.success = true;
-                throw ("Bravo ! La sortie est correcte");
+                context.doNotStartGrade  = false;
+                throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
-                !context.compareSensorState(sensor.type, expectedState.state, newState)) {
+                !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
                 type = "wrong";
                 context.fail = false;
             }
@@ -1819,7 +2113,8 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.fail) {
                 context.success = false;
-                throw ("La sortie est incorrecte");
+                context.doNotStartGrade  = false;
+                throw (strings.messages.wrongState);
             }
             else
                 context.increaseTime(sensor);
@@ -1903,7 +2198,7 @@ var getContext = function (display, infos, curLevel) {
 
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
-            throw ("Referenced not existing sensor " + sensorType + " in port " + port);
+            throw (strings.messages.sensorNotFound);
         }
 
         if (state == null) {
@@ -2491,6 +2786,6 @@ function hideSlider(sensor) {
     if (sensor.slider)
         sensor.slider.remove();
     
-    if (sensor.focusrect)
+    if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas)
         sensor.focusrect.toFront();
 };
