@@ -1088,7 +1088,8 @@ function ArcDragger(settings) {
          }
          if(radiusRatio > 5 && !vInfo["large-arc"])
                radiusRatio = 0;
-         vInfo["radius-ratio"] = radiusRatio;
+         vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
+         // vInfo["radius-ratio"] = radiusRatio;
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
       self.visualGraph.graphDrawer.refreshEdgePosition(self.edgeVertices[0],self.edgeVertices[1]);
