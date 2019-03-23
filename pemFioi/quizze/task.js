@@ -16,7 +16,18 @@ var lang = {
             'placeholder_regexp': 'Enter text',
             'error_regexp': 'Invalid format'
         },
-        fr: {}
+        fr: {
+            'score': 'Score',
+            'grader_msg': 'Votre score est ',
+            'validate': 'Valider',
+            'placeholder_text': 'Entrez du texte',
+            'placeholder_number': 'Entrez un nombre',
+            'error_number': 'Vous devez entrer un nombre.',
+            'placeholder_string': 'Entrez une chaîne de caractères',
+            'error_string': 'Vous devez entrer une chaïne de caractères',
+            'placeholder_regexp': 'Entrez du texte.',
+            'error_regexp': 'Format invalide'
+        },
     },
 
     set: function(lng) {
