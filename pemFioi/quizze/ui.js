@@ -47,40 +47,6 @@ function QuizzeUI(params) {
     }
 
 
-    // apply desing
-    var single_tpl =
-        '<div class="answer-block">\
-            <span class="answer-label">%%LABEL%%</span>\
-            <span class="answer-code">%%CODE%%</span>\
-        </div>';
-
-    var multiple_tpl =
-        '<div class="answer-block">\
-            <span class="answer-label">%%LABEL%%</span>\
-            <span class="answer-switch"><span class="cursor"></span></span>\
-        </div>';
-
-    params.parent.find('question').each(function() {
-        var question = $(this);
-        var answers = question.find('answer');
-            answers.each(function(i) {
-                var answer = $(this);
-                if (question.attr("type") === "single") {
-                    var html = single_tpl;
-                    html = html
-                        .replace('%%LABEL%%', answer.html())
-                        .replace('%%CODE%%', String.fromCharCode(i + 65));
-                }
-                else if (question.attr("type") === "multiple") {
-                    var html = multiple_tpl;
-                    html = html
-                        .replace('%%LABEL%%', answer.html());
-                }
-                answer.html(html)
-            });
-        answers.wrapAll('<div class="answers"></div>');
-    })
-
 
     // questions types
     function initQuestionSingle(parent) {
@@ -252,10 +218,49 @@ function QuizzeUI(params) {
     }
 
 
+
+
+    // apply desing
+
+    var single_tpl =
+        '<div class="answer-block">\
+            <span class="answer-label">%%LABEL%%</span>\
+            <span class="answer-code">%%CODE%%</span>\
+        </div>';
+
+    var multiple_tpl =
+        '<div class="answer-block">\
+            <span class="answer-label">%%LABEL%%</span>\
+            <span class="answer-switch"><span class="cursor"></span></span>\
+        </div>';
+
+    params.parent.find('question').each(function() {
+        var question = $(this);
+        var answers = question.find('answer');
+            answers.each(function(i) {
+                var answer = $(this);
+                if (question.attr("type") === "single") {
+                    var html = single_tpl;
+                    html = html
+                        .replace('%%LABEL%%', answer.html())
+                        .replace('%%CODE%%', String.fromCharCode(i + 65));
+                }
+                else if (question.attr("type") === "multiple") {
+                    var html = multiple_tpl;
+                    html = html
+                        .replace('%%LABEL%%', answer.html());
+                }
+                answer.html(html)
+            });
+        answers.wrapAll('<div class="answers"></div>');
+    })
+
+
+
+    // sys
+
     params.parent.find('solution').hide();
     params.parent.show();
-
-
 
     // interface
 

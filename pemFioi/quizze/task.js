@@ -149,11 +149,11 @@ task.load = function(views, success) {
     task_token.init()
 
     platform.getTaskParams(null, null, function(taskParams) {
-        var random = parseInt(taskParams.randomSeed, 10) || 0
+        var random = parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100) //0
         var q = QuizzeUI({
             parent: $('#task'),
-            shuffle_questions: random > 0, // in dev mode always 0 here and shuffle disabled
-            shuffle_answers: random > 0,
+            shuffle_questions: !!json.shuffle_questions,
+            shuffle_answers: !!json.shuffle_answers,
             random: random
         });
 
