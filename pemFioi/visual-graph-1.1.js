@@ -701,6 +701,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var s = vInfo["sweep"] || 0;
             var l = vInfo["large-arc"] || 0;
             var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+            if(vInfo["radius-ratio"] == 0.5){
+               R += 10;
+            }
             if(x2 > x1){
                var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
                var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
@@ -760,6 +763,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var b = 2*(A*B - A*y2 - x2);
          var c = x2*x2 + y2*y2 + B*B - 2*y2*B - R*R;
          var delta = b*b - 4*a*c;
+         if(delta <= 0)
+            delta = 0;
          if(y1 > y2){
             if(s){
                var xc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
