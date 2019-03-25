@@ -1256,7 +1256,6 @@ function GraphDragger(settings) {
          if(self.gridEnabled){
             for(vertPos of self.vertInitPos){
                if($.inArray(vertPos.id,self.gridAlignment[self.gridAlignmentRefIndex]) >= 0){
-
                   var newX = (vertPos.position.x + dx) - (vertPos.position.x + dx) % self.gridX;
                   var newY = (vertPos.position.y + dy) - (vertPos.position.y + dy) % self.gridY;
                   dx = newX - vertPos.position.x;
