@@ -247,10 +247,31 @@ question.horizontal .answer-switch {
   align-self: center;
 }
 
-
+/*
+*
+* QUESTION DEFAULT LAYOUT: TYPE INPUT ANSWERS
+*
+*/
+input[type=text] {
+  font-size: 12px;
+  background: #f8f8f8;
+  border: 1px solid #e1e1e1;
+  border-radius: 5px;
+  padding: 6px 12px;
+  width: 100%;
+  color: #555555;
+  font-size: 16px;
+}
+input[type=text]:focus {
+  box-shadow: 0 1px 3px #333 inset;
+}
+::placeholder,
+:placeholder-shown {
+  font-style: italic;
+  opacity: 0.7;
+}
 answer .error {
 }
-
 answer .error-message {
   color: #ff001f;
   background-color: #ffe5e8;
@@ -269,12 +290,11 @@ answer .error-message .icon {
   position: absolute;
   left: 8px;
   top: calc(50% - 0.5em - 5px);
-
 }
 
 /*
 *
-* DISPLAY SOLUTION
+* SOLUTION DISPLAY
 *
 */
 solution {
@@ -300,41 +320,43 @@ question:nth-child(odd) solution {
 .displaySolution .horizontal answer.correct .answer-code::before {
   content: "\f0a6";
 }
-.displaySolution answer.selected:not(.correct) .answer-block {
+.displaySolution answer.mistake .answer-block {
   color: #797979;
   border-color: #ff001f;
 }
-.displaySolution answer.selected:not(.correct) .answer-code {
+.displaySolution answer.mistake .answer-code {
   background-color: #ff001f;
   border-color: #ff001f;
 }
-.displaySolution answer.selected:not(.correct) .answer-code::before {
+.displaySolution answer.mistake .answer-code::before {
   content: "\f00d";
 }
 
-answer-group {
-  display: block;
+/*
+*
+* SCORE
+*
+*/
+#score {
+  border-top: 1px solid #e1e1e1;
+  border-bottom: 1px solid #e1e1e1;
+  margin-top: 2em;
+  font-size: 26px;
+  padding: 14px 0;
+  color: #4a90e2;
+  display: flex;
 }
-
-input[type=text] {
-  font-size: 12px;
-  background: #f8f8f8;
-  border: 1px solid #e1e1e1;
-  border-radius: 5px;
-  padding: 6px 12px;
-  width: 100%;
-  color: #555555;
-  font-size: 16px;
+#score .scoreLabel {
+  flex-grow: 1;
 }
-input[type=text]:focus {
-  box-shadow: 0 1px 3px #333 inset;
+#score .max-value {
+  color: #9b9b9b;
 }
-::placeholder,
-:placeholder-shown {
-  font-style: italic;
-  opacity: 0.7;
-}
-
+/*
+*
+* INTERFACE CONTROLS
+*
+*/
 
 #displayHelper_saved {
   border-top: 1px solid #e1e1e1;
@@ -380,6 +402,8 @@ button,
 .btn:hover {
   color: #fff;
 }
+
+
 
 #popupMessage.floatingMessage {
   position: fixed;

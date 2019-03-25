@@ -16,7 +16,18 @@ var lang = {
             'placeholder_regexp': 'Enter text',
             'error_regexp': 'Invalid format'
         },
-        fr: {}
+        fr: {
+            'score': 'Score',
+            'grader_msg': 'Votre score est ',
+            'validate': 'Valider',
+            'placeholder_text': 'Entrez du texte',
+            'placeholder_number': 'Entrez un nombre',
+            'error_number': 'Vous devez entrer un nombre.',
+            'placeholder_string': 'Entrez une chaîne de caractères',
+            'error_string': 'Vous devez entrer une chaïne de caractères',
+            'placeholder_regexp': 'Entrez du texte.',
+            'error_regexp': 'Format invalide'
+        },
     },
 
     set: function(lng) {
@@ -86,7 +97,7 @@ task.getMetaData = function(success, error) {
 };
 
 task.reloadState = function(state, success, error) { success() }
-task.getState = function(success, error) { success({})  }
+task.getState = function(success, error) { success("{}")  }
 task.reloadStateObject = function(obj) { }
 task.getStateObject = function() { return {} }
 task.getDefaultStateObject = function() { return {} }
@@ -138,11 +149,11 @@ task.load = function(views, success) {
     task_token.init()
 
     platform.getTaskParams(null, null, function(taskParams) {
-        var random = parseInt(taskParams.randomSeed, 10) || 0
+        var random = parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100) //0
         var q = QuizzeUI({
             parent: $('#task'),
-            shuffle_questions: random > 0, // in dev mode always 0 here and shuffle disabled
-            shuffle_answers: random > 0,
+            shuffle_questions: !!json.shuffle_questions,
+            shuffle_answers: !!json.shuffle_answers,
             random: random
         });
 
@@ -172,7 +183,7 @@ task.load = function(views, success) {
 
 
         function displayScore(score, max_score) {
-            var msg = lang.translate('score') + ' <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
+            var msg = '<span class="scoreLabel">' + lang.translate('score') + '</span>' + ' <span class="value">' + score + '</span><span class="max-value">/' + max_score + '</span>';
             if($('#score').length == 0) {
                 var div = '<div id="score"></div>';
                 $('.taskContent').first().append(div);
@@ -231,8 +242,10 @@ var grader = {
     gradeTask: task.gradeAnswer
 };
 
-if(window.platform) {
-    platform.initWithTask(task);
-}
-
 lang.set(window.stringsLanguage)
+
+$(function() {
+    if(window.platform) {
+        platform.initWithTask(task);
+    }
+});

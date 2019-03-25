@@ -733,11 +733,21 @@ function VertexDragAndConnect(settings) {
    this.visualGraph = settings.visualGraph;
    var graphMouse = settings.graphMouse;
    var dragThreshold = settings.dragThreshold;
+   this.dragLimits = settings.dragLimits;
    this.onVertexSelect = settings.onVertexSelect;
    this.onPairSelect = settings.onPairSelect;
    this.onEdgeSelect = settings.onEdgeSelect;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
+
+   this.gridEnabled = false;
+   this.gridX = null;
+   this.gridY = null;
+   this.enabled = false;
+   this.dragEnabled = false;
+   this.occupiedSnapPositions = {};
+   this.vertexToSnapPosition = {};
+
    this.enabled = false;
    this.selectionParent = null;
    this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, settings.vertexThreshold, settings.edgeThreshold, false);
@@ -747,12 +757,25 @@ function VertexDragAndConnect(settings) {
       }
       this.enabled = enabled;
 
+      this.setDragEnabled(enabled);
+      this.fuzzyClicker.setEnabled(enabled);
+   };
+
+   this.setGridEnabled = function(enabled, gridX, gridY) {
+      this.gridEnabled = enabled;
+      if(enabled) {
+         this.gridX = gridX;
+         this.gridY = gridY;
+      }
+   };
+
+   this.setDragEnabled = function(enabled) {
       if(enabled){
          this.enableDrag();
       }else{
          this.disableDrag();
       }
-      this.fuzzyClicker.setEnabled(enabled);
+      this.dragEnabled = enabled;
    };
 
    this.disableDrag = function() {
@@ -761,7 +784,6 @@ function VertexDragAndConnect(settings) {
    };
 
    this.enableDrag = function() {
-      graphMouse.removeEvent(id + "$$$dragAndConnect");
       graphMouse.addEvent(id + "$$$dragAndConnect", "drag", "vertex", null, [self.moveHandler, self.startHandler, self.endHandler]);
    };
 
@@ -834,12 +856,18 @@ function VertexDragAndConnect(settings) {
       if(!self.isDragging) {
          return;
       }
+      if(!self.dragEnabled)
+         return;
 
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
-      if(settings.dragLimits) {
-         newX = Math.min(settings.dragLimits.maxX, Math.max(newX, settings.dragLimits.minX));
-         newY = Math.min(settings.dragLimits.maxY, Math.max(newY, settings.dragLimits.minY));
+      if(self.gridEnabled) {
+         newX -= (newX % self.gridX);
+         newY -= (newY % self.gridY);
+      }
+      if(self.dragLimits) {
+         newX = Math.min(self.dragLimits.maxX, Math.max(newX, self.dragLimits.minX));
+         newY = Math.min(self.dragLimits.maxY, Math.max(newY, self.dragLimits.minY));
       }
       if(settings.snapToLastGoodPosition) {
          var position = {
@@ -859,7 +887,7 @@ function VertexDragAndConnect(settings) {
          self.arcDragger.unselectAll();
       }
       // Click on background or on the selected vertex -  deselect it.
-      if(id === null){
+      if(id === null || id === self.selectionParent){
          if(self.selectionParent !== null) {
             self.onVertexSelect(self.selectionParent, false);
          }
@@ -929,8 +957,6 @@ function ArcDragger(settings) {
    this.vertexThreshold = settings.vertexThreshold || 0;
    this.edgeThreshold = settings.edgeThreshold || 10;
    this.enabled = false;
-   /* for deselection */
-   // this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, onFuzzyClick, true, true, true, this.vertexThreshold, this.edgeThreshold, false);
 
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -943,16 +969,7 @@ function ArcDragger(settings) {
       else {
          this.disableEdgesDrag();
       }
-      // this.fuzzyClicker.setEnabled(enabled);
    };
-
-   // function onFuzzyClick(elementType, id, x, y, event) {
-   //    console.log(elementType);
-   //    if(elementType === "edgeLabel"){
-   //       // console.log(event)
-   //       // event.stopPropagation();
-   //    }
-   // };
 
    this.setOnEdgeSelect = function(fct) {
       this.onEdgeSelect = fct;
@@ -1012,7 +1029,6 @@ function ArcDragger(settings) {
       }else if(self.onEdgeSelect){
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
-         
          self.onEdgeSelect(self.elementID,info.selected);
          if(!info.selected){
             self.elementID = null;
@@ -1059,7 +1075,8 @@ function ArcDragger(settings) {
          }
          if(radiusRatio > 5 && !vInfo["large-arc"])
                radiusRatio = 0;
-         vInfo["radius-ratio"] = radiusRatio;
+         vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
+         // vInfo["radius-ratio"] = radiusRatio;
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
       self.visualGraph.graphDrawer.refreshEdgePosition(self.edgeVertices[0],self.edgeVertices[1]);
@@ -1089,11 +1106,15 @@ function ArcDragger(settings) {
       var side = (x1 < x2) ? 1 : 0;
       if(x1 === x2) {
          if(xMouse > x1){
-            side = 0;
+            side = (y1 > y2) ? 0 : 1;
+         }else{
+            side = (y1 > y2) ? 1 : 0;
          }
       }else if(y1 === y2){
          if(yMouse > y1){
-            side = 0;
+            side = (x1 < x2) ? 0 : 1;
+         }else{
+            side = (x1 < x2) ? 1 : 0;
          }
       }else{
          var a = (y2 - y1)/(x2 - x1);
@@ -1109,17 +1130,156 @@ function ArcDragger(settings) {
       var edges = self.graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
          var info = self.graph.getEdgeInfo(edges[iEdge]);
-         info.selected = false;
+         if(info.selected)
+            info.selected = false;
          if(self.onEdgeSelect){
             self.onEdgeSelect(edges[iEdge],false);
          }
       }
+      if(self.callback)
+         self.callback();
    };
 
    this.setStartDragCallback = function(fct) {
       this.startDragCallback = fct;
    };
 
+   if(settings.enabled) {
+      this.setEnabled(true);
+   }
+};
+
+function GraphDragger(settings) {
+   var self = this;
+   this.id = settings.id;
+   this.paper = settings.paper;
+   this.paperElementID = settings.paperElementID;
+   this.graph = settings.graph;
+   this.visualGraph = settings.visualGraph;
+
+   this.enabled = false;
+   this.dragEnabled = false;
+   this.scaleEnabled = false;
+   this.gridEnabled = false;
+
+   this.gridX = null;
+   this.gridY = null;
+   this.gridAlignment = {};
+   this.gridAlignmentRefIndex = null;
+
+   this.mouseInitPos = null;
+   this.vertInitPos = null;
+   this.isShiftPressed = false;
+   this.callback = settings.callback;
+
+   this.dragMove = new PaperMouseEvent(this.paperElementID, this.paper, "mousemove", onDragMove, false);
+   this.dragEnd = new PaperMouseEvent(this.paperElementID, this.paper, "mouseup", onDragEnd, false);
+   this.fuzzyClicker = new FuzzyClicker(this.id + "$$$fuzzyclicker", this.paperElementID, this.paper, this.graph, this.visualGraph, 
+      onFuzzyClick, false, false, true, 0, settings.edgeThreshold, false, "mousedown");
+
+   this.setEnabled = function(enabled){
+      if(enabled == this.enabled) {
+         return;
+      }
+      if(enabled){
+         $(window).keydown(function(event){
+            if(event.which == 16){
+               if(!self.isShiftPressed){
+                  self.isShiftPressed = true;
+               }
+            }
+         });
+         $(window).keyup(function(event){
+            if(event.which == 16){
+               if(self.isShiftPressed){
+                  self.isShiftPressed = false;
+               }
+            }
+         });
+      }else{
+         $(window).off("keydown");
+         $(window).off("keyup");
+      }
+      this.dragEnabled = enabled;
+      this.scaleEnabled = enabled;
+      this.enabled = enabled;
+      this.fuzzyClicker.setEnabled(enabled);
+   };
+
+   this.setGridEnabled = function(enabled, gridX, gridY) {
+      this.gridEnabled = enabled;
+      if(enabled) {
+         this.gridX = gridX;
+         this.gridY = gridY;
+      }
+   };
+
+   function onFuzzyClick(elementType, id, x, y, event){
+      self.onDragStart(x,y,event);
+   }
+   this.onDragStart = function(x,y,event){
+      self.mouseInitPos = {x:x,y:y};
+      self.dragMove.setEnabled(true);
+      self.dragEnd.setEnabled(true);
+      var vertices = self.graph.getAllVertices();
+      self.vertInitPos = $.map(vertices, function(id) {
+         return {
+            id: id,
+            position: self.visualGraph.graphDrawer.getVertexPosition(id)
+         };
+      });
+      if(self.gridEnabled){
+         for(vertex of vertices){
+            var pos = self.visualGraph.graphDrawer.getVertexPosition(vertex);
+            var index = pos.x % self.gridX + ";" + pos.y % self.gridY;
+            var maxLength = 0;
+            if(!self.gridAlignment[index]){
+               self.gridAlignment[index] = [vertex];
+            }else{
+               self.gridAlignment[index].push(vertex);
+            }
+            if(self.gridAlignment[index].length > maxLength){
+               maxLength = self.gridAlignment[index].length;
+               self.gridAlignmentRefIndex = index;
+            }
+         }
+      }
+   };
+   function onDragMove(x,y,event){
+      if(self.isShiftPressed && self.scaleEnabled){
+         var ratioX = x / self.mouseInitPos.x;
+         var ratioY = y / self.mouseInitPos.y;
+         $.each(self.vertInitPos, function(index, element) {
+            self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x*ratioX, element.position.y*ratioY);
+         });
+      }else if(self.dragEnabled){
+         var dx = x - self.mouseInitPos.x;
+         var dy = y - self.mouseInitPos.y;
+         if(self.gridEnabled){
+            for(vertPos of self.vertInitPos){
+               if($.inArray(vertPos.id,self.gridAlignment[self.gridAlignmentRefIndex]) >= 0){
+                  var newX = (vertPos.position.x + dx) - (vertPos.position.x + dx) % self.gridX;
+                  var newY = (vertPos.position.y + dy) - (vertPos.position.y + dy) % self.gridY;
+                  dx = newX - vertPos.position.x;
+                  dy = newY - vertPos.position.y;
+               }
+            }
+         }
+         $.each(self.vertInitPos, function(index, element) {
+            self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x + dx, element.position.y + dy);
+         });
+      }
+   }
+   function onDragEnd(x,y,event){
+      self.dragMove.setEnabled(false);
+      self.dragEnd.setEnabled(false);
+      self.gridAlignment = {};
+      self.gridAlignmentRefIndex = null;
+      if(self.callback){
+         self.callback();
+      }
+   };
+   
    if(settings.enabled) {
       this.setEnabled(true);
    }
@@ -1135,7 +1295,6 @@ function GraphEditor(settings) {
    var onEdgeSelect = settings.onEdgeSelect;
    this.createVertex = settings.createVertex;
    var callback = settings.callback || null;
-   
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
       "stroke-width": 4
@@ -1154,22 +1313,20 @@ function GraphEditor(settings) {
    };
    var overlayAttr = {
       opacity: 0,
-      fill: "white",
+      fill: "red",
       "cursor": "pointer"
    };
-   // var vertexAttr = visualGraph.graphDrawer.circleAttr; 
    var vertexLabelAttr = settings.vertexLabelAttr || defaultVertexlabelAttr;
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
    var customCreateVertex = settings.createVertex; // must return vertexId
 
-   this.pencil = null;
+   this.loopIcon = null;
    this.cross = null;
    this.edgeCross = null;
    this.terminalIcon = null;
    this.textEditor = null;
-   // this.edgeTextEditor = null;
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
       id:"ArcDragger",
@@ -1193,6 +1350,26 @@ function GraphEditor(settings) {
       // callback: settings.callback,
       enabled: false
    });
+   this.graphDragger = new GraphDragger({
+      id: "GraphDragger",
+      paper: settings.paper,
+      paperElementID: settings.paperElementID,
+      graph: graph,
+      visualGraph: visualGraph,  
+      edgeThreshold: settings.edgeThreshold,
+      callback: settings.callback,
+      enabled: false
+   });
+   this.gridEnabled = false;
+   this.removeVertexEnabled = false;
+   this.createEdgeEnabled = false;
+   this.removeEdgeEnabled = false;
+   this.vertexDragEnabled = false;
+   this.edgeDragEnabled = false;
+   this.multipleEdgesEnabled = false;
+   this.loopEnabled = false;
+   this.editVertexLabelEnabled = false;
+   this.editEdgeLabelEnabled = false;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1203,6 +1380,36 @@ function GraphEditor(settings) {
       self.vertexDragAndConnect.setEnabled(enabled);
       self.vertexCreator.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
+      self.graphDragger.setEnabled(enabled);
+      this.removeVertexEnabled = enabled;
+      this.createEdgeEnabled = enabled;
+      this.removeEdgeEnabled = enabled;
+      this.multipleEdgesEnabled = enabled;
+      this.loopEnabled = enabled;
+      this.editVertexLabelEnabled = enabled;
+      this.editEdgeLabelEnabled = enabled;
+      this.setVertexDragEnabled(enabled);
+      this.setEdgeDragEnabled(enabled);
+   };
+
+   this.setVertexDragEnabled = function(enabled) {
+      this.vertexDragAndConnect.dragEnabled = enabled;
+      if(enabled === this.vertexDragEnabled)
+         return;
+      this.vertexDragEnabled = enabled;
+   };
+
+   this.setEdgeDragEnabled = function(enabled) {
+      this.arcDragger.setEnabled(enabled);
+      if(enabled === this.edgeDragEnabled)
+         return;
+      this.edgeDragEnabled = enabled;
+   };
+
+   this.setGridEnabled = function(enabled,gridX,gridY) {
+      this.gridEnabled = {snapToGrid:enabled,gridX:gridX,gridY:gridY};
+      this.vertexDragAndConnect.setGridEnabled(enabled,gridX,gridY);
+      this.graphDragger.setGridEnabled(enabled,gridX,gridY);
    };
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
@@ -1210,6 +1417,7 @@ function GraphEditor(settings) {
       if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
+         self.editLabel(vertexId,"vertex");
       }else{
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
@@ -1220,6 +1428,18 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
+      if(!self.createEdgeEnabled)
+         return;
+      
+      if(!self.multipleEdgesEnabled){
+         var previousEdges = graph.getEdgesBetween(id1,id2);
+         if(previousEdges.length > 1){
+            return;
+         }else if(previousEdges.length == 1){
+            graph.removeEdge(previousEdges[0]);
+         }
+      }
+      
       var edgeGuid = 0;
       while(graph.isEdge("e_" + edgeGuid)) {
          edgeGuid++;
@@ -1234,10 +1454,30 @@ function GraphEditor(settings) {
 
    this.defaultOnEdgeSelect = function(edgeID,selected) {
       var edge = visualGraph.getRaphaelsFromID(edgeID);
+      if(!self.removeEdgeEnabled){
+         if(!selected){
+            $(document).off("keydown");
+            edge[0].attr(visualGraph.graphDrawer.lineAttr);
+            if(self.edgeCross)
+               self.edgeCross.remove();
+         }
+         return;
+      }
+      
       if(selected){
          edge[0].attr(selectedEdgeAttr);
+         
          self.addEdgeCross(edgeID);
+         $(document).keydown(function(event){
+            if(event.which == 46){  // if press delete
+               graph.removeEdge(edgeID);
+               if(callback){
+                  callback();
+               }
+            }
+         });
       }else{
+         $(document).off("keydown");
          edge[0].attr(visualGraph.graphDrawer.lineAttr);
          if(self.edgeCross)
             self.edgeCross.remove();
@@ -1340,12 +1580,16 @@ function GraphEditor(settings) {
    };
 
    this.addIcons = function(vertexId) {
-      self.addPencil(vertexId);
-      self.addCross(vertexId);
-      self.addTerminalIcon(vertexId);
+      // self.addPencil(vertexId);
+      if(this.createEdgeEnabled && this.loopEnabled)
+         this.addLoopIcon(vertexId);
+      if(this.removeVertexEnabled)
+         this.addCross(vertexId);
+      this.addTerminalIcon(vertexId);
    };
    this.removeIcons = function() {
-      self.pencil.remove();
+      // self.pencil.remove();
+      self.loopIcon.remove();
       self.cross.remove();
       self.terminalIcon.remove();
    };
@@ -1377,6 +1621,33 @@ function GraphEditor(settings) {
          "L" + x + "," + (y + 3*qSize) +
          "Z" 
          ).attr(iconAttr);
+      var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
+      return paper.set(icon,overlay);
+   };
+
+   this.addLoopIcon = function(vertexId) {
+      var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
+      var size = 20;
+      var X = vertexPos.x - vertexRadius - size;
+      var Y = vertexPos.y - vertexRadius - 3*size/4;
+      if(self.loopIcon){
+         self.loopIcon.remove();
+      }
+      self.loopIcon = self.drawLoopIcon(X,Y,size);
+      visualGraph.pushVertexRaphael(vertexId,self.loopIcon);
+      
+      self.loopIcon.click(function(){
+         self.vertexDragAndConnect.onPairSelect(vertexId,vertexId);
+      });
+   };
+
+   this.drawLoopIcon = function(x,y,size) {
+      var qSize = size/4;
+      var icon = paper.path(
+         "M" + (x + 2*qSize) + "," + y +
+         "A" + size/2 + "," + size/2 + "," + 0 + "," + 1 + "," + 0 + "," + (x + 2*qSize + 0.1) + "," + (y)
+         ).attr({"stroke":iconAttr.fill,"stroke-width":size/5,"arrow-end":"classic-medium-short"});
       var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
       return paper.set(icon,overlay);
    };
@@ -1568,20 +1839,23 @@ function GraphEditor(settings) {
          callback: settings.callback,
          enabled: true
       });
+      this.setVertexDragEnabled(this.vertexDragEnabled);
+      this.setEdgeDragEnabled(this.edgeDragEnabled);
+      if(this.gridEnabled)
+         this.setGridEnabled(this.gridEnabled.snapToGrid,this.gridEnabled.gridX,this.gridEnabled.gridY);
       this.setDefaultSettings();
    };
 
    this.editLabel = function(id,type) {
-      if(type === "vertex"){
+      if(type === "vertex" && this.editVertexLabelEnabled){
          var info = graph.getVertexInfo(id);
          var attr = visualGraph.graphDrawer.vertexLabelAttr;
          var labelPos = visualGraph.getVertexVisualInfo(id);
-      }else if(type === "edge"){
+      }else if(type === "edge" && self.editEdgeLabelEnabled){
          var info = graph.getEdgeInfo(id);
          var attr = visualGraph.graphDrawer.edgeLabelAttr;
          var labelPos = visualGraph.graphDrawer.getLabelPos(id);
       }else{
-         console.log("type error");
          return
       }
       var fontSize = attr["font-size"] || 15;
