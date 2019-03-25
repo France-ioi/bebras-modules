@@ -1029,7 +1029,6 @@ function ArcDragger(settings) {
       }else if(self.onEdgeSelect){
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
-         
          self.onEdgeSelect(self.elementID,info.selected);
          if(!info.selected){
             self.elementID = null;
@@ -1131,11 +1130,14 @@ function ArcDragger(settings) {
       var edges = self.graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
          var info = self.graph.getEdgeInfo(edges[iEdge]);
-         info.selected = false;
+         if(info.selected)
+            info.selected = false;
          if(self.onEdgeSelect){
             self.onEdgeSelect(edges[iEdge],false);
          }
       }
+      if(self.callback)
+         self.callback();
    };
 
    this.setStartDragCallback = function(fct) {
@@ -1416,17 +1418,7 @@ function GraphEditor(settings) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          self.editLabel(vertexId,"vertex");
-         // $(document).keydown(function(event){
-         //    if(event.which == 46){  // if press delete
-         //       graph.removeVertex(vertexId);
-         //       self.vertexDragAndConnect.selectionParent = null;
-         //       if(callback){
-         //          callback();
-         //       }
-         //    }
-         // });
       }else{
-         // $(document).off("keydown");
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
       }
@@ -1972,7 +1964,6 @@ function GraphEditor(settings) {
       }
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
-      // this.vertexDragAndConnect.setGridEnabled(true,this.gridX,this.gridY);
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
    };
