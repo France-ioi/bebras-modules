@@ -1255,7 +1255,8 @@ function GraphDragger(settings) {
          var dy = y - self.mouseInitPos.y;
          if(self.gridEnabled){
             for(vertPos of self.vertInitPos){
-               if($.inArray(self.gridAlignment[self.gridAlignmentRefIndex],vertPos.id)){
+               if($.inArray(vertPos.id,self.gridAlignment[self.gridAlignmentRefIndex]) >= 0){
+
                   var newX = (vertPos.position.x + dx) - (vertPos.position.x + dx) % self.gridX;
                   var newY = (vertPos.position.y + dy) - (vertPos.position.y + dy) % self.gridY;
                   dx = newX - vertPos.position.x;
@@ -1271,6 +1272,8 @@ function GraphDragger(settings) {
    function onDragEnd(x,y,event){
       self.dragMove.setEnabled(false);
       self.dragEnd.setEnabled(false);
+      self.gridAlignment = {};
+      self.gridAlignmentRefIndex = null;
       if(self.callback){
          self.callback();
       }
