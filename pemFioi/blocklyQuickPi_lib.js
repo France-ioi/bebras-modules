@@ -170,19 +170,21 @@ var getContext = function (display, infos, curLevel) {
                         if (!state.hit) {
                             context.success = false;
                             throw (strings.messages.wrongState);
-                        } else if (lastTurn) {
-                            context.success = true;
-                            if (context.autoGrading)
-                                context.doNotStartGrade = false;
-                            else
-                                context.doNotStartGrade = true;
-                            throw (strings.messages.programEnded);
-
                         }
                     }
-                    else
-                        break;
+                    else {
+                        if (lastTurn) {
+                            context.success = false;
+                            throw (strings.messages.wrongState);
+                        }
+                    }
                 }
+            }
+
+            if (lastTurn) {
+                context.success = true;
+                context.doNotStartGrade = false;
+                throw (strings.messages.programEnded);
             }
         } else {
             if (!context.offLineMode) {
@@ -237,12 +239,11 @@ var getContext = function (display, infos, curLevel) {
                         context.gradingStatesBySensor[key] = [];
 
                     context.gradingStatesBySensor[key].push(state);
+                    state.hit = false;
 
                     if (state.time > context.maxTime)
                         context.maxTime = state.time;
                 }
-
-                context.failed = false;
             }
         }
 
@@ -251,7 +252,9 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.state = null;
             sensor.lastState = 0;
-            sensor.lastStateChange = 0;
+            sensor.lastStateChange = null;
+            sensor.callsInTimeSlot = 0;
+            sensor.lastTimeIncrease = 0;
         }
 
         if (context.display) {
@@ -561,7 +564,12 @@ var getContext = function (display, infos, curLevel) {
             context.sensorSize = sensorSize * .90;
 
             context.timelineStartx = context.sensorSize * 3;
-            context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / context.maxTime;
+
+            var maxTime = context.maxTime;
+            if (maxTime == 0)
+                maxTime = 1000;
+
+            context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
@@ -579,7 +587,7 @@ var getContext = function (display, infos, curLevel) {
                 var key = sensor.type.toUpperCase() + sensor.port.toUpperCase();
                 if (context.gradingStatesBySensor.hasOwnProperty(key)) {
                     var states = context.gradingStatesBySensor[key];
-                    var startTime = -1;
+                    var startTime = 0;
                     var lastState = null;
                     sensor.lastAnalogState = null;
 
@@ -1252,7 +1260,9 @@ var getContext = function (display, infos, curLevel) {
 
 
     function drawSensorTimeLineState(sensor, state, startTime, endTime, type) {
-        if (paper == undefined || !context.display)
+        if (paper == undefined ||
+            !context.display ||
+            !context.autoGrading)
             return;
 
         var stateOffset = 160;
@@ -2203,6 +2213,7 @@ var getContext = function (display, infos, curLevel) {
     context.registerQuickPiEvent = function (sensorType, port, newState, setInSensor = true) {
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
+            context.success = false;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -2212,13 +2223,19 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (context.autoGrading && context.gradingStatesBySensor != undefined) {
+            var fail = false;
             var type = "actual";
             var expectedState = context.getSensorExpectedState(sensorType, port);
 
-            if (!sensor.lastStateChange) {
+            if (expectedState != null)
+                expectedState.hit = true;
+
+            if (sensor.lastStateChange == null) {
                 sensor.lastStateChange = 0;
                 sensor.lastState = 0;
             }
+
+            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
 
             if (context.currentTime >= context.maxTime) {
                 context.success = true;
@@ -2228,18 +2245,13 @@ var getContext = function (display, infos, curLevel) {
             else if (expectedState != null &&
                 !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
                 type = "wrong";
-                context.fail = false;
-            }
-            else {
-                if (expectedState != null)
-                    expectedState.hit = true;
+                fail = true;
             }
 
-            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
             sensor.lastStateChange = context.currentTime;
             sensor.lastState = newState;
 
-            if (context.fail) {
+            if (fail) {
                 context.success = false;
                 context.doNotStartGrade = false;
                 throw (strings.messages.wrongState);
@@ -2288,7 +2300,7 @@ var getContext = function (display, infos, curLevel) {
         var lastState;
         var startTime = -1;
         for (var i = 0; i < sensorStates.length; i++) {
-            if (startTime > 0) {
+            if (startTime >= 0) {
                 if (context.currentTime >= startTime &&
                     context.currentTime < sensorStates[i].time) {
                     state = lastState;
@@ -2301,7 +2313,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         // This is the end state
-        if (state == null && context.currentTime > startTime) {
+        if (state == null && context.currentTime >= startTime) {
             state = lastState;
         }
 
@@ -2326,6 +2338,7 @@ var getContext = function (display, infos, curLevel) {
 
         var sensor = findSensor(sensorType, port);
         if (!sensor) {
+            context.success = false;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -2337,7 +2350,7 @@ var getContext = function (display, infos, curLevel) {
             drawSensor(sensor);
         }
 
-        if (!sensor.lastStateChange) {
+        if (sensor.lastStateChange == null) {
             sensor.lastStateChange = 0;
             sensor.lastState = 0;
         }
@@ -2589,12 +2602,11 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.sleep = function (time, callback) {
 
-        if (!context.display || context.autoGrading || context.offLineMode) {
+        if (!context.display || context.autoGrading) {
             context.currentTime += time * 1000;
             context.runner.noDelay(callback);
         }
         else {
-
             context.runner.waitDelay(callback, null, time * 1000);
         }
     };
