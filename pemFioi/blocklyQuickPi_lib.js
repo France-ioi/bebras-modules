@@ -96,7 +96,69 @@ var getContext = function (display, infos, curLevel) {
                 cantConnectoToBT: "Aucun appareil n'est connecté en Bluetooth",
                 canConnectoToUSB: "Connecté en USB.",
                 canConnectoToBT: "Connecté en Bluetooth.",
-
+                connectionHTML: `
+                <div id="piui">
+                    <button type="button" id="piconnect" class="btn">
+                        <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
+                    </button>
+    
+                    <span id="piinstallui">
+                        <span class="fa fa-exchange-alt"></span>
+                        <button type="button" id="piinstall" class="btn">
+                            <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
+                        </button>
+                    </span>
+                </div>`,
+                connectionDialogHTML: `
+                <div class="content connectPi">
+                    <div class="panel-heading">
+                        <h2 class="sectionTitle">
+                            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                            Accès — Sélection IOI — 2018
+                        </h2>
+                        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="switchRadio btn-group" id="piconsel">
+                            <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
+                            <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
+                            <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
+                        </div>
+                        <div id="pischoolcon">
+                            <div class="form-group">
+                                <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">Aa</div>
+                                    <input type="text" id="schoolkey" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
+                                <div class="input-group">
+                                    <button class="input-group-prepend" id=pigetlist disabled>Get list</button>
+                                    <select id="pilist" class="custom-select" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="piiplabel">ou entrez son adesse IP</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">123</div>
+                                    <input id=piaddress type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div panel-body-usbbt>
+                            <label id="piconnectionlabel">Aucun appareil n'est connecté en USB</label>
+                        </div>
+    
+                        <div class="inlineButtons">
+                            <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
+                            <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>Déconnecter</button>
+                        </div>
+                    </div>
+                </div>
+                `,
             }
         },
         none: {
@@ -507,19 +569,7 @@ var getContext = function (display, infos, curLevel) {
         // Ask the parent to update sizes
         //context.blocklyHelper.updateSize();
         //context.updateScale();
-        var piUi = `
-            <div id="piui">
-                <button type="button" id="piconnect" class="btn">
-                    <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
-                </button>
-
-                <span id="piinstallui">
-                    <span class="fa fa-exchange-alt"></span>
-                    <button type="button" id="piinstall" class="btn">
-                        <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
-                    </button>
-                </span>
-            </div>`;
+        var piUi = strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
@@ -700,56 +750,8 @@ var getContext = function (display, infos, curLevel) {
 
         $('#piconnect').click(function () {
 
-            window.displayHelper.showPopupDialog(`
-            <div class="content connectPi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Accès — Sélection IOI — 2018
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div class="panel-body">
-                    <div class="switchRadio btn-group" id="piconsel">
-                        <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
-                        <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
-                        <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
-                    </div>
-                    <div id="pischoolcon">
-                        <div class="form-group">
-                            <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">Aa</div>
-                                <input type="text" id="schoolkey" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
-                            <div class="input-group">
-                                <button class="input-group-prepend" id=pigetlist disabled>Get list</button>
-                                <select id="pilist" class="custom-select" disabled>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label id="piiplabel">ou entrez son adesse IP</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">123</div>
-                                <input id=piaddress type="text" class="form-control">
-                            </div>
-                        </div>
-                    </div>
-                    <div panel-body-usbbt>
-                        <label id="piconnectionlabel">Aucun appareil n'est connecté en USB</label>
-                    </div>
-
-                    <div class="inlineButtons">
-                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
-                        <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>Déconnecter</button>
-                    </div>
-                </div>
-            </div>
-            `);
+            window.displayHelper.showPopupDialog(strings.messages.connectionDialogHTML);
+             ;
 
             if (context.offLineMode) {
                 $('#piconnectok').attr('disabled', false);
