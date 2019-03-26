@@ -563,8 +563,9 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
    function eventHandler(xPos, yPos, event) {
       // Check if vertex was clicked
-      // console.log(self.id);
+      
       var vertex = self.getFuzzyVertex(xPos, yPos);
+
       if(vertex !== null) {
          if(forVertices) {
             self.callback("vertex", vertex, xPos, yPos, event);
@@ -600,13 +601,16 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
    
    this.getFuzzyVertex = function(xPos, yPos) {
       // Look for closest vertex.
+      // console.log(self.id);
       var vertex = null;
       var minDistance = Infinity;
       this.graph.forEachVertex(function(id) {
          var distance = visualGraph.graphDrawer.getDistanceFromVertex(id, xPos, yPos);
+         // console.log(distance+" "+vertexThreshold);
          if(distance <= vertexThreshold && distance < minDistance) {
             vertex = id;
             minDistance = distance;
+
          }
       });
       return vertex;
@@ -733,6 +737,7 @@ function VertexDragAndConnect(settings) {
    this.visualGraph = settings.visualGraph;
    var graphMouse = settings.graphMouse;
    var dragThreshold = settings.dragThreshold;
+   this.vertexThreshold = settings.vertexThreshold || 0;
    this.dragLimits = settings.dragLimits;
    this.onVertexSelect = settings.onVertexSelect;
    this.onPairSelect = settings.onPairSelect;
@@ -750,7 +755,7 @@ function VertexDragAndConnect(settings) {
 
    this.enabled = false;
    this.selectionParent = null;
-   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, settings.vertexThreshold, settings.edgeThreshold, false);
+   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, settings.edgeThreshold, false);
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -883,6 +888,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id) {
+      // console.log(id);
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
@@ -1291,9 +1297,9 @@ function GraphEditor(settings) {
    var paperId = settings.paperElementID;
    var graph = settings.graph;
    var visualGraph = settings.visualGraph;
-   var onVertexSelect = settings.onVertexSelect;
-   var onEdgeSelect = settings.onEdgeSelect;
-   this.createVertex = settings.createVertex;
+   var onVertexSelect = settings.onVertexSelect;   // optional
+   var onEdgeSelect = settings.onEdgeSelect;    // optional
+   this.createVertex = settings.createVertex;   // optional
    var callback = settings.callback || null;
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -1320,7 +1326,6 @@ function GraphEditor(settings) {
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
-   var customCreateVertex = settings.createVertex; // must return vertexId
 
    this.loopIcon = null;
    this.cross = null;
