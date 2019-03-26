@@ -585,23 +585,11 @@ var getContext = function (display, infos, curLevel) {
         $('#introControls').html(introControls)
         $('#taskIntro').addClass('piui');
 
-        if (infos.customSensors) {
-            $('#grid').html(`
-                <div id="sensorPicker" style="height: 20%; width: 90%; padding: 5px;">
-                </div>
-
-                <div id="virtualSensors" style="height: 90%; width: 90%; padding: 5px;">
-                </div>
-                `
-            );
-        } else {
-            $('#grid').html(`
-                <div id="virtualSensors" style="height: 90%; width: 90%; padding: 5px;">
-                </div>
-                `
-            );
-
-        }
+        $('#grid').html(`
+            <div id="virtualSensors" style="height: 90%; width: 90%; padding: 5px;">
+            </div>
+             `
+        );
 
         this.raphaelFactory.destroyAll();
         paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#virtualSensors').width(), $('#virtualSensors').height());
@@ -669,6 +657,11 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
 
+            if (infos.customSensors)
+            {
+                nSensors++;
+            }
+
 
             var geometry = squareSize(paper.width, paper.height, nSensors);
 
@@ -706,7 +699,9 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linecapstring": "round"
                     });
 
-                    if (infos.quickPiSensors[iSensor]) {
+                    if (iSensor == infos.quickPiSensors.length && infos.customSensors) {
+                        drawCustomSensorAdder(x, y, geometry.size);
+                    } else if (infos.quickPiSensors[iSensor]) {
                         var sensor = infos.quickPiSensors[iSensor];
                         var doublewitdh = findSensorDefinition(sensor).doubleWidth;
 
@@ -962,10 +957,48 @@ var getContext = function (display, infos, curLevel) {
                 context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
             }
         }
-
-        if (infos.customSensors)
-            drawSensorSelector();
     };
+
+    function drawCustomSensorAdder(x, y, size)
+    {
+        if (context.sensorAdder) {
+            context.sensorAdder.remove();
+        }
+
+        var centerx = x + size / 2;
+        var centery = y + size / 2;
+        var fontsize = size * .70;
+
+        context.sensorAdder = paper.text(centerx, centery, "+");
+
+        context.sensorAdder.attr({ "font-size": fontsize + "px",
+                                    fill: "lightgray" });
+        context.sensorAdder.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+        context.sensorAdder.click(function() {
+
+            window.displayHelper.showPopupDialog(`
+                <div>
+                    <div class="panel-heading">
+                        <h2 class="sectionTitle">
+                            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                            Accès — Sélection IOI — 2018
+                        </h2>
+                        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                    </div>
+                    <div id="sensorPicker" class="panel-body">
+                    <div>
+                </div>
+            `);
+
+            $('#picancel').click(function() {
+                $('#popupMessage').hide();
+                window.displayHelper.popupMessageShown = false;    
+            });
+
+            drawSensorSelector();
+        });
+    }
 
     function isPortUsed(port) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -976,7 +1009,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return false;
-    }
+    };
 
     var portTypePorts = {
         "D": [5, 16, 18, 22, 24, 26],
@@ -993,7 +1026,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     function addSensorToSelector(sensorDefinition) {
-        var iDiv = document.createElement('span');
+        var iDiv = document.createElement('div');
 
         var image = new Image();
         image.src = getImg(sensorDefinition.selectorImages[0]);
@@ -1019,6 +1052,9 @@ var getContext = function (display, infos, curLevel) {
             infos.quickPiSensors.push(
                 { type: sensorDefinition.name, port: sensorDefinition.portType + port },
             );
+
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
 
             context.resetDisplay();
         };
@@ -1449,6 +1485,7 @@ var getContext = function (display, infos, curLevel) {
 
         var actuallydragged;
 
+        sensor.hasslider = true;
         sensor.focusrect.drag(
             function (dx, dy, x, y, event) {
 
@@ -1606,9 +1643,15 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function removeSlider(sensor) {
-
-        if (sensor.slider)
+        if (sensor.hasslider && sensor.focusrect) {
+            sensor.focusrect.undrag();
+            sensor.hasslider = false;
+        }
+        
+        if (sensor.slider) {
             sensor.slider.remove();
+            sensor.slider = null;
+        }
     }
 
     function sensorInConnectedModeError() {
@@ -1647,18 +1690,23 @@ var getContext = function (display, infos, curLevel) {
             "height": imgh,
         });
 
-
         if (infos.customSensors) {
             if (!sensor.removerect || !sensor.removerect.paper.canvas)
-                sensor.removerect = paper.rect(imgx + imgw, imgy, 10, 10);
+                sensor.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
 
             sensor.removerect.attr({
-                "fill": "red",
-                "x": imgx + imgw,
+                "font-size": "30" + "px",
+                fill: "lightgray",
+                "font-family": "Font Awesome 5 Free",
+                'text-anchor': 'start',
+                "x": portx,
                 "y": imgy,
-                "width": 10,
-                "height": 10,    
             });
+
+            sensor.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+            sensor.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
+            sensor.removerect.node.style.fontWeight = "bold";
+            
 
             sensor.removerect.click(function (element) {
                 for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -2609,11 +2657,11 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi.sleep = function (time, callback) {
 
         if (!context.display || context.autoGrading) {
-            context.currentTime += time * 1000;
+            context.currentTime += time;
             context.runner.noDelay(callback);
         }
         else {
-            context.runner.waitDelay(callback, null, time * 1000);
+            context.runner.waitDelay(callback, null, time);
         }
     };
 
