@@ -507,7 +507,7 @@ def readLightIntensity(pin):
 
 def sleep(sleep_time):
 	sleep_time = float(sleep_time)
-	time.sleep(sleep_time)
+	time.sleep(sleep_time/1000)
 
 def reportBlockValue(id, state):
     return state

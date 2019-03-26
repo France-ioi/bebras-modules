@@ -214,9 +214,7 @@ img {
    top: 50%;
    transform: translate(0,-50%);
 }
-#popupMessage.floatingMessage .container img {
-   display: none;
-}
+
 #popupMessage .message {
    font-size: 18px;
 }
