@@ -704,6 +704,33 @@ class DHT11:
         return the_bytes[0] + the_bytes[1] + the_bytes[2] + the_bytes[3] & 255
 
 
+def readTemperatureDHT11(pin):
+    pin = int(pin)
+    haveold = False
+
+    try:
+        lasttime = DHT11_last_value[pin]["time"]
+        haveold = True
+        if time.time() - lasttime < 2:
+            return DHT11_last_value[pin]["temperature"]
+    except:
+        pass
+
+       
+    instance = DHT11(pin=pin)
+    result = instance.read()
+    if result.is_valid():
+        DHT11_last_value[pin] = {
+            "time": time.time(),
+            "temperature": result.temperature,
+            "humidity": result.humidity
+        }
+        return result.temperature
+    elif haveold:
+        return DHT11_last_value[pin]["temperature"] 
+
+    return 0
+
 def readHumidity(pin):
     pin = int(pin)
     haveold = False
@@ -730,5 +757,8 @@ def readHumidity(pin):
         return DHT11_last_value[pin]["humidity"] 
 
     return 0
+
+def currentTime():
+    return time.time() * 1000
     
 `

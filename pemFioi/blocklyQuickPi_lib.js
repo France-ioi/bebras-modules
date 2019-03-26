@@ -26,6 +26,7 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "distance lue par le capteur à ultrasons",
                 readLightIntensity: "Intensité lumineuse",
                 readHumidity: "l'humidité ambiante",
+                currentTime: "current time",
                 /*turnLedOn: "Turn Led On",
                 turnLedOff: "Turn Led Off",
                 buttonState: "Return Button State",
@@ -59,6 +60,7 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "readDistance",
                 readLightIntensity: "readLightIntensity",
                 readHumidity: "readHumidity",
+                currentTime: "currentTime",
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -78,6 +80,7 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "readDistance(): Read distance using ultrasonic sensor",
                 readLightIntensity: "readLightIntensity(): Read light intensity",
                 readHumidity: "readHumidity(): lire l'humidité ambiante",
+                currentTime: "currentTime(): returns current time",
             },
             constant: {
             },
@@ -180,6 +183,7 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "Read distance using ultrasonic sensor",
                 readLightIntensity: "Read light intensity",
                 readHumidity: "lire l'humidité ambiante",
+                currentTime: "returns current time",
             }
         }
     }
@@ -2722,6 +2726,17 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.currentTime = function(callback) {
+        var millis = new Date().getTime();
+
+        if (context.autoGrading) {
+            millis = context.currentTime;
+        }
+        
+        context.runner.waitDelay(callback, millis);
+
+    };
+
 
     /***** Blocks definitions *****/
     /* Here we define all blocks/functions of the library.
@@ -2753,6 +2768,8 @@ var getContext = function (display, infos, curLevel) {
             // Categories are reflected in the Blockly menu
             sensors: [
                 { name: "buttonState", yieldsValue: true },
+                { name: "currentTime", yieldsValue: true },
+
                 { name: "waitForButton" },
                 {
                     name: "buttonStateInPort", yieldsValue: true, params: ["Number"], blocklyJson: {
@@ -2890,6 +2907,7 @@ var getContext = function (display, infos, curLevel) {
                         "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
                         "</block>"
                 },
+                
             ]
         }
         // We can add multiple namespaces by adding other keys to customBlocks.
