@@ -944,7 +944,6 @@ function ArcDragger(settings) {
    this.id = settings.id;
    this.paper = settings.paper;
    this.paperElementID = settings.paperElementID;
-   this.enabled = false;
    this.graph = settings.graph;
    this.visualGraph = settings.visualGraph;
    this.graphMouse = settings.graphMouse;
@@ -962,7 +961,10 @@ function ArcDragger(settings) {
    this.isDragging = false;
    this.vertexThreshold = settings.vertexThreshold || 0;
    this.edgeThreshold = settings.edgeThreshold || 10;
+
    this.enabled = false;
+   this.dragEnabled = false;
+   // this.labelEditEnabled = false;
 
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -986,10 +988,12 @@ function ArcDragger(settings) {
 
    this.enableEdgesDrag = function() {
       this.graphMouse.addEvent(this.id, "drag", "edge", null, [this.moveHandler, this.startHandler, this.endHandler]);
+      this.dragEnabled = true;
    };
 
    this.disableEdgesDrag = function() {
       this.graphMouse.removeEvent(this.id);
+      this.dragEnabled = false;
    };
 
    this.startHandler = function(x, y, event) {
@@ -1043,6 +1047,8 @@ function ArcDragger(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
+      if(!self.dragEnabled)
+         return;
       self.isDragging = true;
       self.unselectAll();
       var x0 = self.originalPosition.x;
@@ -1082,7 +1088,6 @@ function ArcDragger(settings) {
          if(radiusRatio > 5 && !vInfo["large-arc"])
                radiusRatio = 0;
          vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
-         // vInfo["radius-ratio"] = radiusRatio;
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
       self.visualGraph.graphDrawer.refreshEdgePosition(self.edgeVertices[0],self.edgeVertices[1]);
@@ -1383,18 +1388,30 @@ function GraphEditor(settings) {
       }
       this.enabled = enabled;
       self.vertexDragAndConnect.setEnabled(enabled);
-      self.vertexCreator.setEnabled(enabled);
+
+      // self.vertexCreator.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
       self.graphDragger.setEnabled(enabled);
-      this.removeVertexEnabled = enabled;
-      this.createEdgeEnabled = enabled;
-      this.removeEdgeEnabled = enabled;
+      // this.removeVertexEnabled = enabled;
+      // this.createEdgeEnabled = enabled;
+      // this.removeEdgeEnabled = enabled;
       this.multipleEdgesEnabled = enabled;
       this.loopEnabled = enabled;
       this.editVertexLabelEnabled = enabled;
       this.editEdgeLabelEnabled = enabled;
       this.setVertexDragEnabled(enabled);
-      this.setEdgeDragEnabled(enabled);
+      // this.setEdgeDragEnabled(enabled);
+      this.setCreateVertexEnabled(enabled);
+      this.setCreateEdgeEnabled(enabled);
+   };
+
+   this.setCreateVertexEnabled = function(enabled) {
+      this.vertexCreator.setEnabled(enabled);
+      this.removeVertexEnabled = enabled;
+   };
+   this.setCreateEdgeEnabled = function(enabled) {
+      this.createEdgeEnabled = enabled;
+      this.removeEdgeEnabled = enabled;
    };
 
    this.setVertexDragEnabled = function(enabled) {
@@ -1405,10 +1422,11 @@ function GraphEditor(settings) {
    };
 
    this.setEdgeDragEnabled = function(enabled) {
-      this.arcDragger.setEnabled(enabled);
+      // this.arcDragger.setEnabled(enabled);
       if(enabled === this.edgeDragEnabled)
          return;
       this.edgeDragEnabled = enabled;
+      this.arcDragger.dragEnabled = enabled;
    };
 
    this.setGridEnabled = function(enabled,gridX,gridY) {
