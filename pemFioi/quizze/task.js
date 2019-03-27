@@ -152,8 +152,8 @@ task.load = function(views, success) {
         var random = parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100) //0
         var q = QuizzeUI({
             parent: $('#task'),
-            shuffle_questions: !!json.shuffle_questions,
-            shuffle_answers: !!json.shuffle_answers,
+            shuffle_questions: !!quizze_settings.shuffle_questions,
+            shuffle_answers: !!quizze_settings.shuffle_answers,
             random: random
         });
 
@@ -206,7 +206,7 @@ task.load = function(views, success) {
             }
             var token = task_token.get()
             if(token) {
-                useGraderUrl(json.graderUrl, token, answer, onGrade);
+                useGraderUrl(quizze_settings.graderUrl, token, answer, onGrade);
             } else {
                 useGraderData(answer, onGrade);
             }
