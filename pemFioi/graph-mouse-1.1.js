@@ -1388,21 +1388,16 @@ function GraphEditor(settings) {
       }
       this.enabled = enabled;
       self.vertexDragAndConnect.setEnabled(enabled);
-
-      // self.vertexCreator.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
       self.graphDragger.setEnabled(enabled);
-      // this.removeVertexEnabled = enabled;
-      // this.createEdgeEnabled = enabled;
-      // this.removeEdgeEnabled = enabled;
-      this.multipleEdgesEnabled = enabled;
-      this.loopEnabled = enabled;
-      this.editVertexLabelEnabled = enabled;
-      this.editEdgeLabelEnabled = enabled;
+      
       this.setVertexDragEnabled(enabled);
-      // this.setEdgeDragEnabled(enabled);
       this.setCreateVertexEnabled(enabled);
       this.setCreateEdgeEnabled(enabled);
+      this.setMultipleEdgesEnabled(enabled);
+      this.setEditVertexLabelEnabled(enabled);
+      this.setEditEdgeLabelEnabled(enabled);
+      this.setLoopEnabled(enabled);
    };
 
    this.setCreateVertexEnabled = function(enabled) {
@@ -1413,22 +1408,32 @@ function GraphEditor(settings) {
       this.createEdgeEnabled = enabled;
       this.removeEdgeEnabled = enabled;
    };
-
    this.setVertexDragEnabled = function(enabled) {
       this.vertexDragAndConnect.dragEnabled = enabled;
-      if(enabled === this.vertexDragEnabled)
-         return;
       this.vertexDragEnabled = enabled;
    };
-
    this.setEdgeDragEnabled = function(enabled) {
-      // this.arcDragger.setEnabled(enabled);
-      if(enabled === this.edgeDragEnabled)
-         return;
       this.edgeDragEnabled = enabled;
       this.arcDragger.dragEnabled = enabled;
    };
-
+   this.setDragGraphEnabled = function(enabled) {
+      this.graphDragger.dragEnabled = enabled;
+   };
+   this.setScaleGraphEnabled = function(enabled) {
+      this.graphDragger.scaleEnabled = enabled;
+   };
+   this.setMultipleEdgesEnabled = function(enabled) {
+      this.multipleEdgesEnabled = enabled;
+   };
+   this.setLoopEnabled = function(enabled) {
+      this.loopEnabled = enabled;
+   };
+   this.setEditVertexLabelEnabled = function(enabled) {
+      this.editVertexLabelEnabled = enabled;
+   };
+   this.setEditEdgeLabelEnabled = function(enabled) {
+      this.editEdgeLabelEnabled = enabled;
+   };
    this.setGridEnabled = function(enabled,gridX,gridY) {
       this.gridEnabled = {snapToGrid:enabled,gridX:gridX,gridY:gridY};
       this.vertexDragAndConnect.setGridEnabled(enabled,gridX,gridY);
