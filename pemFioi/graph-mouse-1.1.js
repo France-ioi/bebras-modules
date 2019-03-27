@@ -266,7 +266,7 @@ function VertexClicker(id, graph, visualGraph, graphMouse, vertexCallback, enabl
    }
 }
 
-function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled) {
+function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
    var self = this;
    this.paper = paper;
    this.enabled = false;
@@ -284,7 +284,9 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled) {
    };
 
    this.clickHandler = function(event) {
+      // console.log(self.paper);
       var offset = $(self.paper.canvas).offset();
+      // var offset = $("#"+paperElementID).offset();
       var xPos = event.pageX - offset.left;
       var yPos = event.pageY - offset.top;
       callback(xPos, yPos, event);
@@ -546,7 +548,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
    this.id = id;
    this.graph = graph;
    this.visualGraph = visualGraph;
-   this.paperMouse = new PaperMouseEvent(paperElementID, paper, event, eventHandler, enabled);
+   this.paperMouse = new PaperMouseEvent(paperElementID, paper, event, eventHandler, enabled,id);
    this.callback = callback;
    this.enabled = false;
    this.setEnabled = function(enabled) {
@@ -563,7 +565,6 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
    function eventHandler(xPos, yPos, event) {
       // Check if vertex was clicked
-      
       var vertex = self.getFuzzyVertex(xPos, yPos);
 
       if(vertex !== null) {
@@ -689,7 +690,7 @@ function FuzzyRemover(id, paperElementID, paper, graph, visualGraph, callback, f
 
 function VertexCreator(settings) {
    var self = this;
-   this.id = settings.id;
+   this.id = settings.id || "VertexCreator";
    this.paperElementID = settings.paperElementID;
    this.paper = settings.paper;
    this.graph = settings.graph;
@@ -701,7 +702,8 @@ function VertexCreator(settings) {
    this.edgeThreshold = settings.edgeThreshold || 10;
    this.enabled = false;
 
-   this.fuzzyDblClicker = new FuzzyClicker(this.id + "_fuzzyDblClicker", this.paperElementID, this.paper, this.graph, this.visualGraph, eventHandler, this.forVertices, this.forEdges, true, this.vertexThreshold, this.edgeThreshold, false, "dblclick")
+   this.fuzzyDblClicker = new FuzzyClicker(this.id + "_fuzzyDblClicker", this.paperElementID, this.paper, this.graph, this.visualGraph, eventHandler, 
+      this.forVertices, this.forEdges, true, this.vertexThreshold, this.edgeThreshold, false, "dblclick")
 
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
@@ -731,7 +733,7 @@ function VertexCreator(settings) {
 
 function VertexDragAndConnect(settings) {
    var self = this;
-   var id = settings.id;
+   var id = settings.id || "VertexDragAndConnect";
    var paper = settings.paper;
    var graph = settings.graph;
    this.visualGraph = settings.visualGraph;
@@ -755,7 +757,8 @@ function VertexDragAndConnect(settings) {
 
    this.enabled = false;
    this.selectionParent = null;
-   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, this.vertexThreshold, settings.edgeThreshold, false);
+   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
+      this.vertexThreshold, settings.edgeThreshold, false);
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -894,7 +897,7 @@ function VertexDragAndConnect(settings) {
       }
       // Click on background or on the selected vertex -  deselect it.
       if(id === null || id === self.selectionParent){
-         if(self.selectionParent !== null) {
+         if(self.selectionParent !== null && self.onVertexSelect) {
             self.onVertexSelect(self.selectionParent, false);
          }
          self.selectionParent = null;
@@ -902,7 +905,7 @@ function VertexDragAndConnect(settings) {
       }
 
       // Start a new pair.
-      if(self.selectionParent === null) {
+      if(self.selectionParent === null && self.onVertexSelect) {
          self.selectionParent = id;
          self.onVertexSelect(id, true);
          return;
@@ -912,7 +915,8 @@ function VertexDragAndConnect(settings) {
       if(self.onPairSelect) {
          self.onPairSelect(self.selectionParent, id);
       }
-      self.onVertexSelect(self.selectionParent, false, true);
+      if(self.onVertexSelect)
+         self.onVertexSelect(self.selectionParent, false, true);
       self.selectionParent = null;
    };
 
@@ -941,7 +945,7 @@ function VertexDragAndConnect(settings) {
 
 function ArcDragger(settings) {
    var self = this;
-   this.id = settings.id;
+   this.id = settings.id || "ArcDragger";
    this.paper = settings.paper;
    this.paperElementID = settings.paperElementID;
    this.graph = settings.graph;
@@ -1162,7 +1166,7 @@ function ArcDragger(settings) {
 
 function GraphDragger(settings) {
    var self = this;
-   this.id = settings.id;
+   this.id = settings.id || "GraphDragger";
    this.paper = settings.paper;
    this.paperElementID = settings.paperElementID;
    this.graph = settings.graph;
@@ -1339,7 +1343,7 @@ function GraphEditor(settings) {
    this.textEditor = null;
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
-      id:"ArcDragger",
+      // id:"ArcDragger",
       paper: settings.paper,
       paperElementID: settings.paperElementID,
       graph: graph,
@@ -1350,7 +1354,7 @@ function GraphEditor(settings) {
       enabled: false
    });
    this.vertexCreator = new VertexCreator({
-      id:"VertexCreator",
+      // id:"VertexCreator",
       paper: settings.paper,
       paperElementID: settings.paperElementID,
       graph: graph,
@@ -1361,7 +1365,7 @@ function GraphEditor(settings) {
       enabled: false
    });
    this.graphDragger = new GraphDragger({
-      id: "GraphDragger",
+      // id: "GraphDragger",
       paper: settings.paper,
       paperElementID: settings.paperElementID,
       graph: graph,
@@ -1390,10 +1394,11 @@ function GraphEditor(settings) {
       self.vertexDragAndConnect.setEnabled(enabled);
       self.arcDragger.setEnabled(enabled);
       self.graphDragger.setEnabled(enabled);
-      
-      this.setVertexDragEnabled(enabled);
+
       this.setCreateVertexEnabled(enabled);
       this.setCreateEdgeEnabled(enabled);
+      this.setVertexDragEnabled(enabled);
+      this.setEdgeDragEnabled(enabled);
       this.setMultipleEdgesEnabled(enabled);
       this.setEditVertexLabelEnabled(enabled);
       this.setEditEdgeLabelEnabled(enabled);
@@ -1854,9 +1859,10 @@ function GraphEditor(settings) {
    };
 
    this.updateHandlers = function() {
-      self.vertexDragAndConnect.setEnabled(false);
+      this.vertexDragAndConnect.setEnabled(false);
       settings.graphMouse = new GraphMouse("mouse", graph, visualGraph);
-      self.vertexDragAndConnect = new VertexDragAndConnect(settings);
+      this.vertexDragAndConnect = new VertexDragAndConnect(settings);
+      this.vertexDragAndConnect.setEnabled(true);
       this.arcDragger.setEnabled(false);
       this.arcDragger = new ArcDragger({
          id:"ArcDragger",
@@ -2000,7 +2006,5 @@ function GraphEditor(settings) {
    
    if(settings.enabled) {
       this.setEnabled(true);
-   } else {
-      this.enabled = false;
    }
 };

@@ -424,11 +424,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    this.refreshEdgePosition = function(vertex1, vertex2) {
       var edges = this.graph.getEdgesFrom(vertex1, vertex2);
-      
+
       var info1 = this.visualGraph.getVertexVisualInfo(vertex1);
       var info2 = this.visualGraph.getVertexVisualInfo(vertex2);
       var newPath;
-      
+
       for(var iEdge in edges) {
          var edgeID = edges[iEdge];
          var raphaels = this.visualGraph.getRaphaelsFromID(edgeID);
@@ -438,6 +438,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          else {
             newPath = this._getEdgePath(vertex1, vertex2, edgeID);
          }
+
          raphaels[0].attr("path", newPath);
          raphaels[2].attr("path", newPath);
          var info = this.graph.getEdgeInfo(edgeID);
