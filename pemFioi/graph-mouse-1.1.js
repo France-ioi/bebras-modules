@@ -1387,6 +1387,7 @@ function GraphEditor(settings) {
    this.editVertexLabelEnabled = false;
    this.editEdgeLabelEnabled = false;
    this.vertexSelectEnabled = false;
+   this.terminalEnabled = false;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1407,15 +1408,18 @@ function GraphEditor(settings) {
       this.setEditEdgeLabelEnabled(enabled);
       this.setLoopEnabled(enabled);
       this.setVertexSelectEnabled(enabled);
+      this.setTerminalEnabled(enabled);
    };
 
    this.setCreateVertexEnabled = function(enabled) {
       this.vertexCreator.setEnabled(enabled);
       this.removeVertexEnabled = enabled;
+      this.checkVertexSelect();
    };
    this.setCreateEdgeEnabled = function(enabled) {
       this.createEdgeEnabled = enabled;
       this.removeEdgeEnabled = enabled;
+      this.checkVertexSelect();
    };
    this.setVertexDragEnabled = function(enabled) {
       this.vertexDragAndConnect.dragEnabled = enabled;
@@ -1448,15 +1452,26 @@ function GraphEditor(settings) {
       this.vertexDragAndConnect.setGridEnabled(enabled,gridX,gridY);
       this.graphDragger.setGridEnabled(enabled,gridX,gridY);
    };
+   this.setTerminalEnabled = function(enabled) {
+      this.terminalEnabled = enabled;
+      this.checkVertexSelect();
+   };
    this.setVertexSelectEnabled = function(enabled) {
       this.vertexSelectEnabled = enabled;
    };
 
+   this.checkVertexSelect = function() {
+      if(!this.terminalEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled){
+         this.setVertexSelectEnabled(false);
+      }else{
+         this.setVertexSelectEnabled(true);
+      }
+   };
+   
+
    this.defaultOnVertexSelect = function(vertexId,selected) {
-      if(!self.vertexSelectEnabled)
-         return;
       var attr;
-      if(selected) {
+      if(selected && self.vertexSelectEnabled) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          self.editLabel(vertexId,"vertex");
@@ -1626,7 +1641,8 @@ function GraphEditor(settings) {
          this.addLoopIcon(vertexId);
       if(this.removeVertexEnabled)
          this.addCross(vertexId);
-      this.addTerminalIcon(vertexId);
+      if(this.terminalEnabled)
+         this.addTerminalIcon(vertexId);
    };
    this.removeIcons = function() {
       if(self.loopIcon)
