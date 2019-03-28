@@ -963,6 +963,7 @@ function ArcDragger(settings) {
    this.callback = settings.callback;
    this.startDragCallback = settings.startDragCallback;
    this.isDragging = false;
+   this.isOnLabel = false;
    this.vertexThreshold = settings.vertexThreshold || 0;
    this.edgeThreshold = settings.edgeThreshold || 10;
 
@@ -1001,7 +1002,6 @@ function ArcDragger(settings) {
    };
 
    this.startHandler = function(x, y, event) {
-      
       self.isDragging = false;
       if(self.elementID !== this.data("id")){
          self.unselectAll();
@@ -1016,9 +1016,10 @@ function ArcDragger(settings) {
       }
       self.loop = (self.edgeVertices[0] === self.edgeVertices[1]) ? true : false;
 
-      var paperPos = $("#"+self.paperElementID).position();
+      var paperPos = $(self.paper.canvas).offset();
       
       self.originalPosition = {x: (x - paperPos.left), y: (y - paperPos.top)};
+      self.isOnLabel = self.visualGraph.graphDrawer.isOnEdgeLabel(this.data("id"),self.originalPosition.x,self.originalPosition.y);
       self.distance = Math.sqrt(Math.pow((self.edgeVerticesPos[0].x - self.edgeVerticesPos[1].x),2) + Math.pow((self.edgeVerticesPos[0].y - self.edgeVerticesPos[1].y),2));
       if(self.startDragCallback){
          self.startDragCallback(self.elementID);
@@ -1036,10 +1037,11 @@ function ArcDragger(settings) {
       var paperPos = $("#"+self.paperElementID).position();
       var xMouse = event.pageX - paperPos.left;
       var yMouse = event.pageY - paperPos.top;
-      if(self.visualGraph.graphDrawer.isOnEdgeLabel(this.data("id"),xMouse,yMouse)){
+      if(self.isOnLabel){
          if(self.editEdgeLabel){
             self.editEdgeLabel(self.elementID,"edge");
          }     
+         self.isOnLabel = false;
       }else if(self.onEdgeSelect){
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
@@ -1051,7 +1053,7 @@ function ArcDragger(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
-      if(!self.dragEnabled)
+      if(!self.dragEnabled || self.isOnLabel)
          return;
       self.isDragging = true;
       self.unselectAll();
@@ -1384,6 +1386,7 @@ function GraphEditor(settings) {
    this.loopEnabled = false;
    this.editVertexLabelEnabled = false;
    this.editEdgeLabelEnabled = false;
+   this.vertexSelectEnabled = false;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1403,6 +1406,7 @@ function GraphEditor(settings) {
       this.setEditVertexLabelEnabled(enabled);
       this.setEditEdgeLabelEnabled(enabled);
       this.setLoopEnabled(enabled);
+      this.setVertexSelectEnabled(enabled);
    };
 
    this.setCreateVertexEnabled = function(enabled) {
@@ -1444,8 +1448,13 @@ function GraphEditor(settings) {
       this.vertexDragAndConnect.setGridEnabled(enabled,gridX,gridY);
       this.graphDragger.setGridEnabled(enabled,gridX,gridY);
    };
+   this.setVertexSelectEnabled = function(enabled) {
+      this.vertexSelectEnabled = enabled;
+   };
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
+      if(!self.vertexSelectEnabled)
+         return;
       var attr;
       if(selected) {
          attr = selectedVertexAttr;
@@ -1461,7 +1470,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
-      if(!self.createEdgeEnabled)
+      if(!self.createEdgeEnabled || !self.vertexSelectEnabled)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -1613,7 +1622,6 @@ function GraphEditor(settings) {
    };
 
    this.addIcons = function(vertexId) {
-      // self.addPencil(vertexId);
       if(this.createEdgeEnabled && this.loopEnabled)
          this.addLoopIcon(vertexId);
       if(this.removeVertexEnabled)
@@ -1621,10 +1629,12 @@ function GraphEditor(settings) {
       this.addTerminalIcon(vertexId);
    };
    this.removeIcons = function() {
-      // self.pencil.remove();
-      self.loopIcon.remove();
-      self.cross.remove();
-      self.terminalIcon.remove();
+      if(self.loopIcon)
+         self.loopIcon.remove();
+      if(self.cross)
+         self.cross.remove();
+      if(self.terminalIcon)
+         self.terminalIcon.remove();
    };
 
    this.addPencil = function(vertexId) {

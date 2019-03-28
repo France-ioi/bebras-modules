@@ -387,7 +387,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          cx: x,
          cy: y
       });
-
       // Move the custom Raphael objects.
       if(vertexMover) {
          vertexMover(id, raphaels, x, y);
