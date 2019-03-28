@@ -152,7 +152,7 @@ var getContext = function (display, infos, curLevel) {
                             </div>
                         </div>
                         <div panel-body-usbbt>
-                            <label id="piconnectionlabel">Aucun appareil n'est connecté en USB</label>
+                            <label id="piconnectionlabel"></label>
                         </div>
     
                         <div class="inlineButtons">
@@ -853,9 +853,11 @@ var getContext = function (display, infos, curLevel) {
                     $(this).addClass('active');
                     $('#pischoolcon').show("slow");
                 }
+                $('#piconnectionlabel').hide();
             });
 
             $('#piconusb').click(function () {
+                $('#piconnectionlabel').show();
                 if (!context.quickPiConnection.isConnected()) {
                     sessionStorage.connectionMethod = "USB";
                     $('#piconnectok').attr('disabled', true);
@@ -881,6 +883,7 @@ var getContext = function (display, infos, curLevel) {
             });
 
             $('#piconbt').click(function () {
+                $('#piconnectionlabel').show();
                 if (!context.quickPiConnection.isConnected()) {
                     sessionStorage.connectionMethod = "BT";
                     $('#piconnectok').attr('disabled', true);

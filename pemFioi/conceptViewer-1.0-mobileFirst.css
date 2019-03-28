@@ -27,6 +27,9 @@
     padding: 15px;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+#conceptViewer .exit {
+  cursor: pointer;
+}
 #conceptViewer .exit .icon {
     font-size: 18px;
     color: #4a90e2;
