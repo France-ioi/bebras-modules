@@ -671,7 +671,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var y2 = vertex2Pos.y;
 
       var label = info.label || "";
-      var labelW = label.length * this.edgeLabelAttr["font-size"];
+      var labelW = label.length * this.edgeLabelAttr["font-size"] || this.edgeLabelAttr["font-size"];
       var labelH = this.edgeLabelAttr["font-size"];
       var margin = 10;
       if(label.length < 2){
@@ -737,13 +737,14 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
 
    this.isOnEdgeLabel = function(edgeID,x,y) {
       var edgeInfo = this.graph.getEdgeInfo(edgeID);
-      if(!edgeInfo.label || edgeInfo.label.length === 0){
-         return false;
-      }
+      // if(!edgeInfo.label || edgeInfo.label.length === 0){
+      //    return false;
+      // }
       var labelPos = this.getLabelPos(edgeID);
       var fontSize = this.edgeLabelAttr["font-size"] || 15;  
       var labelH = fontSize;
-      var labelW = edgeInfo.label.length * fontSize;
+      var labelW = edgeInfo.label.length * fontSize || fontSize;
+      // console.log(edgeID+" "+labelH+" "+labelW);
       if(x < (labelPos.x + labelW/2) && x > (labelPos.x - labelW/2) && y < (labelPos.y + labelH/2) && y > (labelPos.y - labelH/2)){
          return true;
       }
