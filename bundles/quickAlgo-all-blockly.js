@@ -298,7 +298,8 @@ var localLanguageStrings = {
       listVariable: "liste",
       scaleDrawing: "Zoom ×2",
       loopRepeat: "repeat",
-      loopDo: "do"
+      loopDo: "do",
+      infiniteLoop: "répéter indéfiniment"
    },
    en: {
       categories: {
@@ -383,7 +384,8 @@ var localLanguageStrings = {
       listVariable: "list",
       scaleDrawing: "Scale 2×",
       loopRepeat: "repeat",
-      loopDo: "do"
+      loopDo: "do",
+      infiniteLoop: "repeat indefinitely"
    },
    de: {
       categories: {
@@ -491,7 +493,8 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Funciones",
          read: "Lectura",
-         print: "Escritura"
+         print: "Escritura",
+         infiniteLoop: "Repetir indefinidamente"
       },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",

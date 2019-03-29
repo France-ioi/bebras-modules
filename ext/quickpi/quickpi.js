@@ -304,10 +304,14 @@ screenLine2 = None
 
 pi = pigpio.pi()
 
+def cleanupPin(pin):
+    pi.set_mode(pin, pigpio.INPUT)
+
 def changePinState(pin, state):
   pin = int(pin)
   state = int(state)
 
+  cleanupPin(pin)
   GPIO.setup(pin, GPIO.OUT)
   if state:
     GPIO.output(pin, GPIO.HIGH)
@@ -353,6 +357,7 @@ def buttonState():
 
 def waitForButton(pin):
   pin = int(pin)
+  cleanupPin(pin)
   GPIO.setup(pin, GPIO.IN)
   while not GPIO.input(pin):
     time.sleep(0.01)
@@ -390,89 +395,90 @@ _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
 def readDistance(pin):
-	pin = int(pin)
+    pin = int(pin)
 
-	GPIO.setup(pin, GPIO.OUT)
-	GPIO.output(pin, GPIO.LOW)
-	usleep(2)
-	GPIO.output(pin, GPIO.HIGH)
-	usleep(10)
-	GPIO.output(pin, GPIO.LOW)
+    cleanupPin(pin)
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
+    usleep(2)
+    GPIO.output(pin, GPIO.HIGH)
+    usleep(10)
+    GPIO.output(pin, GPIO.LOW)
 
-	GPIO.setup(pin, GPIO.IN)
+    GPIO.setup(pin, GPIO.IN)
 
-	t0 = time.time()
-	count = 0
-	while count < _TIMEOUT1:
-		if GPIO.input(pin):
-			break
-		count += 1
-	if count >= _TIMEOUT1:
-		return None
+    t0 = time.time()
+    count = 0
+    while count < _TIMEOUT1:
+        if GPIO.input(pin):
+            break
+        count += 1
+    if count >= _TIMEOUT1:
+        return None
 
-	t1 = time.time()
-	count = 0
-	while count < _TIMEOUT2:
-		if not GPIO.input(pin):
-			break
-		count += 1
-	if count >= _TIMEOUT2:
-		return None
+    t1 = time.time()
+    count = 0
+    while count < _TIMEOUT2:
+        if not GPIO.input(pin):
+            break
+        count += 1
+    if count >= _TIMEOUT2:
+        return None
 
-	t2 = time.time()
+    t2 = time.time()
 
-	dt = int((t1 - t0) * 1000000)
-	if dt > 530:
-		return None
+    dt = int((t1 - t0) * 1000000)
+    if dt > 530:
+        return None
 
-	distance = ((t2 - t1) * 1000000 / 29 / 2)    # cm
+    distance = ((t2 - t1) * 1000000 / 29 / 2)    # cm
 
-	return round(distance, 1)
+    return round(distance, 1)
 
 def displayText(line1, line2=""):
-	global screenLine1
-	global screenLine2
-	
-	if line1 == screenLine1 and line2 == screenLine2:
-		return
+    global screenLine1
+    global screenLine2
+    
+    if line1 == screenLine1 and line2 == screenLine2:
+        return
 
-	screenLine1 = line1
-	screenLine2 = line2
+    screenLine1 = line1
+    screenLine2 = line2
 
-	address = 0x3e
-	bus = smbus.SMBus(1)
+    address = 0x3e
+    bus = smbus.SMBus(1)
 
-	bus.write_byte_data(address, 0x80, 0x01) #clear
-	time.sleep(0.05)
-	bus.write_byte_data(address, 0x80, 0x08 | 0x04) # display on, no cursor
-	bus.write_byte_data(address, 0x80, 0x28) # two lines
-	time.sleep(0.05)
+    bus.write_byte_data(address, 0x80, 0x01) #clear
+    time.sleep(0.05)
+    bus.write_byte_data(address, 0x80, 0x08 | 0x04) # display on, no cursor
+    bus.write_byte_data(address, 0x80, 0x28) # two lines
+    time.sleep(0.05)
 
-	# This will allow arguments to be numbers
-	line1 = str(line1)
-	line2 = str(line2)
+    # This will allow arguments to be numbers
+    line1 = str(line1)
+    line2 = str(line2)
 
-	count = 0
-	for c in line1:
-		bus.write_byte_data(address, 0x40, ord(c))
-		count += 1
-		if count == 16:
-			break
+    count = 0
+    for c in line1:
+        bus.write_byte_data(address, 0x40, ord(c))
+        count += 1
+        if count == 16:
+            break
 
-	bus.write_byte_data(address, 0x80, 0xc0) # Next line
-	count = 0
-	for c in line2:
-		bus.write_byte_data(address, 0x40, ord(c))
-		count += 1
-		if count == 16:
-			break
+    bus.write_byte_data(address, 0x80, 0xc0) # Next line
+    count = 0
+    for c in line2:
+        bus.write_byte_data(address, 0x40, ord(c))
+        count += 1
+        if count == 16:
+            break
 
 def setServoAngle(pin, angle):
-	pin = int(pin)
-	angle = int(angle)
+    pin = int(pin)
+    angle = int(angle)
 
-	pulsewidth = (angle * 11.11) + 500
-	pi.set_servo_pulsewidth(pin, pulsewidth)
+    pulsewidth = (angle * 11.11) + 500
+    pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
 	pin = int(pin)
