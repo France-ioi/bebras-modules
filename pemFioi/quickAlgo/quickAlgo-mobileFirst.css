@@ -1582,7 +1582,7 @@ button.showLongIntro .icon, button.videoBtn .icon {
   font-size: 12px;
 }
 #piui .btn span + span {
-  padding-left: 10px;
+  margin-left: 10px;
 }
 .btn#piconnect {
   background-color: #f5a623;
