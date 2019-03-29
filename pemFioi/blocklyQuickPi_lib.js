@@ -1216,10 +1216,15 @@ var getContext = function (display, infos, curLevel) {
                 var portSelect = document.getElementById("selector-sensor-port");
                 var ports = portTypePorts[sensorDefinition.portType]
                 for (var iPort = 0; iPort < ports.length; iPort++) {
-                    if (!isPortUsed(sensorDefinition.portType + ports[iPort])) {
+                    var port = sensorDefinition.portType + ports[iPort];
+                    if (sensorDefinition.portType == "i2c")
+                        port = "i2c";
+
+
+                    if (!isPortUsed(sensorDefinition.name, port)) {
                         var option = document.createElement('option');
-                        option.innerText = sensorDefinition.portType + ports[iPort];
-                        option.value = ports[iPort]
+                        option.innerText = port;
+                        option.value = port;
                         portSelect.appendChild(option);
                         hasPorts = true;
                     }
@@ -1246,7 +1251,7 @@ var getContext = function (display, infos, curLevel) {
                 var port = $("#selector-sensor-port option:selected").text();
 
                 infos.quickPiSensors.push(
-                    { type: sensorDefinition.name, port: sensorDefinition.portType + port },
+                    { type: sensorDefinition.name, port: port },
                 );
 
                 $('#popupMessage').hide();
@@ -1265,9 +1270,12 @@ var getContext = function (display, infos, curLevel) {
         });
     };
 
-    function isPortUsed(port) {
+    function isPortUsed(type, port) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
             var sensor = infos.quickPiSensors[i];
+
+            if (sensor.type == type && port == "i2c")
+                return true;
 
             if (sensor.port == port)
                 return true;
@@ -1939,38 +1947,6 @@ var getContext = function (display, infos, curLevel) {
             "height": imgh,
         });
 
-        if (infos.customSensors && !context.autoGrading) {
-            if (!sensor.removerect || !sensor.removerect.paper.canvas)
-                sensor.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
-
-            sensor.removerect.attr({
-                "font-size": "30" + "px",
-                fill: "lightgray",
-                "font-family": "Font Awesome 5 Free",
-                'text-anchor': 'start',
-                "x": portx,
-                "y": imgy,
-            });
-
-            sensor.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-            sensor.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
-            sensor.removerect.node.style.fontWeight = "bold";
-
-
-            sensor.removerect.click(function (element) {
-                for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                    if (infos.quickPiSensors[i] === sensor) {
-                        sensor.removed = true;
-                        infos.quickPiSensors.splice(i, 1);
-                    }
-                }
-
-                context.resetDisplay();
-            });
-        }
-
-
-
         if (context.autoGrading) {
             imgw = sensor.drawInfo.width * .80;
             imgh = sensor.drawInfo.height * .80;
@@ -2353,8 +2329,7 @@ var getContext = function (display, infos, curLevel) {
             } else {
                 removeSlider(sensor);
             }
-        }
-        else if (sensor.type == "potentiometer") {
+        } else if (sensor.type == "potentiometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -2569,9 +2544,38 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
+        if (infos.customSensors && !context.autoGrading) {
+            if (!sensor.removerect || !sensor.removerect.paper.canvas)
+                sensor.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
+
+            sensor.removerect.attr({
+                "font-size": "30" + "px",
+                fill: "lightgray",
+                "font-family": "Font Awesome 5 Free",
+                'text-anchor': 'start',
+                "x": portx,
+                "y": imgy,
+            });
+
+            sensor.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+            sensor.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
+            sensor.removerect.node.style.fontWeight = "bold";
+
+
+            sensor.removerect.click(function (element) {
+                for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                    if (infos.quickPiSensors[i] === sensor) {
+                        sensor.removed = true;
+                        infos.quickPiSensors.splice(i, 1);
+                    }
+                }
+
+                context.resetDisplay();
+            });
+        }
+
         if (sensor.portText)
             sensor.portText.remove();
-
 
         if (sensor.hasOwnProperty("stateText"))
             sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
