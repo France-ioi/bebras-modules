@@ -628,6 +628,55 @@ var getContext = function (display, infos, curLevel) {
         },
     ];
 
+    context.savePrograms = function(xml) {
+        var node = goog.dom.createElement("quickpi");
+        xml.appendChild(node);
+
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var currentSensor = infos.quickPiSensors[i];
+
+            var node = goog.dom.createElement("sensor");
+
+            node.setAttribute("type", currentSensor.type);
+            node.setAttribute("port", currentSensor.port);
+
+            var elements = xml.getElementsByTagName("quickpi");
+
+            elements[0].appendChild(node);
+        }
+    }
+
+    context.loadPrograms = function(xml) {
+        var elements = xml.getElementsByTagName("sensor");
+
+        if (elements.length > 0) {
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var sensor = infos.quickPiSensors[i];
+                sensor.removed = true;
+            }
+            infos.quickPiSensors = [];
+
+            for (var i = 0; i < elements.length; i++) {
+                var sensornode = elements[i];
+                var sensor = {
+                    "type" : sensornode.getAttribute("type"),
+                    "port" : sensornode.getAttribute("port"),
+                };
+
+                sensor.state = null;
+                sensor.lastState = 0;
+                sensor.lastStateChange = null;
+                sensor.callsInTimeSlot = 0;
+                sensor.lastTimeIncrease = 0;
+    
+
+                infos.quickPiSensors.push(sensor);
+            }
+
+            this.resetDisplay();
+        }
+    }
+
 
     // Reset the context's display
     context.resetDisplay = function () {
@@ -637,6 +686,10 @@ var getContext = function (display, infos, curLevel) {
         // Ask the parent to update sizes
         //context.blocklyHelper.updateSize();
         //context.updateScale();
+
+        if (!context.display || !this.raphaelFactory)
+            return;
+
         var piUi = strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
@@ -659,9 +712,6 @@ var getContext = function (display, infos, curLevel) {
         paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#virtualSensors').width(), $('#virtualSensors').height());
 
         var quickPiSensors = infos.quickPiSensors;
-        if (!Array.isArray(infos.quickPiSensors)) {
-            quickPiSensors = infos.quickPiSensors;
-        }
 
         if (context.autoGrading) {
             var numSensors = infos.quickPiSensors.length;
@@ -1858,7 +1908,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function drawSensor(sensor, state = true, juststate = false, donotmovefocusrect = false) {
-        if (paper == undefined || !context.display)
+        if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
 
         var imgw = sensor.drawInfo.width / 2;
