@@ -114,7 +114,7 @@ var getContext = function (display, infos, curLevel) {
                     </span>
                 </div>`,
                 connectionDialogHTML: `
-                <div class="content connectPi">
+                <div class="content connectPi qpi">
                     <div class="panel-heading">
                         <h2 class="sectionTitle">
                             <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
@@ -1062,25 +1062,38 @@ var getContext = function (display, infos, curLevel) {
         context.sensorAdder.click(function () {
 
             window.displayHelper.showPopupDialog(`
-                <div>
+                <div class="content qpi">
                     <div class="panel-heading">
                         <h2 class="sectionTitle">
                             <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                            Accès — Sélection IOI — 2018
+                            Ajouter un composant
                         </h2>
                         <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                     </div>
                     <div id="sensorPicker" class="panel-body">
-                        <div>
-                        <img id="selector-sensor-image">
-                            <select id="selector-sensor-list">
-                            </select>
-                            <select id="selector-sensor-port">
-                            </select>
-                            <button id="selector-add-button">AJouter</button>
-                            <label id="selector-label">No ports available for this sensor</label>
+                        <label>Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.</label>
+                        <div class="flex-container">
+                            <div class="flex-col half">
+                                <img id="selector-sensor-image">
+                            </div>
+                            <div class="flex-col half">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <select id="selector-sensor-list" class="custom-select"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <select id="selector-sensor-port" class="custom-select"></select>
+                                    </div>
+                                    <label id="selector-label">No ports available for this sensor</label>
+                                </div>
+                            </div>
                         </div>
-                    <div>
+                    </div>
+                    <div class="singleButton">
+                        <button id="selector-add-button" class="btn btn-centered"><i class="icon fa fa-check"></i>Ajouter</button>
+                    </div>
                 </div>
             `);
 

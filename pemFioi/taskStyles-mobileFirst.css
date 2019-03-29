@@ -22,7 +22,16 @@ img {
 #choose-view {
   margin-top: 0 !important;
 }
-
+.btn-centered {
+  margin: 10px auto 0;
+  display: block;
+}
+.flex-container {
+  display: flex;
+}
+.flex-container .flex-col.half {
+  flex: 1 0 0;
+}
 /*****************
   LEVEL SELECTOR
 *****************/
@@ -214,7 +223,8 @@ img {
    top: 50%;
    transform: translate(0,-50%);
 }
-#popupMessage.floatingMessage .container img {
+#popupMessage.floatingMessage .container img.messageArrow,
+#popupMessage.floatingMessage .container img.beaver {
    display: none;
 }
 #popupMessage .message {
@@ -254,14 +264,15 @@ img {
 }
 
 /* QuickPi connexion popup */
-#popupMessage .connectPi .panel-heading {
+
+#popupMessage .qpi .panel-heading {
   margin: -20px -20px 0;
   padding: 20px
 }
-#popupMessage .connectPi .sectionTitle {
+#popupMessage .qpi .sectionTitle {
   color: inherit;
 }
-#popupMessage .connectPi .sectionTitle .iconTag {
+#popupMessage .qpi .sectionTitle .iconTag {
   margin-left: -20px; /* panel-heading padding */
   margin-right: 14px;
   padding-left: 24px;
@@ -270,24 +281,26 @@ img {
   border-left: 2px solid rgba(0,0,0,0.8);
   border-radius: 0 50px 50px 0;
 }
-#popupMessage .connectPi .sectionTitle .iconTag .icon {
+#popupMessage .qpi .sectionTitle .iconTag .icon {
   width: auto;
   background-color: transparent;
   margin-right: 0;
   line-height: 31px;
   font-size: 12px;
 }
-#popupMessage .connectPi .panel-body {
+#popupMessage .qpi .panel-body {
   margin-left: 44px; /* Align left to .sectionTitle text left */
   font-size: 12px;
 }
-#popupMessage .connectPi .panel-body label {
+#popupMessage .qpi .panel-body label {
   display: block;
   margin-top: 2em;
 }
-
-#popupMessage .connectPi .form-control,
-#popupMessage .connectPi select {
+#popupMessage .qpi .form-group {
+  position: relative;
+}
+#popupMessage .qpi .form-control,
+#popupMessage .qpi select {
   background-color: transparent;
   border: none;
   font-size: 16px;
@@ -296,18 +309,18 @@ img {
   color: #555555;
   border-radius: 5px; 
 }
-#popupMessage .connectPi .form-control {
+#popupMessage .qpi .form-control {
   flex-grow: 1;
   margin: 0;
   padding: 6px 12px;
 }
-#popupMessage .connectPi input {
+#popupMessage .qpi input {
   margin-left: 0;
 }
-#popupMessage .connectPi select {
+#popupMessage .qpi select {
   padding: 6px 12px;
 }
-#popupMessage .connectPi .input-group {
+#popupMessage .qpi .input-group {
   position: relative;
   width: 100%;
   margin: 10px 0 0;
@@ -321,7 +334,7 @@ img {
   border-radius: 5px;
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
 }
-#popupMessage .connectPi .input-group .input-group-prepend {
+#popupMessage .qpi .input-group .input-group-prepend {
   border-radius: 5px 0 0 5px;
   line-height: 2.4rem;
   padding: 6px 12px;
@@ -330,10 +343,10 @@ img {
   padding: 6px 9px;
   font-weight: bold;
 }
-#popupMessage .connectPi .input-group button.input-group-prepend {
+#popupMessage .qpi .input-group button.input-group-prepend {
   color: #fff;
 }
-#popupMessage .connectPi .input-group .custom-select {
+#popupMessage .qpi .input-group .custom-select {
   position: relative;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
@@ -341,7 +354,7 @@ img {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
-#popupMessage .connectPi .btn {
+#popupMessage .qpi .btn {
   margin: 10px auto 0;
   border-radius: 50px;
   padding: 6px 50px;
@@ -352,49 +365,68 @@ img {
   font-size: 1.2rem;
   position: relative;
 }
-#popupMessage .connectPi .btn .icon {
+#popupMessage .qpi .btn .icon {
   position: absolute;
   left: 16px;
   top: 7px;
   top: calc(50% - 0.5em);
 }
-#popupMessage .connectPi .btn-group.switchRadio {
+#popupMessage .qpi .btn-group.switchRadio {
   display: flex;
   background-color: #e5e5e5;
   border-radius: 50px;
   margin: 2em 0;
   box-shadow: 1px 1px 0 0 #ccc inset;
 }
-#popupMessage .connectPi .btn-group.switchRadio .btn {
+#popupMessage .qpi .btn-group.switchRadio .btn {
   flex: 1 1 auto;
   margin: 0;
   border-left: 1px solid #d3d3d3;
   transition: all ease 250ms;
 }
-#popupMessage .connectPi .btn-group.switchRadio .btn:not(.active) {
+#popupMessage .qpi .btn-group.switchRadio .btn:not(.active) {
   background-color: transparent;
   border-radius: 0;
   color: #bbbbbb;
 }
-#popupMessage .connectPi .btn-group.switchRadio .btn:first-child,
-#popupMessage .connectPi .btn-group.switchRadio .btn.active + .btn {
+#popupMessage .qpi .btn-group.switchRadio .btn:first-child,
+#popupMessage .qpi .btn-group.switchRadio .btn.active + .btn {
   border-left: 0;
 }
-#popupMessage .connectPi .btn-group.switchRadio .btn .icon {
+#popupMessage .qpi .btn-group.switchRadio .btn .icon {
   position: static;
   padding-right: 10px;
 }
-.inlineButtons {
+#popupMessage .qpi #sensorPicker .flex-container {
+  align-items: flex-end;
+  margin: 2em 0;
+}
+#popupMessage .qpi #sensorPicker .flex-container .half:first-child {
+  text-align: center;
+}
+#popupMessage .qpi #sensorPicker #selector-label {
+  position: absolute;
+  top: 15px;
+  left: 3px;
+  font-style: italic;
+}
+.qpi .inlineButtons {
   text-align: center;
   margin: 2em 0;
   display: flex;
 }
-.inlineButtons button {
+.qpi .inlineButtons button {
   flex: 1 0 0;
 }
-#popupMessage .connectPi .inlineButtons button + button {
+.qpi .singleButton {
+  margin: 2em 0;
+  text-align: center;
+}
+#popupMessage .qpi .inlineButtons button + button {
   margin-left: 10px;
 }
+
+/* Python */
 .pythonIntroSimple code, .pythonIntroFull code {
   cursor: pointer;
   color: #4D87CE;
