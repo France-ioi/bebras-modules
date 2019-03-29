@@ -101,7 +101,8 @@ var localLanguageStrings = {
       testLabel: "Test",
       testError: "erreur",
       testSuccess: "validé",
-      seeTest: "voir"
+      seeTest: "voir",
+      infiniteLoop: "répéter indéfiniment"
    },
    en: {
       categories: {
