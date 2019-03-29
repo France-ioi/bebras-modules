@@ -1968,18 +1968,21 @@ function GraphEditor(settings) {
          return;
       }
       var oldLabel = info.label;
-      var newLabel = (self.textEditor) ? self.textEditor.val() : null;
+      var newLabel = (self.textEditor) ? self.textEditor.val() : "";
       var raphElement = visualGraph.getRaphaelsFromID(id);
-      if(newLabel && oldLabel !== newLabel){
+      if(oldLabel !== newLabel){
+         if(newLabel.length === 0){
+            newLabel = "?";
+         }
          info.label = newLabel;
          if(type === "vertex"){
             graph.setVertexInfo(id,info);
-            raphElement[1].attr("text",info.label);
+            raphElement[1].attr("text",newLabel);
          }else{
             graph.setEdgeInfo(id,info);
             var labelPos = visualGraph.graphDrawer.getLabelPos(id);
             raphElement[1].attr({
-               text:info.label,
+               text:newLabel,
                x: labelPos.x,
                y: labelPos.y
             });
