@@ -611,8 +611,10 @@ var quickAlgoInterface = {
                 '<div>';
             $('#blocklyLibContent').append(introLong);
             var renderTaskIntro = '' +
+                '<div class="introContent">' +
                 '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
-                levelIntroContent +
+                    levelIntroContent +
+                '</div>' +
                 '<div id="introControls">' +
                     '<button type="button" class="showLongIntro" onclick="quickAlgoInterface.toggleLongIntro();"></button>' +
                 '</div>';
@@ -620,8 +622,10 @@ var quickAlgoInterface = {
             quickAlgoInterface.toggleLongIntro(false);
         } else {
             $('#taskIntro').html(
+                '<div class="introContent">' +
                 '<h2 class="introTitleIcon"><span class="fas fa-book icon"></span></h2>' +
-                levelIntroContent);
+                    levelIntroContent +
+                '</div>');
         }
         this.bindVideoBtns();
     },

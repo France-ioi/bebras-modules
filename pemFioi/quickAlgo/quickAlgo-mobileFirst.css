@@ -502,6 +502,18 @@ p {
             flex: 1 0 60%;
     min-width: 0;
   }
+  #taskIntro {
+    overflow: visible;
+    padding: 0;
+  }
+  #taskIntro .introContent {
+    padding: 10px 20px;
+    max-height: 100%;
+    overflow: auto;
+  }
+  #taskIntro.hasLongIntro .introContent {
+    padding-bottom: 70px;
+  }
 }
 @media /* Tablets landscape and desktop */
   screen and (min-width: 855px) and (orientation: landscape) {
@@ -534,8 +546,19 @@ p {
         -ms-flex: 1 1 auto;
             flex: 1 1 auto;
   }
+  #taskIntro {
+    overflow: visible;
+    padding: 0;
+  }
+  #taskIntro .introContent {
+    padding: 10px 20px;
+    max-height: 100%;
+    overflow: auto;
+  }
+  #taskIntro.hasLongIntro .introContent {
+    padding-bottom: 30px;
+  }
 }
-
 /*****************
   TASK GRID & TESTS
 *****************/
@@ -1449,6 +1472,7 @@ body.fullscreen #taskToolbar {
   color: #787878;
   /*font-weight: bold;*/
   font-size: 18px;
+  position: relative;
 }
 #taskIntro .introTitleIcon {
   float: left;
@@ -1469,7 +1493,6 @@ body.fullscreen #taskToolbar {
   font-weight: 100;
   color: #4a90e2;
 }
-
 button.showLongIntro, button.videoBtn {
   position: relative;
   color: #4a90e2;
@@ -1484,8 +1507,14 @@ button.showLongIntro, button.videoBtn {
   font-size: 12px;
 }
 button.showLongIntro {
+  position: absolute;
+  bottom: 47px;
+  z-index: 1;
+  right: 9px;
+  box-shadow: 2px 2px 5px #ccd;
+}
+button.showLongIntro {
   display: none;
-  float: right;
 }
 button.showLongIntro .icon, button.videoBtn .icon {
   position: absolute;
@@ -1500,6 +1529,12 @@ button.showLongIntro .icon, button.videoBtn .icon {
 #taskIntro video {
   max-width: 100%;
   margin: 20px auto;
+}
+@media /* Tablets landscape and desktop */
+  screen and (min-width: 855px) and (orientation: landscape) {
+  button.showLongIntro {
+    bottom: 10px;
+  }   
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
