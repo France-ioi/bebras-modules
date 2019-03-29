@@ -828,7 +828,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                {
                   name: "controls_flow_statements",
                   blocklyXml: "<block type='controls_flow_statements'></block>"
-               }
+               },
+               {
+                  name: "controls_infiniteloop",
+                  blocklyXml: "<block type='controls_infiniteloop'></block>",
+                  excludedByDefault: true
+               },
             ],
             math: [
                {
@@ -1534,7 +1539,12 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                   {
                      name: "control_repeat_until",
                      blocklyXml: "<block type='control_repeat_until'></block>"
-                  }
+                  },
+                  {
+                     name: "controls_infiniteloop",
+                     blocklyXml: "<block type='controls_infiniteloop'></block>",
+                     excludedByDefault: true
+                  }   
                ],
             input: [
                {
@@ -2300,6 +2310,32 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
            return code;
          };
 
+
+         Blockly.Blocks['controls_infiniteloop'] = {
+           init: function() {
+             this.appendStatementInput("inner_blocks")
+             .setCheck(null)
+             .appendField(that.strings.infiniteLoop);
+             this.setPreviousStatement(true, null);
+             this.setNextStatement(false, null);
+             this.setColour(that.getDefaultColours().categories["loops"])
+             this.setTooltip("");
+             this.setHelpUrl("");
+           }
+         }
+         Blockly.JavaScript['controls_infiniteloop'] = function(block) {
+           var statements = Blockly.JavaScript.statementToCode(block, 'inner_blocks');
+           var code = 'while(true){\n' + statements + '}\n';
+           return code;
+         };
+         Blockly.Python['controls_infiniteloop'] = function(block) {
+            // Do while/until loop.
+            var branch = Blockly.Python.statementToCode(block, 'inner_blocks');
+            branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+                Blockly.Python.PASS;
+
+            return 'while True:\n' + branch;
+          };
 
          if(this.scratchMode) {
             Blockly.Blocks['robot_start'] = {
