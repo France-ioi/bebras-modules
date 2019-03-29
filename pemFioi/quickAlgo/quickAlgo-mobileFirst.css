@@ -24,6 +24,10 @@ html, body {
   margin: 0;
   padding: 0;
 }
+html {
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+}
 body {
   font-size: 12px;
   position: relative;
@@ -1583,13 +1587,18 @@ button.showLongIntro .icon, button.videoBtn .icon {
 .btn#piconnect {
   background-color: #f5a623;
 }
-html {
-  -ms-touch-action: manipulation;
-  touch-action: manipulation;
-} 
+.connectPi #piconnectionlabel {
+  text-align: center;
+}
+.connectPi #piconnectionlabel .deviceName {
+  color: #4a90e2;
+  font-weight: bold;
+}
+.connectPi #piconnectionlabel .deviceName i {
+  padding-right: 10px;
+}
+
 /************************
   MODAL POPUPS
 *************************/
-#conceptViewer .exit {
-  cursor: pointer;
-}
+
