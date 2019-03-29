@@ -481,26 +481,32 @@ def setServoAngle(pin, angle):
     pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
-	pin = int(pin)
+    pin = int(pin)
 
-	reg = 0x30 + pin
-	address = 0x04
+    reg = 0x30 + pin
+    address = 0x04
 
-	bus = smbus.SMBus(1)
-	bus.write_byte(address, reg)
-	return bus.read_word_data(address, reg)
+    try:
+        bus = smbus.SMBus(1)
+        bus.write_byte(address, reg)
+        return bus.read_word_data(address, reg)
+    except:
+        return 0
 
 
 def readTemperature(pin):
-	B = 4275.
-	R0 = 100000.
+    B = 4275.
+    R0 = 100000.
 
-	val = readADC(pin)
+    val = readADC(pin)
+    
+    if val == 0:
+        return 0
 
-	r = 1000. / val - 1.
-	r = R0 * r
+    r = 1000. / val - 1.
+    r = R0 * r
 
-	return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
+    return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
 
 def readRotaryAngle(pin):
 	return int(readADC(pin) / 10)

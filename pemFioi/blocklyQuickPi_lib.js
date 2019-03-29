@@ -808,6 +808,8 @@ var getContext = function (display, infos, curLevel) {
 
         context.blocklyHelper.updateSize();
 
+        context.inUSBConnection = false;
+        context.inBTConnection = false;
         context.releasing = false;
         context.offLineMode = true;
 
@@ -846,15 +848,24 @@ var getContext = function (display, infos, curLevel) {
                     $('#piaddress').val("192.168.233.1");
 
                     $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').show();
+                    $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+
+                    context.inUSBConnection = true;
+                    context.inBTConnection = false;
                 } else if (sessionStorage.connectionMethod == "BT") {
                     $('#piconwifi').removeClass('active');
                     $('#piconbt').addClass('active');
                     $('#pischoolcon').hide();
 
                     $('#piaddress').val("192.168.233.2");
-                    $('#piconnectok').attr('disabled', false);
 
                     $('#piconnectok').attr('disabled', true);
+                    $('#piconnectionlabel').show();
+                    $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
+                    
+                    context.inUSBConnection = false;
+                    context.inBTConnection = true;
                 }
             }
 
@@ -868,6 +879,9 @@ var getContext = function (display, infos, curLevel) {
 
 
             $('#piconnectok').click(function () {
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
 
@@ -879,6 +893,9 @@ var getContext = function (display, infos, curLevel) {
             });
 
             $('#pirelease').click(function () {
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
 
@@ -888,6 +905,9 @@ var getContext = function (display, infos, curLevel) {
             });
 
             $('#picancel').click(function () {
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+                
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
             });
@@ -931,7 +951,10 @@ var getContext = function (display, infos, curLevel) {
                     $('#pischoolcon').show("slow");
                     $('#piconnectionlabel').hide();
                 }
-                $('#piconnectionlabel').hide();
+
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+
             });
 
             $('#piconusb').click(function () {
@@ -944,20 +967,31 @@ var getContext = function (display, infos, curLevel) {
 
                     $(this).addClass('active');
                     $('#pischoolcon').hide("slow");
-
-                    context.quickPiConnection.isAvailable("192.168.233.1", function (available) {
-                        if (available) {
-                            $('#piconnectok').attr('disabled', false);
-
-                            $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
-                        } else {
-                            $('#piconnectok').attr('disabled', true);
-
-                            $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
-                        }
-                    });
-
                     $('#piaddress').val("192.168.233.1");
+                    
+                    context.inUSBConnection = true;
+                    context.inBTConnection = false;
+
+                    function updateUSBAvailability(available) {
+
+                        if  (context.inUSBConnection && context.offLineMode) {
+                            if (available) {
+                                $('#piconnectok').attr('disabled', false);
+
+                                $('#piconnectionlabel').text(strings.messages.canConnectoToUSB)
+                            } else {
+                                $('#piconnectok').attr('disabled', true);
+
+                                $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
+                            }
+
+                            context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
+                        }
+                    }
+
+                    updateUSBAvailability(false);
+                    
+                    
                 }
             });
 
@@ -974,15 +1008,27 @@ var getContext = function (display, infos, curLevel) {
 
                     $('#piaddress').val("192.168.233.2");
 
-                    context.quickPiConnection.isAvailable("192.168.233.2", function (available) {
-                        if (available) {
-                            $('#piconnectok').attr('disabled', false);
-                            $('piconnectionlabel').val(strings.messages.canConnectoToBT)
-                        } else {
-                            $('#piconnectok').attr('disabled', true);
-                            $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                    context.inUSBConnection = false;
+                    context.inBTConnection = true;
+
+                    function updateBTAvailability(available) {
+
+                        if  (context.inUSBConnection && context.offLineMode) {
+                            if (available) {
+                                $('#piconnectok').attr('disabled', false);
+
+                                $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
+                            } else {
+                                $('#piconnectok').attr('disabled', true);
+
+                                $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                            }
+
+                            context.quickPiConnection.isAvailable("192.168.233.2", updateUSBAvailability);
                         }
-                    });
+                    }
+
+                    updateBTAvailability(false);
                 }
             });
 
