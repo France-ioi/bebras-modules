@@ -455,6 +455,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
             this.cleanBlockAttributes(xml);
+
+            if (this.mainContext.savePrograms) {
+               this.mainContext.savePrograms(xml);
+            }
+
             this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.player].blocklyJS = this.getCode("javascript");
             //this.programs[this.player].blocklyPython = this.getCode("python");
@@ -467,6 +472,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.workspace.clear();
             this.cleanBlockAttributes(xml, this.getOrigin());
             Blockly.Xml.domToWorkspace(xml, this.workspace);
+
+            if (this.mainContext.loadPrograms) {
+               this.mainContext.loadPrograms(xml);
+            }
          }
          $("#program").val(this.programs[this.player].javascript);
       },
