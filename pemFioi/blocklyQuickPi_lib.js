@@ -25,7 +25,7 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "Intensité lumineuse",
                 readHumidity: "l'humidité ambiante",
                 currentTime: "Temps actuel en millisecondes",
-                changeBuzzerState: "sonnerie le port %1",
+                changeBuzzerState: "buzzer sur le port %1",
                 /*turnLedOn: "Turn Led On",
                 turnLedOff: "Turn Led Off",
                 buttonState: "Return Button State",
@@ -80,7 +80,7 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "readDistance(): Read distance using ultrasonic sensor",
                 readLightIntensity: "readLightIntensity(): Read light intensity",
                 readHumidity: "readHumidity(): lire l'humidité ambiante",
-                currentTime: "currentTime(): returns current time",
+                currentTime: "currentTime(): Temps actuel en millisecondes",
                 changeBuzzerState: "setBuzzerState(): sonnerie",
             },
             constant: {
@@ -88,10 +88,10 @@ var getContext = function (display, infos, curLevel) {
 
             startingBlockName: "Programme", // Name for the starting block
             messages: {
-                sensorNotFound: "Tried to use a non existing sensor.",
-                manualTestSuccess: "Manual test validated automatically.",
+                sensorNotFound: "Accès à un capteur ou actuateur inexistant.",
+                manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test failed, reached wrong state.",
+                wrongState: "Test échoué. Un état invalide a été atteint",
                 programEnded: "programme terminé.",
                 piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -100,6 +100,12 @@ var getContext = function (display, infos, curLevel) {
                 cantConnectoToBT: "Aucun appareil n'est connecté en Bluetooth",
                 canConnectoToUSB: "Connecté en USB.",
                 canConnectoToBT: "Connecté en Bluetooth.",
+                noPortsAvailable: "Aucun port compatible avec ce {0} n'est disponible (type {1})",
+                sensor: "capteur",
+                actuator: "actionneur",
+                removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur?",
+                remove: "Retirer",
+                keep: "Garder",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -139,7 +145,7 @@ var getContext = function (display, infos, curLevel) {
                             <div class="form-group">
                                 <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
                                 <div class="input-group">
-                                    <button class="input-group-prepend" id=pigetlist disabled>Get list</button>
+                                    <button class="input-group-prepend" id=pigetlist disabled>Obtenir la liste</button>
                                     <select id="pilist" class="custom-select" disabled>
                                     </select>
                                 </div>
@@ -163,6 +169,7 @@ var getContext = function (display, infos, curLevel) {
                     </div>
                 </div>
                 `,
+
             }
         },
         none: {
@@ -371,7 +378,8 @@ var getContext = function (display, infos, curLevel) {
 
     function findSensorDefinition(sensor) {
         return sensorDefinitions.find(function (element) {
-            if (sensor.type == element.name)
+            if (sensor.type == element.name &&
+                (!sensor.subType || sensor.subType == element.subType))
                 return element;
         })
     }
@@ -383,11 +391,96 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "led",
-            description: "LED Light",
+            subType: "red",
+            description: "LED rouge",
             isAnalog: false,
             isSensor: false,
             portType: "D",
-            selectorImages: ["ledoff.png"],
+            selectorImages: ["ledon-red.png"],
+            valueType: "boolean",
+            getPercentageFromState: function (state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function (percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function (state) {
+
+            }
+        },
+        {
+            name: "led",
+            subType: "blue",
+            description: "LED bleue",
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["ledon-blue.png"],
+            valueType: "boolean",
+            getPercentageFromState: function (state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function (percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function (state) {
+
+            }
+        },
+        {
+            name: "led",
+            subType: "green",
+            description: "LED verte",
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["ledon-green.png"],
+            valueType: "boolean",
+            getPercentageFromState: function (state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function (percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function (state) {
+
+            }
+        },
+        {
+            name: "led",
+            subType: "orange",
+            description: "LED orange",
+            isAnalog: false,
+            isSensor: false,
+            portType: "D",
+            selectorImages: ["ledon-orange.png"],
             valueType: "boolean",
             getPercentageFromState: function (state) {
                 if (state)
@@ -629,51 +722,61 @@ var getContext = function (display, infos, curLevel) {
     ];
 
     context.savePrograms = function(xml) {
-        var node = goog.dom.createElement("quickpi");
-        xml.appendChild(node);
+        if (context.infos.customSensors) 
+        {
+            var node = goog.dom.createElement("quickpi");
+            xml.appendChild(node);
 
-        for (var i = 0; i < infos.quickPiSensors.length; i++) {
-            var currentSensor = infos.quickPiSensors[i];
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var currentSensor = infos.quickPiSensors[i];
 
-            var node = goog.dom.createElement("sensor");
+                var node = goog.dom.createElement("sensor");
 
-            node.setAttribute("type", currentSensor.type);
-            node.setAttribute("port", currentSensor.port);
+                node.setAttribute("type", currentSensor.type);
+                node.setAttribute("port", currentSensor.port);
+                if (currentSensor.subType)
+                    node.setAttribute("subtype", currentSensor.subType);
 
-            var elements = xml.getElementsByTagName("quickpi");
+                var elements = xml.getElementsByTagName("quickpi");
 
-            elements[0].appendChild(node);
+                elements[0].appendChild(node);
+            }
         }
     }
 
     context.loadPrograms = function(xml) {
-        var elements = xml.getElementsByTagName("sensor");
+        if (context.infos.customSensors) {
+            var elements = xml.getElementsByTagName("sensor");
 
-        if (elements.length > 0) {
-            for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                var sensor = infos.quickPiSensors[i];
-                sensor.removed = true;
-            }
-            infos.quickPiSensors = [];
+            if (elements.length > 0) {
+                for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                    var sensor = infos.quickPiSensors[i];
+                    sensor.removed = true;
+                }
+                infos.quickPiSensors = [];
 
-            for (var i = 0; i < elements.length; i++) {
-                var sensornode = elements[i];
-                var sensor = {
-                    "type" : sensornode.getAttribute("type"),
-                    "port" : sensornode.getAttribute("port"),
-                };
+                for (var i = 0; i < elements.length; i++) {
+                    var sensornode = elements[i];
+                    var sensor = {
+                        "type" : sensornode.getAttribute("type"),
+                        "port" : sensornode.getAttribute("port"),
+                    };
 
-                sensor.state = null;
-                sensor.lastState = 0;
-                sensor.lastStateChange = null;
-                sensor.callsInTimeSlot = 0;
-                sensor.lastTimeIncrease = 0;
+                    if (sensornode.getAttribute("subtype")) {
+                        sensor.subType = sensornode.getAttribute("subtype");
+                    }
+
+                    sensor.state = null;
+                    sensor.lastState = 0;
+                    sensor.lastStateChange = null;
+                    sensor.callsInTimeSlot = 0;
+                    sensor.lastTimeIncrease = 0;
     
+                    infos.quickPiSensors.push(sensor);
+                }
 
-                infos.quickPiSensors.push(sensor);
+                this.resetDisplay();
             }
-
-            this.resetDisplay();
         }
     }
 
@@ -1182,7 +1285,7 @@ var getContext = function (display, infos, curLevel) {
                                     <div class="input-group">
                                         <select id="selector-sensor-port" class="custom-select"></select>
                                     </div>
-                                    <label id="selector-label">No ports available for this sensor</label>
+                                    <label id="selector-label"></label>
                                 </div>
                             </div>
                         </div>
@@ -1201,11 +1304,20 @@ var getContext = function (display, infos, curLevel) {
                 el.textContent = sensorDefinition.description;
                 el.value = sensorDefinition.name;
 
+                if (sensorDefinition.subType)
+                el.value += "-" + sensorDefinition.subType;
+
                 select.appendChild(el);
             }
 
             $('#selector-sensor-list').on('change', function () {
-                var dummysensor = { type: this.value };
+
+                var values = this.value.split("-");
+
+                var dummysensor = { type: values[0] };
+
+                if (values.length == 2)
+                    dummysensor.subType = values[1];
 
                 var sensorDefinition = findSensorDefinition(dummysensor);
 
@@ -1232,6 +1344,12 @@ var getContext = function (display, infos, curLevel) {
 
                 if (!hasPorts) {
                     $('#selector-add-button').attr("disabled", true);
+
+                    var object_function = strings.messages.actuator;
+                    if (sensorDefinition.isSensor)
+                        object_function = strings.messages.sensor;
+
+                    $('#selector-label').text(strings.messages.noPortsAvailable.format(object_function, sensorDefinition.portType));
                     $('#selector-label').show();
                 }
                 else {
@@ -1242,16 +1360,21 @@ var getContext = function (display, infos, curLevel) {
 
             $('#selector-add-button').click(function () {
                 var sensorType = $("#selector-sensor-list option:selected").val();
+                var values = sensorType.split("-");
 
-                var dummysensor = { type: sensorType };
+                var dummysensor = { type: values[0] };
+                if (values.length == 2)
+                    dummysensor.subType = values[1];
 
                 var sensorDefinition = findSensorDefinition(dummysensor);
 
 
                 var port = $("#selector-sensor-port option:selected").text();
 
-                infos.quickPiSensors.push(
-                    { type: sensorDefinition.name, port: port },
+                infos.quickPiSensors.push({
+                        type: sensorDefinition.name,
+                        subType: sensorDefinition.subType,
+                        port: port },
                 );
 
                 $('#popupMessage').hide();
@@ -1969,8 +2092,17 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (!sensor.ledon || !sensor.ledon.paper.canvas)
-                sensor.ledon = paper.image(getImg('ledon.png'), imgx, imgy, imgw, imgh);
+            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
+                var imagename = "ledon-";
+                if (sensor.subType)
+                    imagename += sensor.subType;
+                else
+                    imagename += "red";
+
+                imagename += ".png";
+
+                sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+            }
 
             if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
                 sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
@@ -2563,14 +2695,20 @@ var getContext = function (display, infos, curLevel) {
 
 
             sensor.removerect.click(function (element) {
-                for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                    if (infos.quickPiSensors[i] === sensor) {
-                        sensor.removed = true;
-                        infos.quickPiSensors.splice(i, 1);
-                    }
-                }
 
-                context.resetDisplay();
+            window.displayHelper.showPopupMessage(strings.messages.removeConfirmation,
+             'blanket',
+             strings.messages.remove,
+               function() {
+                    for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                        if (infos.quickPiSensors[i] === sensor) {
+                            sensor.removed = true;
+                            infos.quickPiSensors.splice(i, 1);
+                        }
+                    }
+                    context.resetDisplay();
+                },
+                strings.messages.keep);
             });
         }
 
