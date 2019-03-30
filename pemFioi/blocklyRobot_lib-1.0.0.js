@@ -1877,7 +1877,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "readNumber",
       type: "sensors",
-      block: { name: "readNumber", yieldsValue: true },
+      block: { name: "readNumber", yieldsValue: 'int' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.readNumber(robot.row, robot.col));
