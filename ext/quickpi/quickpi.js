@@ -304,19 +304,33 @@ screenLine2 = None
 
 pi = pigpio.pi()
 
+def normalizePin(pin):
+    returnpin = 0
+    hadporttype = False
+
+    if isinstance(pin, str):
+        if pin[0].isalpha():
+            returnpin = int(pin[1:])
+            hadporttype = True
+
+    if not hadporttype:
+        returnpin = int(pin)
+
+    return returnpin
+
 def cleanupPin(pin):
     pi.set_mode(pin, pigpio.INPUT)
 
 def changePinState(pin, state):
-  pin = int(pin)
-  state = int(state)
+    pin = normalizePin(pin)
+    state = int(state)
 
-  cleanupPin(pin)
-  GPIO.setup(pin, GPIO.OUT)
-  if state:
-    GPIO.output(pin, GPIO.HIGH)
-  else:
-    GPIO.output(pin, GPIO.LOW)
+    cleanupPin(pin)
+    GPIO.setup(pin, GPIO.OUT)
+    if state:
+        GPIO.output(pin, GPIO.HIGH)
+    else:
+        GPIO.output(pin, GPIO.LOW)
 
 def turnLedOn(pin=5):
 	changePinState(pin, 1)
@@ -328,17 +342,22 @@ def changeLedState(pin, state):
 	changePinState(pin, state)
 
 def toggleLedState(pin):
-	GPIO.setup(pin, GPIO.OUT)
-	if GPIO.input(pin):
-		GPIO.output(pin, GPIO.LOW)
-	else:
-		GPIO.output(pin, GPIO.HIGH)
+    pin = normalizePin(pin)
+
+    GPIO.setup(pin, GPIO.OUT)
+    if GPIO.input(pin):
+        GPIO.output(pin, GPIO.LOW)
+    else:
+        GPIO.output(pin, GPIO.HIGH)
 
 def buzzOn(pin):
   changePinState(pin, 1)
 
 def buzzOff(pin):
   changePinState(pin, 0)
+
+def changeBuzzerState(pin, state):
+    changePinState(pin, state)
 
 def magnetOn(pin):
   changePinState(pin, 1)
@@ -347,27 +366,27 @@ def magnetOff(pin):
   changePinState(pin, 0)
 
 def buttonStateInPort(pin):
-  pin = int(pin)
+    pin = normalizePin(pin)
 
-  GPIO.setup(pin, GPIO.IN)
-  return GPIO.input(pin)
+    GPIO.setup(pin, GPIO.IN)
+    return GPIO.input(pin)
 
 def buttonState():
-	return buttonStateInPort(22)
+    return buttonStateInPort(22)
 
 def waitForButton(pin):
-  pin = int(pin)
-  cleanupPin(pin)
-  GPIO.setup(pin, GPIO.IN)
-  while not GPIO.input(pin):
-    time.sleep(0.01)
-  time.sleep(0.1) # debounce
+    pin = normalizePin(pin)
+    cleanupPin(pin)
+    GPIO.setup(pin, GPIO.IN)
+    while not GPIO.input(pin):
+        time.sleep(0.01)
+    time.sleep(0.1) # debounce
 
 def buttonWasPressedCallback(pin):
     button_was_pressed[pin] = 1
 
 def buttonWasPressed(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     init = False
     try:
         init = button_interrupt_enabled[pin]
@@ -395,7 +414,7 @@ _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
 def readDistance(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
 
     cleanupPin(pin)
     GPIO.setup(pin, GPIO.OUT)
@@ -474,14 +493,14 @@ def displayText(line1, line2=""):
             break
 
 def setServoAngle(pin, angle):
-    pin = int(pin)
+    pin = normalizePin(pin)
     angle = int(angle)
 
     pulsewidth = (angle * 11.11) + 500
     pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
 
     reg = 0x30 + pin
     address = 0x04
@@ -717,7 +736,7 @@ class DHT11:
 
 
 def readTemperatureDHT11(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     haveold = False
 
     try:
@@ -744,7 +763,7 @@ def readTemperatureDHT11(pin):
     return 0
 
 def readHumidity(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     haveold = False
 
     try:
