@@ -507,7 +507,7 @@ var quickAlgoInterface = {
             var testName = this.strings.testLabel + ' '+(iTest+1);
             if (testData[iTest].hasOwnProperty("testName"))
             {
-                testName += "(" + testData[iTest].testName + ")";
+                testName = testData[iTest].testName;
             }
             $('#testTab'+iTest+' .testTitle').html(icon+' ' + testName);
         }
@@ -522,7 +522,7 @@ var quickAlgoInterface = {
 
             if (testData && testData[iTest] && testData[iTest].hasOwnProperty("testName"))
             {
-                testName += "(" + testData[iTest].testName + ")";
+                testName = testData[iTest].testName;
             }
 
             $('#testTab'+iTest+' .testTitle').html('<span class="testResultIcon">&nbsp;</span> ' + testName);
