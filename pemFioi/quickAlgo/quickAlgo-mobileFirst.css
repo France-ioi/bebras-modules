@@ -510,6 +510,7 @@ p {
     padding: 10px 20px;
     max-height: 100%;
     overflow: auto;
+    margin-bottom: 20px;
   }
   #taskIntro.hasLongIntro .introContent {
     padding-bottom: 70px;
@@ -554,6 +555,7 @@ p {
     padding: 10px 20px;
     max-height: 100%;
     overflow: auto;
+    margin-bottom: 20px;
   }
   #taskIntro.hasLongIntro .introContent {
     padding-bottom: 40px;
@@ -1543,9 +1545,6 @@ button.videoBtn .icon {
   margin-bottom: 10px; /* Needed to space buttons when wrapped */
 }
 
-#introControls button {
-  box-shadow: 2px 2px 5px #ccd;
-}
 button.showLongIntro {
   position: relative;
   color: #4a90e2;
