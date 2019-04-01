@@ -284,7 +284,7 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
    };
 
    this.clickHandler = function(event) {
-      // console.log(self.paper);
+      // console.log(jqEvent+" "+id);
       var offset = $(self.paper.canvas).offset();
       // var offset = $("#"+paperElementID).offset();
       var xPos = event.pageX - offset.left;
@@ -1083,17 +1083,19 @@ function ArcDragger(settings) {
          vInfo["angle"] = (self.startAngle - deltaAngle)%360;
       }else{
          var circleParameters = self.getCircleParameters(self.edgeVerticesPos[0].x,self.edgeVerticesPos[0].y,self.edgeVerticesPos[1].x,self.edgeVerticesPos[1].y,xMouse,yMouse);
-         var radius = circleParameters.r;
-         var radiusRatio = radius /self.distance; 
-         vInfo["sweep"] = self.getSide(xMouse,yMouse,self.edgeVerticesPos);
-         if(self.getSide(circleParameters.xc,circleParameters.yc,self.edgeVerticesPos)){
-            vInfo["large-arc"] = (vInfo["sweep"]) ? 1 : 0;
-         }else{
-            vInfo["large-arc"] = (vInfo["sweep"]) ? 0 : 1;
+         if(circleParameters){
+            var radius = circleParameters.r;
+            var radiusRatio = radius /self.distance; 
+            vInfo["sweep"] = self.getSide(xMouse,yMouse,self.edgeVerticesPos);
+            if(self.getSide(circleParameters.xc,circleParameters.yc,self.edgeVerticesPos)){
+               vInfo["large-arc"] = (vInfo["sweep"]) ? 1 : 0;
+            }else{
+               vInfo["large-arc"] = (vInfo["sweep"]) ? 0 : 1;
+            }
+            if(radiusRatio > 5 && !vInfo["large-arc"])
+                  radiusRatio = 0;
+            vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
          }
-         if(radiusRatio > 5 && !vInfo["large-arc"])
-               radiusRatio = 0;
-         vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
       self.visualGraph.graphDrawer.refreshEdgePosition(self.edgeVertices[0],self.edgeVertices[1]);
@@ -1337,6 +1339,7 @@ function GraphEditor(settings) {
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
+   this.alphabet = settings.alphabet;
 
    this.loopIcon = null;
    this.cross = null;
@@ -1969,6 +1972,14 @@ function GraphEditor(settings) {
       }
       var oldLabel = info.label;
       var newLabel = (self.textEditor) ? self.textEditor.val() : "";
+      if(self.alphabet){
+         for(var iLetter = 0; iLetter < newLabel.length; iLetter++){
+            if(!self.alphabet.includes(newLabel.charAt(iLetter))){
+               newLabel = oldLabel;
+               break;
+            }
+         }
+      }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
          if(newLabel.length === 0){
