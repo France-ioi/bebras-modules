@@ -750,8 +750,11 @@ function VertexDragAndConnect(settings) {
    this.gridEnabled = false;
    this.gridX = null;
    this.gridY = null;
+   
    this.enabled = false;
    this.dragEnabled = false;
+   this.vertexSelectEnabled = false;
+
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
 
@@ -767,6 +770,7 @@ function VertexDragAndConnect(settings) {
 
       this.setDragEnabled(enabled);
       this.fuzzyClicker.setEnabled(enabled);
+      this.setVertexSelectEnabled(enabled);
    };
 
    this.setGridEnabled = function(enabled, gridX, gridY) {
@@ -784,6 +788,10 @@ function VertexDragAndConnect(settings) {
          this.disableDrag();
       }
       this.dragEnabled = enabled;
+   };
+
+   this.setVertexSelectEnabled = function(enabled) {
+      this.vertexSelectEnabled = enabled;
    };
 
    this.disableDrag = function() {
@@ -895,29 +903,31 @@ function VertexDragAndConnect(settings) {
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
-      // Click on background or on the selected vertex -  deselect it.
-      if(id === null || id === self.selectionParent){
-         if(self.selectionParent !== null && self.onVertexSelect) {
-            self.onVertexSelect(self.selectionParent, false);
+      if(self.vertexSelectEnabled) {
+         // Click on background or on the selected vertex -  deselect it.
+         if(id === null || id === self.selectionParent){
+            if(self.selectionParent !== null && self.onVertexSelect) {
+               self.onVertexSelect(self.selectionParent, false);
+            }
+            self.selectionParent = null;
+            return;
          }
+   
+         // Start a new pair.
+         if(self.selectionParent === null && self.onVertexSelect) {
+            self.selectionParent = id;
+            self.onVertexSelect(id, true);
+            return;
+         }
+   
+         // Finish a new pair.
+         if(self.onPairSelect) {
+            self.onPairSelect(self.selectionParent, id);
+         }
+         if(self.onVertexSelect)
+            self.onVertexSelect(self.selectionParent, false, true);
          self.selectionParent = null;
-         return;
       }
-
-      // Start a new pair.
-      if(self.selectionParent === null && self.onVertexSelect) {
-         self.selectionParent = id;
-         self.onVertexSelect(id, true);
-         return;
-      }
-
-      // Finish a new pair.
-      if(self.onPairSelect) {
-         self.onPairSelect(self.selectionParent, id);
-      }
-      if(self.onVertexSelect)
-         self.onVertexSelect(self.selectionParent, false, true);
-      self.selectionParent = null;
    };
 
    this.setOnVertexSelect = function(fct) {
@@ -1461,6 +1471,7 @@ function GraphEditor(settings) {
    };
    this.setVertexSelectEnabled = function(enabled) {
       this.vertexSelectEnabled = enabled;
+      this.vertexDragAndConnect.setVertexSelectEnabled(enabled);
    };
 
    this.checkVertexSelect = function() {
@@ -1474,7 +1485,7 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
       var attr;
-      if(selected && self.vertexSelectEnabled) {
+      if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          self.editLabel(vertexId,"vertex");
@@ -1488,7 +1499,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
-      if(!self.createEdgeEnabled || !self.vertexSelectEnabled)
+      if(!self.createEdgeEnabled)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -1903,6 +1914,7 @@ function GraphEditor(settings) {
          enabled: true
       });
       this.setVertexDragEnabled(this.vertexDragEnabled);
+      this.setVertexSelectEnabled(this.vertexSelectEnabled);
       this.setEdgeDragEnabled(this.edgeDragEnabled);
       if(this.gridEnabled)
          this.setGridEnabled(this.gridEnabled.snapToGrid,this.gridEnabled.gridX,this.gridEnabled.gridY);
