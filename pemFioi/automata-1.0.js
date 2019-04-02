@@ -70,6 +70,12 @@ function Automata(settings) {
    this.setTerminalEnabled = function(enabled) {
       this.graphEditor.setTerminalEnabled(enabled);
    };
+   this.setDefaultVertexLabelEnabled = function(enabled) {
+      this.graphEditor.setDefaultVertexLabelEnabled(enabled);
+   };
+   this.setDefaultEdgeLabelEnabled = function(enabled) {
+      this.graphEditor.setDefaultEdgeLabelEnabled(enabled);
+   };
 
    this.initGraph = function() {
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, this.id+"_VisualGraph", this.graphPaper, null, this.graphDrawer, true);
