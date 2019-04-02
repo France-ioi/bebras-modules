@@ -739,9 +739,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
 
    this.isOnEdgeLabel = function(edgeID,x,y) {
       var edgeInfo = this.graph.getEdgeInfo(edgeID);
-      // if(!edgeInfo.label || edgeInfo.label.length === 0){
-      //    return false;
-      // }
+      if(!edgeInfo.label || edgeInfo.label.length === 0){
+         return false;
+      }
       var labelPos = this.getLabelPos(edgeID);
       var fontSize = this.edgeLabelAttr["font-size"] || 15;  
       var labelH = fontSize;
