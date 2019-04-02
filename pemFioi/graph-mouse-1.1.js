@@ -284,7 +284,7 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
    };
 
    this.clickHandler = function(event) {
-      // console.log(self.paper);
+      // console.log(jqEvent+" "+id);
       var offset = $(self.paper.canvas).offset();
       // var offset = $("#"+paperElementID).offset();
       var xPos = event.pageX - offset.left;
@@ -750,8 +750,11 @@ function VertexDragAndConnect(settings) {
    this.gridEnabled = false;
    this.gridX = null;
    this.gridY = null;
+   
    this.enabled = false;
    this.dragEnabled = false;
+   this.vertexSelectEnabled = false;
+
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
 
@@ -767,6 +770,7 @@ function VertexDragAndConnect(settings) {
 
       this.setDragEnabled(enabled);
       this.fuzzyClicker.setEnabled(enabled);
+      this.setVertexSelectEnabled(enabled);
    };
 
    this.setGridEnabled = function(enabled, gridX, gridY) {
@@ -784,6 +788,10 @@ function VertexDragAndConnect(settings) {
          this.disableDrag();
       }
       this.dragEnabled = enabled;
+   };
+
+   this.setVertexSelectEnabled = function(enabled) {
+      this.vertexSelectEnabled = enabled;
    };
 
    this.disableDrag = function() {
@@ -895,29 +903,31 @@ function VertexDragAndConnect(settings) {
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
-      // Click on background or on the selected vertex -  deselect it.
-      if(id === null || id === self.selectionParent){
-         if(self.selectionParent !== null && self.onVertexSelect) {
-            self.onVertexSelect(self.selectionParent, false);
+      if(self.vertexSelectEnabled) {
+         // Click on background or on the selected vertex -  deselect it.
+         if(id === null || id === self.selectionParent){
+            if(self.selectionParent !== null && self.onVertexSelect) {
+               self.onVertexSelect(self.selectionParent, false);
+            }
+            self.selectionParent = null;
+            return;
          }
+   
+         // Start a new pair.
+         if(self.selectionParent === null && self.onVertexSelect) {
+            self.selectionParent = id;
+            self.onVertexSelect(id, true);
+            return;
+         }
+   
+         // Finish a new pair.
+         if(self.onPairSelect) {
+            self.onPairSelect(self.selectionParent, id);
+         }
+         if(self.onVertexSelect)
+            self.onVertexSelect(self.selectionParent, false, true);
          self.selectionParent = null;
-         return;
       }
-
-      // Start a new pair.
-      if(self.selectionParent === null && self.onVertexSelect) {
-         self.selectionParent = id;
-         self.onVertexSelect(id, true);
-         return;
-      }
-
-      // Finish a new pair.
-      if(self.onPairSelect) {
-         self.onPairSelect(self.selectionParent, id);
-      }
-      if(self.onVertexSelect)
-         self.onVertexSelect(self.selectionParent, false, true);
-      self.selectionParent = null;
    };
 
    this.setOnVertexSelect = function(fct) {
@@ -1083,17 +1093,19 @@ function ArcDragger(settings) {
          vInfo["angle"] = (self.startAngle - deltaAngle)%360;
       }else{
          var circleParameters = self.getCircleParameters(self.edgeVerticesPos[0].x,self.edgeVerticesPos[0].y,self.edgeVerticesPos[1].x,self.edgeVerticesPos[1].y,xMouse,yMouse);
-         var radius = circleParameters.r;
-         var radiusRatio = radius /self.distance; 
-         vInfo["sweep"] = self.getSide(xMouse,yMouse,self.edgeVerticesPos);
-         if(self.getSide(circleParameters.xc,circleParameters.yc,self.edgeVerticesPos)){
-            vInfo["large-arc"] = (vInfo["sweep"]) ? 1 : 0;
-         }else{
-            vInfo["large-arc"] = (vInfo["sweep"]) ? 0 : 1;
+         if(circleParameters){
+            var radius = circleParameters.r;
+            var radiusRatio = radius /self.distance; 
+            vInfo["sweep"] = self.getSide(xMouse,yMouse,self.edgeVerticesPos);
+            if(self.getSide(circleParameters.xc,circleParameters.yc,self.edgeVerticesPos)){
+               vInfo["large-arc"] = (vInfo["sweep"]) ? 1 : 0;
+            }else{
+               vInfo["large-arc"] = (vInfo["sweep"]) ? 0 : 1;
+            }
+            if(radiusRatio > 5 && !vInfo["large-arc"])
+                  radiusRatio = 0;
+            vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
          }
-         if(radiusRatio > 5 && !vInfo["large-arc"])
-               radiusRatio = 0;
-         vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
       self.visualGraph.graphDrawer.refreshEdgePosition(self.edgeVertices[0],self.edgeVertices[1]);
@@ -1337,6 +1349,7 @@ function GraphEditor(settings) {
    var edgeLabelAttr = settings.edgeLabelAttr || visualGraph.graphDrawer.edgeLabelAttr;
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
+   this.alphabet = settings.alphabet;
 
    this.loopIcon = null;
    this.cross = null;
@@ -1388,6 +1401,8 @@ function GraphEditor(settings) {
    this.editEdgeLabelEnabled = false;
    this.vertexSelectEnabled = false;
    this.terminalEnabled = false;
+   this.defaultVertexLabelEnabled = false;
+   this.defaultEdgeLabelEnabled = false;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1409,6 +1424,8 @@ function GraphEditor(settings) {
       this.setLoopEnabled(enabled);
       this.setVertexSelectEnabled(enabled);
       this.setTerminalEnabled(enabled);
+      this.setDefaultVertexLabelEnabled(enabled);  
+      this.setDefaultEdgeLabelEnabled(enabled);     
    };
 
    this.setCreateVertexEnabled = function(enabled) {
@@ -1458,6 +1475,13 @@ function GraphEditor(settings) {
    };
    this.setVertexSelectEnabled = function(enabled) {
       this.vertexSelectEnabled = enabled;
+      this.vertexDragAndConnect.setVertexSelectEnabled(enabled);
+   };
+   this.setDefaultVertexLabelEnabled = function(enabled) {
+      this.defaultVertexLabelEnabled = enabled;
+   };
+   this.setDefaultEdgeLabelEnabled = function(enabled) {
+      this.defaultEdgeLabelEnabled = enabled;
    };
 
    this.checkVertexSelect = function() {
@@ -1471,7 +1495,7 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
       var attr;
-      if(selected && self.vertexSelectEnabled) {
+      if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          self.editLabel(vertexId,"vertex");
@@ -1485,7 +1509,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
-      if(!self.createEdgeEnabled || !self.vertexSelectEnabled)
+      if(!self.createEdgeEnabled)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -1502,7 +1526,11 @@ function GraphEditor(settings) {
          edgeGuid++;
       }
       var edgeID = "e_" + edgeGuid;
-      graph.addEdge(edgeID, id1, id2,{label:edgeID});
+      if(self.defaultEdgeLabelEnabled){
+         graph.addEdge(edgeID, id1, id2,{label:edgeID});
+      }else{
+         graph.addEdge(edgeID, id1, id2);
+      }
       self.setNewEdgeVisualInfo(edgeID,id1,id2);
       if(callback){
          callback();
@@ -1549,7 +1577,11 @@ function GraphEditor(settings) {
       var vertexId = "v_" + vertexGuid;
       var point = {x: x, y: y};
       visualGraph.setVertexVisualInfo(vertexId, point);
-      graph.addVertex(vertexId,{label:vertexId});
+      if(self.defaultVertexLabelEnabled){
+         graph.addVertex(vertexId,{label:vertexId});
+      }else{
+         graph.addVertex(vertexId);
+      }
       if(callback){
          callback();
       }
@@ -1900,6 +1932,7 @@ function GraphEditor(settings) {
          enabled: true
       });
       this.setVertexDragEnabled(this.vertexDragEnabled);
+      this.setVertexSelectEnabled(this.vertexSelectEnabled);
       this.setEdgeDragEnabled(this.edgeDragEnabled);
       if(this.gridEnabled)
          this.setGridEnabled(this.gridEnabled.snapToGrid,this.gridEnabled.gridX,this.gridEnabled.gridY);
@@ -1969,6 +2002,14 @@ function GraphEditor(settings) {
       }
       var oldLabel = info.label;
       var newLabel = (self.textEditor) ? self.textEditor.val() : "";
+      if(self.alphabet){
+         for(var iLetter = 0; iLetter < newLabel.length; iLetter++){
+            if(!self.alphabet.includes(newLabel.charAt(iLetter))){
+               newLabel = oldLabel;
+               break;
+            }
+         }
+      }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
          if(newLabel.length === 0){

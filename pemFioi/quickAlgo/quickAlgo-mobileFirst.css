@@ -510,6 +510,7 @@ p {
     padding: 10px 20px;
     max-height: 100%;
     overflow: auto;
+    margin-bottom: 20px;
   }
   #taskIntro.hasLongIntro .introContent {
     padding-bottom: 70px;
@@ -554,9 +555,10 @@ p {
     padding: 10px 20px;
     max-height: 100%;
     overflow: auto;
+    margin-bottom: 20px;
   }
   #taskIntro.hasLongIntro .introContent {
-    padding-bottom: 30px;
+    padding-bottom: 40px;
   }
 }
 /*****************
@@ -1493,7 +1495,7 @@ body.fullscreen #taskToolbar {
   font-weight: 100;
   color: #4a90e2;
 }
-button.showLongIntro, button.videoBtn {
+button.videoBtn {
   position: relative;
   color: #4a90e2;
   border: 1px solid #4a90e2;
@@ -1506,21 +1508,12 @@ button.showLongIntro, button.videoBtn {
   font-weight: bold;
   font-size: 12px;
 }
-button.showLongIntro {
-  position: absolute;
-  bottom: 47px;
-  z-index: 1;
-  right: 9px;
-  box-shadow: 2px 2px 5px #ccd;
-}
-button.showLongIntro {
-  display: none;
-}
-button.showLongIntro .icon, button.videoBtn .icon {
+button.videoBtn .icon {
   position: absolute;
   left: 15px;
   top: 10px;
 }
+
 #taskIntroLong .panel-body {
   padding: 20px;
   overflow: auto;
@@ -1530,9 +1523,50 @@ button.showLongIntro .icon, button.videoBtn .icon {
   max-width: 100%;
   margin: 20px auto;
 }
+
+/* Intro controls
+  QuickPi Connexion, QuickPi connexion status, display long intro
+ */
+#introControls {
+  position: absolute;
+  width: 100%;
+  right: 0;
+  bottom: 47px;
+  padding: 0 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap-reverse;
+  margin-bottom: -10px; /* Compensate margin bottom needed when buttons wrapped */
+  z-index: 1;
+}
+#introControls .showLongIntro {
+  align-self: flex-end;
+  margin-bottom: 10px; /* Needed to space buttons when wrapped */
+}
+
+button.showLongIntro {
+  position: relative;
+  color: #4a90e2;
+  border: 1px solid #4a90e2;
+  border-radius: 50px;
+  box-shadow: none;
+  padding: 8px 15px 8px 40px;
+  cursor: pointer;
+  background: #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 12px;
+  display: none;
+}
+button.showLongIntro .icon {
+  position: absolute;
+  left: 15px;
+  top: 10px;
+}
 @media /* Tablets landscape and desktop */
   screen and (min-width: 855px) and (orientation: landscape) {
-  button.showLongIntro {
+  #introControls {
     bottom: 10px;
   }   
 }
@@ -1540,14 +1574,12 @@ button.showLongIntro .icon, button.videoBtn .icon {
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
-  #taskIntro .long {
-    display: none;
-  }
   button.showLongIntro {
     display: block;
   }
-
 }
+
+/* Long version of task introduction */
 #taskIntroLong {
   position: absolute;
   top: 0;
@@ -1562,6 +1594,14 @@ button.showLongIntro .icon, button.videoBtn .icon {
 }
 #taskIntroLong.displayIntroLong {
   display: block !important;
+}
+@media /* Tablets and desktop */
+  screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
+  screen and (min-width: 855px) and (orientation: landscape),
+  screen and (min-width: 1025px) {
+  #taskIntro .long {
+    display: none;
+  }
 }
 .pythonIntroBtn {
   color: #4D87CE;
@@ -1591,15 +1631,7 @@ button.showLongIntro .icon, button.videoBtn .icon {
 }
 /* QuickPi */
 .piui #introControls {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap-reverse;
-  margin-bottom: -10px;
-}
-.piui #introControls .showLongIntro {
-  align-self: flex-end;
-  margin-bottom: 10px;
 }
 #piui > * {
   margin-bottom: 10px;

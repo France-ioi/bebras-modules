@@ -1877,7 +1877,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "readNumber",
       type: "sensors",
-      block: { name: "readNumber", yieldsValue: true },
+      block: { name: "readNumber", yieldsValue: 'int' },
       func: function(callback) {
          var robot = this.getRobot();
          this.callCallback(callback, this.readNumber(robot.row, robot.col));
@@ -1959,7 +1959,7 @@ var getContext = function(display, infos, curLevel) {
    infos.newBlocks.push({
       name: "shoot",
       type: "actions",
-      block: { name: "shoot", blocklyXml: "<block type='shoot_noShadow'>" +
+      block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
                               "  <value name='PARAM_0'>" +
                               "    <shadow type='math_number'>" +
                               "      <field name='NUM'>0</field>" +
