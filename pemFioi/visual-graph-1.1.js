@@ -344,8 +344,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          return [this.paper.path(path).attr(this.lineAttr).toBack(), this.paper.path(path).attr(innerLineAttr)];
       }
       else {
-         var clickArea = this.paper.path(this._getEdgePath(vertex1, vertex2, id)).attr(this.edgeClickAreaAttr).toBack();
-         var path = this.paper.path(this._getEdgePath(vertex1, vertex2, id)).attr(this.lineAttr).toBack();
+         var clickArea = this.paper.path(this._getEdgePath(id)).attr(this.edgeClickAreaAttr).toBack();
+         var path = this.paper.path(this._getEdgePath(id)).attr(this.lineAttr).toBack();
          var info = this.graph.getEdgeInfo(id);
          var labelText = info.label || "";
          var labelPos = this.getLabelPos(id, vertex1, vertex2);
@@ -435,7 +435,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             newPath = this._getThickEdgePath(vertex1, vertex2);
          }
          else {
-            newPath = this._getEdgePath(vertex1, vertex2, edgeID);
+            newPath = this._getEdgePath(edgeID);
          }
 
          raphaels[0].attr("path", newPath);
@@ -449,9 +449,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          }
       }
    };
-   this._getEdgePath = function(vertex1, vertex2, edgeID) {
+   this._getEdgePath = function(edgeID) {
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
-
+      var vertices = this.graph.getEdgeVertices(edgeID);
+      var vertex1 = vertices[0];
+      var vertex2 = vertices[1];
       if(edgeVisualInfo["radius-ratio"] || vertex1 === vertex2){
          return  this._getCurvedEdgePath(vertex1,vertex2,edgeID);
       }
@@ -737,9 +739,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
 
    this.isOnEdgeLabel = function(edgeID,x,y) {
       var edgeInfo = this.graph.getEdgeInfo(edgeID);
-      // if(!edgeInfo.label || edgeInfo.label.length === 0){
-      //    return false;
-      // }
+      if(!edgeInfo.label || edgeInfo.label.length === 0){
+         return false;
+      }
       var labelPos = this.getLabelPos(edgeID);
       var fontSize = this.edgeLabelAttr["font-size"] || 15;  
       var labelH = fontSize;

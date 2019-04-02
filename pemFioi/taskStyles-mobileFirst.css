@@ -399,7 +399,7 @@ img {
 }
 #popupMessage .qpi #sensorPicker .flex-container {
   align-items: flex-end;
-  margin: 2em 0;
+  margin: 2em 0 4em;
 }
 #popupMessage .qpi #sensorPicker .flex-container .half:first-child {
   text-align: center;
