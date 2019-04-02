@@ -134,9 +134,9 @@ function Automata(settings) {
 
    this.initBeaver = function() {
       // this.beaver = settings.beaver || this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr);
-      var circle = this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr).attr("fill","white");
-      var letter = this.graphPaper.text(0,0,"B");
-      this.beaver = this.graphPaper.set(circle,letter);
+      this.beaver = this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr).attr("fill","black");
+      // var letter = this.graphPaper.text(0,0,"B");
+      // this.beaver = this.graphPaper.set(circle,letter);
       var pos = this.visualGraph.getVertexVisualInfo(this.startID);
       // if(this.beaver.attr("src")){
       //    this.beaver.attr({
