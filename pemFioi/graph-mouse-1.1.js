@@ -1401,6 +1401,8 @@ function GraphEditor(settings) {
    this.editEdgeLabelEnabled = false;
    this.vertexSelectEnabled = false;
    this.terminalEnabled = false;
+   this.defaultVertexLabelEnabled = false;
+   this.defaultEdgeLabelEnabled = false;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1422,6 +1424,8 @@ function GraphEditor(settings) {
       this.setLoopEnabled(enabled);
       this.setVertexSelectEnabled(enabled);
       this.setTerminalEnabled(enabled);
+      this.setDefaultVertexLabelEnabled(enabled);  
+      this.setDefaultEdgeLabelEnabled(enabled);     
    };
 
    this.setCreateVertexEnabled = function(enabled) {
@@ -1473,6 +1477,12 @@ function GraphEditor(settings) {
       this.vertexSelectEnabled = enabled;
       this.vertexDragAndConnect.setVertexSelectEnabled(enabled);
    };
+   this.setDefaultVertexLabelEnabled = function(enabled) {
+      this.defaultVertexLabelEnabled = enabled;
+   };
+   this.setDefaultEdgeLabelEnabled = function(enabled) {
+      this.defaultEdgeLabelEnabled = enabled;
+   };
 
    this.checkVertexSelect = function() {
       if(!this.terminalEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled){
@@ -1516,7 +1526,11 @@ function GraphEditor(settings) {
          edgeGuid++;
       }
       var edgeID = "e_" + edgeGuid;
-      graph.addEdge(edgeID, id1, id2,{label:edgeID});
+      if(self.defaultEdgeLabelEnabled){
+         graph.addEdge(edgeID, id1, id2,{label:edgeID});
+      }else{
+         graph.addEdge(edgeID, id1, id2);
+      }
       self.setNewEdgeVisualInfo(edgeID,id1,id2);
       if(callback){
          callback();
@@ -1563,7 +1577,11 @@ function GraphEditor(settings) {
       var vertexId = "v_" + vertexGuid;
       var point = {x: x, y: y};
       visualGraph.setVertexVisualInfo(vertexId, point);
-      graph.addVertex(vertexId,{label:vertexId});
+      if(self.defaultVertexLabelEnabled){
+         graph.addVertex(vertexId,{label:vertexId});
+      }else{
+         graph.addVertex(vertexId);
+      }
       if(callback){
          callback();
       }
