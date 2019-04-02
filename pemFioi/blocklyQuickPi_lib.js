@@ -1298,7 +1298,7 @@ var getContext = function (display, infos, curLevel) {
                     <div id="sensorPicker" class="panel-body">
                         <label>Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.</label>
                         <div class="flex-container">
-                            <div class="flex-col half">
+                            <div id="selector-image-container" class="flex-col half">
                                 <img id="selector-sensor-image">
                             </div>
                             <div class="flex-col half">
@@ -1347,7 +1347,19 @@ var getContext = function (display, infos, curLevel) {
 
                 var sensorDefinition = findSensorDefinition(dummysensor);
 
-                $('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
+                var imageContainer = document.getElementById("selector-image-container");
+                while (imageContainer.firstChild) {
+                    imageContainer.removeChild(imageContainer.firstChild);
+                }
+                for (var i = 0; i < sensorDefinition.selectorImages.length; i++) {
+                    var image = document.createElement('img');
+
+                    image.src = getImg(sensorDefinition.selectorImages[i]);
+
+                    imageContainer.appendChild(image);
+
+                    //$('#selector-sensor-image').attr("src", getImg(sensorDefinition.selectorImages[0]));
+                }
 
                 var hasPorts = false;
                 $('#selector-sensor-port').empty();
