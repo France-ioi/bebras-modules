@@ -10,14 +10,15 @@ Utilisation :
 */
 
 var showdownConvert = function (showdown) {
-    var showdownConverter = new showdown.Converter({headerLevelStart: 3});
+    var showdownConverter = new showdown.Converter({headerLevelStart: 3, backslashEscapesHTMLTags: true});
     $( function () {
         $(".markdown").each(function(idx, elem) {
             var newDiv = $('<div></div>');
             newDiv.html(showdownConverter.makeHtml($(this).html()) + '</div>');
             newDiv.addClass("markdown-translated");
             newDiv.insertAfter($(this));
-            $(this).hide();
+            // remove to reduce mathjax work
+            $(this).remove();
         })
     });
 }
