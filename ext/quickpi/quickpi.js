@@ -299,6 +299,8 @@ servo_last_value = {}
 
 DHT11_last_value = {}
 
+distance_last_value = {}
+
 screenLine1 = None
 screenLine2 = None
 
@@ -417,6 +419,13 @@ def readDistance(pin):
     pin = normalizePin(pin)
 
     cleanupPin(pin)
+
+    last_value = 0
+    try:
+        last_value = distance_last_value[pin]
+    except:
+        pass
+
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.LOW)
     usleep(2)
@@ -433,7 +442,7 @@ def readDistance(pin):
             break
         count += 1
     if count >= _TIMEOUT1:
-        return None
+        return last_value
 
     t1 = time.time()
     count = 0
@@ -442,17 +451,21 @@ def readDistance(pin):
             break
         count += 1
     if count >= _TIMEOUT2:
-        return None
+        return last_value
 
     t2 = time.time()
 
     dt = int((t1 - t0) * 1000000)
     if dt > 530:
-        return None
+        return last_value
 
     distance = ((t2 - t1) * 1000000 / 29 / 2)    # cm
 
-    return round(distance, 1)
+    distance = round(distance, 1)
+
+    distance_last_value[pin] = distance
+
+    return distance
 
 def displayText(line1, line2=""):
     global screenLine1
