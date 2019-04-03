@@ -3057,7 +3057,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var button = context.findSensor("button", "D22");
+            var button = context.findSensor("button", port);
             
             findSensorDefinition(button).getLiveState(port, function(returnVal) {
                 button.state = returnVal != "0";
@@ -3199,7 +3199,7 @@ var getContext = function (display, infos, curLevel) {
         else if (angle < 0)
             angle = 0;
 
-        context.registerQuickPiEvent("servo", angle);
+        context.registerQuickPiEvent("servo", port, angle);
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
