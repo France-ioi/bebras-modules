@@ -1066,7 +1066,9 @@ function ArcDragger(settings) {
       if(!self.dragEnabled || self.isOnLabel)
          return;
       self.isDragging = true;
-      self.unselectAll();
+      // var info = self.graph.getEdgeInfo(self.elementID);
+      // if(info.selected)
+      //    self.unselectAll();
       var x0 = self.originalPosition.x;
       var y0 = self.originalPosition.y;
       var xMouse = x0 + dx;
@@ -1323,7 +1325,7 @@ function GraphEditor(settings) {
    var onVertexSelect = settings.onVertexSelect;   // optional
    var onEdgeSelect = settings.onEdgeSelect;    // optional
    this.createVertex = settings.createVertex;   // optional
-   var callback = settings.callback || null;
+   var callback = settings.callback;
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
       "stroke-width": 4
@@ -1448,9 +1450,11 @@ function GraphEditor(settings) {
    };
    this.setDragGraphEnabled = function(enabled) {
       this.graphDragger.dragEnabled = enabled;
+      this.checkGraphDrag();
    };
    this.setScaleGraphEnabled = function(enabled) {
       this.graphDragger.scaleEnabled = enabled;
+      this.checkGraphDrag();
    };
    this.setMultipleEdgesEnabled = function(enabled) {
       this.multipleEdgesEnabled = enabled;
@@ -1489,6 +1493,13 @@ function GraphEditor(settings) {
          this.setVertexSelectEnabled(false);
       }else{
          this.setVertexSelectEnabled(true);
+      }
+   };
+   this.checkGraphDrag = function() {
+      if(!this.graphDragger.dragEnabled && !this.graphDragger.scaleEnabled){
+         this.graphDragger.setEnabled(false);
+      }else{
+         this.graphDragger.setEnabled(true);
       }
    };
    
@@ -1820,6 +1831,7 @@ function GraphEditor(settings) {
          info.terminal = !info.terminal;
          
          graph.setVertexInfo(vertexId,info);
+         // visualGraph.graphDrawer.updateVertex(vertexId);
          visualGraph.redraw();
          self.updateHandlers();
          
@@ -1918,16 +1930,19 @@ function GraphEditor(settings) {
 
    this.updateHandlers = function() {
       this.vertexDragAndConnect.setEnabled(false);
+      this.arcDragger.setEnabled(false);
       settings.graphMouse = new GraphMouse("mouse", graph, visualGraph);
       this.vertexDragAndConnect = new VertexDragAndConnect(settings);
       this.vertexDragAndConnect.setEnabled(true);
-      this.arcDragger.setEnabled(false);
+      // this.arcDragger.setEnabled(false);
       this.arcDragger = new ArcDragger({
-         id:"ArcDragger",
+         // id:"ArcDragger",
+         paper: paper,
          paperElementID: settings.paperElementID,
          graph: graph,
          visualGraph: visualGraph,  
          graphMouse: settings.graphMouse,
+         onEdgeSelect: onEdgeSelect,
          callback: settings.callback,
          enabled: true
       });
@@ -1986,9 +2001,6 @@ function GraphEditor(settings) {
             self.writeLabel(id,type);
          }
       });
-      if(callback){
-         callback();
-      }
    };
 
    this.writeLabel = function(id,type) {
@@ -2032,6 +2044,9 @@ function GraphEditor(settings) {
       if(self.textEditor)
          self.textEditor.remove();
       raphElement[1].show();
+      if(callback){
+         callback();
+      }
    };
 
    this.startDragCallback = function(ID) {
@@ -2040,7 +2055,8 @@ function GraphEditor(settings) {
          var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
          if(self.textEditor)
             self.textEditor.remove();
-         vertexRaph[1].show();
+         if(vertexRaph[1])
+            vertexRaph[1].show();
       }
       var edges = graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
