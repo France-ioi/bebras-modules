@@ -28,6 +28,9 @@ function Automata(settings) {
    this.graphMouse;
    this.graphEditor;
 
+   this.NFA;
+   this.targetNFA = settings.targetNFA;
+
    this.enabled = false;
 
    this.margin = 10;
@@ -42,6 +45,9 @@ function Automata(settings) {
       
       this.graphEditor.setDragGraphEnabled(false);
       this.graphEditor.setScaleGraphEnabled(false);
+
+      if(enabled && !this.targetNFA)
+         this.generateTargetNFA();
    };
    this.setCreateVertexEnabled = function(enabled) {
       this.graphEditor.setCreateVertexEnabled(enabled);
@@ -96,6 +102,7 @@ function Automata(settings) {
             maxY: this.graphPaper.height - this.visualGraph.graphDrawer.circleAttr.r
          },
          alphabet: this.alphabet,
+         callback: this.getNFA,
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
@@ -139,24 +146,56 @@ function Automata(settings) {
    };
 
    this.initBeaver = function() {
-      // this.beaver = settings.beaver || this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr);
       this.beaver = this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr).attr("fill","black");
-      // var letter = this.graphPaper.text(0,0,"B");
-      // this.beaver = this.graphPaper.set(circle,letter);
       var pos = this.visualGraph.getVertexVisualInfo(this.startID);
-      // if(this.beaver.attr("src")){
-      //    this.beaver.attr({
-      //       x: pos.x - this.beaver.attr("width")/2,
-      //       y: pos.x - this.beaver.attr("height")/2
-      //    })
-      // }else{
-         this.beaver.attr({
-            cx: pos.x,
-            cy: pos.y,
-            x: pos.x,
-            y: pos.y
-         });
-      // }
+      this.beaver.attr({
+         cx: pos.x,
+         cy: pos.y,
+         x: pos.x,
+         y: pos.y
+      });
+   };
+
+   this.getNFA = function() {
+      var vertices = self.graph.getAllVertices();
+      var transitionTable = {};
+      for(vertex of vertices){
+         transitionTable[vertex] = {};
+         var children = self.graph.getChildren(vertex);
+         for(child of children){
+            var edges = self.graph.getEdgesFrom(vertex,child);
+            for(var edge of edges){
+               var info = self.graph.getEdgeInfo(edge);
+               var label = info.label || "";
+               if(!transitionTable[vertex][label]){
+                  transitionTable[vertex][label] = [child];
+               }else{
+                  transitionTable[vertex][label].push(child);
+               }
+            }
+         }
+      }
+      self.NFA = new NFA(self.alphabet,transitionTable,[self.startID],[self.endID]);
+   };
+
+   this.generateTargetNFA = function() {
+      var str = "";
+      for(var letter of this.sequence){
+         str += letter;
+      }
+      this.targetNFA = NFA.for(str,this.alphabet);
+   };
+
+   this.compareWithTarget = function() {
+      var dfa = this.NFA.to_DFA();
+      var targetDFA = this.targetNFA.to_DFA();
+      var e_c = dfa.find_equivalence_counterexamples(targetDFA);
+      var equivalent = false;
+      if(!e_c[0] && !e_c[1]){
+         equivalent = true;
+      }
+      var noUnreachableDFA = dfa.without_unreachables();
+      return {equivalent: equivalent, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
    };
 
    function drawArrow(x,y,size,dir) {
@@ -306,6 +345,7 @@ function Automata(settings) {
    this.initGraph();
    this.initSequence();
    this.initBeaver();
+   this.getNFA();
    this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
 
    if(settings.enabled){
