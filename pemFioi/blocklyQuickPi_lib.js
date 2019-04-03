@@ -334,6 +334,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.lastStateChange = null;
             sensor.callsInTimeSlot = 0;
             sensor.lastTimeIncrease = 0;
+            sensor.removed = false;
         }
 
         if (context.display) {
@@ -1594,6 +1595,13 @@ var getContext = function (display, infos, curLevel) {
         if (context.display) {
             // Do something here
         }
+
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var sensor = infos.quickPiSensors[i];
+
+            sensor.removed = true;
+        }
+
     };
 
     context.findSensor = function findSensor(type, port, error=true) {
@@ -2109,13 +2117,13 @@ var getContext = function (display, infos, curLevel) {
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
 
         sensor.focusrect.attr({
-            "fill": "468DDF",
-            "fill-opacity": 0,
-            "opacity": 0,
-            "x": imgx,
-            "y": imgy,
-            "width": imgw,
-            "height": imgh,
+                "fill": "468DDF",
+                "fill-opacity": 0,
+                "opacity": 0,
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
         });
 
         if (context.autoGrading) {
@@ -3203,7 +3211,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
-            var command = "setServoAngle(" + port + "," + angle + ")";
+            var command = "setServoAngle(\"" + port + "\"," + angle + ")";
             cb = context.runner.waitCallback(callback);
             context.quickPiConnection.sendCommand(command, cb);
         }
