@@ -1063,6 +1063,9 @@ var getContext = function (display, infos, curLevel) {
                 $('#piaddress').val(sessionStorage.raspberryPiIpAddress);
             }
 
+            if (sessionStorage.schoolkey) {
+                $('#schoolkey').val(sessionStorage.schoolkey);
+            }
 
             $('#piconnectok').click(function () {
                 context.inUSBConnection = false;
@@ -1100,6 +1103,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#schoolkey').on('input', function (e) {
                 var schoolkey = $('#schoolkey').val();
+                sessionStorage.schoolkey = schoolkey;
 
                 if (schoolkey)
                     $('#pigetlist').attr("disabled", false);
