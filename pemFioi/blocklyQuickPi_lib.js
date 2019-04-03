@@ -26,6 +26,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "l'humidité ambiante",
                 currentTime: "Temps actuel en millisecondes",
                 changeBuzzerState: "buzzer sur le port %1",
+                getTemperature: "Get temperature %1",
                 /*turnLedOn: "Turn Led On",
                 turnLedOff: "Turn Led Off",
                 buttonState: "Return Button State",
@@ -61,6 +62,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
                 changeBuzzerState: "setBuzzerState",
+                getTemperature: "getTemperature",
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -82,6 +84,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity(): lire l'humidité ambiante",
                 currentTime: "currentTime(): Temps actuel en millisecondes",
                 changeBuzzerState: "setBuzzerState(): sonnerie",
+                getTemperature: "getTemperature(): Get temperature",
             },
             constant: {
             },
@@ -193,6 +196,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "lire l'humidité ambiante",
                 currentTime: "returns current time",
                 changeBuzzerState: "sonnerie",
+                getTemperature: "Get temperature",
             }
         }
     }
@@ -244,8 +248,8 @@ var getContext = function (display, infos, curLevel) {
                     if (state.time < context.currentTime) {
                         if (!state.hit) {
                             context.success = false;
-                            throw (strings.messages.wrongState);
                         }
+                        throw (strings.messages.wrongState);
                     }
                     else {
                         if (lastTurn) {
@@ -626,7 +630,7 @@ var getContext = function (display, infos, curLevel) {
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("buttonStateInPort(\"" + port + "\")", function (retVal) {
                     var intVal = parseInt(retVal, 10);
-                    callback(intVal == 0);
+                    callback(intVal != 0);
                 });
             },
         },
@@ -639,7 +643,7 @@ var getContext = function (display, infos, curLevel) {
             valueType: "number",
             valueMin: 0,
             valueMax: 60,
-            selectorImages: ["temperature-hot.png", "tempteature-overlay.png"],
+            selectorImages: ["temperature-hot.png", "temperature-overlay.png"],
             getPercentageFromState: function (state) {
                 return state / 60;
             },
@@ -1592,12 +1596,18 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    function findSensor(type, port) {
+    context.findSensor = function findSensor(type, port, error=true) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
             var sensor = infos.quickPiSensors[i];
 
             if (sensor.type == type && sensor.port == port)
                 return sensor;
+        }
+
+        if (error) {
+            context.success = false;
+            //context.doNotStartGrade = true;
+            throw (strings.messages.sensorNotFound);
         }
 
         return null;
@@ -2714,41 +2724,48 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
-        if (infos.customSensors && !context.autoGrading) {
-            if (!sensor.removerect || !sensor.removerect.paper.canvas)
-                sensor.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
+        sensor.focusrect.mousedown(function () {
+            if (infos.customSensors && !context.autoGrading) {
+                if (context.removerect) {
+                    context.removerect.remove();
+                }
 
-            sensor.removerect.attr({
-                "font-size": "30" + "px",
-                fill: "lightgray",
-                "font-family": "Font Awesome 5 Free",
-                'text-anchor': 'start',
-                "x": portx,
-                "y": imgy,
-            });
+                context.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
+                removeRect = context.removerect;
+                sensorWithRemoveRect = sensor;
 
-            sensor.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-            sensor.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
-            sensor.removerect.node.style.fontWeight = "bold";
+                context.removerect.attr({
+                    "font-size": "30" + "px",
+                    fill: "lightgray",
+                    "font-family": "Font Awesome 5 Free",
+                    'text-anchor': 'start',
+                    "x": portx,
+                    "y": imgy,
+                });
+
+                context.removerect.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+                context.removerect.node.style.fontFamily = '"Font Awesome 5 Free"';
+                context.removerect.node.style.fontWeight = "bold";
 
 
-            sensor.removerect.click(function (element) {
+                context.removerect.click(function (element) {
 
-            window.displayHelper.showPopupMessage(strings.messages.removeConfirmation,
-             'blanket',
-             strings.messages.remove,
-               function() {
-                    for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                        if (infos.quickPiSensors[i] === sensor) {
-                            sensor.removed = true;
-                            infos.quickPiSensors.splice(i, 1);
-                        }
-                    }
-                    context.resetDisplay();
-                },
-                strings.messages.keep);
-            });
-        }
+                    window.displayHelper.showPopupMessage(strings.messages.removeConfirmation,
+                        'blanket',
+                        strings.messages.remove,
+                        function () {
+                            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                                if (infos.quickPiSensors[i] === sensor) {
+                                    sensor.removed = true;
+                                    infos.quickPiSensors.splice(i, 1);
+                                }
+                            }
+                            context.resetDisplay();
+                        },
+                        strings.messages.keep);
+                });
+            }
+        });
 
         if (sensor.portText)
             sensor.portText.remove();
@@ -2761,7 +2778,7 @@ var getContext = function (display, infos, curLevel) {
 
 
         sensor.portText = paper.text(portx, porty, sensor.port);
-        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "lightgray" });
+        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
 
         if (!donotmovefocusrect) {
             // This needs to be in front of everything
@@ -2772,9 +2789,10 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.registerQuickPiEvent = function (sensorType, port, newState, setInSensor = true) {
-        var sensor = findSensor(sensorType, port);
+        var sensor = context.findSensor(sensorType, port);
         if (!sensor) {
             context.success = false;
+            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -2897,9 +2915,10 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
-        var sensor = findSensor(sensorType, port);
+        var sensor = context.findSensor(sensorType, port);
         if (!sensor) {
             context.success = false;
+            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -2995,7 +3014,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.waitDelay(callback);
         } else if (context.offLineMode) {
-            button = findSensor("button", "D22");
+            button = context.findSensor("button", "D22");
             if (button) {
                 var cb = context.runner.waitCallback(callback);
                 button.onPressed = function () {
@@ -3020,7 +3039,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var button = findSensor("button", "D22");
+            var button = context.findSensor("button", "D22");
 
             findSensorDefinition(button).getLiveState("D22", function(returnVal) {
                 button.state = returnVal != "0";
@@ -3038,7 +3057,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var button = findSensor("button", "D22");
+            var button = context.findSensor("button", "D22");
             
             findSensorDefinition(button).getLiveState(port, function(returnVal) {
                 button.state = returnVal != "0";
@@ -3153,7 +3172,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var sensor = findSensor("temperature", port);
+            var sensor = context.findSensor("temperature", port);
             
             findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
@@ -3199,11 +3218,11 @@ var getContext = function (display, infos, curLevel) {
         } else {
 
             var cb = context.runner.waitCallback(callback);
-            var sensor = findSensor("potentiometer", port);
+            var sensor = context.findSensor("potentiometer", port);
 
             findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
-                drawSensor(button);
+                drawSensor(sensor);
                 cb(returnVal);
             });
         }
@@ -3218,11 +3237,11 @@ var getContext = function (display, infos, curLevel) {
         } else {
 
             var cb = context.runner.waitCallback(callback);
-            var sensor = findSensor("range", port);
+            var sensor = context.findSensor("range", port);
 
             findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
-                drawSensor(button);
+                drawSensor(sensor);
                 cb(returnVal);
             });
         }
@@ -3237,11 +3256,11 @@ var getContext = function (display, infos, curLevel) {
             context.waitDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var sensor = findSensor("light", port);
+            var sensor = context.findSensor("light", port);
 
             findSensorDefinition(button).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
-                drawSensor(button);
+                drawSensor(sensor);
                 cb(returnVal);
             });
         }
@@ -3255,11 +3274,11 @@ var getContext = function (display, infos, curLevel) {
         } else {
 
             var cb = context.runner.waitCallback(callback);
-            var sensor = findSensor("humidity", port);
+            var sensor = context.findSensor("humidity", port);
 
             findSensorDefinition(button).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
-                drawSensor(button);
+                drawSensor(sensor);
                 cb(returnVal);
             });
         }
@@ -3273,6 +3292,12 @@ var getContext = function (display, infos, curLevel) {
         }
 
         context.runner.waitDelay(callback, millis);
+    };
+
+    context.quickpi.getTemperature = function(location, callback) {
+        var retVal =  25;
+
+        context.waitDelay(callback, retVal);
     };
 
     /***** Blocks definitions *****/
@@ -3448,7 +3473,15 @@ var getContext = function (display, infos, curLevel) {
                         "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>1000</field></shadow></value>" +
                         "</block>"
                 },
-
+            ],
+            internet: [
+                {
+                    name: "getTemperature", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            { "type": "field_input", "name": "PARAM_0", text: "Paris, France"},
+                        ]
+                    },
+                },
             ]
         }
         // We can add multiple namespaces by adding other keys to customBlocks.
@@ -3459,7 +3492,8 @@ var getContext = function (display, infos, curLevel) {
         return {
             categories: {
                 actions: 0,
-                sensors: 100
+                sensors: 100,
+                internet: 200,
             }
         };
     };
@@ -3483,14 +3517,22 @@ if (window.quickAlgoLibraries) {
 }
 
 var sensorWithSlider = null;
+var removeRect = null;
+var sensorWithRemoveRect = null;
 
 window.addEventListener('click', function (e) {
     var keep = false;
+    var keepremove = false;
     e = e || window.event;
     var target = e.target || e.srcElement;
 
-    if (!sensorWithSlider)
-        return;
+    if (sensorWithRemoveRect && sensorWithRemoveRect.focusrect && target == sensorWithRemoveRect.focusrect.node)
+        keepremove = true;
+
+    if (removeRect && !keepremove) {
+        removeRect.remove();
+        removeRect = null;
+    }
 
     if (sensorWithSlider && sensorWithSlider.focusrect && target == sensorWithSlider.focusrect.node)
         keep = true;
@@ -3503,7 +3545,6 @@ window.addEventListener('click', function (e) {
                 return false;
             }
         });
-
     }
 
     if (!keep) {
@@ -3517,8 +3558,10 @@ function hideSlider(sensor) {
     if (!sensor)
         return;
 
-    if (sensor.slider)
+    if (sensor.slider) {
         sensor.slider.remove();
+        sensor.slider = null;
+    }
 
     if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas)
         sensor.focusrect.toFront();
