@@ -248,8 +248,8 @@ var getContext = function (display, infos, curLevel) {
                     if (state.time < context.currentTime) {
                         if (!state.hit) {
                             context.success = false;
+                            throw (strings.messages.wrongState);
                         }
-                        throw (strings.messages.wrongState);
                     }
                     else {
                         if (lastTurn) {
