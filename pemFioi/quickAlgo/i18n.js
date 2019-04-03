@@ -24,7 +24,8 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Fonctions",
          read: "Lecture",
-         print: "Écriture"
+         print: "Écriture",
+         internet: "Internet"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",

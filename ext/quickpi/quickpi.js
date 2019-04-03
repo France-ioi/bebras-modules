@@ -299,24 +299,40 @@ servo_last_value = {}
 
 DHT11_last_value = {}
 
+distance_last_value = {}
+
 screenLine1 = None
 screenLine2 = None
 
 pi = pigpio.pi()
 
+def normalizePin(pin):
+    returnpin = 0
+    hadporttype = False
+
+    if isinstance(pin, str):
+        if pin[0].isalpha():
+            returnpin = int(pin[1:])
+            hadporttype = True
+
+    if not hadporttype:
+        returnpin = int(pin)
+
+    return returnpin
+
 def cleanupPin(pin):
     pi.set_mode(pin, pigpio.INPUT)
 
 def changePinState(pin, state):
-  pin = int(pin)
-  state = int(state)
+    pin = normalizePin(pin)
+    state = int(state)
 
-  cleanupPin(pin)
-  GPIO.setup(pin, GPIO.OUT)
-  if state:
-    GPIO.output(pin, GPIO.HIGH)
-  else:
-    GPIO.output(pin, GPIO.LOW)
+    cleanupPin(pin)
+    GPIO.setup(pin, GPIO.OUT)
+    if state:
+        GPIO.output(pin, GPIO.HIGH)
+    else:
+        GPIO.output(pin, GPIO.LOW)
 
 def turnLedOn(pin=5):
 	changePinState(pin, 1)
@@ -328,17 +344,22 @@ def changeLedState(pin, state):
 	changePinState(pin, state)
 
 def toggleLedState(pin):
-	GPIO.setup(pin, GPIO.OUT)
-	if GPIO.input(pin):
-		GPIO.output(pin, GPIO.LOW)
-	else:
-		GPIO.output(pin, GPIO.HIGH)
+    pin = normalizePin(pin)
+
+    GPIO.setup(pin, GPIO.OUT)
+    if GPIO.input(pin):
+        GPIO.output(pin, GPIO.LOW)
+    else:
+        GPIO.output(pin, GPIO.HIGH)
 
 def buzzOn(pin):
   changePinState(pin, 1)
 
 def buzzOff(pin):
   changePinState(pin, 0)
+
+def changeBuzzerState(pin, state):
+    changePinState(pin, state)
 
 def magnetOn(pin):
   changePinState(pin, 1)
@@ -347,27 +368,27 @@ def magnetOff(pin):
   changePinState(pin, 0)
 
 def buttonStateInPort(pin):
-  pin = int(pin)
+    pin = normalizePin(pin)
 
-  GPIO.setup(pin, GPIO.IN)
-  return GPIO.input(pin)
+    GPIO.setup(pin, GPIO.IN)
+    return GPIO.input(pin)
 
 def buttonState():
-	return buttonStateInPort(22)
+    return buttonStateInPort(22)
 
 def waitForButton(pin):
-  pin = int(pin)
-  cleanupPin(pin)
-  GPIO.setup(pin, GPIO.IN)
-  while not GPIO.input(pin):
-    time.sleep(0.01)
-  time.sleep(0.1) # debounce
+    pin = normalizePin(pin)
+    cleanupPin(pin)
+    GPIO.setup(pin, GPIO.IN)
+    while not GPIO.input(pin):
+        time.sleep(0.01)
+    time.sleep(0.1) # debounce
 
 def buttonWasPressedCallback(pin):
     button_was_pressed[pin] = 1
 
 def buttonWasPressed(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     init = False
     try:
         init = button_interrupt_enabled[pin]
@@ -395,9 +416,16 @@ _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
 def readDistance(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
 
     cleanupPin(pin)
+
+    last_value = 0
+    try:
+        last_value = distance_last_value[pin]
+    except:
+        pass
+
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.LOW)
     usleep(2)
@@ -414,7 +442,7 @@ def readDistance(pin):
             break
         count += 1
     if count >= _TIMEOUT1:
-        return None
+        return last_value
 
     t1 = time.time()
     count = 0
@@ -423,17 +451,21 @@ def readDistance(pin):
             break
         count += 1
     if count >= _TIMEOUT2:
-        return None
+        return last_value
 
     t2 = time.time()
 
     dt = int((t1 - t0) * 1000000)
     if dt > 530:
-        return None
+        return last_value
 
     distance = ((t2 - t1) * 1000000 / 29 / 2)    # cm
 
-    return round(distance, 1)
+    distance = round(distance, 1)
+
+    distance_last_value[pin] = distance
+
+    return distance
 
 def displayText(line1, line2=""):
     global screenLine1
@@ -474,33 +506,39 @@ def displayText(line1, line2=""):
             break
 
 def setServoAngle(pin, angle):
-    pin = int(pin)
+    pin = normalizePin(pin)
     angle = int(angle)
 
     pulsewidth = (angle * 11.11) + 500
     pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readADC(pin):
-	pin = int(pin)
+    pin = normalizePin(pin)
 
-	reg = 0x30 + pin
-	address = 0x04
+    reg = 0x30 + pin
+    address = 0x04
 
-	bus = smbus.SMBus(1)
-	bus.write_byte(address, reg)
-	return bus.read_word_data(address, reg)
+    try:
+        bus = smbus.SMBus(1)
+        bus.write_byte(address, reg)
+        return bus.read_word_data(address, reg)
+    except:
+        return 0
 
 
 def readTemperature(pin):
-	B = 4275.
-	R0 = 100000.
+    B = 4275.
+    R0 = 100000.
 
-	val = readADC(pin)
+    val = readADC(pin)
+    
+    if val == 0:
+        return 0
 
-	r = 1000. / val - 1.
-	r = R0 * r
+    r = 1000. / val - 1.
+    r = R0 * r
 
-	return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
+    return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
 
 def readRotaryAngle(pin):
 	return int(readADC(pin) / 10)
@@ -711,7 +749,7 @@ class DHT11:
 
 
 def readTemperatureDHT11(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     haveold = False
 
     try:
@@ -738,7 +776,7 @@ def readTemperatureDHT11(pin):
     return 0
 
 def readHumidity(pin):
-    pin = int(pin)
+    pin = normalizePin(pin)
     haveold = False
 
     try:
