@@ -1051,6 +1051,8 @@ var getContext = function (display, infos, curLevel) {
                     context.inUSBConnection = false;
                     context.inBTConnection = true;
                 }
+            } else {
+                sessionStorage.connectionMethod = "WIFI";
             }
 
             if (sessionStorage.pilist) {
