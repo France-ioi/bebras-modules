@@ -1261,6 +1261,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.installing = true;
             $('#piinstallprogresss').show();
+            $('#piinstallcheck').hide();
 
             context.quickPiConnection.installProgram(python_code, function () {
                 context.justinstalled = true;
@@ -2169,12 +2170,12 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
                 sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
 
-                if (!context.autoGrading) {
                     sensor.focusrect.click(function () {
-                        sensor.state = !sensor.state;
-                        drawSensor(sensor);
-                    })
-                }
+                        if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
+                            sensor.state = !sensor.state;
+                            drawSensor(sensor);
+                        }
+                    });
             }
 
             sensor.ledon.attr({
@@ -2216,12 +2217,12 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.buzzeroff || !sensor.buzzeroff.paper.canvas) {
                 sensor.buzzeroff = paper.image(getImg('buzzer.png'), imgx, imgy, imgw, imgh);
 
-                if (!context.autoGrading) {
                     sensor.focusrect.click(function () {
-                        sensor.state = !sensor.state;
-                        drawSensor(sensor);
-                    })
-                }
+                        if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
+                            sensor.state = !sensor.state;
+                            drawSensor(sensor);
+                        }
+                    });
             }
 
             if (sensor.state) {
@@ -3074,9 +3075,9 @@ var getContext = function (display, infos, curLevel) {
             var button = context.findSensor("button", port);
             
             findSensorDefinition(button).getLiveState(port, function(returnVal) {
-                button.state = returnVal != "0";
+                button.state = returnVal;
                 drawSensor(button);
-                cb(returnVal != "0");
+                cb(returnVal);
             });
         }
     };
