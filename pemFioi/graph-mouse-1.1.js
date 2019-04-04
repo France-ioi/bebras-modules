@@ -862,6 +862,9 @@ function VertexDragAndConnect(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
+      if(dx == 0 && dy == 0){
+         return;
+      }
       if(self.selectionParent !== null) {
          self.onVertexSelect(self.selectionParent, false);
       }
@@ -899,7 +902,6 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id) {
-      // console.log(id);
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
@@ -912,14 +914,14 @@ function VertexDragAndConnect(settings) {
             self.selectionParent = null;
             return;
          }
-   
+         
          // Start a new pair.
          if(self.selectionParent === null && self.onVertexSelect) {
             self.selectionParent = id;
             self.onVertexSelect(id, true);
             return;
          }
-   
+         
          // Finish a new pair.
          if(self.onPairSelect) {
             self.onPairSelect(self.selectionParent, id);
@@ -1068,9 +1070,6 @@ function ArcDragger(settings) {
          return;
       }
       self.isDragging = true;
-      // var info = self.graph.getEdgeInfo(self.elementID);
-      // if(info.selected)
-      //    self.unselectAll();
       var x0 = self.originalPosition.x;
       var y0 = self.originalPosition.y;
       var xMouse = x0 + dx;
