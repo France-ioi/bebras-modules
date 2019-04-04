@@ -1053,6 +1053,7 @@ function ArcDragger(settings) {
          }     
          self.isOnLabel = false;
       }else if(self.onEdgeSelect){
+
          var info = self.graph.getEdgeInfo(self.elementID);
          info.selected = !info.selected;
          self.onEdgeSelect(self.elementID,info.selected);
@@ -1063,8 +1064,9 @@ function ArcDragger(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
-      if(!self.dragEnabled || self.isOnLabel)
+      if(!self.dragEnabled || self.isOnLabel || (dx == 0 && dy == 0)){
          return;
+      }
       self.isDragging = true;
       // var info = self.graph.getEdgeInfo(self.elementID);
       // if(info.selected)
@@ -1537,8 +1539,9 @@ function GraphEditor(settings) {
          edgeGuid++;
       }
       var edgeID = "e_" + edgeGuid;
+      var edgeLabel = (self.alphabet) ? self.alphabet[0] : edgeID;
       if(self.defaultEdgeLabelEnabled){
-         graph.addEdge(edgeID, id1, id2,{label:edgeID});
+         graph.addEdge(edgeID, id1, id2,{label:edgeLabel});
       }else{
          graph.addEdge(edgeID, id1, id2);
       }
