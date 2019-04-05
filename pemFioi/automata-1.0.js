@@ -46,6 +46,8 @@ function Automata(settings) {
       
       this.graphEditor.setDragGraphEnabled(false);
       this.graphEditor.setScaleGraphEnabled(false);
+      this.setEditVertexLabelEnabled(false);
+      this.setDefaultVertexLabelEnabled(false);
    };
    this.setCreateVertexEnabled = function(enabled) {
       this.graphEditor.setCreateVertexEnabled(enabled);
@@ -224,8 +226,6 @@ function Automata(settings) {
       if(!e_c[0] && !e_c[1]){
          equivalent = true;
       }
-      console.log(dfa);
-      console.log(targetDFA);
       var noUnreachableDFA = dfa.without_unreachables();
       return {equivalent: equivalent, e_c: e_c, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
    };
