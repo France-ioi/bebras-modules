@@ -655,7 +655,10 @@ var getContext = function (display, infos, curLevel) {
                 return state1 == state2;
             },
             getLiveState: function (port, callback) {
-                context.quickPiConnection.sendCommand("readTemperature(\"" + port + "\")", callback);
+                context.quickPiConnection.sendCommand("readTemperature(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback();
+                });
             },
         },
         {
@@ -678,7 +681,10 @@ var getContext = function (display, infos, curLevel) {
                 return state1 == state2;
             },
             getLiveState: function (port, callback) {
-                context.quickPiConnection.sendCommand("readRotaryAngle(\"" + port + "\")", callback);
+                context.quickPiConnection.sendCommand("readRotaryAngle(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback(val);
+                });
             },
         },
         {
@@ -701,7 +707,10 @@ var getContext = function (display, infos, curLevel) {
                 return state1 == state2;
             },
             getLiveState: function (port, callback) {
-                context.quickPiConnection.sendCommand("readLightIntensity(\"" + port + "\")", callback);
+                context.quickPiConnection.sendCommand("readLightIntensity(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback();
+                });
             },
         },
         {
@@ -724,7 +733,10 @@ var getContext = function (display, infos, curLevel) {
                 return state1 == state2;
             },
             getLiveState: function (port, callback) {
-                context.quickPiConnection.sendCommand("readDistance(\"" + port + "\")", callback);
+                context.quickPiConnection.sendCommand("readDistance(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback();
+                });
             },
         },
         {
@@ -747,7 +759,10 @@ var getContext = function (display, infos, curLevel) {
                 return state1 == state2;
             },
             getLiveState: function (port, callback) {
-                context.quickPiConnection.sendCommand("readHumidity(\"" + port + "\")", callback);
+                context.quickPiConnection.sendCommand("readHumidity(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback();
+                });
             },
         },
     ];
@@ -2504,6 +2519,8 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state == null)
                 sensor.state = 0;
 
+            sensor.state = Math.round(sensor.state);
+
             sensor.stateText = paper.text(state1x, state1y, sensor.state + "°");
 
             if ((!context.runner || !context.runner.isRunning())
@@ -2785,15 +2802,20 @@ var getContext = function (display, infos, curLevel) {
         if (sensor.portText)
             sensor.portText.remove();
 
-        if (sensor.hasOwnProperty("stateText"))
+        if (sensor.hasOwnProperty("stateText")) {
             sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        }
 
-        if (sensor.hasOwnProperty("stateText2"))
+        if (sensor.hasOwnProperty("stateText2")) {
             sensor.stateText2.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText2.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        }
 
 
         sensor.portText = paper.text(portx, porty, sensor.port);
         sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
+        sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
 
         if (!donotmovefocusrect) {
             // This needs to be in front of everything
