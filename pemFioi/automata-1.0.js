@@ -10,8 +10,8 @@ function Automata(settings) {
    this.edgeAttr = settings.edgeAttr;
    this.graphDrawer = settings.graphDrawer || new SimpleGraphDrawer(this.circleAttr,this.edgeAttr,null,true);
 
-   this.startID = settings.startID;
-   this.endID = settings.endID;
+   this.startID = [];
+   this.endID = [];
    this.alphabet = settings.alphabet;
 
    this.sequencePaper = settings.sequencePaper;
@@ -30,6 +30,7 @@ function Automata(settings) {
 
    this.NFA;
    this.targetNFA = settings.targetNFA;
+   this.callback = settings.callback;
 
    this.enabled = false;
 
@@ -45,9 +46,6 @@ function Automata(settings) {
       
       this.graphEditor.setDragGraphEnabled(false);
       this.graphEditor.setScaleGraphEnabled(false);
-
-      if(enabled && !this.targetNFA)
-         this.generateTargetNFA();
    };
    this.setCreateVertexEnabled = function(enabled) {
       this.graphEditor.setCreateVertexEnabled(enabled);
@@ -82,6 +80,15 @@ function Automata(settings) {
    this.setDefaultEdgeLabelEnabled = function(enabled) {
       this.graphEditor.setDefaultEdgeLabelEnabled(enabled);
    };
+   this.setSequence = function(seq) {
+      if(Array.isArray(seq)){
+         this.sequence = seq;
+      }else if(typeof seq === "string") {
+         this.sequence = seq.split("");
+      }else{
+         console.log("type error");
+      }
+   };
 
    this.initGraph = function() {
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, this.id+"_VisualGraph", this.graphPaper, null, this.graphDrawer, true);
@@ -102,7 +109,8 @@ function Automata(settings) {
             maxY: this.graphPaper.height - this.visualGraph.graphDrawer.circleAttr.r
          },
          alphabet: this.alphabet,
-         callback: this.getNFA,
+         callback: this.callback,
+         onDragEnd: this.callback,
          enabled: false
       };
       this.graphEditor = new GraphEditor(editorSettings);
@@ -147,7 +155,7 @@ function Automata(settings) {
 
    this.initBeaver = function() {
       this.beaver = this.graphPaper.circle(0,0,0).attr(this.graphDrawer.circleAttr).attr("fill","black");
-      var pos = this.visualGraph.getVertexVisualInfo(this.startID);
+      var pos = this.visualGraph.getVertexVisualInfo(this.startID[0]);
       this.beaver.attr({
          cx: pos.x,
          cy: pos.y,
@@ -157,12 +165,20 @@ function Automata(settings) {
    };
 
    this.getNFA = function() {
+      self.startID = [];
+      self.endID = [];
       var vertices = self.graph.getAllVertices();
       var transitionTable = {};
       for(vertex of vertices){
+         var info = self.graph.getVertexInfo(vertex);
          transitionTable[vertex] = {};
          var children = self.graph.getChildren(vertex);
+         if(info.terminal && children.length > 0 && !this.startID.includes[vertex])
+            this.startID.push(vertex);
          for(child of children){
+            var childInfo = self.graph.getVertexInfo(child);
+            if(childInfo.terminal && !this.endID.includes[child])
+               this.endID.push(child);
             var edges = self.graph.getEdgesFrom(vertex,child);
             for(var edge of edges){
                var info = self.graph.getEdgeInfo(edge);
@@ -175,7 +191,14 @@ function Automata(settings) {
             }
          }
       }
-      self.NFA = new NFA(self.alphabet,transitionTable,[self.startID],[self.endID]);
+      if(this.startID.length == 0){
+         return {error: "noStart"}
+      }
+      if(this.endID.length == 0){
+         return {error:"noEnd"};
+      }
+      self.NFA = new NFA(self.alphabet,transitionTable,this.startID,this.endID);
+      return null;
    };
 
    this.generateTargetNFA = function() {
@@ -187,6 +210,13 @@ function Automata(settings) {
    };
 
    this.compareWithTarget = function() {
+      if(!this.targetNFA){
+         this.generateTargetNFA();
+      }
+      var error = this.getNFA();
+      if(error){
+         return error;
+      }
       var dfa = this.NFA.to_DFA();
       var targetDFA = this.targetNFA.to_DFA();
       var e_c = dfa.find_equivalence_counterexamples(targetDFA);
@@ -194,8 +224,10 @@ function Automata(settings) {
       if(!e_c[0] && !e_c[1]){
          equivalent = true;
       }
+      console.log(dfa);
+      console.log(targetDFA);
       var noUnreachableDFA = dfa.without_unreachables();
-      return {equivalent: equivalent, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
+      return {equivalent: equivalent, e_c: e_c, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
    };
 
    function drawArrow(x,y,size,dir) {
@@ -220,7 +252,9 @@ function Automata(settings) {
       return arrow;
    };
 
-   this.try = function(callback) {
+   this.run = function(callback) {
+      this.initSequence();
+      this.initBeaver();
       this.result = null;
       var edges = this.graph.getAllEdges();
       for(edge of edges){
@@ -248,9 +282,9 @@ function Automata(settings) {
             if(oldEdgeID === eID)   // to avoid multiple calls when animated object is a set of elements
                return;
             oldEdgeID = eID;
-            
+
             step++;
-            if(vID !== self.endID){
+            if(!self.endID.includes(vID)){
                subTask.delayFactory.create("delay"+step,function(){
                   self.loop(vID,step,callback);
                },100);
@@ -333,19 +367,24 @@ function Automata(settings) {
 
    this.resetAnimation = function() {
       self.stopAnimation();
-      self.cursor.attr("transform","");
-      self.cursorX = self.margin;
-      self.beaver.remove();
-      self.initBeaver();
+      if(self.cursor){
+         // self.cursor.attr("transform","");
+         // self.cursorX = self.margin;
+         self.sequencePaper.clear();
+      }
+      if(self.beaver){
+         self.beaver.remove();
+         // self.initBeaver();
+      }
       if(settings.resetCallback)
          settings.resetCallback();
    };
 
 
    this.initGraph();
-   this.initSequence();
-   this.initBeaver();
-   this.getNFA();
+   // this.initSequence();
+   // this.initBeaver();
+   // this.getNFA();
    this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
 
    if(settings.enabled){
