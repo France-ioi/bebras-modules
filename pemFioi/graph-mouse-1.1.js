@@ -1358,7 +1358,9 @@ function GraphEditor(settings) {
    this.cross = null;
    this.edgeCross = null;
    this.terminalIcon = null;
+   this.initialIcon = null;
    this.textEditor = null;
+
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
       // id:"ArcDragger",
@@ -1688,6 +1690,7 @@ function GraphEditor(settings) {
          this.addCross(vertexId);
       if(this.terminalEnabled)
          this.addTerminalIcon(vertexId);
+      this.addInitialIcon(vertexId);
    };
    this.removeIcons = function() {
       if(self.loopIcon)
@@ -1696,38 +1699,40 @@ function GraphEditor(settings) {
          self.cross.remove();
       if(self.terminalIcon)
          self.terminalIcon.remove();
+      if(self.initialIcon)
+         self.initialIcon.remove();
    };
 
-   this.addPencil = function(vertexId) {
-      var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
-      var pencilSize = 20;
-      var pencilX = vertexPos.x - vertexRadius - 3*pencilSize/4;
-      var pencilY = vertexPos.y - vertexRadius - 3*pencilSize/4;
-      if(self.pencil){
-         self.pencil.remove();
-      }
-      self.pencil = self.drawPencil(pencilX,pencilY,pencilSize);
-      visualGraph.pushVertexRaphael(vertexId,self.pencil);
+   // this.addPencil = function(vertexId) {
+   //    var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
+   //    var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
+   //    var pencilSize = 20;
+   //    var pencilX = vertexPos.x - vertexRadius - 3*pencilSize/4;
+   //    var pencilY = vertexPos.y - vertexRadius - 3*pencilSize/4;
+   //    if(self.pencil){
+   //       self.pencil.remove();
+   //    }
+   //    self.pencil = self.drawPencil(pencilX,pencilY,pencilSize);
+   //    visualGraph.pushVertexRaphael(vertexId,self.pencil);
       
-      self.pencil.click(function(){
-         self.editLabel(vertexId,"vertex");
-      });
-   };
+   //    self.pencil.click(function(){
+   //       self.editLabel(vertexId,"vertex");
+   //    });
+   // };
 
-   this.drawPencil = function(x,y,size) {
-      var qSize = size/4;
-      var icon = paper.path(
-         "M" + (x + 3*qSize) + "," + y +
-         "L" + (x + size) + "," + (y + qSize) +
-         "L" + (x + qSize) + "," + (y + size) +
-         "L" + x + "," + (y + size) + 
-         "L" + x + "," + (y + 3*qSize) +
-         "Z" 
-         ).attr(iconAttr);
-      var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
-      return paper.set(icon,overlay);
-   };
+   // this.drawPencil = function(x,y,size) {
+   //    var qSize = size/4;
+   //    var icon = paper.path(
+   //       "M" + (x + 3*qSize) + "," + y +
+   //       "L" + (x + size) + "," + (y + qSize) +
+   //       "L" + (x + qSize) + "," + (y + size) +
+   //       "L" + x + "," + (y + size) + 
+   //       "L" + x + "," + (y + 3*qSize) +
+   //       "Z" 
+   //       ).attr(iconAttr);
+   //    var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
+   //    return paper.set(icon,overlay);
+   // };
 
    this.addLoopIcon = function(vertexId) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
@@ -1831,9 +1836,10 @@ function GraphEditor(settings) {
       self.terminalIcon.click(function(){
          var info = graph.getVertexInfo(vertexId);
          info.terminal = !info.terminal;
+         if(info.initial)
+            info.initial = false;
          
          graph.setVertexInfo(vertexId,info);
-         // visualGraph.graphDrawer.updateVertex(vertexId);
          visualGraph.redraw();
          self.updateHandlers();
          
@@ -1855,6 +1861,50 @@ function GraphEditor(settings) {
          "V" + (y + qSize) +
          "H" + x +
          "Z" 
+         ).attr(iconAttr);
+      var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
+      return paper.set(icon,overlay);
+   };
+
+   this.addInitialIcon = function(vertexId) {
+      var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
+      var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
+      var size = 20;
+      var X = vertexPos.x - vertexRadius - size;
+      var Y = vertexPos.y + vertexRadius;
+      if(self.initialIcon){
+         self.initialIcon.remove();
+      }
+      self.initialIcon = self.drawInitialIcon(X,Y,size);
+      visualGraph.pushVertexRaphael(vertexId,self.initialIcon);
+      
+      self.initialIcon.click(function(){
+         var info = graph.getVertexInfo(vertexId);
+         info.initial = !info.initial;
+         if(info.terminal)
+            info.terminal = false;
+         
+         graph.setVertexInfo(vertexId,info);
+         visualGraph.redraw();
+         self.updateHandlers();
+         
+         if(callback){
+            callback();
+         }
+      });
+   };
+
+   this.drawInitialIcon = function(x,y,size) {
+      var qSize = size/4;
+      var icon = paper.path(
+         "M" + (x + size) + "," + y +
+         "V" + (y + size/2) +
+         "L" + (x + 7*qSize/2) + "," + (y + 3*qSize/2) +
+         "L" + (x + qSize) + "," + (y + size) +
+         "L" + x + "," + (y + 3*qSize) + 
+         "L" + (x + 5*qSize/2) + "," + (y + qSize/2) + 
+         "L" + (x + size/2) + "," + y + 
+         "Z"
          ).attr(iconAttr);
       var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
       return paper.set(icon,overlay);
