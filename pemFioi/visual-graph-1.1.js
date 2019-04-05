@@ -320,6 +320,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var terminalCircle = this.paper.circle(pos.x, pos.y).attr("r",this.circleAttr.r + 5);
          var result = [node,labelRaph,terminalCircle];
          this._addCustomElements(id, [labelRaph,terminalCircle]);
+      }else if(info.initial){
+         var initialArrow = this.paper.path("M" + (pos.x - 3*this.circleAttr.r) + "," + pos.y + "H" + (pos.x - this.circleAttr.r)).attr(this.lineAttr);
+         initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
+         var result = [node,labelRaph,initialArrow];
+         this._addCustomElements(id, [labelRaph,initialArrow]);
       }else{
          var result = [node,labelRaph];
          this._addCustomElements(id, [labelRaph]);
