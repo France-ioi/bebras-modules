@@ -77,11 +77,11 @@ var importableModules = function () {
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
-      // Quizze task
-      'quizze_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quizze/quizzeStyles-0.1.css", id: "quizze_styles"},
-      'quizze_ui': {src: modulesPath+"/pemFioi/quizze/ui.js", id: "quizze_ui"},
-      'quizze_task': {src: modulesPath+"/pemFioi/quizze/task.js", id: "quizze_task"},
-      'quizze_grader': {src: modulesPath+"/pemFioi/quizze/grader.js", id: "quizze_grader"},
+      // Quiz task
+      'quiz_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz/quizStyles-0.1.css", id: "quiz_styles"},
+      'quiz_ui': {src: modulesPath+"/pemFioi/quiz/ui.js", id: "quiz_ui"},
+      'quiz_task': {src: modulesPath+"/pemFioi/quiz/task.js", id: "quiz_task"},
+      'quiz_grader': {src: modulesPath+"/pemFioi/quiz/grader.js", id: "quiz_grader"},
 
 
       // Bundles

@@ -35,4 +35,4 @@
         return res;
     }
 
-})(typeof exports === 'undefined' ? (this['QuizzeGrader'] ? this['QuizzeGrader'] : this['QuizzeGrader'] = {}) : exports)
+})(typeof exports === 'undefined' ? (this['QuizGrader'] ? this['QuizGrader'] : this['QuizGrader'] = {}) : exports)

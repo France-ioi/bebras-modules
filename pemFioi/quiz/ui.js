@@ -1,8 +1,12 @@
-function QuizzeUI(params) {
+function QuizUI(params) {
+
+    var questions_order = [];
+    var answers_order = [];
+
 
     // sys utils
     function error(msg) {
-        console.error('Quizze error: ' + msg);
+        console.error('Quiz error: ' + msg);
     }
 
 
@@ -18,13 +22,16 @@ function QuizzeUI(params) {
         return a;
     }
 
-    function shuffleElements(elements) {
+    function shuffleElements(elements, shuffle) {
         var order = [];
         if(!elements.length) {
             return order;
         }
         for(var i=0; i<elements.length; i++) {
             order[i] = i;
+        }
+        if(!shuffle) {
+            return order;
         }
         order = shuffleArray(order);
         var parent = $(elements[0]).parent();
@@ -49,7 +56,7 @@ function QuizzeUI(params) {
 
 
     // questions types
-    function initQuestionSingle(parent) {
+    function initQuestionSingle(parent, question_idx) {
 
         var answers = parent.find('answer');
         answers.each(function(i) {
@@ -59,9 +66,7 @@ function QuizzeUI(params) {
             parent.find('answer').removeClass('selected mistake');
             $(this).addClass('selected');
         });
-        if(params.shuffle_answers) {
-            shuffleElements(answers);
-        }
+        answers_order[question_idx] = shuffleElements(answers, params.shuffle_answers);
 
         return {
             getAnswer: function() {
@@ -84,7 +89,7 @@ function QuizzeUI(params) {
     }
 
 
-    function initQuestionMultiple(parent) {
+    function initQuestionMultiple(parent, question_idx) {
 
         var answers = parent.find('answer');
         answers.each(function(i) {
@@ -94,9 +99,7 @@ function QuizzeUI(params) {
             answers.removeClass('mistake');
             $(this).toggleClass('selected');
         });
-        if(params.shuffle_answers) {
-            shuffleElements(answers);
-        }
+        answers_order[question_idx] = shuffleElements(answers, params.shuffle_answers);
 
         return {
             getAnswer: function() {
@@ -132,7 +135,7 @@ function QuizzeUI(params) {
 
 
 
-    function initQuestionInput(parent) {
+    function initQuestionInput(parent, question_idx) {
 
         var answer = parent.find('answer');
         var input = $('<input type="text"/>');
@@ -163,9 +166,10 @@ function QuizzeUI(params) {
                 valid && msg && msg.remove();
             });
         }
-
         input.attr('placeholder', lang.translate('placeholder_' + format));
         answer.append(input);
+
+        answers_order[question_idx] = [0];
 
         return {
             getAnswer: function() {
@@ -208,14 +212,12 @@ function QuizzeUI(params) {
         el = $(el)
         var type = el.attr('type') || 'single';
         if(question_factory[type]) {
-            questions[i] = question_factory[type](el);
+            questions[i] = question_factory[type](el, i);
         } else {
             error('Unsupported question type ' + type);
         }
     });
-    if(params.shuffle_questions) {
-        shuffleElements(els);
-    }
+    questions_order = shuffleElements(els, params.shuffle_questions);
 
 
 
@@ -258,9 +260,13 @@ function QuizzeUI(params) {
 
 
     // sys
-
     params.parent.find('solution').hide();
+
+
+
     params.parent.show();
+
+
 
     // interface
 
