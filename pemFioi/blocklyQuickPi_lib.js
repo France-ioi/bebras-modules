@@ -236,7 +236,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
-        if (!context.display && !context.autoGrading) {
+        if (!context.display && !context.autoGrading && context.autoValidateManual) {
             context.success = true;
             throw (strings.messages.manualTestSuccess);
         }
@@ -341,10 +341,15 @@ var getContext = function (display, infos, curLevel) {
         if (context.display) {
             context.resetDisplay();
         } else {
-            // Initialize success to
-            // -True if it's a manual test (we consider it's always a success)
-            // -False if it's an automatic test (it changes to True if it's a success)
-            context.success = !context.autoGrading;
+
+            context.success = false;
+        }
+
+        if (context.display) {
+            if (context.autoGrading)
+                context.autoValidateManual = true;
+            else
+                context.autoValidateManual = false;
         }
 
         context.timeLineStates = [];
