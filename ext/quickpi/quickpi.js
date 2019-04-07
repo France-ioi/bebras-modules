@@ -11,6 +11,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.raspiServer = "";
     this.wsSession = null;
     this.resultsCallback = null;
+    this.resultsSeq = 0;
     this.commandMode = false;
     this.userName = userName;
     this.sessionTainted = false;
@@ -22,6 +23,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.pingsWithoutPong = 0;
     this.oninstalled = null;
     this.commandQueue = [];
+    this.seq = 0;
 
     this.connect = function(ipaddress) {
         if (this.wsSession != null) {
@@ -33,6 +35,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
         this.resultsCallback = null;
+        this.seq = Math.random() * 65536;
 
         this.wsSession = new WebSocket(url);
 
@@ -89,9 +92,12 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
                 }
             } else if (message.command == "execLineresult") {
                 if (commandMode && resultsCallback != null) {
-                    tempCallback = resultsCallback;
-                    resultsCallback = null;
-                    tempCallback(message.result);
+
+                    if (!message.seq || message.seq == resultsSeq) {
+                        tempCallback = resultsCallback;
+                        resultsCallback = null;
+                        tempCallback(message.result);
+                    }
 
                     if (commandQueue.length > 0)
                     {
@@ -251,19 +257,21 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
                     this.startNewSession();
 
                     this.commandQueue.push ({
-                        command: command,
-                        callback: callback
+                        "command": command,
+                        "callback": callback
                     });    
                 } else { 
-
+                    this.seq++;
                     var command =
                     {
                         "command": "execLine",
-                        "line": command
+                        "line": command,
+                        "seq": seq
                     }
 
                     this.sessionTainted = true;
                     this.resultsCallback = callback;
+                    this.resultsSeq = seq;
                     this.wsSession.send(JSON.stringify(command));
                 }
             }
