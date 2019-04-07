@@ -112,10 +112,10 @@ $('.grader').hide();
 // grade
 
 function useGraderData(answer, callback) {
-    if(window.QuizzeGrader.grade && window.QuizzeGrader.data) {
-        return callback(window.QuizzeGrader.grade(window.QuizzeGrader.data, answer));
+    if(window.QuizGrader.grade && window.QuizGrader.data) {
+        return callback(window.QuizGrader.grade(window.QuizGrader.data, answer));
     }
-    console.error('Local QuizzeGrader not found');
+    console.error('Local QuizGrader not found');
 }
 
 
@@ -150,16 +150,18 @@ task.load = function(views, success) {
 
     platform.getTaskParams(null, null, function(taskParams) {
         var random = parseInt(taskParams.randomSeed, 10) || Math.floor(Math.random() * 100) //0
-        var q = QuizzeUI({
+        var q = QuizUI({
             parent: $('#task'),
-            shuffle_questions: !!quizze_settings.shuffle_questions,
-            shuffle_answers: !!quizze_settings.shuffle_answers,
+            shuffle_questions: !!quiz_settings.shuffle_questions,
+            shuffle_answers: !!quiz_settings.shuffle_answers,
             random: random
         });
 
 
         task.showViews = function(views, callback) {
+            console.log(views)
             q.toggleSolutions(!!views.solution);
+
             $('#solution').toggle(!!views.solution);
             callback()
         }
@@ -206,7 +208,7 @@ task.load = function(views, success) {
             }
             var token = task_token.get()
             if(token) {
-                useGraderUrl(quizze_settings.graderUrl, token, answer, onGrade);
+                useGraderUrl(quiz_settings.graderUrl, token, answer, onGrade);
             } else {
                 useGraderData(answer, onGrade);
             }
@@ -236,7 +238,7 @@ task.load = function(views, success) {
     });
 };
 
-window.QuizzeGrader = {}
+window.QuizGrader = {}
 
 var grader = {
     gradeTask: task.gradeAnswer
