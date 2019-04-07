@@ -3034,6 +3034,27 @@ var getContext = function (display, infos, curLevel) {
         return retval;
     };
 
+    context.normalizePort = function(port, preferedtype) {
+        var newPort = port;
+        if (typeof port === 'string')
+        {
+            newPort = port.toUpperCase();
+
+            if (newPort != "I2C") {
+                if (newPort[0] != 'D' && newPort[0] != 'A') {
+                    newPort = preferedtype + newPort;
+                }
+            }
+        }
+        else
+        {
+            if (preferedtype)
+                newPort = preferedtype + port;
+        }
+
+        return newPort;
+    }
+
 
     /***** Functions *****/
     /* Here we define each function of the library.
@@ -3111,6 +3132,8 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.buttonStateInPort = function (port, callback) {
 
+        port = context.normalizePort(port, "D");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("button", port);
 
@@ -3129,6 +3152,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.toggleLedState = function (port, callback) {
+        port = context.normalizePort(port, "D");
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("button", port);
@@ -3145,6 +3169,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.buttonWasPressed = function (port, callback) {
+        port = context.normalizePort(port, "D");
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("button", port);
@@ -3160,6 +3185,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.changeLedState = function (port, state, callback) {
+        port = context.normalizePort(port, "D");
+
         var command = "changeLedState(\"" + port + "\"," + state + ")";
 
         context.registerQuickPiEvent("led", port, state ? true : false);
@@ -3174,6 +3201,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.changeBuzzerState = function (port, state, callback) {
+        port = context.normalizePort(port, "D");
+
         var command = "changeBuzzerState(\"" + port + "\"," + state + ")";
 
         context.registerQuickPiEvent("buzzer", state ? true : false);
@@ -3190,6 +3219,8 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.toggleLedState = function (port, callback) {
+        port = context.normalizePort(port, "D");
+
         var command = "toggleLedState(\"" + port + "\")";
         var state = context.getSensorState("led", port);
 
@@ -3226,6 +3257,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readTemperature = function (port, callback) {
+        port = context.normalizePort(port, "A");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("temperature", port);
 
@@ -3259,6 +3292,8 @@ var getContext = function (display, infos, curLevel) {
         else if (angle < 0)
             angle = 0;
 
+        port = context.normalizePort(port, "D");
+
         context.registerQuickPiEvent("servo", port, angle);
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -3271,6 +3306,8 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readRotaryAngle = function (port, callback) {
+        port = context.normalizePort(port, "A");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState("potentiometer", port);
@@ -3290,6 +3327,8 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readDistance = function (port, callback) {
+        port = context.normalizePort(port, "D");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState("range", port);
@@ -3310,6 +3349,8 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readLightIntensity = function (port, callback) {
+        port = context.normalizePort(port, "A");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState("light", port);
@@ -3327,6 +3368,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readHumidity = function (port, callback) {
+        port = context.normalizePort(port, "D");
+
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState("humidity", port);
