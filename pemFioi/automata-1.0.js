@@ -4,7 +4,6 @@ function Automata(settings) {
    this.id = settings.id || "Automata";
    this.graphPaper = settings.graphPaper;
    this.graphPaperElementID = settings.graphPaperElementID;
-   this.seqPaper = settings.seqPaper;
    this.visualGraphJSON = settings.visualGraphJSON;
    this.circleAttr = settings.circleAttr;
    this.edgeAttr = settings.edgeAttr;
@@ -123,8 +122,9 @@ function Automata(settings) {
          h: this.seqLettersAttr["font-size"] + this.margin,
          w: this.sequence.length * (this.seqLettersAttr["font-size"] + this.margin)
       };
+      var paperW = this.sequencePaper.width;
       var containerPos = {
-         x: 2*this.margin,
+         x: (paperW - containerSize.w)/2,
          y: this.margin
       }
       var container = this.sequencePaper.rect(containerPos.x,containerPos.y,containerSize.w,containerSize.h);
@@ -382,9 +382,6 @@ function Automata(settings) {
 
 
    this.initGraph();
-   // this.initSequence();
-   // this.initBeaver();
-   // this.getNFA();
    this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
 
    if(settings.enabled){
