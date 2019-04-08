@@ -398,12 +398,19 @@ img {
   padding-right: 10px;
 }
 #popupMessage .qpi #sensorPicker .flex-container {
-  align-items: flex-end;
+  align-items: center;
   margin: 2em 0 4em;
 }
-#popupMessage .qpi #sensorPicker .flex-container .half:first-child {
+#popupMessage .qpi #selector-image-container {
   text-align: center;
+  position: relative;
+  height: 70px;
 }
+#popupMessage .qpi #selector-image-container img {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, 0);
 #popupMessage .qpi #sensorPicker #selector-label {
   position: absolute;
   top: 15px;
