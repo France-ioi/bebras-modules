@@ -175,12 +175,12 @@ function Automata(settings) {
          var info = self.graph.getVertexInfo(vertex);
          transitionTable[vertex] = {};
          var children = self.graph.getChildren(vertex);
-         if(info.terminal && children.length > 0 && !this.startID.includes[vertex])
+         if(info.initial && !this.startID.includes[vertex]){
             this.startID.push(vertex);
+         }else if(info.terminal && !this.endID.includes[vertex]){
+            this.endID.push(vertex);
+         }
          for(child of children){
-            var childInfo = self.graph.getVertexInfo(child);
-            if(childInfo.terminal && !this.endID.includes[child])
-               this.endID.push(child);
             var edges = self.graph.getEdgesFrom(vertex,child);
             for(var edge of edges){
                var info = self.graph.getEdgeInfo(edge);
