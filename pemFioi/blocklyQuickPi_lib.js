@@ -911,6 +911,8 @@ var getContext = function (display, infos, curLevel) {
                         lastState = state.state;
                     }
 
+                    drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected", true);
+
                     sensor.lastAnalogState = null;
                 }
             }
@@ -1770,8 +1772,6 @@ var getContext = function (display, infos, curLevel) {
             storeTimeLineState(sensor, state, startTime, endTime, type);
         }
 
-        var stateOffset = 160;
-
         var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
 
@@ -1845,17 +1845,17 @@ var getContext = function (display, infos, curLevel) {
             });
         } else if (sensor.type == "screen") {
             if (state) {
-                sensor.stateText = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+                sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
 
-                sensor.stateText.attr({
+                sensor.stateBubble.attr({
                     "font": "Font Awesome 5 Free",
                     "stroke": color,
                     "fill": color,
                     "font-size": (strokewidth * 2) + "px"
                 });
 
-                sensor.stateText.node.style.fontFamily = '"Font Awesome 5 Free"';
-                sensor.stateText.node.style.fontWeight = "bold";
+                sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                sensor.stateBubble.node.style.fontWeight = "bold";
 
                 function showPopup() {
                     if (!sensor.tooltip) {
@@ -1874,9 +1874,9 @@ var getContext = function (display, infos, curLevel) {
                     }
                 };
 
-                sensor.stateText.click(showPopup);
+                sensor.stateBubble.click(showPopup);
 
-                sensor.stateText.hover(showPopup, function () {
+                sensor.stateBubble.hover(showPopup, function () {
                     if (sensor.tooltip) {
                         sensor.tooltip.remove();
                         sensor.tooltip = null;
@@ -1903,14 +1903,14 @@ var getContext = function (display, infos, curLevel) {
 
         if (type == "wrong") {
             /*
-            wrongindicator = paper.path(["M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
+            wrongindicator = paper.path(["M", startx,
                              sensor.drawInfo.y,
-                        "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
+                        "L", startx + stateLenght,
                                 sensor.drawInfo.y + sensor.drawInfo.height, 
     
-                        "M", sensor.drawInfo.x + stateOffset + (sensor.drawInfo.width * stateNumber),
+                        "M", startx,
                                 sensor.drawInfo.y + sensor.drawInfo.height,
-                        "L", sensor.drawInfo.x + stateOffset + 40 + (sensor.drawInfo.width * stateNumber),
+                        "L", startx + stateLenght,
                                    sensor.drawInfo.y
                             ]);
     
@@ -2886,6 +2886,8 @@ var getContext = function (display, infos, curLevel) {
                 !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
                 type = "wrong";
                 fail = true;
+
+                drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime + 100, type);
             }
 
             sensor.lastStateChange = context.currentTime;
