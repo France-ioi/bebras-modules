@@ -608,10 +608,13 @@ function LogicController(nbTestCases, maxInstructions) {
   };
   this.updateSize = function () {
     var panelWidth = 500;
-    panelWidth = $('#editorContainer').width() - 30;
-    if (panelWidth != this._prevWidth) {
-      $("#taskIntro").css("width", panelWidth);
-      $("#grid").css("left", panelWidth + 20 + "px");
+
+    if ($("#editorContainer").length > 0) {
+      panelWidth = $('#editorContainer').width() - 30;
+      if (panelWidth != this._prevWidth) {
+          $("#taskIntro").css("width", panelWidth);
+          $("#grid").css("left", panelWidth + 20 + "px");
+      }
     }
     this._prevWidth = panelWidth;
   };
