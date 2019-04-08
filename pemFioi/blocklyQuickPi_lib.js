@@ -69,22 +69,22 @@ var getContext = function (display, infos, curLevel) {
                 turnLedOn: "turnLedOn(): Turns on a light connected to Raspberry",
                 turnLedOff: "turnLedOff(): Turns off a light connected to Raspberry",
                 buttonState: "buttonState(): Returns the state of a button, Pressed means True and not pressed means False",
-                buttonStateInPort: "buttonStateInPort(): Returns the state of a button, Pressed means True and not pressed means False",
-                waitForButton: "waitForButton(): Stops program execution until a button is pressed",
-                buttonWasPressed: "buttonWasPressed(): Returns true if the button has been pressed and will clear the value",
-                changeLedState: "changeLedState(): Change led state in the given port",
-                toggleLedState: "toggleLedState(): Toggles the led state",
-                displayText: "displayText(): Display text in LCD screen",
-                readTemperature: "readTemperature(): Read Ambient temperature",
-                sleep: "sleep(): pause program execute for a number of seconds",
-                setServoAngle: "setServoAngle(): Set servo motor to an specified angle",
-                readRotaryAngle: "readRotaryAngle(): Read state of potentiometer",
-                readDistance: "readDistance(): Read distance using ultrasonic sensor",
-                readLightIntensity: "readLightIntensity(): Read light intensity",
-                readHumidity: "readHumidity(): lire l'humidité ambiante",
+                buttonStateInPort: "buttonStateInPort(port): Returns the state of a button, Pressed means True and not pressed means False",
+                waitForButton: "waitForButton(port): Stops program execution until a button is pressed",
+                buttonWasPressed: "buttonWasPressed(port): Returns true if the button has been pressed and will clear the value",
+                changeLedState: "changeLedState(port, state): Change led state in the given port",
+                toggleLedState: "toggleLedState(port): Toggles the led state",
+                displayText: "displayText(line1, line2): Display text in LCD screen",
+                readTemperature: "readTemperature(port): Read Ambient temperature",
+                sleep: "sleep(1000): pause program execute for a number of seconds",
+                setServoAngle: "setServoAngle(port, angle): Set servo motor to an specified angle",
+                readRotaryAngle: "readRotaryAngle(port): Read state of potentiometer",
+                readDistance: "readDistance(port): Read distance using ultrasonic sensor",
+                readLightIntensity: "readLightIntensity(port): Read light intensity",
+                readHumidity: "readHumidity(port): lire l'humidité ambiante",
                 currentTime: "currentTime(): Temps actuel en millisecondes",
-                changeBuzzerState: "setBuzzerState(): sonnerie",
-                getTemperature: "getTemperature(): Get temperature",
+                changeBuzzerState: "setBuzzerState(port, state): sonnerie",
+                getTemperature: "getTemperature(port): Get temperature",
             },
             constant: {
             },
@@ -2395,7 +2395,7 @@ var getContext = function (display, infos, curLevel) {
             porty = imgy + imgh / 3;
 
             if (context.autoGrading) {
-                imgw = sensor.drawInfo.width;
+                imgw = sensor.drawInfo.width * 1.5;
                 imgh = sensor.drawInfo.height * .70;
 
                 imgx = sensor.drawInfo.x + imgw / 2;
@@ -2408,6 +2408,7 @@ var getContext = function (display, infos, curLevel) {
                 porty = imgy + (imgh / 2);
 
                 portsize = imgh / 4;
+                statesize = imgh / 6;
             }
 
             if (!sensor.img || !sensor.img.paper.canvas)
