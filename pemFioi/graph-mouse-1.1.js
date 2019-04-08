@@ -1568,6 +1568,9 @@ function GraphEditor(settings) {
          edge[0].attr(selectedEdgeAttr);
          
          self.addEdgeCross(edgeID);
+         var info = graph.getEdgeInfo(edgeID);
+         if(info.label.length == 0)
+            self.editLabel(edgeID,"edge");
          $(document).keydown(function(event){
             if(event.which == 46){  // if press delete
                graph.removeEdge(edgeID);
@@ -2019,7 +2022,7 @@ function GraphEditor(settings) {
          return
       }
       var fontSize = attr["font-size"] || 15;
-      var label = info.label || "";
+      var label = info.label || " ";
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[1].hide();
       self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
@@ -2065,10 +2068,12 @@ function GraphEditor(settings) {
          return;
       }
       var oldLabel = info.label;
-      var newLabel = (self.textEditor) ? self.textEditor.val() : "";
+      var newLabel = (self.textEditor) ? self.textEditor.val().trim() : "";
+
       if(self.alphabet){
          for(var iLetter = 0; iLetter < newLabel.length; iLetter++){
-            if(!self.alphabet.includes(newLabel.charAt(iLetter))){
+            var letter = newLabel.charAt(iLetter);
+            if(letter != " " && !self.alphabet.includes(letter)){
                newLabel = oldLabel;
                break;
             }
@@ -2076,9 +2081,6 @@ function GraphEditor(settings) {
       }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
-         if(newLabel.length === 0){
-            newLabel = "?";
-         }
          info.label = newLabel;
          if(type === "vertex"){
             graph.setVertexInfo(id,info);
