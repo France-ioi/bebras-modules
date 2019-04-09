@@ -1,5 +1,8 @@
 /*blocklyRoboy_lib-1.0.0 by Arthur Léonard*/
 
+/*TODO : un changement de taille de la fenetre à la fin d'une execution duplique les items*/
+/*TODO : traduire le context wiring*/
+
 var robotCommands = [];
 
 var getContext = function(display, infos, curLevel) {
@@ -30,6 +33,7 @@ var getContext = function(display, infos, curLevel) {
             label: {
                row: "ligne du robot",
                col: "colonne du robot",
+               wait: "attendre",
                north: "avancer vers le haut",
                south: "avancer vers le bas",
                east: "avancer vers la droite",
@@ -67,11 +71,15 @@ var getContext = function(display, infos, curLevel) {
                shoot: "tirer au laser dans la direction %1",
                shoot_noShadow: "tirer au laser dans la direction %1",
                shootCondition: "retour départ tir direction %1",
-               shootCondition_noShadow: "retour départ tir direction %1"
+               shootCondition_noShadow: "retour départ tir direction %1",
+               connect: "brancher un câble",
+               onMale: "sur une prise mâle",
+               onFemale: "sur une prise femelle"
             },
             code: {
                row: "ligneRobot",
                col: "colonneRobot",
+               wait: "attendre",
                north: "haut",
                south: "bas",
                east: "droite",
@@ -109,7 +117,10 @@ var getContext = function(display, infos, curLevel) {
                shoot: "tirerLaser",
                shoot_noShadow: "tirerLaser",
                shootCondition: "tirerCondition",
-               shootCondition_noShadow: "tirerCondition"
+               shootCondition_noShadow: "tirerCondition",
+               connect: "brancherCable",
+               onMale: "surMale",
+               onFemale: "surFemelle"
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -144,7 +155,16 @@ var getContext = function(display, infos, curLevel) {
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
                successLights: "Bravo, votre robot a allumé tous les spots !",
-               failureLaser: "Le robot doit se trouver sur une borne laser pour pouvoir tirer !"
+               failureLaser: "Le robot doit se trouver sur une borne laser pour pouvoir tirer !",
+               failureNoPlug: "Le robot doit se trouver sur une prise pour pouvoir brancher un câble !",
+               failureAlreadyWired: "Cette prise est déjà connectée à un câble !",
+               failureWrongPlugType: "On ne peut pas connecter ces prises ensemble !",
+               successPlugsWired: "La machine est réparée !",
+               failurePlugsWired: "La machine ne fonctionne pas car des prises n'ont pas été connectées !",
+               failureWireCrossing: "Impossible de relier ces deux prises, deux câbles vont s'intersecter !",
+               failureWireTooLong: "Impossible de relier ces deux prises car elles sont trop éloignées !",
+               failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
+               failureProjectile: "Le robot s'est pris un projectile !"
             },
             startingBlockName: "Programme du robot"
          },
@@ -1361,7 +1381,18 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, offsetY: 3, zOrder: 3 },
             platform: { num: 2, img: "platform.png", side: 60, isObstacle: true, zOrder: 0 },
             gears: { num: 4, img: "gears.png", side: 60, isContainer: true, zOrder: 1},
-            wheel: { num:5, img: "wheel.png", side: 60, isWithdrawable: true, zOrder: 2}
+            wheel: { num:5, img: "wheel.png", side: 60, isWithdrawable: true, zOrder: 2},
+            projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
+            dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+            dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
+            projectile_generator: {num: 7, side: 60, action: function(item, time) {
+               if(item.period == undefined)
+                  item.period = 1;
+               if(item.start == undefined)
+                  item.start = 1;
+               if(time % item.period == item.start) 
+                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
+            }}
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -1497,6 +1528,61 @@ var getContext = function(display, infos, curLevel) {
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
+      pixelArt: {
+         newBlocks: (function(names, colors, translations) {
+            var blocks = [];
+            for(var iColor = 0;iColor < colors.length;iColor++) {
+               blocks.push({
+                  name: names[iColor],
+                  strings: {
+                    fr: {
+                       label: translations["fr"][iColor],
+                       code: translations["fr"][iColor],
+                       description: translations["fr"][iColor] + "(): Peint la case en " + translations["fr"][iColor]
+                    }
+                  },
+                  category: "robot",
+                  type: "actions",
+                  block: {
+                     name: names[iColor]
+                  },
+                  func: (function(cur_color) { return function(callback) {
+                     var robot = this.getRobot();
+                     this.withdraw(undefined, false);
+                     this.dropObject({type: "paint", color: cur_color});
+                     if (robot.col == context.nbCols - 1) {
+                        robot.row = (robot.row + 1) % context.nbRows;
+                        robot.col = 0;
+                        redisplayItem(robot);
+                        this.callCallback(callback);
+                     } else {
+                        this.forward(callback);
+                     };
+                  } })(colors[iColor])
+               });
+            }
+            return blocks;
+         })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"], 
+            ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
+            {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
+         backgroundColor: "#ece4ce",
+         itemTypes: {
+            green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
+            marker_red: { num: 2, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff0000";}  },
+            marker_blue: { num: 3, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#0000ff";} },
+            marker_yellow: { num: 4, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ffff00";} },
+            marker_white: { num: 5, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ffffff";} },
+            marker_green: { num: 6, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#00ff00";} },
+            marker_orange: { num: 7, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff8000";} },
+            marker_pink: { num: 8, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff80ff";} },
+            marker_purple: { num: 9, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#800080";} },
+            marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#804d00";} },
+            marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#808080";} },
+            marker_black: { num: 12, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#000000";} },
+            paint: { side: 60, isWithdrawable: true, zOrder: 1 }
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
+      },
       rocket: {
          backgroundColor: "#666699",
          itemTypes: {
@@ -1522,6 +1608,20 @@ var getContext = function(display, infos, curLevel) {
             number: { num: 5, side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
+      },
+      wiring: {
+        backgroundColor: "#00733f",
+        maxWireLength: 100,
+        maxTotalLength: 100000,
+        itemTypes: {
+          red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 3 },
+          wire: { img: "wire.png", side: 60, isWire: true, zOrder: 1},
+          black_male: { num: 2, img: "black_male.png", side: 60, zOrder: 0, plugType: 1},
+          black_female: { num: 3, img: "black_female.png", side: 60, zOrder: 0, plugType: -1},
+          white_male: { num: 4, img: "white_male.png", side: 60, zOrder: 0, plugType: 2},
+          white_female: { num: 5, img: "white_female.png", side: 60, zOrder: 0, plugType: -2},
+        },
+        checkEndCondition: robotEndConditions.checkPlugsWired
       }
    };
    var iconSrc = $("img[src$='icon.png']").attr("src");
@@ -1576,6 +1676,16 @@ var getContext = function(display, infos, curLevel) {
       block: { name: "col", yieldsValue: 'int' },
       func: function(callback) {
          this.callCallback(callback, 1 + this.getRobot().col);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "wait",
+      type: "actions",
+      block: { name: "wait" },
+      func: function(callback) {
+         this.advanceTime(1);
+         this.waitDelay(callback);
       }
    });
    
@@ -2069,6 +2179,34 @@ var getContext = function(display, infos, curLevel) {
       }
    });
    
+   infos.newBlocks.push({
+      name: "connect",
+      type: "actions",
+      block: { name: "connect" },
+      func: function(callback) {
+         this.connect();
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onMale",
+      type: "sensors",
+      block: { name: "onMale", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onFemale",
+      type: "sensors",
+      block: { name: "onFemale", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
+      }
+   });
+   
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -2176,10 +2314,17 @@ var getContext = function(display, infos, curLevel) {
          context.nbCols = context.tiles[0].length;
       }
       context.nbPlatforms = infos.nbPlatforms;
+      
       context.items = [];
+      context.multicell_items = [];
+      
+      context.last_connect = undefined;
+      context.wires = [];
+      
       context.lost = false;
       context.success = false;
       context.nbMoves = 0;
+      context.time = 0;
       context.bag = [];
       
       if(infos.bagInit != undefined) {
@@ -2203,21 +2348,19 @@ var getContext = function(display, infos, curLevel) {
       }
       
       if(context.display) {
-         context.resetDisplay();
+         this.delayFactory.destroyAll();
+         this.raphaelFactory.destroyAll();
+         if(paper !== undefined)
+            paper.remove();
+         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+         resetBoard();
+         resetItems();
+         context.updateScale();
          $("#nbMoves").html(context.nbMoves);
       }
       else {
          resetItems();
       }
-   };
-   
-   context.resetDisplay = function() {
-      this.delayFactory.destroyAll();
-      this.raphaelFactory.destroyAll();
-      paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-      resetBoard();
-      resetItems();
-      context.updateScale();
    };
    
    context.unload = function() {
@@ -2236,13 +2379,13 @@ var getContext = function(display, infos, curLevel) {
          x = x - (dirToState[item.dir] * item.side * scale);
       }
       var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
-      if(!itemType.img && !itemType.color) {
+      if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
          x += item.side * scale / 2;
          y += item.side * scale / 2;
       }
       
       var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
-      return ret;//{x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
+      return ret;
    }
    
    var resetBoard = function() {
@@ -2285,6 +2428,7 @@ var getContext = function(display, infos, curLevel) {
       for(var property in infos.itemTypes[item.type]) {
          item[property] = infos.itemTypes[item.type][property];
       }
+      
       if(context.display && redisplay) {
          redisplayItem(item);
       }
@@ -2338,14 +2482,17 @@ var getContext = function(display, infos, curLevel) {
       });
       for(var iItem = 0;iItem < cellItems.length;iItem++) {
          if(cellItems[iItem].element)
-         cellItems[iItem].element.toFront();
+            cellItems[iItem].element.toFront();
       }
    };
 
    var redisplayItem = function(item, resetZOrder) {
+      if(context.display !== true)
+         return;
       if(resetZOrder === undefined)
          resetZOrder = true;
-      if(item.element != null) {
+      
+      if(item.element !== undefined) {
          item.element.remove();
       }
       var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
@@ -2360,7 +2507,8 @@ var getContext = function(display, infos, curLevel) {
       else if(item.color !== undefined) {
          item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
       }
-      item.element.attr(itemAttributes(item));
+      if(item.element !== undefined)
+         item.element.attr(itemAttributes(item));
       if(resetZOrder)
          resetItemsZOrder(item.row, item.col);
    };
@@ -2372,6 +2520,7 @@ var getContext = function(display, infos, curLevel) {
       if(paper == null) {
          return;
       }
+      
       if(window.quickAlgoResponsive) {
          var areaWidth = Math.max(200, $('#grid').width()-24);
          var areaHeight = Math.max(150, $('#grid').height()-24);
@@ -2414,16 +2563,29 @@ var getContext = function(display, infos, curLevel) {
    };
    
    var redisplayAllItems = function() {
+      if(context.display !== true)
+         return;
       for(var iItem = 0;iItem < context.items.length;iItem++) {
          var item = context.items[iItem];
          redisplayItem(item, false);
-         item.element.attr(itemAttributes(item));
+         if(item.element !== undefined)
+            item.element.attr(itemAttributes(item));
+      }
+      
+      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
+         var item = context.multicell_items[iItem];
+         item.redisplay();
       }
       
       var cellItems = [];
       
       for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
          var item = context.items[iItem];
+         cellItems.push(item);
+      }
+      
+      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
+         var item = context.multicell_items[iItem];
          cellItems.push(item);
       }
       
@@ -2437,7 +2599,29 @@ var getContext = function(display, infos, curLevel) {
          return 0;
       });
       for(var iItem = 0;iItem < cellItems.length;iItem++) {
-         cellItems[iItem].element.toFront();
+         if(cellItems[iItem].element !== undefined)
+            cellItems[iItem].element.toFront();
+      }
+   };
+   
+   context.advanceTime = function(epsilon) {
+      var items = [];
+      for(var id in context.items) {
+         items.push(context.items[id]);
+      }
+      
+      for(var iTime = 0;iTime < epsilon;iTime++) {
+         context.time++;
+         for(var id in items) {
+            if(items[id] !== undefined && items[id].action !== undefined) {
+               items[id].action.bind(context)(items[id], context.time);
+            }
+         }
+         
+         var robot = this.getRobot();
+         if(this.hasOn(robot.row, robot.col, function(item) { return item.isProjectile === true; })) {
+            throw(context.strings.messages.failureProjectile);
+         }
       }
    };
    
@@ -2472,6 +2656,13 @@ var getContext = function(display, infos, curLevel) {
       return false;
    };
    
+   context.setIndexes = function() {
+      for(var id in context.items) {
+         var item = context.items[id];
+         item.index = id;
+      }
+   }
+   
    context.getItemsOn = function(row, col, filter) {
       if(filter === undefined) {
          filter = function(obj) { return true; };
@@ -2480,7 +2671,6 @@ var getContext = function(display, infos, curLevel) {
       for(var id in context.items) {
          var item = context.items[id];
          if(item.row == row && item.col == col && filter(item)) {
-            item.index = id;
             selected.push(item);
          }
       }
@@ -2519,6 +2709,12 @@ var getContext = function(display, infos, curLevel) {
             return false;
          throw(strings.messages.obstacle);
       }
+      
+      if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         throw(strings.messages.failureProjectile);
+      }
       return true;
    };
    
@@ -2535,6 +2731,25 @@ var getContext = function(display, infos, curLevel) {
          col: item.col + delta[lookDir][1] * mult
       };
    };
+   
+   context.isCrossing = function(wireA, wireB) {
+      function crossProduct(pointA, pointB, pointC) {
+         return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
+      }
+      
+      function onLine(segment, point) {
+         return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
+          && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
+      }
+      
+      if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
+         return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
+      }
+      return (crossProduct(wireA[0], wireA[1], wireB[0])
+      * crossProduct(wireA[0], wireA[1], wireB[1]) <= 0) &&
+      (crossProduct(wireB[0], wireB[1], wireA[0])
+      * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
+   }
    
    context.moveRobot = function(newRow, newCol, newDir, callback) {
       var iRobot = context.getRobotId();
@@ -2554,6 +2769,7 @@ var getContext = function(display, infos, curLevel) {
       
       if(item.dir !== undefined)
          item.dir = newDir;
+      
       item.row = newRow;
       item.col = newCol;
       
@@ -2577,6 +2793,7 @@ var getContext = function(display, infos, curLevel) {
          $("#nbMoves").html(context.nbMoves);
       }
       
+      context.advanceTime(1);
       context.waitDelay(callback);
    };
    
@@ -2609,6 +2826,36 @@ var getContext = function(display, infos, curLevel) {
       }
    };
    
+   context.moveProjectile = function(item) {
+      if(!context.isInGrid(item.row + 1, item.col)) {
+         context.destroy(item);
+      }
+      
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
+         return;
+      }
+      
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
+         return;
+      }
+      
+      context.moveItem(item, item.row + 1, item.col);
+      return;
+   };
+   
+   context.destroy = function(item) {
+      context.setIndexes();
+      context.items.splice(item.index, 1);
+
+      if(context.display) {
+         item.element.remove();
+      }
+   };
+   
    context.fall = function(item, row, col, callback) {
       var startRow = row;
       var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
@@ -2638,7 +2885,7 @@ var getContext = function(display, infos, curLevel) {
       if(!context.isInGrid(item.row - 1, item.col)) {
          throw(context.strings.messages.jumpOutsideGrid);
       }
-      var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true; });
+      var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
       if(obstacle.length > 0) {
          throw(context.strings.messages.jumpObstacleBlocking);
       }
@@ -2670,6 +2917,7 @@ var getContext = function(display, infos, curLevel) {
       }
       
       var withdrawable = withdrawables[0];
+      context.setIndexes();
       context.items.splice(withdrawable.index, 1);
       context.bag.push(withdrawable);
       
@@ -2712,11 +2960,7 @@ var getContext = function(display, infos, curLevel) {
             }
          }
          object.zOrder = maxi + 0.000001;
-         context.items.push(object);
-         
-         if(context.display) {
-            redisplayItem(object);
-         }
+         resetItem(object);
       }
    };
    
@@ -2735,14 +2979,14 @@ var getContext = function(display, infos, curLevel) {
       object.col = coords.col;
       var itemsOn = context.getItemsOn(coords.row, coords.col);
       var maxi = object.zOrder;
+      if(maxi === undefined) {
+         maxi = 0;
+      }
       for(var item in itemsOn) {
          if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
             maxi = itemsOn[item].zOrder;
          }
       }
-      object.zOrder = maxi + 0.000001;
-      context.items.push(object);
-      
       resetItem(object);
    };
    
@@ -2960,6 +3204,72 @@ var getContext = function(display, infos, curLevel) {
       
       return findRobot;
    };
+   
+   context.connect = function() {
+      var robot = context.getRobot();
+      
+      var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
+      
+      if(plugs.length == 0) {
+         throw(strings.messages.failureNoPlug);
+      }
+      
+      var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
+      
+      if(wires.length != 0) {
+         throw(strings.messages.failureAlreadyWired);
+      }
+      
+      this.dropObject({type: "wire", zOrder: 1});
+      
+      if(this.last_connect !== undefined) {
+         if(this.last_connect.plugType + plugs[0].plugType != 0)
+            throw(strings.messages.failureWrongPlugType);
+            
+         function segmentLength(segment) {
+            return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
+         }
+         
+         var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
+         
+         if(segmentLength(wire) > infos.maxWireLength) {
+            throw(strings.messages.failureWireTooLong);
+         }
+         
+         var totalLength = segmentLength(wire);
+         for(var iWire = 0;iWire < this.wires.length;iWire++) {
+            if(this.isCrossing(wire, this.wires[iWire])) {
+               throw(strings.messages.failureWireCrossing);
+            }
+            totalLength += segmentLength(this.wires[iWire]);
+         }
+         
+         if(totalLength > infos.maxTotalLength) {
+            throw(strings.messages.failureTotalLengthExceeded);
+         }
+         
+         this.wires.push(wire);
+         
+         var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
+         var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
+         var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
+         var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
+         
+         var wire_item = {zOrder: 2};
+         wire_item.redisplay = function() {
+            wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
+            wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
+         };
+         
+         this.multicell_items.push(wire_item);
+         redisplayAllItems();
+         
+         this.last_connect = undefined;
+      }
+      else {
+         this.last_connect = plugs[0];
+      }
+   };
       
    return context;
 };
@@ -2995,6 +3305,25 @@ var robotEndConditions = {
          throw(window.languageStrings.messages.failurePickedAllWithdrawables);
       }
    },
+   checkPlugsWired: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
+               solved = false;
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPlugsWired);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePlugsWired);
+      }
+   },
    checkContainersFilled: function(context, lastTurn) {
       var solved = true;
       
@@ -3027,6 +3356,10 @@ var robotEndConditions = {
                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length < container.containerSize) {
                   solved = false;
                   message = Math.min(message, 1);
+               }
+               if(context.getItemsOn(row, col, filter).length == 0) {
+                  solved = false;
+                  message = Math.min(message, 0);
                }
                if(container.containerFilter != undefined) {
                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
