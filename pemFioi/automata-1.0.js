@@ -90,6 +90,9 @@ function Automata(settings) {
          console.log("type error");
       }
    };
+   this.setEditEnabled = function(enabled) {
+      this.graphEditor.setEnabled(enabled);
+   };
 
    this.initGraph = function() {
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, this.id+"_VisualGraph", this.graphPaper, null, this.graphDrawer, true);
@@ -203,18 +206,19 @@ function Automata(settings) {
       return null;
    };
 
-   this.generateTargetNFA = function() {
-      var str = "";
-      for(var letter of this.sequence){
-         str += letter;
-      }
-      this.targetNFA = NFA.for(str,this.alphabet);
-   };
+   // this.generateTargetNFA = function() {
+   //    var str = "";
+   //    for(var letter of this.sequence){
+   //       str += letter;
+   //    }
+   //    this.targetNFA = NFA.for(str,this.alphabet);
+   // };
 
    this.compareWithTarget = function() {
-      if(!this.targetNFA){
-         this.generateTargetNFA();
-      }
+      /* compare automata with target NFA */
+      // if(!this.targetNFA){
+      //    this.generateTargetNFA();
+      // }
       var error = this.getNFA();
       if(error){
          return error;
@@ -228,6 +232,203 @@ function Automata(settings) {
       }
       var noUnreachableDFA = dfa.without_unreachables();
       return {equivalent: equivalent, e_c: e_c, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
+   };
+
+   this.regexToNFA = function(regex) {
+      /* convert a regex into a NFA and set it to targetNFA */
+      var groupIndices = [0]; // Indices of groups in nfa array
+      var orIndices = []; //  Indices of | in nfa array
+      var string = "";
+      var nfa = [];  // Array of nfas
+
+      for(var iChar = 0; iChar < regex.length; iChar++){
+         var char = regex.charAt(iChar);
+
+         if(this.alphabet.includes(char)){
+            string.concat(char);
+         }else{
+            switch(char){
+               case "(":
+                  /* open group */
+                  ifString();
+                  groupIndices.push(nfa.length);
+                  break;
+               case ")":
+                  /* close group */
+                  ifString();
+                  concatGroup();
+                  break;
+               case "?":
+               case "*":
+               case "+":
+               case "{":
+                  var lastNFA = getLastNFA();
+                  if(char == "?"){
+                     nfa.push(lastNFA.optional());
+                  }else if(char == "*"){
+                     nfa.push(lastNFA.star());
+                  }else if(char == "+"){
+                     nfa.push(lastNFA.plus());
+                  }else if(char == "{"){
+                     var error = repeatNFA(lastNFA);
+                     if(error){
+                        return error;
+                     }
+                  }
+                  break;
+               case "|":
+                  ifString();
+                  /* concat nfas in subgroup before */
+                  concatGroup(true);
+                  orIndices.push(nfa.length);
+                  break;
+               case "[":
+                  ifString();
+                  var error = oneOf();
+                  if(error){
+                     return error;
+                  }
+                  break;
+               default:
+                  var checkValidChar = new RegExp('[-},0-9]');
+                  if(!checkValidChar.test(char)){
+                     return "error: invalid character";
+                  }
+            }
+         }
+      }
+      /* final close group */
+      ifString();
+      concatGroup();
+      console.log(nfa.length);
+      this.targetNFA = nfa[0];
+
+      function ifString() {
+         if(string != ""){
+            nfa.push(NFA.for(string,this.alphabet));
+            string = "";
+         }
+      };
+
+      function concatGroup(or) {
+         /* concat nfas in group */
+         if(or){
+            var startIndex = groupIndices[groupIndices.length - 1];
+         }else{
+            var startIndex = groupIndices.pop();
+         }
+         /* if | inside group, unify subgroups before and after */
+         if(orIndices[orIndices.length - 1] > startIndex){
+            var subStartIndex = orIndices.pop();
+            var subGroup1 = nfa[subStartIndex - 1];
+            var subGroup2 = nfa[subStartIndex];   // first nfa in subgroup after
+            for(var iElement = subStartIndex + 1; iElement < nfa.length; iElement++){
+               subGroup2 = subGroup2.concat(nfa[iElement]);
+            }
+            nfa = nfa.slice(0,subStartIndex - 1);
+            nfa.push(subGroup1.union(subGroup2));
+         }
+
+         var groupNFA = nfa[startIndex];   // first nfa in group
+         for(var iElement = startIndex + 1; iElement < nfa.length; iElement++){
+            groupNFA = groupNFA.concat(nfa[iElement]);
+         }
+         nfa = nfa.slice(0,startIndex);
+         nfa.push(groupNFA);
+      };
+
+      function getLastNFA() {
+         if(string != ""){
+            var substr1 = string.substring(0,string.length-1);
+            var substr2 = string.substring(string.length-1);
+            if(substr1 != ""){
+               nfa.push(NFA.for(substr1,this.alphabet));
+            }
+            var lastNFA = NFA.for(substr2,this.alphabet);
+            string = "";
+         }else{
+            var lastNFA = nfa.pop();
+         }
+         return lastNFA;
+      };
+
+      function repeatNFA(aut) {
+         var insideBrackets = "";
+         for(var jChar = iChar + 1; jChar < regex.length; jChar++){
+            var nextChar = regex[jChar];
+            if(nextChar != "}"){
+               insideBrackets += nextChar;
+            }
+         }
+         var repeat = insideBrackets.split(",");
+         if(repeat.length == 0){
+            return;
+         }else if(repeat.length > 2){
+            return "error: wrong format inside curly brackets";
+         }else if(isNaN(repeat[0])){
+            return "error: missing number after {";
+         }else if(repeat.length == 2 && repeat[1] != "" && isNaN(repeat[1])){
+            return "error: wrong format inside curly brackets";
+         }    
+         var result = aut.repeat(repeat[0]);
+         if(repeat.length == 2){
+            if(repeat[1] == ""){
+               result = result.concat(aut.star());
+            }else{
+               var optionalRepeat = aut.optional().repeat(repeat[1]);
+               result = result.concat(optionalRepeat);
+            }
+         }
+         nfa.push(result);
+      };
+
+      function oneOf() {
+         var insideBrackets = "";
+         for(var jChar = iChar + 1; jChar < regex.length; jChar++){
+            var nextChar = regex[jChar];
+            if(nextChar != "]"){
+               insideBrackets += nextChar;
+            }
+         }
+         if(insideBrackets = ""){
+            return;
+         }
+         var result;
+         var hyphenIndex = insideBrackets.indexOf("-")
+         while(hyphenIndex > -1){
+            if(hyphenIndex == 0){
+               return "error: wrong character after [";
+            }else if(hyphenIndex == insideBrackets.length - 1){
+               return "error: missing character after -";
+            }
+            var startChar = insideBrackets.charAt(hyphenIndex - 1);
+            var endChar = insideBrackets.charAt(hyphenIndex + 1);
+            if(startChar >= endChar){
+               return "error: second element in a range should be larger than the first";
+            }
+            // for()
+            hyphenIndex = insideBrackets.indexOf("-");
+         }
+         // if(insideBrackets.includes("-")){
+         //    break;
+         // }else if(repeat.length > 2){
+         //    return "error: wrong format inside curly brackets";
+         // }else if(isNaN(repeat[0])){
+         //    return "error: missing number after {";
+         // }else if(repeat.length == 2 && repeat[1] != "" && isNaN(repeat[1])){
+         //    return "error: wrong format inside curly brackets";
+         // }    
+         // var result = aut.repeat(repeat[0]);
+         // if(repeat.length == 2){
+         //    if(repeat[1] == ""){
+         //       result = result.concat(aut.star());
+         //    }else{
+         //       var optionalRepeat = aut.optional().repeat(repeat[1]);
+         //       result = result.concat(optionalRepeat);
+         //    }
+         // }
+         nfa.push(result);
+      };
    };
 
    function drawArrow(x,y,size,dir) {
