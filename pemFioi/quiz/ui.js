@@ -88,6 +88,10 @@ function QuizUI(params) {
             showResult: function(mistakes) {
                 parent.find('answer').removeClass('correct mistake');
                 parent.find('answer.selected').addClass(mistakes === null ? 'correct' : 'mistake');
+            },
+
+            reset: function() {
+                parent.find('answer').removeClass('selected correct mistake');
             }
         }
 
@@ -132,6 +136,10 @@ function QuizUI(params) {
                         el.addClass(mistakes.indexOf(idx) === -1 ? 'correct' : 'mistake')
                     })
                 }
+            },
+
+            reset: function() {
+                parent.find('answer').removeClass('selected correct mistake');
             }
         }
 
@@ -188,6 +196,11 @@ function QuizUI(params) {
             showResult: function(mistakes) {
                 answer.removeClass('correct mistake');
                 answer.addClass(mistakes === null ? 'correct' : 'mistake');
+            },
+
+            reset: function() {
+                answer.removeClass('correct mistake');
+                input.val('');
             }
         }
 
@@ -333,6 +346,12 @@ function QuizUI(params) {
             mistakes = Array.isArray(mistakes) ? mistakes : [];
             for(var i=0; i<questions.length; i++) {
                 questions[i].showResult(mistakes[i]);
+            }
+        },
+
+        reset: function() {
+            for(var i=0; i<questions.length; i++) {
+                questions[i].reset();
             }
         }
 

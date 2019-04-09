@@ -8,6 +8,9 @@ var lang = {
             'score': 'Score',
             'grader_msg': 'Your score is ',
             'validate': 'Validate',
+            'restart': 'Restart',
+            'restart_scratch': 'Restart from scratch',
+            'restart_current': 'Restart from current answer',
             'placeholder_text': 'Enter text',
             'placeholder_number': 'Enter number',
             'error_number': 'Must be a number',
@@ -44,6 +47,103 @@ var lang = {
 }
 
 
+var task_toolbar = {
+
+    buttons: {},
+    holder: false,
+    popup: false,
+
+    addButton: function(parent, name, callback) {
+        var btn = $('<button class="btn btn-success">' + lang.translate(name) + '</button>');
+        btn.on('click', callback);
+        parent.append(btn);
+        this.buttons[name] = btn;
+    },
+
+
+    restartTask: function(from_scratch) {
+        this.setValidated(false);
+        this.popup.hide();
+        this.unfreezeTask();
+        task.showViews({"task": true, "solution": false}, function(){});
+        if(from_scratch) {
+            window.quiz_ui.reset();
+        }
+    },
+
+    showPopup: function() {
+        if(!this.popup) {
+            this.popup = $(
+                '<div class="quiz-popup">\
+                    <div class="opacity-overlay"></div>\
+                    <div class="inner"><div class="content"></div></div>\
+                </div>'
+            );
+            $(document.body).append(this.popup);
+            var el = this.popup.find('.content');
+            var self = this;
+            this.addButton(el, 'restart_scratch', function() {
+                self.restartTask(true);
+            });
+            this.addButton(el, 'restart_current', function() {
+                self.restartTask();
+            });
+            this.addButton(el, 'cancel', function() {
+                self.popup.hide();
+            });
+        }
+        this.popup.show();
+    },
+
+
+    freezeTask: function() {
+        if(!this.freezer) {
+            this.freezer = $('<div class="freeze-overlay"></div>')
+            $('.taskContent').append(this.freezer);
+        }
+        this.freezer.show();
+    },
+
+
+    unfreezeTask: function() {
+        this.freezer.hide();
+    },
+
+
+    setValidated: function(validated) {
+        if(validated) {
+            this.buttons.validate.hide();
+            this.buttons.solution.show();
+        } else {
+            this.buttons.validate.show();
+            this.buttons.solution.hide();
+        }
+    },
+
+
+    init: function() {
+        if(this.holder) return;
+        $('#showSolutionButton').remove();
+        this.holder = $('<div class="quiz-toolbar"></div>');
+        var self = this;
+        this.addButton(this.holder, 'validate', function() {
+            platform.validate('done');
+            self.freezeTask();
+            self.setValidated(true);
+        });
+        this.addButton(this.holder, 'solution', function() {
+            miniPlatformShowSolution();
+        });
+        this.buttons.solution.hide();
+        this.addButton(this.holder, 'restart', function() {
+            self.showPopup();
+        });
+        this.holder.insertAfter($('.taskContent'));
+    }
+
+}
+
+
 var task_token = {
 
     token: null,
@@ -68,7 +168,7 @@ var task_token = {
 
 
 
-var task = {}
+window.task = {}
 
 task.getViews = function(success, error) {
     var views = {
@@ -156,12 +256,11 @@ task.load = function(views, success) {
             shuffle_answers: !!quiz_settings.shuffle_answers,
             random: random
         });
-
+        window.quiz_ui = q;
 
         task.showViews = function(views, callback) {
-            console.log(views)
+            //console.log(views)
             q.toggleSolutions(!!views.solution);
-
             $('#solution').toggle(!!views.solution);
             callback()
         }
@@ -228,12 +327,6 @@ task.load = function(views, success) {
             return [];
         }
 
-        var btn = $('<button class="btn btn-success btn-validate">' + lang.translate('validate') + '</button>');
-        btn.on('click', function() {
-            platform.validate('done');
-        });
-        btn.insertAfter($('.taskContent'));
-
         success();
     });
 };
@@ -249,5 +342,6 @@ lang.set(window.stringsLanguage)
 $(function() {
     if(window.platform) {
         platform.initWithTask(task);
+        task_toolbar.init();
     }
 });
