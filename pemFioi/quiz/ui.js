@@ -299,12 +299,6 @@ function QuizUI(params) {
     });
 
 
-    // dev, TODO: remove
-    setTimeout(function() {
-        $('#solution').show();
-    }, 500)
-
-
 
     // sys
     params.parent.show();
