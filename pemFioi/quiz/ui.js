@@ -10,6 +10,11 @@ function QuizUI(params) {
     }
 
 
+    function questionLabel(idx) {
+        return String.fromCharCode(idx + 65);
+    }
+
+
     function shuffleArray(a) {
         var j, x, i, r;
         for(i = a.length - 1; i > 0; i--) {
@@ -245,7 +250,7 @@ function QuizUI(params) {
                     var html = single_tpl;
                     html = html
                         .replace('%%LABEL%%', answer.html())
-                        .replace('%%CODE%%', String.fromCharCode(i + 65));
+                        .replace('%%CODE%%', questionLabel(i));
                 }
                 else if (question.attr("type") === "multiple") {
                     var html = multiple_tpl;
@@ -259,11 +264,49 @@ function QuizUI(params) {
 
 
 
+
+    // replace refs in solution with real answer and qustion numbers/labels
+    function realQuestionNumber(question_idx) {
+        var idx = questions_order.indexOf(question_idx);
+        return idx === -1 ? '' : idx + 1;
+    }
+
+    function realAnswerNumber(question_idx, answer_idx) {
+        if(answers_order[question_idx]) {
+            var idx = answers_order[question_idx].indexOf(question_idx);
+            if(idx !== -1) {
+                return questionLabel(idx);
+            }
+        }
+        return '';
+    }
+
+    $('#solution').find('ref').each(function() {
+        var el = $(this);
+        var nq = el.attr('question');
+        if(typeof nq === 'undefined') {
+            return;
+        }
+        nq = parseInt(nq, 10) - 1;
+        var na = el.attr('answer');
+        if(typeof na !== 'undefined') {
+            na = parseInt(na, 10) - 1;
+            var text = realAnswerNumber(nq, na);
+        } else {
+            var text = realQuestionNumber(nq);
+        }
+        el.text(text);
+    });
+
+
+    // dev, TODO: remove
+    setTimeout(function() {
+        $('#solution').show();
+    }, 500)
+
+
+
     // sys
-    params.parent.find('solution').hide();
-
-
-
     params.parent.show();
 
 
