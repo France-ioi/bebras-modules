@@ -461,9 +461,71 @@ button,
 }
 
 
-.btn-validate {
+.btn {
   cursor: pointer;
-  display: block;
-  margin: 40px auto;
   background-color: #4a90e2;
+}
+
+
+.quiz-popup {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+}
+
+.quiz-popup .opacity-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.quiz-popup .inner {
+  position: relative;
+  z-index: 2;
+  top: 50%;
+  text-align: center;
+}
+
+.quiz-popup .content {
+  background: #fff;
+  border-radius: 10px;
+  padding: 40px;
+  display: inline-block;
+}
+
+.quiz-popup .content .btn {
+  margin: 0 10px;
+}
+
+
+.quiz-toolbar {
+  margin: 40px auto;
+  text-align: center;
+}
+
+.quiz-toolbar .btn {
+  margin: 0 10px;
+}
+
+
+.taskContent {
+  position: relative;
+}
+
+#task .freeze-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background:transparent;
+  z-index: 1;
 }
