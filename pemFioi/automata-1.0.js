@@ -306,7 +306,7 @@ function Automata(settings) {
                default:
                   var checkValidChar = new RegExp('[-}\\],0-9]');
                   if(!checkValidChar.test(char)){
-                     return "error: invalid character";
+                     return "error: invalid character "+char;
                   }
             }
          }
