@@ -169,9 +169,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
             this.languages[iPlayer] = "blockly";
             this.setPlayer(iPlayer);
-            if(this.startingBlock) {
+            if(this.startingBlock || options.startingExample) {
                var xml = this.getDefaultContent();
-
                Blockly.Events.recordUndo = false;
                Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(xml), this.workspace);
                Blockly.Events.recordUndo = true;
@@ -373,8 +372,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.includeBlocks = includeBlocks;
       },
 
-      getDefaultContent: function () {
-         if (this.startingBlock) {
+      getEmptyContent: function() {
+         if(this.startingBlock) {
             if(this.scratchMode) {
                return '<xml><block type="robot_start" deletable="false" movable="false" x="10" y="20"></block></xml>';
             } else {
@@ -386,6 +385,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
       },
 
+      getDefaultContent: function() {
+         if(this.options.startingExample) {
+            var xml = this.options.startingExample[this.language];
+            if(xml) { return xml; }
+         }
+         return this.getEmptyContent();
+      },
+
       checkRobotStart: function () {
          if(!this.startingBlock || !this.workspace) { return; }
          var blocks = this.workspace.getTopBlocks(true);
@@ -393,7 +400,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if(blocks[b].type == 'robot_start') { return;}
          }
 
-         var xml = Blockly.Xml.textToDom(this.getDefaultContent())
+         var xml = Blockly.Xml.textToDom(this.getEmptyContent())
          Blockly.Xml.domToWorkspace(xml, this.workspace);
       },
 
