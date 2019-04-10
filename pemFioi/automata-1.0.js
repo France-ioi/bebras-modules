@@ -243,9 +243,9 @@ function Automata(settings) {
 
       for(var iChar = 0; iChar < regex.length; iChar++){
          var char = regex.charAt(iChar);
-
+         // console.log(char);
          if(this.alphabet.includes(char)){
-            string.concat(char);
+            string += char;
          }else{
             switch(char){
                case "(":
@@ -256,13 +256,19 @@ function Automata(settings) {
                case ")":
                   /* close group */
                   ifString();
-                  concatGroup();
+                  var error = concatGroup();
+                  if(error){
+                     return error;
+                  }
                   break;
                case "?":
                case "*":
                case "+":
                case "{":
                   var lastNFA = getLastNFA();
+                  if(!lastNFA){
+                     return "error: missing character before "+char;
+                  }
                   if(char == "?"){
                      nfa.push(lastNFA.optional());
                   }else if(char == "*"){
@@ -278,19 +284,27 @@ function Automata(settings) {
                   break;
                case "|":
                   ifString();
+                  if(nfa.length == 0){
+                     return "error: missing character before |";
+                  }
                   /* concat nfas in subgroup before */
-                  concatGroup(true);
+                  var error = concatGroup(true);
+                  if(error){
+                     return error;
+                  }
                   orIndices.push(nfa.length);
                   break;
                case "[":
                   ifString();
-                  var error = oneOf();
-                  if(error){
+                  var error = oneOf(iChar);
+                  if(error && isNaN(error)){
                      return error;
+                  }else{
+                     iChar = error; // set iChar to end bracket
                   }
                   break;
                default:
-                  var checkValidChar = new RegExp('[-},0-9]');
+                  var checkValidChar = new RegExp('[-}\\],0-9]');
                   if(!checkValidChar.test(char)){
                      return "error: invalid character";
                   }
@@ -299,13 +313,22 @@ function Automata(settings) {
       }
       /* final close group */
       ifString();
-      concatGroup();
-      console.log(nfa.length);
-      this.targetNFA = nfa[0];
+      var error = concatGroup();
+      if(error){
+         return error;
+      }
+      if(groupIndices.length != 0){
+         return "error: missing parenthesis";
+      }
+      if(nfa[0]){
+         this.targetNFA = nfa[0];
+      }else{
+         return "error: empty regex";
+      }
 
       function ifString() {
          if(string != ""){
-            nfa.push(NFA.for(string,this.alphabet));
+            nfa.push(NFA.for(string,self.alphabet));
             string = "";
          }
       };
@@ -314,6 +337,8 @@ function Automata(settings) {
          /* concat nfas in group */
          if(or){
             var startIndex = groupIndices[groupIndices.length - 1];
+         }else if(groupIndices.length <= 0){
+            return "error: missing opening parenthesis";
          }else{
             var startIndex = groupIndices.pop();
          }
@@ -322,6 +347,9 @@ function Automata(settings) {
             var subStartIndex = orIndices.pop();
             var subGroup1 = nfa[subStartIndex - 1];
             var subGroup2 = nfa[subStartIndex];   // first nfa in subgroup after
+            if(!subGroup2){
+               return "error: missing character after |";
+            }
             for(var iElement = subStartIndex + 1; iElement < nfa.length; iElement++){
                subGroup2 = subGroup2.concat(nfa[iElement]);
             }
@@ -342,9 +370,9 @@ function Automata(settings) {
             var substr1 = string.substring(0,string.length-1);
             var substr2 = string.substring(string.length-1);
             if(substr1 != ""){
-               nfa.push(NFA.for(substr1,this.alphabet));
+               nfa.push(NFA.for(substr1,self.alphabet));
             }
-            var lastNFA = NFA.for(substr2,this.alphabet);
+            var lastNFA = NFA.for(substr2,self.alphabet);
             string = "";
          }else{
             var lastNFA = nfa.pop();
@@ -354,11 +382,18 @@ function Automata(settings) {
 
       function repeatNFA(aut) {
          var insideBrackets = "";
+         var closingBracket = false;
          for(var jChar = iChar + 1; jChar < regex.length; jChar++){
             var nextChar = regex[jChar];
             if(nextChar != "}"){
                insideBrackets += nextChar;
+            }else{
+               closingBracket = true;
+               break;
             }
+         }
+         if(!closingBracket){
+            return "error: missing closing curly bracket";
          }
          var repeat = insideBrackets.split(",");
          if(repeat.length == 0){
@@ -374,25 +409,36 @@ function Automata(settings) {
          if(repeat.length == 2){
             if(repeat[1] == ""){
                result = result.concat(aut.star());
+            }else if(repeat[1] <= repeat[0]){
+               return "error: second element in a range should be larger than the first";
             }else{
-               var optionalRepeat = aut.optional().repeat(repeat[1]);
+               var range = repeat[1] - repeat[0];
+               var optionalRepeat = aut.optional().repeat(range);
                result = result.concat(optionalRepeat);
             }
          }
          nfa.push(result);
       };
 
-      function oneOf() {
+      function oneOf(iChar) {
          var insideBrackets = "";
+         var closingBracket = false;
          for(var jChar = iChar + 1; jChar < regex.length; jChar++){
             var nextChar = regex[jChar];
             if(nextChar != "]"){
                insideBrackets += nextChar;
+               if(!self.alphabet.includes(nextChar) && nextChar != "-"){
+                  return "error: invalid character inside brackets";
+               }
+            }else{
+               closingBracket = true;
+               break;
             }
          }
-         if(insideBrackets = ""){
-            return;
+         if(!closingBracket){
+            return "error: missing closing bracket";
          }
+
          var result;
          var hyphenIndex = insideBrackets.indexOf("-")
          while(hyphenIndex > -1){
@@ -406,28 +452,35 @@ function Automata(settings) {
             if(startChar >= endChar){
                return "error: second element in a range should be larger than the first";
             }
-            // for()
+            var startCode = startChar.charCodeAt();
+            var endCode = endChar.charCodeAt();
+            for(var iCode = startCode; iCode <= endCode; iCode++){
+               var chr = String.fromCharCode(iCode);
+               if(!result){
+                  result = NFA.for(chr,self.alphabet);
+               }else{
+                  result = result.union(NFA.for(chr,self.alphabet));
+               }
+            }
+            insideBrackets = insideBrackets.replace(startChar+'-'+endChar,'');
             hyphenIndex = insideBrackets.indexOf("-");
          }
-         // if(insideBrackets.includes("-")){
-         //    break;
-         // }else if(repeat.length > 2){
-         //    return "error: wrong format inside curly brackets";
-         // }else if(isNaN(repeat[0])){
-         //    return "error: missing number after {";
-         // }else if(repeat.length == 2 && repeat[1] != "" && isNaN(repeat[1])){
-         //    return "error: wrong format inside curly brackets";
-         // }    
-         // var result = aut.repeat(repeat[0]);
-         // if(repeat.length == 2){
-         //    if(repeat[1] == ""){
-         //       result = result.concat(aut.star());
-         //    }else{
-         //       var optionalRepeat = aut.optional().repeat(repeat[1]);
-         //       result = result.concat(optionalRepeat);
-         //    }
-         // }
+         if(insideBrackets == ""){
+            if(result){
+               nfa.push(result);
+            }
+            return jChar;
+         }
+         for(var chr of insideBrackets){
+            if(!result){
+               result = NFA.for(chr,self.alphabet);
+            }else{
+               result = result.union(NFA.for(chr,self.alphabet));
+            }
+         }
+
          nfa.push(result);
+         return jChar;
       };
    };
 
