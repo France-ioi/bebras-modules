@@ -48,6 +48,27 @@ for each level.
 
 ### gridInfos options
 
+#### example and startingExample
+
+Type : object
+
+These two objects allow to specify a snippet of code to be either used as the
+starting blocks (startingExample), or as an example to be inserted when the
+user clicks on the "Insert example" button (example).
+
+The possible keys for these objects are each of the languages supported by
+quickAlgo.
+
+For example :
+```
+startingExample: {
+    easy: {
+        blockly: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" id="QVpm7s!cvjXGYyqyRGi`" deletable="false" movable="false" editable="false" x="0" y="0"><next><block type="south" id="3i/LU1hZoS;-/`?==7a4"><next><block type="east" id="LJ_SQD?*Bp~bo}Cf]:V."></block></next></block></next></block></xml>',
+        python: "from robot import *\nbas()\ndroite()\n"
+    }
+}
+```
+
 #### hideControls
 
 Type : object
