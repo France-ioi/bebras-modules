@@ -395,6 +395,9 @@ function Automata(settings) {
          if(!closingBracket){
             return "error: missing closing curly bracket";
          }
+         if(insideBrackets == ""){
+            return "error: empty curly brackets";
+         }
          var repeat = insideBrackets.split(",");
          if(repeat.length == 0){
             return;
@@ -404,7 +407,9 @@ function Automata(settings) {
             return "error: missing number after {";
          }else if(repeat.length == 2 && repeat[1] != "" && isNaN(repeat[1])){
             return "error: wrong format inside curly brackets";
-         }    
+         }else if(repeat[0] < 1)   {
+            return "error: number inside curly brackets should be greater than 0";
+         } 
          var result = aut.repeat(repeat[0]);
          if(repeat.length == 2){
             if(repeat[1] == ""){
