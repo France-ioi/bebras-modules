@@ -235,95 +235,86 @@ function Automata(settings) {
    };
 
    this.regexToNFA = function(regex) {
-      /* convert a regex into a NFA and set it to targetNFA */
-      var groupIndices = [0]; // Indices of groups in nfa array
-      var orIndices = []; //  Indices of | in nfa array
-      var string = "";
-      var nfa = [];  // Array of nfas
+      try{
+         /* convert a regex into a NFA and set it to targetNFA */
+         var groupIndices = [0]; // Indices of groups in nfa array
+         var orIndices = []; //  Indices of | in nfa array
+         var string = "";
+         var nfa = [];  // Array of nfas
 
-      for(var iChar = 0; iChar < regex.length; iChar++){
-         var char = regex.charAt(iChar);
-         // console.log(char);
-         if(this.alphabet.includes(char)){
-            string += char;
-         }else{
-            switch(char){
-               case "(":
-                  /* open group */
-                  ifString();
-                  groupIndices.push(nfa.length);
-                  break;
-               case ")":
-                  /* close group */
-                  ifString();
-                  var error = concatGroup();
-                  if(error){
-                     return error;
-                  }
-                  break;
-               case "?":
-               case "*":
-               case "+":
-               case "{":
-                  var lastNFA = getLastNFA();
-                  if(!lastNFA){
-                     return "error: missing character before "+char;
-                  }
-                  if(char == "?"){
-                     nfa.push(lastNFA.optional());
-                  }else if(char == "*"){
-                     nfa.push(lastNFA.star());
-                  }else if(char == "+"){
-                     nfa.push(lastNFA.plus());
-                  }else if(char == "{"){
-                     var error = repeatNFA(lastNFA);
+         for(var iChar = 0; iChar < regex.length; iChar++){
+            var char = regex.charAt(iChar);
+            // console.log(char);
+            if(this.alphabet.includes(char)){
+               string += char;
+            }else{
+               switch(char){
+                  case "(":
+                     /* open group */
+                     ifString();
+                     groupIndices.push(nfa.length);
+                     break;
+                  case ")":
+                     /* close group */
+                     ifString();
+                     var error = concatGroup();
                      if(error){
                         return error;
                      }
-                  }
-                  break;
-               case "|":
-                  ifString();
-                  if(nfa.length == 0){
-                     return "error: missing character before |";
-                  }
-                  /* concat nfas in subgroup before */
-                  var error = concatGroup(true);
-                  if(error){
-                     return error;
-                  }
-                  orIndices.push(nfa.length);
-                  break;
-               case "[":
-                  ifString();
-                  var error = oneOf(iChar);
-                  if(error && isNaN(error)){
-                     return error;
-                  }else{
-                     iChar = error; // set iChar to end bracket
-                  }
-                  break;
-               default:
-                  var checkValidChar = new RegExp('[-}\\],0-9]');
-                  if(!checkValidChar.test(char)){
-                     return "error: invalid character "+char;
-                  }
+                     break;
+                  case "?":
+                  case "*":
+                  case "+":
+                  case "{":
+                     var lastNFA = getLastNFA();
+                     if(!lastNFA){
+                        throw "error: missing character before "+char;
+                     }
+                     if(char == "?"){
+                        nfa.push(lastNFA.optional());
+                     }else if(char == "*"){
+                        nfa.push(lastNFA.star());
+                     }else if(char == "+"){
+                        nfa.push(lastNFA.plus());
+                     }else if(char == "{"){
+                        repeatNFA(lastNFA);
+                     }
+                     break;
+                  case "|":
+                     ifString();
+                     if(nfa.length == 0){
+                        throw "error: missing character before |";
+                     }
+                     /* concat nfas in subgroup before */
+                     concatGroup(true);
+                     orIndices.push(nfa.length);
+                     break;
+                  case "[":
+                     ifString();
+                     var newIndex = oneOf(iChar);
+                     iChar = newIndex; // set iChar to end bracket
+                     break;
+                  default:
+                     var checkValidChar = new RegExp('[-}\\],0-9]');
+                     if(!checkValidChar.test(char)){
+                        throw "error: invalid character "+char;
+                     }
+               }
             }
          }
-      }
-      /* final close group */
-      ifString();
-      var error = concatGroup();
-      if(error){
+         /* final close group */
+         ifString();
+         concatGroup();
+         if(groupIndices.length != 0){
+            throw "error: missing parenthesis";
+         }
+         if(nfa[0]){
+            this.targetNFA = nfa[0];
+         }else{
+            throw "error: empty regex";
+         }
+      }catch(error){
          return error;
-      }
-      if(groupIndices.length != 0){
-         return "error: missing parenthesis";
-      }
-      if(nfa[0]){
-         this.targetNFA = nfa[0];
-      }else{
-         return "error: empty regex";
       }
 
       function ifString() {
@@ -338,7 +329,7 @@ function Automata(settings) {
          if(or){
             var startIndex = groupIndices[groupIndices.length - 1];
          }else if(groupIndices.length <= 0){
-            return "error: missing opening parenthesis";
+            throw "error: missing opening parenthesis";
          }else{
             var startIndex = groupIndices.pop();
          }
@@ -348,7 +339,7 @@ function Automata(settings) {
             var subGroup1 = nfa[subStartIndex - 1];
             var subGroup2 = nfa[subStartIndex];   // first nfa in subgroup after
             if(!subGroup2){
-               return "error: missing character after |";
+               throw "error: missing character after |";
             }
             for(var iElement = subStartIndex + 1; iElement < nfa.length; iElement++){
                subGroup2 = subGroup2.concat(nfa[iElement]);
@@ -393,29 +384,29 @@ function Automata(settings) {
             }
          }
          if(!closingBracket){
-            return "error: missing closing curly bracket";
+            throw "error: missing closing curly bracket";
          }
          if(insideBrackets == ""){
-            return "error: empty curly brackets";
+            throw "error: empty curly brackets";
          }
          var repeat = insideBrackets.split(",");
          if(repeat.length == 0){
             return;
          }else if(repeat.length > 2){
-            return "error: wrong format inside curly brackets";
+            throw "error: wrong format inside curly brackets";
          }else if(isNaN(repeat[0])){
-            return "error: missing number after {";
+            throw "error: missing number after {";
          }else if(repeat.length == 2 && repeat[1] != "" && isNaN(repeat[1])){
-            return "error: wrong format inside curly brackets";
+            throw "error: wrong format inside curly brackets";
          }else if(repeat[0] < 1)   {
-            return "error: number inside curly brackets should be greater than 0";
+            throw "error: number inside curly brackets should be greater than 0";
          } 
          var result = aut.repeat(repeat[0]);
          if(repeat.length == 2){
             if(repeat[1] == ""){
                result = result.concat(aut.star());
             }else if(repeat[1] <= repeat[0]){
-               return "error: second element in a range should be larger than the first";
+               throw "error: second element in a range should be larger than the first";
             }else{
                var range = repeat[1] - repeat[0];
                var optionalRepeat = aut.optional().repeat(range);
@@ -433,7 +424,7 @@ function Automata(settings) {
             if(nextChar != "]"){
                insideBrackets += nextChar;
                if(!self.alphabet.includes(nextChar) && nextChar != "-"){
-                  return "error: invalid character inside brackets";
+                  throw "error: invalid character inside brackets";
                }
             }else{
                closingBracket = true;
@@ -441,21 +432,21 @@ function Automata(settings) {
             }
          }
          if(!closingBracket){
-            return "error: missing closing bracket";
+            throw "error: missing closing bracket";
          }
 
          var result;
          var hyphenIndex = insideBrackets.indexOf("-")
          while(hyphenIndex > -1){
             if(hyphenIndex == 0){
-               return "error: wrong character after [";
+               throw "error: wrong character after [";
             }else if(hyphenIndex == insideBrackets.length - 1){
-               return "error: missing character after -";
+               throw "error: missing character after -";
             }
             var startChar = insideBrackets.charAt(hyphenIndex - 1);
             var endChar = insideBrackets.charAt(hyphenIndex + 1);
             if(startChar >= endChar){
-               return "error: second element in a range should be larger than the first";
+               throw "error: second element in a range should be larger than the first";
             }
             var startCode = startChar.charCodeAt();
             var endCode = endChar.charCodeAt();
