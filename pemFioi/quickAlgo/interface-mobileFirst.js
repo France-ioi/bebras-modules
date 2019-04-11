@@ -466,15 +466,15 @@ var quickAlgoInterface = {
             if(this.nbTestCases > 1) {
                 var curTest = iTest + 1;
                 var testImg = '';
-                if (displayHelper.hasLevels) {
-                    testImg = 'test' + curLevel + curTest + '.png';
+                if (displayHelper.hasLevels && this.options.hasTestThumbnails) {
+                    testImg = '<div class="testThumbnail">' +
+                            '<img src="test' + curLevel + curTest + '.png" alt="grid thumbnail for test '+iTest+'" width=50 height=50/>' +
+                        '</div>';
                 }
                 testTabs += '' +
                     '<div id="testTab'+iTest+'" class="testTab" onclick="task.displayedSubTask.changeTestTo('+iTest+')">' +
                         '<span class="testTitle"></span>' +
-                        '<div class="testThumbnail">' +
-                            '<img src="'+testImg+'" alt="grid thumbnail for test '+iTest+'" width=50 height=50/>' +
-                        '</div>' +
+                        testImg +
                     '</div>';
             }
         }
