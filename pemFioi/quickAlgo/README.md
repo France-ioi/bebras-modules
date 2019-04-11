@@ -69,6 +69,14 @@ startingExample: {
 }
 ```
 
+#### hasTestThumbnails
+
+Type : boolean
+
+Enables displaying test thumbnails in the test selector. The thumbnails must be
+present in the folder, and the filename must be `test[Level][number].png`, for
+example `testEasy1.png`.
+
 #### hideControls
 
 Type : object
