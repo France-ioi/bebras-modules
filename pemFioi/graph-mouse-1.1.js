@@ -1839,8 +1839,8 @@ function GraphEditor(settings) {
       self.terminalIcon.click(function(){
          var info = graph.getVertexInfo(vertexId);
          info.terminal = !info.terminal;
-         if(info.initial)
-            info.initial = false;
+         // if(info.initial)
+         //    info.initial = false;
          
          graph.setVertexInfo(vertexId,info);
          visualGraph.redraw();
@@ -1884,8 +1884,8 @@ function GraphEditor(settings) {
       self.initialIcon.click(function(){
          var info = graph.getVertexInfo(vertexId);
          info.initial = !info.initial;
-         if(info.terminal)
-            info.terminal = false;
+         // if(info.terminal)
+         //    info.terminal = false;
          
          graph.setVertexInfo(vertexId,info);
          visualGraph.redraw();
