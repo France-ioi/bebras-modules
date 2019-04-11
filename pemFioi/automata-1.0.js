@@ -47,6 +47,20 @@ function Automata(settings) {
    this.enabled = false;
 
    this.margin = 10;
+   var comparisonMessages = [
+      [
+         "accepted by the automata but doesn't match the regex: ",
+         "not accepted by the automata but matches the regex: "
+      ],
+      [
+         "accepted by the automata but doesn't match the regex: ",
+         "not accepted by the automata but matches the regex: "
+      ],
+      [
+         "not accepted by the nfa but is accepted by your dfa: ",
+         "accepted by the nfa but is not accepted by your dfa: "
+      ],
+   ];
 
 
    this.setEnabled = function(enabled) {
@@ -669,49 +683,17 @@ function Automata(settings) {
 
    this.validate = function(data) {
       this.resetAnimation();
+      
       switch(mode){
          case 1:
-            var comp = this.compareWithTarget();
-            if(comp.error){
-               return comp;
-            }
-            if(comp.equivalent){
-               return { error: null };
-            }else{
-               if(comp["e_c"][0]){
-                  this.setSequence(comp["e_c"][0]);
-                  var text = "The following string is accepted by the automata but doesn't match the regex: "+comp["e_c"][0];
-               }else{
-                  this.setSequence(comp["e_c"][1]);
-                  var text = "The following string is not accepted by the automata but matches the regex: "+comp["e_c"][1];
-               }
-               this.run();
-               return { error: text };
-            }
+            break;
          case 2:
             var regex = data;
             var error = this.regexToNFA(regex);
             if(error){
                return { error: error };
             }
-
-            var comp = this.compareWithTarget();
-            if(comp.error){
-               return comp;
-            }
-            if(comp.equivalent){
-               return { error: null };
-            }else{
-               if(comp["e_c"][0]){
-                  this.setSequence(comp["e_c"][0]);
-                  var text = "The following string is accepted by the automata but doesn't match the regex: "+comp["e_c"][0];
-               }else{
-                  this.setSequence(comp["e_c"][1]);
-                  var text = "The following string is not accepted by the automata but matches the regex: "+comp["e_c"][1];
-               }
-               this.run();
-               return { error: text };
-            }
+            break;
          case 3:
             if(!this.isDFA(this.graph)){
                return { error: "This automaton is nondeterministic" };
@@ -721,21 +703,22 @@ function Automata(settings) {
                return nfaFromGraph;
             }
             this.targetNFA = nfaFromGraph.nfa;
+            break;
+      }
 
-            var comp = this.compareWithTarget();
-            if(comp.equivalent){
-               return { error: null };
-            }else{
-               if(comp["e_c"][0]){
-                  this.setSequence(comp["e_c"][0]);
-                  var text = "The following string is not accepted by the nfa but matches your dfa: "+comp["e_c"][0];
-               }else{
-                  this.setSequence(comp["e_c"][1]);
-                  var text = "The following string is accepted by the nfa but doesn't match your dfa: "+comp["e_c"][1];
-               }
-               this.run();
-               return { error: text };
-            }
+      var comp = this.compareWithTarget();
+      if(comp.equivalent){
+         return { error: null };
+      }else{
+         if(comp["e_c"][0]){
+            this.setSequence(comp["e_c"][0]);
+            var text = "The following string "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
+         }else{
+            this.setSequence(comp["e_c"][1]);
+            var text = "The following string "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
+         }
+         this.run();
+         return { error: text };
       }
    };
 
