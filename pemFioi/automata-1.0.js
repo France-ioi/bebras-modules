@@ -670,6 +670,24 @@ function Automata(settings) {
    this.validate = function(data) {
       this.resetAnimation();
       switch(mode){
+         case 1:
+            var comp = this.compareWithTarget();
+            if(comp.error){
+               return comp;
+            }
+            if(comp.equivalent){
+               return { error: null };
+            }else{
+               if(comp["e_c"][0]){
+                  this.setSequence(comp["e_c"][0]);
+                  var text = "The following string is accepted by the automata but doesn't match the regex: "+comp["e_c"][0];
+               }else{
+                  this.setSequence(comp["e_c"][1]);
+                  var text = "The following string is not accepted by the automata but matches the regex: "+comp["e_c"][1];
+               }
+               this.run();
+               return { error: text };
+            }
          case 2:
             var regex = data;
             var error = this.regexToNFA(regex);
