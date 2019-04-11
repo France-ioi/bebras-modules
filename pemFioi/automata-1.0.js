@@ -49,16 +49,20 @@ function Automata(settings) {
    this.margin = 10;
    var comparisonMessages = [
       [
-         "accepted by the automata but doesn't match the regex: ",
-         "not accepted by the automata but matches the regex: "
+         "accepted by the automaton but doesn't match the regex: ",
+         "not accepted by the automaton but matches the regex: "
       ],
       [
-         "accepted by the automata but doesn't match the regex: ",
-         "not accepted by the automata but matches the regex: "
+         "accepted by the automaton but doesn't match the regex: ",
+         "not accepted by the automaton but matches the regex: "
       ],
       [
          "not accepted by the nfa but is accepted by your dfa: ",
          "accepted by the nfa but is not accepted by your dfa: "
+      ],
+      [
+         "not accepted by the non mimimized automaton but is accepted by your automaton: ",
+         "accepted by the non mimimized automaton but is not accepted by your automaton: "
       ],
    ];
 
@@ -212,7 +216,8 @@ function Automata(settings) {
          var children = graph.getChildren(vertex);
          if(info.initial && !this.startID.includes[vertex]){
             this.startID.push(vertex);
-         }else if(info.terminal && !this.endID.includes[vertex]){
+         }
+         if(info.terminal && !this.endID.includes[vertex]){
             this.endID.push(vertex);
          }
          for(child of children){
@@ -229,31 +234,39 @@ function Automata(settings) {
          }
       }
       if(this.startID.length == 0){
-         return {error: "noStart", nfa: null};
+         return {error: "error: no initial state", nfa: null};
       }
       if(this.endID.length == 0){
-         return {error:"noEnd", nfa: null};
+         return {error:"error: no final state", nfa: null};
       }
       return { error: null, nfa: new NFA(self.alphabet,transitionTable,this.startID,this.endID) };
-      // return null;
    };
 
    this.compareWithTarget = function() {
       /* compare automata with target NFA */
       var nfaFromGraph = this.nfaFromGraph(this.graph);
       if(nfaFromGraph.error){
-         return error;
+         return nfaFromGraph;
       }
       this.NFA = nfaFromGraph.nfa;
       var dfa = this.NFA.to_DFA();
       var targetDFA = this.targetNFA.to_DFA();
+      var isMin = null;
+      if(mode == 4){
+         var isMin = true;
+         var minimizedTarget = targetDFA.minimized();
+         var minStatesNb = minimizedTarget.states.length;
+         if(dfa.states.length > minStatesNb){
+            var isMin = false;
+         }
+      }
       var e_c = dfa.find_equivalence_counterexamples(targetDFA);
       var equivalent = false;
       if(!e_c[0] && !e_c[1]){
          equivalent = true;
       }
       var noUnreachableDFA = dfa.without_unreachables();
-      return {equivalent: equivalent, e_c: e_c};
+      return {equivalent: equivalent, e_c: e_c, isMin: isMin};
    };
 
    this.regexToNFA = function(regex) {
@@ -683,7 +696,7 @@ function Automata(settings) {
 
    this.validate = function(data) {
       this.resetAnimation();
-      
+
       switch(mode){
          case 1:
             break;
@@ -695,6 +708,7 @@ function Automata(settings) {
             }
             break;
          case 3:
+         case 4:
             if(!this.isDFA(this.graph)){
                return { error: "This automaton is nondeterministic" };
             }
@@ -704,25 +718,33 @@ function Automata(settings) {
             }
             this.targetNFA = nfaFromGraph.nfa;
             break;
+         default:
+            return { error: "error: invalid mode" };
       }
 
       var comp = this.compareWithTarget();
-      if(comp.equivalent){
-         return { error: null };
-      }else{
-         if(comp["e_c"][0]){
-            this.setSequence(comp["e_c"][0]);
-            var text = "The following string "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
-         }else{
-            this.setSequence(comp["e_c"][1]);
-            var text = "The following string "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
-         }
-         this.run();
-         return { error: text };
+      if(comp.error){
+         return comp;
       }
+      if(comp.equivalent){
+         if(mode == 4 && !comp.isMin){
+            return { error: "This automaton is not minimized" };
+         }
+         return { error: null };
+      }
+      if(comp["e_c"][0]){
+         this.setSequence(comp["e_c"][0]);
+         var text = "The following string "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
+      }else{
+         this.setSequence(comp["e_c"][1]);
+         var text = "The following string "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
+      }
+      this.run();
+      return { error: text };
+      
    };
 
-   if(mode == 3){
+   if(mode == 3 || mode == 4){
       this.initStaticGraph();
    }
    this.initGraph();
