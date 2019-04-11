@@ -460,13 +460,21 @@ var quickAlgoInterface = {
     initTestSelector: function (nbTestCases) {
         // Create the DOM for the tests display
         this.nbTestCases = nbTestCases;
-
+        var curLevel = this.level.charAt(0).toUpperCase() + this.level.slice(1);;
         var testTabs = '<div class="tabs">';
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
             if(this.nbTestCases > 1) {
+                var curTest = iTest + 1;
+                var testImg = '';
+                if (displayHelper.hasLevels) {
+                    testImg = 'test' + curLevel + curTest + '.png';
+                }
                 testTabs += '' +
                     '<div id="testTab'+iTest+'" class="testTab" onclick="task.displayedSubTask.changeTestTo('+iTest+')">' +
                         '<span class="testTitle"></span>' +
+                        '<div class="testThumbnail">' +
+                            '<img src="'+testImg+'" alt="grid thumbnail for test '+iTest+'" width=50 height=50/>' +
+                        '</div>' +
                     '</div>';
             }
         }
@@ -531,7 +539,9 @@ var quickAlgoInterface = {
 
     updateTestSelector: function (newCurTest) {
         $("#testSelector .testTab").removeClass('currentTest');
+        $("#testSelector .testTab .testThumbnail").show();
         $("#testTab"+newCurTest).addClass('currentTest');
+        $("#testTab"+newCurTest + " .testThumbnail").hide();
         $("#task").append($('#messages'));
         //$("#testTab"+newCurTest+" .panel-body").prepend($('#grid')).append($('#messages')).show();
     },

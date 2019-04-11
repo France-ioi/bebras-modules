@@ -608,11 +608,12 @@ p {
     background-color: purple;
 }
 .testResultIcon {
-  display: inline-block;
   width: 21px;
   height: 21px;
-  line-height: 21px;
-  margin-right: 6px;
+  line-height: 36px;
+  position: absolute;
+  top: 0;
+  left: -27px;
 }
 .testResultIcon.testSuccess span {
   background: #b8e986;
@@ -645,6 +646,16 @@ p {
   padding: 2px;
   text-transform: uppercase;
   position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+    -ms-flex-pack: center;
+  justify-content: center;
+  align-items: center;
 }
 #testSelector .testTab.currentTest {
   box-shadow: 0 1px 0 0px #ccc;
@@ -682,6 +693,8 @@ p {
 #testSelector .tabs .testTab:not(.currentTest) {
   box-shadow: 0 1px 0 0px #ccc inset;
   color: #ababac;
+  font-size: 12px;
+  line-height: 16px;
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
