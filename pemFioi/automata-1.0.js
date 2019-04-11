@@ -1,10 +1,25 @@
 function Automata(settings) {
    var self = this;
    var subTask = settings.subTask;
+   /* modes:
+      1: regex to automata
+      2: automata to regex
+      3: nfa to dfa
+   */
+   var mode = settings.mode;
    this.id = settings.id || "Automata";
+   
    this.graphPaper = settings.graphPaper;
    this.graphPaperElementID = settings.graphPaperElementID;
    this.visualGraphJSON = settings.visualGraphJSON;
+   this.visualGraph;
+   this.graph;
+
+   this.staticGraphPaper = settings.staticGraphPaper;
+   this.staticVisualGraphJSON = settings.staticVisualGraphJSON;
+   this.staticVisualGraph;
+   this.staticGraph;
+
    this.circleAttr = settings.circleAttr;
    this.edgeAttr = settings.edgeAttr;
    this.graphDrawer = settings.graphDrawer || new SimpleGraphDrawer(this.circleAttr,this.edgeAttr,null,true);
@@ -22,8 +37,6 @@ function Automata(settings) {
    this.beaver;
    this.result;
 
-   this.visualGraph;
-   this.graph;
    this.graphMouse;
    this.graphEditor;
 
@@ -120,6 +133,11 @@ function Automata(settings) {
       this.graphEditor = new GraphEditor(editorSettings);
    };
 
+   this.initStaticGraph = function() {
+      this.staticVisualGraph = VisualGraph.fromJSON(this.staticVisualGraphJSON, this.id+"_staticVisualGraph", this.staticGraphPaper, null, this.graphDrawer, true);
+      this.staticGraph = this.staticVisualGraph.graph;
+   };
+
    this.initSequence = function() {
       var containerSize = {
          h: this.seqLettersAttr["font-size"] + this.margin,
@@ -169,24 +187,24 @@ function Automata(settings) {
       });
    };
 
-   this.getNFA = function() {
-      self.startID = [];
-      self.endID = [];
-      var vertices = self.graph.getAllVertices();
+   this.nfaFromGraph = function(graph) {
+      this.startID = [];
+      this.endID = [];
+      var vertices = graph.getAllVertices();
       var transitionTable = {};
       for(vertex of vertices){
-         var info = self.graph.getVertexInfo(vertex);
+         var info = graph.getVertexInfo(vertex);
          transitionTable[vertex] = {};
-         var children = self.graph.getChildren(vertex);
+         var children = graph.getChildren(vertex);
          if(info.initial && !this.startID.includes[vertex]){
             this.startID.push(vertex);
          }else if(info.terminal && !this.endID.includes[vertex]){
             this.endID.push(vertex);
          }
          for(child of children){
-            var edges = self.graph.getEdgesFrom(vertex,child);
+            var edges = graph.getEdgesFrom(vertex,child);
             for(var edge of edges){
-               var info = self.graph.getEdgeInfo(edge);
+               var info = graph.getEdgeInfo(edge);
                var label = info.label || "";
                if(!transitionTable[vertex][label]){
                   transitionTable[vertex][label] = [child];
@@ -197,32 +215,22 @@ function Automata(settings) {
          }
       }
       if(this.startID.length == 0){
-         return {error: "noStart"}
+         return {error: "noStart", nfa: null};
       }
       if(this.endID.length == 0){
-         return {error:"noEnd"};
+         return {error:"noEnd", nfa: null};
       }
-      self.NFA = new NFA(self.alphabet,transitionTable,this.startID,this.endID);
-      return null;
+      return { error: null, nfa: new NFA(self.alphabet,transitionTable,this.startID,this.endID) };
+      // return null;
    };
-
-   // this.generateTargetNFA = function() {
-   //    var str = "";
-   //    for(var letter of this.sequence){
-   //       str += letter;
-   //    }
-   //    this.targetNFA = NFA.for(str,this.alphabet);
-   // };
 
    this.compareWithTarget = function() {
       /* compare automata with target NFA */
-      // if(!this.targetNFA){
-      //    this.generateTargetNFA();
-      // }
-      var error = this.getNFA();
-      if(error){
+      var nfaFromGraph = this.nfaFromGraph(this.graph);
+      if(nfaFromGraph.error){
          return error;
       }
+      this.NFA = nfaFromGraph.nfa;
       var dfa = this.NFA.to_DFA();
       var targetDFA = this.targetNFA.to_DFA();
       var e_c = dfa.find_equivalence_counterexamples(targetDFA);
@@ -231,12 +239,12 @@ function Automata(settings) {
          equivalent = true;
       }
       var noUnreachableDFA = dfa.without_unreachables();
-      return {equivalent: equivalent, e_c: e_c, unusedVertices: (this.NFA.states.length >= noUnreachableDFA.states.length)};
+      return {equivalent: equivalent, e_c: e_c};
    };
 
    this.regexToNFA = function(regex) {
+      /* convert a regex into a NFA and set it to targetNFA */
       try{
-         /* convert a regex into a NFA and set it to targetNFA */
          var groupIndices = [0]; // Indices of groups in nfa array
          var orIndices = []; //  Indices of | in nfa array
          var string = "";
@@ -630,7 +638,92 @@ function Automata(settings) {
          settings.resetCallback();
    };
 
+   this.isDFA = function(graph) {
+      var vertices = graph.getAllVertices();
+      var nInitial = 0;
+      for(var vertex of vertices){
+         var info = graph.getVertexInfo(vertex);
+         if(info.initial){
+            nInitial++;
+            if(nInitial > 1){
+               return false;
+            }
+         }
+         var children = graph.getChildren(vertex);
+         var nSameEdgeLabel = 0;
+         var edgeLabel = [];
+         for(var child of children){
+            var edges = graph.getEdgesFrom(vertex,child);
+            for(var edge of edges){
+               var edgeInfo = graph.getEdgeInfo(edge);
+               if(edgeLabel.includes(edgeInfo.label)){
+                  return false;
+               }else{
+                  edgeLabel.push(edgeInfo.label);
+               }
+            }
+         }
+      }
+      return true;
+   };
 
+   this.validate = function(data) {
+      this.resetAnimation();
+      switch(mode){
+         case 2:
+            var regex = data;
+            var error = this.regexToNFA(regex);
+            if(error){
+               return { error: error };
+            }
+
+            var comp = this.compareWithTarget();
+            if(comp.error){
+               return comp;
+            }
+            if(comp.equivalent){
+               return { error: null };
+            }else{
+               if(comp["e_c"][0]){
+                  this.setSequence(comp["e_c"][0]);
+                  var text = "The following string is accepted by the automata but doesn't match the regex: "+comp["e_c"][0];
+               }else{
+                  this.setSequence(comp["e_c"][1]);
+                  var text = "The following string is not accepted by the automata but matches the regex: "+comp["e_c"][1];
+               }
+               this.run();
+               return { error: text };
+            }
+         case 3:
+            if(!this.isDFA(this.graph)){
+               return { error: "This automaton is nondeterministic" };
+            }
+            var nfaFromGraph = this.nfaFromGraph(this.staticGraph);
+            if(nfaFromGraph.error){
+               return nfaFromGraph;
+            }
+            this.targetNFA = nfaFromGraph.nfa;
+
+            var comp = this.compareWithTarget();
+            if(comp.equivalent){
+               return { error: null };
+            }else{
+               if(comp["e_c"][0]){
+                  this.setSequence(comp["e_c"][0]);
+                  var text = "The following string is not accepted by the nfa but matches your dfa: "+comp["e_c"][0];
+               }else{
+                  this.setSequence(comp["e_c"][1]);
+                  var text = "The following string is accepted by the nfa but doesn't match your dfa: "+comp["e_c"][1];
+               }
+               this.run();
+               return { error: text };
+            }
+      }
+   };
+
+   if(mode == 3){
+      this.initStaticGraph();
+   }
    this.initGraph();
    this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
 
