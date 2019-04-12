@@ -2,9 +2,12 @@ function Automata(settings) {
    var self = this;
    var subTask = settings.subTask;
    /* modes:
-      1: regex to automata
-      2: automata to regex
+      1: regex to automaton
+      2: automaton to regex
       3: nfa to dfa
+      4: minimization
+      5: find a word
+
    */
    var mode = settings.mode;
    this.id = settings.id || "Automata";
@@ -27,6 +30,7 @@ function Automata(settings) {
    this.startID = [];
    this.endID = [];
    this.alphabet = settings.alphabet;
+   this.regex = settings.regex;
 
    this.sequencePaper = settings.sequencePaper;
    this.sequence = settings.sequence;
@@ -43,6 +47,9 @@ function Automata(settings) {
    this.NFA;
    this.targetNFA = settings.targetNFA;
    this.callback = settings.callback;
+
+   this.acceptedByRegex = settings.acceptedByRegex;
+   this.acceptedByAutomaton = settings.acceptedByAutomaton;
 
    this.enabled = false;
 
@@ -666,6 +673,7 @@ function Automata(settings) {
    };
 
    this.isDFA = function(graph) {
+      /* check if a graph represents a deterministic automaton */
       var vertices = graph.getAllVertices();
       var nInitial = 0;
       for(var vertex of vertices){
@@ -694,6 +702,13 @@ function Automata(settings) {
       return true;
    };
 
+   this.isWordAccepted = function(word) {
+      /* is this word accepted by this.NFA and this.targetNFA */
+      var acceptedByNFA = this.NFA.test(word);
+      var acceptedByTargetNFA = this.targetNFA.test(word);
+      return { nfa: acceptedByNFA, target: acceptedByTargetNFA };
+   };
+
    this.validate = function(data) {
       this.resetAnimation();
 
@@ -717,6 +732,28 @@ function Automata(settings) {
                return nfaFromGraph;
             }
             this.targetNFA = nfaFromGraph.nfa;
+            break;
+         case 5:
+            var word = data;
+            if(!word){
+               return { error: "Enter a word in the input field" };
+            }
+            var wordAccepted = this.isWordAccepted(word);
+            var error;
+            if(!wordAccepted.nfa && !wordAccepted.target){
+               error = (!this.acceptedByAutomaton && !this.acceptedByRegex) ? null : "This word is accepted neither by the regex nor by the automaton";
+            }else if(wordAccepted.nfa && wordAccepted.target){
+               error = (this.acceptedByAutomaton && this.acceptedByRegex) ? null : "This word is accepted by both the regex and the automaton";
+            }else if(wordAccepted.nfa && !wordAccepted.target){
+               error = (this.acceptedByAutomaton && !this.acceptedByRegex) ? null : "This word is accepted by the automaton and not by the regex";
+            }else if(!wordAccepted.nfa && wordAccepted.target){
+               error = (!this.acceptedByAutomaton && this.acceptedByRegex) ? null : "This word is accepted by the regex and not by the automaton";
+            }
+            if(error){
+               this.setSequence(word);
+               this.run();
+            }
+            return { error: error };
             break;
          default:
             return { error: "error: invalid mode" };
@@ -749,6 +786,10 @@ function Automata(settings) {
    }
    this.initGraph();
    this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
+   if(mode == 5){
+      this.regexToNFA(this.regex);
+      this.NFA = this.nfaFromGraph(this.graph).nfa;
+   }
 
    if(settings.enabled){
       this.setEnabled(true);
