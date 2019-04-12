@@ -460,7 +460,7 @@ var quickAlgoInterface = {
     initTestSelector: function (nbTestCases) {
         // Create the DOM for the tests display
         this.nbTestCases = nbTestCases;
-        var curLevel = this.level.charAt(0).toUpperCase() + this.level.slice(1);;
+        var curLevel = this.level;
         var testTabs = '<div class="tabs">';
         for(var iTest=0; iTest<this.nbTestCases; iTest++) {
             if(this.nbTestCases > 1) {
@@ -468,7 +468,7 @@ var quickAlgoInterface = {
                 var testImg = '';
                 if (displayHelper.hasLevels && this.options.hasTestThumbnails) {
                     testImg = '<div class="testThumbnail">' +
-                            '<img src="test' + curLevel + curTest + '.png" alt="grid thumbnail for test '+iTest+'" width=50 height=50/>' +
+                            '<img src="test_' + curLevel + '_' + curTest + '.png" alt="grid thumbnail for test '+curTest+'" width=50 height=50/>' +
                         '</div>';
                 }
                 testTabs += '' +
