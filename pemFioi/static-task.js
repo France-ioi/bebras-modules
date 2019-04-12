@@ -9,7 +9,6 @@
 var task = {};
 
 task.showViews = function(views, success, error) {
-   console.error('showViews');
    success();
 };
 
@@ -49,7 +48,6 @@ task.getState = function(success, error) {
 };
 
 task.getMetaData = function(success, error) {
-   console.error('getMetadata');
    if (typeof json !== 'undefined') {
       success(json);
    } else {
@@ -75,7 +73,6 @@ task.getDefaultAnswerObject = function() {}
 
 
 task.load = function(views, success, error) {
-  console.error('load');
    success();
 };
 
@@ -87,4 +84,18 @@ var grader = {
 
 if (platform) {
   platform.initWithTask(task);
+}
+
+
+window.platformScrollTo = function(target) {
+    var offset = 0;
+    if(typeof target == 'number') {
+        offset = target;
+    } else {
+        if(!target.offset) {
+            target = $(target);
+        }
+        var offset = target.offset().top;
+    }
+    platform.updateDisplay({scrollTop: offset});
 }
