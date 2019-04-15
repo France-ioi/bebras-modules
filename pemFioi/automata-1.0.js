@@ -7,7 +7,7 @@ function Automata(settings) {
       3: nfa to dfa
       4: minimization
       5: find a word
-
+      6: word list (automata)
    */
    var mode = settings.mode;
    this.id = settings.id || "Automata";
@@ -51,6 +51,9 @@ function Automata(settings) {
    this.acceptedByRegex = settings.acceptedByRegex;
    this.acceptedByAutomaton = settings.acceptedByAutomaton;
 
+   this.wordList = settings.wordList;
+   this.maxNbStates = settings.maxNbStates;
+
    this.enabled = false;
 
    this.margin = 10;
@@ -71,6 +74,16 @@ function Automata(settings) {
          "not accepted by the non mimimized automaton but is accepted by your automaton: ",
          "accepted by the non mimimized automaton but is not accepted by your automaton: "
       ],
+      [
+         "This word is accepted neither by the regex nor by the automaton",
+         "This word is accepted by both the regex and the automaton",
+         "This word is accepted by the automaton and not by the regex",
+         "This word is accepted by the regex and not by the automaton"
+      ],
+      [
+         "accepted by your automaton but it is not in the word list: ",
+         "in the word list but it is not accepted by your automaton: "
+      ]
    ];
 
 
@@ -251,11 +264,6 @@ function Automata(settings) {
 
    this.compareWithTarget = function() {
       /* compare automata with target NFA */
-      var nfaFromGraph = this.nfaFromGraph(this.graph);
-      if(nfaFromGraph.error){
-         return nfaFromGraph;
-      }
-      this.NFA = nfaFromGraph.nfa;
       var dfa = this.NFA.to_DFA();
       var targetDFA = this.targetNFA.to_DFA();
       var isMin = null;
@@ -301,7 +309,7 @@ function Automata(settings) {
                      ifString();
                      var error = concatGroup();
                      if(error){
-                        return error;
+                        return { error: error };
                      }
                      break;
                   case "?":
@@ -351,12 +359,13 @@ function Automata(settings) {
             throw "error: missing parenthesis";
          }
          if(nfa[0]){
-            this.targetNFA = nfa[0];
+            // this.targetNFA = nfa[0];
+            return { nfa: nfa[0], error: null };
          }else{
             throw "error: empty regex";
          }
       }catch(error){
-         return error;
+         return { error: error };
       }
 
       function ifString() {
@@ -660,13 +669,10 @@ function Automata(settings) {
    this.resetAnimation = function() {
       self.stopAnimation();
       if(self.cursor){
-         // self.cursor.attr("transform","");
-         // self.cursorX = self.margin;
          self.sequencePaper.clear();
       }
       if(self.beaver){
          self.beaver.remove();
-         // self.initBeaver();
       }
       if(settings.resetCallback)
          settings.resetCallback();
@@ -709,6 +715,18 @@ function Automata(settings) {
       return { nfa: acceptedByNFA, target: acceptedByTargetNFA };
    };
 
+   this.nfaFromList = function() {
+      var nfa;
+      for(var word of this.wordList){
+         if(!nfa){
+            nfa = NFA.for(word,this.alphabet);
+         }else{
+            nfa = nfa.union(NFA.for(word,this.alphabet));
+         }
+      }
+      return nfa;
+   };
+
    this.validate = function(data) {
       this.resetAnimation();
 
@@ -717,9 +735,11 @@ function Automata(settings) {
             break;
          case 2:
             var regex = data;
-            var error = this.regexToNFA(regex);
-            if(error){
-               return { error: error };
+            var res = this.regexToNFA(regex);
+            if(res.error){
+               return res;
+            }else{
+               this.targetNFA = res.nfa;
             }
             break;
          case 3:
@@ -738,16 +758,26 @@ function Automata(settings) {
             if(!word){
                return { error: "Enter a word in the input field" };
             }
+            var regexToNFA = this.regexToNFA(this.regex);
+            if(regexToNFA.error){
+               return regexToNFA;
+            }
+            this.targetNFA = regexToNFA.nfa;
+            var nfaFromGraph = this.nfaFromGraph(this.graph);
+            if(nfaFromGraph.error){
+               return nfaFromGraph;
+            }
+            this.NFA = nfaFromGraph.nfa;
             var wordAccepted = this.isWordAccepted(word);
             var error;
             if(!wordAccepted.nfa && !wordAccepted.target){
-               error = (!this.acceptedByAutomaton && !this.acceptedByRegex) ? null : "This word is accepted neither by the regex nor by the automaton";
+               error = (!this.acceptedByAutomaton && !this.acceptedByRegex) ? null : comparisonMessages[4][0];
             }else if(wordAccepted.nfa && wordAccepted.target){
-               error = (this.acceptedByAutomaton && this.acceptedByRegex) ? null : "This word is accepted by both the regex and the automaton";
+               error = (this.acceptedByAutomaton && this.acceptedByRegex) ? null : comparisonMessages[4][1];
             }else if(wordAccepted.nfa && !wordAccepted.target){
-               error = (this.acceptedByAutomaton && !this.acceptedByRegex) ? null : "This word is accepted by the automaton and not by the regex";
+               error = (this.acceptedByAutomaton && !this.acceptedByRegex) ? null : comparisonMessages[4][2];
             }else if(!wordAccepted.nfa && wordAccepted.target){
-               error = (!this.acceptedByAutomaton && this.acceptedByRegex) ? null : "This word is accepted by the regex and not by the automaton";
+               error = (!this.acceptedByAutomaton && this.acceptedByRegex) ? null : comparisonMessages[4][3];
             }
             if(error){
                this.setSequence(word);
@@ -755,14 +785,35 @@ function Automata(settings) {
             }
             return { error: error };
             break;
+         case 6:
+            var regex = data;
+            if(regex){
+               var res = this.regexToNFA(regex);
+               if(res.error){
+                  return res;
+               }
+               this.NFA = res.nfa;
+            }
+            
+            if(this.maxNbStates && this.maxNbStates < this.graph.getVerticesCount()){
+               return { error: "The number of states is greater than "+this.maxNbStates };
+            }
+            this.targetNFA = this.nfaFromList();
+            break;
          default:
             return { error: "error: invalid mode" };
       }
 
-      var comp = this.compareWithTarget();
-      if(comp.error){
-         return comp;
+      if(this.graph){
+         var nfaFromGraph = this.nfaFromGraph(this.graph);
+         if(nfaFromGraph.error){
+            return nfaFromGraph;
+         }
+         this.NFA = nfaFromGraph.nfa;
       }
+
+      var comp = this.compareWithTarget();
+
       if(comp.equivalent){
          if(mode == 4 && !comp.isMin){
             return { error: "This automaton is not minimized" };
@@ -771,10 +822,10 @@ function Automata(settings) {
       }
       if(comp["e_c"][0]){
          this.setSequence(comp["e_c"][0]);
-         var text = "The following string "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
+         var text = "The following string is "+comparisonMessages[mode - 1][0]+comp["e_c"][0];
       }else{
          this.setSequence(comp["e_c"][1]);
-         var text = "The following string "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
+         var text = "The following string is "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
       }
       this.run();
       return { error: text };
@@ -784,11 +835,9 @@ function Automata(settings) {
    if(mode == 3 || mode == 4){
       this.initStaticGraph();
    }
-   this.initGraph();
-   this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
-   if(mode == 5){
-      this.regexToNFA(this.regex);
-      this.NFA = this.nfaFromGraph(this.graph).nfa;
+   if(this.visualGraphJSON){
+      this.initGraph();
+      this.reset = new PaperMouseEvent(this.graphPaperElementID, this.graphPaper, "click", this.resetAnimation, false,"reset");
    }
 
    if(settings.enabled){
