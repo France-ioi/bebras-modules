@@ -8,6 +8,7 @@ function Automata(settings) {
       4: minimization
       5: find a word
       6: word list (automata)
+      7: word list (regex)
    */
    var mode = settings.mode;
    this.id = settings.id || "Automata";
@@ -53,6 +54,7 @@ function Automata(settings) {
 
    this.wordList = settings.wordList;
    this.maxNbStates = settings.maxNbStates;
+   this.maxNbChar = settings.maxNbChar;
 
    this.enabled = false;
 
@@ -83,6 +85,10 @@ function Automata(settings) {
       [
          "accepted by your automaton but it is not in the word list: ",
          "in the word list but it is not accepted by your automaton: "
+      ],
+      [
+         "accepted by your regex but it is not in the word list: ",
+         "in the word list but it is not accepted by your regex: "
       ]
    ];
 
@@ -91,13 +97,15 @@ function Automata(settings) {
       if(enabled == this.enabled)
          return;
       this.enabled = enabled;
-      this.graphEditor.setEnabled(enabled);
-      this.reset.setEnabled(enabled);
-      
-      this.graphEditor.setDragGraphEnabled(false);
-      this.graphEditor.setScaleGraphEnabled(false);
-      this.setEditVertexLabelEnabled(false);
-      this.setDefaultVertexLabelEnabled(false);
+      if(this.visualGraphJSON){
+         this.graphEditor.setEnabled(enabled);
+         this.reset.setEnabled(enabled);
+         
+         this.graphEditor.setDragGraphEnabled(false);
+         this.graphEditor.setScaleGraphEnabled(false);
+         this.setEditVertexLabelEnabled(false);
+         this.setDefaultVertexLabelEnabled(false);
+      }
    };
    this.setCreateVertexEnabled = function(enabled) {
       this.graphEditor.setCreateVertexEnabled(enabled);
@@ -786,25 +794,28 @@ function Automata(settings) {
             return { error: error };
             break;
          case 6:
-            var regex = data;
-            if(regex){
-               var res = this.regexToNFA(regex);
-               if(res.error){
-                  return res;
-               }
-               this.NFA = res.nfa;
-            }
-            
-            if(this.maxNbStates && this.maxNbStates < this.graph.getVerticesCount()){
+            if(this.maxNbStates < this.graph.getVerticesCount()){
                return { error: "The number of states is greater than "+this.maxNbStates };
             }
+            this.targetNFA = this.nfaFromList();
+            break;
+         case 7:
+            var regex = data;
+            if(this.maxNbChar < regex.length){
+               return { error: "The regex is longer than "+this.maxNbChar };
+            }
+            var res = this.regexToNFA(regex);
+            if(res.error){
+               return res;
+            }
+            this.NFA = res.nfa;
             this.targetNFA = this.nfaFromList();
             break;
          default:
             return { error: "error: invalid mode" };
       }
 
-      if(this.graph){
+      if(mode != 7){
          var nfaFromGraph = this.nfaFromGraph(this.graph);
          if(nfaFromGraph.error){
             return nfaFromGraph;
@@ -827,7 +838,9 @@ function Automata(settings) {
          this.setSequence(comp["e_c"][1]);
          var text = "The following string is "+comparisonMessages[mode - 1][1]+comp["e_c"][1];
       }
-      this.run();
+      if(mode != 7){
+         this.run();
+      }
       return { error: text };
       
    };
