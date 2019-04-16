@@ -1607,9 +1607,10 @@ function GraphEditor(settings) {
 
    this.setNewEdgeVisualInfo = function(edgeID,id1,id2) {
       var edges = graph.getEdgesBetween(id1,id2);
-      if(edges.length <= 1)
-         return;
+
       if(id1 === id2){
+         if(edges.length <= 1)
+            return;
          var angle = 0;
          var validAngle;
          var increment = 20;
@@ -1684,11 +1685,50 @@ function GraphEditor(settings) {
                   }
                }
             }
+            if(nTry == 0){
+               var neighbors1 = graph.getNeighbors(id1);
+               var neighbors2 = graph.getNeighbors(id2);
+               var neighbors = neighbors1.concat(neighbors2);
+               for(var neighbor of neighbors){
+                  if(neighbor != id1 && neighbor != id2 && areAligned(id1,id2,neighbor)){
+                     var edges1 = graph.getEdgesBetween(id1,neighbor);
+                     var edges2 = graph.getEdgesBetween(id2,neighbor);
+                     var edges3 = edges1.concat(edges2);
+                     for(var edge of edges3){
+                        var vInfo = visualGraph.getEdgeVisualInfo(edge);
+                        if(!vInfo["radius-ratio"]){
+                           validParameters = false;
+                           nTry++;
+                        }
+                     }
+                  }
+               }
+            }
          }while(!validParameters);
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
-         console.log(parameterSet[nTry]);
       }
       visualGraph.graphDrawer.refreshEdgePosition(id1,id2);
+   };
+
+   function areAligned(id1,id2,id3){
+      var vInfo1 = visualGraph.getVertexVisualInfo(id1); 
+      var vInfo2 = visualGraph.getVertexVisualInfo(id2); 
+      var vInfo3 = visualGraph.getVertexVisualInfo(id3);
+      if(vInfo1.x != vInfo2.x){
+         var a = (vInfo2.y - vInfo1.y)/(vInfo2.x - vInfo1.x);
+         var b = vInfo1.y - a*vInfo1.x;     
+         if(vInfo3.y < (a * vInfo3.x + b + 5) && vInfo3.y > (a * vInfo3.x + b - 5)){
+            return true;
+         }else{
+            return false;
+         }
+      }else{
+         if(vInfo3.x < (vInfo1.x + 5) && vInfo3.x > (vInfo1.x - 5)){
+            return true;
+         }else{
+            return false;
+         }
+      }
    };
 
    this.addIcons = function(vertexId) {
