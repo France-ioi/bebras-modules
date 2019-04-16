@@ -1634,6 +1634,7 @@ function GraphEditor(settings) {
          }while(!validAngle);
          visualGraph.setEdgeVisualInfo(edgeID,{angle:angle});
       }else{
+         var edgesFrom = graph.getEdgesFrom(id1,id2);
          var validParameters;
          var parameterSet = [
             {"sweep":0,"large-arc":0,"radius-ratio":0},
@@ -1667,13 +1668,16 @@ function GraphEditor(settings) {
             }
             for(var iEdge = 0; iEdge < edges.length; iEdge++){
                if(edges[iEdge] !== edgeID){
+                  var isFrom = edgesFrom.includes(edges[iEdge]);
                   var vInfo = visualGraph.getEdgeVisualInfo(edges[iEdge]);
                   if(!vInfo["radius-ratio"]){
                      vInfo["radius-ratio"] = 0;
-                     vInfo["sweep"] = 0;
+                     vInfo["sweep"] = (isFrom) ? 0 : 1;
                      vInfo["large-arc"] = 0;
                   }
-                  if(vInfo["radius-ratio"] === parameterSet[nTry]["radius-ratio"] && vInfo["sweep"] === parameterSet[nTry]["sweep"] && vInfo["large-arc"] === parameterSet[nTry]["large-arc"]){
+                  if(vInfo["radius-ratio"] === parameterSet[nTry]["radius-ratio"] && 
+                     (vInfo["sweep"] === parameterSet[nTry]["sweep"] && isFrom || vInfo["sweep"] !== parameterSet[nTry]["sweep"] && !isFrom) && 
+                     vInfo["large-arc"] === parameterSet[nTry]["large-arc"]){
                      validParameters = false;
                      nTry++;
                      break;
@@ -1682,6 +1686,7 @@ function GraphEditor(settings) {
             }
          }while(!validParameters);
          visualGraph.setEdgeVisualInfo(edgeID,parameterSet[nTry]);
+         console.log(parameterSet[nTry]);
       }
       visualGraph.graphDrawer.refreshEdgePosition(id1,id2);
    };
