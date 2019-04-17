@@ -129,8 +129,8 @@ function LogicController(nbTestCases, maxInstructions) {
   }
 
   this.getDefaultContent = function () {
-    if(this.options.startingExample && this.options.startingExample.python) {
-      return this.options.startingExample.python;
+    if(this._options.startingExample && this._options.startingExample.python) {
+      return this._options.startingExample.python;
     }
     var availableModules = this.getAvailableModules();
     var content = '';
