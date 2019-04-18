@@ -2258,9 +2258,13 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state) {
                 if (!sensor.buzzerInterval) {
                     sensor.buzzerInterval = setInterval(function () {
-                        sensor.ringingState = !sensor.ringingState;
-                        //drawSensor(sensor);
-                        drawSensor(sensor, true, false, true);
+
+                        if (!sensor.removed) {
+                            sensor.ringingState = !sensor.ringingState;
+                            drawSensor(sensor, true, false, true);
+                        } else {
+                            clearInterval(sensor.buzzerInterval);
+                        }
 
                     }, 100);
                 }
