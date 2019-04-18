@@ -559,31 +559,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var info = this.graph.getVertexInfo(vertex2);
          var content = (info.content) ? info.content : "";
          var boxSize = this.getBoxSize(content);
-         var x3, y3;
-         // if(x1 == "x2"){
-         //    x3 = x2;
-         //    y3 = (y1 < y2) ? (y2 - boxSize.h/2) : (y2 + boxSize.h/2)
-         // }else{
-         var alpha = (x2 != x1) ? Math.atan((y2 - y1)/(x2 - x1)) : Math.PI/2;  // angle between v2 and v1
+         if(x2 != x1){
+            var alpha = Math.atan((y2 - y1)/(x2 - x1));
+         }else{
+            var alpha = (y2 > y1) ? Math.PI/2 : -Math.PI/2;
+         }
          if(x1 > x2){
             alpha += Math.PI;
          }
-         var beta = Math.atan(boxSize.h/boxSize.w);   // angle between v2 and corner of the box
-         if(alpha <= beta && alpha >= -beta){
-            x3 = x2 - boxSize.w/2;
-            y3 = y2 - (boxSize.w/2)*(y2 - y1)/(x2 - x1);
-         }else if(alpha > beta && alpha < Math.PI - beta){
-            x3 = x2 - (boxSize.h/2)*Math.tan(Math.PI/2 - alpha);
-            y3 = y2 - (boxSize.h/2);
-         }else if(alpha <= (Math.PI + beta) && alpha >= (Math.PI - beta)){
-            x3 = x2 + boxSize.w/2;
-            y3 = y2 + (boxSize.w/2)*(y2 - y1)/(x2 - x1);
-         }else if(alpha > (Math.PI + beta) || alpha < -beta){
-            x3 = x2 + (boxSize.h/2)*Math.tan(Math.PI/2 - alpha);
-            y3 = y2 + (boxSize.h/2);
-         }
-         // }
-         return ["M", x1, y1, "L", x3, y3];
+         var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
+
+         return ["M", x1, y1, "L", pos2.x, pos2.y];
       }
    };
    this._getThickEdgePath = function(vertex1, vertex2) {
@@ -657,6 +643,22 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          }
          return [ "M", x1, y1, "A", R, R, 0, l, s, x3, y3 ]; 
       }else{
+         /* table mode */
+         var info = this.graph.getVertexInfo(vertex2);
+         var content = (info.content) ? info.content : "";
+         var boxSize = this.getBoxSize(content);
+         if(vertex1 === vertex2){
+            angle = edgeVisualInfo.angle || 0;
+            alpha = Math.PI - angle*Math.PI/180;
+            R = (edgeVisualInfo["radius-ratio"]) ? edgeVisualInfo["radius-ratio"]*r : 1.5*r;
+            var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize.w,boxSize.h,alpha - Math.PI/12);
+            var pos2 = this.getSurfacePointFromAngle(x1,y1,boxSize.w,boxSize.h,alpha + Math.PI/12);
+
+            l = 1;
+            edgeVisualInfo.angle = angle;
+            edgeVisualInfo["radius-ratio"] = R/r;
+            return [ "M", pos2.x, pos2.y, "A", R, R, 0, l, s, pos1.x, pos1.y ]; 
+         }
          if(x2 != x1){
             var alpha = Math.atan((y2 - y1)/(x2 - x1));
          }else{
@@ -675,70 +677,59 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var info1 = this.graph.getVertexInfo(vertex1);
             var content1 = (info1.content) ? info1.content : "";
             var boxSize1 = this.getBoxSize(content1);
-            var delta = (Math.PI - alpha1)%(2*Math.PI);
-            if(delta > 3*Math.PI/2){
-               delta -= 2*Math.PI;
-            }else if(alpha < -Math.PI/2){
-               delta += 2*Math.PI;
-            }
-            var beta1 = Math.atan(boxSize1.h/boxSize1.w);   // angle between v1 and corner of the box
-            if(delta <= beta1 && delta >= -beta1){
-               // console.log("1'");
-               x4 = x1 - boxSize1.w/2;
-               y4 = y1 - (boxSize1.w/2)*Math.tan(delta);
-            }else if(delta > beta1 && delta < Math.PI - beta1){
-               // console.log("2'");
-               x4 = x1 - (boxSize1.h/2)*Math.tan(Math.PI/2 - delta);
-               y4 = y1 - (boxSize1.h/2);
-            }else if(delta <= (Math.PI + beta1) && delta >= (Math.PI - beta1)){
-               // console.log("3'");
-               x4 = x1 + boxSize1.w/2;
-               y4 = y1 + (boxSize1.w/2)*Math.tan(delta);
-            }else if(delta > (Math.PI + beta1) || delta < -beta1){
-               // console.log("4'");
-               x4 = x1 + (boxSize1.h/2)*Math.tan(Math.PI/2 - delta);
-               y4 = y1 + (boxSize1.h/2);
-            }
+            var delta = Math.PI - alpha1;
+            var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
          }else{
-            var x4 = x1, y4 = y1;
+            var pos1 = { x: x1, y: y1 };
          }
          if(s){
             alpha = (l) ? alpha - angle : alpha + angle;
          }else{
             alpha = (l) ? alpha + angle : alpha - angle;
          }
-         alpha = alpha%(2*Math.PI);
-         if(alpha > 3*Math.PI/2){
-            alpha -= 2*Math.PI;
-         }else if(alpha < -Math.PI/2){
-            alpha += 2*Math.PI;
-         }
-         var info = this.graph.getVertexInfo(vertex2);
-         var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content);
-         var x3, y3;
-         var beta = Math.atan(boxSize.h/boxSize.w);   // angle between v2 and corner of the box
-         if(alpha <= beta && alpha >= -beta){
-            // console.log("1");
-            x3 = x2 - boxSize.w/2;
-            y3 = y2 - (boxSize.w/2)*Math.tan(alpha);
-         }else if(alpha > beta && alpha < Math.PI - beta){
-            // console.log("2");
-            x3 = x2 - (boxSize.h/2)*Math.tan(Math.PI/2 - alpha);
-            y3 = y2 - (boxSize.h/2);
-         }else if(alpha <= (Math.PI + beta) && alpha >= (Math.PI - beta)){
-            // console.log("3");
-            x3 = x2 + boxSize.w/2;
-            y3 = y2 + (boxSize.w/2)*Math.tan(alpha);
-         }else if(alpha > (Math.PI + beta) || alpha < -beta){
-            // console.log("4");
-            x3 = x2 + (boxSize.h/2)*Math.tan(Math.PI/2 - alpha);
-            y3 = y2 + (boxSize.h/2);
-         }
-         var D2 = Math.sqrt(Math.pow((x3-x4),2) + Math.pow((y3-y4),2));
+
+         var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
+
+         var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
          var R2 = D2*edgeVisualInfo["radius-ratio"];  
-         return [ "M", x4, y4, "A", R2, R2, 0, l, s, x3, y3 ]; 
+         return [ "M", pos1.x, pos1.y, "A", R2, R2, 0, l, s, pos2.x, pos2.y ]; 
       }
+   };
+
+   this.getSurfacePointFromAngle = function(x,y,w,h,angle) {
+      /* return the coordinates of the point at the surface of a box at a given angle 
+      *  x,y : coordinates of the box center
+      *  w,h: width and height of the box
+      *  angle: angle from the center (in rad)  
+      */
+      var x2,y2;
+      var beta = Math.atan(h/w);
+
+      angle = angle%(2*Math.PI);
+      if(angle > 3*Math.PI/2){
+         angle -= 2*Math.PI;
+      }else if(angle < -Math.PI/2){
+         angle += 2*Math.PI;
+      } 
+
+      if(angle <= beta && angle >= -beta){
+         // console.log("1");
+         x2 = x - w/2;
+         y2 = y - (w/2)*Math.tan(angle);
+      }else if(angle > beta && angle < Math.PI - beta){
+         // console.log("2");
+         x2 = x - (h/2)*Math.tan(Math.PI/2 - angle);
+         y2 = y - h/2;
+      }else if(angle <= (Math.PI + beta) && angle >= (Math.PI - beta)){
+         // console.log("3");
+         x2 = x + w/2;
+         y2 = y + (w/2)*Math.tan(angle);
+      }else if(angle > (Math.PI + beta) || angle < -beta){
+         // console.log("4");
+         x2 = x + (h/2)*Math.tan(Math.PI/2 - angle);
+         y2 = y + h/2;
+      }
+      return { x: x2, y: y2 };
    };
 
    
