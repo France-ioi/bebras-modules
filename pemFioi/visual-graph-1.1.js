@@ -851,18 +851,76 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       if(vInfo["radius-ratio"] || vertex1 ===  vertex2){ // if curved edge
          if(vertex1 === vertex2){   // if loop
-            angle = vInfo.angle*Math.PI/180 || 0;
             var R = this.circleAttr.r*vInfo["radius-ratio"];
-            var xm = x1 + 2*R*Math.cos(angle);
-            var ym = y1 - 2*R*Math.sin(angle);
-            var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
-            var y = ym + (labelH/2)*Math.cos(angle + Math.PI/2);
+            if(vertex1Pos.tableMode){  // if table mode
+               angle = vInfo.angle*Math.PI/180 || 0;
+               var alpha = Math.PI - angle;
+               var info = this.graph.getVertexInfo(vertex1);
+               var content = (info.content) ? info.content : "";
+               var boxSize = this.getBoxSize(content);
+               var betaW = Math.asin(boxSize.w*Math.tan(Math.PI/12)/(2*R));
+               var betaH = Math.asin(boxSize.h*Math.tan(Math.PI/12)/(2*R));
+               // var beta = Math.atan(boxSize.h/boxSize.w);
+               // if(beta < (angle + Math.PI/12) && beta > (angle - Math.PI/12)){
+                  // var mPos = this.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w + 2*R,boxSize.h + 2*R,alpha);
+               // }else{
+                  var mPos = this.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w + 2*R*(1 + Math.cos(betaW)),boxSize.h + 2*R*(1 + Math.cos(betaH)),alpha);
+               // }
+               var xm = mPos.x, ym = mPos.y;
+               var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
+               var y = ym + (labelH)*Math.cos(angle + Math.PI/2);
+            }else{
+               angle = vInfo.angle*Math.PI/180 || 0;
+               var xm = x1 + 2*R*Math.cos(angle);
+               var ym = y1 - 2*R*Math.sin(angle);
+               var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
+               var y = ym + (labelH/2)*Math.cos(angle + Math.PI/2);
+            }
          }else{
-            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
-            var R = D*vInfo["radius-ratio"];
             var s = vInfo["sweep"] || 0;
             var l = vInfo["large-arc"] || 0;
-            var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+            var R = D*vInfo["radius-ratio"];
+            if(vertex2Pos.tableMode){
+               var info = this.graph.getVertexInfo(vertex2);
+               var content = (info.content) ? info.content : "";
+               var boxSize = this.getBoxSize(content);
+               
+               var alpha = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));  
+               var angle2 = angle;
+               if(x1 > x2){
+                  angle2 = angle + Math.PI;
+               }
+               
+               if(vertex1Pos.tableMode){
+                  if(s){
+                     var alpha1 = (l) ? -angle2 - alpha : alpha - angle2;
+                  }else{
+                     var alpha1 = (l) ? alpha - angle2 : -angle2 - alpha;
+                  }
+                  var info1 = this.graph.getVertexInfo(vertex1);
+                  var content1 = (info1.content) ? info1.content : "";
+                  var boxSize1 = this.getBoxSize(content1);
+                  var delta = Math.PI - alpha1;
+                  var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
+               }else{
+                  var pos1 = { x: x1, y: y1 };
+               }
+               if(s){
+                  angle2 = (l) ? angle2 - alpha : angle2 + alpha;
+               }else{
+                  angle2 = (l) ? angle2 + alpha : angle2 - alpha;
+               }
+
+               var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,angle2);
+
+               var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
+               var R = D2*vInfo["radius-ratio"];
+               var cPos = this.getCenterPosition(R,s,l,pos1,pos2);
+               // console.log(cPos.y);
+            }else{
+               var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+            }
             if(vInfo["radius-ratio"] == 0.5){
                R += 10;
             }
@@ -917,7 +975,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var x1 = vInfo1.x, y1 = vInfo1.y;
       var x2 = vInfo2.x, y2 = vInfo2.y;
       
-      if(y1 !== y2){
+      // if(y1 !== y2){
+      if(y1 > (y2 + 1) && y1 < (y2 - 1)){ // to prevent divergence when y1 is very close to y2
          // parameters of the bisection
          var A = (x1 - x2)/(y2 - y1);
          var B = (x2*x2 + y2*y2 - x1*x1 - y1*y1)/(2*(y2 - y1));
@@ -949,6 +1008,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var b = -2*y1;
          var c = y1*y1 + xc*xc + x1*x1 - 2*xc*x1 - R*R;
          var delta = b*b - 4*a*c;
+
          if(x1 < x2){
             if(s){
                var yc = (l) ? (-b - Math.sqrt(delta))/(2*a) : (-b + Math.sqrt(delta))/(2*a);
@@ -963,6 +1023,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             }
          }
       }
+      // console.log(yc);
       return {x:xc,y:yc};
    };
 
