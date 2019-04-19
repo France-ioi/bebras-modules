@@ -917,7 +917,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
                var R = D2*vInfo["radius-ratio"];
                var cPos = this.getCenterPosition(R,s,l,pos1,pos2);
-               // console.log(cPos.y);
             }else{
                var cPos = this.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
             }
@@ -976,7 +975,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var x2 = vInfo2.x, y2 = vInfo2.y;
       
       // if(y1 !== y2){
-      if(y1 > (y2 + 1) && y1 < (y2 - 1)){ // to prevent divergence when y1 is very close to y2
+      if(y1 > (y2 + 1) || y1 < (y2 - 1)){ // to prevent divergence when y1 is very close to y2
          // parameters of the bisection
          var A = (x1 - x2)/(y2 - y1);
          var B = (x2*x2 + y2*y2 - x1*x1 - y1*y1)/(2*(y2 - y1));
