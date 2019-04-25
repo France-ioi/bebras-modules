@@ -158,7 +158,7 @@ function QuizUI(params) {
         if(format == 'string') {
             validator = '.+';
         } else if(format == 'number') {
-            validator = '^-?\d*\.?\d*$';
+            validator = '^-?[0-9]*\.?[0-9]*$';
         } else if(format == 'regexp') {
             validator = answer.attr('validator');
         }
