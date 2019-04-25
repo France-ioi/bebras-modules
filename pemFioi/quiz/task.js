@@ -7,7 +7,8 @@ var lang = {
         en: {
             'score': 'Score',
             'grader_msg': 'Your score is ',
-            'validate': 'Validate',
+            'validate': 'Submit',
+            'solution': 'Show answer',
             'restart': 'Restart',
             'restart_scratch': 'Restart from scratch',
             'restart_current': 'Restart from current answer',
@@ -23,6 +24,7 @@ var lang = {
             'score': 'Score',
             'grader_msg': 'Votre score est ',
             'validate': 'Valider',
+            'solution': 'Voir la réponse',
             'placeholder_text': 'Entrez du texte',
             'placeholder_number': 'Entrez un nombre',
             'error_number': 'Vous devez entrer un nombre.',
