@@ -663,7 +663,7 @@ var getContext = function (display, infos, curLevel) {
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readTemperature(\"" + port + "\")", function(val) {
                     val = Math.round(val);
-                    callback();
+                    callback(val);
                 });
             },
         },
@@ -715,7 +715,7 @@ var getContext = function (display, infos, curLevel) {
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readLightIntensity(\"" + port + "\")", function(val) {
                     val = Math.round(val);
-                    callback();
+                    callback(val);
                 });
             },
         },
@@ -741,7 +741,7 @@ var getContext = function (display, infos, curLevel) {
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readDistance(\"" + port + "\")", function(val) {
                     val = Math.round(val);
-                    callback();
+                    callback(val);
                 });
             },
         },
@@ -767,7 +767,7 @@ var getContext = function (display, infos, curLevel) {
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readHumidity(\"" + port + "\")", function(val) {
                     val = Math.round(val);
-                    callback();
+                    callback(val);
                 });
             },
         },
