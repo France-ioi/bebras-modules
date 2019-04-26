@@ -336,7 +336,7 @@ function QuizUI(params) {
         },
 
         toggleSolutions: function(visible) {
-            params.parent.find('solution').toggle(visible);
+            params.parent.find('#solution').toggle(visible);
             if (visible) {
                 $('#task').toggleClass('displaySolution');
             }
