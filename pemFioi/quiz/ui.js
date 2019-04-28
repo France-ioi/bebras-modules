@@ -158,7 +158,7 @@ function QuizUI(params) {
         if(format == 'string') {
             validator = '.+';
         } else if(format == 'number') {
-            validator = '^[0-9\.]*$';
+            validator = '^-?[0-9]*\.?[0-9]*$';
         } else if(format == 'regexp') {
             validator = answer.attr('validator');
         }
@@ -336,7 +336,7 @@ function QuizUI(params) {
         },
 
         toggleSolutions: function(visible) {
-            params.parent.find('solution').toggle(visible);
+            params.parent.find('#solution').toggle(visible);
             if (visible) {
                 $('#task').toggleClass('displaySolution');
             }
