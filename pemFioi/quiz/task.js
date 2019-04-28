@@ -293,6 +293,15 @@ task.load = function(views, success) {
         }
 
 
+        function displayMessages(messages) {
+            if($('#grader-messages').length == 0) {
+                var div = '<div id="grader-messages"></div>';
+                $('.taskContent').first().append(div);
+            }
+            $('#grader-messages').html(messages.join('<br>'));
+        }
+
+
         task.gradeAnswer = function(answer, answer_token, callback) {
             answer = JSON.parse(answer);
             function onGrade(result) {
@@ -303,6 +312,7 @@ task.load = function(views, success) {
                 );
                 q.showResult(result.mistakes);
                 displayScore(final_score, taskParams.maxScore);
+                displayMessages(result.messages);
                 callback(final_score, lang.translate('grader_msg') + final_score, null);
             }
             var token = task_token.get()
