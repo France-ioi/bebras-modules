@@ -647,7 +647,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             /* loop */
             angleCenter = edgeVisualInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
             var angleCorr = (angleCenter*Math.PI/180)%(2*Math.PI); // to match angle orientation of other functions
-            angleCorr = bindAngle(angleCorr);
+            angleCorr = this.bindAngle(angleCorr);
             R = (edgeVisualInfo["radius-ratio"]) ? edgeVisualInfo["radius-ratio"]*r : 1.5*r;
             var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
             /* loop center stays at R/2 from box surface */
@@ -728,7 +728,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var x2,y2;
       var beta = Math.atan(h/w);
 
-      angle = bindAngle(angle); 
+      angle = this.bindAngle(angle); 
 
       if(angle <= beta && angle >= -beta){
          // console.log("1");
@@ -827,7 +827,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                /* loop */
                angleCenter = vInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
                var angleCorr = (angleCenter*Math.PI/180)%(2*Math.PI);
-               angleCorr = bindAngle(angleCorr);
+               angleCorr = this.bindAngle(angleCorr);
                R = (vInfo["radius-ratio"]) ? vInfo["radius-ratio"]*this.circleAttr.r : 1.5*this.circleAttr.r;
                var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
                var surfPos = this.getSurfacePointFromAngle(x1,y1,boxSize.w,boxSize.h,Math.PI - angleCorr);
@@ -955,7 +955,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var R = this.circleAttr.r*vInfo["radius-ratio"];
             if(vertex1Pos.tableMode){  // if table mode
                angle = vInfo.angle*Math.PI/180 || 0;
-               angle = bindAngle(angle);
+               angle = this.bindAngle(angle);
                var info = this.graph.getVertexInfo(vertex1);
                var content = (info.content) ? info.content : "";
                var boxSize = this.getBoxSize(content);
@@ -1002,9 +1002,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                
                var alpha = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));  
                var angle2 = angle;
-               // if(x1 > x2){
-               //    angle2 = angle + Math.PI;
-               // }
                
                if(vertex1Pos.tableMode){
                   if(s){
@@ -1037,33 +1034,17 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             if(vInfo["radius-ratio"] == 0.5){
                R += 10;
             }
-            // if(x2 > x1){
-               var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
-               var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
-            // }else{
-            //    var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
-            //    var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
-            // }
+            var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
+            var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
             
-            // if(x1 < x2){
-               var x = (s) ? xm + (labelW/2)*Math.sin(angle) : xm - (labelW/2)*Math.sin(angle);
-               var y = (s) ? ym - (labelH/2 + margin)*Math.cos(angle) : ym + (labelH/2 + margin)*Math.cos(angle);
-            // }else{
-            //    var x = (s) ? xm - (labelW/2)*Math.sin(angle) : xm + (labelW/2)*Math.sin(angle);
-            //    var y = (s) ? ym + (labelH/2 + margin)*Math.cos(angle) : ym - (labelH/2 + margin)*Math.cos(angle);
-            // }
+            var x = (s) ? xm + (labelW/2)*Math.sin(angle) : xm - (labelW/2)*Math.sin(angle);
+            var y = (s) ? ym - (labelH/2 + margin)*Math.cos(angle) : ym + (labelH/2 + margin)*Math.cos(angle);
          }
       }else{
          var xm = (x2 + x1)/2;
          var ym = (y2 + y1)/2;
-         // if(x1 < x2){
-         //    var x = xm - (labelW/2)*Math.sin(angle);
-         //    var y = ym + (labelH/2 + margin)*Math.cos(angle);
-         // }else{
-            var x = xm + (labelW/2)*Math.sin(angle);
-            var y = ym - (labelH/2 + margin)*Math.cos(angle);
-         // }
-         
+         var x = xm + (labelW/2)*Math.sin(angle);
+         var y = ym - (labelH/2 + margin)*Math.cos(angle);
       }
       return {x:x,y:y};
    };
@@ -1166,7 +1147,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return { nbLines: nbLines, nbCol: nbCol };
    };
 
-   function bindAngle(angle) {
+   this.bindAngle = function(angle) {
       /* return angle between -PI/2 and 3PI/2 */
       angle = angle%(2*Math.PI);
       if(angle > 3*Math.PI/2){
