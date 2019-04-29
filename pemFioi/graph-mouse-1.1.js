@@ -1983,33 +1983,125 @@ function GraphEditor(settings) {
          angle = Math.atan((y2 - y1)/(x2 - x1));
       }
       if(vInfo["radius-ratio"] || vertex1 ===  vertex2){ // if curved edge
-         if(vertex1 === vertex2){
-            angle = vInfo.angle*Math.PI/180 || 0;
-            var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
-            var xm = x1 + 2*R*Math.cos(angle);
-            var ym = y1 - 2*R*Math.sin(angle);
-            var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
-            var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
+         if(!vertex2Pos.tableMode){
+            if(vertex1 === vertex2){
+               angle = vInfo.angle*Math.PI/180 || 0;
+               var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
+               var xm = x1 + 2*R*Math.cos(angle);
+               var ym = y1 - 2*R*Math.sin(angle);
+               var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
+               var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
+            }else{
+               var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+               var R = D*vInfo["radius-ratio"];
+               var s = vInfo["sweep"] || 0;
+               var l = vInfo["large-arc"] || 0;
+               var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+               if(x2 > x1){
+                  var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
+                  var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
+               }else{
+                  var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
+                  var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
+               }
+               
+               if(x1 < x2){
+                  var x = (s) ? xm - (crossSize/2)*Math.sin(angle) - crossSize/2 : xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
+                  var y = (s) ? ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
+               }else{
+                  var x = (s) ? xm + (crossSize/2)*Math.sin(angle) - crossSize/2 : xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
+                  var y = (s) ? ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
+               }
+            }
          }else{
-            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
-            var R = D*vInfo["radius-ratio"];
-            var s = vInfo["sweep"] || 0;
-            var l = vInfo["large-arc"] || 0;
-            var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
-            if(x2 > x1){
+            /* table mode */
+            var info1 = graph.getVertexInfo(vertex1);
+            var content = (info1.content) ? info1.content : "";
+            var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+            
+            if(vertex1 === vertex2){
+               /* loop */
+               angle = vInfo.angle*Math.PI/180 || 0;
+               angle = visualGraph.graphDrawer.bindAngle(angle);
+               var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
+               
+               var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
+               var surfPos = visualGraph.graphDrawer.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w,boxSize.h,Math.PI - angle);
+               if(angle <= beta && angle > -beta){
+                  /* right side */
+                  var xm = surfPos.x + R*3/2;
+                  var ym = surfPos.y;
+                  var x = xm - crossSize*1.2;
+                  var y = ym - crossSize/2;
+               }else if(angle <= Math.PI + beta && angle > Math.PI - beta){
+                  /* left side */
+                  var xm = surfPos.x - R*3/2;
+                  var ym = surfPos.y;
+                  var x = xm + crossSize/2;
+                  var y = ym - crossSize/2;
+               }else if(angle > beta && angle <= Math.PI - beta){
+                  /* top */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y - R*3/2;
+                  var x = xm - crossSize/2;
+                  var y = ym + crossSize/2;
+               }else if(angle > Math.PI + beta || angle <= - beta){
+                  /* bottom */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y + R*3/2;
+                  var x = xm - crossSize/2;
+                  var y = ym - crossSize*1.2;
+               }
+            }else{
+               var angle = visualGraph.graphDrawer.getAngleBetween(x1,y1,x2,y2);
+               var s = vInfo["sweep"] || 0;
+               var l = vInfo["large-arc"] || 0;
+               var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+               var R = D*vInfo["radius-ratio"];
+               if(vertex2Pos.tableMode){
+                  var info = graph.getVertexInfo(vertex2);
+                  var content = (info.content) ? info.content : "";
+                  var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+                  
+                  var alpha = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));  
+                  var angle2 = angle;
+                  
+                  if(vertex1Pos.tableMode){
+                     if(s){
+                        var alpha1 = (l) ? -angle2 - alpha : alpha - angle2;
+                     }else{
+                        var alpha1 = (l) ? alpha - angle2 : -angle2 - alpha;
+                     }
+                     var info1 = graph.getVertexInfo(vertex1);
+                     var content1 = (info1.content) ? info1.content : "";
+                     var boxSize1 = visualGraph.graphDrawer.getBoxSize(content1);
+                     var delta = Math.PI - alpha1;
+                     var pos1 = visualGraph.graphDrawer.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
+                  }else{
+                     var pos1 = { x: x1, y: y1 };
+                  }
+                  if(s){
+                     angle2 = (l) ? angle2 - alpha : angle2 + alpha;
+                  }else{
+                     angle2 = (l) ? angle2 + alpha : angle2 - alpha;
+                  }
+
+                  var pos2 = visualGraph.graphDrawer.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,angle2);
+
+                  var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
+                  var R = D2*vInfo["radius-ratio"];
+                  var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,pos1,pos2);
+               }else{
+                  var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+               }
+               if(vInfo["radius-ratio"] == 0.5){
+                  R += 10;
+               }
                var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
                var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
-            }else{
-               var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
-               var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
-            }
-            
-            if(x1 < x2){
+               
                var x = (s) ? xm - (crossSize/2)*Math.sin(angle) - crossSize/2 : xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
                var y = (s) ? ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
-            }else{
-               var x = (s) ? xm + (crossSize/2)*Math.sin(angle) - crossSize/2 : xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
-               var y = (s) ? ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
             }
          }
       }else{
@@ -2018,11 +2110,11 @@ function GraphEditor(settings) {
          var x = xm - crossSize/2;
          var y = ym - crossSize/2;
          if(x1 < x2){
-            var x = xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
-            var y = ym - (crossSize/2)*Math.cos(angle) - crossSize/2;
-         }else{
             var x = xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
             var y = ym + (crossSize/2)*Math.cos(angle) - crossSize/2;
+         }else{
+            var x = xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
+            var y = ym - (crossSize/2)*Math.cos(angle) - crossSize/2;
          }
       }
       return {x:x,y:y};
