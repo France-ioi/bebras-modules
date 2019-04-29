@@ -23,23 +23,27 @@
             if(typeof grader_data[i] === 'function') {
                 var fres = grader_data[i](answer[i]);
                 if(typeof fres === 'object') {
-                    valid = 'valid' in fres && fres.valid;
+                    var score = 'score' in fres ? (parseFloat(fres.score) || 0) : 0;
+                    valid = score > 0;
                     if('message' in fres && fres.message) {
                         res.messages.push(fres.message);
                     }
+                    res.score += score;
                 } else {
                     valid = !!fres;
+                    res.score += valid ? 1 : 0;
                 }
                 res.mistakes.push(valid ? null : answer[i]);
             } else if(Array.isArray(grader_data[i])) {
                 var test = testMultiple(grader_data[i], answer[i]);
                 valid = test === true;
                 res.mistakes.push(valid ? [] : test);
+                res.score += valid ? 1 : 0;
             } else {
                 valid = grader_data[i] == answer[i] ? 1 : 0;
                 res.mistakes.push(valid ? null : answer[i]);
+                res.score += valid ? 1 : 0;
             }
-            res.score += valid ? 1 : 0;
         }
         res.score = res.score / grader_data.length;
         return res;
