@@ -650,7 +650,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             angleCorr = bindAngle(angleCorr);
             R = (edgeVisualInfo["radius-ratio"]) ? edgeVisualInfo["radius-ratio"]*r : 1.5*r;
             var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
-            /* loop center is at R/2 from box surface */
+            /* loop center stays at R/2 from box surface */
             if(angleCorr <= beta && angleCorr > -beta){
                /* right side */
                var alpha1 = Math.PI - Math.atan(R*Math.sqrt(3)/(boxSize.w) + Math.tan(angleCorr)); // angle between center of vertex and arrow point
@@ -885,16 +885,33 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             var R = this.circleAttr.r*vInfo["radius-ratio"];
             if(vertex1Pos.tableMode){  // if table mode
                angle = vInfo.angle*Math.PI/180 || 0;
+
                var alpha = Math.PI - angle;
                var info = this.graph.getVertexInfo(vertex1);
                var content = (info.content) ? info.content : "";
                var boxSize = this.getBoxSize(content);
-               var betaW = Math.asin(boxSize.w*Math.tan(Math.PI/12)/(2*R));
-               var betaH = Math.asin(boxSize.h*Math.tan(Math.PI/12)/(2*R));
-               var mPos = this.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w + 2*R*(1 + Math.cos(betaW)),boxSize.h + 2*R*(1 + Math.cos(betaH)),alpha);
-               var xm = mPos.x, ym = mPos.y;
+
+               var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
+               var surfPos = this.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w,boxSize.h,alpha);
+               if(alpha <= beta && alpha > -beta){
+                  /* left side */
+                  var xm = surfPos.x - R*3/2;
+                  var ym = surfPos.y;
+               }else if(alpha <= Math.PI + beta && alpha > Math.PI - beta){
+                  /* right side */
+                  var xm = surfPos.x + R*3/2;
+                  var ym = surfPos.y;
+               }else if(alpha > beta && alpha <= Math.PI - beta){
+                  /* top */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y - R*3/2;
+               }else if(alpha > Math.PI + beta || alpha <= - beta){
+                  /* bottom */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y + R*3/2;
+               }
                var x = xm - (labelW/2)*Math.sin(angle - Math.PI/2);
-               var y = ym + (labelH)*Math.cos(angle + Math.PI/2);
+               var y = ym + (labelH*1.5)*Math.cos(angle + Math.PI/2);
             }else{
                angle = vInfo.angle*Math.PI/180 || 0;
                var xm = x1 + 2*R*Math.cos(angle);
