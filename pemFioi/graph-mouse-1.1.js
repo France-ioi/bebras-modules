@@ -1395,6 +1395,8 @@ function GraphEditor(settings) {
       callback: settings.callback,
       enabled: false
    });
+
+   this.tableMode = false;
    this.gridEnabled = false;
    this.removeVertexEnabled = false;
    this.createEdgeEnabled = false;
@@ -1491,6 +1493,16 @@ function GraphEditor(settings) {
    this.setDefaultEdgeLabelEnabled = function(enabled) {
       this.defaultEdgeLabelEnabled = enabled;
    };
+   this.setTableMode = function(enabled) {
+      this.tableMode = enabled;
+      var vertices = graph.getAllVertices();
+      for(var vertex of vertices){
+         var vInfo = visualGraph.getVertexVisualInfo(vertex);
+         vInfo.tableMode = enabled;
+      }
+      visualGraph.redraw();
+      this.updateHandlers();
+   };
 
    this.checkVertexSelect = function() {
       if(!this.terminalEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled){
@@ -1506,7 +1518,6 @@ function GraphEditor(settings) {
          this.graphDragger.setEnabled(true);
       }
    };
-   
 
    this.defaultOnVertexSelect = function(vertexId,selected) {
       var attr;
@@ -1594,7 +1605,7 @@ function GraphEditor(settings) {
          vertexGuid++;
       }
       var vertexId = "v_" + vertexGuid;
-      var point = {x: x, y: y};
+      var point = {x: x, y: y, tableMode: self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
          graph.addVertex(vertexId,{label:vertexId});
