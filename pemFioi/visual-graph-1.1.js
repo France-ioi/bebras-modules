@@ -378,7 +378,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
       var textSize = this.getTextSize(content);
-      var minW = 2*this.circleAttr.r;
+      var minW = 2*this.circleAttr.r + 50;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
       var w = Math.max(0.8*textSize.nbCol * this.vertexLabelAttr["font-size"], minW);
       var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexLabelAttr["font-size"] + 2*margin, minH);
@@ -404,7 +404,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var labelText = info.label || "";
          var labelPos = this.getLabelPos(id, vertex1, vertex2);
          var label = this.paper.text(labelPos.x,labelPos.y,labelText).attr(this.edgeLabelAttr);
-         return [path,label,clickArea];   // !!!
+         return [path,label,clickArea];  
       }
    };
    
@@ -561,9 +561,6 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var content = (info.content) ? info.content : "";
          var boxSize = this.getBoxSize(content);
          var alpha = this.getAngleBetween(x1,y1,x2,y2);
-         // if(x1 > x2){
-         //    alpha += Math.PI;
-         // }
          var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
 
          return ["M", x1, y1, "L", pos2.x, pos2.y];
