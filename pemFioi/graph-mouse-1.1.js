@@ -757,6 +757,8 @@ function VertexDragAndConnect(settings) {
 
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
+   this.isGoodPosition = settings.isGoodPosition;
+   this.snapToLastGoodPosition = settings.snapToLastGoodPosition;
 
    this.enabled = false;
    this.selectionParent = null;
@@ -844,9 +846,9 @@ function VertexDragAndConnect(settings) {
       if(self.isDragging) {
          var isSnappedToGoodPosition = false;
 
-         if(settings.snapToLastGoodPosition) {
+         if(self.snapToLastGoodPosition) {
             var position = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
-            if(!settings.isGoodPosition(self.elementID, position)) {
+            if(!self.isGoodPosition(self.elementID, position)) {
                self.visualGraph.graphDrawer.moveVertex(self.elementID, self.lastGoodPosition.x, self.lastGoodPosition.y);
                isSnappedToGoodPosition = true;
             }
@@ -888,12 +890,12 @@ function VertexDragAndConnect(settings) {
          newX = Math.min(self.dragLimits.maxX, Math.max(newX, self.dragLimits.minX));
          newY = Math.min(self.dragLimits.maxY, Math.max(newY, self.dragLimits.minY));
       }
-      if(settings.snapToLastGoodPosition) {
+      if(self.snapToLastGoodPosition) {
          var position = {
             x: newX,
             y: newY
          };
-         if(settings.isGoodPosition(self.elementID, position)) {
+         if(self.isGoodPosition(self.elementID, position)) {
             self.lastGoodPosition = position;
          }
       }
@@ -946,6 +948,9 @@ function VertexDragAndConnect(settings) {
    };
    this.setStartDragCallback = function(fct) {
       this.startDragCallback = fct;
+   };
+   this.setIsGoodPosition = function(fct) {
+      this.isGoodPosition = fct;
    };
 
    if(settings.enabled) {
@@ -2380,6 +2385,46 @@ function GraphEditor(settings) {
          }
       self.arcDragger.unselectAll();
    };
+
+   this.isGoodPosition = function(vID,position) {
+      var vertices = graph.getAllVertices();
+      var vInfo = visualGraph.getVertexVisualInfo(vID);
+      if(vInfo.tableMode){
+         var info = graph.getVertexInfo(vID);
+         var content = info.content;
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+      }
+      for(vertex of vertices){
+         if(vertex != vID){
+            var vInfo2 = visualGraph.getVertexVisualInfo(vertex);
+            if(vInfo2.tableMode){
+               var info2 = graph.getVertexInfo(vID);
+               var content2 = info2.content;
+               var boxSize2 = visualGraph.graphDrawer.getBoxSize(content2);
+               if(vInfo.tableMode){
+                  if(Math.abs(vInfo.x - vInfo2.x) < (boxSize.w/2 + boxSize2.w/2) && Math.abs(vInfo.y - vInfo2.y) < (boxSize.h/2 + boxSize2.h/2)){
+                     return false;
+                  }
+               }else{
+                  if(Math.abs(vInfo.x - vInfo2.x) < (visualGraph.graphDrawer.circleAttr.r + boxSize2.w/2) && Math.abs(vInfo.y - vInfo2.y) < (visualGraph.graphDrawer.circleAttr.r + boxSize2.h/2)){
+                     return false;
+                  }
+               }
+            }else{
+               if(vInfo.tableMode){
+                  if(Math.abs(vInfo.x - vInfo2.x) < (boxSize.w/2 + visualGraph.graphDrawer.circleAttr.r) && Math.abs(vInfo.y - vInfo2.y) < (boxSize.h/2 + visualGraph.graphDrawer.circleAttr.r)){
+                     return false;
+                  }
+               }else{
+                  if(Math.abs(vInfo.x - vInfo2.x) < 2*visualGraph.graphDrawer.circleAttr.r  && Math.abs(vInfo.y - vInfo2.y) < 2*visualGraph.graphDrawer.circleAttr.r ){
+                     return false;
+                  }
+               }
+            }
+         }
+      }
+      return true;
+   };
    
 
    this.setDefaultSettings = function() {
@@ -2397,6 +2442,8 @@ function GraphEditor(settings) {
       }
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
+      this.vertexDragAndConnect.setIsGoodPosition(this.isGoodPosition);
+      this.vertexDragAndConnect.snapToLastGoodPosition = true;
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
    };
