@@ -2368,6 +2368,8 @@ function GraphEditor(settings) {
             self.textEditor.remove();
          if(vertexRaph[1])
             vertexRaph[1].show();
+         if(vertexRaph[3])
+            vertexRaph[3].show();
       }
       var edges = graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
