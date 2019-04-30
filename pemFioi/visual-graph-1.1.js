@@ -338,6 +338,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             this._addCustomElements(id, [labelRaph]);
          }
       }else{
+         /* table mode */
          var content = (info.content) ? info.content : "";
          var boxSize = this.getBoxSize(content);
          var w = boxSize.w;
@@ -376,7 +377,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    this.getBoxSize = function(content) {
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
-      var textSize = getTextSize(content);
+      var textSize = this.getTextSize(content);
       var minW = 2*this.circleAttr.r;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
       var w = Math.max(0.8*textSize.nbCol * this.vertexLabelAttr["font-size"], minW);
@@ -1135,7 +1136,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       return distanceSquared(xPos, yPos, x1 + t * (x2 - x1), y1 + t * (y2 - y1));
    }
 
-   function getTextSize(text) {
+   this.getTextSize = function(text) {
       var array = text.split("\n");
       var nbLines = array.length;
       var nbCol = 0;
