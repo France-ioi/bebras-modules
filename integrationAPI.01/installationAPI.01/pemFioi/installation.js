@@ -217,7 +217,7 @@ $(document).ready(function() {
 
 
 function fillImages(text, images, res) {
-   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4"];
+   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4", "zip"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
       var regexp = new RegExp("[\'\"]([^;\"\']*." + ext + ")[\'\"]", "g");
