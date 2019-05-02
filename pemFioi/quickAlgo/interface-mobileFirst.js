@@ -466,9 +466,9 @@ var quickAlgoInterface = {
             if(this.nbTestCases > 1) {
                 var curTest = iTest + 1;
                 var testImg = '';
-                if (displayHelper.hasLevels && this.options.hasTestThumbnails) {
+                if (this.options.hasTestThumbnails) {
                     testImg = '<div class="testThumbnail">' +
-                            '<img src="test_' + curLevel + '_' + curTest + '.png" alt="grid thumbnail for test '+curTest+'" width=50 height=50/>' +
+                            '<img src="test_' + curLevel + '_' + curTest + '.png" alt="grid thumbnail for test '+curTest+'" width=120 height=120 />' +
                         '</div>';
                 }
                 testTabs += '' +
