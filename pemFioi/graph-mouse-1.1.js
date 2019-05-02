@@ -2350,6 +2350,24 @@ function GraphEditor(settings) {
       self.textEditor.css(attr);
       $("#"+paperId).append(self.textEditor);
       self.textEditor.focus();
+
+      self.textEditor.keyup(function(){ // resize vertex & textarea when text length changes
+         var text = $(this).val();
+         var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
+         if(text.length > 0){
+            $(this).css({
+               width: newBoxSize.w,
+               height: newBoxSize.h - labelHeight
+            });
+            raphElement[0].attr({
+               height: newBoxSize.h,
+               width: newBoxSize.w
+            });
+
+
+         }
+      });
+
       self.textEditor.focusout(function(){
          self.writeContent(id);
       });

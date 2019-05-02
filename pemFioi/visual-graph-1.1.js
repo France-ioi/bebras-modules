@@ -491,9 +491,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          else {
             newPath = this._getEdgePath(edgeID);
          }
-
-         raphaels[0].attr("path", newPath);
-         raphaels[2].attr("path", newPath);
+         raphaels[0].attr("path", newPath);  // edge
+         raphaels[2].attr("path", newPath);  // click area
          var info = this.graph.getEdgeInfo(edgeID);
          var labelText = info.label || "";
          var labelPos = this.getLabelPos(edgeID, vertex1, vertex2);
