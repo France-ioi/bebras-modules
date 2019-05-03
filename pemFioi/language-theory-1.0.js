@@ -1,13 +1,14 @@
-if(typeof require != 'undefined') {
-   var {
-      nounTypes,
-      nouns,
-      adjectiveTypes,
-      adjectives
-   } = require('./sentences_wordList.js');
-}
+// if(typeof require != 'undefined') {
+//    var {
+//       nounTypes,
+//       nouns,
+//       adjectiveTypes,
+//       adjectives
+//    } = require('./sentences_wordList.js');
+// }
 
 function LanguageTheory(){
+
    this.getRandomWord = function(minLength,randomSeed) {
       var wordList = [];
       for(var nounType of nounTypes){
@@ -52,13 +53,23 @@ function LanguageTheory(){
          }else if(answer[type].length > length){
             return "The "+taskStrings[type]+" input is longer than "+length;
          }
-         if(!this.isFactor(type,answer[type],word)){
+         if(!this.isSubsequence(type,answer[type],word)){
             return answer[type]+" is not a "+type+" of "+word;
+         }
+         if(type == "factor" || type == "subsequence"){
+            if(this.isSubsequence("prefix",answer[type],word)){
+               return "Please enter a "+type+" which is not a prefix";
+            }else if(this.isSubsequence("suffix",answer[type],word)){
+               return "Please enter a "+type+" which is not a suffix";
+            }
+         }
+         if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
+            return "Please enter a "+type+" which is not a factor";
          }
       }
    };
 
-   this.isFactor = function(type,string,word) {
+   this.isSubsequence = function(type,string,word) {
       switch(type){
          case "prefix":
             var regex = new RegExp('^'+string);
@@ -67,8 +78,15 @@ function LanguageTheory(){
             var regex = new RegExp(string+'$');
             break;
          case "factor":
-            var regex = new RegExp('.+'+string+'.+');
+            var regex = new RegExp('.*'+string+'.*');
             break;
+         case "subsequence":
+            var regexStr = "";
+            for(var iLetter = 0; iLetter < string.length; iLetter++){
+               regexStr += ".*"+string.charAt(iLetter);
+            }
+            regexStr += ".*";
+            var regex = new RegExp(regexStr);
       }
       
       if(regex.test(word)){
