@@ -1,39 +1,32 @@
-// if(typeof require != 'undefined') {
-//    var {
-//       nounTypes,
-//       nouns,
-//       adjectiveTypes,
-//       adjectives
-//    } = require('./sentences_wordList.js');
-// }
-
 function LanguageTheory(){
 
-   this.getRandomWord = function(minLength,randomSeed) {
+   this.getRandomWord = function(minLength,maxLength,rng) {
       var wordList = [];
+      var array = [];
+      var minLength = minLength || 0;
+      var maxLength = maxLength || Infinity;
+
       for(var nounType of nounTypes){
          if(nounType != "city"){
-            wordList = wordList.concat(nouns[nounType]["M"]).concat(nouns[nounType]["F"]);
+            array = array.concat(nouns[nounType]["M"]).concat(nouns[nounType]["F"]);
          }else{
-            wordList = wordList.concat(nouns[nounType]);
+            array = array.concat(nouns[nounType]);
          }
       }
-      wordList = wordList.concat(adjectives["before"]).concat(adjectives["after"]);
-      var index = randomSeed;
-      do{
-         index = index%wordList.length; 
-         var word = wordList[index];
-         index++;
-      }while(word[0].length < minLength);
-      return word[0];
+      array = array.concat(adjectives["before"]).concat(adjectives["after"]);
+
+      for(var word of array){
+         if(word[0].length >= minLength && word[0].length <= maxLength && !word[0].includes(" ") && !word[0].includes("-")){
+            wordList.push(word[0]);
+         }
+      }
+
+      var index = rng.nextInt(0,wordList.length-1);
+      return wordList[index];
    };
 
-   this.getWord = function(minLength,randomSeed) {
-      var word;
-      do{
-         word = this.getRandomWord(minLength,randomSeed).toLowerCase().trim();
-         randomSeed++;
-      }while(word.includes(" ") || word.includes("-"));
+   this.getWord = function(minLength,maxLength,rng) {
+      var word = this.getRandomWord(minLength,maxLength,rng).toLowerCase().trim();
       word = word.replace(/[èéêë]/g,"e");
       word = word.replace(/[ôö]/g,"o");
       word = word.replace(/[âà]/g,"a");
@@ -46,25 +39,27 @@ function LanguageTheory(){
    this.validation = function(word,answer,length) {
       var error = null;
       for(var type in answer){
-         if(answer[type].length == 0){
-            return "The "+taskStrings[type]+" input is empty";
-         }else if(answer[type].length < length){
-            return "The "+taskStrings[type]+" input is shorter than "+length;
-         }else if(answer[type].length > length){
-            return "The "+taskStrings[type]+" input is longer than "+length;
-         }
-         if(!this.isSubsequence(type,answer[type],word)){
-            return answer[type]+" is not a "+type+" of "+word;
-         }
-         if(type == "factor" || type == "subsequence"){
-            if(this.isSubsequence("prefix",answer[type],word)){
-               return "Please enter a "+type+" which is not a prefix";
-            }else if(this.isSubsequence("suffix",answer[type],word)){
-               return "Please enter a "+type+" which is not a suffix";
+         if(type != "seed"){
+            if(answer[type].length == 0){
+               return "The "+taskStrings[type]+" input is empty";
+            }else if(answer[type].length < length){
+               return "The "+taskStrings[type]+" input is shorter than "+length;
+            }else if(answer[type].length > length){
+               return "The "+taskStrings[type]+" input is longer than "+length;
             }
-         }
-         if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
-            return "Please enter a "+type+" which is not a factor";
+            if(!this.isSubsequence(type,answer[type],word)){
+               return answer[type]+" is not a "+type+" of "+word;
+            }
+            if(type == "factor" || type == "subsequence"){
+               if(this.isSubsequence("prefix",answer[type],word)){
+                  return "Please enter a "+type+" which is not a prefix";
+               }else if(this.isSubsequence("suffix",answer[type],word)){
+                  return "Please enter a "+type+" which is not a suffix";
+               }
+            }
+            if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
+               return "Please enter a "+type+" which is not a factor";
+            }
          }
       }
    };
