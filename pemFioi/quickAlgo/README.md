@@ -71,10 +71,12 @@ startingExample: {
 
 #### hasTestThumbnails
 
+**DEPRECATED** : this option will be removed soon.
+
 Type : boolean
 
 Enables displaying test thumbnails in the test selector. The thumbnails must be
-present in the folder, and the filename must be `test[Level][number].png`, for
+present in the folder, and the filename must be `test_[level]_[number].png`, for
 example `testEasy1.png`.
 
 #### hideControls
