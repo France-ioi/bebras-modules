@@ -470,7 +470,7 @@ var quickAlgoInterface = {
                 var levelTestImg = $('img#test_' + curLevel + '_' + curTest);
                 if(levelTestImg.length) {
                     testImg = '<div class="testThumbnail">' +
-                                 '<img src="' + levelTestImg.attr('src') + '" alt="grid thumbnail for test '+curTest+'" width=50 height=50/>' +
+                                 '<img src="' + levelTestImg.attr('src') + '" alt="grid thumbnail for test '+curTest+'" width=120 height=120/>' +
                               '</div>';
                 } else if (this.options.hasTestThumbnails) {
                     // hasTestThumbnails is a legacy option
