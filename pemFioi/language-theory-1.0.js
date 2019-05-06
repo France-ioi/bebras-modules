@@ -21,7 +21,7 @@ function LanguageTheory(){
          }
       }
 
-      var index = rng.nextInt(0,wordList.length-1);
+      var index = (rng.nextInt(0,10000) + Math.floor(Math.random()*10000))%(wordList.length-1);
       return wordList[index];
    };
 
