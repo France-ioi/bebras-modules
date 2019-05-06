@@ -2431,19 +2431,25 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return true;
       },
 
-      checkBlocksAreAllowed: function(xml) {
+      checkBlocksAreAllowed: function(xml, silent) {
          if(this.includeBlocks && this.includeBlocks.standardBlocks && this.includeBlocks.standardBlocks.includeAll) { return true; }
          var allowed = this.getBlocksAllowed();
          var blockList = xml.getElementsByTagName('block');
          var notAllowed = [];
-         for(var i=0; i<blockList.length; i++) {
-            var block = blockList[i];
+         function checkBlock(block) {
             var blockName = block.getAttribute('type');
             if(!arrayContains(allowed, blockName)) {
                notAllowed.push(blockName);
             }
          }
-         if(notAllowed.length > 0) {
+         for(var i=0; i<blockList.length; i++) {
+            checkBlock(blockList[i]);
+         }
+         if(xml.localName == 'block') {
+            // Also check the top element
+            checkBlock(xml);
+         }
+         if(!silent && notAllowed.length > 0) {
             console.error('Error: tried to load programs with unallowed blocks '+notAllowed.join(', '));
          }
          return !(notAllowed.length);
