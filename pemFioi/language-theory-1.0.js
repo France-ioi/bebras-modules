@@ -102,34 +102,6 @@ function LanguageTheory(rng){
       return string;
    };
 
-   this.validation = function(word,answer,length) {
-      var error = null;
-      for(var type in answer){
-         if(type != "seed"){
-            if(answer[type].length == 0){
-               return "The "+taskStrings[type]+" input is empty";
-            }else if(answer[type].length < length){
-               return "The "+taskStrings[type]+" input is shorter than "+length;
-            }else if(answer[type].length > length){
-               return "The "+taskStrings[type]+" input is longer than "+length;
-            }
-            if(!this.isSubsequence(type,answer[type],word)){
-               return answer[type]+" is not a "+type+" of "+word;
-            }
-            if(type == "factor" || type == "subsequence"){
-               if(this.isSubsequence("prefix",answer[type],word)){
-                  return "Please enter a "+type+" which is not a prefix";
-               }else if(this.isSubsequence("suffix",answer[type],word)){
-                  return "Please enter a "+type+" which is not a suffix";
-               }
-            }
-            if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
-               return "Please enter a "+type+" which is not a factor";
-            }
-         }
-      }
-   };
-
    this.isSubsequence = function(type,string,word) {
       switch(type){
          case "prefix":
@@ -156,4 +128,126 @@ function LanguageTheory(rng){
          return false;
       }
    };
+
+   this.isPrimitive = function(string) {
+      for(var iLetter = 1; iLetter <= string.length/2; iLetter++){
+         var substr = string.substring(0,iLetter);
+         var regex = new RegExp('^('+substr+'){2,}$');
+         if(regex.test(string)){
+            return false;
+         }
+      }
+      return true;
+   };
+
+   this.getLengthOfLongestPrimitiveSubsequence = function(word,type) {
+      switch(type){
+         case "prefix":
+            for(var endIndex = word.length - 1; endIndex > 0; endIndex--){
+               var substr = word.substring(0,endIndex);
+               if(this.isPrimitive(substr)){
+                  return substr.length;
+               }
+            }
+         case "suffix":
+            for(var startIndex = 1; startIndex < word.length; startIndex++){
+               var substr = word.substring(startIndex,word.length);
+               if(this.isPrimitive(substr)){
+                  return substr.length;
+               }
+            }
+         case "factor":
+            var length = 0;
+            for(var startIndex = 1; startIndex < word.length - 1; startIndex++){
+               for(var endIndex = word.length - 1; endIndex > 1; endIndex--){
+                  var substr = word.substring(startIndex,endIndex);
+                  if(this.isPrimitive(substr) && !this.isSubsequence("prefix",substr,word) && !this.isSubsequence("suffix",substr,word) && substr.length > length){
+                     length = substr.length;
+                  }
+               }
+            }
+            return length;
+         case "subsequence":
+            var length = 0;
+            for(var iLetter = 0; iLetter < word.length; iLetter++){
+               var substr = word.substr(0,iLetter)+word.substring(iLetter+1);
+               if(this.isPrimitive(substr) && !this.isSubsequence("factor",substr,word) && substr.length > length){
+                  // console.log(substr);
+                  length = substr.length;
+               }else if(substr.length > 1){
+                  length = Math.max(this.getLengthOfLongestPrimitiveSubsequence(substr,"subsequence"),length);
+               }
+            }
+            return length;
+      }
+   };
+
+
+
+   this.validation = function(data) {
+      var error = null;
+      switch(data.mode){
+         case 1:  // find_factor
+            var answer = data.answer;
+            var word = data.word;
+            var length = data.factorLength;
+            for(var type in answer){
+               if(type != "seed"){
+                  if(answer[type].length == 0){
+                     return "The "+taskStrings[type]+" input is empty";
+                  }else if(answer[type].length < length){
+                     return "The "+taskStrings[type]+" input is shorter than "+length;
+                  }else if(answer[type].length > length){
+                     return "The "+taskStrings[type]+" input is longer than "+length;
+                  }
+                  if(!this.isSubsequence(type,answer[type],word)){
+                     return answer[type]+" is not a "+type+" of "+word;
+                  }
+                  if(type == "factor" || type == "subsequence"){
+                     if(this.isSubsequence("prefix",answer[type],word)){
+                        return "Please enter a "+type+" which is not a prefix";
+                     }else if(this.isSubsequence("suffix",answer[type],word)){
+                        return "Please enter a "+type+" which is not a suffix";
+                     }
+                  }
+                  if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
+                     return "Please enter a "+type+" which is not a factor";
+                  }
+               }
+            }
+         case 2: // longest primitive
+            var answer = data.answer;
+            var word = data.word;
+            for(var type in answer){
+               if(type != "seed"){
+                  var length = this.getLengthOfLongestPrimitiveSubsequence(word,type);
+                  if(answer[type].length == 0){
+                     return "The "+taskStrings[type]+" input is empty";
+                  }
+                  if(!this.isPrimitive(answer[type])){
+                     return "The "+taskStrings[type]+" input is not primitive";
+                  }
+                  if(!this.isSubsequence(type,answer[type],word)){
+                     return answer[type]+" is not a "+type+" of "+word;
+                  }
+                  if(type == "factor" || type == "subsequence"){
+                     if(this.isSubsequence("prefix",answer[type],word)){
+                        return "Please enter a "+type+" which is not a prefix";
+                     }else if(this.isSubsequence("suffix",answer[type],word)){
+                        return "Please enter a "+type+" which is not a suffix";
+                     }
+                  }
+                  if(type == "subsequence" && this.isSubsequence("factor",answer[type],word)){
+                     return "Please enter a "+type+" which is not a factor";
+                  }
+                  if(answer[type].length < length){
+                     return "The "+taskStrings[type]+" input is not the longest possible for the word "+word;
+                  }
+
+               }
+            }
+      }
+      
+   };
+
 };
