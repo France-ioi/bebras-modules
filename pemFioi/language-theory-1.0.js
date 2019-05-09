@@ -215,6 +215,7 @@ function LanguageTheory(rng){
                   }
                }
             }
+            break;
          case 2: // longest primitive
             var answer = data.answer;
             var word = data.word;
