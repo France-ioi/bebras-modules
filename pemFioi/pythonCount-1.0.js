@@ -153,8 +153,6 @@ function pythonForbiddenLists(includeBlocks) {
 function pythonForbidden(code, includeBlocks) {
    var forbidden = pythonForbiddenLists(includeBlocks).forbidden;
 
-   if(forbidden.length <= 0) { return false; }
-
    // Remove comments and strings before scanning
    var removePatterns = [
       /#[^\n\r]+/,
@@ -168,6 +166,16 @@ function pythonForbidden(code, includeBlocks) {
          code = code.replace(removePatterns[i], '');
      }
    }
+
+   // exec and eval are forbidden anyway
+   if(/(^|\W)exec\((\W|$)/.exec(code)) {
+      return 'exec';
+   }
+   if(/(^|\W)eval\((\W|$)/.exec(code)) {
+      return 'eval';
+   }
+
+   if(forbidden.length <= 0) { return false; }
 
    // Scan for each forbidden keyword
    for(var i=0; i<forbidden.length; i++) {
