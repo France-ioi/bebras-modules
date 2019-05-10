@@ -254,6 +254,12 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
       } else if(pyKey == 'math_number') {
          var re = /\W\d+(\.\d*)?/g;
       } else {
+         // Check for assign statements
+         var re = new RegExp('=\\W*'+pyKey+'([^(]|$)');
+         if(re.exec(code)) {
+            return {type: 'assign', name: pyKey};
+         }
+
          var re = new RegExp('(^|\\W)'+pyKey+'(\\W|$)', 'g');
       }
       var count = (code.match(re) || []).length;
@@ -265,14 +271,15 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
          if(usesCount[pointer] > limitedUses[pointer].nbUses) {
             // TODO :: i18n ?
             if(pyKey == 'list_brackets') {
-               return 'crochets [ ]';
+               var name = 'crochets [ ]';
             } else if(pyKey == 'dict_brackets') {
-               return 'accolades { }';
+               var name = 'accolades { }';
             } else if(pyKey == 'math_number') {
-               return 'nombres';
+               var name = 'nombres';
             } else {
-               return pyKey;
+               var name = pyKey;
             }
+            return {type: 'uses', name: name};
          }
       }
    }
