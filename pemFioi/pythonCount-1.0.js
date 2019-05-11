@@ -99,7 +99,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr'];
    var allowed = []
 
    if(!includeBlocks) {
