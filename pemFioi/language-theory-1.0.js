@@ -182,13 +182,30 @@ function LanguageTheory(rng){
       }
    };
 
-
+   this.isConjugate = function(word1,word2) {
+      // console.log(word1+" "+word2);
+      if(word1.length != word2.length){
+         return false;
+      }else{
+         for(var iLetter = 1; iLetter < word1.length; iLetter++){
+            var prefix1 = word1.substring(0,iLetter);
+            var suffix1 = word1.substring(iLetter);
+            var prefix2 = word2.slice(0,-iLetter);
+            var suffix2 = word2.slice(-iLetter);
+            // console.log(prefix1+" "+suffix1+" "+prefix2+" "+suffix2);
+            if(prefix1 == suffix2 && prefix2 == suffix1){
+               return true;
+            }
+         }
+         return false;
+      }
+   };
 
    this.validation = function(data) {
       var error = null;
+      var answer = data.answer;
       switch(data.mode){
          case 1:  // find_factor
-            var answer = data.answer;
             var word = data.word;
             var length = data.factorLength;
             for(var type in answer){
@@ -217,7 +234,6 @@ function LanguageTheory(rng){
             }
             break;
          case 2: // longest primitive
-            var answer = data.answer;
             var word = data.word;
             for(var type in answer){
                if(type != "seed"){
@@ -244,7 +260,20 @@ function LanguageTheory(rng){
                   if(answer[type].length < length){
                      return "The "+taskStrings[type]+" input is not the longest possible for the word "+word;
                   }
-
+               }
+            }
+         case 3: // conjugate
+            var words = data.words;
+            for(var iPair = 0; iPair < answer.pairs.length; iPair++){
+               for(var iWord = 0; iWord < 2; iWord++){
+                  if(answer.pairs[iPair][iWord] == null){
+                     return "One of the pairs is not complete";
+                  }
+               }
+            }
+            for(var iPair = 0; iPair < answer.pairs.length; iPair++){
+               if(!this.isConjugate(words[answer.pairs[iPair][0]],words[answer.pairs[iPair][1]])){
+                  return "Error in pair "+iPair;
                }
             }
       }
