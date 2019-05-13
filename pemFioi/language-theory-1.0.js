@@ -201,6 +201,19 @@ function LanguageTheory(rng){
       }
    };
 
+   this.isMirror = function(word1,word2) {
+      if(word1.length != word2.length){
+         return false;
+      }else{
+         for(var iLetter = 0; iLetter < word1.length; iLetter++){
+            if(word1.charAt(iLetter) != word2.charAt(word2.length - 1 - iLetter)){
+               return false;
+            }
+         }
+         return true;
+      }
+   };
+
    this.validation = function(data) {
       var error = null;
       var answer = data.answer;
@@ -274,6 +287,18 @@ function LanguageTheory(rng){
             for(var iPair = 0; iPair < answer.pairs.length; iPair++){
                if(!this.isConjugate(words[answer.pairs[iPair][0]],words[answer.pairs[iPair][1]])){
                   return "Error in pair "+iPair;
+               }
+            }
+         case 4: // mirrors
+            var words = data.words;
+            for(var iWord = 0; iWord < words.length; iWord++){
+               if(!answer.mirrors[iWord]){
+                  return "Entry "+(iWord+1)+" is empty";
+               }
+            }
+            for(var iWord = 0; iWord < words.length; iWord++){
+               if(!this.isMirror(answer.mirrors[iWord],words[iWord])){
+                  return "Error at line "+(iWord+1);
                }
             }
       }
