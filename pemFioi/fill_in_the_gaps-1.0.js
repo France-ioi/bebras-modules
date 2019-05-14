@@ -142,7 +142,8 @@ function FillInTheGaps(settings) {
       for(var gap in self.gapContent){
          if(self.gapContent[gap] == id.substr(5)){
             self.gapContent[gap] = null;
-            self.saveAnswer();
+            if(self.answer)
+               self.saveAnswer();
          }
       }
       self.dragCallback();
@@ -186,7 +187,8 @@ function FillInTheGaps(settings) {
             var newY = self.gapPos[gap].y;
             self.toPos(id,newX,newY);
             self.gapContent[gap] = id.substr(5);
-            self.saveAnswer();
+            if(self.answer)
+               self.saveAnswer();
          }else{
             // self.resizeWord(id,false);
             self.toPos(id,self.wordOriginPos[id].x,self.wordOriginPos[id].y);   
