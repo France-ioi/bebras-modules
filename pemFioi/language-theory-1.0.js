@@ -7,6 +7,7 @@ function LanguageTheory(rng){
    };
 
    this.getWordList = function(minLength,maxLength) {
+      /* return an array of words from sentences_wordList.js */
       var wordList = [];
       var array = [];
       var minLength = minLength || 0;
@@ -82,12 +83,14 @@ function LanguageTheory(rng){
    };
 
    this.getFactor = function(word) {
+      /* return a random factor of word */
       var startIndex = this.rng.nextInt(1,word.length - 3);
       var endIndex = this.rng.nextInt(startIndex + 2, word.length - 1);
       return word.slice(startIndex,endIndex);
    };
 
    this.getSubsequence = function(word) {
+      /* return a random subsequence of word */
       do{
          var startIndex = this.rng.nextInt(0,word.length - 3);
          var endIndex = this.rng.nextInt(startIndex + 1,word.length);
@@ -214,12 +217,22 @@ function LanguageTheory(rng){
       }
    };
 
+   this.getMirror = function(string) {
+      var mirror = "";
+      for(var iLetter = 1; iLetter <= string.length; iLetter++){
+         mirror += string.charAt(string.length - iLetter);
+      }
+      return mirror;
+   };
+
    this.validation = function(data) {
       var error = null;
       var answer = data.answer;
+      var word = data.word;
+      var words = data.words;
       switch(data.mode){
          case 1:  // find_factor
-            var word = data.word;
+            // var word = data.word;
             var length = data.factorLength;
             for(var type in answer){
                if(type != "seed"){
@@ -247,7 +260,7 @@ function LanguageTheory(rng){
             }
             break;
          case 2: // longest primitive
-            var word = data.word;
+            // var word = data.word;
             for(var type in answer){
                if(type != "seed"){
                   var length = this.getLengthOfLongestPrimitiveSubsequence(word,type);
@@ -275,8 +288,9 @@ function LanguageTheory(rng){
                   }
                }
             }
+            break;
          case 3: // conjugate
-            var words = data.words;
+            // var words = data.words;
             for(var iPair = 0; iPair < answer.pairs.length; iPair++){
                for(var iWord = 0; iWord < 2; iWord++){
                   if(answer.pairs[iPair][iWord] == null){
@@ -289,8 +303,9 @@ function LanguageTheory(rng){
                   return "Error in pair "+iPair;
                }
             }
+            break;
          case 4: // mirrors
-            var words = data.words;
+            // var words = data.words;
             for(var iWord = 0; iWord < words.length; iWord++){
                if(!answer.mirrors[iWord]){
                   return "Entry "+(iWord+1)+" is empty";
@@ -301,6 +316,30 @@ function LanguageTheory(rng){
                   return "Error at line "+(iWord+1);
                }
             }
+            break;
+         case 5: // mirror factor
+         case 6: // mirror prefix
+         case 7: // mirror suffix
+            var types = {5:"factor",6:"prefix",7:"suffix"};
+            var type = types[data.mode];
+            var length = data.length;
+            for(var iWord = 0; iWord < words.length; iWord++){
+               if(!answer.factors[iWord]){
+                  return "Entry "+(iWord+1)+" is empty";
+               }
+            }
+            for(var iWord = 0; iWord < words.length; iWord++){
+               if(answer.factors[iWord].length < length){
+                  return answer.factors[iWord]+" is shorter than "+length;
+               }
+               if(!this.isSubsequence("factor",answer.factors[iWord],words[iWord])){
+                  return answer.factors[iWord]+" is not a factor of "+words[iWord];
+               }
+               if(!this.isSubsequence(type,this.getMirror(answer.factors[iWord]),words[iWord])){
+                  return "The mirror of "+answer.factors[iWord]+" is not a "+type+" of "+words[iWord];
+               }
+            }
+            break;
       }
       
    };
