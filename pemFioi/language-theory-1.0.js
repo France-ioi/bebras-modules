@@ -320,8 +320,10 @@ function LanguageTheory(rng){
          case 5: // mirror factor
          case 6: // mirror prefix
          case 7: // mirror suffix
-            var types = {5:"factor",6:"prefix",7:"suffix"};
-            var type = types[data.mode];
+         case 8: // mirror subsequence
+            var type = (data.mode == 8) ? "subsequence" : "factor"; 
+            var mirrorTypes = {5:"factor",6:"prefix",7:"suffix",8:"subsequence"};
+            var mirrorType = mirrorTypes[data.mode];
             var length = data.length;
             for(var iWord = 0; iWord < words.length; iWord++){
                if(!answer.factors[iWord]){
@@ -332,11 +334,11 @@ function LanguageTheory(rng){
                if(answer.factors[iWord].length < length){
                   return answer.factors[iWord]+" is shorter than "+length;
                }
-               if(!this.isSubsequence("factor",answer.factors[iWord],words[iWord])){
-                  return answer.factors[iWord]+" is not a factor of "+words[iWord];
+               if(!this.isSubsequence(type,answer.factors[iWord],words[iWord])){
+                  return answer.factors[iWord]+" is not a "+type+" of "+words[iWord];
                }
-               if(!this.isSubsequence(type,this.getMirror(answer.factors[iWord]),words[iWord])){
-                  return "The mirror of "+answer.factors[iWord]+" is not a "+type+" of "+words[iWord];
+               if(!this.isSubsequence(mirrorType,this.getMirror(answer.factors[iWord]),words[iWord])){
+                  return "The mirror of "+answer.factors[iWord]+" is not a "+mirrorType+" of "+words[iWord];
                }
             }
             break;
