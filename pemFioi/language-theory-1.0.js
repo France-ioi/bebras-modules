@@ -1,5 +1,5 @@
 function LanguageTheory(rng){
-
+   var self = this;
    this.rng = rng;
 
    this.setRNG = function(fct) {
@@ -143,19 +143,29 @@ function LanguageTheory(rng){
       return true;
    };
 
-   this.getLengthOfLongestPrimitiveSubsequence = function(word,type) {
+   this.getLengthOfLongestSubsequence = function(word,type,whichIs) {
+      switch(whichIs){
+         case "primitive":
+            var whichIsFct = this.isPrimitive;
+            break;
+         case "palindrome":
+            var whichIsFct = this.isPalindrome;
+            break;
+         default:
+            var whichIsFct = function(str){return true};
+      }
       switch(type){
          case "prefix":
             for(var endIndex = word.length - 1; endIndex > 0; endIndex--){
                var substr = word.substring(0,endIndex);
-               if(this.isPrimitive(substr)){
+               if(whichIsFct(substr)){
                   return substr.length;
                }
             }
          case "suffix":
             for(var startIndex = 1; startIndex < word.length; startIndex++){
                var substr = word.substring(startIndex,word.length);
-               if(this.isPrimitive(substr)){
+               if(whichIsFct(substr)){
                   return substr.length;
                }
             }
@@ -164,7 +174,7 @@ function LanguageTheory(rng){
             for(var startIndex = 1; startIndex < word.length - 1; startIndex++){
                for(var endIndex = word.length - 1; endIndex > 1; endIndex--){
                   var substr = word.substring(startIndex,endIndex);
-                  if(this.isPrimitive(substr) && !this.isSubsequence("prefix",substr,word) && !this.isSubsequence("suffix",substr,word) && substr.length > length){
+                  if(whichIsFct(substr) && !this.isSubsequence("prefix",substr,word) && !this.isSubsequence("suffix",substr,word) && substr.length > length){
                      length = substr.length;
                   }
                }
@@ -174,11 +184,11 @@ function LanguageTheory(rng){
             var length = 0;
             for(var iLetter = 0; iLetter < word.length; iLetter++){
                var substr = word.substr(0,iLetter)+word.substring(iLetter+1);
-               if(this.isPrimitive(substr) && !this.isSubsequence("factor",substr,word) && substr.length > length){
+               if(whichIsFct(substr) && !this.isSubsequence("factor",substr,word) && substr.length > length){
                   // console.log(substr);
                   length = substr.length;
                }else if(substr.length > 1){
-                  length = Math.max(this.getLengthOfLongestPrimitiveSubsequence(substr,"subsequence"),length);
+                  length = Math.max(this.getLengthOfLongestSubsequence(substr,"subsequence",whichIs),length);
                }
             }
             return length;
@@ -217,6 +227,10 @@ function LanguageTheory(rng){
       }
    };
 
+   this.isPalindrome = function(word) {
+      return self.isMirror(word,word);
+   };
+
    this.getMirror = function(string) {
       var mirror = "";
       for(var iLetter = 1; iLetter <= string.length; iLetter++){
@@ -232,7 +246,6 @@ function LanguageTheory(rng){
       var words = data.words;
       switch(data.mode){
          case 1:  // find_factor
-            // var word = data.word;
             var length = data.factorLength;
             for(var type in answer){
                if(type != "seed"){
@@ -260,15 +273,24 @@ function LanguageTheory(rng){
             }
             break;
          case 2: // longest primitive
-            // var word = data.word;
+         case 9: // longest palindrome
+            if(data.mode == 2){
+               var whichIs = "primitive";
+               var whichIsAdj = whichIs;
+               var whichIsFct = this.isPrimitive;
+            }else{
+               var whichIs = "palindrome";
+               var whichIsAdj = "palindromic";
+               var whichIsFct = this.isPalindrome;
+            }
             for(var type in answer){
                if(type != "seed"){
-                  var length = this.getLengthOfLongestPrimitiveSubsequence(word,type);
+                  var length = this.getLengthOfLongestSubsequence(word,type,whichIs);
                   if(answer[type].length == 0){
                      return "The "+taskStrings[type]+" input is empty";
                   }
-                  if(!this.isPrimitive(answer[type])){
-                     return "The "+taskStrings[type]+" input is not primitive";
+                  if(!whichIsFct(answer[type])){
+                     return "The "+taskStrings[type]+" input is not "+whichIsAdj;
                   }
                   if(!this.isSubsequence(type,answer[type],word)){
                      return answer[type]+" is not a "+type+" of "+word;
@@ -284,13 +306,12 @@ function LanguageTheory(rng){
                      return "Please enter a "+type+" which is not a factor";
                   }
                   if(answer[type].length < length){
-                     return "The "+taskStrings[type]+" input is not the longest possible for the word "+word;
+                     return answer[type]+" is not the longest possible "+whichIsAdj+" "+type+" for the word "+word;
                   }
                }
             }
             break;
          case 3: // conjugate
-            // var words = data.words;
             for(var iPair = 0; iPair < answer.pairs.length; iPair++){
                for(var iWord = 0; iWord < 2; iWord++){
                   if(answer.pairs[iPair][iWord] == null){
@@ -305,7 +326,6 @@ function LanguageTheory(rng){
             }
             break;
          case 4: // mirrors
-            // var words = data.words;
             for(var iWord = 0; iWord < words.length; iWord++){
                if(!answer.mirrors[iWord]){
                   return "Entry "+(iWord+1)+" is empty";
