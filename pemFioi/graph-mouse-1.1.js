@@ -1365,7 +1365,9 @@ function GraphEditor(settings) {
    this.terminalIcon = null;
    this.initialIcon = null;
    this.pencil = null;
+
    this.textEditor = null;
+   this.editionInfo = {};
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
@@ -1773,9 +1775,6 @@ function GraphEditor(settings) {
          this.addTerminalIcon(vertexId);
       this.addInitialIcon(vertexId);
       var vInfo = visualGraph.getVertexVisualInfo(vertexId);
-      // if(vInfo.tableMode){
-      //    this.addPencil(vertexId);
-      // }
    };
    this.removeIcons = function() {
       if(self.loopIcon)
@@ -2245,6 +2244,7 @@ function GraphEditor(settings) {
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[1].hide();
       self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
+      self.editInfo = {id: id, type: type, field: "label"};
       $("#"+paperId).css("position","relative");
 
       self.textEditor.css({
@@ -2314,8 +2314,10 @@ function GraphEditor(settings) {
             });
          }
       }
-      if(self.textEditor)
+      if(self.textEditor){
          self.textEditor.remove();
+         self.editInfo = {};
+      }
       raphElement[1].show();
       if(callback){
          callback();
@@ -2334,6 +2336,7 @@ function GraphEditor(settings) {
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[3].hide();
       self.textEditor = $("<textarea id=\"textEditor\">"+content+"</textarea>");
+      self.editInfo = {id: id, type: "vertex", field: "content"};
       $("#"+paperId).css("position","relative");
 
       var textAlign = attr["text-anchor"] || "middle";
@@ -2401,8 +2404,10 @@ function GraphEditor(settings) {
          info.content = newContent;
          graph.setVertexInfo(id,info);
       }
-      if(self.textEditor)
+      if(self.textEditor){
          self.textEditor.remove();
+         self.editInfo = {};
+      }
 
       visualGraph.redraw();
       self.updateHandlers();
@@ -2413,11 +2418,20 @@ function GraphEditor(settings) {
    };
 
    this.startDragCallback = function(ID) {
+      // console.log(ID);
       var vertices = graph.getAllVertices();
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
          var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
-         if(self.textEditor)
+         if(self.textEditor){
+            if(self.editInfo.id == ID){
+               if(self.editInfo.field == "label"){
+                  self.writeLabel(ID,self.editInfo.type);
+               }else{
+                  self.writeContent(ID);
+               }
+            }
             self.textEditor.remove();
+         }
          if(vertexRaph[1])
             vertexRaph[1].show();
          if(vertexRaph[3])
