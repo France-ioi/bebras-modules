@@ -2324,25 +2324,38 @@ function GraphEditor(settings) {
 
    this.editContent = function(id) {
       var info = graph.getVertexInfo(id);
-      var attr = visualGraph.graphDrawer.vertexLabelAttr;
+      var attr = visualGraph.graphDrawer.vertexContentAttr;
       var fontSize = attr["font-size"] || 15;
       var vertexPos = visualGraph.getVertexVisualInfo(id);
       var content = (info.content) ? info.content : "";
       var boxSize = visualGraph.graphDrawer.getBoxSize(content);
-      var labelHeight = 2*fontSize;
+      var labelHeight = 2*visualGraph.graphDrawer.vertexLabelAttr["font-size"];
       
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[3].hide();
       self.textEditor = $("<textarea id=\"textEditor\">"+content+"</textarea>");
       $("#"+paperId).css("position","relative");
 
+      var textAlign = attr["text-anchor"] || "middle";
+      switch(textAlign){
+         case "middle":
+            var editorAlign = "center";
+            break;
+         case "start":
+            var editorAlign = "left";
+            break;
+         case "end":
+            var editorAlign = "right";
+            break;
+      }
       self.textEditor.css({
          position: "absolute",
          left: vertexPos.x - boxSize.w/2,
          top: vertexPos.y - boxSize.h/2 + labelHeight,
-         width: boxSize.w,
+         width: boxSize.w - 20,
          height: boxSize.h - labelHeight,
-         "text-align": "center",
+         "text-align": editorAlign,
+         "padding": "0 10px",
          background: "none",
          border: "none",
          color: attr.fill || "black"
