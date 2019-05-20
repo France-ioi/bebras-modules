@@ -250,6 +250,18 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.wsSession.send(JSON.stringify(command));
     }
 
+    this.setSessionSensorTable = function(sensorTable) {
+        if (this.wsSession != null) {
+            command = {
+                "command": "setSensorTable",
+                "sensorTable": sensorTable
+            };    
+
+            this.wsSession.send(JSON.stringify(command));
+        }
+
+    }
+
     this.sendCommand = function (command, callback) {
         if (this.wsSession != null) {
             if (this.resultsCallback == null) {
@@ -296,6 +308,7 @@ import time
 import smbus
 import math
 import pigpio 
+import threading
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -311,6 +324,21 @@ distance_last_value = {}
 
 screenLine1 = None
 screenLine2 = None
+
+oleddisp = None
+oledfont = None
+oledimage = None
+oleddraw = None
+oledwidth = 128
+oledheight = 32
+
+oledtimer = None
+oledlock = threading.Lock()
+
+vl53l0x = None
+
+enabledBMI160 = False
+enabledLSM303C = False
 
 pi = pigpio.pi()
 
@@ -378,7 +406,7 @@ def magnetOff(pin):
 def buttonStateInPort(pin):
     pin = normalizePin(pin)
 
-    GPIO.setup(pin, GPIO.IN)
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     return GPIO.input(pin)
 
 def buttonState():
@@ -387,7 +415,7 @@ def buttonState():
 def waitForButton(pin):
     pin = normalizePin(pin)
     cleanupPin(pin)
-    GPIO.setup(pin, GPIO.IN)
+    GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     while not GPIO.input(pin):
         time.sleep(0.01)
     time.sleep(0.1) # debounce
@@ -405,7 +433,7 @@ def buttonWasPressed(pin):
 
     if not init:
         button_interrupt_enabled[pin] = True
-        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(pin, GPIO.FALLING, callback=buttonWasPressedCallback, bouncetime=300)
 
     wasPressed = 0
@@ -418,12 +446,25 @@ def buttonWasPressed(pin):
 
     return wasPressed
 
+def readDistanceVL53(pin):
+    global vl53l0x
+
+    if vl53l0x == None:
+        import board
+        import busio
+        import adafruit_vl53l0x
+
+        i2c = busio.I2C(board.SCL, board.SDA)
+        vl53l0x = adafruit_vl53l0x.VL53L0X(i2c)
+
+    return vl53l0x.range
+
 usleep = lambda x: time.sleep(x / 1000000.0)
 
 _TIMEOUT1 = 1000
 _TIMEOUT2 = 10000
 
-def readDistance(pin):
+def readDistanceUltrasonic(pin):
     pin = normalizePin(pin)
 
     cleanupPin(pin)
@@ -475,7 +516,187 @@ def readDistance(pin):
 
     return distance
 
+def readDistance(pin):
+    pin = normalizePin(pin)
+    #handler = getPinHandler(pin, "range")
+    #handler(pin)
+
+    return readDistanceUltrasonic(pin)
+
+def initOLEDScreen():
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    if oleddisp == None:
+        from board import SCL, SDA
+        import busio
+        from PIL import Image, ImageDraw, ImageFont
+        import adafruit_ssd1306
+
+        i2c = busio.I2C(SCL, SDA)
+
+        oleddisp = adafruit_ssd1306.SSD1306_I2C(oledwidth, oledheight, i2c)
+
+        oleddisp.fill(0)
+        oleddisp.show()
+
+        oledfont = ImageFont.load_default()
+
+        oledimage = Image.new('1', (oledwidth, oledheight))
+
+        oleddraw = ImageDraw.Draw(oledimage)   
+
+
+# Address 0x3c
 def displayText(line1, line2=""):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+    
+    initOLEDScreen()  
+
+    # This will allow arguments to be numbers
+    line1 = str(line1)
+    line2 = str(line2)
+
+    oleddraw.rectangle((0, 0, oledwidth, oledheight), outline=0, fill=0)
+
+    oleddraw.text((0, 0), line1, font=oledfont, fill=255)
+    oleddraw.text((0, 15), line2, font=oledfont, fill=255)
+
+    oleddisp.image(oledimage)
+    oleddisp.show()
+
+def updateScreen():
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    global oledtimer
+
+    oledlock.acquire(True)
+
+    oleddisp.image(oledimage)
+    oleddisp.show()
+    oledtimer = None
+
+    oledlock.release()
+
+def scheduleUpdateScreen():
+    global oledtimer
+
+    oledlock.acquire(True)
+    if oledtimer == None:
+        oledtimer = threading.Timer(0.2, updateScreen)
+        oledtimer.start()   
+    oledlock.release()
+
+def plotPixel(x, y):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    oledlock.acquire(True)
+    oleddraw.point((x, y), fill=255)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+def drawLine(x0, y0, x1, y1):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    oledlock.acquire(True)
+    oleddraw.line((x0, y0, x1, y1), fill=255)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+def drawRectangle(x0, y0, x1, y1, fill):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    fillcolor = 0
+    if fill:
+        fillcolor = 255
+
+    oledlock.acquire(True)
+    oleddraw.rectangle((x0, y0, x1, y1), fill=fillcolor, outline=2555rtgh88 hy< )
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+def drawCircle(x0, y0, radius, fill):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    fillcolor = 0
+    if fill:
+        fillcolor = 255
+
+    boundx0 = x0 - radius
+    boundy0 = y0 - radius
+
+    boundx1 = x0 + radius
+    boundy1 = y0 + radius
+
+    oledlock.acquire(True)
+    oleddraw.ellipse((boundx0, boundy0, boundx1, boundy1), fill=fillcolor, outline=255)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+
+def unplotPixel(x, y):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    oledlock.acquire(True)
+    oleddraw.point((x, y), fill=0)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+
+def clearScreen():
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+
+    initOLEDScreen()
+
+    oledlock.acquire(True)
+    oleddraw.rectangle((0, 0, oledwidth, oledheight), outline=0, fill=0)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+
+def displayText123(line1, line2=""):
     global screenLine1
     global screenLine2
     
@@ -534,7 +755,7 @@ def readADC(pin):
         return 0
 
 
-def readTemperature(pin):
+def readTemperature123(pin):
     B = 4275.
     R0 = 100000.
 
@@ -554,8 +775,8 @@ def readRotaryAngle(pin):
 def readSoundSensor(pin):
 	return int(readADC(pin) / 10)
 
-def readLightIntensity(pin):
-	return int(readADC(pin) * 100 / 631)
+#def readLightIntensity(pin):
+#	return int(readADC(pin) * 100 / 631)
 
 def sleep(sleep_time):
 	sleep_time = float(sleep_time)
@@ -812,5 +1033,400 @@ def readHumidity(pin):
 
 def currentTime():
     return time.time() * 1000
+
+
+BMI160_DEVICE_ADDRESS = 0x68
+BMI160_REGA_USR_CHIP_ID      = 0x00
+BMI160_REGA_USR_ACC_CONF_ADDR     = 0x40
+BMI160_REGA_USR_ACC_RANGE_ADDR    = 0x41
+BMI160_REGA_USR_GYR_CONF_ADDR     = 0x42
+BMI160_REGA_USR_GYR_RANGE_ADDR    = 0x43
+BMI160_REGA_CMD_CMD_ADDR          =   0x7e
+BMI160_REGA_CMD_EXT_MODE_ADDR     =   0x7f
+BMI160_REGA_TEMPERATURE           = 0x20
+CMD_SOFT_RESET_REG      = 0xb6
+CMD_PMU_ACC_SUSPEND     = 0x10
+CMD_PMU_ACC_NORMAL      = 0x11
+CMD_PMU_ACC_LP1         = 0x12
+CMD_PMU_ACC_LP2         = 0x13
+CMD_PMU_GYRO_SUSPEND    = 0x14
+CMD_PMU_GYRO_NORMAL     = 0x15
+CMD_PMU_GYRO_FASTSTART  = 0x17
+
+BMI160_USER_DATA_14_ADDR = 0X12 # accel x
+BMI160_USER_DATA_15_ADDR = 0X13 # accel x
+BMI160_USER_DATA_16_ADDR = 0X14 # accel y
+BMI160_USER_DATA_17_ADDR = 0X15 # accel y
+BMI160_USER_DATA_18_ADDR = 0X16 # accel z
+BMI160_USER_DATA_19_ADDR = 0X17 # accel z
+
+BMI160_USER_DATA_8_ADDR  = 0X0C
+BMI160_USER_DATA_9_ADDR  = 0X0D
+BMI160_USER_DATA_10_ADDR = 0X0E
+BMI160_USER_DATA_11_ADDR = 0X0F
+BMI160_USER_DATA_12_ADDR = 0X10
+BMI160_USER_DATA_13_ADDR = 0X11
+
+def initBMI160():
+    bus = smbus.SMBus(1)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_ACC_CONF_ADDR, 0x25)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_ACC_RANGE_ADDR, 0x5)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_GYR_CONF_ADDR, 0x26)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_GYR_RANGE_ADDR, 0x1)
+
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, CMD_SOFT_RESET_REG)
+
+    time.sleep(0.1)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, CMD_PMU_ACC_NORMAL) # Enable ACCEL
+    time.sleep(0.0038)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, CMD_PMU_GYRO_NORMAL)  ## Enable Gyro
+    time.sleep(0.080)
+
+def readAccelBMI160():
+    global enabledBMI160
+
+    try:
+        if not enabledBMI160:
+            enabledBMI160 = True
+            initBMI160()
+        
+        bus = smbus.SMBus(1)
+        acc_value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_14_ADDR, 6)
+        acc_x =  (acc_value[1] << 8) | acc_value[0]
+        acc_y =  (acc_value[3] << 8) | acc_value[2]
+        acc_z =  (acc_value[5] << 8) | acc_value[4]
+
+        if acc_x & 0x8000 != 0:
+            acc_x -= 1 << 16
+
+        if acc_y & 0x8000 != 0:
+            acc_y -= 1 << 16
+
+        if acc_z & 0x8000 != 0:
+            acc_z -= 1 << 16
+
+        acc_x = float(acc_x)  / 16384.0;
+        acc_y = float(acc_y)  / 16384.0;
+        acc_z = float(acc_z) / 16384.0;
+
+        return [round(acc_x, 2), round(acc_y, 2), round(acc_z, 2)]
+    except:
+        return [0, 0, 0]
+
+def readAcceleration(axis):
+    acceleration = readAccelBMI160()
+
+    if axis.lower() == "x":
+        return acceleration[0]
+    elif axis.lower() == "y":
+        return acceleration[1]
+    elif axis.lower() == "z":
+        return acceleration[2]
+
+    return 0
+
+def computeRotation(rotationType):
+    acceleration = readAccelBMI160()
+    zsign = 1
+
+    if acceleration[2] < 0:
+        zsign = -1
+
+    if rotationType.lower() == "pitch":
+        pitch = 180 * math.atan2 (acceleration[0], zsign * math.sqrt(acceleration[1]*acceleration[1] + acceleration[2]*acceleration[2]))/math.pi
+
+        return int(pitch)
+    elif rotationType.lower() == "roll":
+        roll = 180 * math.atan2 (acceleration[1], zsign * math.sqrt(acceleration[0]*acceleration[0] + acceleration[2]*acceleration[2]))/math.pi
+
+        return int(roll)
+
+    return 0
+
+
+
+def readGyroBMI160():
+    global enabledBMI160
+
+    try:
+        if not enabledBMI160:
+            enabledBMI160 = True
+            initBMI160()
+        
+        bus = smbus.SMBus(1)
+        value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_8_ADDR, 6)
+        x =  (value[1] << 8) | value[0]
+        y =  (value[3] << 8) | value[2]
+        z =  (value[5] << 8) | value[4]
+
+        if x & 0x8000 != 0:
+            x -= 1 << 16
+
+        if y & 0x8000 != 0:
+            y -= 1 << 16
+
+        if z & 0x8000 != 0:
+            z -= 1 << 16
+
+        #x = float(x)  / 16384.0;
+        #y = float(y)  / 16384.0;
+        #z = float(z) / 16384.0;
+  
+        return [x, y, z]
+    except:
+        return [0, 0, 0]
+
+#def readTemperatureBMI160():
+def readTemperature(pin):
+    global enabledBMI160
+
+    try:
+        if not enabledBMI160:
+            enabledBMI160 = True
+            initBMI160()
+        
+        bus = smbus.SMBus(1)
+        temp_value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_TEMPERATURE, 2)
+
+        temp = (temp_value[1] << 8 | temp_value[0])
+        if temp & 0x8000:
+            temp = (23.0 - ((0x10000 - temp)/512.0));
+        else:
+            temp = ((temp/512.0) + 23.0);
     
+        return temp
+    except:
+        return 0
+
+ACC_I2C_ADDR = 0x1D
+MAG_I2C_ADDR = 0x1E
+
+CTRL_REG0               = 0x1F
+CTRL_REG1               = 0x20
+CTRL_REG2               = 0x21
+CTRL_REG3               = 0x22
+CTRL_REG4               = 0x23
+CTRL_REG5               = 0x24
+CTRL_REG6               = 0x25
+CTRL_REG7               = 0x26
+
+MAG_OUTX_L     = 0x28
+MAG_OUTX_H     = 0x29
+MAG_OUTY_L     = 0x2A
+MAG_OUTY_H     = 0x2B
+MAG_OUTZ_L     = 0x2C
+MAG_OUTZ_H     = 0x2D
+
+MAG_DO_0_625_Hz = 0x00,
+MAG_DO_1_25_Hz  = 0x04,
+MAG_DO_2_5_Hz   = 0x08,
+MAG_DO_5_Hz     = 0x0C,
+MAG_DO_10_Hz    = 0x10,
+MAG_DO_20_Hz    = 0x14,
+MAG_DO_40_Hz    = 0x18,
+MAG_DO_80_Hz = 0x1C
+
+MAG_FS_4_Ga   =  0x00
+MAG_FS_8_Ga   =  0x20
+MAG_FS_12_Ga  =  0x40
+MAG_FS_16_Ga = 0x60
+    
+def twos_comp(val, bits):
+        # Calculate the 2s complement of int:val #
+        if(val&(1<<(bits-1)) != 0):
+                val = val - (1<<bits)
+        return val
+
+def initLSM303C():
+    bus = smbus.SMBus(1)
+
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG6, 0x00)
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG5, (4<<2))
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG3, 0x00)
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG7, 0x00) # 0x00 continuous conversion mode
+
+def readMagnetometerLSM303C():
+    global enabledLSM303C
+
+    try:
+        if not enabledLSM303C:
+            enabledLSM303C = True
+            initLSM303C()
+
+        bus = smbus.SMBus(1) 
+
+        X = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_L), 16)
+        Y = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_L), 16)
+        Z = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_L), 16)
+
+        return [X, Y, Z]
+    except:
+        return [0, 0, 0]
+ 
+def readMagneticForce(axis):
+    maneticforce = readMagnetometerLSM303C()
+
+    if axis.lower() == "x":
+        return maneticforce[0]
+    elif axis.lower() == "y":
+        return maneticforce[1]
+    elif axis.lower() == "z":
+        return maneticforce[2]
+
+    return 0
+
+
+def readStick(pinup, pindown, pinleft, pinright, pincenter):
+    pinup = normalizePin(pinup)
+    pindown = normalizePin(pindown)
+    pinleft = normalizePin(pinleft)
+    pinright = normalizePin(pinright)
+    pincenter = normalizePin(pincenter)
+
+
+    GPIO.setup(pinup, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(pindown, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(pinleft, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(pinright, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(pincenter, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+    return [GPIO.input(pinup),
+            GPIO.input(pindown),
+            GPIO.input(pinleft),
+            GPIO.input(pinright),
+            GPIO.input(pincenter)]
+
+def setInfraredState(pin, state):
+    pin = normalizePin(pin)
+    state = int(state)
+
+    cleanupPin(pin)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.wave_clear()
+    pi.wave_tx_stop()
+
+    if state:
+        wf = []
+
+        wf.append(pigpio.pulse(1<<pin, 0, 13))
+        wf.append(pigpio.pulse(0, 1<<pin, 13))
+
+        pi.wave_add_generic(wf)
+
+        a = pi.wave_create()
+
+        pi.wave_send_repeat(a)
+
+def changePassiveBuzzerState(pin, state):
+    pin = normalizePin(pin)
+    state = int(state)
+
+    cleanupPin(pin)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.wave_clear()
+    pi.wave_tx_stop()
+
+    if state:
+        wf = []
+
+        wf.append(pigpio.pulse(1<<pin, 0, 500))
+        wf.append(pigpio.pulse(0, 1<<pin, 500))
+
+        pi.wave_add_generic(wf)
+
+        a = pi.wave_create()
+
+        pi.wave_send_repeat(a)
+
+
+def readADCADS1015(pin, gain):
+    ADS1x15_CONFIG_GAIN = {
+        2/3: 0x0000,
+        1:   0x0200,
+        2:   0x0400,
+        4:   0x0600,
+        8:   0x0800,
+        16:  0x0A00
+    }
+
+    ADS1015_CONFIG_DR = {
+        128:   0x0000,
+        250:   0x0020,
+        490:   0x0040,
+        920:   0x0060,
+        1600:  0x0080,
+        2400:  0x00A0,
+        3300:  0x00C0
+    }
+
+    ADS1x15_CONFIG_MUX_OFFSET      = 12
+    ADS1x15_CONFIG_OS_SINGLE       = 0x8000
+    ADS1x15_CONFIG_MODE_SINGLE      = 0x0100
+    ADS1x15_CONFIG_COMP_QUE_DISABLE = 0x0003
+    ADS1x15_POINTER_CONFIG = 0x01
+    ADS1x15_POINTER_CONVERSION     = 0x00
+    ADS1x15_CONFIG_MODE_CONTINUOUS  = 0x0000
+
+    bus = smbus.SMBus(1)
+
+    address = 0x48
+
+    pin = normalizePin(pin)
+
+    mux = pin + 0x04
+    gain = ADS1x15_CONFIG_GAIN[gain]
+    data_rate = 0x00C0 #3.3ksps
+
+    config = ADS1x15_CONFIG_OS_SINGLE
+    config |= (mux & 0x07) << ADS1x15_CONFIG_MUX_OFFSET
+    config |= gain
+    config |= ADS1x15_CONFIG_MODE_CONTINUOUS
+    config |= data_rate
+    config |= ADS1x15_CONFIG_COMP_QUE_DISABLE
+
+    bus.write_i2c_block_data(address, ADS1x15_POINTER_CONFIG, [(config >> 8) & 0xFF, config & 0xFF])
+
+    time.sleep(0.001)
+    result = bus.read_i2c_block_data(address, ADS1x15_POINTER_CONVERSION, 2)
+
+    value = twos_comp(result[0] << 8 | result[1], 16)
+
+    return value
+
+def readLightIntensity(pin):
+    pin = normalizePin(pin)
+
+    val = int(readADCADS1015(pin, 1))
+    
+    if val < 0:
+        val = 0
+
+    if val > 25840: # FIX ME ???
+        val = 25840
+    
+    val = val * 100 / 25840
+
+    return val
+
+def readSoundLevel(pin):
+    pin = normalizePin(pin)
+    max = -25000
+    min = 25000
+    
+    for i in range(50):
+        val = int(readADCADS1015(pin, 8))
+
+        if val > max:
+            max = val
+
+        if val < min:
+            min = val
+
+    return max - min        
+
+
 `
