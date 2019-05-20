@@ -273,6 +273,10 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       "font-size": 15,
       "font-family": "sans-serif"
    };
+   this.vertexContentAttr = {
+      "font-size": 15,
+      "font-family": "sans-serif"
+   };
    this.edgeLabelAttr = {
       "font-size": 15,
       "font-family": "sans-serif"
@@ -306,6 +310,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    this.setVertexLabelAttr = function(attr) {
       this.vertexLabelAttr = attr;
+   };
+   this.setVertexContentAttr = function(attr) {
+      this.vertexContentAttr = attr;
    };
    this.setEdgeClickAreaAttr = function(attr) {
       this.edgeClickAreaAttr = attr;
@@ -349,7 +356,19 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var node = this.paper.rect(x,y,w,h).attr(this.circleAttr);
          var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(this.vertexLabelAttr);
          var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.circleAttr);
-         var content = this.paper.text(pos.x, y + labelHeight + (h - labelHeight)/2,content).attr(this.vertexLabelAttr);
+         var textAlign = this.vertexContentAttr["text-anchor"] || "middle";
+         switch(textAlign){
+            case "middle":
+               var contentX = pos.x;
+               break;
+            case "start":
+               var contentX = pos.x - boxSize.w/2 + 10;
+               break;
+            case "end":
+               var contentX = pos.x + boxSize.w/2 - 10;
+               break;
+         }
+         var content = this.paper.text(contentX, y + labelHeight + (h - labelHeight)/2,content).attr(this.vertexContentAttr);
          if(info.initial && !info.terminal){
             var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
             initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
@@ -380,8 +399,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var textSize = this.getTextSize(content);
       var minW = 2*this.circleAttr.r + 50;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
-      var w = Math.max(0.8*textSize.nbCol * this.vertexLabelAttr["font-size"], minW);
-      var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexLabelAttr["font-size"] + 2*margin, minH);
+      var w = Math.max(0.8*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
+      var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
       return { w: w, h: h };
    };
 
