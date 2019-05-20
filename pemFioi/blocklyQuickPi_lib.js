@@ -14,7 +14,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonStateInPort: "bouton enfoncé sur le port %1",
                 waitForButton: "Attendre le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
-                changeLedState: "Passer la LED à %2 sur le port %1",
+                changeLedState: "Passer la LED %1 à %2 ",
                 toggleLedState: "Inverser la LED sur le port %1",
                 displayText: "Afficher à l'écran Ligne 1: %1 Ligne 2: %2",
                 readTemperature: "température ambiante",
@@ -27,6 +27,28 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "Temps actuel en millisecondes",
                 changeBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
+
+                plotPixel: "Draw pixel",
+                unplotPixel: "Clear pixel",
+                drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
+                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (x₁,y₁) %3  %4 Fill %5",
+                drawCircle: "Draw circle (x₀,y₀) %1 %2 Radius %3 Fill 4",
+                clearScreen: "Clear entiere screen",
+
+                readAcceleration: "Read acceleration (mm/s²)",
+                computeRotation: "Compute rotation from accelerometer (°) %1",
+                stickState: "Read stick State",
+                readSoundLevel: "Read sound intensity",
+
+                readMagneticForce: "Read Magnetic Force (µT) %1",
+                computeCompassHeading: "Compute Compass Heading (°)",
+
+                readInfraredState: "Read Infrared Receiver State %1",
+                setInfraredState: "Set Infrared transmiter State %1",
+
+
+
+
                 /*turnLedOn: "Turn Led On",
                 turnLedOff: "Turn Led Off",
                 buttonState: "Return Button State",
@@ -47,7 +69,7 @@ var getContext = function (display, infos, curLevel) {
                 turnLedOn: "turnLedOn",
                 turnLedOff: "turnLedOff",
                 buttonState: "buttonState",
-                buttonStateInPort: "buttonStateInPort",
+                buttonStateInPort : "buttonStateInPort",
                 waitForButton: "waitForButton",
                 buttonWasPressed: "buttonWasPressed",
                 changeLedState: "changeLedState",
@@ -63,6 +85,28 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "currentTime",
                 changeBuzzerState: "setBuzzerState",
                 getTemperature: "getTemperature",
+
+                plotPixel: "plotPixel",
+                unplotPixel: "unplotPixel",
+                drawLine: "drawLine",
+                drawRectangle: "drawRectangle",
+                drawCircle: "drawCircle",
+                clearScreen: "clearScreen",
+
+                readAcceleration: "readAcceleration",
+                computeRotation: "computeRotation",
+
+                stickState: "stickState",
+                readSoundLevel: "readSoundLevel",
+
+
+                readMagneticForce: "readMagneticForce",
+                computeCompassHeading: "computeCompassHeading",
+
+                readInfraredState: "readInfraredState",
+                setInfraredState: "setInfraredState",
+
+
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -85,6 +129,27 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "currentTime(): Temps actuel en millisecondes",
                 changeBuzzerState: "setBuzzerState(port, state): sonnerie",
                 getTemperature: "getTemperature(port): Get temperature",
+
+                plotPixel: "plotPixel()",
+                unplotPixel: "unplotPixel()",
+                drawLine: "drawLine()",
+                drawRectangle: "drawRectangle()",
+                drawCircle: "drawCircle()",
+                clearScreen: "clearScreen()",
+
+                readAcceleration: "readAcceleration()",
+                computeRotation: "computeRotation",
+
+                stickState: "stickState()",
+                readSoundLevel: "readSoundLevel()",
+
+
+                readMagneticForce: "readMagneticForce()",
+                computeCompassHeading: "computeCompassHeading()",
+
+                readInfraredState: "readInfraredState()",
+                setInfraredState: "setInfraredState()",
+
             },
             constant: {
             },
@@ -120,6 +185,12 @@ var getContext = function (display, infos, curLevel) {
                         <span class="fa fa-exchange-alt"></span>
                         <button type="button" id="piinstall" class="btn">
                             <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
+                        </button>
+                    </span>
+
+                    <span id="pichangehatui">
+                        <button type="button" id="pichangehat" class="btn">
+                            <span class="fas fa-hat-wizard"></span><span>Change Board</span></span></span>
                         </button>
                     </span>
                 </div>`,
@@ -198,6 +269,26 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "returns current time",
                 changeBuzzerState: "sonnerie",
                 getTemperature: "Get temperature",
+
+                plotPixel: "plotPixel",
+                unplotPixel: "unplotPixel",
+                drawLine: "drawLine",
+                drawRectangle: "drawRectangle",
+                drawCircle: "drawCircle",
+                clearScreen: "clearScreen",
+
+                readAcceleration: "readAcceleration",
+                computeRotation: "computeRotation",
+
+                stickState: "stickState",
+                readSoundLevel: "readSoundLevel",
+
+
+                readMagneticForce: "readMagneticForce",
+                computeCompassHeading: "computeCompassHeading",
+
+                readInfraredState: "readInfraredState",
+                setInfraredState: "setInfraredState",
             }
         }
     }
@@ -282,6 +373,29 @@ var getContext = function (display, infos, curLevel) {
             }
         }
     };
+
+    context.resetSensorTable = function()
+    {
+        var sensorTable = [];
+
+        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+            var sensor = infos.quickPiSensors[iSensor];
+
+            var tableEntry = {
+                type: sensor.type,
+                name: sensor.name,
+                port: sensor.port
+            }
+
+            if (sensor.subType)
+                tableEntry.subType = sensor.subType;
+
+            sensorTable.push(tableEntry);
+
+        }
+
+        context.quickPiConnection.setSessionSensorTable(sensorTable);
+    }
 
     context.reset = function (taskInfos) {
         if (!context.offLineMode) {
@@ -383,17 +497,169 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
         }
-
     }
-
 
     function findSensorDefinition(sensor) {
-        return sensorDefinitions.find(function (element) {
-            if (sensor.type == element.name &&
-                (!sensor.subType || sensor.subType == element.subType))
-                return element;
-        })
+        for (var iType = 0; iType < sensorDefinitions.length; iType++) {
+            var type = sensorDefinitions[iType];
+
+            if (sensor.type == type.name) {
+                if (sensor.subType && type.subTypes) {
+
+                    for (var iSubType = 0; iSubType < type.subTypes.length; iSubType++) {
+                        var subType = type.subTypes[iSubType];
+
+                        if (subType.subType == sensor.subType) {
+                            return $.extend({}, type, subType);
+                        }              
+                    }
+                } else {
+                    return type;
+                }
+            }
+        }
+
+        return null;
     }
+
+
+    function getCurrentBoard(sensor) {
+        var found = boardDefinitions.find(function (element) {
+            if (context.board == element.name)
+                return element;
+        });
+
+        return found;
+    }
+
+
+    context.board = "grovepi";
+
+    var boardDefinitions = [
+        {
+            name: "grovepi",
+            friendlyName: "Grove Base Hat for Raspberry Pi",
+            image: "grovepihat.png",
+            adc: "stm32grove",
+            portTypes: {
+                "D": [5, 16, 18, 22, 24, 26],
+                "A": [0, 2, 4, 6],
+                "i2c": ["i2c"],
+            },
+        },
+        {
+            name: "quickpi",
+            friendlyName: "France IOI QuickPi Hat",
+            image: "quickpihat.png",
+            adc: "ads1015",
+            portTypes: {
+                "D": [5, 16, 24],
+                "A": [0],
+            },
+            builtinSensors: [
+                {
+                    type: "screen",
+                    subType: "oled128x32",
+                    port: "i2c",                    
+                    suggestedName: "oledscreen1",
+                },
+                {
+                    type: "led",
+                    subType: "red",
+                    port: "D4",
+                    suggestedName: "redled1",
+                },
+                {
+                    type: "led",
+                    subType: "green",
+                    port: "D17",
+                    suggestedName: "greenled1",
+                },
+                {
+                    type: "led",
+                    subType: "blue",
+                    port: "D27",       
+                    suggestedName: "blueled1",             
+                },
+                {
+                    type: "irtrans",
+                    port: "D22", 
+                    suggestedName: "infraredtransmiter1",        
+                },
+                {
+                    type: "irrecv",
+                    port: "D23",
+                    suggestedName: "infraredreceiver1",
+                },
+                {
+                    type: "sound",
+                    port: "A1",
+                    suggestedName: "microphone1",
+                },
+                {
+                    type: "buzzer",
+                    subType: "passive",
+                    port: "D25",
+                    suggestedName: "buzzer1",
+                },
+                {
+                    type: "accelerometer",
+                    subType: "BMI160",
+                    port: "i2c",
+                    suggestedName: "accelerometer1",
+                },
+                {
+                    type: "gyroscope",
+                    subType: "BMI160",
+                    port: "i2c",
+                    suggestedName: "gryscope1",
+                },
+                {
+                    type: "magnetometer",
+                    subType: "LSM303C",
+                    port: "i2c",
+                    suggestedName: "magnetometer1",
+                },
+                {
+                    type: "temperature",
+                    subType: "LSM303C",
+                    port: "i2c",
+                    suggestedName: "temperature1",
+                },
+                {
+                    type: "range",
+                    subType: "vl53l0x",
+                    port: "i2c",
+                    suggestedName: "distance1",
+                },
+                {
+                    type: "button",
+                    port: "D26",
+                    suggestedName: "button1",
+                },
+                {
+                    type: "light",
+                    port: "A2",
+                    suggestedName: "light1",
+                },
+                {
+                    type: "stick",
+                    port: "D19",
+                    suggestedName: "stick1",
+                }
+            ]
+        },
+        {
+            name: "pinohat",
+            image: "pinohat.png",
+            friendlyName: "Raspberry Pi without hat",
+            adc: ["ads1015", "mcp3008", "none"],
+            portTypes: {
+                "D": [5, 16, 24],
+                "A": [0],
+            },
+        }
+    ]
 
 
     var sensorDefinitions = [
@@ -402,8 +668,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "led",
-            subType: "red",
-            description: "LED rouge",
+            description: "LED",
             isAnalog: false,
             isSensor: false,
             portType: "D",
@@ -429,100 +694,28 @@ var getContext = function (display, infos, curLevel) {
                 var command = "changeLedState(\"" + port + "\"," + ledstate + ")";
 
                 context.quickPiConnection.sendCommand(command, callback);
+            },
+            subTypes: [{
+                subType: "blue",
+                description: "LED bleue",
+                selectorImages: ["ledon-blue.png"],
+            },
+            {
+                subType: "green",
+                description: "LED verte",
+                selectorImages: ["ledon-green.png"],
+            },
+            {
+                subType: "orange",
+                description: "LED orange",
+                selectorImages: ["ledon-orange.png"],
+            },
+            {
+                subType: "red",
+                description: "LED rouge",
+                selectorImages: ["ledon-red.png"],
             }
-        },
-        {
-            name: "led",
-            subType: "blue",
-            description: "LED bleue",
-            isAnalog: false,
-            isSensor: false,
-            portType: "D",
-            selectorImages: ["ledon-blue.png"],
-            valueType: "boolean",
-            getPercentageFromState: function (state) {
-                if (state)
-                    return 1;
-                else
-                    return 0;
-            },
-            getStateFromPercentage: function (percentage) {
-                if (percentage)
-                    return 1;
-                else
-                    return 0;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
-            setLiveState: function (port, state, callback) {
-                var ledstate = state ? 1 : 0;
-                var command = "changeLedState(\"" + port + "\"," + ledstate + ")";
-
-                context.quickPiConnection.sendCommand(command, callback);
-            }
-        },
-        {
-            name: "led",
-            subType: "green",
-            description: "LED verte",
-            isAnalog: false,
-            isSensor: false,
-            portType: "D",
-            selectorImages: ["ledon-green.png"],
-            valueType: "boolean",
-            getPercentageFromState: function (state) {
-                if (state)
-                    return 1;
-                else
-                    return 0;
-            },
-            getStateFromPercentage: function (percentage) {
-                if (percentage)
-                    return 1;
-                else
-                    return 0;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
-            setLiveState: function (port, state, callback) {
-                var ledstate = state ? 1 : 0;
-                var command = "changeLedState(\"" + port + "\"," + ledstate + ")";
-
-                context.quickPiConnection.sendCommand(command, callback);
-            }
-        },
-        {
-            name: "led",
-            subType: "orange",
-            description: "LED orange",
-            isAnalog: false,
-            isSensor: false,
-            portType: "D",
-            selectorImages: ["ledon-orange.png"],
-            valueType: "boolean",
-            getPercentageFromState: function (state) {
-                if (state)
-                    return 1;
-                else
-                    return 0;
-            },
-            getStateFromPercentage: function (percentage) {
-                if (percentage)
-                    return 1;
-                else
-                    return 0;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
-            setLiveState: function (port, state, callback) {
-                var ledstate = state ? 1 : 0;
-                var command = "changeLedState(\"" + port + "\"," + ledstate + ")";
-
-                context.quickPiConnection.sendCommand(command, callback);
-            }
+            ],
         },
         {
             name: "buzzer",
@@ -547,12 +740,26 @@ var getContext = function (display, infos, curLevel) {
             compareState: function (state1, state2) {
                 return state1 == state2;
             },
-            setLiveState: function (port, state, callback) {
-                var ledstate = state ? 1 : 0;
-                var command = "changeBuzzerState(\"" + port + "\"," + ledstate + ")";
-
-                context.quickPiConnection.sendCommand(command, callback);
-            }
+            subTypes: [{
+                subType: "active",
+                description: "Grove Buzzer",
+                setLiveState: function (port, state, callback) {
+                    var ledstate = state ? 1 : 0;
+                    var command = "changeBuzzerState(\"" + port + "\"," + ledstate + ")";
+    
+                    context.quickPiConnection.sendCommand(command, callback);
+                },
+            },
+            {
+                subType: "passive",
+                description: "Quick Pi Passive Buzzer",
+                setLiveState: function (port, state, callback) {
+                    var ledstate = state ? 1 : 0;
+                    var command = "changePassiveBuzzerState(\"" + port + "\"," + ledstate + ")";
+    
+                    context.quickPiConnection.sendCommand(command, callback);
+                },
+            }],
         },
         {
             name: "servo",
@@ -581,7 +788,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "screen",
-            description: "Display",
+            description: "Screen",
             isAnalog: false,
             isSensor: false,
             doubleWidth: true,
@@ -606,7 +813,42 @@ var getContext = function (display, infos, curLevel) {
                 var command = "displayText(\"" + state.line1 + "\", \"" + state.line2 + "\")";
 
                 context.quickPiConnection.sendCommand(command, callback);
-            }
+            },
+            subTypes: [{
+                subType: "16x2lcd",
+                description: "Grove 16x2 LCD",
+            },
+            {
+                subType: "oled128x32",
+                description: "128x32 Oled Screen",
+            }],
+
+        },
+        {
+            name: "irtrans",
+            description: "IR Transmiter",
+            isAnalog: true,
+            isSensor: true,
+            portType: "D",
+            valueType: "number",
+            valueMin: 0,
+            valueMax: 60,
+            selectorImages: ["irtrans.png"],
+            getPercentageFromState: function (state) {
+                return state / 60;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 60);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            setLiveState: function (port, state, callback) {
+                var ledstate = state ? 1 : 0;
+                var command = "setInfraredState(\"" + port + "\"," + ledstate + ")";
+
+                context.quickPiConnection.sendCommand(command, callback);
+            },
         },
         /******************************** */
         /*             sensors            */
@@ -642,6 +884,40 @@ var getContext = function (display, infos, curLevel) {
             },
         },
         {
+            name: "stick",
+            description: "5 way button",
+            isAnalog: false,
+            isSensor: true,
+            portType: "D",
+            valueType: "boolean",
+            selectorImages: ["stick.png"],
+            gpiosNames: [["Up", "D10"], ["Down", "D9"], ["Left", "D11"], ["Right", "D8"], ["Center", "D7"]],
+            gpios: [10, 9, 11, 8, 7],
+            getPercentageFromState: function (state) {
+                if (state)
+                    return 1;
+                else
+                    return 0;
+            },
+            getStateFromPercentage: function (percentage) {
+                if (percentage)
+                    return 1;
+                else
+                    return 0;
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                var cmd = "readStick(" + this.gpios.join() + ")";
+
+                context.quickPiConnection.sendCommand("readStick(" + this.gpios.join() + ")", function (retVal) {
+                    var array = JSON.parse(retVal);
+                    callback(array);
+                });
+            },
+        },
+        {
             name: "temperature",
             description: "Temperature sensor",
             isAnalog: true,
@@ -666,6 +942,21 @@ var getContext = function (display, infos, curLevel) {
                     callback(val);
                 });
             },
+            subTypes: [{
+                subType: "groveanalog",
+                description: "Grove 16x2 LCD",
+                portType: "A",
+            },
+            {
+                subType: "LSM303C",
+                description: "128x32 Oled Screen",
+                portType: "i2c",
+            },
+            {
+                subType: "DHT11",
+                description: "128x32 Oled Screen",
+                portType: "D",
+            }],
         },
         {
             name: "potentiometer",
@@ -738,12 +1029,24 @@ var getContext = function (display, infos, curLevel) {
             compareState: function (state1, state2) {
                 return state1 == state2;
             },
+            /*
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readDistance(\"" + port + "\")", function(val) {
                     val = Math.round(val);
                     callback(val);
                 });
+            },*/
+            subTypes: [{
+                subType: "vl53l0x",
+                description: "Time of flight distance sensor",
+                portType: "i2c",
             },
+            {
+                subType: "ultrasonic",
+                description: "Capteur de distance à ultrason",
+                portType: "D",
+            }],
+
         },
         {
             name: "humidity",
@@ -771,6 +1074,140 @@ var getContext = function (display, infos, curLevel) {
                 });
             },
         },
+        {
+            name: "sound",
+            description: "Sound sensor",
+            isAnalog: true,
+            isSensor: true,
+            portType: "A",
+            valueType: "number",
+            valueMin: 0,
+            valueMax: 100,
+            selectorImages: ["sound.png"],
+            getPercentageFromState: function (state) {
+                return state / 100;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                context.quickPiConnection.sendCommand("readSoundLevel(\"" + port + "\")", function(val) {
+                    val = Math.round(val);
+                    callback(val);
+                });
+            },
+        },
+        {
+            name: "accelerometer",
+            description: "Accelerometer sensor (BMI160)",
+            isAnalog: true,
+            isSensor: true,
+            portType: "i2c",
+            valueType: "object",
+            valueMin: 0,
+            valueMax: 100,
+            selectorImages: ["accel.png"],
+            getPercentageFromState: function (state) {
+                return state / 100;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
+
+                    var array = JSON.parse(val);
+                    callback(array);
+                });
+            },
+        },
+        {
+            name: "gyroscope",
+            description: "Gyropscope sensor (BMI160)",
+            isAnalog: true,
+            isSensor: true,
+            portType: "i2c",
+            valueType: "object",
+            valueMin: 0,
+            valueMax: 100,
+            selectorImages: ["gyro.png"],
+            getPercentageFromState: function (state) {
+                return state / 100;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                context.quickPiConnection.sendCommand("readGyroBMI160()", function(val) {
+
+                    var array = JSON.parse(val);
+                    callback(array);
+                });
+            },
+        },
+        {
+            name: "magnetometer",
+            description: "Magnetometer sensor (LSM303C)",
+            isAnalog: true,
+            isSensor: true,
+            portType: "i2c",
+            valueType: "object",
+            valueMin: 0,
+            valueMax: 100,
+            selectorImages: ["mag.png"],
+            getPercentageFromState: function (state) {
+                return state / 100;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 100);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                context.quickPiConnection.sendCommand("readMagnetometerLSM303C()", function(val) {
+
+                    var array = JSON.parse(val);
+                    callback(array);
+                });
+            },
+        },
+        {
+            name: "irrecv",
+            description: "IR Receiver",
+            isAnalog: true,
+            isSensor: true,
+            portType: "D",
+            valueType: "number",
+            valueMin: 0,
+            valueMax: 60,
+            selectorImages: ["irrecv.png"],
+            getPercentageFromState: function (state) {
+                return state / 60;
+            },
+            getStateFromPercentage: function (percentage) {
+                return Math.round(percentage * 60);
+            },
+            compareState: function (state1, state2) {
+                return state1 == state2;
+            },
+            getLiveState: function (port, callback) {
+                context.quickPiConnection.sendCommand("buttonStateInPort(\"" + port + "\")", function (retVal) {
+                    var intVal = parseInt(retVal, 10);
+                    callback(intVal == 0);
+                });
+            },
+        },
+
     ];
 
     context.savePrograms = function(xml) {
@@ -786,8 +1223,10 @@ var getContext = function (display, infos, curLevel) {
 
                 node.setAttribute("type", currentSensor.type);
                 node.setAttribute("port", currentSensor.port);
+                node.setAttribute("name", currentSensor.name);
+
                 if (currentSensor.subType)
-                    node.setAttribute("subtype", currentSensor.subType);
+                    node.setAttribute("subType", currentSensor.subType);
 
                 var elements = xml.getElementsByTagName("quickpi");
 
@@ -812,10 +1251,11 @@ var getContext = function (display, infos, curLevel) {
                     var sensor = {
                         "type" : sensornode.getAttribute("type"),
                         "port" : sensornode.getAttribute("port"),
+                        "name" : sensornode.getAttribute("name"),
                     };
 
-                    if (sensornode.getAttribute("subtype")) {
-                        sensor.subType = sensornode.getAttribute("subtype");
+                    if (sensornode.getAttribute("subType")) {
+                        sensor.subType = sensornode.getAttribute("subType");
                     }
 
                     sensor.state = null;
@@ -1275,6 +1715,83 @@ var getContext = function (display, infos, curLevel) {
             });
         });
 
+
+
+        $('#pichangehat').click(function () {
+            window.displayHelper.showPopupDialog(`
+            <div class="content connectPi qpi">
+            <div class="panel-heading">
+                <h2 class="sectionTitle">
+                    <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                    Select your hat
+                </h2>
+                <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+            </div>
+            <div class="panel-body">
+
+                <div id=boardlist>
+                </div>
+
+                <div panel-body-usbbt>
+                    <label id="piconnectionlabel"></label>
+                </div>
+            </div>
+        </div>`);
+
+            $('#picancel').click(function () {
+                $('#popupMessage').hide();
+                window.displayHelper.popupMessageShown = false;
+            });
+
+
+            for (var i = 0; i < boardDefinitions.length; i++) {
+                let board = boardDefinitions[i];
+                var image = document.createElement('img');
+                image.src = getImg(board.image);
+
+                $('#boardlist').append(image);
+
+                image.onclick = function () {
+                    $('#popupMessage').hide();
+                    window.displayHelper.popupMessageShown = false;
+
+                    context.board = board.name;
+
+                    for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                        var sensor = infos.quickPiSensors[i];
+                        sensor.removed = true;
+                    }
+                    infos.quickPiSensors = [];
+
+                    if (board.builtinSensors) {
+                        for (var i = 0; i < board.builtinSensors.length; i++) {
+                            var sensor = board.builtinSensors[i];
+
+                            var newSensor = {
+                                "type": sensor.type,
+                                "port": sensor.port,
+                            };
+
+                            if (sensor.subType) {
+                                newSensor.subType = sensor.subType;
+                            }
+
+                            sensor.state = null;
+                            sensor.lastState = 0;
+                            sensor.lastStateChange = null;
+                            sensor.callsInTimeSlot = 0;
+                            sensor.lastTimeIncrease = 0;
+
+                            infos.quickPiSensors.push(newSensor);
+                        }
+                    }
+
+                    context.resetDisplay();
+                }
+            }
+        });
+
+
         $('#piinstall').click(function () {
             context.blocklyHelper.reportValues = false;
             python_code = context.blocklyHelper.getCode("python");
@@ -1399,7 +1916,7 @@ var getContext = function (display, infos, curLevel) {
                 var hasPorts = false;
                 $('#selector-sensor-port').empty();
                 var portSelect = document.getElementById("selector-sensor-port");
-                var ports = portTypePorts[sensorDefinition.portType]
+                var ports = getCurrentBoard().portTypes[sensorDefinition.portType];
                 for (var iPort = 0; iPort < ports.length; iPort++) {
                     var port = sensorDefinition.portType + ports[iPort];
                     if (sensorDefinition.portType == "i2c")
@@ -1478,12 +1995,6 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return false;
-    };
-
-    var portTypePorts = {
-        "D": [5, 16, 18, 22, 24, 26],
-        "A": [0, 2, 4, 6],
-        "i2c": ["i2c"]
     };
 
     // Straight from stack overflow :)
@@ -1570,6 +2081,8 @@ var getContext = function (display, infos, curLevel) {
     function raspberryPiConnected() {
         showasConnected();
 
+        context.resetSensorTable();
+        
         context.quickPiConnection.startNewSession();
 
         context.liveUpdateCount = 0;
@@ -2137,14 +2650,14 @@ var getContext = function (display, infos, curLevel) {
         var imgx = sensor.drawInfo.x + imgw / 3;
         var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
-        var state1x = imgx + imgw;
-        var state1y = imgy + imgh * 2 / 3;
+        var state1x = imgx + (imgw / 2);
+        var state1y = imgy + imgh + (imgh * .2);
 
         var portx = imgx + imgw;
         var porty = imgy + imgh / 3;
 
         var portsize = sensor.drawInfo.height * 0.10;
-        var statesize = sensor.drawInfo.height * 0.10;
+        var statesize = sensor.drawInfo.height * 0.08;
 
         if (!sensor.focusrect || !sensor.focusrect.paper.canvas)
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
@@ -2315,7 +2828,11 @@ var getContext = function (display, infos, curLevel) {
             if ((!context.runner || !context.runner.isRunning())
                 && !context.offLineMode) {
 
-                findSensorDefinition(sensor).setLiveState(sensor.port, sensor.state, function(x) {});
+                var setLiveState = findSensorDefinition(sensor).setLiveState;
+
+                if (setLiveState) {
+                    setLiveState(sensor.port, sensor.state, function(x) {});
+                }
             }
 
         } else if (sensor.type == "button") {
@@ -2782,7 +3299,273 @@ var getContext = function (display, infos, curLevel) {
 
                 removeSlider(sensor);
             }
+        } else if (sensor.type == "accelerometer") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('accel.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (sensor.state) {
+                try {
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " Y: " + sensor.state[1] + " Z: " + sensor.state[2]);
+                } catch (Err)
+                {
+                    var a = 1;
+                }
+            }
+        } else if (sensor.type == "gyroscope") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            }); 
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (sensor.state) {
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " Y: " + sensor.state[1] + " Z: " + sensor.state[2]);
+            }
+        } else if (sensor.type == "magnetometer") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('mag.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (sensor.state) {
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " Y: " + sensor.state[1] + " Z: " + sensor.state[2]);
+            }
+        } else if (sensor.type == "sound") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('sound.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (sensor.state) {
+                sensor.stateText = paper.text(state1x, state1y, sensor.state);
+            }
+        } else if (sensor.type == "irtrans") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
+                sensor.ledon = paper.image(getImg("irtranson.png"), imgx, imgy, imgw, imgh);
+            }
+
+            if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
+                sensor.ledoff = paper.image(getImg('irtransoff.png'), imgx, imgy, imgw, imgh);
+
+                    sensor.focusrect.click(function () {
+                        if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
+                            sensor.state = !sensor.state;
+                            drawSensor(sensor);
+                        } else {
+                            actuatorsInRunningModeError();
+                        }
+                    });
+            }
+
+            sensor.ledon.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+            sensor.ledoff.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            if (sensor.state) {
+                sensor.ledon.attr({ "opacity": 1 });
+                sensor.ledoff.attr({ "opacity": 0 });
+
+                sensor.stateText = paper.text(state1x, state1y, "ON");
+            } else {
+                sensor.ledon.attr({ "opacity": 0 });
+                sensor.ledoff.attr({ "opacity": 1 });
+
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+
+
+            if ((!context.runner || !context.runner.isRunning())
+                && !context.offLineMode) {
+
+                findSensorDefinition(sensor).setLiveState(sensor.port, sensor.state, function(x) {});
+            }
+        } else if (sensor.type == "irrecv") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.buttonon || !sensor.buttonon.paper.canvas)
+                sensor.buttonon = paper.image(getImg('irrecvon.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.buttonoff || !sensor.buttonoff.paper.canvas)
+                sensor.buttonoff = paper.image(getImg('irrecvoff.png'), imgx, imgy, imgw, imgh);
+
+            sensor.buttonon.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+            sensor.buttonoff.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            if (sensor.state) {
+                sensor.buttonon.attr({ "opacity": 1 });
+                sensor.buttonoff.attr({ "opacity": 0 });
+
+                sensor.stateText = paper.text(state1x, state1y, "ON");
+            } else {
+                sensor.buttonon.attr({ "opacity": 0 });
+                sensor.buttonoff.attr({ "opacity": 1 });
+
+                sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+        } else if (sensor.type == "stick") {
+            if (sensor.stateText)
+                sensor.stateText.remove();
+
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('stick.png'), imgx, imgy, imgw, imgh);
+                
+            if (!sensor.imgup || !sensor.imgup.paper.canvas)
+                sensor.imgup = paper.image(getImg('stickup.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.imgdown || !sensor.imgdown.paper.canvas)
+                sensor.imgdown = paper.image(getImg('stickdown.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.imgleft || !sensor.imgleft.paper.canvas)
+                sensor.imgleft = paper.image(getImg('stickleft.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.imgright || !sensor.imgright.paper.canvas)
+                sensor.imgright = paper.image(getImg('stickright.png'), imgx, imgy, imgw, imgh);
+
+            if (!sensor.imgcenter || !sensor.imgcenter.paper.canvas)
+                sensor.imgcenter = paper.image(getImg('stickcenter.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+            
+            sensor.imgup.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+                "opacity": 0,
+            });
+            sensor.imgdown.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+                "opacity": 0,
+            });
+            sensor.imgleft.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+                "opacity": 0,
+            });
+            sensor.imgright.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+                "opacity": 0,
+            });            
+            sensor.imgcenter.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+                "opacity": 0,
+            });
+
+            if (sensor.stateText)
+               sensor.stateText.remove();
+
+            if (sensor.state) {
+                var stateString = "";
+
+                if (sensor.state[0]) {
+                    stateString += "UP"
+                    sensor.imgup.attr({ "opacity": 1 });
+                }
+                if (sensor.state[1]) {
+                    stateString += "DOWN"
+                    sensor.imgdown.attr({ "opacity": 1 });
+                }
+                if (sensor.state[2]) {
+                    stateString += "LEFT"
+                    sensor.imgleft.attr({ "opacity": 1 });
+                }
+                if (sensor.state[3]) {
+                    stateString += "RIGHT"
+                    sensor.imgright.attr({ "opacity": 1 });
+                }
+                if (sensor.state[4]) {
+                    stateString += "CENTER"
+                    sensor.imgcenter.attr({ "opacity": 1 });
+                }
+
+                sensor.stateText = paper.text(state1x, state1y, stateString);
+            }
         }
+
 
         sensor.focusrect.mousedown(function () {
             if (infos.customSensors && !context.autoGrading) {
@@ -2790,6 +3573,7 @@ var getContext = function (display, infos, curLevel) {
                     context.removerect.remove();
                 }
 
+                if (!context.runner || !context.runner.isRunning()) {
                 context.removerect = paper.text(portx, imgy, "\uf00d"); // fa-times char
                 removeRect = context.removerect;
                 sensorWithRemoveRect = sensor;
@@ -2825,14 +3609,19 @@ var getContext = function (display, infos, curLevel) {
                         strings.messages.keep);
                 });
             }
+            }
         });
 
         if (sensor.portText)
             sensor.portText.remove();
 
         if (sensor.stateText) {
-            sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+            sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'middle', 'font-weight': 'bold', fill: "gray" });
+            try {
             sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+            } catch (err) {
+                var a = 1;
+            }
         }
 
         if (sensor.stateText2) {
@@ -2844,6 +3633,18 @@ var getContext = function (display, infos, curLevel) {
         sensor.portText = paper.text(portx, porty, sensor.port);
         sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
         sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+        if (sensor.nameText) {
+            sensor.nameText.remove();
+        }
+
+
+        if (sensor.name) {
+            sensor.nameText = paper.text(portx, porty - 20, sensor.name);
+            sensor.nameText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
+            sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        }
+
 
         if (!donotmovefocusrect) {
             // This needs to be in front of everything
@@ -3137,7 +3938,7 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.buttonStateInPort = function (port, callback) {
+    context.quickpi.buttonStateInPort = function (name, callback) {
 
         port = context.normalizePort(port, "D");
 
@@ -3212,7 +4013,7 @@ var getContext = function (display, infos, curLevel) {
 
         var command = "changeBuzzerState(\"" + port + "\"," + state + ")";
 
-        context.registerQuickPiEvent("buzzer", state ? true : false);
+        context.registerQuickPiEvent("buzzer", port, state ? true : false);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -3276,7 +4077,7 @@ var getContext = function (display, infos, curLevel) {
             
             findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
-                drawSensor(button);
+                drawSensor(sensor);
                 cb(returnVal);
             });
         }
@@ -3366,8 +4167,9 @@ var getContext = function (display, infos, curLevel) {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("light", port);
 
-            findSensorDefinition(button).getLiveState(port, function(returnVal) {
+            findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
+
                 drawSensor(sensor);
                 cb(returnVal);
             });
@@ -3386,7 +4188,7 @@ var getContext = function (display, infos, curLevel) {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("humidity", port);
 
-            findSensorDefinition(button).getLiveState(port, function(returnVal) {
+            findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
                 cb(returnVal);
@@ -3409,6 +4211,243 @@ var getContext = function (display, infos, curLevel) {
 
         context.waitDelay(callback, retVal);
     };
+
+
+    context.quickpi.plotPixel = function(x, y, callback) {
+        /*
+        context.registerQuickPiEvent("screen", "i2c",
+            {
+                line1: line1,
+                line2: line2
+            }
+        );
+            FIXME
+        */
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "plotPixel(" + x + "," + y + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+    context.quickpi.unplotPixel = function(x, y, callback) {
+        /*
+        context.registerQuickPiEvent("screen", "i2c",
+            {
+                line1: line1,
+                line2: line2
+            }
+        );
+            FIXME
+        */
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "unplotPixel(" + x + "," + y + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "drawLine(" + x0 + "," + y0 + "," + x1 + "," + y1 + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.drawRectangle = function(x0, y0, x1, y1, fill, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var fillstring = "False";
+            if (fill)
+                fillstring = "True";
+
+            var command = "drawRectangle(" + x0 + "," + y0 + "," + x1 + "," + y1 + "," + fillstring + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+    
+    context.quickpi.drawCircle = function(x0, y0, radius, fill, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var fillstring = "False";
+            if (fill)
+                fillstring = "True";
+
+            var command = "drawCircle(" + x0 + "," + y0 + "," + radius + "," + fillstring + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.clearScreen = function(callback) {
+        /*
+        context.registerQuickPiEvent("screen", "i2c",
+            {
+                line1: line1,
+                line2: line2
+            }
+        );
+            FIXME
+        */
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "clearScreen()";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+    context.quickpi.readAcceleration = function(axis, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "readAcceleration(\"" + axis + "\")";
+            context.quickPiConnection.sendCommand(command, function (returnVal) {
+                cb(returnVal);
+            });
+        }
+    };
+
+    context.quickpi.computeRotation = function(rotationType, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var command = "computeRotation(\"" + rotationType + "\")";
+
+            context.quickPiConnection.sendCommand(command, function (returnVal) {
+                cb(returnVal);
+            });
+        }
+    };
+
+
+    context.quickpi.readSoundLevel = function (port, callback) {
+        port = context.normalizePort(port, "A");
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("sound", port);
+
+            context.runner.noDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var sensor = context.findSensor("sound", port);
+            
+            findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
+                sensor.state = returnVal;
+                drawSensor(sensor);
+                cb(returnVal);
+            });
+        }
+    };
+
+    context.quickpi.readMagneticForce = function (axis, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("magnetometer", "i2c");
+
+            context.runner.noDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var sensor = context.findSensor("magnetometer", "i2c");
+            
+            findSensorDefinition(sensor).getLiveState(axis, function(returnVal) {
+                sensor.state = returnVal;
+                drawSensor(sensor);
+                cb(returnVal);
+            });
+            
+        }
+    };
+
+    context.quickpi.computeCompassHeading = function (rotationType, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("magnetometer", "i2c");
+
+            context.runner.noDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var sensor = context.findSensor("magnetometer", "i2c");
+            
+            findSensorDefinition(sensor).getLiveState(function(returnVal) {
+                sensor.state = returnVal;
+                drawSensor(sensor);
+                cb(returnVal);
+            });
+        }
+    };
+
+    
+    context.quickpi.readInfraredState = function (port, callback) {
+
+        port = context.normalizePort(port, "D");
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("irrecv", port);
+
+            context.runner.noDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var sensor = context.findSensor("irrecv", port);
+            
+            findSensorDefinition(sensor).getLiveState(port, function(returnVal) {
+                sensor.state = returnVal;
+                drawSensor(sensor);
+                cb(returnVal);
+            });
+        }
+    };
+
+    context.quickpi.setInfraredState = function (port, state, callback) {
+        port = context.normalizePort(port, "D");
+
+        context.registerQuickPiEvent("irtrans", port, state ? true : false);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var sensor = context.findSensor("irtrans", port);
+            
+            findSensorDefinition(sensor).setLiveState(port, state, cb);
+
+        }
+    };
+
 
     /***** Blocks definitions *****/
     /* Here we define all blocks/functions of the library.
@@ -3434,8 +4473,41 @@ var getContext = function (display, infos, curLevel) {
        [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
 
-    var analogPortOptions = [["A0", "A0"], ["A2", "A2"], ["A4", "A4"], ["A6", "A6"]];
-    var digitalPortOptions = [["D5", "D5"], ["D16", "D16"], ["D18", "D18"], ["D22", "D22"], ["D24", "D24"], ["D26", "D26"]];
+    function getSensorPorts(sensorType)
+    {
+        return function () {
+            var ports = [];
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var sensor = infos.quickPiSensors[i];
+
+                if (sensor.type == sensorType) {
+                    ports.push([sensor.port, sensor.port]);
+                }
+            }
+
+            if (sensorType == "button") {
+                for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                    var sensor = infos.quickPiSensors[i];
+    
+                    if (sensor.type == "stick") {
+                        var stickDefinition = findSensorDefinition(sensor);
+
+                        for (var iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++) {
+                            var name = "Stick " + stickDefinition.gpiosNames[iStick][0];
+
+                            ports.push([name, stickDefinition.gpiosNames[iStick][1]]);
+                        }
+                    }
+                }                
+            }
+
+            if (ports.length == 0) {
+                ports.push(["none", "none"]);
+            }
+
+            return ports;
+        }
+    }
     
 
     context.customBlocks = {
@@ -3451,7 +4523,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "buttonStateInPort", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("button")
                             }
                         ]
                     }
@@ -3460,7 +4532,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "buttonWasPressed", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("button")
                             }
                         ]
                     }
@@ -3469,7 +4541,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "readTemperature", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": analogPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("temperature")
                             }
                         ]
                     }
@@ -3478,7 +4550,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "readRotaryAngle", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": analogPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("potentiometer")
                             }
                         ]
                     }
@@ -3487,7 +4559,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "readDistance", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("range")
                             }
                         ]
                     }
@@ -3496,7 +4568,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "readLightIntensity", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": analogPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("light")
                             }
                         ]
                     }
@@ -3505,7 +4577,55 @@ var getContext = function (display, infos, curLevel) {
                     name: "readHumidity", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("humidity")
+                            }
+                        ]
+                    }
+                },
+                {
+                    name: "readAcceleration", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    name: "computeRotation", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": [["pitch", "pitch"], ["roll", "roll"]]
+                            }
+                        ]
+                    }
+                },
+                {
+                    name: "readSoundLevel", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("sound")
+                            }
+                        ]
+                    }
+                },
+                {
+                    name: "readMagneticForce", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": [["x", "x"], ["y", "y"], ["z", "z"] ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    name: "computeCompassHeading", yieldsValue: true
+                },
+                {
+                    name: "readInfraredState", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("irrecv")
                             }
                         ]
                     }
@@ -3519,7 +4639,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "changeLedState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("led")
                             },
                             { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
                         ]
@@ -3529,7 +4649,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "changeBuzzerState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("buzzer")
                             },
                             { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
                         ]
@@ -3539,7 +4659,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "toggleLedState", params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("led")
                             },
                         ]
                     }
@@ -3549,7 +4669,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "setServoAngle", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": digitalPortOptions
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("servo")
                             },
                             { "type": "input_value", "name": "PARAM_1" },
 
@@ -3573,6 +4693,84 @@ var getContext = function (display, infos, curLevel) {
 
                 },
                 {
+                    name: "plotPixel", params: ["Number", "Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='plotPixel'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "unplotPixel", params: ["Number", "Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='unplotPixel'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "drawLine", params: ["Number", "Number", "Number", "Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                            { "type": "input_value", "name": "PARAM_2"},
+                            { "type": "input_value", "name": "PARAM_3"},
+                        ]
+                    },
+                    blocklyXml: "<block type='drawLine'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "drawRectangle", params: ["Number", "Number", "Number", "Number", "Boolean"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                            { "type": "input_value", "name": "PARAM_2"},
+                            { "type": "input_value", "name": "PARAM_3"},
+                            { "type": "input_value", "name": "PARAM_4"},
+                        ]
+                    },
+                    blocklyXml: "<block type='drawRectangle'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_4'><shadow type='logic_boolean'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "drawCircle", params: ["Number", "Number", "Number", "Boolean"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                            { "type": "input_value", "name": "PARAM_2"},
+                            { "type": "input_value", "name": "PARAM_3"},
+                        ]
+                    },
+                    blocklyXml: "<block type='drawCircle'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_3'><shadow type='logic_boolean'></shadow></value>" +
+                        "</block>"
+                },
+
+                {
+                    name: "clearScreen"
+                },
+                {
                     name: "sleep", params: ["Number"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0", "value": 0 },
@@ -3582,6 +4780,14 @@ var getContext = function (display, infos, curLevel) {
                     blocklyXml: "<block type='sleep'>" +
                         "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>1000</field></shadow></value>" +
                         "</block>"
+                },
+                {
+                    name: "setInfraredState", params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            {"type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("irtrans")},
+                            { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
+                        ]
+                    }
                 },
             ],
             internet: [
