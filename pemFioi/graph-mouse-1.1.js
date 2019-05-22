@@ -1845,7 +1845,7 @@ function GraphEditor(settings) {
       self.loopIcon = self.drawLoopIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.loopIcon);
       
-      self.loopIcon.click(function(){
+      self.loopIcon.mousedown(function(){
          self.vertexDragAndConnect.onPairSelect(vertexId,vertexId);
       });
    };
@@ -1880,8 +1880,12 @@ function GraphEditor(settings) {
       self.cross = self.drawCross(crossX,crossY,crossSize);
       visualGraph.pushVertexRaphael(vertexId,self.cross);
       
-      self.cross.click(function(){
+      self.cross.mousedown(function(){
          graph.removeVertex(vertexId);
+         if(self.textEditor){
+            self.textEditor.remove();
+            self.editInfo = {};
+         }
          if(callback){
             callback();
          }
@@ -1950,7 +1954,7 @@ function GraphEditor(settings) {
       self.terminalIcon = self.drawTerminalIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.terminalIcon);
       
-      self.terminalIcon.click(function(){
+      self.terminalIcon.mousedown(function(){
          var info = graph.getVertexInfo(vertexId);
          info.terminal = !info.terminal;
          
@@ -2004,7 +2008,7 @@ function GraphEditor(settings) {
       self.initialIcon = self.drawInitialIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.initialIcon);
       
-      self.initialIcon.click(function(){
+      self.initialIcon.mousedown(function(){
          var info = graph.getVertexInfo(vertexId);
          info.initial = !info.initial;
          
@@ -2270,7 +2274,7 @@ function GraphEditor(settings) {
       self.textEditor.focusout(function(){
          self.writeLabel(id,type);
       });
-      self.textEditor.keypress(function(event){
+      self.textEditor.keypress(function(event){ // write when return is pressed
          if(event.which == 13){
             self.writeLabel(id,type);
          }
@@ -2278,6 +2282,7 @@ function GraphEditor(settings) {
    };
 
    this.writeLabel = function(id,type) {
+      console.log("wL");
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
       }else if(type === "edge"){
@@ -2370,28 +2375,50 @@ function GraphEditor(settings) {
       self.textEditor.keyup(function(){ // resize vertex & textarea when text length changes
          var text = $(this).val();
          var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
+         info.content = text;
          if(text.length > 0){
-            $(this).css({
-               width: newBoxSize.w,
-               height: newBoxSize.h - labelHeight
-            });
-            raphElement[0].attr({
+            raphElement[0].transform(""); // box
+            raphElement[0].attr({   
+               x: vertexPos.x - newBoxSize.w/2,
+               y: vertexPos.y - newBoxSize.h/2,
                height: newBoxSize.h,
                width: newBoxSize.w
             });
+            raphElement[1].transform(""); // label
+            raphElement[1].attr({   
+               x: vertexPos.x,
+               y: vertexPos.y - newBoxSize.h/2 +labelHeight/2
+            });
+            raphElement[2].transform(""); // line
+            raphElement[2].attr("path","M"+(vertexPos.x - newBoxSize.w/2)+","+(vertexPos.y - newBoxSize.h/2 + labelHeight)+"H"+(vertexPos.x + newBoxSize.w/2));
+            if(info.initial && !info.terminal){
 
+            }else if(!info.initial && info.terminal){
+               console.log("check");
+               raphElement[4].attr({
+                  x: vertexPos.x - newBoxSize.w/2 - 5,
+                  y: vertexPos.y - newBoxSize.h/2 - 5,
+                  height: newBoxSize.h + 10,
+                  width: newBoxSize.w + 10
+               });
+            }else if(info.initial && info.terminal){
 
+            }
+
+            $(this).css({
+               left: vertexPos.x - newBoxSize.w/2,
+               top: vertexPos.y - newBoxSize.h/2 + labelHeight,
+               width: newBoxSize.w,
+               height: newBoxSize.h - labelHeight
+            });
+            self.removeIcons();
+            self.addIcons(id);
          }
       });
 
-      self.textEditor.focusout(function(){
+      self.textEditor.focusout(function(ev){
          self.writeContent(id);
       });
-      // self.textEditor.keypress(function(event){
-      //    if(event.which == 13){
-      //       self.writeContent(id);
-      //    }
-      // });
    };
 
    this.writeContent = function(id) {
