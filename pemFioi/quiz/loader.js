@@ -1,5 +1,4 @@
-function loadQuizModules(modulesPath) {
-    window.modulesPath = modulesPath
+function loadQuizModules() {
 
     var modules = [
         'jquery-1.7.1',
