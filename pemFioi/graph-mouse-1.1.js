@@ -1881,6 +1881,9 @@ function GraphEditor(settings) {
       visualGraph.pushVertexRaphael(vertexId,self.cross);
       
       self.cross.mousedown(function(){
+         if(self.vertexDragAndConnect){
+            self.vertexDragAndConnect.selectionParent = null;
+         }
          graph.removeVertex(vertexId);
          if(self.textEditor){
             self.textEditor.remove();
@@ -2282,7 +2285,6 @@ function GraphEditor(settings) {
    };
 
    this.writeLabel = function(id,type) {
-      console.log("wL");
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
       }else if(type === "edge"){
@@ -2394,7 +2396,6 @@ function GraphEditor(settings) {
             if(info.initial && !info.terminal){
 
             }else if(!info.initial && info.terminal){
-               console.log("check");
                raphElement[4].attr({
                   x: vertexPos.x - newBoxSize.w/2 - 5,
                   y: vertexPos.y - newBoxSize.h/2 - 5,
