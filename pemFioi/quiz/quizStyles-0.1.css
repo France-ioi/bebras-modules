@@ -54,6 +54,11 @@ statement {
   font-weight: bold;
   display: block;
 }
+statement p {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
+  margin: 0;
+}
 statement::before {
   counter-increment: questions-counter;
   content: counter(questions-counter);
@@ -81,6 +86,11 @@ answer {
   border-top: 1px solid;
   border-color: #e1e1e1;
   padding: 5px 0;
+}
+answer p {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
+  margin: 0;
 }
 question:nth-child(odd) answer {
   border-color: #d2d2d2;
@@ -528,4 +538,57 @@ button,
   bottom: 0;
   background:transparent;
   z-index: 1;
+}
+
+
+.fill-gaps-toolbar {
+  height: 50px;
+}
+
+
+.fill-gaps-toolbar .word {
+  border: 1px solid #4a90e2;;
+  border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  cursor: move;
+  padding: 4px 20px;
+  margin-right: 10px;
+}
+
+
+.fill-gaps-text .word {
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  cursor: move;
+  padding: 4px 20px;
+}
+
+.fill-gaps-text .placeholder {
+  display: inline-block;
+  border-radius: 5px;
+  background: #AAA;
+  min-width: 60px;
+  padding: 5px 0px;
+}
+
+.fill-gaps-text .placeholder-hover {
+  border: 1px solid #4a90e2;
+  background: #FFF;
+  padding: 4px 0px;
+}
+
+.fill-gaps-text .placeholder:empty:before {
+  content: "\00a0";
+}
+
+.displaySolution .fill-gaps-text .correct span {
+
+}
+
+.displaySolution .fill-gaps-text .mistake span {
+  color: #ff001f;
+  border-color: #ff001f;
 }
