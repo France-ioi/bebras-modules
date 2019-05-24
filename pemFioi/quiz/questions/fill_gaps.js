@@ -92,6 +92,7 @@
 
             setAnswer: function(value) {
                 resetWords();
+                var placeholders = text.find('.placeholder');
                 placeholders.each(function(i) {
                     var placeholder = $(this);
                     if(value[i]) {
