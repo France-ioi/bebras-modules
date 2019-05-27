@@ -115,15 +115,23 @@ Quiz.UI = function(params) {
     // replace refs in solution with real answer and qustion numbers/labels
     function realQuestionNumber(question_idx) {
         var idx = questions_order.indexOf(question_idx);
-        return idx === -1 ? '' : idx + 1;
+        if(idx > -1) {
+            return idx + 1;
+        } else {
+            console.error("Could not find question index " + question_idx + ".");
+            return '';
+        }
     }
 
     function realAnswerNumber(question_idx, answer_idx) {
-        if(questions[question_idx].answers_order) {
+        if(questions[question_idx] && questions[question_idx].answers_order) {
             var idx = questions[question_idx].answers_order.indexOf(question_idx);
             if(idx !== -1) {
                 return Quiz.common.questionLabel(idx);
             }
+            console.error("Could not find answer index " + answer_idx + " in question " + question_idx + ".");
+        } else {
+            console.error("Could not find question index " + question_idx + ".");
         }
 
         return '';

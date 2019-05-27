@@ -58,6 +58,8 @@ statement p {
   /* because we get <p> wraps here by taskeditor tinymce */
   display: inline;
   margin: 0;
+  font-weight: normal;
+  font-style: italic;
 }
 statement::before {
   counter-increment: questions-counter;
@@ -541,21 +543,22 @@ button,
 }
 
 
-.fill-gaps-toolbar {
-  height: 50px;
-}
-
-
 .fill-gaps-toolbar .word {
-  border: 1px solid #4a90e2;;
+  display: inline-block;
+  border: 1px solid #4a90e2;
   border-radius: 5px;
   background-color: white;
   text-align: center;
   cursor: move;
   padding: 4px 20px;
   margin-right: 10px;
+  margin-bottom: 4px;
 }
 
+
+.fill-gaps-text {
+  font-size: 20px;
+}
 
 .fill-gaps-text .word {
   border: 1px solid #4a90e2;
@@ -572,6 +575,8 @@ button,
   background: #AAA;
   min-width: 60px;
   padding: 5px 0px;
+  color : #4a90e2;
+  font-weight: bold;
 }
 
 .fill-gaps-text .placeholder-hover {
