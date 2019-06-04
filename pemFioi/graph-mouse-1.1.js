@@ -1331,7 +1331,10 @@ function GraphEditor(settings) {
    var onVertexSelect = settings.onVertexSelect;   // optional
    var onEdgeSelect = settings.onEdgeSelect;    // optional
    this.createVertex = settings.createVertex;   // optional
+   
    var callback = settings.callback;
+   var selectVertexCallback = settings.selectVertexCallback;
+
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
       "stroke-width": 4
@@ -1413,9 +1416,11 @@ function GraphEditor(settings) {
    this.multipleEdgesEnabled = false;
    this.loopEnabled = false;
    this.editVertexLabelEnabled = false;
+   this.editVertexContentEnabled = false;
    this.editEdgeLabelEnabled = false;
    this.vertexSelectEnabled = false;
    this.terminalEnabled = false;
+   this.initialEnabled = false;
    this.defaultVertexLabelEnabled = false;
    this.defaultEdgeLabelEnabled = false;
    this.enabled = false;
@@ -1435,10 +1440,12 @@ function GraphEditor(settings) {
       this.setEdgeDragEnabled(enabled);
       this.setMultipleEdgesEnabled(enabled);
       this.setEditVertexLabelEnabled(enabled);
+      this.setEditVertexContentEnabled(enabled);
       this.setEditEdgeLabelEnabled(enabled);
       this.setLoopEnabled(enabled);
       this.setVertexSelectEnabled(enabled);
       this.setTerminalEnabled(enabled);
+      this.setInitialEnabled(enabled);
       this.setDefaultVertexLabelEnabled(enabled);  
       this.setDefaultEdgeLabelEnabled(enabled);     
    };
@@ -1478,6 +1485,9 @@ function GraphEditor(settings) {
    this.setEditVertexLabelEnabled = function(enabled) {
       this.editVertexLabelEnabled = enabled;
    };
+   this.setEditVertexContentEnabled = function(enabled) {
+      this.editVertexContentEnabled = enabled;
+   };
    this.setEditEdgeLabelEnabled = function(enabled) {
       this.editEdgeLabelEnabled = enabled;
    };
@@ -1488,6 +1498,10 @@ function GraphEditor(settings) {
    };
    this.setTerminalEnabled = function(enabled) {
       this.terminalEnabled = enabled;
+      this.checkVertexSelect();
+   };
+   this.setInitialEnabled = function(enabled) {
+      this.initialEnabled = enabled;
       this.checkVertexSelect();
    };
    this.setVertexSelectEnabled = function(enabled) {
@@ -1512,7 +1526,7 @@ function GraphEditor(settings) {
    };
 
    this.checkVertexSelect = function() {
-      if(!this.terminalEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled){
+      if(!this.terminalEnabled && !this.initialEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled && !this.vertexSelectEnabled){
          this.setVertexSelectEnabled(false);
       }else{
          this.setVertexSelectEnabled(true);
@@ -1555,6 +1569,9 @@ function GraphEditor(settings) {
       if(visualGraph.getRaphaelsFromID(vertexId)[0]){
          visualGraph.getRaphaelsFromID(vertexId)[0].attr(attr);
       }   
+      if(selectVertexCallback){
+         selectVertexCallback(vertexId,selected);
+      }
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
@@ -1773,7 +1790,8 @@ function GraphEditor(settings) {
          this.addCross(vertexId);
       if(this.terminalEnabled)
          this.addTerminalIcon(vertexId);
-      this.addInitialIcon(vertexId);
+      if(this.initialEnabled)
+         this.addInitialIcon(vertexId);
       var vInfo = visualGraph.getVertexVisualInfo(vertexId);
    };
    this.removeIcons = function() {
@@ -2332,6 +2350,9 @@ function GraphEditor(settings) {
    };
 
    this.editContent = function(id) {
+      if(!self.editVertexContentEnabled){
+         return;
+      }
       var info = graph.getVertexInfo(id);
       var attr = visualGraph.graphDrawer.vertexContentAttr;
       var fontSize = attr["font-size"] || 15;
