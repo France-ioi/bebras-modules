@@ -868,42 +868,43 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                // var distFromCenter = Math.sqrt(distanceSquared(xc,yc,xPos,yPos));
                // return Math.abs(distFromCenter - R); 
             }else{
-               var r = this.circleAttr.r;
-               var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
-               var R = D*vInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
-               var s = vInfo.sweep || 0;  // sweep flag
-               var l = vInfo["large-arc"] || 0;  // large arc flag  
+               var param = this.getEdgeParam();
+               // var r = this.circleAttr.r;
+               // var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
+               // var R = D*vInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
+               // var s = vInfo.sweep || 0;  // sweep flag
+               // var l = vInfo["large-arc"] || 0;  // large arc flag  
 
-               /* Calculation of the coordinates of the target point at the surface of the target vertex */
-               var angle = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));
-               var alpha = this.getAngleBetween(x1,y1,x2,y2);
+               // /* Calculation of the coordinates of the target point at the surface of the target vertex */
+               // var angle = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));
+               // var alpha = this.getAngleBetween(x1,y1,x2,y2);
                
-               if(vertex1Pos.tableMode){
-                  if(s){
-                     var alpha1 = (l) ? -alpha - angle : angle - alpha;
-                  }else{
-                     var alpha1 = (l) ? angle - alpha : -alpha - angle;
-                  }
-                  var info1 = this.graph.getVertexInfo(vertices[0]);
-                  var content1 = (info1.content) ? info1.content : "";
-                  var boxSize1 = this.getBoxSize(content1);
-                  var delta = Math.PI - alpha1;
-                  var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
-               }else{
-                  var pos1 = { x: x1, y: y1 };
-               }
-               if(s){
-                  alpha = (l) ? alpha - angle : alpha + angle;
-               }else{
-                  alpha = (l) ? alpha + angle : alpha - angle;
-               }
+               // if(vertex1Pos.tableMode){
+               //    if(s){
+               //       var alpha1 = (l) ? -alpha - angle : angle - alpha;
+               //    }else{
+               //       var alpha1 = (l) ? angle - alpha : -alpha - angle;
+               //    }
+               //    var info1 = this.graph.getVertexInfo(vertices[0]);
+               //    var content1 = (info1.content) ? info1.content : "";
+               //    var boxSize1 = this.getBoxSize(content1);
+               //    var delta = Math.PI - alpha1;
+               //    var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
+               // }else{
+               //    var pos1 = { x: x1, y: y1 };
+               // }
+               // if(s){
+               //    alpha = (l) ? alpha - angle : alpha + angle;
+               // }else{
+               //    alpha = (l) ? alpha + angle : alpha - angle;
+               // }
 
-               var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
+               // var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
 
-               var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
-               var R = D2*vInfo["radius-ratio"]; 
+               // var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
+               // var R = D2*vInfo["radius-ratio"]; 
 
-               var cPos = this.getCenterPosition(R,s,l,pos1,pos2);
+               var cPos = this.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
                var xc = cPos.x;
                var yc = cPos.y;
             }
@@ -942,6 +943,56 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          return Math.sqrt(distanceToSegmentSquared(xPos, yPos, x1, y1, x2, y2));
       }
    };
+
+   this.getEdgeParam = function(id) {
+      /* return the parameters of an edge in table mode */
+      var vInfo = this.visualGraph.getEdgeVisualInfo(id);
+      var vertices = this.graph.getEdgeVertices(id);
+      var vertex1Pos = this.visualGraph.getVertexVisualInfo(vertices[0]);
+      var vertex2Pos = this.visualGraph.getVertexVisualInfo(vertices[1]);
+      var x1 = vertex1Pos.x;
+      var y1 = vertex1Pos.y;
+      var x2 = vertex2Pos.x;
+      var y2 = vertex2Pos.y;
+      var info = this.graph.getVertexInfo(vertices[0]);
+      var content = (info.content) ? info.content : "";
+      var boxSize = this.getBoxSize(content);
+      var r = this.circleAttr.r;
+      var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
+      var R = D*vInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
+      var s = vInfo.sweep || 0;  // sweep flag
+      var l = vInfo["large-arc"] || 0;  // large arc flag  
+
+      /* Calculation of the coordinates of the target point at the surface of the target vertex */
+      var angle = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));
+      var alpha = this.getAngleBetween(x1,y1,x2,y2);
+      
+      if(vertex1Pos.tableMode){
+         if(s){
+            var alpha1 = (l) ? -alpha - angle : angle - alpha;
+         }else{
+            var alpha1 = (l) ? angle - alpha : -alpha - angle;
+         }
+         var info1 = this.graph.getVertexInfo(vertices[0]);
+         var content1 = (info1.content) ? info1.content : "";
+         var boxSize1 = this.getBoxSize(content1);
+         var delta = Math.PI - alpha1;
+         var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
+      }else{
+         var pos1 = { x: x1, y: y1 };
+      }
+      if(s){
+         alpha = (l) ? alpha - angle : alpha + angle;
+      }else{
+         alpha = (l) ? alpha + angle : alpha - angle;
+      }
+
+      var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
+
+      var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
+      var R = D2*vInfo["radius-ratio"]; 
+      return {R: R, s:s, l:l, D: D2, pos1: pos1, pos2: pos2};
+   }
 
    this.getLabelPos = function(edgeID,vertex1,vertex2) {
       if(!vertex1 || !vertex2){
