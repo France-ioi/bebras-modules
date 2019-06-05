@@ -452,7 +452,11 @@ function LR_Parser(settings,subTask) {
       if(progress > 100){
          self.pauseSimulation();
       }else{
-         var animationTime = (action.actionType == "r") ? 2*this.animationTime : this.animationTime;
+         if(reverse){
+            var animationTime = 10;
+         }else{
+            var animationTime = (action.actionType == "r") ? 2*this.animationTime : this.animationTime;
+         }
          $("#progressBar").animate({width:progress+"%"},animationTime,function(){
             if(action.actionType != "r" || self.selectedRule == null){
                if(reverse){
@@ -482,13 +486,13 @@ function LR_Parser(settings,subTask) {
                // var nonTerminal = self.grammar.rules[rule].nonterminal;
                // var development = self.grammar.rules[rule].development;
                this.reverseReduction(rule);
-               this.timouOutID = setTimeout(function() {
-                  self.selectedStackElements = [];
-                  $(".rule").removeClass("selected");
-                  self.selectedRule = null;
-                  self.styleRules();
-                  self.updateStackTable();
-               }, self.animationTime);
+               // this.timouOutID = setTimeout(function() {
+               //    self.selectedStackElements = [];
+               //    $(".rule").removeClass("selected");
+               //    self.selectedRule = null;
+               //    self.styleRules();
+               //    self.updateStackTable();
+               // }, self.animationTime);
                return;
             }
             
@@ -701,16 +705,21 @@ function LR_Parser(settings,subTask) {
       for(var symbol of development){
          var state = this.lrTable.states[previousState][symbol][0].actionValue;
          this.stack.push([state,symbol]);
-         this.selectedStackElements.push(String(this.stack.length - 1));
+         // this.selectedStackElements.push(String(this.stack.length - 1));
          previousState = state;
       }
-      this.selectedRule = rule;
+      // this.selectedRule = rule;
       this.updateStackTable();
-      $(".rule").removeClass("selected");
-      $(".rule[data_rule="+rule+"]").addClass("selected");
-      this.styleRules();
+      // $(".rule").removeClass("selected");
+      // $(".rule[data_rule="+rule+"]").addClass("selected");
+      // this.styleRules();
       this.styleStackTable();
       this.updateState(false);
+      // self.selectedStackElements = [];
+      // $(".rule").removeClass("selected");
+      // self.selectedRule = null;
+      // self.styleRules();
+      // self.updateStackTable();
    }
 
    /* SHIFT */
@@ -749,7 +758,7 @@ function LR_Parser(settings,subTask) {
       }
       this.currentVertex = this.getStateID(newState);
       this.updateStackTable();
-      this.updateCursor(true);
+      this.updateCursor(!reverse);
       this.updateState(!reverse);
    };
 
