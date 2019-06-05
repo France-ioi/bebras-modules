@@ -296,9 +296,10 @@ function LR_Parser(settings,subTask) {
    this.initPlayer = function() {
       var html = "<div id=\"player\">"
       html += "<div id=\"play\"><i class=\"fas fa-play\"></i></div>";
+      html += "<div id=\"progressBarClickArea\">";
       html += "<div id=\"progressBarContainer\">";
       html += "<div id=\"progressBar\"><div id=\"progressBarMarker\"></div></div>"
-      html += "</div>";
+      html += "</div></div>";
       html += "<div id=\"stepBackward\"><i class=\"fas fa-step-backward\"></i></div>";
       html += "<div id=\"stepForward\"><i class=\"fas fa-step-forward\"></i></div>";
       html += "</div>";
@@ -403,6 +404,8 @@ function LR_Parser(settings,subTask) {
       });
       this.disablePlayerSteps();
       this.enablePlayerSteps();
+      this.disableProgressBarClick();
+      this.enableProgressBarClick();
    };
 
    this.disablePlayerSteps = function() {
@@ -423,19 +426,37 @@ function LR_Parser(settings,subTask) {
       });
    };
 
-   this.runSimulation = function() {
-      self.stack = [["0", "#"]];
-      self.inputIndex = 0;
-      self.updateCursor(false);
-      self.simulationStep = 0;
-      self.selectedRule = null;
-      $(".rule").removeClass("selected");
-      self.selectedStackElements = [];
-      self.styleRules();
-      self.styleStackTable();
-      self.styleProgressBar();
+   this.disableProgressBarClick = function() {
+      $("#progressBarClickArea").off("click");
+      $("#progressBarClickArea").css({
+         cursor: "auto"
+      });
+   };
 
-      self.runSimulationLoop(self.simulationStep,true,false);
+   this.enableProgressBarClick = function() {
+      $("#progressBarClickArea").click(self.progressBarClick);
+      $("#progressBarClickArea").css({
+         cursor: "pointer"
+      });
+   };
+
+   this.reset = function() {
+      this.stack = [["0", "#"]];
+      this.inputIndex = 0;
+      this.updateCursor(false);
+      this.simulationStep = 0;
+      this.selectedRule = null;
+      $(".rule").removeClass("selected");
+      this.selectedStackElements = [];
+      this.styleRules();
+      this.styleStackTable();
+      this.styleProgressBar();
+   };
+
+   this.runSimulation = function() {
+      self.reset();
+
+      self.runSimulationLoop(self.simulationStep,true,false,true);
       
       $("#play i").removeClass("fa-play").addClass("fa-pause");
       $("#play").off("click");
@@ -443,17 +464,18 @@ function LR_Parser(settings,subTask) {
       
    };
 
-   this.runSimulationLoop = function(step,loop,reverse) {
-      
+   this.runSimulationLoop = function(step,loop,reverse,anim) {
+      // console.log(step+" "+this.actionSequence.length);
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
       this.disablePlayerSteps();
+      this.disableProgressBarClick();
       // console.log(step+" "+action.actionType);
       if(progress > 100){
-         self.pauseSimulation();
+         self.pauseSimulation(true);
       }else{
-         if(reverse){
-            var animationTime = 10;
+         if(!anim){
+            var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 2*this.animationTime : this.animationTime;
          }
@@ -467,9 +489,10 @@ function LR_Parser(settings,subTask) {
             }
             if(!loop){
                self.enablePlayerSteps();
+               self.enableProgressBarClick();
                return;
             }
-            self.runSimulationLoop(self.simulationStep,loop,reverse);
+            self.runSimulationLoop(self.simulationStep,loop,reverse,anim);
          });
       }
       if(!action){
@@ -478,7 +501,7 @@ function LR_Parser(settings,subTask) {
             
       switch(action.actionType){
          case "s":
-            self.applyShift(action.state,reverse);
+            self.applyShift(action.state,reverse,anim);
             break;
          case "r":
             var rule = action.rule;
@@ -498,38 +521,37 @@ function LR_Parser(settings,subTask) {
             
             var nbRedChar = self.grammar.rules[rule].development.length;
             var startIndex = self.stack.length - nbRedChar;
-            // if(self.selectedRule == null){
-               for(var iSelCol = 0; iSelCol < nbRedChar; iSelCol++){
-                  var index = startIndex + iSelCol;
-                  $(".stackElement[data_col="+index+"]").addClass("selected");
-                  self.selectedStackElements.push(index);
-               }
-               self.styleStackTable();
-               $(".rule").removeClass("selected");
-               $(".rule[data_rule="+rule+"]").addClass("selected");
-               self.selectedRule = rule;
-               self.styleRules();
-            // }else{
-               // if(reverse){
-                  // $(".stackElement").removeClass("selected");
-                  // self.selectedStackElements = [];
-                  // $(".rule").removeClass("selected");
-               // }else{
+            for(var iSelCol = 0; iSelCol < nbRedChar; iSelCol++){
+               var index = startIndex + iSelCol;
+               $(".stackElement[data_col="+index+"]").addClass("selected");
+               self.selectedStackElements.push(index);
+            }
+            self.styleStackTable();
+            $(".rule").removeClass("selected");
+            $(".rule[data_rule="+rule+"]").addClass("selected");
+            self.selectedRule = rule;
+            self.styleRules();
+            if(anim){
                this.timouOutID = setTimeout(function() {
                   var nonTerminal = self.grammar.rules[rule].nonterminal;
                   var goto = action.goto;
-                  self.applyReduction(nonTerminal,goto);
+                  self.applyReduction(nonTerminal,goto,true);
                }, self.animationTime);
-                  
-               // }
-               
+            }else{
+               var nonTerminal = self.grammar.rules[rule].nonterminal;
+               var goto = action.goto;
+               self.applyReduction(nonTerminal,goto,false);
+            }
+                                 
             }
       // }
 
    };
 
-   this.pauseSimulation = function() {
+   this.pauseSimulation = function(end) {
       console.log("pause");
+      if(!end)
+         self.simulationStep++;
       // clearTimeout(self.timeOutID);
       // subTask.raphaelFactory.stopAnimate("anim");
       $("#progressBar").stop();
@@ -552,7 +574,24 @@ function LR_Parser(settings,subTask) {
       if(self.simulationStep >= self.actionSequence.length){
          return;
       }else{
-         self.runSimulationLoop(self.simulationStep, false, false);
+         self.runSimulationLoop(self.simulationStep, false, false,true);
+      }
+   };
+
+   this.progressBarClick = function(event) {
+      var x = event.pageX - $(this).offset().left;
+      var w = $(this).width();
+      var step = Math.floor(self.actionSequence.length*x/w);
+      // if(step < 0){
+      //    self.reset();
+      // }
+      self.replayUpTo(step,false);
+   };
+
+   this.replayUpTo = function(step,anim) {
+      this.reset();
+      for(var iStep = 0; iStep <= step; iStep++){
+         this.runSimulationLoop(iStep,false,false,anim);
       }
    };
 
@@ -685,7 +724,7 @@ function LR_Parser(settings,subTask) {
       return this.stack[previousCol][0];
    };
 
-   this.applyReduction = function(nonTerminal,goto) {
+   this.applyReduction = function(nonTerminal,goto,anim) {
       var newStackElement = [goto,nonTerminal];
       this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
       this.selectedStackElements = [];
@@ -693,7 +732,7 @@ function LR_Parser(settings,subTask) {
       this.selectedRule = null;
       this.styleRules();
       this.updateStackTable();
-      this.updateState(true);
+      this.updateState(anim);
    };
 
    this.reverseReduction = function(rule) {
@@ -747,7 +786,7 @@ function LR_Parser(settings,subTask) {
       }
    };
 
-   this.applyShift = function(newState,reverse) {
+   this.applyShift = function(newState,reverse,anim) {
       if(reverse){
          this.stack.pop();
          this.inputIndex--;
@@ -758,8 +797,8 @@ function LR_Parser(settings,subTask) {
       }
       this.currentVertex = this.getStateID(newState);
       this.updateStackTable();
-      this.updateCursor(!reverse);
-      this.updateState(!reverse);
+      this.updateCursor(!(reverse || !anim));
+      this.updateState(!(reverse || !anim));
    };
 
    this.updateStackTable = function() {
@@ -938,8 +977,8 @@ function LR_Parser(settings,subTask) {
          "background-color": this.colors.lightgrey
       });
       $("#player > *").css({
-         display: "inline-block",
-         "vertical-align": "middle",
+         // display: "inline-block",
+         // "vertical-align": "middle",
          color: "white",
          // "font-size": "15px",
          // "border-radius": "20px",
@@ -1186,16 +1225,15 @@ function LR_Parser(settings,subTask) {
    };
 
    this.styleProgressBar = function() {
-      // var playerWidth = $("#player").innerWidth();
-      // var playWidth = $("#play").outerWidth();
-      // var stepBackWidth = $("#stepBackward").outerWidth();
-      // var progressBarContWidth = playerWidth - playWidth - 2* stepBackWidth - 75;
-      $("#progressBarContainer").css({
+      $("#progressBarClickArea").css({
          "flex-grow": "1",
-         // width: progressBarContWidth+"px",
+         height: "20px",
+         margin: "0 10px",
+         "padding-top": "8px"
+      });
+      $("#progressBarContainer").css({
          height: "4px",
          "background-color": "grey",
-         margin: "0 10px"
       });
       $("#progressBar").css({
          width: "0%",
