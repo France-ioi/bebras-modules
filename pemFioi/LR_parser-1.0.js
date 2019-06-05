@@ -53,13 +53,7 @@ function LR_Parser(settings,subTask) {
       blue: "#4990e2"
    };
    this.unselectedTabAttr = {
-      // display: "inline-block",
-      // margin: "0.5em 1em",
-      // "font-weight": "bold",
-      // color: "grey",
       opacity: 0.5
-      // cursor: "pointer",
-      // border: "none"
    };
    this.selectedTabAttr = {
       // color: this.colors.black,
@@ -73,7 +67,7 @@ function LR_Parser(settings,subTask) {
      "arrow-end": "long-classic-wide"
    };
    this.defaultVertexAttr = {
-     "r": 20,
+     "r": 15,
      "fill": "#4a4a4a",
      "stroke": "white",
      "stroke-width": 1
@@ -86,11 +80,11 @@ function LR_Parser(settings,subTask) {
       "fill": this.colors.blue
    };
    this.defaultVertexLabelAttr = {
-     "font-size": 16,
+     "font-size": 12,
      "fill": "white"
    };
    this.defaultVertexContentAttr = {
-     "font-size": 16,
+     "font-size": 12,
      "fill": "white",
      "text-anchor": "start"
    };
@@ -286,7 +280,9 @@ function LR_Parser(settings,subTask) {
       var html = "<h3>GRAMMAR</h3>";
       html += "<ul>";
       for(var iRule = 0; iRule < this.rules.length; iRule++){
-         html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+iRule+"</span> "+this.rules[iRule].replace("->","<i class=\"fas fa-long-arrow-alt-right\"></i>")+"</li>";
+         html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+iRule+
+         "</span> <span class=\"nonTerminal\">"+this.grammar.rules[iRule].nonterminal+"</span><i class=\"fas fa-long-arrow-alt-right\"></i><span class=\"development\">"+
+         this.grammar.rules[iRule].development.join(" ")+"</span></li>";
       }
       html += "</ul>";
       $("#rules").html(html);
@@ -879,32 +875,42 @@ function LR_Parser(settings,subTask) {
    };
 
    this.style = function() {
+      $("body").css({
+         "font-size": "80%"
+      })
       /* tabs */
       this.styleTabs();
 
       /* paper, parse table */
       $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-         margin: "1em 0",
-         height: this.paperHeight+"px"
+         margin: "1em auto",
+         height: this.paperHeight+"px",
+         width: this.paperWidth+"px"
       });
 
       /* parse info */
+      $("#parseInfo").css({
+         display: "flex",
+         "justify-content": "center",
+         "align-items": "flex-start"
+      });
       $("#parseInfo > *").css({
-         display: "inline-block",
-         "vertical-align": "top",
+         // display: "inline-block",
+         // "vertical-align": "top",
          "box-sizing": "border-box"
       });
 
       /* rules */
       this.styleRules();
 
-      var rulesWidth = $("#rules").outerWidth();
-      var totalWidth = $("#parseInfo").width();
+      // var rulesWidth = $("#rules").outerWidth();
+      // var totalWidth = $("#parseInfo").width();
 
       /* action */
-      $("#action").width(totalWidth - rulesWidth - 20);
+      // $("#action").width(totalWidth - rulesWidth - 20);
       $("#action").css({
-         "margin-left": "15px"
+         "margin-left": "15px",
+         "flex-grow": "20"
       });
       $("#action h4").css({
          color: "grey",
@@ -914,6 +920,9 @@ function LR_Parser(settings,subTask) {
 
       /* player */
       $("#player").css({
+         display: "flex",
+         "align-items": "center",
+         "justify-content": "space-between",
          width: "100%",
          padding: "10px",
          "border-radius": "25px",
@@ -923,8 +932,10 @@ function LR_Parser(settings,subTask) {
          display: "inline-block",
          "vertical-align": "middle",
          color: "white",
-         "font-size": "15px",
-         "border-radius": "20px",
+         // "font-size": "15px",
+         // "border-radius": "20px",
+         "font-size": "1em",
+         "border-radius": "2em",
          "text-align": "center",
          "box-sizing": "border-box"
       });
@@ -1106,6 +1117,7 @@ function LR_Parser(settings,subTask) {
 
    this.styleRules = function() {
       $("#rules").css({
+         "flex-grow": "1",
          "background-color": this.colors.lightgrey,
          "border-radius": "0 5px 5px 0",
          "overflow": "hidden",
@@ -1124,20 +1136,33 @@ function LR_Parser(settings,subTask) {
          padding: 0
       });
       $(".rule").css({
-         padding: "0.3em 0.5em 0.3em 0",
+         // display: "flex",
+         // "justify-content": "space-between",
+         // "align-items": "center",
+         padding: "0.2em 0.5em 0.2em 0",
          margin: "0.5em 1em",
          "background-color": "transparent",
          color: this.colors.black,
          "border-radius": "1em"
       });
+      // $(".rule > *").css({
+      //    "flex-grow": "1",
+      //    "text-align": "center"
+      // });
+      // $(".development").css({
+      //    "flex-grow": "2"
+      // })
       $(".ruleIndex").css({
+         "flex-grow": "0",
          "background-color": this.colors.black,
          "border-radius": "1em",
          color: "white",
-         padding: "0.3em 0.5em"
+         padding: "0.2em 0.5em",
+         "margin-right": "0.5em"
       });
       $(".rule i").css({
-         color: "grey"
+         color: "grey",
+         margin: "0 0.5em"
       });
       $(".rule.selected").css({
          "background-color": this.colors.blue,
@@ -1152,12 +1177,13 @@ function LR_Parser(settings,subTask) {
    };
 
    this.styleProgressBar = function() {
-      var playerWidth = $("#player").innerWidth();
-      var playWidth = $("#play").outerWidth();
-      var stepBackWidth = $("#stepBackward").outerWidth();
-      var progressBarContWidth = playerWidth - playWidth - 2* stepBackWidth - 75;
+      // var playerWidth = $("#player").innerWidth();
+      // var playWidth = $("#play").outerWidth();
+      // var stepBackWidth = $("#stepBackward").outerWidth();
+      // var progressBarContWidth = playerWidth - playWidth - 2* stepBackWidth - 75;
       $("#progressBarContainer").css({
-         width: progressBarContWidth+"px",
+         "flex-grow": "1",
+         // width: progressBarContWidth+"px",
          height: "4px",
          "background-color": "grey",
          margin: "0 10px"
