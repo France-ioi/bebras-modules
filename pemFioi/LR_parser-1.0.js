@@ -477,7 +477,7 @@ function LR_Parser(settings,subTask) {
          if(!anim){
             var animationTime = 0;
          }else{
-            var animationTime = (action.actionType == "r") ? 2*this.animationTime : this.animationTime;
+            var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
          }
          $("#progressBar").animate({width:progress+"%"},animationTime,function(){
             if(action.actionType != "r" || self.selectedRule == null){
@@ -726,13 +726,53 @@ function LR_Parser(settings,subTask) {
 
    this.applyReduction = function(nonTerminal,goto,anim) {
       var newStackElement = [goto,nonTerminal];
-      this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
-      this.selectedStackElements = [];
-      $(".rule").removeClass("selected");
-      this.selectedRule = null;
-      this.styleRules();
-      this.updateStackTable();
-      this.updateState(anim);
+      // console.log(this.selectedStackElements);
+      if(anim){
+         this.displayMessage("reduce","REDUCE "+this.selectedRule);
+         var prevStates = [this.getPreviousState()];
+         for(var col of this.selectedStackElements){
+            prevStates.push(this.stack[col][0]);
+         }
+         var state = prevStates.pop();
+         var animTime = this.animationTime/prevStates.length;
+         this.reductionAnimLoop(state,prevStates,animTime,newStackElement);
+      }else{
+         this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
+         this.selectedStackElements = [];
+         $(".rule").removeClass("selected");
+         this.selectedRule = null;
+         this.styleRules();
+         this.updateStackTable();
+
+         this.updateState(anim);
+      }
+   };
+
+   this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement) {
+      var prevState = prevStates.pop();
+      var selectedCol = self.selectedStackElements[prevStates.length];
+      $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
+      this.changeStateAnim(state,prevState,animTime,function(){
+         self.displayMessage("reduce","REDUCE "+self.selectedRule);
+         if(prevStates.length > 0){
+            self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement);
+         }else{
+            self.stack.splice(self.selectedStackElements[0],self.selectedStackElements.length,newStackElement);
+            self.selectedStackElements = [];
+            
+            self.updateStackTable();
+            $(".stackElement[data_col="+selectedCol+"]").hide();
+            $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
+               $(".rule").removeClass("selected");
+               self.selectedRule = null;
+               self.styleRules();
+               self.updateState(true);
+               self.displayMessage("reduce","GOTO "+newStackElement[0]);
+            });
+            // self.updateState(true);
+            // self.displayMessage("reduce","GOTO "+newStackElement[0]);
+         }
+      });
    };
 
    this.reverseReduction = function(rule) {
@@ -839,43 +879,57 @@ function LR_Parser(settings,subTask) {
          stateVertex[0].attr(this.defaultCurrentStateAttr);
       }else{
          var previousState = this.stack[this.stack.length - 2][0];
-         var prevID = this.getStateID(previousState);
-         var previousStateVertex = this.visualGraph.getRaphaelsFromID(prevID);
-         var previousStateVisualInfo = this.visualGraph.getVertexVisualInfo(prevID);
-         var vInfo = this.visualGraph.getVertexVisualInfo(id);
-         var edgeID = this.graph.getEdgesBetween(prevID,id)[0];
-         var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
-         if(!edgeVisualInfo["radius-ratio"]){
-            var alpha = this.visualGraph.graphDrawer.getAngleBetween(previousStateVisualInfo.x,previousStateVisualInfo.y,vInfo.x,vInfo.y);
-            var info1 = this.graph.getVertexInfo(prevID);
-            var info2 = this.graph.getVertexInfo(id);
-            var content1 = (info1.content) ? info1.content : "";
-            var content2 = (info2.content) ? info2.content : "";
-            var boxSize1 = this.visualGraph.graphDrawer.getBoxSize(content1);
-            var boxSize2 = this.visualGraph.graphDrawer.getBoxSize(content2);
-            var pos1 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(previousStateVisualInfo.x,previousStateVisualInfo.y,boxSize1.w,boxSize1.h,alpha + Math.PI);
-            var pos2 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo.x,vInfo.y,boxSize2.w,boxSize2.h,alpha);
+         this.changeStateAnim(previousState,this.currentState,this.animationTime);
+      }      
+   };
 
-            var pos = {x:pos1.x,y:pos1.y};
-            var newPos = {cx:pos2.x,cy:pos2.y};
-         }else{
-            var param = this.visualGraph.graphDrawer.getEdgeParam(edgeID);
-            var cPos = this.visualGraph.graphDrawer.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
-            var alpha = (param.l) ? (Math.asin(param.D/(2*param.R)) + Math.PI) : Math.asin(param.D/(2*param.R));
-            var alpha = -2*alpha*180/Math.PI;
+   this.changeStateAnim = function(state1,state2,time,callback) {
+      var id2 = this.getStateID(state2);
+      var v2 = this.visualGraph.getRaphaelsFromID(id2);
+      // var previousState = this.stack[this.stack.length - 2][0];
+      var id1 = this.getStateID(state1);
+      var v1 = this.visualGraph.getRaphaelsFromID(id1);
+      var vInfo1 = this.visualGraph.getVertexVisualInfo(id1);
+      var vInfo2 = this.visualGraph.getVertexVisualInfo(id2);
+      var edgeID = this.graph.getEdgesBetween(id1,id2)[0];
+      var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
+      if(!edgeVisualInfo["radius-ratio"]){
+         var alpha = this.visualGraph.graphDrawer.getAngleBetween(vInfo1.x,vInfo1.y,vInfo2.x,vInfo2.y);
+         var info1 = this.graph.getVertexInfo(id1);
+         var info2 = this.graph.getVertexInfo(id2);
+         var content1 = (info1.content) ? info1.content : "";
+         var content2 = (info2.content) ? info2.content : "";
+         var boxSize1 = this.visualGraph.graphDrawer.getBoxSize(content1);
+         var boxSize2 = this.visualGraph.graphDrawer.getBoxSize(content2);
+         var pos1 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo1.x,vInfo1.y,boxSize1.w,boxSize1.h,alpha + Math.PI);
+         var pos2 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo2.x,vInfo2.y,boxSize2.w,boxSize2.h,alpha);
 
+         var pos = {x:pos1.x,y:pos1.y};
+         var newPos = {cx:pos2.x,cy:pos2.y};
+      }else{
+         var param = this.visualGraph.graphDrawer.getEdgeParam(edgeID);
+         var cPos = this.visualGraph.graphDrawer.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
+         var alpha = (param.l) ? (Math.asin(param.D/(2*param.R)) + Math.PI) : Math.asin(param.D/(2*param.R));
+         var alpha = -2*alpha*180/Math.PI;
+         if(this.graph.getEdgesFrom(id1,id2).length > 0 && this.graph.getEdgesFrom(id1,id2)[0] == edgeID){
             var pos = param.pos1;
             var newPos = {transform:"r "+alpha+","+cPos.x+","+cPos.y};
+         }else{
+            var pos = param.pos2;
+            var newPos = {transform:"r "+(-alpha)+","+cPos.x+","+cPos.y};
          }
-         previousStateVertex[0].attr(this.defaultCurrentStateAttr);
-         var ball = this.paper.circle(pos.x,pos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
-         var anim = new Raphael.animation(newPos,this.animationTime,function(){
-            self.resetStates();
-            stateVertex[0].attr(self.defaultCurrentStateAttr);
-            ball.remove();
-         });
-         subTask.raphaelFactory.animate("anim",ball,anim);
-      }      
+      }
+      v1[0].attr(this.defaultCurrentStateAttr);
+      var token = this.paper.circle(pos.x,pos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
+      var anim = new Raphael.animation(newPos,time,function(){
+         self.resetStates();
+         v2[0].attr(self.defaultCurrentStateAttr);
+         token.remove();
+         self.displayMessage("reset");
+         if(callback)
+            callback();
+      });
+      subTask.raphaelFactory.animate("anim",token,anim);
    };
 
    this.resetStates = function() {
@@ -923,7 +977,7 @@ function LR_Parser(settings,subTask) {
    };
 
    this.style = function() {
-      $("body").css({
+      $("#"+this.divID).css({
          "font-size": "80%"
       })
       /* tabs */
@@ -935,6 +989,10 @@ function LR_Parser(settings,subTask) {
          height: this.paperHeight+"px",
          width: this.paperWidth+"px"
       });
+
+      // $("#"+this.parseTableID).css({
+      //    "font-size": "1.2em"
+      // });
 
       /* parse info */
       $("#parseInfo").css({
