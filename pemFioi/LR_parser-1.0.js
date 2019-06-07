@@ -1,8 +1,9 @@
-function LR_Parser(settings,subTask) {
+function LR_Parser(settings,subTask,answer) {
    self = this;
    this.mode = settings.mode;
    /* 
    1: simulation
+   2: execute existing automaton
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -16,9 +17,7 @@ function LR_Parser(settings,subTask) {
    this.inputIndex = 0;
    this.actionSequence = [];
    this.simulationStep = 0;
-   // this.timeOutShift;
-   // this.timeOutSelect;
-   // this.timeOutRed;
+
    this.timeOutID;
    this.animationTime = 1000;
 
@@ -46,6 +45,9 @@ function LR_Parser(settings,subTask) {
    this.selectedRule = null;
    this.selectedStackElements = [];
 
+   this.accept = false;
+   this.error = false;
+
    this.colors = {
       black: "#4a4a4a",
       yellow: "#f7aa28",
@@ -56,10 +58,7 @@ function LR_Parser(settings,subTask) {
       opacity: 0.5
    };
    this.selectedTabAttr = {
-      // color: this.colors.black,
       opacity: 1
-      // "border-bottom": "3px solid black",
-      // cursor: "auto"
    };
    this.defaultEdgeAttr = {
      "stroke": "#f7aa28",
@@ -109,8 +108,8 @@ function LR_Parser(settings,subTask) {
       this.initParser();
       this.initTabs();
       this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
+      this.initAutomata();
       if(this.mode == 1){
-         this.initAutomata();
          this.initActionSequence();
       }
       this.initParseTable();
@@ -163,7 +162,7 @@ function LR_Parser(settings,subTask) {
             selectVertexCallback: this.onVertexSelect,
             enabled: true
          });
-         if(this.mode == 2){
+         // if(this.mode == 2){
             this.graphEditor.setCreateVertexEnabled(false);
             this.graphEditor.setCreateEdgeEnabled(false);
             this.graphEditor.setVertexDragEnabled(false);
@@ -175,7 +174,7 @@ function LR_Parser(settings,subTask) {
             this.graphEditor.setEditEdgeLabelEnabled(false);
             this.graphEditor.setTerminalEnabled(false);
             this.graphEditor.setInitialEnabled(false);
-         }
+         // }
       }
    };
 
@@ -199,7 +198,7 @@ function LR_Parser(settings,subTask) {
                   this.actionSequence.push({
                      actionType: "s",
                      state: action[0].actionValue,
-                     char: symbol
+                     // char: symbol
                   });
                   state = action[0].actionValue;
                   this.stack.push([state,symbol]);
@@ -326,7 +325,7 @@ function LR_Parser(settings,subTask) {
 
    this.initReduceButton = function() {
       var html = "<div id=\"reduceBar\">";
-      html += "<span class=\"messageBackground\"><span id=\"reduceMessage\" class=\"actionMessage\"></span></span>"
+      html += "<div class=\"messageBackground\"><div id=\"reduceMessage\" class=\"actionMessage\"></div></div>"
       html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>"
       html += "</div>";
       $("#actionInfo").append(html);
@@ -354,7 +353,7 @@ function LR_Parser(settings,subTask) {
 
    this.initShiftButton = function() {
       var html = "<div id=\"shiftBar\">";
-      html += "<span class=\"messageBackground\"><span id=\"shiftMessage\" class=\"actionMessage\"></span></span>"
+      html += "<div class=\"messageBackground\"><div id=\"shiftMessage\" class=\"actionMessage\"></div></div>"
       html += "<div id=\"shiftButton\" class=\"actionButton\"><i class=\"fas fa-arrow-right buttonIcon\"></i> SHIFT</div>"
       html += "</div>";
       $("#actionInfo").append(html);
@@ -391,6 +390,11 @@ function LR_Parser(settings,subTask) {
          $(".rule, .actionButton, #stackTable .stackElement").css({
             cursor: "pointer"
          });
+         this.initPlayerHandlers();
+         $("#acceptButton").off("click");
+         $("#acceptButton").click(self.acceptInput);
+         $("#errorButton").off("click");
+         $("#errorButton").click(self.refuseInput);
       }else{
          this.initPlayerHandlers();
       }
@@ -454,14 +458,12 @@ function LR_Parser(settings,subTask) {
    };
 
    this.runSimulation = function() {
-      self.reset();
-
-      self.runSimulationLoop(self.simulationStep,true,false,true);
-      
       $("#play i").removeClass("fa-play").addClass("fa-pause");
       $("#play").off("click");
       $("#play").click(self.pauseSimulation);
-      
+      self.resetFeedback();
+      self.reset();
+      self.runSimulationLoop(self.simulationStep,true,false,true);
    };
 
    this.runSimulationLoop = function(step,loop,reverse,anim) {
@@ -496,6 +498,7 @@ function LR_Parser(settings,subTask) {
          });
       }
       if(!action){
+         self.pauseSimulation(true);
          return;
       }
             
@@ -506,16 +509,7 @@ function LR_Parser(settings,subTask) {
          case "r":
             var rule = action.rule;
             if(reverse){
-               // var nonTerminal = self.grammar.rules[rule].nonterminal;
-               // var development = self.grammar.rules[rule].development;
                this.reverseReduction(rule);
-               // this.timouOutID = setTimeout(function() {
-               //    self.selectedStackElements = [];
-               //    $(".rule").removeClass("selected");
-               //    self.selectedRule = null;
-               //    self.styleRules();
-               //    self.updateStackTable();
-               // }, self.animationTime);
                return;
             }
             
@@ -543,13 +537,11 @@ function LR_Parser(settings,subTask) {
                self.applyReduction(nonTerminal,goto,false);
             }
                                  
-            }
-      // }
-
+      }
    };
 
    this.pauseSimulation = function(end) {
-      console.log("pause");
+      // console.log("pause");
       if(!end)
          self.simulationStep++;
       // clearTimeout(self.timeOutID);
@@ -560,7 +552,7 @@ function LR_Parser(settings,subTask) {
    };
 
    this.stepBackward = function() {
-      // self.pauseSimulation();
+      self.resetFeedback();
       // console.log(self.simulationStep);
       if(self.simulationStep < 1){
          return;
@@ -570,7 +562,7 @@ function LR_Parser(settings,subTask) {
    };
 
    this.stepForward = function() {
-      // self.pauseSimulation();
+      self.resetFeedback();
       if(self.simulationStep >= self.actionSequence.length){
          return;
       }else{
@@ -579,12 +571,11 @@ function LR_Parser(settings,subTask) {
    };
 
    this.progressBarClick = function(event) {
+      self.resetFeedback();
       var x = event.pageX - $(this).offset().left;
       var w = $(this).width();
       var step = Math.floor(self.actionSequence.length*x/w);
-      // if(step < 0){
-      //    self.reset();
-      // }
+
       self.replayUpTo(step,false);
    };
 
@@ -657,6 +648,7 @@ function LR_Parser(settings,subTask) {
       self.resetFeedback();
       if(self.selectedRule == null){
          self.displayMessage("reduce","You must select a rule");
+         // self.displayMessage("reduce","REDUCE 0000654065406540");
       }else if(self.selectedStackElements.length == 0){
          self.displayMessage("reduce","You must select a part of the stack");
       }else if(self.selectedState == null){
@@ -672,7 +664,14 @@ function LR_Parser(settings,subTask) {
          if(self.selectedState != goto){
             self.displayError("Wrong goto state");
          }else{
-            self.applyReduction(nonTerminal,goto);
+            self.actionSequence.push({
+               actionType: "r",
+               rule: self.selectedRule,
+               goto: goto
+            });
+            self.simulationStep++;
+            self.applyReduction(nonTerminal,goto,true);
+            self.saveAnswer();
          }
       }
    };
@@ -726,7 +725,6 @@ function LR_Parser(settings,subTask) {
 
    this.applyReduction = function(nonTerminal,goto,anim) {
       var newStackElement = [goto,nonTerminal];
-      // console.log(this.selectedStackElements);
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var prevStates = [this.getPreviousState()];
@@ -769,8 +767,6 @@ function LR_Parser(settings,subTask) {
                self.updateState(true);
                self.displayMessage("reduce","GOTO "+newStackElement[0]);
             });
-            // self.updateState(true);
-            // self.displayMessage("reduce","GOTO "+newStackElement[0]);
          }
       });
    };
@@ -784,21 +780,14 @@ function LR_Parser(settings,subTask) {
       for(var symbol of development){
          var state = this.lrTable.states[previousState][symbol][0].actionValue;
          this.stack.push([state,symbol]);
-         // this.selectedStackElements.push(String(this.stack.length - 1));
          previousState = state;
       }
-      // this.selectedRule = rule;
+
       this.updateStackTable();
-      // $(".rule").removeClass("selected");
-      // $(".rule[data_rule="+rule+"]").addClass("selected");
-      // this.styleRules();
+
       this.styleStackTable();
       this.updateState(false);
-      // self.selectedStackElements = [];
-      // $(".rule").removeClass("selected");
-      // self.selectedRule = null;
-      // self.styleRules();
-      // self.updateStackTable();
+
    }
 
    /* SHIFT */
@@ -820,7 +809,13 @@ function LR_Parser(settings,subTask) {
             }else if(edgeInfo.label != self.input.charAt(self.inputIndex)){
                self.displayError("Invalid shift");
             }else{
-               self.applyShift(self.selectedState);
+               self.actionSequence.push({
+                  actionType: "s",
+                  state: self.selectedState
+               });
+               self.simulationStep++;
+               self.applyShift(self.selectedState,false,true);
+               self.saveAnswer();
             }
          }
       }
@@ -859,7 +854,6 @@ function LR_Parser(settings,subTask) {
       }
       this.currentState = this.stack[this.stack.length - 1][0];
       this.currentVertex = this.getStateID(this.currentState);
-      // console.log(this.currentState);
    };
 
    this.updateCursor = function(anim) {
@@ -886,7 +880,6 @@ function LR_Parser(settings,subTask) {
    this.changeStateAnim = function(state1,state2,time,callback) {
       var id2 = this.getStateID(state2);
       var v2 = this.visualGraph.getRaphaelsFromID(id2);
-      // var previousState = this.stack[this.stack.length - 2][0];
       var id1 = this.getStateID(state1);
       var v1 = this.visualGraph.getRaphaelsFromID(id1);
       var vInfo1 = this.visualGraph.getVertexVisualInfo(id1);
@@ -938,10 +931,53 @@ function LR_Parser(settings,subTask) {
          var info = this.graph.getVertexInfo(vertexID);
          var vertex = this.visualGraph.getRaphaelsFromID(vertexID);
          vertex[0].attr(this.vertexAttr);
-         if(info.selected){
-            vertex[0].attr(this.selectedVertexAttr);
-         }
+
+         info.selected = false;
+         this.graph.setVertexInfo(vertexID,info);
       }
+      this.selectedState = null;
+      if(this.graphEditor)
+         this.graphEditor.vertexDragAndConnect.selectionParent = null;
+   };
+
+   /* ACCEPT / ERROR */
+
+   this.acceptInput = function() {
+      self.resetFeedback();
+      self.accept = !self.accept;
+      if(self.accept){
+         $("#acceptButton").css({
+            "background-color": self.colors.yellow
+            // border: "1px solid "+self.colors.yellow
+         });
+         if(self.error){
+            self.refuseInput();
+         }
+      }else{
+         $("#acceptButton").css({
+            "background-color": self.colors.blue
+            // border: "none"
+         });
+      }
+      self.saveAnswer();
+   };
+
+   this.refuseInput = function() {
+      self.resetFeedback();
+      self.error = !self.error;
+      if(self.error){
+         $("#errorButton").css({
+            "background-color": self.colors.yellow
+         });
+         if(self.accept){
+            self.acceptInput();
+         }
+      }else{
+         $("#errorButton").css({
+            "background-color": self.colors.blue
+         });
+      }
+      self.saveAnswer();
    };
 
    this.onVertexSelect = function(ID,selected) {
@@ -957,6 +993,49 @@ function LR_Parser(settings,subTask) {
          var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
          stateVertex[0].attr(self.defaultCurrentStateAttr);
       }
+   };
+
+   this.saveAnswer = function() {
+      answer.actionSequence = JSON.parse(JSON.stringify(this.actionSequence));
+      answer.accept = this.accept;
+      answer.error = this.error;
+   };
+
+   this.reloadAnswer = function() {
+      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+      this.replayUpTo(this.actionSequence.length,false);
+      if(answer.accept){
+         this.acceptInput();
+      }else if(answer.error){
+         this.refuseInput();
+      }
+   };
+
+   this.validation = function() {
+      if(!answer.accept && !answer.error){
+         this.displayError("You must click on either the accept or the error button");
+      }else{
+         this.reset();
+         this.actionSequence = [];
+         this.initActionSequence();
+         var lastAction = this.actionSequence[this.actionSequence.length - 1];
+         var accept = false;
+         if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
+            accept = true;
+         }
+         if(answer.actionSequence.length != this.actionSequence.length){
+            this.displayError("Your parsing is incomplete");
+         }else if(answer.accept && !accept){
+            this.displayError("Wrong answer");
+         }else if(answer.error && accept){
+            this.displayError("Wrong answer");
+         }else{
+            return true;
+         }
+      }
+      this.reset();
+      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+      this.replayUpTo(this.actionSequence.length,false);
    };
 
    this.displayMessage = function(type,message) {
@@ -990,9 +1069,9 @@ function LR_Parser(settings,subTask) {
          width: this.paperWidth+"px"
       });
 
-      // $("#"+this.parseTableID).css({
-      //    "font-size": "1.2em"
-      // });
+      $("#"+this.parseTableID+" table").css({
+         "font-size": "1.2em"
+      });
 
       /* parse info */
       $("#parseInfo").css({
@@ -1001,19 +1080,13 @@ function LR_Parser(settings,subTask) {
          "align-items": "flex-start"
       });
       $("#parseInfo > *").css({
-         // display: "inline-block",
-         // "vertical-align": "top",
          "box-sizing": "border-box"
       });
 
       /* rules */
       this.styleRules();
 
-      // var rulesWidth = $("#rules").outerWidth();
-      // var totalWidth = $("#parseInfo").width();
-
       /* action */
-      // $("#action").width(totalWidth - rulesWidth - 20);
       $("#action").css({
          "margin-left": "15px",
          "flex-grow": "20"
@@ -1029,17 +1102,13 @@ function LR_Parser(settings,subTask) {
          display: "flex",
          "align-items": "center",
          "justify-content": "space-between",
-         width: "100%",
+         // width: "100%",
          padding: "10px",
          "border-radius": "25px",
          "background-color": this.colors.lightgrey
       });
       $("#player > *").css({
-         // display: "inline-block",
-         // "vertical-align": "middle",
          color: "white",
-         // "font-size": "15px",
-         // "border-radius": "20px",
          "font-size": "1em",
          "border-radius": "2em",
          "text-align": "center",
@@ -1048,8 +1117,7 @@ function LR_Parser(settings,subTask) {
       $("#play").css({
          "background-color": this.colors.blue,
          padding: "10px 12px",
-         "margin-right": "10px",
-         // cursor: "pointer"
+         "margin-right": "10px"
       });
       $("#stepBackward, #stepForward").css({
          "background-color": this.colors.black,
@@ -1071,29 +1139,32 @@ function LR_Parser(settings,subTask) {
          width: "110px",
          padding: "0.5em 0",
          "text-align": "center",
-         float: "right",
+         // float: "right",
          "font-weight": "bold",
          "font-size": "0.9em",
          // cursor: "pointer"
       });
-      var buttonHeight = $(".actionButton").outerHeight();
+      var buttonHeight = $(".actionButton").innerHeight();
       $("#reduceBar, #shiftBar, #acceptBar, #errorBar").css({
-         "text-align": "right",
-         height: buttonHeight+"px"
+         // "text-align": "right",
+         // height: buttonHeight+"px",
+         display: "flex",
+         "justify-content": "flex-end",
       });
       $("#acceptBar, #errorBar").css({
          "margin-top": "0.5em"
       });
       $(".actionMessage").css({
-         display: "inline-block",
+         // display: "inline-block",
          padding: "0.5em 1em",
          color: "grey",
          "background-color": "white",
          "border-radius": "0 5px 0 0",
-         height: buttonHeight+"px"
+         height: buttonHeight+"px",
+         "box-sizing": "border-box"
       });
       $(".messageBackground").css({
-         display: "inline-block",
+         // display: "inline-block",
          "background-color": this.colors.blue,
          height: buttonHeight+"px"
       })
