@@ -868,7 +868,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                // var distFromCenter = Math.sqrt(distanceSquared(xc,yc,xPos,yPos));
                // return Math.abs(distFromCenter - R); 
             }else{
-               var param = this.getEdgeParam();
+               var param = this.getEdgeParam(id);
                // var r = this.circleAttr.r;
                // var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
                // var R = D*vInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
