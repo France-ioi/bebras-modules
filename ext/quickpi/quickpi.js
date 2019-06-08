@@ -394,8 +394,9 @@ def buzzOn(pin):
 def buzzOff(pin):
   changePinState(pin, 0)
 
-def changeBuzzerState(pin, state):
-    changePinState(pin, state)
+def setBuzzerState(pin, state):
+    #changePinState(pin, state)
+    changePassiveBuzzerState(pin, state)
 
 def magnetOn(pin):
   changePinState(pin, 1)
@@ -636,7 +637,7 @@ def drawRectangle(x0, y0, x1, y1, fill):
         fillcolor = 255
 
     oledlock.acquire(True)
-    oleddraw.rectangle((x0, y0, x1, y1), fill=fillcolor, outline=2555rtgh88 hy< )
+    oleddraw.rectangle((x0, y0, x1, y1), fill=fillcolor, outline=255)
     oledlock.release()
 
     scheduleUpdateScreen()

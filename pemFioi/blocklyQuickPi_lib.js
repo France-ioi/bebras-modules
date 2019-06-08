@@ -25,7 +25,7 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "Intensité lumineuse",
                 readHumidity: "l'humidité ambiante",
                 currentTime: "Temps actuel en millisecondes",
-                changeBuzzerState: "buzzer sur le port %1",
+                setBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
 
                 plotPixel: "Draw pixel",
@@ -37,7 +37,6 @@ var getContext = function (display, infos, curLevel) {
 
                 readAcceleration: "Read acceleration (mm/s²)",
                 computeRotation: "Compute rotation from accelerometer (°) %1",
-                stickState: "Read stick State",
                 readSoundLevel: "Read sound intensity",
 
                 readMagneticForce: "Read Magnetic Force (µT) %1",
@@ -83,7 +82,7 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "readLightIntensity",
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
-                changeBuzzerState: "setBuzzerState",
+                setBuzzerState: "setBuzzerState",
                 getTemperature: "getTemperature",
 
                 plotPixel: "plotPixel",
@@ -96,7 +95,6 @@ var getContext = function (display, infos, curLevel) {
                 readAcceleration: "readAcceleration",
                 computeRotation: "computeRotation",
 
-                stickState: "stickState",
                 readSoundLevel: "readSoundLevel",
 
 
@@ -126,21 +124,20 @@ var getContext = function (display, infos, curLevel) {
                 readDistance: "readDistance(port): Read distance using ultrasonic sensor",
                 readLightIntensity: "readLightIntensity(port): Read light intensity",
                 readHumidity: "readHumidity(port): lire l'humidité ambiante",
-                currentTime: "currentTime(): Temps actuel en millisecondes",
-                changeBuzzerState: "setBuzzerState(port, state): sonnerie",
+                currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
+                setBuzzerState: "setBuzzerState(port, state): sonnerie",
                 getTemperature: "getTemperature(port): Get temperature",
 
-                plotPixel: "plotPixel()",
-                unplotPixel: "unplotPixel()",
-                drawLine: "drawLine()",
-                drawRectangle: "drawRectangle()",
-                drawCircle: "drawCircle()",
+                plotPixel: "plotPixel(x, y)",
+                unplotPixel: "unplotPixel(x, y)",
+                drawLine: "drawLine(x0, y0, x1, y1)",
+                drawRectangle: "drawRectangle(x0, y0, x1, y1, fill)",
+                drawCircle: "drawCircle(x0, y0, radius, fill)",
                 clearScreen: "clearScreen()",
 
-                readAcceleration: "readAcceleration()",
-                computeRotation: "computeRotation",
+                readAcceleration: "readAcceleration(axis)",
+                computeRotation: "computeRotation()",
 
-                stickState: "stickState()",
                 readSoundLevel: "readSoundLevel()",
 
 
@@ -267,7 +264,7 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "Read light intensity",
                 readHumidity: "lire l'humidité ambiante",
                 currentTime: "returns current time",
-                changeBuzzerState: "sonnerie",
+                setBuzzerState: "sonnerie",
                 getTemperature: "Get temperature",
 
                 plotPixel: "plotPixel",
@@ -280,9 +277,7 @@ var getContext = function (display, infos, curLevel) {
                 readAcceleration: "readAcceleration",
                 computeRotation: "computeRotation",
 
-                stickState: "stickState",
                 readSoundLevel: "readSoundLevel",
-
 
                 readMagneticForce: "readMagneticForce",
                 computeCompassHeading: "computeCompassHeading",
@@ -745,7 +740,7 @@ var getContext = function (display, infos, curLevel) {
                 description: "Grove Buzzer",
                 setLiveState: function (port, state, callback) {
                     var ledstate = state ? 1 : 0;
-                    var command = "changeBuzzerState(\"" + port + "\"," + ledstate + ")";
+                    var command = "setBuzzerState(\"" + port + "\"," + ledstate + ")";
     
                     context.quickPiConnection.sendCommand(command, callback);
                 },
@@ -891,7 +886,7 @@ var getContext = function (display, infos, curLevel) {
             portType: "D",
             valueType: "boolean",
             selectorImages: ["stick.png"],
-            gpiosNames: [["Up", "D10"], ["Down", "D9"], ["Left", "D11"], ["Right", "D8"], ["Center", "D7"]],
+            gpiosNames: ["Up", "Down", "Left", "Right", "Center"],
             gpios: [10, 9, 11, 8, 7],
             getPercentageFromState: function (state) {
                 if (state)
@@ -906,7 +901,14 @@ var getContext = function (display, infos, curLevel) {
                     return 0;
             },
             compareState: function (state1, state2) {
-                return state1 == state2;
+                if (state1 == null && state2 == null)
+                    return true;
+
+                return state1[0] == state2[0] &&
+                        state1[1] == state2[1] &&
+                        state1[2] == state2[2] &&
+                        state1[3] == state2[3] &&
+                        state1[4] == state2[4];
             },
             getLiveState: function (port, callback) {
                 var cmd = "readStick(" + this.gpios.join() + ")";
@@ -916,6 +918,23 @@ var getContext = function (display, infos, curLevel) {
                     callback(array);
                 });
             },
+            getButtonState: function(buttonname, state) {
+                if (state) {
+                    var buttonparts = buttonname.split(" ");
+                    var actualbuttonmame = buttonname;
+                    if (buttonparts.length == 2) {
+                        actualbuttonmame = buttonparts[1];
+                    }
+
+                    var index = this.gpiosNames.indexOf(actualbuttonmame);
+
+                    if (index >= 0) {
+                        return state[index];
+                    }
+                }
+
+                return false;
+            }
         },
         {
             name: "temperature",
@@ -1121,7 +1140,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getLiveState: function (port, callback) {
                 context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
-
                     var array = JSON.parse(val);
                     callback(array);
                 });
@@ -1775,6 +1793,8 @@ var getContext = function (display, infos, curLevel) {
                             if (sensor.subType) {
                                 newSensor.subType = sensor.subType;
                             }
+
+                            newSensor.name = getSensorSuggestedName(sensor.type, sensor.suggestedName);
 
                             sensor.state = null;
                             sensor.lastState = 0;
@@ -2876,7 +2896,7 @@ var getContext = function (display, infos, curLevel) {
                         sensor.state = true;
                         drawSensor(sensor);
                     } else
-                        sensorInConnectedModeError()
+                        sensorInConnectedModeError();
                 };
 
 
@@ -2889,7 +2909,7 @@ var getContext = function (display, infos, curLevel) {
                         if (sensor.onPressed)
                             sensor.onPressed();
                     } else
-                        sensorInConnectedModeError()
+                        sensorInConnectedModeError();
                 }
 
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
@@ -3563,7 +3583,116 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 sensor.stateText = paper.text(state1x, state1y, stateString);
+            } else {
+                sensor.state = [false, false, false, false, false];
             }
+
+            function poinInRect(rect, x, y) {
+
+                if (x > rect.left && x < rect.right && y > rect.top  && y < rect.bottom) 
+                    return true; 
+          
+                return false; 
+            }
+
+            function moveRect(rect, x, y) {
+                rect.left += x;
+                rect.right += x;
+
+                rect.top += y;
+                rect.bottom += y;
+            }
+
+            sensor.focusrect.node.onmousedown = function(evt) {
+                if (!context.offLineMode) {
+                    sensorInConnectedModeError();
+                    return;
+                }
+
+                var e = evt.target;
+                var dim = e.getBoundingClientRect();
+                var rectsize = dim.width * .30;
+
+
+                var rect = {
+                    left: dim.left,
+                    right: dim.left + rectsize,
+                    top: dim.top,
+                    bottom: dim.top + rectsize,    
+                }
+
+                // Up left
+                if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[0] = true;
+                    sensor.state[2] = true;
+                }
+
+                // Up
+                 moveRect(rect, rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[0] = true;
+                 }
+
+                 // Up right
+                 moveRect(rect, rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[0] = true;
+                    sensor.state[3] = true;
+                 }
+
+                 // Right
+                 moveRect(rect, 0, rectsize);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[3] = true;
+                 }
+
+                 // Center
+                 moveRect(rect, -rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[4] = true;
+                 }
+
+                 // Left
+                 moveRect(rect, -rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[2] = true;
+                 }
+
+                 // Down left
+                 moveRect(rect, 0, rectsize);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[1] = true;
+                    sensor.state[2] = true;
+                 }
+
+                 // Down
+                 moveRect(rect, rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[1] = true;
+                 }
+
+                 // Down right
+                 moveRect(rect, rectsize, 0);
+                 if (poinInRect(rect, evt.clientX, evt.clientY)) {
+                    sensor.state[1] = true;
+                    sensor.state[3] = true;
+                 }
+
+                 drawSensor(sensor);
+            }
+
+            sensor.focusrect.node.onmouseup = function(evt) {
+                if (!context.offLineMode) {
+                    sensorInConnectedModeError();
+                    return;
+                }
+
+                sensor.state = [false, false, false, false, false];
+                drawSensor(sensor);
+            }
+
+            sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
+            sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
         }
 
 
@@ -3940,21 +4069,44 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.buttonStateInPort = function (name, callback) {
 
-        port = context.normalizePort(port, "D");
+        var sensor = findSensorByName(name);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("button", port);
 
-            context.runner.noDelay(callback, state);
+            if (sensor.type == "stick") {
+                var state = context.getSensorState("stick", sensor.port);
+                var stickDefinition = findSensorDefinition(sensor);
+                var buttonstate = stickDefinition.getButtonState(name, sensor.state);
+
+
+                context.runner.noDelay(callback, buttonstate);
+            } else {
+                var state = context.getSensorState("button", sensor.port);
+
+                context.runner.noDelay(callback, state);
+            }
         } else {
             var cb = context.runner.waitCallback(callback);
-            var button = context.findSensor("button", port);
-            
-            findSensorDefinition(button).getLiveState(port, function(returnVal) {
-                button.state = returnVal;
-                drawSensor(button);
-                cb(returnVal);
-            });
+
+            if (sensor.type == "stick") {
+                var stickDefinition = findSensorDefinition(sensor);
+
+                stickDefinition.getLiveState(sensor.port, function(returnVal) {
+                    sensor.state = returnVal;
+                    drawSensor(sensor);
+
+                    var buttonstate = stickDefinition.getButtonState(name, sensor.state);
+
+                    cb(buttonstate);
+                });
+
+            } else {
+                findSensorDefinition(sensor).getLiveState(sensor.port, function(returnVal) {
+                    sensor.state = returnVal;
+                    drawSensor(sensor);
+                    cb(returnVal);
+                });
+            }
         }
     };
 
@@ -3995,7 +4147,7 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi.changeLedState = function (port, state, callback) {
         port = context.normalizePort(port, "D");
 
-        var command = "changeLedState(\"" + port + "\"," + state + ")";
+        var command = "changeLedState(\"" + port + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent("led", port, state ? true : false);
 
@@ -4008,10 +4160,10 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.changeBuzzerState = function (port, state, callback) {
+    context.quickpi.setBuzzerState = function (port, state, callback) {
         port = context.normalizePort(port, "D");
 
-        var command = "changeBuzzerState(\"" + port + "\"," + state + ")";
+        var command = "setBuzzerState(\"" + port + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent("buzzer", port, state ? true : false);
 
@@ -4493,9 +4645,9 @@ var getContext = function (display, infos, curLevel) {
                         var stickDefinition = findSensorDefinition(sensor);
 
                         for (var iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++) {
-                            var name = "Stick " + stickDefinition.gpiosNames[iStick][0];
+                            var name = sensor.name + " " + stickDefinition.gpiosNames[iStick];
 
-                            ports.push([name, stickDefinition.gpiosNames[iStick][1]]);
+                            ports.push([name, name]);
                         }
                     }
                 }                
@@ -4507,6 +4659,78 @@ var getContext = function (display, infos, curLevel) {
 
             return ports;
         }
+    }
+    
+
+    function getSensorNames(sensorType)
+    {
+        return function () {
+            var ports = [];
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var sensor = infos.quickPiSensors[i];
+
+                if (sensor.type == sensorType) {
+                    ports.push([sensor.name, sensor.name]);
+                }
+            }
+
+            if (sensorType == "button") {
+                for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                    var sensor = infos.quickPiSensors[i];
+    
+                    if (sensor.type == "stick") {
+                        var stickDefinition = findSensorDefinition(sensor);
+
+                        for (var iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++) {
+                            var name = sensor.name + " " + stickDefinition.gpiosNames[iStick];
+
+                            ports.push([name, name]);
+                        }
+                    }
+                }                
+            }
+
+            if (ports.length == 0) {
+                ports.push(["none", "none"]);
+            }
+
+            return ports;
+        }
+    }
+    
+
+    function findSensorByName(name) {
+        var firstname = name.split(" ")[0];
+
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+
+            var sensor = infos.quickPiSensors[i];
+
+            if (sensor.name == firstname) {
+                return sensor;
+            }
+        }
+        return null;
+    }
+
+    
+
+
+    function getSensorSuggestedName(type, suggested) {
+        if (suggested) {
+            if (!findSensorByName(suggested))
+                return suggested;
+        }
+
+        var i = 0;
+        var newName;
+
+        do {
+            i++;
+            newname = type + i.toString();
+        } while (findSensorByName(newName));
+
+        return newName;
     }
     
 
@@ -4523,7 +4747,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "buttonStateInPort", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("button")
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
                             }
                         ]
                     }
@@ -4646,7 +4870,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "changeBuzzerState", params: ["String", "Number"], blocklyJson: {
+                    name: "setBuzzerState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorPorts("buzzer")
