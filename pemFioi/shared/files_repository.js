@@ -37,6 +37,7 @@ function FilesRepository(options) {
                 '</div>' +
             '</div>';
         $(options.parent).append($(html));
+        if(browser_compatible) addInput();
     }
 
 
@@ -112,6 +113,4 @@ function FilesRepository(options) {
 
     // init
     initModal();
-    if(!browser_compatible) return;
-    addInput();
 }

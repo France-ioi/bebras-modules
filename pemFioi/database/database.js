@@ -107,12 +107,13 @@ function TableRendererHtml(options) {
             return 'NULL';
         }
         switch(type) {
+            case 'image':
+                return '<img style="height: ' + options.render_row_height + '" src="' + value + '"/>'
             case 'number':
             case 'string':
             case 'date':
+            default :
                 return value;
-            case 'image':
-                return '<img style="height: ' + options.render_row_height + '" src="' + value + '"/>'
         }
         return '';
     }
@@ -507,7 +508,7 @@ function Table(params) {
         sortByColumn: function(columnName, direction) {
             var res = cloneParams();
             var idx = this.columnIndex(columnName);
-            var cb = direction == 'ask' ? [1, -1] : [-1, 1];
+            var cb = direction == 'asc' ? [1, -1] : [-1, 1];
 
             res.records = stableSort(params.records, function(a, b) {
                 if(a[idx] === b[idx]) return 0;

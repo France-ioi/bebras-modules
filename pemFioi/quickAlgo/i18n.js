@@ -411,8 +411,8 @@ var localLanguageStrings = {
          colour: "Barve",
          dicts: "Slovarji",
          input: "Vnos",
-         lists: "Tabele",
-         tables: "Tables", // TODO :: translate
+         lists: "Seznami",
+         tables: "Tabele",
          logic: "Logika",
          loops: "Zanke",
          control: "Nadzor",
@@ -454,53 +454,53 @@ var localLanguageStrings = {
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Ustvari iz Blocklyja",
-      loadExample: "Insert example", // TODO :: translate
-      saveOrLoadButton: "Load / save", // TODO :: translate
+      loadExample: "Naloži primer",
+      saveOrLoadButton: "Naloži / Shrani",
       saveOrLoadProgram: "Shrani ali znova naloži kodo:",
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
-      files: "Files", // TODO :: translate
+      files: "Datoteke",
       reloadProgram: "Znova naloži",
-      restart: "Restart",  // TODO :: translate
-      loadBestAnswer: "Load best answer",  // TODO :: translate
+      restart: "Ponastavi",
+      loadBestAnswer: "Naloži najboljši odgovor",
       saveProgram: "Shrani",
       limitBlocks: "{remainingBlocks} kock izmed {maxBlocks} imaš še na voljo.",
       limitBlocksOver: "{remainingBlocks} kock preko meje {maxBlocks} kock, ki so na voljo.",
-      limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.", // TODO :: translate
-      limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.", // TODO :: translate
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",  // TODO :: translate
+      limitElements: "{remainingBlocks} elementov izmed {maxBlocks} imaš še na voljo.",
+      limitElementsOver: "{remainingBlocks} elementov preko meje {maxBlocks} elementov, ki so na voljo.",
+      capacityWarning: "Opozorilo : program je rešen narobe, uporablja preveliko število kock. Bodi pozoren na število blokov, ki jih lahko uporabiš, informacijo o tem imaš zgoraj.",
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
       errorEmptyProgram: "Program je prazen! Poveži kocke.",
       tooManyBlocks: "Uporabljaš preveč kock!",
-      limitedBlock: "You use too many of a limited use block:", // TODO
+      limitedBlock: "Uporabljaš preveliko število omejeneg števila blokov:",
       uninitializedVar: "Spremenljivka ni določena:",
-      undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.", // TODO :: translate
+      undefinedMsg: "Do napake lahko pride, ker je indeks prevelik, ali pa spremenljivka ni definirana.",
       valueTrue: 'resnično',
       valueFalse: 'neresnično',
-      evaluatingAnswer: 'Evaluation in progress', // TODO
+      evaluatingAnswer: 'Proces preverjanja',
       correctAnswer: 'Pravilni odgovor',
       partialAnswer: 'Delni odgovor',
       wrongAnswer: 'Napačen odgovor',
       resultsNoSuccess: "Noben test ni bil opravljen.",
       resultsPartialSuccess: "Opravljen(ih) {nbSuccess} test(ov) od {nbTests}.",
       gradingInProgress: "Ocenjevanje poteka",
-      introTitle: "Your mission",  // TODO :: translate
-      introDetailsTitle: "Mission details",  // TODO :: translate
+      introTitle: "Naloga",  
+      introDetailsTitle: "Podrobnosti naloge",
       textVariable: "besedilo",
       listVariable: "tabela",
-      scaleDrawing: "Zoom ×2", // TODO :: translate
+      scaleDrawing: "Približaj ×2",
       loopRepeat: "repeat",
       loopDo: "do",
-      displayVideo: "Display video",  // TODO :: translate
-      showDetails: "Show details", // TODO :: translate
-      hideDetails: "Hide details",  // TODO :: translate
-      editor: "Editor", // TODO :: translate
-      instructions: "Instructions", // TODO :: translate
-      testLabel: "Test", // TODO :: translate
-      testError: "error",  // TODO :: translate
-      testSuccess: "valid",  // TODO :: translate
-      seeTest: "see test"  // TODO :: translate
+      displayVideo: "Prikaži video",
+      showDetails: "Prikaži podrobnosti",
+      hideDetails: "Skrij podrobnosti",
+      editor: "Urednik",
+      instructions: "Navodila",
+      testLabel: "Test",
+      testError: "napaka",
+      testSuccess: "pravilno",
+      seeTest: "poglej test"
    }
 };
 

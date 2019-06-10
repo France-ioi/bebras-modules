@@ -466,9 +466,17 @@ var quickAlgoInterface = {
             if(this.nbTestCases > 1) {
                 var curTest = iTest + 1;
                 var testImg = '';
-                if (displayHelper.hasLevels && this.options.hasTestThumbnails) {
+                // Test thumbnail
+                var levelTestImg = $('img#test_' + curLevel + '_' + curTest);
+                if(levelTestImg.length) {
                     testImg = '<div class="testThumbnail">' +
-                            '<img src="test_' + curLevel + '_' + curTest + '.png" alt="grid thumbnail for test '+curTest+'" width=50 height=50/>' +
+                                 '<img src="' + levelTestImg.attr('src') + '" alt="grid thumbnail for test '+curTest+'" width=120 height=120/>' +
+                              '</div>';
+                } else if (this.options.hasTestThumbnails) {
+                    // hasTestThumbnails is a legacy option
+                    // TODO :: remove
+                    testImg = '<div class="testThumbnail">' +
+                            '<img src="test_' + curLevel + '_' + curTest + '.png" alt="grid thumbnail for test '+curTest+'" width=120 height=120 />' +
                         '</div>';
                 }
                 testTabs += '' +

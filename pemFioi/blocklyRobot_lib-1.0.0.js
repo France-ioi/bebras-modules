@@ -1566,6 +1566,7 @@ var getContext = function(display, infos, curLevel) {
             ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
             {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
          backgroundColor: "#ece4ce",
+         ignoreBag: true,
          itemTypes: {
             green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
             marker_red: { num: 2, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff0000";}  },
@@ -3357,17 +3358,18 @@ var robotEndConditions = {
                   solved = false;
                   message = Math.min(message, 1);
                }
-               if(context.getItemsOn(row, col, filter).length == 0) {
+               else if(context.getItemsOn(row, col, filter).length == 0) {
                   solved = false;
                   message = Math.min(message, 0);
                }
+               
                if(container.containerFilter != undefined) {
                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
                      solved = false;
                      message = Math.min(message, 0);
                   }
                   for(var item in context.bag) {
-                     if(filter(context.bag[item])) {
+                     if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
                         solved = false;
                         message = Math.min(message, 2);
                      }
