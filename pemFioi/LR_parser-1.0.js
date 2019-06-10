@@ -20,6 +20,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.timeOutID;
    this.animationTime = 1000;
+   this.token;
 
    this.divID = settings.divID,
    this.parseInfoID = "parseInfo";
@@ -764,7 +765,7 @@ function LR_Parser(settings,subTask,answer) {
       var prevState = prevStates.pop();
       var selectedCol = self.selectedStackElements[prevStates.length];
       $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
-      this.changeStateAnim(state,prevState,animTime,function(){
+      this.changeStateAnim(state,prevState,animTime,true,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
          if(prevStates.length > 0){
             self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement);
@@ -891,7 +892,7 @@ function LR_Parser(settings,subTask,answer) {
       }      
    };
 
-   this.changeStateAnim = function(state1,state2,time,callback) {
+   this.changeStateAnim = function(state1,state2,time,reduction,callback) {
       var id2 = this.getStateID(state2);
       var v2 = this.visualGraph.getRaphaelsFromID(id2);
       var id1 = this.getStateID(state1);
@@ -900,6 +901,8 @@ function LR_Parser(settings,subTask,answer) {
       var vInfo2 = this.visualGraph.getVertexVisualInfo(id2);
       var edgeID = this.graph.getEdgesBetween(id1,id2)[0];
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
+      var initPos = vInfo1;
+      var finalPos = vInfo2;
       if(!edgeVisualInfo["radius-ratio"]){
          var alpha = this.visualGraph.graphDrawer.getAngleBetween(vInfo1.x,vInfo1.y,vInfo2.x,vInfo2.y);
          var info1 = this.graph.getVertexInfo(id1);
@@ -911,32 +914,71 @@ function LR_Parser(settings,subTask,answer) {
          var pos1 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo1.x,vInfo1.y,boxSize1.w,boxSize1.h,alpha + Math.PI);
          var pos2 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo2.x,vInfo2.y,boxSize2.w,boxSize2.h,alpha);
 
-         var pos = {x:pos1.x,y:pos1.y};
-         var newPos = {cx:pos2.x,cy:pos2.y};
+         var step1 = {transform: "t"+(vInfo2.x - vInfo1.x)+","+(vInfo2.y - vInfo1.y)};
       }else{
          var param = this.visualGraph.graphDrawer.getEdgeParam(edgeID);
          var cPos = this.visualGraph.graphDrawer.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
          var alpha = (param.l) ? (Math.asin(param.D/(2*param.R)) + Math.PI) : Math.asin(param.D/(2*param.R));
          var alpha = -2*alpha*180/Math.PI;
          if(this.graph.getEdgesFrom(id1,id2).length > 0 && this.graph.getEdgesFrom(id1,id2)[0] == edgeID){
-            var pos = param.pos1;
-            var newPos = {transform:"r "+alpha+","+cPos.x+","+cPos.y};
+            var pos1 = param.pos1;
+            var pos2 = param.pos2;
+            var angle = alpha;
          }else{
-            var pos = param.pos2;
-            var newPos = {transform:"r "+(-alpha)+","+cPos.x+","+cPos.y};
+            var pos1 = param.pos2;
+            var pos2 = param.pos1;
+            var angle = -alpha;
          }
+         var distance1 = Math.sqrt((pos1.x - initPos.x) * (pos1.x - initPos.x) + (pos1.y - initPos.y) * (pos1.y - initPos.y));
+         var distance2 = Math.abs(param.R * alpha * Math.PI/180);
+         var distance3 = Math.sqrt((finalPos.x - pos2.x) * (finalPos.x - pos2.x) + (finalPos.y - pos2.y) * (finalPos.y - pos2.y));
+         var totalDistance = distance1 + distance2 + distance3;
+         var time1 = time * distance1 / totalDistance;
+         var time2 = time * distance2 / totalDistance;
+         var time3 = time * distance3 / totalDistance;
+         var step1 = {transform: "t"+(pos1.x - vInfo1.x)+","+(pos1.y - vInfo1.y)};
+         var step2 = {transform: "r "+angle+","+(cPos.x)+","+(cPos.y)};
+         var step3 = {transform: "t"+(vInfo2.x - pos2.x)+","+(vInfo2.y - pos2.y)};
       }
-      v1[0].attr(this.defaultCurrentStateAttr);
-      var token = this.paper.circle(pos.x,pos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
-      var anim = new Raphael.animation(newPos,time,function(){
-         self.resetStates();
-         v2[0].attr(self.defaultCurrentStateAttr);
-         token.remove();
-         self.displayMessage("reset");
-         if(callback)
-            callback();
-      });
-      subTask.raphaelFactory.animate("anim",token,anim);
+      v1[0].attr(this.defaultVertexAttr);
+      if(this.token){
+         this.token.remove();
+      }
+      this.token = this.paper.circle(initPos.x,initPos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
+      if(!edgeVisualInfo["radius-ratio"]){
+         var anim1 = new Raphael.animation(step1,time,function(){
+            self.resetStates();
+            if(!reduction){
+               v2[0].attr(self.defaultCurrentStateAttr);
+               self.token.remove();
+            }
+            self.displayMessage("reset");
+            if(callback)
+               callback();
+         });
+      }else{
+         var anim1 = new Raphael.animation(step1,time1,function(){
+            self.token.transform("");
+            self.token.attr({cx:pos1.x,cy:pos1.y});
+            subTask.raphaelFactory.animate("anim",self.token,anim2);
+         });
+         var anim2 = new Raphael.animation(step2,time2,function(){
+            self.token.transform("");
+            self.token.attr({cx:pos2.x,cy:pos2.y});
+            subTask.raphaelFactory.animate("anim",self.token,anim3);
+         });
+         var anim3 = new Raphael.animation(step3,time3,function(){
+            self.resetStates();
+            if(!reduction){
+               v2[0].attr(self.defaultCurrentStateAttr);
+               self.token.remove();
+            }
+            self.displayMessage("reset");
+            if(callback)
+               callback();
+         });
+      }
+      subTask.raphaelFactory.animate("anim",this.token,anim1);
    };
 
    this.resetStates = function() {
