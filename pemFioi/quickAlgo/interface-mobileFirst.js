@@ -170,7 +170,7 @@ var quickAlgoInterface = {
         this.updateBestAnswerStatus();
         this.setupTaskIntro(level);
         this.wrapIntroAndGrid();
-        this.checkFonts();
+        FontsLoader.checkFonts();
         this.registerFullscreenEvents();
         if(!this.curMode || !$('#task').hasClass(this.curMode)) {
             this.selectMode('mode-instructions');
@@ -822,40 +822,6 @@ var quickAlgoInterface = {
         });
         that.replaceWith(video);
         video[0].play();
-    },
-
-    checkFonts: function() {
-        // Check if local fonts loaded properly, else use a CDN
-        // (issue mostly happens when opening a task locally in Firefox)
-        function checkFontsLoaded() {
-            // iOS will always return true to document.fonts.check
-            if(window.iOSDetected || !document.fonts || !document.fonts.check || !document.fonts.check('12px "Titillium Web"')) {
-                if(!window.iOSDetected && window.modulesPath) {
-                    // Load fonts from CSS files with embedded fonts
-                    if(window.embeddedFontsAdded) { return; }
-                    $('head').append(''
-                        + '<link rel="stylesheet" href="' + window.modulesPath + '/fonts/embed-titilliumweb.css">'
-                        + '<link rel="stylesheet" href="' + window.modulesPath + '/fonts/embed-fontawesome.css">'
-                        );
-                    window.embeddedFontsAdded = true;
-                } else {
-                    // Load fonts from static4
-                    // (especially for iOS on which the embed doesn't work)
-                    $('head').append(''
-                        + '<link rel="stylesheet" href="https://static4.castor-informatique.fr/modules/fonts/titilliumweb.css">'
-                        + '<link rel="stylesheet" href="https://static4.castor-informatique.fr/modules/fonts/fontAwesome/css/all.css">'
-                    // Alternate links to use CDN
-//                        + '<link href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,700" rel="stylesheet">'
-//                        + '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">'
-                        );
-                }
-            }
-        };
-        if(document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(checkFontsLoaded);
-        } else {
-            checkFontsLoaded();
-        }
     }
 };
 
@@ -863,9 +829,10 @@ window.quickAlgoResponsive = true;
 
 $(document).ready(function() {
 
-    $('head').append('\
+/*    $('head').append('\
         <link rel="stylesheet"\
-        href="' + (window.modulesPath ? window.modulesPath : '../../modules') + '/fonts/fontAwesome/css/all.css">');
+        href="' + (window.modulesPath ? window.modulesPath : '../../modules') + '/fonts/fontAwesome/css/all.css">');*/
+    FontsLoader.loadFonts(['fontawesome', 'titillium-web']);
 
     var taskTitleTarget = $("#miniPlatformHeader table td").first();
     if(taskTitleTarget.length) {
