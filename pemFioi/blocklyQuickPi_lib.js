@@ -2144,7 +2144,20 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display) {
             return;
         }
-        context.resetDisplay();
+
+        width = $('#virtualSensors').width();
+        height =  $('#virtualSensors').height();
+
+        if (!context.oldwidth ||
+            !context.oldheight ||
+            context.oldwidth != width ||
+            context.oldheight != height) {
+
+            context.oldwidth = width;
+            context.oldheight =  height;
+
+            context.resetDisplay();
+        }
     };
 
     // When the context is unloaded, this function is called to clean up
