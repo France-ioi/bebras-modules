@@ -588,14 +588,28 @@ function LR_Parser(settings,subTask,answer) {
 
    this.selectStackElement = function() {
       self.resetFeedback();
-      var col = $(this).attr("data_col");
+      var col = parseInt($(this).attr("data_col"));
+
       if($(this).hasClass("selected")){
-         $(".stackElement[data_col="+col+"]").removeClass("selected");
-         self.selectedStackElements = self.selectedStackElements.filter(element => element != col);
+         for(var iCol = 0; iCol <= col; iCol++){
+            $(".stackElement[data_col="+iCol+"]").removeClass("selected");
+         }
+         self.selectedStackElements = self.selectedStackElements.filter(element => element > col);
       }else{
-         $(".stackElement[data_col="+col+"]").addClass("selected");
-         self.selectedStackElements.push(col);
+         for(var iCol = col; iCol < self.stack.length; iCol++){
+            $(".stackElement[data_col="+iCol+"]").addClass("selected");
+            if(!self.selectedStackElements.includes(iCol)){
+               self.selectedStackElements.push(iCol);
+            }
+         }
       }
+      // if($(this).hasClass("selected")){
+      //    $(".stackElement[data_col="+col+"]").removeClass("selected");
+      //    self.selectedStackElements = self.selectedStackElements.filter(element => element != col);
+      // }else{
+      //    $(".stackElement[data_col="+col+"]").addClass("selected");
+      //    self.selectedStackElements.push(col);
+      // }
       self.styleStackTable();
    };
 
