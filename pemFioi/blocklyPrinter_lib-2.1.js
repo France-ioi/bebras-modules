@@ -212,10 +212,14 @@ var getContext = function(display, infos) {
       // Fix display of arrays
       var valueToStr = function(value) {
          if(value && value.length && typeof value == 'object') {
-            for(var i=0; i < value.length; i++) {
-               if(value[i] && typeof value[i].v != 'undefined') {
+            var oldValue = value;
+            value = [];
+            for(var i=0; i < oldValue.length; i++) {
+               if(oldValue[i] && typeof oldValue[i].v != 'undefined') {
                    // When used inside Skulpt (Python mode)
-                   value[i] = value[i].v;
+                   value.push(oldValue[i].v);
+               } else {
+                   value.push(oldValue[i]);
                }
                value[i] = valueToStr(value[i]);
             }
