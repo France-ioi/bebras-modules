@@ -157,6 +157,7 @@ Quiz.UI = function(params) {
 
 
     // sys
+    FontsLoader.loadFonts(['fontawesome', 'titillium-web']);
     params.parent.show();
 
 
