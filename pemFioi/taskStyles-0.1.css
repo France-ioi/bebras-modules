@@ -311,6 +311,13 @@ h1 .stars {
    border-radius: 8px;
    text-align: justify;
 }
+#popupMessage.noAvatar img.beaver, #popupMessage.noAvatar img.messageArrow {
+   display: none;
+}
+#popupMessage.noAvatar .message {
+   margin-left: 0px;
+   max-width: 615px;
+}
 #popupMessage p {
    margin: .5em 0 0;
 }
