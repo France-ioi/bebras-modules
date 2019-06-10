@@ -354,8 +354,10 @@ function LogicController(nbTestCases, maxInstructions) {
       return {text: text, invalid: true, type: 'capacity'};
     }
     var limited = this.findLimited(code);
-    if(limited) {
-      return {text: 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".', invalid: true, type: 'limited'};
+    if(limited && limited.type == 'uses') {
+      return {text: 'Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited.name+'".', invalid: true, type: 'limited'};
+    } else if(limited && limited.type == 'assign') {
+      return {text: 'Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "'+limited.name+'".', invalid: true, type: 'limited'};
     } else if(remaining == 0) {
       return {text: text, warning: true, type: 'capacity'};
     }

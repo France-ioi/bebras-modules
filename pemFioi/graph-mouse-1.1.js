@@ -757,6 +757,8 @@ function VertexDragAndConnect(settings) {
 
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
+   this.isGoodPosition = settings.isGoodPosition;
+   this.snapToLastGoodPosition = settings.snapToLastGoodPosition;
 
    this.enabled = false;
    this.selectionParent = null;
@@ -844,9 +846,9 @@ function VertexDragAndConnect(settings) {
       if(self.isDragging) {
          var isSnappedToGoodPosition = false;
 
-         if(settings.snapToLastGoodPosition) {
+         if(self.snapToLastGoodPosition) {
             var position = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
-            if(!settings.isGoodPosition(self.elementID, position)) {
+            if(!self.isGoodPosition(self.elementID, position)) {
                self.visualGraph.graphDrawer.moveVertex(self.elementID, self.lastGoodPosition.x, self.lastGoodPosition.y);
                isSnappedToGoodPosition = true;
             }
@@ -858,7 +860,7 @@ function VertexDragAndConnect(settings) {
          return;
       }
 
-      self.clickHandler(self.elementID);
+      self.clickHandler(self.elementID,event.pageX,event.pageY);
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
@@ -888,12 +890,12 @@ function VertexDragAndConnect(settings) {
          newX = Math.min(self.dragLimits.maxX, Math.max(newX, self.dragLimits.minX));
          newY = Math.min(self.dragLimits.maxY, Math.max(newY, self.dragLimits.minY));
       }
-      if(settings.snapToLastGoodPosition) {
+      if(self.snapToLastGoodPosition) {
          var position = {
             x: newX,
             y: newY
          };
-         if(settings.isGoodPosition(self.elementID, position)) {
+         if(self.isGoodPosition(self.elementID, position)) {
             self.lastGoodPosition = position;
          }
       }
@@ -901,7 +903,7 @@ function VertexDragAndConnect(settings) {
       self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
 
-   this.clickHandler = function(id) {
+   this.clickHandler = function(id,x,y) {
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
@@ -909,7 +911,7 @@ function VertexDragAndConnect(settings) {
          // Click on background or on the selected vertex -  deselect it.
          if(id === null || id === self.selectionParent){
             if(self.selectionParent !== null && self.onVertexSelect) {
-               self.onVertexSelect(self.selectionParent, false);
+               self.onVertexSelect(self.selectionParent, false,x,y);
             }
             self.selectionParent = null;
             return;
@@ -918,7 +920,7 @@ function VertexDragAndConnect(settings) {
          // Start a new pair.
          if(self.selectionParent === null && self.onVertexSelect) {
             self.selectionParent = id;
-            self.onVertexSelect(id, true);
+            self.onVertexSelect(id, true,x,y);
             return;
          }
          
@@ -927,7 +929,7 @@ function VertexDragAndConnect(settings) {
             self.onPairSelect(self.selectionParent, id);
          }
          if(self.onVertexSelect)
-            self.onVertexSelect(self.selectionParent, false, true);
+            self.onVertexSelect(self.selectionParent, false, x,y);
          self.selectionParent = null;
       }
    };
@@ -946,6 +948,9 @@ function VertexDragAndConnect(settings) {
    };
    this.setStartDragCallback = function(fct) {
       this.startDragCallback = fct;
+   };
+   this.setIsGoodPosition = function(fct) {
+      this.isGoodPosition = fct;
    };
 
    if(settings.enabled) {
@@ -1326,7 +1331,10 @@ function GraphEditor(settings) {
    var onVertexSelect = settings.onVertexSelect;   // optional
    var onEdgeSelect = settings.onEdgeSelect;    // optional
    this.createVertex = settings.createVertex;   // optional
+   
    var callback = settings.callback;
+   var selectVertexCallback = settings.selectVertexCallback;
+
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
       "stroke-width": 4
@@ -1359,7 +1367,10 @@ function GraphEditor(settings) {
    this.edgeCross = null;
    this.terminalIcon = null;
    this.initialIcon = null;
+   this.pencil = null;
+
    this.textEditor = null;
+   this.editionInfo = {};
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
@@ -1394,6 +1405,8 @@ function GraphEditor(settings) {
       callback: settings.callback,
       enabled: false
    });
+
+   this.tableMode = false;
    this.gridEnabled = false;
    this.removeVertexEnabled = false;
    this.createEdgeEnabled = false;
@@ -1403,9 +1416,11 @@ function GraphEditor(settings) {
    this.multipleEdgesEnabled = false;
    this.loopEnabled = false;
    this.editVertexLabelEnabled = false;
+   this.editVertexContentEnabled = false;
    this.editEdgeLabelEnabled = false;
    this.vertexSelectEnabled = false;
    this.terminalEnabled = false;
+   this.initialEnabled = false;
    this.defaultVertexLabelEnabled = false;
    this.defaultEdgeLabelEnabled = false;
    this.enabled = false;
@@ -1425,10 +1440,12 @@ function GraphEditor(settings) {
       this.setEdgeDragEnabled(enabled);
       this.setMultipleEdgesEnabled(enabled);
       this.setEditVertexLabelEnabled(enabled);
+      this.setEditVertexContentEnabled(enabled);
       this.setEditEdgeLabelEnabled(enabled);
       this.setLoopEnabled(enabled);
       this.setVertexSelectEnabled(enabled);
       this.setTerminalEnabled(enabled);
+      this.setInitialEnabled(enabled);
       this.setDefaultVertexLabelEnabled(enabled);  
       this.setDefaultEdgeLabelEnabled(enabled);     
    };
@@ -1468,6 +1485,9 @@ function GraphEditor(settings) {
    this.setEditVertexLabelEnabled = function(enabled) {
       this.editVertexLabelEnabled = enabled;
    };
+   this.setEditVertexContentEnabled = function(enabled) {
+      this.editVertexContentEnabled = enabled;
+   };
    this.setEditEdgeLabelEnabled = function(enabled) {
       this.editEdgeLabelEnabled = enabled;
    };
@@ -1480,6 +1500,10 @@ function GraphEditor(settings) {
       this.terminalEnabled = enabled;
       this.checkVertexSelect();
    };
+   this.setInitialEnabled = function(enabled) {
+      this.initialEnabled = enabled;
+      this.checkVertexSelect();
+   };
    this.setVertexSelectEnabled = function(enabled) {
       this.vertexSelectEnabled = enabled;
       this.vertexDragAndConnect.setVertexSelectEnabled(enabled);
@@ -1490,9 +1514,19 @@ function GraphEditor(settings) {
    this.setDefaultEdgeLabelEnabled = function(enabled) {
       this.defaultEdgeLabelEnabled = enabled;
    };
+   this.setTableMode = function(enabled) {
+      this.tableMode = enabled;
+      var vertices = graph.getAllVertices();
+      for(var vertex of vertices){
+         var vInfo = visualGraph.getVertexVisualInfo(vertex);
+         vInfo.tableMode = enabled;
+      }
+      visualGraph.redraw();
+      this.updateHandlers();
+   };
 
    this.checkVertexSelect = function() {
-      if(!this.terminalEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled){
+      if(!this.terminalEnabled && !this.initialEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled && !this.vertexSelectEnabled){
          this.setVertexSelectEnabled(false);
       }else{
          this.setVertexSelectEnabled(true);
@@ -1505,14 +1539,29 @@ function GraphEditor(settings) {
          this.graphDragger.setEnabled(true);
       }
    };
-   
 
-   this.defaultOnVertexSelect = function(vertexId,selected) {
+   this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
       if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
-         self.editLabel(vertexId,"vertex");
+         var vInfo = visualGraph.getVertexVisualInfo(vertexId);
+         if(!vInfo.tableMode){
+            self.editLabel(vertexId,"vertex");
+         }else{
+            /* table mode */
+            var offset = $(paper.canvas).offset();
+            var xPos = x - offset.left;
+            var yPos = y - offset.top;
+            var info = graph.getVertexInfo(vertexId);
+            var content = (info.content) ? info.content : "";
+            var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+            if(yPos < (vInfo.y - boxSize.h/2 + 2*visualGraph.graphDrawer.vertexLabelAttr["font-size"])){
+               self.editLabel(vertexId,"vertex");
+            }else{
+               self.editContent(vertexId);
+            }
+         }
       }else{
          attr = visualGraph.graphDrawer.circleAttr;
          self.removeIcons();
@@ -1520,6 +1569,9 @@ function GraphEditor(settings) {
       if(visualGraph.getRaphaelsFromID(vertexId)[0]){
          visualGraph.getRaphaelsFromID(vertexId)[0].attr(attr);
       }   
+      if(selectVertexCallback){
+         selectVertexCallback(vertexId,selected);
+      }
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
@@ -1593,7 +1645,7 @@ function GraphEditor(settings) {
          vertexGuid++;
       }
       var vertexId = "v_" + vertexGuid;
-      var point = {x: x, y: y};
+      var point = {x: x, y: y, tableMode: self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
          graph.addVertex(vertexId,{label:vertexId});
@@ -1738,7 +1790,9 @@ function GraphEditor(settings) {
          this.addCross(vertexId);
       if(this.terminalEnabled)
          this.addTerminalIcon(vertexId);
-      this.addInitialIcon(vertexId);
+      if(this.initialEnabled)
+         this.addInitialIcon(vertexId);
+      var vInfo = visualGraph.getVertexVisualInfo(vertexId);
    };
    this.removeIcons = function() {
       if(self.loopIcon)
@@ -1749,14 +1803,19 @@ function GraphEditor(settings) {
          self.terminalIcon.remove();
       if(self.initialIcon)
          self.initialIcon.remove();
+      if(self.pencil)
+         self.pencil.remove();
    };
 
    // this.addPencil = function(vertexId) {
    //    var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
-   //    var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
+   //    // var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
    //    var pencilSize = 20;
-   //    var pencilX = vertexPos.x - vertexRadius - 3*pencilSize/4;
-   //    var pencilY = vertexPos.y - vertexRadius - 3*pencilSize/4;
+   //    var info = graph.getVertexInfo(vertexId);
+   //    var content = (info.content) ? info.content : "";
+   //    var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+   //    var pencilX = vertexPos.x - pencilSize/2;
+   //    var pencilY = vertexPos.y + boxSize.h/2 + pencilSize/2;
    //    if(self.pencil){
    //       self.pencil.remove();
    //    }
@@ -1764,7 +1823,7 @@ function GraphEditor(settings) {
    //    visualGraph.pushVertexRaphael(vertexId,self.pencil);
       
    //    self.pencil.click(function(){
-   //       self.editLabel(vertexId,"vertex");
+   //       self.editContent(vertexId);
    //    });
    // };
 
@@ -1786,15 +1845,25 @@ function GraphEditor(settings) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
       var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
-      var X = vertexPos.x - vertexRadius - size;
-      var Y = vertexPos.y - vertexRadius - 3*size/4;
+
+      if(!vertexPos.tableMode){
+         var X = vertexPos.x - vertexRadius - size;
+         var Y = vertexPos.y - vertexRadius - 3*size/4;
+      }else{
+         var info = graph.getVertexInfo(vertexId);
+         var content = (info.content) ? info.content : "";
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+         var X = vertexPos.x - boxSize.w/2 - size;
+         var Y = vertexPos.y - boxSize.h/2 - 3*size/4;
+      }
+      
       if(self.loopIcon){
          self.loopIcon.remove();
       }
       self.loopIcon = self.drawLoopIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.loopIcon);
       
-      self.loopIcon.click(function(){
+      self.loopIcon.mousedown(function(){
          self.vertexDragAndConnect.onPairSelect(vertexId,vertexId);
       });
    };
@@ -1813,16 +1882,31 @@ function GraphEditor(settings) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
       var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var crossSize = 20;
-      var crossX = vertexPos.x + vertexRadius;
-      var crossY = vertexPos.y - vertexRadius - 3*crossSize/4;
+      if(!vertexPos.tableMode){
+         var crossX = vertexPos.x + vertexRadius;
+         var crossY = vertexPos.y - vertexRadius - 3*crossSize/4;
+      }else{
+         var info = graph.getVertexInfo(vertexId);
+         var content = (info.content) ? info.content : "";
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+         var crossX = vertexPos.x + boxSize.w/2;
+         var crossY = vertexPos.y - boxSize.h/2 - 3*crossSize/4;
+      }
       if(self.cross){
          self.cross.remove();
       }
       self.cross = self.drawCross(crossX,crossY,crossSize);
       visualGraph.pushVertexRaphael(vertexId,self.cross);
       
-      self.cross.click(function(){
+      self.cross.mousedown(function(){
+         if(self.vertexDragAndConnect){
+            self.vertexDragAndConnect.selectionParent = null;
+         }
          graph.removeVertex(vertexId);
+         if(self.textEditor){
+            self.textEditor.remove();
+            self.editInfo = {};
+         }
          if(callback){
             callback();
          }
@@ -1873,19 +1957,27 @@ function GraphEditor(settings) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
       var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
-      var X = vertexPos.x + vertexRadius;
-      var Y = vertexPos.y + vertexRadius;
+
+      if(!vertexPos.tableMode){
+         var X = vertexPos.x + vertexRadius;
+         var Y = vertexPos.y + vertexRadius;
+      }else{
+         var info = graph.getVertexInfo(vertexId);
+         var content = (info.content) ? info.content : "";
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+         var X = vertexPos.x + boxSize.w/2;
+         var Y = vertexPos.y + boxSize.h/2;
+      }
+      
       if(self.terminalIcon){
          self.terminalIcon.remove();
       }
       self.terminalIcon = self.drawTerminalIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.terminalIcon);
       
-      self.terminalIcon.click(function(){
+      self.terminalIcon.mousedown(function(){
          var info = graph.getVertexInfo(vertexId);
          info.terminal = !info.terminal;
-         // if(info.initial)
-         //    info.initial = false;
          
          graph.setVertexInfo(vertexId,info);
          visualGraph.redraw();
@@ -1918,19 +2010,28 @@ function GraphEditor(settings) {
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
       var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
-      var X = vertexPos.x - vertexRadius - size;
-      var Y = vertexPos.y + vertexRadius;
+
+      if(!vertexPos.tableMode){
+         var X = vertexPos.x - vertexRadius - size;
+         var Y = vertexPos.y + vertexRadius;
+      }else{
+         var info = graph.getVertexInfo(vertexId);
+         var content = (info.content) ? info.content : "";
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+         var X = vertexPos.x - boxSize.w/2 - size;
+         var Y = vertexPos.y + boxSize.h/2;
+      }
+
+      
       if(self.initialIcon){
          self.initialIcon.remove();
       }
       self.initialIcon = self.drawInitialIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.initialIcon);
       
-      self.initialIcon.click(function(){
+      self.initialIcon.mousedown(function(){
          var info = graph.getVertexInfo(vertexId);
          info.initial = !info.initial;
-         // if(info.terminal)
-         //    info.terminal = false;
          
          graph.setVertexInfo(vertexId,info);
          visualGraph.redraw();
@@ -1983,33 +2084,125 @@ function GraphEditor(settings) {
          angle = Math.atan((y2 - y1)/(x2 - x1));
       }
       if(vInfo["radius-ratio"] || vertex1 ===  vertex2){ // if curved edge
-         if(vertex1 === vertex2){
-            angle = vInfo.angle*Math.PI/180 || 0;
-            var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
-            var xm = x1 + 2*R*Math.cos(angle);
-            var ym = y1 - 2*R*Math.sin(angle);
-            var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
-            var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
+         if(!vertex2Pos.tableMode){
+            if(vertex1 === vertex2){
+               angle = vInfo.angle*Math.PI/180 || 0;
+               var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
+               var xm = x1 + 2*R*Math.cos(angle);
+               var ym = y1 - 2*R*Math.sin(angle);
+               var x = xm + (crossSize)*Math.sin(angle - Math.PI/2) - crossSize/2;
+               var y = ym - (crossSize)*Math.cos(angle + Math.PI/2) - crossSize/2;
+            }else{
+               var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+               var R = D*vInfo["radius-ratio"];
+               var s = vInfo["sweep"] || 0;
+               var l = vInfo["large-arc"] || 0;
+               var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+               if(x2 > x1){
+                  var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
+                  var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
+               }else{
+                  var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
+                  var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
+               }
+               
+               if(x1 < x2){
+                  var x = (s) ? xm - (crossSize/2)*Math.sin(angle) - crossSize/2 : xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
+                  var y = (s) ? ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
+               }else{
+                  var x = (s) ? xm + (crossSize/2)*Math.sin(angle) - crossSize/2 : xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
+                  var y = (s) ? ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
+               }
+            }
          }else{
-            var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
-            var R = D*vInfo["radius-ratio"];
-            var s = vInfo["sweep"] || 0;
-            var l = vInfo["large-arc"] || 0;
-            var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
-            if(x2 > x1){
+            /* table mode */
+            var info1 = graph.getVertexInfo(vertex1);
+            var content = (info1.content) ? info1.content : "";
+            var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+            
+            if(vertex1 === vertex2){
+               /* loop */
+               angle = vInfo.angle*Math.PI/180 || 0;
+               angle = visualGraph.graphDrawer.bindAngle(angle);
+               var R = visualGraph.graphDrawer.circleAttr.r*vInfo["radius-ratio"];
+               
+               var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
+               var surfPos = visualGraph.graphDrawer.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w,boxSize.h,Math.PI - angle);
+               if(angle <= beta && angle > -beta){
+                  /* right side */
+                  var xm = surfPos.x + R*3/2;
+                  var ym = surfPos.y;
+                  var x = xm - crossSize*1.2;
+                  var y = ym - crossSize/2;
+               }else if(angle <= Math.PI + beta && angle > Math.PI - beta){
+                  /* left side */
+                  var xm = surfPos.x - R*3/2;
+                  var ym = surfPos.y;
+                  var x = xm + crossSize/2;
+                  var y = ym - crossSize/2;
+               }else if(angle > beta && angle <= Math.PI - beta){
+                  /* top */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y - R*3/2;
+                  var x = xm - crossSize/2;
+                  var y = ym + crossSize/2;
+               }else if(angle > Math.PI + beta || angle <= - beta){
+                  /* bottom */
+                  var xm = surfPos.x;
+                  var ym = surfPos.y + R*3/2;
+                  var x = xm - crossSize/2;
+                  var y = ym - crossSize*1.2;
+               }
+            }else{
+               var angle = visualGraph.graphDrawer.getAngleBetween(x1,y1,x2,y2);
+               var s = vInfo["sweep"] || 0;
+               var l = vInfo["large-arc"] || 0;
+               var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));
+               var R = D*vInfo["radius-ratio"];
+               if(vertex2Pos.tableMode){
+                  var info = graph.getVertexInfo(vertex2);
+                  var content = (info.content) ? info.content : "";
+                  var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+                  
+                  var alpha = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));  
+                  var angle2 = angle;
+                  
+                  if(vertex1Pos.tableMode){
+                     if(s){
+                        var alpha1 = (l) ? -angle2 - alpha : alpha - angle2;
+                     }else{
+                        var alpha1 = (l) ? alpha - angle2 : -angle2 - alpha;
+                     }
+                     var info1 = graph.getVertexInfo(vertex1);
+                     var content1 = (info1.content) ? info1.content : "";
+                     var boxSize1 = visualGraph.graphDrawer.getBoxSize(content1);
+                     var delta = Math.PI - alpha1;
+                     var pos1 = visualGraph.graphDrawer.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
+                  }else{
+                     var pos1 = { x: x1, y: y1 };
+                  }
+                  if(s){
+                     angle2 = (l) ? angle2 - alpha : angle2 + alpha;
+                  }else{
+                     angle2 = (l) ? angle2 + alpha : angle2 - alpha;
+                  }
+
+                  var pos2 = visualGraph.graphDrawer.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,angle2);
+
+                  var D2 = Math.sqrt(Math.pow((pos2.x-pos1.x),2) + Math.pow((pos2.y-pos1.y),2));
+                  var R = D2*vInfo["radius-ratio"];
+                  var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,pos1,pos2);
+               }else{
+                  var cPos = visualGraph.graphDrawer.getCenterPosition(R,s,l,vertex1Pos,vertex2Pos);
+               }
+               if(vInfo["radius-ratio"] == 0.5){
+                  R += 10;
+               }
                var xm = (s) ? cPos.x + R*Math.sin(angle) : cPos.x - R*Math.sin(angle);
                var ym = (s) ? cPos.y - R*Math.cos(angle) : cPos.y + R*Math.cos(angle);
-            }else{
-               var xm = (s) ? cPos.x - R*Math.sin(angle) : cPos.x + R*Math.sin(angle);
-               var ym = (s) ? cPos.y + R*Math.cos(angle) : cPos.y - R*Math.cos(angle);
-            }
-            
-            if(x1 < x2){
+               
                var x = (s) ? xm - (crossSize/2)*Math.sin(angle) - crossSize/2 : xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
                var y = (s) ? ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
-            }else{
-               var x = (s) ? xm + (crossSize/2)*Math.sin(angle) - crossSize/2 : xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
-               var y = (s) ? ym - (crossSize/2 + margin)*Math.cos(angle) - crossSize/2 : ym + (crossSize/2 + margin)*Math.cos(angle) - crossSize/2;
             }
          }
       }else{
@@ -2018,11 +2211,11 @@ function GraphEditor(settings) {
          var x = xm - crossSize/2;
          var y = ym - crossSize/2;
          if(x1 < x2){
-            var x = xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
-            var y = ym - (crossSize/2)*Math.cos(angle) - crossSize/2;
-         }else{
             var x = xm - (crossSize/2)*Math.sin(angle) - crossSize/2;
             var y = ym + (crossSize/2)*Math.cos(angle) - crossSize/2;
+         }else{
+            var x = xm + (crossSize/2)*Math.sin(angle) - crossSize/2;
+            var y = ym - (crossSize/2)*Math.cos(angle) - crossSize/2;
          }
       }
       return {x:x,y:y};
@@ -2059,6 +2252,11 @@ function GraphEditor(settings) {
          var info = graph.getVertexInfo(id);
          var attr = visualGraph.graphDrawer.vertexLabelAttr;
          var labelPos = visualGraph.getVertexVisualInfo(id);
+         if(labelPos.tableMode){
+            var content = (info.content) ? info.content : "";
+            var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+            var labelHeight = 2*attr["font-size"];
+         }
       }else if(type === "edge" && self.editEdgeLabelEnabled){
          var info = graph.getEdgeInfo(id);
          var attr = visualGraph.graphDrawer.edgeLabelAttr;
@@ -2071,12 +2269,13 @@ function GraphEditor(settings) {
       var raphElement = visualGraph.getRaphaelsFromID(id);
       raphElement[1].hide();
       self.textEditor = $("<input id=\"textEditor\" value=\""+label+"\">");
+      self.editInfo = {id: id, type: type, field: "label"};
       $("#"+paperId).css("position","relative");
 
       self.textEditor.css({
          position: "absolute",
          left: labelPos.x,
-         top: labelPos.y,
+         top: (labelPos.tableMode) ? labelPos.y - boxSize.h/2 + labelHeight/2 : labelPos.y,
          width: label.length * fontSize,
          transform: "translate(-50%,-50%)",
          "text-align": "center",
@@ -2096,7 +2295,7 @@ function GraphEditor(settings) {
       self.textEditor.focusout(function(){
          self.writeLabel(id,type);
       });
-      self.textEditor.keypress(function(event){
+      self.textEditor.keypress(function(event){ // write when return is pressed
          if(event.which == 13){
             self.writeLabel(id,type);
          }
@@ -2140,22 +2339,152 @@ function GraphEditor(settings) {
             });
          }
       }
-      if(self.textEditor)
+      if(self.textEditor){
          self.textEditor.remove();
+         self.editInfo = {};
+      }
       raphElement[1].show();
       if(callback){
          callback();
       }
    };
 
+   this.editContent = function(id) {
+      if(!self.editVertexContentEnabled){
+         return;
+      }
+      var info = graph.getVertexInfo(id);
+      var attr = visualGraph.graphDrawer.vertexContentAttr;
+      var fontSize = attr["font-size"] || 15;
+      var vertexPos = visualGraph.getVertexVisualInfo(id);
+      var content = (info.content) ? info.content : "";
+      var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+      var labelHeight = 2*visualGraph.graphDrawer.vertexLabelAttr["font-size"];
+      
+      var raphElement = visualGraph.getRaphaelsFromID(id);
+      raphElement[3].hide();
+      self.textEditor = $("<textarea id=\"textEditor\">"+content+"</textarea>");
+      self.editInfo = {id: id, type: "vertex", field: "content"};
+      $("#"+paperId).css("position","relative");
+
+      var textAlign = attr["text-anchor"] || "middle";
+      switch(textAlign){
+         case "middle":
+            var editorAlign = "center";
+            break;
+         case "start":
+            var editorAlign = "left";
+            break;
+         case "end":
+            var editorAlign = "right";
+            break;
+      }
+      self.textEditor.css({
+         position: "absolute",
+         left: vertexPos.x - boxSize.w/2,
+         top: vertexPos.y - boxSize.h/2 + labelHeight,
+         width: boxSize.w - 20,
+         height: boxSize.h - labelHeight,
+         "text-align": editorAlign,
+         "padding": "0 10px",
+         background: "none",
+         border: "none",
+         color: attr.fill || "black"
+      });
+      self.textEditor.css(attr);
+      $("#"+paperId).append(self.textEditor);
+      self.textEditor.focus();
+
+      self.textEditor.keyup(function(){ // resize vertex & textarea when text length changes
+         var text = $(this).val();
+         var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
+         info.content = text;
+         if(text.length > 0){
+            raphElement[0].transform(""); // box
+            raphElement[0].attr({   
+               x: vertexPos.x - newBoxSize.w/2,
+               y: vertexPos.y - newBoxSize.h/2,
+               height: newBoxSize.h,
+               width: newBoxSize.w
+            });
+            raphElement[1].transform(""); // label
+            raphElement[1].attr({   
+               x: vertexPos.x,
+               y: vertexPos.y - newBoxSize.h/2 +labelHeight/2
+            });
+            raphElement[2].transform(""); // line
+            raphElement[2].attr("path","M"+(vertexPos.x - newBoxSize.w/2)+","+(vertexPos.y - newBoxSize.h/2 + labelHeight)+"H"+(vertexPos.x + newBoxSize.w/2));
+            if(info.initial && !info.terminal){
+
+            }else if(!info.initial && info.terminal){
+               raphElement[4].attr({
+                  x: vertexPos.x - newBoxSize.w/2 - 5,
+                  y: vertexPos.y - newBoxSize.h/2 - 5,
+                  height: newBoxSize.h + 10,
+                  width: newBoxSize.w + 10
+               });
+            }else if(info.initial && info.terminal){
+
+            }
+
+            $(this).css({
+               left: vertexPos.x - newBoxSize.w/2,
+               top: vertexPos.y - newBoxSize.h/2 + labelHeight,
+               width: newBoxSize.w,
+               height: newBoxSize.h - labelHeight
+            });
+            self.removeIcons();
+            self.addIcons(id);
+         }
+      });
+
+      self.textEditor.focusout(function(ev){
+         self.writeContent(id);
+      });
+   };
+
+   this.writeContent = function(id) {
+      var info = graph.getVertexInfo(id);
+      var oldContent = info.content;
+      var newContent = (self.textEditor) ? self.textEditor.val().trim() : "";
+
+      var raphElement = visualGraph.getRaphaelsFromID(id);
+      if(oldContent !== newContent){
+         info.content = newContent;
+         graph.setVertexInfo(id,info);
+      }
+      if(self.textEditor){
+         self.textEditor.remove();
+         self.editInfo = {};
+      }
+
+      visualGraph.redraw();
+      self.updateHandlers();
+
+      if(callback){
+         callback();
+      }
+   };
+
    this.startDragCallback = function(ID) {
+      // console.log(ID);
       var vertices = graph.getAllVertices();
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
          var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
-         if(self.textEditor)
+         if(self.textEditor){
+            if(self.editInfo.id == ID){
+               if(self.editInfo.field == "label"){
+                  self.writeLabel(ID,self.editInfo.type);
+               }else{
+                  self.writeContent(ID);
+               }
+            }
             self.textEditor.remove();
+         }
          if(vertexRaph[1])
             vertexRaph[1].show();
+         if(vertexRaph[3])
+            vertexRaph[3].show();
       }
       var edges = graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
@@ -2165,6 +2494,46 @@ function GraphEditor(settings) {
          edgeRaph[1].show();
          }
       self.arcDragger.unselectAll();
+   };
+
+   this.isGoodPosition = function(vID,position) {
+      var vertices = graph.getAllVertices();
+      var vInfo = visualGraph.getVertexVisualInfo(vID);
+      if(vInfo.tableMode){
+         var info = graph.getVertexInfo(vID);
+         var content = info.content || "";
+         var boxSize = visualGraph.graphDrawer.getBoxSize(content);
+      }
+      for(vertex of vertices){
+         if(vertex != vID){
+            var vInfo2 = visualGraph.getVertexVisualInfo(vertex);
+            if(vInfo2.tableMode){
+               var info2 = graph.getVertexInfo(vID);
+               var content2 = info2.content || "";
+               var boxSize2 = visualGraph.graphDrawer.getBoxSize(content2);
+               if(vInfo.tableMode){
+                  if(Math.abs(vInfo.x - vInfo2.x) < (boxSize.w/2 + boxSize2.w/2) && Math.abs(vInfo.y - vInfo2.y) < (boxSize.h/2 + boxSize2.h/2)){
+                     return false;
+                  }
+               }else{
+                  if(Math.abs(vInfo.x - vInfo2.x) < (visualGraph.graphDrawer.circleAttr.r + boxSize2.w/2) && Math.abs(vInfo.y - vInfo2.y) < (visualGraph.graphDrawer.circleAttr.r + boxSize2.h/2)){
+                     return false;
+                  }
+               }
+            }else{
+               if(vInfo.tableMode){
+                  if(Math.abs(vInfo.x - vInfo2.x) < (boxSize.w/2 + visualGraph.graphDrawer.circleAttr.r) && Math.abs(vInfo.y - vInfo2.y) < (boxSize.h/2 + visualGraph.graphDrawer.circleAttr.r)){
+                     return false;
+                  }
+               }else{
+                  if(Math.abs(vInfo.x - vInfo2.x) < 2*visualGraph.graphDrawer.circleAttr.r && Math.abs(vInfo.y - vInfo2.y) < 2*visualGraph.graphDrawer.circleAttr.r ){
+                     return false;
+                  }
+               }
+            }
+         }
+      }
+      return true;
    };
    
 
@@ -2183,6 +2552,8 @@ function GraphEditor(settings) {
       }
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
+      this.vertexDragAndConnect.setIsGoodPosition(this.isGoodPosition);
+      this.vertexDragAndConnect.snapToLastGoodPosition = true;
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
    };

@@ -156,6 +156,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                toolboxNode.html(xml);
             }
 
+            // Restore clipboard if allowed
+            if(window.blocklyClipboardSaved && this.checkBlocksAreAllowed(window.blocklyClipboardSaved)) {
+               Blockly.clipboardXml_ = window.blocklyClipboardSaved;
+               Blockly.clipboardSource_ = this.workspace;
+            }
+
             $(".blocklyToolboxDiv").css("background-color", "rgba(168, 168, 168, 0.5)");
             this.workspace.addChangeListener(this.onChange.bind(this));
             this.onChange();
@@ -189,6 +195,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             // Need to hide the WidgetDiv before disposing of the workspace
             Blockly.WidgetDiv.hide();
          } catch(e) {}
+
+         // Save clipboard
+         if(this.display && Blockly.clipboardXml_) {
+            window.blocklyClipboardSaved = Blockly.clipboardXml_;
+         }
+
          var ws = this.workspace;
          if (ws != null) {
             try {

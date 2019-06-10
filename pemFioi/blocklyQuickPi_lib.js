@@ -310,7 +310,11 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
+    if(window.getQuickPiConnection) {
+        // Only if the quickpi connection lib is imported
+        // Allows to load the context for documentation purposes as well
+        context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected);
+    }
     var orange = false;
     var paper;
     context.offLineMode = true;

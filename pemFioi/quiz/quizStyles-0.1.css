@@ -54,6 +54,13 @@ statement {
   font-weight: bold;
   display: block;
 }
+statement p {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
+  margin: 0;
+  font-weight: normal;
+  font-style: italic;
+}
 statement::before {
   counter-increment: questions-counter;
   content: counter(questions-counter);
@@ -82,6 +89,11 @@ answer {
   border-color: #e1e1e1;
   padding: 5px 0;
 }
+answer p {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
+  margin: 0;
+}
 question:nth-child(odd) answer {
   border-color: #d2d2d2;
 }
@@ -95,13 +107,13 @@ answer .answer-block {
   border: 1px solid transparent;
   border-radius: 20px;
   transition: all linear 50ms;
+  justify-content: space-between;
 }
 answer.selected .answer-block {
   color: #4a90e2;
   border-color: #4a90e2;
 }
 answer .answer-label {
-  flex: 1 0 auto;
   line-height: 1.5em;
   transition: all linear 50ms;
 }
@@ -192,6 +204,7 @@ question.horizontal answer .answer-code {
   cursor: pointer;
   align-self: center;
   box-shadow: 0 1px 0 0 #727273 inset;
+  flex: 0 0 auto;
 }
 .answer-switch::before,
 .answer-switch::after {
@@ -528,4 +541,60 @@ button,
   bottom: 0;
   background:transparent;
   z-index: 1;
+}
+
+
+.fill-gaps-toolbar .word {
+  display: inline-block;
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  cursor: move;
+  padding: 4px 20px;
+  margin-right: 10px;
+  margin-bottom: 4px;
+}
+
+
+.fill-gaps-text {
+  font-size: 20px;
+}
+
+.fill-gaps-text .word {
+  border: 1px solid #4a90e2;
+  border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  cursor: move;
+  padding: 4px 20px;
+}
+
+.fill-gaps-text .placeholder {
+  display: inline-block;
+  border-radius: 5px;
+  background: #AAA;
+  min-width: 60px;
+  padding: 5px 0px;
+  color : #4a90e2;
+  font-weight: bold;
+}
+
+.fill-gaps-text .placeholder-hover {
+  border: 1px solid #4a90e2;
+  background: #FFF;
+  padding: 4px 0px;
+}
+
+.fill-gaps-text .placeholder:empty:before {
+  content: "\00a0";
+}
+
+.displaySolution .fill-gaps-text .correct span {
+
+}
+
+.displaySolution .fill-gaps-text .mistake span {
+  color: #ff001f;
+  border-color: #ff001f;
 }

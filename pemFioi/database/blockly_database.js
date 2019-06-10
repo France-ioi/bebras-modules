@@ -183,6 +183,14 @@ var getContext = function(display, infos) {
     var files, db_helper;
     var ready = false;
 
+    var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
+    context.conceptList = [
+        {id: 'database_introduction', name: 'Database - introduction', url: conceptBaseUrl+'#database_introduction'},
+        {id: 'database_load', name: 'Tables - chargement', url: conceptBaseUrl+'#database_load'},
+        {id: 'database_visualisation', name: 'Tables - visualisation', url: conceptBaseUrl+'#database_visualisation'},
+        {id: 'database_process', name: 'Tables - manipulation', url: conceptBaseUrl+'#database_process'},
+    ];
+
     context.reset = function(taskInfos) {
         if(!context.display || ready) return;
         ready = true;
@@ -203,15 +211,44 @@ var getContext = function(display, infos) {
             }, infos.databaseConfig)
         );
 
+        table_options = '';
+        Object.keys(task_tables).forEach(function(name){
+            table_options += '<option value="'+name+'">'+name+'</option>';
+        });
 
         var html =
+            '<div id="visualisation">' +
+                '<select name="visualisation_tables" style="width: 300px;" id="visualisation_tables">' + table_options + '</select>' +
+                '<button class="btn btn-xs" id="btn_visu">Visualiser</button>' +
+            '</div><br/>' +
             '<div id="database_controls">' +
                 '<button class="btn btn-xs" style="float: right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
             '</div>';
-        $('#testSelector').prepend($(html))
+
+        $('#testSelector').prepend($(html));
         $('#btn_files').click(function() {
             files.show();
-        })
+        });
+        $('#btn_visu').click(function() {
+            filename = $("#visualisation_tables option:selected").val();
+            if (isNaN(filename)) {
+                quickAlgoInterface.context.database.loadTable(filename, function(table){
+                    quickAlgoInterface.context.database.displayTable(table,0,function(){/*do nothing*/})
+                })
+            }
+            else {
+                quickAlgoInterface.context.database.loadTableFromCsv(filename, 0, function(table){
+                    quickAlgoInterface.context.database.displayTable(table,0,function(){/*do nothing*/})
+                })
+            }
+        });
+        $('.modal button.close').click(function() {
+            $('#visualisation_tables option.imported').remove();
+            nb_csv = $("#files_repository_list tbody tr").length;
+            for(var i = 1; i <= nb_csv; i++) {
+                $('#visualisation_tables').append('<option value="'+i+'" class="imported">'+i+'</option>');
+            }
+        });
 
 
 /*

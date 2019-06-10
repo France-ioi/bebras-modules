@@ -172,7 +172,7 @@ exports.pronouns = {
    //    ["laquelle", 0, 0],
    //    ["lesquelles", 0, 1] ]  
 };
-exports.nounTypes = ["name","job","animal","plant","item","country","city"];
+exports.nounTypes = ["name","job","animal","plant","country","city"];
 exports.nouns = {
    "name": { 
       "M": [

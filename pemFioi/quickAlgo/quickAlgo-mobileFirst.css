@@ -316,6 +316,10 @@ p {
   padding: 10px 20px;
   overflow: auto;
 }
+#taskIntro .introContent {
+  max-height: 100%;
+  overflow: auto;
+}
 #gridContainer {
   background-color: #fff;
   -webkit-box-flex: 1;
@@ -695,6 +699,9 @@ p {
   color: #ababac;
   font-size: 12px;
   line-height: 16px;
+}
+#testSelector .tabs .testTab .testThumbnail {
+  width: 80%;
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
@@ -1544,7 +1551,7 @@ button.videoBtn .icon {
   position: absolute;
   width: 100%;
   right: 0;
-  bottom: 47px;
+  bottom: 10px;
   padding: 0 10px;
   display: flex;
   justify-content: flex-end;
@@ -1577,11 +1584,11 @@ button.showLongIntro .icon {
   left: 15px;
   top: 10px;
 }
-@media /* Tablets landscape and desktop */
-  screen and (min-width: 855px) and (orientation: landscape) {
+@media /* Tablets portrait */
+  screen and (min-width: 768px) and (orientation: portrait) {
   #introControls {
-    bottom: 10px;
-  }   
+    bottom: 47px;
+  }
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
@@ -1643,6 +1650,15 @@ button.showLongIntro .icon {
   box-shadow: none;
 }
 /* QuickPi */
+#taskIntro.piui .introContent {
+  padding: 10px 20px 2em;
+}
+@media /* Tablets portrait */
+  screen and (min-width: 768px) and (orientation: portrait) {
+  #taskIntro.piui .introContent {
+    padding-bottom: 60px;
+  }
+}
 .piui #introControls {
   justify-content: space-between;
 }

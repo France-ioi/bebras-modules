@@ -99,7 +99,7 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr'];
    var allowed = []
 
    if(!includeBlocks) {
@@ -153,8 +153,6 @@ function pythonForbiddenLists(includeBlocks) {
 function pythonForbidden(code, includeBlocks) {
    var forbidden = pythonForbiddenLists(includeBlocks).forbidden;
 
-   if(forbidden.length <= 0) { return false; }
-
    // Remove comments and strings before scanning
    var removePatterns = [
       /#[^\n\r]+/,
@@ -168,6 +166,16 @@ function pythonForbidden(code, includeBlocks) {
          code = code.replace(removePatterns[i], '');
      }
    }
+
+   // exec and eval are forbidden anyway
+   if(/(^|\W)exec\((\W|$)/.exec(code)) {
+      return 'exec';
+   }
+   if(/(^|\W)eval\((\W|$)/.exec(code)) {
+      return 'eval';
+   }
+
+   if(forbidden.length <= 0) { return false; }
 
    // Scan for each forbidden keyword
    for(var i=0; i<forbidden.length; i++) {
@@ -246,6 +254,12 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
       } else if(pyKey == 'math_number') {
          var re = /\W\d+(\.\d*)?/g;
       } else {
+         // Check for assign statements
+         var re = new RegExp('=\\W*'+pyKey+'([^(]|$)');
+         if(re.exec(code)) {
+            return {type: 'assign', name: pyKey};
+         }
+
          var re = new RegExp('(^|\\W)'+pyKey+'(\\W|$)', 'g');
       }
       var count = (code.match(re) || []).length;
@@ -257,14 +271,15 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
          if(usesCount[pointer] > limitedUses[pointer].nbUses) {
             // TODO :: i18n ?
             if(pyKey == 'list_brackets') {
-               return 'crochets [ ]';
+               var name = 'crochets [ ]';
             } else if(pyKey == 'dict_brackets') {
-               return 'accolades { }';
+               var name = 'accolades { }';
             } else if(pyKey == 'math_number') {
-               return 'nombres';
+               var name = 'nombres';
             } else {
-               return pyKey;
+               var name = pyKey;
             }
+            return {type: 'uses', name: name};
          }
       }
    }
