@@ -527,8 +527,8 @@ function LR_Parser(settings,subTask,answer) {
       // console.log(progress);
       if(progress <= 100){
          if(!anim || action.actionType == "error"){
-            // var animationTime = (step == 0) ? 100 : 0;
-            var animationTime = 0;
+            var animationTime = (step == 0 && this.actionSequence.length <= 1) ? 100 : 0;
+            // var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
          }
@@ -1315,7 +1315,7 @@ function LR_Parser(settings,subTask,answer) {
             this.replayUpTo(this.actionSequence.length,false);
             break;
          case 3:
-            console.log(this.lrClosureTable.kernels);
+            // console.log(this.lrClosureTable.kernels);
             var lrClosureTable = this.lrClosureTable.kernels;
             var vertices = this.graph.getAllVertices();
             var terminalState = this.getTerminalState();
