@@ -904,6 +904,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id,x,y) {
+      // console.log(id+" "+self.selectionParent)
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
@@ -1523,6 +1524,9 @@ function GraphEditor(settings) {
       }
       visualGraph.redraw();
       this.updateHandlers();
+   };
+   this.setIconAttr = function(attr){
+      iconAttr = attr;
    };
 
    this.checkVertexSelect = function() {
@@ -2467,7 +2471,7 @@ function GraphEditor(settings) {
    };
 
    this.startDragCallback = function(ID) {
-      // console.log(ID);
+      // console.log("start drag callback");
       var vertices = graph.getAllVertices();
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
          var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
