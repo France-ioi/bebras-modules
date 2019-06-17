@@ -4,6 +4,7 @@ function LR_Parser(settings,subTask,answer) {
    /* 
    1: simulation
    2: execute existing automaton
+   3: create automaton
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -76,6 +77,10 @@ function LR_Parser(settings,subTask,answer) {
       "stroke": this.colors.yellow,
      "stroke-width": 5,
    };
+   this.defaultSelectedEdgeAttr = {
+      "stroke": this.colors.yellow,
+     "stroke-width": 6,
+   };
    this.defaultCurrentStateAttr = {
       "fill": this.colors.blue
    };
@@ -96,7 +101,7 @@ function LR_Parser(settings,subTask,answer) {
    this.vertexLabelAttr = settings.vertexLabelAttr || this.defaultVertexLabelAttr;
    this.vertexContentAttr = settings.vertexContentAttr || this.defaultVertexContentAttr;
    this.selectedVertexAttr = settings.selectedVertexAttr || this.defaultSelectedVertexAttr;
-
+   this.selectedEdgeAttr = settings.selectedEdgeAttr || this.defaultSelectedEdgeAttr;
 
    this.init = function() {
       var html = "";
@@ -108,9 +113,8 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+this.divID).html(html);
       this.initParser();
       this.initTabs();
-      this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
       this.initAutomata();
-      if(this.mode == 1){
+      if(this.mode != 2){
          this.initActionSequence();
       }
       this.initParseTable();
@@ -118,8 +122,11 @@ function LR_Parser(settings,subTask,answer) {
       this.initParseInfo();
 
       this.style();
-      this.updateState();
+      // if(this.mode != 3){
+         this.updateState(false);
+      // }
       this.initHandlers();
+      // console.log(this.actionSequence);
    };
 
    this.initTabs = function() {
@@ -135,35 +142,55 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initAutomata = function() {
-      this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
-      this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
-      this.graphDrawer.setVertexContentAttr(this.vertexContentAttr);
+      if(!this.paper){
+         this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
+      }
+      if(!this.graphDrawer){
+         this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
+         this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
+         this.graphDrawer.setVertexContentAttr(this.vertexContentAttr);
+      }
+      if(this.visualGraph){
+         this.visualGraph.remove();
+      }
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, "visualGraph", this.paper, null, this.graphDrawer, true);
       this.graph = this.visualGraph.graph;
       if(this.mode != 1){
          this.graphMouse = new GraphMouse("graphMouse",this.graph,this.visualGraph);
-         this.graphEditor = new GraphEditor({
+         var graphEditorSettings = {
             paper: this.paper,
             graph: this.graph,
             paperElementID: this.graphPaperID,
             visualGraph: this.visualGraph,
             graphMouse: this.graphMouse,
-            // dragThreshold: 10,
-            // edgeThreshold: 20,
-            // dragLimits: {
-            //    minX: this.visualGraph.graphDrawer.circleAttr.r,
-            //    maxX: this.graphPaper.width - this.visualGraph.graphDrawer.circleAttr.r,
-            //    minY: this.visualGraph.graphDrawer.circleAttr.r,
-            //    maxY: this.graphPaper.height - this.visualGraph.graphDrawer.circleAttr.r
-            // },
             // alphabet: this.alphabet,
             // callback: this.callback,
             // onDragEnd: this.callback,
             selectedVertexAttr: this.selectedVertexAttr,
-            selectVertexCallback: this.onVertexSelect,
+            selectedEdgeAttr: this.selectedEdgeAttr,
             enabled: true
-         });
-         // if(this.mode == 2){
+         };
+         if(this.mode == 2){
+            graphEditorSettings.selectVertexCallback = this.onVertexSelect;
+         }
+         if(this.mode == 3){
+            graphEditorSettings.dragThreshold = 10;
+            graphEditorSettings.edgeThreshold = 20;
+            graphEditorSettings.dragLimits = {
+               minX: this.visualGraph.graphDrawer.circleAttr.r,
+               maxX: this.paper.width - this.visualGraph.graphDrawer.circleAttr.r,
+               minY: this.visualGraph.graphDrawer.circleAttr.r,
+               maxY: this.paper.height - this.visualGraph.graphDrawer.circleAttr.r
+            };
+            graphEditorSettings.callback = this.graphEditorCallback;
+            graphEditorSettings.selectVertexCallback = this.selectVertexCallback;
+         }
+         if(this.graphEditor){
+            this.graphEditor.setEnabled(false);
+            this.graphEditor = null;
+         }
+         this.graphEditor = new GraphEditor(graphEditorSettings);
+         if(this.mode == 2){            
             this.graphEditor.setCreateVertexEnabled(false);
             this.graphEditor.setCreateEdgeEnabled(false);
             this.graphEditor.setVertexDragEnabled(false);
@@ -175,11 +202,22 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setEditEdgeLabelEnabled(false);
             this.graphEditor.setTerminalEnabled(false);
             this.graphEditor.setInitialEnabled(false);
-         // }
+         }else if(this.mode == 3){
+            this.paper.rect(1,1,this.paperWidth - 2, this.paperHeight - 2);
+            this.graphEditor.setTableMode(true);
+            this.graphEditor.setMultipleEdgesEnabled(false);
+            this.graphEditor.setLoopEnabled(false);
+            this.graphEditor.setInitialEnabled(false);
+         }
+         this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
+      this.setContentArrows();
    };
 
    this.initActionSequence = function() {
+      if(this.actionSequence){
+         this.actionSequence = [];
+      }
       if(this.input.charAt(this.input.length - 1) != "$"){
          this.input += "$";
       }
@@ -193,7 +231,8 @@ function LR_Parser(settings,subTask,answer) {
       do{
          nLoop++;
          var action = this.lrTable.states[state][symbol];
-         if(action){
+
+         if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))){
             switch(action[0].actionType){
                case "s":
                   this.actionSequence.push({
@@ -379,7 +418,7 @@ function LR_Parser(settings,subTask,answer) {
    this.initHandlers = function() {
       $("#"+this.tabsID+" #switchContainer").off("click");
       $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
-      if(this.mode != 1){
+      if(this.mode == 2){
          $("#reduceButton").off("click");
          $("#reduceButton").click(self.reduce);
          $("#shiftButton").off("click");
@@ -453,9 +492,18 @@ function LR_Parser(settings,subTask,answer) {
       this.selectedRule = null;
       $(".rule").removeClass("selected");
       this.selectedStackElements = [];
+      this.updateStackTable();
+      this.updateState(false);
+      this.error = false;
+      this.accept = false;
+
       this.styleRules();
       this.styleStackTable();
       this.styleProgressBar();
+      $("#acceptButton, #errorButton").css({
+         "background-color": this.colors.blue
+      });
+
    };
 
    this.runSimulation = function() {
@@ -465,19 +513,21 @@ function LR_Parser(settings,subTask,answer) {
       self.resetFeedback();
       self.reset();
       self.runSimulationLoop(self.simulationStep,true,false,true);
+      if(self.mode == 3){
+         self.graphEditor.setEnabled(false);
+      }
    };
 
    this.runSimulationLoop = function(step,loop,reverse,anim) {
-      // console.log(step+" "+this.actionSequence.length);
+      console.log(step+" "+loop+" "+reverse+" "+anim)
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
       this.disablePlayerSteps();
       this.disableProgressBarClick();
-      // console.log(step+" "+action.actionType);
-      if(progress > 100){
-         self.pauseSimulation(true);
-      }else{
-         if(!anim){
+      // console.log(progress);
+      if(progress <= 100){
+         if(!anim || action.actionType == "error"){
+            // var animationTime = (step == 0) ? 100 : 0;
             var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
@@ -499,7 +549,8 @@ function LR_Parser(settings,subTask,answer) {
          });
       }
       if(!action){
-         self.pauseSimulation(true);
+         // console.log("check")
+         self.pauseSimulation(null,true);
          return;
       }
             
@@ -529,7 +580,7 @@ function LR_Parser(settings,subTask,answer) {
             if(anim){
                this.timouOutID = setTimeout(function() {
                   var nonTerminal = self.grammar.rules[rule].nonterminal;
-                  var goto = action.goto;
+                  var goto = action.goto || self.getPreviousState();
                   self.applyReduction(nonTerminal,goto,true);
                }, self.animationTime);
             }else{
@@ -537,24 +588,38 @@ function LR_Parser(settings,subTask,answer) {
                var goto = action.goto;
                self.applyReduction(nonTerminal,goto,false);
             }
-                                 
+            break;
+         case "error":
+            self.refuseInput();
+            break;
       }
    };
 
-   this.pauseSimulation = function(end) {
-      // console.log("pause");
-      if(!end)
-         self.simulationStep++;
-      // clearTimeout(self.timeOutID);
-      // subTask.raphaelFactory.stopAnimate("anim");
-      $("#progressBar").stop();
+   this.pauseSimulation = function(ev,end) {
+      console.log("pause");
+      if(!end){
+         clearTimeout(self.timeOutID);
+         subTask.raphaelFactory.stopAnimate("anim");
+         $("#progressBar").stop();
+         self.replayUpTo(self.simulationStep);
+         if(self.token){
+            self.token.remove();
+         }
+      }
+
       $("#play i").removeClass("fa-pause").addClass("fa-play");
       self.initPlayerHandlers();
+      if(self.mode == 3){
+         // console.log("enab");
+         self.graphEditor.setEnabled(true);
+         self.graphEditor.setMultipleEdgesEnabled(false);
+         self.graphEditor.setLoopEnabled(false);
+         self.graphEditor.setInitialEnabled(false);
+      }
    };
 
    this.stepBackward = function() {
       self.resetFeedback();
-      // console.log(self.simulationStep);
       if(self.simulationStep < 1){
          return;
       }else{
@@ -604,13 +669,6 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      // if($(this).hasClass("selected")){
-      //    $(".stackElement[data_col="+col+"]").removeClass("selected");
-      //    self.selectedStackElements = self.selectedStackElements.filter(element => element != col);
-      // }else{
-      //    $(".stackElement[data_col="+col+"]").addClass("selected");
-      //    self.selectedStackElements.push(col);
-      // }
       self.styleStackTable();
    };
 
@@ -655,6 +713,7 @@ function LR_Parser(settings,subTask,answer) {
             return vertex;
          }
       }
+      return false;
    };
 
    /* REDUCE */
@@ -723,14 +782,24 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.getTerminalState = function() {
-      var vertices = this.graph.getAllVertices();
-      for(var vertex of vertices){
-         var info = this.graph.getVertexInfo(vertex);
-         if(info.terminal){
-            return info.label;
+      var initVertex = this.getStateID(0);
+      if(initVertex){
+         var children = this.graph.getChildren(initVertex);
+
+         for(var child of children){
+            var edges = this.graph.getEdgesFrom(initVertex,child);
+            if(edges.length > 0){
+               var edgeInfo = this.graph.getEdgeInfo(edges[0]);
+               if(edgeInfo.label == this.grammar.rules[0].nonterminal){
+                  var vertexInfo = this.graph.getVertexInfo(child);
+                  if(vertexInfo.terminal){
+                     return vertexInfo.label;
+                  }
+               }
+            }
          }
       }
-      return false;
+      return null;
    };
 
    this.getPreviousState = function() {
@@ -863,7 +932,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       $("#stackTable").html(html);
       this.styleStackTable();
-      if(this.mode != 1){
+      if(this.mode == 2){
          $(".stackElement").off("click");
          $(".stackElement").click(self.selectStackElement);
       }
@@ -882,6 +951,9 @@ function LR_Parser(settings,subTask,answer) {
 
    this.updateState = function(anim) {
       var id = this.getStateID(this.currentState);
+      if(!id){
+         return;
+      }
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
       if(!anim){
@@ -889,7 +961,11 @@ function LR_Parser(settings,subTask,answer) {
       }else{
          var previousState = this.stack[this.stack.length - 2][0];
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
-      }      
+      }
+      if(this.currentState == this.getTerminalState()){
+         if(!this.accept)
+            this.acceptInput();
+      }     
    };
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
@@ -903,7 +979,12 @@ function LR_Parser(settings,subTask,answer) {
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
       var initPos = vInfo1;
       var finalPos = vInfo2;
-      if(!edgeVisualInfo["radius-ratio"]){
+      if(state1 == state2){
+         if(this.token){
+            this.token.remove();
+         }
+         return
+      }else if(!edgeVisualInfo["radius-ratio"]){
          var alpha = this.visualGraph.graphDrawer.getAngleBetween(vInfo1.x,vInfo1.y,vInfo2.x,vInfo2.y);
          var info1 = this.graph.getVertexInfo(id1);
          var info2 = this.graph.getVertexInfo(id2);
@@ -986,14 +1067,11 @@ function LR_Parser(settings,subTask,answer) {
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
          var vertex = this.visualGraph.getRaphaelsFromID(vertexID);
-         vertex[0].attr(this.vertexAttr);
-
-         info.selected = false;
+         vertex[0].attr({fill:this.vertexAttr.fill});
+         // info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
       this.selectedState = null;
-      if(this.graphEditor)
-         this.graphEditor.vertexDragAndConnect.selectionParent = null;
    };
 
    /* ACCEPT / ERROR */
@@ -1004,7 +1082,6 @@ function LR_Parser(settings,subTask,answer) {
       if(self.accept){
          $("#acceptButton").css({
             "background-color": self.colors.yellow
-            // border: "1px solid "+self.colors.yellow
          });
          if(self.error){
             self.refuseInput();
@@ -1012,7 +1089,6 @@ function LR_Parser(settings,subTask,answer) {
       }else{
          $("#acceptButton").css({
             "background-color": self.colors.blue
-            // border: "none"
          });
       }
       self.saveAnswer();
@@ -1036,6 +1112,122 @@ function LR_Parser(settings,subTask,answer) {
       self.saveAnswer();
    };
 
+   this.doesAutomatonAllowAction = function(state,symbol,action){
+      var v1 = this.getStateID(state);
+      switch(action[0].actionType){
+         case "s":
+         case "":
+            var v2 = this.getStateID(action[0].actionValue);
+            if(v1 === false || v2 === false){
+               return false
+            }
+            var edge = this.graph.getEdgesFrom(v1,v2);
+            if(edge.length == 0){
+               return false
+            }
+            var edgeLabel = this.graph.getEdgeInfo(edge).label;
+            if(edgeLabel != symbol){
+               return false
+            }
+            break;
+         case "r":
+            if(!this.contentAllowReduction(v1,action[0].actionValue)){
+               return false;
+            }
+            break;
+         default:
+            return false;
+      }
+      return true;
+   };
+
+   this.contentAllowReduction = function(id,rule) {
+      var content = this.readContent(id);
+      if(content){
+         var ruleArray = this.grammar.rules[rule];
+         for(var line of content){
+            var match = true;
+            if(line.nonTerminal != ruleArray.nonterminal || line.development.length != ruleArray.development.length){
+               match = false;
+            }else{
+               for(var iChar in line.development){
+                  if(iChar == (line.development.length - 1) && line.development[iChar] != ruleArray.development[iChar]+"."){
+                     match = false;
+                  }else if(iChar < (line.development.length - 1) && line.development[iChar] != ruleArray.development[iChar]){
+                     match = false;
+                  }
+               }
+            }
+            if(match == true){
+               return true
+            }
+         }
+      }
+      return false
+   };
+
+   this.readContent = function(id) {
+      /* return the vertex content as an array of objects {nonTerminal,[development]}*/
+      var contentObj = [];
+      var info = this.graph.getVertexInfo(id);
+      if(!info.content){
+         return false;
+      }
+      var lines = info.content.split('\n');
+      for(var line of lines){
+         var rule = line.split('→');
+         if(rule.length <= 1){
+            return false
+         }
+         var nonTerminal = rule[0];
+         var development = rule[1].trim();
+         contentObj.push({
+            nonTerminal: nonTerminal.trim(),
+            development: development.split(' ')
+         });
+      }
+      // console.log(contentObj);
+      return contentObj;
+   };
+
+   this.readLine = function(line) {
+      /* return the rule and dot index */
+      var ruleIndex = null;
+      var developmentStr = line.development.join("");
+      var dotIndex = developmentStr.indexOf(".");
+      var lastDotIndex = developmentStr.lastIndexOf(".");
+      if(lastDotIndex != dotIndex){
+         dotIndex = null;
+      }
+      var developmentNoDot = line.development.map(x => x.replace(/\./g,''));
+      for(var rule of this.grammar.rules){
+         if(rule.nonterminal == line.nonTerminal && Beav.Object.eq(developmentNoDot,rule.development)){
+            ruleIndex = rule.index;
+         }
+      }
+      // console.log(ruleIndex+" "+dotIndex);
+      return {ruleIndex: ruleIndex, dotIndex: dotIndex};
+   };
+
+   this.graphEditorCallback = function() {
+      self.pauseSimulation(null,true);
+      self.resetFeedback();
+      self.actionSequence = [];
+      self.reset();
+
+      self.setContentArrows();
+      self.initActionSequence();
+      self.saveAnswer();
+   };
+
+   this.selectVertexCallback = function(id,selected) {
+      var current = self.getStateID(self.currentState);
+      if(!selected && id == current){
+         var raph = self.visualGraph.getRaphaelsFromID(id);
+         raph[0].attr(self.defaultCurrentStateAttr);
+      }
+   }
+
    this.onVertexSelect = function(ID,selected) {
       if(selected){
          self.selectedVertex = ID;
@@ -1051,47 +1243,130 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
+   this.setContentArrows = function() {
+      var vertices = this.graph.getAllVertices();
+      for(var vertex of vertices){
+         var info = this.graph.getVertexInfo(vertex);
+         if(info.content){
+            info.content = info.content.replace(/->/g,"→");
+            var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
+            raphObj[3].attr({"text":info.content});
+         }
+      }
+   };
+
    this.saveAnswer = function() {
-      answer.actionSequence = JSON.parse(JSON.stringify(this.actionSequence));
-      answer.accept = this.accept;
-      answer.error = this.error;
+      if(self.mode == 2){
+         answer.actionSequence = JSON.parse(JSON.stringify(self.actionSequence));
+         answer.accept = self.accept;
+         answer.error = self.error;
+      }else if(self.mode == 3){
+         answer.visualGraphJSON = self.visualGraph.toJSON();
+      }
    };
 
    this.reloadAnswer = function() {
-      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-      this.replayUpTo(this.actionSequence.length,false);
-      if(answer.accept){
-         this.acceptInput();
-      }else if(answer.error){
-         this.refuseInput();
+      if(this.mode == 2){
+         this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+         this.replayUpTo(this.actionSequence.length,false);
+         if(answer.accept){
+            this.acceptInput();
+         }else if(answer.error){
+            this.refuseInput();
+         }
+      }else if(this.mode == 3){
+         this.visualGraphJSON = answer.visualGraphJSON;
+
+         this.initAutomata();
+         this.updateState();
       }
    };
 
    this.validation = function() {
-      if(!answer.accept && !answer.error){
-         this.displayError("You must click on either the accept or the error button");
-      }else{
-         this.reset();
-         this.actionSequence = [];
-         this.initActionSequence();
-         var lastAction = this.actionSequence[this.actionSequence.length - 1];
-         var accept = false;
-         if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
-            accept = true;
-         }
-         if(answer.actionSequence.length != this.actionSequence.length){
-            this.displayError("Your parsing is incomplete");
-         }else if(answer.accept && !accept){
-            this.displayError("Wrong answer");
-         }else if(answer.error && accept){
-            this.displayError("Wrong answer");
-         }else{
-            return true;
-         }
+      switch(this.mode){
+         case 2:
+            if(!answer.accept && !answer.error){
+               this.displayError("You must click on either the accept or the error button");
+            }else{
+               this.reset();
+               this.actionSequence = [];
+               this.initActionSequence();
+               var lastAction = this.actionSequence[this.actionSequence.length - 1];
+               var accept = false;
+               if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
+                  accept = true;
+               }
+               if(answer.actionSequence.length != this.actionSequence.length){
+                  this.displayError("Your parsing is incomplete");
+               }else if(answer.accept && !accept){
+                  this.displayError("Wrong answer");
+               }else if(answer.error && accept){
+                  this.displayError("Wrong answer");
+               }else{
+                  return true;
+               }
+            }
+            this.reset();
+            this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+            this.replayUpTo(this.actionSequence.length,false);
+            break;
+         case 3:
+            console.log(this.lrClosureTable.kernels);
+            var lrClosureTable = this.lrClosureTable.kernels;
+            var vertices = this.graph.getAllVertices();
+            var terminalState = this.getTerminalState();
+            if(vertices.length != lrClosureTable.length +1){
+               this.displayError("The number of states in your automaton is incorrect")
+            }else if(!terminalState){
+               this.displayError("Wrong terminal state")
+            }else{
+               var success = true;
+               for(var state of lrClosureTable){
+                  var stateVertex = this.getStateID(state.index);
+                  if(!stateVertex){
+                     this.displayError("State "+state.index+" is missing");
+                     return
+                  }
+                  var nGoto = state.keys.length;
+                  var children = this.graph.getChildren(stateVertex);
+                  if((state.index == 0 && children.length != nGoto + 1) || (state.index != 0 && children.length != nGoto)){
+                     this.displayError("The number of transitions from state "+state.index+" is incorrect");
+                     return
+                  }
+                  for(var child of children){
+                     var edges = this.graph.getEdgesFrom(stateVertex,child);
+                     var edgeInfo = this.graph.getEdgeInfo(edges[0]);
+                     var childInfo = this.graph.getVertexInfo(child);
+                     if(state.gotos[edgeInfo.label] != childInfo.label && !(state.index == 0 && terminalState == childInfo.label)){
+                        this.displayError("Wrong transition from state "+state.index+" to state "+childInfo.label);
+                        return
+                     }
+                  }
+                  var content = this.readContent(stateVertex);
+                  if((state.index != 0 && content.length != state.closure.length) || (state.index == 0 && (content.length > state.closure.length + 1 || content.length < state.closure.length))){
+                     this.displayError("The number of lines in state "+state.index+" is incorrect");
+                     return
+                  }
+                  for(var item of state.closure){
+                     var rule = item.rule.index;
+                     var dot = item.dotIndex;
+                     var itemFound = false;
+                     for(var line of content){
+                        var lineInfo = this.readLine(line);
+                        if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dot){
+                           itemFound = true;
+                           break;
+                        }
+                     }
+                     if(!itemFound){
+                        this.displayError("Error in the content of state "+state.index);
+                        return
+                     }
+                  }
+               }
+               return success;
+            }
       }
-      this.reset();
-      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-      this.replayUpTo(this.actionSequence.length,false);
    };
 
    this.displayMessage = function(type,message) {
@@ -1195,10 +1470,8 @@ function LR_Parser(settings,subTask,answer) {
          width: "110px",
          padding: "0.5em 0",
          "text-align": "center",
-         // float: "right",
          "font-weight": "bold",
-         "font-size": "0.9em",
-         // cursor: "pointer"
+         "font-size": "0.9em"
       });
       var buttonHeight = $(".actionButton").innerHeight();
       $("#reduceBar, #shiftBar, #acceptBar, #errorBar").css({
