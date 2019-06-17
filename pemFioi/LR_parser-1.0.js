@@ -519,7 +519,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.runSimulationLoop = function(step,loop,reverse,anim) {
-      console.log(step+" "+loop+" "+reverse+" "+anim)
+      // console.log(step+" "+loop+" "+reverse+" "+anim)
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
       this.disablePlayerSteps();
@@ -596,7 +596,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.pauseSimulation = function(ev,end) {
-      console.log("pause");
+      // console.log("pause");
       if(!end){
          clearTimeout(self.timeOutID);
          subTask.raphaelFactory.stopAnimate("anim");
@@ -804,7 +804,11 @@ function LR_Parser(settings,subTask,answer) {
 
    this.getPreviousState = function() {
       var previousCol = parseInt(this.selectedStackElements.sort()[0]) - 1;
-      return this.stack[previousCol][0];
+      if(this.stack[previousCol]){
+         return this.stack[previousCol][0];
+      }else{
+         return null
+      }
    };
 
    this.applyReduction = function(nonTerminal,goto,anim) {
