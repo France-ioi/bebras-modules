@@ -833,6 +833,7 @@ function VertexDragAndConnect(settings) {
    }
 
    this.startHandler = function(x, y, event) {
+      // console.log("startDrag")
       self.elementID = this.data("id");
       self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
       self.lastGoodPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
@@ -1366,7 +1367,12 @@ function GraphEditor(settings) {
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
    this.alphabet = settings.alphabet;
-
+   if(!settings.vertexLabelPrefix && settings.vertexLabelPrefix != ""){
+      this.vertexLabelPrefix = "v_";
+   }else{
+      this.vertexLabelPrefix = settings.vertexLabelPrefix;
+   }
+   console.log(this.vertexLabelPrefix);
    this.loopIcon = null;
    this.cross = null;
    this.edgeCross = null;
@@ -1376,8 +1382,8 @@ function GraphEditor(settings) {
 
    this.textEditor = null;
    this.editionInfo = {};
+   this.edited = false; // true when label or content has just been modified
 
-   settings.onDragEnd = callback;
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
       // id:"ArcDragger",
@@ -1551,10 +1557,12 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
+      console.log("vertex")
       if(selected) {
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          var vInfo = visualGraph.getVertexVisualInfo(vertexId);
+         // self.edited = false;
          if(!vInfo.tableMode){
             self.editLabel(vertexId,"vertex");
          }else{
@@ -1584,6 +1592,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
+      console.log("pair");
       if(!self.createEdgeEnabled)
          return;
       
@@ -1657,13 +1666,32 @@ function GraphEditor(settings) {
       var point = {x: x, y: y, tableMode: self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
-         graph.addVertex(vertexId,{label:vertexId});
+         var label = self.getDefaultLabel();
+         graph.addVertex(vertexId,{label:label});
       }else{
          graph.addVertex(vertexId);
       }
       if(callback){
          callback();
       }
+   };
+
+   this.getDefaultLabel = function() {
+      var vertices = graph.getAllVertices();
+      var index = 0;
+      do{
+         var alreadyExist = false;
+         for(var vertex of vertices){
+            var info = graph.getVertexInfo(vertex);
+            var label = this.vertexLabelPrefix + index;
+            if(info.label == label){
+               alreadyExist = true;
+               index++;
+               break;
+            }
+         }
+      }while(alreadyExist)
+      return label;
    };
 
    this.setNewEdgeVisualInfo = function(edgeID,id1,id2) {
@@ -2312,6 +2340,7 @@ function GraphEditor(settings) {
    };
 
    this.writeLabel = function(id,type) {
+      console.log("writeLabel")
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
       }else if(type === "edge"){
@@ -2335,6 +2364,7 @@ function GraphEditor(settings) {
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
          info.label = newLabel;
+         self.edited = true;
          if(type === "vertex"){
             graph.setVertexInfo(id,info);
             raphElement[1].attr("text",newLabel);
@@ -2398,7 +2428,8 @@ function GraphEditor(settings) {
          "padding": "0 10px",
          background: "none",
          border: "none",
-         color: attr.fill || "black"
+         color: attr.fill || "black",
+         "font-family": "Arial, sans-serif"
       });
       self.textEditor.css(attr);
       $("#"+paperId).append(self.textEditor);
@@ -2430,6 +2461,7 @@ function GraphEditor(settings) {
       if(oldContent !== newContent && validContent){
          info.content = newContent;
          graph.setVertexInfo(id,info);
+         self.edited = true;
       }
       if(self.textEditor){
          self.textEditor.remove();
