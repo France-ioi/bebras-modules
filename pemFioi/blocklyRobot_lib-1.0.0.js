@@ -1544,7 +1544,7 @@ var getContext = function(display, infos, curLevel) {
                   category: "robot",
                   type: "actions",
                   block: {
-                     name: names[iColor]
+                     name: names[iColor], blocklyJson: {"colour": colors[iColor]}//"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": colors[iColor]}]
                   },
                   func: (function(cur_color) { return function(callback) {
                      var robot = this.getRobot();
