@@ -1168,7 +1168,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    }
 
    this.getTextSize = function(text) {
-      var array = text.split("\n");
+      var array = (text) ? text.split("\n") : [];
       var nbLines = array.length;
       var nbCol = 0;
       for(var line of array){
