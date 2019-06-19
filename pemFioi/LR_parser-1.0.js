@@ -5,6 +5,7 @@ function LR_Parser(settings,subTask,answer) {
    1: simulation
    2: execute existing automaton
    3: create automaton
+   4: create parse table
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -41,14 +42,19 @@ function LR_Parser(settings,subTask,answer) {
    this.graphEditor;
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
-   this.selectedTab = 0;
+   this.selectedTab = (this.mode != 4) ? 0 : 1;
    this.cursor;
    this.selectedVertex = null;
    this.selectedRule = null;
    this.selectedStackElements = [];
 
+   this.cellEditor = null;
+
    this.accept = false;
    this.error = false;
+
+   var arrow = "🡒";
+   var dot = "🞄";
 
    this.colors = {
       black: "#4a4a4a",
@@ -122,11 +128,9 @@ function LR_Parser(settings,subTask,answer) {
       this.initParseInfo();
 
       this.style();
-      // if(this.mode != 3){
-         this.updateState(false);
-      // }
+      this.updateState(false);
       this.initHandlers();
-      // console.log(this.actionSequence);
+      console.log(this.grammar);
    };
 
    this.initTabs = function() {
@@ -155,7 +159,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, "visualGraph", this.paper, null, this.graphDrawer, true);
       this.graph = this.visualGraph.graph;
-      if(this.mode != 1){
+      if(this.mode != 1 && this.mode != 4){
          this.graphMouse = new GraphMouse("graphMouse",this.graph,this.visualGraph);
          var graphEditorSettings = {
             paper: this.paper,
@@ -164,8 +168,6 @@ function LR_Parser(settings,subTask,answer) {
             visualGraph: this.visualGraph,
             graphMouse: this.graphMouse,
             // alphabet: this.alphabet,
-            // callback: this.callback,
-            // onDragEnd: this.callback,
             selectedVertexAttr: this.selectedVertexAttr,
             selectedEdgeAttr: this.selectedEdgeAttr,
             enabled: true
@@ -184,6 +186,9 @@ function LR_Parser(settings,subTask,answer) {
             };
             graphEditorSettings.callback = this.graphEditorCallback;
             graphEditorSettings.selectVertexCallback = this.selectVertexCallback;
+            graphEditorSettings.contentValidation = this.contentValidation;
+            graphEditorSettings.onDragEnd = this.graphEditorCallback;
+            graphEditorSettings.vertexLabelPrefix = "";
          }
          if(this.graphEditor){
             this.graphEditor.setEnabled(false);
@@ -211,7 +216,9 @@ function LR_Parser(settings,subTask,answer) {
          }
          this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
-      this.setContentArrows();
+      this.formatContent();
+      this.visualGraph.redraw();
+      this.graphEditor.updateHandlers();
    };
 
    this.initActionSequence = function() {
@@ -294,11 +301,13 @@ function LR_Parser(settings,subTask,answer) {
          html += "<tr>";
          html += "<td>"+state.index+"</td>";
          for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            html += "<td>";
-            if(state[colLabel[iCol]]){
-               html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
-            }else if(colLabel[iCol] == "S" && state.index == 0){
-               html += "Acc."
+            html += "<td data_state=\""+state.index+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            if(this.mode != 4){
+               if(state[colLabel[iCol]]){
+                  html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
+               }else if(colLabel[iCol] == "S" && state.index == 0){
+                  html += "Acc."
+               }
             }
             html += "</td>";
          }
@@ -435,6 +444,9 @@ function LR_Parser(settings,subTask,answer) {
          $("#acceptButton").click(self.acceptInput);
          $("#errorButton").off("click");
          $("#errorButton").click(self.refuseInput);
+      }else if(this.mode == 4){
+         $("#"+this.parseTableID+" td").off("click");
+         $("#"+this.parseTableID+" td").click(self.clickCell);
       }else{
          this.initPlayerHandlers();
       }
@@ -1151,11 +1163,11 @@ function LR_Parser(settings,subTask,answer) {
          var ruleArray = this.grammar.rules[rule];
          for(var line of content){
             var match = true;
-            if(line.nonTerminal != ruleArray.nonterminal || line.development.length != ruleArray.development.length){
+            if(line.nonTerminal != ruleArray.nonterminal || line.development.length != ruleArray.development.length + 1){
                match = false;
             }else{
                for(var iChar in line.development){
-                  if(iChar == (line.development.length - 1) && line.development[iChar] != ruleArray.development[iChar]+"."){
+                  if(iChar == (line.development.length - 1) && line.development[iChar] != dot){
                      match = false;
                   }else if(iChar < (line.development.length - 1) && line.development[iChar] != ruleArray.development[iChar]){
                      match = false;
@@ -1179,7 +1191,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       var lines = info.content.split('\n');
       for(var line of lines){
-         var rule = line.split('→');
+         var rule = line.split(arrow);
          if(rule.length <= 1){
             return false
          }
@@ -1198,12 +1210,12 @@ function LR_Parser(settings,subTask,answer) {
       /* return the rule and dot index */
       var ruleIndex = null;
       var developmentStr = line.development.join("");
-      var dotIndex = developmentStr.indexOf(".");
-      var lastDotIndex = developmentStr.lastIndexOf(".");
+      var dotIndex = developmentStr.indexOf(dot);
+      var lastDotIndex = developmentStr.lastIndexOf(dot);
       if(lastDotIndex != dotIndex){
          dotIndex = null;
       }
-      var developmentNoDot = line.development.map(x => x.replace(/\./g,''));
+      var developmentNoDot = line.development.filter(x => x != dot);
       for(var rule of this.grammar.rules){
          if(rule.nonterminal == line.nonTerminal && Beav.Object.eq(developmentNoDot,rule.development)){
             ruleIndex = rule.index;
@@ -1213,13 +1225,16 @@ function LR_Parser(settings,subTask,answer) {
       return {ruleIndex: ruleIndex, dotIndex: dotIndex};
    };
 
-   this.graphEditorCallback = function() {
+   this.graphEditorCallback = function(validContent) {
+      // console.log("callback");
       self.pauseSimulation(null,true);
-      self.resetFeedback();
+      if(validContent !== false){
+         self.resetFeedback();
+      }
       self.actionSequence = [];
       self.reset();
 
-      self.setContentArrows();
+      self.formatContent();
       self.initActionSequence();
       self.saveAnswer();
    };
@@ -1247,16 +1262,111 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.setContentArrows = function() {
+   this.formatContent = function() {
       var vertices = this.graph.getAllVertices();
       for(var vertex of vertices){
          var info = this.graph.getVertexInfo(vertex);
          if(info.content){
-            info.content = info.content.replace(/->/g,"→");
+            info.content = info.content.replace(/->/g,arrow);
+            info.content = info.content.replace(/\./g,dot);
+            info.content = info.content.replace(/ /g,"");
+            var lines = info.content.split('\n');
+            var formatedContent = "";
+            for(var iLine in lines){
+               var line = lines[iLine];
+               var formatedLine = "";
+               for(var iChar = 0; iChar < line.length; iChar++){
+                  var char = fixedCharAt(line,iChar);
+                  if(iChar != line.length - 1 && char != " "){
+                     if(char == "S" && fixedCharAt(line,iChar + 1) == "'"){
+                        formatedLine += char;
+                     }else{
+                        formatedLine += char+" ";
+                     }
+                  }
+               }
+               formatedContent += formatedLine.trim();
+               if(iLine != lines.length - 1){
+                  formatedContent += "\n";
+               }
+            }
+            info.content = formatedContent;
             var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
             raphObj[3].attr({"text":info.content});
+            // this.graphEditor.resizeTableVertex(vertex,info.content);
          }
       }
+   };
+
+   this.contentValidation = function(content) {
+      if(content){
+         var lines = content.split('\n');
+         for(var line of lines){
+            for(var iChar = 0; iChar < line.length; iChar++){
+               var char = fixedCharAt(line,iChar);
+               if(!self.isCharValid(char)){
+                  if(!((iChar > 0 && self.isPairValid(line.charAt(iChar - 1)+char)) || (iChar < line.length - 1 && self.isPairValid(char+line.charAt(iChar + 1))))){
+                     self.displayError(char+" is not a valid symbol for this grammar");
+                     return false;
+                  }
+               }
+            }
+         }
+      }
+      return true
+   };
+
+   function fixedCharAt(str, idx) {
+      var ret = '';
+      str += '';
+      var end = str.length;
+
+      var surrogatePairs = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+      while ((surrogatePairs.exec(str)) != null) {
+         var li = surrogatePairs.lastIndex;
+         if (li - 2 < idx) {
+            idx++;
+         } else {
+            break;
+         }
+      }
+
+      if (idx >= end || idx < 0) {
+         return '';
+      }
+
+      ret += str.charAt(idx);
+
+      if (/[\uD800-\uDBFF]/.test(ret) && /[\uDC00-\uDFFF]/.test(str.charAt(idx+1))) {
+         // On avance d'un puisque l'un des caractères fait partie de la paire
+         ret += str.charAt(idx+1); 
+      }
+      return ret;
+   }
+
+   this.isCharValid = function(char) {
+      if(this.grammar.alphabet.includes(char) || char == "." || char == dot || char == arrow || char == " " || char == "$" || char == ""){
+         return true
+      }else{
+         return false
+      }
+   };
+
+   this.isPairValid = function(pair) {
+      if(pair == "S'" || pair == "->"){
+         return true
+      }
+      return false
+   };
+
+   this.clickCell = function() {
+      console.log($(this).attr("data_state")+" "+$(this).attr("data_symbol"));
+      var cellContent = $(this).text();
+      if(self.cellEditor){
+         self.cellEditor.remove();
+      }
+      self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\">");
+      $(this).append(self.cellEditor);
    };
 
    this.saveAnswer = function() {
@@ -1319,7 +1429,7 @@ function LR_Parser(settings,subTask,answer) {
             var lrClosureTable = this.lrClosureTable.kernels;
             var vertices = this.graph.getAllVertices();
             var terminalState = this.getTerminalState();
-            if(vertices.length != lrClosureTable.length +1){
+            if(vertices.length != lrClosureTable.length + 1){
                this.displayError("The number of states in your automaton is incorrect")
             }else if(!terminalState){
                this.displayError("Wrong terminal state")
@@ -1353,11 +1463,11 @@ function LR_Parser(settings,subTask,answer) {
                   }
                   for(var item of state.closure){
                      var rule = item.rule.index;
-                     var dot = item.dotIndex;
+                     var dotIndex = item.dotIndex;
                      var itemFound = false;
                      for(var line of content){
                         var lineInfo = this.readLine(line);
-                        if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dot){
+                        if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dotIndex){
                            itemFound = true;
                            break;
                         }
