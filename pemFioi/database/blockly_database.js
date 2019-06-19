@@ -22,7 +22,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord(%1, %2)',
                 unionTables: 'unionTables(%1, %2)',
                 displayRecord: 'displayRecord(%1)',
-                displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)'
+                displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
+                printConsole: 'printConsole(%1)',
+                displayTableOnGraph: 'displayTableOnGraph(%1, %2)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -41,7 +43,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord',
                 unionTables: 'unionTables',
                 displayRecord: 'displayRecord',
-                displayTableOnMap: 'displayTableOnMap'
+                displayTableOnMap: 'displayTableOnMap',
+                printConsole: 'printConsole',
+                displayTableOnGraph: 'displayTableOnGraph'
             },
             description: {
 /*                loadTable: 'loadTable()',
@@ -60,7 +64,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord()',
                 unionTables: 'unionTables()',
                 displayRecord: 'displayRecord()',
-                displayTableOnMap: 'displayTableOnMap()'
+                displayTableOnMap: 'displayTableOnMap()',
+                printConsole: 'printConsole()',
+                displayTableOnGraph: 'displayTableOnGraph()'
 */
             },
             startingBlockName: "Programme",
@@ -108,7 +114,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord(%1, %2)',
                 unionTables: 'unionTables(%1, %2)',
                 displayRecord: 'displayRecord(%1)',
-                displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)'
+                displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
+                printConsole: 'printConsole(%1)',
+                displayTableOnGraph: 'displayTableOnGraph(%1, %2)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -127,7 +135,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord',
                 unionTables: 'unionTables',
                 displayRecord: 'displayRecord',
-                displayTableOnMap: 'displayTableOnMap'
+                displayTableOnMap: 'displayTableOnMap',
+                printConsole: 'printConsole',
+                displayTableOnGraph: 'displayTableOnGraph'
             },
             description: {
 /*                loadTable: 'loadTable()',
@@ -146,7 +156,9 @@ var getContext = function(display, infos) {
                 insertRecord: 'insertRecord()',
                 unionTables: 'unionTables()',
                 displayRecord: 'displayRecord()',
-                displayTableOnMap: 'displayTableOnMap()'
+                displayTableOnMap: 'displayTableOnMap()',
+                printConsole: 'printConsole()',
+                displayTableOnGraph: 'displayTableOnGraph()'
 */
             },
             startingBlockName: "Programme",
@@ -299,14 +311,22 @@ var getContext = function(display, infos) {
         }
     }
 
-
+    /*
+    Blockly.JavaScript['text_print'] = function(block) {
+        db_helper.displayConsole(Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''");
+        return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ");\n";
+    };
+    Blockly.JavaScript['text_print_noend'] = function(block) {
+        db_helper.displayConsole(Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''");
+        return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ", '');\n";
+    };
+    */
     context.database = {
 
         loadTable: function(name, callback) {
             if(!task_tables[name]) throw new Error(strings.messages.table_not_found + name);
             context.waitDelay(callback, Table(task_tables[name]));
         },
-
 
         loadTableFromCsv: function(fileNumber, types, callback) {
             var file = files.getFile(fileNumber - 1);
@@ -385,25 +405,34 @@ var getContext = function(display, infos) {
                 records: [
                     Object.values(record),
                 ]
-            }
+            };
             res.columnTypes = Array.apply(null, Array(res.records[0].length)).map(function() {
                 return 'string';
-            })
-            var table = Table(res)
+            });
+            var table = Table(res);
             db_helper.displayTable(table);
             context.waitDelay(callback);
         },
-
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
             db_helper.displayTableOnMap(
                 table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
             );
             context.waitDelay(callback);
-        }
+        },
+
+        printConsole: function(text, callback) {
+            db_helper.displayConsole(text);
+            context.waitDelay(callback);
+        },
+
+        displayTableOnGraph: function(table, nameColumn, callback) {
+            db_helper.displayTableOnGraph(
+                table.selectColumns([nameColumn]),
+            );
+            context.waitDelay(callback);
+        },
     }
-
-
 
     context.customBlocks = {
         database: {
@@ -414,7 +443,7 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'loadTableFromCsv',
-                    params: ['String', 'Block'],
+                    params: ['String', 'Number'],
                     params_names: ['file', 'columnTypes'],
                     yieldsValue: true
                 },
@@ -479,7 +508,7 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'displayTable',
-                    params: ['Block', 'Block'],
+                    params: ['Block', 'Number'],
                     params_names: ['table', 'columns'],
                 },
                 { name: 'displayRecord',
@@ -489,7 +518,15 @@ var getContext = function(display, infos) {
                 { name: 'displayTableOnMap',
                     params: ['Block', 'String','String', 'String'],
                     params_names: ['table', 'nameColumn', 'longitudeColumn', 'latitudeColumn'],
-                }
+                },
+                { name: 'printConsole',
+                    params: ['String'],
+                    params_names: ['text'],
+                },
+                { name: 'displayTableOnGraph',
+                    params: ['Block', 'String'],
+                    params_names: ['table', 'nameColumn'],
+                },
             ]
         }
     }
