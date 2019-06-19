@@ -32,32 +32,52 @@ function DatabaseHelper(options) {
 
     var renderers = {
         html: new TableRendererHtml(options),
-        map: new TableRendererMap(options)
+        map: new TableRendererMap(options),
+        graph: new TableRendererGraph(options),
+        console: new ConsoleRenderer(options),
     }
     var last_renderer = null;
     var last_table = null;
 
+    this.hide = function() {
+        renderers.html.hide();
+        renderers.map.hide();
+        renderers.graph.hide();
+        renderers.console.hide();
+    };
 
     this.displayTable = function(table) {
         last_table = table;
-        renderers.map.hide();
+        this.hide();
         renderers.html.displayTable(table);
         last_renderer = 'html';
-    }
-
+    };
 
     this.displayTableOnMap = function(table) {
         last_table = table;
-        renderers.html.hide();
+        this.hide();
         renderers.map.displayTable(table);
         last_renderer = 'map';
-    }
+    };
 
+    this.displayTableOnGraph = function(table) {
+        last_table = table;
+        this.hide();
+        renderers.graph.displayTable(table);
+        last_renderer = 'graph';
+    };
+
+    this.displayConsole = function(variable) {
+        this.hide();
+        renderers.console.print(variable);
+    };
 
     this.validateResult = function(reference_table) {
-        if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
-            return 'incorrect_results';
-        }
+        this.hide();
+        //FIXME la last table stockée est celle sui ne contient que namecolumn dans graph, ou nam let et lng dans Map, ca n'a pas de sens de refuser une table trop complete ??
+        //if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
+        //    return 'incorrect_results';
+        //}
         if(last_table.params().records.length < reference_table.params().records.length) {
             return 'some_results_missing';
         }
@@ -66,8 +86,7 @@ function DatabaseHelper(options) {
             return 'incorrect_results';
         }
         return true;
-    }
-
+    };
 
     this.loadCsv = function(file, types, callback) {
         var reader = new FileReader();
@@ -75,7 +94,7 @@ function DatabaseHelper(options) {
             var res = {
                 columnTypes: types,
                 records: []
-            }
+            };
             var lines = reader.result.split(/\r\n|\n/);
             for(var i=0, line; line=lines[i]; i++) {
                 if(i === 0) {
@@ -85,22 +104,23 @@ function DatabaseHelper(options) {
                 }
             }
             callback(Table(res));
-        }
+        };
         reader.readAsText(file);
-    }
-
+    };
 }
-
-
 
 
 function TableRendererHtml(options) {
 
-
     var container = $('<div class="database">');
     container.hide();
     options.parent.append(container);
-
+    this.clear = function() {
+        container.html("");
+    }
+    this.hide = function() {
+        container.hide();
+    }
 
     this.formatValue = function(value, type) {
         if(value === null) {
@@ -117,8 +137,6 @@ function TableRendererHtml(options) {
         }
         return '';
     }
-
-
 
     this.displayTable = function(table, reference_table) {
         var html = '';
@@ -161,28 +179,19 @@ function TableRendererHtml(options) {
         container.show();
         return valid_all;
     }
-
-
-    this.hide = function() {
-        container.hide();
-    }
-
-}
-
-
-
-if(typeof(Number.prototype.toRad) === "undefined") {
-    Number.prototype.toRad = function() {
-        return this * Math.PI / 180;
-    }
 }
 
 function TableRendererMap(options) {
 
-    var container = $('<div>');
+    var container = $('<div class="renderer_map">');
     container.hide();
     options.parent.append(container);
-
+    this.clear = function() {
+        renderer.clear("");
+    }
+    this.hide = function() {
+        container.hide();
+    }
 
     function Renderer() {
 
@@ -272,13 +281,12 @@ function TableRendererMap(options) {
         canvas.width = options.width;
         canvas.height = options.height;
 
-        container.append($(canvas))
+        container.append($(canvas));
         var context = canvas.getContext('2d');
 
         context.textAlign = 'center';
         context.font = options.font_size + 'px sans-serif';
     }
-
 
     function validateLng(lng) {
         if(isNaN(lng)) {
@@ -297,7 +305,6 @@ function TableRendererMap(options) {
             throw new Error('Latitude is outside of the map')
         }
     }
-
 
     // interface
     this.displayTable = function(table, reference_table) {
@@ -321,18 +328,119 @@ function TableRendererMap(options) {
         return valid_all;
     }
 
+    // init
+    var renderer = new Renderer();
+}
 
+function TableRendererGraph(options) {
+
+    var container = $('<div class="renderer_graph">');
+    container.hide();
+    options.parent.append(container);
+    this.clear = function() {
+        renderer.clear("");
+    }
     this.hide = function() {
         container.hide();
+    }
+
+    function Renderer() {
+
+        function rgba(colors, opacity) {
+            return 'rgba(' + colors.r + ',' + colors.g + ',' + colors.b + ',' + opacity + ')';
+        }
+        this.clear = function() {
+            context.fillStyle = rgba(options.background_color, 1);
+            context.fillRect(0, 0, options.width, options.height)
+        };
+        this.init = function() {
+            context.beginPath();
+            context.moveTo(0,0);
+            context.lineTo(0,options.height);
+            context.lineTo(options.width,options.height);
+            context.lineTo(0,options.height);
+        };
+        this.point = function(x,xMax,y,yMin,yMax) {context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));};
+        this.show = function() {context.stroke();};
+
+        var canvas = document.createElement('canvas');
+        canvas.width = options.width;
+        canvas.height = options.height;
+
+        container.append($(canvas));
+        var context = canvas.getContext('2d');
+
+        context.textAlign = 'center';
+        context.font = options.font_size + 'px sans-serif';
+    }
+
+    // interface
+    this.displayTable = function(table, reference_table) {
+        renderer.clear();
+        var rows = table.params().records;
+
+        var valid_value = true;
+        var valid_all = true;
+
+        var reference_rows = reference_table ? reference_table.params().records : null;
+
+        renderer.init();
+        var yMin = rows[0][0];
+        var yMax = rows[0][0];
+        for(var i=0, row; row=rows[i]; i++) {
+            if (yMax < row[0]) {yMax = row[0];}
+            if (yMin > row[0]) {yMin = row[0];}
+        }
+        for(i=0; row=rows[i]; i++) {
+            if(reference_rows) {
+                valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+            }
+            valid_all = valid_all && valid_value;
+            renderer.point(i,rows.length-1,row[0],yMin,yMax);
+        }
+        renderer.show();
+        container.show();
+
+        return valid_all;
     }
 
     // init
     var renderer = new Renderer();
 }
 
+function ConsoleRenderer(options) {
+
+    var container = $('<div class="console">');
+    container.hide();
+    options.parent.append(container);
+    this.clear = function() {
+        container.html("");
+    };
+    this.hide = function() {
+        container.hide();
+    };
+
+    //TODO option pour mettre la console en superposition avec le renderer actuel >> ca rend tres moche en fait
+    //TODO option pour mettre la console dans un onglet alternatif
+    //TODO integrer la console a la librairie d'onglets de renderers
+    //TODO une fois la librairie d'onglets de renderer créée, deplacer son CSS au même endroit
+
+    this.print = function(variable) {
+        nd = new Date();
+        var html = "<div class='console_time'>["+("0"+nd.getHours()).slice(-2)+":"+("0"+nd.getMinutes()).slice(-2)+"]</div><div class='console_row'>"+variable+"</div>";
+        container.append(html);
+        container.show();
+    }
+
+}
 
 
 
+if(typeof(Number.prototype.toRad) === "undefined") {
+    Number.prototype.toRad = function() {
+        return this * Math.PI / 180;
+    }
+}
 
 function Table(params) {
 

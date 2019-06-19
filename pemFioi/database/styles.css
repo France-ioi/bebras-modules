@@ -31,3 +31,23 @@
 .database td.invalid {
     background: #FFAAAA;
 }
+
+
+
+
+/* console renderer */
+.console {
+    height:400px;
+    width:400px;
+    overflow-x: hidden
+}
+.console .console_row {
+    text-align:left;
+}
+.console .console_time {
+    color:darkgray;
+    width: 55px;
+    float: left;
+    text-align: left;
+    overflow: hidden;
+}
