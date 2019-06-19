@@ -397,9 +397,15 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
       var textSize = this.getTextSize(content);
+      // var test = $("<p>"+content+"</p>");
+      // test.css("display","inline");
+      // $("body").append(test);
+      // var testW = test.width();
+      // test.remove();
       var minW = 2*this.circleAttr.r + 50;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
-      var w = Math.max(0.8*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
+      var w = Math.max(0.7*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
+      // var w = Math.max(testW, minW);
       var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
       return { w: w, h: h };
    };
