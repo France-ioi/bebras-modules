@@ -184,7 +184,11 @@ function PythonInterpreter(context, msgCallback) {
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else {
-      return val.v;
+      var retVal = val.v;
+      if(val instanceof Sk.builtin.tuple) {
+         retVal.isTuple = true;
+      }
+      return retVal;
     }
   };
 

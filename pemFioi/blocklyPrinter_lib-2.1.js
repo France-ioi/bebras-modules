@@ -223,7 +223,12 @@ var getContext = function(display, infos) {
                }
                value[i] = valueToStr(value[i]);
             }
-            return '[' + value.join(', ') + ']';
+            if(oldValue.isTuple) {
+               if(value.length == 1) { value.push(''); }
+               return '(' + value.join(', ') + ')';
+            } else {
+               return '[' + value.join(', ') + ']';
+            }
          } else if(value === true) {
             return 'True';
          } else if(value === false) {
