@@ -1372,7 +1372,6 @@ function GraphEditor(settings) {
    }else{
       this.vertexLabelPrefix = settings.vertexLabelPrefix;
    }
-   console.log(this.vertexLabelPrefix);
    this.loopIcon = null;
    this.cross = null;
    this.edgeCross = null;
@@ -1381,7 +1380,7 @@ function GraphEditor(settings) {
    this.pencil = null;
 
    this.textEditor = null;
-   this.editionInfo = {};
+   this.editInfo = {};
    this.edited = false; // true when label or content has just been modified
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
@@ -1557,8 +1556,10 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
+
       console.log("vertex")
       if(selected) {
+         self.edited = false;
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          var vInfo = visualGraph.getVertexVisualInfo(vertexId);
@@ -1593,7 +1594,8 @@ function GraphEditor(settings) {
 
    this.defaultOnPairSelect = function(id1,id2) {
       console.log("pair");
-      if(!self.createEdgeEnabled)
+      self.startDragCallback(id1);
+      if(!self.createEdgeEnabled || self.edited)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -2456,13 +2458,17 @@ function GraphEditor(settings) {
       }else{
          var validContent = true;
       }
-
+      
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldContent !== newContent && validContent){
          info.content = newContent;
          graph.setVertexInfo(id,info);
          self.edited = true;
       }
+      if(oldContent !== newContent && !validContent){
+         self.edited = true
+      }
+
       if(self.textEditor){
          self.textEditor.remove();
          self.editInfo = {};
@@ -2530,24 +2536,26 @@ function GraphEditor(settings) {
    };
 
    this.startDragCallback = function(ID) {
-      // console.log("start drag callback");
-      var vertices = graph.getAllVertices();
-      for(var iVertex = 0; iVertex < vertices.length; iVertex++){
-         var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
-         if(self.textEditor){
-            if(self.editInfo.id == ID){
-               if(self.editInfo.field == "label"){
-                  self.writeLabel(ID,self.editInfo.type);
-               }else{
-                  self.writeContent(ID);
+      console.log("start drag callback");
+      if(self.textEditor){
+         var vertices = graph.getAllVertices();
+         for(var iVertex = 0; iVertex < vertices.length; iVertex++){
+            var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
+            
+               if(self.editInfo.id == ID){
+                  if(self.editInfo.field == "label"){
+                     self.writeLabel(ID,self.editInfo.type);
+                  }else{
+                     self.writeContent(ID);
+                  }
                }
-            }
-            self.textEditor.remove();
+               self.textEditor.remove();
+            
+            if(vertexRaph[1])
+               vertexRaph[1].show();
+            if(vertexRaph[3])
+               vertexRaph[3].show();
          }
-         if(vertexRaph[1])
-            vertexRaph[1].show();
-         if(vertexRaph[3])
-            vertexRaph[3].show();
       }
       var edges = graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
