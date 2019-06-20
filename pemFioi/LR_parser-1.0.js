@@ -1754,9 +1754,7 @@ function LR_Parser(settings,subTask,answer) {
    this.styleTabs = function() {
       if(!this.sideTable){
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-            margin: "1em auto",
-            height: this.paperHeight+"px",
-            width: this.paperWidth+"px"
+            margin: "1em auto"
          });
 
          $("#"+this.parseTableID+" table").css({
@@ -1786,7 +1784,6 @@ function LR_Parser(settings,subTask,answer) {
             "flex-direction": "row",
             "justify-content": "space-around",
             // "flex-wrap": "wrap-reverse",
-            // overflow: "auto",
             margin: "1em 0"
          });
          // $("#"+this.tabsContainerID+" > *").css({
