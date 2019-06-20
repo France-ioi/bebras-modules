@@ -8,6 +8,7 @@ function loadQuizModules() {
         'platform-pr',
         'installationAPI.01',
         'miniPlatform',
+        'fonts-loader-1.0',
         'quiz_styles',
         'quiz',
         'quiz_task',

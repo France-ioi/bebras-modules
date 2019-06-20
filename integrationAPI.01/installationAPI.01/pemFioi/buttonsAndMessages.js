@@ -948,6 +948,19 @@ window.displayHelper = {
          afterReload();
       }
    },
+
+   getImgPath: function() {
+      if(window.contestsRoot) {
+         // Hack: when in the context of the platform, we need to change the path
+         return window.contestsRoot + '/' + window.contestFolder + '/';
+      } else if(window.modulesPath) {
+         var modulesPath = window.modulesPath[window.modulesPath.length-1] == '/' ? window.modulesPath : window.modulesPath + '/';
+         return modulesPath + 'img/';
+      } else {
+         return '../../../_common/modules/img/';
+      }
+   },
+
    getAvatar: function(mood) {
       if (displayHelper.avatarType == "beaver") {
          return "castor.png";
@@ -970,8 +983,7 @@ window.displayHelper = {
 
       $('#popupMessage').addClass('floatingMessage');
 
-      // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
+      var imgPath = displayHelper.getImgPath();
 
       var popupHtml = '<div class="container">' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
@@ -987,6 +999,10 @@ window.displayHelper = {
    },
 
 
+   errorPopupAvatar: function() {
+      $('#popupMessage').addClass('noAvatar');
+   },
+
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
@@ -997,9 +1013,9 @@ window.displayHelper = {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
       }
+      $('#popupMessage').removeClass('noAvatar');
 
-      // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
+      var imgPath = displayHelper.getImgPath();
       if(mode == 'lock') {
          var buttonYes = '';
       } else if (mode == 'input') {
@@ -1012,7 +1028,7 @@ window.displayHelper = {
          buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + noButtonText + '</button>';
       }
       var popupHtml = '<div class="container">' +
-         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
+         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '" onerror="displayHelper.errorPopupAvatar();"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>';
       if(mode == 'input') {

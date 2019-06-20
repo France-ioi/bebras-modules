@@ -4,6 +4,8 @@ function LR_Parser(settings,subTask,answer) {
    /* 
    1: simulation
    2: execute existing automaton
+   3: create automaton
+   4: create parse table
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -20,12 +22,15 @@ function LR_Parser(settings,subTask,answer) {
 
    this.timeOutID;
    this.animationTime = 1000;
+   this.token;
 
    this.divID = settings.divID,
    this.parseInfoID = "parseInfo";
    this.parseTableID = "parseTable";
    this.graphPaperID = "graphPaper";
    this.tabsID = "tabs";
+   this.tabsContainerID = "tabsCont";
+   this.sideTable = false;
 
    this.paper;
    this.paperHeight = settings.paperHeight;
@@ -39,14 +44,19 @@ function LR_Parser(settings,subTask,answer) {
    this.graphEditor;
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
-   this.selectedTab = 0;
+   this.selectedTab = (this.mode != 4) ? 0 : 1;
    this.cursor;
    this.selectedVertex = null;
    this.selectedRule = null;
    this.selectedStackElements = [];
 
+   this.cellEditor = null;
+
    this.accept = false;
    this.error = false;
+
+   var arrow = "🡒";
+   var dot = "🞄";
 
    this.colors = {
       black: "#4a4a4a",
@@ -75,6 +85,10 @@ function LR_Parser(settings,subTask,answer) {
       "stroke": this.colors.yellow,
      "stroke-width": 5,
    };
+   this.defaultSelectedEdgeAttr = {
+      "stroke": this.colors.yellow,
+     "stroke-width": 6,
+   };
    this.defaultCurrentStateAttr = {
       "fill": this.colors.blue
    };
@@ -95,30 +109,36 @@ function LR_Parser(settings,subTask,answer) {
    this.vertexLabelAttr = settings.vertexLabelAttr || this.defaultVertexLabelAttr;
    this.vertexContentAttr = settings.vertexContentAttr || this.defaultVertexContentAttr;
    this.selectedVertexAttr = settings.selectedVertexAttr || this.defaultSelectedVertexAttr;
-
+   this.selectedEdgeAttr = settings.selectedEdgeAttr || this.defaultSelectedEdgeAttr;
 
    this.init = function() {
       var html = "";
       html += "<div id=\""+this.tabsID+"\"></div>";
+      html += "<div id=\""+this.tabsContainerID+"\">";
       html += "<div id=\""+this.graphPaperID+"\"></div>";
       html += "<div id=\""+this.parseTableID+"\"></div>";
+      html += "</div>";
       html += "<div id=\""+this.parseInfoID+"\"></div>";
 
       $("#"+this.divID).html(html);
       this.initParser();
       this.initTabs();
-      this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
       this.initAutomata();
-      if(this.mode == 1){
+      if(this.mode != 2){
          this.initActionSequence();
       }
       this.initParseTable();
       this.showTab();
+      
       this.initParseInfo();
 
       this.style();
-      this.updateState();
+      this.updateState(false);
       this.initHandlers();
+      // console.log(this.grammar);
+      if(this.mode == 3){
+         this.onResize();
+      }
    };
 
    this.initTabs = function() {
@@ -134,35 +154,56 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initAutomata = function() {
-      this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
-      this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
-      this.graphDrawer.setVertexContentAttr(this.vertexContentAttr);
+      if(!this.paper){
+         this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
+      }
+      if(!this.graphDrawer){
+         this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
+         this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
+         this.graphDrawer.setVertexContentAttr(this.vertexContentAttr);
+      }
+      if(this.visualGraph){
+         this.visualGraph.remove();
+      }
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, "visualGraph", this.paper, null, this.graphDrawer, true);
       this.graph = this.visualGraph.graph;
-      if(this.mode != 1){
+      if(this.mode != 1 && this.mode != 4){
          this.graphMouse = new GraphMouse("graphMouse",this.graph,this.visualGraph);
-         this.graphEditor = new GraphEditor({
+         var graphEditorSettings = {
             paper: this.paper,
             graph: this.graph,
             paperElementID: this.graphPaperID,
             visualGraph: this.visualGraph,
             graphMouse: this.graphMouse,
-            // dragThreshold: 10,
-            // edgeThreshold: 20,
-            // dragLimits: {
-            //    minX: this.visualGraph.graphDrawer.circleAttr.r,
-            //    maxX: this.graphPaper.width - this.visualGraph.graphDrawer.circleAttr.r,
-            //    minY: this.visualGraph.graphDrawer.circleAttr.r,
-            //    maxY: this.graphPaper.height - this.visualGraph.graphDrawer.circleAttr.r
-            // },
             // alphabet: this.alphabet,
-            // callback: this.callback,
-            // onDragEnd: this.callback,
             selectedVertexAttr: this.selectedVertexAttr,
-            selectVertexCallback: this.onVertexSelect,
+            selectedEdgeAttr: this.selectedEdgeAttr,
             enabled: true
-         });
-         // if(this.mode == 2){
+         };
+         if(this.mode == 2){
+            graphEditorSettings.selectVertexCallback = this.onVertexSelect;
+         }
+         if(this.mode == 3){
+            graphEditorSettings.dragThreshold = 10;
+            graphEditorSettings.edgeThreshold = 20;
+            graphEditorSettings.dragLimits = {
+               minX: this.visualGraph.graphDrawer.circleAttr.r,
+               maxX: this.paper.width - this.visualGraph.graphDrawer.circleAttr.r,
+               minY: this.visualGraph.graphDrawer.circleAttr.r,
+               maxY: this.paper.height - this.visualGraph.graphDrawer.circleAttr.r
+            };
+            graphEditorSettings.callback = this.graphEditorCallback;
+            graphEditorSettings.selectVertexCallback = this.selectVertexCallback;
+            graphEditorSettings.contentValidation = this.contentValidation;
+            graphEditorSettings.onDragEnd = this.graphEditorCallback;
+            graphEditorSettings.vertexLabelPrefix = "";
+         }
+         if(this.graphEditor){
+            this.graphEditor.setEnabled(false);
+            this.graphEditor = null;
+         }
+         this.graphEditor = new GraphEditor(graphEditorSettings);
+         if(this.mode == 2){            
             this.graphEditor.setCreateVertexEnabled(false);
             this.graphEditor.setCreateEdgeEnabled(false);
             this.graphEditor.setVertexDragEnabled(false);
@@ -174,11 +215,24 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setEditEdgeLabelEnabled(false);
             this.graphEditor.setTerminalEnabled(false);
             this.graphEditor.setInitialEnabled(false);
-         // }
+         }else if(this.mode == 3){
+            this.paper.rect(1,1,this.paperWidth - 2, this.paperHeight - 2);
+            this.graphEditor.setTableMode(true);
+            this.graphEditor.setMultipleEdgesEnabled(false);
+            this.graphEditor.setLoopEnabled(false);
+            this.graphEditor.setInitialEnabled(false);
+         }
+         this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
+      this.formatContent();
+      this.visualGraph.redraw();
+      this.graphEditor.updateHandlers();
    };
 
    this.initActionSequence = function() {
+      if(this.actionSequence){
+         this.actionSequence = [];
+      }
       if(this.input.charAt(this.input.length - 1) != "$"){
          this.input += "$";
       }
@@ -192,7 +246,8 @@ function LR_Parser(settings,subTask,answer) {
       do{
          nLoop++;
          var action = this.lrTable.states[state][symbol];
-         if(action){
+
+         if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))){
             switch(action[0].actionType){
                case "s":
                   this.actionSequence.push({
@@ -254,11 +309,13 @@ function LR_Parser(settings,subTask,answer) {
          html += "<tr>";
          html += "<td>"+state.index+"</td>";
          for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            html += "<td>";
-            if(state[colLabel[iCol]]){
-               html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
-            }else if(colLabel[iCol] == "S" && state.index == 0){
-               html += "Acc."
+            html += "<td data_state=\""+state.index+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            if(this.mode != 4){
+               if(state[colLabel[iCol]]){
+                  html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
+               }else if(colLabel[iCol] == "S" && state.index == 0){
+                  html += "Acc."
+               }
             }
             html += "</td>";
          }
@@ -378,26 +435,38 @@ function LR_Parser(settings,subTask,answer) {
    this.initHandlers = function() {
       $("#"+this.tabsID+" #switchContainer").off("click");
       $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
-      if(this.mode != 1){
-         $("#reduceButton").off("click");
-         $("#reduceButton").click(self.reduce);
-         $("#shiftButton").off("click");
-         $("#shiftButton").click(self.shift);
-         $(".stackElement").off("click");
-         $(".stackElement").click(self.selectStackElement);
-         $(".rule").off("click");
-         $(".rule").click(self.selectRule);
-         $(".rule, .actionButton, #stackTable .stackElement").css({
-            cursor: "pointer"
-         });
-         this.initPlayerHandlers();
-         $("#acceptButton").off("click");
-         $("#acceptButton").click(self.acceptInput);
-         $("#errorButton").off("click");
-         $("#errorButton").click(self.refuseInput);
-      }else{
-         this.initPlayerHandlers();
+      switch(this.mode){
+         case 2:
+            $("#reduceButton").off("click");
+            $("#reduceButton").click(self.reduce);
+            $("#shiftButton").off("click");
+            $("#shiftButton").click(self.shift);
+            $(".stackElement").off("click");
+            $(".stackElement").click(self.selectStackElement);
+            $(".rule").off("click");
+            $(".rule").click(self.selectRule);
+            $(".rule, .actionButton, #stackTable .stackElement").css({
+               cursor: "pointer"
+            });
+            this.initPlayerHandlers();
+            $("#acceptButton").off("click");
+            $("#acceptButton").click(self.acceptInput);
+            $("#errorButton").off("click");
+            $("#errorButton").click(self.refuseInput); 
+            break;
+         case 3:
+            this.initPlayerHandlers();
+            // $(window).off("resize");
+            $(window).resize(self.onResize);
+            break;
+         case 4:
+            $("#"+this.parseTableID+" td").off("click");
+            $("#"+this.parseTableID+" td").click(self.clickCell);
+            break;
+         default:
+            this.initPlayerHandlers();
       }
+
    };
 
    this.initPlayerHandlers = function() {
@@ -444,6 +513,25 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
+   this.onResize = function() {
+      var width = $(window).width();
+      var sideTable = true;
+      if(width < 1180){
+         sideTable = false
+      }
+      if(self.sideTable != sideTable){
+         self.sideTable = sideTable;
+         self.styleTabSwitch();
+         self.styleTabs();
+         if(self.sideTable){
+            $("#"+self.graphPaperID).show();
+            $("#"+self.parseTableID).show();
+         }else{
+            self.showTab();
+         }
+      }
+   };
+
    this.reset = function() {
       this.stack = [["0", "#"]];
       this.inputIndex = 0;
@@ -452,9 +540,18 @@ function LR_Parser(settings,subTask,answer) {
       this.selectedRule = null;
       $(".rule").removeClass("selected");
       this.selectedStackElements = [];
+      this.updateStackTable();
+      this.updateState(false);
+      this.error = false;
+      this.accept = false;
+
       this.styleRules();
       this.styleStackTable();
       this.styleProgressBar();
+      $("#acceptButton, #errorButton").css({
+         "background-color": this.colors.blue
+      });
+
    };
 
    this.runSimulation = function() {
@@ -464,20 +561,22 @@ function LR_Parser(settings,subTask,answer) {
       self.resetFeedback();
       self.reset();
       self.runSimulationLoop(self.simulationStep,true,false,true);
+      if(self.mode == 3){
+         self.graphEditor.setEnabled(false);
+      }
    };
 
    this.runSimulationLoop = function(step,loop,reverse,anim) {
-      // console.log(step+" "+this.actionSequence.length);
+      // console.log(step+" "+loop+" "+reverse+" "+anim)
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
       this.disablePlayerSteps();
       this.disableProgressBarClick();
-      // console.log(step+" "+action.actionType);
-      if(progress > 100){
-         self.pauseSimulation(true);
-      }else{
-         if(!anim){
-            var animationTime = 0;
+      // console.log(progress);
+      if(progress <= 100){
+         if(!anim || action.actionType == "error"){
+            var animationTime = (step == 0 && this.actionSequence.length <= 1) ? 100 : 0;
+            // var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
          }
@@ -498,7 +597,8 @@ function LR_Parser(settings,subTask,answer) {
          });
       }
       if(!action){
-         self.pauseSimulation(true);
+         // console.log("check")
+         self.pauseSimulation(null,true);
          return;
       }
             
@@ -528,7 +628,7 @@ function LR_Parser(settings,subTask,answer) {
             if(anim){
                this.timouOutID = setTimeout(function() {
                   var nonTerminal = self.grammar.rules[rule].nonterminal;
-                  var goto = action.goto;
+                  var goto = action.goto || self.getPreviousState();
                   self.applyReduction(nonTerminal,goto,true);
                }, self.animationTime);
             }else{
@@ -536,24 +636,38 @@ function LR_Parser(settings,subTask,answer) {
                var goto = action.goto;
                self.applyReduction(nonTerminal,goto,false);
             }
-                                 
+            break;
+         case "error":
+            self.refuseInput();
+            break;
       }
    };
 
-   this.pauseSimulation = function(end) {
+   this.pauseSimulation = function(ev,end) {
       // console.log("pause");
-      if(!end)
-         self.simulationStep++;
-      // clearTimeout(self.timeOutID);
-      // subTask.raphaelFactory.stopAnimate("anim");
-      $("#progressBar").stop();
+      if(!end){
+         clearTimeout(self.timeOutID);
+         subTask.raphaelFactory.stopAnimate("anim");
+         $("#progressBar").stop();
+         self.replayUpTo(self.simulationStep);
+         if(self.token){
+            self.token.remove();
+         }
+      }
+
       $("#play i").removeClass("fa-pause").addClass("fa-play");
       self.initPlayerHandlers();
+      if(self.mode == 3){
+         // console.log("enab");
+         self.graphEditor.setEnabled(true);
+         self.graphEditor.setMultipleEdgesEnabled(false);
+         self.graphEditor.setLoopEnabled(false);
+         self.graphEditor.setInitialEnabled(false);
+      }
    };
 
    this.stepBackward = function() {
       self.resetFeedback();
-      // console.log(self.simulationStep);
       if(self.simulationStep < 1){
          return;
       }else{
@@ -603,13 +717,6 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      // if($(this).hasClass("selected")){
-      //    $(".stackElement[data_col="+col+"]").removeClass("selected");
-      //    self.selectedStackElements = self.selectedStackElements.filter(element => element != col);
-      // }else{
-      //    $(".stackElement[data_col="+col+"]").addClass("selected");
-      //    self.selectedStackElements.push(col);
-      // }
       self.styleStackTable();
    };
 
@@ -631,7 +738,7 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+self.tabTag[self.selectedTab]).removeClass("selectedTab");
       self.selectedTab = 1 - self.selectedTab;
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
-      self.styleTabs();
+      self.styleTabSwitch();
       self.showTab();
    };
 
@@ -654,6 +761,7 @@ function LR_Parser(settings,subTask,answer) {
             return vertex;
          }
       }
+      return false;
    };
 
    /* REDUCE */
@@ -722,19 +830,33 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.getTerminalState = function() {
-      var vertices = this.graph.getAllVertices();
-      for(var vertex of vertices){
-         var info = this.graph.getVertexInfo(vertex);
-         if(info.terminal){
-            return info.label;
+      var initVertex = this.getStateID(0);
+      if(initVertex){
+         var children = this.graph.getChildren(initVertex);
+
+         for(var child of children){
+            var edges = this.graph.getEdgesFrom(initVertex,child);
+            if(edges.length > 0){
+               var edgeInfo = this.graph.getEdgeInfo(edges[0]);
+               if(edgeInfo.label == this.grammar.rules[0].nonterminal){
+                  var vertexInfo = this.graph.getVertexInfo(child);
+                  if(vertexInfo.terminal){
+                     return vertexInfo.label;
+                  }
+               }
+            }
          }
       }
-      return false;
+      return null;
    };
 
    this.getPreviousState = function() {
       var previousCol = parseInt(this.selectedStackElements.sort()[0]) - 1;
-      return this.stack[previousCol][0];
+      if(this.stack[previousCol]){
+         return this.stack[previousCol][0];
+      }else{
+         return null
+      }
    };
 
    this.applyReduction = function(nonTerminal,goto,anim) {
@@ -764,7 +886,7 @@ function LR_Parser(settings,subTask,answer) {
       var prevState = prevStates.pop();
       var selectedCol = self.selectedStackElements[prevStates.length];
       $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
-      this.changeStateAnim(state,prevState,animTime,function(){
+      this.changeStateAnim(state,prevState,animTime,true,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
          if(prevStates.length > 0){
             self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement);
@@ -862,7 +984,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       $("#stackTable").html(html);
       this.styleStackTable();
-      if(this.mode != 1){
+      if(this.mode == 2){
          $(".stackElement").off("click");
          $(".stackElement").click(self.selectStackElement);
       }
@@ -881,6 +1003,9 @@ function LR_Parser(settings,subTask,answer) {
 
    this.updateState = function(anim) {
       var id = this.getStateID(this.currentState);
+      if(!id){
+         return;
+      }
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
       if(!anim){
@@ -888,10 +1013,14 @@ function LR_Parser(settings,subTask,answer) {
       }else{
          var previousState = this.stack[this.stack.length - 2][0];
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
-      }      
+      }
+      if(this.currentState == this.getTerminalState()){
+         if(!this.accept)
+            this.acceptInput();
+      }     
    };
 
-   this.changeStateAnim = function(state1,state2,time,callback) {
+   this.changeStateAnim = function(state1,state2,time,reduction,callback) {
       var id2 = this.getStateID(state2);
       var v2 = this.visualGraph.getRaphaelsFromID(id2);
       var id1 = this.getStateID(state1);
@@ -900,7 +1029,14 @@ function LR_Parser(settings,subTask,answer) {
       var vInfo2 = this.visualGraph.getVertexVisualInfo(id2);
       var edgeID = this.graph.getEdgesBetween(id1,id2)[0];
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
-      if(!edgeVisualInfo["radius-ratio"]){
+      var initPos = vInfo1;
+      var finalPos = vInfo2;
+      if(state1 == state2){
+         if(this.token){
+            this.token.remove();
+         }
+         return
+      }else if(!edgeVisualInfo["radius-ratio"]){
          var alpha = this.visualGraph.graphDrawer.getAngleBetween(vInfo1.x,vInfo1.y,vInfo2.x,vInfo2.y);
          var info1 = this.graph.getVertexInfo(id1);
          var info2 = this.graph.getVertexInfo(id2);
@@ -911,32 +1047,71 @@ function LR_Parser(settings,subTask,answer) {
          var pos1 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo1.x,vInfo1.y,boxSize1.w,boxSize1.h,alpha + Math.PI);
          var pos2 = this.visualGraph.graphDrawer.getSurfacePointFromAngle(vInfo2.x,vInfo2.y,boxSize2.w,boxSize2.h,alpha);
 
-         var pos = {x:pos1.x,y:pos1.y};
-         var newPos = {cx:pos2.x,cy:pos2.y};
+         var step1 = {transform: "t"+(vInfo2.x - vInfo1.x)+","+(vInfo2.y - vInfo1.y)};
       }else{
          var param = this.visualGraph.graphDrawer.getEdgeParam(edgeID);
          var cPos = this.visualGraph.graphDrawer.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
          var alpha = (param.l) ? (Math.asin(param.D/(2*param.R)) + Math.PI) : Math.asin(param.D/(2*param.R));
          var alpha = -2*alpha*180/Math.PI;
          if(this.graph.getEdgesFrom(id1,id2).length > 0 && this.graph.getEdgesFrom(id1,id2)[0] == edgeID){
-            var pos = param.pos1;
-            var newPos = {transform:"r "+alpha+","+cPos.x+","+cPos.y};
+            var pos1 = param.pos1;
+            var pos2 = param.pos2;
+            var angle = alpha;
          }else{
-            var pos = param.pos2;
-            var newPos = {transform:"r "+(-alpha)+","+cPos.x+","+cPos.y};
+            var pos1 = param.pos2;
+            var pos2 = param.pos1;
+            var angle = -alpha;
          }
+         var distance1 = Math.sqrt((pos1.x - initPos.x) * (pos1.x - initPos.x) + (pos1.y - initPos.y) * (pos1.y - initPos.y));
+         var distance2 = Math.abs(param.R * alpha * Math.PI/180);
+         var distance3 = Math.sqrt((finalPos.x - pos2.x) * (finalPos.x - pos2.x) + (finalPos.y - pos2.y) * (finalPos.y - pos2.y));
+         var totalDistance = distance1 + distance2 + distance3;
+         var time1 = time * distance1 / totalDistance;
+         var time2 = time * distance2 / totalDistance;
+         var time3 = time * distance3 / totalDistance;
+         var step1 = {transform: "t"+(pos1.x - vInfo1.x)+","+(pos1.y - vInfo1.y)};
+         var step2 = {transform: "r "+angle+","+(cPos.x)+","+(cPos.y)};
+         var step3 = {transform: "t"+(vInfo2.x - pos2.x)+","+(vInfo2.y - pos2.y)};
       }
-      v1[0].attr(this.defaultCurrentStateAttr);
-      var token = this.paper.circle(pos.x,pos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
-      var anim = new Raphael.animation(newPos,time,function(){
-         self.resetStates();
-         v2[0].attr(self.defaultCurrentStateAttr);
-         token.remove();
-         self.displayMessage("reset");
-         if(callback)
-            callback();
-      });
-      subTask.raphaelFactory.animate("anim",token,anim);
+      v1[0].attr(this.defaultVertexAttr);
+      if(this.token){
+         this.token.remove();
+      }
+      this.token = this.paper.circle(initPos.x,initPos.y,10).attr({"fill":this.colors.blue,"stroke": "none"});
+      if(!edgeVisualInfo["radius-ratio"]){
+         var anim1 = new Raphael.animation(step1,time,function(){
+            self.resetStates();
+            if(!reduction){
+               v2[0].attr(self.defaultCurrentStateAttr);
+               self.token.remove();
+            }
+            self.displayMessage("reset");
+            if(callback)
+               callback();
+         });
+      }else{
+         var anim1 = new Raphael.animation(step1,time1,function(){
+            self.token.transform("");
+            self.token.attr({cx:pos1.x,cy:pos1.y});
+            subTask.raphaelFactory.animate("anim",self.token,anim2);
+         });
+         var anim2 = new Raphael.animation(step2,time2,function(){
+            self.token.transform("");
+            self.token.attr({cx:pos2.x,cy:pos2.y});
+            subTask.raphaelFactory.animate("anim",self.token,anim3);
+         });
+         var anim3 = new Raphael.animation(step3,time3,function(){
+            self.resetStates();
+            if(!reduction){
+               v2[0].attr(self.defaultCurrentStateAttr);
+               self.token.remove();
+            }
+            self.displayMessage("reset");
+            if(callback)
+               callback();
+         });
+      }
+      subTask.raphaelFactory.animate("anim",this.token,anim1);
    };
 
    this.resetStates = function() {
@@ -944,14 +1119,11 @@ function LR_Parser(settings,subTask,answer) {
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
          var vertex = this.visualGraph.getRaphaelsFromID(vertexID);
-         vertex[0].attr(this.vertexAttr);
-
-         info.selected = false;
+         vertex[0].attr({fill:this.vertexAttr.fill});
+         // info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
       this.selectedState = null;
-      if(this.graphEditor)
-         this.graphEditor.vertexDragAndConnect.selectionParent = null;
    };
 
    /* ACCEPT / ERROR */
@@ -962,7 +1134,6 @@ function LR_Parser(settings,subTask,answer) {
       if(self.accept){
          $("#acceptButton").css({
             "background-color": self.colors.yellow
-            // border: "1px solid "+self.colors.yellow
          });
          if(self.error){
             self.refuseInput();
@@ -970,7 +1141,6 @@ function LR_Parser(settings,subTask,answer) {
       }else{
          $("#acceptButton").css({
             "background-color": self.colors.blue
-            // border: "none"
          });
       }
       self.saveAnswer();
@@ -994,6 +1164,125 @@ function LR_Parser(settings,subTask,answer) {
       self.saveAnswer();
    };
 
+   this.doesAutomatonAllowAction = function(state,symbol,action){
+      var v1 = this.getStateID(state);
+      switch(action[0].actionType){
+         case "s":
+         case "":
+            var v2 = this.getStateID(action[0].actionValue);
+            if(v1 === false || v2 === false){
+               return false
+            }
+            var edge = this.graph.getEdgesFrom(v1,v2);
+            if(edge.length == 0){
+               return false
+            }
+            var edgeLabel = this.graph.getEdgeInfo(edge).label;
+            if(edgeLabel != symbol){
+               return false
+            }
+            break;
+         case "r":
+            if(!this.contentAllowReduction(v1,action[0].actionValue)){
+               return false;
+            }
+            break;
+         default:
+            return false;
+      }
+      return true;
+   };
+
+   this.contentAllowReduction = function(id,rule) {
+      var content = this.readContent(id);
+      if(content){
+         var ruleArray = this.grammar.rules[rule];
+         for(var line of content){
+            var match = true;
+            if(line.nonTerminal != ruleArray.nonterminal || line.development.length != ruleArray.development.length + 1){
+               match = false;
+            }else{
+               for(var iChar in line.development){
+                  if(iChar == (line.development.length - 1) && line.development[iChar] != dot){
+                     match = false;
+                  }else if(iChar < (line.development.length - 1) && line.development[iChar] != ruleArray.development[iChar]){
+                     match = false;
+                  }
+               }
+            }
+            if(match == true){
+               return true
+            }
+         }
+      }
+      return false
+   };
+
+   this.readContent = function(id) {
+      /* return the vertex content as an array of objects {nonTerminal,[development]}*/
+      var contentObj = [];
+      var info = this.graph.getVertexInfo(id);
+      if(!info.content){
+         return false;
+      }
+      var lines = info.content.split('\n');
+      for(var line of lines){
+         var rule = line.split(arrow);
+         if(rule.length <= 1){
+            return false
+         }
+         var nonTerminal = rule[0];
+         var development = rule[1].trim();
+         contentObj.push({
+            nonTerminal: nonTerminal.trim(),
+            development: development.split(' ')
+         });
+      }
+      // console.log(contentObj);
+      return contentObj;
+   };
+
+   this.readLine = function(line) {
+      /* return the rule and dot index */
+      var ruleIndex = null;
+      var developmentStr = line.development.join("");
+      var dotIndex = developmentStr.indexOf(dot);
+      var lastDotIndex = developmentStr.lastIndexOf(dot);
+      if(lastDotIndex != dotIndex){
+         dotIndex = null;
+      }
+      var developmentNoDot = line.development.filter(x => x != dot);
+      for(var rule of this.grammar.rules){
+         if(rule.nonterminal == line.nonTerminal && Beav.Object.eq(developmentNoDot,rule.development)){
+            ruleIndex = rule.index;
+         }
+      }
+      // console.log(ruleIndex+" "+dotIndex);
+      return {ruleIndex: ruleIndex, dotIndex: dotIndex};
+   };
+
+   this.graphEditorCallback = function(validContent) {
+      // console.log("callback");
+      self.pauseSimulation(null,true);
+      if(validContent !== false){
+         self.resetFeedback();
+      }
+      self.actionSequence = [];
+      self.reset();
+
+      self.formatContent();
+      self.initActionSequence();
+      self.saveAnswer();
+   };
+
+   this.selectVertexCallback = function(id,selected) {
+      var current = self.getStateID(self.currentState);
+      if(!selected && id == current){
+         var raph = self.visualGraph.getRaphaelsFromID(id);
+         raph[0].attr(self.defaultCurrentStateAttr);
+      }
+   }
+
    this.onVertexSelect = function(ID,selected) {
       if(selected){
          self.selectedVertex = ID;
@@ -1009,47 +1298,227 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
+   this.formatContent = function() {
+      var vertices = this.graph.getAllVertices();
+      for(var vertex of vertices){
+         var info = this.graph.getVertexInfo(vertex);
+         if(info.content){
+            info.content = info.content.replace(/->/g,arrow);
+            info.content = info.content.replace(/\./g,dot);
+            info.content = info.content.replace(/ /g,"");
+            var lines = info.content.split('\n');
+            var formatedContent = "";
+            for(var iLine in lines){
+               var line = lines[iLine];
+               var formatedLine = "";
+               for(var iChar = 0; iChar < line.length; iChar++){
+                  var char = fixedCharAt(line,iChar);
+                  if(iChar != line.length - 1 && char != " "){
+                     if(char == "S" && fixedCharAt(line,iChar + 1) == "'"){
+                        formatedLine += char;
+                     }else{
+                        formatedLine += char+" ";
+                     }
+                  }else if(char != " "){
+                     formatedLine += char;
+                  }
+               }
+               formatedContent += formatedLine.trim();
+               if(iLine != lines.length - 1){
+                  formatedContent += "\n";
+               }
+            }
+            info.content = formatedContent;
+            var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
+            raphObj[3].attr({"text":info.content});
+            // this.graphEditor.resizeTableVertex(vertex,info.content);
+         }
+      }
+   };
+
+   this.contentValidation = function(content) {
+      if(content){
+         var lines = content.split('\n');
+         for(var line of lines){
+            for(var iChar = 0; iChar < line.length; iChar++){
+               var char = fixedCharAt(line,iChar);
+               if(!self.isCharValid(char)){
+                  if(!((iChar > 0 && self.isPairValid(line.charAt(iChar - 1)+char)) || (iChar < line.length - 1 && self.isPairValid(char+line.charAt(iChar + 1))))){
+                     self.displayError(char+" is not a valid symbol for this grammar");
+                     return false;
+                  }
+               }
+            }
+         }
+      }
+      return true
+   };
+
+   function fixedCharAt(str, idx) {
+      var ret = '';
+      str += '';
+      var end = str.length;
+
+      var surrogatePairs = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
+      while ((surrogatePairs.exec(str)) != null) {
+         var li = surrogatePairs.lastIndex;
+         if (li - 2 < idx) {
+            idx++;
+         } else {
+            break;
+         }
+      }
+
+      if (idx >= end || idx < 0) {
+         return '';
+      }
+
+      ret += str.charAt(idx);
+
+      if (/[\uD800-\uDBFF]/.test(ret) && /[\uDC00-\uDFFF]/.test(str.charAt(idx+1))) {
+         // On avance d'un puisque l'un des caractères fait partie de la paire
+         ret += str.charAt(idx+1); 
+      }
+      return ret;
+   }
+
+   this.isCharValid = function(char) {
+      if(this.grammar.alphabet.includes(char) || char == "." || char == dot || char == arrow || char == " " || char == "$" || char == ""){
+         return true
+      }else{
+         return false
+      }
+   };
+
+   this.isPairValid = function(pair) {
+      if(pair == "S'" || pair == "->"){
+         return true
+      }
+      return false
+   };
+
+   this.clickCell = function() {
+      console.log($(this).attr("data_state")+" "+$(this).attr("data_symbol"));
+      var cellContent = $(this).text();
+      if(self.cellEditor){
+         self.cellEditor.remove();
+      }
+      self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\">");
+      $(this).append(self.cellEditor);
+   };
+
    this.saveAnswer = function() {
-      answer.actionSequence = JSON.parse(JSON.stringify(this.actionSequence));
-      answer.accept = this.accept;
-      answer.error = this.error;
+      if(self.mode == 2){
+         answer.actionSequence = JSON.parse(JSON.stringify(self.actionSequence));
+         answer.accept = self.accept;
+         answer.error = self.error;
+      }else if(self.mode == 3){
+         answer.visualGraphJSON = self.visualGraph.toJSON();
+      }
    };
 
    this.reloadAnswer = function() {
-      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-      this.replayUpTo(this.actionSequence.length,false);
-      if(answer.accept){
-         this.acceptInput();
-      }else if(answer.error){
-         this.refuseInput();
+      if(this.mode == 2){
+         this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+         this.replayUpTo(this.actionSequence.length,false);
+         if(answer.accept){
+            this.acceptInput();
+         }else if(answer.error){
+            this.refuseInput();
+         }
+      }else if(this.mode == 3){
+         this.visualGraphJSON = answer.visualGraphJSON;
+
+         this.initAutomata();
+         this.updateState();
       }
    };
 
    this.validation = function() {
-      if(!answer.accept && !answer.error){
-         this.displayError("You must click on either the accept or the error button");
-      }else{
-         this.reset();
-         this.actionSequence = [];
-         this.initActionSequence();
-         var lastAction = this.actionSequence[this.actionSequence.length - 1];
-         var accept = false;
-         if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
-            accept = true;
-         }
-         if(answer.actionSequence.length != this.actionSequence.length){
-            this.displayError("Your parsing is incomplete");
-         }else if(answer.accept && !accept){
-            this.displayError("Wrong answer");
-         }else if(answer.error && accept){
-            this.displayError("Wrong answer");
-         }else{
-            return true;
-         }
+      switch(this.mode){
+         case 2:
+            if(!answer.accept && !answer.error){
+               this.displayError("You must click on either the accept or the error button");
+            }else{
+               this.reset();
+               this.actionSequence = [];
+               this.initActionSequence();
+               var lastAction = this.actionSequence[this.actionSequence.length - 1];
+               var accept = false;
+               if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
+                  accept = true;
+               }
+               if(answer.actionSequence.length != this.actionSequence.length){
+                  this.displayError("Your parsing is incomplete");
+               }else if(answer.accept && !accept){
+                  this.displayError("Wrong answer");
+               }else if(answer.error && accept){
+                  this.displayError("Wrong answer");
+               }else{
+                  return true;
+               }
+            }
+            this.reset();
+            this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+            this.replayUpTo(this.actionSequence.length,false);
+            break;
+         case 3:
+            // console.log(this.lrClosureTable.kernels);
+            var lrClosureTable = this.lrClosureTable.kernels;
+            var vertices = this.graph.getAllVertices();
+            var terminalState = this.getTerminalState();
+            if(vertices.length != lrClosureTable.length + 1){
+               this.displayError("The number of states in your automaton is incorrect")
+            }else if(!terminalState){
+               this.displayError("Wrong terminal state")
+            }else{
+               var success = true;
+               for(var state of lrClosureTable){
+                  var stateVertex = this.getStateID(state.index);
+                  if(!stateVertex){
+                     this.displayError("State "+state.index+" is missing");
+                     return
+                  }
+                  var nGoto = state.keys.length;
+                  var children = this.graph.getChildren(stateVertex);
+                  if((state.index == 0 && children.length != nGoto + 1) || (state.index != 0 && children.length != nGoto)){
+                     this.displayError("The number of transitions from state "+state.index+" is incorrect");
+                     return
+                  }
+                  for(var child of children){
+                     var edges = this.graph.getEdgesFrom(stateVertex,child);
+                     var edgeInfo = this.graph.getEdgeInfo(edges[0]);
+                     var childInfo = this.graph.getVertexInfo(child);
+                     if(state.gotos[edgeInfo.label] != childInfo.label && !(state.index == 0 && terminalState == childInfo.label)){
+                        this.displayError("Wrong transition from state "+state.index+" to state "+childInfo.label);
+                        return
+                     }
+                  }
+                  var content = this.readContent(stateVertex);
+                  if((state.index != 0 && content.length != state.closure.length) || (state.index == 0 && (content.length > state.closure.length + 1 || content.length < state.closure.length))){
+                     this.displayError("The number of lines in state "+state.index+" is incorrect");
+                     return
+                  }
+                  for(var item of state.closure){
+                     var rule = item.rule.index;
+                     var dotIndex = item.dotIndex;
+                     var itemFound = false;
+                     for(var line of content){
+                        var lineInfo = this.readLine(line);
+                        if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dotIndex){
+                           itemFound = true;
+                           break;
+                        }
+                     }
+                     if(!itemFound){
+                        this.displayError("Error in the content of state "+state.index);
+                        return
+                     }
+                  }
+               }
+               return success;
+            }
       }
-      this.reset();
-      this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-      this.replayUpTo(this.actionSequence.length,false);
    };
 
    this.displayMessage = function(type,message) {
@@ -1074,18 +1543,10 @@ function LR_Parser(settings,subTask,answer) {
          "font-size": "80%"
       })
       /* tabs */
-      this.styleTabs();
+      this.styleTabSwitch();
 
       /* paper, parse table */
-      $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-         margin: "1em auto",
-         height: this.paperHeight+"px",
-         width: this.paperWidth+"px"
-      });
-
-      $("#"+this.parseTableID+" table").css({
-         "font-size": "1.2em"
-      });
+      this.styleTabs();
 
       /* parse info */
       $("#parseInfo").css({
@@ -1153,10 +1614,8 @@ function LR_Parser(settings,subTask,answer) {
          width: "110px",
          padding: "0.5em 0",
          "text-align": "center",
-         // float: "right",
          "font-weight": "bold",
-         "font-size": "0.9em",
-         // cursor: "pointer"
+         "font-size": "0.9em"
       });
       var buttonHeight = $(".actionButton").innerHeight();
       $("#reduceBar, #shiftBar, #acceptBar, #errorBar").css({
@@ -1248,29 +1707,15 @@ function LR_Parser(settings,subTask,answer) {
       $("#bottomCircle").css({
          bottom: "-6px"
       });
-
-      /* parse Table */
-      $("#"+this.parseTableID+" table").css({
-         margin: "auto",
-         "border-collapse": "collapse",
-         border: "2px solid "+this.colors.blue,
-         "text-align": "center"
-      });
-      $("#"+this.parseTableID+" table th").css({
-         "background-color": this.colors.blue,
-         color: "white",
-         padding: "0.5em 1em",
-         border: "1px solid white"
-      });
-      $("#"+this.parseTableID+" table td").css({
-         "background-color": this.colors.lightgrey,
-         color: this.colors.black,
-         padding: "0.5em 1em",
-         border: "1px solid "+this.colors.blue
-      });
    };
 
-   this.styleTabs = function() {
+   this.styleTabSwitch = function() {
+      if(this.sideTable){
+         $("#"+this.tabsID).hide();
+         return
+      }else{
+         $("#"+this.tabsID).show();
+      }
       $("#"+this.tabsID).css({
          "text-align": "right",
          margin: "1em 0"
@@ -1304,6 +1749,72 @@ function LR_Parser(settings,subTask,answer) {
          left: this.selectedTab*25+"px"
          // "box-shadow": "inset 0 0 0 0 rgba(0,0,0,0.2)"
       });
+   };
+
+   this.styleTabs = function() {
+      if(!this.sideTable){
+         $("#"+this.graphPaperID+", #"+this.parseTableID).css({
+            margin: "1em auto"
+         });
+
+         $("#"+this.parseTableID+" table").css({
+            "font-size": "1.2em"
+         });
+         $("#"+this.parseTableID+" table").css({
+            margin: "auto",
+            "border-collapse": "collapse",
+            border: "2px solid "+this.colors.blue,
+            "text-align": "center"
+         });
+         $("#"+this.parseTableID+" table th").css({
+            "background-color": this.colors.blue,
+            color: "white",
+            padding: "0.5em 1em",
+            border: "1px solid white"
+         });
+         $("#"+this.parseTableID+" table td").css({
+            "background-color": this.colors.lightgrey,
+            color: this.colors.black,
+            padding: "0.5em 1em",
+            border: "1px solid "+this.colors.blue
+         });
+      }else{
+         $("#"+this.tabsContainerID).css({
+            display: "flex",
+            "flex-direction": "row",
+            "justify-content": "space-around",
+            // "flex-wrap": "wrap-reverse",
+            margin: "1em 0"
+         });
+         // $("#"+this.tabsContainerID+" > *").css({
+         //    display: "inline-block",
+         //    "vertical-align": "top"
+         // });
+         $("#"+this.parseTableID+" table").css({
+            // display: "flex",
+            // "align-content": "stretch",
+            // "flex-wrap": "wrap",
+            "border-collapse": "collapse",
+            border: "2px solid "+this.colors.blue,
+            "text-align": "center"
+         });
+         // $("#"+this.parseTableID+" tr").css({
+         //    display: "flex",
+         //    "align-content": "stretch"
+         // })
+         $("#"+this.parseTableID+" table th").css({
+            "background-color": this.colors.blue,
+            color: "white",
+            padding: "0.2em 0.4em",
+            border: "1px solid white"
+         });
+         $("#"+this.parseTableID+" table td").css({
+            "background-color": this.colors.lightgrey,
+            color: this.colors.black,
+            padding: "0.2em 0.4em",
+            border: "1px solid "+this.colors.blue
+         });
+      }
    };
 
    this.styleRules = function() {

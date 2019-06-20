@@ -744,6 +744,7 @@ function VertexDragAndConnect(settings) {
    this.onVertexSelect = settings.onVertexSelect;
    this.onPairSelect = settings.onPairSelect;
    this.onEdgeSelect = settings.onEdgeSelect;
+   this.onDragEnd = settings.onDragEnd;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
 
@@ -832,6 +833,7 @@ function VertexDragAndConnect(settings) {
    }
 
    this.startHandler = function(x, y, event) {
+      // console.log("startDrag")
       self.elementID = this.data("id");
       self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
       self.lastGoodPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
@@ -853,8 +855,8 @@ function VertexDragAndConnect(settings) {
                isSnappedToGoodPosition = true;
             }
          }
-         if(settings.onDragEnd) {
-            settings.onDragEnd(self.elementID, isSnappedToGoodPosition);
+         if(self.onDragEnd) {
+            self.onDragEnd(self.elementID, isSnappedToGoodPosition);
          }
          self.isDragging = false;
          return;
@@ -904,6 +906,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id,x,y) {
+      // console.log(id+" "+self.selectionParent)
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
@@ -1173,8 +1176,10 @@ function ArcDragger(settings) {
             self.onEdgeSelect(edges[iEdge],false);
          }
       }
-      if(self.callback)
-         self.callback();
+      // if(self.callback){
+      //    console.log("arcDragger unselect cb")
+      //    self.callback();
+      // }
    };
 
    this.setStartDragCallback = function(fct) {
@@ -1312,7 +1317,7 @@ function GraphDragger(settings) {
       self.dragEnd.setEnabled(false);
       self.gridAlignment = {};
       self.gridAlignmentRefIndex = null;
-      if(self.callback){
+      if(self.callback && x != self.mouseInitPos.x && y != self.mouseInitPos.y){
          self.callback();
       }
    };
@@ -1334,6 +1339,7 @@ function GraphEditor(settings) {
    
    var callback = settings.callback;
    var selectVertexCallback = settings.selectVertexCallback;
+   this.contentValidation = settings.contentValidation;
 
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -1361,7 +1367,11 @@ function GraphEditor(settings) {
    var selectedVertexAttr = settings.selectedVertexAttr || defaultSelectedVertexAttr;
    var selectedEdgeAttr = settings.selectedEdgeAttr || defaultSelectedEdgeAttr;
    this.alphabet = settings.alphabet;
-
+   if(!settings.vertexLabelPrefix && settings.vertexLabelPrefix != ""){
+      this.vertexLabelPrefix = "v_";
+   }else{
+      this.vertexLabelPrefix = settings.vertexLabelPrefix;
+   }
    this.loopIcon = null;
    this.cross = null;
    this.edgeCross = null;
@@ -1370,7 +1380,8 @@ function GraphEditor(settings) {
    this.pencil = null;
 
    this.textEditor = null;
-   this.editionInfo = {};
+   this.editInfo = {};
+   this.edited = false; // true when label or content has just been modified
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
@@ -1524,6 +1535,9 @@ function GraphEditor(settings) {
       visualGraph.redraw();
       this.updateHandlers();
    };
+   this.setIconAttr = function(attr){
+      iconAttr = attr;
+   };
 
    this.checkVertexSelect = function() {
       if(!this.terminalEnabled && !this.initialEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled && !this.vertexSelectEnabled){
@@ -1542,10 +1556,13 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
+      // console.log("vertex")
       if(selected) {
+         self.edited = false;
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          var vInfo = visualGraph.getVertexVisualInfo(vertexId);
+         // self.edited = false;
          if(!vInfo.tableMode){
             self.editLabel(vertexId,"vertex");
          }else{
@@ -1575,7 +1592,9 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
-      if(!self.createEdgeEnabled)
+      // console.log("pair");
+      self.startDragCallback(id1);
+      if(!self.createEdgeEnabled || self.edited)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -1648,13 +1667,32 @@ function GraphEditor(settings) {
       var point = {x: x, y: y, tableMode: self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
-         graph.addVertex(vertexId,{label:vertexId});
+         var label = self.getDefaultLabel();
+         graph.addVertex(vertexId,{label:label});
       }else{
          graph.addVertex(vertexId);
       }
       if(callback){
          callback();
       }
+   };
+
+   this.getDefaultLabel = function() {
+      var vertices = graph.getAllVertices();
+      var index = 0;
+      do{
+         var alreadyExist = false;
+         for(var vertex of vertices){
+            var info = graph.getVertexInfo(vertex);
+            var label = this.vertexLabelPrefix + index;
+            if(info.label == label){
+               alreadyExist = true;
+               index++;
+               break;
+            }
+         }
+      }while(alreadyExist)
+      return label;
    };
 
    this.setNewEdgeVisualInfo = function(edgeID,id1,id2) {
@@ -2303,6 +2341,7 @@ function GraphEditor(settings) {
    };
 
    this.writeLabel = function(id,type) {
+      // console.log("writeLabel")
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
       }else if(type === "edge"){
@@ -2326,6 +2365,7 @@ function GraphEditor(settings) {
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
          info.label = newLabel;
+         self.edited = true;
          if(type === "vertex"){
             graph.setVertexInfo(id,info);
             raphElement[1].attr("text",newLabel);
@@ -2389,7 +2429,8 @@ function GraphEditor(settings) {
          "padding": "0 10px",
          background: "none",
          border: "none",
-         color: attr.fill || "black"
+         color: attr.fill || "black",
+         "font-family": "Arial, sans-serif"
       });
       self.textEditor.css(attr);
       $("#"+paperId).append(self.textEditor);
@@ -2397,45 +2438,7 @@ function GraphEditor(settings) {
 
       self.textEditor.keyup(function(){ // resize vertex & textarea when text length changes
          var text = $(this).val();
-         var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
-         info.content = text;
-         if(text.length > 0){
-            raphElement[0].transform(""); // box
-            raphElement[0].attr({   
-               x: vertexPos.x - newBoxSize.w/2,
-               y: vertexPos.y - newBoxSize.h/2,
-               height: newBoxSize.h,
-               width: newBoxSize.w
-            });
-            raphElement[1].transform(""); // label
-            raphElement[1].attr({   
-               x: vertexPos.x,
-               y: vertexPos.y - newBoxSize.h/2 +labelHeight/2
-            });
-            raphElement[2].transform(""); // line
-            raphElement[2].attr("path","M"+(vertexPos.x - newBoxSize.w/2)+","+(vertexPos.y - newBoxSize.h/2 + labelHeight)+"H"+(vertexPos.x + newBoxSize.w/2));
-            if(info.initial && !info.terminal){
-
-            }else if(!info.initial && info.terminal){
-               raphElement[4].attr({
-                  x: vertexPos.x - newBoxSize.w/2 - 5,
-                  y: vertexPos.y - newBoxSize.h/2 - 5,
-                  height: newBoxSize.h + 10,
-                  width: newBoxSize.w + 10
-               });
-            }else if(info.initial && info.terminal){
-
-            }
-
-            $(this).css({
-               left: vertexPos.x - newBoxSize.w/2,
-               top: vertexPos.y - newBoxSize.h/2 + labelHeight,
-               width: newBoxSize.w,
-               height: newBoxSize.h - labelHeight
-            });
-            self.removeIcons();
-            self.addIcons(id);
-         }
+         self.resizeTableVertex(id,text);
       });
 
       self.textEditor.focusout(function(ev){
@@ -2444,47 +2447,114 @@ function GraphEditor(settings) {
    };
 
    this.writeContent = function(id) {
+      // console.log(id);
       var info = graph.getVertexInfo(id);
       var oldContent = info.content;
       var newContent = (self.textEditor) ? self.textEditor.val().trim() : "";
 
+      if(self.contentValidation){
+         var validContent = self.contentValidation(newContent);
+      }else{
+         var validContent = true;
+      }
+      
       var raphElement = visualGraph.getRaphaelsFromID(id);
-      if(oldContent !== newContent){
+      if(oldContent !== newContent && validContent){
          info.content = newContent;
          graph.setVertexInfo(id,info);
+         self.edited = true;
       }
+      if(oldContent !== newContent && !validContent){
+         self.edited = true
+      }
+
       if(self.textEditor){
          self.textEditor.remove();
          self.editInfo = {};
       }
+      // if(!validContent){
+      //    var raphElement = visualGraph.getRaphaelsFromID(id);
+      //    raphElement[3].show();
+      //    self.resizeTableVertex(id,oldContent);
+      //    return
+      // }
 
       visualGraph.redraw();
       self.updateHandlers();
 
       if(callback){
-         callback();
+         callback(validContent);
       }
    };
 
+   this.resizeTableVertex = function(id,text) {
+      var raphElement = visualGraph.getRaphaelsFromID(id);
+      var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
+      var info = graph.getVertexInfo(id);
+      var vertexPos = visualGraph.getVertexVisualInfo(id);
+      var labelHeight = 2*visualGraph.graphDrawer.vertexLabelAttr["font-size"];
+      raphElement[0].transform(""); // box
+      raphElement[0].attr({   
+         x: vertexPos.x - newBoxSize.w/2,
+         y: vertexPos.y - newBoxSize.h/2,
+         height: newBoxSize.h,
+         width: newBoxSize.w
+      });
+      raphElement[1].transform(""); // label
+      raphElement[1].attr({   
+         x: vertexPos.x,
+         y: vertexPos.y - newBoxSize.h/2 +labelHeight/2
+      });
+      raphElement[2].transform(""); // line
+      raphElement[2].attr("path","M"+(vertexPos.x - newBoxSize.w/2)+","+(vertexPos.y - newBoxSize.h/2 + labelHeight)+"H"+(vertexPos.x + newBoxSize.w/2));
+      if(info.initial && !info.terminal){
+
+      }else if(!info.initial && info.terminal){
+         raphElement[4].attr({
+            x: vertexPos.x - newBoxSize.w/2 - 5,
+            y: vertexPos.y - newBoxSize.h/2 - 5,
+            height: newBoxSize.h + 10,
+            width: newBoxSize.w + 10
+         });
+      }else if(info.initial && info.terminal){
+
+      }
+      if(self.textEditor){
+         self.textEditor.css({
+            left: vertexPos.x - newBoxSize.w/2,
+            top: vertexPos.y - newBoxSize.h/2 + labelHeight,
+            width: newBoxSize.w,
+            height: newBoxSize.h - labelHeight
+         });
+      }
+      var oldContent = info.content;
+      self.removeIcons();
+      info.content = text;
+      self.addIcons(id);
+      info.content = oldContent;
+   };
+
    this.startDragCallback = function(ID) {
-      // console.log(ID);
-      var vertices = graph.getAllVertices();
-      for(var iVertex = 0; iVertex < vertices.length; iVertex++){
-         var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
-         if(self.textEditor){
-            if(self.editInfo.id == ID){
-               if(self.editInfo.field == "label"){
-                  self.writeLabel(ID,self.editInfo.type);
-               }else{
-                  self.writeContent(ID);
+      // console.log("start drag callback");
+      if(self.textEditor){
+         var vertices = graph.getAllVertices();
+         for(var iVertex = 0; iVertex < vertices.length; iVertex++){
+            var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
+            
+               if(self.editInfo.id == ID){
+                  if(self.editInfo.field == "label"){
+                     self.writeLabel(ID,self.editInfo.type);
+                  }else{
+                     self.writeContent(ID);
+                  }
                }
-            }
-            self.textEditor.remove();
+               self.textEditor.remove();
+            
+            if(vertexRaph[1])
+               vertexRaph[1].show();
+            if(vertexRaph[3])
+               vertexRaph[3].show();
          }
-         if(vertexRaph[1])
-            vertexRaph[1].show();
-         if(vertexRaph[3])
-            vertexRaph[3].show();
       }
       var edges = graph.getAllEdges();
       for(var iEdge = 0; iEdge < edges.length; iEdge++){
