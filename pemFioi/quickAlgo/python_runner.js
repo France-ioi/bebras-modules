@@ -185,6 +185,12 @@ function PythonInterpreter(context, msgCallback) {
       return val.v ? true : false;
     } else {
       var retVal = val.v;
+      if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
+         retVal = [];
+         for(var i = 0; i < val.v.length; i++) {
+            retVal[i] = this.skToJs(val.v[i]);
+         }
+      }
       if(val instanceof Sk.builtin.tuple) {
          retVal.isTuple = true;
       }
