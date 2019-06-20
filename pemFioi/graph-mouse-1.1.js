@@ -1556,8 +1556,7 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
-
-      console.log("vertex")
+      // console.log("vertex")
       if(selected) {
          self.edited = false;
          attr = selectedVertexAttr;
@@ -2536,7 +2535,7 @@ function GraphEditor(settings) {
    };
 
    this.startDragCallback = function(ID) {
-      console.log("start drag callback");
+      // console.log("start drag callback");
       if(self.textEditor){
          var vertices = graph.getAllVertices();
          for(var iVertex = 0; iVertex < vertices.length; iVertex++){

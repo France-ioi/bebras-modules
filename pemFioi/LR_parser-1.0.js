@@ -29,6 +29,8 @@ function LR_Parser(settings,subTask,answer) {
    this.parseTableID = "parseTable";
    this.graphPaperID = "graphPaper";
    this.tabsID = "tabs";
+   this.tabsContainerID = "tabsCont";
+   this.sideTable = false;
 
    this.paper;
    this.paperHeight = settings.paperHeight;
@@ -112,8 +114,10 @@ function LR_Parser(settings,subTask,answer) {
    this.init = function() {
       var html = "";
       html += "<div id=\""+this.tabsID+"\"></div>";
+      html += "<div id=\""+this.tabsContainerID+"\">";
       html += "<div id=\""+this.graphPaperID+"\"></div>";
       html += "<div id=\""+this.parseTableID+"\"></div>";
+      html += "</div>";
       html += "<div id=\""+this.parseInfoID+"\"></div>";
 
       $("#"+this.divID).html(html);
@@ -125,12 +129,16 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.initParseTable();
       this.showTab();
+      
       this.initParseInfo();
 
       this.style();
       this.updateState(false);
       this.initHandlers();
-      console.log(this.grammar);
+      // console.log(this.grammar);
+      if(this.mode == 3){
+         this.onResize();
+      }
    };
 
    this.initTabs = function() {
@@ -427,29 +435,38 @@ function LR_Parser(settings,subTask,answer) {
    this.initHandlers = function() {
       $("#"+this.tabsID+" #switchContainer").off("click");
       $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
-      if(this.mode == 2){
-         $("#reduceButton").off("click");
-         $("#reduceButton").click(self.reduce);
-         $("#shiftButton").off("click");
-         $("#shiftButton").click(self.shift);
-         $(".stackElement").off("click");
-         $(".stackElement").click(self.selectStackElement);
-         $(".rule").off("click");
-         $(".rule").click(self.selectRule);
-         $(".rule, .actionButton, #stackTable .stackElement").css({
-            cursor: "pointer"
-         });
-         this.initPlayerHandlers();
-         $("#acceptButton").off("click");
-         $("#acceptButton").click(self.acceptInput);
-         $("#errorButton").off("click");
-         $("#errorButton").click(self.refuseInput);
-      }else if(this.mode == 4){
-         $("#"+this.parseTableID+" td").off("click");
-         $("#"+this.parseTableID+" td").click(self.clickCell);
-      }else{
-         this.initPlayerHandlers();
+      switch(this.mode){
+         case 2:
+            $("#reduceButton").off("click");
+            $("#reduceButton").click(self.reduce);
+            $("#shiftButton").off("click");
+            $("#shiftButton").click(self.shift);
+            $(".stackElement").off("click");
+            $(".stackElement").click(self.selectStackElement);
+            $(".rule").off("click");
+            $(".rule").click(self.selectRule);
+            $(".rule, .actionButton, #stackTable .stackElement").css({
+               cursor: "pointer"
+            });
+            this.initPlayerHandlers();
+            $("#acceptButton").off("click");
+            $("#acceptButton").click(self.acceptInput);
+            $("#errorButton").off("click");
+            $("#errorButton").click(self.refuseInput); 
+            break;
+         case 3:
+            this.initPlayerHandlers();
+            // $(window).off("resize");
+            $(window).resize(self.onResize);
+            break;
+         case 4:
+            $("#"+this.parseTableID+" td").off("click");
+            $("#"+this.parseTableID+" td").click(self.clickCell);
+            break;
+         default:
+            this.initPlayerHandlers();
       }
+
    };
 
    this.initPlayerHandlers = function() {
@@ -494,6 +511,25 @@ function LR_Parser(settings,subTask,answer) {
       $("#progressBarClickArea").css({
          cursor: "pointer"
       });
+   };
+
+   this.onResize = function() {
+      var width = $(window).width();
+      var sideTable = true;
+      if(width < 1180){
+         sideTable = false
+      }
+      if(self.sideTable != sideTable){
+         self.sideTable = sideTable;
+         self.styleTabSwitch();
+         self.styleTabs();
+         if(self.sideTable){
+            $("#"+self.graphPaperID).show();
+            $("#"+self.parseTableID).show();
+         }else{
+            self.showTab();
+         }
+      }
    };
 
    this.reset = function() {
@@ -702,7 +738,7 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+self.tabTag[self.selectedTab]).removeClass("selectedTab");
       self.selectedTab = 1 - self.selectedTab;
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
-      self.styleTabs();
+      self.styleTabSwitch();
       self.showTab();
    };
 
@@ -1507,18 +1543,10 @@ function LR_Parser(settings,subTask,answer) {
          "font-size": "80%"
       })
       /* tabs */
-      this.styleTabs();
+      this.styleTabSwitch();
 
       /* paper, parse table */
-      $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-         margin: "1em auto",
-         height: this.paperHeight+"px",
-         width: this.paperWidth+"px"
-      });
-
-      $("#"+this.parseTableID+" table").css({
-         "font-size": "1.2em"
-      });
+      this.styleTabs();
 
       /* parse info */
       $("#parseInfo").css({
@@ -1679,29 +1707,15 @@ function LR_Parser(settings,subTask,answer) {
       $("#bottomCircle").css({
          bottom: "-6px"
       });
-
-      /* parse Table */
-      $("#"+this.parseTableID+" table").css({
-         margin: "auto",
-         "border-collapse": "collapse",
-         border: "2px solid "+this.colors.blue,
-         "text-align": "center"
-      });
-      $("#"+this.parseTableID+" table th").css({
-         "background-color": this.colors.blue,
-         color: "white",
-         padding: "0.5em 1em",
-         border: "1px solid white"
-      });
-      $("#"+this.parseTableID+" table td").css({
-         "background-color": this.colors.lightgrey,
-         color: this.colors.black,
-         padding: "0.5em 1em",
-         border: "1px solid "+this.colors.blue
-      });
    };
 
-   this.styleTabs = function() {
+   this.styleTabSwitch = function() {
+      if(this.sideTable){
+         $("#"+this.tabsID).hide();
+         return
+      }else{
+         $("#"+this.tabsID).show();
+      }
       $("#"+this.tabsID).css({
          "text-align": "right",
          margin: "1em 0"
@@ -1735,6 +1749,75 @@ function LR_Parser(settings,subTask,answer) {
          left: this.selectedTab*25+"px"
          // "box-shadow": "inset 0 0 0 0 rgba(0,0,0,0.2)"
       });
+   };
+
+   this.styleTabs = function() {
+      if(!this.sideTable){
+         $("#"+this.graphPaperID+", #"+this.parseTableID).css({
+            margin: "1em auto",
+            height: this.paperHeight+"px",
+            width: this.paperWidth+"px"
+         });
+
+         $("#"+this.parseTableID+" table").css({
+            "font-size": "1.2em"
+         });
+         $("#"+this.parseTableID+" table").css({
+            margin: "auto",
+            "border-collapse": "collapse",
+            border: "2px solid "+this.colors.blue,
+            "text-align": "center"
+         });
+         $("#"+this.parseTableID+" table th").css({
+            "background-color": this.colors.blue,
+            color: "white",
+            padding: "0.5em 1em",
+            border: "1px solid white"
+         });
+         $("#"+this.parseTableID+" table td").css({
+            "background-color": this.colors.lightgrey,
+            color: this.colors.black,
+            padding: "0.5em 1em",
+            border: "1px solid "+this.colors.blue
+         });
+      }else{
+         $("#"+this.tabsContainerID).css({
+            display: "flex",
+            "flex-direction": "row",
+            "justify-content": "space-around",
+            // "flex-wrap": "wrap-reverse",
+            // overflow: "auto",
+            margin: "1em 0"
+         });
+         // $("#"+this.tabsContainerID+" > *").css({
+         //    display: "inline-block",
+         //    "vertical-align": "top"
+         // });
+         $("#"+this.parseTableID+" table").css({
+            // display: "flex",
+            // "align-content": "stretch",
+            // "flex-wrap": "wrap",
+            "border-collapse": "collapse",
+            border: "2px solid "+this.colors.blue,
+            "text-align": "center"
+         });
+         // $("#"+this.parseTableID+" tr").css({
+         //    display: "flex",
+         //    "align-content": "stretch"
+         // })
+         $("#"+this.parseTableID+" table th").css({
+            "background-color": this.colors.blue,
+            color: "white",
+            padding: "0.2em 0.4em",
+            border: "1px solid white"
+         });
+         $("#"+this.parseTableID+" table td").css({
+            "background-color": this.colors.lightgrey,
+            color: this.colors.black,
+            padding: "0.2em 0.4em",
+            border: "1px solid "+this.colors.blue
+         });
+      }
    };
 
    this.styleRules = function() {
