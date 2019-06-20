@@ -1592,7 +1592,7 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2) {
-      console.log("pair");
+      // console.log("pair");
       self.startDragCallback(id1);
       if(!self.createEdgeEnabled || self.edited)
          return;
@@ -2341,7 +2341,7 @@ function GraphEditor(settings) {
    };
 
    this.writeLabel = function(id,type) {
-      console.log("writeLabel")
+      // console.log("writeLabel")
       if(type === "vertex"){
          var info = graph.getVertexInfo(id);
       }else if(type === "edge"){
