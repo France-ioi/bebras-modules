@@ -1283,6 +1283,8 @@ function LR_Parser(settings,subTask,answer) {
                      }else{
                         formatedLine += char+" ";
                      }
+                  }else if(char != " "){
+                     formatedLine += char;
                   }
                }
                formatedContent += formatedLine.trim();
