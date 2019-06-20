@@ -250,18 +250,6 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.wsSession.send(JSON.stringify(command));
     }
 
-    this.setSessionSensorTable = function(sensorTable) {
-        if (this.wsSession != null) {
-            command = {
-                "command": "setSensorTable",
-                "sensorTable": sensorTable
-            };    
-
-            this.wsSession.send(JSON.stringify(command));
-        }
-
-    }
-
     this.sendCommand = function (command, callback) {
         if (this.wsSession != null) {
             if (this.resultsCallback == null) {
@@ -303,6 +291,12 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
 
 
 var pythonLib = `
+try:
+    sensorTable
+except:
+    sensorTable = []
+
+
 import RPi.GPIO as GPIO
 import time
 import smbus
@@ -321,6 +315,8 @@ servo_last_value = {}
 DHT11_last_value = {}
 
 distance_last_value = {}
+
+passive_buzzer_last_value = {}
 
 screenLine1 = None
 screenLine2 = None
@@ -342,19 +338,39 @@ enabledLSM303C = False
 
 pi = pigpio.pi()
 
+def nameToPin(name):
+    for sensor in sensorTable:
+        if sensor["name"] == name:
+            return sensor["port"]
+
+    return 0
+
+def nameToDef(name, type):
+    for sensor in sensorTable:
+        if sensor["name"] == name:
+            return sensor
+
+    for sensor in sensorTable:
+        if sensor["type"] == type:
+            return sensor
+
+    return None
+
 def normalizePin(pin):
     returnpin = 0
     hadporttype = False
 
-    if isinstance(pin, str):
-        if pin[0].isalpha():
-            returnpin = int(pin[1:])
-            hadporttype = True
+    pin = str(pin)
 
-    if not hadporttype:
-        returnpin = int(pin)
+    if pin.isdigit():
+        returnpin = pin
+    elif len(pin) >= 2 and pin[0].isalpha() and pin[1:].isdigit():
+        returnpin = pin[1:]
+    else:
+        returnpin = normalizePin(nameToPin(pin))
 
-    return returnpin
+    return int(returnpin)
+
 
 def cleanupPin(pin):
     pi.set_mode(pin, pigpio.INPUT)
@@ -393,10 +409,6 @@ def buzzOn(pin):
 
 def buzzOff(pin):
   changePinState(pin, 0)
-
-def setBuzzerState(pin, state):
-    #changePinState(pin, state)
-    changePassiveBuzzerState(pin, state)
 
 def magnetOn(pin):
   changePinState(pin, 1)
@@ -447,18 +459,42 @@ def buttonWasPressed(pin):
 
     return wasPressed
 
-def readDistanceVL53(pin):
+def initVL53():
     global vl53l0x
 
-    if vl53l0x == None:
-        import board
-        import busio
-        import adafruit_vl53l0x
+    import board
+    import busio
+    import adafruit_vl53l0x
 
+    try:
         i2c = busio.I2C(board.SCL, board.SDA)
         vl53l0x = adafruit_vl53l0x.VL53L0X(i2c)
+    except:
+        vl53l0x = None
 
-    return vl53l0x.range
+
+def readDistanceVL53(pin):
+    global vl53l0x
+    distance = 0
+    justinit = False
+
+    if vl53l0x == None:
+        initVL53()
+
+        if vl53l0x is not None:
+            justinit = True
+
+    try:
+        distance = vl53l0x.range / 10
+    except:
+        try:
+            if not justinit:
+                initVL53()
+                distance = vl53l0x.range / 10
+        except:
+            pass
+
+    return distance
 
 usleep = lambda x: time.sleep(x / 1000000.0)
 
@@ -517,13 +553,6 @@ def readDistanceUltrasonic(pin):
 
     return distance
 
-def readDistance(pin):
-    pin = normalizePin(pin)
-    #handler = getPinHandler(pin, "range")
-    #handler(pin)
-
-    return readDistanceUltrasonic(pin)
-
 def initOLEDScreen():
     global oleddisp
     global oledfont
@@ -551,7 +580,7 @@ def initOLEDScreen():
 
 
 # Address 0x3c
-def displayText(line1, line2=""):
+def displayTextOled(line1, line2=""):
     global oleddisp
     global oledfont
     global oledimage
@@ -580,19 +609,18 @@ def updateScreen():
     global oledtimer
 
     oledlock.acquire(True)
-
     oleddisp.image(oledimage)
+    oledlock.release()
+    
     oleddisp.show()
     oledtimer = None
-
-    oledlock.release()
 
 def scheduleUpdateScreen():
     global oledtimer
 
     oledlock.acquire(True)
     if oledtimer == None:
-        oledtimer = threading.Timer(0.2, updateScreen)
+        oledtimer = threading.Timer(0.05, updateScreen)
         oledtimer.start()   
     oledlock.release()
 
@@ -697,7 +725,7 @@ def clearScreen():
     scheduleUpdateScreen()
 
 
-def displayText123(line1, line2=""):
+def displayText16x2(line1, line2=""):
     global screenLine1
     global screenLine2
     
@@ -742,7 +770,7 @@ def setServoAngle(pin, angle):
     pulsewidth = (angle * 11.11) + 500
     pi.set_servo_pulsewidth(pin, pulsewidth)
 
-def readADC(pin):
+def readGrovePiADC(pin):
     pin = normalizePin(pin)
 
     reg = 0x30 + pin
@@ -755,29 +783,6 @@ def readADC(pin):
     except:
         return 0
 
-
-def readTemperature123(pin):
-    B = 4275.
-    R0 = 100000.
-
-    val = readADC(pin)
-    
-    if val == 0:
-        return 0
-
-    r = 1000. / val - 1.
-    r = R0 * r
-
-    return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
-
-def readRotaryAngle(pin):
-	return int(readADC(pin) / 10)
-
-def readSoundSensor(pin):
-	return int(readADC(pin) / 10)
-
-#def readLightIntensity(pin):
-#	return int(readADC(pin) * 100 / 631)
 
 def sleep(sleep_time):
 	sleep_time = float(sleep_time)
@@ -1177,8 +1182,13 @@ def readGyroBMI160():
     except:
         return [0, 0, 0]
 
-#def readTemperatureBMI160():
-def readTemperature(pin):
+def twos_comp(val, bits):
+        # Calculate the 2s complement of int:val #
+        if(val&(1<<(bits-1)) != 0):
+                val = val - (1<<bits)
+        return val
+
+def readTemperatureBMI160(pin):
     global enabledBMI160
 
     try:
@@ -1189,11 +1199,15 @@ def readTemperature(pin):
         bus = smbus.SMBus(1)
         temp_value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_TEMPERATURE, 2)
 
-        temp = (temp_value[1] << 8 | temp_value[0])
-        if temp & 0x8000:
-            temp = (23.0 - ((0x10000 - temp)/512.0));
-        else:
-            temp = ((temp/512.0) + 23.0);
+
+        temp = twos_comp(temp_value[1] << 8 | temp_value[0], 16)
+
+        temp = (temp * 0.0019073486328125) + 22.5
+
+#        if temp & 0x8000:
+            #temp = (23.0 - ((0x10000 - temp)/512.0));
+#        else:
+#            temp = ((temp/512.0) + 23.0);
     
         return temp
     except:
@@ -1202,14 +1216,12 @@ def readTemperature(pin):
 ACC_I2C_ADDR = 0x1D
 MAG_I2C_ADDR = 0x1E
 
-CTRL_REG0               = 0x1F
 CTRL_REG1               = 0x20
 CTRL_REG2               = 0x21
 CTRL_REG3               = 0x22
 CTRL_REG4               = 0x23
 CTRL_REG5               = 0x24
-CTRL_REG6               = 0x25
-CTRL_REG7               = 0x26
+
 
 MAG_OUTX_L     = 0x28
 MAG_OUTX_H     = 0x29
@@ -1232,19 +1244,14 @@ MAG_FS_8_Ga   =  0x20
 MAG_FS_12_Ga  =  0x40
 MAG_FS_16_Ga = 0x60
     
-def twos_comp(val, bits):
-        # Calculate the 2s complement of int:val #
-        if(val&(1<<(bits-1)) != 0):
-                val = val - (1<<bits)
-        return val
 
 def initLSM303C():
     bus = smbus.SMBus(1)
 
-    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG6, 0x00)
-    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG5, (4<<2))
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG1, 0x7E) # X, Y High performace, Data rate 80hz
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG4, 0x0C) # Z High performace
+    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG5, 0x40)
     bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG3, 0x00)
-    bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG7, 0x00) # 0x00 continuous conversion mode
 
 def readMagnetometerLSM303C():
     global enabledLSM303C
@@ -1259,6 +1266,10 @@ def readMagnetometerLSM303C():
         X = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_L), 16)
         Y = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_L), 16)
         Z = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_L), 16)
+
+        X = round((X + 392.5) * 5000/5887, 0)
+        Y = round((Y - 145.5) * 5000/5885, 0)
+        Z =  round((Z + 3839)* 5000/6591, 0)
 
         return [X, Y, Z]
     except:
@@ -1320,39 +1331,63 @@ def setInfraredState(pin, state):
 
         pi.wave_send_repeat(a)
 
+def changeActiveBuzzerState(pin, state):
+    changePinState(pin, state)
+
+
 def changePassiveBuzzerState(pin, state):
     pin = normalizePin(pin)
+    laststate = 255
+
+    try:
+        laststate = passive_buzzer_last_value[pin]
+    except:
+        pass
+
     state = int(state)
 
-    cleanupPin(pin)
+    if state != laststate:
+        passive_buzzer_last_value[pin] = state
+        pi.set_mode(pin, pigpio.OUTPUT)
 
-    pi.set_mode(pin, pigpio.OUTPUT)
+        pi.wave_clear()
+        pi.wave_tx_stop()
 
-    pi.wave_clear()
-    pi.wave_tx_stop()
+        if state:
+            wf = []
 
-    if state:
-        wf = []
+            wf.append(pigpio.pulse(1<<pin, 0, 500))
+            wf.append(pigpio.pulse(0, 1<<pin, 500))
 
-        wf.append(pigpio.pulse(1<<pin, 0, 500))
-        wf.append(pigpio.pulse(0, 1<<pin, 500))
+            pi.wave_add_generic(wf)
 
-        pi.wave_add_generic(wf)
+            a = pi.wave_create()
 
-        a = pi.wave_create()
+            pi.wave_send_repeat(a)
+        else:
+            GPIO.setup(pin, GPIO.OUT)
+            GPIO.output(pin, GPIO.LOW)
 
-        pi.wave_send_repeat(a)
 
-
-def readADCADS1015(pin, gain):
+def readADCADS1015(pin, gain=1):
     ADS1x15_CONFIG_GAIN = {
-        2/3: 0x0000,
-        1:   0x0200,
-        2:   0x0400,
-        4:   0x0600,
-        8:   0x0800,
-        16:  0x0A00
+        2/3: 0x0000, # +/- 6.144V
+        1:   0x0200, # +/- 4.096v
+        2:   0x0400, # +/- 2.048v
+        4:   0x0600, # +/- 1.024v
+        8:   0x0800, # +/- 0.512v
+        16:  0x0A00 # +/- 0.256v
     }
+
+    ADS1x15_GAIN_MAX_VOLTAGE = {
+        2/3: 6.144,
+        1:   4.096,
+        2:   2.048,
+        4:   1.024,
+        8:   0.512,
+        16:  0.256
+    }
+
 
     ADS1015_CONFIG_DR = {
         128:   0x0000,
@@ -1379,39 +1414,42 @@ def readADCADS1015(pin, gain):
     pin = normalizePin(pin)
 
     mux = pin + 0x04
-    gain = ADS1x15_CONFIG_GAIN[gain]
+    gainbits = ADS1x15_CONFIG_GAIN[gain]
     data_rate = 0x00C0 #3.3ksps
 
     config = ADS1x15_CONFIG_OS_SINGLE
     config |= (mux & 0x07) << ADS1x15_CONFIG_MUX_OFFSET
-    config |= gain
+    config |= gainbits
     config |= ADS1x15_CONFIG_MODE_CONTINUOUS
     config |= data_rate
     config |= ADS1x15_CONFIG_COMP_QUE_DISABLE
 
-    bus.write_i2c_block_data(address, ADS1x15_POINTER_CONFIG, [(config >> 8) & 0xFF, config & 0xFF])
+    value = 0
 
-    time.sleep(0.001)
-    result = bus.read_i2c_block_data(address, ADS1x15_POINTER_CONVERSION, 2)
+    try:
+        bus.write_i2c_block_data(address, ADS1x15_POINTER_CONFIG, [(config >> 8) & 0xFF, config & 0xFF])
 
-    value = twos_comp(result[0] << 8 | result[1], 16)
+        time.sleep(0.001)
+
+        result = bus.read_i2c_block_data(address, ADS1x15_POINTER_CONVERSION, 2)
+
+        value = twos_comp(result[0] << 8 | result[1], 16)
+
+        max = ADS1x15_GAIN_MAX_VOLTAGE[gain];
+
+        # Normalize the value so that 0v is 0 and 3.3v is 999
+        value = value / (32768. / max  * 3.3 / 1000.)
+
+        if value < 0:
+            value = 0
+
+        if value > 999:
+            value = 999
+    except:
+        pass
 
     return value
 
-def readLightIntensity(pin):
-    pin = normalizePin(pin)
-
-    val = int(readADCADS1015(pin, 1))
-    
-    if val < 0:
-        val = 0
-
-    if val > 25840: # FIX ME ???
-        val = 25840
-    
-    val = val * 100 / 25840
-
-    return val
 
 def readSoundLevel(pin):
     pin = normalizePin(pin)
@@ -1429,5 +1467,147 @@ def readSoundLevel(pin):
 
     return max - min        
 
+adcHandler = [
+    {
+        "type": "grovepi", 
+        "handler": readGrovePiADC
+    },
+    {
+        "type": "ads1015",
+        "handler": readADCADS1015
+    }
+]
 
+
+def readADC(pin):
+    for handler in adcHandler:
+        if handler["type"] == currentADC:
+            return handler["handler"](pin)
+
+    return 0
+
+def readTemperatureGroveAnalog(pin):
+    B = 4275.
+    R0 = 100000.
+
+    val = readADC(pin)
+    
+    if val == 0:
+        return 0
+
+    r = 1000. / val - 1.
+    r = R0 * r
+
+    return round(1. / (math.log10(r / R0) / B + 1 / 298.15) - 273.15, 1)
+
+
+def readRotaryAngle(pin):
+	return int(readADC(pin) / 10)
+
+def readSoundSensor(pin):
+	return int(readADC(pin) / 10)
+
+def readLightIntensity(pin):
+	return int((readADC(pin) + 1)/ 10)
+    
+sensorHandler = [
+    {
+        "type": "screen",
+        "subType": "oled128x32",
+        "handler": displayTextOled
+    },
+    {
+        "type": "screen",
+        "subType": "16x2lcd",
+        "handler": displayText16x2
+    },
+    {
+        "type": "range",
+        "subType": "vl53l0x",
+        "handler": readDistanceVL53
+    },
+    {
+        "type": "range",
+        "subType": "ultrasonic",
+        "handler": readDistanceUltrasonic
+    },
+    {
+        "type": "temperature",
+        "subType": "BMI160",
+        "handler": readTemperatureBMI160
+    },
+    {
+        "type": "temperature",
+        "subType": "groveanalog",
+        "handler": readTemperatureGroveAnalog
+    },
+    {
+        "type": "temperature",
+        "subType": "DHT11",
+        "handler": readTemperatureDHT11
+    },
+    {
+        "type": "buzzer",
+        "subType": "passive",
+        "handler": changePassiveBuzzerState
+    },
+    {
+        "type": "buzzer",
+        "subType": "active",
+        "handler": changeActiveBuzzerState
+    },
+]
+
+def nameToHandler(name, type):
+    sensor =  nameToDef(name, "range")
+
+    if sensor is not None:
+        for handler in sensorHandler:
+            if handler["type"] == type and "subType" in sensor and handler["subType"] == sensor["subType"]:
+                return [sensor, handler["handler"]]
+    return None
+        
+
+def readDistance(name):
+    ret =  nameToHandler(name, "range")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return handler(name)
+    
+    return 0
+
+
+def displayText(name, line1, line2=""):
+    ret =  nameToHandler(name, "screen")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return handler(line1, line2)
+
+def readTemperature(name):
+    ret =  nameToHandler(name, "temperature")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return round(handler(name), 1)
+    
+    return 0
+
+def setBuzzerState(name, state):
+    ret =  nameToHandler(name, "buzzer")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return handler(name, state)
+    
+    return 0
 `
