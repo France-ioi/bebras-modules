@@ -193,7 +193,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             };
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
-               displayHelper.setupLevels(null, reloadWithCallbacks, levels);
+               displayHelper.setupLevels(defaultLevel, reloadWithCallbacks, levels);
             }
             callback();
          }
