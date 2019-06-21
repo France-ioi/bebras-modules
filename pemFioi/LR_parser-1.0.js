@@ -226,7 +226,8 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.formatContent();
       this.visualGraph.redraw();
-      this.graphEditor.updateHandlers();
+      if(this.graphEditor)
+         this.graphEditor.updateHandlers();
    };
 
    this.initActionSequence = function() {
@@ -1754,7 +1755,8 @@ function LR_Parser(settings,subTask,answer) {
    this.styleTabs = function() {
       if(!this.sideTable){
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-            margin: "1em auto"
+            margin: "1em auto",
+            "text-align": "center"
          });
 
          $("#"+this.parseTableID+" table").css({
