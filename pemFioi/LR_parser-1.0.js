@@ -49,6 +49,7 @@ function LR_Parser(settings,subTask,answer) {
    this.selectedVertex = null;
    this.selectedRule = null;
    this.selectedStackElements = [];
+   this.selectedState = null;
 
    this.cellEditor = null;
 
@@ -1124,7 +1125,7 @@ function LR_Parser(settings,subTask,answer) {
          // info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
-      this.selectedState = null;
+      // this.selectedState = null;
    };
 
    /* ACCEPT / ERROR */
@@ -1756,7 +1757,8 @@ function LR_Parser(settings,subTask,answer) {
       if(!this.sideTable){
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
             margin: "1em auto",
-            "text-align": "center"
+            "text-align": "center",
+            height: this.paperHeight
          });
 
          $("#"+this.parseTableID+" table").css({
