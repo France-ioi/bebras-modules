@@ -387,8 +387,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {
-         that._mainContext.runner.stop();
-         that._mainContext.reset();
+         that._mainContext.runner.reset();
       }
 
       if(window.quickAlgoInterface) {
