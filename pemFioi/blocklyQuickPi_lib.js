@@ -28,12 +28,16 @@ var getContext = function (display, infos, curLevel) {
                 setBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
 
-                plotPixel: "Draw pixel",
-                unplotPixel: "Clear pixel",
+                drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
-                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (x₁,y₁) %3  %4 Fill %5",
-                drawCircle: "Draw circle (x₀,y₀) %1 %2 Radius %3 Fill %4",
+                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
+                drawCircle: "Draw circle (x₀,y₀) %1 %2 Diameter %3",
                 clearScreen: "Clear entiere screen",
+
+                fill: "Enable fill and set color", 
+                noFill: "Set draw functions to not fill",
+                stroke: "Enable stroke and set color",
+                noStroke: "Disable stroke on draw functions",
 
                 readAcceleration: "Read acceleration (mm/s²)",
                 computeRotation: "Compute rotation from accelerometer (°) %1",
@@ -85,12 +89,17 @@ var getContext = function (display, infos, curLevel) {
                 setBuzzerState: "setBuzzerState",
                 getTemperature: "getTemperature",
 
-                plotPixel: "plotPixel",
-                unplotPixel: "unplotPixel",
+                drawPoint: "drawPoint",
                 drawLine: "drawLine",
                 drawRectangle: "drawRectangle",
                 drawCircle: "drawCircle",
                 clearScreen: "clearScreen",
+
+                fill: "fill", 
+                noFill: "noFill",
+                stroke: "stroke",
+                noStroke: "noStroke",
+
 
                 readAcceleration: "readAcceleration",
                 computeRotation: "computeRotation",
@@ -116,7 +125,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonWasPressed: "buttonWasPressed(port): Returns true if the button has been pressed and will clear the value",
                 changeLedState: "changeLedState(port, state): Change led state in the given port",
                 toggleLedState: "toggleLedState(port): Toggles the led state",
-                displayText: "displayText(line1, line2): Display text in LCD screen",
+                displayText: "displayText(port, line1, line2): Display text in LCD screen",
                 readTemperature: "readTemperature(port): Read Ambient temperature",
                 sleep: "sleep(1000): pause program execute for a number of seconds",
                 setServoAngle: "setServoAngle(port, angle): Set servo motor to an specified angle",
@@ -128,12 +137,17 @@ var getContext = function (display, infos, curLevel) {
                 setBuzzerState: "setBuzzerState(port, state): sonnerie",
                 getTemperature: "getTemperature(port): Get temperature",
 
-                plotPixel: "plotPixel(x, y)",
-                unplotPixel: "unplotPixel(x, y)",
+                drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
-                drawRectangle: "drawRectangle(x0, y0, x1, y1, fill)",
-                drawCircle: "drawCircle(x0, y0, radius, fill)",
+                drawRectangle: "drawRectangle(x0, y0, x1, y1)",
+                drawCircle: "drawCircle(x0, y0, diameter)",
                 clearScreen: "clearScreen()",
+
+                fill: "fill(color)", 
+                noFill: "noFill()",
+                stroke: "stroke(color)",
+                noStroke: "noStroke()",
+
 
                 readAcceleration: "readAcceleration(axis)",
                 computeRotation: "computeRotation()",
@@ -267,12 +281,16 @@ var getContext = function (display, infos, curLevel) {
                 setBuzzerState: "sonnerie",
                 getTemperature: "Get temperature",
 
-                plotPixel: "plotPixel",
-                unplotPixel: "unplotPixel",
+                drawPoint: "drawPoint",
                 drawLine: "drawLine",
                 drawRectangle: "drawRectangle",
                 drawCircle: "drawCircle",
                 clearScreen: "clearScreen",
+
+                fill: "fill", 
+                noFill: "noFill",
+                stroke: "stroke",
+                noStroke: "noStroke",
 
                 readAcceleration: "readAcceleration",
                 computeRotation: "computeRotation",
@@ -435,7 +453,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (taskInfos != undefined) {
-            // Instructions that have been called without
+            // Insatructions that have been called without
             // ever getting into a quickpi block
             context.piLessInstructions = 0;
 
@@ -4138,19 +4156,19 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.waitForButton = function (callback) {
+    context.quickpi.waitForButton = function (name, callback) {
         //        context.registerQuickPiEvent("button", "D22", "wait", false);
+        var sensor = findSensorByName(name);
 
         if (!context.display || context.autoGrading) {
 
-            context.advanceToNextRelease("button", "D22");
+            context.advanceToNextRelease("button", sensor.port);
 
             context.waitDelay(callback);
         } else if (context.offLineMode) {
-            button = context.findSensor("button", "D22");
-            if (button) {
+            if (sensor) {
                 var cb = context.runner.waitCallback(callback);
-                button.onPressed = function () {
+                sensor.onPressed = function () {
                     cb();
                 }
             } else {
@@ -4160,7 +4178,7 @@ var getContext = function (display, infos, curLevel) {
         else {
             var cb = context.runner.waitCallback(callback);
 
-            context.quickPiConnection.sendCommand("waitForButton(22)", cb);
+            context.quickPiConnection.sendCommand("waitForButton(\"" + name + "\")", cb);
         }
     };
 
@@ -4226,33 +4244,33 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
-    context.quickpi.toggleLedState = function (port, callback) {
-        port = context.normalizePort(port, "D");
+    context.quickpi.toggleLedState = function (name, callback) {
+        var sensor = findSensorByName(name);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("button", port);
+            var state = context.getSensorState("button", sensor.port);
 
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
-            context.quickPiConnection.sendCommand("toggleLedState(\"" + port + "\")", function (returnVal) {
+            context.quickPiConnection.sendCommand("toggleLedState(\"" + name + "\")", function (returnVal) {
                 cb(returnVal != "0");
             });
         }
     };
 
 
-    context.quickpi.buttonWasPressed = function (port, callback) {
-        port = context.normalizePort(port, "D");
+    context.quickpi.buttonWasPressed = function (name, callback) {
+        var sensor = findSensorByName(name);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("button", port);
+            var state = context.getSensorState("button", sensor.port);
 
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            context.quickPiConnection.sendCommand("buttonWasPressed(\"" + port + "\")", function (returnVal) {
+            context.quickPiConnection.sendCommand("buttonWasPressed(\"" + name + "\")", function (returnVal) {
                 cb(returnVal != "0");
             });
         }
@@ -4476,7 +4494,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
-    context.quickpi.plotPixel = function(x, y, callback) {
+    context.quickpi.drawPoint = function(x, y, callback) {
         /*
         context.registerQuickPiEvent("screen", "i2c",
             {
@@ -4492,36 +4510,12 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
 
-            var command = "plotPixel(" + x + "," + y + ")";
+            var command = "drawPoint(" + x + "," + y + ")";
             context.quickPiConnection.sendCommand(command, function () {
                 cb();
             });
         }
     };
-
-    context.quickpi.unplotPixel = function(x, y, callback) {
-        /*
-        context.registerQuickPiEvent("screen", "i2c",
-            {
-                line1: line1,
-                line2: line2
-            }
-        );
-            FIXME
-        */
-
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            context.waitDelay(callback);
-        } else {
-            var cb = context.runner.waitCallback(callback);
-
-            var command = "unplotPixel(" + x + "," + y + ")";
-            context.quickPiConnection.sendCommand(command, function () {
-                cb();
-            });
-        }
-    };
-
 
     context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
@@ -4537,32 +4531,26 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
-    context.quickpi.drawRectangle = function(x0, y0, x1, y1, fill, callback) {
+    context.quickpi.drawRectangle = function(x0, y0, x1, y1, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var fillstring = "False";
-            if (fill)
-                fillstring = "True";
 
-            var command = "drawRectangle(" + x0 + "," + y0 + "," + x1 + "," + y1 + "," + fillstring + ")";
+            var command = "drawRectangle(" + x0 + "," + y0 + "," + x1 + "," + y1 + ")";
             context.quickPiConnection.sendCommand(command, function () {
                 cb();
             });
         }
     };
     
-    context.quickpi.drawCircle = function(x0, y0, radius, fill, callback) {
+    context.quickpi.drawCircle = function(x0, y0, diameter, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var fillstring = "False";
-            if (fill)
-                fillstring = "True";
 
-            var command = "drawCircle(" + x0 + "," + y0 + "," + radius + "," + fillstring + ")";
+            var command = "drawCircle(" + x0 + "," + y0 + "," + diameter + ")";
             context.quickPiConnection.sendCommand(command, function () {
                 cb();
             });
@@ -4778,14 +4766,25 @@ var getContext = function (display, infos, curLevel) {
     
 
     function findSensorByName(name) {
-        var firstname = name.split(" ")[0];
 
-        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+        if (isNaN(name.substring(0, 1)) && !isNaN(name.substring(1))) {
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var sensor = infos.quickPiSensors[i];
 
-            var sensor = infos.quickPiSensors[i];
+                if (sensor.port == name) {
+                    return sensor;
+                }
+            }
+        } else {
+            var firstname = name.split(" ")[0];
 
-            if (sensor.name == firstname) {
-                return sensor;
+
+            for (var i = 0; i < infos.quickPiSensors.length; i++) {
+                var sensor = infos.quickPiSensors[i];
+
+                if (sensor.name == firstname) {
+                    return sensor;
+                }
             }
         }
         return null;
@@ -4820,7 +4819,15 @@ var getContext = function (display, infos, curLevel) {
                 { name: "buttonState", yieldsValue: true },
                 { name: "currentTime", yieldsValue: true },
 
-                { name: "waitForButton" },
+                {
+                    name: "waitForButton", params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
+                            }
+                        ]
+                    }
+                },
                 {
                     name: "buttonStateInPort", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
@@ -4996,25 +5003,13 @@ var getContext = function (display, infos, curLevel) {
 
                 },
                 {
-                    name: "plotPixel", params: ["Number", "Number"], blocklyJson: {
+                    name: "drawPoint", params: ["Number", "Number"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0"},
                             { "type": "input_value", "name": "PARAM_1"},
                         ]
                     },
-                    blocklyXml: "<block type='plotPixel'>" +
-                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
-                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
-                        "</block>"
-                },
-                {
-                    name: "unplotPixel", params: ["Number", "Number"], blocklyJson: {
-                        "args0": [
-                            { "type": "input_value", "name": "PARAM_0"},
-                            { "type": "input_value", "name": "PARAM_1"},
-                        ]
-                    },
-                    blocklyXml: "<block type='unplotPixel'>" +
+                    blocklyXml: "<block type='drawPoint'>" +
                         "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "</block>"
@@ -5036,13 +5031,12 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "drawRectangle", params: ["Number", "Number", "Number", "Number", "Boolean"], blocklyJson: {
+                    name: "drawRectangle", params: ["Number", "Number", "Number", "Number"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0"},
                             { "type": "input_value", "name": "PARAM_1"},
                             { "type": "input_value", "name": "PARAM_2"},
                             { "type": "input_value", "name": "PARAM_3"},
-                            { "type": "input_value", "name": "PARAM_4"},
                         ]
                     },
                     blocklyXml: "<block type='drawRectangle'>" +
@@ -5050,16 +5044,14 @@ var getContext = function (display, infos, curLevel) {
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_3'><shadow type='math_number'></shadow></value>" +
-                        "<value name='PARAM_4'><shadow type='logic_boolean'></shadow></value>" +
                         "</block>"
                 },
                 {
-                    name: "drawCircle", params: ["Number", "Number", "Number", "Boolean"], blocklyJson: {
+                    name: "drawCircle", params: ["Number", "Number", "Number"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0"},
                             { "type": "input_value", "name": "PARAM_1"},
                             { "type": "input_value", "name": "PARAM_2"},
-                            { "type": "input_value", "name": "PARAM_3"},
                         ]
                     },
                     blocklyXml: "<block type='drawCircle'>" +
