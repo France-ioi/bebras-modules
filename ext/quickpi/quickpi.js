@@ -624,16 +624,44 @@ def scheduleUpdateScreen():
         oledtimer.start()   
     oledlock.release()
 
-def plotPixel(x, y):
+fillcolor = 255
+strokecolor = 255
+
+def fill(color):
+    global fillcolor
+
+    if int(color) > 0:
+        fillcolor = 255
+    else:
+        fillcolor = 0
+
+def noFill():
+    global fillcolor
+    fillcolor = None
+
+def stroke(color):
+    global strokecolor
+
+    if int(color) > 0:
+        strokecolor = 255
+    else:
+        strokecolor = 0
+
+def noStroke(color):
+    global strokecolor
+    strokecolor = None
+
+def drawPoint(x, y):
     global oleddisp
     global oledfont
     global oledimage
     global oleddraw
+    global strokecolor
 
     initOLEDScreen()
 
     oledlock.acquire(True)
-    oleddraw.point((x, y), fill=255)
+    oleddraw.point((x, y), fill=strokecolor)
     oledlock.release()
 
     scheduleUpdateScreen()
@@ -643,20 +671,39 @@ def drawLine(x0, y0, x1, y1):
     global oledfont
     global oledimage
     global oleddraw
+    global strokecolor
 
     initOLEDScreen()
 
     oledlock.acquire(True)
-    oleddraw.line((x0, y0, x1, y1), fill=255)
+    oleddraw.line((x0, y0, x1, y1), fill=strokecolor)
     oledlock.release()
 
     scheduleUpdateScreen()
 
-def drawRectangle(x0, y0, x1, y1, fill):
+def drawRectangle(x0, y0, width, height):
     global oleddisp
     global oledfont
     global oledimage
     global oleddraw
+    global fillcolor
+    global strokecolor
+
+    initOLEDScreen()
+
+    oledlock.acquire(True)
+    oleddraw.rectangle((x0, y0, x0 + width, y0 + height), fill=fillcolor, outline=strokecolor)
+    oledlock.release()
+
+    scheduleUpdateScreen()
+
+def drawCircle(x0, y0, diameter):
+    global oleddisp
+    global oledfont
+    global oledimage
+    global oleddraw
+    global fillcolor
+    global strokecolor
 
     initOLEDScreen()
 
@@ -664,23 +711,7 @@ def drawRectangle(x0, y0, x1, y1, fill):
     if fill:
         fillcolor = 255
 
-    oledlock.acquire(True)
-    oleddraw.rectangle((x0, y0, x1, y1), fill=fillcolor, outline=255)
-    oledlock.release()
-
-    scheduleUpdateScreen()
-
-def drawCircle(x0, y0, radius, fill):
-    global oleddisp
-    global oledfont
-    global oledimage
-    global oleddraw
-
-    initOLEDScreen()
-
-    fillcolor = 0
-    if fill:
-        fillcolor = 255
+    radius = diameter / 2
 
     boundx0 = x0 - radius
     boundy0 = y0 - radius
@@ -689,26 +720,10 @@ def drawCircle(x0, y0, radius, fill):
     boundy1 = y0 + radius
 
     oledlock.acquire(True)
-    oleddraw.ellipse((boundx0, boundy0, boundx1, boundy1), fill=fillcolor, outline=255)
+    oleddraw.ellipse((boundx0, boundy0, boundx1, boundy1), fill=fillcolor, outline=strokecolor)
     oledlock.release()
 
     scheduleUpdateScreen()
-
-
-def unplotPixel(x, y):
-    global oleddisp
-    global oledfont
-    global oledimage
-    global oleddraw
-
-    initOLEDScreen()
-
-    oledlock.acquire(True)
-    oleddraw.point((x, y), fill=0)
-    oledlock.release()
-
-    scheduleUpdateScreen()
-
 
 def clearScreen():
     global oleddisp
