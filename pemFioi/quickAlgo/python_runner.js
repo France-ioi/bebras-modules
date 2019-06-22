@@ -18,6 +18,7 @@ function PythonInterpreter(context, msgCallback) {
   this._isRunning = false;
   this._stepInProgress = false;
   this.stepMode = false;
+  this._isReset = true;
   this._steps = 0;
   this._stepsWithoutAction = 0;
   this._lastNbActions = null;
@@ -395,6 +396,7 @@ function PythonInterpreter(context, msgCallback) {
     this._resetInterpreterState();
     Sk.running = true;
     this._isRunning = true;
+    this._isReset = false;
   };
 
   this.run = function () {
@@ -641,6 +643,13 @@ function PythonInterpreter(context, msgCallback) {
   this._asyncCallback = function () {
     return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
   }
+
+  this.reset = function() {
+    if(this._isReset) { return; }
+    this.stop();
+    this.context.reset();
+    this._isReset = true;
+  };
 }
 
 function initBlocklyRunner(context, msgCallback) {
