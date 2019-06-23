@@ -13,6 +13,12 @@ var getContext = function(display, infos, curLevel) {
          messages: {},
          description: {}
       },
+      en: {
+         label: {},
+         code: {},
+         messages: {},
+         description: {}
+      },
       es: {
          label: {},
          code: {},
@@ -168,7 +174,146 @@ var getContext = function(display, infos, curLevel) {
             },
             startingBlockName: "Programme du robot"
          },
-
+         en: {
+            label: {
+               row: "robot's row",
+               col: "robot's column",
+               wait: "wait",
+               north: "move up",
+               south: "move down",
+               east: "move right",
+               west: "more left",
+               left: "turn left",
+               right: "turn right",
+               turnAround: "turn around",
+               forward: "move forward",
+               backwards: "move backwards",
+               jump: "jump",
+               obstacleInFront: "obstacle ahead",
+               obstacleEast: "obstacle on the right",
+               obstacleWest: "obstacle on the left",
+               obstacleNorth: "obstacle above",
+               obstacleSouth: "obstacle below",
+               obstacleRight: "obstacle on the right",
+               obstacleLeft: "obstacle on the left",
+               gridEdgeEast: "grid edge on the right",
+               gridEdgeWest: "grid edge on the left",
+               gridEdgeNorth: "grid edge above",
+               gridEdgeSouth: "grid edge below",
+               platformInFront: "platform ahead",
+               platformAbove: "platform above",
+               withdrawObject: "pick the object",
+               dropObject: "drop the object",
+               onObject: "on an object",
+               onContainer: "on a container",
+               onNumber: "on a number",
+               onWritable: "on a blackboard",
+               onLauncher: "on a laser emitter",
+               writeNumber: "write the number",
+               readNumber: "number in the cell",
+               pushObject: "push the object",
+               pushableInFront: "pushable object ahead",
+               shoot: "shoot a laser in direction %1",
+               shoot_noShadow: "shoot a laser in direction %1",
+               shootCondition: "laser shot returning to starting point in direction %1",
+               shootCondition_noShadow: "laser shot returning to starting point in direction %1",
+               connect: "plug a wire",
+               onMale: "to a male plug",
+               onFemale: "to a female plug"
+            },
+            code: {
+               row: "robotRow",
+               col: "robotColumn",
+               wait: "wait",
+               north: "up",
+               south: "down",
+               east: "right",
+               west: "left",
+               left: "turnLeft",
+               right: "turnRight",
+               turnAround: "turnAround",
+               forward: "forward",
+               backwards: "backwards",
+               jump: "jump",
+               obstacleInFront: "obstacleAhead",
+               obstacleEast: "obstacleRight",
+               obstacleWest: "obstacleLeft",
+               obstacleNorth: "obstacleAbove",
+               obstacleSouth: "obstacleBelow",
+               obstacleRight: "obstacleRightRel",
+               obstacleLeft: "obstacleLeftRel",
+               gridEdgeEast: "gridEdgeRight",
+               gridEdgeWest: "gridEdgeLeft",
+               gridEdgeNorth: "gridEdgeAbove",
+               gridEdgeSouth: "gridEdgeBelow",
+               platformInFront: "plateformAhead",
+               platformAbove: "platformAbove",
+               withdrawObject: "pickObject",
+               dropObject: "dropObject",
+               onObject: "onObject",
+               onContainer: "onContainer",
+               onNumber: "onNumber",
+               onWritable: "onWritable",
+               onLauncher: "onLauncher",
+               writeNumber: "writeNumber",
+               readNumber: "numberOnCell",
+               pushObject: "pushObject",
+               pushableInFront: "pushableAhead",
+               shoot: "shootLaser",
+               shoot_noShadow: "shootLaser",
+               shootCondition: "shootOnCondition",
+               shootCondition_noShadow: "shootOnCondition",
+               connect: "plugCable",
+               onMale: "onMalePlug",
+               onFemale: "onFemalePlug"
+            },
+            messages: {
+               leavesGrid: "The robot exits the grid!",
+               obstacle: "The robot attempts to move towards an obstacle!",
+               nothingToPickUp: "There is nothing to puck up!",
+               nothingToLookAt: "There is no card or container in this cell",
+               falls: "The robot will leap into the void",
+               willFallAndCrash: "The robot will jump from a high point and crash!",
+               jumpOutsideGrid: "The robot tries to jump outside of the grid!",
+               jumpObstacleBlocking: "The robot tries to jump but an obstacle blacks it",
+               jumpNoPlatform: "The robot tries to jump but there is no platform above!",
+               tooManyObjects: "The robot tries to transport too many objects at a time!",
+               emptyBag: "The robot tries to drop an object but it doesn't carry one!",
+               successReachExit: "Congratulations, your robot reached the exit!",
+               failureReachExit: "Your robot didn't reach the exit.",
+               successPickedAllWithdrawables: "Congratulations, your robot picked up everything!",
+               failurePickedAllWithdrawables: "Your robot didn't pick up everything.",
+               successContainersFilled: "Congratulations, your robot filled every container",
+               failureContainersFilled: "An object was left outside of containers",
+               failureContainersFilledLess: "Yout robot didn't fill every container",
+               failureContainersFilledBag: "Your robot didn't drop all the objects",
+               failureUnfilteredObject: "Your robot picked an invalid object",
+               failureTooManyMoves: "Your robot made too many moves.",
+               failureWriteHere: "Your robot can't write here!",
+               failureReadHere: "There is no number written here!",
+               successNumbersWritten: "Congratulations, your robot wrote all the correct numbers!",
+               failureNumbersWritten: "Your robot didn't write the correct numbers!",
+               failureNothingToPush: "There is no object to push!",
+               failureWhilePushing: "The robot can't push this object!",
+               failureDropObject: "You can't drop an object here",
+               failureDropOutside: "Your robot tries to drop an object outside of the grid",
+               failureNotEnoughPlatform: "Not enough platforms",
+               failureLights: "There are still lights to turn on.",
+               successLights: "Congratulations, your robot turned on all the lights!",
+               failureLaser: "The robot has to be on a launcher to be able to shoot!",
+               failureNoPlug: "The robot has to be on a plug to plug in a cable!",
+               failureAlreadyWired: "This plug is already connected to a cable!",
+               failureWrongPlugType: "You can't connect these plugs together!",
+               successPlugsWired: "The machine is fixed!",
+               failurePlugsWired: "The machine doesn't work because some plugs are not connected!",
+               failureWireCrossing: "Impossible to connect these two plugs: two cables would intersect!",
+               failureWireTooLong: "Impossible to connect these two plugs: they are too far from eachother!",
+               failureTotalLengthExceeded: "You don't have enough length of cable to connect these two plugs!",
+               failureProjectile: "The robot got hit by a projectile!"
+            },
+            startingBlockName: "Program of the robot"
+         },
+         
          es: {
             label: {
                row: "fila del robot",
@@ -422,6 +567,13 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Votre robot s'est perdu en chemin."
             }
          },
+         en: {
+            messages: {
+               obstacle: "The robot will get out of the marked track!",
+               successReachExit: "Congratulations, your robot collected the safe!",
+               failureReachExit: "Yout robot got lost."
+            }
+         },
 
          es: {
             messages: {
@@ -444,6 +596,20 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Il y a des cartes mal rangées",
                failureContainersFilledLess: "Il y a encore des cartes à ranger.",
                failureContainersFilledBag: "Votre robot doit déposer sa carte."
+            }
+         },
+         en: {
+            label: {
+               withdrawObject: "pick up the card",
+               dropObject: "drop the card",
+               onObject: "on a card",
+               onContainer: "on a placeholder",
+            },
+             messages: {
+               successContainersFilled: "Congratulations, your robot placed all the cards at the right location!",
+               failureContainersFilled: "Some cards are misplaced",
+               failureContainersFilledLess: "There are still misplaced cards.",
+               failureContainersFilledBag: "Your robot must drop its card."
             }
          },
 
@@ -472,6 +638,15 @@ var getContext = function(display, infos, curLevel) {
                failureReachExit: "Votre robot n'a pas atteint la case verte."
             }
          },
+         en: {
+            label: {
+               
+            },
+             messages: {
+               successPickedAllWithdrawables: "Congratulations, your robot succeeded this mission!",
+               failureReachExit: "Your robot didn't reach the green cell."
+            }
+         },
 
          es: {
             label: {
@@ -491,6 +666,15 @@ var getContext = function(display, infos, curLevel) {
              messages: {
                successReachExit: "Bravo, votre robot a atteint la case verte !",
                failureReachExit: "Votre robot n'a pas atteint la case verte."
+            }
+         },
+         en: {
+            label: {
+               
+            },
+             messages: {
+               successReachExit: "Congratulations, your robot reached the green cells!",
+               failureReachExit: "Your robot didn't reach the green cell."
             }
          },
 
@@ -519,6 +703,23 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                successContainersFilled: "Bravo, votre robot a déposé des plots sur les bonnes cases !",
                failureContainersFilled: "Il manque des plots ou ils ne sont pas au bon endroit."
+            }
+         },
+
+         en: {
+            label: {
+               dropObject: "drop a cone",
+               onContainer: "on a marked cell",
+               obstacleInFront: "cone ahead"
+            },
+            code: {
+               dropObject: "dropCone",
+               onContainer: "onMarkedCell",
+               obstacleInFront: "coneAhead"
+            },
+            messages: {
+               successContainersFilled: "Congratulations, your robot dropped cones on the marked cells!",
+               failureContainersFilled: "Some cones are missing or are misplaced."
             }
          },
 
@@ -558,6 +759,24 @@ var getContext = function(display, infos, curLevel) {
 					obstacle: "Attention à la fleur !",
             }
          },
+         en: {
+            label: {
+               dropObject: "plant a seed",
+               onContainer: "soil on the cell",
+               obstacleInFront: "flower ahead"
+            },
+            code: {
+               dropObject: "plantSeed",
+               onContainer: "soilOnCell",
+               obstacleInFront: "flowerAhead"
+            },
+            messages: {
+               successContainersFilled: "Congratulations, your robot is a good gardener!",
+               failureContainersFilled: "Your robot dropped seeds where there is no soil.",
+               failureContainersFilledLess: "Some soil spots don't have any flower!",
+					obstacle: "Be careful, there's a flower!",
+            }
+         },
 
          es: {
             label: {
@@ -585,6 +804,13 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Le robot tente de foncer dans un mur !"
             }
          },
+         fr: {
+            messages: {
+               successReachExit: "Congratulations, the robot reached the green cell!",
+               failureReachExit: "The robot didn't reach the green cell.",
+               obstacle: "The robot is attemting to run into a wall!"
+            }
+         },
 
          es: {
             messages: {
@@ -607,6 +833,18 @@ var getContext = function(display, infos, curLevel) {
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
             }
          },
+         fr: {
+            label: {
+               withdrawObject: "pick the domino",
+            },
+            code: {
+               withdrawObject: "pickDomino"
+            },
+            messages: {
+               "successPickedAllWithdrawables": "Congratulations, the robot picked all the requested dominoes!",
+               "failurePickedAllWithdrawables": "The robot didn't pick up the requested dominoes!"
+            }
+         },
          es: {
             label: {
                withdrawObject: "recoger el dominó",
@@ -624,6 +862,30 @@ var getContext = function(display, infos, curLevel) {
          fr: {
             label: {
                withdrawObject: "ramasser la roue dentée",
+               dropObject: "accrocher la roue dentée",
+               onObject: "sur une roue dentée",
+               onContainer: "sur une machine"
+            },
+            code: {
+               withdrawObject: "ramasserRoue",
+               dropObject: "deposerRoue",
+               onObject: "surRoueDentee",
+               onContainer: "surMachine"
+            },
+            messages: {
+               successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
+               failureContainersFilled: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
+               failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
+               failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
+               failureDropObject: "Il y a déjà une plateforme ici !",
+               emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
+            }
+         },
+
+         en: {
+            label: {
+               withdrawObject: "pick up the gear",
                dropObject: "accrocher la roue dentée",
                onObject: "sur une roue dentée",
                onContainer: "sur une machine"
