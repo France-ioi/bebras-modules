@@ -30,14 +30,14 @@ var getContext = function (display, infos, curLevel) {
 
                 drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
-                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
+                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (width,height) %3  %4",
                 drawCircle: "Draw circle (x₀,y₀) %1 %2 Diameter %3",
                 clearScreen: "Clear entiere screen",
 
-                fill: "Enable fill and set color", 
-                noFill: "Set draw functions to not fill",
-                stroke: "Enable stroke and set color",
-                noStroke: "Disable stroke on draw functions",
+                fill: "Set fill color", 
+                noFill: "Do not fill shapes",
+                stroke: "Set stroke color",
+                noStroke: "Do not stroke",
 
                 readAcceleration: "Read acceleration (mm/s²)",
                 computeRotation: "Compute rotation from accelerometer (°) %1",
@@ -139,7 +139,7 @@ var getContext = function (display, infos, curLevel) {
 
                 drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
-                drawRectangle: "drawRectangle(x0, y0, x1, y1)",
+                drawRectangle: "drawRectangle(x0, y0, width, height)",
                 drawCircle: "drawCircle(x0, y0, diameter)",
                 clearScreen: "clearScreen()",
 
@@ -3071,6 +3071,55 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.img || !sensor.img.paper.canvas)
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
 
+            if (!sensor.rect || !sensor.rect.paper.canvas)
+                sensor.rect = paper.rect(imgx, imgy, 128, 32);
+            
+            sensor.rect.attr({
+                "x": imgx + (imgw / 2) - (128/2),
+                "y": imgy + (imgh / 2) - (32/2),
+                "width": 128,
+                "height": 32,
+            });
+
+            sensor.canvas = null;
+            if (!sensor.canvas) {
+                var newNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                newNode.setAttribute("x",imgx + (imgw / 2) - (128/2),); //Set rect data
+                newNode.setAttribute("y",imgy + (imgh / 2) - (32/2),); //Set rect data
+                newNode.setAttribute("width","128"); //Set rect data
+                newNode.setAttribute("height","32"); //Set rect data
+                paper.canvas.appendChild(newNode);
+    
+                sensor.newNode = newNode;
+
+                var canvas = document.createElement("canvas");
+                canvas.id = "screencanvas";
+                canvas.width = 128;
+                canvas.height = 32;
+                newNode.appendChild(canvas);
+
+                sensor.canvas = canvas;
+
+                console.log("duh");
+            } else {
+                sensor.newNode.setAttribute("x", imgx + (imgw / 2) - (128/2)); //Set rect data
+                sensor.newNode.setAttribute("y", imgy + (imgh / 2) - (32/2)); //Set rect data
+                sensor.newNode.setAttribute("width","128"); //Set rect data
+                sensor.newNode.setAttribute("height","32"); //Set rect data
+
+            }
+    
+
+
+//            sensor.rect.node = "Hello";
+//'<div style="position: absolute; overflow: auto; width: 0; height: 0;"></div>
+
+
+//                var el = document.createElement("label");
+//                el.innerText = "test";
+//                sensor.rect.node.appendChild(el);
+
+
             sensor.img.attr({
                 "x": imgx,
                 "y": imgy,
@@ -4506,6 +4555,15 @@ var getContext = function (display, infos, curLevel) {
         */
 
         if (!context.display || context.autoGrading || context.offLineMode) {
+            var sensor = findSensorByName("screen1");
+
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                ctx.fillRect(x, y, 1, 1);
+            }
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -4519,6 +4577,18 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
+
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+            }
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -4531,8 +4601,23 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
-    context.quickpi.drawRectangle = function(x0, y0, x1, y1, callback) {
+    context.quickpi.drawRectangle = function(x0, y0, width, height, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
+
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                ctx.rect(x0, y0, width, height);
+                
+                if (!context.noStroke)
+                    ctx.stroke();
+
+                if (!context.noFill)
+                    ctx.fill();
+            }
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -4546,6 +4631,20 @@ var getContext = function (display, infos, curLevel) {
     
     context.quickpi.drawCircle = function(x0, y0, diameter, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
+
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                ctx.beginPath();
+                ctx.arc(x0, y0, diameter/2, 0, Math.PI*2); 
+                ctx.closePath();
+
+                if (!context.noFill)
+                    ctx.fill();
+            }
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -4559,17 +4658,16 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.clearScreen = function(callback) {
-        /*
-        context.registerQuickPiEvent("screen", "i2c",
-            {
-                line1: line1,
-                line2: line2
-            }
-        );
-            FIXME
-        */
-
         if (!context.display || context.autoGrading || context.offLineMode) {
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
+
+            }
+           
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -4580,6 +4678,88 @@ var getContext = function (display, infos, curLevel) {
             });
         }
     };
+
+    context.quickpi.fill = function(color, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+
+                context.noFill = false;
+                if (color)
+                    ctx.fillStyle = "black";
+                else
+                    ctx.fillStyle = "white";  
+            }
+
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "fill(\"" + color + "\")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.noFill = function(callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.noFill = true;
+
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "NoFill()";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.stroke = function(color, callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var sensor = findSensorByName("screen1");
+            if (sensor && sensor.canvas)
+            {
+                var ctx = sensor.canvas.getContext('2d');
+ 
+                context.noStroke = false;
+                if (color)
+                    ctx.strokeStyle = "black";
+                else
+                    ctx.strokeStyle = "white";  
+            }
+
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            var command = "stroke(\"" + color + "\")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
+
+    context.quickpi.noStroke = function(callback) {
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.noStroke = true;
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "noStroke()";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
 
     context.quickpi.readAcceleration = function(axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
@@ -5058,12 +5238,37 @@ var getContext = function (display, infos, curLevel) {
                         "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_2'><shadow type='math_number'></shadow></value>" +
-                        "<value name='PARAM_3'><shadow type='logic_boolean'></shadow></value>" +
                         "</block>"
                 },
 
                 {
                     name: "clearScreen"
+                },
+                {
+                    name: "fill", params: ["Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                        ]
+                    },
+                    blocklyXml: "<block type='fill'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "noFill"
+                },
+                {
+                    name: "stroke", params: ["Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                        ]
+                    },
+                    blocklyXml: "<block type='stroke'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "noStroke"
                 },
                 {
                     name: "sleep", params: ["Number"], blocklyJson: {
