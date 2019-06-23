@@ -804,7 +804,7 @@ var getContext = function(display, infos, curLevel) {
                obstacle: "Le robot tente de foncer dans un mur !"
             }
          },
-         fr: {
+         en: {
             messages: {
                successReachExit: "Congratulations, the robot reached the green cell!",
                failureReachExit: "The robot didn't reach the green cell.",
@@ -833,7 +833,7 @@ var getContext = function(display, infos, curLevel) {
                "failurePickedAllWithdrawables": "Le robot n'a pas ramassé les dominos demandés."
             }
          },
-         fr: {
+         en: {
             label: {
                withdrawObject: "pick the domino",
             },
@@ -891,10 +891,10 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "sur une machine"
             },
             code: {
-               withdrawObject: "ramasserRoue",
-               dropObject: "deposerRoue",
-               onObject: "surRoueDentee",
-               onContainer: "surMachine"
+               withdrawObject: "pickGear",
+               dropObject: "attachGear",
+               onObject: "onGear",
+               onContainer: "onMachine"
             },
             messages: {
                successContainersFilled: "Bravo, les machines sont prêtes à fonctionner !",
