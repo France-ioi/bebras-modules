@@ -707,10 +707,6 @@ def drawCircle(x0, y0, diameter):
 
     initOLEDScreen()
 
-    fillcolor = 0
-    if fill:
-        fillcolor = 255
-
     radius = diameter / 2
 
     boundx0 = x0 - radius
