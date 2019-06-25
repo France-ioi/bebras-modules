@@ -755,6 +755,7 @@ function VertexDragAndConnect(settings) {
    this.enabled = false;
    this.dragEnabled = false;
    this.vertexSelectEnabled = false;
+   this.allowDeselection = true;   // to deal with graph editorcontent validation
 
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
@@ -821,8 +822,8 @@ function VertexDragAndConnect(settings) {
             self.onVertexSelect(self.selectionParent, false);
          }
          self.selectionParent = null;
-         if(this.onEdgeSelect) {
-            this.onEdgeSelect(id);
+         if(self.onEdgeSelect) {
+            self.onEdgeSelect(id);
          }
       }
       else if(elementType === "edgeLabel"){
@@ -861,7 +862,7 @@ function VertexDragAndConnect(settings) {
          self.isDragging = false;
          return;
       }
-
+      // console.log("dragend");
       self.clickHandler(self.elementID,event.pageX,event.pageY);
    };
 
@@ -869,7 +870,7 @@ function VertexDragAndConnect(settings) {
       if(dx == 0 && dy == 0){
          return;
       }
-      if(self.selectionParent !== null) {
+      if(self.selectionParent !== null && self.allowDeselection) {
          self.onVertexSelect(self.selectionParent, false);
       }
       self.selectionParent = null;
@@ -910,7 +911,7 @@ function VertexDragAndConnect(settings) {
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
-      if(self.vertexSelectEnabled) {
+      if(self.vertexSelectEnabled && self.allowDeselection) {
          // Click on background or on the selected vertex -  deselect it.
          if(id === null || id === self.selectionParent){
             if(self.selectionParent !== null && self.onVertexSelect) {
@@ -1382,6 +1383,7 @@ function GraphEditor(settings) {
    this.textEditor = null;
    this.editInfo = {};
    this.edited = false; // true when label or content has just been modified
+   // this.validContent = true;
 
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
@@ -1424,6 +1426,7 @@ function GraphEditor(settings) {
    this.removeEdgeEnabled = false;
    this.vertexDragEnabled = false;
    this.edgeDragEnabled = false;
+   this.graphDragEnabled = false;
    this.multipleEdgesEnabled = false;
    this.loopEnabled = false;
    this.editVertexLabelEnabled = false;
@@ -1445,6 +1448,7 @@ function GraphEditor(settings) {
       self.arcDragger.setEnabled(enabled);
       self.graphDragger.setEnabled(enabled);
 
+      this.setGraphDragEnabled(enabled);
       this.setCreateVertexEnabled(enabled);
       this.setCreateEdgeEnabled(enabled);
       this.setVertexDragEnabled(enabled);
@@ -1479,7 +1483,8 @@ function GraphEditor(settings) {
       this.edgeDragEnabled = enabled;
       this.arcDragger.dragEnabled = enabled;
    };
-   this.setDragGraphEnabled = function(enabled) {
+   this.setGraphDragEnabled = function(enabled) {
+      this.graphDragEnabled = enabled;
       this.graphDragger.dragEnabled = enabled;
       this.checkGraphDrag();
    };
@@ -1556,13 +1561,12 @@ function GraphEditor(settings) {
 
    this.defaultOnVertexSelect = function(vertexId,selected,x,y) {
       var attr;
-      // console.log("vertex")
+      // console.log(vertexId+" select "+selected);
       if(selected) {
          self.edited = false;
          attr = selectedVertexAttr;
          self.addIcons(vertexId);
          var vInfo = visualGraph.getVertexVisualInfo(vertexId);
-         // self.edited = false;
          if(!vInfo.tableMode){
             self.editLabel(vertexId,"vertex");
          }else{
@@ -2442,22 +2446,41 @@ function GraphEditor(settings) {
       });
 
       self.textEditor.focusout(function(ev){
-         self.writeContent(id);
+         if(self.contentValidation){
+            var text = $(this).val();
+            self.editInfo.validContent = self.contentValidation(text);
+         }else{
+            self.editInfo.validContent = true;
+         }
+         // console.log(self.editInfo);
+         if(self.editInfo.validContent){
+            self.vertexDragAndConnect.allowDeselection = true;
+            self.vertexDragAndConnect.dragEnabled = self.vertexDragEnabled;
+            self.graphDragger.dragEnabled = self.graphDragEnabled;
+            self.writeContent(id);
+         }else{
+            $(this).focus();
+            self.vertexDragAndConnect.allowDeselection = false;
+            self.vertexDragAndConnect.dragEnabled = false;
+            self.graphDragger.dragEnabled = false;
+         }
       });
    };
 
    this.writeContent = function(id) {
       // console.log(id);
       var info = graph.getVertexInfo(id);
-      var oldContent = info.content;
+      var oldContent = info.content || "";
       var newContent = (self.textEditor) ? self.textEditor.val().trim() : "";
-
-      if(self.contentValidation){
-         var validContent = self.contentValidation(newContent);
-      }else{
+      // if(self.contentValidation){
+      //    var validContent = self.contentValidation(newContent);
+      // }else{
          var validContent = true;
-      }
-      
+      // }
+      // if(!validContent){
+      //    self.textEditor.focus();
+      //    return
+      // }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldContent !== newContent && validContent){
          info.content = newContent;
@@ -2478,10 +2501,10 @@ function GraphEditor(settings) {
       //    self.resizeTableVertex(id,oldContent);
       //    return
       // }
-
-      visualGraph.redraw();
-      self.updateHandlers();
-
+      if(self.edited){
+         visualGraph.redraw();
+         self.updateHandlers();
+      }
       if(callback){
          callback(validContent);
       }
@@ -2523,7 +2546,7 @@ function GraphEditor(settings) {
          self.textEditor.css({
             left: vertexPos.x - newBoxSize.w/2,
             top: vertexPos.y - newBoxSize.h/2 + labelHeight,
-            width: newBoxSize.w,
+            width: newBoxSize.w - 20,
             height: newBoxSize.h - labelHeight
          });
       }
@@ -2537,6 +2560,9 @@ function GraphEditor(settings) {
    this.startDragCallback = function(ID) {
       // console.log("start drag callback");
       if(self.textEditor){
+         self.textEditor.focusout();
+      }
+      if(self.textEditor && !(self.editInfo.field == "content" && self.editInfo.validContent == false)){
          var vertices = graph.getAllVertices();
          for(var iVertex = 0; iVertex < vertices.length; iVertex++){
             var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
