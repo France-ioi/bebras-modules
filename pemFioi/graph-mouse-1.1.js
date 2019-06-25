@@ -747,6 +747,7 @@ function VertexDragAndConnect(settings) {
    this.onDragEnd = settings.onDragEnd;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
+   this.clickHandlerCallback = settings.clickHandlerCallback;
 
    this.gridEnabled = false;
    this.gridX = null;
@@ -930,11 +931,15 @@ function VertexDragAndConnect(settings) {
          
          // Finish a new pair.
          if(self.onPairSelect) {
-            self.onPairSelect(self.selectionParent, id);
+            self.onPairSelect(self.selectionParent, id, x, y);
          }
-         if(self.onVertexSelect)
+         if(self.onVertexSelect){
             self.onVertexSelect(self.selectionParent, false, x,y);
+         }
          self.selectionParent = null;
+         if(self.clickHandlerCallback){
+            self.clickHandlerCallback(id,x,y);
+         }
       }
    };
 
@@ -952,6 +957,9 @@ function VertexDragAndConnect(settings) {
    };
    this.setStartDragCallback = function(fct) {
       this.startDragCallback = fct;
+   };
+   this.setClickHandlerCallback = function(fct) {
+      this.clickHandlerCallback = fct;
    };
    this.setIsGoodPosition = function(fct) {
       this.isGoodPosition = fct;
@@ -1384,7 +1392,6 @@ function GraphEditor(settings) {
    this.editInfo = {};
    this.edited = false; // true when label or content has just been modified
    // this.validContent = true;
-
    this.vertexDragAndConnect = new VertexDragAndConnect(settings);
    this.arcDragger = new ArcDragger({
       // id:"ArcDragger",
@@ -1595,8 +1602,13 @@ function GraphEditor(settings) {
       }
    };
 
-   this.defaultOnPairSelect = function(id1,id2) {
+   this.defaultOnPairSelect = function(id1,id2,x,y) {
       // console.log("pair");
+      if(!self.createEdgeEnabled){
+      //     if edge creation is disabled, change selected vertex in a single click 
+      //    self.vertexDragAndConnect.onVertexSelect(id2,true,x,y);
+         return
+      }
       self.startDragCallback(id1);
       if(!self.createEdgeEnabled || self.edited)
          return;
@@ -1624,6 +1636,13 @@ function GraphEditor(settings) {
       self.setNewEdgeVisualInfo(edgeID,id1,id2);
       if(callback){
          callback();
+      }
+   };
+
+   this.clickHandlerCallback = function(id,x,y) {
+      if(!self.createEdgeEnabled){
+         self.vertexDragAndConnect.onVertexSelect(id,true,x,y);
+         self.vertexDragAndConnect.selectionParent = id;
       }
    };
 
@@ -2649,6 +2668,7 @@ function GraphEditor(settings) {
       this.vertexDragAndConnect.setArcDragger(this.arcDragger);
       this.vertexDragAndConnect.setStartDragCallback(this.startDragCallback);
       this.vertexDragAndConnect.setIsGoodPosition(this.isGoodPosition);
+      this.vertexDragAndConnect.setClickHandlerCallback(this.clickHandlerCallback);
       this.vertexDragAndConnect.snapToLastGoodPosition = true;
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
