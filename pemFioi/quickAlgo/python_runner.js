@@ -18,7 +18,6 @@ function PythonInterpreter(context, msgCallback) {
   this._isRunning = false;
   this._stepInProgress = false;
   this.stepMode = false;
-  this._isReset = true;
   this._steps = 0;
   this._stepsWithoutAction = 0;
   this._lastNbActions = null;
@@ -185,17 +184,7 @@ function PythonInterpreter(context, msgCallback) {
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else {
-      var retVal = val.v;
-      if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
-         retVal = [];
-         for(var i = 0; i < val.v.length; i++) {
-            retVal[i] = this.skToJs(val.v[i]);
-         }
-      }
-      if(val instanceof Sk.builtin.tuple) {
-         retVal.isTuple = true;
-      }
-      return retVal;
+      return val.v;
     }
   };
 
@@ -396,7 +385,6 @@ function PythonInterpreter(context, msgCallback) {
     this._resetInterpreterState();
     Sk.running = true;
     this._isRunning = true;
-    this._isReset = false;
   };
 
   this.run = function () {
@@ -643,13 +631,6 @@ function PythonInterpreter(context, msgCallback) {
   this._asyncCallback = function () {
     return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
   }
-
-  this.reset = function() {
-    if(this._isReset) { return; }
-    this.stop();
-    this.context.reset();
-    this._isReset = true;
-  };
 }
 
 function initBlocklyRunner(context, msgCallback) {

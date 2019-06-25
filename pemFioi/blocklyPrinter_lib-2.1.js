@@ -210,7 +210,7 @@ var getContext = function(display, infos) {
       }
 
       // Fix display of arrays
-      var valueToStr = function(value, inArray) {
+      var valueToStr = function(value) {
          if(value && value.length && typeof value == 'object') {
             var oldValue = value;
             value = [];
@@ -221,16 +221,9 @@ var getContext = function(display, infos) {
                } else {
                    value.push(oldValue[i]);
                }
-               value[i] = valueToStr(value[i], true);
+               value[i] = valueToStr(value[i]);
             }
-            if(oldValue.isTuple) {
-               if(value.length == 1) { value.push(''); }
-               return '(' + value.join(', ') + ')';
-            } else {
-               return '[' + value.join(', ') + ']';
-            }
-         } else if(inArray && typeof value == 'string') {
-            return "'" + value.replace(/'/g, "\\'") + "'";
+            return '[' + value.join(', ') + ']';
          } else if(value === true) {
             return 'True';
          } else if(value === false) {

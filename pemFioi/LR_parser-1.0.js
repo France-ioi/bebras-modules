@@ -49,7 +49,6 @@ function LR_Parser(settings,subTask,answer) {
    this.selectedVertex = null;
    this.selectedRule = null;
    this.selectedStackElements = [];
-   this.selectedState = null;
 
    this.cellEditor = null;
 
@@ -227,8 +226,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.formatContent();
       this.visualGraph.redraw();
-      if(this.graphEditor)
-         this.graphEditor.updateHandlers();
+      this.graphEditor.updateHandlers();
    };
 
    this.initActionSequence = function() {
@@ -1126,7 +1124,7 @@ function LR_Parser(settings,subTask,answer) {
          // info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
-      // this.selectedState = null;
+      this.selectedState = null;
    };
 
    /* ACCEPT / ERROR */
@@ -1766,9 +1764,7 @@ function LR_Parser(settings,subTask,answer) {
    this.styleTabs = function() {
       if(!this.sideTable){
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-            margin: "1em auto",
-            "text-align": "center",
-            height: this.paperHeight
+            margin: "1em auto"
          });
 
          $("#"+this.parseTableID+" table").css({

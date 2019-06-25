@@ -724,21 +724,20 @@ window.displayHelper = {
          }
       }
       this.initLevelVars();
-
-      var self = this;
-      function callSetupLevels() {
-         if(!initLevel) {
-            initLevel = self.taskParams.options.difficulty ? self.taskParams.options.difficulty : "easy";
+      if (!initLevel) {
+         if (!this.taskParams) {
+            var self = this;
+            window.platform.getTaskParams(null, null, function(taskParams) {
+               self.taskParams = taskParams;
+               initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
+               self.doSetupLevels(initLevel);
+            });
+         } else {
+            initLevel = this.taskParams.options.difficulty ? this.taskParams.options.difficulty : "easy";
+            this.doSetupLevels(initLevel);
          }
-         self.doSetupLevels(initLevel);
-      };
-      if (!this.taskParams) {
-         window.platform.getTaskParams(null, null, function(taskParams) {
-            self.taskParams = taskParams;
-            callSetupLevels();
-         });
       } else {
-         callSetupLevels();
+         this.doSetupLevels(initLevel);
       }
    },
    doSetupLevels: function(initLevel) {
