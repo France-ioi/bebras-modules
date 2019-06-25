@@ -209,7 +209,7 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setCreateEdgeEnabled(false);
             this.graphEditor.setVertexDragEnabled(false);
             this.graphEditor.setEdgeDragEnabled(false);
-            this.graphEditor.setDragGraphEnabled(false);
+            this.graphEditor.setGraphDragEnabled(false);
             this.graphEditor.setScaleGraphEnabled(false);
             this.graphEditor.setEditVertexLabelEnabled(false);
             this.graphEditor.setEditVertexContentEnabled(false);
@@ -516,6 +516,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.onResize = function() {
+      /* switch between table displays */
       var width = $(window).width();
       var sideTable = true;
       if(width < 1180){
@@ -1342,13 +1343,23 @@ function LR_Parser(settings,subTask,answer) {
       if(content){
          var lines = content.split('\n');
          for(var line of lines){
+            var nDots = 0;
             for(var iChar = 0; iChar < line.length; iChar++){
                var char = fixedCharAt(line,iChar);
                if(!self.isCharValid(char)){
                   if(!((iChar > 0 && self.isPairValid(line.charAt(iChar - 1)+char)) || (iChar < line.length - 1 && self.isPairValid(char+line.charAt(iChar + 1))))){
                      self.displayError(char+" is not a valid symbol for this grammar");
+                     // displayHelper.showPopupMessage(char+" is not a valid symbol for this grammar","blanket");
                      return false;
                   }
+               }
+               if(char == "." || char == dot){
+                  nDots++;
+               }
+               if(nDots > 1){
+                  self.displayError("There shouldn't be more than one dot in a single line");
+                  // displayHelper.showPopupMessage("There shouldn't be more than one dot in a single line","blanket");
+                  return false;
                }
             }
          }
@@ -1407,6 +1418,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\">");
       $(this).append(self.cellEditor);
+      self.styleCellEditor();
    };
 
    this.saveAnswer = function() {
@@ -1544,7 +1556,7 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+this.divID).css({
          "font-size": "80%"
       })
-      /* tabs */
+      /* tab switch */
       this.styleTabSwitch();
 
       /* paper, parse table */
@@ -1728,7 +1740,6 @@ function LR_Parser(settings,subTask,answer) {
          "font-weight": "bold",
          color: this.colors.black,
          margin: "0 0.2em"
-         // "text-align": "right"
       });
       $("#"+this.tabsID+" span").css(this.unselectedTabAttr);
       $("#"+this.tabsID+" span.selectedTab").css(this.selectedTabAttr);
@@ -1749,7 +1760,6 @@ function LR_Parser(settings,subTask,answer) {
          position: "absolute",
          top: 0,
          left: this.selectedTab*25+"px"
-         // "box-shadow": "inset 0 0 0 0 rgba(0,0,0,0.2)"
       });
    };
 
@@ -1787,25 +1797,13 @@ function LR_Parser(settings,subTask,answer) {
             display: "flex",
             "flex-direction": "row",
             "justify-content": "space-around",
-            // "flex-wrap": "wrap-reverse",
             margin: "1em 0"
          });
-         // $("#"+this.tabsContainerID+" > *").css({
-         //    display: "inline-block",
-         //    "vertical-align": "top"
-         // });
          $("#"+this.parseTableID+" table").css({
-            // display: "flex",
-            // "align-content": "stretch",
-            // "flex-wrap": "wrap",
             "border-collapse": "collapse",
             border: "2px solid "+this.colors.blue,
             "text-align": "center"
          });
-         // $("#"+this.parseTableID+" tr").css({
-         //    display: "flex",
-         //    "align-content": "stretch"
-         // })
          $("#"+this.parseTableID+" table th").css({
             "background-color": this.colors.blue,
             color: "white",
@@ -1842,22 +1840,13 @@ function LR_Parser(settings,subTask,answer) {
          padding: 0
       });
       $(".rule").css({
-         // display: "flex",
-         // "justify-content": "space-between",
-         // "align-items": "center",
+
          padding: "0.2em 0.5em 0.2em 0",
          margin: "0.5em 1em",
          "background-color": "transparent",
          color: this.colors.black,
          "border-radius": "1em"
       });
-      // $(".rule > *").css({
-      //    "flex-grow": "1",
-      //    "text-align": "center"
-      // });
-      // $(".development").css({
-      //    "flex-grow": "2"
-      // })
       $(".ruleIndex").css({
          "flex-grow": "0",
          "background-color": this.colors.black,
@@ -1943,6 +1932,12 @@ function LR_Parser(settings,subTask,answer) {
       $("#stackTable .stackElement.selected").css({
          "background-color": this.colors.blue,
          color: "white"
+      });
+   };
+
+   this.styleCellEditor = function() {
+      $("#cellEditor").css({
+         width: "2em"
       });
    };
    
