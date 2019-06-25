@@ -4689,8 +4689,6 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
-        context.waitDelay(callback);
-        return;
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var sensor = findSensorByType("screen");
@@ -4718,7 +4716,6 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.drawRectangle = function(x0, y0, width, height, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
@@ -4746,7 +4743,6 @@ var getContext = function (display, infos, curLevel) {
     
 
     context.quickpi.drawCircle = function(x0, y0, diameter, callback) {
-        console.log(".");
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var sensor = findSensorByType("screen");
@@ -4839,10 +4835,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.stroke = function(color, callback) {
-        context.waitDelay(callback);
-        return;
         if (!context.display || context.autoGrading || context.offLineMode) {
-            /*
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
@@ -4853,7 +4846,7 @@ var getContext = function (display, infos, curLevel) {
                     ctx.strokeStyle = "black";
                 else
                     ctx.strokeStyle = "white";  
-            }*/
+            }
 
             context.waitDelay(callback);
         } else {
