@@ -25,7 +25,8 @@ var localLanguageStrings = {
          functions: "Fonctions",
          read: "Lecture",
          print: "Écriture",
-         internet: "Internet"
+         internet: "Internet",
+         display: "Afficher",
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
