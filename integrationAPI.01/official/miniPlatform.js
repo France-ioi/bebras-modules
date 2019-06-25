@@ -12,8 +12,8 @@
  *   - task.getMetaData(), as documented in the PEM
  */
 
-    // demo platform key
-    var demo_key = 'buddy'
+   // demo platform key
+   var demo_key = 'buddy'
 
 
    var languageStrings = {
@@ -95,6 +95,13 @@
          'gradeAnswer': 'Test grader'
       }
    };
+
+function getLanguageString(key) {
+   // Default to english strings
+   var ls = languageStrings[window.stringsLanguage] ? languageStrings[window.stringsLanguage] : languageStrings['en'];
+   var str = ls[key];
+   return str ? str : '';
+}
 
    /*
    * Create custom elements for platformless implementation
@@ -238,7 +245,7 @@ function miniPlatformPreviewGrade(answer) {
             "<div style='padding:50px'><span id='previewScoreMessage'></span><br/><br/><input type='button' onclick='$(\"#previewScorePopup\").remove()' value='OK' /></div></div></div>").insertBefore("#solution");
       }
       $("#previewScorePopup").show();
-      $("#previewScoreMessage").html("<b>" + languageStrings[window.stringsLanguage].showSolution + " " + score + "/" + maxScore + "</b><br/>" + languageStrings[window.stringsLanguage].showSolution);
+      $("#previewScoreMessage").html("<b>" + getLanguageString('showSolution') + " " + score + "/" + maxScore + "</b><br/>" + getLanguageString('showSolution'));
    };
    // acceptedAnswers is not documented, but necessary for old Bebras tasks
    if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
@@ -332,14 +339,14 @@ var chooseView = (function () {
          /*
          for(var viewName in views) {
             if (!views[viewName].requires) {
-               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>')
+               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
                $("#choose-view").append(btn);
                btn.click(this.selectFactory(viewName));
             }
          }
          */
          $("#grade").remove();
-         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + languageStrings[window.stringsLanguage].gradeAnswer + '</button></center>');
+         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + getLanguageString('gradeAnswer') + '</button></center>');
          // display grader button only if dev mode by adding URL hash 'dev'
          if (getHashParameter('dev')) {
             $(document.body).append(btnGradeAnswer);
@@ -507,7 +514,7 @@ $(document).ready(function() {
                     platform.trigger('showViews', [{"task": true}]);
                 });
                 if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
                 }
 
                 // add branded header to platformless task depending on avatarType
