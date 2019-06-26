@@ -1262,12 +1262,12 @@ function LR_Parser(settings,subTask,answer) {
       return {ruleIndex: ruleIndex, dotIndex: dotIndex};
    };
 
-   this.graphEditorCallback = function(validContent) {
+   this.graphEditorCallback = function() {
       // console.log("callback");
       self.pauseSimulation(null,true);
-      if(validContent !== false){
+      // if(validContent !== false){
          self.resetFeedback();
-      }
+      // }
       self.actionSequence = [];
       self.reset();
 
@@ -1285,6 +1285,7 @@ function LR_Parser(settings,subTask,answer) {
    }
 
    this.onVertexSelect = function(ID,selected) {
+      // console.log("onVertexSelect")
       if(selected){
          self.selectedVertex = ID;
          self.selectedState = self.graph.getVertexInfo(ID).label;
@@ -1292,6 +1293,7 @@ function LR_Parser(settings,subTask,answer) {
          self.selectedVertex = null;
          self.selectedState = null;
       }
+      // console.log(self.selectedState);
       self.resetFeedback();
       if(ID == self.getStateID(self.currentState)){
          var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
