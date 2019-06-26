@@ -731,7 +731,7 @@ function LR_Parser(settings,subTask,answer) {
       self.resetFeedback();
       var col = parseInt($(this).attr("data_col"));
 
-      if($(this).hasClass("selected")){
+      if($(".stackElement[data_col="+col+"]").hasClass("selected")){
          for(var iCol = 0; iCol <= col; iCol++){
             $(".stackElement[data_col="+iCol+"]").removeClass("selected");
          }
@@ -947,6 +947,7 @@ function LR_Parser(settings,subTask,answer) {
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
                $(".rule").removeClass("selected");
+               $(".rule[data_rule="+self.selectedRule+"]").addClass("previousRule");
                self.selectedRule = null;
                self.styleRules();
                self.updateState(true);
@@ -1114,6 +1115,8 @@ function LR_Parser(settings,subTask,answer) {
          }
          this.stackElementsHL = [];
       }
+      $(".rule").removeClass("previousRule");
+      this.styleRules();
    };
 
    this.updateState = function(anim) {
@@ -1972,6 +1975,9 @@ function LR_Parser(settings,subTask,answer) {
       $(".rule i").css({
          color: "grey",
          margin: "0 0.5em"
+      });
+      $(".rule.previousRule").css({
+         "background-color": "#d9e3ef"
       });
       $(".rule.selected").css({
          "background-color": this.colors.blue,
