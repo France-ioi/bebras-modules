@@ -842,7 +842,7 @@ function VertexDragAndConnect(settings) {
       self.isDragging = false;
       self.visualGraph.elementToFront(self.elementID);
       if(self.startDragCallback){
-         self.startDragCallback(self.elementID);
+         self.startDragCallback(self.elementID,x,y);
       }
    };
 
@@ -1031,6 +1031,7 @@ function ArcDragger(settings) {
    };
 
    this.startHandler = function(x, y, event) {
+      // console.log("arc drag start")
       self.isDragging = false;
       if(self.elementID !== this.data("id")){
          self.unselectAll();
@@ -1603,14 +1604,12 @@ function GraphEditor(settings) {
    };
 
    this.defaultOnPairSelect = function(id1,id2,x,y) {
-      // console.log("pair");
+      // console.log("pair "+id1+" "+id2);
       if(!self.createEdgeEnabled){
-      //     if edge creation is disabled, change selected vertex in a single click 
-      //    self.vertexDragAndConnect.onVertexSelect(id2,true,x,y);
          return
       }
       self.startDragCallback(id1);
-      if(!self.createEdgeEnabled || self.edited)
+      if(self.edited)
          return;
       
       if(!self.multipleEdgesEnabled){
@@ -1637,10 +1636,12 @@ function GraphEditor(settings) {
       if(callback){
          callback();
       }
+      // console.log("pair end")
    };
 
    this.clickHandlerCallback = function(id,x,y) {
       if(!self.createEdgeEnabled){
+         /* if edge creation is disabled, change selected vertex in a single click */ 
          self.vertexDragAndConnect.onVertexSelect(id,true,x,y);
          self.vertexDragAndConnect.selectionParent = id;
       }
@@ -2465,6 +2466,7 @@ function GraphEditor(settings) {
       });
 
       self.textEditor.focusout(function(ev){
+         // console.log("focusout "+id)
          if(self.contentValidation){
             var text = $(this).val();
             self.editInfo.validContent = self.contentValidation(text);
@@ -2491,41 +2493,36 @@ function GraphEditor(settings) {
       var info = graph.getVertexInfo(id);
       var oldContent = info.content || "";
       var newContent = (self.textEditor) ? self.textEditor.val().trim() : "";
-      // if(self.contentValidation){
-      //    var validContent = self.contentValidation(newContent);
-      // }else{
-         var validContent = true;
-      // }
-      // if(!validContent){
-      //    self.textEditor.focus();
-      //    return
-      // }
+
       var raphElement = visualGraph.getRaphaelsFromID(id);
-      if(oldContent !== newContent && validContent){
+      if(oldContent !== newContent){
          info.content = newContent;
          graph.setVertexInfo(id,info);
          self.edited = true;
       }
-      if(oldContent !== newContent && !validContent){
-         self.edited = true
-      }
-
+ 
       if(self.textEditor){
          self.textEditor.remove();
-         self.editInfo = {};
+         if(!self.editInfo.clickedVertex)
+            self.editInfo = {};
       }
-      // if(!validContent){
-      //    var raphElement = visualGraph.getRaphaelsFromID(id);
-      //    raphElement[3].show();
-      //    self.resizeTableVertex(id,oldContent);
-      //    return
-      // }
+
       if(self.edited){
          visualGraph.redraw();
          self.updateHandlers();
+      }else{
+         raphElement[3].show();
+      }
+      if(self.editInfo.clickedVertex && self.edited){
+         self.vertexDragAndConnect.selectionParent = null;
+         var clickedVertex = self.editInfo.clickedVertex;
+         var x = self.editInfo.x;
+         var y = self.editInfo.y;
+         // self.editInfo = {};
+         self.vertexDragAndConnect.clickHandler(clickedVertex,x,y);
       }
       if(callback){
-         callback(validContent);
+         callback();
       }
    };
 
@@ -2576,21 +2573,27 @@ function GraphEditor(settings) {
       info.content = oldContent;
    };
 
-   this.startDragCallback = function(ID) {
-      // console.log("start drag callback");
+   this.startDragCallback = function(ID,x,y) {
+      // console.log("start drag callback "+ID);
       if(self.textEditor){
+         self.editInfo.clickedVertex = ID;
+         self.editInfo.x = x;
+         self.editInfo.y = y;
          self.textEditor.focusout();
+         return
       }
       if(self.textEditor && !(self.editInfo.field == "content" && self.editInfo.validContent == false)){
+         // console.log(self.editInfo)
          var vertices = graph.getAllVertices();
          for(var iVertex = 0; iVertex < vertices.length; iVertex++){
             var vertexRaph = visualGraph.getRaphaelsFromID(vertices[iVertex]);
-            
-               if(self.editInfo.id == ID){
+
+               if(self.editInfo.id == vertices[iVertex]){
                   if(self.editInfo.field == "label"){
-                     self.writeLabel(ID,self.editInfo.type);
+                     self.writeLabel(self.editInfo.id,self.editInfo.type);
                   }else{
-                     self.writeContent(ID);
+                     // console.log("startDragCallback write"+self.editInfo.id)
+                     self.writeContent(self.editInfo.id);
                   }
                }
                self.textEditor.remove();
