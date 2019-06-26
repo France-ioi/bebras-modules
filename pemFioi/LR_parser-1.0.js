@@ -50,6 +50,11 @@ function LR_Parser(settings,subTask,answer) {
    this.selectedRule = null;
    this.selectedStackElements = [];
 
+   this.inputHighlight = null;
+   this.prevStateHighlight = null;
+   this.pathHighlight = [];
+   this.stackElementsHL = [];
+
    this.cellEditor = null;
 
    this.accept = false;
@@ -76,7 +81,7 @@ function LR_Parser(settings,subTask,answer) {
      "arrow-end": "long-classic-wide"
    };
    this.defaultVertexAttr = {
-     "r": 15,
+     "r": 10,
      "fill": "#4a4a4a",
      "stroke": "white",
      "stroke-width": 1
@@ -100,6 +105,12 @@ function LR_Parser(settings,subTask,answer) {
      "font-size": 12,
      "fill": "white",
      "text-anchor": "start"
+   };
+   this.previousStateAttr = {
+      "stroke": "#cbddf3",
+     "stroke-width": 5,
+     "fill": "none",
+     // opacity: "0.1"
    };
    this.selectedStackElementAttr = {
 
@@ -136,7 +147,7 @@ function LR_Parser(settings,subTask,answer) {
       this.updateState(false);
       this.initHandlers();
       // console.log(this.grammar);
-      if(this.mode == 3){
+      if(this.mode >= 3){
          this.onResize();
       }
    };
@@ -226,7 +237,8 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.formatContent();
       this.visualGraph.redraw();
-      this.graphEditor.updateHandlers();
+      if(this.graphEditor)
+         this.graphEditor.updateHandlers();
    };
 
    this.initActionSequence = function() {
@@ -292,6 +304,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.initParseTable = function() {
       var colLabel = [];
+      var terminalStateIndex = this.lrTable.states.length;
       var html = "<table><tr><th rowspan=2>State</th><th colspan=\""+(this.grammar.terminals.length + 1)+"\">Action</th><th colspan=\""+this.grammar.nonterminals.length+"\">Goto</th></tr>";
       html += "<tr>";
       for(var terminal of this.grammar.terminals){
@@ -305,22 +318,25 @@ function LR_Parser(settings,subTask,answer) {
          colLabel.push(nonterminal);
       }
       html += "</tr>";
-      for(var state of this.lrTable.states){
+      for(var iState = 0; iState <= this.lrTable.states.length; iState++){
+         var state = this.lrTable.states[iState];
+         var stateID = (state) ? state.index : terminalStateIndex;
          html += "<tr>";
-         html += "<td>"+state.index+"</td>";
+         html += "<td>"+stateID+"</td>";
          for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            html += "<td data_state=\""+state.index+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
             if(this.mode != 4){
-               if(state[colLabel[iCol]]){
+               if(state && state[colLabel[iCol]]){
                   html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
-               }else if(colLabel[iCol] == "S" && state.index == 0){
-                  html += "Acc."
+               }else if(colLabel[iCol] == "S" && stateID == 0){
+                  html += terminalStateIndex;
                }
             }
             html += "</td>";
          }
          html += "</tr>";
       }
+      // html += "<tr><td>"+terminalStateIndex+"</td></tr>";
       html += "</table>";
       $("#"+this.parseTableID).html(html);
    };
@@ -374,8 +390,10 @@ function LR_Parser(settings,subTask,answer) {
 
    this.initStackTable = function() {
       var html = "<h4>Stack</h4>";
+      html += "<div id=\"stackTableContainer\">";  // to deal with stack highlight
       html += "<table id=\"stackTable\">";
       html += "</table>";
+      html += "</div>";
       $("#actionInfo").html(html);
       this.updateStackTable();
    };
@@ -462,6 +480,7 @@ function LR_Parser(settings,subTask,answer) {
          case 4:
             $("#"+this.parseTableID+" td").off("click");
             $("#"+this.parseTableID+" td").click(self.clickCell);
+            $(window).resize(self.onResize);
             break;
          default:
             this.initPlayerHandlers();
@@ -556,6 +575,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.runSimulation = function() {
+      self.clearHighlight();
       $("#play i").removeClass("fa-play").addClass("fa-pause");
       $("#play").off("click");
       $("#play").click(self.pauseSimulation);
@@ -577,6 +597,7 @@ function LR_Parser(settings,subTask,answer) {
       if(progress <= 100){
          if(!anim || action.actionType == "error"){
             var animationTime = (step == 0 && this.actionSequence.length <= 1) ? 100 : 0;
+            this.clearHighlight();
             // var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
@@ -608,6 +629,7 @@ function LR_Parser(settings,subTask,answer) {
             self.applyShift(action.state,reverse,anim);
             break;
          case "r":
+            self.clearHighlight();
             var rule = action.rule;
             if(reverse){
                this.reverseReduction(rule);
@@ -668,6 +690,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepBackward = function() {
+      // self.clearHighlight();
       self.resetFeedback();
       if(self.simulationStep < 1){
          return;
@@ -677,6 +700,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepForward = function() {
+      // self.clearHighlight();
       self.resetFeedback();
       if(self.simulationStep >= self.actionSequence.length){
          return;
@@ -686,6 +710,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.progressBarClick = function(event) {
+      self.clearHighlight();
       self.resetFeedback();
       var x = event.pageX - $(this).offset().left;
       var w = $(this).width();
@@ -699,6 +724,7 @@ function LR_Parser(settings,subTask,answer) {
       for(var iStep = 0; iStep <= step; iStep++){
          this.runSimulationLoop(iStep,false,false,anim);
       }
+      this.clearHighlight();
    };
 
    this.selectStackElement = function() {
@@ -776,8 +802,8 @@ function LR_Parser(settings,subTask,answer) {
          self.displayMessage("reduce","You must select a part of the stack");
       }else if(self.selectedState == null){
          self.displayMessage("reduce","You must select a state in the automaton");
-      }else if(!self.isContiguous()){
-         self.displayError("Selected stack elements must be contiguous");
+      // }else if(!self.isContiguous()){
+      //    self.displayError("Selected stack elements must be contiguous");
       }else if(!self.compareSelectedRuleAndStack()){
          self.displayError("You cannot reduce the selected stack elements with the selected rule");
       }else{
@@ -799,21 +825,21 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.isContiguous = function() {
-      var elements = this.selectedStackElements;
-      var length = elements.length;
-      if(length == 0){
-         return false;
-      }else if(length > 1){
-         elements.sort();
-         for(var iEl = 0; iEl < length - 1; iEl++){
-            if(parseInt(elements[iEl + 1]) != parseInt(elements[iEl]) + 1){
-               return false;
-            }
-         }
-      }
-      return true;
-   };
+   // this.isContiguous = function() {
+   //    var elements = this.selectedStackElements;
+   //    var length = elements.length;
+   //    if(length == 0){
+   //       return false;
+   //    }else if(length > 1){
+   //       elements.sort();
+   //       for(var iEl = 0; iEl < length - 1; iEl++){
+   //          if(parseInt(elements[iEl + 1]) != parseInt(elements[iEl]) + 1){
+   //             return false;
+   //          }
+   //       }
+   //    }
+   //    return true;
+   // };
 
    this.compareSelectedRuleAndStack = function() {
       this.selectedStackElements.sort();
@@ -861,8 +887,10 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyReduction = function(nonTerminal,goto,anim) {
+      this.clearHighlight();
       var newStackElement = [goto,nonTerminal];
       if(anim){
+         this.highlightPrevState(this.currentState);
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var prevStates = [this.getPreviousState()];
          for(var col of this.selectedStackElements){
@@ -886,6 +914,26 @@ function LR_Parser(settings,subTask,answer) {
    this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement) {
       var prevState = prevStates.pop();
       var selectedCol = self.selectedStackElements[prevStates.length];
+
+      /* highlight */
+      var stackElementHL = $("<div class=\"stackElementHL\" data_col=\""+selectedCol+"\"></div>");
+      stackElementHL.css({
+         position: "absolute",
+         left: $(".stackElement[data_col="+selectedCol+"]").position().left,
+         top: 0,
+         width: $(".stackElement[data_col="+selectedCol+"]").outerWidth(),
+         height: $("#stackTable").height(),
+         "background-color": "rgb(0,10,20)",
+         opacity: "0.1",
+         border: "1px solid "+this.colors.black
+      });
+      this.stackElementsHL.push(stackElementHL);
+      if(this.mode == 2){
+         stackElementHL.off("click");
+         stackElementHL.click(self.selectStackElement);
+      }
+      $("#stackTableContainer").append(stackElementHL);
+
       $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
       this.changeStateAnim(state,prevState,animTime,true,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
@@ -959,6 +1007,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyShift = function(newState,reverse,anim) {
+      this.clearHighlight();
       if(reverse){
          this.stack.pop();
          this.inputIndex--;
@@ -968,9 +1017,14 @@ function LR_Parser(settings,subTask,answer) {
          this.inputIndex++;
       }
       this.currentVertex = this.getStateID(newState);
+      if(!reverse){
+         // this.highlightEdge(this.currentState,newState);
+         this.highlightPrevState(this.currentState);
+      }
       this.updateStackTable();
       this.updateCursor(!(reverse || !anim));
       this.updateState(!(reverse || !anim));
+
    };
 
    this.updateStackTable = function() {
@@ -996,9 +1050,69 @@ function LR_Parser(settings,subTask,answer) {
    this.updateCursor = function(anim) {
       var newX = this.inputIndex * $(".inputChar").outerWidth();
       if(anim){
+         var xHL = $("#cursor").position().left;
+         var wHL = newX - xHL
+         this.inputHighlight = $("<div id=\"inputHL\"></div>");
+         this.inputHighlight.css({
+            position: "absolute",
+            left: xHL,
+            top: 0,
+            height: "100%",
+            width: wHL+"px",
+            "background-color": "rgb(0,10,20)",
+            opacity: "0.1"
+         })
+         $("#inputBar").append(this.inputHighlight);
          $("#cursor").animate({left:newX+"px"},this.animationTime);
       }else{
          $("#cursor").css({left:newX+"px"});
+      }
+   };
+
+   this.highlightPrevState = function(previousState) {
+      var vertex = this.getStateID(previousState);
+      var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
+      var x = raphObj[0].attr("x");
+      var y = raphObj[0].attr("y");
+      var width = raphObj[0].attr("width");
+      var height = raphObj[0].attr("height");
+      var r = raphObj[0].attr("r");
+      this.prevStateHighlight = this.paper.rect(x,y,width,height,r).attr(this.previousStateAttr)
+   };
+
+   this.highlightEdge = function(edgeID) {
+      if(!edgeID){
+         return;
+      }
+      var raphObj = this.visualGraph.getRaphaelsFromID(edgeID); 
+      var edgeHL = raphObj[0].clone();
+      edgeHL.attr({"stroke": this.colors.blue});
+      edgeHL.toBack();
+      raphObj[1].toBack();
+      raphObj[0].toBack();
+      this.pathHighlight.push(edgeHL);  
+   };
+
+   this.clearHighlight = function() {
+      if(this.inputHighlight){
+         this.inputHighlight.remove();
+         this.inputHighlight = null;
+      }
+      if(this.prevStateHighlight){
+         this.prevStateHighlight.remove();
+         this.prevStateHighlight = null;
+      }
+      if(this.pathHighlight.length > 0){
+         for(var path of this.pathHighlight){
+            path.remove();
+         }
+         this.pathHighlight = [];
+      }
+      if(this.stackElementsHL.length > 0){
+         for(var elem of this.stackElementsHL){
+            elem.remove();
+         }
+         this.stackElementsHL = [];
       }
    };
 
@@ -1032,6 +1146,7 @@ function LR_Parser(settings,subTask,answer) {
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
       var initPos = vInfo1;
       var finalPos = vInfo2;
+      this.highlightEdge(edgeID);
       if(state1 == state2){
          if(this.token){
             this.token.remove();
@@ -1265,9 +1380,7 @@ function LR_Parser(settings,subTask,answer) {
    this.graphEditorCallback = function() {
       // console.log("callback");
       self.pauseSimulation(null,true);
-      // if(validContent !== false){
-         self.resetFeedback();
-      // }
+      self.resetFeedback();
       self.actionSequence = [];
       self.reset();
 
@@ -1765,6 +1878,9 @@ function LR_Parser(settings,subTask,answer) {
 
    this.styleTabs = function() {
       if(!this.sideTable){
+         $("#"+this.graphPaperID).css({
+            width: this.paperWidth
+         });
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
             margin: "1em auto"
          });
@@ -1900,6 +2016,9 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.styleStackTable = function() {
+      $("#stackTableContainer").css({
+         position: "relative"
+      })
       $("#stackTable").css({
          border: "2px solid "+this.colors.blue,
          "border-right": "none",
