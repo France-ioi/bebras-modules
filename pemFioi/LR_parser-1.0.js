@@ -324,7 +324,7 @@ function LR_Parser(settings,subTask,answer) {
          html += "<tr>";
          html += "<td>"+stateID+"</td>";
          for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            html += (stateID == terminalStateIndex) ? "<td>" : "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
             if(this.mode != 4){
                if(state && state[colLabel[iCol]]){
                   html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
@@ -478,9 +478,10 @@ function LR_Parser(settings,subTask,answer) {
             $(window).resize(self.onResize);
             break;
          case 4:
-            $("#"+this.parseTableID+" td").off("click");
-            $("#"+this.parseTableID+" td").click(self.clickCell);
+            $("#"+this.parseTableID+" td[data_state]").off("click");
+            $("#"+this.parseTableID+" td[data_state]").click(self.clickCell);
             $(window).resize(self.onResize);
+            this.initPlayerHandlers();
             break;
          default:
             this.initPlayerHandlers();
@@ -576,6 +577,11 @@ function LR_Parser(settings,subTask,answer) {
 
    this.runSimulation = function() {
       self.clearHighlight();
+      if(self.mode == 4){
+         if(!self.checkParseTable()){
+            return
+         }
+      }
       $("#play i").removeClass("fa-play").addClass("fa-pause");
       $("#play").off("click");
       $("#play").click(self.pauseSimulation);
@@ -690,7 +696,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepBackward = function() {
-      // self.clearHighlight();
+      if(self.mode == 4){
+         if(!self.checkParseTable()){
+            return
+         }
+      }
       self.resetFeedback();
       if(self.simulationStep < 1){
          return;
@@ -700,7 +710,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepForward = function() {
-      // self.clearHighlight();
+      if(self.mode == 4){
+         if(!self.checkParseTable()){
+            return
+         }
+      }
       self.resetFeedback();
       if(self.simulationStep >= self.actionSequence.length){
          return;
@@ -711,6 +725,11 @@ function LR_Parser(settings,subTask,answer) {
 
    this.progressBarClick = function(event) {
       self.clearHighlight();
+      if(self.mode == 4){
+         if(!self.checkParseTable()){
+            return
+         }
+      }
       self.resetFeedback();
       var x = event.pageX - $(this).offset().left;
       var w = $(this).width();
@@ -1526,16 +1545,88 @@ function LR_Parser(settings,subTask,answer) {
       return false
    };
 
+   /* parse table edit */
+
    this.clickCell = function() {
-      console.log($(this).attr("data_state")+" "+$(this).attr("data_symbol"));
+      self.resetFeedback();
+      var cell = $(this);
+      var state = $(this).attr("data_state");
+      var symbol = $(this).attr("data_symbol");
       var cellContent = $(this).text();
+      var maxlength = (self.lrTable.states.length >= 10) ? 3 : 2;
+      // console.log(state+" "+symbol);
+      $(this).off("click");
       if(self.cellEditor){
          self.cellEditor.remove();
       }
-      self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\">");
-      $(this).append(self.cellEditor);
-      self.styleCellEditor();
+      self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\" maxlength=\""+maxlength+"\">");
+      $(this).html(self.cellEditor);
+      self.styleCellEditor(state,symbol);
+      self.cellEditor.focus();
+      self.cellEditor.focusout(function(ev){
+         var text = $(this).val();
+         self.writeCell(text,cell);
+      });
+      self.cellEditor.keyup(function(ev){
+         var text = $(this).val();
+         if(ev.which == 13){
+            self.writeCell(text,cell);
+         }
+         // console.log(text);
+      });
    };
+
+   this.writeCell = function(text,cell) {
+      self.cellEditor.remove();
+      cell.text(text);
+      cell.click(self.clickCell);
+      var state = cell.attr("data_state");
+      var symbol = cell.attr("data_symbol");
+      if(!answer[state])
+         answer[state] = {};
+      answer[state][symbol] = text;
+      // console.log(answer);
+   };
+
+   this.checkParseTable = function() {
+      // console.log(self.lrTable.states)
+      for(var state of self.lrTable.states){
+         if(!answer[state.index]){
+            self.displayError("Line "+state.index+" is empty");
+            return false;
+         }
+         for(var symbol in answer[state.index]){
+            if(answer[state.index][symbol] != ""){
+               if(symbol != "S" && !state[symbol]){
+                  self.displayError("Error in line "+state.index+" at column "+symbol);
+                  return false;
+               }
+               if(symbol == "S" && (state.index != 0 || answer[state.index][symbol] != self.lrTable.states.length)){
+                  self.displayError("Error in line "+state.index+" at column "+symbol);
+                  return false;
+               }
+            }
+         }
+         for(var symbol in state){
+            if(symbol != "index"){
+               if(!answer[state.index][symbol]){
+                  self.displayError("An entry is missing in line "+state.index);
+                  return false;
+               }
+               var expected = state[symbol][0].actionType+state[symbol][0].actionValue;
+               if(answer[state.index][symbol] != expected){
+                  self.displayError("Error in line "+state.index+" at column "+symbol);
+                  return false;
+               }
+            }
+         }
+         if(!answer[0]["S"]){
+            self.displayError("Error in line 0 at column S");
+            return false;
+         }
+      }
+      return true;
+   }
 
    this.saveAnswer = function() {
       if(self.mode == 2){
@@ -1548,19 +1639,29 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.reloadAnswer = function() {
-      if(this.mode == 2){
-         this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-         this.replayUpTo(this.actionSequence.length,false);
-         if(answer.accept){
-            this.acceptInput();
-         }else if(answer.error){
-            this.refuseInput();
-         }
-      }else if(this.mode == 3){
-         this.visualGraphJSON = answer.visualGraphJSON;
-
-         this.initAutomata();
-         this.updateState();
+      switch(this.mode){
+         case 2:
+            this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
+            this.replayUpTo(this.actionSequence.length,false);
+            if(answer.accept){
+               this.acceptInput();
+            }else if(answer.error){
+               this.refuseInput();
+            }
+            break;
+         case 3:
+            this.visualGraphJSON = answer.visualGraphJSON;
+            this.initAutomata();
+            this.updateState();
+            break;
+         case 4:
+            for(var state in answer){
+               if(answer[state]){
+                  for(var symbol in answer[state]){
+                     $("#"+this.parseTableID+" table td[data_symbol=\""+symbol+"\"][data_state=\""+state+"\"]").text(answer[state][symbol])
+                  }
+               }
+            }
       }
    };
 
@@ -1648,6 +1749,9 @@ function LR_Parser(settings,subTask,answer) {
                }
                return success;
             }
+         case 4:
+            var success = this.checkParseTable();
+            return success
       }
    };
 
@@ -1707,7 +1811,6 @@ function LR_Parser(settings,subTask,answer) {
          display: "flex",
          "align-items": "center",
          "justify-content": "space-between",
-         // width: "100%",
          padding: "10px",
          "border-radius": "25px",
          "background-color": this.colors.lightgrey
@@ -1749,8 +1852,6 @@ function LR_Parser(settings,subTask,answer) {
       });
       var buttonHeight = $(".actionButton").innerHeight();
       $("#reduceBar, #shiftBar, #acceptBar, #errorBar").css({
-         // "text-align": "right",
-         // height: buttonHeight+"px",
          display: "flex",
          "justify-content": "flex-end",
       });
@@ -1758,7 +1859,6 @@ function LR_Parser(settings,subTask,answer) {
          "margin-top": "0.5em"
       });
       $(".actionMessage").css({
-         // display: "inline-block",
          padding: "0.5em 1em",
          color: "grey",
          "background-color": "white",
@@ -1767,7 +1867,6 @@ function LR_Parser(settings,subTask,answer) {
          "box-sizing": "border-box"
       });
       $(".messageBackground").css({
-         // display: "inline-block",
          "background-color": this.colors.blue,
          height: buttonHeight+"px"
       })
@@ -1779,14 +1878,12 @@ function LR_Parser(settings,subTask,answer) {
          "margin-right": "0.2em"
       });
       $("#shiftButton .buttonIcon").css({
-         // "font-size": "0.9em",
          "margin-right": "0.5em"
       });
 
       /* input */
       $("#inputBar").css({
          position: "relative",
-         // height: "2em",
          "background-color": this.colors.lightgrey,
          "margin-top": "5px",
          "border-top": "1px solid grey",
@@ -1799,7 +1896,6 @@ function LR_Parser(settings,subTask,answer) {
       $(".inputChar").css({
          display: "inline-block",
          width: "1.5em",
-         // height: "1.5em",
          "text-align": "center",
          color: this.colors.black,
          "font-size": "1.5em",
@@ -1887,28 +1983,6 @@ function LR_Parser(settings,subTask,answer) {
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
             margin: "1em auto"
          });
-
-         $("#"+this.parseTableID+" table").css({
-            "font-size": "1.2em"
-         });
-         $("#"+this.parseTableID+" table").css({
-            margin: "auto",
-            "border-collapse": "collapse",
-            border: "2px solid "+this.colors.blue,
-            "text-align": "center"
-         });
-         $("#"+this.parseTableID+" table th").css({
-            "background-color": this.colors.blue,
-            color: "white",
-            padding: "0.5em 1em",
-            border: "1px solid white"
-         });
-         $("#"+this.parseTableID+" table td").css({
-            "background-color": this.colors.lightgrey,
-            color: this.colors.black,
-            padding: "0.5em 1em",
-            border: "1px solid "+this.colors.blue
-         });
       }else{
          $("#"+this.tabsContainerID).css({
             display: "flex",
@@ -1916,24 +1990,47 @@ function LR_Parser(settings,subTask,answer) {
             "justify-content": "space-around",
             margin: "1em 0"
          });
-         $("#"+this.parseTableID+" table").css({
-            "border-collapse": "collapse",
-            border: "2px solid "+this.colors.blue,
-            "text-align": "center"
-         });
-         $("#"+this.parseTableID+" table th").css({
-            "background-color": this.colors.blue,
-            color: "white",
-            padding: "0.2em 0.4em",
-            border: "1px solid white"
-         });
-         $("#"+this.parseTableID+" table td").css({
-            "background-color": this.colors.lightgrey,
-            color: this.colors.black,
-            padding: "0.2em 0.4em",
-            border: "1px solid "+this.colors.blue
-         });
       }
+      this.styleParseTable();
+   };
+
+   this.styleParseTable = function() {
+      if(!this.sideTable){
+         $("#"+this.parseTableID+" table").css({
+            "font-size": "1.2em"
+         });
+         $("#"+this.parseTableID+" table").css({
+            margin: "auto"
+         });
+         $("#"+this.parseTableID+" table th, #"+this.parseTableID+" table td").css({
+            padding: "0.5em 1em"
+         });
+      }else{
+         $("#"+this.parseTableID+" table th, #"+this.parseTableID+" table td").css({
+            padding: "0.2em 0.4em"
+         });
+         if(this.mode == 4){
+            $("#"+this.parseTableID+" table td[data_symbol]").css({
+               width: "1.5em"
+            });
+         }
+      }
+
+      $("#"+this.parseTableID+" table").css({
+         "border-collapse": "collapse",
+         border: "2px solid "+this.colors.blue,
+         "text-align": "center"
+      });
+      $("#"+this.parseTableID+" table th").css({
+         "background-color": this.colors.blue,
+         color: "white",
+         border: "1px solid white"
+      });
+      $("#"+this.parseTableID+" table td").css({
+         "background-color": this.colors.lightgrey,
+         color: this.colors.black,
+         border: "1px solid "+this.colors.blue
+      });
    };
 
    this.styleRules = function() {
@@ -2024,7 +2121,7 @@ function LR_Parser(settings,subTask,answer) {
    this.styleStackTable = function() {
       $("#stackTableContainer").css({
          position: "relative"
-      })
+      });
       $("#stackTable").css({
          border: "2px solid "+this.colors.blue,
          "border-right": "none",
@@ -2058,9 +2155,13 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
-   this.styleCellEditor = function() {
+   this.styleCellEditor = function(state,symbol) {
+      $("#"+this.parseTableID+" table td[data_symbol=\""+symbol+"\"][data_state=\""+state+"\"]").css({
+         padding: 0
+      })
       $("#cellEditor").css({
-         width: "2em"
+         width: "1.5em",
+         // height: "100%"
       });
    };
    
