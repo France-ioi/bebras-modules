@@ -1441,6 +1441,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.graphEditorCallback = function() {
+      self.clearHighlight();
       self.pauseSimulation(null,true);
       self.resetFeedback();
       self.actionSequence = [];
