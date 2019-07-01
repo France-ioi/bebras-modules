@@ -435,19 +435,23 @@ function LR_Parser(settings,subTask,answer) {
    }; 
 
    this.initAcceptButton = function(){
-      var html = "<div id=\"acceptBar\">";
-      html += "<span id=\"acceptMessage\" class=\"actionMessage\"></span>"
+      // var html = "<div id=\"acceptBar\">";
+      // html += "<span id=\"acceptMessage\" class=\"actionMessage\"></span>"
+      var html = "<div class=\"messageBackground\"><div id=\"acceptMessage\" class=\"actionMessage\"></div></div>";
       html += "<div id=\"acceptButton\" class=\"actionButton\"><i class=\"fas fa-thumbs-up buttonIcon\"></i> ACCEPT</div>"
-      html += "</div>";
-      $("#actionInfo").append(html);
+      // html += "</div>";
+      // $("#actionInfo").append(html);
+      $("#shiftBar").append(html);
    };
 
    this.initErrorButton = function(){
-      var html = "<div id=\"errorBar\">";
-      html += "<span id=\"errorMessage\" class=\"actionMessage\"></span>"
+      // var html = "<div id=\"errorBar\">";
+      // html += "<span id=\"errorMessage\" class=\"actionMessage\"></span>"
+      var html = "<div class=\"messageBackground\"><div id=\"errorMessage\" class=\"actionMessage\"></div></div>";
       html += "<div id=\"errorButton\" class=\"actionButton\"><i class=\"fas fa-times buttonIcon\"></i> ERROR</div>"
-      html += "</div>";
-      $("#actionInfo").append(html);
+      // html += "</div>";
+      // $("#actionInfo").append(html);
+      $("#shiftBar").append(html);
    };
 
    this.initHandlers = function() {
@@ -821,8 +825,6 @@ function LR_Parser(settings,subTask,answer) {
          self.displayMessage("reduce","You must select a part of the stack");
       }else if(self.selectedState == null){
          self.displayMessage("reduce","You must select a state in the automaton");
-      // }else if(!self.isContiguous()){
-      //    self.displayError("Selected stack elements must be contiguous");
       }else if(!self.compareSelectedRuleAndStack()){
          self.displayError("You cannot reduce the selected stack elements with the selected rule");
       }else{
@@ -843,22 +845,6 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
    };
-
-   // this.isContiguous = function() {
-   //    var elements = this.selectedStackElements;
-   //    var length = elements.length;
-   //    if(length == 0){
-   //       return false;
-   //    }else if(length > 1){
-   //       elements.sort();
-   //       for(var iEl = 0; iEl < length - 1; iEl++){
-   //          if(parseInt(elements[iEl + 1]) != parseInt(elements[iEl]) + 1){
-   //             return false;
-   //          }
-   //       }
-   //    }
-   //    return true;
-   // };
 
    this.compareSelectedRuleAndStack = function() {
       this.selectedStackElements.sort();
@@ -1273,11 +1259,17 @@ function LR_Parser(settings,subTask,answer) {
          $("#acceptButton").css({
             "background-color": self.colors.yellow
          });
+         $("#acceptMessage").parent().css({
+            "background-color": self.colors.yellow
+         });
          if(self.error){
             self.refuseInput();
          }
       }else{
          $("#acceptButton").css({
+            "background-color": self.colors.blue
+         });
+         $("#acceptMessage").parent().css({
             "background-color": self.colors.blue
          });
       }
@@ -1291,11 +1283,17 @@ function LR_Parser(settings,subTask,answer) {
          $("#errorButton").css({
             "background-color": self.colors.yellow
          });
+         $("#errorMessage").parent().css({
+            "background-color": self.colors.yellow
+         });
          if(self.accept){
             self.acceptInput();
          }
       }else{
          $("#errorButton").css({
+            "background-color": self.colors.blue
+         });
+         $("#errorMessage").parent().css({
             "background-color": self.colors.blue
          });
       }
@@ -1851,13 +1849,13 @@ function LR_Parser(settings,subTask,answer) {
          "font-size": "0.9em"
       });
       var buttonHeight = $(".actionButton").innerHeight();
-      $("#reduceBar, #shiftBar, #acceptBar, #errorBar").css({
+      $("#reduceBar, #shiftBar").css({
          display: "flex",
          "justify-content": "flex-end",
       });
-      $("#acceptBar, #errorBar").css({
-         "margin-top": "0.5em"
-      });
+      // $("#acceptBar, #errorBar").css({
+      //    "margin-top": "0.5em"
+      // });
       $(".actionMessage").css({
          padding: "0.5em 1em",
          color: "grey",
@@ -1870,9 +1868,12 @@ function LR_Parser(settings,subTask,answer) {
          "background-color": this.colors.blue,
          height: buttonHeight+"px"
       })
-      $("#reduceButton, #shiftButton").css({
+      $("#reduceButton, #shiftButton, #acceptButton, #errorButton").css({
          "border-radius": "0 0 5px 5px"
       });
+      // $("#acceptButton, #errorButton").css({
+      //    "margin-left": "1em"
+      // });
       $(".buttonIcon").css({
          "font-size": "0.9em",
          "margin-right": "0.2em"
@@ -1981,14 +1982,15 @@ function LR_Parser(settings,subTask,answer) {
             width: this.paperWidth
          });
          $("#"+this.graphPaperID+", #"+this.parseTableID).css({
-            margin: "1em auto"
+            margin: "1em auto",
+            height: this.paperHeight
          });
       }else{
          $("#"+this.tabsContainerID).css({
             display: "flex",
             "flex-direction": "row",
             "justify-content": "space-around",
-            margin: "1em 0"
+            margin: "1em 0",
          });
       }
       this.styleParseTable();
@@ -2003,7 +2005,7 @@ function LR_Parser(settings,subTask,answer) {
             margin: "auto"
          });
          $("#"+this.parseTableID+" table th, #"+this.parseTableID+" table td").css({
-            padding: "0.5em 1em"
+            padding: "0.4em 0.8em"
          });
       }else{
          $("#"+this.parseTableID+" table th, #"+this.parseTableID+" table td").css({
@@ -2036,6 +2038,7 @@ function LR_Parser(settings,subTask,answer) {
    this.styleRules = function() {
       $("#rules").css({
          "flex-grow": "1",
+         "flex-shrink": "0",
          "background-color": this.colors.lightgrey,
          "border-radius": "0 5px 5px 0",
          "overflow": "hidden",
