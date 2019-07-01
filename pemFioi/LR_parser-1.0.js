@@ -42,6 +42,7 @@ function LR_Parser(settings,subTask,answer) {
    this.graph;
    this.graphMouse;
    this.graphEditor;
+   this.isLastActionAGraphEdit = false;
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
@@ -374,6 +375,9 @@ function LR_Parser(settings,subTask,answer) {
       html += "</div></div>";
       html += "<div id=\"stepBackward\"><i class=\"fas fa-step-backward\"></i></div>";
       html += "<div id=\"stepForward\"><i class=\"fas fa-step-forward\"></i></div>";
+      if(this.mode == 3){
+         html += "<div id=\"undo\">UNDO</div>";
+      }
       html += "</div>";
       html += "<div id=\"actionInfo\"></div>";
       $("#action").html(html);
@@ -478,7 +482,7 @@ function LR_Parser(settings,subTask,answer) {
             break;
          case 3:
             this.initPlayerHandlers();
-            // $(window).off("resize");
+            this.disableUndoButton();
             $(window).resize(self.onResize);
             break;
          case 4:
@@ -537,6 +541,22 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
+   this.disableUndoButton = function() {
+      $("#undo").off("click");
+      $("#undo").css({
+         cursor: "auto",
+         opacity: "0.5"
+      })
+   };
+   this.enableUndoButton = function() {
+      $("#undo").off("click");
+      $("#undo").click(self.undo);
+      $("#undo").css({
+         cursor: "pointer",
+         opacity: "1"
+      })
+   };
+
    this.onResize = function() {
       /* switch between table displays */
       var width = $(window).width();
@@ -580,6 +600,10 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.runSimulation = function() {
+      if(self.mode == 3){
+         self.isLastActionAGraphEdit = false;
+         self.showUndo();
+      }
       self.clearHighlight();
       if(self.mode == 4){
          if(!self.checkParseTable()){
@@ -678,6 +702,11 @@ function LR_Parser(settings,subTask,answer) {
 
    this.pauseSimulation = function(ev,end) {
       // console.log("pause");
+      if(self.mode == 3){
+         self.isLastActionAGraphEdit = false;
+         self.showUndo();
+      }
+
       if(!end){
          clearTimeout(self.timeOutID);
          subTask.raphaelFactory.stopAnimate("anim");
@@ -700,6 +729,10 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepBackward = function() {
+      if(self.mode == 3){
+         self.isLastActionAGraphEdit = false;
+         self.showUndo();
+      }
       if(self.mode == 4){
          if(!self.checkParseTable()){
             return
@@ -714,6 +747,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepForward = function() {
+      if(self.mode == 3){
+         self.isLastActionAGraphEdit = false;
+         self.showUndo();
+      }
+
       if(self.mode == 4){
          if(!self.checkParseTable()){
             return
@@ -728,6 +766,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.progressBarClick = function(event) {
+      if(self.mode == 3){
+         self.isLastActionAGraphEdit = false;
+         self.showUndo();
+      }
+
       self.clearHighlight();
       if(self.mode == 4){
          if(!self.checkParseTable()){
@@ -1398,7 +1441,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.graphEditorCallback = function() {
-      // console.log("callback");
       self.pauseSimulation(null,true);
       self.resetFeedback();
       self.actionSequence = [];
@@ -1407,6 +1449,10 @@ function LR_Parser(settings,subTask,answer) {
       self.formatContent();
       self.initActionSequence();
       self.saveAnswer();
+      self.isLastActionAGraphEdit = true;
+      self.showUndo();
+      if(answer.visualGraphJSON.length > 1)
+         self.enableUndoButton()
    };
 
    this.selectVertexCallback = function(id,selected) {
@@ -1632,7 +1678,7 @@ function LR_Parser(settings,subTask,answer) {
          answer.accept = self.accept;
          answer.error = self.error;
       }else if(self.mode == 3){
-         answer.visualGraphJSON = self.visualGraph.toJSON();
+         answer.visualGraphJSON.push(self.visualGraph.toJSON());
       }
    };
 
@@ -1648,7 +1694,7 @@ function LR_Parser(settings,subTask,answer) {
             }
             break;
          case 3:
-            this.visualGraphJSON = answer.visualGraphJSON;
+            this.visualGraphJSON = answer.visualGraphJSON[answer.visualGraphJSON.length - 1];
             this.initAutomata();
             this.updateState();
             break;
@@ -1660,6 +1706,14 @@ function LR_Parser(settings,subTask,answer) {
                   }
                }
             }
+      }
+   };
+
+   this.undo = function() {
+      answer.visualGraphJSON.pop();
+      self.reloadAnswer();
+      if(answer.visualGraphJSON.length <= 1){
+         self.disableUndoButton()
       }
    };
 
@@ -1825,11 +1879,17 @@ function LR_Parser(settings,subTask,answer) {
          padding: "10px 12px",
          "margin-right": "10px"
       });
-      $("#stepBackward, #stepForward").css({
+      $("#stepBackward, #stepForward, #undo").css({
          "background-color": this.colors.black,
          padding: "10px 20px",
          "margin-left": "10px"
       });
+      $("#undo").css({
+         "font-weight": "bold"
+      })
+      if(this.mode == 3){
+         this.showUndo();
+      }
       this.styleProgressBar();
 
       /* stack */
@@ -2167,6 +2227,16 @@ function LR_Parser(settings,subTask,answer) {
          // height: "100%"
       });
    };
+
+   this.showUndo = function() {
+      if(this.isLastActionAGraphEdit){
+         $("#stepBackward, #stepForward").hide();
+         $("#undo").show();
+      }else{
+         $("#stepBackward, #stepForward").show();
+         $("#undo").hide();
+      }
+   }
    
    this.init();
 
