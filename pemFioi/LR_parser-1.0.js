@@ -43,6 +43,7 @@ function LR_Parser(settings,subTask,answer) {
    this.graphMouse;
    this.graphEditor;
    this.isLastActionAGraphEdit = false;
+   this.isDragging = false;
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
@@ -528,14 +529,18 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.disableProgressBarClick = function() {
-      $("#progressBarClickArea").off("click");
+      $("#progressBarClickArea").off("mousedown");
+      $("#player").off("mousemove");
+      $("#player").off("mouseup");
       $("#progressBarClickArea").css({
          cursor: "auto"
       });
    };
 
    this.enableProgressBarClick = function() {
-      $("#progressBarClickArea").click(self.progressBarClick);
+      $("#progressBarClickArea").mousedown(self.progressBarDragStart);
+      $("#player").mousemove(self.progressBarDragMove);
+      $("#player").mouseup(self.progressBarDragEnd);
       $("#progressBarClickArea").css({
          cursor: "pointer"
       });
@@ -615,13 +620,13 @@ function LR_Parser(settings,subTask,answer) {
       $("#play").click(self.pauseSimulation);
       self.resetFeedback();
       self.reset();
-      self.runSimulationLoop(self.simulationStep,true,false,true);
+      self.runSimulationLoop(self.simulationStep,true,false,true,true);
       if(self.mode == 3){
          self.graphEditor.setEnabled(false);
       }
    };
 
-   this.runSimulationLoop = function(step,loop,reverse,anim) {
+   this.runSimulationLoop = function(step,loop,reverse,anim,progressBarMove) {
       // console.log(step+" "+loop+" "+reverse+" "+anim)
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
@@ -636,7 +641,12 @@ function LR_Parser(settings,subTask,answer) {
          }else{
             var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
          }
-         $("#progressBar").animate({width:progress+"%"},animationTime,function(){
+         if(progressBarMove){
+            var newPos = {width:progress+"%"};
+         }else{
+            var newPos = {};
+         }
+         $("#progressBar").animate(newPos,animationTime,function(){
             if(action.actionType != "r" || self.selectedRule == null){
                if(reverse){
                   self.simulationStep--;
@@ -649,7 +659,7 @@ function LR_Parser(settings,subTask,answer) {
                self.enableProgressBarClick();
                return;
             }
-            self.runSimulationLoop(self.simulationStep,loop,reverse,anim);
+            self.runSimulationLoop(self.simulationStep,loop,reverse,anim,progressBarMove);
          });
       }
       if(!action){
@@ -711,7 +721,7 @@ function LR_Parser(settings,subTask,answer) {
          clearTimeout(self.timeOutID);
          subTask.raphaelFactory.stopAnimate("anim");
          $("#progressBar").stop();
-         self.replayUpTo(self.simulationStep);
+         self.replayUpTo(self.simulationStep,false,true);
          if(self.token){
             self.token.remove();
          }
@@ -742,7 +752,7 @@ function LR_Parser(settings,subTask,answer) {
       if(self.simulationStep < 1){
          return;
       }else{
-         self.runSimulationLoop(self.simulationStep - 1, false, true);
+         self.runSimulationLoop(self.simulationStep - 1, false, true,false,true);
       }
    };
 
@@ -761,16 +771,15 @@ function LR_Parser(settings,subTask,answer) {
       if(self.simulationStep >= self.actionSequence.length){
          return;
       }else{
-         self.runSimulationLoop(self.simulationStep, false, false,true);
+         self.runSimulationLoop(self.simulationStep, false, false,true,true);
       }
    };
 
-   this.progressBarClick = function(event) {
+   this.progressBarDragStart = function(event) {
       if(self.mode == 3){
          self.isLastActionAGraphEdit = false;
          self.showUndo();
       }
-
       self.clearHighlight();
       if(self.mode == 4){
          if(!self.checkParseTable()){
@@ -778,17 +787,52 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       self.resetFeedback();
+      self.isDragging = true;
+
       var x = event.pageX - $(this).offset().left;
       var w = $(this).width();
-      var step = Math.floor(self.actionSequence.length*x/w);
-
-      self.replayUpTo(step,false);
+      
+      var step = Math.floor(self.actionSequence.length*x/w - 0.5);
+      self.replayUpTo(step,false,false);
+      $("#progressBar").width(x/w*100+"%");
+   };
+   this.progressBarDragMove = function(event) {
+      if(!self.isDragging){
+         return
+      }
+      var x = event.pageX - $("#progressBarClickArea").offset().left;
+      var y = event.pageY - $(this).offset().top;
+      var w = $("#progressBarClickArea").width();
+      var h = $(this).outerHeight();
+      if(x < 0 || x > w || y < 10 || y >= h - 10){
+         self.isDragging = false;
+         $("#progressBar").width(self.simulationStep/self.actionSequence.length*100+"%");
+         return
+      }
+      var step = Math.floor(self.actionSequence.length*x/w - 0.5);
+      if(step != self.simulationStep - 1){
+         self.replayUpTo(step,false,false);
+      }
+      $("#progressBar").width(x/w*100+"%");
+   };
+   this.progressBarDragEnd = function(event) {
+      if(!self.isDragging){
+         return
+      }
+      self.isDragging = false;
+      var x = event.pageX - $("#progressBarClickArea").offset().left;
+      var w = $("#progressBarClickArea").width();
+      var step = Math.floor(self.actionSequence.length*x/w - 0.5);
+      if(step != self.simulationStep){
+         self.replayUpTo(step,false,false);
+      }
+      $("#progressBar").width((step + 1)/self.actionSequence.length*100+"%");
    };
 
-   this.replayUpTo = function(step,anim) {
+   this.replayUpTo = function(step,anim,progressBarMove) {
       this.reset();
       for(var iStep = 0; iStep <= step; iStep++){
-         this.runSimulationLoop(iStep,false,false,anim);
+         this.runSimulationLoop(iStep,false,false,anim,progressBarMove);
       }
       this.clearHighlight();
    };
@@ -1687,7 +1731,7 @@ function LR_Parser(settings,subTask,answer) {
       switch(this.mode){
          case 2:
             this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-            this.replayUpTo(this.actionSequence.length,false);
+            this.replayUpTo(this.actionSequence.length,false,true);
             if(answer.accept){
                this.acceptInput();
             }else if(answer.error){
@@ -1744,7 +1788,7 @@ function LR_Parser(settings,subTask,answer) {
             }
             this.reset();
             this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
-            this.replayUpTo(this.actionSequence.length,false);
+            this.replayUpTo(this.actionSequence.length,false,true);
             break;
          case 3:
             // console.log(this.lrClosureTable.kernels);
