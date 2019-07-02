@@ -44,6 +44,7 @@ function LR_Parser(settings,subTask,answer) {
    this.graphEditor;
    this.isLastActionAGraphEdit = false;
    this.isDragging = false;
+   this.isAnimationRunning = false;
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
@@ -528,6 +529,22 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
+   this.disablePlayerStepBack = function() {
+      $("#stepBackward").off("click");
+      $("#stepBackward").css({
+         cursor: "auto",
+         opacity: "0.5"
+      });
+   };
+
+   this.enablePlayerStepBack = function() {
+      $("#stepBackward").click(self.stepBackward);
+      $("#stepBackward").css({
+         cursor: "pointer",
+         opacity: "1"
+      });
+   };
+
    this.disableProgressBarClick = function() {
       $("#progressBarClickArea").off("mousedown");
       $("#player").off("mousemove");
@@ -628,9 +645,10 @@ function LR_Parser(settings,subTask,answer) {
 
    this.runSimulationLoop = function(step,loop,reverse,anim,progressBarMove) {
       // console.log(step+" "+loop+" "+reverse+" "+anim)
+      this.isAnimationRunning = true;
       var progress = (reverse) ? 100*(step)/this.actionSequence.length : 100*(step + 1)/this.actionSequence.length;
       var action = this.actionSequence[step];
-      this.disablePlayerSteps();
+      this.disablePlayerStepBack();
       this.disableProgressBarClick();
       // console.log(progress);
       if(progress <= 100){
@@ -647,6 +665,7 @@ function LR_Parser(settings,subTask,answer) {
             var newPos = {};
          }
          $("#progressBar").animate(newPos,animationTime,function(){
+            self.isAnimationRunning = false;
             if(action.actionType != "r" || self.selectedRule == null){
                if(reverse){
                   self.simulationStep--;
@@ -655,7 +674,7 @@ function LR_Parser(settings,subTask,answer) {
                }
             }
             if(!loop){
-               self.enablePlayerSteps();
+               self.enablePlayerStepBack();
                self.enableProgressBarClick();
                return;
             }
@@ -693,7 +712,7 @@ function LR_Parser(settings,subTask,answer) {
             self.selectedRule = rule;
             self.styleRules();
             if(anim){
-               this.timouOutID = setTimeout(function() {
+               this.timeOutID = setTimeout(function() {
                   var nonTerminal = self.grammar.rules[rule].nonterminal;
                   var goto = action.goto || self.getPreviousState();
                   self.applyReduction(nonTerminal,goto,true);
@@ -712,6 +731,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.pauseSimulation = function(ev,end) {
       // console.log("pause");
+      self.isAnimationRunning = false;
       if(self.mode == 3){
          self.isLastActionAGraphEdit = false;
          self.showUndo();
@@ -721,6 +741,7 @@ function LR_Parser(settings,subTask,answer) {
          clearTimeout(self.timeOutID);
          subTask.raphaelFactory.stopAnimate("anim");
          $("#progressBar").stop();
+         $(".stackElement").stop();
          self.replayUpTo(self.simulationStep,false,true);
          if(self.token){
             self.token.remove();
@@ -771,6 +792,9 @@ function LR_Parser(settings,subTask,answer) {
       if(self.simulationStep >= self.actionSequence.length){
          return;
       }else{
+         if(self.isAnimationRunning){
+            self.pauseSimulation();
+         }
          self.runSimulationLoop(self.simulationStep, false, false,true,true);
       }
    };
@@ -1009,16 +1033,18 @@ function LR_Parser(settings,subTask,answer) {
 
       /* highlight */
       var stackElementHL = $("<div class=\"stackElementHL\" data_col=\""+selectedCol+"\"></div>");
-      stackElementHL.css({
-         position: "absolute",
-         left: $(".stackElement[data_col="+selectedCol+"]").position().left,
-         top: 0,
-         width: $(".stackElement[data_col="+selectedCol+"]").outerWidth(),
-         height: $("#stackTable").height(),
-         "background-color": "rgb(0,10,20)",
-         opacity: "0.1",
-         border: "1px solid "+this.colors.black
-      });
+      // if($(".stackElement[data_col="+selectedCol+"]").position()){
+         stackElementHL.css({
+            position: "absolute",
+            left: $(".stackElement[data_col="+selectedCol+"]").position().left,
+            top: 0,
+            width: $(".stackElement[data_col="+selectedCol+"]").outerWidth(),
+            height: $("#stackTable").height(),
+            "background-color": "rgb(0,10,20)",
+            opacity: "0.1",
+            border: "1px solid "+this.colors.black
+         });
+      // }
       this.stackElementsHL.push(stackElementHL);
       if(this.mode == 2){
          stackElementHL.off("click");
