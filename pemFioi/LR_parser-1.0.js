@@ -1977,6 +1977,7 @@ function LR_Parser(settings,subTask,answer) {
                }
                return success;
             }
+            break;
          case 4:
             var success = this.checkParseTable();
             return success
