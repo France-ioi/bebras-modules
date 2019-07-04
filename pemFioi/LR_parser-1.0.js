@@ -246,7 +246,7 @@ function LR_Parser(settings,subTask,answer) {
          this.graphEditor.updateHandlers();
    };
 
-   this.initActionSequence = function() {
+   this.initActionSequence = function(validation) {
       if(this.actionSequence){
          this.actionSequence = [];
       }
@@ -348,7 +348,7 @@ function LR_Parser(settings,subTask,answer) {
       }while(iChar < this.input.length && !error && !success && nLoop < 50);
       this.stack = [["0","#"]];
       console.log(this.derivationTree);
-      if(this.mode == 2){
+      if(this.mode == 2 && !validation){
          this.actionSequence = [];
       }
    };
@@ -492,21 +492,21 @@ function LR_Parser(settings,subTask,answer) {
    this.initAcceptButton = function(){
       // var html = "<div id=\"acceptBar\">";
       // html += "<span id=\"acceptMessage\" class=\"actionMessage\"></span>"
-      var html = "<div class=\"messageBackground\"><div id=\"acceptMessage\" class=\"actionMessage\"></div></div>";
-      html += "<div id=\"acceptButton\" class=\"actionButton\"><i class=\"fas fa-thumbs-up buttonIcon\"></i> ACCEPT</div>"
+      // var html = "<div class=\"messageBackground\"><div id=\"acceptMessage\" class=\"actionMessage\"></div></div>";
+      var html = "<div id=\"acceptButton\" class=\"actionButton\"><i class=\"fas fa-thumbs-up buttonIcon\"></i> ACCEPT</div>";
       // html += "</div>";
-      // $("#actionInfo").append(html);
-      $("#shiftBar").append(html);
+      $("#actionInfo").append(html);
+      // $("#shiftBar").append(html);
    };
 
    this.initErrorButton = function(){
       // var html = "<div id=\"errorBar\">";
       // html += "<span id=\"errorMessage\" class=\"actionMessage\"></span>"
-      var html = "<div class=\"messageBackground\"><div id=\"errorMessage\" class=\"actionMessage\"></div></div>";
-      html += "<div id=\"errorButton\" class=\"actionButton\"><i class=\"fas fa-times buttonIcon\"></i> ERROR</div>"
+      // var html = "<div class=\"messageBackground\"><div id=\"errorMessage\" class=\"actionMessage\"></div></div>";
+      var html = "<div id=\"errorButton\" class=\"actionButton\"><i class=\"fas fa-times buttonIcon\"></i> ERROR</div>";
       // html += "</div>";
-      // $("#actionInfo").append(html);
-      $("#shiftBar").append(html);
+      $("#actionInfo").append(html);
+      // $("#shiftBar").append(html);
    };
 
    this.initDerivationTree = function() {
@@ -1896,7 +1896,7 @@ function LR_Parser(settings,subTask,answer) {
             }else{
                this.reset();
                this.actionSequence = [];
-               this.initActionSequence();
+               this.initActionSequence(true);
                var lastAction = this.actionSequence[this.actionSequence.length - 1];
                var accept = false;
                if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
@@ -2068,7 +2068,10 @@ function LR_Parser(settings,subTask,answer) {
 
       /* action button */
       $("#acceptButton, #errorButton").css({
-         "border-radius": "1em"
+         "border-radius": "1em",
+         float: "right",
+         "margin-top": "1em",
+         clear: "right"
       });
       $(".actionButton").css({
          "background-color": this.colors.blue,
@@ -2085,7 +2088,8 @@ function LR_Parser(settings,subTask,answer) {
          "justify-content": "flex-end",
       });
       // $("#acceptBar, #errorBar").css({
-      //    "margin-top": "0.5em"
+      //    "margin-top": "0.5em",
+
       // });
       $(".actionMessage").css({
          padding: "0.5em 1em",
@@ -2099,7 +2103,7 @@ function LR_Parser(settings,subTask,answer) {
          "background-color": this.colors.blue,
          height: buttonHeight+"px"
       })
-      $("#reduceButton, #shiftButton, #acceptButton, #errorButton").css({
+      $("#reduceButton, #shiftButton").css({
          "border-radius": "0 0 5px 5px"
       });
       // $("#acceptButton, #errorButton").css({
@@ -2394,7 +2398,8 @@ function LR_Parser(settings,subTask,answer) {
    this.styleDerivationTree = function() {
       $("#derivationTree").css({
          position: "relative",
-         "padding-top": "10px"
+         "padding-top": "10px",
+         width: this.input.length*2+"em"
       });
       $("#derivationTree h4").css({
          // position: "absolute",
