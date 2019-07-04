@@ -2476,7 +2476,18 @@ function LR_Parser(settings,subTask,answer) {
                var y1 = 2*self.treeHeight - row - 0.1;
                var y2 = y1 + 0.8;
                // var y2 = 2*self.treeHeight - child.row - 1.1;
-               branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+               if(x1 == x2){
+                  branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+               }else{
+                  var em = $("#tree").width()/(1.5*self.input.length);
+                  var x1c = x1*em;
+                  var y1c = (y1 + 0.7)*em;
+                  var x2c = x2*em;
+                  var y2c = (y2 - 0.7)*em;
+                  // branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+
+                  branchSvg += "<path d=\"M "+x1*em+","+y1*em+" C "+x1c+","+y1c+" "+x2c+","+y2c+" "+x2*em+","+y2*em+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\" fill=\"none\"/>";
+               }
                // if(child.row < row - 1){
                   var x3 = x2;
                   var y3 = 2*self.treeHeight - child.row - 1.1;
