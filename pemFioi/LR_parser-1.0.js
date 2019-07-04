@@ -140,9 +140,12 @@ function LR_Parser(settings,subTask,answer) {
       this.initParser();
       this.initTabs();
       this.initAutomata();
-      // if(this.mode != 2){
+      if(this.mode != 3){
+         this.initActionSequence(false,true);
+      }else{
+         this.initActionSequence(false,true);
          this.initActionSequence();
-      // }
+      }
       this.initParseTable();
       this.showTab();
       
@@ -246,7 +249,7 @@ function LR_Parser(settings,subTask,answer) {
          this.graphEditor.updateHandlers();
    };
 
-   this.initActionSequence = function(validation) {
+   this.initActionSequence = function(validation,tree) {
       if(this.actionSequence){
          this.actionSequence = [];
       }
@@ -265,7 +268,7 @@ function LR_Parser(settings,subTask,answer) {
          nLoop++;
          var action = this.lrTable.states[state][symbol];
 
-         if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))){
+         if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action)) || tree){
             switch(action[0].actionType){
                case "s":
                   this.actionSequence.push({
@@ -294,42 +297,44 @@ function LR_Parser(settings,subTask,answer) {
                   }
                   
                   /* create derivation tree */
-                  if(nbRedChar == 1){
-                     if(this.derivationTree[iChar - 1]){
-                        this.derivationTree[iChar - 1].push(ruleIndex);
-                     }else{
-                        this.derivationTree[iChar - 1] = [ruleIndex];
-                     }
-                     if(this.derivationTree[iChar - 1].length > this.treeHeight){
-                        this.treeHeight = this.derivationTree[iChar - 1].length;
-                     }
-                  }else{
-                     var nodeHeight = 0;
-                     for(var i = iChar - nbRedChar; i < iChar; i++){
-                        var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
-                        if(branchLength > nodeHeight){
-                           nodeHeight = branchLength;
+                  if(tree){
+                     if(nbRedChar == 1){
+                        if(this.derivationTree[iChar - 1]){
+                           this.derivationTree[iChar - 1].push(ruleIndex);
+                        }else{
+                           this.derivationTree[iChar - 1] = [ruleIndex];
                         }
-                     }
-   
-                     for(var i = iChar - nbRedChar; i < iChar; i++){
-                        var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
-                        if(branchLength != nodeHeight){
-                           var gap = nodeHeight - branchLength;
-                           for(var j = 0; j < gap; j++){
-                              if(!this.derivationTree[i]){
-                                 this.derivationTree[i] = [];
-                              }
-                              this.derivationTree[i].push("")
+                        if(this.derivationTree[iChar - 1].length > this.treeHeight){
+                           this.treeHeight = this.derivationTree[iChar - 1].length;
+                        }
+                     }else{
+                        var nodeHeight = 0;
+                        for(var i = iChar - nbRedChar; i < iChar; i++){
+                           var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
+                           if(branchLength > nodeHeight){
+                              nodeHeight = branchLength;
                            }
                         }
-                        if(i < iChar - 1){
-                           this.derivationTree[i].push("-")
-                        }else{
-                           this.derivationTree[i].push(ruleIndex)
-                        }
-                        if(this.derivationTree[i].length > this.treeHeight){
-                           this.treeHeight = this.derivationTree[i].length;
+      
+                        for(var i = iChar - nbRedChar; i < iChar; i++){
+                           var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
+                           if(branchLength != nodeHeight){
+                              var gap = nodeHeight - branchLength;
+                              for(var j = 0; j < gap; j++){
+                                 if(!this.derivationTree[i]){
+                                    this.derivationTree[i] = [];
+                                 }
+                                 this.derivationTree[i].push("")
+                              }
+                           }
+                           if(i < iChar - 1){
+                              this.derivationTree[i].push("-")
+                           }else{
+                              this.derivationTree[i].push(ruleIndex)
+                           }
+                           if(this.derivationTree[i].length > this.treeHeight){
+                              this.treeHeight = this.derivationTree[i].length;
+                           }
                         }
                      }
                   }
@@ -1571,7 +1576,7 @@ function LR_Parser(settings,subTask,answer) {
       /* return the vertex content as an array of objects {nonTerminal,[development]}*/
       var contentObj = [];
       var info = this.graph.getVertexInfo(id);
-      if(!info.content){
+      if(!info || !info.content){
          return false;
       }
       var lines = info.content.split('\n');
