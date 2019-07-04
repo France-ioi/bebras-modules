@@ -19,6 +19,8 @@ function LR_Parser(settings,subTask,answer) {
    this.inputIndex = 0;
    this.actionSequence = [];
    this.simulationStep = 0;
+   this.derivationTree = [];
+   this.treeHeight = 0;
 
    this.timeOutID;
    this.animationTime = 1000;
@@ -138,9 +140,9 @@ function LR_Parser(settings,subTask,answer) {
       this.initParser();
       this.initTabs();
       this.initAutomata();
-      if(this.mode != 2){
+      // if(this.mode != 2){
          this.initActionSequence();
-      }
+      // }
       this.initParseTable();
       this.showTab();
       
@@ -252,6 +254,7 @@ function LR_Parser(settings,subTask,answer) {
          this.input += "$";
       }
       this.input = this.input.replace(/ /g,"");
+      // this.derivationTree = Beav.Array.make(this.input.length - 1,[]);
       var state = 0;
       var iChar = 0;
       var symbol = this.input.charAt(iChar);
@@ -276,17 +279,59 @@ function LR_Parser(settings,subTask,answer) {
                   symbol = this.input.charAt(iChar);
                   break;
                case "r":
+                  var ruleIndex = action[0].actionValue; 
                   this.actionSequence.push({
                      actionType: "r",
-                     rule: action[0].actionValue
+                     rule: ruleIndex
                   });
-                  symbol = this.grammar.rules[action[0].actionValue].nonterminal;
-                  nbRedChar = this.grammar.rules[action[0].actionValue].development.length;
+                  symbol = this.grammar.rules[ruleIndex].nonterminal;
+                  nbRedChar = this.grammar.rules[ruleIndex].development.length;
                   state = this.stack[this.stack.length - 1 - nbRedChar][0];
                   this.stack.splice(this.stack.length - nbRedChar,nbRedChar,symbol);
                   if(symbol == "S" && iChar >= this.input.length - 1){
                      this.actionSequence[this.actionSequence.length - 1]["goto"] = this.getTerminalState();
                      success = true;
+                  }
+                  
+                  /* create derivation tree */
+                  if(nbRedChar == 1){
+                     if(this.derivationTree[iChar - 1]){
+                        this.derivationTree[iChar - 1].push(ruleIndex);
+                     }else{
+                        this.derivationTree[iChar - 1] = [ruleIndex];
+                     }
+                     if(this.derivationTree[iChar - 1].length > this.treeHeight){
+                        this.treeHeight = this.derivationTree[iChar - 1].length;
+                     }
+                  }else{
+                     var nodeHeight = 0;
+                     for(var i = iChar - nbRedChar; i < iChar; i++){
+                        var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
+                        if(branchLength > nodeHeight){
+                           nodeHeight = branchLength;
+                        }
+                     }
+   
+                     for(var i = iChar - nbRedChar; i < iChar; i++){
+                        var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
+                        if(branchLength != nodeHeight){
+                           var gap = nodeHeight - branchLength;
+                           for(var j = 0; j < gap; j++){
+                              if(!this.derivationTree[i]){
+                                 this.derivationTree[i] = [];
+                              }
+                              this.derivationTree[i].push("")
+                           }
+                        }
+                        if(i < iChar - 1){
+                           this.derivationTree[i].push("-")
+                        }else{
+                           this.derivationTree[i].push(ruleIndex)
+                        }
+                        if(this.derivationTree[i].length > this.treeHeight){
+                           this.treeHeight = this.derivationTree[i].length;
+                        }
+                     }
                   }
                   break;
                case "":    // goto
@@ -302,7 +347,10 @@ function LR_Parser(settings,subTask,answer) {
          }
       }while(iChar < this.input.length && !error && !success && nLoop < 50);
       this.stack = [["0","#"]];
-      // console.log(this.actionSequence);
+      console.log(this.derivationTree);
+      if(this.mode == 2){
+         this.actionSequence = [];
+      }
    };
 
    this.initParseTable = function() {
@@ -392,6 +440,7 @@ function LR_Parser(settings,subTask,answer) {
       this.initShiftButton();
       this.initAcceptButton();
       this.initErrorButton();
+      this.initDerivationTree();
    };
 
    this.initStackTable = function() {
@@ -458,6 +507,54 @@ function LR_Parser(settings,subTask,answer) {
       // html += "</div>";
       // $("#actionInfo").append(html);
       $("#shiftBar").append(html);
+   };
+
+   this.initDerivationTree = function() {
+      var html = "<div id=\"derivationTree\">";
+      html += "<h4>Derivation Tree</h4>";
+      html += "<div id=\"tree\"></div>"
+      for(var iChar = 0; iChar < this.input.length - 1; iChar++){
+         html += "<div class=\"inputChar\">"+this.input[iChar]+"</div>";
+      }
+      html += "</div>";
+      $("#actionInfo").append(html);
+      for(var iLine = 0; iLine < 2*this.treeHeight; iLine++){
+         // var line = "<div class=\"treeLine\">"
+         var line = "";
+         for(var iChar = 0; iChar < this.input.length - 1; iChar++){
+            // line += "<div class=\"inputChar\" data_col=\""+iChar+"\" data_row=\""+iLine+"\">";
+            if(iLine % 2 == 0){
+               // if(this.derivationTree[iChar].length > iLine / 2 && this.derivationTree[iChar][iLine / 2] != "-"){
+               //    line += "|";
+               // }else if(this.derivationTree[iChar].length > iLine / 2 && this.derivationTree[iChar][iLine / 2] == "-"){
+               //    line += "/";
+               // }
+            }else{
+               var rule = this.derivationTree[iChar][(iLine - 1)/2];
+               if(rule === ""){
+                  // line += "|";
+               }
+               if(this.grammar.rules[rule]){
+                  // jChar = iChar - 1;
+
+                  // do{
+                  //    if(this.derivationTree[jChar] && this.derivationTree[jChar] == "-"){
+
+                  //    }
+                  // }while(jChar > 0 && )
+                  line += "<div class=\"treeChar\" data_col=\""+iChar+"\" data_row=\""+iLine+"\" data_nbRed=\""+this.grammar.rules[rule].development.length+"\">";
+                  line += this.grammar.rules[rule].nonterminal;
+                  line += "</div>";
+
+               }
+            }
+            // line += "</div>";
+         }
+         // line += "</div>";
+         $("#tree").append(line);
+      }
+      var html2 = "<div id=\"treeCursor\"></div>";
+      $("#derivationTree").append(html2);
    };
 
    this.initHandlers = function() {
@@ -672,6 +769,7 @@ function LR_Parser(settings,subTask,answer) {
                }else{
                   self.simulationStep++;
                }
+               // console.log(self.simulationStep);
             }
             if(!loop){
                self.enablePlayerStepBack();
@@ -790,11 +888,13 @@ function LR_Parser(settings,subTask,answer) {
       }
       self.resetFeedback();
       if(self.simulationStep >= self.actionSequence.length){
+         // console.log("return "+self.simulationStep)
          return;
       }else{
          if(self.isAnimationRunning){
             self.pauseSimulation();
          }
+         // console.log(self.simulationStep);
          self.runSimulationLoop(self.simulationStep, false, false,true,true);
       }
    };
@@ -1182,9 +1282,9 @@ function LR_Parser(settings,subTask,answer) {
             opacity: "0.1"
          })
          $("#inputBar").append(this.inputHighlight);
-         $("#cursor").animate({left:newX+"px"},this.animationTime);
+         $("#cursor, #treeCursor").animate({left:newX+"px"},this.animationTime);
       }else{
-         $("#cursor").css({left:newX+"px"});
+         $("#cursor, #treeCursor").css({left:newX+"px"});
       }
    };
 
@@ -2065,6 +2165,8 @@ function LR_Parser(settings,subTask,answer) {
       $("#bottomCircle").css({
          bottom: "-6px"
       });
+
+      this.styleDerivationTree();
    };
 
    this.styleTabSwitch = function() {
@@ -2286,6 +2388,105 @@ function LR_Parser(settings,subTask,answer) {
       $("#stackTable .stackElement.selected").css({
          "background-color": this.colors.blue,
          color: "white"
+      });
+   };
+
+   this.styleDerivationTree = function() {
+      $("#derivationTree").css({
+         position: "relative",
+         "padding-top": "10px"
+      });
+      $("#derivationTree h4").css({
+         // position: "absolute",
+         "margin": "0 0 1em 0"
+      });
+      $("#tree").css({
+         "font-size": "1.5em",
+         position: "relative",
+         height: 2*this.treeHeight+"em",
+         width: this.input.length*1.5+"em"
+      });
+      $("#derivationTree .inputChar, .treeChar").css({
+         width: "1.5em",
+         "text-align": "center",
+         "color": this.colors.blue
+      });
+
+      var branchSvg = "";
+      $("#tree .treeChar").each(function(){
+         var col = $(this).attr("data_col");
+         var row = $(this).attr("data_row");
+         var nbRed = $(this).attr("data_nbRed");
+         var left = (col - (nbRed - 1)/2)*1.5;
+         $(this).css({
+            position: "absolute",
+            left: left+"em",
+            bottom: row+"em"
+         });
+
+         if(row == 1){
+            var x1 = left + 0.75;
+            var x2 = x1;
+            var y1 = 2*self.treeHeight - 1;
+            var y2 = y1 + 1;
+            branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
+         }else if(nbRed == 1){
+            var x1 = left + 0.75;
+            var x2 = x1;
+            var y1 = 2*self.treeHeight - row - 0.1;
+            var y2 = y1 + 1;
+            branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
+         }else{
+            var iChar = col;
+            var iLine = (row - 1)/2;
+            var children = [];
+            for(var j = iChar - (nbRed - 1); j <= iChar; j++){
+               jLine = iLine - 1;
+               var foundChild = false;
+               do{
+                  var rule = self.derivationTree[j][jLine];
+                  if(rule != ""){
+                     children.push({col:j,row:(2*jLine + 1),nbRed:self.grammar.rules[rule].development.length})
+                     foundChild = true;
+                  }else{
+                     jLine--; 
+                     if(jLine < 0){
+                        children.push({col:j,row:jLine,nbRed:1})
+                        foundChild = true;
+                     }
+                  }
+               }while(!foundChild)
+            }
+            // console.log(children);
+            for(var child of children){
+               var childLeft = (child.col - (child.nbRed - 1)/2)*1.5;
+               var x1 = left + 0.75;
+               var x2 = childLeft + 0.75;
+               var y1 = 2*self.treeHeight - row - 0.1;
+               var y2 = y1 + 0.8;
+               // var y2 = 2*self.treeHeight - child.row - 1.1;
+               branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+               // if(child.row < row - 1){
+                  var x3 = x2;
+                  var y3 = 2*self.treeHeight - child.row - 1.1;
+                  branchSvg += "<line x1=\""+x2+"em\" y1=\""+y2+"em\" x2=\""+x3+"em\" y2=\""+y3+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+               // }             
+            }
+         }
+      });
+      var svg = $("<svg width=\""+this.input.length*1.5+"em\" height=\""+2*this.treeHeight+"em\">"+branchSvg+"</svg>").css({
+         position: "absolute",
+         bottom: 0,
+         left: 0
+      });
+      $("#tree").append(svg);
+      $("#treeCursor").css({
+         position: "absolute",
+         bottom: 0,
+         left: 0,
+         height: $("#derivationTree").outerHeight() + $("#shiftBar").height(),
+         width: 0,
+         "border-left": "1px dotted "+this.colors.blue
       });
    };
 
