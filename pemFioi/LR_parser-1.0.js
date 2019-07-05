@@ -352,7 +352,7 @@ function LR_Parser(settings,subTask,answer) {
          }
       }while(iChar < this.input.length && !error && !success && nLoop < 50);
       this.stack = [["0","#"]];
-      console.log(this.derivationTree);
+      // console.log(this.derivationTree);
       if(this.mode == 2 && !validation){
          this.actionSequence = [];
       }
@@ -2402,51 +2402,58 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.styleDerivationTree = function() {
+      var charWidth = $("#inputBar .inputChar").width();
+      var charHeight = $("#inputBar .inputChar").height()*0.7;
       $("#derivationTree").css({
          position: "relative",
          "padding-top": "10px",
-         width: this.input.length*2+"em"
+         width: this.input.length*charWidth
       });
       $("#derivationTree h4").css({
          // position: "absolute",
          "margin": "0 0 1em 0"
       });
+
       $("#tree").css({
-         "font-size": "1.5em",
+         // "font-size": "1.2em",
          position: "relative",
-         height: 2*this.treeHeight+"em",
-         width: this.input.length*1.5+"em"
+         height: 2*this.treeHeight*charHeight,
+         width: this.input.length*charWidth
       });
+
       $("#derivationTree .inputChar, .treeChar").css({
-         width: "1.5em",
+         "font-size": charHeight,
+         "font-weight": "bold",
+         width: charWidth,
          "text-align": "center",
          "color": this.colors.blue
       });
-
+      
+      
       var branchSvg = "";
       $("#tree .treeChar").each(function(){
          var col = $(this).attr("data_col");
          var row = $(this).attr("data_row");
          var nbRed = $(this).attr("data_nbRed");
-         var left = (col - (nbRed - 1)/2)*1.5;
+         var left = (col - (nbRed - 1)/2)*charWidth;
          $(this).css({
             position: "absolute",
-            left: left+"em",
-            bottom: row+"em"
+            left: left,
+            bottom: row*charHeight
          });
 
          if(row == 1){
-            var x1 = left + 0.75;
+            var x1 = (left + charWidth/2);
             var x2 = x1;
-            var y1 = 2*self.treeHeight - 1;
-            var y2 = y1 + 1;
-            branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
+            var y1 = (2*self.treeHeight - 1)*charHeight;
+            var y2 = y1 + charHeight;
+            branchSvg += "<line x1=\""+x1+"\" y1=\""+y1+"\" x2=\""+x2+"\" y2=\""+y2+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
          }else if(nbRed == 1){
-            var x1 = left + 0.75;
+            var x1 = (left + charWidth/2);
             var x2 = x1;
-            var y1 = 2*self.treeHeight - row - 0.1;
-            var y2 = y1 + 1;
-            branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
+            var y1 = (2*self.treeHeight - row - 0.1)*charHeight;
+            var y2 = y1 + charHeight*(0.9);
+            branchSvg += "<line x1=\""+x1+"\" y1=\""+y1+"\" x2=\""+x2+"\" y2=\""+y2+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";
          }else{
             var iChar = col;
             var iLine = (row - 1)/2;
@@ -2470,33 +2477,33 @@ function LR_Parser(settings,subTask,answer) {
             }
             // console.log(children);
             for(var child of children){
-               var childLeft = (child.col - (child.nbRed - 1)/2)*1.5;
-               var x1 = left + 0.75;
-               var x2 = childLeft + 0.75;
+               var childLeft = (child.col - (child.nbRed - 1)/2)*charWidth;
+               var x1 = (left + charWidth/2);
+               var x2 = childLeft + charWidth/2;
                var y1 = 2*self.treeHeight - row - 0.1;
                var y2 = y1 + 0.8;
                // var y2 = 2*self.treeHeight - child.row - 1.1;
                if(x1 == x2){
-                  branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+                  branchSvg += "<line x1=\""+x1+"\" y1=\""+y1*charHeight+"\" x2=\""+x2+"\" y2=\""+y2*charHeight+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
                }else{
-                  var em = $("#tree").width()/(1.5*self.input.length);
-                  var x1c = x1*em;
-                  var y1c = (y1 + 0.7)*em;
-                  var x2c = x2*em;
-                  var y2c = (y2 - 0.7)*em;
+                  // var em = $("#tree").width()/(1.5*self.input.length);
+                  var x1c = x1;
+                  var y1c = (y1 + 0.7);
+                  var x2c = x2;
+                  var y2c = (y2 - 0.7);
                   // branchSvg += "<line x1=\""+x1+"em\" y1=\""+y1+"em\" x2=\""+x2+"em\" y2=\""+y2+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
 
-                  branchSvg += "<path d=\"M "+x1*em+","+y1*em+" C "+x1c+","+y1c+" "+x2c+","+y2c+" "+x2*em+","+y2*em+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\" fill=\"none\"/>";
+                  branchSvg += "<path d=\"M "+x1+","+y1*charHeight+" C "+x1c+","+y1c*charHeight+" "+x2c+","+y2c*charHeight+" "+x2+","+y2*charHeight+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\" fill=\"none\"/>";
                }
                // if(child.row < row - 1){
                   var x3 = x2;
-                  var y3 = 2*self.treeHeight - child.row - 1.1;
-                  branchSvg += "<line x1=\""+x2+"em\" y1=\""+y2+"em\" x2=\""+x3+"em\" y2=\""+y3+"em\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
+                  var y3 = 2*self.treeHeight - child.row - 1.2;
+                  branchSvg += "<line x1=\""+x2+"\" y1=\""+y2*charHeight+"\" x2=\""+x3+"\" y2=\""+y3*charHeight+"\" stroke=\""+self.colors.yellow+"\" stroke-width=\"2\"/>";  
                // }             
             }
          }
       });
-      var svg = $("<svg width=\""+this.input.length*1.5+"em\" height=\""+2*this.treeHeight+"em\">"+branchSvg+"</svg>").css({
+      var svg = $("<svg width=\""+this.input.length*charWidth+"\" height=\""+2*this.treeHeight*charHeight+"\">"+branchSvg+"</svg>").css({
          position: "absolute",
          bottom: 0,
          left: 0
