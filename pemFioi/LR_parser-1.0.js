@@ -831,6 +831,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.treeAnim = function(step,reverse,anim) {
+      // console.log("tree");
       for(var el of this.treeElements[step]){
          if(anim && !reverse){
             var anim = new Raphael.animation({opacity:1},this.animationTime);
@@ -848,6 +849,16 @@ function LR_Parser(settings,subTask,answer) {
       //       }
       //    }
       // }
+   };
+
+   this.eraseHigherBranches = function(step) {
+      for(var iStep in self.treeElements){
+         if(iStep > step){
+            for(var el of self.treeElements[iStep]){
+               el.attr({opacity:0});
+            }
+         }
+      }
    };
 
    this.pauseSimulation = function(ev,end) {
@@ -894,7 +905,10 @@ function LR_Parser(settings,subTask,answer) {
       if(self.simulationStep < 1){
          return;
       }else{
-         self.runSimulationLoop(self.simulationStep - 1, false, true,false,true);
+         self.clearHighlight();
+         self.replayUpTo(self.simulationStep - 2,false,true);
+         self.eraseHigherBranches(self.simulationStep - 1);
+         // self.runSimulationLoop(self.simulationStep - 1, false, true,false,true);
       }
    };
 
@@ -911,13 +925,11 @@ function LR_Parser(settings,subTask,answer) {
       }
       self.resetFeedback();
       if(self.simulationStep >= self.actionSequence.length){
-         // console.log("return "+self.simulationStep)
          return;
       }else{
          if(self.isAnimationRunning){
             self.pauseSimulation();
          }
-         // console.log(self.simulationStep);
          self.runSimulationLoop(self.simulationStep, false, false,true,true);
       }
    };
@@ -959,13 +971,14 @@ function LR_Parser(settings,subTask,answer) {
       var step = Math.floor(self.actionSequence.length*x/w - 0.5);
       if(step != self.simulationStep - 1){
          self.replayUpTo(step,false,false);
-         for(var iStep in self.treeElements){
-            if(iStep > step){
-               for(var el of self.treeElements[iStep]){
-                  el.attr({opacity:0});
-               }
-            }
-         }
+         // for(var iStep in self.treeElements){
+         //    if(iStep > step){
+         //       for(var el of self.treeElements[iStep]){
+         //          el.attr({opacity:0});
+         //       }
+         //    }
+         // }
+         self.eraseHigherBranches(step);
       }
       $("#progressBar").width(x/w*100+"%");
    };
@@ -979,23 +992,25 @@ function LR_Parser(settings,subTask,answer) {
       var step = Math.floor(self.actionSequence.length*x/w - 0.5);
       if(step != self.simulationStep){
          self.replayUpTo(step,false,false);
-         for(var iStep in self.treeElements){
-            if(iStep > step){
-               for(var el of self.treeElements[iStep]){
-                  el.attr({opacity:0});
-               }
-            }
-         }
+         // for(var iStep in self.treeElements){
+         //    if(iStep > step){
+         //       for(var el of self.treeElements[iStep]){
+         //          el.attr({opacity:0});
+         //       }
+         //    }
+         // }
+         self.eraseHigherBranches(step);
       }
       $("#progressBar").width((step + 1)/self.actionSequence.length*100+"%");
    };
 
    this.replayUpTo = function(step,anim,progressBarMove) {
+      // console.log("replay "+step);
       this.reset();
       for(var iStep = 0; iStep <= step; iStep++){
          this.runSimulationLoop(iStep,false,false,anim,progressBarMove);
       }
-      this.clearHighlight();
+      // this.clearHighlight();
    };
 
    this.selectStackElement = function() {
@@ -1142,17 +1157,25 @@ function LR_Parser(settings,subTask,answer) {
    this.applyReduction = function(nonTerminal,goto,anim) {
       this.clearHighlight();
       var newStackElement = [goto,nonTerminal];
+      this.highlightPrevState(this.currentState);
+      var prevStates = [this.getPreviousState()];
+      for(var col of this.selectedStackElements){
+         prevStates.push(this.stack[col][0]);
+      }
+      var state = prevStates.pop();
       if(anim){
-         this.highlightPrevState(this.currentState);
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
-         var prevStates = [this.getPreviousState()];
-         for(var col of this.selectedStackElements){
-            prevStates.push(this.stack[col][0]);
-         }
-         var state = prevStates.pop();
+         // var prevStates = [this.getPreviousState()];
+         // for(var col of this.selectedStackElements){
+         //    prevStates.push(this.stack[col][0]);
+         // }
+         // var state = prevStates.pop();
          var animTime = this.animationTime/prevStates.length;
          this.reductionAnimLoop(state,prevStates,animTime,newStackElement);
       }else{
+         this.highlightReductionPath(state,prevStates);
+         this.highlightRule(this.selectedRule);
+         this.highlightReducedStackElements(prevStates);
          this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
          this.selectedStackElements = [];
          $(".rule").removeClass("selected");
@@ -1201,10 +1224,11 @@ function LR_Parser(settings,subTask,answer) {
             self.updateStackTable();
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
-               $(".rule").removeClass("selected");
-               $(".rule[data_rule="+self.selectedRule+"]").addClass("previousRule");
-               self.selectedRule = null;
-               self.styleRules();
+               // $(".rule").removeClass("selected");
+               // $(".rule[data_rule="+self.selectedRule+"]").addClass("previousRule");
+               // self.selectedRule = null;
+               // self.styleRules();
+               self.highlightRule(self.selectedRule);
                self.updateState(true);
                self.displayMessage("reduce","GOTO "+newStackElement[0]);
             });
@@ -1229,7 +1253,7 @@ function LR_Parser(settings,subTask,answer) {
       this.styleStackTable();
       this.updateState(false);
 
-   }
+   };
 
    /* SHIFT */
 
@@ -1305,25 +1329,32 @@ function LR_Parser(settings,subTask,answer) {
 
    this.updateCursor = function(anim) {
       var newX = this.inputIndex * $(".inputChar").outerWidth();
+      var xHL = $("#cursor").position().left;
+      var wHL = newX - xHL;
+
+      if(this.inputHighlight){
+         this.inputHighlight.remove();
+      }
+      this.inputHighlight = $("<div id=\"inputHL\"></div>");
+      this.inputHighlight.css({
+         position: "absolute",
+         left: xHL,
+         top: 0,
+         height: "100%",
+         width: wHL+"px",
+         "background-color": "rgb(0,10,20)",
+         opacity: "0.1"
+      });
+      $("#inputBar").append(this.inputHighlight);
+
       if(anim){
-         var xHL = $("#cursor").position().left;
-         var wHL = newX - xHL
-         this.inputHighlight = $("<div id=\"inputHL\"></div>");
-         this.inputHighlight.css({
-            position: "absolute",
-            left: xHL,
-            top: 0,
-            height: "100%",
-            width: wHL+"px",
-            "background-color": "rgb(0,10,20)",
-            opacity: "0.1"
-         })
-         $("#inputBar").append(this.inputHighlight);
          $("#cursor, #treeCursor").animate({left:newX+"px"},this.animationTime);
       }else{
          $("#cursor, #treeCursor").css({left:newX+"px"});
       }
    };
+
+   /* HIGHLIGHT */
 
    this.highlightPrevState = function(previousState) {
       var vertex = this.getStateID(previousState);
@@ -1349,7 +1380,53 @@ function LR_Parser(settings,subTask,answer) {
       this.pathHighlight.push(edgeHL);  
    };
 
+   this.highlightReductionPath = function(state,prevStates) {
+      var prevStates = JSON.parse(JSON.stringify(prevStates));
+      do{
+         var vertexID = this.getStateID(state);
+         var prevState = prevStates.pop();
+         var prevVertexID = this.getStateID(prevState);
+         var edgeID = this.graph.getEdgesBetween(prevVertexID,vertexID)[0];
+         this.highlightEdge(edgeID);
+         state = prevState;
+      }while(prevStates.length > 0)
+   };
+
+   this.highlightRule = function(rule) {
+      $(".rule").removeClass("selected");
+      $(".rule[data_rule="+rule+"]").addClass("previousRule");
+      self.selectedRule = null;
+      self.styleRules();
+   };
+
+   this.highlightReducedStackElements = function(prevStates) {
+      var prevStates = JSON.parse(JSON.stringify(prevStates));
+      do{
+         var prevState = prevStates.pop();
+         var selectedCol = self.selectedStackElements[prevStates.length];
+
+         var stackElementHL = $("<div class=\"stackElementHL\" data_col=\""+selectedCol+"\"></div>");
+         stackElementHL.css({
+            position: "absolute",
+            left: $(".stackElement[data_col="+selectedCol+"]").position().left,
+            top: 0,
+            width: $(".stackElement[data_col="+selectedCol+"]").outerWidth(),
+            height: $("#stackTable").height(),
+            "background-color": "rgb(0,10,20)",
+            opacity: "0.1",
+            border: "1px solid "+this.colors.black
+         });
+         this.stackElementsHL.push(stackElementHL);
+         if(this.mode == 2){
+            stackElementHL.off("click");
+            stackElementHL.click(self.selectStackElement);
+         }
+         $("#stackTableContainer").append(stackElementHL);
+      }while(prevStates.length > 0)
+   };
+
    this.clearHighlight = function() {
+      // console.log("clearHL");
       if(this.inputHighlight){
          this.inputHighlight.remove();
          this.inputHighlight = null;
@@ -1381,10 +1458,16 @@ function LR_Parser(settings,subTask,answer) {
       }
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
+      var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
       if(!anim){
          stateVertex[0].attr(this.defaultCurrentStateAttr);
+         if(previousState != null){
+            var id1 = this.getStateID(previousState);
+            var edgeID = this.graph.getEdgesBetween(id1,id)[0];
+            this.highlightEdge(edgeID);
+         }
       }else{
-         var previousState = this.stack[this.stack.length - 2][0];
+         // var previousState = this.stack[this.stack.length - 2][0];
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
       }
       if(this.currentState == this.getTerminalState()){
