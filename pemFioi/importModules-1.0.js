@@ -23,6 +23,7 @@ var importableModules = function () {
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
+      'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
       'fonts-loader-1.0': {src: modulesPath+"/pemFioi/fontsLoader-1.0.js", id: "fonts-loader"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},

@@ -822,6 +822,25 @@ var quickAlgoInterface = {
         });
         that.replaceWith(video);
         video[0].play();
+    },
+
+    exportCurrentAsPng: function(name) {
+        if(typeof window.saveSvgAsPng == 'undefined') {
+            throw "Unable to export without save-svg-as-png. Please add 'save-svg-as-png' to the importModules statement.";
+        }
+        if(!name) { name = 'export.png'; }
+        var svgBbox = $('#blocklyDiv svg')[0].getBoundingClientRect();
+        var blocksBbox = $('#blocklyDiv svg > .blocklyWorkspace > .blocklyBlockCanvas')[0].getBoundingClientRect();
+        var svg = $('#blocklyDiv svg').clone();
+        svg.find('.blocklyFlyout, .blocklyMainBackground, .blocklyTrash, .blocklyBubbleCanvas, .blocklyScrollbarVertical, .blocklyScrollbarHorizontal, .blocklyScrollbarBackground').remove();
+        var options = {
+            backgroundColor: '#FFFFFF',
+            top: blocksBbox.top - svgBbox.top - 4, 
+            left: blocksBbox.left - svgBbox.left - 4, 
+            width: blocksBbox.width + 8, 
+            height: blocksBbox.height + 8
+            };
+        window.saveSvgAsPng(svg[0], name, options);
     }
 };
 
