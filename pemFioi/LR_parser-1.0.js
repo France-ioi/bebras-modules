@@ -36,6 +36,8 @@ function LR_Parser(settings,subTask,answer) {
    this.tabsID = "tabs";
    this.tabsContainerID = "tabsCont";
    this.sideTable = false;
+   this.rowHL = null;
+   this.colHL = null;
 
    this.paper;
    this.paperHeight = settings.paperHeight;
@@ -120,13 +122,25 @@ function LR_Parser(settings,subTask,answer) {
      "fill": "none",
      // opacity: "0.1"
    };
-   this.selectedStackElementAttr = {
-
+   this.cellAttr = {
+      "background-color": this.colors.lightgrey,
+      color: this.colors.black,
+      border: "1px solid "+this.colors.black
+   };
+   // this.selectedCellAttr = {
+   //    "background-color": this.colors.blue,
+   //    color: "white",
+   //    border: "1px solid "+this.colors.lightgrey
+   // };
+   this.cellHighlightAttr = {
+      position: "absolute",
+      border: "4px solid "+this.colors.blue
    };
    this.treeLineAttr = {
       stroke: this.colors.yellow,
       "stroke-width": 2
    };
+
    this.vertexAttr = settings.vertexAttr || this.defaultVertexAttr;
    this.edgeAttr = settings.edgeAttr || this.defaultEdgeAttr;
    this.vertexLabelAttr = settings.vertexLabelAttr || this.defaultVertexLabelAttr;
@@ -389,9 +403,10 @@ function LR_Parser(settings,subTask,answer) {
          var state = this.lrTable.states[iState];
          var stateID = (state) ? state.index : terminalStateIndex;
          html += "<tr>";
-         html += "<td>"+stateID+"</td>";
+         html += "<td data_state=\""+stateID+"\">"+stateID+"</td>";
          for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            html += (stateID == terminalStateIndex) ? "<td>" : "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            // html += (stateID == terminalStateIndex) ? "<td>" : "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
+            html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
             if(this.mode != 4){
                if(state && state[colLabel[iCol]]){
                   html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
@@ -530,38 +545,14 @@ function LR_Parser(settings,subTask,answer) {
       html += "<h4>Derivation Tree</h4>";
       html += "<div id=\"tree\"></div>";
       html += "<div id=\"treeCursor\"></div>";
-      // for(var iChar = 0; iChar < this.input.length - 1; iChar++){
-      //    html += "<div class=\"inputChar\">"+this.input[iChar]+"</div>";
-      // }
       html += "</div>";
       $("#actionInfo").append(html);
-      // for(var iLine = 0; iLine < 2*this.treeHeight; iLine++){
-      //    var line = "";
-      //    for(var iChar = 0; iChar < this.input.length - 1; iChar++){
-      //       if(iLine % 2 != 0){
-      //          var rule = (this.derivationTree[iChar][(iLine - 1)/2]) ? this.derivationTree[iChar][(iLine - 1)/2][0] : "";
-      //          var actionIndex = (this.derivationTree[iChar][(iLine - 1)/2]) ? this.derivationTree[iChar][(iLine - 1)/2][1] : "";
-      //          // if(rule === ""){
-      //          // }
-      //          if(this.grammar.rules[rule]){
-      //             line += "<div class=\"treeChar\" data_col=\""+iChar+"\" data_row=\""+iLine+"\" data_nbRed=\""+this.grammar.rules[rule].development.length+"\" data_action=\""+actionIndex+"\">";
-      //             line += this.grammar.rules[rule].nonterminal;
-      //             line += "</div>";
-
-      //          }
-      //       }
-      //    }
-      //    $("#tree").append(line);
-      // }
-      // html += "<div id=\"raphTree\"></div>";
-      // $("#tree").append(raphTree);
-      // var html2 = "<div id=\"treeCursor\"></div>";
-      // $("#derivationTree").append(html2);
    };
 
    this.initHandlers = function() {
       $("#"+this.tabsID+" #switchContainer").off("click");
       $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
+      $(window).resize(self.onResize);
       switch(this.mode){
          case 2:
             $("#reduceButton").off("click");
@@ -584,12 +575,12 @@ function LR_Parser(settings,subTask,answer) {
          case 3:
             this.initPlayerHandlers();
             this.disableUndoButton();
-            $(window).resize(self.onResize);
+            // $(window).resize(self.onResize);
             break;
          case 4:
             $("#"+this.parseTableID+" td[data_state]").off("click");
             $("#"+this.parseTableID+" td[data_state]").click(self.clickCell);
-            $(window).resize(self.onResize);
+            // $(window).resize(self.onResize);
             this.initPlayerHandlers();
             break;
          default:
@@ -680,20 +671,23 @@ function LR_Parser(settings,subTask,answer) {
 
    this.onResize = function() {
       /* switch between table displays */
-      var width = $(window).width();
-      var sideTable = true;
-      if(width < 1180){
-         sideTable = false
-      }
-      if(self.sideTable != sideTable){
-         self.sideTable = sideTable;
-         self.styleTabSwitch();
-         self.styleTabs();
-         if(self.sideTable){
-            $("#"+self.graphPaperID).show();
-            $("#"+self.parseTableID).show();
-         }else{
-            self.showTab();
+      self.updateParseTable();
+      if(self.mode >= 3){
+         var width = $(window).width();
+         var sideTable = true;
+         if(width < 1180){
+            sideTable = false
+         }
+         if(self.sideTable != sideTable){
+            self.sideTable = sideTable;
+            self.styleTabSwitch();
+            self.styleTabs();
+            if(self.sideTable){
+               $("#"+self.graphPaperID).show();
+               $("#"+self.parseTableID).show();
+            }else{
+               self.showTab();
+            }
          }
       }
    };
@@ -782,7 +776,6 @@ function LR_Parser(settings,subTask,answer) {
          });
       }
       if(!action){
-         // console.log("check")
          self.pauseSimulation(null,true);
          return;
       }
@@ -842,13 +835,6 @@ function LR_Parser(settings,subTask,answer) {
             el.attr({opacity:1});
          }
       }
-      // for(var iStep in this.treeElements){
-      //    if(iStep > step){
-      //       for(var el of this.treeElements[iStep]){
-      //          el.attr({opacity:0});
-      //       }
-      //    }
-      // }
    };
 
    this.eraseHigherBranches = function(step) {
@@ -874,6 +860,8 @@ function LR_Parser(settings,subTask,answer) {
          subTask.raphaelFactory.stopAnimate("anim");
          $("#progressBar").stop();
          $(".stackElement").stop();
+         self.rowHL.stop();
+         self.colHL.stop();
          self.replayUpTo(self.simulationStep,false,true);
          if(self.token){
             self.token.remove();
@@ -971,13 +959,6 @@ function LR_Parser(settings,subTask,answer) {
       var step = Math.floor(self.actionSequence.length*x/w - 0.5);
       if(step != self.simulationStep - 1){
          self.replayUpTo(step,false,false);
-         // for(var iStep in self.treeElements){
-         //    if(iStep > step){
-         //       for(var el of self.treeElements[iStep]){
-         //          el.attr({opacity:0});
-         //       }
-         //    }
-         // }
          self.eraseHigherBranches(step);
       }
       $("#progressBar").width(x/w*100+"%");
@@ -992,13 +973,6 @@ function LR_Parser(settings,subTask,answer) {
       var step = Math.floor(self.actionSequence.length*x/w - 0.5);
       if(step != self.simulationStep){
          self.replayUpTo(step,false,false);
-         // for(var iStep in self.treeElements){
-         //    if(iStep > step){
-         //       for(var el of self.treeElements[iStep]){
-         //          el.attr({opacity:0});
-         //       }
-         //    }
-         // }
          self.eraseHigherBranches(step);
       }
       $("#progressBar").width((step + 1)/self.actionSequence.length*100+"%");
@@ -1048,11 +1022,13 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.switchTab = function() {
+
       $("#"+self.tabTag[self.selectedTab]).removeClass("selectedTab");
       self.selectedTab = 1 - self.selectedTab;
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
       self.styleTabSwitch();
       self.showTab();
+      self.updateParseTable();
    };
 
    this.showTab = function() {
@@ -1224,10 +1200,6 @@ function LR_Parser(settings,subTask,answer) {
             self.updateStackTable();
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
-               // $(".rule").removeClass("selected");
-               // $(".rule[data_rule="+self.selectedRule+"]").addClass("previousRule");
-               // self.selectedRule = null;
-               // self.styleRules();
                self.highlightRule(self.selectedRule);
                self.updateState(true);
                self.displayMessage("reduce","GOTO "+newStackElement[0]);
@@ -1451,11 +1423,59 @@ function LR_Parser(settings,subTask,answer) {
       this.styleRules();
    };
 
+   this.updateParseTable = function(anim) {
+      if(!this.rowHL){
+         this.rowHL = $("<div id=\"rowHL\"></div>");
+         $("#"+this.parseTableID).append(this.rowHL);
+         this.rowHL.css(this.cellHighlightAttr);
+      }
+      if(!this.colHL){
+         this.colHL = $("<div id=\"colHL\"></div>");
+         $("#"+this.parseTableID).append(this.colHL);
+         this.colHL.css(this.cellHighlightAttr);
+      }
+      var tableW = $("#"+this.parseTableID+" table").width();
+      var tableH = $("#"+this.parseTableID+" table").height();
+      var tablePos = $("#"+this.parseTableID+" table").position();
+      var tableMarginLeft = ($("#"+this.parseTableID).width() - tableW)/2;
+      var actionH = $("#"+this.parseTableID+" table th:nth-child(2)").outerHeight();
+      // console.log(tableMarginLeft);
+      var rowH = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").outerHeight();
+      var colW = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").outerWidth();
+      var rowTop = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position().top;
+      var colLeft = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").position().left;
+      var newRowAttr = {
+         width: tableW - 4,
+         height: rowH - 4,
+         top: rowTop - 2,
+         left: tableMarginLeft - 2
+      };
+      var newColAttr = {
+         width: colW - 4,
+         height: tableH - 4 - actionH,
+         top: actionH,
+         left: colLeft - 2
+      };
+      if(!anim){
+         this.rowHL.css(newRowAttr);
+         this.colHL.css(newColAttr);
+         // $("#"+this.parseTableID+" td").removeClass("selected");
+         // $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").addClass("selected");
+         // $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").addClass("selected");
+         // this.styleParseTable();
+      }else{
+         this.rowHL.animate(newRowAttr,this.animationTime);
+         this.colHL.animate(newColAttr,this.animationTime);
+      }
+      // console.log(this.inputIndex+" "+this.input)
+   };
+
    this.updateState = function(anim) {
       var id = this.getStateID(this.currentState);
       if(!id){
          return;
       }
+      this.updateParseTable(anim);
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
       var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
@@ -2375,22 +2395,23 @@ function LR_Parser(settings,subTask,answer) {
             });
          }
       }
-
+      $("#"+this.parseTableID).css({
+         position: "relative"
+      })
       $("#"+this.parseTableID+" table").css({
          "border-collapse": "collapse",
-         border: "2px solid "+this.colors.blue,
+         border: "2px solid "+this.colors.black,
          "text-align": "center"
       });
       $("#"+this.parseTableID+" table th").css({
-         "background-color": this.colors.blue,
+         "background-color": this.colors.black,
          color: "white",
          border: "1px solid white"
       });
-      $("#"+this.parseTableID+" table td").css({
-         "background-color": this.colors.lightgrey,
-         color: this.colors.black,
-         border: "1px solid "+this.colors.blue
-      });
+      $("#"+this.parseTableID+" td").css(this.cellAttr);
+
+      $("#rowHL, #colHL").css(this.cellHighlightAttr);
+      // $("#"+this.parseTableID+" td.selected").css(this.selectedCellAttr);
    };
 
    this.styleRules = function() {
