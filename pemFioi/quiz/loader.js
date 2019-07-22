@@ -18,6 +18,7 @@ function loadQuizModules() {
     // question types
     if(window.quiz_question_types.fill_gaps) {
         modules.push('jquery-ui-1.10.3');
+        modules.push('jquery-ui.touch-punch');
         modules.push('quiz_questions_fill_gaps');
     }
     if(window.quiz_question_types.single || window.quiz_question_types.multiple) {
