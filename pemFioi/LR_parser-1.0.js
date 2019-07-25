@@ -278,17 +278,18 @@ function LR_Parser(settings,subTask,answer) {
          this.input += "$";
       }
       this.input = this.input.replace(/ /g,"");
-      // this.derivationTree = Beav.Array.make(this.input.length - 1,[]);
       var state = 0;
       var iChar = 0;
       var symbol = this.input.charAt(iChar);
       var error = false;
       var success = false;
       var nLoop = 0;
+      var treeIndex = 0;
+      // console.log(this.lrTable.states);
       do{
          nLoop++;
          var action = this.lrTable.states[state][symbol];
-
+         // console.log(nLoop+" "+action);
          if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action)) || tree){
             switch(action[0].actionType){
                case "s":
@@ -309,9 +310,13 @@ function LR_Parser(settings,subTask,answer) {
                      rule: ruleIndex
                   });
                   symbol = this.grammar.rules[ruleIndex].nonterminal;
-                  nbRedChar = this.grammar.rules[ruleIndex].development.length;
+                  nbRedChar = (this.grammar.rules[ruleIndex].development[0] == "''") ? 0 : this.grammar.rules[ruleIndex].development.length;
                   state = this.stack[this.stack.length - 1 - nbRedChar][0];
-                  this.stack.splice(this.stack.length - nbRedChar,nbRedChar,symbol);
+                  if(nbRedChar > 0){
+                     this.stack.splice(this.stack.length - nbRedChar,nbRedChar,symbol);
+                  }else{
+                     this.stack.push(symbol);
+                  }
                   if(symbol == "S" && iChar >= this.input.length - 1){
                      this.actionSequence[this.actionSequence.length - 1]["goto"] = this.getTerminalState();
                      success = true;
@@ -319,26 +324,44 @@ function LR_Parser(settings,subTask,answer) {
                   
                   /* create derivation tree */
                   if(tree){
-                     if(nbRedChar == 1){
-                        if(this.derivationTree[iChar - 1]){
-                           // this.derivationTree[iChar - 1].push([ruleIndex,this.actionSequence.length]);
-                           this.derivationTree[iChar - 1].push([ruleIndex,this.actionSequence.length - 1]);
+                     var inputIndex = iChar - 1;
+                     if(nbRedChar == 0){  //  to deal with empty development
+                        treeIndex = 2*inputIndex + 2;
+                     }else{
+                        // console.log(treeIndex);
+                        treeIndex = (2*inputIndex + 1 >= treeIndex) ? 2*inputIndex + 1 : treeIndex; 
+                     }
+                     
+                     if(nbRedChar <= 1){
+                        if(this.derivationTree[treeIndex]){
+                           this.derivationTree[treeIndex].push([ruleIndex,this.actionSequence.length - 1]);
                         }else{
-                           this.derivationTree[iChar - 1] = [[ruleIndex,this.actionSequence.length - 1]];
+                           this.derivationTree[treeIndex] = [[ruleIndex,this.actionSequence.length - 1]];
                         }
-                        if(this.derivationTree[iChar - 1].length > this.treeHeight){
-                           this.treeHeight = this.derivationTree[iChar - 1].length;
+                        if(this.derivationTree[treeIndex].length > this.treeHeight){
+                           this.treeHeight = this.derivationTree[treeIndex].length;
                         }
                      }else{
+                        // console.log(treeIndex+" "+ruleIndex);
                         var nodeHeight = 0;
-                        for(var i = iChar - nbRedChar; i < iChar; i++){
+
+                        var childrenIndices = [treeIndex];
+                        var iCol = treeIndex;
+                        do{
+                           iCol--;
+                           if(this.derivationTree[iCol] || iCol%2 == 1){
+                              childrenIndices.unshift(iCol);
+                           }
+                        }while(childrenIndices.length < nbRedChar && iCol >= 0);
+
+                        for(var i of childrenIndices){
                            var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
                            if(branchLength > nodeHeight){
                               nodeHeight = branchLength;
                            }
                         }
       
-                        for(var i = iChar - nbRedChar; i < iChar; i++){
+                        for(var i of childrenIndices){
                            var branchLength = (this.derivationTree[i]) ? this.derivationTree[i].length : 0;
                            if(branchLength != nodeHeight){
                               var gap = nodeHeight - branchLength;
@@ -347,14 +370,10 @@ function LR_Parser(settings,subTask,answer) {
                                     this.derivationTree[i] = [];
                                  }
                                  this.derivationTree[i].push(["",this.actionSequence.length - 1]);
-                                 // this.derivationTree[i].push("");
                               }
                            }
-                           if(i < iChar - 1){
-                              // this.derivationTree[i].push("-")
-                           }else{
+                           if(i == treeIndex){
                               this.derivationTree[i].push([ruleIndex,this.actionSequence.length - 1]);
-                              // this.derivationTree[i].push(ruleIndex);
                            }
                            if(this.derivationTree[i].length > this.treeHeight){
                               this.treeHeight = this.derivationTree[i].length;
@@ -434,9 +453,10 @@ function LR_Parser(settings,subTask,answer) {
       var html = "<h3>GRAMMAR</h3>";
       html += "<ul>";
       for(var iRule = 0; iRule < this.rules.length; iRule++){
+         var development = (this.grammar.rules[iRule].development[0] == "''") ? "" : this.grammar.rules[iRule].development.join(" ");
          html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+iRule+
          "</span> <span class=\"nonTerminal\">"+this.grammar.rules[iRule].nonterminal+"</span><i class=\"fas fa-long-arrow-alt-right\"></i><span class=\"development\">"+
-         this.grammar.rules[iRule].development.join(" ")+"</span></li>";
+         development+"</span></li>";
       }
       html += "</ul>";
       $("#rules").html(html);
@@ -793,7 +813,7 @@ function LR_Parser(settings,subTask,answer) {
                return;
             }
             
-            var nbRedChar = self.grammar.rules[rule].development.length;
+            var nbRedChar = (self.grammar.rules[rule].development[0] == "''") ? 0 : self.grammar.rules[rule].development.length;
             var startIndex = self.stack.length - nbRedChar;
             for(var iSelCol = 0; iSelCol < nbRedChar; iSelCol++){
                var index = startIndex + iSelCol;
@@ -1060,7 +1080,7 @@ function LR_Parser(settings,subTask,answer) {
       if(self.selectedRule == null){
          self.displayMessage("reduce","You must select a rule");
          // self.displayMessage("reduce","REDUCE 0000654065406540");
-      }else if(self.selectedStackElements.length == 0){
+      }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
          self.displayMessage("reduce","You must select a part of the stack");
       }else if(self.selectedState == null){
          self.displayMessage("reduce","You must select a state in the automaton");
@@ -1078,6 +1098,7 @@ function LR_Parser(settings,subTask,answer) {
                rule: self.selectedRule,
                goto: goto
             });
+            self.treeAnim(self.simulationStep,false,true);
             self.simulationStep++;
             self.applyReduction(nonTerminal,goto,true);
             self.saveAnswer();
@@ -1088,7 +1109,9 @@ function LR_Parser(settings,subTask,answer) {
    this.compareSelectedRuleAndStack = function() {
       this.selectedStackElements.sort();
       var rule = this.grammar.rules[this.selectedRule];
-      if(rule.development.length != this.selectedStackElements.length){
+      if(rule.development[0] == "''" && this.selectedStackElements.length == 0){
+         return true;
+      }else if(rule.development.length != this.selectedStackElements.length){
          return false;
       }else{
          for(var iEl = 0; iEl < rule.development.length; iEl++){
@@ -1122,7 +1145,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.getPreviousState = function() {
-      var previousCol = parseInt(this.selectedStackElements.sort()[0]) - 1;
+      if(this.selectedStackElements.length > 0){
+         var previousCol = parseInt(this.selectedStackElements.sort()[0]) - 1;
+      }else{
+         var previousCol = this.stack.length - 1;
+      }
       if(this.stack[previousCol]){
          return this.stack[previousCol][0];
       }else{
@@ -1141,19 +1168,19 @@ function LR_Parser(settings,subTask,answer) {
       var state = prevStates.pop();
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
-         // var prevStates = [this.getPreviousState()];
-         // for(var col of this.selectedStackElements){
-         //    prevStates.push(this.stack[col][0]);
-         // }
-         // var state = prevStates.pop();
          var animTime = this.animationTime/prevStates.length;
          this.reductionAnimLoop(state,prevStates,animTime,newStackElement);
       }else{
-         this.highlightReductionPath(state,prevStates);
+         if(prevStates.length > 0){
+            this.highlightReductionPath(state,prevStates);
+            this.highlightReducedStackElements(prevStates);
+            this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
+            this.selectedStackElements = [];
+         }else{
+            this.stack.push(newStackElement);
+         }
          this.highlightRule(this.selectedRule);
-         this.highlightReducedStackElements(prevStates);
-         this.stack.splice(this.selectedStackElements[0],this.selectedStackElements.length,newStackElement);
-         this.selectedStackElements = [];
+         
          $(".rule").removeClass("selected");
          this.selectedRule = null;
          this.styleRules();
@@ -1164,12 +1191,16 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement) {
-      var prevState = prevStates.pop();
+      // console.log(prevStates);
+      if(prevStates.length > 0){
+         var prevState = prevStates.pop();
+      }else{
+         var prevState = state;
+      }
       var selectedCol = self.selectedStackElements[prevStates.length];
-
-      /* highlight */
-      var stackElementHL = $("<div class=\"stackElementHL\" data_col=\""+selectedCol+"\"></div>");
-      // if($(".stackElement[data_col="+selectedCol+"]").position()){
+      if(selectedCol){
+         /* highlight */
+         var stackElementHL = $("<div class=\"stackElementHL\" data_col=\""+selectedCol+"\"></div>");
          stackElementHL.css({
             position: "absolute",
             left: $(".stackElement[data_col="+selectedCol+"]").position().left,
@@ -1180,22 +1211,27 @@ function LR_Parser(settings,subTask,answer) {
             opacity: "0.1",
             border: "1px solid "+this.colors.black
          });
-      // }
-      this.stackElementsHL.push(stackElementHL);
-      if(this.mode == 2){
-         stackElementHL.off("click");
-         stackElementHL.click(self.selectStackElement);
-      }
-      $("#stackTableContainer").append(stackElementHL);
+         this.stackElementsHL.push(stackElementHL);
+         if(this.mode == 2){
+            stackElementHL.off("click");
+            stackElementHL.click(self.selectStackElement);
+         }
+         $("#stackTableContainer").append(stackElementHL);
 
-      $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
+         $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
+      }
       this.changeStateAnim(state,prevState,animTime,true,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
          if(prevStates.length > 0){
             self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement);
          }else{
-            self.stack.splice(self.selectedStackElements[0],self.selectedStackElements.length,newStackElement);
-            self.selectedStackElements = [];
+            if(self.selectedStackElements.length > 0){
+               self.stack.splice(self.selectedStackElements[0],self.selectedStackElements.length,newStackElement);
+               self.selectedStackElements = [];
+            }else{
+               self.stack.push(newStackElement);
+               selectedCol = self.stack.length - 1;
+            }
             
             self.updateStackTable();
             $(".stackElement[data_col="+selectedCol+"]").hide();
@@ -1300,7 +1336,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.updateCursor = function(anim) {
-      var newX = this.inputIndex * $(".inputChar").outerWidth();
+      var newX = (this.inputIndex == 0) ? 0 : (this.inputIndex + 1/2) * $(".inputChar").outerWidth();
       var xHL = $("#cursor").position().left;
       var wHL = newX - xHL;
 
@@ -1424,12 +1460,12 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.updateParseTable = function(anim) {
-      if(!this.rowHL){
+      if(!this.rowHL && this.mode < 4){
          this.rowHL = $("<div id=\"rowHL\"></div>");
          $("#"+this.parseTableID).append(this.rowHL);
          this.rowHL.css(this.cellHighlightAttr);
       }
-      if(!this.colHL){
+      if(!this.colHL && this.mode < 4){
          this.colHL = $("<div id=\"colHL\"></div>");
          $("#"+this.parseTableID).append(this.colHL);
          this.colHL.css(this.cellHighlightAttr);
@@ -1439,7 +1475,6 @@ function LR_Parser(settings,subTask,answer) {
       var tablePos = $("#"+this.parseTableID+" table").position();
       var tableMarginLeft = ($("#"+this.parseTableID).width() - tableW)/2;
       var actionH = $("#"+this.parseTableID+" table th:nth-child(2)").outerHeight();
-      // console.log(tableMarginLeft);
       var rowH = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").outerHeight();
       var colW = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").outerWidth();
       var rowTop = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position().top;
@@ -1456,16 +1491,18 @@ function LR_Parser(settings,subTask,answer) {
          top: actionH,
          left: colLeft - 2
       };
-      if(!anim){
-         this.rowHL.css(newRowAttr);
-         this.colHL.css(newColAttr);
-         // $("#"+this.parseTableID+" td").removeClass("selected");
-         // $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").addClass("selected");
-         // $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").addClass("selected");
-         // this.styleParseTable();
-      }else{
-         this.rowHL.animate(newRowAttr,this.animationTime);
-         this.colHL.animate(newColAttr,this.animationTime);
+      if(this.mode < 4){
+         if(!anim){
+            this.rowHL.css(newRowAttr);
+            this.colHL.css(newColAttr);
+            // $("#"+this.parseTableID+" td").removeClass("selected");
+            // $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").addClass("selected");
+            // $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").addClass("selected");
+            // this.styleParseTable();
+         }else{
+            this.rowHL.animate(newRowAttr,this.animationTime);
+            this.colHL.animate(newColAttr,this.animationTime);
+         }
       }
       // console.log(this.inputIndex+" "+this.input)
    };
@@ -1497,6 +1534,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
+      // console.log(state1+" "+state2);
       var id2 = this.getStateID(state2);
       var v2 = this.visualGraph.getRaphaelsFromID(id2);
       var id1 = this.getStateID(state1);
@@ -1512,8 +1550,12 @@ function LR_Parser(settings,subTask,answer) {
          if(this.token){
             this.token.remove();
          }
+         if(callback){
+            callback();
+         }
          return
       }else if(!edgeVisualInfo["radius-ratio"]){
+         /* straight line */
          var alpha = this.visualGraph.graphDrawer.getAngleBetween(vInfo1.x,vInfo1.y,vInfo2.x,vInfo2.y);
          var info1 = this.graph.getVertexInfo(id1);
          var info2 = this.graph.getVertexInfo(id2);
@@ -1526,6 +1568,7 @@ function LR_Parser(settings,subTask,answer) {
 
          var step1 = {transform: "t"+(vInfo2.x - vInfo1.x)+","+(vInfo2.y - vInfo1.y)};
       }else{
+         /* curve */
          var param = this.visualGraph.graphDrawer.getEdgeParam(edgeID);
          var cPos = this.visualGraph.graphDrawer.getCenterPosition(param.R,param.s,param.l,param.pos1,param.pos2);
          var alpha = (param.l) ? (Math.asin(param.D/(2*param.R)) + Math.PI) : Math.asin(param.D/(2*param.R));
@@ -1533,11 +1576,11 @@ function LR_Parser(settings,subTask,answer) {
          if(this.graph.getEdgesFrom(id1,id2).length > 0 && this.graph.getEdgesFrom(id1,id2)[0] == edgeID){
             var pos1 = param.pos1;
             var pos2 = param.pos2;
-            var angle = alpha;
+            var angle = (param.s) ? -alpha : alpha;
          }else{
             var pos1 = param.pos2;
             var pos2 = param.pos1;
-            var angle = -alpha;
+            var angle = (param.s) ? alpha : -alpha;
          }
          var distance1 = Math.sqrt((pos1.x - initPos.x) * (pos1.x - initPos.x) + (pos1.y - initPos.y) * (pos1.y - initPos.y));
          var distance2 = Math.abs(param.R * alpha * Math.PI/180);
@@ -1654,6 +1697,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.doesAutomatonAllowAction = function(state,symbol,action){
+      // console.log(state);
       var v1 = this.getStateID(state);
       switch(action[0].actionType){
          case "s":
@@ -1687,9 +1731,16 @@ function LR_Parser(settings,subTask,answer) {
       if(content){
          var ruleArray = this.grammar.rules[rule];
          for(var line of content){
+            // console.log(line);
             var match = true;
-            if(line.nonTerminal != ruleArray.nonterminal || line.development.length != ruleArray.development.length + 1){
+            if(line.nonTerminal != ruleArray.nonterminal){
                match = false;
+            }else if(ruleArray.development[0] != "''" && line.development.length != ruleArray.development.length + 1){
+               match = false;
+            }else if(ruleArray.development[0] == "''"){
+               if(line.development.length != 1 || line.development[0] != dot){
+                  match = false;
+               }
             }else{
                for(var iChar in line.development){
                   if(iChar == (line.development.length - 1) && line.development[iChar] != dot){
@@ -1742,11 +1793,10 @@ function LR_Parser(settings,subTask,answer) {
       }
       var developmentNoDot = line.development.filter(x => x != dot);
       for(var rule of this.grammar.rules){
-         if(rule.nonterminal == line.nonTerminal && Beav.Object.eq(developmentNoDot,rule.development)){
+         if(rule.nonterminal == line.nonTerminal && (Beav.Object.eq(developmentNoDot,rule.development) || (rule.development[0] == "''" && developmentNoDot.length == 0))){
             ruleIndex = rule.index;
          }
       }
-      // console.log(ruleIndex+" "+dotIndex);
       return {ruleIndex: ruleIndex, dotIndex: dotIndex};
    };
 
@@ -1839,7 +1889,6 @@ function LR_Parser(settings,subTask,answer) {
                if(!self.isCharValid(char)){
                   if(!((iChar > 0 && self.isPairValid(line.charAt(iChar - 1)+char)) || (iChar < line.length - 1 && self.isPairValid(char+line.charAt(iChar + 1))))){
                      self.displayError(char+" is not a valid symbol for this grammar");
-                     // displayHelper.showPopupMessage(char+" is not a valid symbol for this grammar","blanket");
                      return false;
                   }
                }
@@ -1848,7 +1897,6 @@ function LR_Parser(settings,subTask,answer) {
                }
                if(nDots > 1){
                   self.displayError("There shouldn't be more than one dot in a single line");
-                  // displayHelper.showPopupMessage("There shouldn't be more than one dot in a single line","blanket");
                   return false;
                }
             }
@@ -2029,6 +2077,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.validation = function() {
+      this.pauseSimulation();
       switch(this.mode){
          case 2:
             if(!answer.accept && !answer.error){
@@ -2277,6 +2326,9 @@ function LR_Parser(settings,subTask,answer) {
          color: this.colors.black,
          "font-size": "1.5em",
          padding: "0.1em 0"
+      });
+      $(".inputChar:first-of-type").css({
+         "margin-left": "0.75em"
       });
 
       /* cursor */
@@ -2561,27 +2613,27 @@ function LR_Parser(settings,subTask,answer) {
          "font-size": charHeight,
          "font-weight": "bold",
          "fill": this.colors.blue
-      }      
+      };      
       
       this.treePaper = subTask.raphaelFactory.create("tree","tree",treeWidth,treeHeight);
-      // $("#tree").css({
-      //    position: "absolute",
-      //    bottom: 0,
-      //    left: 0
-      // });
 
       for(var iLine = 0; iLine < 2*this.treeHeight + 1; iLine++){
-         for(var iChar = 0; iChar < this.input.length - 1; iChar++){
+         // for(var iChar = 0; iChar < this.input.length - 1; iChar++){
+         for(var iCol = 0; iCol < this.derivationTree.length; iCol++){
             if(iLine == 0){
-               var x = charWidth * (iChar + 1/2);
+               // var x = charWidth * (iChar + 1/2);
+               var x = charWidth * (iCol + 1) / 2;
                var y = treeHeight - charHeight/2; 
-               this.treePaper.text(x,y,this.input[iChar]).attr(symbolAttr);
-            }else if(iLine % 2 != 0){
-               var rule = (this.derivationTree[iChar][(iLine - 1)/2]) ? this.derivationTree[iChar][(iLine - 1)/2][0] : "";
-               var actionIndex = (this.derivationTree[iChar][(iLine - 1)/2]) ? this.derivationTree[iChar][(iLine - 1)/2][1] : "";
+               // this.treePaper.text(x,y,this.input[iChar]).attr(symbolAttr);
+               if(iCol%2 == 1){
+                  this.treePaper.text(x,y,this.input[(iCol - 1)/2]).attr(symbolAttr);
+               }
+            }else if(iLine % 2 != 0 && this.derivationTree[iCol]){
+               var rule = (this.derivationTree[iCol][(iLine - 1)/2]) ? this.derivationTree[iCol][(iLine - 1)/2][0] : "";
+               var actionIndex = (this.derivationTree[iCol][(iLine - 1)/2]) ? this.derivationTree[iCol][(iLine - 1)/2][1] : "";
                if(this.grammar.rules[rule]){
                   var nbRed = this.grammar.rules[rule].development.length;
-                  var x = (iChar - (nbRed - 1)/2 + 1/2)*charWidth;
+                  var x = (iCol%2 == 0 && nbRed > 1) ? (iCol + 1 - (nbRed - 2))*charWidth/2 : (iCol + 1 - (nbRed - 1))*charWidth/2;
                   var y = treeHeight - charHeight*(iLine + 1 + 1/2);
                   this.treeElements[actionIndex] = [this.treePaper.text(x,y,this.grammar.rules[rule].nonterminal).attr(symbolAttr)];
                   if(iLine == 1){
@@ -2599,7 +2651,18 @@ function LR_Parser(settings,subTask,answer) {
                   }else{
                      var kLine = (iLine - 1)/2;
                      var children = [];
-                     for(var j = iChar - (nbRed - 1); j <= iChar; j++){
+
+                     var childrenIndices = [iCol];
+                     var jCol = iCol;
+                     do{
+                        jCol--;
+                        if(this.derivationTree[jCol]){
+                           childrenIndices.unshift(jCol);
+                        }
+                     }while(childrenIndices.length < nbRed);
+
+                     // for(var j = iChar - (nbRed - 1); j <= iChar; j++){
+                     for(var j of childrenIndices){
                         jLine = kLine - 1;
                         var foundChild = false;
                         do{
@@ -2617,9 +2680,9 @@ function LR_Parser(settings,subTask,answer) {
                         }while(!foundChild)
                      }
                      for(var child of children){
-                        var childLeft = (child.col - (child.nbRed - 1)/2)*charWidth;
+                        var childLeft = (child.col%2 == 0 && child.nbRed > 1) ? (child.col + 1 - (child.nbRed - 2))*charWidth/2 : (child.col + 1 - (child.nbRed - 1))*charWidth/2;
                         var x1 = x;
-                        var x2 = childLeft + charWidth/2;
+                        var x2 = childLeft;
                         var y1 = 2*self.treeHeight - iLine;
                         var y2 = y1 + 1;
                         if(x1 == x2){
