@@ -6,6 +6,7 @@ function LR_Parser(settings,subTask,answer) {
    2: execute existing automaton
    3: create automaton
    4: create parse table
+   5: execute existing automaton with parse table
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -52,6 +53,7 @@ function LR_Parser(settings,subTask,answer) {
    this.isLastActionAGraphEdit = false;
    this.isDragging = false;
    this.isAnimationRunning = false;
+   this.waitingForGoto = false; // used only in mode 5
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
@@ -134,7 +136,8 @@ function LR_Parser(settings,subTask,answer) {
    // };
    this.cellHighlightAttr = {
       position: "absolute",
-      border: "4px solid "+this.colors.blue
+      border: "4px solid "+this.colors.blue,
+      "pointer-events": "none"
    };
    this.treeLineAttr = {
       stroke: this.colors.yellow,
@@ -207,7 +210,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.visualGraph = VisualGraph.fromJSON(this.visualGraphJSON, "visualGraph", this.paper, null, this.graphDrawer, true);
       this.graph = this.visualGraph.graph;
-      if(this.mode != 1 && this.mode != 4){
+      if(this.mode != 1 && this.mode != 4 && this.mode != 5){
          this.graphMouse = new GraphMouse("graphMouse",this.graph,this.visualGraph);
          var graphEditorSettings = {
             paper: this.paper,
@@ -397,7 +400,7 @@ function LR_Parser(settings,subTask,answer) {
       this.stack = [["0","#"]];
       // console.log(this.derivationTree);
       // console.log(this.actionSequence);
-      if(this.mode == 2 && !validation){
+      if((this.mode == 2 || this.mode == 5) && !validation){
          this.actionSequence = [];
       }
    };
@@ -603,6 +606,16 @@ function LR_Parser(settings,subTask,answer) {
             // $(window).resize(self.onResize);
             this.initPlayerHandlers();
             break;
+         case 5:
+            this.initPlayerHandlers();
+            $("#acceptButton").off("click");
+            $("#acceptButton").click(self.acceptInput);
+            $("#errorButton").off("click");
+            $("#errorButton").click(self.refuseInput); 
+            $("#"+this.parseTableID+" td[data_state]").off("click");
+            $("#"+this.parseTableID+" td[data_state]").click(self.clickCell);
+            $("#lrParser").off("click");
+            $("#lrParser").click(self.resetFeedback);
          default:
             this.initPlayerHandlers();
       }
@@ -691,7 +704,8 @@ function LR_Parser(settings,subTask,answer) {
 
    this.onResize = function() {
       /* switch between table displays */
-      self.updateParseTable();
+      // console.log("resize")
+      // self.updateParseTable();
       if(self.mode >= 3){
          var width = $(window).width();
          var sideTable = true;
@@ -710,6 +724,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
+      self.updateParseTable();
    };
 
    this.reset = function() {
@@ -1157,7 +1172,7 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.applyReduction = function(nonTerminal,goto,anim) {
+   this.applyReduction = function(nonTerminal,goto,anim,firstStepOnly) {
       this.clearHighlight();
       var newStackElement = [goto,nonTerminal];
       this.highlightPrevState(this.currentState);
@@ -1169,7 +1184,7 @@ function LR_Parser(settings,subTask,answer) {
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var animTime = this.animationTime/prevStates.length;
-         this.reductionAnimLoop(state,prevStates,animTime,newStackElement);
+         this.reductionAnimLoop(state,prevStates,animTime,newStackElement,firstStepOnly);
       }else{
          if(prevStates.length > 0){
             this.highlightReductionPath(state,prevStates);
@@ -1190,8 +1205,7 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement) {
-      // console.log(prevStates);
+   this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement,firstStepOnly) {
       if(prevStates.length > 0){
          var prevState = prevStates.pop();
       }else{
@@ -1220,10 +1234,17 @@ function LR_Parser(settings,subTask,answer) {
 
          $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
       }
-      this.changeStateAnim(state,prevState,animTime,true,function(){
+      var reduc = true;
+      if(firstStepOnly && prevStates.length == 0){
+         reduc = false;
+         this.currentState = prevState;
+         this.updateParseTable(true);
+         this.waitingForGoto = true;
+      }
+      this.changeStateAnim(state,prevState,animTime,reduc,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
          if(prevStates.length > 0){
-            self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement);
+            self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement,firstStepOnly);
          }else{
             if(self.selectedStackElements.length > 0){
                self.stack.splice(self.selectedStackElements[0],self.selectedStackElements.length,newStackElement);
@@ -1233,16 +1254,22 @@ function LR_Parser(settings,subTask,answer) {
                selectedCol = self.stack.length - 1;
             }
             
-            self.updateStackTable();
+            self.updateStackTable(firstStepOnly);
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
-               self.highlightRule(self.selectedRule);
-               self.updateState(true);
-               self.displayMessage("reduce","GOTO "+newStackElement[0]);
+               if(!firstStepOnly){
+                  self.goto(newStackElement);
+               }
             });
          }
       });
    };
+
+   this.goto = function(newStackElement) {
+      self.highlightRule(self.selectedRule);
+      self.updateState(true);
+      self.displayMessage("reduce","GOTO "+newStackElement[0]);
+   }
 
    this.reverseReduction = function(rule) {
       var newStackElements = [];
@@ -1315,7 +1342,7 @@ function LR_Parser(settings,subTask,answer) {
 
    };
 
-   this.updateStackTable = function() {
+   this.updateStackTable = function(noGoto) {
       var html = "";
       for(var iData = 0; iData < this.stackData.length; iData++) {
          html += "<tr>";
@@ -1331,8 +1358,10 @@ function LR_Parser(settings,subTask,answer) {
          $(".stackElement").off("click");
          $(".stackElement").click(self.selectStackElement);
       }
-      this.currentState = this.stack[this.stack.length - 1][0];
-      this.currentVertex = this.getStateID(this.currentState);
+      if(!noGoto){   // reduc in mode 5
+         this.currentState = this.stack[this.stack.length - 1][0];
+         this.currentVertex = this.getStateID(this.currentState);
+      }
    };
 
    this.updateCursor = function(anim) {
@@ -1460,12 +1489,14 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.updateParseTable = function(anim) {
-      if(!this.rowHL && this.mode < 4){
+      // this.styleParseTable();
+      // console.log("updateParseTable")
+      if(!this.rowHL && this.mode != 4){
          this.rowHL = $("<div id=\"rowHL\"></div>");
          $("#"+this.parseTableID).append(this.rowHL);
          this.rowHL.css(this.cellHighlightAttr);
       }
-      if(!this.colHL && this.mode < 4){
+      if(!this.colHL && this.mode != 4){
          this.colHL = $("<div id=\"colHL\"></div>");
          $("#"+this.parseTableID).append(this.colHL);
          this.colHL.css(this.cellHighlightAttr);
@@ -1485,13 +1516,15 @@ function LR_Parser(settings,subTask,answer) {
          top: rowTop - 2,
          left: tableMarginLeft - 2
       };
+
       var newColAttr = {
          width: colW - 4,
          height: tableH - 4 - actionH,
          top: actionH,
          left: colLeft - 2
       };
-      if(this.mode < 4){
+      // console.log(colW);
+      if(this.mode != 4){
          if(!anim){
             this.rowHL.css(newRowAttr);
             this.colHL.css(newColAttr);
@@ -1512,6 +1545,7 @@ function LR_Parser(settings,subTask,answer) {
       if(!id){
          return;
       }
+      // console.log("updateState")
       this.updateParseTable(anim);
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
@@ -1948,35 +1982,97 @@ function LR_Parser(settings,subTask,answer) {
       return false
    };
 
-   /* parse table edit */
+   /* parse table events */
 
-   this.clickCell = function() {
+   this.clickCell = function(ev) {
       self.resetFeedback();
       var cell = $(this);
       var state = $(this).attr("data_state");
       var symbol = $(this).attr("data_symbol");
       var cellContent = $(this).text();
-      var maxlength = (self.lrTable.states.length >= 10) ? 3 : 2;
-      // console.log(state+" "+symbol);
-      $(this).off("click");
-      if(self.cellEditor){
-         self.cellEditor.remove();
-      }
-      self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\" maxlength=\""+maxlength+"\">");
-      $(this).html(self.cellEditor);
-      self.styleCellEditor(state,symbol);
-      self.cellEditor.focus();
-      self.cellEditor.focusout(function(ev){
-         var text = $(this).val();
-         self.writeCell(text,cell);
-      });
-      self.cellEditor.keyup(function(ev){
-         var text = $(this).val();
-         if(ev.which == 13){
-            self.writeCell(text,cell);
+      if(self.mode == 4){
+         var maxlength = (self.lrTable.states.length >= 10) ? 3 : 2;
+         // console.log(state+" "+symbol);
+         $(this).off("click");
+         if(self.cellEditor){
+            self.cellEditor.remove();
          }
-         // console.log(text);
-      });
+         self.cellEditor = $("<input id=\"cellEditor\" value=\""+cellContent+"\" maxlength=\""+maxlength+"\">");
+         $(this).html(self.cellEditor);
+         self.styleCellEditor(state,symbol);
+         self.cellEditor.focus();
+         self.cellEditor.focusout(function(ev){
+            var text = $(this).val();
+            self.writeCell(text,cell);
+         });
+         self.cellEditor.keyup(function(ev){
+            var text = $(this).val();
+            if(ev.which == 13){
+               self.writeCell(text,cell);
+            }
+            // console.log(text);
+         });
+      }else{
+         // console.log(state+" "+symbol);
+         // console.log(self.currentState);
+         ev.stopPropagation();
+         if(self.waitingForGoto){
+            var expectedSymbol = self.stack[self.stack.length - 1][1];
+         }else{
+            var expectedSymbol = self.input[self.inputIndex];
+         }
+         if(state != self.currentState){
+            self.displayError("Wrong state");
+         }else if(symbol != expectedSymbol){
+            self.displayError("Wrong symbol");
+         }else{
+            if(cellContent.length == 0){
+
+            }else if(cellContent[0] == "s"){
+               var nextState = cellContent[1];
+               self.actionSequence.push({
+                  actionType: "s",
+                  state: nextState
+               });
+               self.simulationStep++;
+               self.applyShift(nextState,false,true);
+               self.saveAnswer();
+            }else if(cellContent[0] == "r"){
+               var rule = cellContent[1];
+               var nonTerminal = self.grammar.rules[rule].nonterminal;
+               // console.log(nonTerminal);
+               self.treeAnim(self.simulationStep,false,true);
+               var nbRedChar = (self.grammar.rules[rule].development[0] == "''") ? 0 : self.grammar.rules[rule].development.length;
+               var startIndex = self.stack.length - nbRedChar;
+               for(var iSelCol = 0; iSelCol < nbRedChar; iSelCol++){
+                  var index = startIndex + iSelCol;
+                  $(".stackElement[data_col="+index+"]").addClass("selected");
+                  self.selectedStackElements.push(index);
+               }
+               self.styleStackTable();
+               $(".rule").removeClass("selected");
+               $(".rule[data_rule="+rule+"]").addClass("selected");
+               self.selectedRule = rule;
+               self.styleRules();
+               var previousState = self.getPreviousState();
+               var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
+               
+               self.simulationStep++;
+               self.applyReduction(nonTerminal,goto,true,true);
+            }else{   // goto
+               self.actionSequence.push({
+                  actionType: "r",
+                  rule: self.selectedRule,
+                  goto: cellContent
+               });
+               self.currentState = cellContent;
+               var newStackElement = [cellContent,symbol];
+               self.goto(newStackElement);
+               self.waitingForGoto = false;
+               self.saveAnswer();
+            }
+         }       
+      }
    };
 
    this.writeCell = function(text,cell) {
@@ -2029,10 +2125,14 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       return true;
-   }
+   };
+
+   // this.windowClick = function(ev) {
+   //    console.log("windowClick");
+   // };
 
    this.saveAnswer = function() {
-      if(self.mode == 2){
+      if(self.mode == 2 || self.mode == 5){
          answer.actionSequence = JSON.parse(JSON.stringify(self.actionSequence));
          answer.accept = self.accept;
          answer.error = self.error;
@@ -2044,6 +2144,7 @@ function LR_Parser(settings,subTask,answer) {
    this.reloadAnswer = function() {
       switch(this.mode){
          case 2:
+         case 5:
             this.actionSequence = JSON.parse(JSON.stringify(answer.actionSequence));
             this.replayUpTo(this.actionSequence.length,false,true);
             if(answer.accept){
@@ -2065,6 +2166,8 @@ function LR_Parser(settings,subTask,answer) {
                   }
                }
             }
+            // this.updateParseTable();
+            // this.onResize();
       }
    };
 
@@ -2080,6 +2183,7 @@ function LR_Parser(settings,subTask,answer) {
       this.pauseSimulation();
       switch(this.mode){
          case 2:
+         case 5:
             if(!answer.accept && !answer.error){
                this.displayError("You must click on either the accept or the error button");
             }else{
@@ -2091,6 +2195,7 @@ function LR_Parser(settings,subTask,answer) {
                if(lastAction.actionType == "r" && lastAction.goto == this.getTerminalState()){
                   accept = true;
                }
+
                if(answer.actionSequence.length != this.actionSequence.length){
                   this.displayError("Your parsing is incomplete");
                }else if(answer.accept && !accept){
@@ -2178,14 +2283,17 @@ function LR_Parser(settings,subTask,answer) {
 
    this.displayError = function(msg) {
       $("#error").text(msg);
+      // console.log(msg)
    };
 
    this.resetFeedback = function() {
-      this.displayMessage("reset");
-      this.displayError("");
+      // console.log("reset")
+      self.displayMessage("reset");
+      self.displayError("");
    };
 
    this.style = function() {
+      // console.log("style")
       $("#"+this.divID).css({
          "font-size": "80%"
       })
@@ -2427,6 +2535,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.styleParseTable = function() {
+      // console.log("styleParseTable")
       if(!this.sideTable){
          $("#"+this.parseTableID+" table").css({
             "font-size": "1.2em"
@@ -2461,6 +2570,11 @@ function LR_Parser(settings,subTask,answer) {
          border: "1px solid white"
       });
       $("#"+this.parseTableID+" td").css(this.cellAttr);
+      if(this.mode >= 4){
+         $("#"+this.parseTableID+" td[data_symbol]").css({
+            cursor: "pointer"
+         })
+      }
 
       $("#rowHL, #colHL").css(this.cellHighlightAttr);
       // $("#"+this.parseTableID+" td.selected").css(this.selectedCellAttr);
