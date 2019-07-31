@@ -7,6 +7,7 @@ function LR_Parser(settings,subTask,answer) {
    3: create automaton
    4: create parse table
    5: execute existing automaton with parse table
+   6: derivation tree bottom up
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -25,6 +26,9 @@ function LR_Parser(settings,subTask,answer) {
    this.treeHeight = 0;
    this.treePaper;
    this.treeElements = {};
+   this.treeCharSize = 20 // mode > 6
+   this.treeTopLine = {};
+   this.treeSelectionMarker = null;
 
    this.timeOutID;
    this.animationTime = 1000;
@@ -143,6 +147,15 @@ function LR_Parser(settings,subTask,answer) {
       stroke: this.colors.yellow,
       "stroke-width": 2
    };
+   this.treeCharAttr = {
+      "font-size": this.treeCharSize * 0.8,
+      "font-weight": "bold",
+      "fill": this.colors.blue
+   };
+   this.treeSelectionMarkerAttr = {
+      fill: this.colors.blue,
+      stroke: "none"
+   };
 
    this.vertexAttr = settings.vertexAttr || this.defaultVertexAttr;
    this.edgeAttr = settings.edgeAttr || this.defaultEdgeAttr;
@@ -153,33 +166,38 @@ function LR_Parser(settings,subTask,answer) {
 
    this.init = function() {
       var html = "";
-      html += "<div id=\""+this.tabsID+"\"></div>";
-      html += "<div id=\""+this.tabsContainerID+"\">";
-      html += "<div id=\""+this.graphPaperID+"\"></div>";
+      if(this.mode < 6){
+         html += "<div id=\""+this.tabsID+"\"></div>";
+         html += "<div id=\""+this.tabsContainerID+"\">";
+         html += "<div id=\""+this.graphPaperID+"\"></div>";
+      }
       html += "<div id=\""+this.parseTableID+"\"></div>";
       html += "</div>";
       html += "<div id=\""+this.parseInfoID+"\"></div>";
 
       $("#"+this.divID).html(html);
+
       this.initParser();
-      this.initTabs();
-      this.initAutomata();
-      if(this.mode != 3){
-         this.initActionSequence(false,true);
-      }else{
-         this.initActionSequence(false,true);
-         this.initActionSequence();
+      if(this.mode < 6){
+         this.initTabs();
+         this.initAutomata();
+         if(this.mode != 3){
+            this.initActionSequence(false,true);
+         }else{
+            this.initActionSequence(false,true);
+            this.initActionSequence();
+         }
+         this.initParseTable();
+         this.showTab();
       }
-      this.initParseTable();
-      this.showTab();
-      
       this.initParseInfo();
 
       this.style();
-      this.updateState(false);
+      if(this.mode < 6){
+         this.updateState(false);
+      }
       this.initHandlers();
-      // console.log(this.grammar);
-      if(this.mode >= 3){
+      if(this.mode >= 3 && this.mode < 6){
          this.onResize();
       }
    };
@@ -466,7 +484,9 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initAction = function() {
-      this.initPlayer();
+      if(this.mode < 6){
+         this.initPlayer();
+      }
       this.initActionInfo();
    };
 
@@ -483,18 +503,25 @@ function LR_Parser(settings,subTask,answer) {
          html += "<div id=\"undo\">UNDO</div>";
       }
       html += "</div>";
-      html += "<div id=\"actionInfo\"></div>";
+      // html += "<div id=\"actionInfo\"></div>";
       $("#action").html(html);
    };
 
    this.initActionInfo = function() {
-      this.initStackTable();
-      this.initReduceButton();
-      this.initInput();
-      this.initShiftButton();
-      this.initAcceptButton();
-      this.initErrorButton();
+      var html = "<div id=\"actionInfo\"></div>";
+      $("#action").append(html);
+      if(this.mode < 6){
+         this.initStackTable();
+         this.initReduceButton();
+         this.initInput();
+         this.initShiftButton();
+         this.initAcceptButton();
+         this.initErrorButton();
+      }
       this.initDerivationTree();
+      if(this.mode == 6){
+         this.initButtons();
+      }
    };
 
    this.initStackTable = function() {
@@ -507,13 +534,30 @@ function LR_Parser(settings,subTask,answer) {
       this.updateStackTable();
    };
 
+   this.initButtons = function() {
+      var html = "<div id=\"buttons\"></div>";
+      $("#tree").append(html);
+      this.initReduceButton();
+      this.initUndoButton();
+   };
+
    this.initReduceButton = function() {
-      var html = "<div id=\"reduceBar\">";
-      html += "<div class=\"messageBackground\"><div id=\"reduceMessage\" class=\"actionMessage\"></div></div>"
-      html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>"
-      html += "</div>";
-      $("#actionInfo").append(html);
+      if(this.mode != 6){
+         var html = "<div id=\"reduceBar\">";
+         html += "<div class=\"messageBackground\"><div id=\"reduceMessage\" class=\"actionMessage\"></div></div>"
+         html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>"
+         html += "</div>";
+         $("#actionInfo").append(html);
+      }else{
+         var html = "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>";
+         $("#buttons").append(html);
+      }
    }; 
+
+   this.initUndoButton = function() {
+      var html = "<div id=\"undo\" class=\"actionButton\"><i class=\"fas fa-undo-alt buttonIcon\"></i> UNDO</div>";
+      $("#buttons").append(html);
+   };
 
    this.initInput = function() {
       if(this.input.charAt(this.input.length - 1) != "$"){
@@ -567,15 +611,29 @@ function LR_Parser(settings,subTask,answer) {
       var html = "<div id=\"derivationTree\">";
       html += "<h4>Derivation Tree</h4>";
       html += "<div id=\"tree\"></div>";
-      html += "<div id=\"treeCursor\"></div>";
+      if(this.mode < 6){
+         html += "<div id=\"treeCursor\"></div>";
+      }
       html += "</div>";
       $("#actionInfo").append(html);
+      if(this.mode >= 6){
+         $("#tree").append($("<div id=\"treePaper\"></div>"));
+         this.derivationTree = {};
+         this.input = this.input.replace(/ /g,"");
+         for(var iChar = 0; iChar < this.input.length; iChar++){
+            this.derivationTree[2* iChar + 1] = this.input.charAt(iChar);
+         }
+
+         this.updateTree();
+      }
    };
 
    this.initHandlers = function() {
-      $("#"+this.tabsID+" #switchContainer").off("click");
-      $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
-      $(window).resize(self.onResize);
+      if(this.mode < 6){
+         $("#"+this.tabsID+" #switchContainer").off("click");
+         $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
+         $(window).resize(self.onResize);
+      }
       switch(this.mode){
          case 2:
             $("#reduceButton").off("click");
@@ -598,12 +656,10 @@ function LR_Parser(settings,subTask,answer) {
          case 3:
             this.initPlayerHandlers();
             this.disableUndoButton();
-            // $(window).resize(self.onResize);
             break;
          case 4:
             $("#"+this.parseTableID+" td[data_state]").off("click");
             $("#"+this.parseTableID+" td[data_state]").click(self.clickCell);
-            // $(window).resize(self.onResize);
             this.initPlayerHandlers();
             break;
          case 5:
@@ -614,8 +670,25 @@ function LR_Parser(settings,subTask,answer) {
             $("#errorButton").click(self.refuseInput); 
             $("#"+this.parseTableID+" td[data_state]").off("click");
             $("#"+this.parseTableID+" td[data_state]").click(self.clickCell);
-            $("#lrParser").off("click");
-            $("#lrParser").click(self.resetFeedback);
+            $("#"+this.divID).off("click");
+            $("#"+this.divID).click(self.resetFeedback);
+            break;
+         case 6:
+            for(var iEl in this.treeTopLine){
+               var el = this.treeTopLine[iEl];
+               el.raphObj.attr("cursor","pointer");
+               el.raphObj.click(self.selectSymbol(iEl));
+            }
+            $(".rule").off("click");
+            $(".rule").click(self.selectRule);
+            $("#reduceButton").off("click");
+            $("#reduceButton").click(self.reduce);
+            // $("#undoButton").off("click");
+            // $("#undoButton").click(self.undo);
+            $(".rule, #reduceButton").css({
+               cursor: "pointer"
+            });
+            break;
          default:
             this.initPlayerHandlers();
       }
@@ -893,10 +966,14 @@ function LR_Parser(settings,subTask,answer) {
       if(!end){
          clearTimeout(self.timeOutID);
          subTask.raphaelFactory.stopAnimate("anim");
-         $("#progressBar").stop();
-         $(".stackElement").stop();
-         self.rowHL.stop();
-         self.colHL.stop();
+         if($("#progressBar"))
+            $("#progressBar").stop();
+         if($(".stackElement"))
+            $(".stackElement").stop();
+         if(self.rowHL)
+            self.rowHL.stop();
+         if(self.colHL)
+            self.colHL.stop();
          self.replayUpTo(self.simulationStep,false,true);
          if(self.token){
             self.token.remove();
@@ -1056,6 +1133,12 @@ function LR_Parser(settings,subTask,answer) {
       self.styleRules();
    };
 
+   this.unselectRules = function() {
+      $(".rule").removeClass("selected");
+      self.selectedRule = null;
+      self.styleRules();
+   };
+
    this.switchTab = function() {
 
       $("#"+self.tabTag[self.selectedTab]).removeClass("selectedTab");
@@ -1092,50 +1175,92 @@ function LR_Parser(settings,subTask,answer) {
 
    this.reduce = function() {
       self.resetFeedback();
-      if(self.selectedRule == null){
-         self.displayMessage("reduce","You must select a rule");
-         // self.displayMessage("reduce","REDUCE 0000654065406540");
-      }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
-         self.displayMessage("reduce","You must select a part of the stack");
-      }else if(self.selectedState == null){
-         self.displayMessage("reduce","You must select a state in the automaton");
-      }else if(!self.compareSelectedRuleAndStack()){
-         self.displayError("You cannot reduce the selected stack elements with the selected rule");
-      }else{
-         var nonTerminal = self.grammar.rules[self.selectedRule].nonterminal;
-         var previousState = self.getPreviousState();
-         var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-         if(self.selectedState != goto){
-            self.displayError("Wrong goto state");
+      if(self.mode < 6){
+         if(self.selectedRule == null){
+            self.displayMessage("reduce","You must select a rule");
+            // self.displayMessage("reduce","REDUCE 0000654065406540");
+         }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
+            self.displayMessage("reduce","You must select a part of the stack");
+         }else if(self.selectedState == null){
+            self.displayMessage("reduce","You must select a state in the automaton");
+         }else if(!self.compareSelectedRuleAndStack()){
+            self.displayError("You cannot reduce the selected stack elements with the selected rule");
          }else{
-            self.actionSequence.push({
-               actionType: "r",
-               rule: self.selectedRule,
-               goto: goto
-            });
-            self.treeAnim(self.simulationStep,false,true);
-            self.simulationStep++;
-            self.applyReduction(nonTerminal,goto,true);
+            var nonTerminal = self.grammar.rules[self.selectedRule].nonterminal;
+            var previousState = self.getPreviousState();
+            var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
+            if(self.selectedState != goto){
+               self.displayError("Wrong goto state");
+            }else{
+               self.actionSequence.push({
+                  actionType: "r",
+                  rule: self.selectedRule,
+                  goto: goto
+               });
+               self.treeAnim(self.simulationStep,false,true);
+               self.simulationStep++;
+               self.applyReduction(nonTerminal,goto,true);
+               self.saveAnswer();
+            }
+         }
+      }else{
+         var selectedIndices = self.getSelectedIndices();
+         if(self.selectedRule == null){
+            self.displayError("You must select a rule");
+         }else if(selectedIndices.length == 0){
+            self.displayError("You must select at least one symbol");
+         }else if(!self.compareSelectedRuleAndStack()){
+            self.displayError("You cannot reduce the selected symbols with the selected rule");
+         }else{
+            var rule = self.grammar.rules[self.selectedRule];
+            var nonTerminal = rule.nonterminal;
+            var newEntry = {};
+            var cpt = 0;
+            var sum = 0;
+            for(var i of selectedIndices){
+               newEntry[i] = self.derivationTree[i];
+               cpt++;
+               sum += parseInt(i);
+               delete self.derivationTree[i];
+            }
+            var newIndex = sum / cpt;
+            newEntry.nonTerminal = nonTerminal;
+            self.derivationTree[newIndex] = newEntry;
+            self.unselectRules();
+            self.updateTree();
+            self.initHandlers();
             self.saveAnswer();
          }
       }
    };
 
    this.compareSelectedRuleAndStack = function() {
-      this.selectedStackElements.sort();
       var rule = this.grammar.rules[this.selectedRule];
-      if(rule.development[0] == "''" && this.selectedStackElements.length == 0){
-         return true;
-      }else if(rule.development.length != this.selectedStackElements.length){
-         return false;
-      }else{
-         for(var iEl = 0; iEl < rule.development.length; iEl++){
-            if(rule.development[iEl] != this.stack[this.selectedStackElements[iEl]][1]){
-               return false;
+      if(this.mode < 6){
+         this.selectedStackElements.sort();
+         if(rule.development[0] == "''" && this.selectedStackElements.length == 0){
+            return true;
+         }else if(rule.development.length != this.selectedStackElements.length){
+            return false;
+         }else{
+            for(var iEl = 0; iEl < rule.development.length; iEl++){
+               if(rule.development[iEl] != this.stack[this.selectedStackElements[iEl]][1]){
+                  return false;
+               }
             }
          }
+         return true;
+      }else{
+         var selectedIndices = this.getSelectedIndices();
+         var selectedSymbols = [];
+         for(var i of selectedIndices){
+            selectedSymbols.push(this.treeTopLine[i].symbol);
+         }
+         if(Beav.Object.eq(selectedSymbols,rule.development)){
+            return true;
+         }
+         return false;
       }
-      return true;
    };
 
    this.getTerminalState = function() {
@@ -2127,9 +2252,173 @@ function LR_Parser(settings,subTask,answer) {
       return true;
    };
 
-   // this.windowClick = function(ev) {
-   //    console.log("windowClick");
-   // };
+   /* derivation tree */
+
+   this.updateTree = function() {
+      var treeHeight = this.getObjectDepth(this.derivationTree);
+      var w = (2 * this.input.length + 1) * this.treeCharSize;
+      var h = (2 * treeHeight + 1)*this.treeCharAttr["font-size"];
+      if(!this.treePaper){
+         this.treePaper = subTask.raphaelFactory.create("treePaper","treePaper",w,h);
+      }else{
+         this.treePaper.clear();
+         this.treePaper.setSize(w,h);
+      }
+      this.treeTopLine = {};
+      this.displayTree(this.derivationTree,0);
+
+      // console.log(this.derivationTree)
+   };
+
+   this.displayTree = function(tree,level,parentCol) {
+      var children = [];
+      for(var col in tree){
+         if(col == "nonTerminal"){
+            continue;
+         }
+         var symbol = tree[col].nonTerminal || tree[col];
+         var x = col * this.treeCharSize;
+         var y = this.treeCharAttr["font-size"] * (2 * level + 1); 
+         if(level == 0){
+            var clickArea = this.treePaper.circle(x,y,this.treeCharSize).attr({
+               fill: "white",
+               stroke: "none",
+               opacity: 0
+            });
+            var text = this.treePaper.text(x,y,symbol).attr(this.treeCharAttr);
+            var raphObj = this.treePaper.set(clickArea,text);
+            this.treeTopLine[col] = {raphObj:raphObj,symbol:symbol,selected:false};
+         }else{
+            var text = this.treePaper.text(x,y,symbol).attr(this.treeCharAttr);
+            children.push(col);
+         }
+         if(typeof tree[col] == 'object'){
+            this.displayTree(tree[col],level + 1,col);
+         }
+      }
+      if(children.length == 1){
+         var col = children[0];
+         var xi = col * this.treeCharSize;
+         var yi = this.treeCharAttr["font-size"] * (2 * level + 1/2); 
+         var yf = this.treeCharAttr["font-size"] * (2 * level - 1/2); 
+         this.treePaper.path("M"+xi+" "+yi+"V"+yf).attr(this.treeLineAttr);
+      }else{
+         for(var child of children){
+            var col = child;
+            var xi = col * this.treeCharSize;
+            var yi = this.treeCharAttr["font-size"] * (2 * level + 1/2); 
+            var xf = parentCol * this.treeCharSize;
+            var yf = this.treeCharAttr["font-size"] * (2 * level - 1/2); 
+            if(xi == xf){
+               this.treePaper.path("M"+xi+" "+yi+"V"+yf).attr(this.treeLineAttr);
+            }else{
+               this.treePaper.path("M"+xi+" "+yi+" C "+xi+","+yf+" "+xf+","+yi+" "+xf+","+yf).attr(this.treeLineAttr);
+            }
+         }
+      }
+   };
+
+   this.selectSymbol = function(index) {
+      return function() {
+         // console.log(index);
+         index = parseFloat(index);
+         self.resetFeedback();
+         var selectedElement = self.treeTopLine[index];
+         var selected = selectedElement.selected;
+         var x = selectedElement.raphObj[0].attr("cx");
+         var y = selectedElement.raphObj[0].attr("cy");
+         var r = self.treeCharSize * 0.7;
+         var selectedIndices = self.getSelectedIndices();
+         // console.log(selectedIndices);
+         if(self.treeSelectionMarker){
+            self.treeSelectionMarker.remove();
+         }
+         if(selected){
+            for(var i of selectedIndices){
+               self.selectElement(self.treeTopLine[i],false);
+            }
+         }else{
+            if(selectedIndices.length == 0){
+               self.selectElement(selectedElement,true);
+               self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
+            }else{
+               var furthestIndex = self.getFurthestIndex(index,selectedIndices);
+               var fx = self.treeTopLine[furthestIndex].raphObj[0].attr("cx");
+               var fy = self.treeTopLine[furthestIndex].raphObj[0].attr("cy");
+               var w = Math.abs(x - fx) + 2 * r;
+               var h = 2 * r;
+               if(index < furthestIndex){
+                  // for(var i = index; i <= furthestIndex; i++){
+                  for(var i in self.treeTopLine){
+                     if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
+                        self.selectElement(self.treeTopLine[i],true);
+                  }
+                  self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
+                  self.treeSelectionMarker.toBack();
+               }else{
+                  // for(var i = index; i >= furthestIndex; i--){
+                  for(var i in self.treeTopLine){
+                     if(parseFloat(i) <= index && parseFloat(i) >= furthestIndex)
+                        self.selectElement(self.treeTopLine[i],true);
+                  }
+                  self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
+               }
+            }
+         }
+         
+      }
+   };
+
+   this.getSelectedIndices = function() {
+      var selectedEl = [];
+      for(var col in this.treeTopLine){
+         var el = this.treeTopLine[col];
+         if(el.selected){
+            selectedEl.push(col);
+         }
+      }
+      return selectedEl;
+   };
+
+   this.getFurthestIndex = function(index,selectedIndices) {
+      var diff = 0;
+      var furthestIndex;
+      for(var i of selectedIndices){
+         var localDiff = Math.abs(i - index);
+         if(localDiff >= diff){
+            diff = localDiff;
+            furthestIndex = i;
+         }
+      }
+      // console.log(furthestIndex);
+      return furthestIndex;
+   };
+
+   this.selectElement = function(el,selected){
+      if(selected){
+         el.selected = true;
+         el.raphObj[1].attr({fill:"white"});
+      }else{
+         el.selected = false;
+         el.raphObj[1].attr({fill:self.colors.blue});
+      }
+   };
+
+   this.getObjectDepth = function(object) {
+      var level = 1;
+       var key;
+       for(key in object) {
+           if (!object.hasOwnProperty(key)) continue;
+
+           if(typeof object[key] == 'object'){
+               var depth = this.getObjectDepth(object[key]) + 1;
+               level = Math.max(depth, level);
+           }
+       }
+       return level;
+   };
+
+   /* answer */
 
    this.saveAnswer = function() {
       if(self.mode == 2 || self.mode == 5){
@@ -2138,6 +2427,11 @@ function LR_Parser(settings,subTask,answer) {
          answer.error = self.error;
       }else if(self.mode == 3){
          answer.visualGraphJSON.push(self.visualGraph.toJSON());
+      }else if(self.mode == 6){
+         answer.push(JSON.parse(JSON.stringify(self.derivationTree)));
+         if(answer.length > 1){
+            self.enableUndoButton();
+         }
       }
    };
 
@@ -2166,24 +2460,41 @@ function LR_Parser(settings,subTask,answer) {
                   }
                }
             }
-            // this.updateParseTable();
-            // this.onResize();
+            break;
+         case 6:
+            this.derivationTree = JSON.parse(JSON.stringify(answer[answer.length - 1]));
+            this.updateTree();
+            this.initHandlers();
+            if(answer.length > 1){
+               self.enableUndoButton();
+            }else{
+               self.disableUndoButton();
+            }
+
       }
    };
 
    this.undo = function() {
-      answer.visualGraphJSON.pop();
-      self.reloadAnswer();
-      if(answer.visualGraphJSON.length <= 1){
-         self.disableUndoButton()
+      if(this.mode < 6){
+         answer.visualGraphJSON.pop();
+         self.reloadAnswer();
+         if(answer.visualGraphJSON.length <= 1){
+            self.disableUndoButton()
+         }
+      }else{
+         answer.pop();
+         self.reloadAnswer();
+         // if(answer.length <= 1){
+         //    self.disableUndoButton();
+         // }
       }
    };
 
    this.validation = function() {
-      this.pauseSimulation();
       switch(this.mode){
          case 2:
          case 5:
+            this.pauseSimulation();
             if(!answer.accept && !answer.error){
                this.displayError("You must click on either the accept or the error button");
             }else{
@@ -2211,6 +2522,7 @@ function LR_Parser(settings,subTask,answer) {
             this.replayUpTo(this.actionSequence.length,false,true);
             break;
          case 3:
+            this.pauseSimulation();
             // console.log(this.lrClosureTable.kernels);
             var lrClosureTable = this.lrClosureTable.kernels;
             var vertices = this.graph.getAllVertices();
@@ -2268,6 +2580,7 @@ function LR_Parser(settings,subTask,answer) {
             }
             break;
          case 4:
+            this.pauseSimulation();
             var success = this.checkParseTable();
             return success
       }
@@ -2297,11 +2610,13 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+this.divID).css({
          "font-size": "80%"
       })
-      /* tab switch */
-      this.styleTabSwitch();
+      if(this.mode < 6){
+         /* tab switch */
+         this.styleTabSwitch();
 
-      /* paper, parse table */
-      this.styleTabs();
+         /* paper, parse table */
+         this.styleTabs();
+      }
 
       /* parse info */
       $("#parseInfo").css({
@@ -2326,152 +2641,180 @@ function LR_Parser(settings,subTask,answer) {
          "font-weight": "normal",
          "margin-bottom": "0.5em",
       });
+      if(this.mode < 6){
+         /* player */
+         $("#player").css({
+            display: "flex",
+            "align-items": "center",
+            "justify-content": "space-between",
+            padding: "10px",
+            "border-radius": "25px",
+            "background-color": this.colors.lightgrey
+         });
+         $("#player > *").css({
+            color: "white",
+            "font-size": "1em",
+            "border-radius": "2em",
+            "text-align": "center",
+            "box-sizing": "border-box"
+         });
+         $("#play").css({
+            "background-color": this.colors.blue,
+            padding: "10px 12px",
+            "margin-right": "10px"
+         });
+         $("#stepBackward, #stepForward, #undo").css({
+            "background-color": this.colors.black,
+            padding: "10px 20px",
+            "margin-left": "10px"
+         });
+         $("#undo").css({
+            "font-weight": "bold"
+         })
+         if(this.mode == 3){
+            this.showUndo();
+         }
+         this.styleProgressBar();
 
-      /* player */
-      $("#player").css({
-         display: "flex",
-         "align-items": "center",
-         "justify-content": "space-between",
-         padding: "10px",
-         "border-radius": "25px",
-         "background-color": this.colors.lightgrey
-      });
-      $("#player > *").css({
-         color: "white",
-         "font-size": "1em",
-         "border-radius": "2em",
-         "text-align": "center",
-         "box-sizing": "border-box"
-      });
-      $("#play").css({
-         "background-color": this.colors.blue,
-         padding: "10px 12px",
-         "margin-right": "10px"
-      });
-      $("#stepBackward, #stepForward, #undo").css({
-         "background-color": this.colors.black,
-         padding: "10px 20px",
-         "margin-left": "10px"
-      });
-      $("#undo").css({
-         "font-weight": "bold"
-      })
-      if(this.mode == 3){
-         this.showUndo();
+         /* stack */
+         this.styleStackTable();
+
+         /* action button */
+         $("#acceptButton, #errorButton").css({
+            "border-radius": "1em",
+            float: "right",
+            "margin-top": "1em",
+            clear: "right"
+         });
+         $(".actionButton").css({
+            "background-color": this.colors.blue,
+            color: "white",
+            width: "110px",
+            padding: "0.5em 0",
+            "text-align": "center",
+            "font-weight": "bold",
+            "font-size": "0.9em"
+         });
+         var buttonHeight = $(".actionButton").innerHeight();
+         $("#reduceBar, #shiftBar").css({
+            display: "flex",
+            "justify-content": "flex-end",
+         });
+
+         $(".actionMessage").css({
+            padding: "0.5em 1em",
+            color: "grey",
+            "background-color": "white",
+            "border-radius": "0 5px 0 0",
+            height: buttonHeight+"px",
+            "box-sizing": "border-box"
+         });
+         $(".messageBackground").css({
+            "background-color": this.colors.blue,
+            height: buttonHeight+"px"
+         })
+         $("#reduceButton, #shiftButton").css({
+            "border-radius": "0 0 5px 5px"
+         });
+         // $("#acceptButton, #errorButton").css({
+         //    "margin-left": "1em"
+         // });
+         $(".buttonIcon").css({
+            "font-size": "0.9em",
+            "margin-right": "0.2em"
+         });
+         $("#shiftButton .buttonIcon").css({
+            "margin-right": "0.5em"
+         });
+
+         /* input */
+         $("#inputBar").css({
+            position: "relative",
+            "background-color": this.colors.lightgrey,
+            "margin-top": "5px",
+            "border-top": "1px solid grey",
+            "border-bottom": "2px solid "+this.colors.blue
+         });
+         $("#inputBar h4").css({
+            position: "absolute",
+            top: "-3em"
+         });
+         $(".inputChar").css({
+            display: "inline-block",
+            width: "1.5em",
+            "text-align": "center",
+            color: this.colors.black,
+            "font-size": "1.5em",
+            padding: "0.1em 0"
+         });
+         $(".inputChar:first-of-type").css({
+            "margin-left": "0.75em"
+         });
+
+         /* cursor */
+         $("#cursor").css({
+            position: "absolute",
+            top: 0,
+            left: 0,
+            height: "2em"
+         });
+         $("#cursorBar").css({
+            height: "2em",
+            width: 0,
+            border: "1px solid "+this.colors.blue,
+            position: "absolute",
+            top: 0,
+            left: 0
+         });
+         $("#topCircle, #bottomCircle").css({
+            width: "6px",
+            height: "6px",
+            "background-color": "white",
+            border: "1px solid "+this.colors.blue,
+            "border-radius": "5px",
+            position: "absolute",
+            left: "-3px",
+            "z-index": 2
+         });
+         $("#topCircle").css({
+            top: "-4px"
+         });
+         $("#bottomCircle").css({
+            bottom: "-6px"
+         });
+
+         this.styleDerivationTree();
+      }else{        
+         $("#tree").css({
+            display: "flex",
+            "justify-content": "flex-start",
+            "align-items": "flex-start"
+         });
+         $("#treePaper").css({
+            // "flex-grow": "2"
+         })
+         $("#reduceButton, #undo").css({
+            "border-radius": "1em",
+            "background-color": this.colors.blue,
+            color: "white",
+            width: "110px",
+            padding: "0.5em 0",
+            "text-align": "center",
+            "font-weight": "bold",
+            "font-size": "0.9em",
+            // "flex-grow": "1"
+         });
+         $(".buttonIcon").css({
+            "font-size": "0.9em",
+            "margin-right": "0.2em"
+         });
+         $("#reduceButton").css({
+            "margin-bottom": "1em"
+         });
+         // $("#undoButton").css({
+         //    opacity: 0.5
+         // });
       }
-      this.styleProgressBar();
-
-      /* stack */
-      this.styleStackTable();
-
-      /* action button */
-      $("#acceptButton, #errorButton").css({
-         "border-radius": "1em",
-         float: "right",
-         "margin-top": "1em",
-         clear: "right"
-      });
-      $(".actionButton").css({
-         "background-color": this.colors.blue,
-         color: "white",
-         width: "110px",
-         padding: "0.5em 0",
-         "text-align": "center",
-         "font-weight": "bold",
-         "font-size": "0.9em"
-      });
-      var buttonHeight = $(".actionButton").innerHeight();
-      $("#reduceBar, #shiftBar").css({
-         display: "flex",
-         "justify-content": "flex-end",
-      });
-      // $("#acceptBar, #errorBar").css({
-      //    "margin-top": "0.5em",
-
-      // });
-      $(".actionMessage").css({
-         padding: "0.5em 1em",
-         color: "grey",
-         "background-color": "white",
-         "border-radius": "0 5px 0 0",
-         height: buttonHeight+"px",
-         "box-sizing": "border-box"
-      });
-      $(".messageBackground").css({
-         "background-color": this.colors.blue,
-         height: buttonHeight+"px"
-      })
-      $("#reduceButton, #shiftButton").css({
-         "border-radius": "0 0 5px 5px"
-      });
-      // $("#acceptButton, #errorButton").css({
-      //    "margin-left": "1em"
-      // });
-      $(".buttonIcon").css({
-         "font-size": "0.9em",
-         "margin-right": "0.2em"
-      });
-      $("#shiftButton .buttonIcon").css({
-         "margin-right": "0.5em"
-      });
-
-      /* input */
-      $("#inputBar").css({
-         position: "relative",
-         "background-color": this.colors.lightgrey,
-         "margin-top": "5px",
-         "border-top": "1px solid grey",
-         "border-bottom": "2px solid "+this.colors.blue
-      });
-      $("#inputBar h4").css({
-         position: "absolute",
-         top: "-3em"
-      });
-      $(".inputChar").css({
-         display: "inline-block",
-         width: "1.5em",
-         "text-align": "center",
-         color: this.colors.black,
-         "font-size": "1.5em",
-         padding: "0.1em 0"
-      });
-      $(".inputChar:first-of-type").css({
-         "margin-left": "0.75em"
-      });
-
-      /* cursor */
-      $("#cursor").css({
-         position: "absolute",
-         top: 0,
-         left: 0,
-         height: "2em"
-      });
-      $("#cursorBar").css({
-         height: "2em",
-         width: 0,
-         border: "1px solid "+this.colors.blue,
-         position: "absolute",
-         top: 0,
-         left: 0
-      });
-      $("#topCircle, #bottomCircle").css({
-         width: "6px",
-         height: "6px",
-         "background-color": "white",
-         border: "1px solid "+this.colors.blue,
-         "border-radius": "5px",
-         position: "absolute",
-         left: "-3px",
-         "z-index": 2
-      });
-      $("#topCircle").css({
-         top: "-4px"
-      });
-      $("#bottomCircle").css({
-         bottom: "-6px"
-      });
-
-      this.styleDerivationTree();
    };
 
    this.styleTabSwitch = function() {
@@ -2704,9 +3047,16 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.styleDerivationTree = function() {
-      var charWidth = $("#inputBar .inputChar").width();
-      var charHeight = $("#inputBar .inputChar").height()*0.7;
-      var treeWidth = this.input.length*charWidth;
+      // if(this.mode < 6){
+         var charWidth = $("#inputBar .inputChar").width();
+         var charHeight = $("#inputBar .inputChar").height()*0.7;
+         var treeWidth = this.input.length*charWidth;
+      // }else{
+      //    var charWidth = this.treeCharSize;
+      //    var charHeight = this.treeCharSize*0.7;
+      //    var treeWidth = (this.input.length + 1)*charWidth;
+      // }
+      // var treeWidth = this.input.length*charWidth;
       var treeHeight = (2*this.treeHeight + 1)*charHeight;
 
       $("#derivationTree").css({
@@ -2818,6 +3168,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
+      // if(this.mode < 6)
       for(var actionIndex in this.treeElements){
          var elements = this.treeElements[actionIndex];
          for(var el of elements){
