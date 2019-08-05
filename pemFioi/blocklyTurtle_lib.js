@@ -254,6 +254,83 @@ var getContext = function(display, infos) {
             paintingFree: "La tortue a tracé le dessin que vous avez programmé. Si vous voulez le garder, vous pouvez faire une capture d'écran."
          }
       },
+      en: {
+         turnleft: "right ↺",
+         turnright: "left ↻",
+         penup: "lift the paintbrush",
+         pendown: "lower the paintbrush",
+         categories: {
+            turtle: "Tortue"
+         },
+         label: {
+            move: "move forward",
+            moveamount: "move forward by %1 step(s)",
+            movebackamount: "move back by %1 step(s)",
+            moveamountvalue: "move forward by %1 step(s)",
+            movebackamountvalue: "move back by %1 step(s)",
+            turnleft: "turn right ↺",
+            turnright: "turn left ↻",
+            turnleftamount: "turn to the left by %1° ↺",
+            turnrightamount: "turn to the right by %1° ↻",
+            turnleftamountvalue: "turn to the left by %1 ↺",
+            turnrightamountvalue: "turn to the right by %1 ↻",
+            turnleftamountvalue_noround: "drehe um %1 Grad nach links ↺",
+            turnrightamountvalue_noround: "drehe um %1 Grad nach rechts ↻",
+            turnleftamountvalue_options: "drehe um %1 nach links ↺",
+            turnrightamountvalue_options: "drehe um %1 nach rechts ↻",
+            turnleftamountvalue_moreoptions: "drehe um %1 nach links ↺",
+            turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
+            turneitheramount: "turn by %1° to the %2",
+            turneitheramountvalue: "turn by %1 to the %2",
+            penup: "lift the paintbrush",
+            pendown: "lower the paintbrush",
+            peneither: "%1",
+            colour2: "setze Farbe",
+            colourvalue: "use color %1",
+            turn: "drehe (Grad) ",
+            alert: "messagebox",
+            log: "logge",
+            inputvalue: "Eingabewert"
+         },
+         code: {
+            move: "forward",
+            moveamount: "forward",
+            movebackamount: "backward",
+            moveamountvalue: "forward",
+            movebackamountvalue: "backward",
+            turnleft: "turnLeft",
+            turnright: "turnRight",
+            turnleftamount: "left",
+            turnrightamount: "right",
+            turnleftamountvalue: "left",
+            turnrightamountvalue: "right",
+            turnleftamountvalue_noround: "dreheLinksGrad",
+            turnrightamountvalue_noround: "dreheRechtsGrad",
+            turnleftamountvalue_options: "dreheLinksGrad",
+            turnrightamountvalue_options: "dreheRechtsGrad",
+            turnleftamountvalue_moreoptions: "dreheLinksGrad",
+            turnrightamountvalue_moreoptions: "dreheRechtsGrad",
+            turneitheramount: "turn",
+            turneitheramountvalue: "turn",
+            penup: "liftBrush",
+            pendown: "lowerBrush",
+            peneither: "stift",
+            colour2: "setzeFarbe",
+            colourvalue: "color",
+            turn: "drehe",
+            alert: "alert",
+            log: "log",
+            inputvalue: "eingabewert"
+         },
+         description: {
+         },
+         startingBlockName: "Program of the turtle",
+         messages: {
+            paintingWrong: "The turtle didn't draw everything correctly.",
+            paintingCorrect: "Congratulations, the turtle has drawn everything correctly.",
+            paintingFree: "The turtle painted according to your program. If you want to keep it, do a screenshot."
+         }
+      },
       none: {
          comment: {
          }
