@@ -284,18 +284,24 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                    } else {
                        block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
                    }
-                   block.blocklyJson.colour = Blockly.Colours.sensing.primary;
-                   block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
-                   block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+                   
+                   if(typeof block.blocklyJson.colour == "undefined") {
+                      block.blocklyJson.colour = Blockly.Colours.sensing.primary;
+                      block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
+                      block.blocklyJson.colourTertiary = Blockly.Colours.sensing.tertiary;
+                   }
                }
             }
             else {
                block.blocklyJson.previousStatement = null;
                block.blocklyJson.nextStatement = null;
+               
                if(this.scratchMode) {
-                   block.blocklyJson.colour = Blockly.Colours.motion.primary;
-                   block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
-                   block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+                   if(typeof block.blocklyJson.colour == "undefined") {
+                      block.blocklyJson.colour = Blockly.Colours.motion.primary;
+                      block.blocklyJson.colourSecondary = Blockly.Colours.motion.secondary;
+                      block.blocklyJson.colourTertiary = Blockly.Colours.motion.tertiary;
+                   }
                }
             }
          }
@@ -321,7 +327,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          // Add message string
          if (typeof block.blocklyJson.message0 == "undefined") {
             block.blocklyJson.message0 = context.strings.label[block.name];
-
+// TODO: Load default colours + custom styles
             if (typeof block.blocklyJson.message0 == "undefined") {
                block.blocklyJson.message0 = "<translation missing: " + block.name + ">";
             }
@@ -355,7 +361,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             } else {
                var colours = this.getDefaultColours();
                block.blocklyJson.colour = 210; // default: blue
-               if ("blocks" in colours &&  block.name in colours.blocks) {
+               if ("blocks" in colours && block.name in colours.blocks) {
                   block.blocklyJson.colour = colours.blocks[block.name];
                }
                else if ("categories" in colours) {
