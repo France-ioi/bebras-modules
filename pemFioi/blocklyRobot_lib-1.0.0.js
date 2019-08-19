@@ -1791,7 +1791,7 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       pixelArt: {
-         newBlocks: (function(names, colors, translations) {
+         newBlocks: (function(names, colors, colorsSecondary, colorsTertiary, translations) {
             var blocks = [];
             for(var iColor = 0;iColor < colors.length;iColor++) {
                blocks.push({
@@ -1806,7 +1806,7 @@ var getContext = function(display, infos, curLevel) {
                   category: "robot",
                   type: "actions",
                   block: {
-                     name: names[iColor], blocklyJson: {"colour": colors[iColor]}//"args0": [{"type": "field_colour", "name": "PARAM_0", "colour": colors[iColor]}]
+                     name: names[iColor], blocklyJson: {"colour": colors[iColor], "colourSecondary": colorsSecondary[iColor], "colourTertiary": colorsTertiary[iColor]}
                   },
                   func: (function(cur_color) { return function(callback) {
                      var robot = this.getRobot();
@@ -1826,6 +1826,8 @@ var getContext = function(display, infos, curLevel) {
             return blocks;
          })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"], 
             ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
+            ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"], 
+            ["#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd"],
             {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
          backgroundColor: "#ece4ce",
          ignoreBag: true,
