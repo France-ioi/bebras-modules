@@ -27,8 +27,9 @@ function LR_Parser(settings,subTask,answer) {
    this.treePaper;
    this.treeElements = {};
    this.treeCharSize = 20 // mode > 6
-   this.treeTopLine = {};
+   this.treeClickableElements = {};
    this.treeSelectionMarker = null;
+   this.inputBaseline = []; // mode = 7
 
    this.timeOutID;
    this.animationTime = 1000;
@@ -519,8 +520,11 @@ function LR_Parser(settings,subTask,answer) {
          this.initErrorButton();
       }
       this.initDerivationTree();
-      if(this.mode == 6){
+      if(this.mode >= 6){
          this.initButtons();
+      }
+      if(this.mode == 7){
+         this.initObjective();
       }
    };
 
@@ -542,14 +546,17 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initReduceButton = function() {
-      if(this.mode != 6){
+      if(this.mode < 6){
          var html = "<div id=\"reduceBar\">";
          html += "<div class=\"messageBackground\"><div id=\"reduceMessage\" class=\"actionMessage\"></div></div>"
          html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>"
          html += "</div>";
          $("#actionInfo").append(html);
-      }else{
+      }else if (this.mode == 6){
          var html = "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>";
+         $("#buttons").append(html);
+      }else if(this.mode == 7){
+         var html = "<div id=\"produceButton\" class=\"actionButton\"><i class=\"fas fa-expand buttonIcon\"></i> PRODUCE</div>";
          $("#buttons").append(html);
       }
    }; 
@@ -620,8 +627,12 @@ function LR_Parser(settings,subTask,answer) {
          $("#tree").append($("<div id=\"treePaper\"></div>"));
          this.derivationTree = {};
          this.input = this.input.replace(/ /g,"");
-         for(var iChar = 0; iChar < this.input.length; iChar++){
-            this.derivationTree[2* iChar + 1] = this.input.charAt(iChar);
+         if(this.mode == 6){
+            for(var iChar = 0; iChar < this.input.length; iChar++){
+               this.derivationTree[2 * iChar + 1] = this.input.charAt(iChar);
+            }
+         }else if(this.mode == 7){
+            this.derivationTree[this.input.length] = this.grammar.rules[0].nonterminal;
          }
 
          this.updateTree();
@@ -674,18 +685,18 @@ function LR_Parser(settings,subTask,answer) {
             $("#"+this.divID).click(self.resetFeedback);
             break;
          case 6:
-            for(var iEl in this.treeTopLine){
-               var el = this.treeTopLine[iEl];
+         case 7:
+            for(var iEl in this.treeClickableElements){
+               var el = this.treeClickableElements[iEl];
                el.raphObj.attr("cursor","pointer");
                el.raphObj.click(self.selectSymbol(iEl));
             }
             $(".rule").off("click");
             $(".rule").click(self.selectRule);
-            $("#reduceButton").off("click");
+            $("#reduceButton, #produceButton").off("click");
             $("#reduceButton").click(self.reduce);
-            // $("#undoButton").off("click");
-            // $("#undoButton").click(self.undo);
-            $(".rule, #reduceButton").css({
+            $("#produceButton").click(self.produce);
+            $(".rule, #reduceButton, #produceButton").css({
                cursor: "pointer"
             });
             break;
@@ -705,6 +716,15 @@ function LR_Parser(settings,subTask,answer) {
       this.enablePlayerSteps();
       this.disableProgressBarClick();
       this.enableProgressBarClick();
+   };
+
+   this.initObjective = function() {
+      var html = "<div id=\"objective\"><h4>Objective</h4><div id=\"string\"></div></div>";
+      $("#actionInfo").append(html);
+      var input = this.input.split('');
+      for(var char of input){
+      $("#objective #string").append("<div class=\"inputChar\">"+char+"</div>");
+      }
    };
 
    this.disablePlayerSteps = function() {
@@ -1254,10 +1274,16 @@ function LR_Parser(settings,subTask,answer) {
          var selectedIndices = this.getSelectedIndices();
          var selectedSymbols = [];
          for(var i of selectedIndices){
-            selectedSymbols.push(this.treeTopLine[i].symbol);
+            selectedSymbols.push(this.treeClickableElements[i].symbol);
          }
-         if(Beav.Object.eq(selectedSymbols,rule.development)){
-            return true;
+         if(this.mode == 6){
+            if(Beav.Object.eq(selectedSymbols,rule.development)){
+               return true;
+            }
+         }else if(this.mode == 7){
+            if(selectedSymbols[0] == rule.nonterminal){
+               return true;
+            }
          }
          return false;
       }
@@ -2255,8 +2281,18 @@ function LR_Parser(settings,subTask,answer) {
    /* derivation tree */
 
    this.updateTree = function() {
+      this.updateTreePaper();
+      this.fixConflict();
+      this.treeClickableElements = {};
+      this.displayTree(this.derivationTree,0,null);
+
+      console.log(this.derivationTree)
+   };
+
+   this.updateTreePaper = function() {
       var treeHeight = this.getObjectDepth(this.derivationTree);
-      var w = (2 * this.input.length + 1) * this.treeCharSize;
+      var treeWidth = this.getTreeWidth(this.derivationTree,1,2 * this.input.length - 1);
+      var w = treeWidth * this.treeCharSize;
       var h = (2 * treeHeight + 1)*this.treeCharAttr["font-size"];
       if(!this.treePaper){
          this.treePaper = subTask.raphaelFactory.create("treePaper","treePaper",w,h);
@@ -2264,22 +2300,18 @@ function LR_Parser(settings,subTask,answer) {
          this.treePaper.clear();
          this.treePaper.setSize(w,h);
       }
-      this.treeTopLine = {};
-      this.displayTree(this.derivationTree,0);
-
-      // console.log(this.derivationTree)
    };
 
    this.displayTree = function(tree,level,parentCol) {
       var children = [];
       for(var col in tree){
-         if(col == "nonTerminal"){
+         if(col == "nonTerminal" || col == "path"){
             continue;
          }
          var symbol = tree[col].nonTerminal || tree[col];
          var x = col * this.treeCharSize;
          var y = this.treeCharAttr["font-size"] * (2 * level + 1); 
-         if(level == 0){
+         if((this.mode == 6 && level == 0) || (this.mode == 7 && this.grammar.nonterminals.includes(symbol) && typeof tree[col] != 'object')){
             var clickArea = this.treePaper.circle(x,y,this.treeCharSize).attr({
                fill: "white",
                stroke: "none",
@@ -2287,10 +2319,17 @@ function LR_Parser(settings,subTask,answer) {
             });
             var text = this.treePaper.text(x,y,symbol).attr(this.treeCharAttr);
             var raphObj = this.treePaper.set(clickArea,text);
-            this.treeTopLine[col] = {raphObj:raphObj,symbol:symbol,selected:false};
+            if(this.mode == 6){
+               this.treeClickableElements[col] = {raphObj:raphObj,symbol:symbol,selected:false};
+            }else{
+               this.treeClickableElements[col] = {raphObj:raphObj,symbol:symbol,selected:false,path:tree["path"]};
+               if(symbol != this.grammar.axiom)
+                  children.push(col);
+            }
          }else{
             var text = this.treePaper.text(x,y,symbol).attr(this.treeCharAttr);
-            children.push(col);
+            if(symbol != this.grammar.axiom)
+               children.push(col);
          }
          if(typeof tree[col] == 'object'){
             this.displayTree(tree[col],level + 1,col);
@@ -2321,45 +2360,54 @@ function LR_Parser(settings,subTask,answer) {
    this.selectSymbol = function(index) {
       return function() {
          // console.log(index);
+         // console.log(self.treeClickableElements);
          index = parseFloat(index);
          self.resetFeedback();
-         var selectedElement = self.treeTopLine[index];
+         var selectedElement = self.treeClickableElements[index];
          var selected = selectedElement.selected;
          var x = selectedElement.raphObj[0].attr("cx");
          var y = selectedElement.raphObj[0].attr("cy");
          var r = self.treeCharSize * 0.7;
-         var selectedIndices = self.getSelectedIndices();
-         // console.log(selectedIndices);
+         if(self.mode == 6){
+            var selectedIndices = self.getSelectedIndices();
+         }
          if(self.treeSelectionMarker){
             self.treeSelectionMarker.remove();
          }
          if(selected){
-            for(var i of selectedIndices){
-               self.selectElement(self.treeTopLine[i],false);
+            if(self.mode == 6){
+               for(var i of selectedIndices){
+                  self.selectElement(self.treeClickableElements[i],false);
+               }
+            }else{
+               self.selectElement(selectedElement,false);
             }
          }else{
-            if(selectedIndices.length == 0){
+            if(self.mode == 7 || selectedIndices.length == 0){
+               if(self.mode == 7){
+                  for(var iEl in self.treeClickableElements){
+                     self.selectElement(self.treeClickableElements[iEl],false);
+                  }
+               }
                self.selectElement(selectedElement,true);
                self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
             }else{
                var furthestIndex = self.getFurthestIndex(index,selectedIndices);
-               var fx = self.treeTopLine[furthestIndex].raphObj[0].attr("cx");
-               var fy = self.treeTopLine[furthestIndex].raphObj[0].attr("cy");
+               var fx = self.treeClickableElements[furthestIndex].raphObj[0].attr("cx");
+               var fy = self.treeClickableElements[furthestIndex].raphObj[0].attr("cy");
                var w = Math.abs(x - fx) + 2 * r;
                var h = 2 * r;
                if(index < furthestIndex){
-                  // for(var i = index; i <= furthestIndex; i++){
-                  for(var i in self.treeTopLine){
+                  for(var i in self.treeClickableElements){
                      if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
-                        self.selectElement(self.treeTopLine[i],true);
+                        self.selectElement(self.treeClickableElements[i],true);
                   }
                   self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
                   self.treeSelectionMarker.toBack();
                }else{
-                  // for(var i = index; i >= furthestIndex; i--){
-                  for(var i in self.treeTopLine){
+                  for(var i in self.treeClickableElements){
                      if(parseFloat(i) <= index && parseFloat(i) >= furthestIndex)
-                        self.selectElement(self.treeTopLine[i],true);
+                        self.selectElement(self.treeClickableElements[i],true);
                   }
                   self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
                }
@@ -2371,8 +2419,8 @@ function LR_Parser(settings,subTask,answer) {
 
    this.getSelectedIndices = function() {
       var selectedEl = [];
-      for(var col in this.treeTopLine){
-         var el = this.treeTopLine[col];
+      for(var col in this.treeClickableElements){
+         var el = this.treeClickableElements[col];
          if(el.selected){
             selectedEl.push(col);
          }
@@ -2406,32 +2454,284 @@ function LR_Parser(settings,subTask,answer) {
 
    this.getObjectDepth = function(object) {
       var level = 1;
-       var key;
-       for(key in object) {
-           if (!object.hasOwnProperty(key)) continue;
+      var key;
+      for(key in object) {
+         if (!object.hasOwnProperty(key)) continue;
 
-           if(typeof object[key] == 'object'){
-               var depth = this.getObjectDepth(object[key]) + 1;
-               level = Math.max(depth, level);
-           }
-       }
-       return level;
+         if(typeof object[key] == 'object'){
+            var depth = this.getObjectDepth(object[key]) + 1;
+            level = Math.max(depth, level);
+         }
+      }
+      return level;
+   };
+
+   this.getTreeWidth = function(tree,min,max) {
+      var min = this.getMinKey(tree,min);
+      var max = this.getMaxKey(tree,max);
+      var width = max - min + 3;
+
+      return width;
+   };
+
+   this.getMinKey = function(tree,min) {
+      for(var key in tree){
+         if(!isNaN(key)){
+            key = parseFloat(key);
+            min = Math.min(key,min);
+            if(typeof tree[key] == 'object'){
+               var localMin = this.getMinKey(tree[key],min);
+               min = Math.min(localMin,min);
+            }
+         }
+      }
+      return min;
+   };
+
+   this.getMaxKey = function(tree,max) {
+      for(var key in tree){
+         if(!isNaN(key)){
+            key = parseFloat(key);
+            max = Math.max(key,max);
+            if(typeof tree[key] == 'object'){
+               var localMax = this.getMaxKey(tree[key],max);
+               max = Math.max(localMax,max);
+            }
+         }
+      }
+      return max;
+   };
+
+   this.produce = function() {
+      var selectedIndices = self.getSelectedIndices();
+      if(self.selectedRule == null){
+         self.displayError("You must select a rule");
+      }else if(selectedIndices.length == 0){
+         self.displayError("You must select at least one symbol");
+      }else if(!self.compareSelectedRuleAndStack()){
+         self.displayError("You cannot develop the selected symbol with the selected rule");
+      }else{
+         var rule = self.grammar.rules[self.selectedRule];
+         var nonTerminal = rule.nonterminal;
+         var newEntry = {};
+         var parentIndex = selectedIndices[0];
+         // var level = self.treeClickableElements[parentIndex].level;
+         var path = self.treeClickableElements[parentIndex].path;
+         var startIndex = parentIndex - rule.development.length + 1;
+         for(var iSymbol = 0; iSymbol < rule.development.length; iSymbol++){
+            var index = startIndex + iSymbol * 2;
+            newEntry[index] = rule.development[iSymbol];
+         }
+         newEntry.nonTerminal = nonTerminal;
+         // console.log(self.treeClickableElements[parentIndex]);
+         if(!path){
+            newEntry.path = [parentIndex];
+            self.derivationTree[parentIndex] = newEntry;
+         }else{
+            newEntry.path = JSON.parse(JSON.stringify(self.treeClickableElements[parentIndex].path));
+            newEntry.path.push(parentIndex);
+            self.addNewEntry(newEntry);
+
+         }
+         self.unselectRules();
+         self.updateTree();
+         self.initHandlers();
+         self.saveAnswer();
+         // console.log(self.derivationTree);
+      }
+   };
+
+   this.addNewEntry = function(newEntry) {
+      var path = JSON.parse(JSON.stringify(newEntry.path));
+      var branch = this.goToBranch(this.derivationTree,path);
+      branch[path[path.length - 1]] = newEntry;
+      // branch = newEntry;
+   };
+
+   this.goToBranch = function(tree,path) {
+      var step = path.shift();
+      var branch = tree[step];
+      if(path.length > 1){
+         branch = this.goToBranch(branch,path);
+      }
+      return branch;
+   };
+
+   this.fixConflict = function() {
+      var negativeKey = this.findNegativeKey(this.derivationTree);
+      if(negativeKey){
+         var newTree = {};
+         var correction = 1 - negativeKey;
+         this.shiftTree(this.derivationTree,correction,newTree);
+         this.derivationTree = JSON.parse(JSON.stringify(newTree));
+         this.updateTreePaper();
+      }
+      this.fixOverlap(this.derivationTree);
+   };
+
+   this.findNegativeKey = function(object) {
+      var negativeKey = 0;
+      for(var key in object) {
+         if(key < negativeKey){
+            negativeKey = key;
+         }
+         if (!object.hasOwnProperty(key)) continue;
+
+         if(typeof object[key] == 'object'){
+            var otherKey = this.findNegativeKey(object[key]);
+            negativeKey = Math.min(negativeKey, otherKey);
+         }
+      }
+      return negativeKey;
+   };
+
+   this.shiftTree = function(tree,correction,nTree) {
+      for(var key in tree) {
+         if(key != "nonTerminal" && key != "path"){
+            key = parseFloat(key);
+            var newKey = key + correction;
+            // console.log(key+" "+correction+" "+newKey);
+            if(typeof tree[key] == 'object'){
+               nTree[newKey] = {};
+               this.shiftTree(tree[key],correction,nTree[newKey]);
+            }else{
+               nTree[newKey] = JSON.parse(JSON.stringify(tree[key]));
+            }
+         }else if(key == "nonTerminal"){
+            nTree[key] = JSON.parse(JSON.stringify(tree[key]));
+         }else if(key == "path"){
+            nTree[key] = tree[key].map(x => parseFloat(x) + correction);
+         }
+      }
+   };
+
+   this.fixOverlap = function(tree) {
+      this.inputBaseline = [];
+      this.getInputBaseLine(this.derivationTree);
+      var baseLength = this.inputBaseline.length;
+      if(baseLength >= this.input.length){
+         var minIndex = 1;
+      }else{
+         var minIndex = this.input.length - baseLength + 1;
+      }
+      
+      if(!this.isOverlapping(minIndex)){
+         return;
+      }
+
+      var maxIndex = minIndex + (baseLength - 1) * 2;
+      var index = maxIndex;
+
+      do{
+         var entry = this.inputBaseline.pop();
+         if(entry.key != index){
+            if(entry.path){
+               var path = JSON.parse(JSON.stringify(entry.path));
+               var branch = this.goToBranch(this.derivationTree,path);
+               if(path.length > 0){
+                  branch = branch[path[0]];
+               }
+            }else{
+               var branch = this.derivationTree;
+            }
+            this.replaceLeafIndex(branch,entry.key,index);
+         }
+         index = index - 2;
+      }while(this.inputBaseline.length > 0);
+
+      this.fixParentsPositions(this.derivationTree);
+      this.updateTreePaper();
+   };
+
+   this.getInputBaseLine = function(tree) {
+      for(var key in tree){
+         if(typeof tree[key] != 'object'){
+             if(key != "nonTerminal"){
+               this.inputBaseline.push({symbol:tree[key],key:key,path:tree.path});
+             }
+         }else if(key != "path"){
+            this.getInputBaseLine(tree[key]);
+         }
+      }
+   };
+
+   this.replaceLeafIndex = function(branch,oldIndex,newIndex) {
+      if(branch[newIndex]){
+         this.replaceLeafIndex(branch,newIndex,newIndex + 2);
+      }
+      if(branch[oldIndex]){
+         branch[newIndex] = JSON.parse(JSON.stringify(branch[oldIndex]));
+         delete branch[oldIndex];
+      }
+   };
+
+   this.isOverlapping = function(minIndex) {
+      var index = minIndex;
+      for(var el of this.inputBaseline){
+         if(el.key != index){
+            return true;
+         }else{
+            index = index + 2;
+         }
+      }
+      return false;
+   };
+
+   this.fixParentsPositions = function(tree) {
+      for(var pos in tree){
+         if(typeof tree[pos] == "object" && pos != "path"){
+            this.fixParentsPositions(tree[pos]);
+            var sum = 0;
+            var cpt = 0;
+            for(var childPos in tree[pos]){
+               if(!isNaN(childPos)){
+                  sum += parseInt(childPos);
+                  cpt++;
+               }
+            }
+            var newPos = Math.round(sum/cpt);
+            if(pos != newPos){
+               this.replaceBranchIndex(tree,pos,newPos);
+            }
+         }
+      }
+   };
+
+   this.replaceBranchIndex = function(parentBranch,oldIndex,newIndex) {
+      parentBranch[newIndex] = JSON.parse(JSON.stringify(parentBranch[oldIndex]));
+      this.replaceBranchPath(parentBranch[newIndex],newIndex,parentBranch[newIndex].path.length - 1);
+      delete parentBranch[oldIndex];
+   };
+
+   this.replaceBranchPath = function(branch,newIndex,level) {
+      branch.path[level] = newIndex;
+      for(var index in branch){
+         if(typeof branch[index] == "object" && !isNaN(index)){
+            this.replaceBranchPath(branch[index],newIndex,level);
+         }
+      }
    };
 
    /* answer */
 
    this.saveAnswer = function() {
-      if(self.mode == 2 || self.mode == 5){
-         answer.actionSequence = JSON.parse(JSON.stringify(self.actionSequence));
-         answer.accept = self.accept;
-         answer.error = self.error;
-      }else if(self.mode == 3){
-         answer.visualGraphJSON.push(self.visualGraph.toJSON());
-      }else if(self.mode == 6){
-         answer.push(JSON.parse(JSON.stringify(self.derivationTree)));
-         if(answer.length > 1){
-            self.enableUndoButton();
-         }
+      switch(self.mode){
+         case 2:
+         case 5:
+            answer.actionSequence = JSON.parse(JSON.stringify(self.actionSequence));
+            answer.accept = self.accept;
+            answer.error = self.error;
+            break;
+         case 3:
+            answer.visualGraphJSON.push(self.visualGraph.toJSON());
+            break;
+         case 6:
+         case 7:
+            answer.push(JSON.parse(JSON.stringify(self.derivationTree)));
+            if(answer.length > 1){
+               self.enableUndoButton();
+            }
+            break;
       }
    };
 
@@ -2462,6 +2762,7 @@ function LR_Parser(settings,subTask,answer) {
             }
             break;
          case 6:
+         case 7:
             this.derivationTree = JSON.parse(JSON.stringify(answer[answer.length - 1]));
             this.updateTree();
             this.initHandlers();
@@ -2582,7 +2883,29 @@ function LR_Parser(settings,subTask,answer) {
          case 4:
             this.pauseSimulation();
             var success = this.checkParseTable();
-            return success
+            return success;
+         case 6:
+            var lastStep = answer[answer.length - 1];
+            var keys = Object.keys(lastStep);
+            if(keys.length == 1 && lastStep[keys[0]].nonTerminal == "S"){
+               return true;
+            }else{
+               this.displayError("You didn't reduce the input to the axiom");
+            }
+            break;
+         case 7:
+            var lastStep = answer[answer.length - 1];
+            this.inputBaseline = [];
+            this.getInputBaseLine(lastStep);
+            var index = 0;
+            for(var el of this.inputBaseline){
+               if(el.symbol != this.input.charAt(index)){
+                  this.displayError("You didn't reach the objective");
+                  return false;
+               }
+               index++;
+            }
+            return true;
       }
    };
 
@@ -2790,10 +3113,7 @@ function LR_Parser(settings,subTask,answer) {
             "justify-content": "flex-start",
             "align-items": "flex-start"
          });
-         $("#treePaper").css({
-            // "flex-grow": "2"
-         })
-         $("#reduceButton, #undo").css({
+         $("#reduceButton, #produceButton, #undo").css({
             "border-radius": "1em",
             "background-color": this.colors.blue,
             color: "white",
@@ -2802,18 +3122,22 @@ function LR_Parser(settings,subTask,answer) {
             "text-align": "center",
             "font-weight": "bold",
             "font-size": "0.9em",
-            // "flex-grow": "1"
          });
          $(".buttonIcon").css({
             "font-size": "0.9em",
             "margin-right": "0.2em"
          });
-         $("#reduceButton").css({
+         $("#reduceButton, #produceButton").css({
             "margin-bottom": "1em"
          });
-         // $("#undoButton").css({
-         //    opacity: 0.5
-         // });
+         $(".inputChar").css({
+            display: "inline-block",
+            width: this.treeCharSize,
+            "text-align": "center",
+            color: this.colors.black,
+            "font-size": this.treeCharSize,
+            padding: "0.5em "+0.5*this.treeCharSize+"px"
+         });
       }
    };
 
