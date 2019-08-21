@@ -1626,7 +1626,8 @@ function GraphEditor(settings) {
          if(previousEdges.length > 1){
             return;
          }else if(previousEdges.length == 1){
-            graph.removeEdge(previousEdges[0]);
+            // graph.removeEdge(previousEdges[0]);
+            return;
          }
       }
       
