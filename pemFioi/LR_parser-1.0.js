@@ -2776,7 +2776,8 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.undo = function() {
-      if(this.mode < 6){
+      self.resetFeedback();
+      if(self.mode < 6){
          answer.visualGraphJSON.pop();
          self.reloadAnswer();
          if(answer.visualGraphJSON.length <= 1){
@@ -2890,7 +2891,7 @@ function LR_Parser(settings,subTask,answer) {
             if(keys.length == 1 && lastStep[keys[0]].nonTerminal == "S"){
                return true;
             }else{
-               this.displayError("You didn't reduce the input to the axiom");
+               this.displayError("You didn't reduce the entire input to the axiom");
             }
             break;
          case 7:
