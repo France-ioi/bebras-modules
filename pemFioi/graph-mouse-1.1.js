@@ -1436,6 +1436,7 @@ function GraphEditor(settings) {
    this.edgeDragEnabled = false;
    this.graphDragEnabled = false;
    this.multipleEdgesEnabled = false;
+   this.backwardEdgesEnabled = false;
    this.loopEnabled = false;
    this.editVertexLabelEnabled = false;
    this.editVertexContentEnabled = false;
@@ -1462,6 +1463,7 @@ function GraphEditor(settings) {
       this.setVertexDragEnabled(enabled);
       this.setEdgeDragEnabled(enabled);
       this.setMultipleEdgesEnabled(enabled);
+      this.setBackwardEdgesEnabled(enabled);
       this.setEditVertexLabelEnabled(enabled);
       this.setEditVertexContentEnabled(enabled);
       this.setEditEdgeLabelEnabled(enabled);
@@ -1502,6 +1504,9 @@ function GraphEditor(settings) {
    };
    this.setMultipleEdgesEnabled = function(enabled) {
       this.multipleEdgesEnabled = enabled;
+   };
+   this.setBackwardEdgesEnabled = function(enabled) {
+      this.backwardEdgesEnabled = enabled;
    };
    this.setLoopEnabled = function(enabled) {
       this.loopEnabled = enabled;
@@ -1613,7 +1618,11 @@ function GraphEditor(settings) {
          return;
       
       if(!self.multipleEdgesEnabled){
-         var previousEdges = graph.getEdgesBetween(id1,id2);
+         if(!self.backwardEdgesEnabled){
+            var previousEdges = graph.getEdgesBetween(id1,id2);
+         }else{
+            var previousEdges = graph.getEdgesFrom(id1,id2);
+         }
          if(previousEdges.length > 1){
             return;
          }else if(previousEdges.length == 1){
