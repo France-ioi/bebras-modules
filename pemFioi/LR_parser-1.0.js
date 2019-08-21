@@ -1243,7 +1243,7 @@ function LR_Parser(settings,subTask,answer) {
                sum += parseInt(i);
                delete self.derivationTree[i];
             }
-            var newIndex = sum / cpt;
+            var newIndex = Math.round(sum / cpt);
             newEntry.nonTerminal = nonTerminal;
             self.derivationTree[newIndex] = newEntry;
             self.unselectRules();
@@ -2286,7 +2286,7 @@ function LR_Parser(settings,subTask,answer) {
       this.treeClickableElements = {};
       this.displayTree(this.derivationTree,0,null);
 
-      console.log(this.derivationTree)
+      // console.log(this.derivationTree)
    };
 
    this.updateTreePaper = function() {
