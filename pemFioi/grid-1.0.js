@@ -1,4 +1,5 @@
 function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr) {
+   self = this;
    this.raphaelID = raphaelID;
    this.paper = paper;
    this.rows = rows;
@@ -60,7 +61,10 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       this.gridHeight = this.gridBottom - this.gridTop;
    };
 
+
+
    this.initTable = function() {
+
       this.table = [];
       for (var iRow = 0; iRow < this.rows; iRow++) {
          this.table.push([]);
@@ -111,6 +115,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
    this.unclickCell = function() {
       this.element.unbind("click", internalClickHandler);
+      this.element.off("click");
    };
 
    var internalClickHandler = function(event) {
@@ -134,7 +139,7 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    };
 
    this.getPaperMouse = function(event) {
-      var offset = $(this.paper.canvas).offset();
+      var offset = $(self.paper.canvas).offset();
       return {
          left: event.pageX - offset.left,
          top: event.pageY - offset.top
