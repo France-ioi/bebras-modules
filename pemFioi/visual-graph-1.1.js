@@ -434,6 +434,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    
    this._getVertexPosition = function(visualInfo) {
+      if(typeof visualInfo == "undefined"){  // IE8
+         return { x: 0, y: 0}
+      }
       if(visualInfo.x === undefined || visualInfo.x === null) {
          visualInfo.x = 0;
          visualInfo.y = 0;
@@ -1177,7 +1180,8 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var array = (text) ? text.split("\n") : [];
       var nbLines = array.length;
       var nbCol = 0;
-      for(var line of array){
+      for(var iLine = 0; iLine < nbLines; iLine++){
+         var line = array[iLine];
          if(line.length > nbCol){
             nbCol = line.length;
          }
