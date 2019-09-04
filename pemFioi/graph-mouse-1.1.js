@@ -276,17 +276,20 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
       }
       this.enabled = enabled;
       if(enabled) {
+         // $("#" + paperElementID).unbind(jqEvent, this.clickHandler);
+         $("#" + paperElementID).off(jqEvent);
          $("#" + paperElementID)[jqEvent](this.clickHandler);
       }
       else {
          $("#" + paperElementID).unbind(jqEvent, this.clickHandler);
+         $("#" + paperElementID).off(jqEvent);
       }
    };
 
    this.clickHandler = function(event) {
       // console.log(jqEvent+" "+id);
-      var offset = $(self.paper.canvas).offset();
-      // var offset = $("#"+paperElementID).offset();
+      // var offset = $(self.paper.canvas).offset();
+      var offset = $("#"+paperElementID).offset();
       var xPos = event.pageX - offset.left;
       var yPos = event.pageY - offset.top;
       callback(xPos, yPos, event);
@@ -607,11 +610,10 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var minDistance = Infinity;
       this.graph.forEachVertex(function(id) {
          var distance = visualGraph.graphDrawer.getDistanceFromVertex(id, xPos, yPos);
-         // console.log(distance+" "+vertexThreshold);
          if(distance <= vertexThreshold && distance < minDistance) {
             vertex = id;
             minDistance = distance;
-
+            // console.log(id);
          }
       });
       return vertex;
@@ -738,7 +740,7 @@ function VertexDragAndConnect(settings) {
    var graph = settings.graph;
    this.visualGraph = settings.visualGraph;
    var graphMouse = settings.graphMouse;
-   var dragThreshold = settings.dragThreshold;
+   this.dragThreshold = settings.dragThreshold;
    this.vertexThreshold = settings.vertexThreshold || 0;
    this.dragLimits = settings.dragLimits;
    this.onVertexSelect = settings.onVertexSelect;
@@ -868,6 +870,7 @@ function VertexDragAndConnect(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
+      // console.log(dragThreshold)
       if(dx == 0 && dy == 0){
          return;
       }
@@ -875,7 +878,7 @@ function VertexDragAndConnect(settings) {
          self.onVertexSelect(self.selectionParent, false);
       }
       self.selectionParent = null;
-      if(!self.isDragging && dx * dx + dy * dy >= dragThreshold * dragThreshold) {
+      if(!self.isDragging && dx * dx + dy * dy >= self.dragThreshold * self.dragThreshold) {
          self.isDragging = true;
       }
       if(!self.isDragging) {
@@ -1668,10 +1671,10 @@ function GraphEditor(settings) {
          }
          return;
       }
-      
+
       if(selected){
          edge[0].attr(selectedEdgeAttr);
-         
+
          self.addEdgeCross(edgeID);
          var info = graph.getEdgeInfo(edgeID);
          if(info.label.length == 0)
