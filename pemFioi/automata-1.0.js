@@ -101,7 +101,7 @@ function Automata(settings) {
          this.graphEditor.setEnabled(enabled);
          this.reset.setEnabled(enabled);
          
-         this.graphEditor.setDragGraphEnabled(false);
+         this.graphEditor.setGraphDragEnabled(false);
          this.graphEditor.setScaleGraphEnabled(false);
          this.setEditVertexLabelEnabled(false);
          this.setDefaultVertexLabelEnabled(false);
