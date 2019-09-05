@@ -8,6 +8,7 @@ function LR_Parser(settings,subTask,answer) {
    4: create parse table
    5: execute existing automaton with parse table
    6: derivation tree bottom up
+   7: derivation tree top down
    */
    this.rules = settings.rules;
    this.input = settings.input;
@@ -30,6 +31,7 @@ function LR_Parser(settings,subTask,answer) {
    this.treeClickableElements = {};
    this.treeSelectionMarker = null;
    this.inputBaseline = []; // mode = 7
+   this.selectedSymbolIndices = [];
 
    this.timeOutID;
    this.animationTime = 1000;
@@ -689,7 +691,13 @@ function LR_Parser(settings,subTask,answer) {
             for(var iEl in this.treeClickableElements){
                var el = this.treeClickableElements[iEl];
                el.raphObj.attr("cursor","pointer");
-               el.raphObj.click(self.selectSymbol(iEl));
+               if(this.mode == 6){
+                  el.raphObj.unmousedown();
+                  el.raphObj.mousedown(self.selectSymbol(iEl));
+               }else{
+                  el.raphObj.unclick();
+                  el.raphObj.click(self.selectSymbol(iEl));
+               }
             }
             $(".rule").off("click");
             $(".rule").click(self.selectRule);
@@ -2359,8 +2367,8 @@ function LR_Parser(settings,subTask,answer) {
 
    this.selectSymbol = function(index) {
       return function() {
-         // console.log(index);
-         // console.log(self.treeClickableElements);
+         // console.log("click");
+         // console.log(self.selectedSymbolIndices);
          index = parseFloat(index);
          self.resetFeedback();
          var selectedElement = self.treeClickableElements[index];
@@ -2368,53 +2376,137 @@ function LR_Parser(settings,subTask,answer) {
          var x = selectedElement.raphObj[0].attr("cx");
          var y = selectedElement.raphObj[0].attr("cy");
          var r = self.treeCharSize * 0.7;
-         if(self.mode == 6){
-            var selectedIndices = self.getSelectedIndices();
-         }
+         // if(self.mode == 6){
+         //    // var selectedIndices = self.getSelectedIndices();
+         //    self.selectedSymbolIndices.push(index);
+         // }
          if(self.treeSelectionMarker){
             self.treeSelectionMarker.remove();
          }
+
          if(selected){
             if(self.mode == 6){
-               for(var i of selectedIndices){
+               for(var i of self.selectedSymbolIndices){
+                  // console.log("deselect "+i)
                   self.selectElement(self.treeClickableElements[i],false);
+                  self.treeClickableElements[i].raphObj.unhover();
                }
+               self.selectedSymbolIndices = [];
+               // for(var iEl in self.treeClickableElements){
+               //    self.selectElement(self.treeClickableElements[iEl],false);
+               //    self.treeClickableElements[iEl].raphObj.unhover();
+               // }
             }else{
                self.selectElement(selectedElement,false);
             }
          }else{
-            if(self.mode == 7 || selectedIndices.length == 0){
-               if(self.mode == 7){
-                  for(var iEl in self.treeClickableElements){
-                     self.selectElement(self.treeClickableElements[iEl],false);
-                  }
+            // if(self.mode == 7 || selectedIndices.length == 0){
+            //    if(self.mode == 7){
+            //       for(var iEl in self.treeClickableElements){
+            //          self.selectElement(self.treeClickableElements[iEl],false);
+            //       }
+            //    }
+            //    self.selectElement(selectedElement,true);
+            //    self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
+            // }else{
+            //    var furthestIndex = self.getFurthestIndex(index,selectedIndices);
+            //    var fx = self.treeClickableElements[furthestIndex].raphObj[0].attr("cx");
+            //    var fy = self.treeClickableElements[furthestIndex].raphObj[0].attr("cy");
+            //    var w = Math.abs(x - fx) + 2 * r;
+            //    var h = 2 * r;
+            //    if(index < furthestIndex){
+            //       for(var i in self.treeClickableElements){
+            //          if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
+            //             self.selectElement(self.treeClickableElements[i],true);
+            //       }
+            //       self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
+            //       self.treeSelectionMarker.toBack();
+            //    }else{
+            //       for(var i in self.treeClickableElements){
+            //          if(parseFloat(i) <= index && parseFloat(i) >= furthestIndex)
+            //             self.selectElement(self.treeClickableElements[i],true);
+            //       }
+            //       self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
+            //    }
+            // }
+            self.selectedSymbolIndices = [];
+            for(var iEl in self.treeClickableElements){
+               // console.log("deselect "+iEl)
+               self.selectElement(self.treeClickableElements[iEl],false);
+               if(iEl != index && self.mode == 6){
+                  self.treeClickableElements[iEl].raphObj.hover(self.hoverIn(iEl),self.hoverOut(iEl));
                }
-               self.selectElement(selectedElement,true);
-               self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
-            }else{
-               var furthestIndex = self.getFurthestIndex(index,selectedIndices);
-               var fx = self.treeClickableElements[furthestIndex].raphObj[0].attr("cx");
-               var fy = self.treeClickableElements[furthestIndex].raphObj[0].attr("cy");
-               var w = Math.abs(x - fx) + 2 * r;
-               var h = 2 * r;
-               if(index < furthestIndex){
-                  for(var i in self.treeClickableElements){
-                     if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
-                        self.selectElement(self.treeClickableElements[i],true);
-                  }
-                  self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
-                  self.treeSelectionMarker.toBack();
-               }else{
-                  for(var i in self.treeClickableElements){
-                     if(parseFloat(i) <= index && parseFloat(i) >= furthestIndex)
-                        self.selectElement(self.treeClickableElements[i],true);
-                  }
-                  self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
-               }
+               $(window).mouseup(self.dragEnd);
             }
+            self.selectedSymbolIndices.push(index);   
+            self.selectElement(selectedElement,true);
+            self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
          }
          
       }
+   };
+
+   this.hoverIn = function(id) {
+      id = parseInt(id);
+      return function() {
+         if(Beav.Array.has(self.selectedSymbolIndices,id)){
+            return
+         }else{
+            self.selectedSymbolIndices.push(id);
+            self.selectElement(self.treeClickableElements[id],true);
+            self.updateTreeSelection();
+
+         }
+      }
+   };
+
+   this.hoverOut = function(id) {
+      return function() {
+         // if(Beav.Array.has(self.selectedSymbolIndices,id)){
+         //    return
+         // }else{
+         //    self.selectedSymbolIndices.push(id);
+         //    self.updateTreeSelection();
+         // }
+      }
+   };
+
+   this.updateTreeSelection = function() {
+      var orderedSelectedIndices = self.selectedSymbolIndices.sort(function(a,b){return (a - b)});
+      // console.log(orderedSelectedIndices)
+      var smallerIndex = orderedSelectedIndices[0];
+      var furthestIndex = orderedSelectedIndices[orderedSelectedIndices.length - 1];
+      // var furthestIndex = self.getFurthestIndex(smallerIndex,self.selectedSymbolIndices);
+      var x = self.treeClickableElements[smallerIndex].raphObj[0].attr("cx");
+      var y = self.treeClickableElements[smallerIndex].raphObj[0].attr("cy");
+      var fx = self.treeClickableElements[furthestIndex].raphObj[0].attr("cx");
+      var fy = self.treeClickableElements[furthestIndex].raphObj[0].attr("cy");
+       var r = self.treeCharSize * 0.7;
+      var w = Math.abs(x - fx) + 2 * r;
+      var h = 2 * r;
+      // if(index < furthestIndex){
+      //    for(var i in self.treeClickableElements){
+      //       if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
+      //          self.selectElement(self.treeClickableElements[i],true);
+      //    }
+      self.treeSelectionMarker.remove();
+      self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
+      self.treeSelectionMarker.toBack();
+      // }else{
+         // for(var i in self.treeClickableElements){
+         //    if(parseFloat(i) <= smallerIndex && parseFloat(i) >= furthestIndex)
+         //       self.selectElement(self.treeClickableElements[i],true);
+         // }
+         // self.treeSelectionMarker.remove();
+         // self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
+      // }
+   };
+
+   this.dragEnd = function() {
+      for(var iEl in self.treeClickableElements){
+         self.treeClickableElements[iEl].raphObj.unhover();
+      }
+      $(window).off("mouseup");
    };
 
    this.getSelectedIndices = function() {
@@ -2443,6 +2535,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.selectElement = function(el,selected){
+      // console.log(el.symbol+" "+selected);
       if(selected){
          el.selected = true;
          el.raphObj[1].attr({fill:"white"});
@@ -2533,6 +2626,7 @@ function LR_Parser(settings,subTask,answer) {
             self.addNewEntry(newEntry);
 
          }
+         self.selectedSymbolIndices = [];
          self.unselectRules();
          self.updateTree();
          self.initHandlers();
