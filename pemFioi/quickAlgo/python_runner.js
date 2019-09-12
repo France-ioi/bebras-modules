@@ -179,12 +179,41 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
+  this._definePythonNumber = function() {
+    // Create a class which behaves as a Number, but can have extra properties
+    this.pythonNumber = function(val) {
+      this.val = new Number(val);
+    }
+    this.pythonNumber.prototype = Object.create(Number.prototype);
+    function makePrototype(func) {
+      return function() { return Number.prototype[func].call(this.val); }
+    }
+    var funcs = ['toExponential', 'toFixed', 'toLocaleString', 'toPrecision', 'toSource', 'toString', 'valueOf'];
+    for(var i = 0; i < funcs.length ; i++) {
+      this.pythonNumber.prototype[funcs[i]] = makePrototype(funcs[i]);
+    }
+  }
+
   this.skToJs = function(val) {
     // Convert Skulpt item to JavaScript
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else {
-      return val.v;
+      var retVal = val.v;
+      if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
+         retVal = [];
+         for(var i = 0; i < val.v.length; i++) {
+            retVal[i] = this.skToJs(val.v[i]);
+         }
+      }
+      if(val instanceof Sk.builtin.tuple) {
+         retVal.isTuple = true;
+      }
+      if(val instanceof Sk.builtin.float_) {
+         retVal = new this.pythonNumber(retVal);
+         retVal.isFloat = true;
+      }
+      return retVal;
     }
   };
 
@@ -292,6 +321,8 @@ function PythonInterpreter(context, msgCallback) {
 
     // Disable document library
     delete Sk.builtinFiles["files"]["src/lib/document.js"];
+
+    this._definePythonNumber();
 
     this.context.callCallback = this.noDelay.bind(this);
   };
