@@ -224,6 +224,8 @@ var getContext = function(display, infos) {
                value[i] = valueToStr(value[i]);
             }
             return '[' + value.join(', ') + ']';
+         } else if(value && value.isFloat && Math.floor(value) == value) {
+            return value + '.0';
          } else if(value === true) {
             return 'True';
          } else if(value === false) {
