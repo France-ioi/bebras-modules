@@ -24,7 +24,7 @@ var getContext = function(display, infos) {
                 displayRecord: 'displayRecord(%1)',
                 displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
                 printConsole: 'printConsole(%1)',
-                displayTableOnGraph: 'displayTableOnGraph(%1, %2)'
+                displayTableOnGraph: 'displayTableOnGraph(%1, %2, %3)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -76,7 +76,10 @@ var getContext = function(display, infos) {
                 inner: 'inner',
                 outer: 'outer',
                 left: 'left',
-                right: 'right'
+                right: 'right',
+                line: 'line chart',
+                bar: 'bar graph',
+                plot: 'scatter plot'
             },
             messages: {
                 table_not_found: 'Table not found: ',
@@ -116,7 +119,7 @@ var getContext = function(display, infos) {
                 displayRecord: 'displayRecord(%1)',
                 displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
                 printConsole: 'printConsole(%1)',
-                displayTableOnGraph: 'displayTableOnGraph(%1, %2)'
+                displayTableOnGraph: 'displayTableOnGraph(%1, %2, %3)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -168,7 +171,10 @@ var getContext = function(display, infos) {
                 inner: 'inner',
                 outer: 'outer',
                 left: 'left',
-                right: 'right'
+                right: 'right',
+                line: 'courbe',
+                bar: 'barres',
+                plot: 'points'
             },
             messages: {
                 table_not_found: 'Table non trouvée: ',
@@ -186,7 +192,6 @@ var getContext = function(display, infos) {
             }
         }
     }
-
 
 
     var context = quickAlgoContext(display, infos)
@@ -311,16 +316,6 @@ var getContext = function(display, infos) {
         }
     }
 
-    /*
-    Blockly.JavaScript['text_print'] = function(block) {
-        db_helper.displayConsole(Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''");
-        return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ");\n";
-    };
-    Blockly.JavaScript['text_print_noend'] = function(block) {
-        db_helper.displayConsole(Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''");
-        return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ", '');\n";
-    };
-    */
     context.database = {
 
         loadTable: function(name, callback) {
@@ -426,9 +421,10 @@ var getContext = function(display, infos) {
             context.waitDelay(callback);
         },
 
-        displayTableOnGraph: function(table, nameColumn, callback) {
+        displayTableOnGraph: function(table, nameColumn, type, callback) {
             db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
+                type,
             );
             context.waitDelay(callback);
         },
@@ -519,13 +515,15 @@ var getContext = function(display, infos) {
                     params: ['Block', 'String','String', 'String'],
                     params_names: ['table', 'nameColumn', 'longitudeColumn', 'latitudeColumn'],
                 },
+                { name: 'displayTableOnGraph',
+                    params: ['Block', 'String', 'GraphType'],
+                    params_names: ['table', 'nameColumn', 'type'],
+                },
+            ],
+            texts: [
                 { name: 'printConsole',
                     params: ['String'],
                     params_names: ['text'],
-                },
-                { name: 'displayTableOnGraph',
-                    params: ['Block', 'String'],
-                    params_names: ['table', 'nameColumn'],
                 },
             ]
         }
@@ -536,8 +534,13 @@ var getContext = function(display, infos) {
         'String': { bType: 'input_value', vType: 'text', fName: 'TEXT', defVal: '' },
         'Block': { bType: 'input_value', fName: 'BLOCK', defVal: '' },
         'SortOrder': { bType: 'field_dropdown', defVal: 'asc', options: [
-            [strings.constantLabel.asc, 'asc'],
-            [strings.constantLabel.desc, 'desc']
+                [strings.constantLabel.asc, 'asc'],
+                [strings.constantLabel.desc, 'desc']
+        ]},
+        'GraphType': { bType: 'field_dropdown', defVal: 'line', options: [
+                [strings.constantLabel.line, 'line'],
+                [strings.constantLabel.bar, 'bar'],
+                [strings.constantLabel.plot, 'plot']
         ]},
         'JoinType': { bType: 'field_dropdown', defVal: 'inner', options: [
             [strings.constantLabel.inner, 'inner'],

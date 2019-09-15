@@ -81,6 +81,13 @@ var importableModules = function () {
       'skulpt_stdlib': {src: modulesPath+"ext/skulpt/skulpt-stdlib.js", id: "skulpt_stdlib"},
       'skulpt_debugger': {src: modulesPath+"ext/skulpt/debugger.js", id: "skulpt_debugger"},
 
+      'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
+      'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
+      'database_css': {type: "stylesheet", src: modulesPath+"/pemFioi/database/styles.css", id: "database_css"},
+
+      'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
+      'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
+
       // Quiz task
       'quiz_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz/quizStyles-0.1.css", id: "quiz_styles"},
       'quiz': {src: modulesPath+"/pemFioi/quiz/quiz.js", id: "quiz"},
