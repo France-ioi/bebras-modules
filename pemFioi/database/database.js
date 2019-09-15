@@ -38,6 +38,7 @@ function DatabaseHelper(options) {
     }
     var last_renderer = null;
     var last_table = null;
+    var last_type = 'line';
 
     this.hide = function() {
         renderers.html.hide();
@@ -60,10 +61,11 @@ function DatabaseHelper(options) {
         last_renderer = 'map';
     };
 
-    this.displayTableOnGraph = function(table) {
+    this.displayTableOnGraph = function(table, type) {
         last_table = table;
+        last_type = type;
         this.hide();
-        renderers.graph.displayTable(table);
+        renderers.graph.displayTable(table, type);
         last_renderer = 'graph';
     };
 
@@ -81,7 +83,10 @@ function DatabaseHelper(options) {
         if(last_table.params().records.length < reference_table.params().records.length) {
             return 'some_results_missing';
         }
-        var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
+        if (last_renderer === 'graph')
+            var valid_all = renderers[last_renderer].displayTable(last_table,last_type, reference_table);
+        else
+            var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
         if(!valid_all) {
             return 'incorrect_results';
         }
@@ -360,7 +365,21 @@ function TableRendererGraph(options) {
             context.lineTo(options.width,options.height);
             context.lineTo(0,options.height);
         };
-        this.point = function(x,xMax,y,yMin,yMax) {context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));};
+        this.line_to = function(x,xMax,y,yMin,yMax) {context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));};
+        this.plot = function(x,xMax,y,yMin,yMax) {
+            context.moveTo(options.width * x / xMax - 3,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.lineTo(options.width * x / xMax + 3,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.moveTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)) - 3);
+            context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)) + 3);};
+        this.bar = function(x,xMax,y,yMin,yMax) {
+            context.moveTo(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.lineTo(options.width * (x+0.9) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.lineTo(options.width * (x+0.9) / xMax,options.height);
+            context.lineTo(options.width * (x+0.1) / xMax,options.height);
+            context.lineTo(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.fillStyle = "#D0D0D0";
+            context.fillRect(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)),options.width * 0.8 / xMax,((y-yMin)*(options.height)/(yMax-yMin)));
+        };
         this.show = function() {context.stroke();};
 
         var canvas = document.createElement('canvas');
@@ -375,7 +394,7 @@ function TableRendererGraph(options) {
     }
 
     // interface
-    this.displayTable = function(table, reference_table) {
+    this.displayTable = function(table, type, reference_table) {
         renderer.clear();
         var rows = table.params().records;
 
@@ -391,12 +410,33 @@ function TableRendererGraph(options) {
             if (yMax < row[0]) {yMax = row[0];}
             if (yMin > row[0]) {yMin = row[0];}
         }
-        for(i=0; row=rows[i]; i++) {
-            if(reference_rows) {
-                valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
-            }
-            valid_all = valid_all && valid_value;
-            renderer.point(i,rows.length-1,row[0],yMin,yMax);
+        switch (type) {
+            case 'bar':
+                for(i=0; row=rows[i]; i++) {
+                    if(reference_rows) {
+                        valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+                    }
+                    valid_all = valid_all && valid_value;
+                    renderer.bar(i,rows.length,row[0],yMin,yMax);
+                }
+                break;
+            case 'plot':
+                for(i=0; row=rows[i]; i++) {
+                    if(reference_rows) {
+                        valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+                    }
+                    valid_all = valid_all && valid_value;
+                    renderer.plot(i+0.5,rows.length,row[0],yMin,yMax);
+                }
+                break;
+            default: //case 'line'
+                for(i=0; row=rows[i]; i++) {
+                    if(reference_rows) {
+                        valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+                    }
+                    valid_all = valid_all && valid_value;
+                    renderer.line_to(i,rows.length-1,row[0],yMin,yMax);
+                }
         }
         renderer.show();
         container.show();
