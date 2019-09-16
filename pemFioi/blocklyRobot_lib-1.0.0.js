@@ -1778,6 +1778,7 @@ var getContext = function(display, infos, curLevel) {
            count: 200,
            type: "paint"
          },
+         ignoreBag: true,
          backgroundColor: "#ffbf5e",
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 3 },
