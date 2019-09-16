@@ -1782,7 +1782,7 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 3 },
             initialPaint: { num: 2, color: "#2e1de5", side: 60, isPaint: true, zOrder: 1 },
-            marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
+            marker: { num: 3, img: "marker.png", side: 60, isContainer: true, containerFilter: function(item) {return item.type === "paint";}, zOrder: 0 },
             marker_white: { num: 4, img: "marker_white.png", isContainer: true, isFake: true, side: 60, zOrder: 0 },
             paint: { color: "#2e1de5", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { side: 60, zOrder: 2 },
