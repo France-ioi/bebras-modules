@@ -90,13 +90,6 @@ function getUrlParameter(sParam) {
 window.forcedLevel = getUrlParameter("level");
 
 function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) { 
-   if (window.forcedLevel !== undefined) {
-      if (window.forcedLevel) {
-         levels = null;
-      }
-   }
-  
-   
    // Create a subTask instance, possibly operating on an existing object.
    function createTask(displayFlag) {
       var subTask = {};
@@ -168,10 +161,18 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    task.load = function(views, callback) {
       hasJustLoaded = true;
       platform.getTaskParams(null, null, function(taskParams) {
+         if(taskParams.options && taskParams.options.level) {
+            window.forcedLevel = taskParams.options.level;
+         }
+         if(window.forcedLevel) {
+            levels = null;
+         }
+
          mainTask = createTask(true);
          mainTask.taskParams = taskParams;
          mainTaskParams = taskParams;
          task.displayedSubTask = mainTask;
+
          if(levels || mainTask.assumeLevels) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
