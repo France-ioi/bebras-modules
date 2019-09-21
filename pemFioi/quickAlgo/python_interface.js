@@ -459,14 +459,44 @@ function LogicController(nbTestCases, maxInstructions) {
 
       var availableConsts = [];
 
+      // Display a list for the simpleHtml version
+      function displaySimpleList(elemList) {
+        var html = '';
+        if(window.quickAlgoResponsive && elemList.length > 9) {
+          // Dropdown mode
+          html  = '<div class="pythonIntroSelect">';
+          html += '<select>';
+          for(var i=0 ; i < elemList.length; i++) {
+            var elem = elemList[i];
+            html += '<option' + (elem.desc ? ' data-desc="' + elem.desc.replace('"', '&quot;') + '"' : '') + '>';
+            html += (typeof elem == 'string' ? elem : elem.func);
+            html += '</option>';
+          }
+          html += '</select>';
+          html += '<div class="pythonIntroSelectBtn"><span class="fas fa-clone"></span></div>';
+          html += '<span class="pythonIntroSelectDesc">' + (elemList[0].desc || '') + '</span>';
+          html += '</div>';
+        } else {
+          // Normal mode
+          for(var i=0 ; i < elemList.length; i++) {
+            var elem = elemList[i];
+            if(i > 0) { html += ', '; }
+            html += '<code>' + (typeof elem == 'string' ? elem : elem.func) + '</code>';
+          }
+        }
+        return html;
+      };
+
       // Generate list of functions available
       var simpleElements = [];
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
-          var blockDesc = '', funcProto = '';
+          var blockDesc = '', funcProto = '', blockHelp = '';
           if (this._mainContext.docGenerator) {
             blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock]);
+            funcProto = blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
+            blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
           } else {
             var blockName = blockList[iBlock];
             blockDesc = this._mainContext.strings.description[blockName];
@@ -476,12 +506,12 @@ function LogicController(nbTestCases, maxInstructions) {
             } else if (blockDesc.indexOf('</code>') < 0) {
               var funcProtoEnd = blockDesc.indexOf(')') + 1;
               funcProto = blockDesc.substring(0, funcProtoEnd);
-              blockDesc = '<code>' + funcProto + '</code>' + blockDesc.substring(funcProtoEnd);
+              blockHelp = blockDesc.substring(funcProtoEnd);
+              blockDesc = '<code>' + funcProto + '</code>' + blockHelp;
             }
           }
-          funcProto = funcProto || blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
           fullHtml += '<li>' + blockDesc + '</li>';
-          simpleElements.push(funcProto);
+          simpleElements.push({func: funcProto, desc: blockHelp});
         }
 
         // Handle constants as well
@@ -496,13 +526,13 @@ function LogicController(nbTestCases, maxInstructions) {
           }
         }
       }
-      simpleHtml += '<code>' + simpleElements.join('</code>, <code>') + '</code>.';
+      simpleHtml += displaySimpleList(simpleElements);
       fullHtml += '</ul>';
     }
 
     if(availableConsts.length) {
       fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
-      simpleHtml += '<br />Constantes disponibles : <code>' + availableConsts.join('</code>, <code>') + '</code>.';
+      simpleHtml += '<br />Constantes disponibles : ' + displaySimpleList(availableConsts);
     }
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
@@ -539,7 +569,7 @@ function LogicController(nbTestCases, maxInstructions) {
     var pflAllowed = processForbiddenList(pflInfos.allowed, true);
     processForbiddenList(pflInfos.forbidden, false);
     if(pflAllowed.length) {
-      simpleHtml += '<br />Mots-clés autorisés : <code>' + pflAllowed.join('</code>, <code>') + '</code>.';
+      simpleHtml += '<br />Mots-clés autorisés : ' + displaySimpleList(pflAllowed);
     }
 
     if(pflInfos.allowed.indexOf('var_assign') > -1) {
@@ -559,7 +589,7 @@ function LogicController(nbTestCases, maxInstructions) {
         $('.pythonIntroBtn').hide();
     }
 
-    $('.pythonIntroSimple code, .pythonIntroFull code').each(function() {
+    $('.pythonIntroSimple code, .pythonIntroSimple option, .pythonIntroFull code').each(function() {
       var elem = $(this);
       var txt = elem.text();
       var pIdx = txt.indexOf('+');
@@ -581,6 +611,17 @@ function LogicController(nbTestCases, maxInstructions) {
         controller._aceEditor.insert(this.getAttribute('data-code'));
         controller._aceEditor.focus();
       }
+    });
+    $('.pythonIntroSelectBtn').on('click', function() {
+      var code = $(this).parent().find('option:selected').attr('data-code');
+      if(controller._aceEditor) {
+        controller._aceEditor.insert(code);
+        controller._aceEditor.focus();
+      }
+    });
+    $('.pythonIntroSelect select').on('change', function() {
+      var desc = $(this).find('option:selected').attr('data-desc');
+      $(this).parent().find('.pythonIntroSelectDesc').html(desc || "");
     });
   };
 

@@ -7,7 +7,7 @@ html {
   -ms-touch-action: manipulation;
   touch-action: manipulation;
 }
-body {
+body, select {
   font-size: 12px;
   position: relative;
   overflow-x: hidden;
@@ -15,7 +15,7 @@ body {
   color: #9b9b9b;
 }
 @media screen and (min-width: 1024px) {
-  body {
+  body, select {
     font-size: 16px;
   }
 }
@@ -1606,6 +1606,24 @@ button.showLongIntro .icon {
   color: #4D87CE;
   font-weight: bold;
   text-decoration: none;
+}
+.pythonIntroSelect {
+  display: inline-block;
+}
+.pythonIntroSelectBtn {
+  display: inline-block;
+}
+.pythonIntroSelectBtn span {
+  cursor: pointer;
+  padding: 0px 4px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 24px;
+  width: 24px;
+  text-align: center;
+  color: #fff;
+  background-color: #4a90e2;
+  margin: 0px 4px;
 }
 .panel-heading {
   display: -webkit-box;
