@@ -110,8 +110,8 @@ button:disabled {
 
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #editorMenu {
     width: 250px;
     right: -250px;
@@ -172,8 +172,8 @@ button:disabled {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #editorMenu .editorActions {
     height: auto;
   }
@@ -194,7 +194,8 @@ button:disabled {
   font-size: 32px;
 }
 @media /* Landscape mobiles */
-  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
+  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
   #editorMenu .editorActions {
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
@@ -316,7 +317,8 @@ p {
 
 @media /* Mobiles */
   screen and (max-width: 767.9px) and (orientation: portrait),
-  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
+  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
   .mode-player #taskContent {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -358,7 +360,8 @@ p {
 }
 
 @media /* Landscape mobiles */
-  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
+  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
 
   #taskContent {
     background-color: #fff;
@@ -500,7 +503,7 @@ p {
   }
 }
 @media /* Tablets landscape and desktop */
-  screen and (min-width: 855px) and (orientation: landscape) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape) {
   #introGrid {
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
@@ -684,8 +687,8 @@ p {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #testSelector .tabs .testTab {
     line-height: 36px;
   }
@@ -745,7 +748,7 @@ p {
   }
 }
 @media /* Some tablets and desktop */
-  screen and (min-width: 855px) {
+  screen and (min-width: 855px) and (min-height: 450px) {
   #introGrid .icon.displaySpeedSlider,
   #introGrid .icon.hideSpeedSlider {
     display: none;
@@ -784,8 +787,8 @@ p {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   .speedCursor {
     width: 100%;
   }
@@ -923,8 +926,8 @@ p {
 
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #introGrid .speedControls {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -952,7 +955,7 @@ p {
   }
 }
 @media /* Tablets landscape and desktop */
-  screen and (min-width: 855px) and (orientation: landscape) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape) {
   #introGrid .playerControls .icon {
     margin-right: 15px;
   }
@@ -978,8 +981,8 @@ body.fullscreen #taskToolbar {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #blocklyLibContent {
     width: auto;
     -webkit-box-flex: 1;
@@ -1038,6 +1041,7 @@ body.fullscreen #taskToolbar {
 }
 @media /* landscape mobiles, tablets and desktop */
   screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
+  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape),
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
@@ -1212,8 +1216,8 @@ body.fullscreen #taskToolbar {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
 /* Hide task toolbar for tablets and desktop,
   but keep element as it is used to calculate other elements position in JS */
   #taskToolbar {
@@ -1348,7 +1352,8 @@ body.fullscreen #taskToolbar {
 }
 @media /* Mobiles */
   screen and (max-width: 767.9px) and (orientation: portrait),
-  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape) {
+  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
+  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
   .errorMessage {
     box-shadow: 0px 0px 0 2px #fff;
   }
@@ -1571,8 +1576,8 @@ button.showLongIntro .icon {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   button.showLongIntro {
     display: block;
   }
@@ -1596,8 +1601,8 @@ button.showLongIntro .icon {
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
-  screen and (min-width: 855px) and (orientation: landscape),
-  screen and (min-width: 1025px) {
+  screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape),
+  screen and (min-width: 1025px) and (min-height: 450px) {
   #taskIntro .long {
     display: none;
   }

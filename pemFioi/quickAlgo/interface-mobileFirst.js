@@ -298,7 +298,7 @@ var quickAlgoInterface = {
         var taskIntroMaxHeight = this.options.introMaxHeight ? this.options.introMaxHeight : '33%';
         $('head').append('' +
             '<style id="quickAlgoInterface">' +
-            '@media screen and (min-width: 855px) and (orientation: landscape) { #taskIntro { max-height: '+taskIntroMaxHeight+'; }}' +
+            '@media screen and (min-width: 855px) and (min-height: 450px) and (orientation: landscape) { #taskIntro { max-height: '+taskIntroMaxHeight+'; }}' +
             '</style>');
     },
 
