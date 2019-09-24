@@ -24,8 +24,13 @@ function DatabaseHelper(options) {
         map_lng_left: 0,
         map_lng_right: 0,
         map_lat_top: 0,
-        map_lat_bottom: 0
+        map_lat_bottom: 0,
 
+        //graph renderer
+        margin_x:40,
+        margin_y:40,
+        graph_width:360,
+        graph_height:360,
     }
 
     var options = Object.assign(defaults, options || {})
@@ -76,19 +81,19 @@ function DatabaseHelper(options) {
 
     this.validateResult = function(reference_table) {
         this.hide();
-        //FIXME la last table stockée est celle sui ne contient que namecolumn dans graph, ou nam let et lng dans Map, ca n'a pas de sens de refuser une table trop complete ??
+        //FIXME la last table stockée est celle qui ne contient que namecolumn dans graph, ou nam lat et lng dans Map, ca n'a pas de sens de refuser une table trop complete ??
         //if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
         //    return 'incorrect_results';
         //}
-        if(last_table.params().records.length < reference_table.params().records.length) {
-            return 'some_results_missing';
-        }
         if (last_renderer === 'graph')
             var valid_all = renderers[last_renderer].displayTable(last_table,last_type, reference_table);
         else
             var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
         if(!valid_all) {
             return 'incorrect_results';
+        }
+        if(last_table.params().records.length < reference_table.params().records.length) {
+            return 'some_results_missing';
         }
         return true;
     };
@@ -358,27 +363,39 @@ function TableRendererGraph(options) {
             context.fillStyle = rgba(options.background_color, 1);
             context.fillRect(0, 0, options.width, options.height)
         };
-        this.init = function() {
+        this.init = function(yName,yMin,yMax) {
             context.beginPath();
-            context.moveTo(0,0);
-            context.lineTo(0,options.height);
-            context.lineTo(options.width,options.height);
-            context.lineTo(0,options.height);
+            context.moveTo(options.margin_x,0);
+            context.lineTo(options.margin_x,options.graph_height);
+            context.lineTo(options.margin_x+options.graph_width,options.graph_height);
+
+            context.strokeText(yName, options.margin_x+15, 10);
+            context.strokeText("index", options.margin_x+options.graph_width-20, options.graph_height-5);
+
+            context.strokeText(yMax, 15, options.graph_height*0.06 + options.font_size/2);
+            context.moveTo(options.margin_x-5,options.graph_height*0.06);
+            context.lineTo(options.margin_x+5,options.graph_height*0.06);
+            context.strokeText(yMin, 15, options.graph_height*0.94 + options.font_size/2);
+            context.moveTo(options.margin_x-5,options.graph_height*0.94);
+            context.lineTo(options.margin_x+5,options.graph_height*0.94);
+
+            context.moveTo(options.margin_x,options.graph_height);
         };
-        this.line_to = function(x,xMax,y,yMin,yMax) {context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));};
+        this.line_to = function(x,xMax,y,yMin,yMax) {context.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));};
         this.plot = function(x,xMax,y,yMin,yMax) {
-            context.moveTo(options.width * x / xMax - 3,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
-            context.lineTo(options.width * x / xMax + 3,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
-            context.moveTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)) - 3);
-            context.lineTo(options.width * x / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)) + 3);};
+            context.moveTo(options.margin_x+(options.graph_width * x / xMax - 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.lineTo(options.margin_x+(options.graph_width * x / xMax + 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.moveTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) - 3);
+            context.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) + 3);
+        };
         this.bar = function(x,xMax,y,yMin,yMax) {
-            context.moveTo(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
-            context.lineTo(options.width * (x+0.9) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
-            context.lineTo(options.width * (x+0.9) / xMax,options.height);
-            context.lineTo(options.width * (x+0.1) / xMax,options.height);
-            context.lineTo(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)));
+            context.moveTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height);
+            context.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height);
+            context.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
             context.fillStyle = "#D0D0D0";
-            context.fillRect(options.width * (x+0.1) / xMax,options.height-((y-yMin)*(options.height)/(yMax-yMin)),options.width * 0.8 / xMax,((y-yMin)*(options.height)/(yMax-yMin)));
+            context.fillRect(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)),options.graph_width * 0.8 / xMax,((y-yMin)*(options.graph_height)/(yMax-yMin)));
         };
         this.show = function() {context.stroke();};
 
@@ -403,13 +420,17 @@ function TableRendererGraph(options) {
 
         var reference_rows = reference_table ? reference_table.params().records : null;
 
-        renderer.init();
         var yMin = rows[0][0];
         var yMax = rows[0][0];
         for(var i=0, row; row=rows[i]; i++) {
             if (yMax < row[0]) {yMax = row[0];}
             if (yMin > row[0]) {yMin = row[0];}
         }
+        var marginY = Math.ceil((yMax-yMin)*0.05);
+
+        renderer.init("Y",yMin,yMax);
+        yMin = Number(yMin) - marginY;
+        yMax = Number(yMax) + marginY;
         switch (type) {
             case 'bar':
                 for(i=0; row=rows[i]; i++) {

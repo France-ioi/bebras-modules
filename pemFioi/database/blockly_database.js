@@ -17,7 +17,7 @@ var getContext = function(display, infos) {
                 sortByFunction: 'sortByFunction(%1, %2)',
                 selectColumns: 'selectColumns(%1, %2)',
                 joinTables: 'joinTables(%1, %2, %3, %4, %5)',
-                displayTable: 'displayTable(%1, %2)',
+                displayTable: 'displayTable(%1)',
                 updateWhere: 'updateWhere(%1, %2, %3)',
                 insertRecord: 'insertRecord(%1, %2)',
                 unionTables: 'unionTables(%1, %2)',
@@ -112,7 +112,7 @@ var getContext = function(display, infos) {
                 sortByFunction: 'sortByFunction(%1, %2)',
                 selectColumns: 'selectColumns(%1, %2)',
                 joinTables: 'joinTables(%1, %2, %3, %4, %5)',
-                displayTable: 'displayTable(%1, %2)',
+                displayTable: 'displayTable(%1)',
                 updateWhere: 'updateWhere(%1, %2, %3)',
                 insertRecord: 'insertRecord(%1, %2)',
                 unionTables: 'unionTables(%1, %2)',
@@ -371,14 +371,8 @@ var getContext = function(display, infos) {
             context.waitDelay(callback, table1.join(column1, table2, column2, type));
         },
 
-        displayTable: function(table, columns, callback) {
-            if(columns) {
-                db_helper.displayTable(
-                    table.selectColumns(Array.from(columns))
-                )
-            } else {
-                db_helper.displayTable(table);
-            }
+        displayTable: function(table, callback) {
+            db_helper.displayTable(table);
             context.waitDelay(callback);
         },
 
@@ -464,7 +458,7 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'getColumn',
-                    params: ['String', 'String'],
+                    params: ['Block', 'String'],
                     params_names: ['record', 'columnName'],
                     yieldsValue: true
                 },
@@ -479,7 +473,7 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'selectColumns',
-                    params: ['Block', 'String'],
+                    params: ['Block', 'Block'],
                     params_names: ['table', 'columns'],
                     yieldsValue: true
                 },
@@ -504,8 +498,8 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'displayTable',
-                    params: ['Block', 'Number'],
-                    params_names: ['table', 'columns'],
+                    params: ['Block'],
+                    params_names: ['table'],
                 },
                 { name: 'displayRecord',
                     params: ['Block'],
