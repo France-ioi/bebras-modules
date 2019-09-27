@@ -1,5 +1,5 @@
 function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gridTop, defaultLineAttr) {
-   self = this;
+   var self = this;
    this.raphaelID = raphaelID;
    this.paper = paper;
    this.rows = rows;
