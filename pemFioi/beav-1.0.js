@@ -387,3 +387,13 @@ Beav.Task.scoreInterpolate = function(minScore, maxScore, minResult, maxResult, 
    return Math.round(minScore + (maxScore - minScore) * (result - minResult) / (maxResult - minResult));
 };
 
+
+/**********************************************************************************/
+/* Geometry */
+
+Beav.Geometry = new Object();
+
+Beav.Geometry.distance = function(x1,y1,x2,y2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
+};
+
