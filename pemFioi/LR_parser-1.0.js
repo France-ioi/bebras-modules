@@ -2462,12 +2462,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.hoverOut = function(id) {
       return function() {
-         // if(Beav.Array.has(self.selectedSymbolIndices,id)){
-         //    return
-         // }else{
-         //    self.selectedSymbolIndices.push(id);
-         //    self.updateTreeSelection();
-         // }
+
       }
    };
 
@@ -2520,19 +2515,19 @@ function LR_Parser(settings,subTask,answer) {
       return selectedEl;
    };
 
-   this.getFurthestIndex = function(index,selectedIndices) {
-      var diff = 0;
-      var furthestIndex;
-      for(var i of selectedIndices){
-         var localDiff = Math.abs(i - index);
-         if(localDiff >= diff){
-            diff = localDiff;
-            furthestIndex = i;
-         }
-      }
-      // console.log(furthestIndex);
-      return furthestIndex;
-   };
+   // this.getFurthestIndex = function(index,selectedIndices) {
+   //    var diff = 0;
+   //    var furthestIndex;
+   //    for(var i of selectedIndices){
+   //       var localDiff = Math.abs(i - index);
+   //       if(localDiff >= diff){
+   //          diff = localDiff;
+   //          furthestIndex = i;
+   //       }
+   //    }
+   //    // console.log(furthestIndex);
+   //    return furthestIndex;
+   // };
 
    this.selectElement = function(el,selected){
       // console.log(el.symbol+" "+selected);
