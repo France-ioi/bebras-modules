@@ -249,14 +249,15 @@ var getContext = function(display, infos) {
         $('#btn_visu').click(function() {
             filename = $("#visualisation_tables option:selected").val();
             if (isNaN(filename)) {
-                quickAlgoInterface.context.database.loadTable(filename, function(table){
-                    quickAlgoInterface.context.database.displayTable(table,0,function(){/*do nothing*/})
-                })
+                var table = Table(task_tables[filename]);
+                db_helper.displayTable(table);
             }
             else {
-                quickAlgoInterface.context.database.loadTableFromCsv(filename, 0, function(table){
-                    quickAlgoInterface.context.database.displayTable(table,0,function(){/*do nothing*/})
-                })
+                var file = files.getFile(fileNumber - 1);
+                var types_arr = Array.from(types);
+                db_helper.loadCsv(file, types_arr, function(table) {
+                    db_helper.displayTable(table);
+                });
             }
         });
         $('.modal button.close').click(function() {
@@ -340,7 +341,9 @@ var getContext = function(display, infos) {
         },
 
         selectByFunction: function(table, filterFunction, callback) {
-            context.waitDelay(callback, table.selectByFunction(filterFunction));
+            table.selectByFunction(filterFunction, function(val) {
+                context.waitDelay(callback, val);
+            });
         },
 
         selectTopRows: function(table, amount, callback) {
@@ -360,7 +363,9 @@ var getContext = function(display, infos) {
         },
 
         sortByFunction: function(table, compareFunction, callback) {
-            context.waitDelay(callback, table.sortByFunction(compareFunction));
+            table.sortByFunction(compareFunction, function(val) {
+                context.waitDelay(callback, val);
+            });
         },
 
         selectColumns: function(table, columns, callback) {
@@ -448,7 +453,7 @@ var getContext = function(display, infos) {
                     yieldsValue: true
                 },
                 { name: 'selectByFunction',
-                    params: ['Block', 'String'],
+                    params: ['Block', 'Function'],
                     params_names: ['table', 'filterFunction'],
                     yieldsValue: true
                 },
