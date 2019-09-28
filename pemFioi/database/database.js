@@ -552,6 +552,35 @@ function Table(params) {
         });
     }
 
+    // Async quickSort, which can handle the compare function being a Promise
+    function quickSortAsync(arr, compare, cb) {
+        if(arr.length < 2) { cb(arr); return; }
+        var pivot = arr[0];
+
+        var leftArr = [], rightArr = [], curIdx = 1;
+        function divideArr() {
+            if(curIdx >= arr.length) {
+                quickSortAsync(leftArr, compare, function(lar) {
+                    quickSortAsync(rightArr, compare, function(rar) {
+                        cb(lar.concat([pivot], rar));
+                    });
+                });
+                return;
+            }
+
+            compare(pivot, arr[curIdx], function(c) {
+                if(c > 0) {
+                    leftArr.push(arr[curIdx]);
+                } else {
+                    rightArr.push(arr[curIdx]);
+                }
+                curIdx += 1;
+                divideArr();
+            });
+        }
+        divideArr();
+    }
+
 
     function formatColumn(value, idx) {
         if(value === null) {
@@ -665,12 +694,34 @@ function Table(params) {
         },
 
 
-        selectByFunction: function(filterFunction) {
+        selectByFunction: function(filterFunction, callback) {
             var res = cloneParams();
-            res.records = params.records.filter(function(row) {
-                return filterFunction(rowToObject(row));
-            })
-            return Table(res);
+            res.records = [];
+            function filterHandler(a, cb) {
+                var x = filterFunction(rowToObject(a));
+                if(x instanceof Promise) {
+                    x.then(cb);
+                } else {
+                    cb(x);
+                }
+            }
+
+            var curIdx = 0;
+            function filterRow() {
+                if(curIdx >= params.records.length) {
+                    callback(Table(res));
+                    return;
+                }
+                var row = params.records[curIdx];
+                filterHandler(row, function(val) {
+                    if(val) {
+                        res.records.push(row);
+                    }
+                    curIdx += 1;
+                    filterRow();
+                });
+            }
+            filterRow();
         },
 
 
@@ -687,15 +738,22 @@ function Table(params) {
         },
 
 
-        sortByFunction: function(compareFunction) {
+        sortByFunction: function(compareFunction, callback) {
             var res = cloneParams();
-            res.records = stableSort(params.records, function(a, b) {
-                return compareFunction(
-                    rowToObject(a),
-                    rowToObject(b)
-                );
+
+            function compareHandler(a, b, cb) {
+                var x = compareFunction(rowToObject(a), rowToObject(b));
+                if(x instanceof Promise) {
+                    x.then(cb);
+                } else {
+                    cb(x);
+                }
+            }
+
+            quickSortAsync(params.records, compareHandler, function(rec) {
+                res.records = rec;
+                callback(Table(res));
             });
-            return Table(res);
         },
 
 

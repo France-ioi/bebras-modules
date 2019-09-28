@@ -198,6 +198,18 @@ function PythonInterpreter(context, msgCallback) {
     // Convert Skulpt item to JavaScript
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
+    } else if(val instanceof Sk.builtin.func) {
+      return function() {
+        var args = [];
+        for(var i = 0; i < arguments.length; i++) {
+          args.push(that._createPrimitive(arguments[i]));
+        }
+        var retp = new Promise(function(resolve, reject) {
+          var p = Sk.misceval.asyncToPromise(function() { return val.tp$call(args); });
+          p.then(function(val) { resolve(that.skToJs(val)); });
+        });
+        return retp;
+      }
     } else {
       var retVal = val.v;
       if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
