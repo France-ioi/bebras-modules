@@ -29,7 +29,7 @@ function FilesRepository(options) {
                 '<p>' + options.strings.incompatible_browser + '</p>';
         }
         var html =
-            '<div id="files_repository_modal" class="modalWrapper">' +
+            '<div id="files_repository_modal" class="modalWrapper" style="display: none;">' +
                 '<div class="modal">' +
                     '<button type="button" class="btn close" onclick="$(`#files_repository_modal`).hide()">x</button>' +
                     '<p><b>' + options.strings.caption + '</b></p>' +
