@@ -1,4 +1,6 @@
-var getContext = function(display, infos) {
+var getContext = function(display, infos, curLevel) {
+
+    //console.log('getContext', curLevel)
 
     var language_strings = {
         en: {
@@ -85,7 +87,8 @@ var getContext = function(display, infos) {
                 table_not_found: 'Table not found: ',
                 file_not_found: 'CSV file not found: ',
                 incorrect_results: 'Incorrect results',
-                some_results_missing: 'Some results are missing'
+                some_results_missing: 'Some results are missing',
+                success: 'Success'
             },
             ui: {
                 'btn_files_repository': 'Add CSV files...',
@@ -181,7 +184,8 @@ var getContext = function(display, infos) {
                 table_not_found: 'Table non trouvée: ',
                 file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
-                some_results_missing: 'Il manque une partie des résultats'
+                some_results_missing: 'Il manque une partie des résultats',
+                success: 'Success'
             },
             ui: {
                 'btn_files_repository': 'Ajouter des CSV...',
@@ -306,6 +310,7 @@ var getContext = function(display, infos) {
             var status = db_helper.validateResult(table);
             if(status === true) {
                 context.success = true;
+                throw new strings.messages.success;
                 return;
             }
             context.success = false;

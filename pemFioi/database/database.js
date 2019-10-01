@@ -169,6 +169,21 @@ function TableRendererHtml(options) {
         return '';
     }
 
+
+
+    function isEqual(a, b, type) {
+        switch(type) {
+            case 'image':
+            case 'string':
+            case 'date':
+                return a == b;
+            case 'number':
+                return parseFloat(a) == parseFloat(b);
+        }
+        return false;
+    }
+
+
     this.displayTable = function(table, reference_table) {
         var html = '';
 
@@ -192,7 +207,7 @@ function TableRendererHtml(options) {
             for(var j=0; j<row.length; j++) {
                 var value = row[j];
                 if(reference_rows) {
-                    valid_value = reference_rows[i] && reference_rows[i][j] === value;
+                    valid_value = reference_rows[i] && isEqual(value, reference_rows[i][j], types[j]);
                 }
                 valid_all = valid_all && valid_value;
                 html +=
