@@ -2,6 +2,7 @@ function DatabaseHelper(options) {
 
     var defaults = {
         date_format: 'YYYY-MM-DD',
+        types: ['number', 'image', 'string', 'date'],
 
         csv_delimiter: ';',
         parent: document.body,
@@ -30,7 +31,7 @@ function DatabaseHelper(options) {
         margin_x:40,
         margin_y:40,
         graph_width:360,
-        graph_height:360,
+        graph_height:360
     }
 
     var options = Object.assign(defaults, options || {})
@@ -98,7 +99,27 @@ function DatabaseHelper(options) {
         return true;
     };
 
+
+    function validateColumnTypes(types) {
+        var invalid_types = [];
+        for(var i=0; i<types.length; i++) {
+            if(options.types.indexOf(types[i]) === -1) {
+                invalid_types.push(types[i]);
+            }
+        }
+        if(invalid_types.length == 0) {
+            return true;
+        }
+
+        throw new Error('Invalid column types: ' + invalid_types.join(', '));
+    }
+
+
     this.loadCsv = function(file, types, callback) {
+        if(!validateColumnTypes(types)) {
+            return;
+        }
+
         var reader = new FileReader();
         reader.onload = function(e) {
             var res = {
