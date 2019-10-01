@@ -336,6 +336,7 @@ function initBlocklyRunner(context, messageCallback) {
             }
 
             if(message.indexOf('undefined') != -1) {
+               console.error(e)
                message += '. ' + runner.strings.undefinedMsg;
             }
 
