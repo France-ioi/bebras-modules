@@ -247,10 +247,10 @@ function TableRendererMap(options) {
         this.clear = function() {
             var img = images.map.get();
             if(img) {
-                context.drawImage(img, 0, 0, options.width, options.height)
+                context2d.drawImage(img, 0, 0, options.width, options.height)
             } else {
-                context.fillStyle = rgba(options.background_color, 1);
-                context.fillRect(0, 0, options.width, options.height)
+                context2d.fillStyle = rgba(options.background_color, 1);
+                context2d.fillRect(0, 0, options.width, options.height)
             }
         }
 
@@ -263,19 +263,19 @@ function TableRendererMap(options) {
             var w = options.pin_scale * img.width;
             var h = options.pin_scale * img.height;
             if(img) {
-                context.drawImage(img, x - w * 0.5, y - h, w, h);
+                context2d.drawImage(img, x - w * 0.5, y - h, w, h);
             }
 
-            var tw = context.measureText(label).width + 2;
-            context.fillStyle = rgba(options.background_color, 1);
-            context.fillRect(
+            var tw = context2d.measureText(label).width + 2;
+            context2d.fillStyle = rgba(options.background_color, 1);
+            context2d.fillRect(
                 x - 0.5 * tw,
                 y,
                 tw,
                 options.font_size + 2
             );
-            context.fillStyle = rgba(valid ? options.text_color : options.mistake_color, 1);
-            context.fillText(label, x, y + 10)
+            context2d.fillStyle = rgba(valid ? options.text_color : options.mistake_color, 1);
+            context2d.fillText(label, x, y + 10)
 
         }
 
@@ -292,10 +292,10 @@ function TableRendererMap(options) {
         canvas.height = options.height;
 
         container.append($(canvas));
-        var context = canvas.getContext('2d');
+        var context2d = canvas.getContext('2d');
 
-        context.textAlign = 'center';
-        context.font = options.font_size + 'px sans-serif';
+        context2d.textAlign = 'center';
+        context2d.font = options.font_size + 'px sans-serif';
     }
 
     function validateLng(lng) {
@@ -360,54 +360,54 @@ function TableRendererGraph(options) {
             return 'rgba(' + colors.r + ',' + colors.g + ',' + colors.b + ',' + opacity + ')';
         }
         this.clear = function() {
-            context.fillStyle = rgba(options.background_color, 1);
-            context.fillRect(0, 0, options.width, options.height)
+            context2d.fillStyle = rgba(options.background_color, 1);
+            context2d.fillRect(0, 0, options.width, options.height)
         };
         this.init = function(yName,yMin,yMax) {
-            context.beginPath();
-            context.moveTo(options.margin_x,0);
-            context.lineTo(options.margin_x,options.graph_height);
-            context.lineTo(options.margin_x+options.graph_width,options.graph_height);
+            context2d.beginPath();
+            context2d.moveTo(options.margin_x,0);
+            context2d.lineTo(options.margin_x,options.graph_height);
+            context2d.lineTo(options.margin_x+options.graph_width,options.graph_height);
 
-            context.strokeText(yName, options.margin_x+15, 10);
-            context.strokeText("index", options.margin_x+options.graph_width-20, options.graph_height-5);
+            context2d.strokeText(yName, options.margin_x+15, 10);
+            context2d.strokeText("index", options.margin_x+options.graph_width-20, options.graph_height-5);
 
-            context.strokeText(yMax, 15, options.graph_height*0.06 + options.font_size/2);
-            context.moveTo(options.margin_x-5,options.graph_height*0.06);
-            context.lineTo(options.margin_x+5,options.graph_height*0.06);
-            context.strokeText(yMin, 15, options.graph_height*0.94 + options.font_size/2);
-            context.moveTo(options.margin_x-5,options.graph_height*0.94);
-            context.lineTo(options.margin_x+5,options.graph_height*0.94);
+            context2d.strokeText(yMax, 15, options.graph_height*0.06 + options.font_size/2);
+            context2d.moveTo(options.margin_x-5,options.graph_height*0.06);
+            context2d.lineTo(options.margin_x+5,options.graph_height*0.06);
+            context2d.strokeText(yMin, 15, options.graph_height*0.94 + options.font_size/2);
+            context2d.moveTo(options.margin_x-5,options.graph_height*0.94);
+            context2d.lineTo(options.margin_x+5,options.graph_height*0.94);
 
-            context.moveTo(options.margin_x,options.graph_height);
+            context2d.moveTo(options.margin_x,options.graph_height);
         };
-        this.line_to = function(x,xMax,y,yMin,yMax) {context.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));};
+        this.line_to = function(x,xMax,y,yMin,yMax) {context2d.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));};
         this.plot = function(x,xMax,y,yMin,yMax) {
-            context.moveTo(options.margin_x+(options.graph_width * x / xMax - 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context.lineTo(options.margin_x+(options.graph_width * x / xMax + 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context.moveTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) - 3);
-            context.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) + 3);
+            context2d.moveTo(options.margin_x+(options.graph_width * x / xMax - 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.lineTo(options.margin_x+(options.graph_width * x / xMax + 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.moveTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) - 3);
+            context2d.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) + 3);
         };
         this.bar = function(x,xMax,y,yMin,yMax) {
-            context.moveTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height);
-            context.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height);
-            context.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context.fillStyle = "#D0D0D0";
-            context.fillRect(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)),options.graph_width * 0.8 / xMax,((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.moveTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height);
+            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height);
+            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.fillStyle = "#D0D0D0";
+            context2d.fillRect(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)),options.graph_width * 0.8 / xMax,((y-yMin)*(options.graph_height)/(yMax-yMin)));
         };
-        this.show = function() {context.stroke();};
+        this.show = function() {context2d.stroke();};
 
         var canvas = document.createElement('canvas');
         canvas.width = options.width;
         canvas.height = options.height;
 
         container.append($(canvas));
-        var context = canvas.getContext('2d');
+        var context2d = canvas.getContext('2d');
 
-        context.textAlign = 'center';
-        context.font = options.font_size + 'px sans-serif';
+        context2d.textAlign = 'center';
+        context2d.font = options.font_size + 'px sans-serif';
     }
 
     // interface

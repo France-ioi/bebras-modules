@@ -218,7 +218,7 @@ var getContext = function(display, infos) {
 
         files = new FilesRepository({
             extensions: '.csv',
-            parent: $('#taskContent'),
+            parent: $('#grid'),
             strings: strings.ui.files_repository
         });
 
@@ -242,7 +242,7 @@ var getContext = function(display, infos) {
                 '<button class="btn btn-xs" style="float: right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
             '</div>';
 
-        $('#testSelector').prepend($(html));
+        $('#grid').prepend($(html));
         $('#btn_files').click(function() {
             files.show();
         });
@@ -377,7 +377,7 @@ var getContext = function(display, infos) {
         },
 
         displayTable: function(table, callback) {
-            db_helper.displayTable(table);
+            context.display && db_helper.displayTable(table);
             context.waitDelay(callback);
         },
 
@@ -404,24 +404,24 @@ var getContext = function(display, infos) {
                 return 'string';
             });
             var table = Table(res);
-            db_helper.displayTable(table);
+            context.display && db_helper.displayTable(table);
             context.waitDelay(callback);
         },
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
-            db_helper.displayTableOnMap(
+            context.display && db_helper.displayTableOnMap(
                 table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
             );
             context.waitDelay(callback);
         },
 
         printConsole: function(text, callback) {
-            db_helper.displayConsole(text);
+            context.display && db_helper.displayConsole(text);
             context.waitDelay(callback);
         },
 
         displayTableOnGraph: function(table, nameColumn, type, callback) {
-            db_helper.displayTableOnGraph(
+            context.display && db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
                 type,
             );
