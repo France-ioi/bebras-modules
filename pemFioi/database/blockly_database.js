@@ -251,9 +251,8 @@ var getContext = function(display, infos) {
                 db_helper.displayTable(table);
             }
             else {
-                var file = files.getFile(fileNumber - 1);
-                var types_arr = Array.from(types);
-                db_helper.loadCsv(file, types_arr, function(table) {
+                var file = files.getFile(filename - 1);
+                db_helper.loadCsv(file, [], function(table) {
                     db_helper.displayTable(table);
                 });
             }
