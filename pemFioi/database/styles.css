@@ -3,8 +3,7 @@
 }
 
 .database {
-    width: 400px;
-    height: 400px;
+    width: auto;
     overflow: auto;
 }
 
@@ -37,8 +36,7 @@
 
 /* console renderer */
 .console {
-    height:400px;
-    width:400px;
+    width: auto;
     overflow-x: hidden
 }
 .console .console_row {
