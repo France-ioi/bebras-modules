@@ -2,6 +2,19 @@
     height: 25px;
 }
 
+#visualisation_tables {
+    float: left;
+}
+
+#btn_visu {
+    float: left;
+}
+
+#btn_files {
+    float: right;
+}
+
+
 .database {
     width: 100%;
     overflow: auto;

@@ -234,12 +234,10 @@ var getContext = function(display, infos) {
         });
 
         var html =
-            '<div id="visualisation">' +
-                '<select name="visualisation_tables" style="width: 300px;" id="visualisation_tables">' + table_options + '</select>' +
-                '<button class="btn btn-xs" id="btn_visu">Visualiser</button>' +
-            '</div><br/>' +
             '<div id="database_controls">' +
-                '<button class="btn btn-xs" style="float: right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
+                '<select name="visualisation_tables" id="visualisation_tables">' + table_options + '</select>' +
+                '<button class="btn btn-default" id="btn_visu">Visualiser</button>' +
+                '<button class="btn btn-default" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
             '</div>';
 
         $('#grid').prepend($(html));
