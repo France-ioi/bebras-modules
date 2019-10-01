@@ -417,7 +417,7 @@ var getContext = function(display, infos, curLevel) {
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
             context.display && db_helper.displayTableOnMap(
-                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
+                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn])
             );
             context.waitDelay(callback);
         },
@@ -430,7 +430,7 @@ var getContext = function(display, infos, curLevel) {
         displayTableOnGraph: function(table, nameColumn, type, callback) {
             context.display && db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
-                type,
+                type
             );
             context.waitDelay(callback);
         },
