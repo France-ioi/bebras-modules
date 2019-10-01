@@ -284,7 +284,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                    } else {
                        block.blocklyJson.outputShape = Blockly.OUTPUT_SHAPE_HEXAGONAL;
                    }
-                   
+
                    if(typeof block.blocklyJson.colour == "undefined") {
                       block.blocklyJson.colour = Blockly.Colours.sensing.primary;
                       block.blocklyJson.colourSecondary = Blockly.Colours.sensing.secondary;
@@ -295,7 +295,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             else {
                block.blocklyJson.previousStatement = null;
                block.blocklyJson.nextStatement = null;
-               
+
                if(this.scratchMode) {
                    if(typeof block.blocklyJson.colour == "undefined") {
                       block.blocklyJson.colour = Blockly.Colours.motion.primary;
@@ -1550,7 +1550,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                      name: "controls_infiniteloop",
                      blocklyXml: "<block type='controls_infiniteloop'></block>",
                      excludedByDefault: true
-                  }   
+                  }
                ],
             input: [
                {
@@ -2009,7 +2009,6 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          mergeIntoArray(stdInclude.wholeCategories, taskStdInclude.wholeCategories || []);
          mergeIntoArray(stdInclude.singleBlocks, taskStdInclude.singleBlocks || []);
          mergeIntoArray(stdInclude.excludedBlocks, taskStdInclude.excludedBlocks || []);
-
          // Add block sets
          if(taskStdInclude.blockSets) {
             for(var iSet in taskStdInclude.blockSets) {
@@ -2056,11 +2055,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 blocks = blocks.blocks;
               }
 
+             var blockNames = [];
              for (var iBlock = 0; iBlock < blocks.length; iBlock++) {
                 if (!(blocks[iBlock].excludedByDefault) && !arrayContains(stdInclude.excludedBlocks, blocks[iBlock].name)) {
+                   blockNames.push(blocks[iBlock].name);
                    categoriesInfos[categoryName].blocksXml.push(blocks[iBlock].blocklyXml);
                 }
               }
+              this.addBlocksAllowed(blockNames);
             }
          }
 
@@ -2101,7 +2103,6 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                console.error('Task configuration error: groupByCategory must be activated for functions.');
             }
          }
-
          this.addBlocksAndCategories(singleBlocks, stdBlocks, categoriesInfos);
 
          // Handle variable blocks, which are normally automatically added with
