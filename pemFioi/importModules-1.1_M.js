@@ -27,6 +27,7 @@ var importableModules = function () {
       'randomGenerator-1.0': {src: modulesPath+"/pemFioi/randomGenerator-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/randomGenerator-1.0.js"},
       'simpleKeyboard-1.0': {src: modulesPath+"/pemFioi/simpleKeyboard-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/simpleKeyboard-1.0.js"},
       'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
+      'shape-paths': {src: modulesPath+"/pemFioi/shape-paths.js", id: "shape-paths"},
 
       'platform-pr': {classStr: "proxy module", src: modulesPath+"/integrationAPI.01/official/platform-pr.js", id: "http://www.france-ioi.org/modules/integrationAPI.01/official/platform-pr.js"},
       'buttonsAndMessages': {classStr: "stdButtonsAndMessages module", src: modulesPath+"/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js",  id: "http://www.france-ioi.org/modules/integrationAPI.01/installationAPI.01/pemFioi/buttonsAndMessages.js"},
