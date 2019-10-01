@@ -83,6 +83,7 @@ var getContext = function(display, infos) {
             },
             messages: {
                 table_not_found: 'Table not found: ',
+                file_not_found: 'CSV file not found: ',
                 incorrect_results: 'Incorrect results',
                 some_results_missing: 'Some results are missing'
             },
@@ -178,6 +179,7 @@ var getContext = function(display, infos) {
             },
             messages: {
                 table_not_found: 'Table non trouvée: ',
+                file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
                 some_results_missing: 'Il manque une partie des résultats'
             },
@@ -323,6 +325,9 @@ var getContext = function(display, infos) {
 
         loadTableFromCsv: function(fileNumber, types, callback) {
             var file = files.getFile(fileNumber - 1);
+            if(file === null) {
+                throw new Error(strings.messages.file_not_found + fileNumber);
+            }
             var types_arr = Array.from(types);
             db_helper.loadCsv(file, types_arr, function(table) {
                 context.waitDelay(callback, table);
