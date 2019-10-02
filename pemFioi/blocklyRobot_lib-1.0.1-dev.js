@@ -1574,8 +1574,8 @@ var getContext = function(display, infos, curLevel) {
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
       gems: {
-         backgroundColor: getGridOptions('gears', 'backgroundColor'),
-         itemTypes: getGridOptions('gears', 'itemTypes'),
+         backgroundColor: getGridOptions('gems', 'backgroundColor'),
+         itemTypes: getGridOptions('gems', 'itemTypes'),
          checkEndCondition: robotEndConditions.checkPickedAllWithdrawables
       },
       help: {
