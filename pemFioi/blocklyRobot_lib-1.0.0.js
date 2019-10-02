@@ -32,7 +32,7 @@ var getContext = function(display, infos, curLevel) {
         description: {}
       }
    };
-
+   
    var contextStrings = {
       none: {
          fr: {
@@ -314,7 +314,7 @@ var getContext = function(display, infos, curLevel) {
             },
             startingBlockName: "Program of the robot"
          },
-
+         
          es: {
             label: {
                row: "fila del robot",
@@ -512,7 +512,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "surConteneur",
                onNumber: "surNombre",
                onWritable: "surTableau",
-               onLauncher: "surLanceur",
+               onLauncher: "surLanceur", 
                writeNumber: "ecrireNombre",
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
@@ -582,7 +582,7 @@ var getContext = function(display, infos, curLevel) {
                successReachExit: "Bravo, ¡su robot ha recuperado el cofre!",
                failureReachExit: "Su robot se perdió en el camino."
             }
-         }
+         }  
       },
       cards: {
          fr: {
@@ -632,7 +632,7 @@ var getContext = function(display, infos, curLevel) {
       chticode_abs: {
          fr: {
             label: {
-
+               
             },
              messages: {
                successPickedAllWithdrawables: "Bravo, votre robot a réussi la mission !",
@@ -641,7 +641,7 @@ var getContext = function(display, infos, curLevel) {
          },
          en: {
             label: {
-
+               
             },
              messages: {
                successPickedAllWithdrawables: "Congratulations, your robot succeeded this mission!",
@@ -651,7 +651,7 @@ var getContext = function(display, infos, curLevel) {
 
          es: {
             label: {
-
+               
             },
              messages: {
                successPickedAllWithdrawables: "Bravo, ¡su robot ha completado la misión!",
@@ -662,7 +662,7 @@ var getContext = function(display, infos, curLevel) {
       chticode_rel: {
          fr: {
             label: {
-
+               
             },
              messages: {
                successReachExit: "Bravo, votre robot a atteint la case verte !",
@@ -671,7 +671,7 @@ var getContext = function(display, infos, curLevel) {
          },
          en: {
             label: {
-
+               
             },
              messages: {
                successReachExit: "Congratulations, your robot reached the green cells!",
@@ -681,7 +681,7 @@ var getContext = function(display, infos, curLevel) {
 
          es: {
             label: {
-
+               
             },
              messages: {
                successReachExit: "Bravo, ¡su robot llegó a la casilla verde!",
@@ -740,7 +740,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Aún hay conos en lugares incorrectos."
             }
          }
-      },
+      },   
       flowers: {
          fr: {
             label: {
@@ -796,7 +796,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "¡Aún hay tierra sin flores!"
             }
          }
-      },
+      },   
       course: {
          fr: {
             messages: {
@@ -927,7 +927,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
                failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
                failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
-            }
+            } 
          }
       },
       marbles: {
@@ -943,7 +943,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "deposerBille",
                onObject: "surBille",
                onContainer: "surTrou",
-            },
+            },   
             messages: {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
@@ -966,7 +966,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "soltarBola",
                onObject: "sobreBola",
                onContainer: "sobreAgujero",
-            },
+            },   
             messages: {
                emptyBag: "¡El robot no carga ninguna bola!",
                tooManyObjects: "¡El robot ya está cargando una bola!",
@@ -1039,7 +1039,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Su robot no ha pintado todas las casillas marcadas.",
                failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
              }
-         }
+         }  
       },
       rocket: {
          fr: {
@@ -1081,7 +1081,7 @@ var getContext = function(display, infos, curLevel) {
                pushableInFront: "caisseDevant",
                obstacleInFront: "obstacleDevant",
                readNumber: "nombreSurCase"
-            },
+            },   
             messages: {
                successContainersFilled: "Bravo, les caisses sont bien rangées !",
                failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
@@ -1105,7 +1105,7 @@ var getContext = function(display, infos, curLevel) {
                pushableInFront: "cajaAdelante",
                obstacleInFront: "obstáculoAdelante",
                readNumber: "númeroEnCasilla"
-            },
+            },   
             messages: {
                successContainersFilled: "Bravo, ¡las cajas están bien ordenadas!",
                failureContainersFilled: "Aún hay cajas que no están en su lugar.",
@@ -1116,1894 +1116,8 @@ var getContext = function(display, infos, curLevel) {
          }
       },
    };
-
-
-   if(window['json'] && window['json']['assetsPath']) {
-      imgPrefix = window['json']['assetsPath'];
-   } else {
-      var iconSrc = $("img[src$='icon.png']").attr("src");
-      var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
-   }
-
-   if(infos.newBlocks == undefined)
-      infos.newBlocks = [];
-   if(infos.maxFallAltitude == undefined)
-      infos.maxFallAltitude = 2;
-
-   var loadContext = function(name) {
-      for(var language in contextStrings[name]) {
-         var ctx = contextStrings[name][language];
-         for(var type in ctx) {
-            if((typeof ctx[type]) === "string") {
-               localLanguageStrings[language][type] = ctx[type];
-            }
-            else {
-               if(localLanguageStrings[language][type] == undefined)
-                  localLanguageStrings[language][type] = {};
-               for(var line in ctx[type]) {
-                  localLanguageStrings[language][type][line] = ctx[type][line];
-               }
-            }
-         }
-      }
-
-      for(var param in getContextParams()[name]) {
-         if(infos[param] === undefined || param == "newBlocks") {
-            infos[param] = getContextParams()[name][param];
-         }
-      }
-   };
-
-   loadContext("none");
-   if(infos.contextType != undefined) {
-      loadContext(infos.contextType);
-   }
-
-   infos.newBlocks.push({
-      name: "row",
-      type: "sensors",
-      block: { name: "row", yieldsValue: 'int' },
-      func: function(callback) {
-         this.callCallback(callback, 1 + this.getRobot().row);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "col",
-      type: "sensors",
-      block: { name: "col", yieldsValue: 'int' },
-      func: function(callback) {
-         this.callCallback(callback, 1 + this.getRobot().col);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "wait",
-      type: "actions",
-      block: { name: "wait" },
-      func: function(callback) {
-         this.advanceTime(1);
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "north",
-      type: "actions",
-      block: { name: "north" },
-      func: function(callback) {
-         this.north(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "south",
-      type: "actions",
-      block: { name: "south" },
-      func: function(callback) {
-         this.south(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "east",
-      type: "actions",
-      block: { name: "east" },
-      func: function(callback) {
-         this.east(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "west",
-      type: "actions",
-      block: { name: "west" },
-      func: function(callback) {
-         this.west(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "left",
-      type: "actions",
-      block: { name: "left" },
-      func: function(callback) {
-         this.turnLeft(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "right",
-      type: "actions",
-      block: { name: "right" },
-      func: function(callback) {
-         this.turnRight(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "turnAround",
-      type: "actions",
-      block: { name: "turnAround" },
-      func: function(callback) {
-         this.turnAround(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "forward",
-      type: "actions",
-      block: { name: "forward" },
-      func: function(callback) {
-         this.forward(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "backwards",
-      type: "actions",
-      block: { name: "backwards" },
-      func: function(callback) {
-         this.backwards(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "jump",
-      type: "actions",
-      block: { name: "jump" },
-      func: function(callback) {
-         this.jump(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleInFront",
-      type: "sensors",
-      block: { name: "obstacleInFront", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.obstacleInFront());
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleEast",
-      type: "sensors",
-      block: { name: "obstacleEast", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleWest",
-      type: "sensors",
-      block: { name: "obstacleWest", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleNorth",
-      type: "sensors",
-      block: { name: "obstacleNorth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleSouth",
-      type: "sensors",
-      block: { name: "obstacleSouth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleRight",
-      type: "sensors",
-      block: { name: "obstacleRight", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         var coords = this.coordsInFront(1);
-         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "obstacleLeft",
-      type: "sensors",
-      block: { name: "obstacleLeft", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         var coords = this.coordsInFront(3);
-         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "gridEdgeEast",
-      type: "sensors",
-      block: { name: "gridEdgeEast", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "gridEdgeWest",
-      type: "sensors",
-      block: { name: "gridEdgeWest", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "gridEdgeNorth",
-      type: "sensors",
-      block: { name: "gridEdgeNorth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "gridEdgeSouth",
-      type: "sensors",
-      block: { name: "gridEdgeSouth", yieldsValue: true },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "platformInFront",
-      type: "sensors",
-      block: { name: "platformInFront", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.platformInFront());
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "platformAbove",
-      type: "sensors",
-      block: { name: "platformAbove", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.platformAbove());
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "withdrawObject",
-      type: "actions",
-      block: { name: "withdrawObject" },
-      func: function(callback) {
-         this.withdraw();
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "dropObject",
-      type: "actions",
-      block: { name: "dropObject" },
-      func: function(callback) {
-         this.drop();
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onObject",
-      type: "sensors",
-      block: { name: "onObject", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onContainer",
-      type: "sensors",
-      block: { name: "onContainer", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onNumber",
-      type: "sensors",
-      block: { name: "onNumber", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
-      }
-   });
-
-	infos.newBlocks.push({
-      name: "onLauncher",
-      type: "sensors",
-      block: { name: "onLauncher", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onWritable",
-      type: "sensors",
-      block: { name: "onWritable", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "writeNumber",
-      type: "actions",
-      block: { name: "writeNumber", params: [null] },
-      func: function(value, callback) {
-         var robot = this.getRobot();
-         this.writeNumber(robot.row, robot.col, value);
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "readNumber",
-      type: "sensors",
-      block: { name: "readNumber", yieldsValue: 'int' },
-      func: function(callback) {
-         var robot = this.getRobot();
-         this.callCallback(callback, this.readNumber(robot.row, robot.col));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "pushObject",
-      type: "actions",
-      block: { name: "pushObject" },
-      func: function(callback) {
-         this.pushObject(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "pushableInFront",
-      type: "sensors",
-      block: { name: "pushableInFront", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "dropInFront",
-      type: "actions",
-      block: { name: "dropInFront" },
-      func: function(callback) {
-         this.drop(1, this.coordsInFront());
-         this.callCallback(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "dropAbove",
-      type: "actions",
-      block: { name: "dropAbove" },
-      func: function(callback) {
-         this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
-         this.callCallback(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "shoot_noShadow",
-      type: "actions",
-      block: {
-         name: "shoot_noShadow",
-         params: [null]
-      },
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-
-               robot.element.toFront();
-            }
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-         }
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "shoot",
-      type: "actions",
-      block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-
-               robot.element.toFront();
-            }
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-         }
-         this.waitDelay(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "shootCondition_noShadow",
-      type: "actions",
-      block: {
-         name: "shootCondition_noShadow",
-         params: [null],
-         yieldsValue: true
-      },
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-
-               robot.element.toFront();
-            }
-            this.waitDelay(callback, retour);
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-            this.callCallback(callback);
-         }
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "shootCondition",
-      type: "actions",
-      block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
-                              "  <value name='PARAM_0'>" +
-                              "    <shadow type='math_number'>" +
-                              "      <field name='NUM'>0</field>" +
-                              "    </shadow>" +
-                              "  </value>" +
-                              "</block>"},
-      func: function(value, callback) {
-         if((typeof value) == "function") {
-            this.callCallback(value);
-            return;
-         }
-
-         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
-            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
-            if(this.display) {
-               var robot = this.getRobot();
-               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
-                  return obj.isLaser === true;
-               });
-
-               if(lasers.length != 0) {
-                  lasers[0].element.toFront();
-               }
-
-               robot.element.toFront();
-            }
-            this.waitDelay(callback, retour);
-         }
-         else {
-            throw(window.languageStrings.messages.failureLaser);
-            this.callCallback(callback);
-         }
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "connect",
-      type: "actions",
-      block: { name: "connect" },
-      func: function(callback) {
-         this.connect();
-         this.callCallback(callback);
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onMale",
-      type: "sensors",
-      block: { name: "onMale", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
-      }
-   });
-
-   infos.newBlocks.push({
-      name: "onFemale",
-      type: "sensors",
-      block: { name: "onFemale", yieldsValue: true },
-      func: function(callback) {
-         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
-      }
-   });
-
-   var context = quickAlgoContext(display, infos);
-   context.robot = {};
-   context.customBlocks = {
-      robot: {
-         actions: [],
-         sensors: []
-      }
-   };
-
-   for(var command in infos.newBlocks) {
-      cmd = infos.newBlocks[command];
-      context.customBlocks.robot[cmd.type].push(cmd.block);
-      if(cmd.strings) {
-         for(var language in cmd.strings) {
-            for(var type in cmd.strings[language]) {
-               localLanguageStrings[language][type][cmd.name] = cmd.strings[language][type];
-            }
-         }
-      }
-      if(cmd.func) {
-         context.robot[cmd.name] = cmd.func.bind(context);
-      }
-   }
-
-   var strings = context.setLocalLanguageStrings(localLanguageStrings);
-
-   function replaceStringsRec(source, dest) {
-
-      if((typeof source != "object") || (typeof dest != "object")) {
-         return;
-      }
-      for(var key1 in source) {
-         if(dest[key1] != undefined) {
-            if(typeof dest[key1] == "object") {
-               replaceStringsRec(source[key1], dest[key1]);
-            }
-            else {
-               dest[key1] = source[key1];
-            }
-         }
-      }
-   }
-
-   if(infos.languageStrings != undefined) {
-      replaceStringsRec(infos.languageStrings.blocklyRobot_lib, strings);
-   }
-
-   var cells = [];
-   var colsLabels = [];
-   var rowsLabels = [];
-   var scale = 1;
-   var paper;
-
-   if(infos.leftMargin === undefined) {
-      infos.leftMargin = 10;
-   }
-   if(infos.rightMargin === undefined) {
-      infos.rightMargin = 10;
-   }
-   if(infos.bottomMargin === undefined) {
-      infos.bottomMargin = 10;
-   }
-   if(infos.topMargin === undefined) {
-      if(infos.showLabels) {
-         infos.topMargin = 10;
-      }
-      else {
-         infos.topMargin = infos.cellSide / 2;
-      }
-   }
-   if(infos.showLabels) {
-      infos.leftMargin += infos.cellSide;
-      infos.topMargin += infos.cellSide;
-   }
-
-   switch(infos.blocklyColourTheme) {
-      case "bwinf":
-         context.provideBlocklyColours = function() {
-            return {
-               categories: {
-                  logic: 100,
-                  loops: 180,
-                  math: 220,
-                  text: 250,
-                  lists: 60,
-                  colour: 310,
-                  variables: 340,
-                  functions: 20,
-                  actions: 260,
-                  sensors : 340,
-                  _default: 280
-               },
-               blocks: {}
-            };
-         }
-         break;
-      default:
-   }
-
-   context.reset = function(gridInfos) {
-      if(gridInfos) {
-         context.tiles = gridInfos.tiles;
-         context.initItems = gridInfos.initItems;
-         context.nbRows = context.tiles.length;
-         context.nbCols = context.tiles[0].length;
-      }
-      context.nbPlatforms = infos.nbPlatforms;
-
-      context.items = [];
-      context.multicell_items = [];
-
-      context.last_connect = undefined;
-      context.wires = [];
-
-      context.lost = false;
-      context.success = false;
-      context.nbMoves = 0;
-      context.time = 0;
-      context.bag = [];
-
-      if(infos.bagInit != undefined) {
-         for(var i = 0;i < infos.bagInit.count;i++) {
-            var item = {};
-
-            var initItem = infos.itemTypes[infos.bagInit.type];
-
-            item.type = infos.bagInit.type;
-            item.side = 0;
-            item.offsetX = 0;
-            item.offsetY = 0;
-            item.nbStates = 1;
-            item.zOrder = 0;
-            for(var property in initItem) {
-               item[property] = initItem[property];
-            }
-
-            context.bag.push(item);
-         }
-      }
-
-      if(context.display) {
-         this.delayFactory.destroyAll();
-         this.raphaelFactory.destroyAll();
-         if(paper !== undefined)
-            paper.remove();
-         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
-         resetBoard();
-         resetItems();
-         context.updateScale();
-         $("#nbMoves").html(context.nbMoves);
-      }
-      else {
-         resetItems();
-      }
-   };
-
-   context.unload = function() {
-      if(context.display && paper != null) {
-         paper.remove();
-      }
-   };
-
-   var itemAttributes = function(item) {
-      var itemType = infos.itemTypes[item.type];
-      var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
-      var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
-      var xClip = x;
-      if(item.dir != undefined) {
-         var dirToState = [0, 2, 4, 6];
-         x = x - (dirToState[item.dir] * item.side * scale);
-      }
-      var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
-      if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
-         x += item.side * scale / 2;
-         y += item.side * scale / 2;
-      }
-
-      var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
-      return ret;
-   }
-
-   var resetBoard = function() {
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         cells[iRow] = [];
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
-            if(context.tiles[iRow][iCol] == 0)
-               cells[iRow][iCol].attr({'stroke-width': '0'});
-            if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
-               cells[iRow][iCol].attr({'fill': infos.backgroundColor});
-            if(infos.noBorders && context.tiles[iRow][iCol] != 0)
-               cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
-         }
-      }
-      if(infos.showLabels) {
-         for(var iRow = 0;iRow < context.nbRows;iRow++) {
-            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
-         }
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
-         }
-      }
-   };
-
-   var resetItem = function(initItem, redisplay) {
-      if(redisplay === undefined)
-         redisplay = true;
-      var item = {};
-      context.items.push(item);
-      for(var property in initItem) {
-         item[property] = initItem[property];
-      }
-
-      item.side = 0;
-      item.offsetX = 0;
-      item.offsetY = 0;
-      item.nbStates = 1;
-      item.zOrder = 0;
-      for(var property in infos.itemTypes[item.type]) {
-         item[property] = infos.itemTypes[item.type][property];
-      }
-
-      if(context.display && redisplay) {
-         redisplayItem(item);
-      }
-   };
-
-   var resetItems = function() {
-      context.items = [];
-      var itemTypeByNum = {};
-      for(var type in infos.itemTypes) {
-         var itemType = infos.itemTypes[type];
-         if(itemType.num != undefined) {
-            itemTypeByNum[itemType.num] = type;
-         }
-      }
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            var itemTypeNum = context.tiles[iRow][iCol];
-            if(itemTypeByNum[itemTypeNum] != undefined) {
-               resetItem({
-                  row: iRow,
-                  col: iCol,
-                  type: itemTypeByNum[itemTypeNum]
-               }, false);
-            }
-         }
-      }
-      for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
-         resetItem(context.initItems[iItem], false);
-      }
-
-      if(context.display)
-         redisplayAllItems();
-   };
-
-   var resetItemsZOrder = function(row, col) {
-      var cellItems = [];
-      for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
-         var item = context.items[iItem];
-         if((item.row == row) && (item.col == col)) {
-            cellItems.push(item);
-         }
-      }
-      cellItems.sort(function(itemA, itemB) {
-         if(itemA.zOrder < itemB.zOrder) {
-            return -1;
-         }
-         if(itemA.zOrder > itemB.zOrder) {
-            return 1;
-         }
-         return 0;
-      });
-      for(var iItem = 0;iItem < cellItems.length;iItem++) {
-         if(cellItems[iItem].element)
-            cellItems[iItem].element.toFront();
-      }
-   };
-
-   var redisplayItem = function(item, resetZOrder) {
-      if(context.display !== true)
-         return;
-      if(resetZOrder === undefined)
-         resetZOrder = true;
-
-      if(item.element !== undefined) {
-         item.element.remove();
-      }
-      var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
-      var y = (infos.cellSide * item.row + infos.topMargin) * scale;
-      var itemType = infos.itemTypes[item.type];
-      if(item.img) {
-         item.element = paper.image(imgPrefix + item.img, x, y, item.side * item.nbStates * scale, item.side * scale);
-      }
-      else if(item.value !== undefined) {
-         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
-      }
-      else if(item.color !== undefined) {
-         item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
-      }
-      if(item.element !== undefined)
-         item.element.attr(itemAttributes(item));
-      if(resetZOrder)
-         resetItemsZOrder(item.row, item.col);
-   };
-
-   context.updateScale = function() {
-      if(!context.display) {
-         return;
-      }
-      if(paper == null) {
-         return;
-      }
-
-      if(window.quickAlgoResponsive) {
-         var areaWidth = Math.max(200, $('#grid').width()-24);
-         var areaHeight = Math.max(150, $('#grid').height()-24);
-      } else {
-         var areaWidth = 400;
-         var areaHeight = 600;
-      }
-      var newCellSide = 0;
-      if(context.nbCols && context.nbRows) {
-         var marginAsCols = infos.leftMargin / infos.cellSide;
-         var marginAsRows = infos.topMargin / infos.cellSide;
-         newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
-      }
-      scale = newCellSide / infos.cellSide;
-      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
-
-      for(var iRow = 0;iRow < context.nbRows;iRow++) {
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            if(cells[iRow][iCol] === undefined)
-               continue;
-            var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
-            var y = (infos.cellSide * iRow + infos.topMargin) * scale;
-            cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
-         }
-      }
-      if(infos.showLabels) {
-         for(var iRow = 0;iRow < context.nbRows;iRow++) {
-            var x = (infos.leftMargin - infos.cellSide / 2) * scale;
-            var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
-            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
-         }
-         for(var iCol = 0;iCol < context.nbCols;iCol++) {
-            var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
-            var y = (infos.topMargin - infos.cellSide / 2) * scale;
-            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
-         }
-      }
-
-      redisplayAllItems();
-   };
-
-   var redisplayAllItems = function() {
-      if(context.display !== true)
-         return;
-      for(var iItem = 0;iItem < context.items.length;iItem++) {
-         var item = context.items[iItem];
-         redisplayItem(item, false);
-         if(item.element !== undefined)
-            item.element.attr(itemAttributes(item));
-      }
-
-      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
-         var item = context.multicell_items[iItem];
-         item.redisplay();
-      }
-
-      var cellItems = [];
-
-      for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
-         var item = context.items[iItem];
-         cellItems.push(item);
-      }
-
-      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
-         var item = context.multicell_items[iItem];
-         cellItems.push(item);
-      }
-
-      cellItems.sort(function(itemA, itemB) {
-         if(itemA.zOrder < itemB.zOrder) {
-            return -1;
-         }
-         if(itemA.zOrder > itemB.zOrder) {
-            return 1;
-         }
-         return 0;
-      });
-      for(var iItem = 0;iItem < cellItems.length;iItem++) {
-         if(cellItems[iItem].element !== undefined)
-            cellItems[iItem].element.toFront();
-      }
-   };
-
-   context.advanceTime = function(epsilon) {
-      var items = [];
-      for(var id in context.items) {
-         items.push(context.items[id]);
-      }
-
-      for(var iTime = 0;iTime < epsilon;iTime++) {
-         context.time++;
-         for(var id in items) {
-            if(items[id] !== undefined && items[id].action !== undefined) {
-               items[id].action.bind(context)(items[id], context.time);
-            }
-         }
-
-         var robot = this.getRobot();
-         if(this.hasOn(robot.row, robot.col, function(item) { return item.isProjectile === true; })) {
-            throw(context.strings.messages.failureProjectile);
-         }
-      }
-   };
-
-   context.getRobotId = function() {
-      for(var id in context.items) {
-         if(context.items[id].isRobot != undefined) {
-            return id;
-         }
-      }
-      return undefined;
-   };
-
-   context.getRobot = function() {
-      return context.items[context.getRobotId()];
-   };
-
-   context.getInfo = function(name) {
-      return infos[name];
-   };
-
-   context.setInfo = function(name, value) {
-      infos[name] = value;
-   };
-
-   context.hasOn = function(row, col, filter) {
-      for(var id in context.items) {
-         var item = context.items[id];
-         if(item.row == row && item.col == col && filter(item)) {
-            return true;
-         }
-      }
-      return false;
-   };
-
-   context.setIndexes = function() {
-      for(var id in context.items) {
-         var item = context.items[id];
-         item.index = id;
-      }
-   }
-
-   context.getItemsOn = function(row, col, filter) {
-      if(filter === undefined) {
-         filter = function(obj) { return true; };
-      }
-      var selected = [];
-      for(var id in context.items) {
-         var item = context.items[id];
-         if(item.row == row && item.col == col && filter(item)) {
-            selected.push(item);
-         }
-      }
-      return selected;
-   };
-
-   context.isOn = function(filter) {
-      var item = context.getRobot();
-      return context.hasOn(item.row, item.col, filter);
-   };
-
-   context.isInFront = function(filter) {
-      var coords = context.coordsInFront();
-      return context.hasOn(coords.row, coords.col, filter);
-   };
-
-   context.isInGrid = function(row, col) {
-      if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
-         return false;
-      }
-      if (context.tiles[row][col] == 0) {
-         return false;
-      }
-      return true;
-   };
-
-   context.tryToBeOn = function(row, col) {
-      if(!context.isInGrid(row, col)) {
-         if(infos.ignoreInvalidMoves)
-            return false;
-         throw(strings.messages.leavesGrid);
-      }
-
-      if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
-         if(infos.ignoreInvalidMoves)
-            return false;
-         throw(strings.messages.obstacle);
-      }
-
-      if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
-         if(infos.ignoreInvalidMoves)
-            return false;
-         throw(strings.messages.failureProjectile);
-      }
-      return true;
-   };
-
-   context.coordsInFront = function(dDir, mult) {
-      if(dDir === undefined)
-         dDir = 0;
-      if(mult === undefined)
-         mult = 1;
-      var item = context.getRobot();
-      var lookDir = (item.dir + dDir + 4) % 4;
-      var delta = [[0,1],[1,0],[0,-1],[-1,0]];
-      return {
-         row: item.row + delta[lookDir][0] * mult,
-         col: item.col + delta[lookDir][1] * mult
-      };
-   };
-
-   context.isCrossing = function(wireA, wireB) {
-      function crossProduct(pointA, pointB, pointC) {
-         return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
-      }
-
-      function onLine(segment, point) {
-         return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
-          && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
-      }
-
-      if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
-         return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
-      }
-      return (crossProduct(wireA[0], wireA[1], wireB[0])
-      * crossProduct(wireA[0], wireA[1], wireB[1]) <= 0) &&
-      (crossProduct(wireB[0], wireB[1], wireA[0])
-      * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
-   }
-
-   context.moveRobot = function(newRow, newCol, newDir, callback) {
-      var iRobot = context.getRobotId();
-      var item = context.items[iRobot];
-      if (context.display)
-         item.element.toFront();
-      var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
-
-      if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
-         if(item.dir !== undefined)
-            item.dir = newDir;
-         if(context.display) {
-            var attr = itemAttributes(item);
-            item.element.attr(attr);
-         }
-      }
-
-      if(item.dir !== undefined)
-         item.dir = newDir;
-
-      item.row = newRow;
-      item.col = newCol;
-
-      context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
-
-      if(context.display) {
-         if(animate) {
-            attr = itemAttributes(item);
-            context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
-         }
-         else {
-            attr = itemAttributes(item);
-            if(infos.actionDelay > 0) {
-               context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
-                  item.element.attr(attr);
-               }, infos.actionDelay / 2);
-            } else {
-               item.element.attr(attr);
-            }
-         }
-         $("#nbMoves").html(context.nbMoves);
-      }
-
-      context.advanceTime(1);
-      context.waitDelay(callback);
-   };
-
-   context.moveItem = function(item, newRow, newCol) {
-      var animate = (item.row != newRow) || (item.col != newCol);
-      var robot = context.getRobot();
-      if(context.display) {
-         resetItemsZOrder(newRow, newCol);
-         resetItemsZOrder(item.row, item.col);
-         resetItemsZOrder(robot.row, robot.col);
-      }
-      item.row = newRow;
-      item.col = newCol;
-
-      if(context.display) {
-         if(animate) {
-            attr = itemAttributes(item);
-            context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
-         }
-         else {
-            attr = itemAttributes(item);
-            if(infos.actionDelay > 0) {
-               context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
-                  item.element.attr(attr);
-               }, infos.actionDelay / 2);
-            } else {
-               item.element.attr(attr);
-            }
-         }
-      }
-   };
-
-   context.moveProjectile = function(item) {
-      if(!context.isInGrid(item.row + 1, item.col)) {
-         context.destroy(item);
-      }
-
-      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
-         context.destroy(item);
-         context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
-         return;
-      }
-
-      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
-         context.destroy(item);
-         context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
-         return;
-      }
-
-      context.moveItem(item, item.row + 1, item.col);
-      return;
-   };
-
-   context.destroy = function(item) {
-      context.setIndexes();
-      context.items.splice(item.index, 1);
-
-      if(context.display) {
-         item.element.remove();
-      }
-   };
-
-   context.fall = function(item, row, col, callback) {
-      var startRow = row;
-      var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
-
-      while(context.isInGrid(row + 1, col) && platforms.length == 0) {
-         row++;
-         platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
-      }
-
-      if(!context.isInGrid(row + 1, col)) {
-         throw(context.strings.messages.falls);
-      }
-
-      if(row - startRow > infos.maxFallAltitude) {
-         throw(context.strings.messages.willFallAndCrash);
-      }
-      context.nbMoves++;
-      context.moveRobot(row, col, item.dir, callback);
-   };
-
-   context.jump = function(callback) {
-      if(!infos.hasGravity) {
-         throw("Error: can't jump without gravity");
-      }
-
-      var item = context.getRobot();
-      if(!context.isInGrid(item.row - 1, item.col)) {
-         throw(context.strings.messages.jumpOutsideGrid);
-      }
-      var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
-      if(obstacle.length > 0) {
-         throw(context.strings.messages.jumpObstacleBlocking);
-      }
-      var platforms = context.getItemsOn(item.row - 1, item.col, function(obj) { return obj.isObstacle === true; });
-      if(platforms.length == 0) {
-         throw(context.strings.messages.jumpNoPlatform);
-      }
-      context.nbMoves++;
-      context.moveRobot(item.row - 2, item.col, item.dir, callback);
-   };
-
-   context.withdraw = function(filter, errorWhenEmpty) {
-      if(filter === undefined) {
-         filter = function(obj) { return true; };
-      }
-      if(errorWhenEmpty === undefined) {
-         errorWhenEmpty = true;
-      }
-      var item = context.getRobot();
-      var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
-      if(withdrawables.length == 0) {
-         if(errorWhenEmpty)
-            throw(context.strings.messages.nothingToPickUp);
-         return;
-      }
-
-      if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
-         throw(context.strings.messages.tooManyObjects);
-      }
-
-      var withdrawable = withdrawables[0];
-      context.setIndexes();
-      context.items.splice(withdrawable.index, 1);
-      context.bag.push(withdrawable);
-
-      if(context.display) {
-         if (infos.actionDelay > 0) {
-            context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
-               withdrawable.element.remove();
-            }, infos.actionDelay);
-         } else {
-            withdrawable.element.remove();
-         }
-      }
-   };
-
-   context.drop = function(count, coords, filter) {
-      if(count === undefined) {
-         count = 1;
-      }
-      if(filter === undefined) {
-         filter = function(obj) { return true; };
-      }
-      if(coords == undefined) {
-         var item = context.getRobot();
-         coords = {row: item.row, col: item.col};
-      }
-
-      for(var i = 0;i < count;i++) {
-         if(context.bag.length == 0) {
-            throw(context.strings.messages.emptyBag);
-         }
-
-         var object = context.bag.pop();
-         object.row = coords.row;
-         object.col = coords.col;
-         var itemsOn = context.getItemsOn(coords.row, coords.col);
-         var maxi = object.zOrder;
-         for(var item in itemsOn) {
-            if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
-               maxi = itemsOn[item].zOrder;
-            }
-         }
-         object.zOrder = maxi + 0.000001;
-         resetItem(object);
-      }
-   };
-
-   context.dropObject = function(object, coords) {
-      if(coords == undefined) {
-         var item = context.getRobot();
-         coords = {row: item.row, col: item.col};
-      }
-
-      if(!context.isInGrid(coords.row, coords.col)) {
-         throw(window.languageStrings.messages.failureDropOutside);
-         return;
-      }
-
-      object.row = coords.row;
-      object.col = coords.col;
-      var itemsOn = context.getItemsOn(coords.row, coords.col);
-      var maxi = object.zOrder;
-      if(maxi === undefined) {
-         maxi = 0;
-      }
-      for(var item in itemsOn) {
-         if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
-            maxi = itemsOn[item].zOrder;
-         }
-      }
-      resetItem(object);
-   };
-
-   context.turnLeft = function(callback) {
-      var robot = context.getRobot();
-      context.moveRobot(robot.row, robot.col, (robot.dir + 3) % 4, callback);
-   };
-
-   context.turnRight = function(callback) {
-      var robot = context.getRobot();
-      context.moveRobot(robot.row, robot.col, (robot.dir + 1) % 4, callback);
-   };
-
-   context.turnAround = function(callback) {
-      var robot = context.getRobot();
-      context.moveRobot(robot.row, robot.col, (robot.dir + 2) % 4, callback);
-   };
-
-   context.forward = function(callback) {
-      var robot = context.getRobot();
-      var coords = context.coordsInFront();
-      if(!context.tryToBeOn(coords.row, coords.col)) {
-         context.waitDelay(callback);
-      }
-      if(infos.hasGravity) {
-         context.fall(robot, coords.row, coords.col, callback);
-      }
-      else {
-         context.nbMoves++;
-         context.moveRobot(coords.row, coords.col, robot.dir, callback);
-      }
-   };
-
-   context.backwards = function(callback) {
-      var robot = context.getRobot();
-      var coords = context.coordsInFront(2);
-      if(!context.tryToBeOn(coords.row, coords.col)) {
-         context.waitDelay(callback);
-      }
-      if(infos.hasGravity) {
-         context.fall(robot, coords.row, coords.col, callback);
-      }
-      else {
-         context.nbMoves++;
-         context.moveRobot(coords.row, coords.col, robot.dir, callback);
-      }
-   };
-
-   context.north = function(callback) {
-      var item = context.getRobot();
-      if(!context.tryToBeOn(item.row - 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
-         context.nbMoves++;
-         context.moveRobot(item.row - 1, item.col, 3, callback);
-      }
-   };
-
-   context.south = function(callback) {
-      var item = context.getRobot();
-      if(!context.tryToBeOn(item.row + 1, item.col)) {
-         context.waitDelay(callback);
-      } else {
-         context.nbMoves++;
-         context.moveRobot(item.row + 1, item.col, 1, callback);
-      }
-   };
-
-   context.east = function(callback) {
-      var item = context.getRobot();
-      if(!context.tryToBeOn(item.row, item.col + 1)) {
-         context.waitDelay(callback);
-      } else {
-         context.nbMoves++;
-         context.moveRobot(item.row, item.col + 1, 0, callback);
-      }
-   };
-
-   context.west = function(callback) {
-      var item = context.getRobot();
-      if(!context.tryToBeOn(item.row, item.col - 1)) {
-         context.waitDelay(callback);
-      } else {
-         context.nbMoves++;
-         context.moveRobot(item.row, item.col - 1, 2, callback);
-      }
-   };
-
-   context.obstacleInFront = function() {
-      return context.isInFront(function(obj) { return obj.isObstacle === true; });
-   };
-
-   context.platformInFront = function() {
-      var coords = context.coordsInFront();
-      return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
-   };
-
-   context.platformAbove = function() {
-      var robot = context.getRobot();
-      return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
-   };
-
-   context.writeNumber = function(row, col, value) {
-      var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
-
-      if(numbers.length == 0) {
-         throw(strings.messages.failureWriteHere);
-      }
-
-      var number = numbers[0];
-      number.value = value;
-      if(context.display) {
-         redisplayItem(number);
-      }
-   };
-
-   context.readNumber = function(row, col) {
-      var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
-
-      if(numbers.length == 0) {
-         throw(strings.messages.failureReadHere);
-      }
-
-      return parseInt(numbers[0].value);
-   };
-
-   context.pushObject = function(callback) {
-      var robot = context.getRobot();
-      var coords = context.coordsInFront();
-
-      var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
-
-      if(items.length == 0) {
-         throw(strings.messages.failureNothingToPush);
-      }
-
-      var coordsAfter = context.coordsInFront(0, 2);
-
-      if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
-         throw(strings.messages.failureWhilePushing);
-      if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
-         throw(strings.messages.failureWhilePushing);
-      if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
-         throw(strings.messages.failureWhilePushing);
-
-      context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
-
-      context.forward(callback);
-   };
-
-   context.shoot = function(lig, col, dir) {
-      dir = dir % 8;
-      var dirs = [
-         [-1, 0],
-         [-1, 1],
-         [0, 1],
-         [1, 1],
-         [1, 0],
-         [1, -1],
-         [0, -1],
-         [-1, -1]
-      ];
-
-      var lights = context.getItemsOn(lig, col, function(obj) {
-         return obj.isLight === true;
-      });
-
-      for(var light in lights) {
-         lights[light].state = 1;
-         lights[light].img = lights[light].states[lights[light].state];
-         if(context.display)
-            redisplayItem(lights[light]);
-      }
-
-      var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
-      var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
-
-      var taille = infos.cellSide;
-
-      var findRobot = false;
-
-      var plig = lig + dirs[dir][0];
-      var pcol = col + dirs[dir][1];
-      if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
-         taille /= 2;
-
-         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
-      }
-      else {
-         var pdir = dir;
-         var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
-         if(mirrors.length != 0) {
-            pdir = mirrors[0].mirrorFunction(dir);
-         }
-
-         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
-
-         if(context.shoot(plig, pcol, pdir)) {
-            findRobot = true;
-         }
-      }
-
-      var dx = (taille * dirs[dir][1]) * scale;
-      var dy = (taille * dirs[dir][0]) * scale;
-
-      if(context.display && paper != undefined) {
-         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
-
-         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
-
-         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
-            segment.remove();
-         }, infos.actionDelay * 2);
-      }
-
-      return findRobot;
-   };
-
-   context.connect = function() {
-      var robot = context.getRobot();
-
-      var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
-
-      if(plugs.length == 0) {
-         throw(strings.messages.failureNoPlug);
-      }
-
-      var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
-
-      if(wires.length != 0) {
-         throw(strings.messages.failureAlreadyWired);
-      }
-
-      this.dropObject({type: "wire", zOrder: 1});
-
-      if(this.last_connect !== undefined) {
-         if(this.last_connect.plugType + plugs[0].plugType != 0)
-            throw(strings.messages.failureWrongPlugType);
-
-         function segmentLength(segment) {
-            return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
-         }
-
-         var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
-
-         if(segmentLength(wire) > infos.maxWireLength) {
-            throw(strings.messages.failureWireTooLong);
-         }
-
-         var totalLength = segmentLength(wire);
-         for(var iWire = 0;iWire < this.wires.length;iWire++) {
-            if(this.isCrossing(wire, this.wires[iWire])) {
-               throw(strings.messages.failureWireCrossing);
-            }
-            totalLength += segmentLength(this.wires[iWire]);
-         }
-
-         if(totalLength > infos.maxTotalLength) {
-            throw(strings.messages.failureTotalLengthExceeded);
-         }
-
-         this.wires.push(wire);
-
-         var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
-         var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
-         var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
-         var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
-
-         var wire_item = {zOrder: 2};
-         wire_item.redisplay = function() {
-            wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
-            wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
-         };
-
-         this.multicell_items.push(wire_item);
-         redisplayAllItems();
-
-         this.last_connect = undefined;
-      }
-      else {
-         this.last_connect = plugs[0];
-      }
-   };
-
-   return context;
-};
-
-var robotEndConditions = {
-   checkReachExit: function(context, lastTurn) {
-      var robot = context.getRobot();
-      if(context.isOn(function(obj) { return obj.isExit === true; })) {
-         context.success = true;
-         throw(window.languageStrings.messages.successReachExit);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
-      }
-   },
-   checkPickedAllWithdrawables: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-               solved = false;
-            }
-         }
-      }
-
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successPickedAllWithdrawables);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-      }
-   },
-   checkPlugsWired: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
-               solved = false;
-            }
-         }
-      }
-
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successPlugsWired);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failurePlugsWired);
-      }
-   },
-   checkContainersFilled: function(context, lastTurn) {
-      var solved = true;
-
-      var messages = [
-         window.languageStrings.messages.failureContainersFilled,
-         window.languageStrings.messages.failureContainersFilledLess,
-         window.languageStrings.messages.failureContainersFilledBag
-      ];
-      var message = 2;
-      if (context.infos.maxMoves != undefined) {
-         if (context.nbMoves > context.infos.maxMoves) {
-            context.success = false;
-            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
-         }
-      }
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
-            if(containers.length != 0) {
-               var container = containers[0];
-               if(container.containerSize == undefined && container.containerFilter == undefined) {
-                  container.containerSize = 1;
-               }
-               var filter;
-               if(container.containerFilter == undefined)
-                  filter = function(obj) { return obj.isWithdrawable === true; };
-               else
-                  filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
-
-               if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
-                  solved = false;
-                  message = Math.min(message, 1);
-               }
-               else if(context.getItemsOn(row, col, filter).length == 0) {
-                  solved = false;
-                  message = Math.min(message, 0);
-               }
-
-               if(container.containerFilter != undefined) {
-                  if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
-                     solved = false;
-                     message = Math.min(message, 0);
-                  }
-                  for(var item in context.bag) {
-                     if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
-                        solved = false;
-                        message = Math.min(message, 2);
-                     }
-                  }
-               }
-            }
-            else {
-               if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
-                  solved = false;
-                  message = Math.min(message, 0);
-               }
-            }
-         }
-      }
-
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successContainersFilled);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(messages[message]);
-      }
-   },
-   checkBothReachAndCollect: function(context, lastTurn) {
-      var robot = context.getRobot();
-      if(context.isOn(function(obj) { return obj.isExit === true; })) {
-         var solved = true;
-         for(var row = 0;row < context.nbRows;row++) {
-            for(var col = 0;col < context.nbCols;col++) {
-               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
-                  solved = false;
-                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-               }
-            }
-         }
-
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
-         }
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureReachExit);
-      }
-   },
-   checkLights: function(context, lastTurn) {
-      var solved = true;
-      for(var row = 0;row < context.nbRows;row++) {
-         for(var col = 0;col < context.nbCols;col++) {
-            if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
-               solved = false;
-            }
-         }
-      }
-
-      if(solved) {
-         context.success = true;
-         throw(window.languageStrings.messages.successLights);
-      }
-      if(lastTurn) {
-         context.success = false;
-         throw(window.languageStrings.messages.failureLights);
-      }
-   }
-};
-
-
-var robotEndFunctionGenerator = {
-   allFilteredPicked: function(filter) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var row = 0;row < context.nbRows;row++) {
-            for(var col = 0;col < context.nbCols;col++) {
-               var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
-               if(filtered.length != 0) {
-                  solved = false;
-               }
-            }
-         }
-
-         for(var item in context.bag) {
-            if(!filter(context.bag[item])) {
-               context.success = false;
-               throw(window.languageStrings.messages.failureUnfilteredObject);
-            }
-         }
-
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successPickedAllWithdrawables);
-         }
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
-         }
-      };
-   },
-   allNumbersWritten: function(numbers) {
-      return function(context, lastTurn) {
-         var solved = true;
-         for(var iNumber in numbers) {
-            var number = numbers[iNumber];
-            var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
-            if(items.length == 0)
-               throw("Error: no number here");
-
-            var expected;
-            if(typeof number.value === "number") {
-               expected = number.value;
-            } else {
-               expected = number.value.bind(context)();
-            }
-
-            if(expected != items[0].value) {
-               solved = false;
-            }
-         }
-
-         if(solved) {
-            context.success = true;
-            throw(window.languageStrings.messages.successNumbersWritten);
-         }
-
-         if(lastTurn) {
-            context.success = false;
-            throw(window.languageStrings.messages.failureNumbersWritten);
-         }
-      };
-   }
-};
-
-
-var getContextParams = function() {
-
-   return {
+   
+   var contextParams = {
       none: {
          hideSaveOrLoad: true,
          actionDelay: 200,
@@ -3539,8 +1653,8 @@ var getContextParams = function() {
                   item.period = 1;
                if(item.start == undefined)
                   item.start = 1;
-               if(time % item.period == item.start)
-                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col});
+               if(time % item.period == item.start) 
+                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
             }}
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
@@ -3607,7 +1721,7 @@ var getContextParams = function() {
             board_background: { num: 4, color: "#685aa6", side: 60, zOrder: 0 },
          },
          checkEndCondition: robotEndConditions.checkLights
-      },
+      }, 
       marbles: {
          bagSize: 1,
          backgroundColor: "#dadada",
@@ -3618,7 +1732,7 @@ var getContextParams = function() {
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 }
+            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 } 
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -3704,7 +1818,7 @@ var getContextParams = function() {
                      else if(this.isOn(function(obj) { return obj.isWithdrawable === true;})) {
                         throw(window.languageStrings.messages.failureRewrite);
                      }
-
+                     
                      this.dropObject({type: "paint", color: cur_color});
                      if (robot.col == context.nbCols - 1) {
                         robot.row = (robot.row + 1) % context.nbRows;
@@ -3718,9 +1832,9 @@ var getContextParams = function() {
                });
             }
             return blocks;
-         })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"],
-            ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"],
-            ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"],
+         })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"], 
+            ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
+            ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"], 
             ["#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd"],
             {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
          backgroundColor: "#ece4ce",
@@ -3752,8 +1866,8 @@ var getContextParams = function() {
             rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
             obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
             objet1: { num: 7, img: "objet1.png", side: 60, isWithdrawable: true, zOrder: 1 },
-            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 },
-            number: { side: 60, zOrder: 1 }
+            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
+            number: { side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -3764,7 +1878,7 @@ var getContextParams = function() {
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
-            number: { num: 5, side: 60, zOrder: 1 }
+            number: { num: 5, side: 60, zOrder: 1 }            
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -3783,8 +1897,1883 @@ var getContextParams = function() {
         checkEndCondition: robotEndConditions.checkPlugsWired
       }
    };
-}
+   var iconSrc = $("img[src$='icon.png']").attr("src");
+   var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
+   
+   if(infos.newBlocks == undefined)
+      infos.newBlocks = [];
+   if(infos.maxFallAltitude == undefined)
+      infos.maxFallAltitude = 2;
+   
+   var loadContext = function(name) {
+      for(var language in contextStrings[name]) {
+         var ctx = contextStrings[name][language];
+         for(var type in ctx) {
+            if((typeof ctx[type]) === "string") {
+               localLanguageStrings[language][type] = ctx[type];
+            }
+            else {
+               if(localLanguageStrings[language][type] == undefined)
+                  localLanguageStrings[language][type] = {};
+               for(var line in ctx[type]) {
+                  localLanguageStrings[language][type][line] = ctx[type][line];
+               }
+            }
+         }
+      }
+      
+      for(var param in contextParams[name]) {
+         if(infos[param] === undefined || param == "newBlocks") {
+            infos[param] = contextParams[name][param];
+         }
+      }
+   };
+   
+   loadContext("none");
+   if(infos.contextType != undefined) {
+      loadContext(infos.contextType);
+   }
+   
+   infos.newBlocks.push({
+      name: "row",
+      type: "sensors",
+      block: { name: "row", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, 1 + this.getRobot().row);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "col",
+      type: "sensors",
+      block: { name: "col", yieldsValue: 'int' },
+      func: function(callback) {
+         this.callCallback(callback, 1 + this.getRobot().col);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "wait",
+      type: "actions",
+      block: { name: "wait" },
+      func: function(callback) {
+         this.advanceTime(1);
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "north",
+      type: "actions",
+      block: { name: "north" },
+      func: function(callback) {
+         this.north(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "south",
+      type: "actions",
+      block: { name: "south" },
+      func: function(callback) {
+         this.south(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "east",
+      type: "actions",
+      block: { name: "east" },
+      func: function(callback) {
+         this.east(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "west",
+      type: "actions",
+      block: { name: "west" },
+      func: function(callback) {
+         this.west(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "left",
+      type: "actions",
+      block: { name: "left" },
+      func: function(callback) {
+         this.turnLeft(callback);
+      }
+   });
 
+   infos.newBlocks.push({
+      name: "right",
+      type: "actions",
+      block: { name: "right" },
+      func: function(callback) {
+         this.turnRight(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "turnAround",
+      type: "actions",
+      block: { name: "turnAround" },
+      func: function(callback) {
+         this.turnAround(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "forward",
+      type: "actions",
+      block: { name: "forward" },
+      func: function(callback) {
+         this.forward(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "backwards",
+      type: "actions",
+      block: { name: "backwards" },
+      func: function(callback) {
+         this.backwards(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "jump",
+      type: "actions",
+      block: { name: "jump" },
+      func: function(callback) {
+         this.jump(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleInFront",
+      type: "sensors",
+      block: { name: "obstacleInFront", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.obstacleInFront());
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleEast",
+      type: "sensors",
+      block: { name: "obstacleEast", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleWest",
+      type: "sensors",
+      block: { name: "obstacleWest", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleNorth",
+      type: "sensors",
+      block: { name: "obstacleNorth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleSouth",
+      type: "sensors",
+      block: { name: "obstacleSouth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleRight",
+      type: "sensors",
+      block: { name: "obstacleRight", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         var coords = this.coordsInFront(1);
+         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "obstacleLeft",
+      type: "sensors",
+      block: { name: "obstacleLeft", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         var coords = this.coordsInFront(3);
+         this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeEast",
+      type: "sensors",
+      block: { name: "gridEdgeEast", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeWest",
+      type: "sensors",
+      block: { name: "gridEdgeWest", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeNorth",
+      type: "sensors",
+      block: { name: "gridEdgeNorth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "gridEdgeSouth",
+      type: "sensors",
+      block: { name: "gridEdgeSouth", yieldsValue: true },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
+      }
+   });
+      
+   infos.newBlocks.push({
+      name: "platformInFront",
+      type: "sensors",
+      block: { name: "platformInFront", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.platformInFront());
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "platformAbove",
+      type: "sensors",
+      block: { name: "platformAbove", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.platformAbove());
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "withdrawObject",
+      type: "actions",
+      block: { name: "withdrawObject" },
+      func: function(callback) {
+         this.withdraw();
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropObject",
+      type: "actions",
+      block: { name: "dropObject" },
+      func: function(callback) {
+         this.drop();
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onObject",
+      type: "sensors",
+      block: { name: "onObject", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onContainer",
+      type: "sensors",
+      block: { name: "onContainer", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onNumber",
+      type: "sensors",
+      block: { name: "onNumber", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
+      }
+   });
+	
+	infos.newBlocks.push({
+      name: "onLauncher",
+      type: "sensors",
+      block: { name: "onLauncher", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onWritable",
+      type: "sensors",
+      block: { name: "onWritable", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "writeNumber",
+      type: "actions",
+      block: { name: "writeNumber", params: [null] },
+      func: function(value, callback) {
+         var robot = this.getRobot();
+         this.writeNumber(robot.row, robot.col, value);
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "readNumber",
+      type: "sensors",
+      block: { name: "readNumber", yieldsValue: 'int' },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.readNumber(robot.row, robot.col));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "pushObject",
+      type: "actions",
+      block: { name: "pushObject" },
+      func: function(callback) {
+         this.pushObject(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "pushableInFront",
+      type: "sensors",
+      block: { name: "pushableInFront", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropInFront",
+      type: "actions",
+      block: { name: "dropInFront" },
+      func: function(callback) {
+         this.drop(1, this.coordsInFront());
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropAbove",
+      type: "actions",
+      block: { name: "dropAbove" },
+      func: function(callback) {
+         this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shoot_noShadow",
+      type: "actions",
+      block: { 
+         name: "shoot_noShadow", 
+         params: [null]
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shoot",
+      type: "actions",
+      block: { name: "shoot", params: [null], blocklyXml: "<block type='shoot_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shootCondition_noShadow",
+      type: "actions",
+      block: { 
+         name: "shootCondition_noShadow", 
+         params: [null],
+         yieldsValue: true
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+            this.waitDelay(callback, retour);
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+            this.callCallback(callback);
+         }
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "shootCondition",
+      type: "actions",
+      block: { name: "shootCondition", blocklyXml: "<block type='shootCondition_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         
+         if(this.isOn(function(obj) { return obj.isLaser === true; })) {
+            var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
+            if(this.display) {
+               var robot = this.getRobot();
+               var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
+                  return obj.isLaser === true;
+               });
+               
+               if(lasers.length != 0) {
+                  lasers[0].element.toFront();
+               }
+               
+               robot.element.toFront();
+            }
+            this.waitDelay(callback, retour);
+         }
+         else {
+            throw(window.languageStrings.messages.failureLaser);
+            this.callCallback(callback);
+         }
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "connect",
+      type: "actions",
+      block: { name: "connect" },
+      func: function(callback) {
+         this.connect();
+         this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onMale",
+      type: "sensors",
+      block: { name: "onMale", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "onFemale",
+      type: "sensors",
+      block: { name: "onFemale", yieldsValue: true },
+      func: function(callback) {
+         this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
+      }
+   });
+   
+   var context = quickAlgoContext(display, infos);
+   context.robot = {};
+   context.customBlocks = {
+      robot: {
+         actions: [],
+         sensors: []
+      }
+   };
+   
+   for(var command in infos.newBlocks) {
+      cmd = infos.newBlocks[command];
+      context.customBlocks.robot[cmd.type].push(cmd.block);
+      if(cmd.strings) {
+         for(var language in cmd.strings) {
+            for(var type in cmd.strings[language]) {
+               localLanguageStrings[language][type][cmd.name] = cmd.strings[language][type];
+            }
+         }
+      }
+      if(cmd.func) {
+         context.robot[cmd.name] = cmd.func.bind(context);
+      }
+   }
+   
+   var strings = context.setLocalLanguageStrings(localLanguageStrings);
+   
+   function replaceStringsRec(source, dest) {
+   
+      if((typeof source != "object") || (typeof dest != "object")) {
+         return;
+      }
+      for(var key1 in source) {
+         if(dest[key1] != undefined) {
+            if(typeof dest[key1] == "object") {
+               replaceStringsRec(source[key1], dest[key1]);
+            }
+            else {
+               dest[key1] = source[key1];
+            }
+         }
+      }
+   }
+   
+   if(infos.languageStrings != undefined) {
+      replaceStringsRec(infos.languageStrings.blocklyRobot_lib, strings);
+   }
+   
+   var cells = [];
+   var colsLabels = [];
+   var rowsLabels = [];
+   var scale = 1;
+   var paper;
+   
+   if(infos.leftMargin === undefined) {
+      infos.leftMargin = 10;
+   }
+   if(infos.rightMargin === undefined) {
+      infos.rightMargin = 10;
+   }
+   if(infos.bottomMargin === undefined) {
+      infos.bottomMargin = 10;
+   }
+   if(infos.topMargin === undefined) {
+      if(infos.showLabels) {
+         infos.topMargin = 10;
+      }
+      else {
+         infos.topMargin = infos.cellSide / 2;
+      }
+   }
+   if(infos.showLabels) {
+      infos.leftMargin += infos.cellSide;
+      infos.topMargin += infos.cellSide;
+   }
+   
+   switch(infos.blocklyColourTheme) {
+      case "bwinf":
+         context.provideBlocklyColours = function() {
+            return {
+               categories: {
+                  logic: 100,
+                  loops: 180,
+                  math: 220,
+                  text: 250,
+                  lists: 60,
+                  colour: 310,
+                  variables: 340,
+                  functions: 20,
+                  actions: 260,
+                  sensors : 340,
+                  _default: 280
+               },
+               blocks: {}
+            };
+         }
+         break;
+      default:
+   }
+   
+   context.reset = function(gridInfos) {
+      if(gridInfos) {
+         context.tiles = gridInfos.tiles;
+         context.initItems = gridInfos.initItems;
+         context.nbRows = context.tiles.length;
+         context.nbCols = context.tiles[0].length;
+      }
+      context.nbPlatforms = infos.nbPlatforms;
+      
+      context.items = [];
+      context.multicell_items = [];
+      
+      context.last_connect = undefined;
+      context.wires = [];
+      
+      context.lost = false;
+      context.success = false;
+      context.nbMoves = 0;
+      context.time = 0;
+      context.bag = [];
+      
+      if(infos.bagInit != undefined) {
+         for(var i = 0;i < infos.bagInit.count;i++) {
+            var item = {};
+            
+            var initItem = infos.itemTypes[infos.bagInit.type];
+            
+            item.type = infos.bagInit.type;
+            item.side = 0;
+            item.offsetX = 0;
+            item.offsetY = 0;
+            item.nbStates = 1;
+            item.zOrder = 0;
+            for(var property in initItem) {
+               item[property] = initItem[property];
+            }
+            
+            context.bag.push(item);
+         }
+      }
+      
+      if(context.display) {
+         this.delayFactory.destroyAll();
+         this.raphaelFactory.destroyAll();
+         if(paper !== undefined)
+            paper.remove();
+         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+         resetBoard();
+         resetItems();
+         context.updateScale();
+         $("#nbMoves").html(context.nbMoves);
+      }
+      else {
+         resetItems();
+      }
+   };
+   
+   context.unload = function() {
+      if(context.display && paper != null) {
+         paper.remove();
+      }
+   };
+   
+   var itemAttributes = function(item) {
+      var itemType = infos.itemTypes[item.type];
+      var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row - (item.side - infos.cellSide) + item.offsetY + infos.topMargin) * scale;
+      var xClip = x;
+      if(item.dir != undefined) {
+         var dirToState = [0, 2, 4, 6];
+         x = x - (dirToState[item.dir] * item.side * scale);
+      }
+      var clipRect = "" + xClip + "," + y + "," + (item.side * scale) + "," + (item.side * scale);
+      if((!itemType.img && !item.img) && (!itemType.color && !item.color)) {
+         x += item.side * scale / 2;
+         y += item.side * scale / 2;
+      }
+      
+      var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
+      return ret;
+   }
+   
+   var resetBoard = function() {
+      for(var iRow = 0;iRow < context.nbRows;iRow++) {
+         cells[iRow] = [];
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            cells[iRow][iCol] = paper.rect(0, 0, 10, 10);
+            if(context.tiles[iRow][iCol] == 0)
+               cells[iRow][iCol].attr({'stroke-width': '0'});
+            if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
+               cells[iRow][iCol].attr({'fill': infos.backgroundColor});
+            if(infos.noBorders && context.tiles[iRow][iCol] != 0)
+               cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
+         }
+      }
+      if(infos.showLabels) {
+         for(var iRow = 0;iRow < context.nbRows;iRow++) {
+            rowsLabels[iRow] = paper.text(0, 0, (iRow + 1));
+         }
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
+         }
+      }
+   };
+   
+   var resetItem = function(initItem, redisplay) {
+      if(redisplay === undefined)
+         redisplay = true;
+      var item = {};
+      context.items.push(item);
+      for(var property in initItem) {
+         item[property] = initItem[property];
+      }
+      
+      item.side = 0;
+      item.offsetX = 0;
+      item.offsetY = 0;
+      item.nbStates = 1;
+      item.zOrder = 0;
+      for(var property in infos.itemTypes[item.type]) {
+         item[property] = infos.itemTypes[item.type][property];
+      }
+      
+      if(context.display && redisplay) {
+         redisplayItem(item);
+      }
+   };
+   
+   var resetItems = function() {
+      context.items = [];
+      var itemTypeByNum = {};
+      for(var type in infos.itemTypes) {
+         var itemType = infos.itemTypes[type];
+         if(itemType.num != undefined) {
+            itemTypeByNum[itemType.num] = type;
+         }
+      }
+      for(var iRow = 0;iRow < context.nbRows;iRow++) {
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            var itemTypeNum = context.tiles[iRow][iCol];
+            if(itemTypeByNum[itemTypeNum] != undefined) {
+               resetItem({
+                  row: iRow,
+                  col: iCol,
+                  type: itemTypeByNum[itemTypeNum]
+               }, false);
+            }
+         }
+      }
+      for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
+         resetItem(context.initItems[iItem], false);
+      }
+      
+      if(context.display)
+         redisplayAllItems();
+   };
+   
+   var resetItemsZOrder = function(row, col) {
+      var cellItems = [];
+      for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
+         var item = context.items[iItem];
+         if((item.row == row) && (item.col == col)) {
+            cellItems.push(item);
+         }
+      }
+      cellItems.sort(function(itemA, itemB) {
+         if(itemA.zOrder < itemB.zOrder) {
+            return -1;
+         }
+         if(itemA.zOrder > itemB.zOrder) {
+            return 1;
+         }
+         return 0;
+      });
+      for(var iItem = 0;iItem < cellItems.length;iItem++) {
+         if(cellItems[iItem].element)
+            cellItems[iItem].element.toFront();
+      }
+   };
+
+   var redisplayItem = function(item, resetZOrder) {
+      if(context.display !== true)
+         return;
+      if(resetZOrder === undefined)
+         resetZOrder = true;
+      
+      if(item.element !== undefined) {
+         item.element.remove();
+      }
+      var x = (infos.cellSide * item.col + infos.leftMargin) * scale;
+      var y = (infos.cellSide * item.row + infos.topMargin) * scale;
+      var itemType = infos.itemTypes[item.type];
+      if(item.img) {
+         item.element = paper.image(imgPrefix + item.img, x, y, item.side * item.nbStates * scale, item.side * scale);
+      }
+      else if(item.value !== undefined) {
+         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
+      }
+      else if(item.color !== undefined) {
+         item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
+      }
+      if(item.element !== undefined)
+         item.element.attr(itemAttributes(item));
+      if(resetZOrder)
+         resetItemsZOrder(item.row, item.col);
+   };
+   
+   context.updateScale = function() {
+      if(!context.display) {
+         return;
+      }
+      if(paper == null) {
+         return;
+      }
+      
+      if(window.quickAlgoResponsive) {
+         var areaWidth = Math.max(200, $('#grid').width()-24);
+         var areaHeight = Math.max(150, $('#grid').height()-24);
+      } else {
+         var areaWidth = 400;
+         var areaHeight = 600;
+      }
+      var newCellSide = 0;
+      if(context.nbCols && context.nbRows) {
+         var marginAsCols = infos.leftMargin / infos.cellSide;
+         var marginAsRows = infos.topMargin / infos.cellSide;
+         newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
+      }
+      scale = newCellSide / infos.cellSide;
+      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
+      
+      for(var iRow = 0;iRow < context.nbRows;iRow++) {
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            if(cells[iRow][iCol] === undefined)
+               continue;
+            var x = (infos.cellSide * iCol + infos.leftMargin) * scale;
+            var y = (infos.cellSide * iRow + infos.topMargin) * scale;
+            cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
+         }
+      }
+      if(infos.showLabels) {
+         for(var iRow = 0;iRow < context.nbRows;iRow++) {
+            var x = (infos.leftMargin - infos.cellSide / 2) * scale;
+            var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
+            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+         for(var iCol = 0;iCol < context.nbCols;iCol++) {
+            var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
+            var y = (infos.topMargin - infos.cellSide / 2) * scale;
+            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+         }
+      }
+      
+      redisplayAllItems();      
+   };
+   
+   var redisplayAllItems = function() {
+      if(context.display !== true)
+         return;
+      for(var iItem = 0;iItem < context.items.length;iItem++) {
+         var item = context.items[iItem];
+         redisplayItem(item, false);
+         if(item.element !== undefined)
+            item.element.attr(itemAttributes(item));
+      }
+      
+      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
+         var item = context.multicell_items[iItem];
+         item.redisplay();
+      }
+      
+      var cellItems = [];
+      
+      for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
+         var item = context.items[iItem];
+         cellItems.push(item);
+      }
+      
+      for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
+         var item = context.multicell_items[iItem];
+         cellItems.push(item);
+      }
+      
+      cellItems.sort(function(itemA, itemB) {
+         if(itemA.zOrder < itemB.zOrder) {
+            return -1;
+         }
+         if(itemA.zOrder > itemB.zOrder) {
+            return 1;
+         }
+         return 0;
+      });
+      for(var iItem = 0;iItem < cellItems.length;iItem++) {
+         if(cellItems[iItem].element !== undefined)
+            cellItems[iItem].element.toFront();
+      }
+   };
+   
+   context.advanceTime = function(epsilon) {
+      var items = [];
+      for(var id in context.items) {
+         items.push(context.items[id]);
+      }
+      
+      for(var iTime = 0;iTime < epsilon;iTime++) {
+         context.time++;
+         for(var id in items) {
+            if(items[id] !== undefined && items[id].action !== undefined) {
+               items[id].action.bind(context)(items[id], context.time);
+            }
+         }
+         
+         var robot = this.getRobot();
+         if(this.hasOn(robot.row, robot.col, function(item) { return item.isProjectile === true; })) {
+            throw(context.strings.messages.failureProjectile);
+         }
+      }
+   };
+   
+   context.getRobotId = function() {
+      for(var id in context.items) {
+         if(context.items[id].isRobot != undefined) {
+            return id;
+         }
+      }
+      return undefined;
+   };
+   
+   context.getRobot = function() {
+      return context.items[context.getRobotId()];
+   };
+   
+   context.getInfo = function(name) {
+      return infos[name];
+   };
+   
+   context.setInfo = function(name, value) {
+      infos[name] = value;
+   };
+   
+   context.hasOn = function(row, col, filter) {
+      for(var id in context.items) {
+         var item = context.items[id];
+         if(item.row == row && item.col == col && filter(item)) {
+            return true;
+         }
+      }
+      return false;
+   };
+   
+   context.setIndexes = function() {
+      for(var id in context.items) {
+         var item = context.items[id];
+         item.index = id;
+      }
+   }
+   
+   context.getItemsOn = function(row, col, filter) {
+      if(filter === undefined) {
+         filter = function(obj) { return true; };
+      }
+      var selected = [];
+      for(var id in context.items) {
+         var item = context.items[id];
+         if(item.row == row && item.col == col && filter(item)) {
+            selected.push(item);
+         }
+      }
+      return selected;
+   };
+   
+   context.isOn = function(filter) {
+      var item = context.getRobot();
+      return context.hasOn(item.row, item.col, filter);
+   };
+   
+   context.isInFront = function(filter) {
+      var coords = context.coordsInFront();
+      return context.hasOn(coords.row, coords.col, filter);
+   };
+   
+   context.isInGrid = function(row, col) {
+      if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
+         return false;
+      }
+      if (context.tiles[row][col] == 0) {
+         return false;
+      }
+      return true;
+   };
+   
+   context.tryToBeOn = function(row, col) {
+      if(!context.isInGrid(row, col)) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         throw(strings.messages.leavesGrid);
+      }
+      
+      if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         throw(strings.messages.obstacle);
+      }
+      
+      if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
+         if(infos.ignoreInvalidMoves)
+            return false;
+         throw(strings.messages.failureProjectile);
+      }
+      return true;
+   };
+   
+   context.coordsInFront = function(dDir, mult) {
+      if(dDir === undefined)
+         dDir = 0;
+      if(mult === undefined)
+         mult = 1;
+      var item = context.getRobot();
+      var lookDir = (item.dir + dDir + 4) % 4;
+      var delta = [[0,1],[1,0],[0,-1],[-1,0]];
+      return {
+         row: item.row + delta[lookDir][0] * mult,
+         col: item.col + delta[lookDir][1] * mult
+      };
+   };
+   
+   context.isCrossing = function(wireA, wireB) {
+      function crossProduct(pointA, pointB, pointC) {
+         return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
+      }
+      
+      function onLine(segment, point) {
+         return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
+          && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
+      }
+      
+      if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
+         return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
+      }
+      return (crossProduct(wireA[0], wireA[1], wireB[0])
+      * crossProduct(wireA[0], wireA[1], wireB[1]) <= 0) &&
+      (crossProduct(wireB[0], wireB[1], wireA[0])
+      * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
+   }
+   
+   context.moveRobot = function(newRow, newCol, newDir, callback) {
+      var iRobot = context.getRobotId();
+      var item = context.items[iRobot];
+      if (context.display) 
+         item.element.toFront();
+      var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
+      
+      if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
+         if(item.dir !== undefined)
+            item.dir = newDir;
+         if(context.display) {
+            var attr = itemAttributes(item);
+            item.element.attr(attr);
+         }
+      }
+      
+      if(item.dir !== undefined)
+         item.dir = newDir;
+      
+      item.row = newRow;
+      item.col = newCol;
+      
+      context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
+      
+      if(context.display) {
+         if(animate) {
+            attr = itemAttributes(item);
+            context.raphaelFactory.animate("animRobot" + iRobot + "_" + Math.random(), item.element, attr, infos.actionDelay);
+         }
+         else {
+            attr = itemAttributes(item);
+            if(infos.actionDelay > 0) {
+               context.delayFactory.createTimeout("moveRobot" + iRobot + "_" + Math.random(), function() {
+                  item.element.attr(attr);
+               }, infos.actionDelay / 2);
+            } else {
+               item.element.attr(attr);
+            }
+         }
+         $("#nbMoves").html(context.nbMoves);
+      }
+      
+      context.advanceTime(1);
+      context.waitDelay(callback);
+   };
+   
+   context.moveItem = function(item, newRow, newCol) {
+      var animate = (item.row != newRow) || (item.col != newCol);
+      var robot = context.getRobot();
+      if(context.display) {
+         resetItemsZOrder(newRow, newCol);
+         resetItemsZOrder(item.row, item.col);
+         resetItemsZOrder(robot.row, robot.col);
+      }
+      item.row = newRow;
+      item.col = newCol;
+      
+      if(context.display) {
+         if(animate) {
+            attr = itemAttributes(item);
+            context.raphaelFactory.animate("animItem" + "_" + Math.random(), item.element, attr, infos.actionDelay);
+         }
+         else {
+            attr = itemAttributes(item);
+            if(infos.actionDelay > 0) {
+               context.delayFactory.createTimeout("moveItem" + "_" + Math.random(), function() {
+                  item.element.attr(attr);
+               }, infos.actionDelay / 2);
+            } else {
+               item.element.attr(attr);
+            }
+         }
+      }
+   };
+   
+   context.moveProjectile = function(item) {
+      if(!context.isInGrid(item.row + 1, item.col)) {
+         context.destroy(item);
+      }
+      
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
+         return;
+      }
+      
+      if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
+         context.destroy(item);
+         context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
+         return;
+      }
+      
+      context.moveItem(item, item.row + 1, item.col);
+      return;
+   };
+   
+   context.destroy = function(item) {
+      context.setIndexes();
+      context.items.splice(item.index, 1);
+
+      if(context.display) {
+         item.element.remove();
+      }
+   };
+   
+   context.fall = function(item, row, col, callback) {
+      var startRow = row;
+      var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
+      
+      while(context.isInGrid(row + 1, col) && platforms.length == 0) {
+         row++;
+         platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
+      }
+      
+      if(!context.isInGrid(row + 1, col)) {
+         throw(context.strings.messages.falls);
+      }
+      
+      if(row - startRow > infos.maxFallAltitude) {
+         throw(context.strings.messages.willFallAndCrash);
+      }
+      context.nbMoves++;
+      context.moveRobot(row, col, item.dir, callback);
+   };
+   
+   context.jump = function(callback) {
+      if(!infos.hasGravity) {
+         throw("Error: can't jump without gravity");
+      }
+      
+      var item = context.getRobot();
+      if(!context.isInGrid(item.row - 1, item.col)) {
+         throw(context.strings.messages.jumpOutsideGrid);
+      }
+      var obstacle = context.getItemsOn(item.row - 2, item.col, function(obj) { return obj.isObstacle === true || obj.isProjectile === true; });
+      if(obstacle.length > 0) {
+         throw(context.strings.messages.jumpObstacleBlocking);
+      }
+      var platforms = context.getItemsOn(item.row - 1, item.col, function(obj) { return obj.isObstacle === true; });
+      if(platforms.length == 0) {
+         throw(context.strings.messages.jumpNoPlatform);
+      }
+      context.nbMoves++;
+      context.moveRobot(item.row - 2, item.col, item.dir, callback);
+   };
+   
+   context.withdraw = function(filter, errorWhenEmpty) {
+      if(filter === undefined) {
+         filter = function(obj) { return true; };
+      }
+      if(errorWhenEmpty === undefined) {
+         errorWhenEmpty = true;
+      }
+      var item = context.getRobot();
+      var withdrawables = context.getItemsOn(item.row, item.col, function(obj) { return obj.isWithdrawable === true && filter(obj); });
+      if(withdrawables.length == 0) {
+         if(errorWhenEmpty)
+            throw(context.strings.messages.nothingToPickUp);
+         return;
+      }
+      
+      if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
+         throw(context.strings.messages.tooManyObjects);
+      }
+      
+      var withdrawable = withdrawables[0];
+      context.setIndexes();
+      context.items.splice(withdrawable.index, 1);
+      context.bag.push(withdrawable);
+      
+      if(context.display) {
+         if (infos.actionDelay > 0) {
+            context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
+               withdrawable.element.remove();
+            }, infos.actionDelay);
+         } else {
+            withdrawable.element.remove();
+         }
+      }
+   };
+   
+   context.drop = function(count, coords, filter) {
+      if(count === undefined) {
+         count = 1;
+      }
+      if(filter === undefined) {
+         filter = function(obj) { return true; };
+      }
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
+      
+      for(var i = 0;i < count;i++) {
+         if(context.bag.length == 0) {
+            throw(context.strings.messages.emptyBag);
+         }
+         
+         var object = context.bag.pop();
+         object.row = coords.row;
+         object.col = coords.col;
+         var itemsOn = context.getItemsOn(coords.row, coords.col);
+         var maxi = object.zOrder;
+         for(var item in itemsOn) {
+            if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+               maxi = itemsOn[item].zOrder;
+            }
+         }
+         object.zOrder = maxi + 0.000001;
+         resetItem(object);
+      }
+   };
+   
+   context.dropObject = function(object, coords) {
+      if(coords == undefined) {
+         var item = context.getRobot();
+         coords = {row: item.row, col: item.col};
+      }
+      
+      if(!context.isInGrid(coords.row, coords.col)) {
+         throw(window.languageStrings.messages.failureDropOutside);
+         return;
+      }
+      
+      object.row = coords.row;
+      object.col = coords.col;
+      var itemsOn = context.getItemsOn(coords.row, coords.col);
+      var maxi = object.zOrder;
+      if(maxi === undefined) {
+         maxi = 0;
+      }
+      for(var item in itemsOn) {
+         if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
+            maxi = itemsOn[item].zOrder;
+         }
+      }
+      resetItem(object);
+   };
+   
+   context.turnLeft = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 3) % 4, callback);
+   };
+   
+   context.turnRight = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 1) % 4, callback);
+   };
+   
+   context.turnAround = function(callback) {
+      var robot = context.getRobot();
+      context.moveRobot(robot.row, robot.col, (robot.dir + 2) % 4, callback);
+   };
+   
+   context.forward = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront();
+      if(!context.tryToBeOn(coords.row, coords.col)) {
+         context.waitDelay(callback);
+      }
+      if(infos.hasGravity) {
+         context.fall(robot, coords.row, coords.col, callback);
+      }
+      else {
+         context.nbMoves++;
+         context.moveRobot(coords.row, coords.col, robot.dir, callback);
+      }
+   };
+   
+   context.backwards = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront(2);
+      if(!context.tryToBeOn(coords.row, coords.col)) {
+         context.waitDelay(callback);
+      }
+      if(infos.hasGravity) {
+         context.fall(robot, coords.row, coords.col, callback);
+      }
+      else {
+         context.nbMoves++;
+         context.moveRobot(coords.row, coords.col, robot.dir, callback);
+      }
+   };
+   
+   context.north = function(callback) {
+      var item = context.getRobot();
+      if(!context.tryToBeOn(item.row - 1, item.col)) {
+         context.waitDelay(callback);
+      } else {
+         context.nbMoves++;
+         context.moveRobot(item.row - 1, item.col, 3, callback);
+      }
+   };
+   
+   context.south = function(callback) {
+      var item = context.getRobot();
+      if(!context.tryToBeOn(item.row + 1, item.col)) {
+         context.waitDelay(callback);
+      } else {
+         context.nbMoves++;
+         context.moveRobot(item.row + 1, item.col, 1, callback);
+      }
+   };
+   
+   context.east = function(callback) {
+      var item = context.getRobot();
+      if(!context.tryToBeOn(item.row, item.col + 1)) {
+         context.waitDelay(callback);
+      } else {
+         context.nbMoves++;
+         context.moveRobot(item.row, item.col + 1, 0, callback);
+      }
+   };
+   
+   context.west = function(callback) {
+      var item = context.getRobot();
+      if(!context.tryToBeOn(item.row, item.col - 1)) {
+         context.waitDelay(callback);
+      } else {
+         context.nbMoves++;
+         context.moveRobot(item.row, item.col - 1, 2, callback);
+      }
+   };
+   
+   context.obstacleInFront = function() {
+      return context.isInFront(function(obj) { return obj.isObstacle === true; });
+   };
+   
+   context.platformInFront = function() {
+      var coords = context.coordsInFront();
+      return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
+   };
+   
+   context.platformAbove = function() {
+      var robot = context.getRobot();
+      return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
+   };
+   
+   context.writeNumber = function(row, col, value) {
+      var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
+      
+      if(numbers.length == 0) {
+         throw(strings.messages.failureWriteHere);
+      }
+      
+      var number = numbers[0];
+      number.value = value;
+      if(context.display) {
+         redisplayItem(number);
+      }
+   };
+   
+   context.readNumber = function(row, col) {
+      var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
+      
+      if(numbers.length == 0) {
+         throw(strings.messages.failureReadHere);
+      }
+      
+      return parseInt(numbers[0].value);
+   };
+   
+   context.pushObject = function(callback) {
+      var robot = context.getRobot();
+      var coords = context.coordsInFront();
+      
+      var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
+      
+      if(items.length == 0) {
+         throw(strings.messages.failureNothingToPush);
+      }
+      
+      var coordsAfter = context.coordsInFront(0, 2);
+      
+      if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
+         throw(strings.messages.failureWhilePushing);
+      if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
+         throw(strings.messages.failureWhilePushing);
+      if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
+         throw(strings.messages.failureWhilePushing);
+      
+      context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
+      
+      context.forward(callback);
+   };
+   
+   context.shoot = function(lig, col, dir) {
+      dir = dir % 8;
+      var dirs = [
+         [-1, 0],
+         [-1, 1],
+         [0, 1],
+         [1, 1],
+         [1, 0],
+         [1, -1],
+         [0, -1],
+         [-1, -1]
+      ];
+      
+      var lights = context.getItemsOn(lig, col, function(obj) {
+         return obj.isLight === true;
+      });
+      
+      for(var light in lights) {
+         lights[light].state = 1;
+         lights[light].img = lights[light].states[lights[light].state];
+         if(context.display)
+            redisplayItem(lights[light]);
+      }
+      
+      var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
+      var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
+      
+      var taille = infos.cellSide;
+      
+      var findRobot = false;
+      
+      var plig = lig + dirs[dir][0];
+      var pcol = col + dirs[dir][1];
+      if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
+         taille /= 2;
+         
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+      }
+      else {
+         var pdir = dir;
+         var mirrors = context.getItemsOn(plig, pcol, function(obj) { return obj.isMirror === true; });
+         if(mirrors.length != 0) {
+            pdir = mirrors[0].mirrorFunction(dir);
+         }
+         
+         findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
+         
+         if(context.shoot(plig, pcol, pdir)) {
+            findRobot = true;
+         }
+      }
+      
+      var dx = (taille * dirs[dir][1]) * scale;
+      var dy = (taille * dirs[dir][0]) * scale;
+      
+      if(context.display && paper != undefined) {
+         var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
+         
+         segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
+         
+         context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
+            segment.remove();
+         }, infos.actionDelay * 2);
+      }
+      
+      return findRobot;
+   };
+   
+   context.connect = function() {
+      var robot = context.getRobot();
+      
+      var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
+      
+      if(plugs.length == 0) {
+         throw(strings.messages.failureNoPlug);
+      }
+      
+      var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
+      
+      if(wires.length != 0) {
+         throw(strings.messages.failureAlreadyWired);
+      }
+      
+      this.dropObject({type: "wire", zOrder: 1});
+      
+      if(this.last_connect !== undefined) {
+         if(this.last_connect.plugType + plugs[0].plugType != 0)
+            throw(strings.messages.failureWrongPlugType);
+            
+         function segmentLength(segment) {
+            return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
+         }
+         
+         var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
+         
+         if(segmentLength(wire) > infos.maxWireLength) {
+            throw(strings.messages.failureWireTooLong);
+         }
+         
+         var totalLength = segmentLength(wire);
+         for(var iWire = 0;iWire < this.wires.length;iWire++) {
+            if(this.isCrossing(wire, this.wires[iWire])) {
+               throw(strings.messages.failureWireCrossing);
+            }
+            totalLength += segmentLength(this.wires[iWire]);
+         }
+         
+         if(totalLength > infos.maxTotalLength) {
+            throw(strings.messages.failureTotalLengthExceeded);
+         }
+         
+         this.wires.push(wire);
+         
+         var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
+         var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
+         var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
+         var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
+         
+         var wire_item = {zOrder: 2};
+         wire_item.redisplay = function() {
+            wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
+            wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
+         };
+         
+         this.multicell_items.push(wire_item);
+         redisplayAllItems();
+         
+         this.last_connect = undefined;
+      }
+      else {
+         this.last_connect = plugs[0];
+      }
+   };
+      
+   return context;
+};
+
+var robotEndConditions = {
+   checkReachExit: function(context, lastTurn) {
+      var robot = context.getRobot();
+      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+         context.success = true;
+         throw(window.languageStrings.messages.successReachExit);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachExit);
+      }
+   },
+   checkPickedAllWithdrawables: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+               solved = false;
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPickedAllWithdrawables);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+      }
+   },
+   checkPlugsWired: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.plugType !== undefined; }) && !context.hasOn(row, col, function(obj) { return obj.isWire === true; })) {
+               solved = false;
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successPlugsWired);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failurePlugsWired);
+      }
+   },
+   checkContainersFilled: function(context, lastTurn) {
+      var solved = true;
+      
+      var messages = [
+         window.languageStrings.messages.failureContainersFilled,
+         window.languageStrings.messages.failureContainersFilledLess,
+         window.languageStrings.messages.failureContainersFilledBag
+      ];
+      var message = 2;
+      if (context.infos.maxMoves != undefined) {
+         if (context.nbMoves > context.infos.maxMoves) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureTooManyMoves + " : " + context.nbMoves);
+         }
+      }
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            var containers = context.getItemsOn(row, col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
+            if(containers.length != 0) {
+               var container = containers[0];
+               if(container.containerSize == undefined && container.containerFilter == undefined) {
+                  container.containerSize = 1;
+               }
+               var filter;
+               if(container.containerFilter == undefined)
+                  filter = function(obj) { return obj.isWithdrawable === true; };
+               else
+                  filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+               
+               if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
+                  solved = false;
+                  message = Math.min(message, 1);
+               }
+               else if(context.getItemsOn(row, col, filter).length == 0) {
+                  solved = false;
+                  message = Math.min(message, 0);
+               }
+               
+               if(container.containerFilter != undefined) {
+                  if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
+                     solved = false;
+                     message = Math.min(message, 0);
+                  }
+                  for(var item in context.bag) {
+                     if(filter(context.bag[item]) && context.infos.ignoreBag === undefined) {
+                        solved = false;
+                        message = Math.min(message, 2);
+                     }
+                  }
+               }
+            }
+            else {
+               if(context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable === true && obj.canBeOutside !== true; }).length > 0) {
+                  solved = false;
+                  message = Math.min(message, 0);
+               }
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successContainersFilled);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(messages[message]);
+      }
+   },
+   checkBothReachAndCollect: function(context, lastTurn) {
+      var robot = context.getRobot();
+      if(context.isOn(function(obj) { return obj.isExit === true; })) {
+         var solved = true;
+         for(var row = 0;row < context.nbRows;row++) {
+            for(var col = 0;col < context.nbCols;col++) {
+               if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true; })) {
+                  solved = false;
+                  throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+               }
+            }
+         }
+         
+         if(solved) {
+            context.success = true;
+            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         }
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureReachExit);
+      }
+   },
+   checkLights: function(context, lastTurn) {
+      var solved = true;
+      for(var row = 0;row < context.nbRows;row++) {
+         for(var col = 0;col < context.nbCols;col++) {
+            if(context.hasOn(row, col, function(obj) { return obj.isLight === true && obj.state === 0; })) {
+               solved = false;
+            }
+         }
+      }
+      
+      if(solved) {
+         context.success = true;
+         throw(window.languageStrings.messages.successLights);
+      }
+      if(lastTurn) {
+         context.success = false;
+         throw(window.languageStrings.messages.failureLights);
+      }
+   }
+};
+
+
+var robotEndFunctionGenerator = {
+   allFilteredPicked: function(filter) {
+      return function(context, lastTurn) {
+         var solved = true;
+         for(var row = 0;row < context.nbRows;row++) {
+            for(var col = 0;col < context.nbCols;col++) {
+               var filtered = context.getItemsOn(row, col, function(obj) { return obj.isWithdrawable && filter(obj); })
+               if(filtered.length != 0) {
+                  solved = false;
+               }
+            }
+         }
+         
+         for(var item in context.bag) {
+            if(!filter(context.bag[item])) {
+               context.success = false;
+               throw(window.languageStrings.messages.failureUnfilteredObject);
+            }
+         }
+         
+         if(solved) {
+            context.success = true;
+            throw(window.languageStrings.messages.successPickedAllWithdrawables);
+         }
+         if(lastTurn) {
+            context.success = false;
+            throw(window.languageStrings.messages.failurePickedAllWithdrawables);
+         }
+      };
+   },
+   allNumbersWritten: function(numbers) {
+      return function(context, lastTurn) {
+         var solved = true;
+         for(var iNumber in numbers) {
+            var number = numbers[iNumber];
+            var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
+            if(items.length == 0)
+               throw("Error: no number here");
+            
+            var expected;
+            if(typeof number.value === "number") {
+               expected = number.value;
+            } else {
+               expected = number.value.bind(context)();
+            }
+            
+            if(expected != items[0].value) {
+               solved = false;
+            }
+         }
+         
+         if(solved) {
+            context.success = true;
+            throw(window.languageStrings.messages.successNumbersWritten);
+         }
+         
+         if(lastTurn) {
+            context.success = false;
+            throw(window.languageStrings.messages.failureNumbersWritten);
+         }
+      };
+   }
+};
 
 if(window.quickAlgoLibraries) {
    quickAlgoLibraries.register('robot', getContext);
