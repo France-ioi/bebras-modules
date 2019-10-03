@@ -40,64 +40,77 @@ function DatabaseHelper(options) {
         html: new TableRendererHtml(options),
         map: new TableRendererMap(options),
         graph: new TableRendererGraph(options),
-        console: new ConsoleRenderer(options),
+        console: new ConsoleRenderer(options)
     }
     var last_renderer = null;
     var last_table = null;
     var last_type = 'line';
 
-    this.hide = function() {
+    this.hide = function(display) {
+        if(!display) return;
         renderers.html.hide();
         renderers.map.hide();
         renderers.graph.hide();
         renderers.console.hide();
     };
 
-    this.displayTable = function(table) {
+    this.displayTable = function(table, display) {
         last_table = table;
-        this.hide();
-        renderers.html.displayTable(table);
+        this.hide(display);
+        renderers.html.displayTable(table, null, display);
         last_renderer = 'html';
     };
 
-    this.displayTableOnMap = function(table) {
+    this.displayTableOnMap = function(table, display) {
         last_table = table;
-        this.hide();
-        renderers.map.displayTable(table);
+        this.hide(display);
+        renderers.map.displayTable(table, null, display);
         last_renderer = 'map';
     };
 
-    this.displayTableOnGraph = function(table, type) {
+    this.displayTableOnGraph = function(table, type, display) {
         last_table = table;
         last_type = type;
-        this.hide();
-        renderers.graph.displayTable(table, type);
+        this.hide(display);
+        renderers.graph.displayTable(table, type, null, display);
         last_renderer = 'graph';
     };
 
-    this.displayConsole = function(variable) {
-        this.hide();
-        renderers.console.print(variable);
+    this.displayConsole = function(variable, display) {
+        this.hide(display);
+        renderers.console.print(variable, display);
     };
 
     this.validateResult = function(reference_table) {
-        this.hide();
+        //this.hide();
         //FIXME la last table stockée est celle qui ne contient que namecolumn dans graph, ou nam lat et lng dans Map, ca n'a pas de sens de refuser une table trop complete ??
         //if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
         //    return 'incorrect_results';
         //}
-        if (last_renderer === 'graph')
-            var valid_all = renderers[last_renderer].displayTable(last_table,last_type, reference_table);
-        else
-            var valid_all = renderers[last_renderer].displayTable(last_table, reference_table);
+        if (last_renderer === 'graph') {
+            var valid_all = renderers[last_renderer].displayTable(last_table, last_type, reference_table, true);
+        } else if(last_renderer) {
+            var valid_all = renderers[last_renderer].displayTable(last_table, reference_table, true);
+        } else {
+            var valid_all = false;
+        }
         if(!valid_all) {
             return 'incorrect_results';
         }
-        if(last_table.params().records.length < reference_table.params().records.length) {
+        if(last_table && reference_table && last_table.params().records.length < reference_table.params().records.length) {
             return 'some_results_missing';
         }
         return true;
     };
+
+
+    this.destroy = function() {
+        alert(1)
+        renderers.html.destroy();
+        renderers.map.destroy();
+        renderers.graph.destroy();
+        renderers.console.destroy();
+    }
 
 
     function validateColumnTypes(types) {
@@ -115,11 +128,19 @@ function DatabaseHelper(options) {
     }
 
 
+    function parseCsvLine(line) {
+        var res = line.split(options.csv_delimiter);
+        for(var i=0; i<res.length; i++) {
+            res[i] = res[i].replace(/['"]+/g, '');
+        }
+        return res;
+    }
+
+
     this.loadCsv = function(file, types, callback) {
         if(!validateColumnTypes(types)) {
             return;
         }
-
         var reader = new FileReader();
         reader.onload = function(e) {
             var res = {
@@ -128,10 +149,11 @@ function DatabaseHelper(options) {
             };
             var lines = reader.result.split(/\r\n|\n/);
             for(var i=0, line; line=lines[i]; i++) {
+                var row = parseCsvLine(line);
                 if(i === 0) {
-                    res.columnNames = line.split(options.csv_delimiter);
+                    res.columnNames = row;
                 } else {
-                    res.records.push(line.split(options.csv_delimiter));
+                    res.records.push(row);
                 }
             }
             callback(Table(res));
@@ -184,7 +206,7 @@ function TableRendererHtml(options) {
     }
 
 
-    this.displayTable = function(table, reference_table) {
+    this.displayTable = function(table, reference_table, display) {
         var html = '';
 
         var rows = table.params().records;
@@ -221,9 +243,15 @@ function TableRendererHtml(options) {
         }
 
         html += '</table>';
-        container.html(html);
-        container.show();
+        if(display) {
+            container.html(html);
+            container.show();
+        }
         return valid_all;
+    }
+
+    this.destroy = function() {
+        container.remove();
     }
 }
 
@@ -353,8 +381,10 @@ function TableRendererMap(options) {
     }
 
     // interface
-    this.displayTable = function(table, reference_table) {
-        renderer.clear();
+    this.displayTable = function(table, reference_table, display) {
+        if(display) {
+            renderer.clear();
+        }
         var rows = table.params().records;
 
         var valid_value = true;
@@ -368,10 +398,18 @@ function TableRendererMap(options) {
             valid_all = valid_all && valid_value;
             validateLng(row[1]);
             validateLat(row[2]);
-            renderer.pin(row[1], row[2], row[0], valid_value);
+            if(display) {
+                renderer.pin(row[1], row[2], row[0], valid_value);
+            }
         }
-        container.show();
+        if(display) {
+            container.show();
+        }
         return valid_all;
+    }
+
+    this.destroy = function() {
+        container.remove();
     }
 
     // init
@@ -447,8 +485,10 @@ function TableRendererGraph(options) {
     }
 
     // interface
-    this.displayTable = function(table, type, reference_table) {
-        renderer.clear();
+    this.displayTable = function(table, type, reference_table, display) {
+        if(display) {
+            renderer.clear();
+        }
         var rows = table.params().records;
 
         var valid_value = true;
@@ -474,7 +514,9 @@ function TableRendererGraph(options) {
                         valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
                     }
                     valid_all = valid_all && valid_value;
-                    renderer.bar(i,rows.length,row[0],yMin,yMax);
+                    if(display) {
+                        renderer.bar(i,rows.length,row[0],yMin,yMax);
+                    }
                 }
                 break;
             case 'plot':
@@ -483,7 +525,9 @@ function TableRendererGraph(options) {
                         valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
                     }
                     valid_all = valid_all && valid_value;
-                    renderer.plot(i+0.5,rows.length,row[0],yMin,yMax);
+                    if(display) {
+                        renderer.plot(i+0.5,rows.length,row[0],yMin,yMax);
+                    }
                 }
                 break;
             default: //case 'line'
@@ -492,13 +536,21 @@ function TableRendererGraph(options) {
                         valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
                     }
                     valid_all = valid_all && valid_value;
-                    renderer.line_to(i,rows.length-1,row[0],yMin,yMax);
+                    if(display) {
+                        renderer.line_to(i,rows.length-1,row[0],yMin,yMax);
+                    }
                 }
         }
-        renderer.show();
-        container.show();
+        if(display) {
+            renderer.show();
+            container.show();
+        }
 
         return valid_all;
+    }
+
+    this.destroy = function() {
+        container.remove();
     }
 
     // init
@@ -522,11 +574,16 @@ function ConsoleRenderer(options) {
     //TODO integrer la console a la librairie d'onglets de renderers
     //TODO une fois la librairie d'onglets de renderer créée, deplacer son CSS au même endroit
 
-    this.print = function(variable) {
+    this.print = function(variable, display) {
+        if(!display) return;
         nd = new Date();
         var html = "<div class='console_time'>["+("0"+nd.getHours()).slice(-2)+":"+("0"+nd.getMinutes()).slice(-2)+"]</div><div class='console_row'>"+variable+"</div>";
         container.append(html);
         container.show();
+    }
+
+    this.destroy = function() {
+        container.remove();
     }
 
 }
