@@ -325,12 +325,12 @@ var getContext = function(display, infos, curLevel) {
             level: curLevel
         });
 
-        db_helper && db_helper.destroy();
         db_helper = new DatabaseHelper(
             Object.assign({
                 parent: $('#grid')
             }, infos.databaseConfig)
         );
+
 
         if(!context.display) return;
 
