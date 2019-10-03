@@ -91,12 +91,16 @@ var getContext = function(display, infos, curLevel) {
                 success: 'Success'
             },
             ui: {
+                'btn_diplay_table': 'Display',
+                'btn_clipboard': 'Copy name to clipboard',
                 'btn_files_repository': 'Add CSV files...',
                 'files_repository': {
                     'caption': 'CSV files list',
                     'hint': 'Use file number as param for loadTableFromCsv function. Allowed CSV files with ; delimiter only.',
                     'add': 'Add',
-                    'incompatible_browser': 'Incompatible browser'
+                    'incompatible_browser': 'Incompatible browser',
+                    'confirm_overwrite': 'Overwrite files?',
+                    'file_not_found': 'File not found: '
                 }
             }
         },
@@ -188,12 +192,16 @@ var getContext = function(display, infos, curLevel) {
                 success: 'Success'
             },
             ui: {
+                'btn_diplay_table': 'Visualiser',
+                'btn_clipboard': 'Copy name to clipboard',
                 'btn_files_repository': 'Ajouter des CSV...',
                 'files_repository': {
                     'caption': 'Liste des fichiers CSV',
                     'hint': 'Utilisez le numéro de fichier comme paramètre de la fonction loadTableFromCsv. Seuls les fichiers CSV utilisant ; comme délimiteur sont acceptés.',
                     'add': 'Ajouter',
-                    'incompatible_browser': 'Navigateur incompatible'
+                    'incompatible_browser': 'Navigateur incompatible',
+                    'confirm_overwrite': 'Overwrite files?',
+                    'file_not_found': 'File not found: '
                 }
             }
         }
@@ -203,7 +211,7 @@ var getContext = function(display, infos, curLevel) {
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
-    var files, db_helper;
+    var files, db_helper, tables_list;
     var ready = false;
 
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
@@ -214,63 +222,146 @@ var getContext = function(display, infos, curLevel) {
         {id: 'database_process', name: 'Tables - manipulation', url: conceptBaseUrl+'#database_process'},
     ];
 
-    context.reset = function(taskInfos) {
-        if(!context.display || ready) return;
-        ready = true;
 
+
+
+    var tables_list = {
+
+        elements: {},
+        tables: {},
+        callback: null,
+
+
+        init: function(params) {
+            this.elements.box = $('<div class="pull_left" style="display: none"></div>');
+
+            this.elements.select = $('<select></select>');
+            this.elements.box.append(this.elements.select);
+
+            var btn = $('<button type="button" class="btn">' + strings.ui.btn_clipboard + '</button>');
+            btn.on('click', this.copyToClipboard.bind(this));
+            this.elements.box.append(btn);
+
+            var btn = $('<button class="btn">' + strings.ui.btn_diplay_table + '</button>');
+            btn.on('click', this.displayTable.bind(this));
+            this.elements.box.append(btn);
+
+            params.parent.prepend(this.elements.box);
+            this.setTables(params.tables);
+            this.callback = params.callback;
+        },
+
+
+        displayTable: function() {
+            var opt = this.elements.select.find('option:selected');
+            this.callback && this.callback(opt.val(), !!opt.data('imported'));
+        },
+
+        copyToClipboard: function() {
+            var opt = this.elements.select.find('option:selected');
+            var text = opt.val();
+            if(navigator.clipboard) {
+                navigator.clipboard.writeText(text)
+                return;
+            }
+            var el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.focus();
+            el.select();
+            try {
+                document.execCommand('copy');
+            } catch (e) {
+                console.error('document.execCommand(\'copy\') error', e);
+            }
+            document.body.removeChild(el);
+        },
+
+        renderOptions: function() {
+            var cnt = 0;
+            this.elements.select.empty();
+            for(var name in this.tables.task) {
+                if(this.tables.task[name].public) {
+                    this.elements.select.append('<option value="'+ name +'">' + name + '</option>');
+                    cnt++;
+                }
+            }
+            for(var i=0; i<this.tables.imported.length; i++) {
+                var filename = this.tables.imported[i];
+                this.elements.select.append('<option value="'+ filename +'" data-imported="1">' + filename + '</option>');
+                cnt++;
+            }
+            return cnt;
+        },
+
+        setTables: function(tables) {
+            this.tables = Object.assign(this.tables, tables);
+            var visible = this.renderOptions() > 0;
+            this.elements.box.toggle(visible);
+        }
+
+    }
+
+
+
+    context.reset = function(taskInfos) {
         if(taskInfos) {
             task_tables = taskInfos.tables || {};
         }
 
-        files = new FilesRepository({
-            extensions: '.csv',
-            parent: $('#grid'),
-            strings: strings.ui.files_repository
+        if(ready) {
+            return;
+        }
+        ready = true;
+
+
+        task_files.initLevel({
+            strings: strings.ui.files_repository,
+            onChange: function(list) {
+                tables_list && tables_list.setTables({
+                    imported: list
+                });
+            },
+            level: curLevel
         });
 
+        db_helper && db_helper.destroy();
         db_helper = new DatabaseHelper(
             Object.assign({
                 parent: $('#grid')
             }, infos.databaseConfig)
         );
 
-        table_options = '';
-        Object.keys(task_tables).forEach(function(name){
-            table_options += '<option value="'+name+'">'+name+'</option>';
-        });
+        if(!context.display) return;
 
-        var html =
+        $('#grid').prepend(
             '<div id="database_controls">' +
-                '<select name="visualisation_tables" id="visualisation_tables">' + table_options + '</select>' +
-                '<button class="btn btn-default" id="btn_visu">Visualiser</button>' +
-                '<button class="btn btn-default" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
-            '</div>';
+                '<button class="btn pull_right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
+            '</div>'
+        );
 
-        $('#grid').prepend($(html));
         $('#btn_files').click(function() {
-            files.show();
-        });
-        $('#btn_visu').click(function() {
-            filename = $("#visualisation_tables option:selected").val();
-            if (isNaN(filename)) {
-                var table = Table(task_tables[filename]);
-                db_helper.displayTable(table);
-            }
-            else {
-                var file = files.getFile(filename - 1);
-                db_helper.loadCsv(file, [], function(table) {
-                    db_helper.displayTable(table);
-                });
-            }
-        });
-        $('.modal button.close').click(function() {
-            $('#visualisation_tables option.imported').remove();
-            nb_csv = $("#files_repository_list tbody tr").length;
-            for(var i = 1; i <= nb_csv; i++) {
-                $('#visualisation_tables').append('<option value="'+i+'" class="imported">'+i+'</option>');
-            }
+            task_files.open();
         });
 
+        tables_list.init({
+            parent: $('#database_controls'),
+            callback: function(filename, is_imported) {
+                if(is_imported) {
+                    var file = task_files.getFile(filename);
+                    db_helper.loadCsv(file, [], function(table) {
+                        db_helper.displayTable(table);
+                    });
+                } else {
+                    var table = Table(task_tables[filename].data);
+                    db_helper.displayTable(table);
+                }
+            },
+            tables: {
+                task: task_tables,
+                imported: []
+            }
+        });
 
 /*
         //test html render
@@ -293,24 +384,26 @@ var getContext = function(display, infos, curLevel) {
             })
         }, 500)
 */
-
-
     }
+
+
 
 
     context.setScale = function(scale) {}
     context.updateScale = function() {}
     context.resetDisplay = function() {}
-    context.unload = function() {}
+    context.unload = function() {
+        console.log('context.unload')
+    }
 
 
     context.expectTable = function(name) {
         if(name in task_tables) {
-            var table = Table(task_tables[name]);
+            var table = Table(task_tables[name].data);
             var status = db_helper.validateResult(table);
             if(status === true) {
                 context.success = true;
-                throw new strings.messages.success;
+                throw strings.messages.success;
                 return;
             }
             context.success = false;
@@ -324,12 +417,12 @@ var getContext = function(display, infos, curLevel) {
     context.database = {
 
         loadTable: function(name, callback) {
-            if(!task_tables[name]) throw new Error(strings.messages.table_not_found + name);
-            context.waitDelay(callback, Table(task_tables[name]));
+            if(!task_tables[name] || !task_tables[name].public) throw new Error(strings.messages.table_not_found + name);
+            context.waitDelay(callback, Table(task_tables[name].data));
         },
 
-        loadTableFromCsv: function(fileNumber, types, callback) {
-            var file = files.getFile(fileNumber - 1);
+        loadTableFromCsv: function(filename, types, callback) {
+            var file = task_files.getFile(filename);
             if(file === null) {
                 throw new Error(strings.messages.file_not_found + fileNumber);
             }
@@ -384,7 +477,7 @@ var getContext = function(display, infos, curLevel) {
         },
 
         displayTable: function(table, callback) {
-            context.display && db_helper.displayTable(table);
+            db_helper.displayTable(table, context.display);
             context.waitDelay(callback);
         },
 
@@ -411,26 +504,28 @@ var getContext = function(display, infos, curLevel) {
                 return 'string';
             });
             var table = Table(res);
-            context.display && db_helper.displayTable(table);
+            db_helper.displayTable(table, context.display);
             context.waitDelay(callback);
         },
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
-            context.display && db_helper.displayTableOnMap(
-                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn])
+            db_helper.displayTableOnMap(
+                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
+                context.display
             );
             context.waitDelay(callback);
         },
 
         printConsole: function(text, callback) {
-            context.display && db_helper.displayConsole(text);
+            db_helper.displayConsole(text, context.display);
             context.waitDelay(callback);
         },
 
         displayTableOnGraph: function(table, nameColumn, type, callback) {
-            context.display && db_helper.displayTableOnGraph(
+            db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
-                type
+                type,
+                context.display
             );
             context.waitDelay(callback);
         },
@@ -567,3 +662,9 @@ if(window.quickAlgoLibraries) {
     if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
     window.quickAlgoLibrariesList.push(['database', getContext]);
 }
+
+
+window.task_files = new FilesRepository({
+    reader: 'text',
+    extensions: '.csv'
+});

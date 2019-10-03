@@ -2,18 +2,13 @@
     height: 25px;
 }
 
-#visualisation_tables {
+#database_controls .pull_left {
     float: left;
 }
 
-#btn_visu {
-    float: left;
-}
-
-#btn_files {
+#database_controls .pull_right {
     float: right;
 }
-
 
 .database {
     width: 100%;

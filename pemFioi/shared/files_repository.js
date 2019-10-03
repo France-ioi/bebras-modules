@@ -6,111 +6,151 @@ function FilesRepository(options) {
             caption: 'Audio files list',
             hint: 'Use file number as param for playRecord function',
             add: 'Add',
-            incompatible_browser: 'Incompatible browser'
+            incompatible_browser: 'Incompatible browser',
+            confirm_overwrite: 'Overwrite files?',
+            file_not_found: 'File not found: '
         }
     }
+    this.options = Object.assign(defaults, options);
+    this.browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
+    this.callbacks = {}
+    this.files = {}
+    this.popup = null;
+    this.level = null;
 
-    options = Object.assign(defaults, options);
 
-    var browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
+    this.initLevel = function(params) {
+        this.level = params.level;
+        this.callbacks.onChange = params.onChange;
+        this.options.strings = Object.assign(defaults.strings, params.strings);
+    }
 
 
-    function initModal() {
-        if($('#files_repository_modal')[0]) return;
+    this.open = function() {
+        if(!this.files[this.level]) {
+            this.files[this.level] = {};
+        }
+        this.renderPopup();
+        this.renderFiles();
+    }
+
+
+    this.close = function() {
+        this.popup.remove();
+        this.popup = null;
+    }
+
+
+    this.onFileInputChange = function(e) {
+        if(!e.target.files.length) {
+            return;
+        }
+
+        var existing_files = [];
+        for(var i=0; i<e.target.files.length; i++) {
+            var filename = e.target.files[i].name;
+            if(filename in this.files[this.level]) {
+                existing_files.push(filename);
+            }
+        }
+        if(existing_files.length > 0 && !confirm(this.options.strings.confirm_overwrite + '\n' + existing_files.join('\n'))) {
+            e.target.value = '';
+            return;
+        }
+        for(var i=0; i<e.target.files.length; i++) {
+            var file = e.target.files[i];
+            this.files[this.level][file.name] = file;
+        }
+        e.target.value = '';
+        this.renderFiles();
+        this.fireOnChange();
+    }
+
+
+    this.renderFiles = function() {
+        var html = '';
+
+        for(var filename in this.files[this.level]) {
+            html +=
+                '<tr><td>' + filename + '</td>' +
+                '<td><button type="button" class="btn close" data-filename="'+ filename +'">x</button></td></tr>'
+        }
+        var el = $('#files_repository_list').empty().append(html);
+        el.find('button.close').click(this.onRemoveFileClick.bind(this));
+    }
+
+
+    this.onRemoveFileClick = function(e) {
+        var filename = $(e.target).data('filename');
+        delete this.files[this.level][filename];
+        this.renderFiles();
+        this.fireOnChange();
+    }
+
+
+    this.onCopyFileNameClick = function(e) {
+        var text = $(e.target).data('filename');
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(text)
+            return;
+        }
+        var el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.focus();
+        el.select();
+        try {
+            document.execCommand('copy');
+        } catch (e) {
+            console.error('document.execCommand(\'copy\') error', e);
+        }
+        document.body.removeChild(el);
+    }
+
+
+    this.renderPopup = function() {
         var inner_html;
-        if(browser_compatible) {
+        if(this.browser_compatible) {
             inner_html =
-                '<p>' + options.strings.hint + '</p>' +
+                '<p>' + this.options.strings.hint + '</p>' +
                 '<table id="files_repository_list"></table>' +
-                '<div id="files_repository_inputs"></div>'
-
+                '<div>' +
+                    '<input type="file" class="btn" multiple accept="' + this.options.extensions + '" title="' + this.options.strings.add + '"/>' +
+                '</div>'
         } else {
             inner_html =
-                '<p>' + options.strings.incompatible_browser + '</p>';
+                '<p>' + this.options.strings.incompatible_browser + '</p>';
         }
-        var html =
-            '<div id="files_repository_modal" class="modalWrapper" style="display: none;">' +
+        this.popup = $(
+            '<div id="files_repository_modal" class="modalWrapper">' +
                 '<div class="modal">' +
-                    '<button type="button" class="btn close" onclick="$(`#files_repository_modal`).hide()">x</button>' +
-                    '<p><b>' + options.strings.caption + '</b></p>' +
-                    inner_html
+                    '<button type="button" class="btn close">x</button>' +
+                    '<p><b>' + this.options.strings.caption + '</b></p>' +
+                    inner_html +
                 '</div>' +
-            '</div>';
-        $(options.parent).append($(html));
-        if(browser_compatible) addInput();
+            '</div>'
+        );
+        this.popup.find('button.close').click(this.close.bind(this));
+        this.popup.find('input[type=file]').change(this.onFileInputChange.bind(this));
+        $(document.body).append(this.popup);
     }
 
 
-    function enumerateFiles() {
-        $('#files_repository_list > tbody > tr').each(function(idx, tr) {
-            $(tr).find('td:nth-child(1)').text(idx + 1 + '. ');
-        })
-    }
-
-
-    function addFilesGroup(files, group_idx) {
-        var html = '';
-        for(var i = 0, f; f = files[i]; i++) {
-            html += '<tr group_idx="' + group_idx + '"><td></td><td>' + f.name + '</td>';
-            if(i==0) {
-                html +=
-                    '<td rowspan="' + files.length + '">' +
-                        '<button type="button" class="btn close">x</button>' +
-                    '</td>';
-            }
-            html += '</tr>';
+    this.getFile = function(filename) {
+        if(filename in this.files[this.level]) {
+            return this.files[this.level][filename];
         }
-        var tr = $(html);
-        tr.find('button.close').click(function() {
-            $('#files_repository_list > tbody > tr[group_idx=' +  group_idx + ']').remove();
-            $('#files_repository_inputs > input[group_idx=' +  group_idx + ']').remove();
-            enumerateFiles();
-        })
-        $('#files_repository_list').append(tr);
-        enumerateFiles();
+        throw new Error(this.options.strings.file_not_found + filename);
     }
 
 
-    var group_idx = 0;
-
-    function addInput() {
-        group_idx ++;
-        var input = $(
-            '<input group_idx="' + group_idx + '" ' +
-            'type="file" class="btn" multiple ' +
-            'accept="' + options.extensions + '" ' +
-            'title="' + options.strings.add + '"/>');
-
-        $('#files_repository_inputs').append(input);
-        input.change(function() {
-            if(!this.files.length) return;
-            addFilesGroup(this.files, group_idx);
-            $(this).hide();
-            addInput();
-        })
+    this.getFileNames = function() {
+        return Object.keys(this.files[this.level]);
     }
 
 
-
-    // interface
-    this.show = function() {
-        $('#files_repository_modal').show();
+    this.fireOnChange = function() {
+        this.callbacks['onChange'] && this.callbacks.onChange(this.getFileNames());
     }
 
-
-    this.getFile = function(n) {
-        var p = 0;
-        var inputs = $('#files_repository_inputs > input[type=file]');
-        for(var i=0, input; input = inputs[i]; i++) {
-            if(n >= p && n < p + input.files.length) {
-                return input.files[n - p];
-            }
-            p += input.files.length;
-        }
-        return null;
-    }
-
-
-    // init
-    initModal();
 }

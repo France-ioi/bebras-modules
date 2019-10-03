@@ -52,7 +52,10 @@ var getContext = function(display, infos) {
                     'caption': 'Audio files list',
                     'hint': 'Use file number as param for playRecord function',
                     'add': 'Add',
-                    'incompatible_browser': 'Incompatible browser'
+                    'incompatible_browser': 'Incompatible browser',
+                    'confirm_overwrite': 'Overwrite files?',
+                    'file_not_found': 'File not found: ',
+                    'copy_to_clipboard': 'Copy name to clipboard'
                 }
             }
         },
@@ -106,7 +109,10 @@ var getContext = function(display, infos) {
                     'caption': 'Liste des fichiers audio',
                     'hint': 'Utilisez le numéro de fichier comme paramètre de la fonction playRecord',
                     'add': 'Ajouter',
-                    'incompatible_browser': 'Navigateur incompatible'
+                    'incompatible_browser': 'Navigateur incompatible',
+                    'confirm_overwrite': 'Overwrite files?',
+                    'file_not_found': 'File not found: ',
+                    'copy_to_clipboard': 'Copy name to clipboard'
                 }
             }
         }
