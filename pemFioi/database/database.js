@@ -105,7 +105,6 @@ function DatabaseHelper(options) {
 
 
     this.destroy = function() {
-        alert(1)
         renderers.html.destroy();
         renderers.map.destroy();
         renderers.graph.destroy();
