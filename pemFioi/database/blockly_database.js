@@ -211,7 +211,7 @@ var getContext = function(display, infos, curLevel) {
     var context = quickAlgoContext(display, infos)
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
-    var files, db_helper, tables_list;
+    var files, tables_list;
     var ready = false;
 
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
@@ -325,7 +325,9 @@ var getContext = function(display, infos, curLevel) {
             level: curLevel
         });
 
-        db_helper = new DatabaseHelper(
+        window.db_helper && window.db_helper.destroy();
+
+        window.db_helper = new DatabaseHelper(
             Object.assign({
                 parent: $('#grid')
             }, infos.databaseConfig)
