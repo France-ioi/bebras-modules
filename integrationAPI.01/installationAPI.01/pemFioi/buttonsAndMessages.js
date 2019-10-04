@@ -872,6 +872,10 @@ window.displayHelper = {
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
+      } catch(e) {
+      }
+      // This try is probably not needed but avoid breaking just in case
+      try {
          $(document).ready(function () {displayHelper.updateLayout();});
          $(window).resize(function () {displayHelper.updateLayout();});
          this.bUseFullWidth = true;
