@@ -297,15 +297,15 @@ var getContext = function(display, infos, curLevel) {
 
         if(!context.display) return;
 
-        $('#grid').prepend(
-            '<div id="database_controls">' +
-                '<button class="btn pull_right" id="btn_files">' + strings.ui.btn_files_repository + '</button>' +
-            '</div>'
-        );
+        $('#grid').prepend('<div id="database_controls"></div>');
 
-        $('#btn_files').click(function() {
-            task_files.open();
-        });
+        if(!infos.databaseConfig['disable_csv_import']) {
+            var btn = $('<button class="btn pull_right" id="btn_files">' + strings.ui.btn_files_repository + '</button>');
+            btn.click(function() {
+                task_files.open();
+            })
+            $('#database_controls').append(btn)
+        }
 
         tables_list.init({
             parent: $('#database_controls'),
@@ -385,6 +385,9 @@ var getContext = function(display, infos, curLevel) {
         },
 
         loadTableFromCsv: function(filename, types, callback) {
+            if(infos.databaseConfig['disable_csv_import']) {
+                throw new Error('CSV import disabled');
+            }
             var file = task_files.getFile(filename);
             if(file === null) {
                 throw new Error(strings.messages.file_not_found + fileNumber);

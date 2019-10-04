@@ -133,7 +133,7 @@ function FilesRepository(options) {
 
 
     this.getFile = function(filename) {
-        if(filename in this.files[this.level]) {
+        if(this.files[this.level] && filename in this.files[this.level]) {
             return this.files[this.level][filename];
         }
         throw new Error(this.options.strings.file_not_found + filename);
