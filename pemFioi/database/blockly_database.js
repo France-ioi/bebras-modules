@@ -240,41 +240,32 @@ var getContext = function(display, infos, curLevel) {
             btn.on('click', this.displayTable.bind(this));
             this.elements.box.append(btn);
 
+            var visible = this.renderOptions(params.tables) > 0;
+            this.elements.box.toggle(visible);
+
             params.parent.prepend(this.elements.box);
-            this.setTables(params.tables);
+
             this.callback = params.callback;
         },
 
 
         displayTable: function() {
             var opt = this.elements.select.find('option:selected');
-            this.callback && this.callback(opt.val(), !!opt.data('imported'));
+            this.callback(opt.val());
         },
 
 
-        renderOptions: function() {
+        renderOptions: function(tables) {
             var cnt = 0;
             this.elements.select.empty();
-            for(var name in this.tables.task) {
-                if(this.tables.task[name].public) {
+            for(var name in tables.task) {
+                if(tables.task[name].public) {
                     this.elements.select.append('<option value="'+ name +'">' + name + '</option>');
                     cnt++;
                 }
             }
-            for(var i=0; i<this.tables.imported.length; i++) {
-                var filename = this.tables.imported[i];
-                this.elements.select.append('<option value="'+ filename +'" data-imported="1">' + filename + '</option>');
-                cnt++;
-            }
             return cnt;
-        },
-
-        setTables: function(tables) {
-            this.tables = Object.assign(this.tables, tables);
-            var visible = this.renderOptions() > 0;
-            this.elements.box.toggle(visible);
         }
-
     }
 
 
@@ -292,11 +283,6 @@ var getContext = function(display, infos, curLevel) {
 
         task_files.initLevel({
             strings: strings.ui.files_repository,
-            onChange: function(list) {
-                tables_list && tables_list.setTables({
-                    imported: list
-                });
-            },
             level: curLevel
         });
 
