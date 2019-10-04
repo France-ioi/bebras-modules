@@ -13,7 +13,6 @@ function FilesRepository(options) {
     }
     this.options = Object.assign(defaults, options);
     this.browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
-    this.callbacks = {}
     this.files = {}
     this.popup = null;
     this.level = null;
@@ -21,7 +20,6 @@ function FilesRepository(options) {
 
     this.initLevel = function(params) {
         this.level = params.level;
-        this.callbacks.onChange = params.onChange;
         this.options.strings = Object.assign(defaults.strings, params.strings);
     }
 
@@ -63,7 +61,6 @@ function FilesRepository(options) {
         }
         e.target.value = '';
         this.renderFiles();
-        this.fireOnChange();
     }
 
 
@@ -84,7 +81,6 @@ function FilesRepository(options) {
         var filename = $(e.target).data('filename');
         delete this.files[this.level][filename];
         this.renderFiles();
-        this.fireOnChange();
     }
 
 
@@ -148,9 +144,5 @@ function FilesRepository(options) {
         return Object.keys(this.files[this.level]);
     }
 
-
-    this.fireOnChange = function() {
-        this.callbacks['onChange'] && this.callbacks.onChange(this.getFileNames());
-    }
 
 }
