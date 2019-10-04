@@ -92,7 +92,6 @@ var getContext = function(display, infos, curLevel) {
             },
             ui: {
                 'btn_diplay_table': 'Display',
-                'btn_clipboard': 'Copy name to clipboard',
                 'btn_files_repository': 'Add CSV files...',
                 'files_repository': {
                     'caption': 'CSV files list',
@@ -193,7 +192,6 @@ var getContext = function(display, infos, curLevel) {
             },
             ui: {
                 'btn_diplay_table': 'Visualiser',
-                'btn_clipboard': 'Copy name to clipboard',
                 'btn_files_repository': 'Ajouter des CSV...',
                 'files_repository': {
                     'caption': 'Liste des fichiers CSV',
@@ -238,10 +236,6 @@ var getContext = function(display, infos, curLevel) {
             this.elements.select = $('<select></select>');
             this.elements.box.append(this.elements.select);
 
-            var btn = $('<button type="button" class="btn">' + strings.ui.btn_clipboard + '</button>');
-            btn.on('click', this.copyToClipboard.bind(this));
-            this.elements.box.append(btn);
-
             var btn = $('<button class="btn">' + strings.ui.btn_diplay_table + '</button>');
             btn.on('click', this.displayTable.bind(this));
             this.elements.box.append(btn);
@@ -257,25 +251,6 @@ var getContext = function(display, infos, curLevel) {
             this.callback && this.callback(opt.val(), !!opt.data('imported'));
         },
 
-        copyToClipboard: function() {
-            var opt = this.elements.select.find('option:selected');
-            var text = opt.val();
-            if(navigator.clipboard) {
-                navigator.clipboard.writeText(text)
-                return;
-            }
-            var el = document.createElement('textarea');
-            el.value = text;
-            document.body.appendChild(el);
-            el.focus();
-            el.select();
-            try {
-                document.execCommand('copy');
-            } catch (e) {
-                console.error('document.execCommand(\'copy\') error', e);
-            }
-            document.body.removeChild(el);
-        },
 
         renderOptions: function() {
             var cnt = 0;
