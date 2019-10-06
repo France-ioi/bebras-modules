@@ -157,10 +157,19 @@ function DatabaseHelper(options) {
     }
 
 
-    function parseCsvLine(line) {
+    function parseCsvValue(v, type) {
+        v = v.replace(/['"]+/g, '');
+        if(type == 'number') {
+            v = parseFloat(v);
+        }
+        return v;
+    }
+
+
+    function parseCsvLine(line, types) {
         var res = line.split(options.csv_delimiter);
         for(var i=0; i<res.length; i++) {
-            res[i] = res[i].replace(/['"]+/g, '');
+            res[i] = parseCsvValue(res[i], types[i]);
         }
         return res;
     }
@@ -177,14 +186,22 @@ function DatabaseHelper(options) {
                 records: []
             };
             var lines = reader.result.split(/\r\n|\n/);
+            var columns_cnt = 0;
             for(var i=0, line; line=lines[i]; i++) {
-                var row = parseCsvLine(line);
+                var row = parseCsvLine(line, types);
+                columns_cnt = Math.max(columns_cnt, row.length);
                 if(i === 0) {
                     res.columnNames = row;
                 } else {
                     res.records.push(row);
                 }
             }
+
+            // add missed types
+            while(res.columnTypes.length < columns_cnt) {
+                res.columnTypes.push('string');
+            }
+
             callback(Table(res));
         };
         reader.readAsText(file);
@@ -223,6 +240,8 @@ function TableRendererHtml(options) {
 
 
     function isEqual(a, b, type) {
+        return a === b;
+        /*
         switch(type) {
             case 'image':
             case 'string':
@@ -232,6 +251,7 @@ function TableRendererHtml(options) {
                 return parseFloat(a) == parseFloat(b);
         }
         return false;
+        */
     }
 
 
@@ -626,22 +646,6 @@ if(typeof(Number.prototype.toRad) === "undefined") {
 }
 
 function Table(params) {
-
-
-    function applyType(value, type) {
-        if(type == 'number') {
-            return parseFloat(value);
-        }
-        return '' + (value || '');
-    }
-
-    for(var i=0; i<params.records.length; i++) {
-        for(var j=0; j<params.records[i].length; j++) {
-            params.records[i][j] = applyType(params.records[i][j], params.columnTypes[j] || 'string');
-        }
-    }
-
-    console.log(params.records)
 
 
 
