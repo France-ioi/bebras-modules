@@ -363,7 +363,7 @@ var getContext = function(display, infos, curLevel) {
     context.expectTable = function(name) {
         if(name in task_tables) {
             var table = Table(task_tables[name].data);
-            var status = db_helper.validateResult(table);
+            var status = db_helper.validateResultByTable(table);
             if(status === true) {
                 context.success = true;
                 throw strings.messages.success;
@@ -375,6 +375,17 @@ var getContext = function(display, infos, curLevel) {
             context.success = false;
             console.error('Table not found: ' + name)
         }
+    }
+
+    context.expectHash = function(hash) {
+        var status = db_helper.validateResultByHash(hash);
+        if(status === true) {
+            context.success = true;
+            throw strings.messages.success;
+            return;
+        }
+        context.success = false;
+        throw new Error(strings.messages[status]);
     }
 
     context.database = {

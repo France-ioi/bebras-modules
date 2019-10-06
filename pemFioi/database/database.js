@@ -57,6 +57,9 @@ function DatabaseHelper(options) {
     this.displayTable = function(table, display) {
         last_table = table;
         this.hide(display);
+        if(options.calculate_hash) {
+            console.log('Hash: ' + this.calculateTableHash(table));
+        }
         renderers.html.displayTable(table, null, display);
         last_renderer = 'html';
     };
@@ -64,6 +67,9 @@ function DatabaseHelper(options) {
     this.displayTableOnMap = function(table, display) {
         last_table = table;
         this.hide(display);
+        if(options.calculate_hash) {
+            console.log('Hash: ' + this.calculateTableHash(table));
+        }
         renderers.map.displayTable(table, null, display);
         last_renderer = 'map';
     };
@@ -72,6 +78,9 @@ function DatabaseHelper(options) {
         last_table = table;
         last_type = type;
         this.hide(display);
+        if(options.calculate_hash) {
+            console.log('Hash: ' + this.calculateTableHash(table));
+        }
         renderers.graph.displayTable(table, type, null, display);
         last_renderer = 'graph';
     };
@@ -81,7 +90,7 @@ function DatabaseHelper(options) {
         renderers.console.print(variable, display);
     };
 
-    this.validateResult = function(reference_table) {
+    this.validateResultByTable = function(reference_table) {
         //this.hide();
         //FIXME la last table stockée est celle qui ne contient que namecolumn dans graph, ou nam lat et lng dans Map, ca n'a pas de sens de refuser une table trop complete ??
         //if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
@@ -102,6 +111,27 @@ function DatabaseHelper(options) {
         }
         return true;
     };
+
+    this.validateResultByHash = function(hash) {
+        if(hash !== this.calculateTableHash(last_table)) {
+            return 'incorrect_results';
+        }
+        return true;
+    }
+
+
+    function hashString(str) {
+        var hash = 0, i = 0, len = str.length;
+        while(i < len) {
+            hash = ((hash << 5) - hash + str.charCodeAt(i++)) << 0;
+        }
+        return hash;
+    }
+
+
+    this.calculateTableHash = function(table) {
+        return hashString(table.toString());
+    }
 
 
     this.destroy = function() {
@@ -939,6 +969,15 @@ function Table(params) {
 
             res.records = joinRecords[type](params, idx1, params2, idx2);
             return Table(res);
+        },
+
+
+        toString: function() {
+            var str = params.columnNames.join('');
+            for(var i=0; i<params.records.length; i++) {
+                str += params.records[i].join('');
+            }
+            return str;
         }
 
     }
