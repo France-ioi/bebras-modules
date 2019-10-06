@@ -239,7 +239,7 @@ function TableRendererHtml(options) {
         var html = '';
 
         var rows = table.params().records;
-        if(rows.length > options.render_max_rows) {
+        if(options.render_max_rows > 0 && rows.length > options.render_max_rows) {
             rows = rows.slice(0, options.render_max_rows);
             html += 'Only the first ' + options.render_max_rows + ' records are displayed';
         }
