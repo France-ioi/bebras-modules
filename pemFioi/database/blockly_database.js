@@ -9,7 +9,8 @@ var getContext = function(display, infos, curLevel) {
             },
             label: {
                 loadTable: 'loadTable(%1)',
-                loadTableFromCsv: 'loadTableFromCsv(%1, %2)',
+                loadTableFromCsv: 'loadTableFromCsv(%1)',
+                loadTableFromCsvWithTypes: 'loadTableFromCsv(%1, %2)',
                 getRecords: 'getRecords(%1)',
                 selectByColumn: 'selectByColumn(%1, %2, %3)',
                 selectByFunction: 'selectByFunction(%1, %2)',
@@ -31,6 +32,7 @@ var getContext = function(display, infos, curLevel) {
             code: {
                 loadTable: 'loadTable',
                 loadTableFromCsv: 'loadTableFromCsv',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
                 getRecords: 'getRecords',
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
@@ -52,6 +54,7 @@ var getContext = function(display, infos, curLevel) {
             description: {
 /*                loadTable: 'loadTable()',
                 loadTableFromCsv: 'loadTableFromCsv()',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes()',
                 getRecords: 'getRecords()',
                 selectByColumn: 'selectByColumn()',
                 selectByFunction: 'selectByFunction()',
@@ -109,7 +112,8 @@ var getContext = function(display, infos, curLevel) {
             },
             label: {
                 loadTable: 'loadTable(%1)',
-                loadTableFromCsv: 'loadTableFromCsv(%1, %2)',
+                loadTableFromCsv: 'loadTableFromCsv(%1)',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes(%1, %2)',
                 getRecords: 'getRecords(%1)',
                 selectByColumn: 'selectByColumn(%1, %2, %3)',
                 selectByFunction: 'selectByFunction(%1, %2)',
@@ -131,6 +135,7 @@ var getContext = function(display, infos, curLevel) {
             code: {
                 loadTable: 'loadTable',
                 loadTableFromCsv: 'loadTableFromCsv',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
                 getRecords: 'getRecords',
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
@@ -152,6 +157,7 @@ var getContext = function(display, infos, curLevel) {
             description: {
 /*                loadTable: 'loadTable()',
                 loadTableFromCsv: 'loadTableFromCsv()',
+                loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes()',
                 getRecords: 'getRecords()',
                 selectByColumn: 'selectByColumn()',
                 selectByFunction: 'selectByFunction()',
@@ -355,9 +361,7 @@ var getContext = function(display, infos, curLevel) {
     context.setScale = function(scale) {}
     context.updateScale = function() {}
     context.resetDisplay = function() {}
-    context.unload = function() {
-        console.log('context.unload')
-    }
+    context.unload = function() {}
 
 
     context.expectTable = function(name) {
@@ -388,6 +392,9 @@ var getContext = function(display, infos, curLevel) {
         throw new Error(strings.messages[status]);
     }
 
+
+
+
     context.database = {
 
         loadTable: function(name, callback) {
@@ -395,7 +402,8 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback, Table(task_tables[name].data));
         },
 
-        loadTableFromCsv: function(filename, types, callback) {
+
+        loadTableFromCsvWithTypes: function(filename, types, callback) {
             if(infos.databaseConfig['disable_csv_import']) {
                 throw new Error('CSV import disabled');
             }
@@ -407,6 +415,10 @@ var getContext = function(display, infos, curLevel) {
             db_helper.loadCsv(file, types_arr, function(table) {
                 context.waitDelay(callback, table);
             });
+        },
+
+        loadTableFromCsv: function(filename, callback) {
+            context.database.loadTableFromCsvWithTypes(filename, [], callback);
         },
 
         getRecords: function(table, callback) {
@@ -517,7 +529,12 @@ var getContext = function(display, infos, curLevel) {
                     yieldsValue: true
                 },
                 { name: 'loadTableFromCsv',
-                    params: ['String', 'Number'],
+                    params: ['String'],
+                    params_names: ['file', 'columnTypes'],
+                    yieldsValue: true
+                },
+                { name: 'loadTableFromCsvWithTypes',
+                    params: ['String', 'Block'],
                     params_names: ['file', 'columnTypes'],
                     yieldsValue: true
                 },
