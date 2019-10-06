@@ -628,6 +628,23 @@ if(typeof(Number.prototype.toRad) === "undefined") {
 function Table(params) {
 
 
+    function applyType(value, type) {
+        if(type == 'number') {
+            return parseFloat(value);
+        }
+        return '' + (value || '');
+    }
+
+    for(var i=0; i<params.records.length; i++) {
+        for(var j=0; j<params.records[i].length; j++) {
+            params.records[i][j] = applyType(params.records[i][j], params.columnTypes[j] || 'string');
+        }
+    }
+
+    console.log(params.records)
+
+
+
     function nullRow(length) {
         return Array.apply(null, Array(length)).map(function() {
             return null;
