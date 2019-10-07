@@ -292,7 +292,9 @@ var getContext = function(display, infos, curLevel) {
             level: curLevel
         });
 
-        window.db_helper && window.db_helper.destroy();
+        if(context.display) {
+            window.db_helper && window.db_helper.destroy();
+        }
 
         window.db_helper = new DatabaseHelper(
             Object.assign({
@@ -332,6 +334,18 @@ var getContext = function(display, infos, curLevel) {
             }
         });
 
+        //console.log(context.blocklyHelper.loadExample)
+        setTimeout(
+            function() {
+                context.blocklyHelper.loadExample({
+                    blockly: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" id="xLC,-=/@KAQ[.hz?OV:h" deletable="false" movable="false" editable="false" x="0" y="0"><next><block type="displayTable" id="VdvCAZO?CsIU?U_arMsl"><value name="PARAM_0"><block type="loadTable" id="HbABJ+[UOm0O(0`[}+S7"><value name="PARAM_0"><shadow type="text" id="2QX-i)zyR}Znz+D/vI3R"><field name="TEXT">test_table</field></shadow></value></block></value></block></next></block></xml>'
+                });
+
+            }, 400
+        )
+
+
+        //subTask.blocklyHelper.loadExample(exampleObj ? exampleObj : subTask.levelGridInfos.example);
 /*
         //test html render
         setTimeout(function() {
