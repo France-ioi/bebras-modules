@@ -4,8 +4,13 @@ function DatabaseHelper(options) {
         date_format: 'YYYY-MM-DD',
         types: ['number', 'image', 'string', 'date'],
 
-        csv_delimiter: ';',
         parent: document.body,
+
+        // common
+        disable_csv_import: false,
+        csv_delimiter: ';',
+        calculate_hash: false,
+        strict_types: false,
 
         // html renderer
         render_row_height: '20px',
@@ -188,13 +193,14 @@ function DatabaseHelper(options) {
             var lines = reader.result.split(/\r\n|\n/);
             var columns_cnt = 0;
             for(var i=0, line; line=lines[i]; i++) {
-                var row = parseCsvLine(line, types);
-                columns_cnt = Math.max(columns_cnt, row.length);
                 if(i === 0) {
+                    var row = parseCsvLine(line, []);
                     res.columnNames = row;
                 } else {
+                    var row = parseCsvLine(line, types);
                     res.records.push(row);
                 }
+                columns_cnt = Math.max(columns_cnt, row.length);
             }
 
             // add missed types
@@ -239,19 +245,8 @@ function TableRendererHtml(options) {
 
 
 
-    function isEqual(a, b, type) {
-        return a === b;
-        /*
-        switch(type) {
-            case 'image':
-            case 'string':
-            case 'date':
-                return a == b;
-            case 'number':
-                return parseFloat(a) == parseFloat(b);
-        }
-        return false;
-        */
+    function isEqual(a, type_a, b, type_b) {
+        return options.strict_types ? (a == b && type_a == type_b) : (a == b);
     }
 
 
@@ -270,6 +265,7 @@ function TableRendererHtml(options) {
             '</th></tr>';
 
         var reference_rows = reference_table ? reference_table.params().records : null;
+        var reference_types = reference_table ? reference_table.params().columnTypes : [];
         var valid_value = true;
         var valid_all = true;
         var types = table.params().columnTypes;
@@ -278,7 +274,7 @@ function TableRendererHtml(options) {
             for(var j=0; j<row.length; j++) {
                 var value = row[j];
                 if(reference_rows) {
-                    valid_value = reference_rows[i] && isEqual(value, reference_rows[i][j], types[j]);
+                    valid_value = reference_rows[i] && isEqual(value, types[j], reference_rows[i][j], reference_types[j]);
                 }
                 valid_all = valid_all && valid_value;
                 html +=
