@@ -338,11 +338,11 @@ function TableRendererMap(options) {
             var mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(map_lat_bottomRad)) / (1 - Math.sin(map_lat_bottomRad))))
 
             this.x = function(lng) {
-                return (lng - options.map_lng_left) * (options.width / mapLngDelta);
+                return (parseFloat(lng) - options.map_lng_left) * (options.width / mapLngDelta);
             }
 
             this.y = function(lat) {
-                var latitudeRad = lat.toRad()
+                var latitudeRad = parseFloat(lat).toRad()
                 return options.height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - mapOffsetY)
             }
         }
