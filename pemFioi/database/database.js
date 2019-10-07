@@ -41,22 +41,25 @@ function DatabaseHelper(options) {
 
     var options = Object.assign(defaults, options || {})
 
-    var renderers = {
-        html: new TableRendererHtml(options),
-        map: new TableRendererMap(options),
-        graph: new TableRendererGraph(options),
-        console: new ConsoleRenderer(options)
+    if(!window.db_renderers) {
+        window.db_renderers = {
+            html: new TableRendererHtml(options),
+            map: new TableRendererMap(options),
+            graph: new TableRendererGraph(options),
+            console: new ConsoleRenderer(options)
+        }
     }
+
     var last_renderer = null;
     var last_table = null;
     var last_type = 'line';
 
     this.hide = function(display) {
         if(!display) return;
-        renderers.html.hide();
-        renderers.map.hide();
-        renderers.graph.hide();
-        renderers.console.hide();
+        db_renderers.html.hide();
+        db_renderers.map.hide();
+        db_renderers.graph.hide();
+        db_renderers.console.hide();
     };
 
     this.displayTable = function(table, display) {
@@ -65,7 +68,7 @@ function DatabaseHelper(options) {
         if(options.calculate_hash) {
             console.log('Hash: ' + this.calculateTableHash(table));
         }
-        renderers.html.displayTable(table, null, display);
+        db_renderers.html.displayTable(table, null, display);
         last_renderer = 'html';
     };
 
@@ -75,7 +78,7 @@ function DatabaseHelper(options) {
         if(options.calculate_hash) {
             console.log('Hash: ' + this.calculateTableHash(table));
         }
-        renderers.map.displayTable(table, null, display);
+        db_renderers.map.displayTable(table, null, display);
         last_renderer = 'map';
     };
 
@@ -86,13 +89,13 @@ function DatabaseHelper(options) {
         if(options.calculate_hash) {
             console.log('Hash: ' + this.calculateTableHash(table));
         }
-        renderers.graph.displayTable(table, type, null, display);
+        db_renderers.graph.displayTable(table, type, null, display);
         last_renderer = 'graph';
     };
 
     this.displayConsole = function(variable, display) {
         this.hide(display);
-        renderers.console.print(variable, display);
+        db_renderers.console.print(variable, display);
     };
 
     this.validateResultByTable = function(reference_table) {
@@ -102,9 +105,9 @@ function DatabaseHelper(options) {
         //    return 'incorrect_results';
         //}
         if (last_renderer === 'graph') {
-            var valid_all = renderers[last_renderer].displayTable(last_table, last_type, reference_table, true);
+            var valid_all = db_renderers[last_renderer].displayTable(last_table, last_type, reference_table, true);
         } else if(last_renderer) {
-            var valid_all = renderers[last_renderer].displayTable(last_table, reference_table, true);
+            var valid_all = db_renderers[last_renderer].displayTable(last_table, reference_table, true);
         } else {
             var valid_all = false;
         }
@@ -140,10 +143,10 @@ function DatabaseHelper(options) {
 
 
     this.destroy = function() {
-        renderers.html.destroy();
-        renderers.map.destroy();
-        renderers.graph.destroy();
-        renderers.console.destroy();
+        db_renderers.html.destroy();
+        db_renderers.map.destroy();
+        db_renderers.graph.destroy();
+        db_renderers.console.destroy();
     }
 
 
