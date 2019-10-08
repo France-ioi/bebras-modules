@@ -50,6 +50,7 @@ window.displayHelper = {
    levels: ['easy', 'medium', 'hard'],
    levelsIdx: { easy: 0, medium: 1, hard: 2 },
    maxStars: 4,
+   inlinePopupMessage: false,
 
    formatTranslation: function(s, args) { return s.replace(/\{([^}]+)\}/g, function(_, match){ return args[match]; }); },
 
@@ -647,7 +648,7 @@ window.displayHelper = {
          }
          addTaskHTML += '</div>';
          if (!document.getElementById('displayHelperAnswering')) {
-            $(self.taskSelector).append(addTaskHTML);   
+            $(self.taskSelector).append(addTaskHTML);
          }
          self.loaded = true;
          self.timeLoaded = new Date().getTime();
@@ -748,7 +749,7 @@ window.displayHelper = {
          task.reloadStateObject(task.getDefaultStateObject(), true);
          task.reloadAnswerObject(task.getDefaultAnswerObject());
       }
-      
+
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
@@ -867,7 +868,7 @@ window.displayHelper = {
          }
      }
    },
-   
+
    useFullWidth: function() {
       // TODO: find a clean way to do this
       try {
@@ -914,7 +915,7 @@ window.displayHelper = {
       state.level = newLevel;
       this.taskLevel = newLevel;
       var self = this;
-      
+
       var afterReload = function() {
          self.submittedScore = self.levelsScores[self.taskLevel];
          self.refreshMessages = true;
@@ -927,7 +928,7 @@ window.displayHelper = {
                self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
-               var easyVersionKey = "levelVersionName_easy"; 
+               var easyVersionKey = "levelVersionName_easy";
                if (self.pointsAsStars) {
                   hardVersionKey += "_stars";
                   easyVersionKey += "_stars";
@@ -941,7 +942,7 @@ window.displayHelper = {
             }
          }
       };
-      
+
       if(self.reloadWithCallbacks) {
          task.reloadStateObject(state, function() {
             task.reloadAnswerObject(answer, afterReload);
@@ -993,7 +994,7 @@ window.displayHelper = {
       var popupHtml = '<div class="container">' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div></div>';
-         
+
       $('#popupMessage').html(popupHtml).show();
 
       this.popupMessageShown = true;
@@ -1008,7 +1009,48 @@ window.displayHelper = {
       $('#popupMessage').addClass('noAvatar');
    },
 
+
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
+      if(this.inlinePopupMessage) {
+         this.showInlineMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);
+      } else {
+         this.showOverlayMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);
+      }
+   },
+
+   showInlineMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
+      message = message.replace('<br/>', '');
+
+      function closeMessage() {
+         $('#introGrid .speedControls .successMessage').remove();
+      }
+      closeMessage();
+
+      var buttonYes = '<button class="btn btn_yes">' + (yesButtonText || this.strings.alright) + '</button>';
+      var buttonNo = '';
+      if(noButtonText != undefined) {
+         buttonNo = '<button class="btn btn_no">' + noButtonText + '</button>';
+      }
+      var el = $(
+         '<div class="successMessage">' +
+            '<div class="messageWrapper">' + message + buttonYes + buttonNo + '</div>' +
+         '</div>'
+      );
+      el.find('.btn_yes').click(function() {
+         closeMessage();
+         displayHelper.popupMessageShown = false;
+         agreeFunc && agreeFunc();
+      });
+      el.find('.btn_no').click(function() {
+         closeMessage();
+         displayHelper.popupMessageShown = false;
+         disagreeFunc && disagreeFunc();
+      });
+      $('#introGrid .speedControls').append(el);
+   },
+
+
+   showOverlayMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -1171,12 +1213,12 @@ window.displayHelper = {
          });
       }
    },
-   
+
    setValidateString: function(str) {
       this.customValidateString = str;
-      $("#displayHelper_validate > input").val(str);      
+      $("#displayHelper_validate > input").val(str);
    },
-   
+
    callValidate: function() {
       if (this.customValidate != undefined) {
          this.customValidate();
@@ -1452,7 +1494,7 @@ window.displayHelper = {
          if (!this.hasSolution) {
             if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = this.strings.yourScoreIsNow;
-            } else if (this.prevSavedScore > this.submittedScore) { 
+            } else if (this.prevSavedScore > this.submittedScore) {
                scoreDiffMsg = this.strings.worseScoreStays;
                showRetrieveAnswer = true;
             }
@@ -1523,7 +1565,7 @@ window.displayHelper = {
                   } else {
                      message += this.strings.forMorePointsMoveToNextLevel;
                   }
-               } else if (this.submittedScore < prevScore) { 
+               } else if (this.submittedScore < prevScore) {
                   message += this.strings.youDidBetterBefore;
                   showRetrieveAnswer = true;
                }
@@ -1550,7 +1592,7 @@ window.displayHelper = {
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
                   return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
-               } 
+               }
             }
             break;
       }
@@ -1604,7 +1646,7 @@ window.displayHelper = {
       this.initLanguage();
       var self = this;
       this.refreshMessages = false;
-      var suffix, prefix; 
+      var suffix, prefix;
       if (this.hasAnswerChanged) {
          suffix = 'changed';
       } else {
@@ -1788,7 +1830,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       [[22, 90], [50, 77], [78, 90], [75, 60], [25, 60]]
    ];
 
-   
+
    if ($('#' + id).length == 0) {
       return;
    }
@@ -1803,7 +1845,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
          fill: fillColors[mode],
          stroke: 'none'
       }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
-      
+
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
       if (xClip > 0) {
