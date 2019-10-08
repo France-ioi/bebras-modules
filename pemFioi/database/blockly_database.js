@@ -334,7 +334,7 @@ var getContext = function(display, infos, curLevel) {
             }
         });
 
-        //console.log(context.blocklyHelper.loadExample)
+        /*
         setTimeout(
             function() {
                 context.blocklyHelper.loadExample({
@@ -343,6 +343,7 @@ var getContext = function(display, infos, curLevel) {
 
             }, 400
         )
+        */
 
 
         //subTask.blocklyHelper.loadExample(exampleObj ? exampleObj : subTask.levelGridInfos.example);
