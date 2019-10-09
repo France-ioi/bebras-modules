@@ -742,32 +742,74 @@ var quickAlgoInterface = {
         this.lastHeight = browserHeight;
     },
 
-    displayError: function(message, lock) {
+    displayNotification: function(type, message, lock, yesFunc, noFunc) {
         if(lock) {
-            $('.errorMessageLock').remove();
+            $('.notificationMessageLock').remove();
         } else {
-            $('.errorMessage').not('.errorMessageLock').remove();
+            $('.notificationMessage').not('.notificationMessageLock').remove();
         }
         if(!message) return;
-        var divClass = lock ? 'errorMessageLock' : '';
+        var divClass = lock ? 'notificationMessageLock' : '';
+        if(type == 'error') {
+            divClass += 'errorMessage';
+            var icon = 'fa-bell';
+        } else {
+            divClass += 'successMessage';
+            var icon = 'fa-check';
+        }
         var id = Math.random();
         var html =
-            '<div class="errorMessage '+divClass+'" data-id="'+id+'">' +
-                '<button type="button" class="btn close">'+
+            '<div class="notificationMessage '+divClass+'" data-id="'+id+'">' +
+                '<button type="button" class="close notificationMessageClose">'+
                     '<span class="fas fa-times"></span>'+
                 '</button>' +
                 '<div class="messageWrapper">' +
-                    '<span class="icon fas fa-bell"></span>' +
+                    '<span class="icon fas ' + icon + '"></span>' +
                     '<p class="message">' + message + '</p>' +
                 '</div>' +
             '</div>';
         $("#taskToolbar").append($(html));
         $("#introGrid .speedControls").append($(html));
-        $(".errorMessage").not('.errorMessageLock').click(function(e) {
-            var targetId = e.currentTarget.getAttribute('data-id');
-            $(e.currentTarget).remove();
-            $(".errorMessage[data-id='"+targetId+"']").remove();
+
+        function closeNotification(e) {
+            var targetNotification = $(e.currentTarget).closest('.notificationMessage');
+            if(!targetNotification) { return; }
+            var targetId = targetNotification.attr('data-id');
+            targetNotification.remove();
+            $(".notificationMessage[data-id='"+targetId+"']").remove();
+        }
+
+        $(".notificationMessage").not('.notificationMessageLock').click(function(e) {
+            closeNotification(e);
+            if(noFunc) { noFunc(); }
         });
+        if(yesFunc) {
+            $('.notificationMessage .btn_yes').click(function(e) {
+                closeNotification(e);
+                yesFunc();
+            });
+        }
+    },
+
+    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
+        // Replacement for displayHelper's showPopupMessage in some cases
+
+        if(!this.context || !this.context.inlinePopupMessage || mode != 'blanket') { return false; }
+
+        message = message.replace(/<br\/?>/g, ' ');
+        var buttonYes = '<button class="btn btn_yes">' + (yesButtonText || this.strings.alright) + '</button>';
+        var buttonNo = '';
+        if(noButtonText != undefined) {
+            buttonNo = '&nbsp;<button class="btn btn_no">' + noButtonText + '</button>';
+        }
+        message += buttonYes + buttonNo;
+        this.displayNotification('success', message, false, agreeFunc, disagreeFunc);
+
+        return true;
+    },
+
+    displayError: function(message, lock) {
+        this.displayNotification('error', message, lock);
     },
 
     makeTestResult: function(results, link) {
@@ -865,6 +907,13 @@ $(document).ready(function() {
     window.addEventListener('resize', function() {
         quickAlgoInterface.onResize();
         }, false);
+
+    // Set up our popup handler in displayHelper
+    if(window.displayHelper) {
+        window.displayHelper.popupMessageHandler = function() {
+            return quickAlgoInterface.showPopupMessage.apply(quickAlgoInterface, arguments);
+        }
+    }
 
     // Set up task calls
     if(window.task) {

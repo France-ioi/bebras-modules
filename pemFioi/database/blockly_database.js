@@ -227,6 +227,8 @@ var getContext = function(display, infos, curLevel) {
     ];
 
 
+    // Tell quickAlgoInterface to display message popups as inline
+    context.inlinePopupMessage = true;
 
 
     var tables_list = {
@@ -277,8 +279,6 @@ var getContext = function(display, infos, curLevel) {
 
 
     context.reset = function(taskInfos) {
-        window.displayHelper.inlinePopupMessage = true;
-
         if(taskInfos) {
             task_tables = taskInfos.tables || {};
         }

@@ -50,7 +50,7 @@ window.displayHelper = {
    levels: ['easy', 'medium', 'hard'],
    levelsIdx: { easy: 0, medium: 1, hard: 2 },
    maxStars: 4,
-   inlinePopupMessage: false,
+   popupMessageHandler: null,
 
    formatTranslation: function(s, args) { return s.replace(/\{([^}]+)\}/g, function(_, match){ return args[match]; }); },
 
@@ -1011,46 +1011,15 @@ window.displayHelper = {
 
 
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
-      if(this.inlinePopupMessage && mode == 'blanket') {
-         this.showInlineMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);
-      } else {
-         this.showOverlayMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);
+      if(this.popupMessageHandler) {
+         // A custom popupMessageHandler was defined, call it
+         // It must return true if it handled the popup, false if displayHelper
+         // should handle the popup instead
+         if(this.popupMessageHandler.apply(null, arguments)) {
+            return;
+         }
       }
-   },
 
-   showInlineMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
-      message = message.replace('<br/>', '');
-
-      function closeMessage() {
-         $('#introGrid .speedControls .successMessage').remove();
-      }
-      closeMessage();
-
-      var buttonYes = '<button class="btn btn_yes">' + (yesButtonText || this.strings.alright) + '</button>';
-      var buttonNo = '';
-      if(noButtonText != undefined) {
-         buttonNo = '<button class="btn btn_no">' + noButtonText + '</button>';
-      }
-      var el = $(
-         '<div class="successMessage">' +
-            '<div class="messageWrapper">' + message + buttonYes + buttonNo + '</div>' +
-         '</div>'
-      );
-      el.find('.btn_yes').click(function() {
-         closeMessage();
-         displayHelper.popupMessageShown = false;
-         agreeFunc && agreeFunc();
-      });
-      el.find('.btn_no').click(function() {
-         closeMessage();
-         displayHelper.popupMessageShown = false;
-         disagreeFunc && disagreeFunc();
-      });
-      $('#introGrid .speedControls').append(el);
-   },
-
-
-   showOverlayMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
