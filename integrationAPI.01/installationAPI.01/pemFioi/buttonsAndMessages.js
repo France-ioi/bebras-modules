@@ -1011,7 +1011,7 @@ window.displayHelper = {
 
 
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
-      if(this.inlinePopupMessage) {
+      if(this.inlinePopupMessage && mode == 'blanket') {
          this.showInlineMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);
       } else {
          this.showOverlayMessage(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc);

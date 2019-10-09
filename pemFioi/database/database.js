@@ -138,6 +138,7 @@ function DatabaseHelper(options) {
 
 
     this.calculateTableHash = function(table) {
+        if(!table) { return null; }
         return hashString(table.toString());
     }
 
