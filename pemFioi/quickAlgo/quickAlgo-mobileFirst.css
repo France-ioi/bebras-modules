@@ -353,8 +353,8 @@ p {
   .mode-player #editorBar {
     display: none !important;
   }
-  .mode-instructions .errorMessage,
-  .mode-player .errorMessage.errorMessageLock {
+  .mode-instructions .notificationMessage,
+  .mode-player .notificationMessage.notificationMessageLock {
     display: none;
   }
 }
@@ -1336,29 +1336,35 @@ body.fullscreen #taskToolbar {
 }
 
 /************************
-  DISPLAY ERROR MESSAGES
+  DISPLAY NOTIFICATIONS
 *************************/
-.errorMessage {
+.notificationMessage {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
   padding: 11px 0;
-  background-color: #db8b0a;
   color: #fff;
   font-weight: bold;
   z-index: 1;
   border-radius: 5px 5px 0 0;
+  line-height: 1.1em;
 }
 @media /* Mobiles */
   screen and (max-width: 767.9px) and (orientation: portrait),
   screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
   screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
-  .errorMessage {
+  .notificationMessage {
     box-shadow: 0px 0px 0 2px #fff;
   }
 }
-.errorMessage .messageWrapper {
+.notificationMessage.errorMessage {
+  background-color: #db8b0a;
+}
+.notificationMessage.successMessage {
+  background-color: #8bbb0a;
+}
+.notificationMessage .messageWrapper {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1369,7 +1375,7 @@ body.fullscreen #taskToolbar {
       -ms-flex-align: center;
           align-items: center;
 }
-.errorMessage .messageWrapper .icon {
+.notificationMessage .messageWrapper .icon {
   width: 28px;
   margin: 0 10px;
   line-height: 28px;
@@ -1379,13 +1385,13 @@ body.fullscreen #taskToolbar {
   border-radius: 50%;
   flex-shrink: 0;
 }
-.errorMessage .messageWrapper .message {
+.notificationMessage .messageWrapper .message {
   -webkit-box-flex: 1;
     -ms-flex: 1 1 auto;
         flex: 1 1 auto;
   margin: 0;
 }
-.errorMessage .btn {
+.notificationMessage .notificationMessageClose {
   position: absolute;
   top: 4px;
   right: 4px;
@@ -1395,62 +1401,9 @@ body.fullscreen #taskToolbar {
   color: rgba(0,0,0,0.20);
   cursor: pointer;
 }
-.errorMessage .btn span {
+.notificationMessage .notificationMessageClose span {
   font-size: 18px;
 }
-.errorMessage.errorMessageLock {
-  background-color: #FF9794;
-}
-.errorMessage.errorMessageLock .btn {
-  display: none;
-}
-.errorMessage .testResults {
-  padding: 2px 10px;
-  margin: 0px 6px;
-  border-radius: 10px;
-  background-color: white;
-}
-.errorMessage .testSuccess {
-  color: green;
-}
-.errorMessage .testResults .testError {
-  color: #FF001F;
-}
-.errorMessage .testLink {
-  color: #4A90E2;
-  text-decoration: underline;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-/************************
-  DISPLAY SUCCESS MESSAGES
-*************************/
-.successMessage {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 11px 0;
-  background-color: #8bbb0a;
-  color: #fff;
-  font-weight: bold;
-  z-index: 1;
-  border-radius: 5px 5px 0 0;
-}
-@media /* Mobiles */
-  screen and (max-width: 767.9px) and (orientation: portrait),
-  screen and (min-width: 480px) and (max-width: 854.9px) and (orientation: landscape),
-  screen and (min-width: 480px) and (max-height: 449.9px) and (orientation: landscape) {
-  .successMessage {
-    box-shadow: 0px 0px 0 2px #fff;
-  }
-}
-.successMessage .messageWrapper {
-  margin: 0 10px;
-  font-size: 75%;
-}
-
 .successMessage .btn {
   background-color: #669900;
   border: none;
@@ -1461,6 +1414,31 @@ body.fullscreen #taskToolbar {
   margin-left: 10px;
   padding: 2px 10px;
 }
+.notificationMessage.notificationMessageLock {
+  background-color: #FF9794;
+}
+.notificationMessage.notificationMessageLock .btn {
+  display: none;
+}
+.notificationMessage .testResults {
+  padding: 2px 10px;
+  margin: 0px 6px;
+  border-radius: 10px;
+  background-color: white;
+}
+.notificationMessage .testSuccess {
+  color: green;
+}
+.notificationMessage .testResults .testError {
+  color: #FF001F;
+}
+.notificationMessage .testLink {
+  color: #4A90E2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 
 
 .modalWrapper {
