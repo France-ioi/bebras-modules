@@ -148,6 +148,7 @@ function DatabaseHelper(options) {
         db_renderers.map.destroy();
         db_renderers.graph.destroy();
         db_renderers.console.destroy();
+        window.db_renderers = null;
     }
 
 

@@ -1,7 +1,5 @@
 var getContext = function(display, infos, curLevel) {
 
-    //console.log('getContext', curLevel)
-
     var language_strings = {
         en: {
             categories: {
