@@ -1,5 +1,6 @@
 #database_controls {
-    height: 25px;
+    height: 35px;
+    overflow: hidden;
 }
 
 #database_controls .pull_left {
@@ -40,6 +41,9 @@
 }
 
 
+.renderer_map canvas {
+    margin: 0 auto;
+}
 
 
 /* console renderer */
