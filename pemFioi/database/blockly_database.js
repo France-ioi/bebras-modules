@@ -357,9 +357,9 @@ var getContext = function(display, infos, curLevel) {
 /*
         //test map render
         setTimeout(function() {
-            context.database.loadTable('test_table2', function(table, callback) {
-                context.database.displayTableOnMap(table, 'city', 'lng', 'lat', function() {
-                    context.expectTable('valid_table2');
+            context.database.loadTable('valid_table3', function(table, callback) {
+                context.database.displayTableOnMap(table, 'nom', 'longitude', 'latitude', function() {
+                    context.expectTable('valid_table3');
                 });
 
             })
