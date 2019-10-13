@@ -184,24 +184,40 @@ function DatabaseHelper(options) {
     }
 
 
+    function detectColumnTypes(row) {
+        var columns = row.split(options.csv_delimiter);
+        var types = [];
+        for(var i=0; i<columns.length; i++) {
+            var v = columns[i].replace(/['"]+/g, '');
+            types.push(!isNaN(parseFloat(v)) && isFinite(v) ? 'number' : 'string');
+        }
+        return types;
+    }
+
+
     this.loadCsv = function(file, types, callback) {
         if(!validateColumnTypes(types)) {
             return;
         }
         var reader = new FileReader();
         reader.onload = function(e) {
+            var lines = reader.result.split(/\r\n|\n/);
+            if(lines.length > 1 && !types.length) {
+                types = detectColumnTypes(lines[1]);
+            }
+
             var res = {
                 columnTypes: types,
                 records: []
             };
-            var lines = reader.result.split(/\r\n|\n/);
             var columns_cnt = 0;
             for(var i=0, line; line=lines[i]; i++) {
                 if(i === 0) {
                     var row = parseCsvLine(line, []);
                     res.columnNames = row;
                 } else {
-                    var row = parseCsvLine(line, types);
+
+                    var row = parseCsvLine(line, res.columnTypes);
                     res.records.push(row);
                 }
                 columns_cnt = Math.max(columns_cnt, row.length);
@@ -211,7 +227,6 @@ function DatabaseHelper(options) {
             while(res.columnTypes.length < columns_cnt) {
                 res.columnTypes.push('string');
             }
-
             callback(Table(res));
         };
         reader.readAsText(file);
