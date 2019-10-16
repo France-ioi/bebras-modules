@@ -8,12 +8,12 @@ function getShapePath(shape, x, y, radius, roundedRectangleRadius) {
             "L", x, y + radius,
             "L", x-radius, y,
             "Z"],
-        hexagon: ["M", 0, -radius,
-            "L", -radius, -radius / 2,
-            "L", -radius, radius / 2,
-            "L", 0, radius,
-            "L", radius, radius / 2,
-            "L", radius, -radius / 2,
+        hexagon: ["M", x, y-radius,
+            "L", x-radius, y-radius / 2,
+            "L", x-radius, y+radius / 2,
+            "L", x, y+radius,
+            "L", x+radius, y+radius / 2,
+            "L", x+radius, y-radius / 2,
             "Z"],
         star: ["M", x, y - radius,
             "L", x + 0.27 * radius, y -0.3 * radius,
@@ -65,4 +65,11 @@ function getShapePath(shape, x, y, radius, roundedRectangleRadius) {
             "Z"]
     };
     return shapePaths[shape];
+
+    
 }
+
+function getShape(paper,shape,x,y,radius) {
+    var path = getShapePath(shape,x,y,radius);
+    return paper.path(path);
+};
