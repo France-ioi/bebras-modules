@@ -42,6 +42,16 @@ Quiz.common = {
 
     questionLabel: function(idx) {
         return String.fromCharCode(idx + 65);
+    },
+
+
+    toggleWrongAnswerMessage: function(parent, msg) {
+        var el = parent.find('.error-message');
+        msg && !el.length && $(
+            '<div class="error-message">' +
+            '<i class="fas fa-bell icon"></i>' + msg +
+            '</div>').insertAfter(parent.find('answer').last());
+        !msg && el.remove();
     }
 
 }
@@ -69,8 +79,6 @@ Quiz.questionTypes = {
 
 Quiz.UI = function(params) {
 
-    Quiz.params = params;
-
     var questions_order = [];
 
     // prepare params
@@ -79,6 +87,8 @@ Quiz.UI = function(params) {
         shuffle_answers: false
     }
     var params = Object.assign(default_params, params);
+    Quiz.params = params;
+
     if(!params.parent) {
         Quiz.common.error('Parent element not specified');
         return false;
@@ -186,10 +196,14 @@ Quiz.UI = function(params) {
             }
         },
 
-        showResult: function(mistakes) {
-            mistakes = Array.isArray(mistakes) ? mistakes : [];
+        showResult: function(result) {
+            var mistakes = Array.isArray(result.mistakes) ? result.mistakes : [];
             for(var i=0; i<questions.length; i++) {
-                questions[i].showResult(mistakes[i]);
+                var msg = params.display_partial_feedback && result.messages[i] ?
+                    lang.translate('wrong_answer_msg') + ' ' + result.messages[i]
+                    :
+                    false;
+                questions[i].showResult(mistakes[i], msg);
             }
         },
 

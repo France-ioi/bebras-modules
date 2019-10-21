@@ -67,9 +67,10 @@
                 }
             },
 
-            showResult: function(mistakes) {
+            showResult: function(mistakes, message) {
                 parent.find('answer').removeClass('correct mistake');
                 parent.find('answer.selected').addClass(mistakes === null ? 'correct' : 'mistake');
+                Quiz.common.toggleWrongAnswerMessage(parent, message);
             },
 
             reset: function() {
@@ -116,7 +117,7 @@
                 });
             },
 
-            showResult: function(mistakes) {
+            showResult: function(mistakes, message) {
                 parent.find('answer').removeClass('correct mistake');
                 if(Array.isArray(mistakes)) {
                     parent.find('answer.selected').each(function() {
@@ -125,6 +126,7 @@
                         el.addClass(mistakes.indexOf(idx) === -1 ? 'correct' : 'mistake')
                     })
                 }
+                Quiz.common.toggleWrongAnswerMessage(parent, message);
             },
 
             reset: function() {

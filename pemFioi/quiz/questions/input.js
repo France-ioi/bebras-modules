@@ -25,20 +25,17 @@
                     var el = $(this);
                     var valid = reg.test(el.val());
                     input.toggleClass('error', !valid);
-                    var msg = answer.find('.error-message');
-                    !valid && !msg.length && answer.append(
-                        '<div class="error-message">' +
-                        '<i class="fas fa-bell icon"></i>' +
-                        lang.translate('error_' + format) +
-                        '</div>'
+                    Quiz.common.toggleWrongAnswerMessage(
+                        parent,
+                        valid ? false : lang.translate('error_' + format)
                     );
-                    valid && msg && msg.remove();
                 });
             }
         }
         input.attr('placeholder', lang.translate('placeholder_' + format));
         answer.append(input);
 
+        answer.wrapAll('<div class="answers"></div>');
 
         return {
             getAnswer: function() {
@@ -49,9 +46,10 @@
                 input.val(value)
             },
 
-            showResult: function(mistakes) {
+            showResult: function(mistakes, message) {
                 answer.removeClass('correct mistake');
                 answer.addClass(mistakes === null ? 'correct' : 'mistake');
+                Quiz.common.toggleWrongAnswerMessage(parent, message);
             },
 
             reset: function() {

@@ -44,6 +44,27 @@ question > * {
 question:nth-child(odd) {
   background: rgba(74,144,226,0.2);
 }
+
+question .error-message {
+  color: #ff001f;
+  background-color: #ffe5e8;
+  margin-top: 10px;
+  border-radius: 50px 0 0 50px;
+  padding: 7px 8px 7px 40px;
+  position: relative;
+  font-size: 14px;
+}
+question .error-message .icon {
+  color: #fff;
+  background-color: #ff001f;
+  padding: 5px 6px;
+  border-radius: 50%;
+  font-size: 12px;
+  position: absolute;
+  left: 8px;
+  top: calc(50% - 0.5em - 5px);
+}
+
 statement {
   color: #4a90e2;
   font-size: 22px;
@@ -280,27 +301,7 @@ input[type=text]:focus {
   font-style: italic;
   opacity: 0.7;
 }
-answer .error {
-}
-answer .error-message {
-  color: #ff001f;
-  background-color: #ffe5e8;
-  margin-top: 10px;
-  border-radius: 50px 0 0 50px;
-  padding: 7px 8px 7px 40px;
-  position: relative;
-  font-size: 14px;
-}
-answer .error-message .icon {
-  color: #fff;
-  background-color: #ff001f;
-  padding: 5px 6px;
-  border-radius: 50%;
-  font-size: 12px;
-  position: absolute;
-  left: 8px;
-  top: calc(50% - 0.5em - 5px);
-}
+
 
 /*
 *
@@ -587,11 +588,11 @@ button,
   content: "\00a0";
 }
 
-.displaySolution .fill-gaps-text .correct span {
+.fill-gaps-text .correct span {
 
 }
 
-.displaySolution .fill-gaps-text .mistake span {
+.fill-gaps-text .mistake span {
   color: #ff001f;
   border-color: #ff001f;
 }
