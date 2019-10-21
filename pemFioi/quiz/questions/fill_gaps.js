@@ -101,7 +101,7 @@
                 });
             },
 
-            showResult: function(mistakes) {
+            showResult: function(mistakes, message) {
                 var placeholders = text.find('.placeholder');
                 placeholders.removeClass('correct mistake');
                 placeholders.each(function() {

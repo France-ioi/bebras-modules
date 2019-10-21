@@ -9,6 +9,7 @@
             en: {
                 'score': 'Score',
                 'grader_msg': 'Your score is ',
+                'wrong_answer_msg': 'Your answer is incorrect.',
                 'validate': 'Submit',
                 'solution': 'Show answer',
                 'restart': 'Restart',
@@ -25,6 +26,7 @@
             fr: {
                 'score': 'Score',
                 'grader_msg': 'Votre score est ',
+                'wrong_answer_msg': 'Your answer is incorrect.',
                 'validate': 'Valider',
                 'solution': 'Voir la réponse',
                 'restart': 'Recommencer',
@@ -262,6 +264,7 @@
                 parent: $('#task'),
                 shuffle_questions: !!quiz_settings.shuffle_questions,
                 shuffle_answers: !!quiz_settings.shuffle_answers,
+                display_partial_feedback: !!quiz_settings.display_partial_feedback,
                 random: random
             });
             window.quiz_ui = q;
@@ -317,7 +320,7 @@
                         taskParams.minScore + Math.round(d * result.score),
                         taskParams.noScore || 0
                     );
-                    q.showResult(result.mistakes);
+                    q.showResult(result);
                     displayScore(final_score, taskParams.maxScore);
                     displayMessages(result.messages);
                     callback(final_score, lang.translate('grader_msg') + final_score, null);

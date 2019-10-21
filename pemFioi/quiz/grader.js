@@ -37,7 +37,7 @@
                         "score" in fres ? parseFloat(fres.score) || 0 : 0;
                     valid = score > 0;
                     if ("message" in fres && fres.message) {
-                        res.messages.push(fres.message);
+                        res.messages[i] = fres.message;
                     }
                     res.score += score;
                 } else {
@@ -50,10 +50,26 @@
                 valid = test === true;
                 res.mistakes.push(valid ? [] : test);
                 res.score += valid ? 1 : 0;
-            } else if (typeof grader_data[i] == 'object' && grader_data[i].strict) {
-                var test = testStrict(grader_data[i].value, answer[i]);
-                valid = test === true;
-                res.mistakes.push(valid ? [] : test);
+            } else if (typeof grader_data[i] == 'object') {
+                if(Array.isArray(grader_data[i].value)) {
+                    if(grader_data[i].strict) {
+                        var test = testStrict(grader_data[i].value, answer[i]);
+                    } else {
+                        var test = testMultiple(grader_data[i].value, answer[i]);
+                    }
+                    valid = test === true;
+                    var mistakes = valid ? [] : test;
+                    res.mistakes.push(mistakes);
+                    if(grader_data[i].messages && mistakes.length && grader_data[i].messages[mistakes[0]]) {
+                        res.messages[i] = grader_data[i].messages[mistakes[0]];
+                    }
+                } else {
+                    valid = grader_data[i] == answer[i] ? 1 : 0;
+                    res.mistakes.push(valid ? null : answer[i]);
+                    if(grader_data[i].messages && !valid && grader_data[i].messages[answer[i]]) {
+                        res.messages[i] = grader_data[i].messages[answer[i]];
+                    }
+                }
                 res.score += valid ? 1 : 0;
             } else {
                 valid = grader_data[i] == answer[i] ? 1 : 0;
