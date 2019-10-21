@@ -141,6 +141,7 @@ function getLanguageString(key) {
 
     if(typeof window.jwt == 'undefined') {
         window.jwt = {
+            isDummy: true,
             sign: function() { return null; },
             decode: function(token) { return token; }
             };
@@ -151,6 +152,9 @@ function getLanguageString(key) {
         this.data = data
         this.data.sHintsRequested = "[]";
         this.key = key
+
+        var query = document.location.search.replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+        this.queryToken = query.sToken;
 
         this.addHintRequest = function(hint_params, callback) {
             try {
@@ -185,6 +189,16 @@ function getLanguageString(key) {
         }
 
         this.get = function(callback) {
+            if(window.jwt.isDummy && this.queryToken) {
+                var token = this.queryToken;
+                if(callback) {
+                    // imitate async req
+                    setTimeout(function() {
+                        callback(token)
+                    }, 0);
+                }
+                return token;
+            }
             return this.getToken(this.data, callback);
         }
 
