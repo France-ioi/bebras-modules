@@ -10,6 +10,7 @@
                 'score': 'Score',
                 'grader_msg': 'Your score is ',
                 'wrong_answer_msg': 'Your answer is incorrect.',
+                'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
                 'validate': 'Submit',
                 'solution': 'Show answer',
                 'restart': 'Restart',
@@ -27,6 +28,7 @@
                 'score': 'Score',
                 'grader_msg': 'Votre score est ',
                 'wrong_answer_msg': 'Your answer is incorrect.',
+                'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
                 'validate': 'Valider',
                 'solution': 'Voir la réponse',
                 'restart': 'Recommencer',
@@ -47,13 +49,15 @@
             this.language = lng;
         },
 
-        translate: function(key) {
+        translate: function() {
+            var str = '', key = arguments[0];
             if(this.strings[this.language] && this.strings[this.language][key]) {
-                return this.strings[this.language][key];
+                str = this.strings[this.language][key];
+            } else {
+                str = this.strings[this.default_language][key] || key;
             }
-            return this.strings[this.default_language][key] || key;
+            return str.replace('%%', arguments[1]);
         }
-
     }
 
 
