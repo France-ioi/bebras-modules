@@ -53,6 +53,7 @@ question .error-message {
   padding: 7px 8px 7px 40px;
   position: relative;
   font-size: 14px;
+  margin: 0 60px;
 }
 question .error-message .icon {
   color: #fff;
@@ -590,6 +591,10 @@ button,
 
 .fill-gaps-text .correct span {
 
+}
+
+.fill-gaps-text .mistake {
+  background-color: #ff001f;
 }
 
 .fill-gaps-text .mistake span {

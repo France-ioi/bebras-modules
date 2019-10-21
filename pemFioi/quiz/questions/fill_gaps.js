@@ -104,12 +104,22 @@
             showResult: function(mistakes, message) {
                 var placeholders = text.find('.placeholder');
                 placeholders.removeClass('correct mistake');
+                if(!Quiz.params.display_partial_feedback) return;
+                var mistakes_cnt = 0;
                 placeholders.each(function() {
                     var placeholder = $(this);
                     var span = placeholder.find('span').first();
                     var text = span.length ? span.text() : null;
-                    placeholder.addClass(text && mistakes.indexOf(text) === -1 ? 'correct' : 'mistake');
+                    var mistake = !text || mistakes.indexOf(text) !== -1;
+                    if(mistake) {
+                        mistakes_cnt++;
+                    }
+                    placeholder.addClass(mistake ? 'mistake' : 'correct');
                 });
+                Quiz.common.toggleWrongAnswerMessage(
+                    parent,
+                    mistakes_cnt ? lang.translate('wrong_fill_gaps_msg', mistakes_cnt) : false
+                );
             },
 
             reset: function() {

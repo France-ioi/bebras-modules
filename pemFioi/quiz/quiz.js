@@ -47,10 +47,10 @@ Quiz.common = {
 
     toggleWrongAnswerMessage: function(parent, msg) {
         var el = parent.find('.error-message');
-        msg && !el.length && $(
+        msg && !el.length && parent.append(
             '<div class="error-message">' +
             '<i class="fas fa-bell icon"></i>' + msg +
-            '</div>').insertAfter(parent.find('answer').last());
+            '</div>');
         !msg && el.remove();
     }
 
