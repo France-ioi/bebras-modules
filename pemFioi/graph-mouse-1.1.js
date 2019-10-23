@@ -743,7 +743,7 @@ function VertexDragAndConnect(settings) {
    var graph = settings.graph;
    this.visualGraph = settings.visualGraph;
    var graphMouse = settings.graphMouse;
-   this.dragThreshold = settings.dragThreshold;
+   this.dragThreshold = settings.dragThreshold || 0;
    this.vertexThreshold = settings.vertexThreshold || 0;
    this.dragLimits = settings.dragLimits;
    this.onVertexSelect = settings.onVertexSelect;
@@ -874,14 +874,14 @@ function VertexDragAndConnect(settings) {
 
    this.moveHandler = function(dx, dy, x, y, event) {
       // console.log(dragThreshold)
-      if(dx == 0 && dy == 0){
+      if(dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
          return;
       }
       if(self.selectionParent !== null && self.allowDeselection) {
          self.onVertexSelect(self.selectionParent, false);
       }
       self.selectionParent = null;
-      if(!self.isDragging && dx * dx + dy * dy >= self.dragThreshold * self.dragThreshold) {
+      if(!self.isDragging) {
          self.isDragging = true;
       }
       if(!self.isDragging) {
