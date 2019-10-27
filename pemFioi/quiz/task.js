@@ -225,19 +225,21 @@
 
     // grade
 
-    function useGraderData(answer, callback) {
+    function useGraderData(answer, versions, callback) {
         if(window.Quiz.grader.handler && window.Quiz.grader.data) {
-            return callback(window.Quiz.grader.handler(window.Quiz.grader.data, answer));
+            var res = window.Quiz.grader.handler(window.Quiz.grader.data, answer, versions);
+            return callback(res);
         }
         console.error('Local Quiz grader not found');
     }
 
 
-    function useGraderUrl(url, task_token, answer, callback) {
+    function useGraderUrl(url, task_token, answer, versions, callback) {
         var data = {
             action: 'grade',
             task: task_token,
-            answer: answer
+            answer: answer,
+            versions: versions
         }
         $.ajax({
             type: 'POST',
@@ -331,9 +333,19 @@
                 }
                 var token = task_token.get()
                 if(token) {
-                    useGraderUrl(quiz_settings.graderUrl, token, answer, onGrade);
+                    useGraderUrl(
+                        quiz_settings.graderUrl,
+                        token,
+                        answer,
+                        Quiz.versions.get(),
+                        onGrade
+                    );
                 } else {
-                    useGraderData(answer, onGrade);
+                    useGraderData(
+                        answer,
+                        Quiz.versions.get(),
+                        onGrade
+                    );
                 }
             };
 

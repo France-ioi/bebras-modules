@@ -22,7 +22,7 @@
     }
 
 
-    window.Quiz.grader.handler = function(grader_data, answer) {
+    window.Quiz.grader.handler = function(grader_data, answer, versions) {
         var res = {
             score: 0,
             mistakes: [],
@@ -30,8 +30,12 @@
         };
         var valid;
         for (var i = 0; i < grader_data.length; i++) {
-            if (typeof grader_data[i] === "function") {
-                var fres = grader_data[i](answer[i]);
+            var grader = grader_data[i];
+            if(versions && i in versions) {
+                grader = grader[versions[i]];
+            }
+            if (typeof grader === "function") {
+                var fres = grader(answer[i]);
                 if (typeof fres === "object") {
                     var score =
                         "score" in fres ? parseFloat(fres.score) || 0 : 0;
@@ -45,34 +49,34 @@
                     res.score += valid ? 1 : 0;
                 }
                 res.mistakes.push(valid ? null : answer[i]);
-            } else if (Array.isArray(grader_data[i])) {
-                var test = testMultiple(grader_data[i], answer[i]);
+            } else if (Array.isArray(grader)) {
+                var test = testMultiple(grader, answer[i]);
                 valid = test === true;
                 res.mistakes.push(valid ? [] : test);
                 res.score += valid ? 1 : 0;
-            } else if (typeof grader_data[i] == 'object') {
-                if(Array.isArray(grader_data[i].value)) {
-                    if(grader_data[i].strict) {
-                        var test = testStrict(grader_data[i].value, answer[i]);
+            } else if (typeof grader == 'object') {
+                if(Array.isArray(grader.value)) {
+                    if(grader.strict) {
+                        var test = testStrict(grader.value, answer[i]);
                     } else {
-                        var test = testMultiple(grader_data[i].value, answer[i]);
+                        var test = testMultiple(grader.value, answer[i]);
                     }
                     valid = test === true;
                     var mistakes = valid ? [] : test;
                     res.mistakes.push(mistakes);
-                    if(grader_data[i].messages && mistakes.length && grader_data[i].messages[mistakes[0]]) {
-                        res.messages[i] = grader_data[i].messages[mistakes[0]];
+                    if(grader.messages && mistakes.length && grader.messages[mistakes[0]]) {
+                        res.messages[i] = grader.messages[mistakes[0]];
                     }
                 } else {
-                    valid = grader_data[i] == answer[i] ? 1 : 0;
+                    valid = grader == answer[i] ? 1 : 0;
                     res.mistakes.push(valid ? null : answer[i]);
-                    if(grader_data[i].messages && !valid && grader_data[i].messages[answer[i]]) {
-                        res.messages[i] = grader_data[i].messages[answer[i]];
+                    if(grader.messages && !valid && grader.messages[answer[i]]) {
+                        res.messages[i] = grader.messages[answer[i]];
                     }
                 }
                 res.score += valid ? 1 : 0;
             } else {
-                valid = grader_data[i] == answer[i] ? 1 : 0;
+                valid = grader == answer[i] ? 1 : 0;
                 res.mistakes.push(valid ? null : answer[i]);
                 res.score += valid ? 1 : 0;
             }
