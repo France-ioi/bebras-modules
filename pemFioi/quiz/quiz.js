@@ -57,6 +57,35 @@ Quiz.common = {
 }
 
 
+Quiz.versions = {
+
+    data: {},
+
+    init: function(params) {
+        var self = this;
+        $('question-group').each(function(i, question_set) {
+            question_set = $(question_set);
+            var questions = question_set.find('question');
+            self.data[i] = (i + params.random) % questions.length;
+            questions.each(function(j, question) {
+                if(j == self.data[i]) {
+                    $(question).insertAfter(question_set);
+                } else {
+                    $(question).remove();
+                }
+            });
+            question_set.remove();
+        });
+    },
+
+
+    get: function() {
+        return this.data;
+    }
+
+}
+
+
 
 Quiz.questionTypes = {
 
@@ -94,10 +123,11 @@ Quiz.UI = function(params) {
         return false;
     }
 
+    // init versions
+    Quiz.versions.init(params);
 
 
     // questions types
-
     function initAnswers(parent) {
         parent.find('answer').click(function() {
             $(this).addClass('selected');
