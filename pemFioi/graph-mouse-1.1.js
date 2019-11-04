@@ -66,7 +66,13 @@ function GraphMouse(graphMouseID, graph, visualGraph) {
       var raphaels = this._getRaphaels(elementType, elementID, handleGetter);
       for(var iElement in raphaels) {
          var element = raphaels[iElement];
-         element[eventType].apply(element, callbacks);
+         if(Beav.Navigator.isIE8()){
+            element[eventType].apply(element, [function(ev,x,y){
+               callbacks[0](elementID);
+            }]);
+         }else{
+            element[eventType].apply(element, callbacks);
+         }
       }
       return raphaels;
    };
@@ -207,9 +213,10 @@ function VertexToggler(id, graph, visualGraph, graphMouse, vertexCallback, enabl
       }
    };
 
-   this.eventHandler = function() {
-      var id = this.data("id");
+   this.eventHandler = function(elementID) { // param only for IE8
+      var id = (Beav.Navigator.isIE8()) ? elementID : this.data("id");
       var info = self.graph.getVertexInfo(id);
+      // console.log(id)
       info.selected = !info.selected;
       vertexCallback(id, info.selected);
    };
