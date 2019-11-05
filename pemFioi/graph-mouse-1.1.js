@@ -67,9 +67,16 @@ function GraphMouse(graphMouseID, graph, visualGraph) {
       for(var iElement in raphaels) {
          var element = raphaels[iElement];
          if(Beav.Navigator.isIE8()){
-            element[eventType].apply(element, [function(ev,x,y){
-               callbacks[0](elementID);
-            }]);
+            switch(eventType){
+               case "click":
+                  element[eventType].apply(element, [function(ev,x,y){
+                     callbacks[0](elementID);
+                  }]);
+                  break;
+               case "drag":
+               default:
+                  element[eventType].apply(element, callbacks);
+            }
          }else{
             element[eventType].apply(element, callbacks);
          }
@@ -777,8 +784,14 @@ function VertexDragAndConnect(settings) {
 
    this.enabled = false;
    this.selectionParent = null;
-   this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
+   if(Beav.Navigator.isIE8()){
+      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, true, true, true, 
       this.vertexThreshold, settings.edgeThreshold, false);
+   }else{
+      this.fuzzyClicker = new FuzzyClicker(id + "$$$fuzzyclicker", settings.paperElementID, paper, graph, this.visualGraph, onFuzzyClick, false, true, true, 
+      this.vertexThreshold, settings.edgeThreshold, false);
+   }
+   
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -846,7 +859,7 @@ function VertexDragAndConnect(settings) {
       }
    }
 
-   this.startHandler = function(x, y, event) {
+   this.startHandler = function(x, y, event) { 
       // console.log("startDrag")
       self.elementID = this.data("id");
       self.originalPosition = self.visualGraph.graphDrawer.getVertexPosition(self.elementID);
@@ -880,7 +893,6 @@ function VertexDragAndConnect(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
-      // console.log(dragThreshold)
       if(dx * dx + dy * dy <= self.dragThreshold * self.dragThreshold){
          return;
       }
