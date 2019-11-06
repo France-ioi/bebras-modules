@@ -601,7 +601,7 @@ var getContext = function(display, infos, curLevel) {
                     yieldsValue: true
                 },
                 { name: 'insertRecord',
-                    params: ['Block', 'String'],
+                    params: ['Block', 'Block'],
                     params_names: ['table', 'record'],
                     yieldsValue: true
                 },
