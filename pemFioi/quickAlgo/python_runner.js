@@ -210,6 +210,19 @@ function PythonInterpreter(context, msgCallback) {
         });
         return retp;
       }
+    } else if(val instanceof Sk.builtin.dict) {
+      var dictKeys = Object.keys(val);
+      var retVal = {};
+      for(var i = 0; i < dictKeys.length; i++) {
+        var key = dictKeys[i];
+        if(key == 'size' || key == '__class__') { continue; }
+        var subItems = val[key].items;
+        for(var j = 0; j < subItems.length; j++) {
+          var subItem = subItems[j];
+          retVal[subItem.lhs.v] = this.skToJs(subItem.rhs);
+        }
+      }
+      return retVal;
     } else {
       var retVal = val.v;
       if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
