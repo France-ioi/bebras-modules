@@ -968,9 +968,14 @@ function Table(params) {
 
         insertRecord: function(record) {
             var res = cloneParams(true);
-            res.records.push(
-                objectToRow(record)
-            );
+            if(Array.isArray(record)) {
+                if(record.length != res.columnTypes.length) {
+                    throw new Error('Wrong record fields length');
+                }
+                res.records.push(record);
+            } else {
+                res.records.push(objectToRow(record));
+            }
             return Table(res);
         },
 
