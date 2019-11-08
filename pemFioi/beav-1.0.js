@@ -397,3 +397,64 @@ Beav.Geometry.distance = function(x1,y1,x2,y2) {
    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
 };
 
+/*
+   This is used to handle drag on devices that have both a touch screen and a mouse.
+   Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
+   To call instead of element.drag(onMove, onStart, onEnd);
+*/
+Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
+   var touchingX = 0;
+   var touchingY = 0;
+   var disabled = false;
+
+   function onTouchStart(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      touchingX = touches[0].pageX;
+      touchingY = touches[0].pageY;
+      onStart(touches[0].pageX, touches[0].pageY, evt);         
+   }
+
+   function onTouchEnd(evt) {
+      if (disabled) {
+         return;
+      }
+      onEnd(null);
+   }
+   
+   function onTouchMove(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      var dx = touches[0].pageX - touchingX;
+      var dy = touches[0].pageY - touchingY;
+      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+   }
+   
+   function callOnStart(x,y,event) {
+      disabled = true;
+      onStart(x,y,event);
+   }
+   
+   function callOnMove(dx,dy,x,y,event) {
+      disabled = true;
+      onMove(dx,dy,x,y,event);
+   }
+   
+   function callOnEnd(event) {
+      disabled = false;
+      onEnd(event);
+   }
+
+   element.undrag();
+   element.drag(callOnMove,callOnStart,callOnEnd);
+   if (element.touchstart) {
+      element.touchstart(onTouchStart);
+      element.touchend(onTouchEnd);
+      element.touchcancel(onTouchEnd);
+      element.touchmove(onTouchMove);
+   }
+}
