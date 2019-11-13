@@ -236,3 +236,46 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
    this.init();
 }
+
+function Keyboard(data) {
+   this.paper = data.paper;
+   this.keys = data.keys;
+   this.nRows = data.nRows;
+   this.nCol = data.nCol;
+   this.keyFiller = data.keyFiller;
+   this.xPos = data.xPos;
+   this.yPos = data.yPos;
+   this.keyWidth = data.keyWidth;
+   this.keyHeight = data.keyHeight;
+   this.marginX = data.marginX;
+   this.marginY = data.marginY;
+   this.repeat = data.repeat;
+   this.initialDelay = data.initialDelay;
+   this.stepDelay = data.stepDelay;
+   this.delayFactory = data.delayFactory;
+   this.attr = data.attr;
+   
+   this.keyboard = [];
+
+   for(var iRow = 0; iRow < this.nRows; iRow++){
+      // this.keyboard[iRow] = [];
+      for(var iCol = 0; iCol < this.nCol; iCol++){
+         var x = this.xPos + iCol * (this.keyWidth + this.marginX);
+         var y = this.yPos + iRow * (this.keyHeight + this.marginY);
+         var specialKey = (this.keyFiller) ? this.keyFiller(data,iRow,iCol) : null;
+         if(!specialKey){
+            var keyIndex = iCol + iRow * this.nCol;
+            var text = this.keys[keyIndex];
+            this.keyboard[keyIndex] = new Button(this.paper,x,y,this.keyWidth,this.keyHeight,text,this.repeat, this.initialDelay, this.stepDelay, this.delayFactory);
+            if(this.attr){
+               for(var iAttr = 0; iAttr < this.attr.length; iAttr++){
+                  var attr = this.attr[iAttr];
+                  var name = attr.name;
+                  var mode = attr.mode;
+                  this.keyboard[keyIndex].setAttr(name,mode,attr.attr);
+               }
+            }
+         }
+      }
+   }
+}
