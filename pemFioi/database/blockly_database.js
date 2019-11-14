@@ -192,7 +192,7 @@ var getContext = function(display, infos, curLevel) {
                 file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
                 some_results_missing: 'Il manque une partie des résultats',
-                success: 'Success'
+                success: 'Succès'
             },
             ui: {
                 'btn_diplay_table': 'Visualiser',
