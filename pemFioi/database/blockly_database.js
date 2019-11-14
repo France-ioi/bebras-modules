@@ -35,7 +35,7 @@ var getContext = function(display, infos, curLevel) {
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
                 selectTopRows: 'selectTopRows',
-                getColumnL: 'getColumn',
+                getColumn: 'getColumn',
                 sortByColumn: 'sortByColumn',
                 sortByFunction: 'sortByFunction',
                 selectColumns: 'selectColumns',
@@ -50,14 +50,14 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnGraph: 'displayTableOnGraph'
             },
             description: {
-/*                loadTable: 'loadTable()',
+                loadTable: 'EN text text %loadTable(...) text loadTable',
                 loadTableFromCsv: 'loadTableFromCsv()',
                 loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes()',
                 getRecords: 'getRecords()',
                 selectByColumn: 'selectByColumn()',
                 selectByFunction: 'selectByFunction()',
                 selectTopRows: 'selectTopRows()',
-                getColumnL: 'getColumn()',
+                getColumn: 'getColumn()',
                 sortByColumn: 'sortByColumn()',
                 sortByFunction: 'sortByFunction()',
                 selectColumns: 'selectColumns()',
@@ -70,7 +70,6 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap()',
                 printConsole: 'printConsole()',
                 displayTableOnGraph: 'displayTableOnGraph()'
-*/
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -141,7 +140,7 @@ var getContext = function(display, infos, curLevel) {
                 selectByColumn: 'selectByColumn',
                 selectByFunction: 'selectByFunction',
                 selectTopRows: 'selectTopRows',
-                getColumnL: 'getColumn',
+                getColumn: 'getColumn',
                 sortByColumn: 'sortByColumn',
                 sortByFunction: 'sortByFunction',
                 selectColumns: 'selectColumns',
@@ -156,14 +155,14 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnGraph: 'displayTableOnGraph'
             },
             description: {
-/*                loadTable: 'loadTable()',
+                loadTable: 'FR text text %loadTable(....) text',
                 loadTableFromCsv: 'loadTableFromCsv()',
                 loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes()',
                 getRecords: 'getRecords()',
                 selectByColumn: 'selectByColumn()',
                 selectByFunction: 'selectByFunction()',
                 selectTopRows: 'selectTopRows()',
-                getColumnL: 'getColumn()',
+                getColumn: 'getColumn()',
                 sortByColumn: 'sortByColumn()',
                 sortByFunction: 'sortByFunction()',
                 selectColumns: 'selectColumns()',
@@ -176,7 +175,6 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap()',
                 printConsole: 'printConsole()',
                 displayTableOnGraph: 'displayTableOnGraph()'
-*/
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -214,9 +212,13 @@ var getContext = function(display, infos, curLevel) {
             }
         }
     }
-
+    language_strings = BlocksHelper.mutateBlockStrings(
+        language_strings,
+        infos.blocksLanguage
+    )
 
     var context = quickAlgoContext(display, infos)
+
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
     var files, tables_list;
@@ -538,6 +540,7 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback);
         },
     }
+
 
     context.customBlocks = {
         database: {
