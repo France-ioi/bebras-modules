@@ -262,9 +262,9 @@ function Keyboard(data) {
       for(var iCol = 0; iCol < this.nCol; iCol++){
          var x = this.xPos + iCol * (this.keyWidth + this.marginX);
          var y = this.yPos + iRow * (this.keyHeight + this.marginY);
-         var specialKey = (this.keyFiller) ? this.keyFiller(data,iRow,iCol) : null;
-         if(!specialKey){
-            var keyIndex = iCol + iRow * this.nCol;
+         var keyIndex = iCol + iRow * this.nCol;
+         var specialKey = (this.keyFiller) ? this.keyFiller(keyIndex,x,y) : null;
+         if(!specialKey){ 
             var text = this.keys[keyIndex];
             this.keyboard[keyIndex] = new Button(this.paper,x,y,this.keyWidth,this.keyHeight,text,this.repeat, this.initialDelay, this.stepDelay, this.delayFactory);
             if(this.attr){
@@ -275,6 +275,8 @@ function Keyboard(data) {
                   this.keyboard[keyIndex].setAttr(name,mode,attr.attr);
                }
             }
+         }else{
+            this.keyboard[keyIndex] = specialKey;
          }
       }
    }
