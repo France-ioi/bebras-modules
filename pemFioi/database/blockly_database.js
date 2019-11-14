@@ -101,6 +101,9 @@ var getContext = function(display, infos, curLevel) {
                     'incompatible_browser': 'Incompatible browser',
                     'confirm_overwrite': 'Overwrite files?',
                     'file_not_found': 'File not found: '
+                },
+                'db_helper': {
+                    'renderer_html_rows_limit': 'Only the first %1 records are displayed'
                 }
             }
         },
@@ -204,6 +207,9 @@ var getContext = function(display, infos, curLevel) {
                     'incompatible_browser': 'Navigateur incompatible',
                     'confirm_overwrite': 'Overwrite files?',
                     'file_not_found': 'File not found: '
+                },
+                'db_helper': {
+                    'renderer_html_rows_limit': 'Only the first %1 records are displayed'
                 }
             }
         }
@@ -298,7 +304,8 @@ var getContext = function(display, infos, curLevel) {
 
         window.db_helper = new DatabaseHelper(
             Object.assign({
-                parent: $('#grid')
+                parent: $('#grid'),
+                strings: strings.ui.db_helper
             }, infos.databaseConfig)
         );
 

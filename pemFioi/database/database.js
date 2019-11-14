@@ -236,7 +236,6 @@ function DatabaseHelper(options) {
 
 
 function TableRendererHtml(options) {
-
     var container = $('<div class="database">');
     container.hide();
     options.parent.append(container);
@@ -276,7 +275,8 @@ function TableRendererHtml(options) {
         var rows = table.params().records;
         if(options.render_max_rows > 0 && rows.length > options.render_max_rows) {
             rows = rows.slice(0, options.render_max_rows);
-            html += 'Only the first ' + options.render_max_rows + ' records are displayed';
+            var str = options.strings.renderer_html_rows_limit.split('%1');
+            html += str[0] + options.render_max_rows + str[1];
         }
 
         html +=
