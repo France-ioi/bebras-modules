@@ -365,6 +365,7 @@ function conditionalLanguageElements(lang) {
 function importLanguageModules(defaultLang) {
    // Default language
    var lang = QueryString.language ? QueryString.language : defaultLang;
+   window.modulesLanguage = lang;
 
    if(typeof languageScripts == 'function') {
       languageScripts = languageScripts();
