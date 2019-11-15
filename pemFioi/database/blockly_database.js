@@ -207,7 +207,7 @@ var getContext = function(display, infos, curLevel) {
                     'file_not_found': 'File not found: '
                 },
                 'db_helper': {
-                    'renderer_html_rows_limit': 'Only the first %1 records are displayed'
+                    'renderer_html_rows_limit': 'Seuls les %1 premiers enregistrements sont affichés'
                 }
             }
         }
