@@ -39,7 +39,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.loadPrograms = function () {
     if(this._aceEditor) {
-      this._aceEditor.setValue(''+this.programs[0].blockly);
+      this._aceEditor.setValue(''+this.programs[0].javascript);
       this._aceEditor.selection.clearSelection();
     }
   };
@@ -204,7 +204,7 @@ function LogicController(nbTestCases, maxInstructions) {
   /**
    *  IO specific operations
    */
-  this._handleFiles = function (files) {
+  this.handleFiles = function (files) {
     var that = this;
     if (files.length < 0) {
       return;
@@ -228,10 +228,10 @@ function LogicController(nbTestCases, maxInstructions) {
               $("#errors").html(that._strings.invalidContent);
             }
           }
-          that.languages[that.player] = "blockly";
+          //that.languages[that.player] = "blockly";
         } else {
-          that.programs[0][that.player].javascript = code;
-          that.languages[that.player] = "javascript";
+          that.programs[0].javascript = code;
+          //that.languages[that.player] = "javascript";
         }
         that.loadPrograms();
       };
