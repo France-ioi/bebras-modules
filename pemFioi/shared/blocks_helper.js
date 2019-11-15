@@ -42,11 +42,6 @@ BlocksHelper = {
             src = blocksLanguage[window.modulesLanguage];
         }
         var dst = window.stringsLanguage;
-        if(src == dst) return strings;
-        console.log(src, dst)
-
-        strings[dst].label = strings[src].label;
-        strings[dst].code = strings[src].code;
 
         for(var k in strings[dst].description) {
             strings[dst].description[k] = strings[dst].description[k].replace(
@@ -54,7 +49,10 @@ BlocksHelper = {
                 strings[src].code[k]
             );
         }
+        if(src == dst) return strings;
 
+        strings[dst].label = strings[src].label;
+        strings[dst].code = strings[src].code;
         return strings;
     }
 
