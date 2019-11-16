@@ -45,7 +45,7 @@ BlocksHelper = {
 
         for(var k in strings[dst].description) {
             strings[dst].description[k] = strings[dst].description[k].replace(
-                new RegExp('%' + k),
+                new RegExp('%' + k, 'g'),
                 strings[src].code[k]
             );
         }
