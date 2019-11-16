@@ -38,7 +38,7 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.loadPrograms = function () {
-    if(this._aceEditor) {
+    if(this._aceEditor && this.programs[0].javascript) {
       this._aceEditor.setValue(''+this.programs[0].javascript);
       this._aceEditor.selection.clearSelection();
     }
