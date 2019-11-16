@@ -50,7 +50,7 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnGraph: 'displayTableOnGraph'
             },
             description: {
-                loadTable: 'EN text text %loadTable(...) text loadTable',
+                loadTable: 'EN text text %loadTable(...) text %loadTable loadTable',
                 loadTableFromCsv: 'loadTableFromCsv()',
                 loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes()',
                 getRecords: 'getRecords()',
@@ -175,7 +175,7 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : permet de visualiser les éléments de la colonne passée en deuxième paramètre sur une carte.',
                 printConsole: 'printConsole()',
                 displayTableOnGraph: 'displayTableOnGraph()'
-/*                
+/*
 
                 loadTable: 'FR text text %loadTable(....) text',
                 loadTable: 'loadTable(tableName) : retourne la table dont le nom est passé en paramètre sous forme de chaîne de caractères.',
