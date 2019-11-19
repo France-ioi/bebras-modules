@@ -186,7 +186,11 @@
                     onClick(that.data[idx].start);
                 }
             }
-            var el = $('<div class="title">' + section.title + '</div>');
+            var el = $(
+                '<div class="title">' + section.title +
+                    '<div class="duration">' + time_string.format(section.end - section.start) + '</div>' +
+                '</div>'
+            );
             el.click(makeClickCallback(idx));
             parent.append(el);
         },

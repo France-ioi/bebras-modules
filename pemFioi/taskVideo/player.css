@@ -16,6 +16,10 @@
     padding: 5px;
 }
 
+.task-video .section .title .duration {
+    float: right;
+}
+
 .task-video .section .title:hover,
 .task-video .sections .active .title {
     background: #DEF;
