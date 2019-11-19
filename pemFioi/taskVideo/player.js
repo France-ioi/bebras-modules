@@ -32,11 +32,9 @@
             function zero(v) {
                 return v < 10 ? '0' + v : v;
             }
-            return (h > 0 ? zero(h) + ':' : '') + zero(m) + ':' + zero(s);
+            return (h > 0 ? h + ':' : '') + zero(m) + ':' + zero(s);
         }
-
     }
-
 
 
     // load youtube IFrame Player API
