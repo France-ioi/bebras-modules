@@ -4,6 +4,41 @@
     var ready = false;
     var state_cache;
 
+
+
+    // time formatter and parser
+    var time_string = {
+
+        parse: function(value) {
+            if(typeof value === 'string') {
+                var mult = 1,
+                    parts = value.split(':'),
+                    res = 0;
+                while(parts.length) {
+                    res += mult * parseFloat(parts.pop());
+                    mult *= 60;
+                }
+                return res;
+            }
+            return value || 0;
+        },
+
+        format: function(value) {
+            var v = parseInt(value, 10),
+                h = Math.floor(v / 3600);
+                m = Math.floor((v - (h * 3600)) / 60),
+                s = v - (h * 3600) - (m * 60);
+
+            function zero(v) {
+                return v < 10 ? '0' + v : v;
+            }
+            return (h > 0 ? zero(h) + ':' : '') + zero(m) + ':' + zero(s);
+        }
+
+    }
+
+
+
     // load youtube IFrame Player API
     var apiLoader = {
         callbacks: [],
@@ -37,7 +72,6 @@
                 this.loading = true;
                 this.fetch();
             }
-
         }
     }
 
@@ -77,7 +111,40 @@
         },
 
 
-        init: function(player, config, parent) {
+        prepareSectionsArray: function(sections) {
+            for(var i=0; i<sections.length; i++) {
+                if('start' in sections[i]) {
+                    sections[i].start = time_string.parse(sections[i].start);
+                }
+                if('end' in sections[i]) {
+                    sections[i].end = time_string.parse(sections[i].end);
+                }
+            }
+            for(var i=0; i<sections.length; i++) {
+                if('start' in sections[i]) continue;
+                if(i == 0) {
+                    sections[i].start = 0;
+                } else if('end' in sections[i - 1]) {
+                    sections[i].start = sections[i - 1].end;
+                } else {
+                    console.error('Section #' + i + ' start time not computable');
+                }
+            }
+            for(var i=0; i<sections.length; i++) {
+                if('end' in sections[i]) continue;
+                if(i == sections.length - 1) {
+                    sections[i].end = player.getDuration();
+                } else if('start' in sections[i + 1]) {
+                    sections[i].end = sections[i + 1].start;
+                } else {
+                    console.error('Section #' + i + ' end time not computable');
+                }
+            }
+            return sections;
+        },
+
+
+        init: function(config, parent) {
             this.active = null;
             this.show_viewed = !!config.show_viewed;
             this.callback = config.callback;
@@ -89,7 +156,7 @@
                 this.data = this.generateSections(config.sections);
             } else {
                 this.visible = true;
-                this.data = config.sections.slice();
+                this.data = this.prepareSectionsArray(config.sections.slice());
                 for(var i=0,section; section = this.data[i]; i++) {
                     section.viewed = false;
                     var parts_amount = Number.isInteger(section.parts) ? section.parts : 1;
@@ -112,22 +179,57 @@
         },
 
 
-        render: function(parent, onClick) {
-            if(!this.visible) return;
+        renderTitle: function(parent, idx, section, onClick) {
             var that = this;
             function makeClickCallback(idx) {
                 return function() {
                     onClick(that.data[idx].start);
                 }
             }
+            var el = $('<div class="title">' + section.title + '</div>');
+            el.click(makeClickCallback(idx));
+            parent.append(el);
+        },
+
+        renderDescription: function(parent, idx, section) {
+            if(!section.description) {
+                return;
+            }
+            var html = section.description.replace(/\{[^\}]+\}/g, function(m) {
+                m = m.substr(1, m.length - 2).split('|');
+                if(m.length > 1) {
+                    var time = time_string.parse(m[1]);
+                    var title = m[0];
+                } else {
+                    var time = time_string.parse(m[0]);
+                    var title = time_string.format(time);
+                }
+
+                return '<span class="time-link" data-time="' + time + '">' + title + '</span>';
+            })
+            var el = $('<div class="description">' + html + '</div>');
+
+            function makeClickCallback(link) {
+                var time = parseFloat($(link).data('time'));
+                return function() {
+                    player.seekTo(time);
+                    player.playVideo();
+                }
+            }
+            el.find('span.time-link').each(function() {
+                $(this).click(makeClickCallback(this));
+            });
+            parent.append(el);
+        },
+
+
+        render: function(parent, onClick) {
+            if(!this.visible) return;
+
             for(var i=0,section; section = this.data[i]; i++) {
-                section.element = $(
-                    '<div class="section">' +
-                        '<div class="title">' + section.title + '</div>' +
-                        (section.description ? '<div class="description">' + section.description + '</div>' : '') +
-                    '</div>'
-                );
-                section.element.click(makeClickCallback(i));
+                section.element = $('<div class="section"></div>');
+                this.renderTitle(section.element, i, section, onClick);
+                this.renderDescription(section.element, i, section);
                 parent.append(section.element);
             }
         },
@@ -312,7 +414,7 @@
             playerVars: youtube,
             events: {
                 'onReady': function(e) {
-                    sections.init(player, config, template.get('sections'));
+                    sections.init(config, template.get('sections'));
                     ready = true;
                     if(state_cache) {
                         stateHandler(state_cache);
