@@ -105,6 +105,11 @@ var importableModules = function () {
       'quiz_questions_fill_gaps': {src: modulesPath+"/pemFioi/quiz/questions/fill_gaps.js", id: "quiz_questions_fill_gaps"},
       'quiz_questions_input': {src: modulesPath+"/pemFioi/quiz/questions/input.js", id: "quiz_questions_input"},
 
+      // Video task
+      'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
+      'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
+      'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
