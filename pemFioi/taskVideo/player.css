@@ -7,21 +7,28 @@
 }
 
 .task-video .sections .section {
-    cursor: pointer;
-    padding: 5px 0;
-}
-
-.task-video .sections .section:hover,
-.task-video .sections .active {
-    background: #DEF;
+    margin-bottom: 5px;
 }
 
 .task-video .section .title {
+    cursor: pointer;
     font-weight: bold;
+    padding: 5px;
+}
+
+.task-video .section .title:hover,
+.task-video .sections .active .title {
+    background: #DEF;
 }
 
 .task-video .section .description {
+    padding: 5px;
     color: #999;
+}
+
+.task-video .time-link {
+    color: #36F;
+    cursor: pointer;
 }
 
 .task-video .sections .viewed .title:after {
@@ -38,3 +45,5 @@
 .task-video .conclusion {
     margin: 20px 0;
 }
+
+
