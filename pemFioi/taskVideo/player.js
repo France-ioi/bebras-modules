@@ -379,6 +379,8 @@
 
 
         destroy: function() {
+            $(window).unbind('scroll');
+            $(window).unbind('resize');
             this.elements.wrapper && this.elements.wrapper.remove();
             this.elements = {};
         }
