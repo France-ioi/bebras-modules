@@ -325,31 +325,77 @@
 
         elements: {},
 
-        init: function(parent) {
-            this.elements = {
-                wrapper: $('<div class="task-video"></div>')
-            }
-
-            this.elements.player = $('<div class="player"><div></div></div>');
-            this.elements.player_wrapper = $('<div class="player-wrapper"></div>');
-            this.elements.player_wrapper.append(this.elements.player);
-            this.elements.wrapper.append(this.elements.player_wrapper);
-
-            this.elements.sections = $('<div class="sections"></div>');
-            this.elements.wrapper.append(this.elements.sections);
-
-            parent.html('');
-            parent.append(this.elements.wrapper);
-
-            $(window).scroll(this.onWindowResize.bind(this));
-            $(window).resize(this.onWindowResize.bind(this));
+        init: function(parent, config) {
+            this.render(parent);
+            var refreshLayout = this.getRefreshLayoutFunc(config);
+            $(window).scroll(refreshLayout);
+            $(window).resize(refreshLayout);
+            refreshLayout();
         },
 
 
-        onWindowResize: function() {
-            var fl1 = $(window).scrollTop() > this.elements.player_wrapper.position().top;
-            var fl2 = $(window).height() > this.elements.player_wrapper.height() + 200;
-            this.elements.player.toggleClass('player-fixed', fl1 && fl2)
+        render: function(parent) {
+            this.elements.root = $(
+                '<div class="task-video">\
+                    <div class="task-video-content" data-key="content">\
+                        <div class="player" data-key="player"><div></div></div>\
+                        <div class="sections" data-key="sections"></div>\
+                    </div>\
+                </div>'
+            );
+            var self = this;
+            this.elements.root.find('[data-key]').each(function() {
+                self.elements[$(this).data('key')] = $(this);
+            });
+            parent.html('').append(this.elements.root);
+        },
+
+
+        getRefreshLayoutFunc: function(config) {
+            var elements = this.elements,
+                win = $(window),
+                doc = $(window.document),
+                is_wide_mode_old = null;
+
+            return function() {
+                var is_fixed_content = win.scrollTop() > elements.root.position().top;
+                elements.content.toggleClass('fixed-content', is_fixed_content);
+
+                var is_wide_mode = win.width() >= config.layout.wide_mode_min_width;
+                elements.root.toggleClass('task-video-wide-mode', is_wide_mode);
+                elements.root.toggleClass('task-video-narrow-mode', !is_wide_mode);
+
+                var scroll = Math.max(0, win.scrollTop() - elements.root.position().top);
+
+                if(is_wide_mode_old !== is_wide_mode) {
+                    is_wide_mode_old = is_wide_mode;
+                    elements.root.height('');
+                    elements.content.width('');
+                    elements.content.height('');
+                    elements.player.height('');
+                    elements.player.width('');
+                    elements.sections.height('');
+                    elements.sections.width('');
+                }
+
+                if(is_wide_mode) {
+                    var video_width = config.layout.wide_mode_video_width * elements.root.width();
+                    elements.player.width(video_width);
+                    elements.sections.width(elements.root.width() - video_width);
+                    elements.content.width(elements.root.width());
+
+                    var max_height = video_width / config.layout.video_aspect_ratio;
+                    var height = Math.max(0.5 * max_height, max_height - scroll);
+                    elements.root.height(height);
+                    elements.content.height(height);
+                } else {
+                    var max_height = elements.root.width() / config.layout.video_aspect_ratio;
+                    var player_height = Math.max(0.5 * max_height, max_height - scroll);
+                    var sections_height = Math.max(0, max_height - scroll);
+                    elements.player.height(player_height);
+                    elements.sections.height(sections_height);
+                }
+            }
         },
 
 
@@ -358,30 +404,12 @@
         },
 
 
-        html: function(name, html) {
-            if(typeof html === 'undefined') {
-                this.elements[name].hide();
-            } else {
-                this.elements[name].show();
-                this.elements[name].html(html);
-            }
-        },
-
-
-        width: function(name, width) {
-            this.elements[name].width(width);
-        },
-
-
-        height: function(name, height) {
-            this.elements[name].height(height);
-        },
 
 
         destroy: function() {
             $(window).unbind('scroll');
             $(window).unbind('resize');
-            this.elements.wrapper && this.elements.wrapper.remove();
+            this.elements.root && this.elements.root.remove();
             this.elements = {};
         }
     }
@@ -457,7 +485,11 @@
 
     function makeConfig(params, callback) {
         var defaults = {
-            player_height: '400px',
+            layout: {
+                video_aspect_ratio: 16/9,
+                wide_mode_min_width: 1024,
+                wide_mode_video_width: 0.6
+            },
             callback: callback
         }
         return Object.assign(defaults, params);
@@ -503,9 +535,7 @@
         if(!events) { events = {}; }
         if(callback) { events.onPlaybackEnd = callback; }
         apiLoader.load(function() {
-            template.init(that);
-            template.height('player_wrapper', config.player_height);
-            template.height('player', config.player_height);
+            template.init(that, config);
             player = createPlayer(template.get('player').find('div')[0], config, events);
         });
         return this;
