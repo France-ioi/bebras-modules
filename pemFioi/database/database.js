@@ -14,7 +14,7 @@ function DatabaseHelper(options) {
 
         // html renderer
         render_row_height: '20px',
-        render_max_rows: 10,
+        render_max_rows: 14,
 
         // map renderer
         width: 400,
@@ -46,7 +46,8 @@ function DatabaseHelper(options) {
             html: new TableRendererHtml(options),
             map: new TableRendererMap(options),
             graph: new TableRendererGraph(options),
-            console: new ConsoleRenderer(options)
+            graphDouble: new TableRendererGraphDouble(options),
+            console: new ConsoleRenderer(options),
         }
     }
 
@@ -59,8 +60,15 @@ function DatabaseHelper(options) {
         db_renderers.html.hide();
         db_renderers.map.hide();
         db_renderers.graph.hide();
+        db_renderers.graphDouble.hide();
         db_renderers.console.hide();
     };
+
+    this.listToTable = function(list) {
+        params = {columnNames: ['index','value'],columnTypes: ['int','int'],records: [],public:true};
+        list.forEach(function(val, i){params.records[i] = [i, val];});
+        return(Table(params));
+    }
 
     this.displayTable = function(table, display) {
         last_table = table;
@@ -83,6 +91,7 @@ function DatabaseHelper(options) {
     };
 
     this.displayTableOnGraph = function(table, type, display) {
+
         last_table = table;
         last_type = type;
         this.hide(display);
@@ -91,6 +100,13 @@ function DatabaseHelper(options) {
         }
         db_renderers.graph.displayTable(table, type, null, display);
         last_renderer = 'graph';
+    };
+
+    this.displayTablesOnGraph = function(table, display) {
+        last_table = table;
+        this.hide(display);
+        renderers.graphDouble.displayTable(table);
+        last_renderer = 'graphDouble';
     };
 
     this.displayConsole = function(variable, display) {
@@ -104,6 +120,7 @@ function DatabaseHelper(options) {
         //if(!last_table || last_table.params().columnNames.length != reference_table.params().columnNames.length) {
         //    return 'incorrect_results';
         //}
+        this.hide(true);
         if (last_renderer === 'graph') {
             var valid_all = db_renderers[last_renderer].displayTable(last_table, last_type, reference_table, true);
         } else if(last_renderer) {
@@ -508,8 +525,12 @@ function TableRendererGraph(options) {
             context2d.lineTo(options.margin_x,options.graph_height);
             context2d.lineTo(options.margin_x+options.graph_width,options.graph_height);
 
-            context2d.strokeText(yName, options.margin_x+15, 10);
-            context2d.strokeText("index", options.margin_x+options.graph_width-20, options.graph_height-5);
+            context2d.save();
+            context2d.translate(0, 0);
+            context2d.rotate(-Math.PI/2);
+            context2d.strokeText(yName, -options.graph_height/2, options.margin_x-15);
+            context2d.restore();
+            context2d.strokeText("index", options.margin_x+options.graph_width/2, options.graph_height+15);
 
             context2d.strokeText(yMax, 15, options.graph_height*0.06 + options.font_size/2);
             context2d.moveTo(options.margin_x-5,options.graph_height*0.06);
@@ -518,23 +539,28 @@ function TableRendererGraph(options) {
             context2d.moveTo(options.margin_x-5,options.graph_height*0.94);
             context2d.lineTo(options.margin_x+5,options.graph_height*0.94);
 
+            context2d.stroke();
+            context2d.beginPath();
             context2d.moveTo(options.margin_x,options.graph_height);
         };
-        this.line_to = function(x,xMax,y,yMin,yMax) {context2d.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));};
-        this.plot = function(x,xMax,y,yMin,yMax) {
+        this.line_to = function(x,xMax,y,yMin,yMax) {
+            context2d.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+        };
+        this.plot = function(x,xMax,y,yMin,yMax,valid) {
+            context2d.strokeStyle = valid?"#000000":"#900000";
             context2d.moveTo(options.margin_x+(options.graph_width * x / xMax - 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
             context2d.lineTo(options.margin_x+(options.graph_width * x / xMax + 3),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
             context2d.moveTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) - 3);
             context2d.lineTo(options.margin_x+(options.graph_width * x / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) + 3);
+            context2d.stroke();
+            context2d.beginPath();
         };
-        this.bar = function(x,xMax,y,yMin,yMax) {
-            context2d.moveTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.9) / xMax),options.graph_height);
-            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height);
-            context2d.lineTo(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
-            context2d.fillStyle = "#D0D0D0";
+        this.bar = function(x,xMax,y,yMin,yMax,valid) {
+            context2d.fillStyle = valid?"#D0D0D0":"#d0b0b0";
+            context2d.strokeRect(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)),options.graph_width * 0.8 / xMax,((y-yMin)*(options.graph_height)/(yMax-yMin)));
             context2d.fillRect(options.margin_x+(options.graph_width * (x+0.1) / xMax),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)),options.graph_width * 0.8 / xMax,((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context2d.stroke();
+            context2d.beginPath();
         };
         this.show = function() {context2d.stroke();};
 
@@ -569,7 +595,8 @@ function TableRendererGraph(options) {
         }
         var marginY = Math.ceil((yMax-yMin)*0.05);
 
-        renderer.init("Y",yMin,yMax);
+        columnNames = table.params().columnNames;
+        renderer.init(columnNames[0],yMin,yMax);
         yMin = Number(yMin) - marginY;
         yMax = Number(yMax) + marginY;
         switch (type) {
@@ -580,7 +607,7 @@ function TableRendererGraph(options) {
                     }
                     valid_all = valid_all && valid_value;
                     if(display) {
-                        renderer.bar(i,rows.length,row[0],yMin,yMax);
+                        renderer.bar(i,rows.length,row[0],yMin,yMax,valid_value);
                     }
                 }
                 break;
@@ -591,7 +618,7 @@ function TableRendererGraph(options) {
                     }
                     valid_all = valid_all && valid_value;
                     if(display) {
-                        renderer.plot(i+0.5,rows.length,row[0],yMin,yMax);
+                        renderer.plot(i+0.5,rows.length,row[0],yMin,yMax,valid_value);
                     }
                 }
                 break;
@@ -622,6 +649,135 @@ function TableRendererGraph(options) {
     var renderer = new Renderer();
 }
 
+function TableRendererGraphDouble(options) {
+
+    var container = $('<div class="renderer_graphdouble">');
+    container.hide();
+    options.parent.append(container);
+    this.clear = function() {
+        renderer.clear("");
+    }
+    this.hide = function() {
+        container.hide();
+    }
+
+    function Renderer() {
+
+        function rgba(colors, opacity) {
+            return 'rgba(' + colors.r + ',' + colors.g + ',' + colors.b + ',' + opacity + ')';
+        }
+        this.clear = function() {
+            context.fillStyle = rgba(options.background_color,1);
+            context.fillRect(0, 0, options.width, options.height);
+            context.stroke();
+            context.beginPath();
+        };
+        this.init = function(xName,xMin,xMax,yName,yMin,yMax) {
+            context.beginPath();
+            context.moveTo(options.margin_x,0);
+            context.lineTo(options.margin_x,options.graph_height);
+            context.lineTo(options.margin_x+options.graph_width,options.graph_height);
+
+            context.save();
+            context.translate(0, 0);
+            context.rotate(-Math.PI/2);
+            context.strokeText(yName, -options.graph_height/2, options.margin_x-15);
+            context.restore();
+            context.strokeText(xName, options.margin_x+options.graph_width/2, options.graph_height+15);
+
+            context.strokeText(yMax, 15, options.graph_height*0.09 + options.font_size/2);
+            context.moveTo(options.margin_x-5,options.graph_height*0.09);
+            context.lineTo(options.margin_x+5,options.graph_height*0.09);
+            context.strokeText(yMin, 15, options.graph_height*0.91 + options.font_size/2);
+            context.moveTo(options.margin_x-5,options.graph_height*0.91);
+            context.lineTo(options.margin_x+5,options.graph_height*0.91);
+
+            context.strokeText(xMin, options.margin_x+options.graph_width*0.09, options.graph_height + 10 + options.font_size/2);
+            context.moveTo(options.margin_x+options.graph_width*0.09,options.graph_height-5);
+            context.lineTo(options.margin_x+options.graph_width*0.09,options.graph_height+5);
+            context.strokeText(xMax, options.margin_x+options.graph_width*0.91, options.graph_height + 10 + options.font_size/2);
+            context.moveTo(options.margin_x+options.graph_width*0.91,options.graph_height-5);
+            context.lineTo(options.margin_x+options.graph_width*0.91,options.graph_height+5);
+
+            context.stroke();
+            context.beginPath();
+            context.moveTo(options.margin_x,options.graph_height);
+        };
+
+        this.plot = function(x,xMin,xMax,y,yMin,yMax,valid) {
+            context.strokeStyle = valid?"#000000":"#900000";
+            context.moveTo(options.margin_x+((x-xMin)*(options.graph_width)/(xMax-xMin)) - 3,options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.lineTo(options.margin_x+((x-xMin)*(options.graph_width)/(xMax-xMin)) + 3,options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)));
+            context.moveTo(options.margin_x+((x-xMin)*(options.graph_width)/(xMax-xMin)),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) - 3);
+            context.lineTo(options.margin_x+((x-xMin)*(options.graph_width)/(xMax-xMin)),options.graph_height-((y-yMin)*(options.graph_height)/(yMax-yMin)) + 3);
+            context.stroke();
+            context.beginPath();
+        };
+        this.show = function() {context.stroke();};
+
+        var canvas = document.createElement('canvas');
+        canvas.width = options.width;
+        canvas.height = options.height;
+
+        container.append($(canvas));
+        var context = canvas.getContext('2d');
+
+        context.textAlign = 'center';
+        context.font = options.font_size + 'px sans-serif';
+    }
+
+    // interface
+    this.displayTable = function(table, reference_table) {
+        renderer.clear();
+        var rows = table.params().records;
+
+        var valid_value = true;
+        var valid_all = true;
+
+        var reference_rows = reference_table ? reference_table.params().records : null;
+
+        var xMin = rows[0][0];
+        var xMax = rows[0][0];
+        var yMin = rows[0][1];
+        var yMax = rows[0][1];
+        for(var i=0, row; row=rows[i]; i++) {
+            if (xMax < row[0]) {xMax = row[0];}
+            if (xMin > row[0]) {xMin = row[0];}
+            if (yMax < row[1]) {yMax = row[1];}
+            if (yMin > row[1]) {yMin = row[1];}
+        }
+        if (xMax === xMin){xMax++;xMin--;}
+        if (yMax === yMin){yMax++;yMin--;}
+        var marginX = (xMax-xMin)*0.11;
+        var marginY = (yMax-yMin)*0.11;
+
+        columnNames = table.params().columnNames;
+        renderer.init(columnNames[0],xMin,xMax,columnNames[1],yMin,yMax);
+        yMin = Number(yMin) - marginY;
+        yMax = Number(yMax) + marginY;
+        xMin = Number(xMin) - marginX;
+        xMax = Number(xMax) + marginX;
+        for(i=0; row=rows[i]; i++) {
+            if(reference_rows) {
+                valid_value = reference_rows[i] && reference_rows[i].join('-') == row.join('-');
+            }
+            valid_all = valid_all && valid_value;
+            renderer.plot(row[0],xMin,xMax,row[1],yMin,yMax,valid_value);
+        }
+        renderer.show();
+        container.show();
+
+        return valid_all;
+    }
+
+    this.destroy = function() {
+        container.remove();
+    }
+
+    // init
+    var renderer = new Renderer();
+}
+
 function ConsoleRenderer(options) {
 
     var container = $('<div class="console">');
@@ -633,11 +789,6 @@ function ConsoleRenderer(options) {
     this.hide = function() {
         container.hide();
     };
-
-    //TODO option pour mettre la console en superposition avec le renderer actuel >> ca rend tres moche en fait
-    //TODO option pour mettre la console dans un onglet alternatif
-    //TODO integrer la console a la librairie d'onglets de renderers
-    //TODO une fois la librairie d'onglets de renderer créée, deplacer son CSS au même endroit
 
     this.print = function(variable, display) {
         if(!display) return;
@@ -662,8 +813,6 @@ if(typeof(Number.prototype.toRad) === "undefined") {
 }
 
 function Table(params) {
-
-
 
     function nullRow(length) {
         return Array.apply(null, Array(length)).map(function() {
