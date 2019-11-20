@@ -2,8 +2,10 @@
     margin: 20px 0;
 }
 
-.task-video .video {
-
+.task-video .player-fixed {
+    position: fixed;
+    left: 0;
+    top: 0;
 }
 
 .task-video .sections .section {
@@ -51,3 +53,26 @@
 }
 
 
+@media (max-width: 1024px) {
+    .task-video .player-fixed {
+        width: 100%;
+    }
+}
+
+
+@media (min-width: 1024px) {
+
+    .task-video .player-wrapper {
+        float: left;
+        width: 50%;
+    }
+
+    .task-video .player-fixed {
+        width: 50%;
+    }
+
+    .task-video .sections {
+        margin-left: 50%;
+    }
+
+}
