@@ -186,7 +186,7 @@
             }
             var el = $(
                 '<div class="title">' + section.title +
-                    '<div class="duration">' + time_string.format(section.end - section.start) + '</div>' +
+                    '<div class="duration">' + time_string.format(section.start) + '</div>' +
                 '</div>'
             );
             el.click(makeClickCallback(idx));
