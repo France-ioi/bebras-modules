@@ -327,17 +327,29 @@
 
         init: function(parent) {
             this.elements = {
-                wrapper: $('<div class="task-video"></div>'),
-                video: $('<div class="video"></div>'),
-                sections: $('<div class="sections"></div>'),
-            };
-            parent.html('');
-            parent.append(this.elements.wrapper)
-            for(var name in this.elements) {
-                if(name !== 'wrapper') {
-                    this.elements.wrapper.append(this.elements[name]);
-                }
+                wrapper: $('<div class="task-video"></div>')
             }
+
+            this.elements.player = $('<div class="player"><div></div></div>');
+            this.elements.player_wrapper = $('<div class="player-wrapper"></div>');
+            this.elements.player_wrapper.append(this.elements.player);
+            this.elements.wrapper.append(this.elements.player_wrapper);
+
+            this.elements.sections = $('<div class="sections"></div>');
+            this.elements.wrapper.append(this.elements.sections);
+
+            parent.html('');
+            parent.append(this.elements.wrapper);
+
+            $(window).scroll(this.onWindowResize.bind(this));
+            $(window).resize(this.onWindowResize.bind(this));
+        },
+
+
+        onWindowResize: function() {
+            var fl1 = $(window).scrollTop() > this.elements.player_wrapper.position().top;
+            var fl2 = $(window).height() > this.elements.player_wrapper.height() + 200;
+            this.elements.player.toggleClass('player-fixed', fl1 && fl2)
         },
 
 
@@ -443,8 +455,7 @@
 
     function makeConfig(params, callback) {
         var defaults = {
-            width: '100%',
-            height: '400px',
+            player_height: '400px',
             callback: callback
         }
         return Object.assign(defaults, params);
@@ -491,9 +502,9 @@
         if(callback) { events.onPlaybackEnd = callback; }
         apiLoader.load(function() {
             template.init(that);
-            template.width('wrapper', config.width);
-            template.height('video', config.height);
-            player = createPlayer(template.get('video')[0], config, events);
+            template.height('player_wrapper', config.player_height);
+            template.height('player', config.player_height);
+            player = createPlayer(template.get('player').find('div')[0], config, events);
         });
         return this;
     }
