@@ -25,7 +25,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: 'displayRecord(%1)',
                 displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
                 printConsole: 'printConsole(%1)',
-                displayTableOnGraph: 'displayTableOnGraph(%1, %2, %3)'
+                displayTableOnGraph: 'displayTableOnGraph(%1, %2, %3, %4, %5)',
+                displayTablesOnGraph: 'displayTablesOnGraph(%1, %2, %3, %4, %5, %6, %7)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -47,7 +48,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: 'displayRecord',
                 displayTableOnMap: 'displayTableOnMap',
                 printConsole: 'printConsole',
-                displayTableOnGraph: 'displayTableOnGraph'
+                displayTableOnGraph: 'displayTableOnGraph',
+                displayTablesOnGraph: 'displayTablesOnGraph'
             },
             description: {
                 loadTable: 'EN text text %loadTable(...) text %loadTable loadTable',
@@ -69,7 +71,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: 'displayRecord()',
                 displayTableOnMap: 'displayTableOnMap()',
                 printConsole: 'printConsole()',
-                displayTableOnGraph: 'displayTableOnGraph()'
+                displayTableOnGraph: 'displayTableOnGraph()',
+                displayTablesOnGraph: 'displayTablesOnGraph()'
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -130,7 +133,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: 'afficher l\'enregistrement(%1)',
                 displayTableOnMap: 'visualiser la table sur une carte(%1, %2, %3, %4)',
                 printConsole: 'afficher dans la console(%1)',
-                displayTableOnGraph: 'visualiser la table sur un graphe(%1, %2, %3)'
+                displayTableOnGraph: 'visualiser la table sur un graphe(%1, %2, %3, %4, %5)',
+                displayTablesOnGraph: 'visualiser les tables sur un graphe(%1, %2, %3, %4, %5, %6, %7)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -152,7 +156,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: 'displayRecord',
                 displayTableOnMap: 'displayTableOnMap',
                 printConsole: 'printConsole',
-                displayTableOnGraph: 'displayTableOnGraph'
+                displayTableOnGraph: 'displayTableOnGraph',
+                displayTablesOnGraph: 'displayTablesOnGraph'
             },
             description: {
                 loadTable: '%loadTable(tableName) : retourne la table dont le nom est passé en paramètre sous forme de chaîne de caractères.',
@@ -174,7 +179,8 @@ var getContext = function(display, infos, curLevel) {
                 displayRecord: '%displayRecord()',
                 displayTableOnMap: '%displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : permet de visualiser les éléments de la colonne passée en deuxième paramètre sur une carte.',
                 printConsole: '%printConsole()',
-                displayTableOnGraph: '%displayTableOnGraph()'
+                displayTableOnGraph: '%displayTableOnGraph()',
+                displayTablesOnGraph: '%displayTablesOnGraph()'
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -189,7 +195,8 @@ var getContext = function(display, infos, curLevel) {
                 plot: 'points'
             },
             messages: {
-                table_not_found: 'Table non trouvée: ',
+                table_not_found: '' +
+                    'Table non trouvée: ',
                 file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
                 some_results_missing: 'Il manque une partie des résultats',
@@ -221,7 +228,6 @@ var getContext = function(display, infos, curLevel) {
 
     var strings = context.setLocalLanguageStrings(language_strings)
     var task_tables = {};
-    var files, tables_list;
     var ready = false;
 
     var conceptBaseUrl = window.location.protocol + '//static4.castor-informatique.fr/help/index.html';
@@ -333,7 +339,7 @@ var getContext = function(display, infos, curLevel) {
                         db_helper.displayTable(table, true);
                     });
                 } else {
-                    var table = Table(task_tables[filename].data);
+                    var table = Table(task_tables[filename]);
                     db_helper.displayTable(table, true);
                 }
             },
@@ -353,27 +359,27 @@ var getContext = function(display, infos, curLevel) {
 
 
         //subTask.blocklyHelper.loadExample(exampleObj ? exampleObj : subTask.levelGridInfos.example);
-/*
-        //test html render
-        setTimeout(function() {
-            context.database.loadTable('test_table', function(table, callback) {
-                context.database.displayTable(table, null, function() {
-                    context.expectTable('valid_table')
-                });
-            })
-        }, 1500);
-*/
-/*
-        //test map render
-        setTimeout(function() {
-            context.database.loadTable('valid_table3', function(table, callback) {
-                context.database.displayTableOnMap(table, 'nom', 'longitude', 'latitude', function() {
-                    context.expectTable('valid_table3');
-                });
+        /*
+                //test html render
+                setTimeout(function() {
+                    context.database.loadTable('test_table', function(table, callback) {
+                        context.database.displayTable(table, null, function() {
+                            context.expectTable('valid_table')
+                        });
+                    })
+                }, 1500);
+        */
+        /*
+                //test map render
+                setTimeout(function() {
+                    context.database.loadTable('valid_table3', function(table, callback) {
+                        context.database.displayTableOnMap(table, 'nom', 'longitude', 'latitude', function() {
+                            context.expectTable('valid_table3');
+                        });
 
-            })
-        }, 500)
-*/
+                    })
+                }, 500)
+        */
     }
 
 
@@ -387,7 +393,7 @@ var getContext = function(display, infos, curLevel) {
 
     context.expectTable = function(name) {
         if(name in task_tables) {
-            var table = Table(task_tables[name].data);
+            var table = Table(task_tables[name]);
             var status = db_helper.validateResultByTable(table);
             if(status === true) {
                 context.success = true;
@@ -420,7 +426,7 @@ var getContext = function(display, infos, curLevel) {
 
         loadTable: function(name, callback) {
             if(!task_tables[name] || !task_tables[name].public) throw new Error(strings.messages.table_not_found + name);
-            context.waitDelay(callback, Table(task_tables[name].data));
+            context.waitDelay(callback, Table(task_tables[name]));
         },
 
 
@@ -487,6 +493,7 @@ var getContext = function(display, infos, curLevel) {
         },
 
         displayTable: function(table, callback) {
+            if (Array.isArray(table)) {table = db_helper.listToTable(table);}
             db_helper.displayTable(table, context.display);
             context.waitDelay(callback);
         },
@@ -531,11 +538,20 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback);
         },
 
-        displayTableOnGraph: function(table, nameColumn, type, callback) {
+        displayTableOnGraph: function(table, nameColumn, minY, maxY, type, callback) {
+            if (Array.isArray(table)) {table = db_helper.listToTable(table);nameColumn = 'value';}
             db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
-                type,
-                context.display
+                minY,maxY,type,context.display
+            );
+            context.waitDelay(callback);
+        },
+
+        displayTablesOnGraph: function(table, nameColumn1, minX, maxX, nameColumn2, minY, maxY, callback) {
+            if (Array.isArray(table)) {table = db_helper.listToTable(table);nameColumn1 = 'index';nameColumn2 = 'value';}
+            db_helper.displayTablesOnGraph(
+                table.selectColumns([nameColumn1,nameColumn2]),
+                minX, maxX, minY, maxY
             );
             context.waitDelay(callback);
         },
@@ -633,8 +649,12 @@ var getContext = function(display, infos, curLevel) {
                     params_names: ['table', 'nameColumn', 'longitudeColumn', 'latitudeColumn'],
                 },
                 { name: 'displayTableOnGraph',
-                    params: ['Block', 'String', 'GraphType'],
-                    params_names: ['table', 'nameColumn', 'type'],
+                    params: ['Block', 'String', 'Number', 'Number', 'GraphType'],
+                    params_names: ['table', 'nameColumn', 'minY', 'maxY', 'type'],
+                },
+                { name: 'displayTablesOnGraph',
+                    params: ['Block', 'String', 'Number', 'Number', 'String', 'Number', 'Number'],
+                    params_names: ['table', 'nameColumn1', 'minX', 'maxX', 'nameColumn2', 'minY', 'maxY'],
                 },
             ],
             texts: [
@@ -653,18 +673,18 @@ var getContext = function(display, infos, curLevel) {
         'SortOrder': { bType: 'field_dropdown', defVal: 'asc', options: [
                 [strings.constantLabel.asc, 'asc'],
                 [strings.constantLabel.desc, 'desc']
-        ]},
+            ]},
         'GraphType': { bType: 'field_dropdown', defVal: 'line', options: [
                 [strings.constantLabel.line, 'line'],
                 [strings.constantLabel.bar, 'bar'],
                 [strings.constantLabel.plot, 'plot']
-        ]},
+            ]},
         'JoinType': { bType: 'field_dropdown', defVal: 'inner', options: [
-            [strings.constantLabel.inner, 'inner'],
-            [strings.constantLabel.outer, 'outer'],
-            [strings.constantLabel.left, 'left'],
-            [strings.constantLabel.right, 'right']
-        ]}
+                [strings.constantLabel.inner, 'inner'],
+                [strings.constantLabel.outer, 'outer'],
+                [strings.constantLabel.left, 'left'],
+                [strings.constantLabel.right, 'right']
+            ]}
     }
 
     BlocksHelper.convertBlocks(context, 'database', typeData);
