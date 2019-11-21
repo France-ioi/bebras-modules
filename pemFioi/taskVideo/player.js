@@ -376,6 +376,7 @@
                     elements.player.width('');
                     elements.sections.height('');
                     elements.sections.width('');
+                    elements.sections.css('margin-top', '');
                 }
 
                 if(is_wide_mode) {
@@ -391,9 +392,8 @@
                 } else {
                     var max_height = elements.root.width() / config.layout.video_aspect_ratio;
                     var player_height = Math.max(0.5 * max_height, max_height - scroll);
-                    var sections_height = Math.max(0, max_height - scroll);
                     elements.player.height(player_height);
-                    elements.sections.height(sections_height);
+                    elements.sections.css('margin-top', is_fixed_content ? max_height : '');
                 }
             }
         },
