@@ -63,9 +63,8 @@
 }
 
 
-
-
-.task-video .fixed-content {
+.task-video-narrow-mode .fixed-content .player,
+.task-video-wide-mode .fixed-content {
     background: #fff;
     position: fixed;
     top: 0;
