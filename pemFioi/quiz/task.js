@@ -127,10 +127,10 @@
         setValidated: function(validated) {
             if(validated) {
                 this.buttons.validate.hide();
-                this.buttons.solution.show();
+                this.buttons.solution && this.buttons.solution.show();
             } else {
                 this.buttons.validate.show();
-                this.buttons.solution.hide();
+                this.buttons.solution && this.buttons.solution.hide();
             }
         },
 
@@ -145,10 +145,12 @@
                 self.freezeTask();
                 self.setValidated(true);
             });
-            this.addButton(this.holder, 'solution', function() {
-                miniPlatformShowSolution();
-            });
-            this.buttons.solution.hide();
+            if($('#solution').length) {
+                this.addButton(this.holder, 'solution', function() {
+                    miniPlatformShowSolution();
+                });
+                this.buttons.solution.hide();
+            }
             this.addButton(this.holder, 'restart', function() {
                 self.showPopup();
             });
