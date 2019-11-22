@@ -159,7 +159,9 @@
                     section.viewed = false;
                     var parts_amount = Number.isInteger(section.parts) ? section.parts : 1;
                     var part_duraton = (section.end - section.start) / parts_amount;
-
+                    if(config.layout.enumerate_sections) {
+                        section.number = 1 + i;
+                    }
                     section.parts = [];
                     for(var j=0; j<parts_amount; j++) {
                         section.parts[j] = {
@@ -185,7 +187,7 @@
                 }
             }
             var el = $(
-                '<div class="title">' + section.title +
+                '<div class="title">' + ('number' in section ? section.number + '. ' : '') + section.title +
                     '<div class="duration">' + time_string.format(section.start) + '</div>' +
                 '</div>'
             );
@@ -488,7 +490,8 @@
             layout: {
                 video_aspect_ratio: 16/9,
                 wide_mode_min_width: 1024,
-                wide_mode_video_width: 0.6
+                wide_mode_video_width: 0.6,
+                enumerate_sections: true
             },
             callback: callback
         }
