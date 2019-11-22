@@ -512,7 +512,7 @@
             }
             if('timestamp' in state) {
                 player.seekTo(state.timestamp);
-                player.playVideo();
+                //player.playVideo();
             }
         } else {
             var sectionsData = sections.getViewed();
