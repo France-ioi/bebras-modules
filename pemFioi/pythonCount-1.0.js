@@ -56,6 +56,12 @@ function pythonCount(text) {
 }
 
 var pythonForbiddenBlocks = {
+    'dicts': {
+      'dicts_create_with': ['dict_brackets'],
+      'dict_get_literal': ['dict_brackets'],
+      'dict_set_literal': ['dict_brackets'],
+      'dict_keys': ['dict_brackets']
+    },
     'logic': {
       'controls_if': ['if', 'else', 'elif'],
       'controls_if_else': ['if', 'else', 'elif'],
