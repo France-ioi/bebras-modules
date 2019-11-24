@@ -388,7 +388,7 @@
                     elements.content.width(elements.root.width());
 
                     var max_height = video_width / config.layout.video_aspect_ratio;
-                    var height = Math.max(0.5 * max_height, max_height - scroll);
+                    var height = Math.floor(Math.max(0.5 * max_height, max_height - scroll));
                     elements.root.height(height);
                     elements.content.height(height);
                 } else {

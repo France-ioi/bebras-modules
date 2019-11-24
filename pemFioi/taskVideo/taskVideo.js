@@ -22,7 +22,7 @@ task.getHeight = function(success, error) {
     // infinite loop with the platform of height increase, try changing your
     // doctype to <!doctype html>
     var d = document;
-    var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight) + 50;
+    var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
 };
