@@ -25,17 +25,6 @@ task.getHeight = function(success, error) {
     // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-
-    // if the new height has already been tried just before the current height,
-    // we're in a loop between two heights.
-    // In that case we want to keep the largest of the two heights
-    if ((task.heights.length == 2) &&
-        (task.heights[0] == h) &&
-        (task.heights[1] > h)) {
-          return task.heights[1];
-    }
-    task.heights.push(h);
-    task.heights = task.heights.slice(-2);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
 };
