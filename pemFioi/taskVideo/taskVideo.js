@@ -23,6 +23,7 @@ task.getHeight = function(success, error) {
     // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
+    h = 20 * Math.ceil(h / 20);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
 };
