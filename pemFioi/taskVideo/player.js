@@ -393,6 +393,7 @@
                     elements.content.height(height);
                 } else {
                     var max_height = elements.root.width() / config.layout.video_aspect_ratio;
+                    elements.sections.height(max_height);
                     var player_height = Math.max(0.5 * max_height, max_height - scroll);
                     elements.player.height(player_height);
                     elements.sections.css('margin-top', is_fixed_content ? max_height : '');
