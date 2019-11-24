@@ -33,6 +33,8 @@ task.getHeight = function(success, error) {
     });
     if(unique.length <= 2) {
         h = Math.max.apply(null, task.heights);
+    } else {
+        task.heights = [h];
     }
     success(h);
     //success(parseInt($("body").outerHeight(true)));
