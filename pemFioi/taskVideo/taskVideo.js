@@ -19,18 +19,21 @@ task.updateToken = function(token, success, error) {
 
 task.heights = [];
 
-
 task.getHeight = function(success, error) {
     // Note : if the html/body is taking all available height, making an
     // infinite loop with the platform of height increase, try changing your
     // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-    if(task.heights.indexOf(h) === -1) {
-        task.heights.push(h);
+
+    task.heights.push(h);
+    task.heights = task.heights.slice(-7);
+    var unique = task.heights.filter(function(item, i, arr) {
+        return arr.indexOf(item) === i
+    });
+    if(unique.length <= 2) {
+        h = Math.max.apply(null, task.heights);
     }
-    task.heights = task.heights.slice(-2);
-    h = Math.max.apply(null, task.heights);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
 };
