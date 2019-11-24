@@ -29,7 +29,7 @@ task.getHeight = function(success, error) {
     if(task.heights.indexOf(h) === -1) {
         task.heights.push(h);
     }
-    task.heights = task.heights.slice(-3);
+    task.heights = task.heights.slice(-2);
     h = Math.max.apply(null, task.heights);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
