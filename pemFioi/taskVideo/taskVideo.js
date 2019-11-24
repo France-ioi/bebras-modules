@@ -17,13 +17,18 @@ task.updateToken = function(token, success, error) {
     success();
 };
 
+task.heights = [];
+
+
 task.getHeight = function(success, error) {
     // Note : if the html/body is taking all available height, making an
     // infinite loop with the platform of height increase, try changing your
     // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-    h = 20 * Math.ceil(h / 20);
+    task.heights.push(h);
+    task.heights = task.heights.slice(-3);
+    h = Math.max.apply(null, task.heights);
     success(h);
     //success(parseInt($("body").outerHeight(true)));
 };
