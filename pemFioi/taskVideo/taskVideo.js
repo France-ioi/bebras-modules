@@ -26,7 +26,9 @@ task.getHeight = function(success, error) {
     // doctype to <!doctype html>
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-    task.heights.push(h);
+    if(task.heights.indexOf(h) === -1) {
+        task.heights.push(h);
+    }
     task.heights = task.heights.slice(-3);
     h = Math.max.apply(null, task.heights);
     success(h);
