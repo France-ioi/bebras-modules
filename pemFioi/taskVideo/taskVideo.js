@@ -26,12 +26,14 @@ task.getHeight = function(success, error) {
     var d = document;
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
 
-    task.heights.push(h);
-    task.heights = task.heights.slice(-3);
+    if(task.heights[task.heights.length - 1] !== h) {
+        task.heights.push(h);
+    }
+    task.heights = task.heights.slice(-5);
     var unique = task.heights.filter(function(item, i, arr) {
         return arr.indexOf(item) === i
     });
-    if(unique.length <= 2) {
+    if(unique.length && unique.length <= 2) {
         h = Math.max.apply(null, task.heights);
     } else {
         task.heights = [h];
