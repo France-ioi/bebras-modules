@@ -27,7 +27,7 @@ task.getHeight = function(success, error) {
     var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
 
     task.heights.push(h);
-    task.heights = task.heights.slice(-7);
+    task.heights = task.heights.slice(-3);
     var unique = task.heights.filter(function(item, i, arr) {
         return arr.indexOf(item) === i
     });
