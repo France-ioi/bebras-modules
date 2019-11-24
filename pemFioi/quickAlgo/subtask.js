@@ -142,6 +142,13 @@ var initBlocklySubTask = function(subTask, language) {
       }
 
       subTask.changeTest(0);
+
+      // Log the loaded level after a second
+      if(window.levelLogActivityTimeout) { clearTimeout(window.levelLogActivityTimeout); }
+      window.levelLogActivityTimeout = setTimeout(function() {
+         subTask.logActivity('loadLevel;' + curLevel);
+         window.levelLogActivityTimeout = null;
+      }, 1000);
    };
 
    subTask.updateScale = function() {
@@ -203,15 +210,25 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.linkBack = false;
    };
 
-   subTask.logActivity = function() {
-      // Sends a validate("log") to the platform if the log GET parameter is set
-      // Performance note : we don't call getAnswerObject, as it's already
-      // called every second by buttonsAndMessages.
+   subTask.logActivity = function(details) {
       var logOption = subTask.taskParams && subTask.taskParams.options && subTask.taskParams.options.log;
-      if(logOption && JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
-         platform.validate("log");
-         subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);
+      if(!logOption) { return; }
+
+      if(!details) {
+         // Sends a validate("log") to the platform if the log GET parameter is set
+         // Performance note : we don't call getAnswerObject, as it's already
+         // called every second by buttonsAndMessages.
+         if(JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
+            platform.validate("log");
+            subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);
+         }
+         return;
       }
+
+      // We can only log extended activity if the platform gave us a
+      // logActivity function
+      if(!window.logActivity) { return; }
+      window.logActivity(details);
    };
 
    subTask.initRun = function(callback) {
