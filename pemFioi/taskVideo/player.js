@@ -361,9 +361,8 @@
 
             return function() {
                 var is_fixed_content = win.scrollTop() > elements.root.position().top;
-                elements.content.toggleClass('fixed-content', is_fixed_content);
-
                 var is_wide_mode = win.width() >= config.layout.wide_mode_min_width;
+
                 elements.root.toggleClass('task-video-wide-mode', is_wide_mode);
                 elements.root.toggleClass('task-video-narrow-mode', !is_wide_mode);
 
@@ -398,6 +397,8 @@
                     elements.player.height(player_height);
                     elements.sections.css('margin-top', is_fixed_content ? max_height : '');
                 }
+
+                elements.content.toggleClass('fixed-content', is_fixed_content);
             }
         },
 
