@@ -286,4 +286,15 @@ function Keyboard(data) {
          }
       }
    }
+   
+   this.remove = function() {
+      for(var iRow = 0; iRow < this.nRows; iRow++){
+         for(var iCol = 0; iCol < this.nCol; iCol++){
+            var keyIndex = iCol + iRow * this.nCol;
+            if (this.keys[keyIndex] != null) {
+               this.keyboard[keyIndex].remove();
+            }
+         }
+      }
+   }
 }
