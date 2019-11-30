@@ -249,6 +249,7 @@ function Keyboard(data) {
    this.keyHeight = data.keyHeight;
    this.marginX = data.marginX;
    this.marginY = data.marginY;
+   this.shiftOddRows = data.shiftOddRows;
    this.repeat = data.repeat;
    this.initialDelay = data.initialDelay;
    this.stepDelay = data.stepDelay;
@@ -262,21 +263,26 @@ function Keyboard(data) {
       for(var iCol = 0; iCol < this.nCol; iCol++){
          var x = this.xPos + iCol * (this.keyWidth + this.marginX);
          var y = this.yPos + iRow * (this.keyHeight + this.marginY);
+         if (this.shiftOddRows && (iRow % 2 == 1)) {
+            x += (this.keyWidth + this.marginX) / 2;
+         }
          var keyIndex = iCol + iRow * this.nCol;
-         var specialKey = (this.keyFiller) ? this.keyFiller(keyIndex,x,y) : null;
-         if(!specialKey){ 
-            var text = this.keys[keyIndex];
-            this.keyboard[keyIndex] = new Button(this.paper,x,y,this.keyWidth,this.keyHeight,text,this.repeat, this.initialDelay, this.stepDelay, this.delayFactory);
-            if(this.attr){
-               for(var iAttr = 0; iAttr < this.attr.length; iAttr++){
-                  var attr = this.attr[iAttr];
-                  var name = attr.name;
-                  var mode = attr.mode;
-                  this.keyboard[keyIndex].setAttr(name,mode,attr.attr);
+         if (this.keys[keyIndex] != null) {
+            var specialKey = (this.keyFiller) ? this.keyFiller(keyIndex,x,y) : null;
+            if(!specialKey){ 
+               var text = this.keys[keyIndex];
+               this.keyboard[keyIndex] = new Button(this.paper,x,y,this.keyWidth,this.keyHeight,text,this.repeat, this.initialDelay, this.stepDelay, this.delayFactory);
+               if(this.attr){
+                  for(var iAttr = 0; iAttr < this.attr.length; iAttr++){
+                     var attr = this.attr[iAttr];
+                     var name = attr.name;
+                     var mode = attr.mode;
+                     this.keyboard[keyIndex].setAttr(name,mode,attr.attr);
+                  }
                }
+            }else{
+               this.keyboard[keyIndex] = specialKey;
             }
-         }else{
-            this.keyboard[keyIndex] = specialKey;
          }
       }
    }
