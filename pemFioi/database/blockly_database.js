@@ -339,7 +339,7 @@ var getContext = function(display, infos, curLevel) {
                         db_helper.displayTable(table, true);
                     });
                 } else {
-                    var table = Table(task_tables[filename]);
+                    var table = Table(task_tables[filename].data);
                     db_helper.displayTable(table, true);
                 }
             },
@@ -393,7 +393,7 @@ var getContext = function(display, infos, curLevel) {
 
     context.expectTable = function(name) {
         if(name in task_tables) {
-            var table = Table(task_tables[name]);
+            var table = Table(task_tables[name].data);
             var status = db_helper.validateResultByTable(table);
             if(status === true) {
                 context.success = true;
@@ -426,7 +426,7 @@ var getContext = function(display, infos, curLevel) {
 
         loadTable: function(name, callback) {
             if(!task_tables[name] || !task_tables[name].public) throw new Error(strings.messages.table_not_found + name);
-            context.waitDelay(callback, Table(task_tables[name]));
+            context.waitDelay(callback, Table(task_tables[name].data));
         },
 
 
