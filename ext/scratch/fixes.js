@@ -436,11 +436,6 @@ Blockly.is3dSupported = function() {
   return Blockly.cache3dSupported_;
 };
 
-// Remove the numpad as it doesn't really work
-Blockly.FieldNumber.prototype.showEditor_ = function() {
-  Blockly.FieldNumber.superClass_.showEditor_.call(this, arguments);
-};
-
 Blockly.FieldTextInput.prototype.oldShowEditor_ = Blockly.FieldTextInput.prototype.showEditor_;
 Blockly.FieldTextInput.prototype.showEditor_ = function() {
   var mobile =

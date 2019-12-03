@@ -20,6 +20,11 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
+    keypadData: {
+        value: '',
+        callbackModify: null,
+        callbackFinished: null
+        },
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -883,6 +888,111 @@ var quickAlgoInterface = {
             height: blocksBbox.height + 8
             };
         window.saveSvgAsPng(svg[0], name, options);
+    },
+
+    renderKeypad: function() {
+        if($('#quickAlgo-keypad').length) { return; }
+        var html = '' +
+            '<div id="quickAlgo-keypad"><div class="keypad">' +
+            '   <div class="keypad-row">' +
+            '       <div class="keypad-value"></div>' +
+            '   </div>' +
+            '   <div class="keypad-row keypad-row-margin">' +
+            '       <div class="keypad-btn" data-btn="1">1</div>' +
+            '       <div class="keypad-btn" data-btn="2">2</div>' +
+            '       <div class="keypad-btn" data-btn="3">3</div>' +
+            '   </div>' +
+            '   <div class="keypad-row">' +
+            '       <div class="keypad-btn" data-btn="4">4</div>' +
+            '       <div class="keypad-btn" data-btn="5">5</div>' +
+            '       <div class="keypad-btn" data-btn="6">6</div>' +
+            '   </div>' +
+            '   <div class="keypad-row">' +
+            '       <div class="keypad-btn" data-btn="7">7</div>' +
+            '       <div class="keypad-btn" data-btn="8">8</div>' +
+            '       <div class="keypad-btn" data-btn="9">9</div>' +
+            '   </div>' +
+            '   <div class="keypad-row">' +
+            '       <div class="keypad-btn" data-btn="0">0</div>' +
+            '       <div class="keypad-btn" data-btn=".">.</div>' +
+            '       <div class="keypad-btn keypad-btn-r" data-btn="R"><span class="fas fa-backspace"></span></div>' +
+            '   </div>' +
+            '   <div class="keypad-row keypad-row-margin">' +
+            '       <div class="keypad-btn keypad-btn-c" data-btn="C"><span class="fas fa-undo"></span></div>' +
+            '       <div class="keypad-btn keypad-btn-v" data-btn="V"><span class="fas fa-check-circle"></span></div>' +
+            '   </div>' +
+            '</div></div>';
+        $('body').append(html);
+        $('#quickAlgo-keypad').on('click', quickAlgoInterface.handleKeypadKey);
+    },
+
+    handleKeypadKey: function(e) {
+        var finished = false;
+
+        if(e) {
+            var btn = $(e.target).closest('div.keypad-btn').attr('data-btn');
+            if(!btn && $(e.target).closest('div.keypad').length == 0) {
+                finished = true;
+            }
+        } else {
+            var btn = null;
+        }
+
+        var data = quickAlgoInterface.keypadData;
+        if(btn == 'R') {
+            data.value = data.value.substring(0, data.value.length - 1);
+        } else if(btn == 'C') {
+            data.value = data.initialValue;
+            finished = true;
+        } else if(btn == 'V') {
+            finished = true;
+        } else if(btn == '0') {
+            if(data.value != '') {
+                data.value += '0';
+            }
+        } else if(btn == '.') {
+            if(data.value.indexOf('.') == -1) {
+                data.value += '.';
+            }
+        } else if(btn) {
+            data.value += btn;
+        }
+
+        if(data.value == '') { data.value = '0'; }
+        while(data.value.length > 1 && data.value.substring(0, 1) == '0') {
+            data.value = data.value.substring(1);
+        }
+
+        if(data.value.length > 19) {
+            data.value = data.value.substring(0, 19);
+        }
+        else if(data.value.length > 12) {
+            $('.keypad-value').addClass('keypad-value-small');
+        } else {
+            $('.keypad-value').removeClass('keypad-value-small');
+        }
+
+        $('.keypad-value').text(data.value);
+
+        if(finished) {
+            $('#quickAlgo-keypad').hide();
+            data.callbackFinished(parseFloat(data.value), !!btn);
+        } else {
+            data.callbackModify(parseFloat(data.value));
+        }
+    },
+
+    displayKeypad: function(initialValue, position, callbackModify, callbackFinished) {
+        this.renderKeypad();
+        $('#quickAlgo-keypad').show();
+        $('.keypad').css('top', position.top).css('left', position.left);
+        quickAlgoInterface.keypadData = {
+            value: initialValue,
+            initialValue: initialValue,
+            callbackModify: callbackModify,
+            callbackFinished: callbackFinished
+            };
+        quickAlgoInterface.handleKeypadKey();
     }
 };
 
