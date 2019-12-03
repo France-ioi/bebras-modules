@@ -117,7 +117,6 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
       var mouseup = function() {
          if(self.enabled) {
-
             // If we received a mousedown event previously, and now the mouse is up
             // and the mouse is not over the button, then this was a drag attempt.
             if(self.mousedown && !self.mouseover) {
@@ -159,6 +158,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       }
       // First firing - immediately on mouse down.
       this.clickHandler(this.clickData);
+      this._stopRepeater();
       delayFactory.create(this.guid + "$buttonRepeatInitial", function() {
          // Second firing - after the initial delay.
          self.clickHandler(self.clickData);

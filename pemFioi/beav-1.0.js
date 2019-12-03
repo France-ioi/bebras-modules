@@ -10,8 +10,9 @@ Beav.Object.eq = function eq(x, y) {
    // assumes arguments to be of same type
    var tx = typeof(x);
    var ty = typeof(y);
-   if (tx != ty)
+   if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
+   }
    if (tx == "boolean" || tx == "number" || tx == "string" || tx == "undefined") {
       return x == y;
    }
