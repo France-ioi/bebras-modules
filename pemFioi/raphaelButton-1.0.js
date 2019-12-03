@@ -102,6 +102,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          }
          if(self.enabled) {
             self.mousedown = true;
+            self.mouseover = true;
             self.moder.setMode("mousedown");
             if(repeat) {
                self._startRepeater();
