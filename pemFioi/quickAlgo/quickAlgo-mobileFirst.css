@@ -1719,3 +1719,95 @@ button.showLongIntro .icon {
   MODAL POPUPS
 *************************/
 
+
+
+/********
+  KEYPAD
+*********/
+
+#quickAlgo-keypad {
+  position: absolute;
+  z-index: 50;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+}
+
+.blocklyWidgetDiv {
+  z-index: 49 !important;
+}
+
+.keypad {
+  position: absolute;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  background-color: #E2F4FC;
+  width: 228px;
+  height: 260px;
+  padding: 8px;
+  border-radius: 6px;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.keypad-value {
+  width: 204px;
+  height: 30px;
+  background-color: #FFF;
+  color: #4A90E2;
+  border-radius: 6px;
+  text-align: center;
+  line-height: 30px;
+  font-size: 26px;
+}
+.keypad-value.keypad-value-small {
+  font-size: 18px;
+}
+
+.keypad-row {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 4px;
+}
+.keypad-row.keypad-row-margin {
+  margin-top: 8px;
+}
+
+.keypad-btn {
+  background-color: #4A90E2;
+  color: #FFF;
+  width: 64px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  font-size: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.keypad-btn.keypad-btn-r {
+  background-color: #E86E64;
+}
+
+.keypad-btn.keypad-btn-c {
+  background-color: #DB8B0A;
+  font-size: 20px;
+}
+
+.keypad-btn.keypad-btn-v {
+  width: 136px;
+  background-color: #88BB88;
+  font-size: 24px;
+}
