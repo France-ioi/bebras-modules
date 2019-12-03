@@ -97,6 +97,9 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.mousedown = false;
 
       var mousedown = function() {
+         if(self.mousedown){
+            return
+         }
          if(self.enabled) {
             self.mousedown = true;
             self.moder.setMode("mousedown");
@@ -158,7 +161,6 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       }
       // First firing - immediately on mouse down.
       this.clickHandler(this.clickData);
-      this._stopRepeater();
       delayFactory.create(this.guid + "$buttonRepeatInitial", function() {
          // Second firing - after the initial delay.
          self.clickHandler(self.clickData);
