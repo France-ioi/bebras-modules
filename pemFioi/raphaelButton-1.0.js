@@ -122,7 +122,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       var mouseup = function() {
          if(self.enabled) {
             // If we received a mousedown event previously, and now the mouse is up
-            // and the mouse is not over the button, then this was a drag attempt.
+            // and the mouse is not over the button, then this was a drag attempt.            
             if(self.mousedown && !self.mouseover) {
                if(self.dragAttemptHandler) {
                   self.dragAttemptHandler(self.dragAttemptData);
@@ -152,6 +152,10 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
       this.elements.transLayer.mouseout(mouseout);
+      if (this.elements.transLayer.touchstart) {
+         this.elements.transLayer.touchstart(mousedown);
+         this.elements.transLayer.touchend(mouseup);
+      }
       $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
       this.moder.setMode("enabled");
    };
