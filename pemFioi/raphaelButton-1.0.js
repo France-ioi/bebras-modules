@@ -275,6 +275,18 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.applyFunction("remove");
    };
 
+   this.toFront = function() {
+      this.elements.shadow.toFront();
+      this.elements.rect.toFront();
+      for(var iElement in this.elements) {
+         if(iElement != "shadow" && iElement != "rect"){
+            var element = this.elements[iElement];
+            element.toFront();
+         }
+      }
+      this.elements.transLayer.toFront();
+   };
+
    this.init();
 }
 
