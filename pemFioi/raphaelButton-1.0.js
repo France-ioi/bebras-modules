@@ -108,6 +108,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          }
          if (self.lastTouchTime != null) {
             var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
+            alert(timeSinceTouch);
             if (timeSinceTouch < 300) {
                return;
             }
