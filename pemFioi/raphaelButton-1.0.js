@@ -104,7 +104,8 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       var mousedown = function() {
          if (self.lastTouchTime != null) {
             var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
-            if (timeSinceTouch < 100) {
+            console.log("timeSinceTouch : " + timeSinceTouch);
+            if (timeSinceTouch < 300) {
                return;
             }
          }
