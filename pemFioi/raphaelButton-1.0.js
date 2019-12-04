@@ -98,6 +98,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
       var touchstart = function() {
          self.touchInProgress = true;
+         self.lastTouchTime = new Date().getTime();
          handleMouseDown();
       }
 
@@ -105,21 +106,23 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          if (self.touchInProgress) {
             return;
          }
+         if (self.lastTouchTime != null) {
+            var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
+            if (timeSinceTouch < 2000) {
+               return;
+            }
+         }
          handleMouseDown();
       }
       
       var handleMouseDown = function() {
-         if (self.lastTouchTime != null) {
-            var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
-                  alert(timeSinceTouch);
-            if (timeSinceTouch < 1000) {
-               if (timeSinceTouch > 100) {
-                  alert(timeSinceTouch);
-               }
+         if (self.lastMousedownTime != null) {
+            var timeSinceDown = new Date().getTime() - self.lastMousedownTime;
+            if (timeSinceDown < 100) {
                return;
             }
          }
-         self.lastTouchTime = new Date().getTime();
+         self.lastMousedownTime = new Date().getTime();
          if(self.mousedown){
             return
          }
@@ -181,6 +184,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.elements.transLayer.click(click);
       this.lastTouchTime = null;
       this.touchInProgress = false;
+      this.lastMousedownTime = null;
       this.elements.transLayer.touchstart(touchstart);
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
