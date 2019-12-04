@@ -98,7 +98,6 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
       var touchstart = function() {
          self.touchInProgress = true;
-         self.lastTouchTime = new Date().getTime();
          handleMouseDown();
       }
 
@@ -106,17 +105,17 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          if (self.touchInProgress) {
             return;
          }
-         if (self.lastTouchTime != null) {
-            var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
-            alert(timeSinceTouch);
-            if (timeSinceTouch < 300) {
-               return;
-            }
-         }
          handleMouseDown();
       }
       
       var handleMouseDown = function() {
+         if (self.lastTouchTime != null) {
+            var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
+            if (timeSinceTouch < 100) {
+               return;
+            }
+         }
+         self.lastTouchTime = new Date().getTime();
          if(self.mousedown){
             return
          }
