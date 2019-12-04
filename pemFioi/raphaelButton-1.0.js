@@ -97,17 +97,21 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.mousedown = false;
 
       var touchstart = function() {
-         usesTouch = true;
+         self.lastTouchTime = new Date().getTime();
+         handleMouseDown();
       }
 
       var mousedown = function() {
-         if (self.mousedownStartTime != null) {
-            var timeSinceTouch = new Date().getTime() - self.mousedownStartTime;
-            if ((timeSinceTouch < 100) || (usesTouch && timeSinceTouch < 300)) {
+         if (self.lastTouchTime != null) {
+            var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
+            if (timeSinceTouch < 100) {
                return;
             }
          }
-         self.mousedownStartTime = new Date().getTime();
+         handleMouseDown();
+      }
+      
+      var handleMouseDown = function() {
          if(self.mousedown){
             return
          }
@@ -129,6 +133,11 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
             }
          }
       };
+
+      var touchend = function() {
+         self.lastTouchTime = new Date().getTime();
+         mouseup();
+      }
 
       var mouseup = function() {
          if(self.enabled) {
@@ -160,13 +169,12 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       };
 
       this.elements.transLayer.click(click);
-      this.mousedownStartTime = null;
-      this.usesTouch = false;
+      this.lastTouchTime = null;
       this.elements.transLayer.touchstart(touchstart);
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
       this.elements.transLayer.mouseout(mouseout);
-      this.elements.transLayer.touchend(mouseup);
+      this.elements.transLayer.touchend(touchend);
       $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
       this.moder.setMode("enabled");
    };
