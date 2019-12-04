@@ -97,14 +97,17 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.mousedown = false;
 
       var touchstart = function() {
+         self.touchInProgress = true;
          self.lastTouchTime = new Date().getTime();
          handleMouseDown();
       }
 
       var mousedown = function() {
+         if (self.touchInProgress) {
+            return;
+         }
          if (self.lastTouchTime != null) {
             var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
-            console.log("timeSinceTouch : " + timeSinceTouch);
             if (timeSinceTouch < 300) {
                return;
             }
@@ -136,11 +139,13 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       };
 
       var touchend = function() {
+         self.touchInProgress = false;
          self.lastTouchTime = new Date().getTime();
          mouseup();
       }
 
       var mouseup = function() {
+         self.touchInProgress = false;
          if(self.enabled) {
             // If we received a mousedown event previously, and now the mouse is up
             // and the mouse is not over the button, then this was a drag attempt.            
@@ -171,6 +176,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
 
       this.elements.transLayer.click(click);
       this.lastTouchTime = null;
+      this.touchInProgress = false;
       this.elements.transLayer.touchstart(touchstart);
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
