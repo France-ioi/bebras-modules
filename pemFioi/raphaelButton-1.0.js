@@ -111,7 +111,10 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       var handleMouseDown = function() {
          if (self.lastTouchTime != null) {
             var timeSinceTouch = new Date().getTime() - self.lastTouchTime;
-            if (timeSinceTouch < 100) {
+            if (timeSinceTouch < 300) {
+               if (timeSinceTouch > 100) {
+                  alert(timeSinceTouch);
+               }
                return;
             }
          }
