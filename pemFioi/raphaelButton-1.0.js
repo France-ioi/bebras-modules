@@ -96,7 +96,18 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.mouseover = false;
       this.mousedown = false;
 
+      var touchstart = function() {
+         usesTouch = true;
+      }
+
       var mousedown = function() {
+         if (self.mousedownStartTime != null) {
+            var timeSinceTouch = new Date().getTime() - self.mousedownStartTime;
+            if ((timeSinceTouch < 100) || (usesTouch && timeSinceTouch < 300)) {
+               return;
+            }
+         }
+         self.mousedownStartTime = new Date().getTime();
          if(self.mousedown){
             return
          }
@@ -149,13 +160,13 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       };
 
       this.elements.transLayer.click(click);
+      this.mousedownStartTime = null;
+      this.usesTouch = false;
+      this.elements.transLayer.touchstart(touchstart);
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
       this.elements.transLayer.mouseout(mouseout);
-      if (this.elements.transLayer.touchstart) {
-         //this.elements.transLayer.touchstart(mousedown);
-         this.elements.transLayer.touchend(mouseup);
-      }
+      this.elements.transLayer.touchend(mouseup);
       $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
       this.moder.setMode("enabled");
    };
