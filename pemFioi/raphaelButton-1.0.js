@@ -153,7 +153,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.elements.transLayer.mouseover(mouseover);
       this.elements.transLayer.mouseout(mouseout);
       if (this.elements.transLayer.touchstart) {
-         this.elements.transLayer.touchstart(mousedown);
+         //this.elements.transLayer.touchstart(mousedown);
          this.elements.transLayer.touchend(mouseup);
       }
       $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
