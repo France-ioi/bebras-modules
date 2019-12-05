@@ -38,8 +38,8 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.loadPrograms = function () {
-    if(this._aceEditor && this.programs[0].javascript) {
-      this._aceEditor.setValue(''+this.programs[0].javascript);
+    if(this._aceEditor && this.programs[0].blockly) {
+      this._aceEditor.setValue(''+this.programs[0].blockly);
       this._aceEditor.selection.clearSelection();
     }
   };
@@ -228,10 +228,8 @@ function LogicController(nbTestCases, maxInstructions) {
               $("#errors").html(that._strings.invalidContent);
             }
           }
-          //that.languages[that.player] = "blockly";
         } else {
-          that.programs[0].javascript = code;
-          //that.languages[that.player] = "javascript";
+          that.programs[0].blockly = code;
         }
         that.loadPrograms();
       };
