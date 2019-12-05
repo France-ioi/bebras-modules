@@ -67,6 +67,10 @@
                 }
             },
 
+            isAnswered: function() {
+                return !isNaN(this.getAnswer());
+            },
+
             showResult: function(mistakes, message) {
                 parent.find('answer').removeClass('correct mistake');
                 parent.find('answer.selected').addClass(mistakes === null ? 'correct' : 'mistake');
@@ -115,6 +119,10 @@
                     var idx = parseInt(el.attr('answer-index'), 10);
                     el.toggleClass('selected', values.indexOf(idx) !== -1);
                 });
+            },
+
+            isAnswered: function() {
+                return this.getAnswer().length > 0;
             },
 
             showResult: function(mistakes, message) {
