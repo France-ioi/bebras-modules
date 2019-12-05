@@ -220,7 +220,8 @@ Quiz.UI = function(params) {
         },
 
         toggleSolutions: function(visible) {
-            params.parent.find('#solution').toggle(visible);
+            $('#solution').toggle(visible);
+            $('solution').toggle(visible);
             if (visible) {
                 $('#task').toggleClass('displaySolution');
             }
