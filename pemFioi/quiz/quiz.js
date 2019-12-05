@@ -231,7 +231,9 @@ Quiz.UI = function(params) {
             var mistakes = Array.isArray(result.mistakes) ? result.mistakes : [];
             for(var i=0; i<questions.length; i++) {
                 var msg = false;
-                if(result.messages[i]) {
+                if(!questions[i].isAnswered()) {
+                    msg = params.display_partial_feedback ? lang.translate('wrong_answer_msg_not_answered') : false;
+                } else if(result.messages[i]) {
                     msg = params.display_partial_feedback ?
                         lang.translate('wrong_answer_msg_partial_feedback') + ' ' + result.messages[i]
                         :

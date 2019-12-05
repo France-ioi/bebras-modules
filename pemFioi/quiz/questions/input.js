@@ -46,6 +46,10 @@
                 input.val(value)
             },
 
+            isAnswered: function() {
+                return this.getAnswer() != '';
+            },
+
             showResult: function(mistakes, message) {
                 answer.removeClass('correct mistake');
                 answer.addClass(mistakes === null ? 'correct' : 'mistake');

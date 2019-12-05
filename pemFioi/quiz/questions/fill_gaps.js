@@ -101,6 +101,10 @@
                 });
             },
 
+            isAnswered: function() {
+                return true;
+            },
+
             showResult: function(mistakes, message) {
                 var placeholders = text.find('.placeholder');
                 placeholders.removeClass('correct mistake');
