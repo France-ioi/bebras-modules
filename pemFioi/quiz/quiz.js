@@ -230,10 +230,13 @@ Quiz.UI = function(params) {
         showResult: function(result) {
             var mistakes = Array.isArray(result.mistakes) ? result.mistakes : [];
             for(var i=0; i<questions.length; i++) {
-                var msg = params.display_partial_feedback && result.messages[i] ?
-                    lang.translate('wrong_answer_msg_partial_feedback') + ' ' + result.messages[i]
-                    :
-                    lang.translate('wrong_answer_msg');
+                var msg = false;
+                if(result.messages[i]) {
+                    msg = params.display_partial_feedback ?
+                        lang.translate('wrong_answer_msg_partial_feedback') + ' ' + result.messages[i]
+                        :
+                        lang.translate('wrong_answer_msg');
+                }
                 questions[i].showResult(mistakes[i], msg);
             }
         },
