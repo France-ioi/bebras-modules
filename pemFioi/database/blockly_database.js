@@ -336,11 +336,11 @@ var getContext = function(display, infos, curLevel) {
                 if(is_imported) {
                     var file = task_files.getFile(filename);
                     db_helper.loadCsv(file, [], function(table) {
-                        db_helper.displayTable(table, true);
+                        db_helper.displayTable(table, true, true);
                     });
                 } else {
                     var table = Table(task_tables[filename].data);
-                    db_helper.displayTable(table, true);
+                    db_helper.displayTable(table, true, true);
                 }
             },
             tables: {

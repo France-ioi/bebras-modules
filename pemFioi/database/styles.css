@@ -46,6 +46,16 @@
 }
 
 
+.highlight-result table,
+.highlight-result th,
+.highlight-result td {
+    border-color: #999;
+    color: #FFF;
+    background: #336;
+}
+
+
+
 /* console renderer */
 .console {
     width: auto;
