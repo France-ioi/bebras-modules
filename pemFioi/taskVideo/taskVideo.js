@@ -94,7 +94,7 @@ task.gradeAnswer = function(answer, answerToken, success, error) {
     if(answerObj.viewed) {
         success(Math.floor(100 * answerObj.viewed / answerObj.total), answerObj.viewed + '/' + answerObj.total + ' sections viewed.');
     } else {
-        success(100, 'No section has been viewed.');
+        success(0, 'No section has been viewed.');
     }
 }
 
