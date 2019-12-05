@@ -9,7 +9,8 @@
             en: {
                 'score': 'Score',
                 'grader_msg': 'Your score is ',
-                'wrong_answer_msg': 'Your answer is incorrect.',
+                'wrong_answer_msg': 'You have at least one mistake.',
+                'wrong_answer_msg_partial_feedback': 'You have at least one mistake. Here is a hint:',
                 'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
                 'validate': 'Submit',
                 'solution': 'Show answer',
@@ -27,7 +28,8 @@
             fr: {
                 'score': 'Score',
                 'grader_msg': 'Votre score est ',
-                'wrong_answer_msg': 'Your answer is incorrect.',
+                'wrong_answer_msg': 'Vous avez au moins une erreur.',
+                'wrong_answer_msg_partial_feedback': 'Vous avez au moins une erreur. Voici un indice :',
                 'wrong_fill_gaps_msg': 'You have %% incorrect answers for this question, highlighted in red.',
                 'validate': 'Valider',
                 'solution': 'Voir la réponse',
