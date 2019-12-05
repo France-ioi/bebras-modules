@@ -347,6 +347,9 @@ function TableRendererHtml(options) {
     }
 }
 
+
+
+
 function TableRendererMap(options) {
 
     var container = $('<div class="renderer_map">');
@@ -474,6 +477,10 @@ function TableRendererMap(options) {
 
     // interface
     this.displayTable = function(table, reference_table, display) {
+        if(reference_table) {
+            // reorder reference_table columns
+            reference_table = reference_table.selectColumns(['name', 'lng', 'lat']);
+        }
         if(display) {
             renderer.clear();
         }
