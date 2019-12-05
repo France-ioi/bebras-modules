@@ -278,9 +278,7 @@
             window.quiz_ui = q;
 
             task.showViews = function(views, callback) {
-                console.log('task views: ', views)
                 q.toggleSolutions(!!views.solution);
-                $('#solution').toggle(!!views.solution);
                 callback()
             }
 
