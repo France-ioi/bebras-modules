@@ -1,6 +1,6 @@
 g_instance = null;
 
-var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
+var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onChangeBoard) {
     this.onConnect = _onConnect;
     this.onDisconnect = _onDisconnect;
 
@@ -18,6 +18,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
     this.connected = false;
     this.onConnect = _onConnect;
     this.onDisconnect = _onDisconnect;
+    this.onChangeBoard = _onChangeBoard;
     this.locked = "";
     this.pingInterval = null;
     this.pingsWithoutPong = 0;
@@ -35,7 +36,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
         this.resultsCallback = null;
-        this.seq = Math.random() * 65536;
+        this.seq = Math.floor(Math.random() * 65536);
 
         this.wsSession = new WebSocket(url);
 
@@ -74,6 +75,12 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.wsSession.onmessage = function (evt) {
             var message = JSON.parse(evt.data);
 
+            if (message.command == "hello") {
+                if (onChangeBoard && message.board)
+                {
+                   onChangeBoard(message.board);
+                }
+            }
             if (message.command == "locked") {
                 locked = message.lockedby;
             } else if (message.command == "pong") {
@@ -250,7 +257,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
         this.wsSession.send(JSON.stringify(command));
     }
 
-    this.sendCommand = function (command, callback) {
+    this.sendCommand = function (command, callback, long) {
         if (this.wsSession != null) {
             if (this.resultsCallback == null) {
                 if (!this.commandMode) {
@@ -266,7 +273,8 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect) {
                     {
                         "command": "execLine",
                         "line": command,
-                        "seq": seq
+                        "seq": seq,
+                        "long": long? true: false
                     }
 
                     this.sessionTainted = true;
@@ -327,14 +335,17 @@ oledimage = None
 oleddraw = None
 oledwidth = 128
 oledheight = 32
+oledautoupdate = True
 
-oledtimer = None
-oledlock = threading.Lock()
 
 vl53l0x = None
 
 enabledBMI160 = False
 enabledLSM303C = False
+
+compassOffset = None
+compassScale = None
+
 
 pi = pigpio.pi()
 
@@ -373,18 +384,20 @@ def normalizePin(pin):
 
 
 def cleanupPin(pin):
-    pi.set_mode(pin, pigpio.INPUT)
+        pi.set_mode(pin, pigpio.INPUT)
 
 def changePinState(pin, state):
     pin = normalizePin(pin)
-    state = int(state)
 
-    cleanupPin(pin)
-    GPIO.setup(pin, GPIO.OUT)
-    if state:
-        GPIO.output(pin, GPIO.HIGH)
-    else:
-        GPIO.output(pin, GPIO.LOW)
+    if pin != 0:
+        state = int(state)
+
+        cleanupPin(pin)
+        GPIO.setup(pin, GPIO.OUT)
+        if state:
+            GPIO.output(pin, GPIO.HIGH)
+        else:
+            GPIO.output(pin, GPIO.LOW)
 
 def turnLedOn(pin=5):
 	changePinState(pin, 1)
@@ -560,24 +573,27 @@ def initOLEDScreen():
     global oleddraw
 
     if oleddisp == None:
-        from board import SCL, SDA
-        import busio
+        from luma.core.interface.serial import i2c
+        from luma.core.render import canvas
+        from luma.oled.device import ssd1306
         from PIL import Image, ImageDraw, ImageFont
-        import adafruit_ssd1306
 
-        i2c = busio.I2C(SCL, SDA)
+        # Reset the screen
+        RESET=21
+        GPIO.setup(RESET, GPIO.OUT)
+        GPIO.output(RESET, 0)
+        time.sleep(0.01)
+        GPIO.output(RESET, 1)
+   
 
-        oleddisp = adafruit_ssd1306.SSD1306_I2C(oledwidth, oledheight, i2c)
-
-        oleddisp.fill(0)
-        oleddisp.show()
+        serial = i2c(port=1, address=0x3C)
+        oleddisp = ssd1306(serial, width=oledwidth, height=oledheight)
 
         oledfont = ImageFont.load_default()
-
         oledimage = Image.new('1', (oledwidth, oledheight))
-
         oleddraw = ImageDraw.Draw(oledimage)   
 
+        oleddisp.display(oledimage)
 
 # Address 0x3c
 def displayTextOled(line1, line2=""):
@@ -597,32 +613,18 @@ def displayTextOled(line1, line2=""):
     oleddraw.text((0, 0), line1, font=oledfont, fill=255)
     oleddraw.text((0, 15), line2, font=oledfont, fill=255)
 
-    oleddisp.image(oledimage)
-    oleddisp.show()
+    updateScreen()
+
+def autoUpdate(autoupdate):
+    global oledautoupdate
+
+    oledautoupdate = bool(autoupdate)
 
 def updateScreen():
     global oleddisp
-    global oledfont
     global oledimage
-    global oleddraw
 
-    global oledtimer
-
-    oledlock.acquire(True)
-    oleddisp.image(oledimage)
-    oledlock.release()
-    
-    oleddisp.show()
-    oledtimer = None
-
-def scheduleUpdateScreen():
-    global oledtimer
-
-    oledlock.acquire(True)
-    if oledtimer == None:
-        oledtimer = threading.Timer(0.05, updateScreen)
-        oledtimer.start()   
-    oledlock.release()
+    oleddisp.display(oledimage)
 
 fillcolor = 255
 strokecolor = 255
@@ -647,60 +649,63 @@ def stroke(color):
     else:
         strokecolor = 0
 
-def noStroke(color):
+def noStroke():
     global strokecolor
     strokecolor = None
 
 def drawPoint(x, y):
+    global oleddraw
+    global strokecolor
+    
+    initOLEDScreen()
+
+    oleddraw.point((x, y), fill=strokecolor)
+
+    global oledautoupdate
+    if oledautoupdate:
+        updateScreen()
+
+def drawText(x, y, text):
     global oleddisp
     global oledfont
     global oledimage
     global oleddraw
-    global strokecolor
+    
+    initOLEDScreen()  
 
-    initOLEDScreen()
+    # This will allow arguments to be numbers
+    text = str(text)
 
-    oledlock.acquire(True)
-    oleddraw.point((x, y), fill=strokecolor)
-    oledlock.release()
+    oleddraw.text((x, y), text, font=oledfont, fill=strokecolor)
 
-    scheduleUpdateScreen()
+    updateScreen()
+
 
 def drawLine(x0, y0, x1, y1):
-    global oleddisp
-    global oledfont
-    global oledimage
     global oleddraw
     global strokecolor
 
     initOLEDScreen()
 
-    oledlock.acquire(True)
     oleddraw.line((x0, y0, x1, y1), fill=strokecolor)
-    oledlock.release()
 
-    scheduleUpdateScreen()
+    global oledautoupdate
+    if oledautoupdate:
+        updateScreen()
 
 def drawRectangle(x0, y0, width, height):
-    global oleddisp
-    global oledfont
-    global oledimage
     global oleddraw
     global fillcolor
     global strokecolor
 
     initOLEDScreen()
-
-    oledlock.acquire(True)
     oleddraw.rectangle((x0, y0, x0 + width, y0 + height), fill=fillcolor, outline=strokecolor)
-    oledlock.release()
 
-    scheduleUpdateScreen()
+    global oledautoupdate
+    if oledautoupdate:
+        updateScreen()
 
 def drawCircle(x0, y0, diameter):
-    global oleddisp
-    global oledfont
-    global oledimage
     global oleddraw
     global fillcolor
     global strokecolor
@@ -715,26 +720,22 @@ def drawCircle(x0, y0, diameter):
     boundx1 = x0 + radius
     boundy1 = y0 + radius
 
-    oledlock.acquire(True)
     oleddraw.ellipse((boundx0, boundy0, boundx1, boundy1), fill=fillcolor, outline=strokecolor)
-    oledlock.release()
 
-    scheduleUpdateScreen()
+    global oledautoupdate
+    if oledautoupdate:
+        updateScreen()
 
 def clearScreen():
-    global oleddisp
-    global oledfont
-    global oledimage
     global oleddraw
 
     initOLEDScreen()
 
-    oledlock.acquire(True)
     oleddraw.rectangle((0, 0, oledwidth, oledheight), outline=0, fill=0)
-    oledlock.release()
 
-    scheduleUpdateScreen()
-
+    global oledautoupdate
+    if oledautoupdate:
+        updateScreen()
 
 def displayText16x2(line1, line2=""):
     global screenLine1
@@ -776,10 +777,12 @@ def displayText16x2(line1, line2=""):
 
 def setServoAngle(pin, angle):
     pin = normalizePin(pin)
-    angle = int(angle)
 
-    pulsewidth = (angle * 11.11) + 500
-    pi.set_servo_pulsewidth(pin, pulsewidth)
+    if pin != 0:
+        angle = int(angle)
+
+        pulsewidth = (angle * 11.11) + 500
+        pi.set_servo_pulsewidth(pin, pulsewidth)
 
 def readGrovePiADC(pin):
     pin = normalizePin(pin)
@@ -1126,8 +1129,9 @@ def readAccelBMI160():
         acc_y = float(acc_y)  / 16384.0;
         acc_z = float(acc_z) / 16384.0;
 
-        return [round(acc_x, 2), round(acc_y, 2), round(acc_z, 2)]
+        return [round(acc_x, 1), round(acc_y, 1), round(acc_z, 1)]
     except:
+        enabledBMI160 = False
         return [0, 0, 0]
 
 def readAcceleration(axis):
@@ -1171,10 +1175,12 @@ def readGyroBMI160():
             initBMI160()
         
         bus = smbus.SMBus(1)
-        value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_8_ADDR, 6)
+        value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_8_ADDR, 15)
         x =  (value[1] << 8) | value[0]
         y =  (value[3] << 8) | value[2]
         z =  (value[5] << 8) | value[4]
+
+        time = (value[14] << 16) | (value[13] << 8) | value[12]
 
         if x & 0x8000 != 0:
             x -= 1 << 16
@@ -1185,12 +1191,13 @@ def readGyroBMI160():
         if z & 0x8000 != 0:
             z -= 1 << 16
 
-        #x = float(x)  / 16384.0;
-        #y = float(y)  / 16384.0;
-        #z = float(z) / 16384.0;
-  
-        return [x, y, z]
+        x = float(x)  * 0.030517578125;
+        y = float(y)  * 0.030517578125;
+        z = float(z)  * 0.030517578125;
+      
+        return [x, y, z, time]
     except:
+        enabledBMI160 = False
         return [0, 0, 0]
 
 def twos_comp(val, bits):
@@ -1222,6 +1229,7 @@ def readTemperatureBMI160(pin):
     
         return temp
     except:
+        enabledBMI160 = False
         return 0
 
 ACC_I2C_ADDR = 0x1D
@@ -1233,6 +1241,13 @@ CTRL_REG3               = 0x22
 CTRL_REG4               = 0x23
 CTRL_REG5               = 0x24
 
+CTRL_REG1_A = 0x20
+CTRL_REG2_A = 0x21
+CTRL_REG3_A = 0x22
+CTRL_REG4_A = 0x23
+CTRL_REG5_A = 0x24
+CTRL_REG6_A = 0x25
+CTRL_REG7_A = 0x26
 
 MAG_OUTX_L     = 0x28
 MAG_OUTX_H     = 0x29
@@ -1241,30 +1256,71 @@ MAG_OUTY_H     = 0x2B
 MAG_OUTZ_L     = 0x2C
 MAG_OUTZ_H     = 0x2D
 
-MAG_DO_0_625_Hz = 0x00,
-MAG_DO_1_25_Hz  = 0x04,
-MAG_DO_2_5_Hz   = 0x08,
-MAG_DO_5_Hz     = 0x0C,
-MAG_DO_10_Hz    = 0x10,
-MAG_DO_20_Hz    = 0x14,
-MAG_DO_40_Hz    = 0x18,
-MAG_DO_80_Hz = 0x1C
-
-MAG_FS_4_Ga   =  0x00
-MAG_FS_8_Ga   =  0x20
-MAG_FS_12_Ga  =  0x40
-MAG_FS_16_Ga = 0x60
-    
 
 def initLSM303C():
     bus = smbus.SMBus(1)
 
+    ## Magnetometer
     bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG1, 0x7E) # X, Y High performace, Data rate 80hz
     bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG4, 0x0C) # Z High performace
     bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG5, 0x40)
     bus.write_byte_data(MAG_I2C_ADDR, CTRL_REG3, 0x00)
 
-def readMagnetometerLSM303C():
+    ## Accelerometer
+    bus.write_byte_data(ACC_I2C_ADDR, CTRL_REG5_A, 0x40)
+    time.sleep(0.05)
+    bus.write_byte_data(ACC_I2C_ADDR, CTRL_REG4_A, 0x0C)
+    bus.write_byte_data(ACC_I2C_ADDR, CTRL_REG1_A, 0xBF) # High resolution, 100Hz output, enable all three axis
+
+
+def readMagnetometerLSM303C(allowcalibration=True, calibratedvalues=True):
+    global enabledLSM303C
+    global compassOffset
+    global compassScale
+
+    try:
+        if not enabledLSM303C:
+            enabledLSM303C = True
+            initLSM303C()
+
+        if compassOffset is None or compassScale is None:
+            loadCompassCalibration()
+
+        if allowcalibration:
+            if compassOffset is None or compassScale is None:
+                calibrateCompassGame()
+
+        bus = smbus.SMBus(1) 
+
+        value = bus.read_i2c_block_data(MAG_I2C_ADDR, MAG_OUTX_L, 6)
+
+        X =  twos_comp((value[1] << 8) | value[0], 16)
+        Y =  twos_comp((value[3] << 8) | value[2], 16)
+        Z =  twos_comp((value[5] << 8) | value[4], 16)
+
+        X = X * 0.048828125
+        Y = Y * 0.048828125
+        Z = Z * 0.048828125
+
+        if (compassOffset is not None) and (compassScale is not None) and calibratedvalues:
+            X = round((X + compassOffset[0]) * compassScale[0], 0)
+            Y = round((Y + compassOffset[1]) * compassScale[1], 0)
+            Z = round((Z + compassOffset[2])* compassScale[2], 0)
+       
+        return [X, Y, Z]
+    except:
+        enabledLSM303C = False
+        return [0, 0, 0]
+
+def computeCompassHeading():
+    values = readMagnetometerLSM303C()
+
+    heading = math.atan2(values[0],values[1])*(180/math.pi) + 180
+
+    return heading
+
+
+def reaAccelerometerLSM303C():
     global enabledLSM303C
 
     try:
@@ -1274,16 +1330,19 @@ def readMagnetometerLSM303C():
 
         bus = smbus.SMBus(1) 
 
-        X = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTX_L), 16)
-        Y = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTY_L), 16)
-        Z = twos_comp(bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_H) << 8 | bus.read_byte_data(MAG_I2C_ADDR, MAG_OUTZ_L), 16)
+        value = bus.read_i2c_block_data(ACC_I2C_ADDR, MAG_OUTX_L, 6)
 
-        X = round((X + 392.5) * 5000/5887, 0)
-        Y = round((Y - 145.5) * 5000/5885, 0)
-        Z =  round((Z + 3839)* 5000/6591, 0)
+        X =  twos_comp((value[1] << 8) | value[0], 16)
+        Y =  twos_comp((value[3] << 8) | value[2], 16)
+        Z =  twos_comp((value[5] << 8) | value[4], 16)
+
+        X = round(X * 0.00059814453125 / 9.8, 2)
+        Y = round(Y * 0.00059814453125 / 9.8, 2)
+        Z =  round(Z * 0.00059814453125 / 9.8, 2)
 
         return [X, Y, Z]
     except:
+        enabledLSM303C = False
         return [0, 0, 0]
  
 def readMagneticForce(axis):
@@ -1321,26 +1380,28 @@ def readStick(pinup, pindown, pinleft, pinright, pincenter):
 
 def setInfraredState(pin, state):
     pin = normalizePin(pin)
-    state = int(state)
 
-    cleanupPin(pin)
+    if pin != 0:
+        state = int(state)
 
-    pi.set_mode(pin, pigpio.OUTPUT)
+        cleanupPin(pin)
 
-    pi.wave_clear()
-    pi.wave_tx_stop()
+        pi.set_mode(pin, pigpio.OUTPUT)
 
-    if state:
-        wf = []
+        pi.wave_clear()
+        pi.wave_tx_stop()
 
-        wf.append(pigpio.pulse(1<<pin, 0, 13))
-        wf.append(pigpio.pulse(0, 1<<pin, 13))
+        if state:
+            wf = []
 
-        pi.wave_add_generic(wf)
+            wf.append(pigpio.pulse(1<<pin, 0, 13))
+            wf.append(pigpio.pulse(0, 1<<pin, 13))
 
-        a = pi.wave_create()
+            pi.wave_add_generic(wf)
 
-        pi.wave_send_repeat(a)
+            a = pi.wave_create()
+
+            pi.wave_send_repeat(a)
 
 def changeActiveBuzzerState(pin, state):
     changePinState(pin, state)
@@ -1491,9 +1552,12 @@ adcHandler = [
 
 
 def readADC(pin):
-    for handler in adcHandler:
-        if handler["type"] == currentADC:
-            return handler["handler"](pin)
+    try:
+        for handler in adcHandler:
+            if handler["type"] == currentADC:
+                return handler["handler"](pin)
+    except:
+        pass
 
     return 0
 
@@ -1621,4 +1685,335 @@ def setBuzzerState(name, state):
         return handler(name, state)
     
     return 0
+
+def setBuzzerAudioOutput(value):
+    if value:
+        pi.set_mode(12, pigpio.ALT0) # 12 is PWM0
+    else:
+        pi.set_mode(12, pigpio.ALT1) # 12 normal
+
+        
+def getBuzzerAudioOutput():
+    if pi.get_mode(12) == pigpio.ALT0:
+        return 1
+
+    return 0
+
+
+def dSquared(c, s):
+    dx = c[0] - s[0]
+    dy = c[1] - s[1]
+    dz = c[2] - s[2]
+
+    return (dx*dx) + (dy*dy) + (dz*dz)
+
+def measureScore(c, data):
+	minD = 0
+	maxD = 0
+
+	minD = maxD = dSquared(c, data[0])
+	for row in data[1:]:
+		d = dSquared(c, row)
+
+		if d < minD:
+			minD = d
+
+		if d > maxD:
+			maxD = d
+
+	return maxD - minD
+
+def spherify(centre, data):
+	radius = 0
+	scaleX = 0.0
+	scaleY = 0.0
+	scaleZ = 0.0
+
+	scale = 0.0
+	weightX = 0.0
+	weightY = 0.0
+	weightZ = 0.0
+
+	for row in data:
+		d = math.sqrt(dSquared(centre, row))
+
+	if d > radius:
+		radius = d
+
+	# Now, for each data point, determine a scalar multiplier for the vector between the centre and that point that
+	# takes the point onto the surface of the enclosing sphere.
+	for row in data:
+		# Calculate the distance from this point to the centre of the sphere
+		d = math.sqrt(dSquared(centre, row))
+
+		# Now determine a scalar multiplier that, when applied to the vector to the centre,
+                # will place this point on the surface of the sphere.
+		s = (radius / d) - 1
+
+		scale = max(scale, s)
+
+                # next, determine the scale effect this has on each of our components.
+		dx = (row[0] - centre[0]) 
+		dy = (row[1] - centre[1])
+		dz = (row[2] - centre[2])
+
+		weightX += s * abs(dx / d)
+		weightY += s * abs(dy / d)
+		weightZ += s * abs(dz / d)
+
+	wmag = math.sqrt((weightX * weightX) + (weightY * weightY) + (weightZ * weightZ))
+
+	scaleX = 1.0 + scale * (weightX / wmag)
+	scaleY = 1.0 + scale * (weightY / wmag)
+	scaleZ = 1.0 + scale * (weightZ / wmag)
+
+	scale = [0, 0, 0]
+	scale[0] = int((1024 * scaleX))
+	scale[1] = int((1024 * scaleY))
+	scale[2] = int((1024 * scaleZ))
+
+	centre[0] = centre[0]
+	centre[1] = centre[1]
+	centre[2] = centre[2]
+
+	return [scale, centre, radius]
+
+def approximateCentre(data):
+	samples = len(data)
+	centre = [0, 0, 0]
+
+	for row in data:
+		for i in range(3):
+			centre[i] = centre[i] + row[i]
+
+	for i in range(3):
+		centre[i] = int(centre[i] / samples)
+
+
+	#print("centre", centre)
+
+	c = centre
+	best = [0, 0, 0]
+	t = [0, 0,0]
+	score = measureScore(c, data)
+	#print("initial score", score)
+	CALIBRATION_INCREMENT = 10
+	while True:
+		for x in range(-CALIBRATION_INCREMENT, CALIBRATION_INCREMENT + CALIBRATION_INCREMENT, CALIBRATION_INCREMENT):
+			for y in range(-CALIBRATION_INCREMENT, CALIBRATION_INCREMENT + CALIBRATION_INCREMENT, CALIBRATION_INCREMENT):
+				for z in range(-CALIBRATION_INCREMENT, CALIBRATION_INCREMENT + CALIBRATION_INCREMENT, CALIBRATION_INCREMENT):
+					t = c
+					t[0] += x
+					t[1] += y
+					t[2] += z
+					s = measureScore(t, data)
+					#print("try", t, "score", s)
+					if (s < score):
+						score = s
+						best = t
+						print(best)
+
+
+		if (best[0] == c[0]) and (best[1] == c[1]) and (best[2] == c[2]):
+			#print("best is equal to centre", best, c)
+			break
+
+		#print(best)
+		c = best
+
+	return c
+
+
+def calibrateCompass(data):
+    centre = approximateCentre(data)
+    return spherify(centre, data)
+    
+def loadCompassCalibration():
+    offset = None
+    scale = None
+    try:
+        f = open("/mnt/data/compasscalibration.txt", 'r')
+        x = f.readline()
+        f.close()
+
+        values = x.split(",")
+
+        if len(values) == 6:
+            offset = [float(values[0]), float(values[1]), float(values[2])]
+            scale = [float(values[3]), float(values[4]), float(values[5])]
+
+        if offset is not None and scale is not None:
+            global compassOffset
+            global compassScale
+
+            compassOffset = offset
+            compassScale = scale
+
+            return [offset, scale]
+    except:
+        pass
+
+    return None
+
+def saveCompassCalibration(scale, offset):
+    f = open("/mnt/data/compasscalibration.txt", "w+")
+
+    f.write(str(offset[0]) + ","
+             + str(offset[1]) + ","
+             + str(offset[2]) + ","
+             + str(scale[0]) + ","
+             + str(scale[1]) + ","
+             + str(scale[2]) + "\\n")
+
+    f.close()
+
+def calibrateCompassGame():
+    n = 7
+    scale = 4
+
+    rect = [[0 for x in range(n)] for y in range(n)] 
+
+    autoUpdate(False)
+
+    done = False
+    rect_offset_x = 97
+    rect_offset_y = 1
+
+    fill(1)
+    drawText(0, 0, "Rotate the board")
+
+    stroke(1)
+    fill(0)
+    drawRectangle(rect_offset_x - 1, rect_offset_y - 1, (n * scale) + 2, (n * scale) + 2)
+    updateScreen()
+
+    cursor_color = 0
+
+    data = []
+
+    start = time.time()
+    while not done and (time.time() - start) < 30:
+        magvalues =  readMagnetometerLSM303C(False, False)
+        accelvalues =  reaAccelerometerLSM303C()
+
+        x_accel = accelvalues[0]
+        y_accel = accelvalues[1]
+
+        data.append(magvalues)
+
+        x_rect = int((x_accel + 1) * (n / 2))
+        y_rect = int((y_accel + 1) * (n / 2))
+
+        if (x_rect >= n):
+            x_rect = n - 1
+        if (x_rect < 0):
+            x_rect = 0
+
+        if (y_rect >= n):
+            y_rect = n - 1
+        if (y_rect < 0):
+            y_rect = 0
+
+        rect[x_rect][y_rect] = 1
+
+	    #print(x_rect, x_accel, y_rect, y_accel)
+
+        done = True # Asume we are done
+        for x in range(n):
+            for y in range(n):
+                if rect[x][y] == 0:
+                    done = False
+                stroke(rect[x][y])
+                fill(rect[x][y])
+
+                if x_rect == x and y_rect == y:
+                    fill(cursor_color)
+                    stroke(cursor_color)
+                    if cursor_color == 1:
+                        cursor_color = 0
+                    else:
+                        cursor_color = 1
+
+                drawRectangle((x * scale) + rect_offset_x,
+					        (y * scale) + rect_offset_y,
+                            scale, scale)
+        updateScreen()
+
+    result = calibrateCompass(data)
+
+    saveCompassCalibration(result[0], result[1])
+
+    global compassOffset
+    global compassScale
+
+    compassOffset = result[0]
+    compassScale = result[1]
+
+gyro_angles = [0, 0, 0]
+gyro_calibration = [0, 0, 0]
+stop_gyro = False
+gyro_thread = None
+gyro_angles_lock = None
+    
+def setGyroZeroAngle():
+    global angles
+    global calibration
+    global gyro_thread
+    global gyro_angles_lock
+
+    if gyro_thread is None:
+        gyro_angles = [0, 0, 0]
+        calibrationsamples = 500
+        samples = 0
+        while samples < calibrationsamples:
+            values = readGyroBMI160()
+
+            gyro_calibration[0] += values[0]
+            gyro_calibration[1] += values[1]
+            gyro_calibration[2] += values[2]
+            samples += 1
+
+        gyro_calibration[0] /= samples
+        gyro_calibration[1] /= samples
+        gyro_calibration[2] /= samples
+
+        gyro_angles_lock = threading.Lock()
+
+        gyro_thread = threading.Thread(target=gyroThread)
+        gyro_thread.start()
+    else:
+        gyro_angles_lock.acquire(True)
+        angles = [0, 0, 0]
+        gyro_angles_lock.release()
+
+
+def computeRotationGyro():
+    global gyro_angles
+
+    return [int(gyro_angles[0]), int(gyro_angles[1]), int(gyro_angles[2])]
+
+def gyroThread():
+    global gyro_angles
+    global gyro_calibration
+    global stop_gyro
+
+    lasttime = readGyroBMI160()[3]
+    start = time.time()
+
+    while True:
+        if stop_gyro:
+            break
+        values = readGyroBMI160()
+
+        dt = (values[3] - lasttime) * 3.9e-5
+        lasttime = values[3]
+
+        gyro_angles_lock.acquire(True)
+        gyro_angles[0] += (values[0] - gyro_calibration[0]) * dt
+        gyro_angles[1] += (values[1] - gyro_calibration[1]) * dt
+        gyro_angles[2] += (values[2] - gyro_calibration[2]) * dt
+        gyro_angles_lock.release()
+
+
+
 `

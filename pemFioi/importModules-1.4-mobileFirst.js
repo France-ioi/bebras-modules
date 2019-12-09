@@ -120,7 +120,8 @@ var importableModules = function () {
       'quickAlgo-all-blockly': {src: modulesPath+"bundles/quickAlgo-all-blockly.js", id: "bundle-quickAlgo-all-blockly"},
       'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"},
 
-      'blockly-quickpi': { src: modulesPath + "/pemFioi/blocklyQuickPi_lib.js", id: "blocklyQuickPi_lib" }
+      'blockly-quickpi': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_lib.js", id: "blocklyQuickPi_lib" },
+      'quickpi-board': { src: modulesPath + "/pemFioi/quickpi/quickpi_board.js", id: "quickpi_board" },
    }
 }
 
