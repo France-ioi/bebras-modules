@@ -781,6 +781,11 @@ def setServoAngle(pin, angle):
     if pin != 0:
         angle = int(angle)
 
+        if angle < 0:
+            angle = 0
+        elif angle > 180:
+            angle = 180
+
         pulsewidth = (angle * 11.11) + 500
         pi.set_servo_pulsewidth(pin, pulsewidth)
 
