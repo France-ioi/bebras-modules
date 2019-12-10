@@ -378,7 +378,7 @@ var getContext = function (display, infos, curLevel) {
             image: "quickpihat.png",
             adc: "ads1015",
             portTypes: {
-                "D": [6, 16, 24],
+                "D": [5, 16, 24],
                 "A": [0],
             },
             builtinSensors: [
@@ -2025,9 +2025,7 @@ var getContext = function (display, infos, curLevel) {
 
             python_code = context.generatePythonSensorTable();
             python_code += "\n\n";
-            python_code += context.blocklyHelper.getCode("python");
-
-            var a = window.task.displayedSubTask.blocklyHelper.getCode('python');
+            python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
 
             if (context.runner)
                 context.runner.stop();
