@@ -895,7 +895,7 @@ var quickAlgoInterface = {
         var html = '' +
             '<div id="quickAlgo-keypad"><div class="keypad">' +
             '   <div class="keypad-row">' +
-            '       <div class="keypad-value"></div>' +
+            '       <input class="keypad-value"></input>' +
             '   </div>' +
             '   <div class="keypad-row keypad-row-margin">' +
             '       <div class="keypad-btn" data-btn="1">1</div>' +
@@ -923,19 +923,34 @@ var quickAlgoInterface = {
             '   </div>' +
             '</div></div>';
         $('body').append(html);
-        $('#quickAlgo-keypad').on('click', quickAlgoInterface.handleKeypadKey);
+        $('#quickAlgo-keypad').on('click keydown', quickAlgoInterface.handleKeypadKey);
     },
 
     handleKeypadKey: function(e) {
         var finished = false;
 
-        if(e) {
+        var btn = null;
+        if(e && e.type == 'click') {
+            // Click on buttons
             var btn = $(e.target).closest('div.keypad-btn').attr('data-btn');
             if(!btn && $(e.target).closest('div.keypad').length == 0) {
+                // Click outside of the keypad
                 finished = true;
             }
-        } else {
-            var btn = null;
+        } else if(e && e.type == 'keydown') {
+            // Key presses
+            // Note : keyCode is deprecated, but there aren't good
+            // cross-browser replacements as of now.
+            if(e.keyCode == 8) {
+                btn = 'R';
+            } else if(e.keyCode == 13 || e.keyCode == 27) {
+                btn = 'V';
+            } else if(e.keyCode == 110 || e.keyCode == 188 || e.keyCode == 190) {
+                btn = '.';
+            } else if(e.keyCode >= 96 && e.keyCode <= 105) {
+                var btn = '' + (e.keyCode - 96);
+            }
+            e.preventDefault();
         }
 
         var data = quickAlgoInterface.keypadData;
@@ -951,6 +966,9 @@ var quickAlgoInterface = {
                 data.value += '0';
             }
         } else if(btn == '.') {
+            if(data.value == '') {
+                data.value = '0';
+            }
             if(data.value.indexOf('.') == -1) {
                 data.value += '.';
             }
@@ -959,7 +977,7 @@ var quickAlgoInterface = {
         }
 
         if(data.value == '') { data.value = '0'; }
-        while(data.value.length > 1 && data.value.substring(0, 1) == '0') {
+        while(data.value.length > 1 && data.value.substring(0, 1) == '0' && data.value.substring(0, 2) != '0.') {
             data.value = data.value.substring(1);
         }
 
@@ -972,14 +990,16 @@ var quickAlgoInterface = {
             $('.keypad-value').removeClass('keypad-value-small');
         }
 
-        $('.keypad-value').text(data.value);
+        $('.keypad-value').val(data.value);
 
         if(finished) {
             $('#quickAlgo-keypad').hide();
             data.callbackFinished(parseFloat(data.value), !!btn);
-        } else {
+            return;
+        } else if(e !== null) {
             data.callbackModify(parseFloat(data.value));
         }
+        $('.keypad-value').focus();
     },
 
     displayKeypad: function(initialValue, position, callbackModify, callbackFinished) {
@@ -987,12 +1007,12 @@ var quickAlgoInterface = {
         $('#quickAlgo-keypad').show();
         $('.keypad').css('top', position.top).css('left', position.left);
         quickAlgoInterface.keypadData = {
-            value: initialValue,
+            value: '',
             initialValue: initialValue,
             callbackModify: callbackModify,
             callbackFinished: callbackFinished
             };
-        quickAlgoInterface.handleKeypadKey();
+        quickAlgoInterface.handleKeypadKey(null);
     }
 };
 
