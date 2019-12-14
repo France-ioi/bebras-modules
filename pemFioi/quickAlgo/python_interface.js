@@ -620,6 +620,12 @@ function LogicController(nbTestCases, maxInstructions) {
     $('.pythonIntroSelect select').on('change', function() {
       var desc = $(this).find('option:selected').attr('data-desc');
       $(this).parent().find('.pythonIntroSelectDesc').html(desc || "");
+
+      var code = $(this).find('option:selected').attr('data-code');
+      if(controller._aceEditor) {
+        controller._aceEditor.insert(code);
+        controller._aceEditor.focus();
+      }
     });
   };
 
