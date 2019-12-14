@@ -141,7 +141,7 @@ var getContext = function (display, infos, curLevel) {
                 toggleLedState: "toggleLedState(port): Toggles the led state",
                 displayText: "displayText(port, line1, line2): Display text in LCD screen",
                 readTemperature: "readTemperature(port): Read Ambient temperature",
-                sleep: "sleep(1000): pause program execute for a number of seconds",
+                sleep: "sleep(milliseconds): pause program execute for a number of seconds",
                 setServoAngle: "setServoAngle(port, angle): Set servo motor to an specified angle",
                 readRotaryAngle: "readRotaryAngle(port): Read state of potentiometer",
                 readDistance: "readDistance(port): Read distance using ultrasonic sensor",
@@ -5372,7 +5372,7 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
                 var sensor = infos.quickPiSensors[i];
 
-                if (sensor.port == name) {
+                if (sensor.port.toUpperCase() == name.toUpperCase()) {
                     return sensor;
                 }
             }
@@ -5383,7 +5383,7 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
                 var sensor = infos.quickPiSensors[i];
 
-                if (sensor.name == firstname) {
+                if (sensor.name.toUpperCase() == firstname.toUpperCase()) {
                     return sensor;
                 }
             }

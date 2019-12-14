@@ -258,7 +258,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     }
 
     this.sendCommand = function (command, callback, long) {
-        if (this.wsSession != null) {
+        if (this.wsSession != null && this.wsSession.readyState == 1) {
             if (this.resultsCallback == null) {
                 if (!this.commandMode) {
                     this.startNewSession();
