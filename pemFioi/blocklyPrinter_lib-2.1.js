@@ -211,7 +211,7 @@ var getContext = function(display, infos) {
 
       // Fix display of arrays
       var valueToStr = function(value) {
-         if(value && value.length && typeof value == 'object') {
+         if(value && value.length !== undefined && typeof value == 'object') {
             var oldValue = value;
             value = [];
             for(var i=0; i < oldValue.length; i++) {
