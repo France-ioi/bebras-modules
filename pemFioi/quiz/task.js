@@ -231,21 +231,22 @@
 
     // grade
 
-    function useGraderData(answer, versions, callback) {
+    function useGraderData(answer, versions, score_settings, callback) {
         if(window.Quiz.grader.handler && window.Quiz.grader.data) {
-            var res = window.Quiz.grader.handler(window.Quiz.grader.data, answer, versions);
+            var res = window.Quiz.grader.handler(window.Quiz.grader.data, answer, versions, score_settings);
             return callback(res);
         }
         console.error('Local Quiz grader not found');
     }
 
 
-    function useGraderUrl(url, task_token, answer, versions, callback) {
+    function useGraderUrl(url, task_token, answer, versions, score_settings, callback) {
         var data = {
             action: 'grade',
             task: task_token,
             answer: answer,
-            versions: versions
+            versions: versions,
+            score_settings: score_settings
         }
         $.ajax({
             type: 'POST',
@@ -326,16 +327,16 @@
             task.gradeAnswer = function(answer, answer_token, callback) {
                 answer = JSON.parse(answer);
                 function onGrade(result) {
-                    var d = taskParams.maxScore - taskParams.minScore;
-                    var final_score = Math.max(
-                        taskParams.minScore + Math.round(d * result.score),
-                        taskParams.noScore || 0
-                    );
                     q.showResult(result);
-                    displayScore(final_score, taskParams.maxScore);
+                    displayScore(result.score, taskParams.maxScore);
                     displayMessages(result.messages);
-                    callback(final_score, lang.translate('grader_msg') + final_score, null);
+                    callback(result.score, lang.translate('grader_msg') + result.score, null);
                 }
+                var scoreSettings = {
+                    maxScore: taskParams.maxScore,
+                    minScore: taskParams.minScore,
+                    noScore: taskParams.noScore
+                    };
                 var token = task_token.get()
                 if(token) {
                     useGraderUrl(
@@ -343,12 +344,14 @@
                         token,
                         answer,
                         Quiz.versions.get(),
+                        scoreSettings,
                         onGrade
                     );
                 } else {
                     useGraderData(
                         answer,
                         Quiz.versions.get(),
+                        scoreSettings,
                         onGrade
                     );
                 }
