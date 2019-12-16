@@ -1,5 +1,13 @@
 (function() {
 
+    function isArrayAnswerEmpty(answers) {
+        for(var i=0; i<answers.length; i++) {
+            if(answers[i]) { return false; }
+        }
+        return true;
+    }
+
+
     function testMultiple(valid, answers) {
         var mistakes = [];
         for(var i=0; i<answers.length; i++) {
@@ -22,66 +30,85 @@
     }
 
 
-    window.Quiz.grader.handler = function(grader_data, answer, versions) {
+    window.Quiz.grader.handler = function(grader_data, answer, versions, score_settings) {
         var res = {
             score: 0,
             mistakes: [],
             messages: []
         };
-        var valid;
+        var isValid;
+        var nb_valid = 0;
+        var nb_mistakes = 0;
         for (var i = 0; i < grader_data.length; i++) {
             var grader = grader_data[i];
             if(versions && i in versions) {
                 grader = grader[versions[i]];
             }
             if (typeof grader === "function") {
+                if(!answer[i]) { continue; }
                 var fres = grader(answer[i]);
                 if (typeof fres === "object") {
                     var score =
                         "score" in fres ? parseFloat(fres.score) || 0 : 0;
-                    valid = score > 0;
+                    isValid = score > 0;
                     if ("message" in fres && fres.message) {
                         res.messages[i] = fres.message;
                     }
-                    res.score += score;
+                    nb_valid += score;
+                    nb_mistakes += score > 0 ? 0 : 1;
                 } else {
-                    valid = !!fres;
-                    res.score += valid ? 1 : 0;
+                    isValid = !!fres;
+                    nb_valid += isValid ? 1 : 0;
+                    nb_mistakes += isValid ? 0 : 1;
                 }
-                res.mistakes.push(valid ? null : answer[i]);
+                res.mistakes.push(isValid ? null : answer[i]);
             } else if (Array.isArray(grader)) {
+                if(isArrayAnswerEmpty(answer[i])) { continue; }
                 var test = testMultiple(grader, answer[i]);
-                valid = test === true;
-                res.mistakes.push(valid ? [] : test);
-                res.score += valid ? 1 : 0;
+                isValid = test === true;
+                res.mistakes.push(isValid ? [] : test);
+                nb_valid += isValid ? 1 : 0;
+                nb_mistakes += isValid ? 0 : 1;
             } else if (typeof grader == 'object') {
                 if(Array.isArray(grader.value)) {
+                    if(isArrayAnswerEmpty(answer[i])) { continue; }
                     if(grader.strict) {
                         var test = testStrict(grader.value, answer[i]);
                     } else {
                         var test = testMultiple(grader.value, answer[i]);
                     }
-                    valid = test === true;
-                    var mistakes = valid ? [] : test;
+                    isValid = test === true;
+                    var mistakes = isValid ? [] : test;
                     res.mistakes.push(mistakes);
                     if(grader.messages && mistakes.length && grader.messages[mistakes[0]]) {
                         res.messages[i] = grader.messages[mistakes[0]];
                     }
                 } else {
-                    valid = grader == answer[i] ? 1 : 0;
-                    res.mistakes.push(valid ? null : answer[i]);
-                    if(grader.messages && !valid && grader.messages[answer[i]]) {
+                    if(!answer[i]) { continue; }
+                    isValid = grader == answer[i] ? 1 : 0;
+                    res.mistakes.push(isValid ? null : answer[i]);
+                    if(grader.messages && !isValid && grader.messages[answer[i]]) {
                         res.messages[i] = grader.messages[answer[i]];
                     }
                 }
-                res.score += valid ? 1 : 0;
+                nb_valid += isValid ? 1 : 0;
+                nb_mistakes += isValid ? 0 : 1;
             } else {
-                valid = grader == answer[i] ? 1 : 0;
-                res.mistakes.push(valid ? null : answer[i]);
-                res.score += valid ? 1 : 0;
+                if(!answer[i]) { continue; }
+                isValid = grader == answer[i] ? 1 : 0;
+                res.mistakes.push(isValid ? null : answer[i]);
+                nb_valid += isValid ? 1 : 0;
+                nb_mistakes += isValid ? 0 : 1;
             }
         }
-        res.score = res.score / grader_data.length;
+        var nb_total = grader_data.length;
+        if(score_settings) {
+            res.score = (nb_valid * score_settings.maxScore
+                       + nb_mistakes * score_settings.minScore
+                       + (nb_total - nb_valid - nb_mistakes) * score_settings.noScore) / grader_data.length;
+        } else {
+            res.score = nb_valid / nb_total;
+        }
         return res;
     };
 
