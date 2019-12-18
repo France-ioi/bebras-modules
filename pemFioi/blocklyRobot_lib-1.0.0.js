@@ -1091,6 +1091,30 @@ var getContext = function(display, infos, curLevel) {
             }
          },
 
+         en: {
+            label: {
+               pushObject: "push the box",
+               onContainer: "on a marked cell",
+               pushableInFront: "in front of a box",
+               obstacleInFront: "in front of an obstacle",
+               readNumber: "number on the cell"
+            },
+            code: {
+               pushObject: "pushBox",
+               onContainer: "onMarkedCell",
+               pushableInFront: "boxAhead",
+               obstacleInFront: "obstacleAhead",
+               readNumber: "numberOnCell"
+            },   
+            messages: {
+               successContainersFilled: "Congratulations, the boxes are correctly placed!",
+               failureContainersFilled: "There are still boxes that are not places correctly.",
+               failureNothingToPush: "There is no box to push here!",
+               failureWhilePushing: "The robot can't push here!",
+               obstacle: "The robot is trying to move into a wall or a box!"
+            }
+         },
+
          es: {
             label: {
                pushObject: "empujar la caja",
