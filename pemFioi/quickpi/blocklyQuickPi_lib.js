@@ -2027,6 +2027,8 @@ var getContext = function (display, infos, curLevel) {
             python_code += "\n\n";
             python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
 
+            python_code = python_code.replace("from quickpi import *", "");
+
             if (context.runner)
                 context.runner.stop();
 
