@@ -1035,6 +1035,11 @@ var getContext = function (display, infos, curLevel) {
         return found;
     }
     
+    context.raspberryPiChangeBoard = function(board) {
+        window.task.displayedSubTask.context.changeBoard(board);
+
+        window.task.displayedSubTask.context.resetSensorTable();
+    }
     
 
     if(window.getQuickPiConnection) {
@@ -4081,23 +4086,23 @@ var getContext = function (display, infos, curLevel) {
                 var stateString = "";
 
                 if (sensor.state[0]) {
-                    stateString += "UP"
+                    stateString += "UP\n"
                     sensor.imgup.attr({ "opacity": 1 });
                 }
                 if (sensor.state[1]) {
-                    stateString += "DOWN"
+                    stateString += "DOWN\n"
                     sensor.imgdown.attr({ "opacity": 1 });
                 }
                 if (sensor.state[2]) {
-                    stateString += "LEFT"
+                    stateString += "LEFT\n"
                     sensor.imgleft.attr({ "opacity": 1 });
                 }
                 if (sensor.state[3]) {
-                    stateString += "RIGHT"
+                    stateString += "RIGHT\n"
                     sensor.imgright.attr({ "opacity": 1 });
                 }
                 if (sensor.state[4]) {
-                    stateString += "CENTER"
+                    stateString += "CENTER\n"
                     sensor.imgcenter.attr({ "opacity": 1 });
                 }
 

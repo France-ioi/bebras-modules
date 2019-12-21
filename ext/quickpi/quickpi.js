@@ -95,6 +95,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                 {
                     var command = commandQueue.shift();
 
+                    resultsCallback = null;
                     sendCommand(command.command, command.callback);
                 }
             } else if (message.command == "execLineresult") {
