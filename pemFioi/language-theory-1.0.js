@@ -72,7 +72,7 @@ function LanguageTheory(rng){
          case "none":
          default:
             do{ 
-               var shuffledWord = Array.from(word);
+               var shuffledWord = Array.prototype.slice.call(word);
                this.rng.shuffle(shuffledWord);
                var stringArray = shuffledWord.slice(0,this.rng.nextInt(2,word.length - 1));
                var string = stringArray.toString();
