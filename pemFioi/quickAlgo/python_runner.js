@@ -38,7 +38,7 @@ function PythonInterpreter(context, msgCallback) {
     handler += "\n\tvar result = Sk.builtin.none.none$;";
 
     // If there are arguments, convert them from Skulpt format to the libs format
-    handler += "\n\tvar args = Array.from(arguments);";
+    handler += "\n\tvar args = Array.prototype.slice.call(arguments);";
     handler += "\n\tfor(var i=0; i<args.length; i++) { args[i] = currentPythonContext.runner.skToJs(args[i]); };";
 
     handler += "\n\tsusp.resume = function() { return result; };";
