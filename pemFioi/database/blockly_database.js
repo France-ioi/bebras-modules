@@ -219,10 +219,6 @@ var getContext = function(display, infos, curLevel) {
             }
         }
     }
-    language_strings = BlocksHelper.mutateBlockStrings(
-        language_strings,
-        infos.blocksLanguage
-    )
 
     var context = quickAlgoContext(display, infos)
 

@@ -7,6 +7,13 @@ var quickAlgoContext = function(display, infos) {
 
   // Set the localLanguageStrings for this context
   context.setLocalLanguageStrings = function(localLanguageStrings) {
+    if(window.BlocksHelper && infos && infos.blocksLanguage) {
+      localLanguageStrings = BlocksHelper.mutateBlockStrings(
+        localLanguageStrings,
+        infos.blocksLanguage
+        );
+    }
+
     context.localLanguageStrings = localLanguageStrings;
     window.stringsLanguage = window.stringsLanguage || "fr";
     window.languageStrings = window.languageStrings || {};
