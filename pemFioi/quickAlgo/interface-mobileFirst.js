@@ -941,11 +941,13 @@ var quickAlgoInterface = {
             // Key presses
             // Note : keyCode is deprecated, but there aren't good
             // cross-browser replacements as of now.
-            if(e.keyCode == 8) {
+            if(e.key && /^\d$/.test(e.key)) {
+                btn = e.key;
+            } else if(e.key == 'Backspace' || e.keyCode == 8) {
                 btn = 'R';
-            } else if(e.keyCode == 13 || e.keyCode == 27) {
+            } else if(e.key == 'Enter' || e.keyCode == 13 || e.keyCode == 27) {
                 btn = 'V';
-            } else if(e.keyCode == 110 || e.keyCode == 188 || e.keyCode == 190) {
+            } else if(e.key == '.' || e.key == ',' || e.keyCode == 110 || e.keyCode == 188 || e.keyCode == 190) {
                 btn = '.';
             } else if(e.keyCode >= 96 && e.keyCode <= 105) {
                 var btn = '' + (e.keyCode - 96);
