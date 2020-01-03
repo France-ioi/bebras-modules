@@ -538,7 +538,7 @@ function LogicController(nbTestCases, maxInstructions) {
     function processForbiddenList(origList, allowed) {
       var list = origList.slice();
 
-      var hiddenWords = ['__getitem__', '__setitem__', 'elif'];
+      var hiddenWords = ['__getitem__', '__setitem__'];
       for(var i = 0; i < hiddenWords.length; i++) {
         var word = hiddenWords[i];
         var wIdx = list.indexOf(word);
