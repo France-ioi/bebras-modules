@@ -1596,7 +1596,8 @@ var getContext = function(display, infos, curLevel) {
             BO: { num: 10, img: "BO.png", side: 60, isWithdrawable: true, isSquare: true, isStar: true, zOrder: 1 },
             BB: { num: 11, img: "BB.png", side: 60, isWithdrawable: true, isSquare: true, zOrder: 1 },
             board_background: { num: 12, color: "#ffffff", side: 60, zOrder: 0 },
-            board: {num: 13, side: 60, isWritable: true, zOrder: 1 }
+            board: {num: 13, side: 60, isWritable: true, zOrder: 1 },
+            obstacle: { num: 14, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 0 }
          }
       },
       gears: {
