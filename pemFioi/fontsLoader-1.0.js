@@ -12,7 +12,7 @@ var importableFonts = function () {
              check: '12px "Titillium Web"',
              src: mp+"/fonts/titilliumweb.css",
              embed: mp+"/fonts/embed-titilliumweb.css",
-             cdn: "https://static4.castor-informatique.fr/modules/fonts/fontAwesome/css/all.css"
+             cdn: "https://static4.castor-informatique.fr/modules/fonts/titilliumweb.css"
         }
     };
 }
@@ -52,7 +52,7 @@ function checkFonts(force) {
         document.fonts.ready.then(function() { checkFonts(true); });
     } else {
         for(var i=0 ; i < fontsToLoad.length; i++) {
-            checkFontLoaded[fontsToLoad[i]];
+            checkFontLoaded(fontsToLoad[i]);
         }
     }
 }
