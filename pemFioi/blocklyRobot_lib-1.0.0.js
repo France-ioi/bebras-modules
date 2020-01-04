@@ -1686,6 +1686,7 @@ var getContext = function(display, infos, curLevel) {
       },
       gems: {
          backgroundColor: "#BF5E47",
+         borderColor: "#96413B",
          itemTypes: {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             gem: { num: 3, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
@@ -2695,8 +2696,16 @@ var getContext = function(display, infos, curLevel) {
                cells[iRow][iCol].attr({'stroke-width': '0'});
             if(infos.backgroundColor && context.tiles[iRow][iCol] != 0)
                cells[iRow][iCol].attr({'fill': infos.backgroundColor});
-            if(infos.noBorders && context.tiles[iRow][iCol] != 0)
-               cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
+            if(infos.noBorders) {
+               if (context.tiles[iRow][iCol] != 0) {
+                  cells[iRow][iCol].attr({'stroke': infos.backgroundColor});
+               }
+            } else {
+               if (infos.borderColor) {
+                  cells[iRow][iCol].attr({'stroke': infos.borderColor});
+               }
+            }
+            
          }
       }
       if(infos.showLabels) {
