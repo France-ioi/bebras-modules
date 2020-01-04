@@ -87,6 +87,9 @@ var makeTurtle = function(coords) {
       this.turtle.style.paddingRight = '2px';
       this.turtle.style.paddingBottom = '3px';
    }
+   this.getCoords = function() {
+      return {x: this.x, y: this.y};
+   }
 };
 
 
@@ -120,6 +123,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turneitheramount: "tourner de %1° vers la %2",
             turneitheramountvalue: "tourner de %1 vers la %2",
+            row: "ligne de la tortue",
+            col: "colonne de la tortue",
             penup: "lever le pinceau",
             pendown: "baisser le pinceau",
             peneither: "%1",
@@ -150,6 +155,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turneitheramount: "tourner",
             turneitheramountvalue: "tourner",
+            row: "ligneTortue",
+            col: "colonneTortue",
             penup: "leverPinceau",
             pendown: "baisserPinceau",
             peneither: "stift",
@@ -201,6 +208,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_nikolaus: "drehe um %1 nach rechts ↻",
             turneitheramount: "drehe um %1° nach %2",
             turneitheramountvalue: "drehe um %1 nach %2",
+            row: "turtle's row", // TODO :: translate
+            col: "turtle's column",
             penup: "hebe Stift ab",
             pendown: "setze Stift auf",
             peneither: "%1",
@@ -235,6 +244,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_nikolaus: "dreheRechtsGrad",
             turneitheramount: "dreheGrade",
             turneitheramountvalue: "dreheGrad",
+            row: "turtleRow", // TODO :: translate
+            col: "turtleColumn",
             penup: "stiftHoch",
             pendown: "stiftRunter",
             peneither: "stift",
@@ -282,6 +293,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "drehe um %1 nach rechts ↻",
             turneitheramount: "turn by %1° to the %2",
             turneitheramountvalue: "turn by %1 to the %2",
+            row: "turtle's row",
+            col: "turtle's column",
             penup: "lift the paintbrush",
             pendown: "lower the paintbrush",
             peneither: "%1",
@@ -312,6 +325,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turneitheramount: "turn",
             turneitheramountvalue: "turn",
+            row: "turtleRow",
+            col: "turtleColumn",
             penup: "liftBrush",
             pendown: "lowerBrush",
             peneither: "stift",
@@ -538,6 +553,12 @@ var getContext = function(display, infos) {
       context.waitDelay(callback);
    }
 
+   context.turtle.row = function(callback) {
+      context.runner.noDelay(callback, context.turtle.invisibleTurtle.getCoords().y);
+   }
+   context.turtle.col = function(callback) {
+      context.runner.noDelay(callback, context.turtle.invisibleTurtle.getCoords().x);
+   }
    context.turtle.move = function(callback) {
       context.turtle.moveamount(1, callback);
    }
@@ -639,6 +660,8 @@ var getContext = function(display, infos) {
                {"type": "field_angle", "name": "PARAM_0", "angle": 90},
                {"type": "field_dropdown", "name": "PARAM_1", "options":
                  [[localLanguageStrings[window.stringsLanguage]["left"],"l"],[localLanguageStrings[window.stringsLanguage]["right"],"r"]]}]}},
+            { name: "row", yieldsValue: true },
+            { name: "col", yieldsValue: true },
             { name: "penup" },
             { name: "pendown" },
             { name: "peneither", blocklyJson: {"args0": [
