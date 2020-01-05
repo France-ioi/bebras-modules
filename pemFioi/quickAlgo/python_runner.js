@@ -27,10 +27,13 @@ function PythonInterpreter(context, msgCallback) {
   this._editorMarker = null;
   this.availableModules = [];
   this._argumentsByBlock = {};
+  this._definedFunctions = [];
 
   var that = this;
 
   this._skulptifyHandler = function (name, generatorName, blockName, nbArgs, type) {
+    if(!arrayContains(this._definedFunctions, name)) { this._definedFunctions.push(name); }
+
     var handler = '';
     handler += "\tcurrentPythonContext.runner.checkArgs('" + name + "', '" + generatorName + "', '" + blockName + "', arguments);";
 
@@ -74,6 +77,8 @@ function PythonInterpreter(context, msgCallback) {
 
   this._injectFunctions = function () {
     // Generate Python custom libraries from all generated blocks
+    this._definedFunctions = [];
+
     if(this.context.infos && this.context.infos.includeBlocks && this.context.infos.includeBlocks.generatedBlocks) {
       // Flatten customBlocks information for easy access
       var blocksInfos = {};
@@ -240,6 +245,11 @@ function PythonInterpreter(context, msgCallback) {
       }
       return retVal;
     }
+  };
+
+  this.getDefinedFunctions = function() {
+    this._injectFunctions();
+    return this._definedFunctions.slice();
   };
 
   this._setTimeout = function(func, time) {

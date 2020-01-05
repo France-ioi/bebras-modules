@@ -125,6 +125,21 @@ function LogicController(nbTestCases, maxInstructions) {
         return false;
       }
     }
+
+    // Check for functions used as values
+    var re = /def\W+([^(]+)\(/g;
+    var foundFuncs = this._mainContext.runner.getDefinedFunctions();
+    var match;
+    while(match = re.exec(code)) {
+       foundFuncs.push(match[1]);
+    }
+    for(var j=0; j<foundFuncs.length; j++) {
+       var re = new RegExp('\\W' + foundFuncs[j] + '([^A-Za-z0-9_(]|$)');
+       if(re.exec(code)) {
+          display("Vous utilisez un nom de fonction sans les parenthèses. Ajoutez les parenthèses pour appeler la fonction.");
+          return false;
+       }
+    }
     return true;
   }
 
