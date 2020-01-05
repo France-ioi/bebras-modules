@@ -1,4 +1,4 @@
-// TODO :: move to code-editor
+// TODO :: move to quickAlgo
 
 /* 
 pythonCount:
@@ -105,15 +105,23 @@ var pythonForbiddenBlocks = {
 
 function pythonForbiddenLists(includeBlocks) {
    // Check for forbidden keywords in code
-   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr'];
+   var forbidden = ['for', 'while', 'if', 'else', 'elif', 'not', 'and', 'or', 'list', 'set', 'list_brackets', 'dict_brackets', '__getitem__', '__setitem__', 'var_assign', 'def', 'lambda', 'break', 'continue', 'setattr', 'map', 'split'];
    var allowed = []
 
    if(!includeBlocks) {
      return {forbidden: forbidden, allowed: allowed};
    }
 
+   var forced = includeBlocks.pythonForceForbidden ? includeBlocks.pythonForceForbidden : [];
+   for(var k=0; k<forced.length; k++) {
+      if(!arrayContains(forbidden, forced[k])) {
+         forbidden.push(forced[k]);
+      }
+   }
+
    var removeForbidden = function(kwList) {
       for(var k=0; k<kwList.length; k++) {
+         if(arrayContains(forced, kwList[k])) { continue; }
          var idx = forbidden.indexOf(kwList[k]);
          if(idx >= 0) {
             forbidden.splice(idx, 1);
@@ -125,7 +133,8 @@ function pythonForbiddenLists(includeBlocks) {
    if(includeBlocks && includeBlocks.standardBlocks) {
       if(includeBlocks.standardBlocks.includeAll || includeBlocks.standardBlocks.includeAllPython) {
          // Everything is allowed
-         return {forbidden: [], allowed: forbidden};
+         removeForbidden(forbidden.slice());
+         return {forbidden: forbidden, allowed: allowed};
       }
       if(includeBlocks.standardBlocks.wholeCategories) {
          for(var c=0; c<includeBlocks.standardBlocks.wholeCategories.length; c++) {
@@ -156,22 +165,39 @@ function pythonForbiddenLists(includeBlocks) {
    return {forbidden: forbidden, allowed: allowed};
 }
 
+function removeFromPatterns(code, patterns) {
+   // Remove matching patterns from code
+   for(var i=0; i<patterns.length; i++) {
+      while(patterns[i].exec(code)) {
+         code = code.replace(patterns[i], '');
+     }
+   }
+   return code;
+}
+
 function pythonForbidden(code, includeBlocks) {
    var forbidden = pythonForbiddenLists(includeBlocks).forbidden;
 
    // Remove comments and strings before scanning
    var removePatterns = [
-      /#[^\n\r]+/,
+      /#[^\n\r]+/
+      ];
+
+   code = removeFromPatterns(code, removePatterns);
+
+   var stringPatterns = [
       /'''(?:[^\\']|\\.|'[^']|'[^'])+'''/,
       /'(?:[^\\']|\\.)+'/,
       /"""(?:[^\\"]|\\.|"[^"]|""[^"])+"""/,
       /"(?:[^\\"]|\\.)+"/
       ];
-   for(var i=0; i<removePatterns.length; i++) {
-      while(removePatterns[i].exec(code)) {
-         code = code.replace(removePatterns[i], '');
-     }
+
+   code2 = removeFromPatterns(code, stringPatterns);
+   if(window.arrayContains && arrayContains(forbidden, 'strings') && code != code2) {
+      return 'chaînes de caractères';
    }
+
+   code = code2;
 
    // exec and eval are forbidden anyway
    if(/(^|\W)exec\((\W|$)/.exec(code)) {
@@ -206,7 +232,7 @@ function pythonForbidden(code, includeBlocks) {
             // Forbidden keyword found
             return '= (assignation de variable)'; // TODO :: i18n ?
          }
-      } else {
+      } else if(forbidden[i] != 'strings') {
          var re = new RegExp('(^|\\W)'+forbidden[i]+'(\\W|$)');
          if(re.exec(code)) {
             // Forbidden keyword found
