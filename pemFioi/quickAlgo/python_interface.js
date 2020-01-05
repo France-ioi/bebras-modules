@@ -128,7 +128,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     // Check for functions used as values
     var re = /def\W+([^(]+)\(/g;
-    var foundFuncs = this._mainContext.runner.getDefinedFunctions();
+    var foundFuncs = this._mainContext && this._mainContext.runner ? this._mainContext.runner.getDefinedFunctions() : [];
     var match;
     while(match = re.exec(code)) {
        foundFuncs.push(match[1]);
