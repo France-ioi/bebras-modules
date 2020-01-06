@@ -932,6 +932,11 @@ var quickAlgoInterface = {
     },
 
     handleKeypadKey: function(e) {
+        // Update if we detected a touch event
+        if($('input.keypad-value').length && window.touchDetected) {
+            $('input.keypad-value').replaceWith('<div class="keypad-value"></div>');
+        }
+
         var finished = false;
 
         var btn = null;
