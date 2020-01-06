@@ -593,14 +593,6 @@ p {
 .testResult.testEvaluating {
     background-color: purple;
 }
-.testResultIcon {
-  width: 21px;
-  height: 21px;
-  line-height: 36px;
-  position: absolute;
-  top: 0;
-  left: -27px;
-}
 .testResultIcon.testSuccess span {
   background: #b8e986;
   border-radius: 100%;
