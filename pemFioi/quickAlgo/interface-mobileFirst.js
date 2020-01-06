@@ -968,6 +968,7 @@ var quickAlgoInterface = {
         var data = quickAlgoInterface.keypadData;
         if(btn == 'R') {
             data.value = data.value.substring(0, data.value.length - 1);
+            if(data.value == '') { data.value = '0'; }
         } else if(btn == 'C') {
             data.value = data.initialValue;
             finished = true;
@@ -988,7 +989,6 @@ var quickAlgoInterface = {
             data.value += btn;
         }
 
-        if(data.value == '') { data.value = '0'; }
         while(data.value.length > 1 && data.value.substring(0, 1) == '0' && data.value.substring(0, 2) != '0.') {
             data.value = data.value.substring(1);
         }
@@ -1002,13 +1002,15 @@ var quickAlgoInterface = {
             $('.keypad-value').removeClass('keypad-value-small');
         }
 
-        $('input.keypad-value').val(data.value);
-        $('div.keypad-value').text(data.value);
+        var displayValue = data.value == '' ? '0' : data.value;
+        $('input.keypad-value').val(displayValue);
+        $('div.keypad-value').text(displayValue);
 
         if(finished) {
             $('#quickAlgo-keypad').hide();
             // Second argument could be !!btn if we want to be able to click on
             // the block's input
+            var finalValue = data.value == '' ? data.initialValue : data.value;
             data.callbackFinished(parseFloat(data.value), true);
             return;
         } else if(e !== null) {
