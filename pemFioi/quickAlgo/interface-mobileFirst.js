@@ -1002,7 +1002,9 @@ var quickAlgoInterface = {
 
         if(finished) {
             $('#quickAlgo-keypad').hide();
-            data.callbackFinished(parseFloat(data.value), !!btn);
+            // Second argument could be !!btn if we want to be able to click on
+            // the block's input
+            data.callbackFinished(parseFloat(data.value), true);
             return;
         } else if(e !== null) {
             data.callbackModify(parseFloat(data.value));
