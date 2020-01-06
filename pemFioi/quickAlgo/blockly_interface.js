@@ -26,7 +26,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       trashInToolbox: false,
       languageStrings: window.LanguageStrings,
       startingBlock: true,
-      mediaUrl: (window.location.protocol == 'file:' && modulesPath) ? modulesPath+'/img/blockly/' : "http://static3.castor-informatique.fr/contestAssets/blockly/",
+      mediaUrl: (
+         (window.location.protocol == 'file:' && modulesPath)
+            ? modulesPath+'/img/blockly/'
+            : (window.location.protocol == 'https:' ? 'https:' : 'http:') + "//static4.castor-informatique.fr/contestAssets/blockly/"
+         ),
       unloaded: false,
       reloadForFlyout: 0,
       display: false,
