@@ -215,3 +215,13 @@ function addInSet(l, val) {
 }
 
 window.iOSDetected = (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) || (navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform));
+
+window.touchDetected = false;
+(function() {
+   var detectTouch = null;
+   detectTouch = function() {
+      window.touchDetected = true;
+      window.removeEventListener('touchstart', detectTouch);
+      }
+   window.addEventListener('touchstart', detectTouch);
+})();

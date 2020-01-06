@@ -713,6 +713,10 @@ p {
 }
 /* toggle player controls and speed slider visibility */
 @media screen and (max-width: 480.9px) { /* Portrait mobiles and low res display */
+  #mode-player.displaySpeedSlider > div.playerControls,
+  #mode-player.displaySpeedSlider > div.speedSlider {
+    flex-basis: 100%;
+  }
   #mode-player.displaySpeedSlider .playerControls,
   #mode-player.displaySpeedSlider > span.far,
   #mode-player.displaySpeedSlider > span.fas {
@@ -724,6 +728,10 @@ p {
 }
 @media /* Small tablets portrait */
   screen and (min-width: 768px) and (max-width: 854.999px) and (orientation: portrait) {
+  #introGrid .speedControls > div.playerControls,
+  #introGrid .speedControls > div.speedSlider {
+    flex-basis: 100%;
+  }
   #introGrid .speedControls.displaySpeedSlider .playerControls,
   #introGrid .speedControls.displaySpeedSlider > span.far,
   #introGrid .speedControls.displaySpeedSlider > span.fas {

@@ -677,6 +677,7 @@ var quickAlgoInterface = {
     unloadLevel: function() {
         // Called when level is unloaded
         this.resetTestScores();
+        $('#quickAlgo-keypad').remove();
         if(this.curMode == 'mode-editor') {
            // Don't stay in editor mode as it can cause task display issues
            this.selectMode('mode-instructions');
@@ -892,10 +893,14 @@ var quickAlgoInterface = {
 
     renderKeypad: function() {
         if($('#quickAlgo-keypad').length) { return; }
+
+        // Type of the screen element
+        var screenType = window.touchDetected ? 'div' : 'input';
+
         var html = '' +
             '<div id="quickAlgo-keypad"><div class="keypad">' +
             '   <div class="keypad-row">' +
-            '       <input class="keypad-value"></input>' +
+            '       <'+screenType+' class="keypad-value"></'+screenType+'>' +
             '   </div>' +
             '   <div class="keypad-row keypad-row-margin">' +
             '       <div class="keypad-btn" data-btn="1">1</div>' +
@@ -992,7 +997,8 @@ var quickAlgoInterface = {
             $('.keypad-value').removeClass('keypad-value-small');
         }
 
-        $('.keypad-value').val(data.value);
+        $('input.keypad-value').val(data.value);
+        $('div.keypad-value').text(data.value);
 
         if(finished) {
             $('#quickAlgo-keypad').hide();
@@ -1001,7 +1007,7 @@ var quickAlgoInterface = {
         } else if(e !== null) {
             data.callbackModify(parseFloat(data.value));
         }
-        $('.keypad-value').focus();
+        $('input.keypad-value').focus();
     },
 
     displayKeypad: function(initialValue, position, callbackModify, callbackFinished) {
