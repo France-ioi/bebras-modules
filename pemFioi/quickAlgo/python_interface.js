@@ -704,6 +704,22 @@ function LogicController(nbTestCases, maxInstructions) {
 
     this._aceEditor.setOption('readOnly', this._readOnly);
   };
+
+  this.canPaste = function() {
+    return window.pythonClipboard ? true : null;
+  }
+  this.copyProgram = function() {
+    var code = this._aceEditor.getSelectedText();
+    if(!code) { code = this._aceEditor.getValue(); }
+    window.pythonClipboard = code;
+  }
+  this.pasteProgram = function() {
+    if(!window.pythonClipboard) { return; }
+    var curCode = this._aceEditor.getValue();
+    this._aceEditor.setValue(curCode + '\n\n' + window.pythonClipboard);
+    var Range = ace.require('ace/range').Range;
+    this._aceEditor.selection.setRange(new Range(curCode.split(/\r\n|\r|\n/).length + 1, 0, this._aceEditor.getValue().split(/\r\n|\r|\n/).length, 0), true);
+  }
 }
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {

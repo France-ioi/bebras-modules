@@ -96,6 +96,7 @@ button:disabled {
   background-color: #4a4a4a;
   color: #FFF;
   z-index: 99;
+  overflow: auto;
 }
 #editorMenu .editorMenuHeader {
   position: absolute;
@@ -169,6 +170,10 @@ button:disabled {
 #editorMenu .editorActions div.editorActionDisabled,
 #editorMenu .editorActions div.editorActionDisabled:hover {
   color: #707070;
+}
+#editorMenu .editorActions div.editorActionForbidden,
+#editorMenu .editorActions div.editorActionForbidden:hover {
+  color: #ff001f;
 }
 @media /* Tablets and desktop */
   screen and (min-width: 768px) and (max-width: 1024.9px) and (orientation: portrait),
