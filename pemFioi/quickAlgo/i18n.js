@@ -66,11 +66,14 @@ var localLanguageStrings = {
       restart: "Recommencer",
       loadBestAnswer: "Charger ma meilleure réponse",
       saveProgram: "Enregistrer",
+      copy: "Copier",
+      paste: "Coller",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       limitElements: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitElementsOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       capacityWarning: "Attention : votre programme est invalide car il utilise trop de blocs. Faites attention à la limite de blocs affichée en haut à droite de l'éditeur.",
+      clipboardDisallowedBlocks: "Vous ne pouvez pas coller ce programme, car il contient des blocs non autorisés dans cette version.",
       previousTestcase: "Précédent",
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
@@ -166,11 +169,14 @@ var localLanguageStrings = {
       restart: "Restart",
       loadBestAnswer: "Load best answer",
       saveProgram: "Save",
+      copy: "Copy",
+      paste: "Paste",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
       limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
       capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
+      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.",
       previousTestcase: "Previous",
       nextTestcase: "Next",
       allTests: "All tests: ",
@@ -266,11 +272,14 @@ var localLanguageStrings = {
       restart: "Restart",  // TODO :: translate
       loadBestAnswer: "Load best answer",  // TODO :: translate
       saveProgram: "Speichern",
+      copy: "Copy", // TODO :: translate
+      paste: "Paste",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
       limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
       capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",  // TODO :: translate
+      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
@@ -365,11 +374,14 @@ var localLanguageStrings = {
       restart: "Reiniciar",
       loadBestAnswer: "Cargar la mejor respuesta",
       saveProgram: "Guardar",
+      copy: "Copy", // TODO :: translate
+      paste: "Paste",
       limitBlocks: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.",
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
       limitElements: "{remainingBlocks} elementos disponibles de {maxBlocks} autorizados.",
       limitElementsOver: "{remainingBlocks} elementos sobre el límite de {maxBlocks} autorizados.",
       capacityWarning: "Advertencia: su programa es inválido porque utiliza demasiados bloques. Ponga atención al límite de bloques permitidos mostrados en la parte superior derecha del editor.",
+      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
@@ -464,11 +476,14 @@ var localLanguageStrings = {
       restart: "Ponastavi",
       loadBestAnswer: "Naloži najboljši odgovor",
       saveProgram: "Shrani",
+      copy: "Copy", // TODO :: translate
+      paste: "Paste",
       limitBlocks: "{remainingBlocks} kock izmed {maxBlocks} imaš še na voljo.",
       limitBlocksOver: "{remainingBlocks} kock preko meje {maxBlocks} kock, ki so na voljo.",
       limitElements: "{remainingBlocks} elementov izmed {maxBlocks} imaš še na voljo.",
       limitElementsOver: "{remainingBlocks} elementov preko meje {maxBlocks} elementov, ki so na voljo.",
       capacityWarning: "Opozorilo : program je rešen narobe, uporablja preveliko število kock. Bodi pozoren na število blokov, ki jih lahko uporabiš, informacijo o tem imaš zgoraj.",
+      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",

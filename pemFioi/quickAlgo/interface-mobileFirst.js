@@ -205,6 +205,8 @@ var quickAlgoInterface = {
                 "</div>" +
                 "<div class='editorActions'>" +
                     "<div rel='example' class='item' onclick='quickAlgoInterface.editorBtn(\"example\");'><span class='fas fa-paste'></span> " + this.strings.loadExample + "</div>" +
+                    "<div rel='copy' class='item' onclick='quickAlgoInterface.editorBtn(\"copy\");'><span class='fas fa-copy'></span> " + this.strings.copy + "</div>" +
+                    "<div rel='paste' class='item' onclick='quickAlgoInterface.editorBtn(\"paste\");'><span class='fas fa-paste'></span> " + this.strings.paste + "</div>" +
                     "<div rel='restart' class='item' onclick='quickAlgoInterface.editorBtn(\"restart\");'><span class='fas fa-trash-alt'></span> " + this.strings.restart + "</div>" +
                     "<div rel='save' class='item' onclick='quickAlgoInterface.editorBtn(\"save\");'><span class='fas fa-download'></span> " + this.strings.saveProgram + "</div>" +
                     "<div rel='load' class='item'>" +
@@ -233,6 +235,7 @@ var quickAlgoInterface = {
         var menuWidth = $('#editorMenu').css('width');
         $('#editorMenu').css('display','block');
         $('body').animate({left: '-' + menuWidth}, 500);
+        this.updateControlsDisplay();
     },
     closeEditorMenu: function() {
         this.editorMenuIsOpen = false;
@@ -246,6 +249,10 @@ var quickAlgoInterface = {
         this.closeEditorMenu();
         if(btn == 'example') {
             task.displayedSubTask.loadExample()
+        } else if(btn == 'copy') {
+            task.displayedSubTask.blocklyHelper.copyProgram();
+        } else if(btn == 'paste') {
+            task.displayedSubTask.blocklyHelper.pasteProgram();
         } else if(btn == 'save') {
             task.displayedSubTask.blocklyHelper.saveProgram();
         } else if(btn == 'restart') {
@@ -283,6 +290,8 @@ var quickAlgoInterface = {
         var hideControls = this.options.hideControls ? this.options.hideControls : {};
         $('.displayHelpBtn').toggleClass('interfaceToggled', !this.hasHelp);
         $('#editorMenu div[rel=example]').toggleClass('interfaceToggled', !this.options.hasExample);
+        $('#editorMenu div[rel=paste]').toggleClass('editorActionDisabled', !this.blocklyHelper || (this.blocklyHelper.canPaste() === null));
+        $('#editorMenu div[rel=paste]').toggleClass('editorActionForbidden', this.blocklyHelper && (this.blocklyHelper.canPaste() === false));
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
