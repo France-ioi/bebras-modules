@@ -267,6 +267,9 @@ VisualGraph.fromJSON = function(visualGraphStr, id, paper, graph, graphDrawer, a
 
 function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexMover, thickMode, innerLineAttr) {
    this.circleAttr = circleAttr;
+   this.rectAttr = circleAttr;
+   this.boxLineAttr = circleAttr;
+   this.minBoxW = 2*circleAttr.r + 50;
    this.lineAttr = lineAttr;
    this.edgeLabelAttr;
    this.vertexLabelAttr = {
@@ -304,6 +307,15 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    };
    this.setCircleAttr = function(circleAttr) {
       this.circleAttr = circleAttr;
+   };
+   this.setRectAttr = function(rectAttr) {
+      this.rectAttr = rectAttr;
+   };
+   this.setBoxLineAttr = function(boxLineAttr) {
+      this.boxLineAttr = boxLineAttr;
+   };
+   this.setMinBoxW = function(w) {
+      this.minBoxW = w;
    };
    this.setLineAttr = function(lineAttr) {
       this.lineAttr = lineAttr;
@@ -353,9 +365,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var x = pos.x - w/2;
          var y = pos.y - h/2;
          var labelHeight = 2*this.vertexLabelAttr["font-size"];
-         var node = this.paper.rect(x,y,w,h).attr(this.circleAttr);
+         var node = this.paper.rect(x,y,w,h).attr(this.rectAttr);
          var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(this.vertexLabelAttr);
-         var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.circleAttr);
+         var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.boxLineAttr);
          var textAlign = this.vertexContentAttr["text-anchor"] || "middle";
          switch(textAlign){
             case "middle":
@@ -397,15 +409,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
       var textSize = this.getTextSize(content);
-      // var test = $("<p>"+content+"</p>");
-      // test.css("display","inline");
-      // $("body").append(test);
-      // var testW = test.width();
-      // test.remove();
-      var minW = 2*this.circleAttr.r + 50;
+      var minW = this.minBoxW;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
       var w = Math.max(0.7*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
-      // var w = Math.max(testW, minW);
       var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
       return { w: w, h: h };
    };
