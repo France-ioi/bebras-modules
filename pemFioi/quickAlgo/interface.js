@@ -294,5 +294,7 @@ var quickAlgoInterface = {
          height: blocksBbox.height + 8
          };
       window.saveSvgAsPng(svg[0], name, options);
-   }
+   },
+
+   updateControlsDisplay: function() {}
 };
