@@ -897,7 +897,14 @@ window.displayHelper = {
          this.popupMessageShown = false;
       }
 
-      for (var curLevel in this.levelsRanks) {
+      var allLevels = ['basic', 'easy', 'medium', 'hard'];
+      if(this.levelsRanks) {
+         for(var lr in this.levelsRanks) {
+            allLevels.push(lr);
+         }
+      }
+      for(var i=0; i < allLevels.length; i++) {
+         var curLevel = allLevels[i];
          $('#tab_' + curLevel).removeClass('current');
          $('.' + curLevel).hide();
       }
