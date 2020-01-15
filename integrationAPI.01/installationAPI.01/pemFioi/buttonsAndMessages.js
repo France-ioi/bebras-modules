@@ -889,10 +889,9 @@ window.displayHelper = {
       return this.levelsMaxScores;
    },
 
-   setLevel: function(newLevel) {
-      if (this.taskLevel == newLevel) {
-         return;
-      } else if (this.popupMessageShown) {
+   displayLevel: function(newLevel) {
+      // Only displays a level, without requesting a level change to the task
+      if (this.popupMessageShown) {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
@@ -909,6 +908,14 @@ window.displayHelper = {
       $('#tabsMenu .li').removeClass('prev next');
       $('#tabsMenu .li.current').prev().addClass('prev');
       $('#tabsMenu .li.current').next().addClass('next');
+   },
+
+   setLevel: function(newLevel) {
+      if (this.taskLevel == newLevel) {
+         return;
+      }
+
+      this.displayLevel(newLevel);
 
       var answer = task.getAnswerObject();
       var state = task.getStateObject();

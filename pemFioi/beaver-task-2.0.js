@@ -192,6 +192,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
                levelStates: {},
                level: defaultLevel
             };
+            if(window.displayHelper) {
+               displayHelper.displayLevel(state.level);
+            }
             mainTask.loadLevel(state.level, null, views);
             if(levels) {
                displayHelper.setupLevels(defaultLevel, reloadWithCallbacks, levels);
@@ -293,6 +296,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             mainTask = createTask(true);
             mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
+            if(window.displayHelper) {
+               displayHelper.displayLevel(level);
+            }
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(levelAnswer);
             if(mainTask.resetDisplay) {
@@ -343,6 +349,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             mainTask = createTask(false);
             mainTask.taskParams = mainTaskParams;
             task.displayedSubTask = mainTask;
+            if(window.displayHelper) {
+               displayHelper.displayLevel(level);
+            }
             mainTask.loadLevel(level, levelState);
             mainTask.reloadAnswerObject(state.levelAnswers[level]);
             if(callback && typeof callback === "function") {
