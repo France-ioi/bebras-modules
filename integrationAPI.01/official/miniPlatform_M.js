@@ -119,6 +119,9 @@
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
             </div>'
+      },
+      none: {
+          'header' : '<span></span>'
       }
    };
 
