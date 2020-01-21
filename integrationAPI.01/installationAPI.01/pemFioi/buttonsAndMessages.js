@@ -984,6 +984,8 @@ window.displayHelper = {
    getAvatar: function(mood) {
       if (displayHelper.avatarType == "beaver") {
          return "castor.png";
+      } else if (displayHelper.avatarType == "none") {
+        return "";
       } else {
          if (mood == "success") {
             return "laptop_success.png";
