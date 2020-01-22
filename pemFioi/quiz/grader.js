@@ -84,7 +84,7 @@
                         res.messages[i] = grader.messages[mistakes[0]];
                     }
                 } else {
-                    if(!answer[i]) { continue; }
+                    if(typeof answer[i] == 'undefined') { continue; }
                     isValid = grader == answer[i] ? 1 : 0;
                     res.mistakes.push(isValid ? null : answer[i]);
                     if(grader.messages && !isValid && grader.messages[answer[i]]) {
