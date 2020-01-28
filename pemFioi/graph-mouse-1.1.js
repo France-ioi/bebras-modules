@@ -1740,7 +1740,7 @@ function GraphEditor(settings) {
          vertexGuid++;
       }
       var vertexId = "v_" + vertexGuid;
-      var point = {x: x, y: y, tableMode: self.tableMode };
+      var point = {x: Math.round(x), y: Math.round(y), tableMode: self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
          var label = self.getDefaultLabel();
