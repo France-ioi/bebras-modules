@@ -1155,6 +1155,11 @@ function ArcDragger(settings) {
             if(radiusRatio > 5 && !vInfo["large-arc"])
                   radiusRatio = 0;
             vInfo["radius-ratio"] = Math.round(radiusRatio*100)/100;
+            if(vInfo["radius-ratio"] == 0){
+               delete vInfo["radius-ratio"];
+               delete vInfo["sweep"];
+               delete vInfo["large-arc"];
+            }
          }
       }
       self.visualGraph.setEdgeVisualInfo(vInfo);
@@ -1581,7 +1586,11 @@ function GraphEditor(settings) {
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
          var vertex = vertices[iVertex];
          var vInfo = visualGraph.getVertexVisualInfo(vertex);
-         vInfo.tableMode = enabled;
+         if(enabled){
+            vInfo.tableMode = enabled;
+         }else{
+            delete vInfo.tableMode;
+         }
       }
       visualGraph.redraw();
       this.updateHandlers();
@@ -1707,7 +1716,7 @@ function GraphEditor(settings) {
 
          self.addEdgeCross(edgeID);
          var info = graph.getEdgeInfo(edgeID);
-         if(info.label.length == 0)
+         if(!info.label || info.label.length == 0)
             self.editLabel(edgeID,"edge");
          $(document).keydown(function(event){
             if(event.which == 46){  // if press delete
@@ -2420,7 +2429,7 @@ function GraphEditor(settings) {
          console.log("type error");
          return;
       }
-      var oldLabel = info.label;
+      var oldLabel = info.label || "";
       var newLabel = (self.textEditor) ? self.textEditor.val().trim() : "";
 
       if(self.alphabet){
@@ -2434,7 +2443,11 @@ function GraphEditor(settings) {
       }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
-         info.label = newLabel;
+         if(newLabel != ""){
+            info.label = newLabel;
+         }else{
+            delete info.label;
+         }
          self.edited = true;
          if(type === "vertex"){
             graph.setVertexInfo(id,info);
