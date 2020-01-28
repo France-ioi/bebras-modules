@@ -137,7 +137,7 @@ var getContext = function(display, infos, curLevel) {
                 displayTablesOnGraph: 'visualiser les tables sur un graphe(%1, %2, %3, %4, %5, %6, %7)'
             },
             code: {
-                loadTable: 'loadTable',
+                loadTable: 'chargerTable',
                 loadTableFromCsv: 'loadTableFromCsv',
                 loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
                 getRecords: 'getRecords',
@@ -161,12 +161,12 @@ var getContext = function(display, infos, curLevel) {
             },
             description: {
                 loadTable: '%loadTable(tableName) : retourne la table dont le nom est passé en paramètre sous forme de chaîne de caractères.',
-                loadTableFromCsv: '%loadTableFromCsv()',
+                loadTableFromCsv: '%loadTableFromCsv(csvFileName) : retourne une table avec les données du fichier csv entré en paramètre sous forme de chaîne de caractères.',
                 loadTableFromCsvWithTypes: '%loadTableFromCsvWithTypes()',
                 getRecords: '%getRecords()',
                 selectByColumn: 'selectByColumn(table, columnName, value) : retourne une table avec les enregistrements de la table initiale, qui ont la valeur \'value\' dans la colonne \'columnName\'.',
                 selectByFunction: '%selectByFunction()',
-                selectTopRows: '%selectTopRows()',
+                selectTopRows: '%selectTopRows(table, nbRows) : retourne une table avec les nbRows premiers enregistrements de la table initiale.',
                 getColumn: '%getColumn()',
                 sortByColumn: '%sortByColumn(table,columnName,direction) : retourne une table avec les enregistrements de la table initiale triés. Le deuxième paramètre est une chaîne de caractères qui indique la colonne à considérer pour le tri. Le tri peut être ascendant: "asc" ou descendant: "desc".',
                 sortByFunction: '%sortByFunction()',
@@ -174,7 +174,7 @@ var getContext = function(display, infos, curLevel) {
                 joinTables: '%joinTables(table1, column1, table2, column2, type) : retourne une table qui est la jointure des deux tables passées en paramètre. La jointure se fait sur les colonnes \'column1\' et \'column2\'. Le type est à choisir parmi \'inner\', \'outer\', \'left\' et \'right\'.',
                 displayTable: '%displayTable(table) : permet d\'afficher la table passée en paramètre dans la zone de visualisation.',
                 updateWhere: '%updateWhere()',
-                insertRecord: '%insertRecord()',
+                insertRecord: '%insertRecord(table, record) : retourne la table initiale avec l\'enregistrement passé en paramètre ajouté. Cet enregistrement est entré sous la forme d\'une liste.',
                 unionTables: '%unionTables()',
                 displayRecord: '%displayRecord()',
                 displayTableOnMap: '%displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : permet de visualiser les éléments de la colonne passée en deuxième paramètre sur une carte.',
