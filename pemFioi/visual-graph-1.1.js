@@ -801,9 +801,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var tableMode = this.visualGraph.getVertexVisualInfo(id).tableMode;
       // var xDistance = xPos - vertexPos.x;
       // var yDistance = yPos - vertexPos.y;
-      var distanceFromCenter = distanceSquared(vertexPos.x,vertexPos.y,xPos,yPos);
+      // var distanceFromCenter = distanceSquared(vertexPos.x,vertexPos.y,xPos,yPos);
+      var distanceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,xPos,yPos);
       if(!tableMode){
-         
          if(distanceFromCenter <= this.circleAttr.r) {
             return 0;
          }

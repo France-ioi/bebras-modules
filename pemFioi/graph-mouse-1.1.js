@@ -586,7 +586,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
    function eventHandler(xPos, yPos, event) {
       // Check if vertex was clicked
       var vertex = self.getFuzzyVertex(xPos, yPos);
-
+      // console.log(id+" forVertices:"+forVertices+" vertex:"+vertex);
       if(vertex !== null) {
          if(forVertices) {
             self.callback("vertex", vertex, xPos, yPos, event);
@@ -597,6 +597,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
 
       // Check if edge was clicked.
       var edge = self.getFuzzyEdge(xPos, yPos);
+      // console.log(id+" forEdges:"+forEdges+" edge:"+edge);
       if(edge !== null) {
          if(forEdges) {
             self.callback("edge", edge, xPos, yPos, event);
@@ -606,6 +607,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       }
 
       var edge2 = self.getFuzzyEdgeLabel(xPos, yPos);
+      // console.log(id+" forEdges:"+forEdges+" edgeLabel:"+edge2);
       if(edge2 !== null) {
          if(forEdges) {
             self.callback("edgeLabel", edge2, xPos, yPos, event);
@@ -614,6 +616,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
          return;
       }
 
+      // console.log(id+" forBackground:"+forBackground);
       // Background was clicked.
       if(forBackground) {
          self.callback(null, null, xPos, yPos, event);
@@ -627,6 +630,7 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
       var minDistance = Infinity;
       this.graph.forEachVertex(function(id) {
          var distance = visualGraph.graphDrawer.getDistanceFromVertex(id, xPos, yPos);
+         // console.log(distance+" "+id)
          if(distance <= vertexThreshold && distance < minDistance) {
             vertex = id;
             minDistance = distance;
@@ -1292,6 +1296,7 @@ function GraphDragger(settings) {
    };
 
    function onFuzzyClick(elementType, id, x, y, event){
+      // console.log(elementType+" "+id)
       self.onDragStart(x,y,event);
    }
    this.onDragStart = function(x,y,event){
