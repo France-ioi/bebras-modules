@@ -815,7 +815,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          var content = (info.content) ? info.content : "";
          var boxSize = this.getBoxSize(content);
          var surfacePoint = this.getSurfacePointFromAngle(vertexPos.x,vertexPos.y,boxSize.w,boxSize.h,angleWithCenter);
-         var surfaceFromCenter = distanceSquared(vertexPos.x,vertexPos.y,surfacePoint.x,surfacePoint.y);
+         var surfaceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,surfacePoint.x,surfacePoint.y);
          if(distanceFromCenter <= surfaceFromCenter) {
             return 0;
          }
