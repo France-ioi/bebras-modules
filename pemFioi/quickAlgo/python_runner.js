@@ -3,6 +3,20 @@
         Python code runner.
 */
 
+var DEBUG_PYTHON_RUNNER = false;
+var pythonRunnerLog = function() {
+  if (DEBUG_PYTHON_RUNNER) {
+    // 1. Convert args to a normal array
+    var args = Array.prototype.slice.call(arguments);
+
+    // 2. Prepend log prefix log string
+    args.unshift("[python_runner.js] ");
+
+    // 3. Pass along arguments to console.log
+    console.log.apply(console, args);
+  }
+};
+
 var currentPythonContext = null;
 
 function PythonInterpreter(context, msgCallback) {
@@ -295,6 +309,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.noDelay = function (callback, value) {
+    pythonRunnerLog('noDelay');
+
     var primitive = this._createPrimitive(value);
     if (primitive !== Sk.builtin.none.none$) {
       // Apparently when we create a new primitive, the debugger adds a call to
@@ -334,11 +350,13 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onOutput = function (_output) {
+    pythonRunnerLog('_onOutput : ' + _output);
+
     that.print(_output);
   };
 
   this._onDebugOut = function (text) {
-    // console.log('DEBUG: ', text);
+
   };
 
   this._configure = function () {
@@ -363,6 +381,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.print = function (message, className) {
+    pythonRunnerLog(message);
+
     if (message === 'Program execution complete') {
       this._onFinished();
     }
@@ -372,6 +392,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onFinished = function () {
+    pythonRunnerLog('_onFinished');
+
     this.stop();
     try {
       this.context.infos.checkEndCondition(this.context, true);
@@ -391,6 +413,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._continue = function () {
+    pythonRunnerLog('_continue');
+
     if (this.context.infos.checkEndEveryTurn) {
       try {
         this.context.infos.checkEndCondition(context, false);
@@ -454,6 +478,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.run = function () {
+    pythonRunnerLog('run');
+
     if(this.stepMode) {
       this._paused = this._stepInProgress;
       this.stepMode = false;
@@ -467,6 +493,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.runStep = function () {
+    pythonRunnerLog('runStep');
+
     this.stepMode = true;
     if(this._isRunning && !this._stepInProgress) {
       this.step();
@@ -521,6 +549,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.reportValue = function (origValue, varName) {
+    pythonRunnerLog('> REPORT_VALUE', origValue, varName);
+
     // Show a popup displaying the value of a block in step-by-step mode
     if(origValue === undefined
         || (origValue && origValue.constructor === Sk.builtin.func)
@@ -531,7 +561,6 @@ function PythonInterpreter(context, msgCallback) {
     }
 
     var value = this.unSkulptValue(origValue);
-
     var highlighted = $('.aceHighlight');
     if(highlighted.length == 0) {
       return origValue;
@@ -570,6 +599,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.stop = function () {
+    pythonRunnerLog('stop');
+
     for (var i = 0; i < this._timeouts.length; i += 1) {
       window.clearTimeout(this._timeouts[i]);
     }
@@ -591,6 +622,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._resetInterpreterState = function () {
+    pythonRunnerLog('_resetInterpreterState');
+
     this._steps = 0;
     this._stepsWithoutAction = 0;
     this._lastNbActions = 0;
@@ -609,6 +642,8 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._resetCallstack = function () {
+    pythonRunnerLog('_resetCallstack');
+
     if (this._resetCallstackOnNextStep) {
       this._resetCallstackOnNextStep = false;
       this._debugger.suspension_stack.pop();
@@ -616,18 +651,21 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.step = function () {
+    pythonRunnerLog('step');
+
     this._resetCallstack();
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
     if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
-      if(curSusp && curSusp.lineno) {
+      if(curSusp && curSusp.$lineno) {
         this.removeEditorMarker();
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
+
         this._editorMarker = editor.session.addMarker(
-          new Range(curSusp.lineno-1, curSusp.colno, curSusp.lineno, 0),
+          new Range(curSusp.$lineno-1, curSusp.$colno, curSusp.$lineno, 0),
           "aceHighlight",
           "line");
       }
@@ -640,8 +678,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.realStep = function () {
-    // For reportValue in Skulpt
-    window.currentPythonRunner = this;
+    pythonRunnerLog('realStep');
 
     this._paused = this.stepMode;
     this._debugger.enable_step_mode();
@@ -656,12 +693,16 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onStepSuccess = function () {
+    pythonRunnerLog('_onStepSuccess');
+
     // If there are still timeouts, there's still a step in progress
     this._stepInProgress = !!this._timeouts.length;
     this._continue();
   };
 
   this._onStepError = function (message) {
+    pythonRunnerLog('_onStepError');
+
     context.onExecutionEnd && context.onExecutionEnd();
     // We always get there, even on a success
     this.stop();
@@ -691,14 +732,21 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._setBreakpoint = function (bp, isTemporary) {
+    pythonRunnerLog('_setBreakpoint');
+
     this._debugger.add_breakpoint(this._editor_filename + ".py", bp, "0", isTemporary);
   };
 
   this._asyncCallback = function () {
+    pythonRunnerLog('_asyncCallback');
+
+    // For reportValue in Skulpt
+    window.currentPythonRunner = this;
+
     return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
-  }
+  };
 }
 
 function initBlocklyRunner(context, msgCallback) {
    return new PythonInterpreter(context, msgCallback);
-};
+}
