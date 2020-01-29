@@ -455,6 +455,8 @@ function LR_Parser(settings,subTask,answer) {
                   html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
                }else if(colLabel[iCol] == "S" && stateID == 0){
                   html += terminalStateIndex;
+               }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
+                  html += "acc";
                }
             }
             html += "</td>";
