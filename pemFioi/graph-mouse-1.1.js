@@ -1465,7 +1465,7 @@ function GraphEditor(settings) {
       enabled: false
    });
 
-   this.globalTableMode = false;
+   this.tableMode = false;
    this.localTableMode = false;
    // this.tableMode = false;
    this.gridEnabled = false;
@@ -1583,8 +1583,8 @@ function GraphEditor(settings) {
    this.setDefaultEdgeLabelEnabled = function(enabled) {
       this.defaultEdgeLabelEnabled = enabled;
    };
-   this.setGlobalTableMode = function(enabled) {
-      this.globalTableMode = enabled;
+   this.setTableMode = function(enabled) {
+      this.tableMode = enabled;
       var vertices = graph.getAllVertices();
       for(var iVertex = 0; iVertex < vertices.length; iVertex++){
          var vertex = vertices[iVertex];
@@ -1746,7 +1746,7 @@ function GraphEditor(settings) {
          vertexGuid++;
       }
       var vertexId = "v_" + vertexGuid;
-      var point = {x: Math.round(x), y: Math.round(y), tableMode: self.localTableMode || self.globalTableMode };
+      var point = {x: Math.round(x), y: Math.round(y), tableMode: self.localTableMode || self.tableMode };
       visualGraph.setVertexVisualInfo(vertexId, point);
       if(self.defaultVertexLabelEnabled){
          var label = self.getDefaultLabel();
