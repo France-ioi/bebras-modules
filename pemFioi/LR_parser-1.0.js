@@ -1568,13 +1568,15 @@ function LR_Parser(settings,subTask,answer) {
          $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
       }
       var reduc = true;
-      this.currentState = prevState;
-      this.updateParseTable(true);
-      if(firstStepOnly && prevStates.length == 0){
-         reduc = false;
-         // this.currentState = prevState;
-         // this.updateParseTable(true);
-         this.waitingForGoto = true;
+      if(prevStates.length == 0){
+         this.currentState = prevState;
+         this.updateParseTable(true);
+         if(firstStepOnly){
+            reduc = false;
+            // this.currentState = prevState;
+            // this.updateParseTable(true);
+            this.waitingForGoto = true;
+         }
       }
       this.changeStateAnim(state,prevState,animTime,reduc,function(){
          self.displayMessage("reduce","REDUCE "+self.selectedRule);
