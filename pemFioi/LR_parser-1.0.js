@@ -1568,10 +1568,12 @@ function LR_Parser(settings,subTask,answer) {
          $(".stackElement[data_col="+selectedCol+"]").fadeOut(animTime);
       }
       var reduc = true;
+      this.currentState = prevState;
+      this.updateParseTable(true);
       if(firstStepOnly && prevStates.length == 0){
          reduc = false;
-         this.currentState = prevState;
-         this.updateParseTable(true);
+         // this.currentState = prevState;
+         // this.updateParseTable(true);
          this.waitingForGoto = true;
       }
       this.changeStateAnim(state,prevState,animTime,reduc,function(){
@@ -1841,6 +1843,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.updateParseTable = function(anim) {
+      // console.log(this.currentState);
       // this.styleParseTable();
       // console.log("updateParseTable")
       if(!this.rowHL && this.mode != 4){
