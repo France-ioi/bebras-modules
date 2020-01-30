@@ -359,7 +359,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }else{
          /* table mode */
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content);
+         var boxSize = this.getBoxSize(content,visualInfo.wCorr);
          var w = boxSize.w;
          var h = boxSize.h;
          var x = pos.x - w/2;
@@ -405,15 +405,21 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }
       return result;
    };
-   this.getBoxSize = function(content) {
+   this.getBoxSize = function(content,wCorrection) {
+      var wCorr = wCorrection || 0;
       var margin = 10;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
-      var textSize = this.getTextSize(content);
+      // var textSize = this.getTextSize(content);
+      var tempText = this.paper.text(0,0,content).attr(this.vertexContentAttr);
+      var textBBox = tempText.getBBox();
+      tempText.remove();
       var minW = this.minBoxW;
       var minH = labelHeight + (2*this.vertexLabelAttr["font-size"]);
-      var w = Math.max(0.7*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
-      var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
-      return { w: w, h: h };
+      // var w = Math.max(0.7*textSize.nbCol * this.vertexContentAttr["font-size"], minW);
+      var w = Math.max(textBBox.width + 2*margin,minW);
+      // var h = Math.max(labelHeight + (1 + textSize.nbLines) * this.vertexContentAttr["font-size"] + 2*margin, minH);
+      var h = Math.max(textBBox.height + labelHeight + 2*margin, minH);
+      return { w: w + wCorr, h: h };
    };
 
    this.updateVertex = function(id) {
@@ -592,7 +598,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       }else{
          var info = this.graph.getVertexInfo(vertex2);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content);
+         var boxSize = this.getBoxSize(content,vInfo2.wCorr);
          var alpha = this.getAngleBetween(x1,y1,x2,y2);
          var pos2 = this.getSurfacePointFromAngle(x2,y2,boxSize.w,boxSize.h,alpha);
 
@@ -673,7 +679,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          /* table mode */
          var info = this.graph.getVertexInfo(vertex2);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content);
+         var boxSize = this.getBoxSize(content,vInfo2.wCorr);
          if(vertex1 === vertex2){   
             /* loop */
             angleCenter = edgeVisualInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
@@ -717,7 +723,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             }
             var info1 = this.graph.getVertexInfo(vertex1);
             var content1 = (info1.content) ? info1.content : "";
-            var boxSize1 = this.getBoxSize(content1);
+            var boxSize1 = this.getBoxSize(content1,vInfo1.wCorr);
             var delta = Math.PI - alpha1;
             var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
          }else{
@@ -812,8 +818,9 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          /* table mode */
          var angleWithCenter = this.getAngleBetween(vertexPos.x,vertexPos.y,xPos,yPos);
          var info = this.graph.getVertexInfo(id);
+         var vInfo = this.visualGraph.getVertexVisualInfo(id);
          var content = (info.content) ? info.content : "";
-         var boxSize = this.getBoxSize(content);
+         var boxSize = this.getBoxSize(content,vInfo.wCorr);
          var surfacePoint = this.getSurfacePointFromAngle(vertexPos.x,vertexPos.y,boxSize.w,boxSize.h,angleWithCenter);
          var surfaceFromCenter = Beav.Geometry.distance(vertexPos.x,vertexPos.y,surfacePoint.x,surfacePoint.y);
          if(distanceFromCenter <= surfaceFromCenter) {
@@ -853,7 +860,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             /* table mode */
             var info = this.graph.getVertexInfo(vertices[0]);
             var content = (info.content) ? info.content : "";
-            var boxSize = this.getBoxSize(content);
+            var boxSize = this.getBoxSize(content,vertex1Pos.wCorr);
             if(vertices[0] === vertices[1]){    
                /* loop */
                angleCenter = vInfo.angle || 0; // angle between center of vertex and projection of center of loop on the surface (in deg with trigonometric orientation)
@@ -936,7 +943,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
       var y2 = vertex2Pos.y;
       var info = this.graph.getVertexInfo(vertices[0]);
       var content = (info.content) ? info.content : "";
-      var boxSize = this.getBoxSize(content);
+      var boxSize = this.getBoxSize(content,vertex1Pos.wCorr);
       var r = this.circleAttr.r;
       var D = Math.sqrt(Math.pow((x2-x1),2) + Math.pow((y2-y1),2));  // distance between vertex1 and vertex2
       var R = D*vInfo["radius-ratio"];   // arc radius, between D/2 and +inf (almost straight line at D*50). 
@@ -955,7 +962,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
          }
          var info1 = this.graph.getVertexInfo(vertices[0]);
          var content1 = (info1.content) ? info1.content : "";
-         var boxSize1 = this.getBoxSize(content1);
+         var boxSize1 = this.getBoxSize(content1,vertex1Pos.wCorr);
          var delta = Math.PI - alpha1;
          var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
       }else{
@@ -1005,7 +1012,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                angle = this.bindAngle(angle);
                var info = this.graph.getVertexInfo(vertex1);
                var content = (info.content) ? info.content : "";
-               var boxSize = this.getBoxSize(content);
+               var boxSize = this.getBoxSize(content,vertex1Pos.wCorr);
 
                var beta = Math.atan(boxSize.h/boxSize.w);   // angle between center of vertex and corner of box
                var surfPos = this.getSurfacePointFromAngle(vertex1Pos.x,vertex1Pos.y,boxSize.w,boxSize.h,Math.PI - angle);
@@ -1045,7 +1052,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
             if(vertex2Pos.tableMode){
                var info = this.graph.getVertexInfo(vertex2);
                var content = (info.content) ? info.content : "";
-               var boxSize = this.getBoxSize(content);
+               var boxSize = this.getBoxSize(content,vertex2Pos.wCorr);
                
                var alpha = (l) ? (Math.asin(D/(2*R)) + Math.PI) : Math.asin(D/(2*R));  
                var angle2 = angle;
@@ -1058,7 +1065,7 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
                   }
                   var info1 = this.graph.getVertexInfo(vertex1);
                   var content1 = (info1.content) ? info1.content : "";
-                  var boxSize1 = this.getBoxSize(content1);
+                  var boxSize1 = this.getBoxSize(content1,vertex1Pos.wCorr);
                   var delta = Math.PI - alpha1;
                   var pos1 = this.getSurfacePointFromAngle(x1,y1,boxSize1.w,boxSize1.h,delta);
                }else{
