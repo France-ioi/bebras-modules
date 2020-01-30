@@ -1586,7 +1586,7 @@ function LR_Parser(settings,subTask,answer) {
                self.stack.push(newStackElement);
                selectedCol = self.stack.length - 1;
             }
-            
+            // console.log(newStackElement)
             self.updateStackTable(firstStepOnly);
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
@@ -1594,11 +1594,16 @@ function LR_Parser(settings,subTask,answer) {
                   self.goto(newStackElement);
                }
             });
+            $(".stackElement.State[data_col="+selectedCol+"]").text("");
          }
       });
    };
 
    this.goto = function(newStackElement) {
+      var col = this.stack.length - 1;
+      $(".stackElement.State[data_col="+col+"]").text(newStackElement[0]);
+      $(".stackElement.State[data_col="+col+"]").css("opacity",0);
+      $(".stackElement.State[data_col="+col+"]").animate({opacity:1},self.animationTime);
       self.highlightRule(self.selectedRule);
       self.updateState(true);
       self.displayMessage("reduce","GOTO "+newStackElement[0]);
@@ -1901,7 +1906,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
-      // console.log(state1+" "+state2);
       var id2 = this.getStateID(state2);
       var v2 = this.visualGraph.getRaphaelsFromID(id2);
       var id1 = this.getStateID(state1);
