@@ -1723,10 +1723,24 @@ function LR_Parser(settings,subTask,answer) {
       $("#inputBar").append(this.inputHighlight);
 
       if(anim){
-         $("#cursor, #treeCursor").animate({left:newX+"px"},this.animationTime);
+         $("#cursor, #treeCursor").animate({left:newX+"px"},this.animationTime,function() {
+            self.updateInputColor();
+         });
       }else{
          $("#cursor, #treeCursor").css({left:newX+"px"});
+         this.updateInputColor();
       }
+   };
+
+   this.updateInputColor = function() {
+      $("#inputBar .inputChar").each(function(index) {
+         if(index < self.inputIndex){
+            $(this).addClass("read");
+         }else{
+            $(this).removeClass("read");
+         }
+      });
+      self.styleInput();
    };
 
    /* HIGHLIGHT */
@@ -3319,28 +3333,7 @@ function LR_Parser(settings,subTask,answer) {
          });
 
          /* input */
-         $("#inputBar").css({
-            position: "relative",
-            "background-color": this.colors.lightgrey,
-            "margin-top": "5px",
-            "border-top": "1px solid grey",
-            "border-bottom": "2px solid "+this.colors.blue
-         });
-         $("#inputBar h4").css({
-            position: "absolute",
-            top: "-3em"
-         });
-         $(".inputChar").css({
-            display: "inline-block",
-            width: "1.5em",
-            "text-align": "center",
-            color: this.colors.black,
-            "font-size": "1.5em",
-            padding: "0.1em 0"
-         });
-         $(".inputChar:first-of-type").css({
-            "margin-left": "0.75em"
-         });
+         this.styleInput();
 
          /* cursor */
          $("#cursor").css({
@@ -3648,6 +3641,34 @@ function LR_Parser(settings,subTask,answer) {
          color: "white"
       });
    };
+
+   this.styleInput = function() {
+      $("#inputBar").css({
+         position: "relative",
+         "background-color": this.colors.lightgrey,
+         "margin-top": "5px",
+         "border-top": "1px solid grey",
+         "border-bottom": "2px solid "+this.colors.blue
+      });
+      $("#inputBar h4").css({
+         position: "absolute",
+         top: "-3em"
+      });
+      $(".inputChar").css({
+         display: "inline-block",
+         width: "1.5em",
+         "text-align": "center",
+         color: this.colors.black,
+         "font-size": "1.5em",
+         padding: "0.1em 0"
+      });
+      $(".inputChar.read").css({
+         color: this.colors.blue
+      });
+      $(".inputChar:first-of-type").css({
+         "margin-left": "0.75em"
+      });
+   }; 
 
    this.styleDerivationTree = function() {
       // if(this.mode < 6){
