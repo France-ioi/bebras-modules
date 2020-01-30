@@ -32,6 +32,7 @@ function LR_Parser(settings,subTask,answer) {
    this.treeSelectionMarker = null;
    this.inputBaseline = []; // mode = 7
    this.selectedSymbolIndices = [];
+   this.reductionMarkerR = 10;
 
    this.timeOutID;
    this.animationTime = 1000;
@@ -136,6 +137,26 @@ function LR_Parser(settings,subTask,answer) {
       color: this.colors.black,
       border: "1px solid "+this.colors.black
    };
+   this.reductionMarkerAttr = {
+      circle: {
+         stroke: "white",
+         fill: "none",
+         r: this.reductionMarkerR
+      },
+      text: {
+         "font-size": 12,
+         "font-weight": "bold",
+         // fill: this.colors.black,
+         fill: "white",
+         "text-anchor": "end"
+      },
+      rule: {
+         "font-size": 12,
+         "font-weight": "bold",
+         fill: this.colors.yellow,
+         "text-anchor": "start"
+      }
+   };
    // this.selectedCellAttr = {
    //    "background-color": this.colors.blue,
    //    color: "white",
@@ -215,6 +236,7 @@ function LR_Parser(settings,subTask,answer) {
       this.grammar = new Grammar(ruleStr);
       this.lrClosureTable = new LRClosureTable(this.grammar);
       this.lrTable = new LRTable(this.lrClosureTable);
+      // console.log(this.lrTable)
    };
 
    this.initAutomata = function() {
@@ -225,6 +247,7 @@ function LR_Parser(settings,subTask,answer) {
          this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
          this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
          this.graphDrawer.setVertexContentAttr(this.vertexContentAttr);
+         this.graphDrawer.setDrawVertex(this.drawVertex);
       }
       if(this.visualGraph){
          this.visualGraph.remove();
@@ -290,8 +313,12 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.formatContent();
       this.visualGraph.redraw();
-      if(this.graphEditor)
+      if(this.mode < 6 && this.mode != 3){
+         // this.displayReductionsInAutomata();
+      }
+      if(this.graphEditor){
          this.graphEditor.updateHandlers();
+      }
    };
 
    this.initActionSequence = function(validation,tree) {
@@ -452,7 +479,13 @@ function LR_Parser(settings,subTask,answer) {
             html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
             if(this.mode != 4){
                if(state && state[colLabel[iCol]]){
-                  html += state[colLabel[iCol]][0]["actionType"]+state[colLabel[iCol]][0]["actionValue"];
+                  var actionType = state[colLabel[iCol]][0]["actionType"];
+                  var actionValue = state[colLabel[iCol]][0]["actionValue"];
+                  if(actionType == "r"){
+                     html += "<span class=\"ruleMarker\">"+actionType+"<span class=\"ruleMarkerIndex\">"+actionValue+"</span>"+"</span>";
+                  }else{
+                     html += actionType+actionValue;
+                  }
                }else if(colLabel[iCol] == "S" && stateID == 0){
                   html += terminalStateIndex;
                }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
@@ -803,6 +836,145 @@ function LR_Parser(settings,subTask,answer) {
          cursor: "pointer",
          opacity: "1"
       })
+   };
+
+   this.drawVertex = function(id, info, visualInfo) {
+      var pos = this._getVertexPosition(visualInfo);
+      this.originalPositions[id] = pos;
+      var label = (info.label) ? info.label : "";
+
+      if(self.mode < 6 && self.mode != 3){
+         var reductionData = self.getReductionData();
+      }
+
+      var content = (info.content) ? info.content : "";
+      var reductionInfo = false;
+      var wCorr = 0;
+      if(reductionData){
+         for(var redData of reductionData){
+            if(redData.state == label){
+               wCorr = 2*self.reductionMarkerR + 20;
+               visualInfo.wCorr = wCorr;
+               reductionInfo = redData;
+               break;
+            }
+         }
+      }
+      var boxSize = this.getBoxSize(content,wCorr);
+      var w = boxSize.w;
+      var h = boxSize.h;
+      var x = pos.x - w/2;
+      var y = pos.y - h/2;
+      var labelHeight = 2*this.vertexLabelAttr["font-size"];
+      var node = this.paper.rect(x,y,w,h).attr(this.rectAttr);
+      var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(this.vertexLabelAttr);
+      var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.boxLineAttr);
+
+      var contentX = pos.x - w/2 + 10;
+
+      var content = this.paper.text(contentX, y + labelHeight + (h - labelHeight)/2,content).attr(this.vertexContentAttr);
+      if(info.initial && !info.terminal){
+         var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
+         initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
+         var result = [node,labelRaph,line,content,initialArrow];
+      }else if(!info.initial && info.terminal){
+         var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
+         var result = [node,labelRaph,line,content,terminalFrame];
+      }else if(info.initial && info.terminal){
+         var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
+         var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
+         initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
+         var result = [node,labelRaph,line,content,initialArrow,terminalFrame];
+      }else{
+         var result = [node,labelRaph,line,content];
+      }
+      if(reductionInfo){
+         var rule = reductionInfo.rule;
+         var attr = self.reductionMarkerAttr;
+         var textSize = this.getTextSize(info.content);
+         var x = visualInfo.x + w/2 - self.reductionMarkerR - 10;
+         if(textSize.nbLines == 1){
+            var y = content.attr("y");
+         }else{
+            var lines = info.content.split("\n");
+            var redIndex;
+            for(var iLine = 0; iLine < lines.length; iLine++){
+               var line = lines[iLine].trim();
+               for (var i = 0, chr; i < line.length; i++) {
+                 [chr, i] = getWholeCharAndI(line, i);
+               }
+               var lastChar = chr;
+               if(lastChar == "." || lastChar == dot){
+                  redIndex = iLine;
+                  break;
+               }
+            }
+            var textBBox = content.getBBox();
+            var y = textBBox.y + (textBBox.height/lines.length)*(redIndex + 1/2);
+         }
+         var circle = this.paper.circle(x,y,10).attr(attr.circle);
+         var text = this.paper.text(x - 1,y,"r").attr(attr.text);
+         var ruleObj = this.paper.text(x + 1,y,rule).attr(attr.rule);
+         result.push(circle,text,ruleObj);
+      }
+      this._addCustomElements(id, result);
+      
+      return result;
+   };
+
+   function getWholeCharAndI(str, i) {
+     var code = str.charCodeAt(i);
+
+     if (Number.isNaN(code)) {
+       return ''; // Position not found
+     }
+     if (code < 0xD800 || code > 0xDFFF) {
+       return [str.charAt(i), i]; // Normal character, keeping 'i' the same
+     }
+
+     // High surrogate (could change last hex to 0xDB7F to treat high private 
+     // surrogates as single characters)
+     if (0xD800 <= code && code <= 0xDBFF) { 
+       if (str.length <= (i+1))  {
+         throw 'High surrogate without following low surrogate';
+       }
+       var next = str.charCodeAt(i+1);
+         if (0xDC00 > next || next > 0xDFFF) {
+           throw 'High surrogate without following low surrogate';
+         }
+         return [str.charAt(i)+str.charAt(i+1), i+1];
+     }
+     // Low surrogate (0xDC00 <= code && code <= 0xDFFF)
+     if (i === 0) {
+       throw 'Low surrogate without preceding high surrogate';
+     }
+     var prev = str.charCodeAt(i-1);
+
+     // (could change last hex to 0xDB7F to treat high private surrogates
+     // as single characters)
+     if (0xD800 > prev || prev > 0xDBFF) { 
+       throw 'Low surrogate without preceding high surrogate';
+     }
+     // Return the next character instead (and increment)
+     return [str.charAt(i+1), i+1]; 
+   };
+
+   this.getReductionData = function() {
+      var attr = this.reductionMarkerAttr;
+      var reductionData = [];
+      for(var iState = 0; iState <= this.lrTable.states.length; iState++){
+         var stateData = this.lrTable.states[iState];
+         for(var symbol in stateData){
+            if(symbol != "index"){
+               var action = stateData[symbol][0];
+               if(action.actionType == "r"){
+                  reductionData.push({ state: iState, rule: action.actionValue });
+                  break;
+               }
+            }
+         }
+      }
+      return reductionData;
    };
 
    this.onResize = function() {
@@ -3334,6 +3506,16 @@ function LR_Parser(settings,subTask,answer) {
             cursor: "pointer"
          })
       }
+      $("#"+this.parseTableID+" td .ruleMarker").css({
+         "background-color": this.colors.black,
+         "border-radius": "1em",
+         color: "white",
+         padding: "0.2em 0.5em"
+      });
+      $("#"+this.parseTableID+" td .ruleMarkerIndex").css({
+         color: this.colors.yellow,
+         // "font-weight": "bold"
+      });
 
       $("#rowHL, #colHL").css(this.cellHighlightAttr);
       // $("#"+this.parseTableID+" td.selected").css(this.selectedCellAttr);
@@ -3372,7 +3554,8 @@ function LR_Parser(settings,subTask,answer) {
          "flex-grow": "0",
          "background-color": this.colors.black,
          "border-radius": "1em",
-         color: "white",
+         // color: "white",
+         color: this.colors.yellow,
          padding: "0.2em 0.5em",
          "margin-right": "0.5em"
       });
