@@ -3386,8 +3386,7 @@ var getContext = function(display, infos, curLevel) {
    };
    
    context.platformInFront = function() {
-      var coords = context.coordsInFront();
-      return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
+      return context.isInFront(function(obj) { return obj.isObstacle && !obj.isPushable ; });
    };
    
    context.platformAbove = function() {
