@@ -15,7 +15,7 @@ var getContext = function (display, infos, curLevel) {
                 turnLedOff: "Éteindre la LED",
                 buttonState: "bouton enfoncé",
                 buttonStateInPort: "bouton enfoncé sur le port %1",
-                waitForButton: "Attendre le bouton",
+                waitForButton: "Attendre une pression sur le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
                 changeLedState: "Passer la LED %1 à %2 ",
                 toggleLedState: "Inverser la LED sur le port %1",
