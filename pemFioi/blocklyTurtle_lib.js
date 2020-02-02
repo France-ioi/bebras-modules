@@ -168,6 +168,7 @@ var getContext = function(display, infos) {
             inputvalue: "eingabewert"
          },
          description: {
+            moveamountvalue: 'forward() : la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
          },
          startingBlockName: "Programme de la tortue",
          messages: {
@@ -338,6 +339,7 @@ var getContext = function(display, infos) {
             inputvalue: "eingabewert"
          },
          description: {
+            
          },
          startingBlockName: "Program of the turtle",
          messages: {
