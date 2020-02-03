@@ -74,6 +74,7 @@ function LR_Parser(settings,subTask,answer) {
    this.prevStateHighlight = null;
    this.pathHighlight = [];
    this.stackElementsHL = [];
+   this.reductionClickArea = {}; // for clicking lines in the automaton in mode 2
 
    this.cellEditor = null;
 
@@ -179,6 +180,12 @@ function LR_Parser(settings,subTask,answer) {
    this.treeSelectionMarkerAttr = {
       fill: this.colors.blue,
       stroke: "none"
+   };
+   this.reductionClickAreaAttr = {
+      stroke: "none",
+      fill: "red",
+      opacity: 0,
+      cursor: "pointer"
    };
 
    this.vertexAttr = settings.vertexAttr || this.defaultVertexAttr;
@@ -691,7 +698,7 @@ function LR_Parser(settings,subTask,answer) {
             $(".stackElement").off("click");
             $(".stackElement").click(self.selectStackElement);
             $(".rule").off("click");
-            $(".rule").click(self.selectRule);
+            $(".rule").click(self.clickRule);
             $(".rule, .actionButton, #stackTable .stackElement").css({
                cursor: "pointer"
             });
@@ -735,7 +742,7 @@ function LR_Parser(settings,subTask,answer) {
                }
             }
             $(".rule").off("click");
-            $(".rule").click(self.selectRule);
+            $(".rule").click(self.clickRule);
             $("#reduceButton, #produceButton").off("click");
             $("#reduceButton").click(self.reduce);
             $("#produceButton").click(self.produce);
@@ -915,7 +922,23 @@ function LR_Parser(settings,subTask,answer) {
          var circle = this.paper.circle(x,y,10).attr(attr.circle);
          var text = this.paper.text(x - 1,y,"r").attr(attr.text);
          var ruleObj = this.paper.text(x + 1,y,rule).attr(attr.rule);
-         result.push(circle,text,ruleObj);
+         if(self.mode == 2){
+            var textBBox = content.getBBox();
+            var lines = info.content.split("\n");
+            var clickAreaX = contentX;
+            var clickAreaY = y - self.reductionMarkerR;
+            var clickAreaW = visualInfo.x + w/2 - 10 - contentX;
+            var clickAreaH = 2*self.reductionMarkerR;
+            var clickArea = this.paper.rect(clickAreaX,clickAreaY,clickAreaW,clickAreaH).attr(self.reductionClickAreaAttr);
+            clickArea.click(self.clickReductionMarker(rule));
+            if(self.reductionClickArea[id]){
+               self.reductionClickArea[id].remove();
+            }
+            self.reductionClickArea[id] = clickArea;
+            // result.push(circle,text,ruleObj,clickArea);
+         }/*else{*/
+            result.push(circle,text,ruleObj);
+         // }
       }
       this._addCustomElements(id, result);
       
@@ -1321,15 +1344,41 @@ function LR_Parser(settings,subTask,answer) {
       self.styleStackTable();
    };
 
-   this.selectRule = function() {
+   this.clickRule = function() {
+      // console.log("select rule")
       self.resetFeedback();
-      var ruleID = $(this).attr("data_rule");
-      if($(this).hasClass("selected")){
-         $(this).removeClass("selected");
+      self.selectRule($(this));
+      // var ruleID = $(this).attr("data_rule");
+      // var ruleObj = $(this);
+      // self.selectRule(ruleObj);
+      // if($(this).hasClass("selected")){
+      //    $(this).removeClass("selected");
+      //    self.selectedRule = null;
+      // }else{
+      //    $(".rule").removeClass("selected");
+      //    $(this).addClass("selected");
+      //    self.selectedRule = ruleID;
+      // }
+      // self.styleRules();
+   };
+
+   this.clickReductionMarker = function(rule) {
+      return function() {
+         var ruleObj = $("#rules [data_rule="+rule+"]");
+         self.selectRule(ruleObj);
+      }
+   }
+
+   this.selectRule = function(ruleObj) {
+      var ruleID = ruleObj.attr("data_rule");
+      // var ruleObj = ruleObj;
+      // self.selectRule(ruleObj);
+      if(ruleObj.hasClass("selected")){
+         ruleObj.removeClass("selected");
          self.selectedRule = null;
       }else{
          $(".rule").removeClass("selected");
-         $(this).addClass("selected");
+         ruleObj.addClass("selected");
          self.selectedRule = ruleID;
       }
       self.styleRules();
@@ -1376,11 +1425,11 @@ function LR_Parser(settings,subTask,answer) {
    /* REDUCE */
 
    this.reduce = function() {
+      // console.log("reduce")
       self.resetFeedback();
       if(self.mode < 6){
          if(self.selectedRule == null){
             self.displayMessage("reduce","You must select a rule");
-            // self.displayMessage("reduce","REDUCE 0000654065406540");
          }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
             self.displayMessage("reduce","You must select a part of the stack");
          }else if(self.selectedState == null){
@@ -2228,6 +2277,9 @@ function LR_Parser(settings,subTask,answer) {
       if(ID == self.getStateID(self.currentState)){
          var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
          stateVertex[0].attr(self.defaultCurrentStateAttr);
+      }
+      if(self.reductionClickArea[ID]){
+         self.reductionClickArea[ID].toFront();
       }
    };
 
