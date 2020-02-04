@@ -75,6 +75,7 @@ function LR_Parser(settings,subTask,answer) {
    this.pathHighlight = [];
    this.stackElementsHL = [];
    this.reductionClickArea = {}; // for clicking lines in the automaton in mode 2
+   this.reductionStates = []; // states with a reduction marker
 
    this.cellEditor = null;
 
@@ -141,7 +142,7 @@ function LR_Parser(settings,subTask,answer) {
    this.reductionMarkerAttr = {
       circle: {
          stroke: "white",
-         fill: "none",
+         fill: this.colors.black,
          r: this.reductionMarkerR
       },
       text: {
@@ -250,6 +251,9 @@ function LR_Parser(settings,subTask,answer) {
       if(!this.paper){
          this.paper = subTask.raphaelFactory.create(this.graphPaperID,this.graphPaperID,this.paperWidth,this.paperHeight);
       }
+      if(this.mode < 6 && this.mode != 3){
+         this.reductionStates = this.getReductionStates();
+      }
       if(!this.graphDrawer){
          this.graphDrawer = new SimpleGraphDrawer(this.vertexAttr,this.edgeAttr,null,true);
          this.graphDrawer.setVertexLabelAttr(this.vertexLabelAttr);
@@ -320,9 +324,7 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.formatContent();
       this.visualGraph.redraw();
-      if(this.mode < 6 && this.mode != 3){
-         // this.displayReductionsInAutomata();
-      }
+
       if(this.graphEditor){
          this.graphEditor.updateHandlers();
       }
@@ -639,23 +641,13 @@ function LR_Parser(settings,subTask,answer) {
    }; 
 
    this.initAcceptButton = function(){
-      // var html = "<div id=\"acceptBar\">";
-      // html += "<span id=\"acceptMessage\" class=\"actionMessage\"></span>"
-      // var html = "<div class=\"messageBackground\"><div id=\"acceptMessage\" class=\"actionMessage\"></div></div>";
       var html = "<div id=\"acceptButton\" class=\"actionButton\"><i class=\"fas fa-thumbs-up buttonIcon\"></i> ACCEPT</div>";
-      // html += "</div>";
       $("#actionInfo").append(html);
-      // $("#shiftBar").append(html);
    };
 
    this.initErrorButton = function(){
-      // var html = "<div id=\"errorBar\">";
-      // html += "<span id=\"errorMessage\" class=\"actionMessage\"></span>"
-      // var html = "<div class=\"messageBackground\"><div id=\"errorMessage\" class=\"actionMessage\"></div></div>";
       var html = "<div id=\"errorButton\" class=\"actionButton\"><i class=\"fas fa-times buttonIcon\"></i> ERROR</div>";
-      // html += "</div>";
       $("#actionInfo").append(html);
-      // $("#shiftBar").append(html);
    };
 
    this.initDerivationTree = function() {
@@ -850,16 +842,13 @@ function LR_Parser(settings,subTask,answer) {
       this.originalPositions[id] = pos;
       var label = (info.label) ? info.label : "";
 
-      if(self.mode < 6 && self.mode != 3){
-         var reductionData = self.getReductionData();
-      }
-
       var content = (info.content) ? info.content : "";
       var reductionInfo = false;
       var wCorr = 0;
-      if(reductionData){
-         for(var redData of reductionData){
+      if(self.reductionStates.length > 0){
+         for(var redData of self.reductionStates){
             if(redData.state == label){
+               /* increase box width for reduction marker */
                wCorr = 2*self.reductionMarkerR + 20;
                visualInfo.wCorr = wCorr;
                reductionInfo = redData;
@@ -982,7 +971,8 @@ function LR_Parser(settings,subTask,answer) {
      return [str.charAt(i+1), i+1]; 
    };
 
-   this.getReductionData = function() {
+   this.getReductionStates = function() {
+      /* return array of states containing a reduction marker */
       var attr = this.reductionMarkerAttr;
       var reductionData = [];
       for(var iState = 0; iState <= this.lrTable.states.length; iState++){
@@ -1134,10 +1124,11 @@ function LR_Parser(settings,subTask,answer) {
                self.selectedStackElements.push(index);
             }
             self.styleStackTable();
-            $(".rule").removeClass("selected");
-            $(".rule[data_rule="+rule+"]").addClass("selected");
-            self.selectedRule = rule;
-            self.styleRules();
+            self.selectRule($(".rule[data_rule="+rule+"]"));
+            // $(".rule").removeClass("selected");
+            // $(".rule[data_rule="+rule+"]").addClass("selected");
+            // self.selectedRule = rule;
+            // self.styleRules();
             if(anim){
                this.timeOutID = setTimeout(function() {
                   var nonTerminal = self.grammar.rules[rule].nonterminal;
@@ -1381,18 +1372,39 @@ function LR_Parser(settings,subTask,answer) {
       if(ruleObj.hasClass("selected")){
          ruleObj.removeClass("selected");
          self.selectedRule = null;
+         self.highlightReductionMarker(ruleID,false);
       }else{
          $(".rule").removeClass("selected");
+         for(var data of self.reductionStates){
+            var state = data.state;
+            var vID = self.getStateID(state);
+            var raphObj = self.visualGraph.getRaphaelsFromID(vID);
+            raphObj[4].attr("fill",self.colors.black);
+         }
          ruleObj.addClass("selected");
          self.selectedRule = ruleID;
+         self.highlightReductionMarker(ruleID,true);
       }
       self.styleRules();
    };
 
    this.unselectRules = function() {
+      // console.log("uselect rules")
       $(".rule").removeClass("selected");
       self.selectedRule = null;
       self.styleRules();
+   };
+
+   this.highlightReductionMarker = function(rule,selected) {
+      for(var data of this.reductionStates){
+         var state = data.state;
+         if(rule == data.rule){ 
+            var vID = this.getStateID(state);
+            var raphObj = this.visualGraph.getRaphaelsFromID(vID);
+            var color = (selected) ? this.colors.blue : this.colors.black;
+            raphObj[4].attr("fill",color);
+         }
+      }
    };
 
    this.switchTab = function() {
@@ -1883,6 +1895,7 @@ function LR_Parser(settings,subTask,answer) {
       $(".rule[data_rule="+rule+"]").addClass("previousRule");
       self.selectedRule = null;
       self.styleRules();
+      self.highlightReductionMarker(rule,false);
    };
 
    this.highlightReducedStackElements = function(prevStates) {
