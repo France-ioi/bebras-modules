@@ -593,7 +593,7 @@ function LR_Parser(settings,subTask,answer) {
       if(this.mode < 6){
          var html = "<div id=\"reduceBar\">";
          html += "<div class=\"messageBackground\"><div id=\"reduceMessage\" class=\"actionMessage\"></div></div>"
-         html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> REDUCE</div>"
+         html += "<div id=\"reduceButton\" class=\"actionButton\"><i class=\"fas fa-compress buttonIcon\"></i> <span>REDUCE</span></div>"
          html += "</div>";
          $("#actionInfo").append(html);
       }else if (this.mode == 6){
@@ -1217,6 +1217,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepBackward = function() {
+      if(self.mode == 2){
+         $("#reduceButton span").text("REDUCE");
+         $("#reduceButton").off("click");
+         $("#reduceButton").click(self.reduce);
+      }
       if(self.mode == 3){
          self.isLastActionAGraphEdit = false;
          self.showUndo();
@@ -1425,34 +1430,34 @@ function LR_Parser(settings,subTask,answer) {
    /* REDUCE */
 
    this.reduce = function() {
-      // console.log("reduce")
+      /* used in mode 2, 6 & 7*/
       self.resetFeedback();
       if(self.mode < 6){
          if(self.selectedRule == null){
             self.displayMessage("reduce","You must select a rule");
          }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
             self.displayMessage("reduce","You must select a part of the stack");
-         }else if(self.selectedState == null){
+         }/*else if(self.selectedState == null){
             self.displayMessage("reduce","You must select a state in the automaton");
-         }else if(!self.compareSelectedRuleAndStack()){
+         }*/else if(!self.compareSelectedRuleAndStack()){
             self.displayError("You cannot reduce the selected stack elements with the selected rule");
          }else{
             var nonTerminal = self.grammar.rules[self.selectedRule].nonterminal;
             var previousState = self.getPreviousState();
             var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-            if(self.selectedState != goto){
+            /*if(self.selectedState != goto){
                self.displayError("Wrong goto state");
-            }else{
-               self.actionSequence.push({
-                  actionType: "r",
-                  rule: self.selectedRule,
-                  goto: goto
-               });
+            }else{*/
+               // self.actionSequence.push({
+               //    actionType: "r",
+               //    rule: self.selectedRule,
+               //    goto: goto
+               // });
                self.treeAnim(self.simulationStep,false,true);
                self.simulationStep++;
-               self.applyReduction(nonTerminal,goto,true);
-               self.saveAnswer();
-            }
+               self.applyReduction(nonTerminal,goto,true,true);
+               // self.saveAnswer();
+            // }
          }
       }else{
          var selectedIndices = self.getSelectedIndices();
@@ -1555,6 +1560,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyReduction = function(nonTerminal,goto,anim,firstStepOnly) {
+      /* firstStepOnly: for manual reduction in two steps (reduction + goto) */
       this.clearHighlight();
       var newStackElement = [goto,nonTerminal];
       this.highlightPrevState(this.currentState);
@@ -1588,11 +1594,13 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.reductionAnimLoop = function(state,prevStates,animTime,newStackElement,firstStepOnly) {
+      /* firstStepOnly: for manual reduction in two steps */
       if(prevStates.length > 0){
          var prevState = prevStates.pop();
       }else{
          var prevState = state;
       }
+      var selectedRule = self.selectedRule;
       var selectedCol = self.selectedStackElements[prevStates.length];
       if(selectedCol){
          /* highlight */
@@ -1628,7 +1636,7 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       this.changeStateAnim(state,prevState,animTime,reduc,function(){
-         self.displayMessage("reduce","REDUCE "+self.selectedRule);
+         self.displayMessage("reduce","REDUCE "+selectedRule);
          if(prevStates.length > 0){
             self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement,firstStepOnly);
          }else{
@@ -1644,7 +1652,11 @@ function LR_Parser(settings,subTask,answer) {
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
                if(!firstStepOnly){
-                  self.goto(newStackElement);
+                  self.goto(newStackElement[0]);
+               }else{
+                  $("#reduceButton span").text("GOTO");
+                  $("#reduceButton").off("click");
+                  $("#reduceButton").click(self.clickGoto(newStackElement[0],selectedRule));
                }
             });
             $(".stackElement.State[data_col="+selectedCol+"]").text("");
@@ -1652,14 +1664,36 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
-   this.goto = function(newStackElement) {
+   this.clickGoto = function(goto,rule) {
+      return function() {
+         if(self.selectedState == null){
+            self.displayMessage("reduce","You must select a state in the automaton");
+         }else if(self.selectedState != goto){
+            self.displayError("Wrong goto state");
+         }else{
+            self.actionSequence.push({
+               actionType: "r",
+               rule: rule,
+               goto: goto
+            });
+            self.currentState = goto;
+            self.goto(goto);
+            self.saveAnswer();
+            $("#reduceButton span").text("REDUCE");
+            $("#reduceButton").off("click");
+            $("#reduceButton").click(self.reduce);
+         }
+      }
+   };
+
+   this.goto = function(newState) {
       var col = this.stack.length - 1;
-      $(".stackElement.State[data_col="+col+"]").text(newStackElement[0]);
+      $(".stackElement.State[data_col="+col+"]").text(newState);
       $(".stackElement.State[data_col="+col+"]").css("opacity",0);
       $(".stackElement.State[data_col="+col+"]").animate({opacity:1},self.animationTime);
       self.highlightRule(self.selectedRule);
       self.updateState(true);
-      self.displayMessage("reduce","GOTO "+newStackElement[0]);
+      self.displayMessage("reduce","GOTO "+newState);
    }
 
    this.reverseReduction = function(rule) {
@@ -2474,8 +2508,9 @@ function LR_Parser(settings,subTask,answer) {
                   goto: cellContent
                });
                self.currentState = cellContent;
-               var newStackElement = [cellContent,symbol];
-               self.goto(newStackElement);
+               // var newStackElement = [cellContent,symbol];
+               // self.goto(newStackElement);
+               self.goto(cellContent);
                self.waitingForGoto = false;
                self.saveAnswer();
             }
