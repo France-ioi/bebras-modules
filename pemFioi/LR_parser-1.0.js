@@ -1432,6 +1432,10 @@ function LR_Parser(settings,subTask,answer) {
    this.reduce = function() {
       /* used in mode 2, 6 & 7*/
       self.resetFeedback();
+      if(self.simulationStep < self.actionSequence.length){
+         self.displayError("You must complete the simulation before performing another action.")
+         return
+      }
       if(self.mode < 6){
          if(self.selectedRule == null){
             self.displayMessage("reduce","You must select a rule");
@@ -1454,7 +1458,7 @@ function LR_Parser(settings,subTask,answer) {
                //    goto: goto
                // });
                self.treeAnim(self.simulationStep,false,true);
-               self.simulationStep++;
+               // self.simulationStep++;
                self.applyReduction(nonTerminal,goto,true,true);
                // self.saveAnswer();
             // }
@@ -1676,6 +1680,7 @@ function LR_Parser(settings,subTask,answer) {
                rule: rule,
                goto: goto
             });
+            self.simulationStep++;
             self.currentState = goto;
             self.goto(goto);
             self.saveAnswer();
@@ -1694,6 +1699,7 @@ function LR_Parser(settings,subTask,answer) {
       self.highlightRule(self.selectedRule);
       self.updateState(true);
       self.displayMessage("reduce","GOTO "+newState);
+      self.currentVertex = self.getStateID(newState);
    }
 
    this.reverseReduction = function(rule) {
@@ -1719,6 +1725,10 @@ function LR_Parser(settings,subTask,answer) {
 
    this.shift = function() {
       self.resetFeedback();
+      if(self.simulationStep < self.actionSequence.length){
+         self.displayError("You must complete the simulation before performing another action.")
+         return
+      }
       if(self.selectedState == null){
          var error = "You must select a state in the automaton";
          self.displayMessage("shift",error);
