@@ -1,3 +1,4 @@
+//multi-views
 /*
     interface:
         Main interface for quickAlgo, common to all languages.
@@ -20,6 +21,106 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
+
+
+
+    namespaceViews: {
+
+        btns: false,
+        namespaces: [],
+        active_name: null,
+        active_idx: null,
+        ready: false,
+        parent: null,
+
+
+        init: function(params) {
+            this.parent = params.grid;
+            this.renderNav(params.nav);
+            this.refreshNav();
+            for(var i=0; i<this.namespaces.length; i++) {
+                this.parent.append(this.namespaces[i].element);
+            }
+        },
+
+        renderNav: function(parent) {
+            this.btns = {
+                prev: $('<i class="fa fa-caret-left prev" style="display: none"></i>'),
+                next: $('<i class="fa fa-caret-right next" style="display: none"></i>')
+            }
+            parent.append(this.btns.prev);
+            parent.append(this.btns.next);
+            this.btns.prev.click(this.navPrev.bind(this));
+            this.btns.next.click(this.navNext.bind(this));
+        },
+
+        add: function(namespace) {
+            var element = $('<div style="display: none"></div>');
+            this.namespaces.push({
+                name: namespace,
+                element: element
+            });
+            if(this.namespaces.length == 1) {
+                this.active_idx = 0;
+                this.active_name = 0;
+                element.show();
+            }
+            this.refreshNav();
+            return element;
+        },
+
+
+        show: function(namespace) {
+            if(this.active_name === namespace) {
+                return;
+            }
+            for(var i=0; i<this.namespaces.length; i++) {
+                if(this.namespaces[i].name === namespace) {
+                    this.active_name = this.namespaces[i].name;
+                    this.active_idx = i;
+                    this.namespaces[i].element.show();
+                } else {
+                    this.namespaces[i].element.hide();
+                }
+            }
+            this.refreshNav();
+        },
+
+
+        reset: function() {
+            var item;
+            while(item = this.namespaces.pop()) {
+                item.element.remove();
+            }
+            this.namespace_idx = null;
+            this.namespace_name = null;
+            this.refreshNav();
+        },
+
+        // sys
+        refreshNav: function() {
+            if(!this.btns) {
+                return;
+            } else if(this.namespaces.length < 2) {
+                this.btns.prev.hide();
+                this.btns.next.hide();
+            } else {
+                this.btns.prev.toggle(this.active_idx > 0);
+                this.btns.next.toggle(this.active_idx < this.namespaces.length - 1);
+            }
+        },
+
+
+        navPrev: function() {
+            this.show(this.namespaces[this.active_idx - 1].name);
+        },
+
+        navNext: function() {
+            this.show(this.namespaces[this.active_idx + 1].name);
+        }
+
+    },
+
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -114,6 +215,7 @@ var quickAlgoInterface = {
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
+        gridHtml += "<div id='namespaceViewControls'></div>";
         gridHtml += "<div class='gridArea'><div id='grid'></div></div>";
         gridHtml += "<div id='gridButtonsAfter'></div>";
         $("#gridContainer").html(gridHtml);
@@ -175,6 +277,12 @@ var quickAlgoInterface = {
         if(!this.curMode || !$('#task').hasClass(this.curMode)) {
             this.selectMode('mode-instructions');
         }
+
+        this.namespaceViews.init({
+            grid: $('#grid'),
+            nav: $('#namespaceViewControls')
+        });
+
         if(!this.checkHeightInterval) {
             this.checkHeightInterval = setInterval(this.checkHeight.bind(this), 1000);
         }
@@ -877,9 +985,9 @@ var quickAlgoInterface = {
         svg.find('.blocklyFlyout, .blocklyMainBackground, .blocklyTrash, .blocklyBubbleCanvas, .blocklyScrollbarVertical, .blocklyScrollbarHorizontal, .blocklyScrollbarBackground').remove();
         var options = {
             backgroundColor: '#FFFFFF',
-            top: blocksBbox.top - svgBbox.top - 4, 
-            left: blocksBbox.left - svgBbox.left - 4, 
-            width: blocksBbox.width + 8, 
+            top: blocksBbox.top - svgBbox.top - 4,
+            left: blocksBbox.left - svgBbox.left - 4,
+            width: blocksBbox.width + 8,
             height: blocksBbox.height + 8
             };
         window.saveSvgAsPng(svg[0], name, options);

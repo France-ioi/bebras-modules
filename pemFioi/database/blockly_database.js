@@ -1,4 +1,7 @@
-var getContext = function(display, infos, curLevel) {
+var getContext = function(display, infos, curLevel, gridElement) {
+    //console.log('getContext')
+
+    var databaseConfig =  infos.databaseConfig || {};
 
     var language_strings = {
         en: {
@@ -248,24 +251,28 @@ var getContext = function(display, infos, curLevel) {
         elements: {},
         tables: {},
         callback: null,
+        redered: false,
 
 
         init: function(params) {
-            this.elements.box = $('<div class="pull_left" style="display: none"></div>');
+            this.renderIntrface(params.parent);
+            this.setTables(params.tables);
+            this.callback = params.callback;
+        },
 
+
+        renderIntrface: function(parent) {
+            if(this.redered) {
+                return;
+            }
+            this.elements.box = $('<div class="pull_left" style="display: none"></div>');
             this.elements.select = $('<select></select>');
             this.elements.box.append(this.elements.select);
-
             var btn = $('<button class="btn">' + strings.ui.btn_diplay_table + '</button>');
             btn.on('click', this.displayTable.bind(this));
             this.elements.box.append(btn);
-
-            var visible = this.renderOptions(params.tables) > 0;
-            this.elements.box.toggle(visible);
-
-            params.parent.prepend(this.elements.box);
-
-            this.callback = params.callback;
+            parent.prepend(this.elements.box);
+            this.redered = true;
         },
 
 
@@ -275,11 +282,20 @@ var getContext = function(display, infos, curLevel) {
         },
 
 
+        setTables: function(tables) {
+            if(!this.redered) {
+                return;
+            }
+            var visible = this.renderOptions(tables) > 0;
+            this.elements.box.toggle(visible);
+        },
+
+
         renderOptions: function(tables) {
             var cnt = 0;
             this.elements.select.empty();
-            for(var name in tables.task) {
-                if(tables.task[name].public) {
+            for(var name in tables) {
+                if(tables[name].public) {
                     this.elements.select.append('<option value="'+ name +'">' + name + '</option>');
                     cnt++;
                 }
@@ -291,11 +307,14 @@ var getContext = function(display, infos, curLevel) {
 
 
     context.reset = function(taskInfos) {
+        //console.log('context.reset', taskInfos)
+
         if(taskInfos) {
             task_tables = taskInfos.tables || {};
         }
 
         if(ready) {
+            tables_list.setTables(task_tables);
             return;
         }
         ready = true;
@@ -312,17 +331,17 @@ var getContext = function(display, infos, curLevel) {
 
         window.db_helper = new DatabaseHelper(
             Object.assign({
-                parent: $('#grid'),
+                parent: gridElement,
                 strings: strings.ui.db_helper
-            }, infos.databaseConfig)
+            }, databaseConfig)
         );
 
 
         if(!context.display) return;
 
-        $('#grid').prepend('<div id="database_controls"></div>');
+        gridElement.prepend('<div id="database_controls"></div>');
 
-        if(!infos.databaseConfig['disable_csv_import']) {
+        if(!databaseConfig['disable_csv_import']) {
             var btn = $('<button class="btn pull_right" id="btn_files">' + strings.ui.btn_files_repository + '</button>');
             btn.click(function() {
                 task_files.open();
@@ -343,10 +362,7 @@ var getContext = function(display, infos, curLevel) {
                     db_helper.displayTable(table, true);
                 }
             },
-            tables: {
-                task: task_tables,
-                imported: []
-            }
+            tables: task_tables
         });
 
 
@@ -431,7 +447,7 @@ var getContext = function(display, infos, curLevel) {
 
 
         loadTableFromCsvWithTypes: function(filename, types, callback) {
-            if(infos.databaseConfig['disable_csv_import']) {
+            if(databaseConfig['disable_csv_import']) {
                 throw new Error('CSV import disabled');
             }
             var file = task_files.getFile(filename);

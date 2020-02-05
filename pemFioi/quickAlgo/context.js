@@ -127,18 +127,33 @@ var quickAlgoLibraries = {
   },
 
   getContext: function() {
+    console.log('getContext mergedMode', this.mergedMode)
+
+    function extendArguments(args, namespace) {
+      var res = Array.prototype.slice.call(args);
+      res.push(quickAlgoInterface.namespaceViews.add(namespace))
+      return res;
+    }
+
     // Get last context registered
     if(this.order.length) {
       if(this.mergedMode) {
         var gc = this.getMergedContext();
         return gc.apply(gc, arguments);
       } else {
-        var gc = this.libs[this.order[this.order.length-1]];
-        return gc.apply(gc, arguments);
+        var ns = this.order[this.order.length-1];
+        var gc = this.libs[ns];
+        return gc.apply(
+          gc,
+          extendArguments(arguments, ns)
+        );
       }
     } else {
       if(getContext) {
-        return getContext.apply(getContext, arguments);
+        return getContext.apply(
+          getContext,
+          extendArguments(arguments, 'default')
+        );
       } else {
         throw "No context registered!";
       }
@@ -152,6 +167,20 @@ var quickAlgoLibraries = {
     this.mergedMode = options;
   },
 
+
+  getMergedContextInfos: function(namespace, infos) {
+    if('mergedModeOptions' in infos && namespace in infos.mergedModeOptions) {
+      var res = Object.assign({}, infos, infos.mergedModeOptions[namespace]);
+      delete res.mergedModeOptions;
+      return res;
+    }
+    return infos;
+  },
+
+  setVisibleNamespace: function(namespace) {
+    console.log('namespace', namespace)
+  },
+
   getMergedContext: function() {
     // Make a context merged from multiple contexts
     if(this.mergedMode.displayed && this.order.indexOf(this.mergedMode.displayed) > -1) {
@@ -160,7 +189,7 @@ var quickAlgoLibraries = {
     }
     var that = this;
 
-    return function(display, infos) {
+    return function(display, infos, curLevel, gridElement) {
       // Merged context
       var context = quickAlgoContext(display, infos);
       var localLanguageStrings = {};
@@ -171,7 +200,13 @@ var quickAlgoLibraries = {
       var subContexts = [];
       for(var scIdx=0; scIdx < that.order.length; scIdx++) {
         // Only the first context gets display = true
-        var newContext = that.libs[that.order[scIdx]](display && (scIdx == 0), infos);
+        var namespace = that.order[scIdx];
+        var newContext = that.libs[namespace](
+          display && (scIdx == 0),
+          that.getMergedContextInfos(namespace, infos),
+          curLevel,
+          quickAlgoInterface.namespaceViews.add(namespace)
+        );
         subContexts.push(newContext);
 
         // Merge objects
@@ -188,12 +223,14 @@ var quickAlgoLibraries = {
             for(var i=0; i < blockList.length; i++) {
               var name = blockList[i].name;
               if(name && !context[namespace][name] && newContext[namespace][name]) {
-                context[namespace][name] = function(nc, func) {
+                //alert([namespace,name])
+                context[namespace][name] = function(nc, func, namespace) {
                   return function() {
+                    that.setVisibleNamespace(namespace);
                     context.propagate(nc);
                     func.apply(nc, arguments);
-                    };
-                }(newContext, newContext[namespace][name]);
+                  };
+                }(newContext, newContext[namespace][name], namespace);
               }
             }
           }
@@ -214,7 +251,7 @@ var quickAlgoLibraries = {
       context.reset = function(taskInfos) {
         for(var i=0; i < subContexts.length; i++) {
           context.propagate(subContexts[i]);
-          subContexts[i].reset(taskInfos);
+          subContexts[i].reset(taskInfos ? taskInfos[that.order[i]] : taskInfos);
         }
       };
       context.resetDisplay = function() {

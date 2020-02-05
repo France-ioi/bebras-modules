@@ -5,7 +5,7 @@
 
 var robotCommands = [];
 
-var getContext = function(display, infos, curLevel) {
+var getContext = function(display, infos, curLevel, gridElement) {
    var localLanguageStrings = {
       fr: {
          label: {},
@@ -32,7 +32,7 @@ var getContext = function(display, infos, curLevel) {
         description: {}
       }
    };
-   
+
    var contextStrings = {
       none: {
          fr: {
@@ -314,7 +314,7 @@ var getContext = function(display, infos, curLevel) {
             },
             startingBlockName: "Program of the robot"
          },
-         
+
          es: {
             label: {
                row: "fila del robot",
@@ -512,7 +512,7 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "surConteneur",
                onNumber: "surNombre",
                onWritable: "surTableau",
-               onLauncher: "surLanceur", 
+               onLauncher: "surLanceur",
                writeNumber: "ecrireNombre",
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
@@ -582,7 +582,7 @@ var getContext = function(display, infos, curLevel) {
                successReachExit: "Bravo, ¡su robot ha recuperado el cofre!",
                failureReachExit: "Su robot se perdió en el camino."
             }
-         }  
+         }
       },
       cards: {
          fr: {
@@ -632,7 +632,7 @@ var getContext = function(display, infos, curLevel) {
       chticode_abs: {
          fr: {
             label: {
-               
+
             },
              messages: {
                successPickedAllWithdrawables: "Bravo, votre robot a réussi la mission !",
@@ -641,7 +641,7 @@ var getContext = function(display, infos, curLevel) {
          },
          en: {
             label: {
-               
+
             },
              messages: {
                successPickedAllWithdrawables: "Congratulations, your robot succeeded this mission!",
@@ -651,7 +651,7 @@ var getContext = function(display, infos, curLevel) {
 
          es: {
             label: {
-               
+
             },
              messages: {
                successPickedAllWithdrawables: "Bravo, ¡su robot ha completado la misión!",
@@ -662,7 +662,7 @@ var getContext = function(display, infos, curLevel) {
       chticode_rel: {
          fr: {
             label: {
-               
+
             },
              messages: {
                successReachExit: "Bravo, votre robot a atteint la case verte !",
@@ -671,7 +671,7 @@ var getContext = function(display, infos, curLevel) {
          },
          en: {
             label: {
-               
+
             },
              messages: {
                successReachExit: "Congratulations, your robot reached the green cells!",
@@ -681,7 +681,7 @@ var getContext = function(display, infos, curLevel) {
 
          es: {
             label: {
-               
+
             },
              messages: {
                successReachExit: "Bravo, ¡su robot llegó a la casilla verde!",
@@ -740,7 +740,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Aún hay conos en lugares incorrectos."
             }
          }
-      },   
+      },
       flowers: {
          fr: {
             label: {
@@ -796,7 +796,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "¡Aún hay tierra sin flores!"
             }
          }
-      },   
+      },
       course: {
          fr: {
             messages: {
@@ -927,7 +927,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Su robot no ha puesto todos los engranajes en el lugar correcto.",
                failureContainersFilledBag: "Su robot debe colocar el engranaje en la máquina.",
                failureDropOutside: "Su robot intenta construir una plataforma fuera de la cuadrícula."
-            } 
+            }
          }
       },
       marbles: {
@@ -943,7 +943,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "deposerBille",
                onObject: "surBille",
                onContainer: "surTrou",
-            },   
+            },
             messages: {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
@@ -966,7 +966,7 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "soltarBola",
                onObject: "sobreBola",
                onContainer: "sobreAgujero",
-            },   
+            },
             messages: {
                emptyBag: "¡El robot no carga ninguna bola!",
                tooManyObjects: "¡El robot ya está cargando una bola!",
@@ -1039,7 +1039,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Su robot no ha pintado todas las casillas marcadas.",
                failureContainersFilledBag: "Su robot no ha puesto todos los objetos",
              }
-         }  
+         }
       },
       rocket: {
          fr: {
@@ -1081,7 +1081,7 @@ var getContext = function(display, infos, curLevel) {
                pushableInFront: "caisseDevant",
                obstacleInFront: "obstacleDevant",
                readNumber: "nombreSurCase"
-            },   
+            },
             messages: {
                successContainersFilled: "Bravo, les caisses sont bien rangées !",
                failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
@@ -1105,7 +1105,7 @@ var getContext = function(display, infos, curLevel) {
                pushableInFront: "cajaAdelante",
                obstacleInFront: "obstáculoAdelante",
                readNumber: "númeroEnCasilla"
-            },   
+            },
             messages: {
                successContainersFilled: "Bravo, ¡las cajas están bien ordenadas!",
                failureContainersFilled: "Aún hay cajas que no están en su lugar.",
@@ -1116,7 +1116,7 @@ var getContext = function(display, infos, curLevel) {
          }
       },
    };
-   
+
    var contextParams = {
       none: {
          hideSaveOrLoad: true,
@@ -1653,8 +1653,8 @@ var getContext = function(display, infos, curLevel) {
                   item.period = 1;
                if(item.start == undefined)
                   item.start = 1;
-               if(time % item.period == item.start) 
-                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col}); 
+               if(time % item.period == item.start)
+                  this.dropObject({type: "projectile"}, {row: item.row, col: item.col});
             }}
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
@@ -1721,7 +1721,7 @@ var getContext = function(display, infos, curLevel) {
             board_background: { num: 4, color: "#685aa6", side: 60, zOrder: 0 },
          },
          checkEndCondition: robotEndConditions.checkLights
-      }, 
+      },
       marbles: {
          bagSize: 1,
          backgroundColor: "#dadada",
@@ -1732,7 +1732,7 @@ var getContext = function(display, infos, curLevel) {
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 } 
+            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -1818,7 +1818,7 @@ var getContext = function(display, infos, curLevel) {
                      else if(this.isOn(function(obj) { return obj.isWithdrawable === true;})) {
                         throw(window.languageStrings.messages.failureRewrite);
                      }
-                     
+
                      this.dropObject({type: "paint", color: cur_color});
                      if (robot.col == context.nbCols - 1) {
                         robot.row = (robot.row + 1) % context.nbRows;
@@ -1832,9 +1832,9 @@ var getContext = function(display, infos, curLevel) {
                });
             }
             return blocks;
-         })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"], 
-            ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"], 
-            ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"], 
+         })(["red", "blue", "yellow", "white", "green", "orange", "pink", "purple", "brown", "grey", "black"],
+            ["#ff0000", "#0000ff", "#ffff00", "#ffffff", "#00ff00", "#ff8000", "#ff80ff", "#800080", "#804d00", "#808080", "#000000"],
+            ["#efa2a2", "#a2a2ef", "#efefa2", "#efefef", "#a2efa2", "#efb6a2", "#efb6ef", "#b6a2b6", "#b6a9a2", "#b6b6b6", "#a2a2a2"],
             ["#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd", "#dddddd"],
             {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
          backgroundColor: "#ece4ce",
@@ -1866,8 +1866,8 @@ var getContext = function(display, infos, curLevel) {
             rocket: { num: 5, img: "rocket.png", side: 60, isExit: true, zOrder: 1 },
             obstacle: { num: 6, img: "obstacle.png", side: 60, isObstacle: true, zOrder: 1 },
             objet1: { num: 7, img: "objet1.png", side: 60, isWithdrawable: true, zOrder: 1 },
-            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 }, 
-            number: { side: 60, zOrder: 1 }            
+            objet2: { num: 8, img: "objet2.png", side: 60, isWithdrawable: true, zOrder: 1 },
+            number: { side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkReachExit
       },
@@ -1878,7 +1878,7 @@ var getContext = function(display, infos, curLevel) {
             wall: { num: 2, img: "wall.png", side: 60, isObstacle: true, zOrder: 0 },
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
-            number: { num: 5, side: 60, zOrder: 1 }            
+            number: { num: 5, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -1899,12 +1899,12 @@ var getContext = function(display, infos, curLevel) {
    };
    var iconSrc = $("img[src$='icon.png']").attr("src");
    var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
-   
+
    if(infos.newBlocks == undefined)
       infos.newBlocks = [];
    if(infos.maxFallAltitude == undefined)
       infos.maxFallAltitude = 2;
-   
+
    var loadContext = function(name) {
       for(var language in contextStrings[name]) {
          var ctx = contextStrings[name][language];
@@ -1921,19 +1921,19 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       }
-      
+
       for(var param in contextParams[name]) {
          if(infos[param] === undefined || param == "newBlocks") {
             infos[param] = contextParams[name][param];
          }
       }
    };
-   
+
    loadContext("none");
    if(infos.contextType != undefined) {
       loadContext(infos.contextType);
    }
-   
+
    infos.newBlocks.push({
       name: "row",
       type: "sensors",
@@ -1942,7 +1942,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, 1 + this.getRobot().row);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "col",
       type: "sensors",
@@ -1951,7 +1951,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, 1 + this.getRobot().col);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "wait",
       type: "actions",
@@ -1961,7 +1961,7 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "north",
       type: "actions",
@@ -1970,7 +1970,7 @@ var getContext = function(display, infos, curLevel) {
          this.north(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "south",
       type: "actions",
@@ -1979,7 +1979,7 @@ var getContext = function(display, infos, curLevel) {
          this.south(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "east",
       type: "actions",
@@ -1988,7 +1988,7 @@ var getContext = function(display, infos, curLevel) {
          this.east(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "west",
       type: "actions",
@@ -1997,7 +1997,7 @@ var getContext = function(display, infos, curLevel) {
          this.west(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "left",
       type: "actions",
@@ -2015,7 +2015,7 @@ var getContext = function(display, infos, curLevel) {
          this.turnRight(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "turnAround",
       type: "actions",
@@ -2024,7 +2024,7 @@ var getContext = function(display, infos, curLevel) {
          this.turnAround(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "forward",
       type: "actions",
@@ -2033,7 +2033,7 @@ var getContext = function(display, infos, curLevel) {
          this.forward(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "backwards",
       type: "actions",
@@ -2042,7 +2042,7 @@ var getContext = function(display, infos, curLevel) {
          this.backwards(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "jump",
       type: "actions",
@@ -2051,7 +2051,7 @@ var getContext = function(display, infos, curLevel) {
          this.jump(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleInFront",
       type: "sensors",
@@ -2060,7 +2060,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.obstacleInFront());
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleEast",
       type: "sensors",
@@ -2070,7 +2070,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(robot.row, robot.col + 1, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleWest",
       type: "sensors",
@@ -2080,7 +2080,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(robot.row, robot.col - 1, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleNorth",
       type: "sensors",
@@ -2090,7 +2090,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleSouth",
       type: "sensors",
@@ -2100,7 +2100,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(robot.row + 1, robot.col, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleRight",
       type: "sensors",
@@ -2111,7 +2111,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "obstacleLeft",
       type: "sensors",
@@ -2122,7 +2122,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.hasOn(coords.row, coords.col, function(obj) { return obj.isObstacle === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "gridEdgeEast",
       type: "sensors",
@@ -2132,7 +2132,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, !this.isInGrid(robot.row, robot.col + 1));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "gridEdgeWest",
       type: "sensors",
@@ -2142,7 +2142,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, !this.isInGrid(robot.row, robot.col - 1));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "gridEdgeNorth",
       type: "sensors",
@@ -2152,7 +2152,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, !this.isInGrid(robot.row - 1, robot.col));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "gridEdgeSouth",
       type: "sensors",
@@ -2162,7 +2162,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, !this.isInGrid(robot.row + 1, robot.col));
       }
    });
-      
+
    infos.newBlocks.push({
       name: "platformInFront",
       type: "sensors",
@@ -2171,7 +2171,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.platformInFront());
       }
    });
-   
+
    infos.newBlocks.push({
       name: "platformAbove",
       type: "sensors",
@@ -2180,7 +2180,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.platformAbove());
       }
    });
-   
+
    infos.newBlocks.push({
       name: "withdrawObject",
       type: "actions",
@@ -2190,7 +2190,7 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "dropObject",
       type: "actions",
@@ -2200,7 +2200,7 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onObject",
       type: "sensors",
@@ -2209,7 +2209,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isWithdrawable === true;}));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onContainer",
       type: "sensors",
@@ -2218,7 +2218,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isContainer === true;}));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onNumber",
       type: "sensors",
@@ -2227,7 +2227,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.value !== undefined;}));
       }
    });
-	
+
 	infos.newBlocks.push({
       name: "onLauncher",
       type: "sensors",
@@ -2236,7 +2236,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isLaser === true;}));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onWritable",
       type: "sensors",
@@ -2245,7 +2245,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.isWritable === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "writeNumber",
       type: "actions",
@@ -2256,7 +2256,7 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "readNumber",
       type: "sensors",
@@ -2266,7 +2266,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.readNumber(robot.row, robot.col));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "pushObject",
       type: "actions",
@@ -2275,7 +2275,7 @@ var getContext = function(display, infos, curLevel) {
          this.pushObject(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "pushableInFront",
       type: "sensors",
@@ -2284,7 +2284,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isInFront(function(obj) { return obj.isPushable === true; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "dropInFront",
       type: "actions",
@@ -2294,7 +2294,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "dropAbove",
       type: "actions",
@@ -2304,12 +2304,12 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "shoot_noShadow",
       type: "actions",
-      block: { 
-         name: "shoot_noShadow", 
+      block: {
+         name: "shoot_noShadow",
          params: [null]
       },
       func: function(value, callback) {
@@ -2324,11 +2324,11 @@ var getContext = function(display, infos, curLevel) {
                var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
                   return obj.isLaser === true;
                });
-               
+
                if(lasers.length != 0) {
                   lasers[0].element.toFront();
                }
-               
+
                robot.element.toFront();
             }
          }
@@ -2338,7 +2338,7 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "shoot",
       type: "actions",
@@ -2361,11 +2361,11 @@ var getContext = function(display, infos, curLevel) {
                var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
                   return obj.isLaser === true;
                });
-               
+
                if(lasers.length != 0) {
                   lasers[0].element.toFront();
                }
-               
+
                robot.element.toFront();
             }
          }
@@ -2375,12 +2375,12 @@ var getContext = function(display, infos, curLevel) {
          this.waitDelay(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "shootCondition_noShadow",
       type: "actions",
-      block: { 
-         name: "shootCondition_noShadow", 
+      block: {
+         name: "shootCondition_noShadow",
          params: [null],
          yieldsValue: true
       },
@@ -2389,7 +2389,7 @@ var getContext = function(display, infos, curLevel) {
             this.callCallback(value);
             return;
          }
-         
+
          if(this.isOn(function(obj) { return obj.isLaser === true; })) {
             var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
             if(this.display) {
@@ -2397,11 +2397,11 @@ var getContext = function(display, infos, curLevel) {
                var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
                   return obj.isLaser === true;
                });
-               
+
                if(lasers.length != 0) {
                   lasers[0].element.toFront();
                }
-               
+
                robot.element.toFront();
             }
             this.waitDelay(callback, retour);
@@ -2412,7 +2412,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    });
-   
+
    infos.newBlocks.push({
       name: "shootCondition",
       type: "actions",
@@ -2428,7 +2428,7 @@ var getContext = function(display, infos, curLevel) {
             this.callCallback(value);
             return;
          }
-         
+
          if(this.isOn(function(obj) { return obj.isLaser === true; })) {
             var retour = this.shoot(this.getRobot().row, this.getRobot().col, value);
             if(this.display) {
@@ -2436,11 +2436,11 @@ var getContext = function(display, infos, curLevel) {
                var lasers = context.getItemsOn(robot.row, robot.col, function(obj) {
                   return obj.isLaser === true;
                });
-               
+
                if(lasers.length != 0) {
                   lasers[0].element.toFront();
                }
-               
+
                robot.element.toFront();
             }
             this.waitDelay(callback, retour);
@@ -2451,7 +2451,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    });
-   
+
    infos.newBlocks.push({
       name: "connect",
       type: "actions",
@@ -2461,7 +2461,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback);
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onMale",
       type: "sensors",
@@ -2470,7 +2470,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType > 0; }));
       }
    });
-   
+
    infos.newBlocks.push({
       name: "onFemale",
       type: "sensors",
@@ -2479,7 +2479,7 @@ var getContext = function(display, infos, curLevel) {
          this.callCallback(callback, this.isOn(function(obj) { return obj.plugType < 0; }));
       }
    });
-   
+
    var context = quickAlgoContext(display, infos);
    context.robot = {};
    context.customBlocks = {
@@ -2488,7 +2488,7 @@ var getContext = function(display, infos, curLevel) {
          sensors: []
       }
    };
-   
+
    for(var command in infos.newBlocks) {
       cmd = infos.newBlocks[command];
       context.customBlocks.robot[cmd.type].push(cmd.block);
@@ -2503,11 +2503,11 @@ var getContext = function(display, infos, curLevel) {
          context.robot[cmd.name] = cmd.func.bind(context);
       }
    }
-   
+
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
-   
+
    function replaceStringsRec(source, dest) {
-   
+
       if((typeof source != "object") || (typeof dest != "object")) {
          return;
       }
@@ -2522,17 +2522,17 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    }
-   
+
    if(infos.languageStrings != undefined) {
       replaceStringsRec(infos.languageStrings.blocklyRobot_lib, strings);
    }
-   
+
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
    var scale = 1;
    var paper;
-   
+
    if(infos.leftMargin === undefined) {
       infos.leftMargin = 10;
    }
@@ -2554,7 +2554,7 @@ var getContext = function(display, infos, curLevel) {
       infos.leftMargin += infos.cellSide;
       infos.topMargin += infos.cellSide;
    }
-   
+
    switch(infos.blocklyColourTheme) {
       case "bwinf":
          context.provideBlocklyColours = function() {
@@ -2578,7 +2578,7 @@ var getContext = function(display, infos, curLevel) {
          break;
       default:
    }
-   
+
    context.reset = function(gridInfos) {
       if(gridInfos) {
          context.tiles = gridInfos.tiles;
@@ -2587,25 +2587,25 @@ var getContext = function(display, infos, curLevel) {
          context.nbCols = context.tiles[0].length;
       }
       context.nbPlatforms = infos.nbPlatforms;
-      
+
       context.items = [];
       context.multicell_items = [];
-      
+
       context.last_connect = undefined;
       context.wires = [];
-      
+
       context.lost = false;
       context.success = false;
       context.nbMoves = 0;
       context.time = 0;
       context.bag = [];
-      
+
       if(infos.bagInit != undefined) {
          for(var i = 0;i < infos.bagInit.count;i++) {
             var item = {};
-            
+
             var initItem = infos.itemTypes[infos.bagInit.type];
-            
+
             item.type = infos.bagInit.type;
             item.side = 0;
             item.offsetX = 0;
@@ -2615,17 +2615,17 @@ var getContext = function(display, infos, curLevel) {
             for(var property in initItem) {
                item[property] = initItem[property];
             }
-            
+
             context.bag.push(item);
          }
       }
-      
+
       if(context.display) {
          this.delayFactory.destroyAll();
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
             paper.remove();
-         paper = this.raphaelFactory.create("paperMain", "grid", infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+         paper = this.raphaelFactory.create("paperMain", gridElement[0], infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
          resetBoard();
          resetItems();
          context.updateScale();
@@ -2635,13 +2635,13 @@ var getContext = function(display, infos, curLevel) {
          resetItems();
       }
    };
-   
+
    context.unload = function() {
       if(context.display && paper != null) {
          paper.remove();
       }
    };
-   
+
    var itemAttributes = function(item) {
       var itemType = infos.itemTypes[item.type];
       var x = (infos.cellSide * item.col + item.offsetX + infos.leftMargin) * scale;
@@ -2656,11 +2656,11 @@ var getContext = function(display, infos, curLevel) {
          x += item.side * scale / 2;
          y += item.side * scale / 2;
       }
-      
+
       var ret = {x: x, y: y, width: item.side * item.nbStates * scale, height: item.side * scale, "clip-rect": clipRect};
       return ret;
    }
-   
+
    var resetBoard = function() {
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          cells[iRow] = [];
@@ -2683,7 +2683,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    };
-   
+
    var resetItem = function(initItem, redisplay) {
       if(redisplay === undefined)
          redisplay = true;
@@ -2692,7 +2692,7 @@ var getContext = function(display, infos, curLevel) {
       for(var property in initItem) {
          item[property] = initItem[property];
       }
-      
+
       item.side = 0;
       item.offsetX = 0;
       item.offsetY = 0;
@@ -2701,12 +2701,12 @@ var getContext = function(display, infos, curLevel) {
       for(var property in infos.itemTypes[item.type]) {
          item[property] = infos.itemTypes[item.type][property];
       }
-      
+
       if(context.display && redisplay) {
          redisplayItem(item);
       }
    };
-   
+
    var resetItems = function() {
       context.items = [];
       var itemTypeByNum = {};
@@ -2731,11 +2731,11 @@ var getContext = function(display, infos, curLevel) {
       for(var iItem = context.initItems.length - 1;iItem >= 0;iItem--) {
          resetItem(context.initItems[iItem], false);
       }
-      
+
       if(context.display)
          redisplayAllItems();
    };
-   
+
    var resetItemsZOrder = function(row, col) {
       var cellItems = [];
       for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
@@ -2764,7 +2764,7 @@ var getContext = function(display, infos, curLevel) {
          return;
       if(resetZOrder === undefined)
          resetZOrder = true;
-      
+
       if(item.element !== undefined) {
          item.element.remove();
       }
@@ -2785,7 +2785,7 @@ var getContext = function(display, infos, curLevel) {
       if(resetZOrder)
          resetItemsZOrder(item.row, item.col);
    };
-   
+
    context.updateScale = function() {
       if(!context.display) {
          return;
@@ -2793,7 +2793,7 @@ var getContext = function(display, infos, curLevel) {
       if(paper == null) {
          return;
       }
-      
+
       if(window.quickAlgoResponsive) {
          var areaWidth = Math.max(200, $('#grid').width()-24);
          var areaHeight = Math.max(150, $('#grid').height()-24);
@@ -2809,7 +2809,7 @@ var getContext = function(display, infos, curLevel) {
       }
       scale = newCellSide / infos.cellSide;
       paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
-      
+
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             if(cells[iRow][iCol] === undefined)
@@ -2831,10 +2831,10 @@ var getContext = function(display, infos, curLevel) {
             colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
          }
       }
-      
-      redisplayAllItems();      
+
+      redisplayAllItems();
    };
-   
+
    var redisplayAllItems = function() {
       if(context.display !== true)
          return;
@@ -2844,24 +2844,24 @@ var getContext = function(display, infos, curLevel) {
          if(item.element !== undefined)
             item.element.attr(itemAttributes(item));
       }
-      
+
       for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
          var item = context.multicell_items[iItem];
          item.redisplay();
       }
-      
+
       var cellItems = [];
-      
+
       for(var iItem = context.items.length - 1;iItem >= 0;iItem--) {
          var item = context.items[iItem];
          cellItems.push(item);
       }
-      
+
       for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
          var item = context.multicell_items[iItem];
          cellItems.push(item);
       }
-      
+
       cellItems.sort(function(itemA, itemB) {
          if(itemA.zOrder < itemB.zOrder) {
             return -1;
@@ -2876,13 +2876,13 @@ var getContext = function(display, infos, curLevel) {
             cellItems[iItem].element.toFront();
       }
    };
-   
+
    context.advanceTime = function(epsilon) {
       var items = [];
       for(var id in context.items) {
          items.push(context.items[id]);
       }
-      
+
       for(var iTime = 0;iTime < epsilon;iTime++) {
          context.time++;
          for(var id in items) {
@@ -2890,14 +2890,14 @@ var getContext = function(display, infos, curLevel) {
                items[id].action.bind(context)(items[id], context.time);
             }
          }
-         
+
          var robot = this.getRobot();
          if(this.hasOn(robot.row, robot.col, function(item) { return item.isProjectile === true; })) {
             throw(context.strings.messages.failureProjectile);
          }
       }
    };
-   
+
    context.getRobotId = function() {
       for(var id in context.items) {
          if(context.items[id].isRobot != undefined) {
@@ -2906,19 +2906,19 @@ var getContext = function(display, infos, curLevel) {
       }
       return undefined;
    };
-   
+
    context.getRobot = function() {
       return context.items[context.getRobotId()];
    };
-   
+
    context.getInfo = function(name) {
       return infos[name];
    };
-   
+
    context.setInfo = function(name, value) {
       infos[name] = value;
    };
-   
+
    context.hasOn = function(row, col, filter) {
       for(var id in context.items) {
          var item = context.items[id];
@@ -2928,14 +2928,14 @@ var getContext = function(display, infos, curLevel) {
       }
       return false;
    };
-   
+
    context.setIndexes = function() {
       for(var id in context.items) {
          var item = context.items[id];
          item.index = id;
       }
    }
-   
+
    context.getItemsOn = function(row, col, filter) {
       if(filter === undefined) {
          filter = function(obj) { return true; };
@@ -2949,17 +2949,17 @@ var getContext = function(display, infos, curLevel) {
       }
       return selected;
    };
-   
+
    context.isOn = function(filter) {
       var item = context.getRobot();
       return context.hasOn(item.row, item.col, filter);
    };
-   
+
    context.isInFront = function(filter) {
       var coords = context.coordsInFront();
       return context.hasOn(coords.row, coords.col, filter);
    };
-   
+
    context.isInGrid = function(row, col) {
       if(row < 0 || col < 0 || row >= context.nbRows || col >= context.nbCols) {
          return false;
@@ -2969,20 +2969,20 @@ var getContext = function(display, infos, curLevel) {
       }
       return true;
    };
-   
+
    context.tryToBeOn = function(row, col) {
       if(!context.isInGrid(row, col)) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.leavesGrid);
       }
-      
+
       if(context.hasOn(row, col, function(item) { return item.isObstacle === true; })) {
          if(infos.ignoreInvalidMoves)
             return false;
          throw(strings.messages.obstacle);
       }
-      
+
       if(context.hasOn(row, col, function(item) { return item.isProjectile === true; })) {
          if(infos.ignoreInvalidMoves)
             return false;
@@ -2990,7 +2990,7 @@ var getContext = function(display, infos, curLevel) {
       }
       return true;
    };
-   
+
    context.coordsInFront = function(dDir, mult) {
       if(dDir === undefined)
          dDir = 0;
@@ -3004,17 +3004,17 @@ var getContext = function(display, infos, curLevel) {
          col: item.col + delta[lookDir][1] * mult
       };
    };
-   
+
    context.isCrossing = function(wireA, wireB) {
       function crossProduct(pointA, pointB, pointC) {
          return (pointB[0] - pointA[0]) * (pointC[1] - pointA[1]) - (pointB[1] - pointA[1]) * (pointC[0] - pointA[0]);
       }
-      
+
       function onLine(segment, point) {
          return (Math.min(segment[0][0], segment[1][0]) <= point[0] && point[0] <= Math.max(segment[0][0], segment[1][0]))
           && (Math.min(segment[0][1], segment[1][1]) <= point[1] && point[1] <= Math.max(segment[0][1], segment[1][1]));
       }
-      
+
       if(crossProduct(wireA[0], wireA[1], wireB[0]) == 0 && crossProduct(wireA[0], wireA[1], wireB[1]) == 0) {
          return onLine(wireA, wireB[0]) || onLine(wireA, wireB[1]) || onLine(wireB, wireA[0]) || onLine(wireB, wireA[1]);
       }
@@ -3023,14 +3023,14 @@ var getContext = function(display, infos, curLevel) {
       (crossProduct(wireB[0], wireB[1], wireA[0])
       * crossProduct(wireB[0], wireB[1], wireA[1]) <= 0);
    }
-   
+
    context.moveRobot = function(newRow, newCol, newDir, callback) {
       var iRobot = context.getRobotId();
       var item = context.items[iRobot];
-      if (context.display) 
+      if (context.display)
          item.element.toFront();
       var animate = (item.row != newRow) || (item.col != newCol) || (newDir == item.dir);
-      
+
       if((item.dir != newDir) && ((item.row != newRow) || (item.col != newCol))) {
          if(item.dir !== undefined)
             item.dir = newDir;
@@ -3039,15 +3039,15 @@ var getContext = function(display, infos, curLevel) {
             item.element.attr(attr);
          }
       }
-      
+
       if(item.dir !== undefined)
          item.dir = newDir;
-      
+
       item.row = newRow;
       item.col = newCol;
-      
+
       context.withdraw(function(obj) { return obj.autoWithdraw === true; }, false);
-      
+
       if(context.display) {
          if(animate) {
             attr = itemAttributes(item);
@@ -3065,11 +3065,11 @@ var getContext = function(display, infos, curLevel) {
          }
          $("#nbMoves").html(context.nbMoves);
       }
-      
+
       context.advanceTime(1);
       context.waitDelay(callback);
    };
-   
+
    context.moveItem = function(item, newRow, newCol) {
       var animate = (item.row != newRow) || (item.col != newCol);
       var robot = context.getRobot();
@@ -3080,7 +3080,7 @@ var getContext = function(display, infos, curLevel) {
       }
       item.row = newRow;
       item.col = newCol;
-      
+
       if(context.display) {
          if(animate) {
             attr = itemAttributes(item);
@@ -3098,28 +3098,28 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    };
-   
+
    context.moveProjectile = function(item) {
       if(!context.isInGrid(item.row + 1, item.col)) {
          context.destroy(item);
       }
-      
+
       if(context.hasOn(item.row + 1, item.col, function(item) { return item.isObstacle === true; } )) {
          context.destroy(item);
          context.dropObject({type: "dispersion"}, {row: item.row + 1, col: item.col});
          return;
       }
-      
+
       if(context.hasOn(item.row + 1, item.col, function(item) { return item.isRobot === true; } )) {
          context.destroy(item);
          context.dropObject({type: "dispersion_robot"}, {row: item.row + 1, col: item.col});
          return;
       }
-      
+
       context.moveItem(item, item.row + 1, item.col);
       return;
    };
-   
+
    context.destroy = function(item) {
       context.setIndexes();
       context.items.splice(item.index, 1);
@@ -3128,32 +3128,32 @@ var getContext = function(display, infos, curLevel) {
          item.element.remove();
       }
    };
-   
+
    context.fall = function(item, row, col, callback) {
       var startRow = row;
       var platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
-      
+
       while(context.isInGrid(row + 1, col) && platforms.length == 0) {
          row++;
          platforms = context.getItemsOn(row + 1, col, function(obj) { return obj.isObstacle === true; });
       }
-      
+
       if(!context.isInGrid(row + 1, col)) {
          throw(context.strings.messages.falls);
       }
-      
+
       if(row - startRow > infos.maxFallAltitude) {
          throw(context.strings.messages.willFallAndCrash);
       }
       context.nbMoves++;
       context.moveRobot(row, col, item.dir, callback);
    };
-   
+
    context.jump = function(callback) {
       if(!infos.hasGravity) {
          throw("Error: can't jump without gravity");
       }
-      
+
       var item = context.getRobot();
       if(!context.isInGrid(item.row - 1, item.col)) {
          throw(context.strings.messages.jumpOutsideGrid);
@@ -3169,7 +3169,7 @@ var getContext = function(display, infos, curLevel) {
       context.nbMoves++;
       context.moveRobot(item.row - 2, item.col, item.dir, callback);
    };
-   
+
    context.withdraw = function(filter, errorWhenEmpty) {
       if(filter === undefined) {
          filter = function(obj) { return true; };
@@ -3184,16 +3184,16 @@ var getContext = function(display, infos, curLevel) {
             throw(context.strings.messages.nothingToPickUp);
          return;
       }
-      
+
       if(infos.bagSize != undefined && context.bag.length == infos.bagSize) {
          throw(context.strings.messages.tooManyObjects);
       }
-      
+
       var withdrawable = withdrawables[0];
       context.setIndexes();
       context.items.splice(withdrawable.index, 1);
       context.bag.push(withdrawable);
-      
+
       if(context.display) {
          if (infos.actionDelay > 0) {
             context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
@@ -3204,7 +3204,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
    };
-   
+
    context.drop = function(count, coords, filter) {
       if(count === undefined) {
          count = 1;
@@ -3216,12 +3216,12 @@ var getContext = function(display, infos, curLevel) {
          var item = context.getRobot();
          coords = {row: item.row, col: item.col};
       }
-      
+
       for(var i = 0;i < count;i++) {
          if(context.bag.length == 0) {
             throw(context.strings.messages.emptyBag);
          }
-         
+
          var object = context.bag.pop();
          object.row = coords.row;
          object.col = coords.col;
@@ -3236,18 +3236,18 @@ var getContext = function(display, infos, curLevel) {
          resetItem(object);
       }
    };
-   
+
    context.dropObject = function(object, coords) {
       if(coords == undefined) {
          var item = context.getRobot();
          coords = {row: item.row, col: item.col};
       }
-      
+
       if(!context.isInGrid(coords.row, coords.col)) {
          throw(window.languageStrings.messages.failureDropOutside);
          return;
       }
-      
+
       object.row = coords.row;
       object.col = coords.col;
       var itemsOn = context.getItemsOn(coords.row, coords.col);
@@ -3262,22 +3262,22 @@ var getContext = function(display, infos, curLevel) {
       }
       resetItem(object);
    };
-   
+
    context.turnLeft = function(callback) {
       var robot = context.getRobot();
       context.moveRobot(robot.row, robot.col, (robot.dir + 3) % 4, callback);
    };
-   
+
    context.turnRight = function(callback) {
       var robot = context.getRobot();
       context.moveRobot(robot.row, robot.col, (robot.dir + 1) % 4, callback);
    };
-   
+
    context.turnAround = function(callback) {
       var robot = context.getRobot();
       context.moveRobot(robot.row, robot.col, (robot.dir + 2) % 4, callback);
    };
-   
+
    context.forward = function(callback) {
       var robot = context.getRobot();
       var coords = context.coordsInFront();
@@ -3292,7 +3292,7 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(coords.row, coords.col, robot.dir, callback);
       }
    };
-   
+
    context.backwards = function(callback) {
       var robot = context.getRobot();
       var coords = context.coordsInFront(2);
@@ -3307,7 +3307,7 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(coords.row, coords.col, robot.dir, callback);
       }
    };
-   
+
    context.north = function(callback) {
       var item = context.getRobot();
       if(!context.tryToBeOn(item.row - 1, item.col)) {
@@ -3317,7 +3317,7 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(item.row - 1, item.col, 3, callback);
       }
    };
-   
+
    context.south = function(callback) {
       var item = context.getRobot();
       if(!context.tryToBeOn(item.row + 1, item.col)) {
@@ -3327,7 +3327,7 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(item.row + 1, item.col, 1, callback);
       }
    };
-   
+
    context.east = function(callback) {
       var item = context.getRobot();
       if(!context.tryToBeOn(item.row, item.col + 1)) {
@@ -3337,7 +3337,7 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(item.row, item.col + 1, 0, callback);
       }
    };
-   
+
    context.west = function(callback) {
       var item = context.getRobot();
       if(!context.tryToBeOn(item.row, item.col - 1)) {
@@ -3347,69 +3347,69 @@ var getContext = function(display, infos, curLevel) {
          context.moveRobot(item.row, item.col - 1, 2, callback);
       }
    };
-   
+
    context.obstacleInFront = function() {
       return context.isInFront(function(obj) { return obj.isObstacle === true; });
    };
-   
+
    context.platformInFront = function() {
       var coords = context.coordsInFront();
       return context.hasOn(coords.row + 1, coords.col, function(obj) { return obj.isObstacle === true; });
    };
-   
+
    context.platformAbove = function() {
       var robot = context.getRobot();
       return context.hasOn(robot.row - 1, robot.col, function(obj) { return obj.isObstacle === true; });
    };
-   
+
    context.writeNumber = function(row, col, value) {
       var numbers = context.getItemsOn(row, col, function(obj) { return obj.isWritable === true; });
-      
+
       if(numbers.length == 0) {
          throw(strings.messages.failureWriteHere);
       }
-      
+
       var number = numbers[0];
       number.value = value;
       if(context.display) {
          redisplayItem(number);
       }
    };
-   
+
    context.readNumber = function(row, col) {
       var numbers = context.getItemsOn(row, col, function(obj) { return obj.value !== undefined; });
-      
+
       if(numbers.length == 0) {
          throw(strings.messages.failureReadHere);
       }
-      
+
       return parseInt(numbers[0].value);
    };
-   
+
    context.pushObject = function(callback) {
       var robot = context.getRobot();
       var coords = context.coordsInFront();
-      
+
       var items = context.getItemsOn(coords.row, coords.col, function(obj) { return obj.isPushable === true ; });
-      
+
       if(items.length == 0) {
          throw(strings.messages.failureNothingToPush);
       }
-      
+
       var coordsAfter = context.coordsInFront(0, 2);
-      
+
       if(!context.isInGrid(coordsAfter.row, coordsAfter.col))
          throw(strings.messages.failureWhilePushing);
       if(context.hasOn(coordsAfter.row, coordsAfter.col, function(obj) { return obj.isObstacle === true; } ))
          throw(strings.messages.failureWhilePushing);
       if(context.tiles[coordsAfter.row][coordsAfter.col] == 0)
          throw(strings.messages.failureWhilePushing);
-      
+
       context.moveItem(items[0], coordsAfter.row, coordsAfter.col);
-      
+
       context.forward(callback);
    };
-   
+
    context.shoot = function(lig, col, dir) {
       dir = dir % 8;
       var dirs = [
@@ -3422,30 +3422,30 @@ var getContext = function(display, infos, curLevel) {
          [0, -1],
          [-1, -1]
       ];
-      
+
       var lights = context.getItemsOn(lig, col, function(obj) {
          return obj.isLight === true;
       });
-      
+
       for(var light in lights) {
          lights[light].state = 1;
          lights[light].img = lights[light].states[lights[light].state];
          if(context.display)
             redisplayItem(lights[light]);
       }
-      
+
       var x = (infos.cellSide * (col + 0.5) + infos.leftMargin) * scale;
       var y = (infos.cellSide * (lig + 0.5) + infos.topMargin) * scale;
-      
+
       var taille = infos.cellSide;
-      
+
       var findRobot = false;
-      
+
       var plig = lig + dirs[dir][0];
       var pcol = col + dirs[dir][1];
       if(!context.isInGrid(plig, pcol) || context.hasOn(plig, pcol, function(obj) { return obj.isOpaque === true; })) {
          taille /= 2;
-         
+
          findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
       }
       else {
@@ -3454,61 +3454,61 @@ var getContext = function(display, infos, curLevel) {
          if(mirrors.length != 0) {
             pdir = mirrors[0].mirrorFunction(dir);
          }
-         
+
          findRobot = context.hasOn(plig, pcol, function(obj) { return obj.isRobot === true; });
-         
+
          if(context.shoot(plig, pcol, pdir)) {
             findRobot = true;
          }
       }
-      
+
       var dx = (taille * dirs[dir][1]) * scale;
       var dy = (taille * dirs[dir][0]) * scale;
-      
+
       if(context.display && paper != undefined) {
          var segment = paper.path("M " + x + " " + y + " l " + dx + " " + dy);
-         
+
          segment.attr({'stroke-width': 5, 'stroke': '#ffff93'});
-         
+
          context.delayFactory.createTimeout("deleteSegement_" + Math.random(), function() {
             segment.remove();
          }, infos.actionDelay * 2);
       }
-      
+
       return findRobot;
    };
-   
+
    context.connect = function() {
       var robot = context.getRobot();
-      
+
       var plugs = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.plugType !== undefined ; });
-      
+
       if(plugs.length == 0) {
          throw(strings.messages.failureNoPlug);
       }
-      
+
       var wires = context.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWire === true; });
-      
+
       if(wires.length != 0) {
          throw(strings.messages.failureAlreadyWired);
       }
-      
+
       this.dropObject({type: "wire", zOrder: 1});
-      
+
       if(this.last_connect !== undefined) {
          if(this.last_connect.plugType + plugs[0].plugType != 0)
             throw(strings.messages.failureWrongPlugType);
-            
+
          function segmentLength(segment) {
             return Math.sqrt((segment[0][0] - segment[1][0]) * (segment[0][0] - segment[1][0]) + (segment[0][1] - segment[1][1]) * (segment[0][1] - segment[1][1]));
          }
-         
+
          var wire = [[this.last_connect.row, this.last_connect.col],[plugs[0].row, plugs[0].col]];
-         
+
          if(segmentLength(wire) > infos.maxWireLength) {
             throw(strings.messages.failureWireTooLong);
          }
-         
+
          var totalLength = segmentLength(wire);
          for(var iWire = 0;iWire < this.wires.length;iWire++) {
             if(this.isCrossing(wire, this.wires[iWire])) {
@@ -3516,34 +3516,34 @@ var getContext = function(display, infos, curLevel) {
             }
             totalLength += segmentLength(this.wires[iWire]);
          }
-         
+
          if(totalLength > infos.maxTotalLength) {
             throw(strings.messages.failureTotalLengthExceeded);
          }
-         
+
          this.wires.push(wire);
-         
+
          var x = (this.last_connect.col + 0.5) * infos.cellSide + infos.leftMargin;
          var y = (this.last_connect.row + 0.5) * infos.cellSide + infos.topMargin;
          var dx = (plugs[0].col - this.last_connect.col) * infos.cellSide;
          var dy = (plugs[0].row - this.last_connect.row) * infos.cellSide;
-         
+
          var wire_item = {zOrder: 2};
          wire_item.redisplay = function() {
             wire_item.element = paper.path("M " + (x * scale) + " " + (y * scale) + " l " + (dx * scale) + " " + (dy * scale));
             wire_item.element.attr({'stroke-width': 5, 'stroke': '#dd0000'});
          };
-         
+
          this.multicell_items.push(wire_item);
          redisplayAllItems();
-         
+
          this.last_connect = undefined;
       }
       else {
          this.last_connect = plugs[0];
       }
    };
-      
+
    return context;
 };
 
@@ -3568,7 +3568,7 @@ var robotEndConditions = {
             }
          }
       }
-      
+
       if(solved) {
          context.success = true;
          throw(window.languageStrings.messages.successPickedAllWithdrawables);
@@ -3587,7 +3587,7 @@ var robotEndConditions = {
             }
          }
       }
-      
+
       if(solved) {
          context.success = true;
          throw(window.languageStrings.messages.successPlugsWired);
@@ -3599,7 +3599,7 @@ var robotEndConditions = {
    },
    checkContainersFilled: function(context, lastTurn) {
       var solved = true;
-      
+
       var messages = [
          window.languageStrings.messages.failureContainersFilled,
          window.languageStrings.messages.failureContainersFilledLess,
@@ -3625,7 +3625,7 @@ var robotEndConditions = {
                   filter = function(obj) { return obj.isWithdrawable === true; };
                else
                   filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
-               
+
                if(container.containerSize != undefined && context.getItemsOn(row, col, filter).length != container.containerSize) {
                   solved = false;
                   message = Math.min(message, 1);
@@ -3634,7 +3634,7 @@ var robotEndConditions = {
                   solved = false;
                   message = Math.min(message, 0);
                }
-               
+
                if(container.containerFilter != undefined) {
                   if(context.hasOn(row, col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
                      solved = false;
@@ -3656,7 +3656,7 @@ var robotEndConditions = {
             }
          }
       }
-      
+
       if(solved) {
          context.success = true;
          throw(window.languageStrings.messages.successContainersFilled);
@@ -3678,7 +3678,7 @@ var robotEndConditions = {
                }
             }
          }
-         
+
          if(solved) {
             context.success = true;
             throw(window.languageStrings.messages.successPickedAllWithdrawables);
@@ -3698,7 +3698,7 @@ var robotEndConditions = {
             }
          }
       }
-      
+
       if(solved) {
          context.success = true;
          throw(window.languageStrings.messages.successLights);
@@ -3723,14 +3723,14 @@ var robotEndFunctionGenerator = {
                }
             }
          }
-         
+
          for(var item in context.bag) {
             if(!filter(context.bag[item])) {
                context.success = false;
                throw(window.languageStrings.messages.failureUnfilteredObject);
             }
          }
-         
+
          if(solved) {
             context.success = true;
             throw(window.languageStrings.messages.successPickedAllWithdrawables);
@@ -3749,24 +3749,24 @@ var robotEndFunctionGenerator = {
             var items = context.getItemsOn(number.row, number.col, function(obj) { return obj.value !== undefined; });
             if(items.length == 0)
                throw("Error: no number here");
-            
+
             var expected;
             if(typeof number.value === "number") {
                expected = number.value;
             } else {
                expected = number.value.bind(context)();
             }
-            
+
             if(expected != items[0].value) {
                solved = false;
             }
          }
-         
+
          if(solved) {
             context.success = true;
             throw(window.languageStrings.messages.successNumbersWritten);
          }
-         
+
          if(lastTurn) {
             context.success = false;
             throw(window.languageStrings.messages.failureNumbersWritten);

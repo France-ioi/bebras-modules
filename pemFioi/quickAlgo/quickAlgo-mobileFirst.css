@@ -295,11 +295,32 @@ p {
 #taskIntro {
   padding: 10px 20px;
   overflow: auto;
+  position: relative;
 }
 #taskIntro .introContent {
   max-height: 100%;
   overflow: auto;
 }
+
+#namespaceViewControls {
+  overflow: hidden;
+  zoom: 1;
+}
+
+#namespaceViewControls i {
+  color: #4a90e2;
+  cursor: pointer;
+  font-size: 200%;
+}
+
+#namespaceViewControls .prev {
+  float: left;
+}
+
+#namespaceViewControls .next {
+  float: right;
+}
+
 #gridContainer {
   background-color: #fff;
   -webkit-box-flex: 1;
@@ -566,6 +587,7 @@ p {
     position: absolute;
     width: 100%;
     height: 100%;
+    z-index: 5;
 }
 #testSelector {
     padding-left: 10px;

@@ -3,16 +3,36 @@
         Logic for quickAlgo tasks, implements the Bebras task API.
 */
 
+var subcontextElements = {
+
+   elements: {},
+
+   get: function(level) {
+      $('#grid .subcontext-grid').hide();
+      if(!(level in this.elements)) {
+         this.elements[level] = $('<div class="subcontext-grid"></div>');
+         console.log(this.elements[level])
+         $('#grid').append(this.elements[level]);
+
+         console.log($('#grid')[0].innerHTML)
+      } else {
+         this.elements[level].show();
+      }
+      return this.elements[level];
+   }
+}
+
+
 var initBlocklySubTask = function(subTask, language) {
    // Blockly tasks need to always have the level-specific behavior from
    // beaver-task-2.0
    subTask.assumeLevels = true;
-   
+
    if (window.forcedLevel != null) {
       for (var level in subTask.data) {
          if (window.forcedLevel != level) {
             subTask.data[level] = undefined;
-         }            
+         }
       }
       subTask.load = function(views, callback) {
          subTask.loadLevel(window.forcedLevel);
@@ -30,11 +50,17 @@ var initBlocklySubTask = function(subTask, language) {
    }
 
    subTask.loadLevel = function(curLevel) {
+      console.log('subTask.loadLevel', curLevel)
+      window.quickAlgoInterface.namespaceViews.reset();
+
       var levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
+
       subTask.levelGridInfos = levelGridInfos;
 
       // Convert legacy options
-      if(!levelGridInfos.hideControls) { levelGridInfos.hideControls = {}; }
+      if(!levelGridInfos.hideControls) {
+         levelGridInfos.hideControls = {};
+      }
       levelGridInfos.hideControls.saveOrLoad = levelGridInfos.hideControls.saveOrLoad || !!levelGridInfos.hideSaveOrLoad;
       levelGridInfos.hideControls.loadBestAnswer = levelGridInfos.hideControls.loadBestAnswer || !!levelGridInfos.hideLoadBestAnswers;
 
@@ -62,22 +88,33 @@ var initBlocklySubTask = function(subTask, language) {
       this.iTestCase = 0;
       this.nbTestCases = subTask.data[curLevel].length;
 
-      this.context = quickAlgoLibraries.getContext(this.display, levelGridInfos, curLevel);
+
+      if('mergedMode' in subTask.gridInfos) {
+         var mergedMode = subTask.gridInfos.mergedMode;
+      } else {
+         var mergedMode = !!subTask.gridInfos.mergedModeOptions;
+      }
+      quickAlgoLibraries.setMergedMode(mergedMode);
+      this.context = quickAlgoLibraries.getContext(
+         this.display,
+         levelGridInfos,
+         curLevel
+      );
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
       if (this.display) {
-        window.quickAlgoInterface.loadInterface(this.context, curLevel);
-        window.quickAlgoInterface.setOptions({
-           hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
-           conceptViewer: levelGridInfos.conceptViewer,
-           conceptViewerLang: this.blocklyHelper.language,
-           hasTestThumbnails: levelGridInfos.hasTestThumbnails,
-           hideControls: levelGridInfos.hideControls,
-           introMaxHeight: levelGridInfos.introMaxHeight
-           });
-        window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         window.quickAlgoInterface.loadInterface(this.context, curLevel);
+         window.quickAlgoInterface.setOptions({
+            hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
+            conceptViewer: levelGridInfos.conceptViewer,
+            conceptViewerLang: this.blocklyHelper.language,
+            hasTestThumbnails: levelGridInfos.hasTestThumbnails,
+            hideControls: levelGridInfos.hideControls,
+            introMaxHeight: levelGridInfos.introMaxHeight
+         });
+         window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }
 
       this.blocklyHelper.loadContext(this.context);
@@ -393,7 +430,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.getGrade = function(callback, display, mainTestCase) {
       // mainTest : set to indicate the first iTestCase to test (typically,
-      // current iTestCase) before others; test will then stop if the 
+      // current iTestCase) before others; test will then stop if the
       if(subTask.context.infos && subTask.context.infos.hideValidate) {
          // There's no validation
          callback({
