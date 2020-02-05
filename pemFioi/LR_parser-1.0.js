@@ -211,7 +211,9 @@ function LR_Parser(settings,subTask,answer) {
 
       this.initParser();
       if(this.mode < 6){
-         this.initTabs();
+         if(this.mode != 2){
+            this.initTabs();
+         }
          this.initAutomata();
          if(this.mode != 3){
             this.initActionSequence(false,true);
@@ -676,7 +678,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initHandlers = function() {
-      if(this.mode < 6){
+      if(this.mode < 6 && this.mode != 2){
          $("#"+this.tabsID+" #switchContainer").off("click");
          $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
          $(window).resize(self.onResize);
