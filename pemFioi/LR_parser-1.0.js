@@ -1444,7 +1444,10 @@ function LR_Parser(settings,subTask,answer) {
          }else{
             var nonTerminal = self.grammar.rules[self.selectedRule].nonterminal;
             var previousState = self.getPreviousState();
-            // console.log(nonTerminal+" "+previousState);
+            if(nonTerminal != "S" && !self.lrTable.states[previousState][nonTerminal]){
+               self.displayError("You cannot reduce with the selected rule from this state");
+               return
+            }
             var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
             
             self.treeAnim(self.simulationStep,false,true);
@@ -1483,8 +1486,6 @@ function LR_Parser(settings,subTask,answer) {
 
    this.compareSelectedRuleAndStack = function() {
       var rule = this.grammar.rules[this.selectedRule];
-      // console.log(rule)
-      // console.log(this.selectedStackElements)
       if(this.mode < 6){
          this.selectedStackElements.sort();
          if(rule.development[0] == "''" && this.selectedStackElements.length == 0){
