@@ -1764,6 +1764,7 @@ function LR_Parser(settings,subTask,answer) {
       this.updateStackTable();
       this.updateCursor(!(reverse || !anim));
       this.updateState(!(reverse || !anim));
+      // console.log(this.selectedState)
    };
 
    this.updateStackTable = function(noGoto) {
@@ -2112,8 +2113,9 @@ function LR_Parser(settings,subTask,answer) {
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
          var vertex = this.visualGraph.getRaphaelsFromID(vertexID);
-         vertex[0].attr({fill:this.vertexAttr.fill});
-         // info.selected = false;
+         // vertex[0].attr({fill:this.vertexAttr.fill});
+         vertex[0].attr(this.vertexAttr);
+         info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
       this.selectedState = null;
