@@ -1344,18 +1344,6 @@ function LR_Parser(settings,subTask,answer) {
       // console.log("select rule")
       self.resetFeedback();
       self.selectRule($(this));
-      // var ruleID = $(this).attr("data_rule");
-      // var ruleObj = $(this);
-      // self.selectRule(ruleObj);
-      // if($(this).hasClass("selected")){
-      //    $(this).removeClass("selected");
-      //    self.selectedRule = null;
-      // }else{
-      //    $(".rule").removeClass("selected");
-      //    $(this).addClass("selected");
-      //    self.selectedRule = ruleID;
-      // }
-      // self.styleRules();
    };
 
    this.clickReductionMarker = function(rule) {
@@ -1367,8 +1355,6 @@ function LR_Parser(settings,subTask,answer) {
 
    this.selectRule = function(ruleObj) {
       var ruleID = ruleObj.attr("data_rule");
-      // var ruleObj = ruleObj;
-      // self.selectRule(ruleObj);
       if(ruleObj.hasClass("selected")){
          ruleObj.removeClass("selected");
          self.selectedRule = null;
@@ -1453,27 +1439,16 @@ function LR_Parser(settings,subTask,answer) {
             self.displayMessage("reduce","You must select a rule");
          }else if(self.selectedStackElements.length == 0 && self.grammar.rules[self.selectedRule].development[0] != "''"){
             self.displayMessage("reduce","You must select a part of the stack");
-         }/*else if(self.selectedState == null){
-            self.displayMessage("reduce","You must select a state in the automaton");
-         }*/else if(!self.compareSelectedRuleAndStack()){
+         }else if(!self.compareSelectedRuleAndStack()){
             self.displayError("You cannot reduce the selected stack elements with the selected rule");
          }else{
             var nonTerminal = self.grammar.rules[self.selectedRule].nonterminal;
             var previousState = self.getPreviousState();
+            // console.log(nonTerminal+" "+previousState);
             var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-            /*if(self.selectedState != goto){
-               self.displayError("Wrong goto state");
-            }else{*/
-               // self.actionSequence.push({
-               //    actionType: "r",
-               //    rule: self.selectedRule,
-               //    goto: goto
-               // });
-               self.treeAnim(self.simulationStep,false,true);
-               // self.simulationStep++;
-               self.applyReduction(nonTerminal,goto,true,true);
-               // self.saveAnswer();
-            // }
+            
+            self.treeAnim(self.simulationStep,false,true);
+            self.applyReduction(nonTerminal,goto,true,true);
          }
       }else{
          var selectedIndices = self.getSelectedIndices();
@@ -1508,6 +1483,8 @@ function LR_Parser(settings,subTask,answer) {
 
    this.compareSelectedRuleAndStack = function() {
       var rule = this.grammar.rules[this.selectedRule];
+      // console.log(rule)
+      // console.log(this.selectedStackElements)
       if(this.mode < 6){
          this.selectedStackElements.sort();
          if(rule.development[0] == "''" && this.selectedStackElements.length == 0){
@@ -1780,13 +1757,12 @@ function LR_Parser(settings,subTask,answer) {
       }
       this.currentVertex = this.getStateID(newState);
       if(!reverse){
-         // this.highlightEdge(this.currentState,newState);
          this.highlightPrevState(this.currentState);
       }
+      this.selectedStackElements = [];
       this.updateStackTable();
       this.updateCursor(!(reverse || !anim));
       this.updateState(!(reverse || !anim));
-
    };
 
    this.updateStackTable = function(noGoto) {
