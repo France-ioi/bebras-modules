@@ -926,10 +926,8 @@ function LR_Parser(settings,subTask,answer) {
                self.reductionClickArea[id].remove();
             }
             self.reductionClickArea[id] = clickArea;
-            // result.push(circle,text,ruleObj,clickArea);
-         }/*else{*/
-            result.push(circle,text,ruleObj);
-         // }
+         }
+         result.push(circle,text,ruleObj);
       }
       this._addCustomElements(id, result);
       
@@ -2121,6 +2119,9 @@ function LR_Parser(settings,subTask,answer) {
          this.graph.setVertexInfo(vertexID,info);
       }
       this.selectedState = null;
+      if(this.graphEditor){
+         this.graphEditor.vertexDragAndConnect.selectionParent = null;
+      }
    };
 
    /* ACCEPT / ERROR */
@@ -2302,15 +2303,15 @@ function LR_Parser(settings,subTask,answer) {
    }
 
    this.onVertexSelect = function(ID,selected) {
-      // console.log("onVertexSelect")
+      // console.log("onVertexSelect"+" "+ID+" "+selected)
+      var info = self.graph.getVertexInfo(ID);
       if(selected){
          self.selectedVertex = ID;
-         self.selectedState = self.graph.getVertexInfo(ID).label;
+         self.selectedState = info.label;
       }else{
          self.selectedVertex = null;
          self.selectedState = null;
       }
-      // console.log(self.selectedState);
       self.resetFeedback();
       if(ID == self.getStateID(self.currentState)){
          var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
