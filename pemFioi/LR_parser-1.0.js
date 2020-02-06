@@ -1408,7 +1408,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.switchTab = function() {
-
       $("#"+self.tabTag[self.selectedTab]).removeClass("selectedTab");
       self.selectedTab = 1 - self.selectedTab;
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
@@ -1636,7 +1635,8 @@ function LR_Parser(settings,subTask,answer) {
       var reduc = true;
       if(prevStates.length == 0){
          this.currentState = prevState;
-         this.updateParseTable(true);
+         // console.log(state+" "+newStackElement)
+         this.updateParseTable(true,newStackElement);
          if(firstStepOnly){
             reduc = false;
             this.waitingForGoto = true;
@@ -1974,8 +1974,8 @@ function LR_Parser(settings,subTask,answer) {
       this.styleRules();
    };
 
-   this.updateParseTable = function(anim) {
-      // console.log(this.currentState);
+   this.updateParseTable = function(anim,newStackElement) {
+      // console.log(this.currentState+" "+newStackElement);
       // this.styleParseTable();
       // console.log("updateParseTable")
       if(!this.rowHL && this.mode != 4){
@@ -2010,17 +2010,21 @@ function LR_Parser(settings,subTask,answer) {
          top: actionH,
          left: colLeft - 2
       };
-      // console.log(colW);
       if(this.mode != 4){
          if(!anim){
             this.rowHL.css(newRowAttr);
             this.colHL.css(newColAttr);
-            // $("#"+this.parseTableID+" td").removeClass("selected");
-            // $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").addClass("selected");
-            // $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").addClass("selected");
-            // this.styleParseTable();
          }else{
-            this.rowHL.animate(newRowAttr,this.animationTime);
+            var tempState = this.currentState;
+            this.rowHL.animate(newRowAttr,this.animationTime,function(){
+               if(newStackElement){
+                  $("#parseTable [data_state="+tempState+"][data_symbol="+newStackElement[1]+"]").css({
+                     "background-color": self.colors.blue,
+                     color: "white" });
+               }else{
+                  self.styleParseTable();
+               }
+            });
             this.colHL.animate(newColAttr,this.animationTime);
          }
       }
