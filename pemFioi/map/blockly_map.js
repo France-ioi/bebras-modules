@@ -1,5 +1,9 @@
 var getContext = function(display, infos, curLevel, gridElement) {
 
+    function getGridElement() {
+        return gridElement || $('#grid');
+    }
+
     var map_strings = {
         fr: {
             categories: {
@@ -75,7 +79,7 @@ var getContext = function(display, infos, curLevel, gridElement) {
         if(!map) {
             var options = $.extend(
                 {
-                    parent: gridElement[0]
+                    parent: getGridElement()[0]
                 },
                 infos.mapConfig
             );

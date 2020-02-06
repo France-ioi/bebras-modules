@@ -1,5 +1,9 @@
 var getContext = function(display, infos, curLevel, gridElement) {
 
+    function getGridElement() {
+        return gridElement || $('#grid');
+    }
+
     var simple_draw_strings = {
         en: {
             categories: {
@@ -119,10 +123,10 @@ var getContext = function(display, infos, curLevel, gridElement) {
     context.reset = function(taskInfos) {
         if(!context.display) return
         draw && draw.destroy()
-        //gridElement.empty()
+        //getGridElement().empty()
         draw = new SimpleDraw({
             context: context,
-            parent: gridElement[0]
+            parent: getGridElement()[0]
         })
     }
 

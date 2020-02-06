@@ -6,6 +6,13 @@
 var robotCommands = [];
 
 var getContext = function(display, infos, curLevel, gridElement) {
+
+
+   function getGridElement() {
+      return gridElement || $('#grid');
+   }
+
+
    var localLanguageStrings = {
       fr: {
          label: {},
@@ -2625,7 +2632,7 @@ var getContext = function(display, infos, curLevel, gridElement) {
          this.raphaelFactory.destroyAll();
          if(paper !== undefined)
             paper.remove();
-         paper = this.raphaelFactory.create("paperMain", gridElement[0], infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
+         paper = this.raphaelFactory.create("paperMain", getGridElement()[0], infos.cellSide * context.nbCols * scale, infos.cellSide * context.nbRows * scale);
          resetBoard();
          resetItems();
          context.updateScale();

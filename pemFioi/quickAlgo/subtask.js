@@ -50,7 +50,7 @@ var initBlocklySubTask = function(subTask, language) {
    }
 
    subTask.loadLevel = function(curLevel) {
-      if(this.display) {
+      if(this.display && 'namespaceViews' in window.quickAlgoInterface) {
          window.quickAlgoInterface.namespaceViews.reset();
       }
 

@@ -131,7 +131,9 @@ var quickAlgoLibraries = {
 
     function extendArguments(args, namespace) {
       var res = Array.prototype.slice.call(args);
-      res.push(quickAlgoInterface.namespaceViews.add(namespace))
+      if('namespaceViews' in window.quickAlgoInterface) {
+        res.push(quickAlgoInterface.namespaceViews.add(namespace))
+      }
       return res;
     }
 
