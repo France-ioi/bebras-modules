@@ -61,7 +61,7 @@ function LR_Parser(settings,subTask,answer) {
    this.isLastActionAGraphEdit = false;
    this.isDragging = false;
    this.isAnimationRunning = false;
-   this.waitingForGoto = false; // used only in mode 5
+   this.waitingForGoto = false; // used only in mode 5 && 2
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
@@ -72,7 +72,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.inputHighlight = null;
    this.prevStateHighlight = null;
-   this.pathHighlight = [];
+   this.pathHighlight = {};
    this.stackElementsHL = [];
    this.reductionClickArea = {}; // for clicking lines in the automaton in mode 2
    this.reductionStates = []; // states with a reduction marker
@@ -89,7 +89,8 @@ function LR_Parser(settings,subTask,answer) {
       black: "#4a4a4a",
       yellow: "#f7aa28",
       lightgrey: "#f2f2f2",
-      blue: "#4990e2"
+      blue: "#4990e2",
+      lightBlue: "#cbddf3"
    };
    this.unselectedTabAttr = {
       opacity: 0.5
@@ -98,13 +99,13 @@ function LR_Parser(settings,subTask,answer) {
       opacity: 1
    };
    this.defaultEdgeAttr = {
-     "stroke": "#f7aa28",
+     "stroke": this.colors.yellow,
      "stroke-width": 4,
      "arrow-end": "long-classic-wide"
    };
    this.defaultVertexAttr = {
      "r": 10,
-     "fill": "#4a4a4a",
+     "fill": this.colors.black,
      "stroke": "white",
      "stroke-width": 1
    };
@@ -129,10 +130,20 @@ function LR_Parser(settings,subTask,answer) {
      "text-anchor": "start"
    };
    this.previousStateAttr = {
-      "stroke": "#cbddf3",
+     "stroke": this.colors.lightBlue,
      "stroke-width": 5,
      "fill": "none",
      // opacity: "0.1"
+   };
+   this.edgeHighlightAttr = {
+      bwd: {
+         stroke: this.colors.lightBlue,
+         "stroke-width": 4
+      },
+      fwd: {
+         stroke: this.colors.blue,
+         "stroke-width": 4
+      }
    };
    this.cellAttr = {
       "background-color": this.colors.lightgrey,
@@ -1587,6 +1598,7 @@ function LR_Parser(settings,subTask,answer) {
          this.updateStackTable();
 
          this.updateState(anim);
+         this.arrangeEdgeHL();
       }
    };
 
@@ -1627,12 +1639,10 @@ function LR_Parser(settings,subTask,answer) {
          this.updateParseTable(true);
          if(firstStepOnly){
             reduc = false;
-            // this.currentState = prevState;
-            // this.updateParseTable(true);
             this.waitingForGoto = true;
          }
       }
-      this.changeStateAnim(state,prevState,animTime,reduc,function(){
+      this.changeStateAnim(state,prevState,animTime,reduc || self.waitingForGoto,function(){
          self.displayMessage("reduce","REDUCE "+selectedRule);
          if(prevStates.length > 0){
             self.reductionAnimLoop(prevState,prevStates,animTime,newStackElement,firstStepOnly);
@@ -1650,6 +1660,7 @@ function LR_Parser(settings,subTask,answer) {
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
                if(!firstStepOnly){
                   self.goto(newStackElement[0]);
+                  self.arrangeEdgeHL();
                }else{
                   $("#reduceButton span").text("GOTO");
                   $("#reduceButton").off("click");
@@ -1693,6 +1704,7 @@ function LR_Parser(settings,subTask,answer) {
       self.updateState(true);
       self.displayMessage("reduce","GOTO "+newState);
       self.currentVertex = self.getStateID(newState);
+      self.arrangeEdgeHL();
    }
 
    this.reverseReduction = function(rule) {
@@ -1846,17 +1858,29 @@ function LR_Parser(settings,subTask,answer) {
       this.prevStateHighlight = this.paper.rect(x,y,width,height,r).attr(this.previousStateAttr)
    };
 
-   this.highlightEdge = function(edgeID) {
+   this.highlightEdge = function(edgeID,back) {
       if(!edgeID){
          return;
       }
+      // console.log("HL edge "+edgeID+" "+back)
+      var attr = this.edgeHighlightAttr;
       var raphObj = this.visualGraph.getRaphaelsFromID(edgeID); 
       var edgeHL = raphObj[0].clone();
-      edgeHL.attr({"stroke": this.colors.blue});
+      if(back){
+         edgeHL.attr(attr.bwd);
+      }else{
+         edgeHL.attr(attr.fwd);
+      }
       edgeHL.toBack();
       raphObj[1].toBack();
       raphObj[0].toBack();
-      this.pathHighlight.push(edgeHL);  
+      var type = (back) ? "bwd" : "fwd";
+      if(!this.pathHighlight[edgeID]){
+         this.pathHighlight[edgeID] = {};
+      }else if(this.pathHighlight[edgeID][type]){
+         this.pathHighlight[edgeID][type].remove();
+      }
+      this.pathHighlight[edgeID][type] = edgeHL;  
    };
 
    this.highlightReductionPath = function(state,prevStates) {
@@ -1866,10 +1890,24 @@ function LR_Parser(settings,subTask,answer) {
          var prevState = prevStates.pop();
          var prevVertexID = this.getStateID(prevState);
          var edgeID = this.graph.getEdgesBetween(prevVertexID,vertexID)[0];
-         this.highlightEdge(edgeID);
+         this.highlightEdge(edgeID,true);
          state = prevState;
       }while(prevStates.length > 0)
    };
+
+   this.arrangeEdgeHL = function() {
+      /* put fwd HL in front of bwd HL */
+      for(var edgeID in this.pathHighlight){
+         var raphObj = this.visualGraph.getRaphaelsFromID(edgeID); 
+         var elem = this.pathHighlight[edgeID];
+         if(elem["bwd"] && elem["fwd"]){
+            elem["fwd"].attr("stroke-dasharray","- ").toBack();
+            elem["bwd"].toBack();
+         }
+         raphObj[1].toBack();
+         raphObj[0].toBack();
+      }
+   }; 
 
    this.highlightRule = function(rule) {
       $(".rule").removeClass("selected");
@@ -1915,11 +1953,16 @@ function LR_Parser(settings,subTask,answer) {
          this.prevStateHighlight.remove();
          this.prevStateHighlight = null;
       }
-      if(this.pathHighlight.length > 0){
-         for(var path of this.pathHighlight){
-            path.remove();
+      for(var edge in this.pathHighlight){
+         var edgeHL = this.pathHighlight[edge];
+         for(var dir in edgeHL){
+            if(edgeHL[dir]){
+               edgeHL[dir].remove();
+               delete edgeHL[dir];
+               // edgeHL[dir] = null;
+               // console.log("clear "+dir+" HL of "+edge)
+            }
          }
-         this.pathHighlight = [];
       }
       if(this.stackElementsHL.length > 0){
          for(var elem of this.stackElementsHL){
@@ -2022,7 +2065,7 @@ function LR_Parser(settings,subTask,answer) {
       var edgeVisualInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
       var initPos = vInfo1;
       var finalPos = vInfo2;
-      this.highlightEdge(edgeID);
+      this.highlightEdge(edgeID,reduction);
       if(state1 == state2){
          if(this.token){
             this.token.remove();
