@@ -1,4 +1,4 @@
-var getContext = function(display, infos) {
+var getContext = function(display, infos, curLevel, gridElement) {
 
 
     var p5_strings = {
@@ -168,7 +168,7 @@ var getContext = function(display, infos) {
         });
 
         player = new PlayerP5({
-            parent: $('#grid')[0],
+            parent: gridElement[0],
             filesRepository: files.getFile
         });
 

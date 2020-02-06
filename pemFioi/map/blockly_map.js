@@ -1,4 +1,4 @@
-var getContext = function(display, infos) {
+var getContext = function(display, infos, curLevel, gridElement) {
 
     var map_strings = {
         fr: {
@@ -73,7 +73,12 @@ var getContext = function(display, infos) {
     context.reset = function(taskInfos) {
         if(!context.display) return
         if(!map) {
-            var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
+            var options = $.extend(
+                {
+                    parent: gridElement[0]
+                },
+                infos.mapConfig
+            );
             map = new Map(options);
             logger = new Logger({
                 parent: $('#gridContainer')
