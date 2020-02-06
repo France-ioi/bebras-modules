@@ -50,8 +50,9 @@ var initBlocklySubTask = function(subTask, language) {
    }
 
    subTask.loadLevel = function(curLevel) {
-      console.log('subTask.loadLevel', curLevel)
-      window.quickAlgoInterface.namespaceViews.reset();
+      if(this.display) {
+         window.quickAlgoInterface.namespaceViews.reset();
+      }
 
       var levelGridInfos = extractLevelSpecific(subTask.gridInfos, curLevel);
 
