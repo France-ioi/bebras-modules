@@ -1149,6 +1149,9 @@ function LR_Parser(settings,subTask,answer) {
 
    this.treeAnim = function(step,reverse,anim) {
       // console.log("tree");
+      if(!this.treeElements[step]){
+         return
+      }
       for(var el of this.treeElements[step]){
          if(anim && !reverse){
             var anim = new Raphael.animation({opacity:1},this.animationTime);
@@ -2119,7 +2122,7 @@ function LR_Parser(settings,subTask,answer) {
          this.graph.setVertexInfo(vertexID,info);
       }
       this.selectedState = null;
-      if(this.graphEditor){
+      if(this.mode == 2){
          this.graphEditor.vertexDragAndConnect.selectionParent = null;
       }
    };

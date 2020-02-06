@@ -290,7 +290,6 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
       }
       this.enabled = enabled;
       if(enabled) {
-         // $("#" + paperElementID).unbind(jqEvent, this.clickHandler);
          $("#" + paperElementID).off(jqEvent);
          $("#" + paperElementID)[jqEvent](this.clickHandler);
       }
@@ -301,7 +300,6 @@ function PaperMouseEvent(paperElementID, paper, jqEvent, callback, enabled,id) {
    };
 
    this.clickHandler = function(event) {
-      // console.log(jqEvent+" "+id);
       // var offset = $(self.paper.canvas).offset();
       var offset = $("#"+paperElementID).offset();
       var xPos = event.pageX - offset.left;
@@ -584,9 +582,9 @@ function FuzzyClicker(id, paperElementID, paper, graph, visualGraph, callback, f
    };
 
    function eventHandler(xPos, yPos, event) {
+      // console.log(id+" forBG:"+forBackground);
       // Check if vertex was clicked
       var vertex = self.getFuzzyVertex(xPos, yPos);
-      // console.log(id+" forVertices:"+forVertices+" vertex:"+vertex);
       if(vertex !== null) {
          if(forVertices) {
             self.callback("vertex", vertex, xPos, yPos, event);
@@ -938,7 +936,6 @@ function VertexDragAndConnect(settings) {
    };
 
    this.clickHandler = function(id,x,y) {
-      // console.log(id+" "+self.selectionParent)
       if(self.arcDragger){
          self.arcDragger.unselectAll();
       }
