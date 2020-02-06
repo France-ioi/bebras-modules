@@ -14,8 +14,8 @@ function FilesRepository(options) {
     this.options = Object.assign(defaults, options);
     this.browser_compatible = window.File && window.FileReader && window.FileList && window.Blob;
     this.files = {}
-    this.popup = null;
     this.level = null;
+    this.elements = {};
 
 
     this.initLevel = function(params) {
@@ -34,8 +34,8 @@ function FilesRepository(options) {
 
 
     this.close = function() {
-        this.popup.remove();
-        this.popup = null;
+        this.elements.popup && this.elements.popup.remove();
+        this.elements = {};
     }
 
 
@@ -72,8 +72,8 @@ function FilesRepository(options) {
                 '<tr><td>' + filename + '</td>' +
                 '<td><button type="button" class="btn close" data-filename="'+ filename +'">x</button></td></tr>'
         }
-        var el = $('#files_repository_list').empty().append(html);
-        el.find('button.close').click(this.onRemoveFileClick.bind(this));
+        this.elements.list.empty().append(html);
+        this.elements.list.find('button.close').click(this.onRemoveFileClick.bind(this));
     }
 
 
@@ -109,7 +109,7 @@ function FilesRepository(options) {
         if(this.browser_compatible) {
             inner_html =
                 '<p>' + this.options.strings.hint + '</p>' +
-                '<table id="files_repository_list"></table>' +
+                '<table class="files_repository_list"></table>' +
                 '<div>' +
                     '<input type="file" class="btn" multiple accept="' + this.options.extensions + '" title="' + this.options.strings.add + '"/>' +
                 '</div>'
@@ -117,8 +117,8 @@ function FilesRepository(options) {
             inner_html =
                 '<p>' + this.options.strings.incompatible_browser + '</p>';
         }
-        this.popup = $(
-            '<div id="files_repository_modal" class="modalWrapper">' +
+        this.elements.popup = $(
+            '<div class="modalWrapper">' +
                 '<div class="modal">' +
                     '<button type="button" class="btn close">x</button>' +
                     '<p><b>' + this.options.strings.caption + '</b></p>' +
@@ -126,9 +126,10 @@ function FilesRepository(options) {
                 '</div>' +
             '</div>'
         );
-        this.popup.find('button.close').click(this.close.bind(this));
-        this.popup.find('input[type=file]').change(this.onFileInputChange.bind(this));
-        $(document.body).append(this.popup);
+        this.elements.popup.find('button.close').click(this.close.bind(this));
+        this.elements.popup.find('input[type=file]').change(this.onFileInputChange.bind(this));
+        this.elements.list = this.elements.popup.find('table.files_repository_list');
+        $(document.body).append(this.elements.popup);
     }
 
 
@@ -146,3 +147,5 @@ function FilesRepository(options) {
 
 
 }
+
+
