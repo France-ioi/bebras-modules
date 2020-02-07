@@ -332,6 +332,7 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setMultipleEdgesEnabled(false);
             this.graphEditor.setLoopEnabled(false);
             this.graphEditor.setInitialEnabled(false);
+            this.graphEditor.setAllowMultipleTerminal(false);
          }
          this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
@@ -2410,7 +2411,7 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.contentValidation = function(content) {
+   this.contentValidation = function(content,id) {
       if(content){
          var lines = content.split('\n');
          for(var line of lines){
