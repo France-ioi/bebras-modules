@@ -97,6 +97,19 @@ var quickAlgoInterface = {
             this.refreshNav();
         },
 
+
+        last_name: null,
+
+        setLast: function(namespace) {
+            this.last_name = namespace;
+        },
+
+        showLast: function() {
+            if(this.last_name !== null) {
+                this.show(this.last_name);
+            }
+        },
+
         // sys
         refreshNav: function() {
             if(!this.btns) {

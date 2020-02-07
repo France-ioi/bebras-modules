@@ -3,26 +3,6 @@
         Logic for quickAlgo tasks, implements the Bebras task API.
 */
 
-var subcontextElements = {
-
-   elements: {},
-
-   get: function(level) {
-      $('#grid .subcontext-grid').hide();
-      if(!(level in this.elements)) {
-         this.elements[level] = $('<div class="subcontext-grid"></div>');
-         console.log(this.elements[level])
-         $('#grid').append(this.elements[level]);
-
-         console.log($('#grid')[0].innerHTML)
-      } else {
-         this.elements[level].show();
-      }
-      return this.elements[level];
-   }
-}
-
-
 var initBlocklySubTask = function(subTask, language) {
    // Blockly tasks need to always have the level-specific behavior from
    // beaver-task-2.0

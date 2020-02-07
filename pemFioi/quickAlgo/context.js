@@ -97,6 +97,9 @@ var quickAlgoContext = function(display, infos) {
   };
 
   context.program_end = function(callback) {
+    if(context.display && 'namespaceViews' in window.quickAlgoInterface) {
+      window.quickAlgoInterface.namespaceViews.showLast();
+    }
     var curRobot = context.curRobot;
     if (!context.programEnded[curRobot]) {
       context.programEnded[curRobot] = true;
@@ -127,7 +130,7 @@ var quickAlgoLibraries = {
   },
 
   getContext: function() {
-    console.log('getContext mergedMode', this.mergedMode)
+    //console.log('getContext mergedMode', this.mergedMode)
 
     function extendArguments(args, namespace) {
       var res = Array.prototype.slice.call(args);
@@ -179,9 +182,6 @@ var quickAlgoLibraries = {
     return infos;
   },
 
-  setVisibleNamespace: function(namespace) {
-    console.log('namespace', namespace)
-  },
 
   getMergedContext: function() {
     // Make a context merged from multiple contexts
@@ -228,7 +228,10 @@ var quickAlgoLibraries = {
                 //alert([namespace,name])
                 context[namespace][name] = function(nc, func, namespace) {
                   return function() {
-                    that.setVisibleNamespace(namespace);
+                    //that.setVisibleNamespace(namespace);
+                    if('namespaceViews' in window.quickAlgoInterface) {
+                      window.quickAlgoInterface.namespaceViews.setLast(namespace);
+                    }
                     context.propagate(nc);
                     func.apply(nc, arguments);
                   };
