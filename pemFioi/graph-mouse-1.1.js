@@ -2111,19 +2111,27 @@ function GraphEditor(settings) {
 
    this.drawTerminalIcon = function(x,y,size) {
       var qSize = size/4;
-      var icon = paper.path(
-         "M" + x + "," + y +
-         "H" + (x + size) +
-         "V" + (y + qSize) +
-         "H" + (x + 5*qSize/2) + 
-         "V" + (y + size) +
-         "H" + (x + 3*qSize/2) +
-         "V" + (y + qSize) +
-         "H" + x +
-         "Z" 
-         ).attr(iconAttr);
+      var attr = {
+         fill: "none",
+         stroke: iconAttr.fill,
+         "stroke-width": size/6
+      }
+      var circle1 = paper.circle(x + size/2,y + size/2,size/4).attr(attr);
+      var circle2 = paper.circle(x + size/2,y + size/2,size/2).attr(attr);
+      // var icon = paper.set(circle1,circle2);
+      // var icon = paper.path(
+      //    "M" + x + "," + y +
+      //    "H" + (x + size) +
+      //    "V" + (y + qSize) +
+      //    "H" + (x + 5*qSize/2) + 
+      //    "V" + (y + size) +
+      //    "H" + (x + 3*qSize/2) +
+      //    "V" + (y + qSize) +
+      //    "H" + x +
+      //    "Z" 
+      //    ).attr(iconAttr);
       var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
-      return paper.set(icon,overlay);
+      return paper.set(circle1,circle2,overlay);
    };
 
    this.addInitialIcon = function(vertexId) {
@@ -2531,7 +2539,7 @@ function GraphEditor(settings) {
          // console.log("focusout "+id)
          if(self.contentValidation){
             var text = $(this).val();
-            self.editInfo.validContent = self.contentValidation(text);
+            self.editInfo.validContent = self.contentValidation(text,id);
          }else{
             self.editInfo.validContent = true;
          }
