@@ -1423,6 +1423,7 @@ function GraphEditor(settings) {
    this.terminalIcon = null;
    this.initialIcon = null;
    this.pencil = null;
+   // this.currentTerminal = null;
 
    this.textEditor = null;
    this.editInfo = {};
@@ -1483,6 +1484,7 @@ function GraphEditor(settings) {
    this.initialEnabled = false;
    this.defaultVertexLabelEnabled = false;
    this.defaultEdgeLabelEnabled = false;
+   this.allowMutlipleTerminal = true;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1600,6 +1602,9 @@ function GraphEditor(settings) {
    };
    this.setIconAttr = function(attr){
       iconAttr = attr;
+   };
+   this.setAllowMultipleTerminal = function(enabled) {
+      this.allowMutlipleTerminal = enabled;
    };
 
    this.checkVertexSelect = function() {
@@ -1908,8 +1913,25 @@ function GraphEditor(settings) {
          this.addLoopIcon(vertexId);
       if(this.removeVertexEnabled)
          this.addCross(vertexId);
-      if(this.terminalEnabled)
-         this.addTerminalIcon(vertexId);
+      if(this.terminalEnabled){
+         if(this.allowMutlipleTerminal){
+            this.addTerminalIcon(vertexId);
+         }else{
+            var vertices = graph.getAllVertices();
+            var terminal = null;
+            for(var iVertex = 0; iVertex < vertices.length; iVertex++){
+               var vertex = vertices[iVertex];
+               var info = graph.getVertexInfo(vertex);
+               if(info.terminal){
+                  terminal = vertex;
+                  break;
+               }
+            }
+            if(terminal == null || terminal == vertexId){
+               this.addTerminalIcon(vertexId);
+            }
+         }
+      }
       if(this.initialEnabled)
          this.addInitialIcon(vertexId);
       var vInfo = visualGraph.getVertexVisualInfo(vertexId);
@@ -2095,18 +2117,23 @@ function GraphEditor(settings) {
       self.terminalIcon = self.drawTerminalIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.terminalIcon);
       
-      self.terminalIcon.mousedown(function(){
-         var info = graph.getVertexInfo(vertexId);
+      self.terminalIcon.mousedown(self.setTerminal(vertexId));
+   };
+
+   this.setTerminal = function(vID) {
+      return function(){
+         var info = graph.getVertexInfo(vID);
          info.terminal = !info.terminal;
          
-         graph.setVertexInfo(vertexId,info);
+         graph.setVertexInfo(vID,info);
          visualGraph.redraw();
          self.updateHandlers();
+         // self.currentTerminal = (info.terminal) ? vID : null;
          
          if(callback){
             callback();
          }
-      });
+      }
    };
 
    this.drawTerminalIcon = function(x,y,size) {
