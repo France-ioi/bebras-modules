@@ -96,6 +96,13 @@ var importableModules = function () {
 
       'files_repository': {src: modulesPath+"/pemFioi/shared/files_repository.js", id: "files_repository"},
       'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
+      'logger': {src: modulesPath+"/pemFioi/shared/logger.js", id: "logger"},
+
+      // P5 task
+      'p5': {src: modulesPath+"/pemFioi/p5/p5.js", id: "p5"},
+      'p5.sound': {src: modulesPath+"/pemFioi/p5/p5.sound.js", id: "p5.sound"},
+      'player_p5': {src: modulesPath+"/pemFioi/p5/player_p5.js", id: "player_p5"},
+      'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
 
       // Quiz task
       'quiz_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz/quizStyles-0.1.css", id: "quiz_styles"},

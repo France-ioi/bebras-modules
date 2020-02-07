@@ -151,7 +151,7 @@ var quickAlgoLibraries = {
         );
       }
     } else {
-      if(getContext) {
+      if('getContext' in window) {
         return getContext.apply(
           getContext,
           extendArguments(arguments, 'default')
