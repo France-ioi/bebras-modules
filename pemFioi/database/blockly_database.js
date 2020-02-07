@@ -106,7 +106,7 @@
                     some_results_missing: 'Some results are missing',
                     success: 'Success'
                 },
-                ui: {
+                ui_database: {
                     'btn_diplay_table': 'Display',
                     'btn_files_repository': 'Add CSV files...',
                     'files_repository': {
@@ -215,7 +215,7 @@
                     some_results_missing: 'Il manque une partie des résultats',
                     success: 'Succès'
                 },
-                ui: {
+                ui_database: {
                     'btn_diplay_table': 'Visualiser',
                     'btn_files_repository': 'Ajouter des CSV...',
                     'files_repository': {
@@ -278,7 +278,7 @@
                 this.elements.box = $('<div class="pull_left" style="display: none"></div>');
                 this.elements.select = $('<select></select>');
                 this.elements.box.append(this.elements.select);
-                var btn = $('<button class="btn">' + strings.ui.btn_diplay_table + '</button>');
+                var btn = $('<button class="btn">' + strings.ui_database.btn_diplay_table + '</button>');
                 btn.on('click', this.displayTable.bind(this));
                 this.elements.box.append(btn);
                 parent.prepend(this.elements.box);
@@ -331,7 +331,7 @@
 
 
             files.initLevel({
-                strings: strings.ui.files_repository,
+                strings: strings.ui_database.files_repository,
                 level: curLevel
             });
 
@@ -342,7 +342,7 @@
             window.db_helper = new DatabaseHelper(
                 Object.assign({
                     parent: getGridElement(),
-                    strings: strings.ui.db_helper
+                    strings: strings.ui_database.db_helper
                 }, databaseConfig)
             );
 
@@ -352,7 +352,7 @@
             getGridElement().prepend('<div id="database_controls"></div>');
 
             if(!databaseConfig['disable_csv_import']) {
-                var btn = $('<button class="btn pull_right" id="btn_files">' + strings.ui.btn_files_repository + '</button>');
+                var btn = $('<button class="btn pull_right" id="btn_files">' + strings.ui_database.btn_files_repository + '</button>');
                 btn.click(function() {
                     files.open();
                 })

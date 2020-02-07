@@ -56,7 +56,7 @@
                     'loading': 'Loading file...',
                     'load_error': 'Error occurred during loading file.'
                 },
-                ui: {
+                ui_p5: {
                     'mic': 'Enable microphone',
                     'btn_files_repository': 'Add audio files...',
                     'files_repository': {
@@ -113,7 +113,7 @@
                     'loading': 'Chargement du fichier',
                     'load_error': 'Une erreur s\'est produite lors du chargement du fichier.'
                 },
-                ui: {
+                ui_p5: {
                     'mic': 'Activer le micro',
                     'btn_files_repository': 'Ajouter des fichiers audio...',
                     'files_repository': {
@@ -172,7 +172,7 @@
             }
 
             files.initLevel({
-                strings: strings.ui.files_repository,
+                strings: strings.ui_p5.files_repository,
                 level: curLevel
             });
 
@@ -191,8 +191,8 @@
             if(!$('#p5_controls')[0]) {
                 var html =
                     '<div id="p5_controls" style="text-align: left;">' +
-                        '<label><input type="checkbox" id="p5_microphone"/>' + strings.ui.mic + '</label>' +
-                        '<button class="btn btn-xs" style="float: right" id="p5_files">' + strings.ui.btn_files_repository + '</button>' +
+                        '<label><input type="checkbox" id="p5_microphone"/>' + strings.ui_p5.mic + '</label>' +
+                        '<button class="btn btn-xs" style="float: right" id="p5_files">' + strings.ui_p5.btn_files_repository + '</button>' +
                     '</div>';
                 $('#testSelector').prepend($(html))
                 $('#p5_microphone').click(function() {
