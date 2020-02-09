@@ -27,8 +27,9 @@ function LogicController(nbTestCases, maxInstructions) {
   this._readOnly = false;
   this.includeBlocks = null;
 
-  this.loadContext = function (mainContext) {
+  this.loadContext = function (mainContext, contextOptions) {
     this._mainContext = mainContext;
+    this._contextOptions = contextOptions || {};
   }
 
   this.savePrograms = function () {
@@ -118,10 +119,19 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     var availableModules = this.getAvailableModules();
     for(var i=0; i < availableModules.length; i++) {
-      var match = new RegExp('import\\s+' + availableModules[i]);
+      if(this._contextOptions.mergedMode) {
+        var match = new RegExp('import\\s+' + availableModules[i]);
+      } else {
+        var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
+      }
       match = match.exec(code);
       if(match === null) {
-        display("Vous devez mettre la ligne <code>from " + availableModules[i] + " import *</code> dans votre programme.");
+        if(this._contextOptions.mergedMode) {
+          var lineStr = 'import ' + availableModules[i];
+        } else {
+          var lineStr = 'from ' + availableModules[i] + ' import *';
+        }
+        display("Vous devez mettre la ligne <code>" + lineStr + "</code> dans votre programme.");
         return false;
       }
     }
@@ -135,7 +145,11 @@ function LogicController(nbTestCases, maxInstructions) {
     var availableModules = this.getAvailableModules();
     var content = '';
     for(var i=0; i < availableModules.length; i++) {
-      content += 'import ' + availableModules[i] + '\n';
+      if(this._contextOptions.mergedMode) {
+        content += 'import ' + availableModules[i] + '\n';
+      } else {
+        content += 'from ' + availableModules[i] + ' import *\n';
+      }
     }
     return content;
   };
@@ -444,6 +458,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var availableModules = this.getAvailableModules();
     if(availableModules.length) {
+      //TODO: check this
       fullHtml += '<p>Votre programme doit commencer par ';
       fullHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
       fullHtml += ' :</p>'
@@ -511,7 +526,10 @@ function LogicController(nbTestCases, maxInstructions) {
             }
           }
           fullHtml += '<li>' + blockDesc + '</li>';
-          simpleElements.push({func: funcProto, desc: blockHelp});
+          simpleElements.push({
+            func: (this._contextOptions.mergedMode ? generatorName + '.' : '') + funcProto,
+            desc: blockHelp
+          });
         }
 
         // Handle constants as well

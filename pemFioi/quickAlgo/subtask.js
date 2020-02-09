@@ -98,7 +98,9 @@ var initBlocklySubTask = function(subTask, language) {
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }
 
-      this.blocklyHelper.loadContext(this.context);
+      this.blocklyHelper.loadContext(this.context, {
+         mergedMode: mergedMode
+      });
 
       //this.answer = task.getDefaultAnswerObject();
       displayHelper.hideValidateButton = true;
