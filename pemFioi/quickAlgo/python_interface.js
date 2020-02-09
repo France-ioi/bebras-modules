@@ -118,7 +118,7 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     var availableModules = this.getAvailableModules();
     for(var i=0; i < availableModules.length; i++) {
-      var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
+      var match = new RegExp('import\\s+' + availableModules[i]);
       match = match.exec(code);
       if(match === null) {
         display("Vous devez mettre la ligne <code>from " + availableModules[i] + " import *</code> dans votre programme.");
@@ -135,7 +135,7 @@ function LogicController(nbTestCases, maxInstructions) {
     var availableModules = this.getAvailableModules();
     var content = '';
     for(var i=0; i < availableModules.length; i++) {
-      content += 'from ' + availableModules[i] + ' import *\n';
+      content += 'import ' + availableModules[i] + '\n';
     }
     return content;
   };
