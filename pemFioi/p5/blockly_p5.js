@@ -181,12 +181,13 @@
                 filesRepository: files.getFile
             });
 
+            logger && logger.destroy();
             logger = new Logger({
-                parent: $('#gridContainer')
+                parent: getGridElement()
             });
 
             if(!$('#p5_message')[0]) {
-                $('<div id="p5_message"></div>').insertAfter($('#grid'));
+                getGridElement().prepend($('<div id="p5_message"></div>'));
             }
             if(!$('#p5_controls')[0]) {
                 var html =
@@ -194,7 +195,7 @@
                         '<label><input type="checkbox" id="p5_microphone"/>' + strings.ui_p5.mic + '</label>' +
                         '<button class="btn btn-xs" style="float: right" id="p5_files">' + strings.ui_p5.btn_files_repository + '</button>' +
                     '</div>';
-                $('#testSelector').prepend($(html))
+                getGridElement().prepend($(html))
                 $('#p5_microphone').click(function() {
                     player.toggleMicrophone($(this).prop('checked'));
                 })

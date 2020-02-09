@@ -56,4 +56,8 @@ function Logger(options) {
         truncate();
         refreshVisibility();
     }
+
+    this.destroy = function() {
+        container.remove();
+    }
 }
