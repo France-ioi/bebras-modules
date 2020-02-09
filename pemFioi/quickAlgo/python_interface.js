@@ -27,9 +27,8 @@ function LogicController(nbTestCases, maxInstructions) {
   this._readOnly = false;
   this.includeBlocks = null;
 
-  this.loadContext = function (mainContext, contextOptions) {
+  this.loadContext = function (mainContext) {
     this._mainContext = mainContext;
-    this._contextOptions = contextOptions || {};
   }
 
   this.savePrograms = function () {
@@ -93,6 +92,13 @@ function LogicController(nbTestCases, maxInstructions) {
     return "";
   }
 
+  this.getModuleImportCode = function(moduleName) {
+    if(this._mainContext.infos.mergedMode) {
+      return 'import ' + moduleName;
+    }
+    return 'from ' + moduleName + ' import *';
+  }
+
   this.checkCode = function(code, display) {
     // Check a code before validation; display is a function which will get
     // error messages
@@ -119,19 +125,14 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     var availableModules = this.getAvailableModules();
     for(var i=0; i < availableModules.length; i++) {
-      if(this._contextOptions.mergedMode) {
+      if(this._mainContext.infos.mergedMode) {
         var match = new RegExp('import\\s+' + availableModules[i]);
       } else {
         var match = new RegExp('from\\s+' + availableModules[i] + '\\s+import\\s+\\*');
       }
       match = match.exec(code);
       if(match === null) {
-        if(this._contextOptions.mergedMode) {
-          var lineStr = 'import ' + availableModules[i];
-        } else {
-          var lineStr = 'from ' + availableModules[i] + ' import *';
-        }
-        display("Vous devez mettre la ligne <code>" + lineStr + "</code> dans votre programme.");
+        display("Vous devez mettre la ligne <code>" + this.getModuleImportCode(availableModules[i]) + "</code> dans votre programme.");
         return false;
       }
     }
@@ -145,11 +146,7 @@ function LogicController(nbTestCases, maxInstructions) {
     var availableModules = this.getAvailableModules();
     var content = '';
     for(var i=0; i < availableModules.length; i++) {
-      if(this._contextOptions.mergedMode) {
-        content += 'import ' + availableModules[i] + '\n';
-      } else {
-        content += 'from ' + availableModules[i] + ' import *\n';
-      }
+      content += this.getModuleImportCode(availableModules[i]) + '\n';
     }
     return content;
   };
@@ -435,7 +432,9 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
 
+
   this.updateTaskIntro = function () {
+    //console.log(this._mainContext.infos)
     if(!this._mainContext.display) { return; }
     if($('.pythonIntro').length == 0) {
       quickAlgoInterface.appendTaskIntro('<hr class="pythonIntroElement long" />'
@@ -458,14 +457,13 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var availableModules = this.getAvailableModules();
     if(availableModules.length) {
-      //TODO: check this
       fullHtml += '<p>Votre programme doit commencer par ';
       fullHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
       fullHtml += ' :</p>'
                  +  '<p><code>'
-                 +  'from ' + availableModules[0] + ' import *';
+                 +  this.getModuleImportCode(availableModules[0]);
       for(var i=1; i < availableModules.length; i++) {
-        fullHtml += '\nfrom ' + availableModules[i] + ' import *';
+        fullHtml += '\n' + this.getModuleImportCode(availableModules[i]);
       }
       fullHtml += '</code></p>'
                  +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
@@ -527,7 +525,7 @@ function LogicController(nbTestCases, maxInstructions) {
           }
           fullHtml += '<li>' + blockDesc + '</li>';
           simpleElements.push({
-            func: (this._contextOptions.mergedMode ? generatorName + '.' : '') + funcProto,
+            func: (this._mainContext.infos.mergedMode ? generatorName + '.' : '') + funcProto,
             desc: blockHelp
           });
         }
