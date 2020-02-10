@@ -2,7 +2,6 @@
 
 /*TODO : un changement de taille de la fenetre à la fin d'une execution duplique les items*/
 /*TODO : traduire le context wiring*/
-
 var robotCommands = [];
 
 var getContext = function(display, infos, curLevel) {
@@ -757,6 +756,7 @@ var getContext = function(display, infos, curLevel) {
                successContainersFilled: "Bravo, votre robot est un bon jardinier !",
                failureContainersFilled: "Votre robot a semé hors des zones de terre.",
                failureContainersFilledLess: "Il reste de la terre vide de fleur !",
+               failureDropObject: "Il y a déjà une fleur ici !",
 					obstacle: "Attention à la fleur !",
             }
          },
@@ -775,6 +775,7 @@ var getContext = function(display, infos, curLevel) {
                successContainersFilled: "Congratulations, your robot is a good gardener!",
                failureContainersFilled: "Your robot dropped seeds where there is no soil.",
                failureContainersFilledLess: "Some soil spots don't have any flower!",
+               failureDropObject: "There is already a flower here !",
 					obstacle: "Be careful, there's a flower!",
             }
          },
@@ -793,6 +794,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                successContainersFilled: "Bravo, ¡el robot es un gran jardinero!",
                failureContainersFilled: "El robot ha sembrado fuera de las casillas con tierra",
+               failureDropObject: "Ya hay una flor aqui !",
                failureContainersFilledLess: "¡Aún hay tierra sin flores!"
             }
          }
@@ -1753,7 +1755,6 @@ var getContext = function(display, infos, curLevel) {
          itemTypes: {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true,  offsetX: -15, offsetY: 15, zOrder: 2 },
             hole: { num: 3, img: "hole.png", side: 60, isContainer: true, zOrder: 0 },
-
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
@@ -3238,6 +3239,37 @@ var getContext = function(display, infos, curLevel) {
       }
    };
    
+   context.checkContainer = function(coords) {
+      var containers = context.getItemsOn(coords.row, coords.col, function(obj) { return (obj.isContainer === true) && (!obj.isFake) });
+      if(containers.length != 0) {
+         
+         var container = containers[0];
+         if(container.containerSize == undefined && container.containerFilter == undefined) {
+            container.containerSize = 1;
+         }
+         var filter;
+         if(container.containerFilter == undefined)
+            filter = function(obj) { return obj.isWithdrawable === true; };
+         else
+            filter = function(obj) { return obj.isWithdrawable === true && container.containerFilter(obj) };
+         
+         if(container.containerSize != undefined && context.getItemsOn(coords.row, coords.col, filter).length > container.containerSize) {
+            throw(window.languageStrings.messages.failureDropObject);
+            return;
+         }
+
+         
+
+         if(container.containerFilter != undefined) {
+            if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
+
+               throw(window.languageStrings.messages.failureDropObject);
+               return;
+            }
+         }
+      }
+   };
+   
    context.drop = function(count, coords, filter) {
       if(count === undefined) {
          count = 1;
@@ -3267,6 +3299,7 @@ var getContext = function(display, infos, curLevel) {
          }
          object.zOrder = maxi + 0.000001;
          resetItem(object);
+         context.checkContainer(coords);
       }
    };
    
@@ -3294,6 +3327,7 @@ var getContext = function(display, infos, curLevel) {
          }
       }
       resetItem(object);
+      context.checkContainer(coords);
    };
    
    context.turnLeft = function(callback) {
