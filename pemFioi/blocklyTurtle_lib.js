@@ -402,10 +402,10 @@
             context.resetDisplay();
 
             context.turtle.displayTurtle.setDrawingContext(
-               holder.first('displayfield')[0].getContext('2d')
+               holder.find('.displayfield')[0].getContext('2d')
             );
             context.turtle.displaySolutionTurtle.setDrawingContext(
-               holder.first('solutionfield')[0].getContext('2d')
+               holder.find('.solutionfield')[0].getContext('2d')
             );
 
             context.turtle.displayTurtle.reset(context.infos.turtleStepSize);
@@ -455,9 +455,10 @@
 
          holder && holder.remove();
          holder = $(
-            "<div style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> " +
+            "<div style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white; overflow: hidden;'> " +
                "<img width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'>" +
-               "<canvas class='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas><canvas id='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas>" +
+               "<canvas class='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas>" +
+               "<canvas class='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas>" +
                "<canvas class='invisibledisplayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;visibility:hidden;'></canvas>" +
                "<img class='turtle' pendown='" + turtleFileName + "' penup='" + turtleUpFileName + "' src='" + turtleFileName + "' style='width: 22px; height: 27px; position:absolute; left: 139px; top: 136px;'></img>" +
             "</div>"
