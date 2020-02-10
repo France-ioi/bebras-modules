@@ -455,7 +455,7 @@
 
          holder && holder.remove();
          holder = $(
-            "<div style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white; overflow: hidden;'> " +
+            "<div style='height: 300px;width: 300px;border: solid 2px;margin: 12px auto;position:relative;background-color:white;'> " +
                "<img width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=10);' src='" + context.infos.overlayFileName + "'>" +
                "<canvas class='solutionfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;opacity: 0.4;filter: alpha(opacity=20);'></canvas>" +
                "<canvas class='displayfield' width='300' height='300' style='width:300px;height:300px;position:absolute;top:0;left:0;'></canvas>" +
