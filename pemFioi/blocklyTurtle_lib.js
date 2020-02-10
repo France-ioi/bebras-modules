@@ -351,7 +351,12 @@
       var paper;
       var holder = null;
 
-      context.turtle = {displayTurtle : new makeTurtle(infos.coords), displaySolutionTurtle : new makeTurtle(infos.coords), invisibleTurtle : new makeTurtle(infos.coords), invisibleSolutionTurtle : new makeTurtle(infos.coords)};
+      context.turtle = {
+         displayTurtle : new makeTurtle(infos.coords),
+         displaySolutionTurtle : new makeTurtle(infos.coords),
+         invisibleTurtle : new makeTurtle(infos.coords),
+         invisibleSolutionTurtle : new makeTurtle(infos.coords)
+      };
 
       switch (infos.blocklyColourTheme) {
          case "bwinf":

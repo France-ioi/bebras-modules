@@ -224,8 +224,11 @@ var quickAlgoLibraries = {
             var blockList = newContext.customBlocks[namespace][category];
             for(var i=0; i < blockList.length; i++) {
               var name = blockList[i].name;
-              if(name && !context[namespace][name] && newContext[namespace][name]) {
+              if(name && !context[namespace][name] && newContext[namespace] && newContext[namespace][name]) {
                 //alert([namespace,name])
+                if(!(namespace in context)) {
+                  context[namespace] = {};
+                }
                 context[namespace][name] = function(nc, func, namespace) {
                   return function() {
                     //that.setVisibleNamespace(namespace);
