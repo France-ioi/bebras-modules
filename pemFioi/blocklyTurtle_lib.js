@@ -466,7 +466,7 @@
          getGridElement().append(holder);
 
          context.blocklyHelper.updateSize();
-         context.turtle.displayTurtle.setTurtle(holder.first('.turtle')[0]);
+         context.turtle.displayTurtle.setTurtle(holder.find('img.turtle')[0]);
          context.turtle.displayTurtle.fixTurtle(); // TODO :: find a way to define whether the turtle needs fixing or not
          context.turtle.displayTurtle.reset();
 
