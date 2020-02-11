@@ -304,6 +304,7 @@ p {
 
 #namespaceViewControls {
   overflow: hidden;
+  background: #FFF;
 }
 
 #namespaceViewControls i {
