@@ -98,6 +98,10 @@ var importableModules = function () {
       'blocks_helper': {src: modulesPath+"/pemFioi/shared/blocks_helper.js", id: "blocks_helper"},
       'logger': {src: modulesPath+"/pemFioi/shared/logger.js", id: "logger"},
 
+      // Processing task
+      'blockly-processing': {src: modulesPath+"/pemFioi/blocklyProcessing_lib.js", id: "blocklyProcessing_lib"},
+      'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
+
       // Map task
       'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
       'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"},
