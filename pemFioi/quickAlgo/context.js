@@ -1,4 +1,5 @@
 var quickAlgoContext = function(display, infos) {
+//  console.log('quickAlgoContext infos', infos)
   var context = {
     display: display,
     infos: infos,
@@ -103,7 +104,11 @@ var quickAlgoContext = function(display, infos) {
     var curRobot = context.curRobot;
     if (!context.programEnded[curRobot]) {
       context.programEnded[curRobot] = true;
-      infos.checkEndCondition(context, true);
+      if('mergedCheckEndCondition' in context) {
+        context.mergedCheckEndCondition();
+      } else {
+        infos.checkEndCondition(context, true);
+      }
     }
     context.waitDelay(callback);
   };
@@ -174,9 +179,9 @@ var quickAlgoLibraries = {
 
 
   getMergedContextInfos: function(namespace, infos) {
-    if('mergedModeOptions' in infos && namespace in infos.mergedModeOptions) {
-      var res = Object.assign({}, infos, infos.mergedModeOptions[namespace]);
-      delete res.mergedModeOptions;
+    if('mergedModeInfos' in infos && namespace in infos.mergedModeInfos) {
+      var res = Object.assign({}, infos, infos.mergedModeInfos[namespace]);
+      delete res.mergedModeInfos;
       return res;
     }
     return infos;
@@ -210,6 +215,8 @@ var quickAlgoLibraries = {
           quickAlgoInterface.namespaceViews.add(namespace)
         );
         subContexts.push(newContext);
+
+
 
         // Merge objects
         mergeIntoObject(localLanguageStrings, newContext.localLanguageStrings);
@@ -288,6 +295,38 @@ var quickAlgoLibraries = {
         }
         return colours;
       };
+
+      context.mergedCheckEndCondition = function() {
+        var messages = [];
+        var errors = [];
+
+
+        for(var i=0; i < subContexts.length; i++) {
+          if('checkEndCondition' in subContexts[i].infos) {
+            try {
+              subContexts[i].infos.checkEndCondition(subContexts[i], true);
+            } catch(e) {
+              var msg = typeof e == 'string' ? e : e.message;
+              if(subContexts[i].success) {
+                messages.push(msg);
+              } else {
+                errors.push(msg);
+              }
+            }
+          } else {
+            console.error('checkEndCondition missed in ' + that.order[i] + ' subcontext infos');
+          }
+        }
+        //console.log('errors', errors)
+        //console.log('messages', messages)
+        if(errors.length) {
+          context.success = false;
+          throw errors.join(' ');
+        } else {
+          context.success = true;
+          throw messages.join(' ');
+        }
+      }
 
       // Fetch some other data / functions some contexts have
       for(var i=0; i < subContexts.length; i++) {

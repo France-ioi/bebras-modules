@@ -312,6 +312,10 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
          } catch (e) {
+            if(e.fileName) {
+               console.error(e.fileName + ':' + e.lineNumber, e)
+            }
+
             context.onExecutionEnd && context.onExecutionEnd();
             runner.stepInProgress = false;
 

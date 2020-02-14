@@ -73,7 +73,7 @@ var initBlocklySubTask = function(subTask, language) {
       if('mergedMode' in subTask.gridInfos) {
          var mergedMode = subTask.gridInfos.mergedMode;
       } else {
-         var mergedMode = !!subTask.gridInfos.mergedModeOptions;
+         var mergedMode = !!subTask.gridInfos.mergedModeInfos;
       }
       quickAlgoLibraries.setMergedMode(mergedMode);
       this.context = quickAlgoLibraries.getContext(
@@ -245,7 +245,7 @@ var initBlocklySubTask = function(subTask, language) {
             } else if(results.successRate >= 1) {
                // All tests passed, request validate from the platform
                platform.validate("done");
-            }
+            }``
             if(results.successRate < 1) {
                // Display the execution message as it won't be shown through
                // validate
