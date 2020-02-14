@@ -36,22 +36,24 @@ var quickAlgoInterface = {
 
         init: function(params) {
             this.parent = params.grid;
-            this.renderNav(params.nav);
+            this.renderNav(params);
             this.refreshNav();
             for(var i=0; i<this.namespaces.length; i++) {
                 this.parent.append(this.namespaces[i].element);
             }
         },
 
-        renderNav: function(parent) {
+        renderNav: function(params) {
             this.btns = {
                 prev: $('<i class="fa fa-caret-left prev" style="display: none"></i>'),
                 next: $('<i class="fa fa-caret-right next" style="display: none"></i>')
             }
-            parent.append(this.btns.prev);
-            parent.append(this.btns.next);
+            params.nav.append(this.btns.prev);
+            params.nav.append(this.btns.next);
             this.btns.prev.click(this.navPrev.bind(this));
             this.btns.next.click(this.navNext.bind(this));
+            params.grid.on('swipeleft', this.navNext.bind(this));
+            params.grid.on('swiperight', this.navPrev.bind(this));
         },
 
         add: function(namespace) {
@@ -66,6 +68,9 @@ var quickAlgoInterface = {
                 element.show();
             }
             this.refreshNav();
+            if(this.parent) {
+                this.parent.append(element);
+            }
             return element;
         },
 
@@ -125,11 +130,15 @@ var quickAlgoInterface = {
 
 
         navPrev: function() {
-            this.show(this.namespaces[this.active_idx - 1].name);
+            if(this.active_idx > 0) {
+                this.show(this.namespaces[this.active_idx - 1].name);
+            }
         },
 
         navNext: function() {
-            this.show(this.namespaces[this.active_idx + 1].name);
+            if(this.active_idx < this.namespaces.length - 1) {
+                this.show(this.namespaces[this.active_idx + 1].name);
+            }
         }
 
     },
