@@ -897,10 +897,11 @@ var getContext = function (display, infos, curLevel) {
             valueMax: 100,
             selectorImages: ["accel.png"],
             getPercentageFromState: function (state) {
-                return state / 100;
+                return (state + 8) / 16;
             },
             getStateFromPercentage: function (percentage) {
-                return Math.round(percentage * 100);
+                var value = (percentage * 16) - 8;
+                return parseFloat(value.toFixed(1));
             },
             compareState: function (state1, state2) {
                 return state1 == state2;
@@ -2881,17 +2882,182 @@ var getContext = function (display, infos, curLevel) {
         return (window.modulesPath ? window.modulesPath : '../../modules/') + 'img/quickpi/' + filename;
     }
 
+    function createSlider(sensor, max, min, x, y, w, h, index)
+    {
+        var sliderobj = {};
+        sliderobj.sliderdata = {};
 
-    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max) {
-        if (juststate) {
+        sliderobj.index = index;
+        sliderobj.min = min;
+        sliderobj.max = max;
+
+        var outsiderectx = x;
+        var outsiderecty = y;
+        var outsidewidth = w / 6;
+        var outsideheight = h;
+
+        var insidewidth = outsidewidth / 6;
+        sliderobj.sliderdata.insideheight = h * 0.60;
+
+        var insiderectx = outsiderectx + (outsidewidth / 2) - (insidewidth / 2);
+        sliderobj.sliderdata.insiderecty = outsiderecty + (outsideheight / 2) - (sliderobj.sliderdata.insideheight / 2);
+
+        var circleradius = (outsidewidth / 2) - 1;
+
+        var pluscirclex = outsiderectx + (outsidewidth / 2);
+        var pluscircley = outsiderecty + circleradius + 1;
+
+        var minuscirclex = pluscirclex;
+        var minuscircley = outsiderecty + outsideheight - circleradius - 1;
+
+        paper.setStart();
+
+        sliderobj.sliderrect = paper.rect(outsiderectx, outsiderecty, outsidewidth, outsideheight, outsidewidth / 2);
+        sliderobj.sliderrect.attr("fill", "#468DDF");
+        sliderobj.sliderrect.attr("stroke", "#468DDF");
+
+        sliderobj.sliderrect = paper.rect(insiderectx, sliderobj.sliderdata.insiderecty, insidewidth, sliderobj.sliderdata.insideheight, 2);
+        sliderobj.sliderrect.attr("fill", "#2E5D94");
+        sliderobj.sliderrect.attr("stroke", "#2E5D94");
+
+
+        sliderobj.plusset = paper.set();
+
+        sliderobj.pluscircle = paper.circle(pluscirclex, pluscircley, circleradius);
+        sliderobj.pluscircle.attr("fill", "#F5A621");
+        sliderobj.pluscircle.attr("stroke", "#F5A621");
+
+        sliderobj.plus = paper.text(pluscirclex, pluscircley, "+");
+        sliderobj.plus.attr({ fill: "white" });
+        sliderobj.plus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+        sliderobj.plusset.push(sliderobj.pluscircle, sliderobj.plus);
+
+        sliderobj.plusset.click(function () {
+
+            if (Array.isArray(sensor.state)) {
+                if (sensor.state[sliderobj.index] < sliderobj.max)
+                    sensor.state[sliderobj.index] += 1;
+            }
+            else 
+            {
+                if (sensor.state < sliderobj.max)
+                    sensor.state += 1;
+            }
+
+            drawSensor(sensor, sensor.state, true);
+        });
+
+
+        sliderobj.minusset = paper.set();
+
+        sliderobj.minuscircle = paper.circle(minuscirclex, minuscircley, circleradius);
+        sliderobj.minuscircle.attr("fill", "#F5A621");
+        sliderobj.minuscircle.attr("stroke", "#F5A621");
+
+        sliderobj.minus = paper.text(minuscirclex, minuscircley, "-");
+        sliderobj.minus.attr({ fill: "white" });
+        sliderobj.minus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+
+        sliderobj.minusset.push(sliderobj.minuscircle, sliderobj.minus);
+
+        sliderobj.minusset.click(function () {
+
+            if (Array.isArray(sensor.state)) {
+                if (sensor.state[sliderobj.index] > sliderobj.min)
+                    sensor.state[sliderobj.index] -= 1;
+            } else {
+                if (sensor.state > sliderobj.min)
+                    sensor.state -= 1;
+            }
+
+            drawSensor(sensor, sensor.state, true);
+        });
+
+
+        var thumbwidth = outsidewidth * .80;
+        sliderobj.sliderdata.thumbheight = outsidewidth * 1.4;
+        sliderobj.sliderdata.scale = (sliderobj.sliderdata.insideheight - sliderobj.sliderdata.thumbheight);
+
+
+        if (Array.isArray(sensor.state)) {
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[index]);
+        } else {
             var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+        }
 
-            thumby = sensor.sliderdata.insiderecty +
-                sensor.sliderdata.insideheight -
-                sensor.sliderdata.thumbheight -
-                (percentage * sensor.sliderdata.scale);
 
-            sensor.thumb.attr('y', thumby);
+        var thumby = sliderobj.sliderdata.insiderecty + sliderobj.sliderdata.insideheight - sliderobj.sliderdata.thumbheight - (percentage * sliderobj.sliderdata.scale);
+
+        var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
+
+        sliderobj.thumb = paper.rect(thumbx, thumby, thumbwidth, sliderobj.sliderdata.thumbheight, outsidewidth / 2);
+        sliderobj.thumb.attr("fill", "#F5A621");
+        sliderobj.thumb.attr("stroke", "#F5A621");
+
+        sliderobj.slider = paper.setFinish();
+
+        sliderobj.thumb.drag(
+            function (dx, dy, x, y, event) {
+
+                var newy = sliderobj.sliderdata.zero + dy;
+
+                if (newy < sliderobj.sliderdata.insiderecty)
+                    newy = sliderobj.sliderdata.insiderecty;
+
+                if (newy > sliderobj.sliderdata.insiderecty + sliderobj.sliderdata.insideheight - sliderobj.sliderdata.thumbheight)
+                    newy = sliderobj.sliderdata.insiderecty + sliderobj.sliderdata.insideheight - sliderobj.sliderdata.thumbheight;
+
+                sliderobj.thumb.attr('y', newy);
+
+                var percentage = 1 - ((newy - sliderobj.sliderdata.insiderecty) / sliderobj.sliderdata.scale);
+
+                if (Array.isArray(sensor.state)) {
+                    sensor.state[sliderobj.index] = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                } else {
+                    sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                }
+                drawSensor(sensor, sensor.state, true);
+            },
+            function (x, y, event) {
+                sliderobj.sliderdata.zero = sliderobj.thumb.attr('y');
+
+            },
+            function (event) {
+            }
+        );
+
+        return sliderobj;
+    }
+
+
+    function setSlider(sensor, juststate, imgx, imgy, imgw, imgh, min, max, triaxial) {
+        if (juststate) {
+
+            if (Array.isArray(sensor.state)) {
+                for (var i = 0; i < sensor.state.length; i++) {
+                    if (sensor.sliders[i] == undefined)
+                        continue;
+
+                    var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[i]);
+
+                    thumby = sensor.sliders[i].sliderdata.insiderecty +
+                        sensor.sliders[i].sliderdata.insideheight -
+                        sensor.sliders[i].sliderdata.thumbheight -
+                        (percentage * sensor.sliders[i].sliderdata.scale);
+    
+                    sensor.sliders[i].thumb.attr('y', thumby);
+                }
+            } else {
+                var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+
+                thumby = sensor.sliders[0].sliderdata.insiderecty +
+                    sensor.sliders[0].sliderdata.insideheight -
+                    sensor.sliders[0].sliderdata.thumbheight -
+                    (percentage * sensor.sliders[0].sliderdata.scale);
+
+                sensor.sliders[0].thumb.attr('y', thumby);
+            }
 
             return;
         }
@@ -2899,25 +3065,27 @@ var getContext = function (display, infos, curLevel) {
         removeSlider(sensor);
 
 
-        sensor.sliderdata = {};
+        sensor.sliders = [];
 
         var actuallydragged;
 
         sensor.hasslider = true;
         sensor.focusrect.drag(
             function (dx, dy, x, y, event) {
+                if (sensor.sliders.length != 1)
+                    return;
 
-                var newy = sensor.sliderdata.zero + dy;
+                var newy = sensor.sliders[0].sliderdata.zero + dy;
 
-                if (newy < sensor.sliderdata.insiderecty)
-                    newy = sensor.sliderdata.insiderecty;
+                if (newy < sensor.sliders[0].sliderdata.insiderecty)
+                    newy = sensor.sliders[0].sliderdata.insiderecty;
 
-                if (newy > sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight)
-                    newy = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight;
+                if (newy > sensor.sliders[0].sliderdata.insiderecty + sensor.sliders[0].sliderdata.insideheight - sensor.sliders[0].sliderdata.thumbheight)
+                    newy = sensor.sliders[0].sliderdata.insiderecty + sensor.sliders[0].sliderdata.insideheight - sensor.sliders[0].sliderdata.thumbheight;
 
-                sensor.thumb.attr('y', newy);
+                sensor.sliders[0].thumb.attr('y', newy);
 
-                var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
+                var percentage = 1 - ((newy - sensor.sliders[0].sliderdata.insiderecty) / sensor.sliders[0].sliderdata.scale);
 
                 sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
                 drawSensor(sensor, sensor.state, true);
@@ -2925,10 +3093,11 @@ var getContext = function (display, infos, curLevel) {
                 actuallydragged++;
             },
             function (x, y, event) {
-
                 showSlider();
                 actuallydragged = 0;
-                sensor.sliderdata.zero = sensor.thumb.attr('y');
+
+                if (sensor.sliders.length == 1)
+                    sensor.sliders[0].sliderdata.zero = sensor.sliders[0].thumb.attr('y');
             },
             function (event) {
                 if (actuallydragged > 4) {
@@ -2941,122 +3110,30 @@ var getContext = function (display, infos, curLevel) {
             hideSlider(sensorWithSlider);
             sensorWithSlider = sensor;
 
-            var outsiderectx = sensor.drawInfo.x;
-            var outsiderecty = sensor.drawInfo.y;
-            var outsidewidth = sensor.drawInfo.width / 6;
-            var outsideheight = sensor.drawInfo.height;
+            if (Array.isArray(sensor.state)) {
+                for (var i = 0; i < sensor.state.length; i++) {
+                    sliderobj = createSlider(sensor,
+                        max,
+                        min,
+                        sensor.drawInfo.x - (i * sensor.drawInfo.width / 5) ,
+                        sensor.drawInfo.y,
+                        sensor.drawInfo.width,
+                        sensor.drawInfo.height,
+                        i);
 
-            var insidewidth = outsidewidth / 6;
-            sensor.sliderdata.insideheight = sensor.drawInfo.height * 0.60;
-
-            var insiderectx = outsiderectx + (outsidewidth / 2) - (insidewidth / 2);
-            sensor.sliderdata.insiderecty = outsiderecty + (outsideheight / 2) - (sensor.sliderdata.insideheight / 2);
-
-            var circleradius = (outsidewidth / 2) - 1;
-
-            var pluscirclex = outsiderectx + (outsidewidth / 2);
-            var pluscircley = outsiderecty + circleradius + 1;
-
-            var minuscirclex = pluscirclex;
-            var minuscircley = outsiderecty + outsideheight - circleradius - 1;
-
-
-            paper.setStart();
-
-
-            sensor.sliderrect = paper.rect(outsiderectx, outsiderecty, outsidewidth, outsideheight, outsidewidth / 2);
-            sensor.sliderrect.attr("fill", "#468DDF");
-            sensor.sliderrect.attr("stroke", "#468DDF");
-
-            sensor.sliderrect = paper.rect(insiderectx, sensor.sliderdata.insiderecty, insidewidth, sensor.sliderdata.insideheight, 2);
-            sensor.sliderrect.attr("fill", "#2E5D94");
-            sensor.sliderrect.attr("stroke", "#2E5D94");
-
-
-            sensor.plusset = paper.set();
-
-            sensor.pluscircle = paper.circle(pluscirclex, pluscircley, circleradius);
-            sensor.pluscircle.attr("fill", "#F5A621");
-            sensor.pluscircle.attr("stroke", "#F5A621");
-
-            sensor.plus = paper.text(pluscirclex, pluscircley, "+");
-            sensor.plus.attr({ fill: "white" });
-            sensor.plus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-
-            sensor.plusset.push(sensor.pluscircle, sensor.plus);
-
-            sensor.plusset.click(function () {
-                if (sensor.state < max)
-                    sensor.state += 1;
-
-                drawSensor(sensor, sensor.state, true);
-            });
-
-
-            sensor.minusset = paper.set();
-
-            sensor.minuscircle = paper.circle(minuscirclex, minuscircley, circleradius);
-            sensor.minuscircle.attr("fill", "#F5A621");
-            sensor.minuscircle.attr("stroke", "#F5A621");
-
-            sensor.minus = paper.text(minuscirclex, minuscircley, "-");
-            sensor.minus.attr({ fill: "white" });
-            sensor.minus.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-
-            sensor.minusset.push(sensor.minuscircle, sensor.minus);
-
-            sensor.minusset.click(function () {
-                if (sensor.state > min)
-                    sensor.state -= 1;
-
-                drawSensor(sensor, sensor.state, true);
-            });
-
-
-            var thumbwidth = outsidewidth * .80;
-            sensor.sliderdata.thumbheight = outsidewidth * 1.4;
-            sensor.sliderdata.scale = (sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight);
-
-
-            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
-
-
-            var thumby = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight - (percentage * sensor.sliderdata.scale);
-
-            var thumbx = insiderectx + (insidewidth / 2) - (thumbwidth / 2);
-
-            sensor.thumb = paper.rect(thumbx, thumby, thumbwidth, sensor.sliderdata.thumbheight, outsidewidth / 2);
-            sensor.thumb.attr("fill", "#F5A621");
-            sensor.thumb.attr("stroke", "#F5A621");
-
-            sensor.slider = paper.setFinish();
-
-            sensor.thumb.drag(
-                function (dx, dy, x, y, event) {
-
-                    var newy = sensor.sliderdata.zero + dy;
-
-                    if (newy < sensor.sliderdata.insiderecty)
-                        newy = sensor.sliderdata.insiderecty;
-
-                    if (newy > sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight)
-                        newy = sensor.sliderdata.insiderecty + sensor.sliderdata.insideheight - sensor.sliderdata.thumbheight;
-
-                    sensor.thumb.attr('y', newy);
-
-                    var percentage = 1 - ((newy - sensor.sliderdata.insiderecty) / sensor.sliderdata.scale);
-                    sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
-                    drawSensor(sensor, sensor.state, true);
-
-
-                },
-                function (x, y, event) {
-                    sensor.sliderdata.zero = sensor.thumb.attr('y');
-
-                },
-                function (event) {
+                        sensor.sliders.push(sliderobj);
                 }
-            );
+            } else {               
+                sliderobj = createSlider(sensor,
+                    max,
+                    min,
+                    sensor.drawInfo.x,
+                    sensor.drawInfo.y,
+                    sensor.drawInfo.width,
+                    sensor.drawInfo.height,
+                    0);
+                sensor.sliders.push(sliderobj);
+            }
         }
     }
 
@@ -3066,9 +3143,13 @@ var getContext = function (display, infos, curLevel) {
             sensor.hasslider = false;
         }
 
-        if (sensor.slider) {
-            sensor.slider.remove();
-            sensor.slider = null;
+        if (sensor.sliders) {
+
+            for (var i = 0; i < sensor.sliders.length; i++) {
+                sensor.sliders[i].slider.remove();
+            }
+
+            sensor.sliders = [];
         }
     }
 
@@ -3829,6 +3910,11 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
+            if (!sensor.state)
+            {
+                sensor.state = [0, 0, 1];
+            }
+
             if (sensor.state) {
                 try {
                 sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "g\nY: " + sensor.state[1] + "g\nZ: " + sensor.state[2] + "g");
@@ -3836,6 +3922,16 @@ var getContext = function (display, infos, curLevel) {
                 {
                     var a = 1;
                 }
+            }
+
+            if (!context.autoGrading && context.offLineMode) {
+                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -8, 8);
+            } else {
+                sensor.focusrect.click(function () {
+                    sensorInConnectedModeError();
+                });
+
+                removeSlider(sensor);
             }
         } else if (sensor.type == "gyroscope") {
             if (sensor.stateText)
@@ -5121,7 +5217,18 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.readAcceleration = function(axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            context.waitDelay(callback);
+            var sensor = findSensorByType("accelerometer");
+            
+            var index = 0;
+            if (axis == "x")
+                index = 0;
+            else if (axis == "y")
+                index = 1;
+            else if (axis == "z")
+                index = 2;
+            
+
+            context.waitDelay(callback, sensor.state[index]);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5841,14 +5948,16 @@ window.addEventListener('click', function (e) {
     if (sensorWithSlider && sensorWithSlider.focusrect && target == sensorWithSlider.focusrect.node)
         keep = true;
 
-    if (sensorWithSlider && sensorWithSlider.slider) {
-        sensorWithSlider.slider.forEach(function (element) {
-            if (target == element.node ||
-                target.parentNode == element.node) {
-                keep = true;
-                return false;
-            }
-        });
+    if (sensorWithSlider && sensorWithSlider.sliders) {
+        for (var i = 0; i < sensorWithSlider.sliders.length; i++) {
+            sensorWithSlider.sliders[i].slider.forEach(function (element) {
+                if (target == element.node ||
+                    target.parentNode == element.node) {
+                    keep = true;
+                    return false;
+                }
+            });
+        }
     }
 
     if (!keep) {
@@ -5862,10 +5971,13 @@ function hideSlider(sensor) {
     if (!sensor)
         return;
 
-    if (sensor.slider) {
-        sensor.slider.remove();
-        sensor.slider = null;
+    if (sensor.sliders) {
+        for (var i = 0; i < sensor.sliders.length; i++) {
+            sensor.sliders[i].slider.remove();
+        }
+        sensor.sliders = [];
     }
+
 
     if (sensor.focusrect && sensor.focusrect.paper && sensor.focusrect.paper.canvas)
         sensor.focusrect.toFront();
