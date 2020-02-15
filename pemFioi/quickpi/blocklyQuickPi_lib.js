@@ -924,10 +924,10 @@ var getContext = function (display, infos, curLevel) {
             valueMax: 100,
             selectorImages: ["gyro.png"],
             getPercentageFromState: function (state) {
-                return state / 100;
+                return (state + 125) / 250;
             },
             getStateFromPercentage: function (percentage) {
-                return Math.round(percentage * 100);
+                return Math.round(percentage * 250) - 125;
             },
             compareState: function (state1, state2) {
                 return state1 == state2;
@@ -954,10 +954,10 @@ var getContext = function (display, infos, curLevel) {
             valueMax: 100,
             selectorImages: ["mag.png"],
             getPercentageFromState: function (state) {
-                return state / 100;
+                return (state + 1600) / 3200;
             },
             getStateFromPercentage: function (percentage) {
-                return Math.round(percentage * 100);
+                return Math.round(percentage * 3200) - 1600;
             },
             compareState: function (state1, state2) {
                 return state1 == state2;
@@ -3948,9 +3948,24 @@ var getContext = function (display, infos, curLevel) {
             }); 
             if (sensor.stateText)
                 sensor.stateText.remove();
+              
+            if (!sensor.state)
+            {
+                sensor.state = [0, 0, 0];
+            }
 
             if (sensor.state) {
                 sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
+            }
+
+            if (!context.autoGrading && context.offLineMode) {
+                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
+            } else {
+                sensor.focusrect.click(function () {
+                    sensorInConnectedModeError();
+                });
+
+                removeSlider(sensor);
             }
         } else if (sensor.type == "magnetometer") {
             if (sensor.stateText)
@@ -3977,6 +3992,11 @@ var getContext = function (display, infos, curLevel) {
                 "transform": ""
             });
 
+            if (!sensor.state)
+            {
+                sensor.state = [0, 0, 0];
+            }
+
             if (sensor.state) {
                 var heading = Math.atan2(sensor.state[0],sensor.state[1])*(180/Math.PI) + 180;
 
@@ -3988,6 +4008,16 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "μT\nY: " + sensor.state[1] + "μT\nZ: " + sensor.state[2] + "μT");
+            }
+
+            if (!context.autoGrading && context.offLineMode) {
+                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -1600, 1600);
+            } else {
+                sensor.focusrect.click(function () {
+                    sensorInConnectedModeError();
+                });
+
+                removeSlider(sensor);
             }
         } else if (sensor.type == "sound") {
             if (sensor.stateText)
@@ -5241,7 +5271,26 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.computeRotation = function(rotationType, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            context.waitDelay(callback);
+            var sensor = findSensorByType("accelerometer");
+
+            var zsign = 1;
+            var result = 0;
+
+            if (sensor.state[2] < 0)
+                zsign = -1;
+        
+            if (rotationType == "pitch")
+            {
+                result = 180 * Math.atan2 (sensor.state[0], zsign * Math.sqrt(sensor.state[1]*sensor.state[1] + sensor.state[2]*sensor.state[2]))/Math.PI;
+            }
+            else if (rotationType == "roll")
+            {
+                result = 180 * Math.atan2 (sensor.state[1], zsign * Math.sqrt(sensor.state[0]*sensor.state[0] + sensor.state[2]*sensor.state[2]))/Math.PI;
+            }
+
+            result = Math.round(result);
+                
+            context.waitDelay(callback, result);
         } else {
             var cb = context.runner.waitCallback(callback);
             var command = "computeRotation(\"" + rotationType + "\")";
@@ -5273,9 +5322,17 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.readMagneticForce = function (axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("magnetometer", "i2c");
+            var sensor = findSensorByType("magnetometer");
+            
+            var index = 0;
+            if (axis == "x")
+                index = 0;
+            else if (axis == "y")
+                index = 1;
+            else if (axis == "z")
+                index = 2;
 
-            context.runner.noDelay(callback, state);
+            context.waitDelay(callback, sensor.state[index]);
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("magnetometer", "i2c");
@@ -5293,15 +5350,18 @@ var getContext = function (display, infos, curLevel) {
 
                 cb(returnVal);
             });
-            
         }
     };
 
     context.quickpi.computeCompassHeading = function (callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("magnetometer", "i2c");
+            var sensor = findSensorByType("magnetometer");
 
-            context.runner.noDelay(callback, state);
+            var heading = Math.atan2(sensor.state[0],sensor.state[1])*(180/Math.PI) + 180;
+
+            heading = Math.round(heading);
+
+            context.runner.noDelay(callback, heading);
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("magnetometer", "i2c");
@@ -5355,10 +5415,18 @@ var getContext = function (display, infos, curLevel) {
     //// Gyroscope
     context.quickpi.readAngularVelocity = function (axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("gyroscope", "i2c");
-
-            context.runner.noDelay(callback, state);
-        } else {
+            var sensor = findSensorByType("gyroscope");
+            
+            var index = 0;
+            if (axis == "x")
+                index = 0;
+            else if (axis == "y")
+                index = 1;
+            else if (axis == "z")
+                index = 2;
+            
+            context.waitDelay(callback, sensor.state[index]);       
+         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("gyroscope", "i2c");
             
