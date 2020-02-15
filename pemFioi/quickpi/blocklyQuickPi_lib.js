@@ -895,6 +895,7 @@ var getContext = function (display, infos, curLevel) {
             valueType: "object",
             valueMin: 0,
             valueMax: 100,
+            step: 0.1,
             selectorImages: ["accel.png"],
             getPercentageFromState: function (state) {
                 return (state + 8) / 16;
@@ -2934,15 +2935,19 @@ var getContext = function (display, infos, curLevel) {
         sliderobj.plusset.push(sliderobj.pluscircle, sliderobj.plus);
 
         sliderobj.plusset.click(function () {
+            var step = 1;
+            var sensorDef = findSensorDefinition(sensor);
+            if (sensorDef.step)
+                step = sensorDef.step;
 
             if (Array.isArray(sensor.state)) {
                 if (sensor.state[sliderobj.index] < sliderobj.max)
-                    sensor.state[sliderobj.index] += 1;
+                    sensor.state[sliderobj.index] += step;
             }
             else 
             {
                 if (sensor.state < sliderobj.max)
-                    sensor.state += 1;
+                    sensor.state += step;
             }
 
             drawSensor(sensor, sensor.state, true);
@@ -2963,12 +2968,17 @@ var getContext = function (display, infos, curLevel) {
 
         sliderobj.minusset.click(function () {
 
+            var step = 1;
+            var sensorDef = findSensorDefinition(sensor);
+            if (sensorDef.step)
+                step = sensorDef.step;
+
             if (Array.isArray(sensor.state)) {
                 if (sensor.state[sliderobj.index] > sliderobj.min)
-                    sensor.state[sliderobj.index] -= 1;
+                    sensor.state[sliderobj.index] -= step;
             } else {
                 if (sensor.state > sliderobj.min)
-                    sensor.state -= 1;
+                    sensor.state -= step;
             }
 
             drawSensor(sensor, sensor.state, true);
