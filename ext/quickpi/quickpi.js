@@ -1131,9 +1131,9 @@ def readAccelBMI160():
         if acc_z & 0x8000 != 0:
             acc_z -= 1 << 16
 
-        acc_x = float(acc_x)  / 16384.0;
-        acc_y = float(acc_y)  / 16384.0;
-        acc_z = float(acc_z) / 16384.0;
+        acc_x = float(acc_x)  / 16384.0 * 9.81;
+        acc_y = float(acc_y)  / 16384.0 * 9.81;
+        acc_z = float(acc_z) / 16384.0 * 9.81;
 
         return [round(acc_x, 1), round(acc_y, 1), round(acc_z, 1)]
     except:
@@ -1342,9 +1342,9 @@ def reaAccelerometerLSM303C():
         Y =  twos_comp((value[3] << 8) | value[2], 16)
         Z =  twos_comp((value[5] << 8) | value[4], 16)
 
-        X = round(X * 0.00059814453125 / 9.8, 2)
-        Y = round(Y * 0.00059814453125 / 9.8, 2)
-        Z =  round(Z * 0.00059814453125 / 9.8, 2)
+        X = round(X * 0.00059814453125, 2)
+        Y = round(Y * 0.00059814453125, 2)
+        Z =  round(Z * 0.00059814453125, 2)
 
         return [X, Y, Z]
     except:

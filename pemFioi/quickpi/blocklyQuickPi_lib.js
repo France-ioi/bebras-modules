@@ -44,7 +44,7 @@ var getContext = function (display, infos, curLevel) {
                 stroke: "Set stroke color",
                 noStroke: "Do not stroke",
 
-                readAcceleration: "Read acceleration (mm/s²)",
+                readAcceleration: "Read acceleration (m/s²)",
                 computeRotation: "Compute rotation from accelerometer (°) %1",
                 readSoundLevel: "Read sound intensity",
 
@@ -1331,16 +1331,6 @@ var getContext = function (display, infos, curLevel) {
             });
         }
     }
-
-    function getCurrentBoard() {
-        var found = boardDefinitions.find(function (element) {
-            if (context.board == element.name)
-                return element;
-        });
-
-        return found;
-    }
-
     
     context.changeBoard = function(newboardname)
     {
@@ -1427,7 +1417,7 @@ var getContext = function (display, infos, curLevel) {
                 node.setAttribute("name", currentSensor.name);
 
                 if (currentSensor.subType)
-                    node.setAttribute("subType", currentSensor.subType);
+                    node.setAttribute("subtype", currentSensor.subType);
 
                 var elements = xml.getElementsByTagName("quickpi");
 
@@ -1455,8 +1445,8 @@ var getContext = function (display, infos, curLevel) {
                         "name" : sensornode.getAttribute("name"),
                     };
 
-                    if (sensornode.getAttribute("subType")) {
-                        sensor.subType = sensornode.getAttribute("subType");
+                    if (sensornode.getAttribute("subtype")) {
+                        sensor.subType = sensornode.getAttribute("subtype");
                     }
 
                     sensor.state = null;
@@ -3927,7 +3917,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 try {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "g\nY: " + sensor.state[1] + "g\nZ: " + sensor.state[2] + "g");
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "m/s²\nY: " + sensor.state[1] + "m/s²\nZ: " + sensor.state[2] + "m/s²");
                 } catch (Err)
                 {
                     var a = 1;
