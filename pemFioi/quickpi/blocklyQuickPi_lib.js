@@ -898,10 +898,10 @@ var getContext = function (display, infos, curLevel) {
             step: 0.1,
             selectorImages: ["accel.png"],
             getPercentageFromState: function (state) {
-                return (state + 8) / 16;
+                return ((state + 78.48) / 156.96);
             },
             getStateFromPercentage: function (percentage) {
-                var value = (percentage * 16) - 8;
+                var value = ((percentage * 156.96) - 78.48);
                 return parseFloat(value.toFixed(1));
             },
             compareState: function (state1, state2) {
@@ -3111,11 +3111,22 @@ var getContext = function (display, infos, curLevel) {
             sensorWithSlider = sensor;
 
             if (Array.isArray(sensor.state)) {
+
+                var offset = 0;
+                var sign = -1;
+                if (sensor.drawInfo.x -
+                     ((sensor.state.length - 1) * sensor.drawInfo.width / 5) < 0)
+                {
+                    sign = 1;
+                    offset = sensor.drawInfo.width;
+                }
+
+
                 for (var i = 0; i < sensor.state.length; i++) {
                     sliderobj = createSlider(sensor,
                         max,
                         min,
-                        sensor.drawInfo.x - (i * sensor.drawInfo.width / 5) ,
+                        sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.width / 5) ,
                         sensor.drawInfo.y,
                         sensor.drawInfo.width,
                         sensor.drawInfo.height,
@@ -3925,7 +3936,7 @@ var getContext = function (display, infos, curLevel) {
             }
 
             if (!context.autoGrading && context.offLineMode) {
-                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -8, 8);
+                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -8 * 9.81, 8 * 9.81);
             } else {
                 sensor.focusrect.click(function () {
                     sensorInConnectedModeError();
