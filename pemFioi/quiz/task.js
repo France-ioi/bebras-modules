@@ -278,6 +278,7 @@
                 shuffle_questions: !!quiz_settings.shuffle_questions,
                 shuffle_answers: !!quiz_settings.shuffle_answers,
                 display_partial_feedback: !!quiz_settings.display_partial_feedback,
+                display_detailed_feedback: !!quiz_settings.display_detailed_feedback,
                 random: random
             });
             window.quiz_ui = q;

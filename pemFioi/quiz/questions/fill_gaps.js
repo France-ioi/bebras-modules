@@ -108,7 +108,7 @@
             showResult: function(mistakes, message) {
                 var placeholders = text.find('.placeholder');
                 placeholders.removeClass('correct mistake');
-                if(!Quiz.params.display_partial_feedback) return;
+                if(!Quiz.params.display_partial_feedback && !Quiz.params.display_detailed_feedback) return;
                 var mistakes_cnt = 0;
                 placeholders.each(function() {
                     var placeholder = $(this);

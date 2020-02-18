@@ -71,7 +71,9 @@
                 nb_mistakes += isValid ? 0 : 1;
             } else if (typeof grader == 'object') {
                 if(Array.isArray(grader.value)) {
-                    if(isArrayAnswerEmpty(answer[i])) { continue; }
+                    if(isArrayAnswerEmpty(answer[i])) {
+                        continue;
+                    }
                     if(grader.strict) {
                         var test = testStrict(grader.value, answer[i]);
                     } else {
@@ -80,9 +82,15 @@
                     isValid = test === true;
                     var mistakes = isValid ? [] : test;
                     res.mistakes.push(mistakes);
-                    if(grader.messages && mistakes.length && grader.messages[mistakes[0]]) {
-                        res.messages[i] = grader.messages[mistakes[0]];
+                    if(grader.messages && mistakes.length) {
+                        res.messages[i] = [];
+                        for(var j=0; j<mistakes.length; j++) {
+                            if(grader.messages[mistakes[j]]) {
+                                res.messages[i][mistakes[j]] = grader.messages[mistakes[j]];
+                            }
+                        }
                     }
+
                 } else {
                     if(typeof answer[i] == 'undefined') { continue; }
                     isValid = grader == answer[i] ? 1 : 0;
