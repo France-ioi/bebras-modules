@@ -1729,11 +1729,10 @@ var getContext = function(display, infos, curLevel) {
       }
    };
 
-   if(window['json'] && window['json']['assetsPath']) {
-      imgPrefix = window['json']['assetsPath'];
+   if('modulesPath' in window) {
+      imgPrefix = window.modulesPath.replace(/\/$/, '') + '/pemFioi/robot/images/' + infos.contextType + '/';
    } else {
-      var iconSrc = $("img[src$='icon.png']").attr("src");
-      var imgPrefix = iconSrc.substring(0, iconSrc.length - 8);
+      console.error('modulesPath undefined');
    }
 
    if(infos.newBlocks == undefined)
