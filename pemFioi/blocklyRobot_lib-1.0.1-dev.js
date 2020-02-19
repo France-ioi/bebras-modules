@@ -3863,8 +3863,10 @@ function getGridOptions(block, key) {
        }
    };
 
-   return gripOptions[block][key];
+   return block in gripOptions ? gripOptions[block][key] : null;
 }
+
+window.quickAlgoRobotGetGridOptions = getGridOptions;
 
 
 
