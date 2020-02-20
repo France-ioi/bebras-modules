@@ -343,6 +343,14 @@ question:nth-child(odd) solution {
 .displaySolution answer.mistake .answer-code::before {
   content: "\f00d";
 }
+.displaySolution answer.correct input[type=text] {
+  border-color: #4a90e2;
+  border-width: 2px;
+}
+.displaySolution answer.mistake input[type=text] {
+  border-color: #ff001f;
+  border-width: 2px;
+}
 
 /*
 *
