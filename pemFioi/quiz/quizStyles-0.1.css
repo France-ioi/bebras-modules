@@ -8,7 +8,7 @@
   position: relative;
   overflow-x: hidden;
   font-family: 'Titillium Web', Arial, Helvetica, sans-serif;
-  color: #9b9b9b;
+  color: #333;
   padding-top: 2em;
   counter-reset: questions-counter;
 }
@@ -36,14 +36,15 @@
 
 question {
   display: block;
-  padding: 20px 0;
 }
 question > * {
   padding: 0 60px;
 }
+/* Old alternating colors
 question:nth-child(odd) {
   background: rgba(74,144,226,0.2);
 }
+*/
 
 question .error-message {
   color: #ff001f;
@@ -66,6 +67,18 @@ question .error-message .icon {
   top: calc(50% - 0.5em - 5px);
 }
 
+question::after {
+  content: '';
+  position: relative;
+  display: block;
+  width: 90vw;
+  height: 1px;
+  left: 5vw;
+  background-color: #4a90e2;
+  margin: 24px 0px;
+  clear: both;
+}
+
 statement {
   color: #4a90e2;
   font-size: 22px;
@@ -78,7 +91,6 @@ statement p {
   display: inline;
   margin: 0;
   font-weight: normal;
-  font-style: italic;
 }
 statement::before {
   counter-increment: questions-counter;
@@ -342,6 +354,14 @@ question:nth-child(odd) solution {
 }
 .displaySolution answer.mistake .answer-code::before {
   content: "\f00d";
+}
+.displaySolution answer.correct input[type=text] {
+  border-color: #4a90e2;
+  border-width: 2px;
+}
+.displaySolution answer.mistake input[type=text] {
+  border-color: #ff001f;
+  border-width: 2px;
 }
 
 /*

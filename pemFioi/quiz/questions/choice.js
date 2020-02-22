@@ -134,7 +134,13 @@
                         el.addClass(mistakes.indexOf(idx) === -1 ? 'correct' : 'mistake')
                     })
                 }
-                Quiz.common.toggleWrongAnswerMessage(parent, message);
+                if(Array.isArray(message)) {
+                    answers.each(function(i) {
+                        Quiz.common.toggleWrongAnswerMessage($(this), message[i]);
+                    });
+                } else {
+                    Quiz.common.toggleWrongAnswerMessage(parent, message);
+                }
             },
 
             reset: function() {

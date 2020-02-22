@@ -7,7 +7,13 @@
 
 #taskIntro {
     font-weight:normal;
+    color: #333 !important;
 }
+
+body {
+    color: #333 !important;
+}
+
 
 img.beaver {
     content:url("../img/jwinf-fox.jpg");
@@ -36,4 +42,9 @@ samp::before {
 samp::after { 
     content: "“";
 }
+
+
+/*#tabsMenu {
+    margin-top: 0px;
+}*/
 
