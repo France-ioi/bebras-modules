@@ -17,7 +17,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonStateInPort: "bouton enfoncé sur le port %1",
                 waitForButton: "Attendre une pression sur le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
-                changeLedState: "Passer la LED %1 à %2 ",
+                setLedState: "Passer la LED %1 à %2 ",
                 toggleLedState: "Inverser la LED sur le port %1",
                 displayText: "Afficher à l'écran %1 Ligne 1: %2 Ligne 2: %3",
                 readTemperature: "température ambiante",
@@ -65,7 +65,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonStateInPort: "Return Button State in port %1",
                 waitForButton: "Wait for button",
                 buttonWasPressed: "Was button pressed",
-                changeLedState: "Turn led %2 in port %1",
+                setLedState: "Turn led %2 in port %1",
                 toggleLedState: "Toggle led state in port %1",
                 displayText: "Display in screen Line 1: %1 Line 2: %2",
                 readTemperature: "Read Ambient temperature",
@@ -82,7 +82,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonStateInPort : "buttonStateInPort",
                 waitForButton: "waitForButton",
                 buttonWasPressed: "buttonWasPressed",
-                changeLedState: "changeLedState",
+                setLedState: "setLedState",
                 toggleLedState: "toggleLedState",
                 displayText: "displayText",
                 readTemperature: "readTemperature",
@@ -137,7 +137,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonStateInPort: "buttonStateInPort(port): Returns the state of a button, Pressed means True and not pressed means False",
                 waitForButton: "waitForButton(port): Stops program execution until a button is pressed",
                 buttonWasPressed: "buttonWasPressed(port): Returns true if the button has been pressed and will clear the value",
-                changeLedState: "changeLedState(port, state): Change led state in the given port",
+                setLedState: "setLedState(port, state): Change led state in the given port",
                 toggleLedState: "toggleLedState(port): Toggles the led state",
                 displayText: "displayText(port, line1, line2): Display text in LCD screen",
                 readTemperature: "readTemperature(port): Read Ambient temperature",
@@ -289,7 +289,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonState: "Returns the state of a button, Pressed means True and not pressed means False",
                 waitForButton: "Stops program execution until a button is pressed",
                 buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
-                changeLedState: "Change led state in the given port",
+                setLedState: "Change led state in the given port",
                 toggleLedState: "If led is on, turns it off, if it's off turns it on",
                 buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
                 displayText: "Display text in LCD screen",
@@ -444,7 +444,7 @@ var getContext = function (display, infos, curLevel) {
             },
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
-                var command = "changeLedState(\"" + sensor.name + "\"," + ledstate + ")";
+                var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
     
                 context.quickPiConnection.sendCommand(command, callback);
             },
@@ -4780,9 +4780,9 @@ var getContext = function (display, infos, curLevel) {
 
     };
 
-    context.quickpi.changeLedState = function (name, state, callback) {
+    context.quickpi.setLedState = function (name, state, callback) {
         var sensor = findSensorByName(name);
-        var command = "changeLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
+        var command = "setLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent(name, state ? true : false);
 
@@ -5782,7 +5782,7 @@ var getContext = function (display, infos, curLevel) {
                 { name: "turnLedOn" },
                 { name: "turnLedOff" },
                 {
-                    name: "changeLedState", params: ["String", "Number"], blocklyJson: {
+                    name: "setLedState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
