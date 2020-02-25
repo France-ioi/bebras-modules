@@ -46,6 +46,7 @@ var importableModules = function () {
       'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
+      'taskStyles-0.2': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.2_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.2.css"},
 
       'conceptDisplay-1.0': {src: modulesPath+"/pemFioi/conceptDisplay-1.0.js", id: "concept_display"},
       'conceptViewer-1.0': {src: modulesPath+"/pemFioi/conceptViewer-1.0.js", id: "concept_viewer"},
