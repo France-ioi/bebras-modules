@@ -83,6 +83,7 @@
             this.setValidated(false);
             this.popup.hide();
             this.unfreezeTask();
+            window.quiz_ui.toggleFeedback(false);
             task.showViews({"task": true, "solution": false}, function(){});
             if(from_scratch) {
                 window.quiz_ui.reset();
@@ -149,7 +150,11 @@
                 self.freezeTask();
                 self.setValidated(true);
             });
-            if($('#solution').length) {
+            var hasSolution = false;
+            $('solution, .solution, #solution').each(function() {
+               if($(this).text().trim() != '') { hasSolution = true; }
+            });
+            if(hasSolution) {
                 this.addButton(this.holder, 'solution', function() {
                     miniPlatformShowSolution();
                 });
@@ -223,9 +228,6 @@
     task.getDefaultStateObject = function() { return {} }
 
 
-
-    $('solution').hide();
-    $('#solution').hide();
     $('.grader').hide();
 
 

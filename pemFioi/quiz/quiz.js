@@ -219,9 +219,11 @@ Quiz.UI = function(params) {
             }
         },
 
+        toggleFeedback: function(visible) {
+            $('#task').toggleClass('displayFeedback', visible);
+        },
+
         toggleSolutions: function(visible) {
-            $('#solution').toggle(visible);
-            $('solution').toggle(visible);
             $('#task').toggleClass('displaySolution', visible);
         },
 
@@ -252,6 +254,8 @@ Quiz.UI = function(params) {
                 }
                 questions[i].showResult(mistakes[i], msg);
             }
+
+            this.toggleFeedback(true);
         },
 
         reset: function() {

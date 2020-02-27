@@ -125,9 +125,9 @@ answer p {
   display: inline;
   margin: 0;
 }
-question:nth-child(odd) answer {
+/*question:nth-child(odd) answer {
   border-color: #d2d2d2;
-}
+}*/
 answer:first-child {
   border-top: none;
 }
@@ -322,44 +322,50 @@ input[type=text]:focus {
 *
 */
 solution {
-  display: block;
+  display: none;
   border-top: 1px solid #e1e1e1;
   margin-top: 30px;
 }
-question:nth-child(odd) solution {
-  border-color: #d2d2d2;
+#solution, .solution {
+  display: none;
 }
-.displaySolution answer.correct:not(.selected) .answer-block {
+.displaySolution solution, .displaySolution .solution, .displaySolution #solution {
+  display: block;
+}
+/*question:nth-child(odd) solution {
+  border-color: #d2d2d2;
+}*/
+.displayFeedback answer.correct:not(.selected) .answer-block {
   border-color: transparent;
 }
-.displaySolution answer.correct:not(.selected) .answer-code::before {
+.displayFeedback answer.correct:not(.selected) .answer-code::before {
   color: #4a90e2;
 }
-.displaySolution answer.correct .answer-block {
+.displayFeedback answer.correct .answer-block {
   font-weight: bold;
 }
-.displaySolution answer.correct .answer-code::before {
+.displayFeedback answer.correct .answer-code::before {
   content: "\f0a5";
 }
-.displaySolution .horizontal answer.correct .answer-code::before {
+.displayFeedback .horizontal answer.correct .answer-code::before {
   content: "\f0a6";
 }
-.displaySolution answer.mistake .answer-block {
+.displayFeedback answer.mistake .answer-block {
   color: #797979;
   border-color: #ff001f;
 }
-.displaySolution answer.mistake .answer-code {
+.displayFeedback answer.mistake .answer-code {
   background-color: #ff001f;
   border-color: #ff001f;
 }
-.displaySolution answer.mistake .answer-code::before {
+.displayFeedback answer.mistake .answer-code::before {
   content: "\f00d";
 }
-.displaySolution answer.correct input[type=text] {
+.displayFeedback answer.correct input[type=text] {
   border-color: #4a90e2;
   border-width: 2px;
 }
-.displaySolution answer.mistake input[type=text] {
+.displayFeedback answer.mistake input[type=text] {
   border-color: #ff001f;
   border-width: 2px;
 }
