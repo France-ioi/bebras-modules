@@ -400,10 +400,10 @@ def changePinState(pin, state):
         else:
             GPIO.output(pin, GPIO.LOW)
 
-def turnLedOn(pin=5):
+def turnLedOn(pin=27):
 	changePinState(pin, 1)
 
-def turnLedOff(pin=5):
+def turnLedOff(pin=27):
 	changePinState(pin, 0)
 
 def setLedState(pin, state):
@@ -437,7 +437,7 @@ def buttonStateInPort(pin):
     return GPIO.input(pin)
 
 def buttonState():
-    return buttonStateInPort(22)
+    return buttonStateInPort(26)
 
 def waitForButton(pin):
     pin = normalizePin(pin)
