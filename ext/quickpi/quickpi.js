@@ -407,7 +407,7 @@ def turnLedOff(pin=5):
 	changePinState(pin, 0)
 
 def setLedState(pin, state):
-	setLedState(pin, state)
+    changePinState(pin, state)
 
 def toggleLedState(pin):
     pin = normalizePin(pin)
