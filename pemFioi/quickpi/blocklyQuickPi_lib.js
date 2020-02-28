@@ -1205,16 +1205,16 @@ var getContext = function (display, infos, curLevel) {
                     sensor.subType = builtinsensor.subType;
                 }
             }
-        }
 
-        // If this is a button try to set it to a stick
-        if (!sensor.port && sensor.type == "button") {
-
-            for (var i = 0; i < board.builtinSensors.length; i++) {
-                var builtinsensor = board.builtinSensors[i];
-                if (builtinsensor.type == "stick")
-                {
-                    sensor.port = builtinsensor.port;
+            
+            // If this is a button try to set it to a stick
+            if (!sensor.port && sensor.type == "button") {
+                for (var i = 0; i < board.builtinSensors.length; i++) {
+                    var builtinsensor = board.builtinSensors[i];
+                    if (builtinsensor.type == "stick")
+                    {
+                        sensor.port = builtinsensor.port;
+                    }
                 }
             }
         }
@@ -1271,9 +1271,16 @@ var getContext = function (display, infos, curLevel) {
                 context.tickIncrease = 100;
 
                 if (context.gradingInput)
+                {
+                    for (var i = 0; i < context.gradingInput.length; i++)
+                    {
+                        context.gradingInput[i].input = true;
+                    }
                     context.gradingStatesByTime = context.gradingInput.concat(context.gradingOutput);
-                else
+                }
+                else {
                     context.gradingStatesByTime = context.gradingOutput;
+                }
 
                 context.gradingStatesByTime.sort(function (a, b) { return a.time - b.time; });
 
@@ -4549,6 +4556,34 @@ var getContext = function (display, infos, curLevel) {
         drawCurrentTime();
     }
 
+    context.increaseTimeBy = function (time) {
+
+        var iStates = 0;
+
+        var newTime = context.currentTime + time;
+
+        // Advance until current time, ignore everything in the past.
+        while (context.gradingStatesByTime[iStates].time <= context.currentTime)
+            iStates++;
+
+        for (; iStates < context.gradingStatesByTime.length; iStates++) {
+            var sensorState = context.gradingStatesByTime[iStates];
+
+            // Until the new time
+            if (sensorState.time >= newTime)
+                break;
+
+            // Mark all inputs as hit
+            if (sensorState.input) {
+                //sensorState.hit = true;
+                context.currentTime = sensorState.time;
+                context.getSensorState(sensorState.name);
+            }
+        }
+
+        context.currentTime = newTime;
+    }
+
     context.getSensorExpectedState = function (name) {
         var state = null;
         var sensorStates = context.gradingStatesBySensor[name];
@@ -4618,6 +4653,8 @@ var getContext = function (display, infos, curLevel) {
         drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, "actual");
         sensor.lastStateChange = context.currentTime;
         sensor.lastState = state;
+
+        context.increaseTime(sensor);
 
         return state;
     }
@@ -4897,7 +4934,8 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.sleep = function (time, callback) {
         if (!context.display || context.autoGrading) {
-            context.currentTime += time;
+
+            context.increaseTimeBy(time);
             context.runner.noDelay(callback);
         }
         else {
