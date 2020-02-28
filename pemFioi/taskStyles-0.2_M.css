@@ -386,10 +386,13 @@ h1 .stars {
 	float: left;
 }
 .largeScreen #zone_1 {
-	width: 430px;
+	/*width: 430px;*/
+   width: 36%;
+   /*min-width: 430px;*/
 }
 .largeScreen #zone_2 {
    /*min-width: 770px;*/
+   /*width: ;*/
 }
 .consigne {
 	padding: 10px;
