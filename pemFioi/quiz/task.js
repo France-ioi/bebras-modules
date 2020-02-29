@@ -24,7 +24,8 @@
                 'placeholder_string': 'Enter string',
                 'error_string': 'Must be a string',
                 'placeholder_regexp': 'Enter text',
-                'error_regexp': 'Invalid format'
+                'error_regexp': 'Invalid format',
+                'error_grading': 'There was an error while submitting this answer, please try again in a few minutes.'
             },
             fr: {
                 'score': 'Score',
@@ -45,7 +46,8 @@
                 'placeholder_string': 'Entrez une chaîne de caractères',
                 'error_string': 'Vous devez entrer une chaïne de caractères',
                 'placeholder_regexp': 'Entrez du texte.',
-                'error_regexp': 'Format invalide'
+                'error_regexp': 'Format invalide',
+                'error_grading': 'Erreur lors de la soumission, veuillez réessayer dans quelques minutes.'
             },
         },
 
@@ -83,6 +85,7 @@
             this.setValidated(false);
             this.popup.hide();
             this.unfreezeTask();
+            window.quiz_ui.toggleFeedback(false);
             task.showViews({"task": true, "solution": false}, function(){});
             if(from_scratch) {
                 window.quiz_ui.reset();
@@ -139,6 +142,17 @@
         },
 
 
+        displayError: function(error) {
+            if(!this.errorHolder) {
+                this.errorHolder = $('<div class="error-message"></div>');
+                this.holder.append('<br>');
+                this.holder.append(this.errorHolder);
+            }
+            this.errorHolder.html('<i class="fas fa-bell icon"></i> ' + error);
+            this.errorHolder.toggle(!!error);
+        },
+
+
         init: function() {
             if(this.holder) return;
             $('#showSolutionButton').remove();
@@ -149,7 +163,11 @@
                 self.freezeTask();
                 self.setValidated(true);
             });
-            if($('#solution').length) {
+            var hasSolution = false;
+            $('solution, .solution, #solution').each(function() {
+               if($(this).text().trim() != '') { hasSolution = true; }
+            });
+            if(hasSolution) {
                 this.addButton(this.holder, 'solution', function() {
                     miniPlatformShowSolution();
                 });
@@ -223,9 +241,6 @@
     task.getDefaultStateObject = function() { return {} }
 
 
-
-    $('solution').hide();
-    $('#solution').hide();
     $('.grader').hide();
 
 
@@ -237,10 +252,11 @@
             return callback(res);
         }
         console.error('Local Quiz grader not found');
+        if(errorcb) { errorcb(); }
     }
 
 
-    function useGraderUrl(url, task_token, answer, versions, score_settings, callback) {
+    function useGraderUrl(url, task_token, answer, versions, score_settings, callback, errorcb) {
         var data = {
             action: 'grade',
             task: task_token,
@@ -259,8 +275,10 @@
                 return callback(res.data);
             }
             console.error('Grader response error: ', res);
+            if(errorcb) { errorcb(); }
         }).fail(function(jqxhr, settings, exception ) {
             console.error('Grader url not responding: ' + url);
+            if(errorcb) { errorcb(); }
         });
     }
 
@@ -333,27 +351,32 @@
                     displayMessages(result.messages);
                     callback(result.score, lang.translate('grader_msg') + result.score, null);
                 }
+                function onError(result) {
+                    task_toolbar.displayError(lang.translate('error_grading'));
+                }
                 var scoreSettings = {
                     maxScore: taskParams.maxScore,
                     minScore: taskParams.minScore,
                     noScore: taskParams.noScore
                     };
                 var token = task_token.get()
-                if(token) {
+                if(true || token) {
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,
                         answer,
                         Quiz.versions.get(),
                         scoreSettings,
-                        onGrade
+                        onGrade,
+                        onError
                     );
                 } else {
                     useGraderData(
                         answer,
                         Quiz.versions.get(),
                         scoreSettings,
-                        onGrade
+                        onGrade,
+                        onError
                     );
                 }
             };
