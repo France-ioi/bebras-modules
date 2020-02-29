@@ -1035,14 +1035,7 @@ var getContext = function (display, infos, curLevel) {
         });
     
         return found;
-    }
-    
-    context.raspberryPiChangeBoard = function(board) {
-        window.task.displayedSubTask.context.changeBoard(board);
-
-        window.task.displayedSubTask.context.resetSensorTable();
-    }
-    
+    }  
 
     if(window.getQuickPiConnection) {
         var lockstring;
@@ -1082,7 +1075,7 @@ var getContext = function (display, infos, curLevel) {
                             throw (strings.messages.wrongState);
                         }
                     }
-                    else {
+                    else if (state.time > context.currentTime) {
                         if (lastTurn) {
                             context.success = false;
                             throw (strings.messages.wrongState);
@@ -1294,6 +1287,7 @@ var getContext = function (display, infos, curLevel) {
 
                     context.gradingStatesBySensor[state.name].push(state);
                     state.hit = false;
+                    state.badonce = false;
 
                     if (state.time > context.maxTime)
                         context.maxTime = state.time;
@@ -2520,7 +2514,8 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function raspberryPiChangeBoard(board) {
-        context.changeBoard(board);
+        window.task.displayedSubTask.context.changeBoard(board);
+        window.task.displayedSubTask.context.resetSensorTable();
     }
 
 
@@ -4495,7 +4490,7 @@ var getContext = function (display, infos, curLevel) {
 
             drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
 
-            if (context.currentTime >= context.maxTime) {
+            if (context.currentTime > context.maxTime) {
                 context.success = true;
                 context.doNotStartGrade = false;
                 throw (strings.messages.testSuccess);
@@ -4563,7 +4558,8 @@ var getContext = function (display, infos, curLevel) {
         var newTime = context.currentTime + time;
 
         // Advance until current time, ignore everything in the past.
-        while (context.gradingStatesByTime[iStates].time <= context.currentTime)
+        while (iStates < context.gradingStatesByTime.length &&
+               context.gradingStatesByTime[iStates].time <= context.currentTime)
             iStates++;
 
         for (; iStates < context.gradingStatesByTime.length; iStates++) {
