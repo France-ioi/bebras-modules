@@ -1059,7 +1059,7 @@ var getContext = function (display, infos, curLevel) {
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
 
-        if (!context.display && !context.autoGrading && context.autoValidateManual) {
+        if (!context.display && !context.autoGrading) {
             context.success = true;
             throw (strings.messages.manualTestSuccess);
         }
@@ -1323,13 +1323,6 @@ var getContext = function (display, infos, curLevel) {
         } else {
 
             context.success = false;
-        }
-
-        if (context.display) {
-            if (context.autoGrading)
-                context.autoValidateManual = true;
-            else
-                context.autoValidateManual = false;
         }
 
         context.timeLineStates = [];
@@ -4585,6 +4578,12 @@ var getContext = function (display, infos, curLevel) {
 
     context.getSensorExpectedState = function (name) {
         var state = null;
+
+        if (!context.gradingStatesBySensor)
+        {
+            return null;
+        }
+
         var sensorStates = context.gradingStatesBySensor[name];
 
         if (!sensorStates)
