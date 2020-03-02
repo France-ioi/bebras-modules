@@ -257,7 +257,8 @@ function LR_Parser(settings,subTask,answer) {
       this.grammar = new Grammar(ruleStr);
       this.lrClosureTable = new LRClosureTable(this.grammar);
       this.lrTable = new LRTable(this.lrClosureTable);
-      // console.log(this.lrTable)
+      // console.log(this.grammar)
+      // console.log(this.lrClosureTable)
    };
 
    this.initAutomata = function() {
@@ -505,14 +506,15 @@ function LR_Parser(settings,subTask,answer) {
                   var actionType = state[colLabel[iCol]][0]["actionType"];
                   var actionValue = state[colLabel[iCol]][0]["actionValue"];
                   if(actionType == "r"){
-                     html += "<span class=\"ruleMarker\">"+actionType+"<span class=\"ruleMarkerIndex\">"+actionValue+"</span>"+"</span>";
+                     var displayedRule = actionValue + 1;
+                     html += "<span class=\"ruleMarker\">"+actionType+"<span class=\"ruleMarkerIndex\">"+displayedRule+"</span>"+"</span>";
                   }else{
                      html += actionType+actionValue;
                   }
                }else if(colLabel[iCol] == "S" && stateID == 0){
                   html += terminalStateIndex;
                }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
-                  html += "acc";
+                  html += "<span class=\"ruleMarker ruleMarkerIndex\">acc</span>";
                }
             }
             html += "</td>";
@@ -536,7 +538,8 @@ function LR_Parser(settings,subTask,answer) {
       html += "<ul>";
       for(var iRule = 0; iRule < this.rules.length; iRule++){
          var development = (this.grammar.rules[iRule].development[0] == "''") ? "" : this.grammar.rules[iRule].development.join(" ");
-         html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+iRule+
+         var displayedRule = iRule + 1;
+         html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+displayedRule+
          "</span> <span class=\"nonTerminal\">"+this.grammar.rules[iRule].nonterminal+"</span><i class=\"fas fa-long-arrow-alt-right\"></i><span class=\"development\">"+
          development+"</span></li>";
       }
@@ -924,7 +927,8 @@ function LR_Parser(settings,subTask,answer) {
          }
          var circle = this.paper.circle(x,y,10).attr(attr.circle);
          var text = this.paper.text(x - 1,y,"r").attr(attr.text);
-         var ruleObj = this.paper.text(x + 1,y,rule).attr(attr.rule);
+         var displayedRule = rule + 1;
+         var ruleObj = this.paper.text(x + 1,y,displayedRule).attr(attr.rule);
          if(self.mode == 2){
             var textBBox = content.getBBox();
             var lines = info.content.split("\n");
@@ -2611,8 +2615,13 @@ function LR_Parser(settings,subTask,answer) {
                   self.displayError("An entry is missing in line "+state.index);
                   return false;
                }
-               var expected = state[symbol][0].actionType+state[symbol][0].actionValue;
+               if(state[symbol][0].actionType == "r"){
+                  var expected = "r"+(state[symbol][0].actionValue + 1);
+               }else{
+                  var expected = state[symbol][0].actionType+state[symbol][0].actionValue;
+               }
                if(answer[state.index][symbol] != expected){
+                  console.log(expected)
                   self.displayError("Error in line "+state.index+" at column "+symbol);
                   return false;
                }

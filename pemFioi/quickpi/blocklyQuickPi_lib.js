@@ -221,7 +221,7 @@ var getContext = function (display, infos, curLevel) {
 
                     <span id="pichangehatui">
                         <button type="button" id="pichangehat" class="btn">
-                            <span class="fas fa-hat-wizard"></span><span>Change Board</span></span></span>
+                            <span class="fas fa-hat-wizard"></span><span>Changer de carte</span></span></span>
                         </button>
                         <button type="button" id="pihatsetup" class="btn">
                             <span class="fas fa-cog"></span><span>Config</span></span></span>
@@ -1966,7 +1966,7 @@ var getContext = function (display, infos, curLevel) {
             <div class="panel-heading">
                 <h2 class="sectionTitle">
                     <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                    Select your hat
+                    Choisissez votre carte
                 </h2>
                 <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
             </div>
@@ -1992,7 +1992,7 @@ var getContext = function (display, infos, curLevel) {
                 var image = document.createElement('img');
                 image.src = getImg(board.image);
 
-                $('#boardlist').append(image);
+                $('#boardlist').append(image).append("&nbsp;&nbsp;");
 
                 image.onclick = function () {
                     $('#popupMessage').hide();
