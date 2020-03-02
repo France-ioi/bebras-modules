@@ -353,8 +353,7 @@ var quickAlgoInterface = {
         // -invalid : Display as invalid (program can't be executed)
         // -type : Type of the text displayed (capacity, forbidden, limited)
 
-        if(!info.text) { return; }
-        $('.capacity').html(info.text);
+        $('.capacity').html(info.text ? info.text : '');
 
         if(info.invalid) {
             this.blinkRemaining(11, true);
