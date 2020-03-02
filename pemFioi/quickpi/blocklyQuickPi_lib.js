@@ -4557,6 +4557,9 @@ var getContext = function (display, infos, curLevel) {
 
         var newTime = context.currentTime + time;
 
+        if (!context.gradingStatesByTime)
+            return;
+
         // Advance until current time, ignore everything in the past.
         while (iStates < context.gradingStatesByTime.length &&
                context.gradingStatesByTime[iStates].time <= context.currentTime)
