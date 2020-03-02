@@ -171,7 +171,7 @@ var getContext = function (display, infos, curLevel) {
                 readSoundLevel: "readSoundLevel(port)",
 
 
-                readMagneticForce: "readMagneticForce()",
+                readMagneticForce: "readMagneticForce(axis)",
                 computeCompassHeading: "computeCompassHeading()",
 
                 readInfraredState: "readInfraredState()",
@@ -1252,6 +1252,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.offLineMode) {
             $('#piinstallcheck').hide();
             context.quickPiConnection.startNewSession();
+            context.resetSensorTable();
         }
 
         if (taskInfos != undefined) {
