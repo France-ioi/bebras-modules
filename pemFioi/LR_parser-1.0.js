@@ -512,7 +512,7 @@ function LR_Parser(settings,subTask,answer) {
                }else if(colLabel[iCol] == "S" && stateID == 0){
                   html += terminalStateIndex;
                }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
-                  html += "acc";
+                  html += "<span class=\"ruleMarker ruleMarkerIndex\">acc</span>";
                }
             }
             html += "</td>";
