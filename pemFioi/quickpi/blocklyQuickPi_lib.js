@@ -2342,7 +2342,7 @@ var getContext = function (display, infos, curLevel) {
                         subType: sensorDefinition.subType,
                         port: port,
                         name: name
-                    },
+                    }
                 );
 
                 $('#popupMessage').hide();
