@@ -47,6 +47,8 @@ function LR_Parser(settings,subTask,answer) {
    this.sideTable = false;
    this.rowHL = null;
    this.colHL = null;
+   this.gotoColHL = null;
+   this.removeGotoColHL = false; // simulation bug fix with parse table anim
 
    this.paper;
    this.paperHeight = settings.paperHeight;
@@ -177,7 +179,8 @@ function LR_Parser(settings,subTask,answer) {
    // };
    this.cellHighlightAttr = {
       position: "absolute",
-      border: "4px solid "+this.colors.blue,
+      border: "4px solid",
+      "border-color": this.colors.blue,
       "pointer-events": "none"
    };
    this.treeLineAttr = {
@@ -239,7 +242,7 @@ function LR_Parser(settings,subTask,answer) {
 
       this.style();
       if(this.mode < 6){
-         this.updateState(false);
+         this.updateState(false,"init");
       }
       this.initHandlers();
       if(this.mode >= 3 && this.mode < 6){
@@ -514,7 +517,7 @@ function LR_Parser(settings,subTask,answer) {
                }else if(colLabel[iCol] == "S" && stateID == 0){
                   html += terminalStateIndex;
                }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
-                  html += "<span class=\"ruleMarker ruleMarkerIndex\">acc</span>";
+                  html += "<span class=\"ruleMarker ruleMarkerIndex\">acc.</span>";
                }
             }
             html += "</td>";
@@ -1028,7 +1031,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      self.updateParseTable();
+      self.updateParseTable({action:"resize"});
    };
 
    this.reset = function() {
@@ -1040,7 +1043,7 @@ function LR_Parser(settings,subTask,answer) {
       $(".rule").removeClass("selected");
       this.selectedStackElements = [];
       this.updateStackTable();
-      this.updateState(false);
+      this.updateState(false,"reset");
       this.error = false;
       this.accept = false;
 
@@ -1124,9 +1127,13 @@ function LR_Parser(settings,subTask,answer) {
             self.applyShift(action.state,reverse,anim);
             break;
          case "r":
+            // console.log("r");
             self.treeAnim(step,reverse,anim);
             self.clearHighlight();
             var rule = action.rule;
+            // console.log(this.grammar.rules[rule])
+            var nonTerminal = self.grammar.rules[rule].nonterminal;
+            self.updateParseTable({action:"startReduction",nonTerminal:nonTerminal,anim:anim});
             if(reverse){
                this.reverseReduction(rule);
                return;
@@ -1141,18 +1148,15 @@ function LR_Parser(settings,subTask,answer) {
             }
             self.styleStackTable();
             self.selectRule($(".rule[data_rule="+rule+"]"));
-            // $(".rule").removeClass("selected");
-            // $(".rule[data_rule="+rule+"]").addClass("selected");
-            // self.selectedRule = rule;
-            // self.styleRules();
+            // console.log(anim)
             if(anim){
                this.timeOutID = setTimeout(function() {
-                  var nonTerminal = self.grammar.rules[rule].nonterminal;
+                  // var nonTerminal = self.grammar.rules[rule].nonterminal;
                   var goto = action.goto || self.getPreviousState();
                   self.applyReduction(nonTerminal,goto,true);
                }, self.animationTime);
             }else{
-               var nonTerminal = self.grammar.rules[rule].nonterminal;
+               // var nonTerminal = self.grammar.rules[rule].nonterminal;
                var goto = action.goto;
                self.applyReduction(nonTerminal,goto,false);
             }
@@ -1224,6 +1228,7 @@ function LR_Parser(settings,subTask,answer) {
          self.graphEditor.setLoopEnabled(false);
          self.graphEditor.setInitialEnabled(false);
       }
+      self.resetParseTableHL();
    };
 
    this.stepBackward = function() {
@@ -1253,6 +1258,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.stepForward = function() {
+      self.resetParseTableHL();
       if(self.mode == 3){
          self.isLastActionAGraphEdit = false;
          self.showUndo();
@@ -1336,6 +1342,7 @@ function LR_Parser(settings,subTask,answer) {
       for(var iStep = 0; iStep <= step; iStep++){
          this.runSimulationLoop(iStep,false,false,anim,progressBarMove);
       }
+      this.resetParseTableHL();
       // this.clearHighlight();
    };
 
@@ -1418,7 +1425,7 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
       self.styleTabSwitch();
       self.showTab();
-      self.updateParseTable();
+      self.updateParseTable({action:"switchTab"});
    };
 
    this.showTab = function() {
@@ -1573,6 +1580,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.applyReduction = function(nonTerminal,goto,anim,firstStepOnly) {
       /* firstStepOnly: for manual reduction in two steps (reduction + goto) */
+      // console.log('applyReduction')
       this.clearHighlight();
       var newStackElement = [goto,nonTerminal];
       this.highlightPrevState(this.currentState);
@@ -1601,7 +1609,7 @@ function LR_Parser(settings,subTask,answer) {
          this.styleRules();
          this.updateStackTable();
 
-         this.updateState(anim);
+         this.updateState(anim,"reduction");
          this.arrangeEdgeHL();
       }
    };
@@ -1641,7 +1649,7 @@ function LR_Parser(settings,subTask,answer) {
       if(prevStates.length == 0){
          this.currentState = prevState;
          // console.log(state+" "+newStackElement)
-         this.updateParseTable(true,newStackElement);
+         this.updateParseTable({action:"reduction",anim:true,newStackElement:newStackElement});
          if(firstStepOnly){
             reduc = false;
             this.waitingForGoto = true;
@@ -1663,6 +1671,10 @@ function LR_Parser(settings,subTask,answer) {
             self.updateStackTable(firstStepOnly);
             $(".stackElement[data_col="+selectedCol+"]").hide();
             $(".stackElement[data_col="+selectedCol+"]").fadeIn(self.animationTime,function(){
+               if(!$(this).hasClass("State")){
+                  /* prevent double callback */
+                  return
+               }
                if(!firstStepOnly){
                   self.goto(newStackElement[0]);
                   self.arrangeEdgeHL();
@@ -1701,16 +1713,17 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.goto = function(newState) {
+      // console.log("goto "+newState)
       var col = this.stack.length - 1;
       $(".stackElement.State[data_col="+col+"]").text(newState);
       $(".stackElement.State[data_col="+col+"]").css("opacity",0);
       $(".stackElement.State[data_col="+col+"]").animate({opacity:1},self.animationTime);
       self.highlightRule(self.selectedRule);
-      self.updateState(true);
+      self.updateState(true,"goto");
       self.displayMessage("reduce","GOTO "+newState);
       self.currentVertex = self.getStateID(newState);
       self.arrangeEdgeHL();
-   }
+   };
 
    this.reverseReduction = function(rule) {
       var newStackElements = [];
@@ -1727,7 +1740,7 @@ function LR_Parser(settings,subTask,answer) {
       this.updateStackTable();
 
       this.styleStackTable();
-      this.updateState(false);
+      this.updateState(false,"reverseReduction");
 
    };
 
@@ -1783,7 +1796,7 @@ function LR_Parser(settings,subTask,answer) {
       this.selectedStackElements = [];
       this.updateStackTable();
       this.updateCursor(!(reverse || !anim));
-      this.updateState(!(reverse || !anim));
+      this.updateState(!(reverse || !anim),"shift");
       // console.log(this.selectedState)
    };
 
@@ -1979,10 +1992,24 @@ function LR_Parser(settings,subTask,answer) {
       this.styleRules();
    };
 
-   this.updateParseTable = function(anim,newStackElement) {
-      // console.log(this.currentState+" "+newStackElement);
-      // this.styleParseTable();
-      // console.log("updateParseTable")
+   this.resetParseTableHL = function() {
+      // console.log("reset")
+      this.styleParseTable();
+      if(this.gotoColHL){
+         self.gotoColHL.remove();
+         self.gotoColHL = null;
+         self.removeGotoColHL = false;
+      }
+   };
+
+   this.updateParseTable = function(data) {
+      if(data){
+         var anim = data.anim;
+         var newStackElement = data.newStackElement;
+         var nonTerminal = data.nonTerminal;
+         var action = data.action;
+      }
+      // console.log("updateParseTable "+action+" "+anim);
       if(!this.rowHL && this.mode != 4){
          this.rowHL = $("<div id=\"rowHL\"></div>");
          $("#"+this.parseTableID).append(this.rowHL);
@@ -2002,6 +2029,35 @@ function LR_Parser(settings,subTask,answer) {
       var colW = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").outerWidth();
       var rowTop = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position().top;
       var colLeft = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").position().left;
+
+      if(action == "startReduction" && anim){
+         /* column selector change color + goto column selector appears */
+         if(this.removeGotoColHL){
+            this.removeGotoColHL = false;
+            this.gotoColHL.remove();
+            this.styleParseTable();
+         }
+         this.colHL.css("border-color",this.colors.lightBlue);
+         this.gotoColHL = $("<div id=\"gotoColHL\"></div>");
+         $("#"+this.parseTableID).append(this.gotoColHL);
+         this.gotoColHL.css(this.cellHighlightAttr);
+         var gotoColW = $("#"+this.parseTableID+" td[data_symbol=\""+nonTerminal+"\"]").outerWidth();
+         var gotoColLeft = $("#"+this.parseTableID+" td[data_symbol=\""+nonTerminal+"\"]").position().left;
+         var gotoColAttr = {
+            width: gotoColW - 4,
+            height: tableH - 4 - actionH,
+            top: actionH,
+            left: gotoColLeft - 2
+         };
+         this.gotoColHL.css(gotoColAttr);
+         // if(anim){
+            this.gotoColHL.hide();
+            this.gotoColHL.fadeIn(this.animationTime);
+         // }
+         // console.log("startReduction");
+         return
+      }
+
       var newRowAttr = {
          width: tableW - 4,
          height: rowH - 4,
@@ -2015,19 +2071,30 @@ function LR_Parser(settings,subTask,answer) {
          top: actionH,
          left: colLeft - 2
       };
+
       if(this.mode != 4){
          if(!anim){
             this.rowHL.css(newRowAttr);
             this.colHL.css(newColAttr);
          }else{
             var tempState = this.currentState;
+
+            if(action == "goto"){
+               this.removeGotoColHL = true;
+               this.gotoColHL.fadeOut(this.animationTime);
+            }
             this.rowHL.animate(newRowAttr,this.animationTime,function(){
+               // console.log("end anim "+action);
                if(newStackElement){
                   $("#parseTable [data_state="+tempState+"][data_symbol="+newStackElement[1]+"]").css({
                      "background-color": self.colors.blue,
                      color: "white" });
-               }else{
+               }else if(self.gotoColHL && action == "goto" && self.removeGotoColHL){
+                  // console.log("remove goto")
+                  self.gotoColHL.remove();
+                  self.gotoColHL = null;
                   self.styleParseTable();
+                  self.removeGotoColHL = false;
                }
             });
             this.colHL.animate(newColAttr,this.animationTime);
@@ -2036,13 +2103,13 @@ function LR_Parser(settings,subTask,answer) {
       // console.log(this.inputIndex+" "+this.input)
    };
 
-   this.updateState = function(anim) {
+   this.updateState = function(anim,action) {
       var id = this.getStateID(this.currentState);
       if(!id){
          return;
       }
       // console.log("updateState")
-      this.updateParseTable(anim);
+      this.updateParseTable({anim:anim,action:action});
       var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
       var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
@@ -2494,7 +2561,6 @@ function LR_Parser(settings,subTask,answer) {
       var cellContent = $(this).text();
       if(self.mode == 4){
          var maxlength = (self.lrTable.states.length >= 10) ? 3 : 2;
-         // console.log(state+" "+symbol);
          $(this).off("click");
          if(self.cellEditor){
             self.cellEditor.remove();
@@ -2512,11 +2578,8 @@ function LR_Parser(settings,subTask,answer) {
             if(ev.which == 13){
                self.writeCell(text,cell);
             }
-            // console.log(text);
          });
       }else{
-         // console.log(state+" "+symbol);
-         // console.log(self.currentState);
          ev.stopPropagation();
          if(self.waitingForGoto){
             var expectedSymbol = self.stack[self.stack.length - 1][1];
@@ -2540,9 +2603,9 @@ function LR_Parser(settings,subTask,answer) {
                self.applyShift(nextState,false,true);
                self.saveAnswer();
             }else if(cellContent[0] == "r"){
-               var rule = cellContent[1];
+               var displayedRule = cellContent[1];
+               var rule = displayedRule - 1;
                var nonTerminal = self.grammar.rules[rule].nonterminal;
-               // console.log(nonTerminal);
                self.treeAnim(self.simulationStep,false,true);
                var nbRedChar = (self.grammar.rules[rule].development[0] == "''") ? 0 : self.grammar.rules[rule].development.length;
                var startIndex = self.stack.length - nbRedChar;
@@ -2558,7 +2621,7 @@ function LR_Parser(settings,subTask,answer) {
                self.styleRules();
                var previousState = self.getPreviousState();
                var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-               
+               self.updateParseTable({anim:true,action:"startReduction",nonTerminal:nonTerminal});
                self.simulationStep++;
                self.applyReduction(nonTerminal,goto,true,true);
             }else{   // goto
@@ -2568,8 +2631,6 @@ function LR_Parser(settings,subTask,answer) {
                   goto: cellContent
                });
                self.currentState = cellContent;
-               // var newStackElement = [cellContent,symbol];
-               // self.goto(newStackElement);
                self.goto(cellContent);
                self.waitingForGoto = false;
                self.saveAnswer();
@@ -3188,7 +3249,7 @@ function LR_Parser(settings,subTask,answer) {
          case 3:
             this.visualGraphJSON = answer.visualGraphJSON[answer.visualGraphJSON.length - 1];
             this.initAutomata();
-            this.updateState();
+            this.updateState(false,"reloadAnswer");
             break;
          case 4:
             for(var state in answer){
