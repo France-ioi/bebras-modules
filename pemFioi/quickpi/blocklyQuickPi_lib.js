@@ -1077,6 +1077,10 @@ var getContext = function (display, infos, curLevel) {
                     }
                     else if (state.time > context.currentTime) {
                         if (lastTurn) {
+                            if (context.autoGrading)
+                                context.doNotStartGrade = false;
+                            else
+                                context.doNotStartGrade = true;        
                             context.success = false;
                             throw (strings.messages.wrongState);
                         }
