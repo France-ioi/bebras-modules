@@ -2602,9 +2602,9 @@ function LR_Parser(settings,subTask,answer) {
                self.applyShift(nextState,false,true);
                self.saveAnswer();
             }else if(cellContent[0] == "r"){
-               var rule = cellContent[1];
+               var displayedRule = cellContent[1];
+               var rule = displayedRule - 1;
                var nonTerminal = self.grammar.rules[rule].nonterminal;
-               // console.log(nonTerminal);
                self.treeAnim(self.simulationStep,false,true);
                var nbRedChar = (self.grammar.rules[rule].development[0] == "''") ? 0 : self.grammar.rules[rule].development.length;
                var startIndex = self.stack.length - nbRedChar;
@@ -2620,7 +2620,7 @@ function LR_Parser(settings,subTask,answer) {
                self.styleRules();
                var previousState = self.getPreviousState();
                var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-               
+               self.updateParseTable({anim:true,action:"startReduction",nonTerminal:nonTerminal});
                self.simulationStep++;
                self.applyReduction(nonTerminal,goto,true,true);
             }else{   // goto
