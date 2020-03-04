@@ -2081,6 +2081,7 @@ function LR_Parser(settings,subTask,answer) {
 
             if(action == "goto"){
                this.removeGotoColHL = true;
+               this.gotoColHL.fadeOut(this.animationTime);
             }
             this.rowHL.animate(newRowAttr,this.animationTime,function(){
                // console.log("end anim "+action);
