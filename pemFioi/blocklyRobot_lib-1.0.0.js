@@ -1141,6 +1141,53 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       },
+      veterinary: {
+         fr: {
+            label: {
+               withdrawObject: "ramasser le bois",
+               dropObject: "donner le bois au castor",
+               onObject: "sur du bois",
+               onContainer: "chez un castor",
+            },
+            code: {
+               withdrawObject: "ramasserBois",
+               dropObject: "donnerBois",
+               onObject: "surBois",
+               onContainer: "chezCastor",
+            },   
+            messages: {
+               emptyBag: "Le robot ne porte pas de bois !",
+               tooManyObjects: "Le robot porte déjà du bois !",
+               successContainersFilled: "Bravo, tous les castors ont du bois. Ils remercient votre robot !",
+               failureContainersFilled: "Tout le bois n'a pas été distribué.",
+               failureContainersFilledLess: "Il reste du bois à distribuer.",
+               failureContainersFilledBag: "Il faut donner le bois au castor !",
+            }
+         },
+
+         es: {
+            label: {
+               withdrawObject: "recoger la bola",
+               dropObject: "soltar la bola",
+               onObject: "sobre una bola",
+               onContainer: "sobre un agujero",
+            },
+            code: {
+               withdrawObject: "recogerBola",
+               dropObject: "soltarBola",
+               onObject: "sobreBola",
+               onContainer: "sobreAgujero",
+            },   
+            messages: {
+               emptyBag: "¡El robot no carga ninguna bola!",
+               tooManyObjects: "¡El robot ya está cargando una bola!",
+               successContainersFilled: "Bravo, ¡el robot ordenó las bolas!",
+               failureContainersFilled: "Hay bolas en lugares incorrectos.",
+               failureContainersFilledLess: "Aún falta colocar una bola.",
+               failureContainersFilledBag: "¡Debe colocar la bola en un agujero!",
+            }
+         }
+      },
    };
    
    var contextParams = {
@@ -1905,6 +1952,18 @@ var getContext = function(display, infos, curLevel) {
             marker: { num: 3, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             box: { num: 4, img: "box.png", side: 60, isObstacle: true, isPushable: true, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 }            
+         },
+         checkEndCondition: robotEndConditions.checkContainersFilled
+      },
+      veterinary: {
+         bagSize: 1,
+         backgroundColor: "#e8c999",
+         borderColor: "#a67d40",
+         itemTypes: {
+            green_robot: { img: "veterinary_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 2 },
+            bebras: { num: 2, img: "bebras.png", side: 70, isContainer: true, zOrder: 0 },
+            wood: { num: 3, img: "wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
+            tree: { num: 4, img: "tree.png", side: 70, isObstacle: true, offsetY: 5, zOrder: 0 }, 
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
