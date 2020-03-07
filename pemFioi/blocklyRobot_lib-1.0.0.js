@@ -1162,6 +1162,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilled: "Tout le bois n'a pas été distribué.",
                failureContainersFilledLess: "Il reste du bois à distribuer.",
                failureContainersFilledBag: "Il faut donner le bois au castor !",
+               failureDropObject: "Ce castor a déjà du bois.",
             }
          },
 
@@ -1957,6 +1958,7 @@ var getContext = function(display, infos, curLevel) {
       },
       veterinary: {
          bagSize: 1,
+         containerSize: 1,
          backgroundColor: "#e8c999",
          borderColor: "#a67d40",
          itemTypes: {
