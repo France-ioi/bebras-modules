@@ -1926,7 +1926,8 @@ var getContext = function(display, infos, curLevel) {
             marker_brown: { num: 10, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#804d00";} },
             marker_grey: { num: 11, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#808080";} },
             marker_black: { num: 12, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#000000";} },
-            paint: { side: 60, isWithdrawable: true, zOrder: 1 }
+            paint: { side: 60, isWithdrawable: true, zOrder: 1 },
+            marker_paint: { num: 1, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.type === "paint";} },
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
