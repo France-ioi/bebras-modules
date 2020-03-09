@@ -1043,6 +1043,16 @@ var getContext = function(display, infos, curLevel) {
              }
          }  
       },
+      pixelArt: {
+         fr: {
+            messages: {
+               successContainersFilled: "Bravo, votre dessin est identique au modèle. Quel artiste !",
+               failureContainersFilled: "Regardez bien le modèle, votre dessin n'est pas identique.",
+				   failureContainersFilledLess: "Le dessin n'est pas fini !",
+				   failureDropObject: "Le robot n'a pas peint cette case de la bonne couleur.",
+            }
+         }
+      },
       rocket: {
          fr: {
             label: {
