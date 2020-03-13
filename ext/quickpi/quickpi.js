@@ -26,12 +26,11 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     this.commandQueue = [];
     this.seq = 0;
 
-    this.connect = function(ipaddress) {
+    this.connect = function(url) {
         if (this.wsSession != null) {
             return;
         }
-
-        url = "ws://" + ipaddress + ":5000/api/v1/commands";
+        
         this.locked = "";
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
@@ -113,6 +112,10 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
 
                         sendCommand(command.command, command.callback);
                     }
+                }
+            } else if (message.command == "closed") {
+                if (wsSession) {
+                        wsSession.close();
                 }
             }
         }
