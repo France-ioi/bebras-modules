@@ -267,6 +267,9 @@ var getContext = function (display, infos, curLevel) {
                                 </div>
                             </div>
                         </div>
+                        <div>
+                            <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
+                        </div>
                         <div panel-body-usbbt>
                             <label id="piconnectionlabel"></label>
                         </div>
@@ -1778,11 +1781,25 @@ var getContext = function (display, infos, curLevel) {
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
 
-                var ipaddress = $('#piaddress').val();
-                sessionStorage.raspberryPiIpAddress = ipaddress;
+                if ($('#piusetunnel').is(":checked")) {
+                    var url = "ws://api.quick-pi.org/client/" + 
+                        $('#schoolkey').val()  + "-" +
+                         $("#pilist option:selected").text() +
+                        "/api/v1/commands";
 
-                showasConnecting();
-                context.quickPiConnection.connect(ipaddress);
+                    sessionStorage.quickPiUrl = url;
+                    context.quickPiConnection.connect(url);
+
+                } else {
+                    var ipaddress = $('#piaddress').val();
+                    sessionStorage.raspberryPiIpAddress = ipaddress;
+                    
+                    showasConnecting();
+                    var url = "ws://" + ipaddress + ":5000/api/v1/commands";
+                    sessionStorage.quickPiUrl = url;
+
+                    context.quickPiConnection.connect(url);
+                }
             });
 
             $('#pirelease').click(function () {
@@ -1932,6 +1949,7 @@ var getContext = function (display, infos, curLevel) {
                 var first = true;
 
                 $('#pilist').empty();
+                $('#piusetunnel').attr('disabled', true);
 
                 for (var i = 0; i < jsonlist.length; i++) {
                     var pi = jsonlist[i];
@@ -1947,6 +1965,8 @@ var getContext = function (display, infos, curLevel) {
                         $('#piaddress').trigger("input");
                         first = false;
                         $('#pilist').prop('disabled', false);
+
+                        $('#piusetunnel').attr('disabled', false);
                     }
                 }
             }
@@ -2075,7 +2095,7 @@ var getContext = function (display, infos, curLevel) {
         if (parseInt(sessionStorage.autoConnect)) {
             if (!context.quickPiConnection.isConnected() && !context.quickPiConnection.isConnecting()) {
                 $('#piconnect').attr("disabled", true);
-                context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
+                context.quickPiConnection.connect(sessionStorage.quickPiUrl);
             }
         }
     };
@@ -2502,7 +2522,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
-            context.quickPiConnection.connect(sessionStorage.raspberryPiIpAddress);
+            context.quickPiConnection.connect(sessionStorage.quickPiUrl);
         } else {
             // If I was never connected don't attempt to autoconnect again
             sessionStorage.autoConnect = "0";
