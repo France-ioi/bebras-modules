@@ -266,10 +266,11 @@ var getContext = function (display, infos, curLevel) {
                                     <input id=piaddress type="text" class="form-control">
                                 </div>
                             </div>
+                            <div>
+                                <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
+                            </div>
                         </div>
-                        <div>
-                            <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
-                        </div>
+
                         <div panel-body-usbbt>
                             <label id="piconnectionlabel"></label>
                         </div>
