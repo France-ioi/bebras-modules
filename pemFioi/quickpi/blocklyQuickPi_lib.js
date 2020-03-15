@@ -238,43 +238,44 @@ var getContext = function (display, infos, curLevel) {
                         <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                     </div>
                     <div class="panel-body">
-                        <div class="switchRadio btn-group" id="piconsel">
-                            <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
-                            <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
-                            <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
-                        </div>
-                        <div id="pischoolcon">
-                            <div class="form-group">
-                                <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">Aa</div>
-                                    <input type="text" id="schoolkey" class="form-control">
+                        <div id="piconnectionmainui">
+                            <div class="switchRadio btn-group" id="piconsel">
+                                <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
+                                <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
+                                <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
+                            </div>
+                            <div id="pischoolcon">
+                                <div class="form-group">
+                                    <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">Aa</div>
+                                        <input type="text" id="schoolkey" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
+                                    <div class="input-group">
+                                        <button class="input-group-prepend" id=pigetlist disabled>Obtenir la liste</button>
+                                        <select id="pilist" class="custom-select" disabled>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label id="piiplabel">ou entrez son adesse IP</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">123</div>
+                                        <input id=piaddress type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div>
+                                    <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
-                                <div class="input-group">
-                                    <button class="input-group-prepend" id=pigetlist disabled>Obtenir la liste</button>
-                                    <select id="pilist" class="custom-select" disabled>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label id="piiplabel">ou entrez son adesse IP</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">123</div>
-                                    <input id=piaddress type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div>
-                                <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
-                            </div>
-                        </div>
 
-                        <div panel-body-usbbt>
-                            <label id="piconnectionlabel"></label>
+                            <div panel-body-usbbt>
+                                <label id="piconnectionlabel"></label>
+                            </div>
                         </div>
-    
                         <div class="inlineButtons">
                             <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
                             <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>Déconnecter</button>
@@ -1761,6 +1762,12 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
 
+            if (infos.runningOnQuickPi)
+            {
+                $('#piconnectionmainui').hide();
+                $('#piaddress').val(window.location.hostname);
+                $('#piaddress').trigger("input");
+            }
 
             if (sessionStorage.pilist) {
                 populatePiList(JSON.parse(sessionStorage.pilist));
@@ -1773,6 +1780,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sessionStorage.schoolkey) {
                 $('#schoolkey').val(sessionStorage.schoolkey);
+                $('#pigetlist').attr("disabled", false);
             }
 
             $('#piconnectok').click(function () {
