@@ -117,7 +117,7 @@
         } else {
             res.score = nb_valid / nb_total;
         }
-        res.score = +res.score.toFixed(2);
+        res.score = Math.floor(res.score);
         return res;
     };
 
