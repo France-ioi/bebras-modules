@@ -103,5 +103,7 @@ var grader = {
 };
 
 if(window.platform) {
-    platform.initWithTask(task);
+    $(function() {
+        platform.initWithTask(task);
+    });
 }
