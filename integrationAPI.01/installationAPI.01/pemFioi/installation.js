@@ -176,10 +176,10 @@ window.implementGetResources = function(task) {
       taskResourcesLoaded = true;
 
       if(window.taskGetResourcesPost) {
-        res = window.taskGetResourcesPost(res);
+        window.taskGetResourcesPost(res, callback);
+      } else {
+        callback(res);
       }
-
-      callback(res);
    };
 }
 
