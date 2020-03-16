@@ -88,6 +88,15 @@ if (platform) {
   });
 }
 
+if(!window.preprocessingFunctions) {
+   window.preprocessingFunctions = [];
+}
+window.preprocessingFunctions.push(function() {
+   if($('#task').length == 0) {
+      $('body').attr('id', 'task');
+   }
+});
+
 window.taskGetResourcesPost = function(res, callback) {
     res.task[0].content = $('body').html();
     callback(res);
