@@ -102,8 +102,8 @@ var grader = {
     gradeTask: task.gradeAnswer
 };
 
-if(window.platform) {
-    $(function() {
+$(function() {
+    if(window.platform) {
         platform.initWithTask(task);
-    });
-}
+    }
+});

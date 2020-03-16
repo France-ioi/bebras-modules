@@ -82,11 +82,11 @@ var grader = {
    gradeTask: task.gradeAnswer
 };
 
-if (platform) {
-  $(function() {
+$(function() {
+   if(window.platform) {
       platform.initWithTask(task);
-  });
-}
+   }
+});
 
 if(!window.preprocessingFunctions) {
    window.preprocessingFunctions = [];
