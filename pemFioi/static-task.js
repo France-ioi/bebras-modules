@@ -83,9 +83,15 @@ var grader = {
 };
 
 if (platform) {
-  platform.initWithTask(task);
+  $(function() {
+      platform.initWithTask(task);
+  });
 }
 
+window.taskGetResourcesPost = function(res, callback) {
+    res.task[0].content = $('body').html();
+    callback(res);
+}
 
 window.platformScrollTo = function(target) {
     var offset = 0;
