@@ -360,7 +360,7 @@
                     noScore: taskParams.noScore
                     };
                 var token = task_token.get()
-                if(true || token) {
+                if(token) {
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,
@@ -411,5 +411,15 @@
             task_toolbar.init();
         }
     })
+
+    window.taskGetResourcesPost = function(res) {
+        // Add grader_data, if available, to the javascript
+        try {
+            $.get('grader_data.js').success(function(data) {
+                res.task.push({type: 'javascript', id: 'grader_data', content: data});
+            });
+        } catch(e) {}
+        return res;
+    };
 
 })();
