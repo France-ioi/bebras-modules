@@ -174,6 +174,11 @@ window.implementGetResources = function(task) {
       });
 
       taskResourcesLoaded = true;
+
+      if(window.taskGetResourcesPost) {
+        res = window.taskGetResourcesPost(res);
+      }
+
       callback(res);
    };
 }
