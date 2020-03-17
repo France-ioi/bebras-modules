@@ -92,6 +92,7 @@ $(function() {
       $('#question-iframe', window.parent.document).css('width', '100%');
    } catch(e) {
    }
+   $('body').css('width', '');
 });
 
 if(!window.preprocessingFunctions) {
