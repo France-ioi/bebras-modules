@@ -4,6 +4,7 @@
 
         default_language: 'en',
         language: 'en',
+        language_set: false,
 
         strings: {
             en: {
@@ -52,10 +53,17 @@
         },
 
         set: function(lng) {
+            if(!lng) {
+                lng = window.stringsLanguage;
+            }
             this.language = lng;
+            this.language_set = true;
         },
 
         translate: function() {
+            if(!this.language_set) {
+                this.set();
+            }
             var str = '', key = arguments[0];
             if(this.strings[this.language] && this.strings[this.language][key]) {
                 str = this.strings[this.language][key];
@@ -402,8 +410,6 @@
     var grader = {
         gradeTask: task.gradeAnswer
     };
-
-    lang.set(window.stringsLanguage)
 
     $(function() {
         if(window.platform) {
