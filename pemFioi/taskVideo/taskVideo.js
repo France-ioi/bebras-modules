@@ -106,4 +106,10 @@ $(function() {
     if(window.platform) {
         platform.initWithTask(task);
     }
+
+    // Copy of displayHelper.useFullWidth
+    try {
+        $('#question-iframe', window.parent.document).css('width', '100%');
+    } catch(e) {
+    }
 });
