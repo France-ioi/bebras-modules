@@ -2096,7 +2096,7 @@ function LR_Parser(settings,subTask,answer) {
          left: colLeft - 2
       };
 
-      if(this.mode != 4){
+      if(this.mode != 4 && this.mode != 2){
          if(!anim){
             this.rowHL.css(newRowAttr);
             this.colHL.css(newColAttr);
