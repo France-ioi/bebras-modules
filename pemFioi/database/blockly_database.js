@@ -137,7 +137,7 @@ var getContext = function(display, infos, curLevel) {
                 displayTablesOnGraph: 'visualiser les tables sur un graphe(%1, %2, %3, %4, %5, %6, %7)'
             },
             code: {
-                loadTable: 'chargerTable',
+                loadTable: 'loadTable',
                 loadTableFromCsv: 'loadTableFromCsv',
                 loadTableFromCsvWithTypes: 'loadTableFromCsvWithTypes',
                 getRecords: 'getRecords',
