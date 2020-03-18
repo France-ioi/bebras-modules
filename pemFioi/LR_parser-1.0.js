@@ -170,6 +170,11 @@ function LR_Parser(settings,subTask,answer) {
          "font-weight": "bold",
          fill: this.colors.yellow,
          "text-anchor": "start"
+      },
+      acc: {
+         "font-size": 12,
+         "font-weight": "bold",
+         fill: this.colors.yellow
       }
    };
    // this.selectedCellAttr = {
@@ -876,6 +881,11 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
+      if(info.terminal){
+         wCorr = 50;
+         visualInfo.wCorr = wCorr;
+         reductionInfo = "acc.";
+      }
       var boxSize = this.getBoxSize(content,wCorr);
       var w = boxSize.w;
       var h = boxSize.h;
@@ -905,10 +915,16 @@ function LR_Parser(settings,subTask,answer) {
          var result = [node,labelRaph,line,content];
       }
       if(reductionInfo){
-         var rule = reductionInfo.rule;
+         if(reductionInfo != "acc."){
+            var rule = reductionInfo.rule;
+         }
          var attr = self.reductionMarkerAttr;
          var textSize = this.getTextSize(info.content);
-         var x = visualInfo.x + w/2 - self.reductionMarkerR - 10;
+         if(reductionInfo != "acc."){
+            var x = visualInfo.x + w/2 - self.reductionMarkerR - 10;
+         }else{
+            var x = visualInfo.x + w/2 - wCorr/2;
+         }
          if(textSize.nbLines == 1){
             var y = content.attr("y");
          }else{
@@ -928,25 +944,33 @@ function LR_Parser(settings,subTask,answer) {
             var textBBox = content.getBBox();
             var y = textBBox.y + (textBBox.height/lines.length)*(redIndex + 1/2);
          }
-         var circle = this.paper.circle(x,y,10).attr(attr.circle);
-         var text = this.paper.text(x - 1,y,"r").attr(attr.text);
-         var displayedRule = rule + 1;
-         var ruleObj = this.paper.text(x + 1,y,displayedRule).attr(attr.rule);
-         if(self.mode == 2){
-            var textBBox = content.getBBox();
-            var lines = info.content.split("\n");
-            var clickAreaX = contentX;
-            var clickAreaY = y - self.reductionMarkerR;
-            var clickAreaW = visualInfo.x + w/2 - 10 - contentX;
-            var clickAreaH = 2*self.reductionMarkerR;
-            var clickArea = this.paper.rect(clickAreaX,clickAreaY,clickAreaW,clickAreaH).attr(self.reductionClickAreaAttr);
-            clickArea.click(self.clickReductionMarker(rule));
-            if(self.reductionClickArea[id]){
-               self.reductionClickArea[id].remove();
+         if(reductionInfo != "acc."){
+            var circle = this.paper.circle(x,y,10).attr(attr.circle);
+            var text = this.paper.text(x - 1,y,"r").attr(attr.text);
+            var displayedRule = rule + 1;
+            var ruleObj = this.paper.text(x + 1,y,displayedRule).attr(attr.rule);
+            if(self.mode == 2){
+               var textBBox = content.getBBox();
+               var lines = info.content.split("\n");
+               var clickAreaX = contentX;
+               var clickAreaY = y - self.reductionMarkerR;
+               var clickAreaW = visualInfo.x + w/2 - 10 - contentX;
+               var clickAreaH = 2*self.reductionMarkerR;
+               var clickArea = this.paper.rect(clickAreaX,clickAreaY,clickAreaW,clickAreaH).attr(self.reductionClickAreaAttr);
+               clickArea.click(self.clickReductionMarker(rule));
+               if(self.reductionClickArea[id]){
+                  self.reductionClickArea[id].remove();
+               }
+               self.reductionClickArea[id] = clickArea;
             }
-            self.reductionClickArea[id] = clickArea;
+            result.push(circle,text,ruleObj);
+         }else{
+            var rectW = 35;
+            var rectH = 2*self.reductionMarkerR;
+            var circle = this.paper.rect(x - rectW/2,y - rectH/2,rectW,rectH).attr(attr.circle);
+            var text = this.paper.text(x - 1,y,reductionInfo).attr(attr.acc);
+            result.push(circle,text);
          }
-         result.push(circle,text,ruleObj);
       }
       this._addCustomElements(id, result);
       
