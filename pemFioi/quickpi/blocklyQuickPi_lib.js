@@ -206,6 +206,8 @@ var getContext = function (display, infos, curLevel) {
                 removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur?",
                 remove: "Retirer",
                 keep: "Garder",
+                minutesago: "Last seen {0} minutes ago",
+                hoursago: "Last seen more than one hour ago",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -1791,9 +1793,12 @@ var getContext = function (display, infos, curLevel) {
                 window.displayHelper.popupMessageShown = false;
 
                 if ($('#piusetunnel').is(":checked")) {
+
+                    var piname = $("#pilist option:selected").text().split("-")[0].trim();
+
                     var url = "ws://api.quick-pi.org/client/" + 
                         $('#schoolkey').val()  + "-" +
-                         $("#pilist option:selected").text() +
+                        piname +
                         "/api/v1/commands";
 
                     sessionStorage.quickPiUrl = url;
@@ -1964,7 +1969,17 @@ var getContext = function (display, infos, curLevel) {
                     var pi = jsonlist[i];
 
                     var el = document.createElement("option");
-                    el.textContent = jsonlist[i].name;
+
+                    var minutes = Math.round(jsonlist[i].seconds_since_ping / 60);
+                    var timeago = "";
+
+                    if (minutes < 60)
+                        timeago = strings.messages.minutesago.format(minutes);
+                    else   
+                        timeago = strings.messages.hoursago;
+
+
+                    el.textContent = jsonlist[i].name + " - " + timeago;
                     el.value = jsonlist[i].ip;
 
                     select.appendChild(el);
