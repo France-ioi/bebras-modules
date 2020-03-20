@@ -111,16 +111,28 @@ function LR_Parser(settings,subTask,answer) {
      "stroke": "white",
      "stroke-width": 1
    };
+   this.headerAttr = {
+      r: 10,
+      fill: "none",
+      stroke: "white",
+     "stroke-width": 1
+   };
    this.defaultSelectedVertexAttr = {
-      "stroke": this.colors.yellow,
-     "stroke-width": 5,
+      stroke: this.colors.yellow,
+     "stroke-width": 5
    };
    this.defaultSelectedEdgeAttr = {
       "stroke": this.colors.yellow,
      "stroke-width": 6,
    };
    this.defaultCurrentStateAttr = {
-      "fill": this.colors.blue
+      // "fill": this.colors.blue,
+      stroke: this.colors.blue,
+      "stroke-width": 5
+   };
+   this.currentHeaderAttr = {
+      "fill": this.colors.blue,
+      stroke: "none"
    };
    this.defaultVertexLabelAttr = {
      "font-size": 12,
@@ -302,6 +314,7 @@ function LR_Parser(settings,subTask,answer) {
          };
          if(this.mode == 2){
             graphEditorSettings.selectVertexCallback = this.onVertexSelect;
+            graphEditorSettings.startDragCallbackCallback = this.startDragCallback;
          }
          if(this.mode == 3){
             graphEditorSettings.dragThreshold = 10;
@@ -893,6 +906,9 @@ function LR_Parser(settings,subTask,answer) {
       var y = pos.y - h/2;
       var labelHeight = 2*this.vertexLabelAttr["font-size"];
       var node = this.paper.rect(x,y,w,h).attr(this.rectAttr);
+      var header = this.paper.rect(x,y,w,labelHeight + 10).attr(this.rectAttr);
+      header.attr("clip-rect",x+" "+y+" "+w+" "+labelHeight);
+      // var headerCover = this.paper.rect(x,y + labelHeight,w,10).attr(self.headerCoverAttr);
       var labelRaph = this.paper.text(pos.x, y + labelHeight/2, label).attr(this.vertexLabelAttr);
       var line = this.paper.path("M"+x+","+(y + labelHeight)+"H"+(x + w)).attr(this.boxLineAttr);
 
@@ -902,17 +918,17 @@ function LR_Parser(settings,subTask,answer) {
       if(info.initial && !info.terminal){
          var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
          initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
-         var result = [node,labelRaph,line,content,initialArrow];
+         var result = [node,labelRaph,line,content,header,initialArrow];
       }else if(!info.initial && info.terminal){
          var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
-         var result = [node,labelRaph,line,content,terminalFrame];
+         var result = [node,labelRaph,line,content,header,terminalFrame];
       }else if(info.initial && info.terminal){
          var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
          var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
          initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
-         var result = [node,labelRaph,line,content,initialArrow,terminalFrame];
+         var result = [node,labelRaph,line,content,header,initialArrow,terminalFrame];
       }else{
-         var result = [node,labelRaph,line,content];
+         var result = [node,labelRaph,line,content,header];
       }
       if(reductionInfo){
          if(reductionInfo != "acc."){
@@ -1415,7 +1431,7 @@ function LR_Parser(settings,subTask,answer) {
             var state = data.state;
             var vID = self.getStateID(state);
             var raphObj = self.visualGraph.getRaphaelsFromID(vID);
-            raphObj[4].attr("fill",self.colors.black);
+            raphObj[5].attr("fill",self.colors.black);
          }
          ruleObj.addClass("selected");
          self.selectedRule = ruleID;
@@ -1438,7 +1454,7 @@ function LR_Parser(settings,subTask,answer) {
             var vID = this.getStateID(state);
             var raphObj = this.visualGraph.getRaphaelsFromID(vID);
             var color = (selected) ? this.colors.blue : this.colors.black;
-            raphObj[4].attr("fill",color);
+            raphObj[5].attr("fill",color);
          }
       }
    };
@@ -2134,11 +2150,10 @@ function LR_Parser(settings,subTask,answer) {
       }
       // console.log("updateState")
       this.updateParseTable({anim:anim,action:action});
-      var stateVertex = this.visualGraph.getRaphaelsFromID(id);
       this.resetStates();
       var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
       if(!anim){
-         stateVertex[0].attr(this.defaultCurrentStateAttr);
+         this.styleVertex(id,"current");
          if(previousState != null){
             var id1 = this.getStateID(previousState);
             var edgeID = this.graph.getEdgesBetween(id1,id)[0];
@@ -2156,9 +2171,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.changeStateAnim = function(state1,state2,time,reduction,callback) {
       var id2 = this.getStateID(state2);
-      var v2 = this.visualGraph.getRaphaelsFromID(id2);
       var id1 = this.getStateID(state1);
-      var v1 = this.visualGraph.getRaphaelsFromID(id1);
       var vInfo1 = this.visualGraph.getVertexVisualInfo(id1);
       var vInfo2 = this.visualGraph.getVertexVisualInfo(id2);
       var edgeID = this.graph.getEdgesBetween(id1,id2)[0];
@@ -2213,7 +2226,7 @@ function LR_Parser(settings,subTask,answer) {
          var step2 = {transform: "r "+angle+","+(cPos.x)+","+(cPos.y)};
          var step3 = {transform: "t"+(vInfo2.x - pos2.x)+","+(vInfo2.y - pos2.y)};
       }
-      v1[0].attr(this.defaultVertexAttr);
+      self.styleVertex(id1,"default");
       if(this.token){
          this.token.remove();
       }
@@ -2222,7 +2235,7 @@ function LR_Parser(settings,subTask,answer) {
          var anim1 = new Raphael.animation(step1,time,function(){
             self.resetStates();
             if(!reduction){
-               v2[0].attr(self.defaultCurrentStateAttr);
+               self.styleVertex(id2,"current");
                self.token.remove();
             }
             self.displayMessage("reset");
@@ -2243,7 +2256,7 @@ function LR_Parser(settings,subTask,answer) {
          var anim3 = new Raphael.animation(step3,time3,function(){
             self.resetStates();
             if(!reduction){
-               v2[0].attr(self.defaultCurrentStateAttr);
+               self.styleVertex(id2,"current");
                self.token.remove();
             }
             self.displayMessage("reset");
@@ -2258,9 +2271,7 @@ function LR_Parser(settings,subTask,answer) {
       var vertices = this.graph.getAllVertices();
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
-         var vertex = this.visualGraph.getRaphaelsFromID(vertexID);
-         // vertex[0].attr({fill:this.vertexAttr.fill});
-         vertex[0].attr(this.vertexAttr);
+         this.styleVertex(vertexID,"default");
          info.selected = false;
          this.graph.setVertexInfo(vertexID,info);
       }
@@ -2319,6 +2330,8 @@ function LR_Parser(settings,subTask,answer) {
       }
       self.saveAnswer();
    };
+
+   /** AUTOMATON **/
 
    this.doesAutomatonAllowAction = function(state,symbol,action){
       // console.log(state);
@@ -2443,25 +2456,31 @@ function LR_Parser(settings,subTask,answer) {
    this.selectVertexCallback = function(id,selected) {
       var current = self.getStateID(self.currentState);
       if(!selected && id == current){
-         var raph = self.visualGraph.getRaphaelsFromID(id);
-         raph[0].attr(self.defaultCurrentStateAttr);
+         self.styleVertex(id,"current");
       }
-   }
+   };
 
    this.onVertexSelect = function(ID,selected) {
       // console.log("onVertexSelect"+" "+ID+" "+selected)
       var info = self.graph.getVertexInfo(ID);
+      var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
       if(selected){
          self.selectedVertex = ID;
          self.selectedState = info.label;
+         stateVertex[4].attr(self.defaultSelectedVertexAttr);
       }else{
          self.selectedVertex = null;
          self.selectedState = null;
+         stateVertex[4].attr(self.headerAttr);
       }
       self.resetFeedback();
       if(ID == self.getStateID(self.currentState)){
-         var stateVertex = self.visualGraph.getRaphaelsFromID(ID);
-         stateVertex[0].attr(self.defaultCurrentStateAttr);
+         self.styleVertex(ID,"current");
+         if(selected){
+            self.styleVertex(ID,"selected");
+         }
+         // stateVertex[1].toFront();
+         // stateVertex[2].toFront();
       }
       if(self.reductionClickArea[ID]){
          self.reductionClickArea[ID].toFront();
@@ -2530,6 +2549,29 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       return true
+   };
+
+   this.styleVertex = function(id,styleType) {
+      var vertex = this.visualGraph.getRaphaelsFromID(id);
+      switch(styleType){
+         case "current":
+            vertex[0].attr(this.defaultCurrentStateAttr);
+            vertex[4].attr(this.currentHeaderAttr);
+            break;
+         case "selected":
+            vertex[0].attr(this.defaultSelectedVertexAttr);
+            vertex[4].attr(this.defaultSelectedVertexAttr);
+            break;
+         default:
+            vertex[0].attr(this.defaultVertexAttr);
+            vertex[4].attr(this.headerAttr);
+      }
+   };
+
+   this.startDragCallback = function(id) {
+      var vertex = self.visualGraph.getRaphaelsFromID(id);
+      vertex[1].toFront();
+      vertex[2].toFront();
    };
 
    function fixedCharAt(str, idx) {
@@ -2720,7 +2762,7 @@ function LR_Parser(settings,subTask,answer) {
       return true;
    };
 
-   /* derivation tree */
+   /** derivation tree **/
 
    this.updateTree = function() {
       this.updateTreePaper();
@@ -2834,35 +2876,6 @@ function LR_Parser(settings,subTask,answer) {
                self.selectElement(selectedElement,false);
             }
          }else{
-            // if(self.mode == 7 || selectedIndices.length == 0){
-            //    if(self.mode == 7){
-            //       for(var iEl in self.treeClickableElements){
-            //          self.selectElement(self.treeClickableElements[iEl],false);
-            //       }
-            //    }
-            //    self.selectElement(selectedElement,true);
-            //    self.treeSelectionMarker = self.treePaper.circle(x,y,r).attr(self.treeSelectionMarkerAttr).toBack();
-            // }else{
-            //    var furthestIndex = self.getFurthestIndex(index,selectedIndices);
-            //    var fx = self.treeClickableElements[furthestIndex].raphObj[0].attr("cx");
-            //    var fy = self.treeClickableElements[furthestIndex].raphObj[0].attr("cy");
-            //    var w = Math.abs(x - fx) + 2 * r;
-            //    var h = 2 * r;
-            //    if(index < furthestIndex){
-            //       for(var i in self.treeClickableElements){
-            //          if(parseFloat(i) >= index && parseFloat(i) <= furthestIndex)
-            //             self.selectElement(self.treeClickableElements[i],true);
-            //       }
-            //       self.treeSelectionMarker = self.treePaper.rect(x - r,y - r,w,h,r).attr(self.treeSelectionMarkerAttr);
-            //       self.treeSelectionMarker.toBack();
-            //    }else{
-            //       for(var i in self.treeClickableElements){
-            //          if(parseFloat(i) <= index && parseFloat(i) >= furthestIndex)
-            //             self.selectElement(self.treeClickableElements[i],true);
-            //       }
-            //       self.treeSelectionMarker = self.treePaper.rect(fx - r,fy - r,w,h,r).attr(self.treeSelectionMarkerAttr).toBack();
-            //    }
-            // }
             self.selectedSymbolIndices = [];
             for(var iEl in self.treeClickableElements){
                // console.log("deselect "+iEl)
