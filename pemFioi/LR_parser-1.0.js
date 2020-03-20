@@ -1389,6 +1389,9 @@ function LR_Parser(settings,subTask,answer) {
    this.selectStackElement = function() {
       self.resetFeedback();
       var col = parseInt($(this).attr("data_col"));
+      if(col == 0){
+         return
+      }
 
       if($(".stackElement[data_col="+col+"]").hasClass("selected")){
          for(var iCol = 0; iCol <= col; iCol++){
@@ -2472,6 +2475,9 @@ function LR_Parser(settings,subTask,answer) {
          self.selectedVertex = null;
          self.selectedState = null;
          stateVertex[4].attr(self.headerAttr);
+         if(self.prevStateHighlight){
+            self.prevStateHighlight.toFront();
+         }
       }
       self.resetFeedback();
       if(ID == self.getStateID(self.currentState)){
@@ -2479,8 +2485,6 @@ function LR_Parser(settings,subTask,answer) {
          if(selected){
             self.styleVertex(ID,"selected");
          }
-         // stateVertex[1].toFront();
-         // stateVertex[2].toFront();
       }
       if(self.reductionClickArea[ID]){
          self.reductionClickArea[ID].toFront();
