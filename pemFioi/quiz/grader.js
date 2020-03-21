@@ -2,7 +2,7 @@
 
     function isArrayAnswerEmpty(answers) {
         for(var i=0; i<answers.length; i++) {
-            if(answers[i]) { return false; }
+            if(typeof answers[i] != "undefined") { return false; }
         }
         return true;
     }
@@ -32,6 +32,7 @@
 
     window.Quiz.grader.handler = function(grader_data, answer, versions, score_settings) {
         var res = {
+            score_settings: score_settings,
             score: 0,
             mistakes: [],
             messages: []
@@ -45,7 +46,7 @@
                 grader = grader[versions[i]];
             }
             if (typeof grader === "function") {
-                if(!answer[i]) { continue; }
+                if(typeof answer[i] == 'undefined') { continue; }
                 var fres = grader(answer[i]);
                 if (typeof fres === "object") {
                     var score =
@@ -71,9 +72,7 @@
                 nb_mistakes += isValid ? 0 : 1;
             } else if (typeof grader == 'object') {
                 if(Array.isArray(grader.value)) {
-                    if(isArrayAnswerEmpty(answer[i])) {
-                        continue;
-                    }
+                    if(isArrayAnswerEmpty(answer[i])) { continue; }
                     if(grader.strict) {
                         var test = testStrict(grader.value, answer[i]);
                     } else {
@@ -90,7 +89,6 @@
                             }
                         }
                     }
-
                 } else {
                     if(typeof answer[i] == 'undefined') { continue; }
                     isValid = grader == answer[i] ? 1 : 0;
@@ -102,7 +100,7 @@
                 nb_valid += isValid ? 1 : 0;
                 nb_mistakes += isValid ? 0 : 1;
             } else {
-                if(!answer[i]) { continue; }
+                if(typeof answer[i] == 'undefined') { continue; }
                 isValid = grader == answer[i] ? 1 : 0;
                 res.mistakes.push(isValid ? null : answer[i]);
                 nb_valid += isValid ? 1 : 0;
@@ -113,11 +111,11 @@
         if(score_settings) {
             res.score = (nb_valid * score_settings.maxScore
                        + nb_mistakes * score_settings.minScore
-                       + (nb_total - nb_valid - nb_mistakes) * score_settings.noScore) / grader_data.length;
+                       + (nb_total - nb_valid - nb_mistakes) * score_settings.noScore) / nb_total;
         } else {
             res.score = nb_valid / nb_total;
         }
-        res.score = Math.floor(res.score);
+        res.score = Math.round(res.score);
         return res;
     };
 
