@@ -1449,6 +1449,29 @@ def changePassiveBuzzerState(pin, state):
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, GPIO.LOW)
 
+def buzzerPlayNote(pin, frequency):
+    pin = normalizePin(pin)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.wave_clear()
+    pi.wave_tx_stop()
+
+    wf = []
+
+    if frequency == 0:
+        pi.wave_tx_stop()
+    else:
+        delay = int(1000000/frequency/2)
+
+        wf.append(pigpio.pulse(1<<pin, 0, delay))
+        wf.append(pigpio.pulse(0, 1<<pin, delay))
+
+        pi.wave_add_generic(wf)
+
+        a = pi.wave_create()
+
+        pi.wave_send_repeat(a)    
 
 def readADCADS1015(pin, gain=1):
     ADS1x15_CONFIG_GAIN = {
