@@ -30,6 +30,7 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "Temps actuel en millisecondes",
                 setBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
+                buzzerPlayNote: "Play frequency %2 in buzzer %1",
 
                 drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
@@ -94,6 +95,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
                 setBuzzerState: "setBuzzerState",
+                buzzerPlayNote: "buzzerPlayNote",
                 getTemperature: "getTemperature",
 
                 drawPoint: "drawPoint",
@@ -149,6 +151,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity(hygrometer): lire l'humidité ambiante",
                 currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
                 setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
+				buzzerPlayNote: "buzzerPlayNote(port, frequency): sonnerie",
                 getTemperature: "getTemperature(thermometer): Get temperature",
 
                 drawPoint: "drawPoint(x, y)",
@@ -196,8 +199,8 @@ var getContext = function (display, infos, curLevel) {
                 cantConnect: "Impossible de se connecter à l'appareil.",
                 sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
                 actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
-                cantConnectoToUSB: "Aucun appareil n'est connecté en USB",
-                cantConnectoToBT: "Aucun appareil n'est connecté en Bluetooth",
+                cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
+                cantConnectoToBT: 'Tentative de connection par Bluetooth, veuillez connecter votre appareil au Raspberry par Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
                 canConnectoToUSB: "Connecté en USB.",
                 canConnectoToBT: "Connecté en Bluetooth.",
                 noPortsAvailable: "Aucun port compatible avec ce {0} n'est disponible (type {1})",
@@ -309,6 +312,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "lire l'humidité ambiante",
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
+                buzzerPlayNote: "sonnerie note",
                 getTemperature: "Get temperature",
 
                 drawPoint: "drawPoint",
@@ -1887,7 +1891,7 @@ var getContext = function (display, infos, curLevel) {
                     sessionStorage.connectionMethod = "USB";
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
+                    $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
 
                     $(this).addClass('active');
                     $('#pischoolcon').hide("slow");
@@ -1906,7 +1910,7 @@ var getContext = function (display, infos, curLevel) {
                             } else {
                                 $('#piconnectok').attr('disabled', true);
 
-                                $('#piconnectionlabel').text(strings.messages.cantConnectoToUSB)
+                                $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
                             }
 
                             context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
@@ -1925,7 +1929,7 @@ var getContext = function (display, infos, curLevel) {
                     sessionStorage.connectionMethod = "BT";
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
-                    $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                    $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
 
                     $(this).addClass('active');
                     $('#pischoolcon').hide("slow");
@@ -1945,7 +1949,7 @@ var getContext = function (display, infos, curLevel) {
                             } else {
                                 $('#piconnectok').attr('disabled', true);
 
-                                $('#piconnectionlabel').text(strings.messages.cantConnectoToBT)
+                                $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
                             }
 
                             context.quickPiConnection.isAvailable("192.168.233.2", updateUSBAvailability);
@@ -4921,6 +4925,23 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.buzzerPlayNote = function (name, frequency, callback) {
+        var sensor = findSensorByName(name);
+
+        var command = "buzzerPlayNote(\"" + name + "\"," + frequency + ")";
+
+        context.registerQuickPiEvent(name, frequency);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, cb);
+        }
+    };
+
+
     context.quickpi.toggleLedState = function (name, callback) {
         var sensor = findSensorByName(name);
 
@@ -5911,6 +5932,19 @@ var getContext = function (display, infos, curLevel) {
                             { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
                         ]
                     }
+                },
+                {
+                    name: "buzzerPlayNote", params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
+                            },
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='buzzerPlayNote'>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
                 },
                 {
                     name: "toggleLedState", params: ["String"], blocklyJson: {
