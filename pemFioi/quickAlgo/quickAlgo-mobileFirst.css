@@ -1813,16 +1813,25 @@ button.showLongIntro .icon {
 }
 
 .keypad-btn.keypad-btn-r {
-  background-color: #E86E64;
-}
-
-.keypad-btn.keypad-btn-c {
   background-color: #DB8B0A;
-  font-size: 20px;
 }
 
 .keypad-btn.keypad-btn-v {
   width: 136px;
   background-color: #88BB88;
   font-size: 24px;
+}
+
+.keypad-exit {
+  position: absolute;
+  right: -20px;
+  top: -20px;
+  height: 40px;
+  width: 40px;
+  text-align:  center;
+  background-color: #e86E64;
+  border-radius: 20px;
+  font-size: 20px;
+  color: #FFF;
+  line-height: 40px;
 }
