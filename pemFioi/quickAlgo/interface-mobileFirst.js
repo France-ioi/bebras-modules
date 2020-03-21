@@ -907,6 +907,7 @@ var quickAlgoInterface = {
 
         var html = '' +
             '<div id="quickAlgo-keypad"><div class="keypad">' +
+            '   <div class="keypad-exit" data-btn="C"><span class="fas fa-times"></span></div>' +
             '   <div class="keypad-row">' +
             '       <'+screenType+' class="keypad-value"></'+screenType+'>' +
             '   </div>' +
@@ -928,10 +929,10 @@ var quickAlgoInterface = {
             '   <div class="keypad-row">' +
             '       <div class="keypad-btn" data-btn="0">0</div>' +
             '       <div class="keypad-btn" data-btn=".">.</div>' +
-            '       <div class="keypad-btn keypad-btn-r" data-btn="R"><span class="fas fa-backspace"></span></div>' +
+            '       <div class="keypad-btn" data-btn="-">+/-</div>' +
             '   </div>' +
             '   <div class="keypad-row keypad-row-margin">' +
-            '       <div class="keypad-btn keypad-btn-c" data-btn="C"><span class="fas fa-undo"></span></div>' +
+            '       <div class="keypad-btn keypad-btn-r" data-btn="R"><span class="fas fa-backspace"></span></div>' +
             '       <div class="keypad-btn keypad-btn-v" data-btn="V"><span class="fas fa-check-circle"></span></div>' +
             '   </div>' +
             '</div></div>';
@@ -950,7 +951,7 @@ var quickAlgoInterface = {
         var btn = null;
         if(e && e.type == 'click') {
             // Click on buttons
-            var btn = $(e.target).closest('div.keypad-btn').attr('data-btn');
+            var btn = $(e.target).closest('div.keypad-btn, div.keypad-exit').attr('data-btn');
             if(!btn && $(e.target).closest('div.keypad').length == 0) {
                 // Click outside of the keypad
                 finished = true;
@@ -967,6 +968,8 @@ var quickAlgoInterface = {
                 btn = 'V';
             } else if(e.key == '.' || e.key == ',' || e.keyCode == 110 || e.keyCode == 188 || e.keyCode == 190) {
                 btn = '.';
+            } else if(e.key == '-' || e.keyCode == 54 || e.keyCode == 109) {
+                btn = '-';
             } else if(e.keyCode >= 96 && e.keyCode <= 105) {
                 var btn = '' + (e.keyCode - 96);
             }
@@ -976,7 +979,7 @@ var quickAlgoInterface = {
         var data = quickAlgoInterface.keypadData;
         if(btn == 'R') {
             data.value = data.value.substring(0, data.value.length - 1);
-            if(data.value == '') { data.value = '0'; }
+            if(data.value == '' || data.value == '-') { data.value = '0'; }
         } else if(btn == 'C') {
             data.value = data.initialValue;
             finished = true;
@@ -985,6 +988,15 @@ var quickAlgoInterface = {
         } else if(btn == '0') {
             if(data.value != '') {
                 data.value += '0';
+            }
+        } else if(btn == '-') {
+            if(data.value == '') {
+                data.value = '0';
+            }
+            if(data.value[0] == '-') {
+                data.value = data.value.substring(1);
+            } else {
+                data.value = '-' + data.value;
             }
         } else if(btn == '.') {
             if(data.value == '') {
@@ -1000,9 +1012,12 @@ var quickAlgoInterface = {
         while(data.value.length > 1 && data.value.substring(0, 1) == '0' && data.value.substring(0, 2) != '0.') {
             data.value = data.value.substring(1);
         }
+        while(data.value.length > 2 && data.value.substring(0, 2) == '-0' && data.value.substring(0, 3) != '-0.') {
+            data.value = '-' + data.value.substring(2);
+        }
 
-        if(data.value.length > 19) {
-            data.value = data.value.substring(0, 19);
+        if(data.value.length > 16) {
+            data.value = data.value.substring(0, 16);
         }
         else if(data.value.length > 12) {
             $('.keypad-value').addClass('keypad-value-small');
@@ -1019,7 +1034,7 @@ var quickAlgoInterface = {
             // Second argument could be !!btn if we want to be able to click on
             // the block's input
             var finalValue = data.value == '' ? data.initialValue : data.value;
-            data.callbackFinished(parseFloat(data.value), true);
+            data.callbackFinished(parseFloat(finalValue), true);
             return;
         } else if(e !== null) {
             data.callbackModify(parseFloat(data.value));
