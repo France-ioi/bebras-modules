@@ -1560,7 +1560,7 @@ def readSoundLevel(pin):
     max = -25000
     min = 25000
     
-    for i in range(50):
+    for i in range(20):
         val = int(readADCADS1015(pin, 8))
 
         if val > max:
