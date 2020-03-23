@@ -195,9 +195,9 @@ var getContext = function (display, infos, curLevel) {
                 testSuccess: "Bravo ! La sortie est correcte",
                 wrongState: "Test échoué. Un état invalide a été atteint",
                 programEnded: "programme terminé.",
-                piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
+                piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
-                wrongVersion: "Version de serveur incorrecte. Veuillez mettre à jour votre tableau..",
+                wrongVersion: "Votre Raspberry Pi a une version trop ancienne, mettez le à jour.",
                 sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
                 actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
                 cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
@@ -4545,7 +4545,7 @@ var getContext = function (display, infos, curLevel) {
         if (context.autoGrading && context.gradingStatesBySensor != undefined) {
             var fail = false;
             var type = "actual";
-            var expectedState = context.getSensorExpectedState(name);
+            var expectedState = context.getSensorExpectedState(sensor.name);
 
             if (expectedState != null)
                 expectedState.hit = true;
