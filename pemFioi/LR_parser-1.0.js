@@ -558,7 +558,7 @@ function LR_Parser(settings,subTask,answer) {
       var html = "<h3>GRAMMAR</h3>";
       html += "<ul>";
       for(var iRule = 0; iRule < this.rules.length; iRule++){
-         var development = (this.grammar.rules[iRule].development[0] == "''") ? "" : this.grammar.rules[iRule].development.join(" ");
+         var development = (this.grammar.rules[iRule].development[0] == "''") ? "<span class=\"epsilon\">ε</span>" : this.grammar.rules[iRule].development.join(" ");
          var displayedRule = iRule + 1;
          html += "<li class=\"rule\" data_rule=\""+iRule+"\"><span class=\"ruleIndex\">"+displayedRule+
          "</span> <span class=\"nonTerminal\">"+this.grammar.rules[iRule].nonterminal+"</span><i class=\"fas fa-long-arrow-alt-right\"></i><span class=\"development\">"+
@@ -723,8 +723,9 @@ function LR_Parser(settings,subTask,answer) {
          case 2:
             $("#reduceButton").off("click");
             $("#reduceButton").click(self.reduce);
-            $("#shiftButton").off("click");
-            $("#shiftButton").click(self.shift);
+            // $("#shiftButton").off("click");
+            // $("#shiftButton").click(self.shift);
+            this.enableShiftButton();
             $(".stackElement").off("click");
             $(".stackElement").click(self.selectStackElement);
             $(".rule").off("click");
@@ -733,8 +734,9 @@ function LR_Parser(settings,subTask,answer) {
                cursor: "pointer"
             });
             this.initPlayerHandlers();
-            $("#acceptButton").off("click");
-            $("#acceptButton").click(self.acceptInput);
+            this.enableAcceptButton();
+            // $("#acceptButton").off("click");
+            // $("#acceptButton").click(self.acceptInput);
             $("#errorButton").off("click");
             $("#errorButton").click(self.refuseInput); 
             break;
@@ -859,6 +861,28 @@ function LR_Parser(settings,subTask,answer) {
       });
    };
 
+   this.disableShiftButton = function() {
+      $("#shiftButton").off("click");   
+      $("#shiftButton").css("cursor","auto");   
+   };
+
+   this.enableShiftButton = function() {
+      $("#shiftButton").off("click");   
+      $("#shiftButton").click(this.shift);
+      $("#shiftButton").css("cursor","pointer");   
+   };
+
+   this.disableAcceptButton = function() {
+      $("#acceptButton").off("click");   
+      $("#acceptButton").css("cursor","auto");   
+   };
+   
+   this.enableAcceptButton = function() {
+      $("#acceptButton").off("click");  
+      $("#acceptButton").click(this.acceptInput); 
+      $("#acceptButton").css("cursor","pointer");   
+   };
+
    this.disableUndoButton = function() {
       $("#undo").off("click");
       $("#undo").css({
@@ -973,7 +997,7 @@ function LR_Parser(settings,subTask,answer) {
                var clickAreaW = visualInfo.x + w/2 - 10 - contentX;
                var clickAreaH = 2*self.reductionMarkerR;
                var clickArea = this.paper.rect(clickAreaX,clickAreaY,clickAreaW,clickAreaH).attr(self.reductionClickAreaAttr);
-               clickArea.click(self.clickReductionMarker(rule));
+               clickArea.click(self.clickReductionMarker(rule,label,id));
                if(self.reductionClickArea[id]){
                   self.reductionClickArea[id].remove();
                }
@@ -1415,10 +1439,23 @@ function LR_Parser(settings,subTask,answer) {
       self.selectRule($(this));
    };
 
-   this.clickReductionMarker = function(rule) {
+   this.clickReductionMarker = function(rule,state,vID) {
       return function() {
-         var ruleObj = $("#rules [data_rule="+rule+"]");
-         self.selectRule(ruleObj);
+         if(state == self.currentState){
+            var ruleObj = $("#rules [data_rule="+rule+"]");
+            self.selectRule(ruleObj);
+         }else{
+            var info = self.graph.getVertexInfo(vID);
+            var raphObj = self.visualGraph.getRaphaelsFromID(vID);
+            info.selected = !info.selected;
+            if(info.selected){
+               raphObj[0].attr(self.defaultSelectedVertexAttr);
+            }else{
+               raphObj[0].attr(self.defaultVertexAttr);
+            }
+            self.onVertexSelect(vID,info.selected);
+            // console.log("click")
+         }
       }
    }
 
@@ -1451,12 +1488,17 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.highlightReductionMarker = function(rule,selected) {
+      // console.log(this.currentState)
       for(var data of this.reductionStates){
          var state = data.state;
-         if(rule == data.rule){ 
+         if(rule == data.rule){
             var vID = this.getStateID(state);
             var raphObj = this.visualGraph.getRaphaelsFromID(vID);
-            var color = (selected) ? this.colors.blue : this.colors.black;
+            if(selected && state == this.currentState){
+               var color = this.colors.blue;
+            }else{
+               var color = this.colors.black;
+            }
             raphObj[5].attr("fill",color);
          }
       }
@@ -1635,6 +1677,12 @@ function LR_Parser(settings,subTask,answer) {
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var animTime = this.animationTime/prevStates.length;
+         // $("#shiftButton").off("click");
+         // $("#shiftButton").css("cursor","auto");
+         this.disableShiftButton();
+         // $("#acceptButton").off("click");
+         // $("#acceptButton").css("cursor","auto");
+         this.disableAcceptButton();
          this.reductionAnimLoop(state,prevStates,animTime,newStackElement,firstStepOnly);
       }else{
          if(prevStates.length > 0){
@@ -1751,6 +1799,8 @@ function LR_Parser(settings,subTask,answer) {
             $("#reduceButton span").text("REDUCE");
             $("#reduceButton").off("click");
             $("#reduceButton").click(self.reduce);
+            self.enableShiftButton();
+            self.enableAcceptButton();
          }
       }
    };
@@ -3832,6 +3882,9 @@ function LR_Parser(settings,subTask,answer) {
       $(".rule.selected i").css({
          color: this.colors.yellow
       });
+      $(".rule .epsilon").css({
+         "font-style": "italic"
+      })
    };
 
    this.styleProgressBar = function() {
