@@ -197,6 +197,7 @@ var getContext = function (display, infos, curLevel) {
                 programEnded: "programme terminé.",
                 piPlocked: "appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
+                wrongVersion: "Version de serveur incorrecte. Veuillez mettre à jour votre tableau..",
                 sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
                 actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
                 cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
@@ -1343,28 +1344,43 @@ var getContext = function (display, infos, curLevel) {
 
         context.timeLineStates = [];
 
-        context.liveUpdateCount = 0;
-        context.sensorPollInterval = setInterval(function () {
-            if ((!context.runner || !context.runner.isRunning())
-                && !context.offLineMode) {
+        //if (context.display)
+        {
+            //console.log ("start polling");
 
-                if (context.liveUpdateCount == 0) {
-                    for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
-                        var sensor = infos.quickPiSensors[iSensor];
+            context.liveUpdateCount = 0;
+            
+            context.sensorPollInterval = setInterval(function () {
+                if ((!context.runner || !context.runner.isRunning())
+                    && !context.offLineMode) {
+                
+                    
+                    if (!context.offLineMode && context.liveUpdateCount == 0) {
+                        context.quickPiConnection.startTransaction();
 
-                        updateLiveSensor(sensor);
+                        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                            var sensor = infos.quickPiSensors[iSensor];
+
+                            updateLiveSensor(sensor);
+                        }
+
+                        context.quickPiConnection.endTransaction();
                     }
                 }
-            }
-        }, 200);
+            }, 200);
+        }
     };
 
     function updateLiveSensor(sensor) {
         if (findSensorDefinition(sensor).isSensor && findSensorDefinition(sensor).getLiveState) {
             context.liveUpdateCount++;
 
+            //console.log("updateLiveSensor " + sensor.name, context.liveUpdateCount);
+
             findSensorDefinition(sensor).getLiveState(sensor, function (returnVal) {
                 context.liveUpdateCount--;
+
+                //console.log("updateLiveSensor callback" + sensor.name, context.liveUpdateCount);
 
                 if (!sensor.removed) {
                     sensor.state = returnVal;
@@ -2534,27 +2550,31 @@ var getContext = function (display, infos, curLevel) {
         context.resetDisplay();
     }
 
-    function raspberryPiDisconnected(wasConnected) {
+    function raspberryPiDisconnected(wasConnected, wrongversion) {
 
         if (context.releasing || !wasConnected)
             showasReleased();
         else
             showasDisconnected();
 
-        context.offLineMode = true;
+        window.task.displayedSubTask.context.offLineMode = true;
 
         if (context.quickPiConnection.wasLocked()) {
             window.displayHelper.showPopupMessage(strings.messages.piPlocked, 'blanket');
+        } else if (wrongversion) {
+            window.displayHelper.showPopupMessage(strings.messages.wrongVersion, 'blanket');
         } else if (!context.releasing && !wasConnected) {
             window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
         }
 
-        if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked()) {
+        
+
+        if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked() && !wrongversion) {
             context.quickPiConnection.connect(sessionStorage.quickPiUrl);
         } else {
             // If I was never connected don't attempt to autoconnect again
             sessionStorage.autoConnect = "0";
-            context.resetDisplay();
+            window.task.displayedSubTask.context.resetDisplay();
         }
 
     }
@@ -2592,6 +2612,7 @@ var getContext = function (display, infos, curLevel) {
         // Do something here
         if (context.sensorPollInterval) {
             clearInterval(context.sensorPollInterval);
+            context.sensorPollInterval = null;
         }
 
         if (context.display) {

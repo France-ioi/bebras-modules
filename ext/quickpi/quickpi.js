@@ -1,4 +1,5 @@
 g_instance = null;
+NEED_VERSION = 1;
 
 var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onChangeBoard) {
     this.onConnect = _onConnect;
@@ -10,8 +11,8 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
 
     this.raspiServer = "";
     this.wsSession = null;
-    this.resultsCallback = null;
-    this.resultsSeq = 0;
+    this.transaction = false;
+    this.resultsCallbackArray = null;
     this.commandMode = false;
     this.userName = userName;
     this.sessionTainted = false;
@@ -25,6 +26,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     this.oninstalled = null;
     this.commandQueue = [];
     this.seq = 0;
+    this.wrongVersion = false;
 
     this.connect = function(url) {
         if (this.wsSession != null) {
@@ -34,7 +36,9 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         this.locked = "";
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
-        this.resultsCallback = null;
+        this.resultsCallbackArray = [];
+        this.wrongVersion = true;
+
         this.seq = Math.floor(Math.random() * 65536);
 
         this.wsSession = new WebSocket(url);
@@ -75,7 +79,16 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
             var message = JSON.parse(evt.data);
 
             if (message.command == "hello") {
-                if (onChangeBoard && message.board)
+                var version = 0;
+                if (message.version)
+                    version = message.version;
+
+                if (version < NEED_VERSION) {
+                    wrongVersion = true;
+                    wsSession.close();
+                    onclose();
+                }
+                else if (onChangeBoard && message.board)
                 {
                    onChangeBoard(message.board);
                 }
@@ -94,19 +107,43 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                 {
                     var command = commandQueue.shift();
 
-                    resultsCallback = null;
+                    resultsCallbackArray = [];
                     sendCommand(command.command, command.callback);
                 }
             } else if (message.command == "execLineresult") {
-                if (commandMode && resultsCallback != null) {
+                if (commandMode) {
 
-                    if (!message.seq || message.seq == resultsSeq) {
-                        tempCallback = resultsCallback;
-                        resultsCallback = null;
-                        tempCallback(message.result);
+                    //console.log("Result seq: " + message.seq);
+
+                    if (resultsCallbackArray && resultsCallbackArray.length > 0)
+                    {
+                        //console.log("resultsCallbackArray has elements")
+                        if (message.seq >= resultsCallbackArray[0].seq)
+                        {
+                            //console.log("we under the seq");
+                            var callbackelement = null;
+                            var found = false;
+
+                            while (resultsCallbackArray.length > 0)
+                            {
+                                callbackelement = resultsCallbackArray.shift();
+
+                                if (callbackelement.seq == message.seq)
+                                {
+                                    //console.log("we found it " + callbackelement.command, message.seq );
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (found) {
+                                callbackelement.callback(message.result);
+                            }
+                        }
                     }
 
-                    if (commandQueue.length > 0)
+
+                    if (commandQueue.length > 0 && !transaction)
                     {
                         var command = commandQueue.shift();
 
@@ -132,7 +169,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
 
                 connected = false;
 
-                onDisconnect(connected);
+                onDisconnect(connected, wrongVersion);
             }
         }
     }
@@ -159,10 +196,10 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         wsSession = null;
         commandMode = false;
         sessionTainted = false;
-
-        onDisconnect(connected);
-
         connected = false;
+
+        onDisconnect(connected, wrongVersion);
+
     }
 
     this.wasLocked = function()
@@ -247,7 +284,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         if (this.commandMode && !this.sessionTainted)
             return;
 
-        this.resultsCallback = null;
+        this.resultsCallbackArray = [];
         this.commandMode = true;
         this.sessionTainted = false;
 
@@ -261,19 +298,68 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         this.wsSession.send(JSON.stringify(command));
     }
 
+    this.startTransaction = function()
+    {
+        this.transaction = true;
+    }
+
+    this.endTransaction = function()
+    {
+        messages = [];
+        this.resultsCallbackArray = [];
+
+        for (var i = 0; i < this.commandQueue.length; i++)
+        {
+            this.seq++;
+            messages.push(
+            {
+                "command": "execLine",
+                "line": this.commandQueue[i].command,
+                "seq": seq,
+                "long": this.commandQueue[i].long? true: false
+            });
+
+            //console.log("trans seq: " + seq);
+
+            this.resultsCallbackArray.push ({
+                "seq": seq,
+                "callback": this.commandQueue[i].callback,
+                "command": this.commandQueue[i].command
+            });
+
+            this.sessionTainted = true;
+        }
+
+        this.commandQueue = [];
+
+        var command =
+        {
+            "command": "transaction",
+            "messages": messages,
+        }
+
+        this.wsSession.send(JSON.stringify(command));
+
+        this.transaction = false;
+    }
+
     this.sendCommand = function (command, callback, long) {
+
         if (this.wsSession != null && this.wsSession.readyState == 1) {
-            if (this.resultsCallback == null) {
+            if (!this.transaction) {
                 if (!this.commandMode) {
                     this.startNewSession();
 
+                    console.log("..............................");
+
                     this.commandQueue.push ({
                         "command": command,
-                        "callback": callback
+                        "callback": callback,
+                        "long": long? true: false
                     });    
                 } else { 
                     this.seq++;
-                    var command =
+                    var commandobj =
                     {
                         "command": "execLine",
                         "line": command,
@@ -281,10 +367,17 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                         "long": long? true: false
                     }
 
+                    //console.log("send command ", command, seq);
+
+                    //console.log("Sending seq: " + seq);
+                    this.resultsCallbackArray.push ({
+                        "seq": seq,
+                        "callback": callback,
+                        "command": command,
+                    });
+        
                     this.sessionTainted = true;
-                    this.resultsCallback = callback;
-                    this.resultsSeq = seq;
-                    this.wsSession.send(JSON.stringify(command));
+                    this.wsSession.send(JSON.stringify(commandobj));
                 }
             }
             else {
