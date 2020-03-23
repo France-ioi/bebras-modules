@@ -37,7 +37,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
         this.resultsCallbackArray = [];
-        this.wrongVersion = true;
+        this.wrongVersion = false;
 
         this.seq = Math.floor(Math.random() * 65536);
 
