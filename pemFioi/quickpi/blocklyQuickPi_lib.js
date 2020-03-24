@@ -289,6 +289,49 @@ var getContext = function (display, infos, curLevel) {
                     </div>
                 </div>
                 `,
+                stickPortsDialog: `
+                <div class="content qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        Stick names and port
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div id="sensorPicker" class="panel-body">
+                    <label></label>
+                    <div class="flex-container">
+                    <table>
+                    <tr>
+                    <th>Name</th>
+                    <th>Port</th>
+                    <th>State</th>
+                    <th>Direction</th>
+                    </tr>
+                    <tr>
+                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"></td>
+                    </tr>
+                    </table>
+                    </div>
+                </div>
+                <div class="singleButton">
+                    <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
+                </div>
+            </div>
+
+                `,
 
             }
         },
@@ -659,7 +702,7 @@ var getContext = function (display, infos, curLevel) {
             portType: "D",
             valueType: "boolean",
             selectorImages: ["stick.png"],
-            gpiosNames: ["Up", "Down", "Left", "Right", "Center"],
+            gpiosNames: ["up", "down", "left", "right", "center"],
             gpios: [10, 9, 11, 8, 7],
             getPercentageFromState: function (state) {
                 if (state)
@@ -693,7 +736,7 @@ var getContext = function (display, infos, curLevel) {
             },
             getButtonState: function(buttonname, state) {
                 if (state) {
-                    var buttonparts = buttonname.split(" ");
+                    var buttonparts = buttonname.split(".");
                     var actualbuttonmame = buttonname;
                     if (buttonparts.length == 2) {
                         actualbuttonmame = buttonparts[1];
@@ -1140,7 +1183,7 @@ var getContext = function (display, infos, curLevel) {
                 var firststick = true;
 
                 for (var iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++) {
-                    var name = sensor.name + " " + stickDefinition.gpiosNames[iStick];
+                    var name = sensor.name + "." + stickDefinition.gpiosNames[iStick];
                     var port = "D" + stickDefinition.gpios[iStick];
 
                     if (firststick) {
@@ -3281,6 +3324,8 @@ var getContext = function (display, infos, curLevel) {
         var statesize = sensor.drawInfo.height * 0.09;
         var namesize = sensor.drawInfo.height * 0.10;
 
+        var drawPortText = true;
+
         if (!sensor.focusrect || !sensor.focusrect.paper.canvas)
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
 
@@ -4330,7 +4375,81 @@ var getContext = function (display, infos, curLevel) {
                     stateString += "CENTER\n"
                     sensor.imgcenter.attr({ "opacity": 1 });
                 }
+                
+                if (sensor.portText)
+                    sensor.portText.remove();
 
+
+                drawPortText = false;
+
+                if (sensor.portText)
+                    sensor.portText.remove();
+
+                var gpios = findSensorDefinition(sensor).gpios;
+                var min = 255;
+                var max = 0;
+
+                for (var i = 0; i < gpios.length; i++)
+                {
+                    if (gpios[i] > max)
+                        max = gpios[i];
+
+                    if (gpios[i] < min)
+                        min = gpios[i];
+                }
+
+                
+                sensor.portText = paper.text(portx, porty, "D" + min.toString() + "-D" + max.toString() + "?");
+                sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
+                sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+                var b = sensor.portText._getBBox();
+                sensor.portText.translate(0,b.height/2);
+
+                $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
+                $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
+                $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
+                $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
+                $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+
+                sensor.portText.click(function () {
+                    window.displayHelper.showPopupDialog(strings.messages.stickPortsDialog);
+
+                    $('#picancel').click(function () {                       
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                    });
+        
+                    $('#picancel2').click(function () {                       
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                    });
+
+                    $('#stickupname').text(sensor.name + ".up");
+                    $('#stickdownname').text(sensor.name + ".down");
+                    $('#stickleftname').text(sensor.name + ".left");
+                    $('#stickrightname').text(sensor.name + ".right");
+                    $('#stickcentername').text(sensor.name + ".center");
+
+                    $('#stickupport').text("D" + gpios[0]);
+                    $('#stickdownport').text("D" + gpios[1]);
+                    $('#stickleftport').text("D" + gpios[2]);
+                    $('#stickrightport').text("D" + gpios[3]);
+                    $('#stickcenterport').text("D" + gpios[4]);
+
+                    $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
+                    $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
+                    $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
+                    $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
+                    $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+
+                    $('#stickupdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickup.png') + '">');
+                    $('#stickdowndirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickdown.png') + '">');
+                    $('#stickleftdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickleft.png') + '">');
+                    $('#stickrightdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickright.png') + '">');
+                    $('#stickcenterdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickcenter.png') + '">');
+                });
+
+                
                 sensor.stateText = paper.text(state1x, state1y, stateString);
             } else {
                 sensor.state = [false, false, false, false, false];
@@ -4490,8 +4609,6 @@ var getContext = function (display, infos, curLevel) {
             }
         });
 
-        if (sensor.portText)
-            sensor.portText.remove();
 
         if (sensor.stateText) {
             try {
@@ -4503,11 +4620,17 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
-        sensor.portText = paper.text(portx, porty, sensor.port);
-        sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
-        sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-        var b = sensor.portText._getBBox();
-        sensor.portText.translate(0,b.height/2);
+
+		if (drawPortText) {
+        	if (sensor.portText)
+            	sensor.portText.remove();
+
+        	sensor.portText = paper.text(portx, porty, sensor.port);
+        	sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "gray" });
+        	sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        	var b = sensor.portText._getBBox();
+        	sensor.portText.translate(0,b.height/2);
+		}
 
         if (sensor.nameText) {
             sensor.nameText.remove();
@@ -5695,7 +5818,7 @@ var getContext = function (display, infos, curLevel) {
                         var stickDefinition = findSensorDefinition(sensor);
 
                         for (var iStick = 0; iStick < stickDefinition.gpiosNames.length; iStick++) {
-                            var name = sensor.name + " " + stickDefinition.gpiosNames[iStick];
+                            var name = sensor.name + "." + stickDefinition.gpiosNames[iStick];
 
                             ports.push([name, name]);
                         }
@@ -5723,7 +5846,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
         } else {
-            var firstname = name.split(" ")[0];
+            var firstname = name.split(".")[0];
 
 
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -5738,7 +5861,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function findSensorByType(type) {
-        var firstname = name.split(" ")[0];
+        var firstname = name.split(".")[0];
 
 
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
