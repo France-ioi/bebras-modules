@@ -55,6 +55,10 @@ function LR_Parser(settings,subTask,answer) {
    this.paperWidth = settings.paperWidth;
    this.visualGraphJSON = settings.visualGraphJSON;
 
+   this.stackPreview;
+   var stackPreviewW = 50;
+   var stackPreviewH;
+
    this.graphDrawer;
    this.visualGraph;
    this.graph;
@@ -218,6 +222,31 @@ function LR_Parser(settings,subTask,answer) {
       fill: "red",
       opacity: 0,
       cursor: "pointer"
+   };
+   this.stackPreviewAttr = {
+      colW: 50,
+      background: {
+         stroke: this.colors.black,
+         fill: this.colors.lightgrey
+      },
+      circle: {
+         r: 5,
+         stroke: "none",
+         fill: this.colors.black
+      },
+      line: {
+         stroke: this.colors.black,
+         "stroke-width": 2
+      },
+      symbolCircle: {
+         r: 10,
+         stroke: this.colors.black,
+         fill: this.colors.lightgrey
+      },
+      symbol: {
+         "font-size": 12,
+         "font-weight": "bold"
+      }
    };
 
    this.vertexAttr = settings.vertexAttr || this.defaultVertexAttr;
@@ -544,7 +573,20 @@ function LR_Parser(settings,subTask,answer) {
       }
       // html += "<tr><td>"+terminalStateIndex+"</td></tr>";
       html += "</table>";
-      $("#"+this.parseTableID).html(html);
+      $("#"+this.parseTableID).append(html);
+      this.initStackPreview();
+   };
+
+   this.initStackPreview = function() {
+      $("#"+this.parseTableID).prepend("<div id=\"stackPreview\"></div>");
+      stackPreviewH = $("#"+this.parseTableID).height();
+      // var parseTablePos = $("#"+this.parseTableID+" table").offset();
+      this.stackPreview = subTask.raphaelFactory.create("stackPreview","stackPreview",stackPreviewW,stackPreviewH);
+      // $("#stackPreview").css({
+      //    position: "absolute",
+      //    left: parseTablePos.left - stackPreviewW,
+      //    top: 0
+      // });
    };
 
    this.initParseInfo = function() {
@@ -718,6 +760,15 @@ function LR_Parser(settings,subTask,answer) {
          $("#"+this.tabsID+" #switchContainer").off("click");
          $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
          $(window).resize(self.onResize);
+      }
+      if(this.mode < 6 && this.mode > 2){
+         $("#stackPreview").hide();
+         $("#"+this.parseTableID+" table").hover(
+            function(){
+               $("#stackPreview").show();
+            },function(){
+               $("#stackPreview").hide();
+            });
       }
       switch(this.mode){
          case 2:
@@ -2143,11 +2194,8 @@ function LR_Parser(settings,subTask,answer) {
             left: gotoColLeft - 2
          };
          this.gotoColHL.css(gotoColAttr);
-         // if(anim){
-            this.gotoColHL.hide();
-            this.gotoColHL.fadeIn(this.animationTime);
-         // }
-         // console.log("startReduction");
+         this.gotoColHL.hide();
+         this.gotoColHL.fadeIn(this.animationTime);
          return
       }
 
@@ -2194,6 +2242,45 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       // console.log(this.inputIndex+" "+this.input)
+      this.updateStackPreview();
+   };
+
+   this.updateStackPreview = function() {
+      this.stackPreview.clear();
+      var attr = this.stackPreviewAttr;
+      var tableW = $("#"+this.parseTableID+" table").width();
+      var tableH = $("#"+this.parseTableID+" table").height();
+      var tablePos = $("#"+this.parseTableID+" table").position();
+      var tableMarginLeft = ($("#"+this.parseTableID).width() - tableW)/2;
+      var headerH = $("#"+this.parseTableID+" table th:first-child").outerHeight();
+      stackPreviewH = tableH + 4;
+      stackPreviewW = this.stack.length*attr.colW;
+      this.stackPreview.setSize(stackPreviewW,stackPreviewH);
+      $("#stackPreview").css({
+         position: "absolute",
+         top: 0,
+         left: tableMarginLeft - stackPreviewW - 2
+      });
+      this.stackPreview.rect(0,headerH,stackPreviewW,stackPreviewH - headerH).attr(attr.background);
+      var lastPos = null;
+      var x = stackPreviewW/2;
+      for(var iElem = 0; iElem < this.stack.length; iElem++){
+         var elem = this.stack[iElem];
+         var state = elem[0];
+         var symbol = elem[1];
+         var line = $("#"+this.parseTableID+" td[data_state=\""+state+"\"]");
+         var x = (iElem + 1/2)*attr.colW;
+         var y = line.position().top + line.outerHeight()/2;
+         this.stackPreview.circle(x,y).attr(attr.circle);
+         if(lastPos){
+            this.stackPreview.path("M"+lastPos.x+" "+lastPos.y+",L"+x+" "+y).attr(attr.line);
+            var xSymbol = (x + lastPos.x)/2;
+            var ySymbol = (y + lastPos.y)/2;
+            this.stackPreview.circle(xSymbol,ySymbol).attr(attr.symbolCircle);
+            this.stackPreview.text(xSymbol,ySymbol,symbol).attr(attr.symbol);
+         }
+         lastPos = { x: x, y: y };
+      }
    };
 
    this.updateState = function(anim,action) {
