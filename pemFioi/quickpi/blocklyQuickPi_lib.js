@@ -12,6 +12,10 @@ var buzzerSound = {
     },
 
     start: function(channel, freq) {
+        var freq = freq || this.default_freq;
+        if(this.channels[channel] && this.channels[channel].frequency.value == freq) {
+            return;
+        }
         var context = this.getContext();
         if(!context) {
             return;
@@ -19,7 +23,7 @@ var buzzerSound = {
         this.stop(channel);
         var o = context.createOscillator();
         o.type = 'sine';
-        o.frequency.value = freq || this.default_freq;
+        o.frequency.value = freq;
         o.connect(context.destination);
         o.start();
         this.channels[channel] = o;
@@ -3540,6 +3544,11 @@ var getContext = function (display, infos, curLevel) {
             }
 
         } else if (sensor.type == "buzzer") {
+            if(sensor.state) {
+                buzzerSound.start(sensor.name);
+            } else {
+                buzzerSound.stop(sensor.name);
+            }
             if (!sensor.buzzeron || !sensor.buzzeron.paper.canvas)
                 sensor.buzzeron = paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
 
