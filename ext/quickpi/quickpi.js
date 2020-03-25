@@ -32,7 +32,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         if (this.wsSession != null) {
             return;
         }
-        
+
         this.locked = "";
         this.pingsWithoutPong = 0;
         this.commandQueue = [];
@@ -356,8 +356,8 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                         "command": command,
                         "callback": callback,
                         "long": long? true: false
-                    });    
-                } else { 
+                    });
+                } else {
                     this.seq++;
                     var commandobj =
                     {
@@ -375,7 +375,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                         "callback": callback,
                         "command": command,
                     });
-        
+
                     this.sessionTainted = true;
                     this.wsSession.send(JSON.stringify(commandobj));
                 }
@@ -406,7 +406,7 @@ import RPi.GPIO as GPIO
 import time
 import smbus
 import math
-import pigpio 
+import pigpio
 import threading
 
 GPIO.setmode(GPIO.BCM)
@@ -681,14 +681,14 @@ def initOLEDScreen():
         GPIO.output(RESET, 0)
         time.sleep(0.01)
         GPIO.output(RESET, 1)
-   
+
 
         serial = i2c(port=1, address=0x3C)
         oleddisp = ssd1306(serial, width=oledwidth, height=oledheight)
 
         oledfont = ImageFont.load_default()
         oledimage = Image.new('1', (oledwidth, oledheight))
-        oleddraw = ImageDraw.Draw(oledimage)   
+        oleddraw = ImageDraw.Draw(oledimage)
 
         oleddisp.display(oledimage)
 
@@ -698,8 +698,8 @@ def displayTextOled(line1, line2=""):
     global oledfont
     global oledimage
     global oleddraw
-    
-    initOLEDScreen()  
+
+    initOLEDScreen()
 
     # This will allow arguments to be numbers
     line1 = str(line1)
@@ -753,7 +753,7 @@ def noStroke():
 def drawPoint(x, y):
     global oleddraw
     global strokecolor
-    
+
     initOLEDScreen()
 
     oleddraw.point((x, y), fill=strokecolor)
@@ -767,8 +767,8 @@ def drawText(x, y, text):
     global oledfont
     global oledimage
     global oleddraw
-    
-    initOLEDScreen()  
+
+    initOLEDScreen()
 
     # This will allow arguments to be numbers
     text = str(text)
@@ -837,7 +837,7 @@ def clearScreen():
 def displayText16x2(line1, line2=""):
     global screenLine1
     global screenLine2
-    
+
     if line1 == screenLine1 and line2 == screenLine2:
         return
 
@@ -906,7 +906,7 @@ def sleep(sleep_time):
 
 def reportBlockValue(id, state):
     return state
-    
+
 
 class DHT11Result:
     'DHT11 sensor result returned by DHT11.read() method'
@@ -1111,7 +1111,7 @@ def readTemperatureDHT11(pin):
     except:
         pass
 
-       
+
     instance = DHT11(pin=pin)
     result = instance.read()
     if result.is_valid():
@@ -1122,7 +1122,7 @@ def readTemperatureDHT11(pin):
         }
         return result.temperature
     elif haveold:
-        return DHT11_last_value[pin]["temperature"] 
+        return DHT11_last_value[pin]["temperature"]
 
     return 0
 
@@ -1138,7 +1138,7 @@ def readHumidity(pin):
     except:
         pass
 
-       
+
     instance = DHT11(pin=pin)
     result = instance.read()
     if result.is_valid():
@@ -1149,7 +1149,7 @@ def readHumidity(pin):
         }
         return result.humidity
     elif haveold:
-        return DHT11_last_value[pin]["humidity"] 
+        return DHT11_last_value[pin]["humidity"]
 
     return 0
 
@@ -1211,7 +1211,7 @@ def readAccelBMI160():
         if not enabledBMI160:
             enabledBMI160 = True
             initBMI160()
-        
+
         bus = smbus.SMBus(1)
         acc_value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_14_ADDR, 6)
         acc_x =  (acc_value[1] << 8) | acc_value[0]
@@ -1275,7 +1275,7 @@ def readGyroBMI160():
         if not enabledBMI160:
             enabledBMI160 = True
             initBMI160()
-        
+
         bus = smbus.SMBus(1)
         value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_8_ADDR, 15)
         x =  (value[1] << 8) | value[0]
@@ -1296,7 +1296,7 @@ def readGyroBMI160():
         x = float(x)  * 0.030517578125;
         y = float(y)  * 0.030517578125;
         z = float(z)  * 0.030517578125;
-      
+
         return [x, y, z, time]
     except:
         enabledBMI160 = False
@@ -1315,7 +1315,7 @@ def readTemperatureBMI160(pin):
         if not enabledBMI160:
             enabledBMI160 = True
             initBMI160()
-        
+
         bus = smbus.SMBus(1)
         temp_value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_TEMPERATURE, 2)
 
@@ -1328,7 +1328,7 @@ def readTemperatureBMI160(pin):
             #temp = (23.0 - ((0x10000 - temp)/512.0));
 #        else:
 #            temp = ((temp/512.0) + 23.0);
-    
+
         return temp
     except:
         enabledBMI160 = False
@@ -1392,7 +1392,7 @@ def readMagnetometerLSM303C(allowcalibration=True, calibratedvalues=True):
             if compassOffset is None or compassScale is None:
                 calibrateCompassGame()
 
-        bus = smbus.SMBus(1) 
+        bus = smbus.SMBus(1)
 
         value = bus.read_i2c_block_data(MAG_I2C_ADDR, MAG_OUTX_L, 6)
 
@@ -1408,7 +1408,7 @@ def readMagnetometerLSM303C(allowcalibration=True, calibratedvalues=True):
             X = round((X + compassOffset[0]) * compassScale[0], 0)
             Y = round((Y + compassOffset[1]) * compassScale[1], 0)
             Z = round((Z + compassOffset[2])* compassScale[2], 0)
-       
+
         return [X, Y, Z]
     except:
         enabledLSM303C = False
@@ -1430,7 +1430,7 @@ def reaAccelerometerLSM303C():
             enabledLSM303C = True
             initLSM303C()
 
-        bus = smbus.SMBus(1) 
+        bus = smbus.SMBus(1)
 
         value = bus.read_i2c_block_data(ACC_I2C_ADDR, MAG_OUTX_L, 6)
 
@@ -1446,7 +1446,7 @@ def reaAccelerometerLSM303C():
     except:
         enabledLSM303C = False
         return [0, 0, 0]
- 
+
 def readMagneticForce(axis):
     maneticforce = readMagnetometerLSM303C()
 
@@ -1542,29 +1542,7 @@ def changePassiveBuzzerState(pin, state):
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, GPIO.LOW)
 
-def buzzerPlayNote(pin, frequency):
-    pin = normalizePin(pin)
 
-    pi.set_mode(pin, pigpio.OUTPUT)
-
-    pi.wave_clear()
-    pi.wave_tx_stop()
-
-    wf = []
-
-    if frequency == 0:
-        pi.wave_tx_stop()
-    else:
-        delay = int(1000000/frequency/2)
-
-        wf.append(pigpio.pulse(1<<pin, 0, delay))
-        wf.append(pigpio.pulse(0, 1<<pin, delay))
-
-        pi.wave_add_generic(wf)
-
-        a = pi.wave_create()
-
-        pi.wave_send_repeat(a)    
 
 def readADCADS1015(pin, gain=1):
     ADS1x15_CONFIG_GAIN = {
@@ -1652,7 +1630,7 @@ def readSoundLevel(pin):
     pin = normalizePin(pin)
     max = -25000
     min = 25000
-    
+
     for i in range(20):
         val = int(readADCADS1015(pin, 8))
 
@@ -1662,11 +1640,11 @@ def readSoundLevel(pin):
         if val < min:
             min = val
 
-    return max - min        
+    return max - min
 
 adcHandler = [
     {
-        "type": "grovepi", 
+        "type": "grovepi",
         "handler": readGrovePiADC
     },
     {
@@ -1691,7 +1669,7 @@ def readTemperatureGroveAnalog(pin):
     R0 = 100000.
 
     val = readADC(pin)
-    
+
     if val == 0:
         return 0
 
@@ -1709,7 +1687,7 @@ def readSoundSensor(pin):
 
 def readLightIntensity(pin):
 	return int((readADC(pin) + 1)/ 10)
-    
+
 sensorHandler = [
     {
         "type": "screen",
@@ -1766,7 +1744,7 @@ def nameToHandler(name, type):
             if handler["type"] == type and "subType" in sensor and handler["subType"] == sensor["subType"]:
                 return [sensor, handler["handler"]]
     return None
-        
+
 
 def readDistance(name):
     ret =  nameToHandler(name, "range")
@@ -1776,7 +1754,7 @@ def readDistance(name):
         handler = ret[1]
 
         return handler(name)
-    
+
     return 0
 
 
@@ -1797,7 +1775,7 @@ def readTemperature(name):
         handler = ret[1]
 
         return round(handler(name), 1)
-    
+
     return 0
 
 def setBuzzerState(name, state):
@@ -1808,8 +1786,43 @@ def setBuzzerState(name, state):
         handler = ret[1]
 
         return handler(name, state)
-    
+
     return 0
+
+def setBuzzerNote(name, state):
+    ret =  nameToHandler(name, "buzzer")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return handler(name, state)
+
+    return 0
+
+def setBuzzerNoteOld(pin, frequency):
+    pin = normalizePin(pin)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.wave_clear()
+    pi.wave_tx_stop()
+
+    wf = []
+
+    if frequency == 0:
+        pi.wave_tx_stop()
+    else:
+        delay = int(1000000/frequency/2)
+
+        wf.append(pigpio.pulse(1<<pin, 0, delay))
+        wf.append(pigpio.pulse(0, 1<<pin, delay))
+
+        pi.wave_add_generic(wf)
+
+        a = pi.wave_create()
+
+        pi.wave_send_repeat(a)
 
 def setBuzzerAudioOutput(value):
     if value:
@@ -1817,7 +1830,7 @@ def setBuzzerAudioOutput(value):
     else:
         pi.set_mode(12, pigpio.ALT1) # 12 normal
 
-        
+
 def getBuzzerAudioOutput():
     if pi.get_mode(12) == pigpio.ALT0:
         return 1
@@ -1878,7 +1891,7 @@ def spherify(centre, data):
 		scale = max(scale, s)
 
                 # next, determine the scale effect this has on each of our components.
-		dx = (row[0] - centre[0]) 
+		dx = (row[0] - centre[0])
 		dy = (row[1] - centre[1])
 		dz = (row[2] - centre[2])
 
@@ -1952,7 +1965,7 @@ def approximateCentre(data):
 def calibrateCompass(data):
     centre = approximateCentre(data)
     return spherify(centre, data)
-    
+
 def loadCompassCalibration():
     offset = None
     scale = None
@@ -1996,7 +2009,7 @@ def calibrateCompassGame():
     n = 7
     scale = 4
 
-    rect = [[0 for x in range(n)] for y in range(n)] 
+    rect = [[0 for x in range(n)] for y in range(n)]
 
     autoUpdate(False)
 
@@ -2079,7 +2092,7 @@ gyro_calibration = [0, 0, 0]
 stop_gyro = False
 gyro_thread = None
 gyro_angles_lock = None
-    
+
 def setGyroZeroAngle():
     global angles
     global calibration

@@ -1,4 +1,35 @@
 ﻿//"use strict";
+var buzzerSound = {
+    context: ('AudioContext' in window) || ('webkitAudioContext' in window) ? new(window.AudioContext || window.webkitAudioContext)() : null,
+    default_freq: 1000,
+    channels: {},
+
+    start: function(channel, freq) {
+        if(!this.context) {
+            return;
+        }
+        this.stop(channel);
+        var o = this.context.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = freq || this.default_freq;
+        o.connect(this.context.destination);
+        o.start();
+        this.channels[channel] = o;
+    },
+
+    stop: function(channel) {
+        this.channels[channel] && this.channels[channel].stop();
+        delete this.channels[channel];
+    },
+
+    stopAll: function() {
+        for(var channel in this.channels) {
+            if(this.channels.hasOwnProperty(channel)) {
+                this.stop(channel);
+            }
+        }
+    }
+}
 
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
@@ -30,7 +61,7 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "Temps actuel en millisecondes",
                 setBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
-                buzzerPlayNote: "Play frequency %2 in buzzer %1",
+                setBuzzerNote: "Play frequency %2 in buzzer %1",
 
                 drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
@@ -40,7 +71,7 @@ var getContext = function (display, infos, curLevel) {
                 updateScreen: "Update drawins to the screen",
                 autoUpdate: "Screen autoupdate mode",
 
-                fill: "Set fill color", 
+                fill: "Set fill color",
                 noFill: "Do not fill shapes",
                 stroke: "Set stroke color",
                 noStroke: "Do not stroke",
@@ -95,7 +126,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
                 setBuzzerState: "setBuzzerState",
-                buzzerPlayNote: "buzzerPlayNote",
+                setBuzzerNote: "setBuzzerNote",
                 getTemperature: "getTemperature",
 
                 drawPoint: "drawPoint",
@@ -106,7 +137,7 @@ var getContext = function (display, infos, curLevel) {
                 updateScreen: "updateScreen",
                 autoUpdate: "autoUpdate",
 
-                fill: "fill", 
+                fill: "fill",
                 noFill: "noFill",
                 stroke: "stroke",
                 noStroke: "noStroke",
@@ -151,7 +182,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity(hygrometer): lire l'humidité ambiante",
                 currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
                 setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
-				buzzerPlayNote: "buzzerPlayNote(port, frequency): sonnerie",
+				setBuzzerNote: "setBuzzerNote(port, frequency): sonnerie",
                 getTemperature: "getTemperature(thermometer): Get temperature",
 
                 drawPoint: "drawPoint(x, y)",
@@ -162,7 +193,7 @@ var getContext = function (display, infos, curLevel) {
                 updateScreen: "updateScreen()",
                 autoUpdate: "autoUpdate(auto)",
 
-                fill: "fill(color)", 
+                fill: "fill(color)",
                 noFill: "noFill()",
                 stroke: "stroke(color)",
                 noStroke: "noStroke()",
@@ -217,7 +248,7 @@ var getContext = function (display, infos, curLevel) {
                     <button type="button" id="piconnect" class="btn">
                         <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
                     </button>
-    
+
                     <span id="piinstallui">
                         <span class="fa fa-exchange-alt"></span>
                         <button type="button" id="piinstall" class="btn">
@@ -356,7 +387,7 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "lire l'humidité ambiante",
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
-                buzzerPlayNote: "sonnerie note",
+                setBuzzerNote: "sonnerie note",
                 getTemperature: "Get temperature",
 
                 drawPoint: "drawPoint",
@@ -367,7 +398,7 @@ var getContext = function (display, infos, curLevel) {
                 updateScreen: "updateScreen",
                 autoUpdate: "autoUpdate",
 
-                fill: "fill", 
+                fill: "fill",
                 noFill: "noFill",
                 stroke: "stroke",
                 noStroke: "noStroke",
@@ -394,7 +425,7 @@ var getContext = function (display, infos, curLevel) {
 
     // Create a base context
     var context = quickAlgoContext(display, infos);
-    
+
     // Import our localLanguageStrings into the global scope
     var strings = context.setLocalLanguageStrings(localLanguageStrings);
 
@@ -467,8 +498,8 @@ var getContext = function (display, infos, curLevel) {
             },
         }
     ]
-    
-    
+
+
     var sensorDefinitions = [
         /******************************** */
         /*             Actuators          */
@@ -500,7 +531,7 @@ var getContext = function (display, infos, curLevel) {
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
-    
+
                 context.quickPiConnection.sendCommand(command, callback);
             },
             subTypes: [{
@@ -555,10 +586,10 @@ var getContext = function (display, infos, curLevel) {
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setBuzzerState(\"" + sensor.name + "\"," + ledstate + ")";
-    
+
                 context.quickPiConnection.sendCommand(command, callback);
             },
-    
+
             subTypes: [{
                 subType: "active",
                 description: "Grove Buzzer",
@@ -591,7 +622,7 @@ var getContext = function (display, infos, curLevel) {
             },
             setLiveState: function (sensor, state, callback) {
                 var command = "setServoAngle(\"" + sensor.name + "\"," + state + ")";
-    
+
                 context.quickPiConnection.sendCommand(command, callback);
             }
         },
@@ -608,19 +639,19 @@ var getContext = function (display, infos, curLevel) {
                 // Both are null are equal
                 if (state1 == null && state2 == null)
                     return true;
-    
+
                 // If only one is null they are different
                 if ((state1 == null && state2) ||
                     (state1 && state2 == null))
                     return false;
-    
+
                 // Otherwise compare the strings
                 return state1.line1 == state2.line1 &&
                     state1.line2 == state2.line2;
             },
             setLiveState: function (sensor, state, callback) {
                 var command = "displayText(\"" + sensor.name + "\"," + state.line1 + "\", \"" + state.line2 + "\")";
-    
+
                 context.quickPiConnection.sendCommand(command, callback);
             },
             subTypes: [{
@@ -632,7 +663,7 @@ var getContext = function (display, infos, curLevel) {
                 subType: "oled128x32",
                 description: "128x32 Oled Screen",
             }],
-    
+
         },
         {
             name: "irtrans",
@@ -656,7 +687,7 @@ var getContext = function (display, infos, curLevel) {
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setInfraredState(\"" + sensor.name + "\"," + ledstate + ")";
-    
+
                 context.quickPiConnection.sendCommand(command, callback);
             },
         },
@@ -719,7 +750,7 @@ var getContext = function (display, infos, curLevel) {
             compareState: function (state1, state2) {
                 if (state1 == null && state2 == null)
                     return true;
-    
+
                 return state1[0] == state2[0] &&
                         state1[1] == state2[1] &&
                         state1[2] == state2[2] &&
@@ -728,7 +759,7 @@ var getContext = function (display, infos, curLevel) {
             },
             getLiveState: function (sensor, callback) {
                 var cmd = "readStick(" + this.gpios.join() + ")";
-    
+
                 context.quickPiConnection.sendCommand("readStick(" + this.gpios.join() + ")", function (retVal) {
                     var array = JSON.parse(retVal);
                     callback(array);
@@ -741,14 +772,14 @@ var getContext = function (display, infos, curLevel) {
                     if (buttonparts.length == 2) {
                         actualbuttonmame = buttonparts[1];
                     }
-    
+
                     var index = this.gpiosNames.indexOf(actualbuttonmame);
-    
+
                     if (index >= 0) {
                         return state[index];
                     }
                 }
-    
+
                 return false;
             }
         },
@@ -885,7 +916,7 @@ var getContext = function (display, infos, curLevel) {
                 portType: "D",
                 pluggable: true,
             }],
-    
+
         },
         {
             name: "humidity",
@@ -990,7 +1021,7 @@ var getContext = function (display, infos, curLevel) {
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readGyroBMI160()", function(val) {
-    
+
                     var array = JSON.parse(val);
                     array[0] = Math.round(array[0]);
                     array[1] = Math.round(array[1]);
@@ -1020,13 +1051,13 @@ var getContext = function (display, infos, curLevel) {
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readMagnetometerLSM303C(False)", function(val) {
-    
+
                     var array = JSON.parse(val);
-    
+
                     array[0] = Math.round(array[0]);
                     array[1] = Math.round(array[1]);
                     array[2] = Math.round(array[2]);
-    
+
                     callback(array);
                 });
             },
@@ -1058,39 +1089,39 @@ var getContext = function (display, infos, curLevel) {
             },
         },
     ];
-    
-    
+
+
     function findSensorDefinition(sensor) {
         for (var iType = 0; iType < sensorDefinitions.length; iType++) {
             var type = sensorDefinitions[iType];
-    
+
             if (sensor.type == type.name) {
                 if (sensor.subType && type.subTypes) {
-    
+
                     for (var iSubType = 0; iSubType < type.subTypes.length; iSubType++) {
                         var subType = type.subTypes[iSubType];
-    
+
                         if (subType.subType == sensor.subType) {
                             return $.extend({}, type, subType);
-                        }              
+                        }
                     }
                 } else {
                     return type;
                 }
             }
         }
-    
+
         return null;
     }
-    
+
     function getCurrentBoard() {
         var found = boardDefinitions.find(function (element) {
             if (context.board == element.name)
                 return element;
         });
-    
+
         return found;
-    }  
+    }
 
     if(window.getQuickPiConnection) {
         var lockstring;
@@ -1100,7 +1131,7 @@ var getContext = function (display, infos, curLevel) {
             lockstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
             sessionStorage.lockstring = lockstring;
         }
-    
+
         context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, raspberryPiChangeBoard);
     }
 
@@ -1108,7 +1139,7 @@ var getContext = function (display, infos, curLevel) {
     context.offLineMode = true;
 
     context.onExecutionEnd = function () {
-
+        buzzerSound.stopAll();
     };
 
     infos.checkEndEveryTurn = true;
@@ -1135,7 +1166,7 @@ var getContext = function (display, infos, curLevel) {
                             if (context.autoGrading)
                                 context.doNotStartGrade = false;
                             else
-                                context.doNotStartGrade = true;        
+                                context.doNotStartGrade = true;
                             context.success = false;
                             throw (strings.messages.wrongState);
                         }
@@ -1190,11 +1221,11 @@ var getContext = function (display, infos, curLevel) {
                         firststick = false;
                     } else {
                         pythonSensorTable += ",";
-                    }        
+                    }
 
                     pythonSensorTable += "{\"type\":\"button\"";
                     pythonSensorTable += ",\"name\":\"" + name + "\"";
-                    pythonSensorTable += ",\"port\":\"" + port + "\"}";  
+                    pythonSensorTable += ",\"port\":\"" + port + "\"}";
                 }
             } else {
                 pythonSensorTable += "{\"type\":\"" + sensor.type + "\"";
@@ -1220,7 +1251,7 @@ var getContext = function (display, infos, curLevel) {
         context.quickPiConnection.sendCommand(pythonSensorTable, function(x) {});
     }
 
-    
+
     context.findSensor = function findSensor(type, port, error=true) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
             var sensor = infos.quickPiSensors[i];
@@ -1239,7 +1270,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function sensorAssignPort(sensor) 
+    function sensorAssignPort(sensor)
     {
         var board = getCurrentBoard();
         var sensorDefinition = findSensorDefinition(sensor);
@@ -1258,7 +1289,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            
+
             // If this is a button try to set it to a stick
             if (!sensor.port && sensor.type == "button") {
                 for (var i = 0; i < board.builtinSensors.length; i++) {
@@ -1270,7 +1301,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
         }
-        
+
 
         // Second try assign it a grove port
         if (!sensor.port) {
@@ -1354,7 +1385,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            
+
             if (infos.quickPiSensors == "default")
             {
                 infos.quickPiSensors = [];
@@ -1392,12 +1423,12 @@ var getContext = function (display, infos, curLevel) {
             //console.log ("start polling");
 
             context.liveUpdateCount = 0;
-            
+
             context.sensorPollInterval = setInterval(function () {
                 if ((!context.runner || !context.runner.isRunning())
                     && !context.offLineMode) {
-                
-                    
+
+
                     if (!context.offLineMode && context.liveUpdateCount == 0) {
                         context.quickPiConnection.startTransaction();
 
@@ -1432,7 +1463,7 @@ var getContext = function (display, infos, curLevel) {
             });
         }
     }
-    
+
     context.changeBoard = function(newboardname)
     {
         if (context.board == newboardname)
@@ -1456,7 +1487,7 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
                 var sensor = infos.quickPiSensors[i];
                 sensor.removed = true;
-            }   
+            }
             infos.quickPiSensors = [];
 
             if (board.builtinSensors) {
@@ -1488,7 +1519,7 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
                 var sensor = infos.quickPiSensors[i];
                 sensorAssignPort(sensor);
-            }   
+            }
         }
 
         context.resetSensorTable();
@@ -1503,7 +1534,7 @@ var getContext = function (display, infos, curLevel) {
         context.changeBoard(sessionStorage.board)
 
     context.savePrograms = function(xml) {
-        if (context.infos.customSensors) 
+        if (context.infos.customSensors)
         {
             var node = goog.dom.createElement("quickpi");
             xml.appendChild(node);
@@ -1555,7 +1586,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.lastStateChange = null;
                     sensor.callsInTimeSlot = 0;
                     sensor.lastTimeIncrease = 0;
-    
+
                     infos.quickPiSensors.push(sensor);
                 }
 
@@ -1806,7 +1837,7 @@ var getContext = function (display, infos, curLevel) {
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').text(strings.messages.canConnectoToBT)
-                    
+
                     context.inUSBConnection = false;
                     context.inBTConnection = true;
                 }
@@ -1859,7 +1890,7 @@ var getContext = function (display, infos, curLevel) {
 
                     var piname = $("#pilist option:selected").text().split("-")[0].trim();
 
-                    var url = "ws://api.quick-pi.org/client/" + 
+                    var url = "ws://api.quick-pi.org/client/" +
                         $('#schoolkey').val()  + "-" +
                         piname +
                         "/api/v1/commands";
@@ -1870,7 +1901,7 @@ var getContext = function (display, infos, curLevel) {
                 } else {
                     var ipaddress = $('#piaddress').val();
                     sessionStorage.raspberryPiIpAddress = ipaddress;
-                    
+
                     showasConnecting();
                     var url = "ws://" + ipaddress + ":5000/api/v1/commands";
                     sessionStorage.quickPiUrl = url;
@@ -1894,7 +1925,7 @@ var getContext = function (display, infos, curLevel) {
             $('#picancel').click(function () {
                 context.inUSBConnection = false;
                 context.inBTConnection = false;
-                
+
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
             });
@@ -1955,7 +1986,7 @@ var getContext = function (display, infos, curLevel) {
                     $(this).addClass('active');
                     $('#pischoolcon').hide("slow");
                     $('#piaddress').val("192.168.233.1");
-                    
+
                     context.inUSBConnection = true;
                     context.inBTConnection = false;
 
@@ -1977,8 +2008,8 @@ var getContext = function (display, infos, curLevel) {
                     }
 
                     updateUSBAvailability(false);
-                    
-                    
+
+
                 }
             });
 
@@ -2038,7 +2069,7 @@ var getContext = function (display, infos, curLevel) {
 
                     if (minutes < 60)
                         timeago = strings.messages.minutesago.format(minutes);
-                    else   
+                    else
                         timeago = strings.messages.hoursago;
 
 
@@ -2131,13 +2162,13 @@ var getContext = function (display, infos, curLevel) {
 
                     <div class="inlineButtons">
                         <button id="pisetupok" class="btn"><i class="fas fa-cog icon"></i>Set</button>
-                </div>  
+                </div>
                 </div>
             </div>`);
 
                 $('#buzzeraudio').prop('checked', buzzerstate ? true : false);
 
-                
+
                 $('#picancel').click(function () {
                     $('#popupMessage').hide();
                     window.displayHelper.popupMessageShown = false;
@@ -2309,16 +2340,16 @@ var getContext = function (display, infos, curLevel) {
                         if (!sensorDefinition.pluggable && !sensorDefinition.subTypes[iSubType].pluggable)
                             continue;
 
-                        
+
                         var el = document.createElement("option");
                         el.textContent = sensorDefinition.description;
-        
+
                         if (sensorDefinition.subTypes[iSubType].description)
                             el.textContent = sensorDefinition.subTypes[iSubType].description;
-        
+
                         el.value = sensorDefinition.name;
                         el.value += "-" + sensorDefinition.subTypes[iSubType].subType;
-                        select.appendChild(el);    
+                        select.appendChild(el);
                     }
                 } else {
                     if (!sensorDefinition.pluggable)
@@ -2327,7 +2358,7 @@ var getContext = function (display, infos, curLevel) {
                     var el = document.createElement("option");
                     el.textContent = sensorDefinition.description;
                     el.value = sensorDefinition.name;
-    
+
                     select.appendChild(el);
                 }
             }
@@ -2342,7 +2373,7 @@ var getContext = function (display, infos, curLevel) {
                         continue;
 
                     var el = document.createElement("option");
-    
+
                     el.textContent = sensorDefinition.description + "(builtin)";
                     el.value = sensorDefinition.name + "-";
 
@@ -2351,7 +2382,7 @@ var getContext = function (display, infos, curLevel) {
 
                     el.value += "-" + sensor.port;
 
-                    select.appendChild(el);    
+                    select.appendChild(el);
                 }
             }
 
@@ -2416,7 +2447,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 }
 
-                
+
 
                 if (!hasPorts) {
                     $('#selector-add-button').attr("disabled", true);
@@ -2582,7 +2613,7 @@ var getContext = function (display, infos, curLevel) {
         showasConnected();
 
         context.resetSensorTable();
-        
+
         context.quickPiConnection.startNewSession();
 
         context.liveUpdateCount = 0;
@@ -2610,7 +2641,7 @@ var getContext = function (display, infos, curLevel) {
             window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
         }
 
-        
+
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked() && !wrongversion) {
             context.quickPiConnection.connect(sessionStorage.quickPiUrl);
@@ -2744,9 +2775,9 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-width": 5,
                     "stroke": "#678AB4",
                     "stroke-linecap": "round"
-            });        
+            });
         }
-        
+
 
         if (context.timeLineCircle)
         {
@@ -2964,7 +2995,7 @@ var getContext = function (display, infos, curLevel) {
                 stateline.animate({path: targetpath}, 200);
             }
 
-            
+
 
             stateline.attr({
                 "stroke-width": strokewidth,
@@ -2979,14 +3010,14 @@ var getContext = function (display, infos, curLevel) {
             wrongindicator = paper.path(["M", startx,
                              sensor.drawInfo.y,
                         "L", startx + stateLenght,
-                                sensor.drawInfo.y + sensor.drawInfo.height, 
-    
+                                sensor.drawInfo.y + sensor.drawInfo.height,
+
                         "M", startx,
                                 sensor.drawInfo.y + sensor.drawInfo.height,
                         "L", startx + stateLenght,
                                    sensor.drawInfo.y
                             ]);
-    
+
             wrongindicator.attr({
                 "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });*/
         }
@@ -3061,7 +3092,7 @@ var getContext = function (display, infos, curLevel) {
                 if (sensor.state[sliderobj.index] < sliderobj.max)
                     sensor.state[sliderobj.index] += step;
             }
-            else 
+            else
             {
                 if (sensor.state < sliderobj.max)
                     sensor.state += step;
@@ -3172,7 +3203,7 @@ var getContext = function (display, infos, curLevel) {
                         sensor.sliders[i].sliderdata.insideheight -
                         sensor.sliders[i].sliderdata.thumbheight -
                         (percentage * sensor.sliders[i].sliderdata.scale);
-    
+
                     sensor.sliders[i].thumb.attr('y', thumby);
                 }
             } else {
@@ -3261,7 +3292,7 @@ var getContext = function (display, infos, curLevel) {
 
                         sensor.sliders.push(sliderobj);
                 }
-            } else {               
+            } else {
                 sliderobj = createSlider(sensor,
                     max,
                     min,
@@ -3615,7 +3646,7 @@ var getContext = function (display, infos, curLevel) {
                 sensor.canvasNode.setAttribute("height", screenheight); //Set rect data
                 paper.canvas.appendChild(sensor.canvasNode);
 
-   
+
                 sensor.canvas = document.createElement("canvas");
                 sensor.canvas.id = "screencanvas";
                 sensor.canvas.width = screenwidth;
@@ -3647,10 +3678,10 @@ var getContext = function (display, infos, curLevel) {
                         $('#canvaslabel').show();
                         $('#screencanvas').hide();
                         sensor.screenrect.attr({ "opacity": 0 });
-                    }                    
+                    }
                 });
             }
-            
+
             sensor.screenrect.attr({
                 "x": imgx + (imgw / 2) - (128/2),
                 "y": imgy + (imgh / 2) - (32/2),
@@ -3675,14 +3706,14 @@ var getContext = function (display, infos, curLevel) {
             sensor.canvasNode.setAttribute("y", imgy + (imgh / 2) - (32/2)); //Set rect data
             sensor.canvasNode.setAttribute("width", "128"); //Set rect data
             sensor.canvasNode.setAttribute("height", "32"); //Set rect data
-    
+
 
             if (sensor.state) {
                 sensor.displayingscreen = false;
                 $('#canvaslabel').hide();
                 $('#screencanvas').hide();
                 sensor.screenrect.attr({ "opacity": 0 });
-                
+
                 var statex = imgx + (imgw * .13);
 
                 var statey = imgy + (imgh * .4);
@@ -4050,7 +4081,7 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
             });
 
-            
+
             if (sensor.stateText)
                 sensor.stateText.remove();
 
@@ -4089,10 +4120,10 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-            }); 
+            });
             if (sensor.stateText)
                 sensor.stateText.remove();
-              
+
             if (!sensor.state)
             {
                 sensor.state = [0, 0, 0];
@@ -4168,7 +4199,7 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state == null)
-                sensor.state = 25; // FIXME                
+                sensor.state = 25; // FIXME
 
             if (!sensor.img || !sensor.img.paper.canvas)
                 sensor.img = paper.image(getImg('sound.png'), imgx, imgy, imgw, imgh);
@@ -4186,7 +4217,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state) {
                 sensor.stateText = paper.text(state1x, state1y, sensor.state);
             }
-            
+
             if (!context.autoGrading && context.offLineMode) {
                 setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
             }
@@ -4290,7 +4321,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (!sensor.img || !sensor.img.paper.canvas)
                 sensor.img = paper.image(getImg('stick.png'), imgx, imgy, imgw, imgh);
-                
+
             if (!sensor.imgup || !sensor.imgup.paper.canvas)
                 sensor.imgup = paper.image(getImg('stickup.png'), imgx, imgy, imgw, imgh);
 
@@ -4312,7 +4343,7 @@ var getContext = function (display, infos, curLevel) {
                 "width": imgw,
                 "height": imgh,
             });
-            
+
             sensor.imgup.attr({
                 "x": imgx,
                 "y": imgy,
@@ -4340,7 +4371,7 @@ var getContext = function (display, infos, curLevel) {
                 "width": imgw,
                 "height": imgh,
                 "opacity": 0,
-            });            
+            });
             sensor.imgcenter.attr({
                 "x": imgx,
                 "y": imgy,
@@ -4375,7 +4406,7 @@ var getContext = function (display, infos, curLevel) {
                     stateString += "CENTER\n"
                     sensor.imgcenter.attr({ "opacity": 1 });
                 }
-                
+
                 if (sensor.portText)
                     sensor.portText.remove();
 
@@ -4398,7 +4429,7 @@ var getContext = function (display, infos, curLevel) {
                         min = gpios[i];
                 }
 
-                
+
                 sensor.portText = paper.text(portx, porty, "D" + min.toString() + "-D" + max.toString() + "?");
                 sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
                 sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
@@ -4414,12 +4445,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.portText.click(function () {
                     window.displayHelper.showPopupDialog(strings.messages.stickPortsDialog);
 
-                    $('#picancel').click(function () {                       
+                    $('#picancel').click(function () {
                         $('#popupMessage').hide();
                         window.displayHelper.popupMessageShown = false;
                     });
-        
-                    $('#picancel2').click(function () {                       
+
+                    $('#picancel2').click(function () {
                         $('#popupMessage').hide();
                         window.displayHelper.popupMessageShown = false;
                     });
@@ -4449,7 +4480,7 @@ var getContext = function (display, infos, curLevel) {
                     $('#stickcenterdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickcenter.png') + '">');
                 });
 
-                
+
                 sensor.stateText = paper.text(state1x, state1y, stateString);
             } else {
                 sensor.state = [false, false, false, false, false];
@@ -4457,10 +4488,10 @@ var getContext = function (display, infos, curLevel) {
 
             function poinInRect(rect, x, y) {
 
-                if (x > rect.left && x < rect.right && y > rect.top  && y < rect.bottom) 
-                    return true; 
-          
-                return false; 
+                if (x > rect.left && x < rect.right && y > rect.top  && y < rect.bottom)
+                    return true;
+
+                return false;
             }
 
             function moveRect(rect, x, y) {
@@ -4486,7 +4517,7 @@ var getContext = function (display, infos, curLevel) {
                     left: dim.left,
                     right: dim.left + rectsize,
                     top: dim.top,
-                    bottom: dim.top + rectsize,    
+                    bottom: dim.top + rectsize,
                 }
 
                 // Up left
@@ -4952,7 +4983,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
                 sensor.state = returnVal != "0";
                 drawSensor(sensor);
@@ -5055,10 +5086,13 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.setBuzzerState = function (name, state, callback) {
         var sensor = findSensorByName(name);
-
         var command = "setBuzzerState(\"" + name + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent(name, state ? true : false);
+
+        if(context.display) {
+            state ? buzzerSound.start(name) : buzzerSound.stop(name);
+        }
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -5069,12 +5103,15 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.buzzerPlayNote = function (name, frequency, callback) {
+    context.quickpi.setBuzzerNote = function (name, frequency, callback) {
         var sensor = findSensorByName(name);
+        var command = "setBuzzerState(\"" + name + "\",True)";
 
-        var command = "buzzerPlayNote(\"" + name + "\"," + frequency + ")";
+        context.registerQuickPiEvent(name, true);
 
-        context.registerQuickPiEvent(name, frequency);
+        if(context.display) {
+            buzzerSound.start(name, frequency);
+        }
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -5135,7 +5172,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5277,7 +5314,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.fillRect(x, y, 1, 1);
             }
 
@@ -5299,7 +5336,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.beginPath();
                 ctx.moveTo(x0, y0);
                 ctx.lineTo(x1, y1);
@@ -5325,11 +5362,11 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.beginPath();
                 ctx.rect(x0, y0, width, height);
                 ctx.closePath();
-                
+
                 if (!context.noStroke)
                     ctx.stroke();
 
@@ -5347,7 +5384,7 @@ var getContext = function (display, infos, curLevel) {
             });
         }
     };
-    
+
 
     context.quickpi.drawCircle = function(x0, y0, diameter, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
@@ -5356,9 +5393,9 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.beginPath();
-                ctx.arc(x0, y0, diameter/2, 0, Math.PI*2); 
+                ctx.arc(x0, y0, diameter/2, 0, Math.PI*2);
                 ctx.closePath();
 
                 if (!context.noFill)
@@ -5383,11 +5420,11 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
 
             }
-           
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -5407,11 +5444,11 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
             }
             */
-           
+
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -5436,7 +5473,7 @@ var getContext = function (display, infos, curLevel) {
                 if (color)
                     ctx.fillStyle = "black";
                 else
-                    ctx.fillStyle = "white";  
+                    ctx.fillStyle = "white";
             }*/
 
             context.waitDelay(callback);
@@ -5461,7 +5498,7 @@ var getContext = function (display, infos, curLevel) {
                 if (color)
                     ctx.fillStyle = "black";
                 else
-                    ctx.fillStyle = "white";  
+                    ctx.fillStyle = "white";
             }
 
             context.waitDelay(callback);
@@ -5498,12 +5535,12 @@ var getContext = function (display, infos, curLevel) {
             if (sensor && sensor.canvas)
             {
                 var ctx = sensor.canvas.getContext('2d');
- 
+
                 context.noStroke = false;
                 if (color)
                     ctx.strokeStyle = "black";
                 else
-                    ctx.strokeStyle = "white";  
+                    ctx.strokeStyle = "white";
             }
 
             context.waitDelay(callback);
@@ -5535,7 +5572,7 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi.readAcceleration = function(axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var sensor = findSensorByType("accelerometer");
-            
+
             var index = 0;
             if (axis == "x")
                 index = 0;
@@ -5543,7 +5580,7 @@ var getContext = function (display, infos, curLevel) {
                 index = 1;
             else if (axis == "z")
                 index = 2;
-            
+
 
             context.waitDelay(callback, sensor.state[index]);
         } else {
@@ -5565,7 +5602,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state[2] < 0)
                 zsign = -1;
-        
+
             if (rotationType == "pitch")
             {
                 result = 180 * Math.atan2 (sensor.state[0], zsign * Math.sqrt(sensor.state[1]*sensor.state[1] + sensor.state[2]*sensor.state[2]))/Math.PI;
@@ -5576,7 +5613,7 @@ var getContext = function (display, infos, curLevel) {
             }
 
             result = Math.round(result);
-                
+
             context.waitDelay(callback, result);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -5598,7 +5635,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5610,7 +5647,7 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi.readMagneticForce = function (axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var sensor = findSensorByType("magnetometer");
-            
+
             var index = 0;
             if (axis == "x")
                 index = 0;
@@ -5623,7 +5660,7 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("magnetometer", "i2c");
-            
+
             findSensorDefinition(sensor).getLiveState(axis, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5652,7 +5689,7 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("magnetometer", "i2c");
-            
+
             context.quickPiConnection.sendCommand("readMagnetometerLSM303C()", function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5665,7 +5702,7 @@ var getContext = function (display, infos, curLevel) {
             }, true);
         }
     };
-    
+
     context.quickpi.readInfraredState = function (name, callback) {
         var sensor = findSensorByName(name);
 
@@ -5675,7 +5712,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5693,7 +5730,7 @@ var getContext = function (display, infos, curLevel) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             findSensorDefinition(sensor).setLiveState(sensor, state, cb);
         }
     };
@@ -5703,7 +5740,7 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi.readAngularVelocity = function (axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var sensor = findSensorByType("gyroscope");
-            
+
             var index = 0;
             if (axis == "x")
                 index = 0;
@@ -5711,12 +5748,12 @@ var getContext = function (display, infos, curLevel) {
                 index = 1;
             else if (axis == "z")
                 index = 2;
-            
-            context.waitDelay(callback, sensor.state[index]);       
+
+            context.waitDelay(callback, sensor.state[index]);
          } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("gyroscope", "i2c");
-            
+
             findSensorDefinition(sensor).getLiveState(axis, function(returnVal) {
                 sensor.state = returnVal;
                 drawSensor(sensor);
@@ -5738,7 +5775,7 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            
+
             context.quickPiConnection.sendCommand("setGyroZeroAngle()", function(returnVal) {
                 cb();
             }, true);
@@ -5753,7 +5790,7 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("gyroscope", "i2c");
-            
+
             context.quickPiConnection.sendCommand("computeRotationGyro()", function(returnVal) {
                 //sensor.state = returnVal;
                 //drawSensor(sensor);
@@ -5796,7 +5833,7 @@ var getContext = function (display, infos, curLevel) {
        [1] https://developers.google.com/blockly/guides/create-custom-blocks/define-blocks
        [2] https://developers.google.com/blockly/guides/create-custom-blocks/type-checks
     */
-    
+
 
     function getSensorNames(sensorType)
     {
@@ -5813,7 +5850,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensorType == "button") {
                 for (var i = 0; i < infos.quickPiSensors.length; i++) {
                     var sensor = infos.quickPiSensors[i];
-    
+
                     if (sensor.type == "stick") {
                         var stickDefinition = findSensorDefinition(sensor);
 
@@ -5823,7 +5860,7 @@ var getContext = function (display, infos, curLevel) {
                             ports.push([name, name]);
                         }
                     }
-                }                
+                }
             }
 
             if (ports.length == 0) {
@@ -5833,7 +5870,7 @@ var getContext = function (display, infos, curLevel) {
             return ports;
         }
     }
-    
+
 
     function findSensorByName(name) {
 
@@ -5872,7 +5909,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return null;
-    }    
+    }
 
     function findSensorByPort(port) {
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -5883,7 +5920,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return null;
-    }    
+    }
 
     function getSensorSuggestedName(type, suggested) {
         if (suggested) {
@@ -5901,7 +5938,7 @@ var getContext = function (display, infos, curLevel) {
 
         return newName;
     }
-    
+
 
     context.customBlocks = {
         // Define our blocks for our namespace "template"
@@ -6078,7 +6115,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "buzzerPlayNote", params: ["String", "Number"], blocklyJson: {
+                    name: "setBuzzerNote", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
@@ -6086,7 +6123,7 @@ var getContext = function (display, infos, curLevel) {
                             { "type": "input_value", "name": "PARAM_1"},
                         ]
                     },
-                    blocklyXml: "<block type='buzzerPlayNote'>" +
+                    blocklyXml: "<block type='setBuzzerNote'>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "</block>"
                 },
