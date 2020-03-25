@@ -131,6 +131,7 @@ var importableModules = function () {
 
       'blockly-quickpi': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_lib.js", id: "blocklyQuickPi_lib" },
       'quickpi-board': { src: modulesPath + "/pemFioi/quickpi/quickpi_board.js", id: "quickpi_board" },
+      'quickpi-connection': { src: modulesPath + "/ext/quickpi/quickpi.js", id: "quickpi_connection" },
    }
 }
 
