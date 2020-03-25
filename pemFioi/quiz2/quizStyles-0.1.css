@@ -47,12 +47,12 @@ question:nth-child(odd) {
 */
 
 question .error-message, .quiz-toolbar .error-message {
-  color: #ff001f;
+  /*color: #ff001f;*/
   background-color: #ffe5e8;
   border-radius: 50px 0 0 50px;
   padding: 7px 8px 7px 40px;
   position: relative;
-  font-size: 14px;
+  /*font-size: 14px;*/
   margin: 10px 60px;
 }
 question .error-message .icon,
@@ -68,12 +68,12 @@ question .error-message .icon,
 }
 
 question .success-message, .quiz-toolbar .success-message {
-  color: #00991f;
+  /*color: #00991f;*/
   background-color: #e5ffe8;
   border-radius: 50px 0 0 50px;
   padding: 7px 8px 7px 40px;
   position: relative;
-  font-size: 14px;
+  /*font-size: 14px;*/
   margin: 10px 60px;
 }
 question .success-message .icon,

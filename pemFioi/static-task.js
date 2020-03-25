@@ -82,19 +82,6 @@ var grader = {
    gradeTask: task.gradeAnswer
 };
 
-$(function() {
-   if(window.platform) {
-      platform.initWithTask(task);
-   }
-
-   // Copy of displayHelper.useFullWidth
-   try {
-      $('#question-iframe', window.parent.document).css('width', '100%');
-   } catch(e) {
-   }
-   $('body').css('width', '');
-});
-
 if(!window.preprocessingFunctions) {
    window.preprocessingFunctions = [];
 }
@@ -120,4 +107,25 @@ window.platformScrollTo = function(target) {
         var offset = target.offset().top;
     }
     platform.updateDisplay({scrollTop: offset});
+}
+
+if(window.$) {
+   $(function() {
+      if(window.platform) {
+         platform.initWithTask(task);
+      }
+
+      // Copy of displayHelper.useFullWidth
+      try {
+         $('#question-iframe', window.parent.document).css('width', '100%');
+      } catch(e) {
+      }
+      $('body').css('width', '');
+   });
+} else if(window.platform) {
+   platform.initWithTask(task);
+} else {
+   setTimeout(function() {
+      window.platform.initWithTask(task);
+   }, 100);
 }
