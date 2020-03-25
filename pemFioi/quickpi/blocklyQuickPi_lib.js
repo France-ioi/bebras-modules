@@ -1151,7 +1151,8 @@ var getContext = function (display, infos, curLevel) {
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
-                    if (state.time < context.currentTime) {
+                    if (state.time < context.currentTime ||
+                        (lastTurn && state.time <= context.currentTime)) {
                         if (!state.hit) {
                             context.success = false;
                             throw (strings.messages.wrongState);
@@ -1159,10 +1160,6 @@ var getContext = function (display, infos, curLevel) {
                     }
                     else if (state.time > context.currentTime) {
                         if (lastTurn) {
-                            if (context.autoGrading)
-                                context.doNotStartGrade = false;
-                            else
-                                context.doNotStartGrade = true;        
                             context.success = false;
                             throw (strings.messages.wrongState);
                         }
@@ -1182,10 +1179,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = true;
-                if (context.autoGrading)
-                    context.doNotStartGrade = false;
-                else
-                    context.doNotStartGrade = true;
 
                 throw (strings.messages.programEnded);
             }
@@ -1388,6 +1381,12 @@ var getContext = function (display, infos, curLevel) {
                 addDefaultBoardSensors();
             }
         }
+
+        context.success = false;
+        if (context.autoGrading)
+            context.doNotStartGrade = false;
+        else
+            context.doNotStartGrade = true;        
 
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
@@ -4689,7 +4688,6 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -4715,7 +4713,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.currentTime > context.maxTime) {
                 context.success = true;
-                context.doNotStartGrade = false;
                 throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
@@ -4730,6 +4727,8 @@ var getContext = function (display, infos, curLevel) {
                 }
                 else {
                     expectedState.badonce = true;
+                    expectedState.hit = false;
+
                 }
             }
 
@@ -4738,7 +4737,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (fail) {
                 context.success = false;
-                context.doNotStartGrade = false;
                 throw (strings.messages.wrongState);
             }
             else
@@ -4861,7 +4859,6 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 

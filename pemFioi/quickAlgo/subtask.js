@@ -261,6 +261,9 @@ var initBlocklySubTask = function(subTask, language) {
          if (!subTask.context.doNotStartGrade ) {
             subTask.context.display = false;
             subTask.getGrade(handleResults, true, subTask.iTestCase);
+         } else {
+            if (!subTask.context.success)
+               window.quickAlgoInterface.displayError(message);
          }
       });
       initContextForLevel(initialTestCase);
