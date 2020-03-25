@@ -106,6 +106,15 @@ var importableModules = function () {
       'quiz_questions_fill_gaps': {src: modulesPath+"/pemFioi/quiz/questions/fill_gaps.js", id: "quiz_questions_fill_gaps"},
       'quiz_questions_input': {src: modulesPath+"/pemFioi/quiz/questions/input.js", id: "quiz_questions_input"},
 
+      // Quiz task v2
+      'quiz2_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/quiz2/quizStyles-0.1.css", id: "quiz_styles"},
+      'quiz2': {src: modulesPath+"/pemFioi/quiz2/quiz.js", id: "quiz"},
+      'quiz2_task': {src: modulesPath+"/pemFioi/quiz2/task.js", id: "quiz_task"},
+      'quiz2_grader': {src: modulesPath+"/pemFioi/quiz2/grader.js", id: "quiz_grader"},
+      'quiz2_questions_choice': {src: modulesPath+"/pemFioi/quiz2/questions/choice.js", id: "quiz_questions_choice"},
+      'quiz2_questions_fill_gaps': {src: modulesPath+"/pemFioi/quiz2/questions/fill_gaps.js", id: "quiz_questions_fill_gaps"},
+      'quiz2_questions_input': {src: modulesPath+"/pemFioi/quiz2/questions/input.js", id: "quiz_questions_input"},
+
       // Video task
       'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},

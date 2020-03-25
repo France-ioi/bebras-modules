@@ -1,3 +1,10 @@
+/*
+    options: {
+        strings: {..}, //
+        extensions: '' // string
+    }
+*/
+
 function FilesRepository(options) {
 
     var defaults = {
@@ -129,6 +136,7 @@ function FilesRepository(options) {
         this.popup.find('button.close').click(this.close.bind(this));
         this.popup.find('input[type=file]').change(this.onFileInputChange.bind(this));
         $(document.body).append(this.popup);
+        this.popup.show();
     }
 
 

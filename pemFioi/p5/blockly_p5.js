@@ -1,4 +1,4 @@
-var getContext = function(display, infos) {
+var getContext = function(display, infos, curLevel) {
 
 
     var p5_strings = {
@@ -122,6 +122,7 @@ var getContext = function(display, infos) {
 
 
 
+
     function delayToRate(delay) {
         if(delay >= 200) {
             return 1;
@@ -161,15 +162,14 @@ var getContext = function(display, infos) {
             return;
         }
 
-        files = new FilesRepository({
-            extensions: '.mp3',
-            parent: $('#taskContent'),
-            strings: strings.ui.files_repository
+        task_files.initLevel({
+            strings: strings.ui.files_repository,
+            level: curLevel
         });
 
         player = new PlayerP5({
             parent: $('#grid')[0],
-            filesRepository: files.getFile
+            filesRepository: task_files.getFile
         });
 
         logger = new Logger({
@@ -190,7 +190,7 @@ var getContext = function(display, infos) {
                 player.toggleMicrophone($(this).prop('checked'));
             })
             $('#p5_files').click(function() {
-                files.show();
+                task_files.open();
             })
         }
         player.toggleMicrophone($('#p5_microphone').prop('checked'));
@@ -216,9 +216,10 @@ var getContext = function(display, infos) {
     context.p5 = {
 
         playSignal: function(channel, type, frequency, amplitude, callback) {
-            player.initSignal(channel, type, frequency, amplitude);
-            context.waitDelay(callback);
-            //callback();
+            context.waitDelay(
+                callback,
+                player.initSignal(channel, type, frequency, amplitude)
+            );
         },
 
         playRecord: function(url, frequency, callback) {
@@ -267,15 +268,17 @@ var getContext = function(display, infos) {
         },
 
         playStop: function(callback) {
-            player.resetChannels();
-            context.waitDelay(callback);
-            //callback();
+            context.waitDelay(
+                callback,
+                player.resetChannels()
+            );
         },
 
         echo: function(msg, callback) {
-            logger.put(msg);
-            context.waitDelay(callback);
-            //callback();
+            context.waitDelay(
+                callback,
+                logger.put(msg)
+            );
         }
     }
 
@@ -330,3 +333,9 @@ if(window.quickAlgoLibraries) {
    if(!window.quickAlgoLibrariesList) { window.quickAlgoLibrariesList = []; }
    window.quickAlgoLibrariesList.push(['p5', getContext]);
 }
+
+
+window.task_files = new FilesRepository({
+    reader: 'text',
+    extensions: '.mp3'
+});
