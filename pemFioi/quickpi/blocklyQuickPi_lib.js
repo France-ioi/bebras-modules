@@ -14,6 +14,11 @@ var getContext = function (display, infos, curLevel) {
                 turnLedOn: "Allumer la LED",
                 turnLedOff: "Éteindre la LED",
                 isLedOn: "Get led state",
+                
+                turnBuzzerOn: "Turn Buzzer on",
+                turnBuzzerOff: "Turn Buzzer off",
+                isBuzzerOn: "Is Buzzer On",
+
                 buttonState: "bouton enfoncé",
                 buttonStateInPort: "bouton enfoncé sur le port %1",
                 waitForButton: "Attendre une pression sur le bouton",
@@ -116,6 +121,9 @@ var getContext = function (display, infos, curLevel) {
                 getLedBrightness: "getLedBrightness",
                 getServoAngle: "getServoAngle",
 
+                turnBuzzerOn: "turnBuzzerOn",
+                turnBuzzerOff: "turnBuzzerOff",
+                isBuzzerOn: "isBuzzerOn",
 
 
                 drawPoint: "drawPoint",
@@ -182,6 +190,11 @@ var getContext = function (display, infos, curLevel) {
 
                 isLedOn: "isLedOn(): get led state",
                 getLedState: "getLedState(led): Get led state",
+
+                turnBuzzerOn: "turnBuzzerOn(): Turn Buzzer On",
+                turnBuzzerOff: "turnBuzzerOff(): Turn Buzzer Off",
+                isBuzzerOn: "isBuzzerOn(): Is Buzzer On",
+
 
                 drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
@@ -400,6 +413,9 @@ var getContext = function (display, infos, curLevel) {
                 isLedOn: "Get led state",
                 getLedState: "Get led state",
 
+                turnBuzzerOn: "Turn Buzzer on",
+                turnBuzzerOff: "Turn Buzzer off",
+                isBuzzerOn: "Is Buzzer On",
 
 
                 drawPoint: "drawPoint",
@@ -4963,6 +4979,51 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.turnBuzzerOn = function (callback) {
+
+        context.registerQuickPiEvent("buzzer1", true);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        }
+        else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnBuzzerOn()", cb);
+        }
+    };
+
+    context.quickpi.turnBuzzerOff = function (callback) {
+        context.registerQuickPiEvent("buzzer1", false);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnBuzzerOff()", cb);
+        }
+    };
+
+    context.quickpi.isBuzzerOn = function (callback) {
+        var sensor = findSensorByName("buzzer1");
+
+        var command = "isBuzzerOn()";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("buzzer1");
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+            });
+        }
+    };
+
+
     context.quickpi.waitForButton = function (name, callback) {
         //        context.registerQuickPiEvent("button", "D22", "wait", false);
         var sensor = findSensorByName(name);
@@ -6240,6 +6301,8 @@ var getContext = function (display, infos, curLevel) {
             actions: [
                 { name: "turnLedOn" },
                 { name: "turnLedOff" },
+                { name: "turnBuzzerOn" },
+                { name: "turnBuzzerOff" },
                 {
                     name: "setLedState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
@@ -6316,6 +6379,9 @@ var getContext = function (display, infos, curLevel) {
                 },
                 {
                     name: "isLedOn", yieldsValue: true
+                },
+                {
+                    name: "isBuzzerOn", yieldsValue: true
                 },
                 {
                     name: "toggleLedState", params: ["String"], blocklyJson: {

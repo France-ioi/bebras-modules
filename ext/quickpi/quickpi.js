@@ -1891,6 +1891,8 @@ def readTemperature(name):
 def setBuzzerState(name, state):
     ret =  nameToHandler(name, "buzzer")
 
+    pin = normalizePin(name)
+    pin_state[pin] = state
     if ret is not None:
         sensor = ret[0]
         handler = ret[1]
@@ -1898,6 +1900,25 @@ def setBuzzerState(name, state):
         return handler(name, state)
     
     return 0
+
+def turnBuzzerOn(pin=12):
+
+    setBuzzerState("buzzer1", 1)
+
+def turnBuzzerOff(pin=12):
+    setBuzzerState("buzzer1", 0)
+
+def isBuzzerOn(pin=12):
+    pin = normalizePin(pin)
+    state = 0
+
+    try:
+        state = pin_state[pin]
+    except:
+        pass
+
+    return state
+
 
 def setBuzzerAudioOutput(value):
     if value:
