@@ -1283,7 +1283,6 @@ var getContext = function (display, infos, curLevel) {
 
         if (error) {
             context.success = false;
-            //context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -5006,7 +5005,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.isBuzzerOn = function (callback) {
-        var sensor = findSensorByName("buzzer1");
+        var sensor = findSensorByName("buzzer1", true);
 
         var command = "isBuzzerOn()";
 
@@ -5026,7 +5025,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.waitForButton = function (name, callback) {
         //        context.registerQuickPiEvent("button", "D22", "wait", false);
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading) {
 
@@ -5051,7 +5050,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.buttonState = function (callback) {
-        var sensor = findSensorByName("button1");
+        var sensor = findSensorByName("button1", true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("button1");
@@ -5070,7 +5069,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.buttonStateInPort = function (name, callback) {
 
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5113,7 +5112,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.toggleLedState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5130,7 +5129,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.buttonWasPressed = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5146,7 +5145,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setLedState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
         var command = "setLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent(name, state ? true : false);
@@ -5161,7 +5160,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setBuzzerState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "setBuzzerState(\"" + name + "\"," + (state ? "True" : "False") + ")";
 
@@ -5177,7 +5176,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.getBuzzerState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "getBuzzerState(\"" + name + "\")";
 
@@ -5196,7 +5195,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setBuzzerNote = function (name, frequency, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "setBuzzerNote(\"" + name + "\"," + frequency + ")";
 
@@ -5212,7 +5211,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.getBuzzerNote = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "getBuzzerNote(\"" + name + "\")";
 
@@ -5233,7 +5232,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.setLedBrightness = function (name, level, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (typeof level == "object")
         {
@@ -5255,7 +5254,7 @@ var getContext = function (display, infos, curLevel) {
 
     
     context.quickpi.getLedBrightness = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "getLedBrightness(\"" + name + "\")";
 
@@ -5274,7 +5273,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.isLedOn = function (callback) {
-        var sensor = findSensorByName("led1");
+        var sensor = findSensorByName("led1", true);
 
         var command = "isLedOn()";
 
@@ -5293,7 +5292,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.getLedState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "getLedState(\"" + name + "\")";
 
@@ -5312,7 +5311,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.toggleLedState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "toggleLedState(\"" + name + "\")";
         var state = context.getSensorState(name);
@@ -5329,7 +5328,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.displayText = function (name, line1, line2, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "displayText(\"" + name + "\",\""  + line1 + "\", \"" + line2 + "\")";
 
@@ -5352,7 +5351,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readTemperature = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5382,7 +5381,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.setServoAngle = function (name, angle, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (angle > 180)
             angle = 180;
@@ -5400,7 +5399,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.getServoAngle = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "getServoAngle(\"" + name + "\")";
 
@@ -5420,7 +5419,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readRotaryAngle = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5440,7 +5439,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readDistance = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState(name);
@@ -5460,7 +5459,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readLightIntensity = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5479,7 +5478,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readHumidity = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5834,7 +5833,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readSoundLevel = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5911,7 +5910,7 @@ var getContext = function (display, infos, curLevel) {
     };
     
     context.quickpi.readInfraredState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5929,7 +5928,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setInfraredState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         context.registerQuickPiEvent(name, state ? true : false);
 
@@ -6079,7 +6078,7 @@ var getContext = function (display, infos, curLevel) {
     }
     
 
-    function findSensorByName(name) {
+    function findSensorByName(name, error=false) {
 
         if (isNaN(name.substring(0, 1)) && !isNaN(name.substring(1))) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -6101,6 +6100,12 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
         }
+
+        if (error) {
+            context.success = false;
+            throw (strings.messages.sensorNotFound);
+        }
+
         return null;
     }
 
