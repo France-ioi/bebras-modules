@@ -412,10 +412,15 @@ import threading
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+led_brightness = {}
+buzzer_frequency = {}
+servo_angle = {}
+
 button_interrupt_enabled = {}
 button_was_pressed = {}
 servo_object = {}
 servo_last_value = {}
+pin_state = {}
 
 DHT11_last_value = {}
 
@@ -489,6 +494,8 @@ def changePinState(pin, state):
     if pin != 0:
         state = int(state)
 
+        pin_state[pin] = state
+
         cleanupPin(pin)
         GPIO.setup(pin, GPIO.OUT)
         if state:
@@ -496,10 +503,32 @@ def changePinState(pin, state):
         else:
             GPIO.output(pin, GPIO.LOW)
 
-def turnLedOn(pin=27):
+def getPinState(pin):
+    pin = normalizePin(pin)
+    state = 0
+
+    try:
+        state = pin_state[pin]
+    except:
+        pass
+
+    return state
+
+
+def getBuzzerState(pin):
+    return getPinState(pin)
+
+def isLedOn(pin=4):
+    return getPinState(pin)
+
+def getLedState(pin):
+    return getPinState(pin)
+
+
+def turnLedOn(pin=4):
 	changePinState(pin, 1)
 
-def turnLedOff(pin=27):
+def turnLedOff(pin=4):
 	changePinState(pin, 0)
 
 def setLedState(pin, state):
@@ -876,6 +905,8 @@ def setServoAngle(pin, angle):
     pin = normalizePin(pin)
 
     if pin != 0:
+        servo_angle[pin] = 0
+
         angle = int(angle)
 
         if angle < 0:
@@ -885,6 +916,17 @@ def setServoAngle(pin, angle):
 
         pulsewidth = (angle * 11.11) + 500
         pi.set_servo_pulsewidth(pin, pulsewidth)
+
+def getServoAngle(pin):
+    pin = normalizePin(pin)
+    angle = 0
+
+    try:
+        angle = servo_angle[pin]
+    except:
+        pass
+
+    return angle
 
 def readGrovePiADC(pin):
     pin = normalizePin(pin)
@@ -1520,6 +1562,7 @@ def changePassiveBuzzerState(pin, state):
 
     state = int(state)
 
+    pin_state[pin] = state
     if state != laststate:
         passive_buzzer_last_value[pin] = state
         pi.set_mode(pin, pigpio.OUTPUT)
@@ -1542,6 +1585,47 @@ def changePassiveBuzzerState(pin, state):
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, GPIO.LOW)
 
+
+
+def getBuzzerNote(pin):
+    pin = normalizePin(pin)
+    frequency = 0
+
+    try:
+        frequency = buzzer_frequency[pin]
+    except:
+        pass
+
+    return frequency
+
+
+def setLedBrightness(pin, level):
+    pin = normalizePin(pin)
+
+    if level > 1:
+        level = 1
+
+    led_brightness [pin] = level
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+    pi.set_PWM_frequency(pin,1000)
+    pi.set_PWM_range(pin, 4000)
+
+    dutycycle = int(4000 * level);
+    pi.set_PWM_dutycycle(pin, dutycycle)
+
+def getLedBrightness(pin):
+    pin = normalizePin(pin)
+    level = 0
+
+    try:
+        level = led_brightness[pin]
+    except:
+        pass
+
+    return level
 
 
 def readADCADS1015(pin, gain=1):
@@ -1781,6 +1865,8 @@ def readTemperature(name):
 def setBuzzerState(name, state):
     ret =  nameToHandler(name, "buzzer")
 
+    pin = normalizePin(name)
+    pin_state[pin] = state
     if ret is not None:
         sensor = ret[0]
         handler = ret[1]
@@ -1792,6 +1878,8 @@ def setBuzzerState(name, state):
 def setBuzzerNote(name, state):
     ret =  nameToHandler(name, "buzzer")
 
+    pin = normalizePin(name)
+    pin_state[pin] = state
     if ret is not None:
         sensor = ret[0]
         handler = ret[1]
@@ -1823,6 +1911,25 @@ def setBuzzerNoteOld(pin, frequency):
         a = pi.wave_create()
 
         pi.wave_send_repeat(a)
+
+def turnBuzzerOn(pin=12):
+
+    setBuzzerState("buzzer1", 1)
+
+def turnBuzzerOff(pin=12):
+    setBuzzerState("buzzer1", 0)
+
+def isBuzzerOn(pin=12):
+    pin = normalizePin(pin)
+    state = 0
+
+    try:
+        state = pin_state[pin]
+    except:
+        pass
+
+    return state
+
 
 def setBuzzerAudioOutput(value):
     if value:

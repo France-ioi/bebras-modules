@@ -44,11 +44,18 @@ var getContext = function (display, infos, curLevel) {
                 // Labels for the blocks
                 turnLedOn: "Allumer la LED",
                 turnLedOff: "Éteindre la LED",
+                isLedOn: "Get led state",
+
+                turnBuzzerOn: "Turn Buzzer on",
+                turnBuzzerOff: "Turn Buzzer off",
+                isBuzzerOn: "Is Buzzer On",
+
                 buttonState: "bouton enfoncé",
                 buttonStateInPort: "bouton enfoncé sur le port %1",
                 waitForButton: "Attendre une pression sur le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
                 setLedState: "Passer la LED %1 à %2 ",
+                getLedState: "Get LED %1 state",
                 toggleLedState: "Inverser la LED sur le port %1",
                 displayText: "Afficher à l'écran %1 Ligne 1: %2 Ligne 2: %3",
                 readTemperature: "température ambiante",
@@ -60,8 +67,15 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "l'humidité ambiante",
                 currentTime: "Temps actuel en millisecondes",
                 setBuzzerState: "buzzer sur le port %1",
+                getBuzzerState: "buzzer state in %1",
                 getTemperature: "Get temperature %1",
+
                 setBuzzerNote: "Play frequency %2 in buzzer %1",
+                getBuzzerNote: "Get frequency in led %1",
+                setLedBrightness: "Set LED %1 brightness %2",
+                getLedBrightness: "Get LED brightness %1",
+                getServoAngle: "Get Servo %1 angle",
+
 
                 drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
@@ -127,7 +141,22 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "currentTime",
                 setBuzzerState: "setBuzzerState",
                 setBuzzerNote: "setBuzzerNote",
+                getBuzzerState: "getBuzzerState",
                 getTemperature: "getTemperature",
+
+                isLedOn: "isLedOn",
+                getLedState: "getLedState",
+
+                setBuzzerNote: "setBuzzerNote",
+                getBuzzerNote: "getBuzzerNote",
+                setLedBrightness: "setLedBrightness",
+                getLedBrightness: "getLedBrightness",
+                getServoAngle: "getServoAngle",
+
+                turnBuzzerOn: "turnBuzzerOn",
+                turnBuzzerOff: "turnBuzzerOff",
+                isBuzzerOn: "isBuzzerOn",
+
 
                 drawPoint: "drawPoint",
                 drawLine: "drawLine",
@@ -183,7 +212,22 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
                 setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
 				setBuzzerNote: "setBuzzerNote(port, frequency): sonnerie",
+                getBuzzerState: "getBuzzerState(buzzer): get buzzer state",
                 getTemperature: "getTemperature(thermometer): Get temperature",
+
+                setBuzzerNote: "setBuzzerNote(buzzer, frequency): sonnerie",
+                getBuzzerNote: "getBuzzerNote(buzzer)",
+                setLedBrightness: "setLedBrightness(led, brightness)",
+                getLedBrightness: "setLedBrightness(led)",
+                getServoAngle: "getServoAngle(servo)",
+
+                isLedOn: "isLedOn(): get led state",
+                getLedState: "getLedState(led): Get led state",
+
+                turnBuzzerOn: "turnBuzzerOn(): Turn Buzzer On",
+                turnBuzzerOff: "turnBuzzerOff(): Turn Buzzer Off",
+                isBuzzerOn: "isBuzzerOn(): Is Buzzer On",
+
 
                 drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
@@ -332,7 +376,7 @@ var getContext = function (display, infos, curLevel) {
                 <div id="sensorPicker" class="panel-body">
                     <label></label>
                     <div class="flex-container">
-                    <table>
+                    <table style="display:table-header-group;">
                     <tr>
                     <th>Name</th>
                     <th>Port</th>
@@ -340,19 +384,19 @@ var getContext = function (display, infos, curLevel) {
                     <th>Direction</th>
                     </tr>
                     <tr>
-                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"></td>
+                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"></td>
+                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"></td>
+                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"></td>
+                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"></td>
+                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
                     </tr>
                     </table>
                     </div>
@@ -388,7 +432,25 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
                 setBuzzerNote: "sonnerie note",
+                getBuzzerState: "get buzzer state",
                 getTemperature: "Get temperature",
+
+
+
+                setBuzzerNote: "Set buzzer note",
+                getBuzzerNote: "Get buzzer note",
+                setLedBrightness: "Set Led Brightness",
+                getLedBrightness: "Get Led Brightness",
+                getServoAngle: "Get Servo Angle",
+
+
+                isLedOn: "Get led state",
+                getLedState: "Get led state",
+
+                turnBuzzerOn: "Turn Buzzer on",
+                turnBuzzerOff: "Turn Buzzer off",
+                isBuzzerOn: "Is Buzzer On",
+
 
                 drawPoint: "drawPoint",
                 drawLine: "drawLine",
@@ -1155,7 +1217,8 @@ var getContext = function (display, infos, curLevel) {
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
-                    if (state.time < context.currentTime) {
+                    if (state.time < context.currentTime ||
+                        (lastTurn && state.time <= context.currentTime)) {
                         if (!state.hit) {
                             context.success = false;
                             throw (strings.messages.wrongState);
@@ -1163,10 +1226,6 @@ var getContext = function (display, infos, curLevel) {
                     }
                     else if (state.time > context.currentTime) {
                         if (lastTurn) {
-                            if (context.autoGrading)
-                                context.doNotStartGrade = false;
-                            else
-                                context.doNotStartGrade = true;
                             context.success = false;
                             throw (strings.messages.wrongState);
                         }
@@ -1186,10 +1245,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = true;
-                if (context.autoGrading)
-                    context.doNotStartGrade = false;
-                else
-                    context.doNotStartGrade = true;
 
                 throw (strings.messages.programEnded);
             }
@@ -1262,7 +1317,6 @@ var getContext = function (display, infos, curLevel) {
 
         if (error) {
             context.success = false;
-            //context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -1392,6 +1446,12 @@ var getContext = function (display, infos, curLevel) {
                 addDefaultBoardSensors();
             }
         }
+
+        context.success = false;
+        if (context.autoGrading)
+            context.doNotStartGrade = false;
+        else
+            context.doNotStartGrade = true;
 
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
@@ -3396,17 +3456,8 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
-                var imagename = "ledon-";
-                if (sensor.subType)
-                    imagename += sensor.subType;
-                else
-                    imagename += "red";
-
-                imagename += ".png";
-
-                sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
-            }
+            if (sensor.state == null)
+                sensor.state = 0;
 
             if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
                 sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
@@ -3420,6 +3471,19 @@ var getContext = function (display, infos, curLevel) {
                         }
                     });
             }
+
+            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
+                var imagename = "ledon-";
+                if (sensor.subType)
+                    imagename += sensor.subType;
+                else
+                    imagename += "red";
+
+                imagename += ".png";
+
+                sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+            }
+
 
             sensor.ledon.attr({
                 "x": imgx,
@@ -3444,6 +3508,13 @@ var getContext = function (display, infos, curLevel) {
                 sensor.ledoff.attr({ "opacity": 1 });
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+
+            var x = typeof sensor.state;
+
+            if(typeof sensor.state == 'number' ) {
+                sensor.ledon.attr({ "opacity": sensor.state });
+                sensor.ledoff.attr({ "opacity": 1 });
             }
 
 
@@ -4473,11 +4544,6 @@ var getContext = function (display, infos, curLevel) {
                     $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
                     $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
 
-                    $('#stickupdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickup.png') + '">');
-                    $('#stickdowndirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickdown.png') + '">');
-                    $('#stickleftdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickleft.png') + '">');
-                    $('#stickrightdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickright.png') + '">');
-                    $('#stickcenterdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickcenter.png') + '">');
                 });
 
 
@@ -4687,7 +4753,6 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -4713,7 +4778,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (context.currentTime > context.maxTime) {
                 context.success = true;
-                context.doNotStartGrade = false;
                 throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
@@ -4728,6 +4792,8 @@ var getContext = function (display, infos, curLevel) {
                 }
                 else {
                     expectedState.badonce = true;
+                    expectedState.hit = false;
+
                 }
             }
 
@@ -4736,7 +4802,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (fail) {
                 context.success = false;
-                context.doNotStartGrade = false;
                 throw (strings.messages.wrongState);
             }
             else
@@ -4859,7 +4924,6 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            context.doNotStartGrade = true;
             throw (strings.messages.sensorNotFound);
         }
 
@@ -4948,9 +5012,54 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.turnBuzzerOn = function (callback) {
+
+        context.registerQuickPiEvent("buzzer1", true);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        }
+        else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnBuzzerOn()", cb);
+        }
+    };
+
+    context.quickpi.turnBuzzerOff = function (callback) {
+        context.registerQuickPiEvent("buzzer1", false);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("turnBuzzerOff()", cb);
+        }
+    };
+
+    context.quickpi.isBuzzerOn = function (callback) {
+        var sensor = findSensorByName("buzzer1", true);
+
+        var command = "isBuzzerOn()";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("buzzer1");
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+            });
+        }
+    };
+
+
     context.quickpi.waitForButton = function (name, callback) {
         //        context.registerQuickPiEvent("button", "D22", "wait", false);
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading) {
 
@@ -4975,7 +5084,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.buttonState = function (callback) {
-        var sensor = findSensorByName("button1");
+        var sensor = findSensorByName("button1", true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState("button1");
@@ -4994,7 +5103,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.buttonStateInPort = function (name, callback) {
 
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5037,7 +5146,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.toggleLedState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5054,7 +5163,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.buttonWasPressed = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5070,7 +5179,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setLedState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
         var command = "setLedState(\"" + sensor.port + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent(name, state ? true : false);
@@ -5085,7 +5194,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setBuzzerState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
+
         var command = "setBuzzerState(\"" + name + "\"," + (state ? "True" : "False") + ")";
 
         context.registerQuickPiEvent(name, state ? true : false);
@@ -5103,6 +5213,25 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.getBuzzerState = function (name, callback) {
+        var sensor = findSensorByName(name, true);
+
+        var command = "getBuzzerState(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
     context.quickpi.setBuzzerNote = function (name, frequency, callback) {
         var sensor = findSensorByName(name);
         var command = "setBuzzerState(\"" + name + "\",True)";
@@ -5114,6 +5243,34 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
+
+
+    context.quickpi.setLedBrightness = function (name, level, callback) {
+        var sensor = findSensorByName(name, true);
+
+        if (typeof level == "object")
+        {
+            level = level.valueOf();
+        }
+
+        var command = "setLedBrightness(\"" + name + "\"," + level + ")";
+
+        context.registerQuickPiEvent(name, level);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -5123,8 +5280,65 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
+    context.quickpi.getLedBrightness = function (name, callback) {
+        var sensor = findSensorByName(name, true);
+
+        var command = "getLedBrightness(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
+    context.quickpi.isLedOn = function (callback) {
+        var sensor = findSensorByName("led1", true);
+
+        var command = "isLedOn()";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState("led1");
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
+    context.quickpi.getLedState = function (name, callback) {
+        var sensor = findSensorByName(name, true);
+
+        var command = "getLedState(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
     context.quickpi.toggleLedState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "toggleLedState(\"" + name + "\")";
         var state = context.getSensorState(name);
@@ -5141,7 +5355,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.displayText = function (name, line1, line2, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         var command = "displayText(\"" + name + "\",\""  + line1 + "\", \"" + line2 + "\")";
 
@@ -5164,12 +5378,12 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readTemperature = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
 
-            context.runner.noDelay(callback, state);
+            context.runner.waitDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5194,7 +5408,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.setServoAngle = function (name, angle, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (angle > 180)
             angle = 180;
@@ -5211,9 +5425,28 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.getServoAngle = function (name, callback) {
+        var sensor = findSensorByName(name, true);
+
+        var command = "getServoAngle(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
+
 
     context.quickpi.readRotaryAngle = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5233,7 +5466,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readDistance = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             var state = context.getSensorState(name);
@@ -5253,7 +5486,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readLightIntensity = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5272,7 +5505,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readHumidity = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
@@ -5627,7 +5860,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.readSoundLevel = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5704,7 +5937,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.readInfraredState = function (name, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
@@ -5722,7 +5955,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setInfraredState = function (name, state, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
 
         context.registerQuickPiEvent(name, state ? true : false);
 
@@ -5872,7 +6105,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function findSensorByName(name) {
+    function findSensorByName(name, error=false) {
 
         if (isNaN(name.substring(0, 1)) && !isNaN(name.substring(1))) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -5894,6 +6127,12 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
         }
+
+        if (error) {
+            context.success = false;
+            throw (strings.messages.sensorNotFound);
+        }
+
         return null;
     }
 
@@ -6094,6 +6333,8 @@ var getContext = function (display, infos, curLevel) {
             actions: [
                 { name: "turnLedOn" },
                 { name: "turnLedOff" },
+                { name: "turnBuzzerOn" },
+                { name: "turnBuzzerOff" },
                 {
                     name: "setLedState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
@@ -6128,6 +6369,53 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
+                    name: "getBuzzerNote", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
+                            },
+                        ]
+                    }
+                },
+                {
+                    name: "setLedBrightness", params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='setLedBrightness'>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "getBuzzerState", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
+                            },
+                        ]
+                    }
+                },
+
+                {
+                    name: "getLedState", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                        ]
+                    }
+                },
+                {
+                    name: "isLedOn", yieldsValue: true
+                },
+                {
+                    name: "isBuzzerOn", yieldsValue: true
+                },
+                {
                     name: "toggleLedState", params: ["String"], blocklyJson: {
                         "args0": [
                             {
@@ -6150,6 +6438,15 @@ var getContext = function (display, infos, curLevel) {
                     blocklyXml: "<block type='setServoAngle'>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "</block>"
+                },
+                {
+                    name: "getServoAngle", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("servo")
+                            },
+                        ]
+                    }
                 },
                 {
                     name: "setInfraredState", params: ["String", "Number"], blocklyJson: {
