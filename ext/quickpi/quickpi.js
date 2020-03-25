@@ -412,6 +412,8 @@ import threading
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
+led_brightness = {}
+
 button_interrupt_enabled = {}
 button_was_pressed = {}
 servo_object = {}
@@ -1542,7 +1544,7 @@ def changePassiveBuzzerState(pin, state):
             GPIO.setup(pin, GPIO.OUT)
             GPIO.output(pin, GPIO.LOW)
 
-def buzzerPlayNote(pin, frequency):
+def setBuzzerNote(pin, frequency):
     pin = normalizePin(pin)
 
     pi.set_mode(pin, pigpio.OUTPUT)
@@ -1554,6 +1556,8 @@ def buzzerPlayNote(pin, frequency):
 
     if frequency == 0:
         pi.wave_tx_stop()
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.LOW)
     else:
         delay = int(1000000/frequency/2)
 
@@ -1565,6 +1569,37 @@ def buzzerPlayNote(pin, frequency):
         a = pi.wave_create()
 
         pi.wave_send_repeat(a)    
+
+
+
+def setLedBrightness(pin, level):
+    pin = normalizePin(pin)
+
+    if level > 1:
+        level = 1
+
+    led_brightness [pin] = level
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+
+    pi.set_mode(pin, pigpio.OUTPUT)
+    pi.set_PWM_frequency(pin,1000)
+    pi.set_PWM_range(pin, 4000)
+
+    dutycycle = int(4000 * level);
+    pi.set_PWM_dutycycle(pin, dutycycle)
+
+def getLedBrightness(pin):
+    pin = normalizePin(pin)
+    level = 0
+
+    try:
+        level = led_brightness[pin]
+    except:
+        pass
+
+    return level
+
 
 def readADCADS1015(pin, gain=1):
     ADS1x15_CONFIG_GAIN = {

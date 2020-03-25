@@ -30,7 +30,13 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "Temps actuel en millisecondes",
                 setBuzzerState: "buzzer sur le port %1",
                 getTemperature: "Get temperature %1",
-                buzzerPlayNote: "Play frequency %2 in buzzer %1",
+                
+                setBuzzerNote: "Play frequency %2 in buzzer %1",
+                getBuzzerNote: "Get frequency in led %1",
+                setLedBrightness: "Set LED %1 brightness %2",
+                getLedBrightness: "Get LED brightness %1",
+                getServoAngle: "Get Servo %1 angle",
+
 
                 drawPoint: "Draw pixel",
                 drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
@@ -95,8 +101,15 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
                 setBuzzerState: "setBuzzerState",
-                buzzerPlayNote: "buzzerPlayNote",
                 getTemperature: "getTemperature",
+
+                setBuzzerNote: "setBuzzerNote",
+                getBuzzerNote: "getBuzzerNote",
+                setLedBrightness: "setLedBrightness",
+                getLedBrightness: "getLedBrightness",
+                getServoAngle: "getServoAngle",
+
+
 
                 drawPoint: "drawPoint",
                 drawLine: "drawLine",
@@ -151,8 +164,14 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "readHumidity(hygrometer): lire l'humidité ambiante",
                 currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
                 setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
-				buzzerPlayNote: "buzzerPlayNote(port, frequency): sonnerie",
                 getTemperature: "getTemperature(thermometer): Get temperature",
+
+                setBuzzerNote: "setBuzzerNote(buzzer, frequency): sonnerie",
+                getBuzzerNote: "getBuzzerNote(buzzer)",
+                setLedBrightness: "setLedBrightness(led, brightness)",
+                getLedBrightness: "setLedBrightness(led)",
+                getServoAngle: "getServoAngle(servo)",
+
 
                 drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
@@ -301,7 +320,7 @@ var getContext = function (display, infos, curLevel) {
                 <div id="sensorPicker" class="panel-body">
                     <label></label>
                     <div class="flex-container">
-                    <table>
+                    <table style="display:table-header-group;">
                     <tr>
                     <th>Name</th>
                     <th>Port</th>
@@ -309,19 +328,19 @@ var getContext = function (display, infos, curLevel) {
                     <th>Direction</th>
                     </tr>
                     <tr>
-                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"></td>
+                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"></td>
+                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"></td>
+                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"></td>
+                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
                     </tr>
                     <tr>
-                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"></td>
+                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
                     </tr>
                     </table>
                     </div>
@@ -356,8 +375,16 @@ var getContext = function (display, infos, curLevel) {
                 readHumidity: "lire l'humidité ambiante",
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
-                buzzerPlayNote: "sonnerie note",
                 getTemperature: "Get temperature",
+
+
+                
+                setBuzzerNote: "Set buzzer note",
+                getBuzzerNote: "Get buzzer note",
+                setLedBrightness: "Set Led Brightness",
+                getLedBrightness: "Get Led Brightness",
+                getServoAngle: "Get Servo Angle",
+
 
                 drawPoint: "drawPoint",
                 drawLine: "drawLine",
@@ -3365,17 +3392,8 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
-                var imagename = "ledon-";
-                if (sensor.subType)
-                    imagename += sensor.subType;
-                else
-                    imagename += "red";
-
-                imagename += ".png";
-
-                sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
-            }
+            if (sensor.state == null)
+                sensor.state = 0;
 
             if (!sensor.ledoff || !sensor.ledoff.paper.canvas) {
                 sensor.ledoff = paper.image(getImg('ledoff.png'), imgx, imgy, imgw, imgh);
@@ -3389,6 +3407,19 @@ var getContext = function (display, infos, curLevel) {
                         }
                     });
             }
+
+            if (!sensor.ledon || !sensor.ledon.paper.canvas) {
+                var imagename = "ledon-";
+                if (sensor.subType)
+                    imagename += sensor.subType;
+                else
+                    imagename += "red";
+
+                imagename += ".png";
+
+                sensor.ledon = paper.image(getImg(imagename), imgx, imgy, imgw, imgh);
+            }
+
 
             sensor.ledon.attr({
                 "x": imgx,
@@ -3413,6 +3444,13 @@ var getContext = function (display, infos, curLevel) {
                 sensor.ledoff.attr({ "opacity": 1 });
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
+            }
+
+            var x = typeof sensor.state;
+
+            if(typeof sensor.state == 'number' ) {
+                sensor.ledon.attr({ "opacity": sensor.state });
+                sensor.ledoff.attr({ "opacity": 1 });
             }
 
 
@@ -4442,11 +4480,6 @@ var getContext = function (display, infos, curLevel) {
                     $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
                     $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
 
-                    $('#stickupdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickup.png') + '">');
-                    $('#stickdowndirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickdown.png') + '">');
-                    $('#stickleftdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickleft.png') + '">');
-                    $('#stickrightdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickright.png') + '">');
-                    $('#stickcenterdirection').html('<img src="' + getImg('stick.png') + '"><img src="' + getImg('stickcenter.png') + '">');
                 });
 
                 
@@ -5069,10 +5102,10 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.buzzerPlayNote = function (name, frequency, callback) {
+    context.quickpi.setBuzzerNote = function (name, frequency, callback) {
         var sensor = findSensorByName(name);
 
-        var command = "buzzerPlayNote(\"" + name + "\"," + frequency + ")";
+        var command = "setBuzzerNote(\"" + name + "\"," + frequency + ")";
 
         context.registerQuickPiEvent(name, frequency);
 
@@ -5085,6 +5118,47 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+
+    context.quickpi.setLedBrightness = function (name, level, callback) {
+        var sensor = findSensorByName(name);
+
+        if (typeof level == "object")
+        {
+            level = level.valueOf();            
+        }
+
+        var command = "setLedBrightness(\"" + name + "\"," + level + ")";
+
+        context.registerQuickPiEvent(name, level);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, cb);
+        }
+    };
+
+    
+    context.quickpi.getLedBrightness = function (name, callback) {
+        var sensor = findSensorByName(name);
+
+        var command = "getLedBrightness(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
 
     context.quickpi.toggleLedState = function (name, callback) {
         var sensor = findSensorByName(name);
@@ -5132,7 +5206,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
 
-            context.runner.noDelay(callback, state);
+            context.runner.waitDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
             
@@ -6078,7 +6152,7 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "buzzerPlayNote", params: ["String", "Number"], blocklyJson: {
+                    name: "setBuzzerNote", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
@@ -6086,9 +6160,31 @@ var getContext = function (display, infos, curLevel) {
                             { "type": "input_value", "name": "PARAM_1"},
                         ]
                     },
-                    blocklyXml: "<block type='buzzerPlayNote'>" +
+                    blocklyXml: "<block type='setBuzzerNote'>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "</block>"
+                },
+                {
+                    name: "setLedBrightness", params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='setLedBrightness'>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "getLedBrightness", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                        ]
+                    }
                 },
                 {
                     name: "toggleLedState", params: ["String"], blocklyJson: {
