@@ -1,18 +1,26 @@
 ﻿//"use strict";
 var buzzerSound = {
-    context: ('AudioContext' in window) || ('webkitAudioContext' in window) ? new(window.AudioContext || window.webkitAudioContext)() : null,
+    context: null,
     default_freq: 1000,
     channels: {},
 
-    start: function(channel, freq) {
+    getContext: function() {
         if(!this.context) {
+            this.context = ('AudioContext' in window) || ('webkitAudioContext' in window) ? new(window.AudioContext || window.webkitAudioContext)() : null;
+        }
+        return this.context;
+    },
+
+    start: function(channel, freq) {
+        var context = this.getContext();
+        if(!context) {
             return;
         }
         this.stop(channel);
-        var o = this.context.createOscillator();
+        var o = context.createOscillator();
         o.type = 'sine';
         o.frequency.value = freq || this.default_freq;
-        o.connect(this.context.destination);
+        o.connect(context.destination);
         o.start();
         this.channels[channel] = o;
     },
@@ -1200,9 +1208,7 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
-    context.onExecutionEnd = function () {
-        buzzerSound.stopAll();
-    };
+    context.onExecutionEnd = function () {};
 
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
@@ -1393,6 +1399,8 @@ var getContext = function (display, infos, curLevel) {
     }
 
     context.reset = function (taskInfos) {
+        buzzerSound.stopAll();
+
         if (!context.offLineMode) {
             $('#piinstallcheck').hide();
             context.quickPiConnection.startNewSession();
