@@ -1478,31 +1478,40 @@ var getContext = function (display, infos, curLevel) {
 
         context.timeLineStates = [];
 
-        //if (context.display)
-        {
-            //console.log ("start polling");
+        startSensorPollInterval();
+    };
 
-            context.liveUpdateCount = 0;
-
-            context.sensorPollInterval = setInterval(function () {
-                if ((!context.runner || !context.runner.isRunning())
-                    && !context.offLineMode) {
-
-
-                    if (!context.offLineMode && context.liveUpdateCount == 0) {
-                        context.quickPiConnection.startTransaction();
-
-                        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
-                            var sensor = infos.quickPiSensors[iSensor];
-
-                            updateLiveSensor(sensor);
-                        }
-
-                        context.quickPiConnection.endTransaction();
-                    }
-                }
-            }, 200);
+    function clearSensorPollInterval() {
+        if(context.sensorPollInterval) {
+            clearInterval(context.sensorPollInterval);
+            context.sensorPollInterval = null;
         }
+    };
+
+    function startSensorPollInterval() {
+        // Start polling the sensors on the raspberry if the raspberry is connected
+
+        clearSensorPollInterval();
+
+        context.liveUpdateCount = 0;
+
+        if(!context.quickPiConnection.isConnected()) { return; }
+
+        context.sensorPollInterval = setInterval(function () {
+            if((context.runner && context.runner.isRunning())
+                || context.offLineMode
+                || context.liveUpdateCount != 0) { return; }
+
+            context.quickPiConnection.startTransaction();
+
+            for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                var sensor = infos.quickPiSensors[iSensor];
+
+                updateLiveSensor(sensor);
+            }
+
+            context.quickPiConnection.endTransaction();
+        }, 200);
     };
 
     function updateLiveSensor(sensor) {
@@ -2682,6 +2691,8 @@ var getContext = function (display, infos, curLevel) {
         sessionStorage.autoConnect = "1";
 
         context.resetDisplay();
+
+        startSensorPollInterval();
     }
 
     function raspberryPiDisconnected(wasConnected, wrongversion) {
@@ -2701,7 +2712,7 @@ var getContext = function (display, infos, curLevel) {
             window.displayHelper.showPopupMessage(strings.messages.cantConnect, 'blanket');
         }
 
-
+        clearSensorPollInterval();
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked() && !wrongversion) {
             context.quickPiConnection.connect(sessionStorage.quickPiUrl);
@@ -2744,11 +2755,7 @@ var getContext = function (display, infos, curLevel) {
     // anything the context may have created
     context.unload = function () {
         // Do something here
-        if (context.sensorPollInterval) {
-            clearInterval(context.sensorPollInterval);
-            context.sensorPollInterval = null;
-        }
-
+        clearSensorPollInterval();
         if (context.display) {
             // Do something here
         }
