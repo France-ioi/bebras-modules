@@ -5233,7 +5233,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.setBuzzerNote = function (name, frequency, callback) {
-        var sensor = findSensorByName(name);
+        var sensor = findSensorByName(name, true);
         var command = "setBuzzerState(\"" + name + "\",True)";
 
         context.registerQuickPiEvent(name, true);
