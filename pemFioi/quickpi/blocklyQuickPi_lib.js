@@ -1215,8 +1215,17 @@ var getContext = function (display, infos, curLevel) {
             throw (strings.messages.manualTestSuccess);
         }
 
+        var testEnded = lastTurn || context.currentTime > context.maxTime;
+
         if (context.autoGrading) {
             for (var sensorStates in context.gradingStatesBySensor) {
+
+                if (lastTurn && context.display && context.taskEnds)
+                {
+                    var sensor = findSensorByName(sensorStates);
+                    drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.maxTime + 1000, "actual");
+                }
+
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
@@ -1236,16 +1245,15 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            if (context.display && context.taskEnds)
+            if (lastTurn && context.display && context.taskEnds)
             {
                 context.currentTime += 1000;
                 drawCurrentTime();
             }
 
 
-            if (lastTurn) {
+            if (testEnded) {
                 context.success = true;
-                context.doNotStartGrade = false;
                 throw (strings.messages.programEnded);
             }
         } else {
@@ -3037,7 +3045,15 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
-                paper.text(startx + 15, ypositiontop + offset - 10, state);
+                if (sensor.timelinestateup) {
+                    paper.text(startx + 15, ypositiontop + offset - 10, state);
+                    sensor.timelinestateup = false;
+                }
+                else {
+                    paper.text(startx + 15, ypositiontop + offset + 20, state);
+                    sensor.timelinestateup = true;
+                }
+
             }
 
             sensor.lastAnalogState = state == null ? 0 : state;
@@ -5377,8 +5393,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getBuzzerNote(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5419,8 +5434,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getLedBrightness(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5438,8 +5452,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "isLedOn()";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("led1");
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5457,8 +5470,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getLedState(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5564,8 +5576,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getServoAngle(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
