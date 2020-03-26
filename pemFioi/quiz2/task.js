@@ -91,9 +91,7 @@
             this.unfreezeTask();
             window.quiz_ui.toggleFeedback(false);
             task.showViews({"task": true, "solution": false}, function(){});
-            if(from_scratch) {
-                window.quiz_ui.reset();
-            }
+            window.quiz_ui.reset(from_scratch);
         },
 
         showPopup: function() {

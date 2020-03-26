@@ -161,10 +161,14 @@
                 parent.find('solution').toggle(flag)
             },
 
-            reset: function() {
+            resetAnswer: function() {
+                parent.find('answer').removeClass('selected');
+            },
+
+            resetFeedback: function() {
                 parent.find('solution').hide();
                 parent.find('.alert-message').remove();
-                parent.find('answer').removeClass('selected correct mistake');
+                parent.find('answer').removeClass('correct mistake');
             },
 
             answers_order: answers_order
@@ -289,10 +293,14 @@
                 }
             },
 
-            reset: function() {
+            resetAnswer: function() {
+                parent.find('answer').removeClass('selected');
+            },
+
+            resetFeedback: function() {
                 parent.find('solution').hide();
                 parent.find('.alert-message').remove();
-                parent.find('answer').removeClass('selected correct mistake');
+                parent.find('answer').removeClass('correct mistake');
             },
 
             answers_order: answers_order

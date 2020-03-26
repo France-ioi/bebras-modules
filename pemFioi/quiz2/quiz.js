@@ -244,9 +244,12 @@ Quiz.UI = function(params) {
             this.toggleFeedback(true);
         },
 
-        reset: function() {
+        reset: function(from_scratch) {
             for(var i=0; i<questions.length; i++) {
-                questions[i].reset();
+                questions[i].resetFeedback();
+                if(from_scratch) {
+                    questions[i].resetAnswer();
+                }
             }
         }
 
