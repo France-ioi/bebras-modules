@@ -3658,6 +3658,9 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.buttonoff || !sensor.buttonoff.paper.canvas)
                 sensor.buttonoff = paper.image(getImg('buttonoff.png'), imgx, imgy, imgw, imgh);
 
+            if (sensor.state == null)
+                sensor.state = false;
+
             sensor.buttonon.attr({
                 "x": imgx,
                 "y": imgy,
@@ -4022,7 +4025,7 @@ var getContext = function (display, infos, curLevel) {
             });
 
             if (sensor.state == null)
-                sensor.state = 0;
+                sensor.state = 500;
 
             if (sensor.rangedistance)
                 sensor.rangedistance.remove();
@@ -6467,6 +6470,15 @@ var getContext = function (display, infos, curLevel) {
 
                 {
                     name: "getLedState", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                        ]
+                    }
+                },
+                {
+                    name: "getLedBrightness", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
