@@ -2,6 +2,7 @@
 var buzzerSound = {
     context: null,
     default_freq: 1000,
+    current_freq: null,
     channels: {},
 
     getContext: function() {
@@ -12,7 +13,7 @@ var buzzerSound = {
     },
 
     start: function(channel, freq) {
-        var freq = freq || this.default_freq;
+        var freq = freq || this.current_freq || this.default_freq;
         if(this.channels[channel] && this.channels[channel].frequency.value == freq) {
             return;
         }
@@ -40,6 +41,7 @@ var buzzerSound = {
                 this.stop(channel);
             }
         }
+        this.current_freq = null;
     }
 }
 
