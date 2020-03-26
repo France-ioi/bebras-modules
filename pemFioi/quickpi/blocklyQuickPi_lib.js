@@ -12,8 +12,7 @@ var buzzerSound = {
         return this.context;
     },
 
-    start: function(channel, freq) {
-        var freq = freq || this.current_freq || this.default_freq;
+    start: function(channel, freq=this.default_freq) {
         if(this.channels[channel] && this.channels[channel].frequency.value == freq) {
             return;
         }
@@ -22,12 +21,15 @@ var buzzerSound = {
             return;
         }
         this.stop(channel);
-        var o = context.createOscillator();
-        o.type = 'sine';
-        o.frequency.value = freq;
-        o.connect(context.destination);
-        o.start();
-        this.channels[channel] = o;
+
+        if (freq > 0) {
+            var o = context.createOscillator();
+            o.type = 'sine';
+            o.frequency.value = freq;
+            o.connect(context.destination);
+            o.start();
+            this.channels[channel] = o;
+        }
     },
 
     stop: function(channel) {
