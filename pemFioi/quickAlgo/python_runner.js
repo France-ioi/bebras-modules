@@ -399,9 +399,9 @@ function PythonInterpreter(context, msgCallback) {
         return;
       }
     }
-    if (this._steps >= this._maxIterations) {
+    if (!this.context.allowInfiniteLoop && this._steps >= this._maxIterations) {
       this._onStepError(window.languageStrings.tooManyIterations);
-    } else if (this._stepsWithoutAction >= this._maxIterWithoutAction) {
+    } else if (!this.context.allowInfiniteLoop && this._stepsWithoutAction >= this._maxIterWithoutAction) {
       this._onStepError(window.languageStrings.tooManyIterationsWithoutAction);
     } else if (!this._paused && this._isRunning) {
       this.step();
