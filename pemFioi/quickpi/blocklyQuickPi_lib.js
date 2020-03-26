@@ -277,10 +277,10 @@ var getContext = function (display, infos, curLevel) {
 
             startingBlockName: "Programme", // Name for the starting block
             messages: {
-                sensorNotFound: "Accès à un capteur ou actuateur inexistant.",
+                sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
                 manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test échoué. Un état invalide a été atteint",
+                wrongState: "Test échoué : {0} est dans un état invalide.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -1231,13 +1231,13 @@ var getContext = function (display, infos, curLevel) {
                         (lastTurn && state.time <= context.currentTime)) {
                         if (!state.hit) {
                             context.success = false;
-                            throw (strings.messages.wrongState);
+                            throw (strings.messages.wrongState.format(state.name));
                         }
                     }
                     else if (state.time > context.currentTime) {
                         if (lastTurn) {
                             context.success = false;
-                            throw (strings.messages.wrongState);
+                            throw (strings.messages.wrongState.format(state.name));
                         }
                     }
                 }
@@ -1327,7 +1327,7 @@ var getContext = function (display, infos, curLevel) {
 
         if (error) {
             context.success = false;
-            throw (strings.messages.sensorNotFound);
+            throw (strings.messages.sensorNotFound.format('type ' + type + ', port ' + port));
         }
 
         return null;
@@ -4782,7 +4782,7 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            throw (strings.messages.sensorNotFound);
+            throw (strings.messages.sensorNotFound.format(name));
         }
 
         if (setInSensor) {
@@ -4831,7 +4831,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (fail) {
                 context.success = false;
-                throw (strings.messages.wrongState);
+                throw (strings.messages.wrongState.format(sensor.name));
             }
             else
                 context.increaseTime(sensor);
@@ -4953,7 +4953,7 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
-            throw (strings.messages.sensorNotFound);
+            throw (strings.messages.sensorNotFound.format(name));
         }
 
         if (state == null) {
@@ -6177,7 +6177,7 @@ var getContext = function (display, infos, curLevel) {
 
         if (error) {
             context.success = false;
-            throw (strings.messages.sensorNotFound);
+            throw (strings.messages.sensorNotFound.format(name));
         }
 
         return null;
