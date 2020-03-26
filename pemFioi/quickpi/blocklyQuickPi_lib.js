@@ -1385,7 +1385,9 @@ var getContext = function (display, infos, curLevel) {
                     if (pluggable || subTypeDefinition.pluggable) {
                         var ports = board.portTypes[sensorDefinition.portType];
                         for (var iPorts = 0; iPorts < ports.length; iPorts++) {
-                            var port = sensorDefinition.portType + ports[iPorts];
+                            var port = sensorDefinition.portType;
+                            if (sensorDefinition.portType != "i2c")
+                                port = sensorDefinition.portType + ports[iPorts];
                             if (!findSensorByPort(port)) {
                                 sensor.port = port;
 
