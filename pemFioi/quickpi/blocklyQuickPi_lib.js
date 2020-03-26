@@ -1,7 +1,7 @@
 ﻿//"use strict";
 var buzzerSound = {
     context: null,
-    default_freq: 1000,
+    default_freq: 200,
     current_freq: null,
     channels: {},
 
@@ -1236,6 +1236,13 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
+            if (context.display && context.taskEnds)
+            {
+                context.currentTime += 1000;
+                drawCurrentTime();
+            }
+
+
             if (lastTurn) {
                 context.success = true;
                 context.doNotStartGrade = false;
@@ -1427,6 +1434,7 @@ var getContext = function (display, infos, curLevel) {
         if (taskInfos != undefined) {
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
+            context.taskEnds = taskInfos.taskEnds;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
                 context.gradingInput = taskInfos.input;
@@ -1746,6 +1754,9 @@ var getContext = function (display, infos, curLevel) {
             if (maxTime == 0)
                 maxTime = 1000;
 
+            if (context.taskEnds)
+                maxTime = maxTime + 1000;
+
             context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
@@ -1776,6 +1787,9 @@ var getContext = function (display, infos, curLevel) {
                     }
 
                     drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected", true);
+                    
+                    if (context.taskEnds)
+                        drawSensorTimeLineState(sensor, lastState, startTime, state.time + 1000, "finnish", false);
 
                     sensor.lastAnalogState = null;
                 }
@@ -2810,7 +2824,8 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
-        for (var i = 0; i <= context.maxTime; i += 1000) {
+        var i = 0;
+        for (; i <= context.maxTime; i += 1000) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
 
             var timelabel = paper.text(x, context.timeLineY, (i / 1000));
@@ -2824,6 +2839,18 @@ var getContext = function (display, infos, curLevel) {
                             "L", x,
                             paper.height - context.sensorSize]);*/
         }
+
+        if (context.taskEnds) {
+            var x = context.timelineStartx + (i * context.pixelsPerTime);
+            var timelabel = paper.text(x, context.timeLineY, '\uf11e');      
+            timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
+            timelabel.node.style.fontWeight = "bold";
+
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            context.timelineText.push(timelabel);
+        }
+
+
         /*
                 paper.path(["M", context.timelineStartx,
                     paper.height - context.sensorSize * 3 / 4,
@@ -2965,7 +2992,7 @@ var getContext = function (display, infos, curLevel) {
 
         var color = "green";
         var strokewidth = 4;
-        if (type == "expected") {
+        if (type == "expected" || type == "finnish") {
             color = "lightgrey";
             strokewidth = 8;
         } else if (type == "wrong") {
@@ -3026,6 +3053,42 @@ var getContext = function (display, infos, curLevel) {
                 "stroke-linejoin": "round",
                 "stroke-linecap": "round"
             });
+        } else if (sensor.type == "stick") {
+
+            var spacing = sensor.drawInfo.height / 5;
+            for (var i = 0; i < 5; i++)
+            {
+                if (state && state[i])
+                {
+                    var startingpath = ["M", startx,
+                            sensor.drawInfo.y + (i * spacing),
+                            "L", startx,
+                            sensor.drawInfo.y + (i * spacing)];
+
+                    var targetpath = ["M", startx,
+                            sensor.drawInfo.y + (i * spacing),
+                            "L", startx + stateLenght,
+                            sensor.drawInfo.y + (i * spacing)];
+
+                    if (type == "expected")
+                    {
+                        var stateline = paper.path(targetpath);
+                    }
+                    else
+                    {
+                        var stateline = paper.path(startingpath);
+                        stateline.animate({path: targetpath}, 200);
+                    }
+
+                    stateline.attr({
+                        "stroke-width": 2,
+                        "stroke": color,
+                        "stroke-linejoin": "round",
+                        "stroke-linecap": "round"
+                    });
+                }
+            }
+
         } else if (sensor.type == "screen") {
             if (state) {
                 sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
@@ -6435,7 +6498,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='setBuzzerNote'>" +
-                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>200</field></shadow></value>" +
                         "</block>"
                 },
                 {
