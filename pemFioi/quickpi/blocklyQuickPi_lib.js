@@ -1707,7 +1707,12 @@ var getContext = function (display, infos, curLevel) {
         );
 
         this.raphaelFactory.destroyAll();
-        paper = this.raphaelFactory.create("paperMain", "virtualSensors", $('#virtualSensors').width(), $('#virtualSensors').height());
+        paper = this.raphaelFactory.create(
+            "paperMain",
+            "virtualSensors",
+            $('#virtualSensors').width(),
+            $('#virtualSensors').height()
+        );
 
         if (infos.quickPiSensors == "default")
         {
@@ -3544,10 +3549,9 @@ var getContext = function (display, infos, curLevel) {
             }
 
         } else if (sensor.type == "buzzer") {
-            if(sensor.state) {
-                buzzerSound.start(sensor.name);
-            } else {
-                buzzerSound.stop(sensor.name);
+            var is_running = context.runner ? context.runner.isRunning() : false;
+            if(!is_running) {
+                sensor.state ? buzzerSound.start(sensor.name) : buzzerSound.stop(sensor.name);
             }
             if (!sensor.buzzeron || !sensor.buzzeron.paper.canvas)
                 sensor.buzzeron = paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
