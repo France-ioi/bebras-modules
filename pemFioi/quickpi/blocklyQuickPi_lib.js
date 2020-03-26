@@ -5262,11 +5262,11 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.setBuzzerNote = function (name, frequency, callback) {
         var sensor = findSensorByName(name, true);
-        var command = "setBuzzerState(\"" + name + "\",True)";
+        var command = "setBuzzerNote(\"" + name + "\"," + frequency + ")";
 
-        context.registerQuickPiEvent(name, true);
+        context.registerQuickPiEvent(name, frequency);
 
-        if(context.display) {
+        if(context.display && context.offLineMode) {
             buzzerSound.start(name, frequency);
         }
 
@@ -5284,6 +5284,24 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.getBuzzerNote = function (name, callback) {
+        var sensor = findSensorByName(name, true);
+
+        var command = "getBuzzerNote(\"" + name + "\")";
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+            context.waitDelay(callback, state);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function(returnVal) {
+                returnVal = parseFloat(returnVal)
+                cb(returnVal);
+
+            });
+        }
+    };
 
 
     context.quickpi.setLedBrightness = function (name, level, callback) {
