@@ -146,8 +146,12 @@
                 });
             },
 
-            reset: function() {
+            resetAnswer: function() {
                 resetWords();
+            },
+
+            resetFeedback: function() {
+                text.find('.placeholder').removeClass('correct mistake');
                 parent.find('solution').hide();
                 parent.find('.alert-message').remove();
             },

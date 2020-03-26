@@ -82,8 +82,11 @@
                 }
             },
 
-            reset: function() {
+            resetAnswer: function() {
                 input.val('');
+            },
+
+            resetFeedback: function() {
                 answer.removeClass('correct mistake');
                 parent.find('solution').hide();
                 parent.find('.alert-message').remove();
