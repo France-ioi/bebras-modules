@@ -40,7 +40,7 @@
                 'solution': 'Voir la réponse',
                 'restart': 'Recommencer',
                 'restart_scratch': 'Recommencer au début',
-                'restart_current': 'Recommencer la question',
+                'restart_current': 'Modifier ma réponse',
                 'cancel' : 'Annuler',
                 'placeholder_text': 'Entrez du texte',
                 'placeholder_number': 'Entrez un nombre',
