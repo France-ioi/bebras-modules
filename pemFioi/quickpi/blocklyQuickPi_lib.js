@@ -1414,6 +1414,7 @@ var getContext = function (display, infos, curLevel) {
         if (taskInfos != undefined) {
             context.currentTime = 0;
             context.autoGrading = taskInfos.autoGrading;
+            context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
                 context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;

@@ -42,8 +42,10 @@ function initBlocklyRunner(context, messageCallback) {
                strs[i] = runner.valueToString(value.properties[i]);
             }
             return '['+strs.join(', ')+']';
-         } else {
+         } else if(value && value.toString) {
             return value.toString();
+         } else {
+            return "" + value;
          }
       };
 
@@ -51,7 +53,7 @@ function initBlocklyRunner(context, messageCallback) {
          // Show a popup displaying the value of a block in step-by-step mode
          if(context.display && runner.stepMode) {
             var displayStr = runner.valueToString(value);
-            if(value.type == 'boolean') {
+            if(value && value.type == 'boolean') {
                displayStr = value.data ? runner.strings.valueTrue : runner.strings.valueFalse;
             }
             if(varName) {
@@ -111,7 +113,7 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
-         if (value != undefined) {
+         if (value !== undefined) {
             if(typeof value.length != 'undefined') {
                // It's an array, create a primitive out of it
                primitive = interpreters[context.curRobot].nativeToPseudo(value);
@@ -120,13 +122,16 @@ function initBlocklyRunner(context, messageCallback) {
             }
          }
          if (runner.stackCount > 100) {
+            // In case of an infinite loop, add some delay to slow down a bit
+            var delay = context.allowInfiniteLoop ? 20 : 0;
+
             runner.stackCount = 0;
             runner.stackResetting = true;
             runner.delayFactory.createTimeout("wait_" + Math.random(), function() {
                runner.stackResetting = false;
                callback(primitive);
                runner.runSyncBlock();
-            }, 0);
+            }, delay);
          } else {
             runner.stackCount += 1;
             callback(primitive);
@@ -284,7 +289,11 @@ function initBlocklyRunner(context, messageCallback) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
-               while (context.curSteps[iInterpreter].total < runner.maxIter && context.curSteps[iInterpreter].withoutAction < runner.maxIterWithoutAction && !context.programEnded[iInterpreter]) {
+               while(!context.programEnded[iInterpreter]) {
+                  if(!context.allowInfiniteLoop &&
+                        (context.curSteps[iInterpreter].total >= runner.maxIter || context.curSteps[iInterpreter].withoutAction >= runner.maxIterWithoutAction)) {
+                     break;
+                  }
                   if (!interpreter.step() || toStop[iInterpreter]) {
                      isRunning[iInterpreter] = false;
                      break;
@@ -301,7 +310,7 @@ function initBlocklyRunner(context, messageCallback) {
                   }
                }
 
-               if (!context.programEnded[iInterpreter]) {
+               if (!context.programEnded[iInterpreter] && !context.allowInfiniteLoop) {
                   if (context.curSteps[iInterpreter].total >= runner.maxIter) {
                      isRunning[iInterpreter] = false;
                      throw context.blocklyHelper.strings.tooManyIterations;
