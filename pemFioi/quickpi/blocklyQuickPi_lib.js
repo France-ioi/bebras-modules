@@ -1337,7 +1337,23 @@ var getContext = function (display, infos, curLevel) {
             for (var i = 0; i < board.builtinSensors.length; i++) {
                 var builtinsensor = board.builtinSensors[i];
 
-                if (builtinsensor.type == sensor.type && !context.findSensor(builtinsensor.type, builtinsensor.port, false))
+                // Search for the specified subtype 
+                if (builtinsensor.type == sensor.type && 
+                    builtinsensor.subType == sensor.subType &&
+                    !context.findSensor(builtinsensor.type, builtinsensor.port, false))
+                {
+                    sensor.port = builtinsensor.port;
+                    sensor.subType = builtinsensor.subType;
+                }
+            }
+
+            // Search without subtype
+            for (var i = 0; i < board.builtinSensors.length; i++) {
+                var builtinsensor = board.builtinSensors[i];
+
+                // Search for the specified subtype 
+                if (builtinsensor.type == sensor.type && 
+                    !context.findSensor(builtinsensor.type, builtinsensor.port, false))
                 {
                     sensor.port = builtinsensor.port;
                     sensor.subType = builtinsensor.subType;
@@ -4897,7 +4913,14 @@ var getContext = function (display, infos, curLevel) {
             return null;
         }
 
-        var sensorStates = context.gradingStatesBySensor[name];
+        var actualname = name;
+        var parts = name.split(".");
+        if (parts.length == 2) {
+            actualname = parts[0];
+        }
+
+
+        var sensorStates = context.gradingStatesBySensor[actualname];
 
         if (!sensorStates)
             return; // Fail??
