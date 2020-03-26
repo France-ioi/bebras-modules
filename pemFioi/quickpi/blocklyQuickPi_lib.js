@@ -1388,7 +1388,9 @@ var getContext = function (display, infos, curLevel) {
                             var port = sensorDefinition.portType + ports[iPorts];
                             if (!findSensorByPort(port)) {
                                 sensor.port = port;
-                                sensor.subType = subTypeDefinition.subType;
+
+                                if (!sensor.subType)
+                                    sensor.subType = subTypeDefinition.subType;
                                 break;
                             }
                         }
