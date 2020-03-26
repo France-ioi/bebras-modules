@@ -114,7 +114,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value !== undefined) {
-            if(typeof value.length != 'undefined') {
+            if(value && typeof value.length != 'undefined') {
                // It's an array, create a primitive out of it
                primitive = interpreters[context.curRobot].nativeToPseudo(value);
             } else {
