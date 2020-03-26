@@ -56,39 +56,43 @@ var getContext = function (display, infos, curLevel) {
         fr: { // French strings
             label: {
                 // Labels for the blocks
+                sleep: "Attendre %1 millisecondes",
+                currentTime: "temps écoulé en millisecondes",
+
                 turnLedOn: "Allumer la LED",
                 turnLedOff: "Éteindre la LED",
-                isLedOn: "Get led state",
-
-                turnBuzzerOn: "Turn Buzzer on",
-                turnBuzzerOff: "Turn Buzzer off",
-                isBuzzerOn: "Is Buzzer On",
-
-                buttonState: "bouton enfoncé",
-                buttonStateInPort: "bouton enfoncé sur le port %1",
-                waitForButton: "Attendre une pression sur le bouton",
-                buttonWasPressed: "Le bouton a été enfoncé",
-                setLedState: "Passer la LED %1 à %2 ",
-                getLedState: "Get LED %1 state",
-                toggleLedState: "Inverser la LED sur le port %1",
-                displayText: "Afficher à l'écran %1 Ligne 1: %2 Ligne 2: %3",
-                readTemperature: "température ambiante",
-                sleep: "Attendre pendant %1 millisecondes",
-                setServoAngle: "Mettre le servo à l'angle %2 sur le port %1",
-                readRotaryAngle: "état du potentiomètre",
-                readDistance: "distance lue par le capteur à ultrasons",
-                readLightIntensity: "Intensité lumineuse",
-                readHumidity: "l'humidité ambiante",
-                currentTime: "Temps actuel en millisecondes",
-                setBuzzerState: "buzzer sur le port %1",
-                getBuzzerState: "buzzer state in %1",
-                getTemperature: "Get temperature %1",
-
-                setBuzzerNote: "Play frequency %2 in buzzer %1",
-                getBuzzerNote: "Get frequency in led %1",
+                isLedOn: "LED allumée",
                 setLedBrightness: "Set LED %1 brightness %2",
                 getLedBrightness: "Get LED brightness %1",
-                getServoAngle: "Get Servo %1 angle",
+                setLedState: "Passer la LED %1 à %2 ",
+                getLedState: "état de la LED %1",
+                toggleLedState: "Inverser la LED %1",
+
+                turnBuzzerOn: "Allumer le buzzer",
+                turnBuzzerOff: "Éteindre le buzzer",
+                isBuzzerOn: "buzzer allumé",
+                setBuzzerState: "mettre le buzzer %1 à %2",
+                getBuzzerState: "buzzer %1 allumé",
+                setBuzzerNote: "Jouer la fréquence %2 sur le buzzer %1",
+                getBuzzerNote: "fréquence du buzzer %1",
+
+                buttonState: "bouton enfoncé",
+                buttonStateInPort: "bouton  %1 enfoncé",
+                waitForButton: "Attendre une pression sur le bouton",
+                buttonWasPressed: "Le bouton a été enfoncé",
+
+                displayText: "Afficher à l'écran %1 Ligne 1: %2 Ligne 2: %3",
+
+                readTemperature: "température ambiante",
+                getTemperature: "temperature du capteur %1",
+
+                readRotaryAngle: "état du potentiomètre",
+                readDistance: "mesure du capteur de distance",
+                readLightIntensity: "intensité lumineuse",
+                readHumidity: "humidité ambiante",
+
+                setServoAngle: "Mettre le servo %1 à l'angle %2",
+                getServoAngle: "angle du servo %1",
 
 
                 drawPoint: "Draw pixel",
@@ -118,21 +122,6 @@ var getContext = function (display, infos, curLevel) {
                 readAngularVelocity: "Read angular velocity (°/s) %1",
                 setGyroZeroAngle: "Set the gyroscope zero point",
                 computeRotationGyro: "Compute rotation in the gyroscope %1",
-
-                /*turnLedOn: "Turn Led On",
-                turnLedOff: "Turn Led Off",
-                buttonState: "Return Button State",
-                buttonStateInPort: "Return Button State in port %1",
-                waitForButton: "Wait for button",
-                buttonWasPressed: "Was button pressed",
-                setLedState: "Turn led %2 in port %1",
-                toggleLedState: "Toggle led state in port %1",
-                displayText: "Display in screen Line 1: %1 Line 2: %2",
-                readTemperature: "Read Ambient temperature",
-                sleep: "Pause program for %1 seconds",
-                setServoAngle: "Set servo to %2 angle in port %1",
-                readRotaryAngle: "Read state of potentiometer",
-                readDistance: "Read distance using the ultrasonic sensor"*/
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
