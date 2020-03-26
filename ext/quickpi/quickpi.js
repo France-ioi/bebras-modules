@@ -1875,23 +1875,12 @@ def setBuzzerState(name, state):
 
     return 0
 
-def setBuzzerNote(name, state):
-    ret =  nameToHandler(name, "buzzer")
-
-    pin = normalizePin(name)
-    pin_state[pin] = state
-    if ret is not None:
-        sensor = ret[0]
-        handler = ret[1]
-
-        return handler(name, state)
-
-    return 0
-
-def setBuzzerNoteOld(pin, frequency):
+def setBuzzerNote(pin, frequency):
     pin = normalizePin(pin)
 
     pi.set_mode(pin, pigpio.OUTPUT)
+
+    buzzer_frequency [pin] = level
 
     pi.wave_clear()
     pi.wave_tx_stop()
@@ -1900,6 +1889,8 @@ def setBuzzerNoteOld(pin, frequency):
 
     if frequency == 0:
         pi.wave_tx_stop()
+        GPIO.setup(pin, GPIO.OUT)
+        GPIO.output(pin, GPIO.LOW)
     else:
         delay = int(1000000/frequency/2)
 
@@ -2258,7 +2249,4 @@ def gyroThread():
         gyro_angles[1] += (values[1] - gyro_calibration[1]) * dt
         gyro_angles[2] += (values[2] - gyro_calibration[2]) * dt
         gyro_angles_lock.release()
-
-
-
 `;
