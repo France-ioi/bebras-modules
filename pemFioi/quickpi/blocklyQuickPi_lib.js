@@ -3016,7 +3016,7 @@ var getContext = function (display, infos, curLevel) {
         var isAnalog = findSensorDefinition(sensor).isAnalog;
         var percentage = + state;
 
-        if (isAnalog) {
+        if (isAnalog || sensor.showAsAnalog) {
             var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state);
 
             if (type == "wrong") {
