@@ -1323,8 +1323,7 @@ var getContext = function (display, infos, curLevel) {
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
-                    if (state.time < context.currentTime ||
-                        (lastTurn && state.time <= context.currentTime)) {
+                    if (testEnded) {
                         if (!state.hit) {
                             context.success = false;
                             throw (strings.messages.wrongState.format(state.name));
@@ -1347,8 +1346,15 @@ var getContext = function (display, infos, curLevel) {
 
 
             if (testEnded) {
-                context.success = true;
-                throw (strings.messages.programEnded);
+                if (context.failedMessage) {
+                    context.success = false;
+                    throw (context.failedMessage);
+
+                }
+                else {
+                    context.success = true;
+                    throw (strings.messages.programEnded);
+                }
             }
         } else {
             if (!context.offLineMode) {
@@ -1540,6 +1546,7 @@ var getContext = function (display, infos, curLevel) {
             context.taskEnds = taskInfos.taskEnds;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
+                context.failedMessage = null;
                 context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
@@ -4996,8 +5003,8 @@ var getContext = function (display, infos, curLevel) {
             drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
 
             if (context.currentTime > context.maxTime) {
-                context.success = true;
-                throw (strings.messages.testSuccess);
+                //context.success = true;
+                //throw (strings.messages.testSuccess);
             }
             else if (expectedState != null &&
                 !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
@@ -5020,8 +5027,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.lastState = newState;
 
             if (fail) {
-                context.success = false;
-                throw (strings.messages.wrongState.format(sensor.name));
+                context.failedMessage =  (strings.messages.wrongState.format(sensor.name));
             }
             else
                 context.increaseTime(sensor);
