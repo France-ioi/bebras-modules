@@ -475,7 +475,7 @@ function LogicController(nbTestCases, maxInstructions) {
       // Display a list for the simpleHtml version
       function displaySimpleList(elemList) {
         var html = '';
-        if(window.quickAlgoResponsive && elemList.length > 9) {
+        if(window.quickAlgoResponsive && elemList.length > 0) {
           // Dropdown mode
           html  = '<div class="pythonIntroSelect">';
           html += '<select>';
@@ -486,8 +486,9 @@ function LogicController(nbTestCases, maxInstructions) {
             html += '</option>';
           }
           html += '</select>';
-          html += '<div class="pythonIntroSelectBtn"><span class="fas fa-clone"></span></div>';
-          html += '<span class="pythonIntroSelectDesc">' + (elemList[0].desc || '') + '</span>';
+          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnCopy"><span class="fas fa-clone"></span></div>';
+          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnHelp"><span class="fas fa-question"></span></div>';
+          html += '<span class="pythonIntroSelectDesc"></span>';
           html += '</div>';
         } else {
           // Normal mode
@@ -602,6 +603,26 @@ function LogicController(nbTestCases, maxInstructions) {
         $('.pythonIntroBtn').hide();
     }
 
+    function updateIntroSelect(elem) {
+       elem = $(elem);
+       var code = elem.find('option:selected').text();
+       var funcName = code.split('(')[0];
+       var conceptId = null;
+       if(window.conceptViewer) {
+          conceptId = window.conceptViewer.hasPythonConcept(funcName);
+       }
+       if(conceptId) {
+          elem.parent().find('.pythonIntroSelectBtnHelp').attr('data-concept', conceptId).show();
+       } else {
+          elem.parent().find('.pythonIntroSelectBtnHelp').hide();
+       }
+
+       var desc = elem.find('option:selected').attr('data-desc');
+       elem.parent().find('.pythonIntroSelectDesc').html(desc || "");
+    }
+
+    $('.pythonIntroSelect select').each(function(idx, elem) { updateIntroSelect(elem); });
+
     $('.pythonIntroSimple code, .pythonIntroSimple option, .pythonIntroFull code').each(function() {
       var elem = $(this);
       var txt = elem.text();
@@ -625,16 +646,18 @@ function LogicController(nbTestCases, maxInstructions) {
         controller._aceEditor.focus();
       }
     });
-    $('.pythonIntroSelectBtn').on('click', function() {
+    $('.pythonIntroSelectBtn.pythonIntroSelectBtnCopy').on('click', function() {
       var code = $(this).parent().find('option:selected').attr('data-code');
       if(controller._aceEditor) {
         controller._aceEditor.insert(code);
         controller._aceEditor.focus();
       }
     });
+    $('.pythonIntroSelectBtn.pythonIntroSelectBtnHelp').on('click', function() {
+      window.conceptViewer.showConcept($(this).attr('data-concept'));
+    });
     $('.pythonIntroSelect select').on('change', function() {
-      var desc = $(this).find('option:selected').attr('data-desc');
-      $(this).parent().find('.pythonIntroSelectDesc').html(desc || "");
+      updateIntroSelect(this);
 
       var code = $(this).find('option:selected').attr('data-code');
       if(controller._aceEditor) {

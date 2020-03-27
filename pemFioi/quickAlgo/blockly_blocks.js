@@ -20,6 +20,7 @@ var blocklyToScratch = {
    singleBlocks: {
       'controls_if': ['control_if'],
       'controls_if_else': ['control_if_else'],
+      'controls_infiniteloop': ['control_forever'],
       'controls_repeat': ['control_repeat'],
       'controls_repeat_ext': ['control_repeat'],
       'controls_whileUntil': ['control_repeat_until'],
@@ -1547,8 +1548,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                      blocklyXml: "<block type='control_repeat_until'></block>"
                   },
                   {
-                     name: "controls_infiniteloop",
-                     blocklyXml: "<block type='controls_infiniteloop'></block>",
+                     name: "control_forever",
+                     blocklyXml: "<block type='control_forever'></block>",
                      excludedByDefault: true
                   }
                ],
@@ -2369,6 +2370,20 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 });
               }
             };
+
+            Blockly.JavaScript['control_forever'] = function(block) {
+              var statements = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
+              var code = 'while(true){\n' + statements + '}\n';
+              return code;
+            };
+            Blockly.Python['control_forever'] = function(block) {
+              // Do while/until loop.
+              var branch = Blockly.Python.statementToCode(block, 'SUBSTACK');
+              branch = Blockly.Python.addLoopTrap(branch, block.id) ||
+                  Blockly.Python.PASS;
+
+              return 'while True:\n' + branch;
+           };
 
          } else {
             if (!this.mainContext.infos || !this.mainContext.infos.showIfMutator) {
