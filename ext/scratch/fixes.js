@@ -630,6 +630,46 @@ Blockly.Blocks['control_repeat_until'] = {
   }
 };
 
+// Fix image path
+Blockly.Blocks['control_forever'] = {
+  /**
+   * Block for repeat n times (external number).
+   * https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#5eke39
+   * @this Blockly.Block
+   */
+  init: function() {
+    this.jsonInit({
+      "id": "control_forever",
+      "message0": "forever",
+      "message1": "%1", // Statement
+      "message2": "%1", // Icon
+      "lastDummyAlign2": "RIGHT",
+      "args1": [
+        {
+          "type": "input_statement",
+          "name": "SUBSTACK"
+        }
+      ],
+      "args2": [
+        {
+          "type": "field_image",
+          "src": Blockly.mainWorkspace.options.pathToMedia + "c_arrow.svg",
+          "width": 16,
+          "height": 16,
+          "alt": "*",
+          "flip_rtl": true
+        }
+      ],
+      "inputsInline": true,
+      "previousStatement": null,
+      "category": Blockly.Categories.control,
+      "colour": Blockly.Colours.control.primary,
+      "colourSecondary": Blockly.Colours.control.secondary,
+      "colourTertiary": Blockly.Colours.control.tertiary
+    });
+  }
+};
+
 Blockly.Blocks['operator_not'] = {
   /**
    * Block for "not" unary boolean operator.
