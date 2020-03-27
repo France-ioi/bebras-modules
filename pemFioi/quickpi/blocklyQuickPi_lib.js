@@ -3909,9 +3909,6 @@ var getContext = function (display, infos, curLevel) {
             if(sensor.drawInfo.width < 150) {
                 screenScale = 0.5;
             }             
-            if(sensor.drawInfo.width < 75) {
-                screenScale = 0.25;
-            }             
             screenScaler.setScale(screenScale);
 
             var screenScalerSize = screenScaler.getSize();
@@ -3919,8 +3916,8 @@ var getContext = function (display, infos, curLevel) {
 
             imgw = screenScalerSize.width + borderSize * 2;
             imgh = screenScalerSize.height + borderSize * 2;            
-            imgx = sensor.drawInfo.x + (sensor.drawInfo.width - imgw) * 0.5;
-            imgy = sensor.drawInfo.y + (sensor.drawInfo.height - imgh) * 0.5;            
+            imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5);
+            imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
 
             portx = imgx + imgw + borderSize;
             porty = imgy + imgh / 3;
