@@ -2347,7 +2347,7 @@ var getContext = function (display, infos, curLevel) {
 
 
             for (var i = 0; i < boardDefinitions.length; i++) {
-                let board = boardDefinitions[i];
+                var board = boardDefinitions[i];
                 var image = document.createElement('img');
                 image.src = getImg(board.image);
 
