@@ -699,6 +699,7 @@ var getContext = function (display, infos, curLevel) {
             isAnalog: false,
             isSensor: false,
             cellsAmount: function(paper) {
+                console.log(context.board)
                 if(context.board == 'grovepi') {
                     return 2;
                 }
@@ -3923,17 +3924,8 @@ var getContext = function (display, infos, curLevel) {
             porty = imgy + imgh / 3;
 /*
             if (context.autoGrading) {
-                imgw = sensor.drawInfo.width * 1.5;
-                imgh = sensor.drawInfo.height * .70;
-
-                imgx = sensor.drawInfo.x + imgw / 2;
-                imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
-
                 state1x = imgx + imgw;
                 state1y = imgy + (imgh / 2);
-
-                portx = sensor.drawInfo.x;
-                porty = imgy + (imgh / 2);
 
                 portsize = imgh / 4;
                 statesize = imgh / 6;
@@ -3947,22 +3939,19 @@ var getContext = function (display, infos, curLevel) {
                
 
             if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
-                var screenwidth = 128;
-                var screenheight = 32;
-
-                sensor.screenrect = paper.rect(imgx, imgy, screenwidth, screenheight);
+                sensor.screenrect = paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
 
                 sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
                 sensor.canvasNode.setAttribute("x",imgx + borderSize); //Set rect data
                 sensor.canvasNode.setAttribute("y",imgy + borderSize); //Set rect data
-                sensor.canvasNode.setAttribute("width", screenwidth); //Set rect data
-                sensor.canvasNode.setAttribute("height", screenheight); //Set rect data
+                sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
                 paper.canvas.appendChild(sensor.canvasNode);
 
                 sensor.canvas = document.createElement("canvas");
                 sensor.canvas.id = "screencanvas";
-                sensor.canvas.width = screenwidth;
-                sensor.canvas.height = screenheight;
+                sensor.canvas.width = screenScalerSize.width;
+                sensor.canvas.height = screenScalerSize.height;
                 sensor.canvasNode.appendChild(sensor.canvas);
             }
 
@@ -3985,8 +3974,8 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
             sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
-            sensor.canvasNode.setAttribute("width", "128"); //Set rect data
-            sensor.canvasNode.setAttribute("height", "32"); //Set rect data
+            sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+            sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
 
 
             if (sensor.state) {
