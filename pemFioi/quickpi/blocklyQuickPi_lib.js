@@ -699,7 +699,6 @@ var getContext = function (display, infos, curLevel) {
             isAnalog: false,
             isSensor: false,
             cellsAmount: function(paper) {
-                console.log(context.board)
                 if(context.board == 'grovepi') {
                     return 2;
                 }
@@ -2703,13 +2702,25 @@ var getContext = function (display, infos, curLevel) {
                 var port = $("#selector-sensor-port option:selected").text();
                 var name = getNewSensorSuggestedName(sensorDefinition.name);
 
-                infos.quickPiSensors.push({
+                if(name == 'screen1') {
+                    // prepend screen because squareSize func can't handle cells wrap
+                    infos.quickPiSensors.unshift({
                         type: sensorDefinition.name,
                         subType: sensorDefinition.subType,
                         port: port,
                         name: name
-                    }
-                );
+                    });                    
+
+                } else {
+                    infos.quickPiSensors.push({
+                        type: sensorDefinition.name,
+                        subType: sensorDefinition.subType,
+                        port: port,
+                        name: name
+                    });                    
+                }
+
+
 
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
