@@ -698,7 +698,17 @@ var getContext = function (display, infos, curLevel) {
             description: "Screen",
             isAnalog: false,
             isSensor: false,
-            doubleWidth: true,
+            cellsAmount: function(paper) {
+                if(context.board == 'grovepi') {
+                    return 2;
+                }
+                if(paper.width < 250) {
+                    return 4;
+                } else if(paper.width < 350) {
+                    return 3;
+                }
+                return 2;
+            },
             portType: "i2c",
             valueType: "object",
             selectorImages: ["screen.png"],
@@ -1158,6 +1168,76 @@ var getContext = function (display, infos, curLevel) {
     ];
 
 
+    var screenScaler = {
+
+        scale: 1,
+
+        setScale: function(scale) {
+            this.scale = scale;
+        },
+
+        getSize: function() {
+            return {
+                width: 128 * this.scale,
+                height: 32 * this.scale
+            }
+        },
+
+        drawPoint: function(sensor, x, y) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.fillRect(
+                this.scale * x, this.scale * y, 1, 1);
+        },
+
+
+        drawLine: function(sensor, x0, y0, x1, y1) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.moveTo(this.scale * x0, this.scale * y0);
+            ctx.lineTo(this.scale * x1, this.scale * y1);
+            ctx.closePath();
+            ctx.stroke();
+        },
+
+
+        drawRectangle: function(sensor, x0, y0, width, height) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.rect(this.scale * x0, this.scale * y0, this.scale * width, this.scale * height);
+            ctx.closePath();
+
+            if (!context.noStroke) {
+                ctx.stroke();
+            }
+
+            if (!context.noFill) {
+                ctx.fill();
+            }
+        },
+
+        drawCircle: function(sensor, x0, y0, diameter) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.arc(this.scale * x0, this.scale * y0, this.scale * diameter / 2, 0, Math.PI * 2);
+            ctx.closePath();
+
+            if (!context.noFill) {
+                ctx.fill();
+            }
+        },
+
+
+        clearScreen: function(sensor) {
+            var ctx = sensor.canvas.getContext('2d');
+            ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
+        }        
+    }
+
+
     function findSensorDefinition(sensor) {
         for (var iType = 0; iType < sensorDefinitions.length; iType++) {
             var type = sensorDefinitions[iType];
@@ -1190,13 +1270,27 @@ var getContext = function (display, infos, curLevel) {
         return found;
     }
 
+    function getSessionStorage(name) {
+        // Use a try in case it gets blocked
+        try {
+            return sessionStorage[name];
+        } catch(e) {
+            return null;
+        }
+    }
+
+    function setSessionStorage(name, value) {
+        // Use a try in case it gets blocked
+        try {
+            sessionStorage[name] = value;
+        } catch(e) {}
+    }
+
     if(window.getQuickPiConnection) {
-        var lockstring;
-        if (sessionStorage.lockstring)
-            lockstring = sessionStorage.lockstring;
-        else {
+        var lockstring = getSessionStorage('lockstring');
+        if(!lockstring) {
             lockstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            sessionStorage.lockstring = lockstring;
+            setSessionStorage('lockstring', lockstring);
         }
 
         context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, raspberryPiChangeBoard);
@@ -1441,6 +1535,7 @@ var getContext = function (display, infos, curLevel) {
 
         if (taskInfos != undefined) {
             context.currentTime = 0;
+            context.tickIncrease = 0;
             context.autoGrading = taskInfos.autoGrading;
             context.taskEnds = taskInfos.taskEnds;
             context.allowInfiniteLoop = !context.autoGrading;
@@ -1592,7 +1687,7 @@ var getContext = function (display, infos, curLevel) {
             return;
 
         context.board = newboardname;
-        sessionStorage.board = newboardname;
+        setSessionStorage('board', newboardname);
 
         if (infos.customSensors) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -1641,8 +1736,8 @@ var getContext = function (display, infos, curLevel) {
 
     context.board = "grovepi";
 
-    if (sessionStorage.board)
-        context.changeBoard(sessionStorage.board)
+    if (getSessionStorage('board'))
+        context.changeBoard(getSessionStorage('board'))
 
     context.savePrograms = function(xml) {
         if (context.infos.customSensors)
@@ -1706,6 +1801,8 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
+
+
     // Reset the context's display
     context.resetDisplay = function () {
         // Do something here
@@ -1718,7 +1815,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || !this.raphaelFactory)
             return;
 
-        var piUi = strings.messages.connectionHTML;
+        var piUi = context.infos.quickPiDisableConnection ? '' : strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
@@ -1748,6 +1845,23 @@ var getContext = function (display, infos, curLevel) {
         {
             infos.quickPiSensors = [];
             addDefaultBoardSensors();
+        }
+
+        if (context.timeLineCurrent)
+        {
+            context.timeLineCurrent.remove();
+            context.timeLineCurrent = null;
+        }
+
+        if (context.timeLineCircle)
+        {
+            context.timeLineCircle.remove();
+            context.timeLineCircle = null;
+        }
+
+        if (context.timeLineTriangle) {
+            context.timeLineTriangle.remove();
+            context.timeLineTriangle = null;
         }
 
         if (context.autoGrading) {
@@ -1819,13 +1933,12 @@ var getContext = function (display, infos, curLevel) {
             }
         } else {
 
-            var hasdoublewitdh = false;
             var nSensors = infos.quickPiSensors.length;
 
             infos.quickPiSensors.forEach(function (sensor) {
-                if (findSensorDefinition(sensor).doubleWidth) {
-                    hasdoublewitdh = true;
-                    nSensors++;
+                var cellsAmount = findSensorDefinition(sensor).cellsAmount;
+                if (cellsAmount) {
+                    nSensors += cellsAmount(paper) - 1;
                 }
             });
 
@@ -1876,15 +1989,16 @@ var getContext = function (display, infos, curLevel) {
                         drawCustomSensorAdder(x, y, geometry.size);
                     } else if (infos.quickPiSensors[iSensor]) {
                         var sensor = infos.quickPiSensors[iSensor];
-                        var doublewitdh = findSensorDefinition(sensor).doubleWidth;
 
-                        if (doublewitdh) {
-                            row++;
+
+                        var cellsAmount = findSensorDefinition(sensor).cellsAmount;
+                        if (cellsAmount) {
+                            row += cellsAmount(paper) - 1;
 
                             sensor.drawInfo = {
                                 x: x,
                                 y: y,
-                                width: geometry.size * 2,
+                                width: geometry.size * cellsAmount(paper),
                                 height: geometry.size
                             }
                         } else {
@@ -1938,7 +2052,7 @@ var getContext = function (display, infos, curLevel) {
             $('#piconnectionlabel').hide();
 
             if (context.quickPiConnection.isConnected()) {
-                if (sessionStorage.connectionMethod == "USB") {
+                if (getSessionStorage('connectionMethod') == "USB") {
                     $('#piconwifi').removeClass('active');
                     $('#piconusb').addClass('active');
                     $('#pischoolcon').hide();
@@ -1950,7 +2064,7 @@ var getContext = function (display, infos, curLevel) {
 
                     context.inUSBConnection = true;
                     context.inBTConnection = false;
-                } else if (sessionStorage.connectionMethod == "BT") {
+                } else if (getSessionStorage('connectionMethod') == "BT") {
                     $('#piconwifi').removeClass('active');
                     $('#piconbt').addClass('active');
                     $('#pischoolcon').hide();
@@ -1965,7 +2079,7 @@ var getContext = function (display, infos, curLevel) {
                     context.inBTConnection = true;
                 }
             } else {
-                sessionStorage.connectionMethod = "WIFI";
+                setSessionStorage('connectionMethod', "WIFI");
             }
 
             $('#piaddress').on('input', function (e) {
@@ -1988,17 +2102,17 @@ var getContext = function (display, infos, curLevel) {
                 $('#piaddress').trigger("input");
             }
 
-            if (sessionStorage.pilist) {
-                populatePiList(JSON.parse(sessionStorage.pilist));
+            if (getSessionStorage('pilist')) {
+                populatePiList(JSON.parse(getSessionStorage('pilist')));
             }
 
-            if (sessionStorage.raspberryPiIpAddress) {
-                $('#piaddress').val(sessionStorage.raspberryPiIpAddress);
+            if (getSessionStorage('raspberryPiIpAddress')) {
+                $('#piaddress').val(getSessionStorage('raspberryPiIpAddress'));
                 $('#piaddress').trigger("input");
             }
 
-            if (sessionStorage.schoolkey) {
-                $('#schoolkey').val(sessionStorage.schoolkey);
+            if (getSessionStorage('schoolkey')) {
+                $('#schoolkey').val(getSessionStorage('schoolkey'));
                 $('#pigetlist').attr("disabled", false);
             }
 
@@ -2018,16 +2132,16 @@ var getContext = function (display, infos, curLevel) {
                         piname +
                         "/api/v1/commands";
 
-                    sessionStorage.quickPiUrl = url;
+                    setSessionStorage('quickPiUrl', url);
                     context.quickPiConnection.connect(url);
 
                 } else {
                     var ipaddress = $('#piaddress').val();
-                    sessionStorage.raspberryPiIpAddress = ipaddress;
+                    setSessionStorage('raspberryPiIpAddress', ipaddress);
 
                     showasConnecting();
                     var url = "ws://" + ipaddress + ":5000/api/v1/commands";
-                    sessionStorage.quickPiUrl = url;
+                    setSessionStorage('quickPiUrl', url);
 
                     context.quickPiConnection.connect(url);
                 }
@@ -2055,7 +2169,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#schoolkey').on('input', function (e) {
                 var schoolkey = $('#schoolkey').val();
-                sessionStorage.schoolkey = schoolkey;
+                setSessionStorage('schoolkey', schoolkey);
 
                 if (schoolkey)
                     $('#pigetlist').attr("disabled", false);
@@ -2088,7 +2202,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#piconwifi').click(function () {
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "WIFI";
+                    setSessionStorage('connectionMethod', "WIFI");
                     $(this).addClass('active');
                     $('#pischoolcon').show("slow");
                     $('#piconnectionlabel').hide();
@@ -2101,7 +2215,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#piconusb').click(function () {
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "USB";
+                    setSessionStorage('connectionMethod', "USB");
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
@@ -2139,7 +2253,7 @@ var getContext = function (display, infos, curLevel) {
             $('#piconbt').click(function () {
                 $('#piconnectionlabel').show();
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "BT";
+                    setSessionStorage('connectionMethod', "BT");
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
@@ -2174,7 +2288,7 @@ var getContext = function (display, infos, curLevel) {
             });
 
             function populatePiList(jsonlist) {
-                sessionStorage.pilist = JSON.stringify(jsonlist);
+                setSessionStorage('pilist', JSON.stringify(jsonlist));
 
                 var select = document.getElementById("pilist");
                 var first = true;
@@ -2247,7 +2361,7 @@ var getContext = function (display, infos, curLevel) {
 
 
             for (var i = 0; i < boardDefinitions.length; i++) {
-                let board = boardDefinitions[i];
+                var board = boardDefinitions[i];
                 var image = document.createElement('img');
                 image.src = getImg(board.image);
 
@@ -2333,10 +2447,10 @@ var getContext = function (display, infos, curLevel) {
         });
 
 
-        if (parseInt(sessionStorage.autoConnect)) {
+        if (parseInt(getSessionStorage('autoConnect'))) {
             if (!context.quickPiConnection.isConnected() && !context.quickPiConnection.isConnecting()) {
                 $('#piconnect').attr("disabled", true);
-                context.quickPiConnection.connect(sessionStorage.quickPiUrl);
+                context.quickPiConnection.connect(getSessionStorage('quickPiUrl'));
             }
         }
     };
@@ -2602,13 +2716,25 @@ var getContext = function (display, infos, curLevel) {
                 var port = $("#selector-sensor-port option:selected").text();
                 var name = getNewSensorSuggestedName(sensorDefinition.name);
 
-                infos.quickPiSensors.push({
+                if(name == 'screen1') {
+                    // prepend screen because squareSize func can't handle cells wrap
+                    infos.quickPiSensors.unshift({
                         type: sensorDefinition.name,
                         subType: sensorDefinition.subType,
                         port: port,
                         name: name
-                    }
-                );
+                    });                    
+
+                } else {
+                    infos.quickPiSensors.push({
+                        type: sensorDefinition.name,
+                        subType: sensorDefinition.subType,
+                        port: port,
+                        name: name
+                    });                    
+                }
+
+
 
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
@@ -2742,7 +2868,7 @@ var getContext = function (display, infos, curLevel) {
         context.liveUpdateCount = 0;
         context.offLineMode = false;
 
-        sessionStorage.autoConnect = "1";
+        setSessionStorage('autoConnect', "1");
 
         context.resetDisplay();
 
@@ -2769,10 +2895,10 @@ var getContext = function (display, infos, curLevel) {
         clearSensorPollInterval();
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked() && !wrongversion) {
-            context.quickPiConnection.connect(sessionStorage.quickPiUrl);
+            context.quickPiConnection.connect(getSessionStorage('quickPiUrl'));
         } else {
             // If I was never connected don't attempt to autoconnect again
-            sessionStorage.autoConnect = "0";
+            setSessionStorage('autoConnect', "0");
             window.task.displayedSubTask.context.resetDisplay();
         }
 
@@ -2869,31 +2995,12 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function drawCurrentTime() {
-        if (!paper || !context.display)
+        if (!paper || !context.display || isNaN(context.currentTime))
             return;
+
 
         var animationSpeed = 200; // ms
         var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
-
-        if (context.currentTime == 0)
-        {
-            if (context.timeLineCurrent)
-            {
-                context.timeLineCurrent.remove();
-                context.timeLineCurrent = null;
-            }
-
-            if (context.timeLineCircle)
-            {
-                context.timeLineCircle.remove();
-                context.timeLineCircle = null;
-            }
-
-            if (context.timeLineTriangle) {
-                context.timeLineTriangle.remove();
-                context.timeLineTriangle = null;
-            }
-        }
 
         var targetpath = ["M", startx, 0, "L", startx, context.timeLineY];
 
@@ -3819,88 +3926,64 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText = null;
             }
 
+            var borderSize = 5;
 
-            imgw = sensor.drawInfo.width / 1.3;
-            imgh = sensor.drawInfo.height / 1.2;
+            var screenScale = 2;
+            if(sensor.drawInfo.width < 300) {
+                screenScale = 1;
+            }
+            if(sensor.drawInfo.width < 150) {
+                screenScale = 0.5;
+            }             
+            screenScaler.setScale(screenScale);
 
-            imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .05);
-            imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+            var screenScalerSize = screenScaler.getSize();
+            borderSize = borderSize * screenScale;
 
-            portx = imgx + imgw * 1.1;
+            imgw = screenScalerSize.width + borderSize * 2;
+            imgh = screenScalerSize.height + borderSize * 2;            
+            imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5);
+            imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
+
+            portx = imgx + imgw + borderSize;
             porty = imgy + imgh / 3;
-
+/*
             if (context.autoGrading) {
-                imgw = sensor.drawInfo.width * 1.5;
-                imgh = sensor.drawInfo.height * .70;
-
-                imgx = sensor.drawInfo.x + imgw / 2;
-                imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
-
                 state1x = imgx + imgw;
                 state1y = imgy + (imgh / 2);
-
-                portx = sensor.drawInfo.x;
-                porty = imgy + (imgh / 2);
 
                 portsize = imgh / 4;
                 statesize = imgh / 6;
             }
+            */
+            statesize = imgh / 3.5;
 
-            var screenwidth = 128;
-            var screenheight = 32;
-
-            if (!sensor.img || !sensor.img.paper.canvas)
+            if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
+            }
+               
 
             if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
-                sensor.screenrect = paper.rect(imgx, imgy, screenwidth, screenheight);
+                sensor.screenrect = paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
 
                 sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                sensor.canvasNode.setAttribute("x",imgx + (imgw / 2) - (screenwidth/2)); //Set rect data
-                sensor.canvasNode.setAttribute("y",imgy + (imgh / 2) - (screenheight/2)); //Set rect data
-                sensor.canvasNode.setAttribute("width", screenwidth); //Set rect data
-                sensor.canvasNode.setAttribute("height", screenheight); //Set rect data
+                sensor.canvasNode.setAttribute("x",imgx + borderSize); //Set rect data
+                sensor.canvasNode.setAttribute("y",imgy + borderSize); //Set rect data
+                sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
                 paper.canvas.appendChild(sensor.canvasNode);
-
 
                 sensor.canvas = document.createElement("canvas");
                 sensor.canvas.id = "screencanvas";
-                sensor.canvas.width = screenwidth;
-                sensor.canvas.height = screenheight;
+                sensor.canvas.width = screenScalerSize.width;
+                sensor.canvas.height = screenScalerSize.height;
                 sensor.canvasNode.appendChild(sensor.canvas);
-
-
-                sensor.canvaslabel = document.createElement("label");
-                sensor.canvaslabel.id = "canvaslabel";
-                sensor.canvaslabel.innerText = "Click to show";
-
-                sensor.canvasNode.appendChild(sensor.canvaslabel);
-
-                sensor.displayingscreen = true;
-
-                sensor.focusrect.click(function () {
-
-                    if ((imgw * 0.80) >= screenwidth )
-                    {
-                        sensor.displayingscreen = true;
-                    } else {
-                        sensor.displayingscreen = !sensor.displayingscreen;
-                    }
-
-                    if (sensor.displayingscreen) {
-                        $('#screencanvas').show();
-                        sensor.screenrect.attr({ "opacity": 1 });
-                    } else {
-                        $('#canvaslabel').show();
-                        $('#screencanvas').hide();
-                        sensor.screenrect.attr({ "opacity": 0 });
-                    }
-                });
             }
 
+
             sensor.screenrect.attr({
-                "x": imgx + (imgw / 2) - (128/2),
-                "y": imgy + (imgh / 2) - (32/2),
+                "x": imgx + borderSize,
+                "y": imgy + borderSize,
                 "width": 128,
                 "height": 32,
             });
@@ -3912,27 +3995,18 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
             });
 
-            if ((imgw * 0.80) < screenwidth ) {
-                sensor.displayingscreen = false;
-                $('#screencanvas').hide();
-                sensor.screenrect.attr({ "opacity": 0 });
-            }
+            sensor.screenrect.attr({ "opacity": 0 });
 
-            sensor.canvasNode.setAttribute("x", imgx + (imgw / 2) - (128/2)); //Set rect data
-            sensor.canvasNode.setAttribute("y", imgy + (imgh / 2) - (32/2)); //Set rect data
-            sensor.canvasNode.setAttribute("width", "128"); //Set rect data
-            sensor.canvasNode.setAttribute("height", "32"); //Set rect data
+            sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
+            sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
+            sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+            sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
 
 
             if (sensor.state) {
-                sensor.displayingscreen = false;
-                $('#canvaslabel').hide();
-                $('#screencanvas').hide();
-                sensor.screenrect.attr({ "opacity": 0 });
+                var statex = imgx + (imgw * .05);
 
-                var statex = imgx + (imgw * .13);
-
-                var statey = imgy + (imgh * .4);
+                var statey = imgy + (imgh * .2);
 
                 if (sensor.state.line1.length > 16)
                     sensor.state.line1 = sensor.state.line1.substring(0, 16);
@@ -4856,7 +4930,7 @@ var getContext = function (display, infos, curLevel) {
             try {
                 sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
                 var b = sensor.stateText._getBBox();
-                sensor.stateText.translate(0,b.height/2);
+                sensor.stateText.translate(0, b.height/2);
                 sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
             } catch (err) {
             }
@@ -4956,6 +5030,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.increaseTime = function (sensor) {
+        if(!context.autoGrading) { return; }
 
         if (!sensor.lastTimeIncrease) {
             sensor.lastTimeIncrease = 0;
@@ -5711,9 +5786,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.fillRect(x, y, 1, 1);
+                screenScaler.drawPoint(sensor, x, y);
             }
 
             context.waitDelay(callback);
@@ -5733,13 +5806,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x1, y1);
-                ctx.closePath();
-                ctx.stroke();
+                screenScaler.drawLine(sensor, x0, y0, x1, y1);
             }
 
             context.waitDelay(callback);
@@ -5759,17 +5826,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.rect(x0, y0, width, height);
-                ctx.closePath();
-
-                if (!context.noStroke)
-                    ctx.stroke();
-
-                if (!context.noFill)
-                    ctx.fill();
+                screenScaler.drawRectangle(sensor, x0, y0, width, height);
             }
 
             context.waitDelay(callback);
@@ -5790,14 +5847,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.arc(x0, y0, diameter/2, 0, Math.PI*2);
-                ctx.closePath();
-
-                if (!context.noFill)
-                    ctx.fill();
+                screenScaler.drawCircle(sensor, x0, y0, diameter)
             }
 
             context.waitDelay(callback);
@@ -5817,10 +5867,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
-
+                screenScaler.clearScreen(sensor)
             }
 
             context.waitDelay(callback);
