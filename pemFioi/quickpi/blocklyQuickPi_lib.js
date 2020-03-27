@@ -3942,6 +3942,7 @@ var getContext = function (display, infos, curLevel) {
                 statesize = imgh / 6;
             }
             */
+            statesize = imgh / 6;
 
             if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
