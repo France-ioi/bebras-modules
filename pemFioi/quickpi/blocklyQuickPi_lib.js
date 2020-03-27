@@ -698,7 +698,14 @@ var getContext = function (display, infos, curLevel) {
             description: "Screen",
             isAnalog: false,
             isSensor: false,
-            doubleWidth: true,
+            cellsAmount: function(paper) {
+                if(paper.width < 250) {
+                    return 4;
+                } else if(paper.width < 350) {
+                    return 3;
+                }
+                return 2;
+            },
             portType: "i2c",
             valueType: "object",
             selectorImages: ["screen.png"],
@@ -1690,6 +1697,8 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
+
+
     // Reset the context's display
     context.resetDisplay = function () {
         // Do something here
@@ -1796,13 +1805,12 @@ var getContext = function (display, infos, curLevel) {
             }
         } else {
 
-            var hasdoublewitdh = false;
             var nSensors = infos.quickPiSensors.length;
 
             infos.quickPiSensors.forEach(function (sensor) {
-                if (findSensorDefinition(sensor).doubleWidth) {
-                    hasdoublewitdh = true;
-                    nSensors++;
+                var cellsAmount = findSensorDefinition(sensor).cellsAmount;
+                if (cellsAmount) {
+                    nSensors += cellsAmount(paper) - 1;
                 }
             });
 
@@ -1853,10 +1861,11 @@ var getContext = function (display, infos, curLevel) {
                         drawCustomSensorAdder(x, y, geometry.size);
                     } else if (infos.quickPiSensors[iSensor]) {
                         var sensor = infos.quickPiSensors[iSensor];
-                        var doublewitdh = findSensorDefinition(sensor).doubleWidth;
 
-                        if (doublewitdh) {
-                            row++;
+
+                        var cellsAmount = findSensorDefinition(sensor).cellsAmount;
+                        if (cellsAmount) {
+                            row += cellsAmount(paper) - 1;
 
                             sensor.drawInfo = {
                                 x: x,
@@ -3749,8 +3758,11 @@ var getContext = function (display, infos, curLevel) {
             var screenwidth = 128;
             var screenheight = 32;
 
-            if (!sensor.img || !sensor.img.paper.canvas)
+            if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
+            }
+            //dimk
+                
 
             if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
                 sensor.screenrect = paper.rect(imgx, imgy, screenwidth, screenheight);
