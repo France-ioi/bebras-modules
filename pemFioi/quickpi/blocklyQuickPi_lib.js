@@ -1314,7 +1314,7 @@ var getContext = function (display, infos, curLevel) {
         if (context.autoGrading) {
             for (var sensorStates in context.gradingStatesBySensor) {
 
-                if (lastTurn && context.display && context.taskEnds)
+                if (lastTurn && context.display && !context.loopsForever)
                 {
                     var sensor = findSensorByName(sensorStates);
                     drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.maxTime + 1000, "actual");
@@ -1338,7 +1338,7 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            if (lastTurn && context.display && context.taskEnds)
+            if (lastTurn && context.display && !context.loopsForever)
             {
                 context.currentTime += 1000;
                 drawCurrentTime();
@@ -1543,7 +1543,7 @@ var getContext = function (display, infos, curLevel) {
             context.currentTime = 0;
             context.tickIncrease = 0;
             context.autoGrading = taskInfos.autoGrading;
-            context.taskEnds = taskInfos.taskEnds;
+            context.loopsForever = taskInfos.loopsForever;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
                 context.failedMessage = null;
@@ -1883,7 +1883,7 @@ var getContext = function (display, infos, curLevel) {
             if (maxTime == 0)
                 maxTime = 1000;
 
-            if (context.taskEnds)
+            if (!context.loopsForever)
                 maxTime = maxTime + 1000;
 
             context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
@@ -1918,7 +1918,7 @@ var getContext = function (display, infos, curLevel) {
 
                     drawSensorTimeLineState(sensor, lastState, state.time, context.maxTime, "expected", true);
                     
-                    if (context.taskEnds)
+                    if (!context.loopsForever)
                         drawSensorTimeLineState(sensor, lastState, startTime, state.time + 1000, "finnish", false);
 
                     sensor.lastAnalogState = null;
@@ -2982,7 +2982,7 @@ var getContext = function (display, infos, curLevel) {
                             paper.height - context.sensorSize]);*/
         }
 
-        if (context.taskEnds) {
+        if (!context.loopsForever) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
             var timelabel = paper.text(x, context.timeLineY, '\uf11e');      
             timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
