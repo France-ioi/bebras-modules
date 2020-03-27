@@ -1270,13 +1270,27 @@ var getContext = function (display, infos, curLevel) {
         return found;
     }
 
+    function getSessionStorage(name) {
+        // Use a try in case it gets blocked
+        try {
+            return sessionStorage[name];
+        } catch(e) {
+            return null;
+        }
+    }
+
+    function setSessionStorage(name, value) {
+        // Use a try in case it gets blocked
+        try {
+            sessionStorage[name] = value;
+        } catch(e) {}
+    }
+
     if(window.getQuickPiConnection) {
-        var lockstring;
-        if (sessionStorage.lockstring)
-            lockstring = sessionStorage.lockstring;
-        else {
+        var lockstring = getSessionStorage('lockstring');
+        if(!lockstring) {
             lockstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            sessionStorage.lockstring = lockstring;
+            setSessionStorage('lockstring', lockstring);
         }
 
         context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, raspberryPiChangeBoard);
@@ -1673,7 +1687,7 @@ var getContext = function (display, infos, curLevel) {
             return;
 
         context.board = newboardname;
-        sessionStorage.board = newboardname;
+        setSessionStorage('board', newboardname);
 
         if (infos.customSensors) {
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
@@ -1722,8 +1736,8 @@ var getContext = function (display, infos, curLevel) {
 
     context.board = "grovepi";
 
-    if (sessionStorage.board)
-        context.changeBoard(sessionStorage.board)
+    if (getSessionStorage('board'))
+        context.changeBoard(getSessionStorage('board'))
 
     context.savePrograms = function(xml) {
         if (context.infos.customSensors)
@@ -2038,7 +2052,7 @@ var getContext = function (display, infos, curLevel) {
             $('#piconnectionlabel').hide();
 
             if (context.quickPiConnection.isConnected()) {
-                if (sessionStorage.connectionMethod == "USB") {
+                if (getSessionStorage('connectionMethod') == "USB") {
                     $('#piconwifi').removeClass('active');
                     $('#piconusb').addClass('active');
                     $('#pischoolcon').hide();
@@ -2050,7 +2064,7 @@ var getContext = function (display, infos, curLevel) {
 
                     context.inUSBConnection = true;
                     context.inBTConnection = false;
-                } else if (sessionStorage.connectionMethod == "BT") {
+                } else if (getSessionStorage('connectionMethod') == "BT") {
                     $('#piconwifi').removeClass('active');
                     $('#piconbt').addClass('active');
                     $('#pischoolcon').hide();
@@ -2065,7 +2079,7 @@ var getContext = function (display, infos, curLevel) {
                     context.inBTConnection = true;
                 }
             } else {
-                sessionStorage.connectionMethod = "WIFI";
+                setSessionStorage('connectionMethod', "WIFI");
             }
 
             $('#piaddress').on('input', function (e) {
@@ -2088,17 +2102,17 @@ var getContext = function (display, infos, curLevel) {
                 $('#piaddress').trigger("input");
             }
 
-            if (sessionStorage.pilist) {
-                populatePiList(JSON.parse(sessionStorage.pilist));
+            if (getSessionStorage('pilist')) {
+                populatePiList(JSON.parse(getSessionStorage('pilist')));
             }
 
-            if (sessionStorage.raspberryPiIpAddress) {
-                $('#piaddress').val(sessionStorage.raspberryPiIpAddress);
+            if (getSessionStorage('raspberryPiIpAddress')) {
+                $('#piaddress').val(getSessionStorage('raspberryPiIpAddress'));
                 $('#piaddress').trigger("input");
             }
 
-            if (sessionStorage.schoolkey) {
-                $('#schoolkey').val(sessionStorage.schoolkey);
+            if (getSessionStorage('schoolkey')) {
+                $('#schoolkey').val(getSessionStorage('schoolkey'));
                 $('#pigetlist').attr("disabled", false);
             }
 
@@ -2118,16 +2132,16 @@ var getContext = function (display, infos, curLevel) {
                         piname +
                         "/api/v1/commands";
 
-                    sessionStorage.quickPiUrl = url;
+                    setSessionStorage('quickPiUrl', url);
                     context.quickPiConnection.connect(url);
 
                 } else {
                     var ipaddress = $('#piaddress').val();
-                    sessionStorage.raspberryPiIpAddress = ipaddress;
+                    setSessionStorage('raspberryPiIpAddress', ipaddress);
 
                     showasConnecting();
                     var url = "ws://" + ipaddress + ":5000/api/v1/commands";
-                    sessionStorage.quickPiUrl = url;
+                    setSessionStorage('quickPiUrl', url);
 
                     context.quickPiConnection.connect(url);
                 }
@@ -2155,7 +2169,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#schoolkey').on('input', function (e) {
                 var schoolkey = $('#schoolkey').val();
-                sessionStorage.schoolkey = schoolkey;
+                setSessionStorage('schoolkey', schoolkey);
 
                 if (schoolkey)
                     $('#pigetlist').attr("disabled", false);
@@ -2188,7 +2202,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#piconwifi').click(function () {
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "WIFI";
+                    setSessionStorage('connectionMethod', "WIFI");
                     $(this).addClass('active');
                     $('#pischoolcon').show("slow");
                     $('#piconnectionlabel').hide();
@@ -2201,7 +2215,7 @@ var getContext = function (display, infos, curLevel) {
 
             $('#piconusb').click(function () {
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "USB";
+                    setSessionStorage('connectionMethod', "USB");
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
@@ -2239,7 +2253,7 @@ var getContext = function (display, infos, curLevel) {
             $('#piconbt').click(function () {
                 $('#piconnectionlabel').show();
                 if (!context.quickPiConnection.isConnected()) {
-                    sessionStorage.connectionMethod = "BT";
+                    setSessionStorage('connectionMethod', "BT");
                     $('#piconnectok').attr('disabled', true);
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
@@ -2274,7 +2288,7 @@ var getContext = function (display, infos, curLevel) {
             });
 
             function populatePiList(jsonlist) {
-                sessionStorage.pilist = JSON.stringify(jsonlist);
+                setSessionStorage('pilist', JSON.stringify(jsonlist));
 
                 var select = document.getElementById("pilist");
                 var first = true;
@@ -2433,10 +2447,10 @@ var getContext = function (display, infos, curLevel) {
         });
 
 
-        if (parseInt(sessionStorage.autoConnect)) {
+        if (parseInt(getSessionStorage('autoConnect'))) {
             if (!context.quickPiConnection.isConnected() && !context.quickPiConnection.isConnecting()) {
                 $('#piconnect').attr("disabled", true);
-                context.quickPiConnection.connect(sessionStorage.quickPiUrl);
+                context.quickPiConnection.connect(getSessionStorage('quickPiUrl'));
             }
         }
     };
@@ -2854,7 +2868,7 @@ var getContext = function (display, infos, curLevel) {
         context.liveUpdateCount = 0;
         context.offLineMode = false;
 
-        sessionStorage.autoConnect = "1";
+        setSessionStorage('autoConnect', "1");
 
         context.resetDisplay();
 
@@ -2881,10 +2895,10 @@ var getContext = function (display, infos, curLevel) {
         clearSensorPollInterval();
 
         if (wasConnected && !context.releasing && !context.quickPiConnection.wasLocked() && !wrongversion) {
-            context.quickPiConnection.connect(sessionStorage.quickPiUrl);
+            context.quickPiConnection.connect(getSessionStorage('quickPiUrl'));
         } else {
             // If I was never connected don't attempt to autoconnect again
-            sessionStorage.autoConnect = "0";
+            setSessionStorage('autoConnect', "0");
             window.task.displayedSubTask.context.resetDisplay();
         }
 
