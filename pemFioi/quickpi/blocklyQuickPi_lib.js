@@ -1,7 +1,7 @@
 ﻿//"use strict";
 var buzzerSound = {
     context: null,
-    default_freq: 1000,
+    default_freq: 200,
     current_freq: null,
     channels: {},
 
@@ -1222,8 +1222,17 @@ var getContext = function (display, infos, curLevel) {
             throw (strings.messages.manualTestSuccess);
         }
 
+        var testEnded = lastTurn || context.currentTime > context.maxTime;
+
         if (context.autoGrading) {
             for (var sensorStates in context.gradingStatesBySensor) {
+
+                if (lastTurn && context.display && context.taskEnds)
+                {
+                    var sensor = findSensorByName(sensorStates);
+                    drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.maxTime + 1000, "actual");
+                }
+
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
@@ -1243,9 +1252,15 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            if (lastTurn) {
+            if (lastTurn && context.display && context.taskEnds)
+            {
+                context.currentTime += 1000;
+                drawCurrentTime();
+            }
+
+
+            if (testEnded) {
                 context.success = true;
-                context.doNotStartGrade = false;
                 throw (strings.messages.programEnded);
             }
         } else {
@@ -1433,7 +1448,9 @@ var getContext = function (display, infos, curLevel) {
 
         if (taskInfos != undefined) {
             context.currentTime = 0;
+            context.tickIncrease = 0;
             context.autoGrading = taskInfos.autoGrading;
+            context.taskEnds = taskInfos.taskEnds;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
                 context.gradingInput = taskInfos.input;
@@ -1711,7 +1728,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || !this.raphaelFactory)
             return;
 
-        var piUi = strings.messages.connectionHTML;
+        var piUi = context.infos.quickPiDisableConnection ? '' : strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
@@ -1743,6 +1760,23 @@ var getContext = function (display, infos, curLevel) {
             addDefaultBoardSensors();
         }
 
+        if (context.timeLineCurrent)
+        {
+            context.timeLineCurrent.remove();
+            context.timeLineCurrent = null;
+        }
+
+        if (context.timeLineCircle)
+        {
+            context.timeLineCircle.remove();
+            context.timeLineCircle = null;
+        }
+
+        if (context.timeLineTriangle) {
+            context.timeLineTriangle.remove();
+            context.timeLineTriangle = null;
+        }
+
         if (context.autoGrading) {
             var numSensors = infos.quickPiSensors.length;
             var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 10);
@@ -1754,6 +1788,9 @@ var getContext = function (display, infos, curLevel) {
             var maxTime = context.maxTime;
             if (maxTime == 0)
                 maxTime = 1000;
+
+            if (context.taskEnds)
+                maxTime = maxTime + 1000;
 
             context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
 
@@ -1768,6 +1805,7 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 drawSensor(sensor);
+                sensor.timelinelastxlabel = 0;
 
                 if (context.gradingStatesBySensor.hasOwnProperty(sensor.name)) {
                     var states = context.gradingStatesBySensor[sensor.name];
@@ -1784,7 +1822,10 @@ var getContext = function (display, infos, curLevel) {
                         lastState = state.state;
                     }
 
-                    drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected", true);
+                    drawSensorTimeLineState(sensor, lastState, state.time, context.maxTime, "expected", true);
+                    
+                    if (context.taskEnds)
+                        drawSensorTimeLineState(sensor, lastState, startTime, state.time + 1000, "finnish", false);
 
                     sensor.lastAnalogState = null;
                 }
@@ -2819,7 +2860,8 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
-        for (var i = 0; i <= context.maxTime; i += 1000) {
+        var i = 0;
+        for (; i <= context.maxTime; i += 1000) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
 
             var timelabel = paper.text(x, context.timeLineY, (i / 1000));
@@ -2833,6 +2875,18 @@ var getContext = function (display, infos, curLevel) {
                             "L", x,
                             paper.height - context.sensorSize]);*/
         }
+
+        if (context.taskEnds) {
+            var x = context.timelineStartx + (i * context.pixelsPerTime);
+            var timelabel = paper.text(x, context.timeLineY, '\uf11e');      
+            timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
+            timelabel.node.style.fontWeight = "bold";
+
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            context.timelineText.push(timelabel);
+        }
+
+
         /*
                 paper.path(["M", context.timelineStartx,
                     paper.height - context.sensorSize * 3 / 4,
@@ -2842,31 +2896,12 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function drawCurrentTime() {
-        if (!paper || !context.display)
+        if (!paper || !context.display || isNaN(context.currentTime))
             return;
+
 
         var animationSpeed = 200; // ms
         var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
-
-        if (context.currentTime == 0)
-        {
-            if (context.timeLineCurrent)
-            {
-                context.timeLineCurrent.remove();
-                context.timeLineCurrent = null;
-            }
-
-            if (context.timeLineCircle)
-            {
-                context.timeLineCircle.remove();
-                context.timeLineCircle = null;
-            }
-
-            if (context.timeLineTriangle) {
-                context.timeLineTriangle.remove();
-                context.timeLineTriangle = null;
-            }
-        }
 
         var targetpath = ["M", startx, 0, "L", startx, context.timeLineY];
 
@@ -2974,7 +3009,7 @@ var getContext = function (display, infos, curLevel) {
 
         var color = "green";
         var strokewidth = 4;
-        if (type == "expected") {
+        if (type == "expected" || type == "finnish") {
             color = "lightgrey";
             strokewidth = 8;
         } else if (type == "wrong") {
@@ -3019,7 +3054,27 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
-                paper.text(startx + 15, ypositiontop + offset - 10, state);
+
+                if (!sensor.timelinelastxlabel)
+                    sensor.timelinelastxlabel = 0;
+                
+                if (!sensor.timelinelastxlabel)
+                    sensor.timelinelastxlabel = 0;
+
+                if ((startx) - sensor.timelinelastxlabel > 5)
+                {
+                    if (sensor.timelinestateup) {
+                        paper.text(startx, ypositiontop + offset - 10, state);
+                        sensor.timelinestateup = false;
+                    }
+                    else {
+                        paper.text(startx, ypositiontop + offset + 20, state);
+                        sensor.timelinestateup = true;
+                    }
+
+                    sensor.timelinelastxlabel = startx;
+                }
+
             }
 
             sensor.lastAnalogState = state == null ? 0 : state;
@@ -3035,6 +3090,42 @@ var getContext = function (display, infos, curLevel) {
                 "stroke-linejoin": "round",
                 "stroke-linecap": "round"
             });
+        } else if (sensor.type == "stick") {
+
+            var spacing = sensor.drawInfo.height / 5;
+            for (var i = 0; i < 5; i++)
+            {
+                if (state && state[i])
+                {
+                    var startingpath = ["M", startx,
+                            sensor.drawInfo.y + (i * spacing),
+                            "L", startx,
+                            sensor.drawInfo.y + (i * spacing)];
+
+                    var targetpath = ["M", startx,
+                            sensor.drawInfo.y + (i * spacing),
+                            "L", startx + stateLenght,
+                            sensor.drawInfo.y + (i * spacing)];
+
+                    if (type == "expected")
+                    {
+                        var stateline = paper.path(targetpath);
+                    }
+                    else
+                    {
+                        var stateline = paper.path(startingpath);
+                        stateline.animate({path: targetpath}, 200);
+                    }
+
+                    stateline.attr({
+                        "stroke-width": 2,
+                        "stroke": color,
+                        "stroke-linejoin": "round",
+                        "stroke-linecap": "round"
+                    });
+                }
+            }
+
         } else if (sensor.type == "screen") {
             if (state) {
                 sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
@@ -3571,11 +3662,19 @@ var getContext = function (display, infos, curLevel) {
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
 
-        } else if (sensor.type == "buzzer") {
-            var is_running = context.runner ? context.runner.isRunning() : false;
-            if(!is_running) {
-                sensor.state ? buzzerSound.start(sensor.name) : buzzerSound.stop(sensor.name);
+        } else if (sensor.type == "buzzer") {           
+
+            if(typeof sensor.state == 'number' &&
+               sensor.state != 0 &&
+               sensor.state != 1) {
+                buzzerSound.start(sensor.name, sensor.state);
+            } else if (sensor.state) {
+                buzzerSound.start(sensor.name);
+            } else {
+                buzzerSound.stop(sensor.name);
             }
+
+
             if (!sensor.buzzeron || !sensor.buzzeron.paper.canvas)
                 sensor.buzzeron = paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
 
@@ -4868,6 +4967,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.increaseTime = function (sensor) {
+        if(!context.autoGrading) { return; }
 
         if (!sensor.lastTimeIncrease) {
             sensor.lastTimeIncrease = 0;
@@ -5326,8 +5426,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getBuzzerNote(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5368,8 +5467,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getLedBrightness(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5387,8 +5485,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "isLedOn()";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("led1");
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5406,8 +5503,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getLedState(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -5513,8 +5609,7 @@ var getContext = function (display, infos, curLevel) {
         var command = "getServoAngle(\"" + name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback, sensor.state);
         } else {
             var cb = context.runner.waitCallback(callback);
 
@@ -6447,7 +6542,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='setBuzzerNote'>" +
-                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>200</field></shadow></value>" +
                         "</block>"
                 },
                 {
