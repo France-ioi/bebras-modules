@@ -1719,7 +1719,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || !this.raphaelFactory)
             return;
 
-        var piUi = strings.messages.connectionHTML;
+        var piUi = context.infos.quickPiDisableConnection ? '' : strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
