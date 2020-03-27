@@ -3654,11 +3654,19 @@ var getContext = function (display, infos, curLevel) {
                 findSensorDefinition(sensor).setLiveState(sensor, sensor.state, function(x) {});
             }
 
-        } else if (sensor.type == "buzzer") {
-            var is_running = context.runner ? context.runner.isRunning() : false;
-            if(!is_running) {
-                sensor.state ? buzzerSound.start(sensor.name) : buzzerSound.stop(sensor.name);
+        } else if (sensor.type == "buzzer") {           
+
+            if(typeof sensor.state == 'number' &&
+               sensor.state != 0 &&
+               sensor.state != 1) {
+                buzzerSound.start(sensor.name, sensor.state);
+            } else if (sensor.state) {
+                buzzerSound.start(sensor.name);
+            } else {
+                buzzerSound.stop(sensor.name);
             }
+
+
             if (!sensor.buzzeron || !sensor.buzzeron.paper.canvas)
                 sensor.buzzeron = paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
 
