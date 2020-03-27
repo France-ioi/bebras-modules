@@ -3942,7 +3942,7 @@ var getContext = function (display, infos, curLevel) {
                 statesize = imgh / 6;
             }
             */
-            statesize = imgh / 6;
+            statesize = imgh / 3.5;
 
             if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
@@ -3990,9 +3990,9 @@ var getContext = function (display, infos, curLevel) {
 
 
             if (sensor.state) {
-                var statex = imgx + (imgw * .13);
+                var statex = imgx + (imgw * .05);
 
-                var statey = imgy + (imgh * .33);
+                var statey = imgy + (imgh * .2);
 
                 if (sensor.state.line1.length > 16)
                     sensor.state.line1 = sensor.state.line1.substring(0, 16);
@@ -4916,7 +4916,7 @@ var getContext = function (display, infos, curLevel) {
             try {
                 sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
                 var b = sensor.stateText._getBBox();
-                sensor.stateText.translate(0,b.height/2);
+                sensor.stateText.translate(0, b.height/2);
                 sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
             } catch (err) {
             }
