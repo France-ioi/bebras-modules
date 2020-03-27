@@ -1778,6 +1778,7 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 drawSensor(sensor);
+                sensor.timelinelastxlabel = 0;
 
                 if (context.gradingStatesBySensor.hasOwnProperty(sensor.name)) {
                     var states = context.gradingStatesBySensor[sensor.name];
@@ -1794,7 +1795,7 @@ var getContext = function (display, infos, curLevel) {
                         lastState = state.state;
                     }
 
-                    drawSensorTimeLineState(sensor, lastState, startTime, state.time, "expected", true);
+                    drawSensorTimeLineState(sensor, lastState, state.time, context.maxTime, "expected", true);
                     
                     if (context.taskEnds)
                         drawSensorTimeLineState(sensor, lastState, startTime, state.time + 1000, "finnish", false);
@@ -3045,13 +3046,25 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
-                if (sensor.timelinestateup) {
-                    paper.text(startx + 15, ypositiontop + offset - 10, state);
-                    sensor.timelinestateup = false;
-                }
-                else {
-                    paper.text(startx + 15, ypositiontop + offset + 20, state);
-                    sensor.timelinestateup = true;
+
+                if (!sensor.timelinelastxlabel)
+                    sensor.timelinelastxlabel = 0;
+                
+                if (!sensor.timelinelastxlabel)
+                    sensor.timelinelastxlabel = 0;
+
+                if ((startx) - sensor.timelinelastxlabel > 5)
+                {
+                    if (sensor.timelinestateup) {
+                        paper.text(startx, ypositiontop + offset - 10, state);
+                        sensor.timelinestateup = false;
+                    }
+                    else {
+                        paper.text(startx, ypositiontop + offset + 20, state);
+                        sensor.timelinestateup = true;
+                    }
+
+                    sensor.timelinelastxlabel = startx;
                 }
 
             }
