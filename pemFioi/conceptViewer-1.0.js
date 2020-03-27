@@ -171,6 +171,16 @@ var conceptViewer = {
     return false;
   },
 
+  hasPythonConcept: function (pythonCode) {
+    for (var i=0; i<this.concepts.length; i++) {
+      var pythonList = this.concepts[i].python;
+      if(pythonList && pythonList.indexOf(pythonCode) > -1) {
+        return this.concepts[i].id;
+      }
+    }
+    return false;
+  },
+
   languageChanged: function () {
     this.loadNavigation();
   },
