@@ -699,6 +699,9 @@ var getContext = function (display, infos, curLevel) {
             isAnalog: false,
             isSensor: false,
             cellsAmount: function(paper) {
+                if(context.board == 'grovepi') {
+                    return 2;
+                }
                 if(paper.width < 250) {
                     return 4;
                 } else if(paper.width < 350) {
@@ -3919,7 +3922,7 @@ var getContext = function (display, infos, curLevel) {
             imgx = sensor.drawInfo.x + (sensor.drawInfo.width - imgw) * 0.5;
             imgy = sensor.drawInfo.y + (sensor.drawInfo.height - imgh) * 0.5;            
 
-            portx = imgx + imgw * 1.1;
+            portx = imgx + imgw + borderSize;
             porty = imgy + imgh / 3;
 /*
             if (context.autoGrading) {
@@ -3991,7 +3994,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state) {
                 var statex = imgx + (imgw * .13);
 
-                var statey = imgy + (imgh * .4);
+                var statey = imgy + (imgh * .33);
 
                 if (sensor.state.line1.length > 16)
                     sensor.state.line1 = sensor.state.line1.substring(0, 16);
