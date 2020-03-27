@@ -1441,6 +1441,7 @@ var getContext = function (display, infos, curLevel) {
 
         if (taskInfos != undefined) {
             context.currentTime = 0;
+            context.tickIncrease = 0;
             context.autoGrading = taskInfos.autoGrading;
             context.taskEnds = taskInfos.taskEnds;
             context.allowInfiniteLoop = !context.autoGrading;
@@ -1748,6 +1749,23 @@ var getContext = function (display, infos, curLevel) {
         {
             infos.quickPiSensors = [];
             addDefaultBoardSensors();
+        }
+
+        if (context.timeLineCurrent)
+        {
+            context.timeLineCurrent.remove();
+            context.timeLineCurrent = null;
+        }
+
+        if (context.timeLineCircle)
+        {
+            context.timeLineCircle.remove();
+            context.timeLineCircle = null;
+        }
+
+        if (context.timeLineTriangle) {
+            context.timeLineTriangle.remove();
+            context.timeLineTriangle = null;
         }
 
         if (context.autoGrading) {
@@ -2869,31 +2887,12 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function drawCurrentTime() {
-        if (!paper || !context.display)
+        if (!paper || !context.display || isNaN(context.currentTime))
             return;
+
 
         var animationSpeed = 200; // ms
         var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
-
-        if (context.currentTime == 0)
-        {
-            if (context.timeLineCurrent)
-            {
-                context.timeLineCurrent.remove();
-                context.timeLineCurrent = null;
-            }
-
-            if (context.timeLineCircle)
-            {
-                context.timeLineCircle.remove();
-                context.timeLineCircle = null;
-            }
-
-            if (context.timeLineTriangle) {
-                context.timeLineTriangle.remove();
-                context.timeLineTriangle = null;
-            }
-        }
 
         var targetpath = ["M", startx, 0, "L", startx, context.timeLineY];
 
@@ -4956,6 +4955,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.increaseTime = function (sensor) {
+        if(!context.autoGrading) { return; }
 
         if (!sensor.lastTimeIncrease) {
             sensor.lastTimeIncrease = 0;
