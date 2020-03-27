@@ -5476,8 +5476,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-            context.waitDelay(callback, state);
+            context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
 
