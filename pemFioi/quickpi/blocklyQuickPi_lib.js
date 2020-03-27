@@ -1165,6 +1165,76 @@ var getContext = function (display, infos, curLevel) {
     ];
 
 
+    var screenScaler = {
+
+        scale: 1,
+
+        setScale: function(scale) {
+            this.scale = scale;
+        },
+
+        getSize: function() {
+            return {
+                width: 128 * this.scale,
+                height: 32 * this.scale
+            }
+        },
+
+        drawPoint: function(sensor, x, y) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.fillRect(
+                this.scale * x, this.scale * y, 1, 1);
+        },
+
+
+        drawLine: function(sensor, x0, y0, x1, y1) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.moveTo(this.scale * x0, this.scale * y0);
+            ctx.lineTo(this.scale * x1, this.scale * y1);
+            ctx.closePath();
+            ctx.stroke();
+        },
+
+
+        drawRectangle: function(sensor, x0, y0, width, height) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.rect(this.scale * x0, this.scale * y0, this.scale * width, this.scale * height);
+            ctx.closePath();
+
+            if (!context.noStroke) {
+                ctx.stroke();
+            }
+
+            if (!context.noFill) {
+                ctx.fill();
+            }
+        },
+
+        drawCircle: function(sensor, x0, y0, diameter) {
+            var ctx = sensor.canvas.getContext('2d');
+
+            ctx.beginPath();
+            ctx.arc(this.scale * x0, this.scale * y0, this.scale * diameter / 2, 0, Math.PI * 2);
+            ctx.closePath();
+
+            if (!context.noFill) {
+                ctx.fill();
+            }
+        },
+
+
+        clearScreen: function(sensor) {
+            var ctx = sensor.canvas.getContext('2d');
+            ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
+        }        
+    }
+
+
     function findSensorDefinition(sensor) {
         for (var iType = 0; iType < sensorDefinitions.length; iType++) {
             var type = sensorDefinitions[iType];
@@ -1911,7 +1981,7 @@ var getContext = function (display, infos, curLevel) {
                             sensor.drawInfo = {
                                 x: x,
                                 y: y,
-                                width: geometry.size * 2,
+                                width: geometry.size * cellsAmount(paper),
                                 height: geometry.size
                             }
                         } else {
@@ -3827,16 +3897,31 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText = null;
             }
 
+            var borderSize = 5;
 
-            imgw = sensor.drawInfo.width / 1.3;
-            imgh = sensor.drawInfo.height / 1.2;
+            var screenScale = 2;
+            if(sensor.drawInfo.width < 300) {
+                screenScale = 1;
+            }
+            if(sensor.drawInfo.width < 150) {
+                screenScale = 0.5;
+            }             
+            if(sensor.drawInfo.width < 75) {
+                screenScale = 0.25;
+            }             
+            screenScaler.setScale(screenScale);
 
-            imgx = sensor.drawInfo.x + (sensor.drawInfo.width * .05);
-            imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
+            var screenScalerSize = screenScaler.getSize();
+            borderSize = borderSize * screenScale;
+
+            imgw = screenScalerSize.width + borderSize * 2;
+            imgh = screenScalerSize.height + borderSize * 2;            
+            imgx = sensor.drawInfo.x + (sensor.drawInfo.width - imgw) * 0.5;
+            imgy = sensor.drawInfo.y + (sensor.drawInfo.height - imgh) * 0.5;            
 
             portx = imgx + imgw * 1.1;
             porty = imgy + imgh / 3;
-
+/*
             if (context.autoGrading) {
                 imgw = sensor.drawInfo.width * 1.5;
                 imgh = sensor.drawInfo.height * .70;
@@ -3853,65 +3938,37 @@ var getContext = function (display, infos, curLevel) {
                 portsize = imgh / 4;
                 statesize = imgh / 6;
             }
-
-            var screenwidth = 128;
-            var screenheight = 32;
+            */
 
             if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('screen.png'), imgx, imgy, imgw, imgh);
             }
-            //dimk
-                
+               
 
             if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
+                var screenwidth = 128;
+                var screenheight = 32;
+
                 sensor.screenrect = paper.rect(imgx, imgy, screenwidth, screenheight);
 
                 sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                sensor.canvasNode.setAttribute("x",imgx + (imgw / 2) - (screenwidth/2)); //Set rect data
-                sensor.canvasNode.setAttribute("y",imgy + (imgh / 2) - (screenheight/2)); //Set rect data
+                sensor.canvasNode.setAttribute("x",imgx + borderSize); //Set rect data
+                sensor.canvasNode.setAttribute("y",imgy + borderSize); //Set rect data
                 sensor.canvasNode.setAttribute("width", screenwidth); //Set rect data
                 sensor.canvasNode.setAttribute("height", screenheight); //Set rect data
                 paper.canvas.appendChild(sensor.canvasNode);
-
 
                 sensor.canvas = document.createElement("canvas");
                 sensor.canvas.id = "screencanvas";
                 sensor.canvas.width = screenwidth;
                 sensor.canvas.height = screenheight;
                 sensor.canvasNode.appendChild(sensor.canvas);
-
-
-                sensor.canvaslabel = document.createElement("label");
-                sensor.canvaslabel.id = "canvaslabel";
-                sensor.canvaslabel.innerText = "Click to show";
-
-                sensor.canvasNode.appendChild(sensor.canvaslabel);
-
-                sensor.displayingscreen = true;
-
-                sensor.focusrect.click(function () {
-
-                    if ((imgw * 0.80) >= screenwidth )
-                    {
-                        sensor.displayingscreen = true;
-                    } else {
-                        sensor.displayingscreen = !sensor.displayingscreen;
-                    }
-
-                    if (sensor.displayingscreen) {
-                        $('#screencanvas').show();
-                        sensor.screenrect.attr({ "opacity": 1 });
-                    } else {
-                        $('#canvaslabel').show();
-                        $('#screencanvas').hide();
-                        sensor.screenrect.attr({ "opacity": 0 });
-                    }
-                });
             }
 
+
             sensor.screenrect.attr({
-                "x": imgx + (imgw / 2) - (128/2),
-                "y": imgy + (imgh / 2) - (32/2),
+                "x": imgx + borderSize,
+                "y": imgy + borderSize,
                 "width": 128,
                 "height": 32,
             });
@@ -3923,24 +3980,15 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
             });
 
-            if ((imgw * 0.80) < screenwidth ) {
-                sensor.displayingscreen = false;
-                $('#screencanvas').hide();
-                sensor.screenrect.attr({ "opacity": 0 });
-            }
+            sensor.screenrect.attr({ "opacity": 0 });
 
-            sensor.canvasNode.setAttribute("x", imgx + (imgw / 2) - (128/2)); //Set rect data
-            sensor.canvasNode.setAttribute("y", imgy + (imgh / 2) - (32/2)); //Set rect data
+            sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
+            sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
             sensor.canvasNode.setAttribute("width", "128"); //Set rect data
             sensor.canvasNode.setAttribute("height", "32"); //Set rect data
 
 
             if (sensor.state) {
-                sensor.displayingscreen = false;
-                $('#canvaslabel').hide();
-                $('#screencanvas').hide();
-                sensor.screenrect.attr({ "opacity": 0 });
-
                 var statex = imgx + (imgw * .13);
 
                 var statey = imgy + (imgh * .4);
@@ -5723,9 +5771,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.fillRect(x, y, 1, 1);
+                screenScaler.drawPoint(sensor, x, y);
             }
 
             context.waitDelay(callback);
@@ -5745,13 +5791,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.moveTo(x0, y0);
-                ctx.lineTo(x1, y1);
-                ctx.closePath();
-                ctx.stroke();
+                screenScaler.drawLine(sensor, x0, y0, x1, y1);
             }
 
             context.waitDelay(callback);
@@ -5771,17 +5811,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.rect(x0, y0, width, height);
-                ctx.closePath();
-
-                if (!context.noStroke)
-                    ctx.stroke();
-
-                if (!context.noFill)
-                    ctx.fill();
+                screenScaler.drawRectangle(sensor, x0, y0, width, height);
             }
 
             context.waitDelay(callback);
@@ -5802,14 +5832,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.beginPath();
-                ctx.arc(x0, y0, diameter/2, 0, Math.PI*2);
-                ctx.closePath();
-
-                if (!context.noFill)
-                    ctx.fill();
+                screenScaler.drawCircle(sensor, x0, y0, diameter)
             }
 
             context.waitDelay(callback);
@@ -5829,10 +5852,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = findSensorByType("screen");
             if (sensor && sensor.canvas)
             {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
-
+                screenScaler.clearScreen(sensor)
             }
 
             context.waitDelay(callback);
