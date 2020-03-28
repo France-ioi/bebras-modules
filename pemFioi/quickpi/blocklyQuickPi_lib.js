@@ -1670,8 +1670,6 @@ var getContext = function (display, infos, curLevel) {
                         }
                     }
                 }
-    
-    
             }
 
 
@@ -3266,18 +3264,23 @@ var getContext = function (display, infos, curLevel) {
 
                 if ((startx) - sensor.timelinelastxlabel > 5)
                 {
+                    var sensorDef = findSensorDefinition(sensor);
+                    var stateText = state.toString();
+                    if(sensorDef && sensorDef.getStateString) {
+                        stateText = sensorDef.getStateString(state);
+                    }
+
                     if (sensor.timelinestateup) {
-                        paper.text(startx, ypositiontop + offset - 10, state);
+                        paper.text(startx, ypositiontop + offset - 10, stateText);
                         sensor.timelinestateup = false;
                     }
                     else {
-                        paper.text(startx, ypositiontop + offset + 20, state);
+                        paper.text(startx, ypositiontop + offset + 20, stateText);
                         sensor.timelinestateup = true;
                     }
 
                     sensor.timelinelastxlabel = startx;
                 }
-
             }
 
             sensor.lastAnalogState = state == null ? 0 : state;
@@ -3953,18 +3956,9 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.showAsAnalog)
-            {
-                sensor.stateText = paper.text(state1x, state1y, sensor.state);
-            }
-            else
-            {
-                if (sensor.state) {
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
-                } else {
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
-                }
-            }
+            var stateText = findSensorDefinition(sensor).getStateString(sensor.state);
+
+            sensor.stateText = paper.text(state1x, state1y, stateText);
 
 
             if ((!context.runner || !context.runner.isRunning())
