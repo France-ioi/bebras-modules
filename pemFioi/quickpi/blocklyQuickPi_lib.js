@@ -581,6 +581,7 @@ var getContext = function (display, infos, curLevel) {
             isAnalog: false,
             isSensor: false,
             portType: "D",
+            initialState: false,
             selectorImages: ["ledon-red.png"],
             valueType: "boolean",
             pluggable: true,
@@ -636,6 +637,7 @@ var getContext = function (display, infos, curLevel) {
             description: "Buzzer",
             isAnalog: false,
             isSensor: false,
+            initialState: false,
             portType: "D",
             selectorImages: ["buzzer-ringing.png"],
             valueType: "boolean",
@@ -676,6 +678,7 @@ var getContext = function (display, infos, curLevel) {
             description: "Servo motor",
             isAnalog: true,
             isSensor: false,
+            initialState: 0,
             portType: "D",
             valueType: "number",
             pluggable: true,
@@ -702,6 +705,7 @@ var getContext = function (display, infos, curLevel) {
             description: "Screen",
             isAnalog: false,
             isSensor: false,
+            initialState: {line1: "", line2: ""},
             cellsAmount: function(paper) {
                 if(context.board == 'grovepi') {
                     return 2;
@@ -1625,6 +1629,12 @@ var getContext = function (display, infos, curLevel) {
             // If the sensor has no port assign one
             if (!sensor.port) {
                 sensorAssignPort(sensor);
+            }
+
+            // Set initial state
+            var sensorDef = findSensorDefinition(sensor);
+            if(sensorDef && !sensorDef.isSensor) {
+                context.registerQuickPiEvent(sensor.name, sensorDef.initialState);
             }
         }
 
