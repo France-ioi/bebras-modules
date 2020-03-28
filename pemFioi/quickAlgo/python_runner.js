@@ -700,7 +700,12 @@ function PythonInterpreter(context, msgCallback) {
 
   this._asyncCallback = function () {
     return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
-  }
+  };
+
+  this.signalAction = function () {
+    // Allows a context to signal an "action" happened
+    this._stepsWithoutAction = 0;
+  };
 }
 
 function initBlocklyRunner(context, msgCallback) {

@@ -453,6 +453,13 @@ function initBlocklyRunner(context, messageCallback) {
          runner.resetDone = true;
       };
 
+      runner.signalAction = function() {
+         // Allows contexts to signal an "action" happened
+         for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+            context.curSteps[iInterpreter].withoutAction = 0;
+         }
+      };
+
       context.runner = runner;
       context.callCallback = runner.noDelay;
       context.programEnded = [];
