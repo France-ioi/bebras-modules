@@ -1036,7 +1036,7 @@ var quickAlgoInterface = {
             data.callbackFinished(parseFloat(finalValue), true);
             return;
         } else if(e !== null) {
-            data.callbackModify(parseFloat(data.value));
+            data.callbackModify(parseFloat(data.value || 0));
         }
         $('input.keypad-value').focus();
     },
