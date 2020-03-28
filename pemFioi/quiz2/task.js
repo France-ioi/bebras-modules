@@ -431,6 +431,19 @@
         }
     })
 
+    window.taskGetResourcesPost = function(res, callback) {
+        // Add grader_data, if available, to the javascript
+        try {
+            $.get('grader_data.js').success(function(data) {
+                res.task.push({type: 'javascript', id: 'grader_data', content: data});
+                callback(res);
+            }).error(function() {
+                callback(res);
+            });
+        } catch(e) {
+            callback(res);
+        }
+    };
 
 
 
