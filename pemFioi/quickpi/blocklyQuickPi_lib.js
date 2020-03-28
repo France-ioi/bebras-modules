@@ -654,11 +654,17 @@ var getContext = function (display, infos, curLevel) {
             portType: "D",
             selectorImages: ["buzzer-ringing.png"],
             valueType: "boolean",
-            getPercentageFromState: function (state) {
-                if (state)
-                    return 1;
-                else
-                    return 0;
+            getPercentageFromState: function (state, sensor) {
+
+                if (sensor.showAsAnalog)
+                {
+                    return state / (sensor.maxAnalog - sensor.minAnalog);
+                } else {
+                    if (state)
+                        return 1;
+                    else
+                        return 0;
+                }
             },
             getStateFromPercentage: function (percentage) {
                 if (percentage)
@@ -1640,6 +1646,32 @@ var getContext = function (display, infos, curLevel) {
                     if (state.time > context.maxTime)
                         context.maxTime = state.time;
                 }
+
+
+                for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                    var sensor = infos.quickPiSensors[iSensor];
+                    var isAnalog = findSensorDefinition(sensor).isAnalog || sensor.showAsAnalog;
+
+                    if (isAnalog) {
+                        sensor.maxAnalog = Number.MIN_VALUE;
+                        sensor.minAnalog = Number.MAX_VALUE;
+
+                        if (context.gradingStatesBySensor.hasOwnProperty(sensor.name)) {
+                            var states = context.gradingStatesBySensor[sensor.name];
+
+                            for (var iState = 0; iState < states.length; iState++) {
+                                var state = states[iState];
+
+                                if (state.state > sensor.maxAnalog)
+                                    sensor.maxAnalog = state.state;
+                                if (state.state < sensor.minAnalog)
+                                    sensor.minAnalog = state.state;
+                            }
+                        }
+                    }
+                }
+    
+    
             }
 
 
@@ -3196,7 +3228,7 @@ var getContext = function (display, infos, curLevel) {
         var percentage = + state;
 
         if (isAnalog || sensor.showAsAnalog) {
-            var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state);
+            var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state, sensor);
 
             if (type == "wrong") {
                 color = "red";
@@ -3209,7 +3241,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.lastAnalogState != null
                 && sensor.lastAnalogState != state) {
-                var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState);
+                var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState, sensor);
 
                 var previousOffset = (ypositionbottom - ypositiontop) * oldStatePercentage;
 
@@ -3508,9 +3540,9 @@ var getContext = function (display, infos, curLevel) {
 
 
         if (Array.isArray(sensor.state)) {
-            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[index]);
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[index], sensor);
         } else {
-            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+            var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state, sensor);
         }
 
 
@@ -3566,7 +3598,7 @@ var getContext = function (display, infos, curLevel) {
                     if (sensor.sliders[i] == undefined)
                         continue;
 
-                    var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[i]);
+                    var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[i], sensor);
 
                     thumby = sensor.sliders[i].sliderdata.insiderecty +
                         sensor.sliders[i].sliderdata.insideheight -
@@ -3576,7 +3608,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.sliders[i].thumb.attr('y', thumby);
                 }
             } else {
-                var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state);
+                var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state, sensor);
 
                 thumby = sensor.sliders[0].sliderdata.insiderecty +
                     sensor.sliders[0].sliderdata.insideheight -
