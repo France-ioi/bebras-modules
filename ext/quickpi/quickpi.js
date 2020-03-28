@@ -732,7 +732,11 @@ def displayTextOled(line1, line2=""):
 
     # This will allow arguments to be numbers
     line1 = str(line1)
-    line2 = str(line2)
+
+    if line2:
+        line2 = str(line2)
+    else:
+        line2 = ""
 
     oleddraw.rectangle((0, 0, oledwidth, oledheight), outline=0, fill=0)
 
@@ -1842,8 +1846,17 @@ def readDistance(name):
     return 0
 
 
-def displayText(name, line1, line2=""):
-    ret =  nameToHandler(name, "screen")
+def displayText(line1, line2=""):
+    ret =  nameToHandler("screen1", "screen")
+
+    if ret is not None:
+        sensor = ret[0]
+        handler = ret[1]
+
+        return handler(line1, line2)
+
+def displayText2Lines(line1, line2=""):
+    ret =  nameToHandler("screen1", "screen")
 
     if ret is not None:
         sensor = ret[0]

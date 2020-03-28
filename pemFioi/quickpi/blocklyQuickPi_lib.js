@@ -83,7 +83,8 @@ var getContext = function (display, infos, curLevel) {
                 waitForButton: "Attendre une pression sur le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
 
-                displayText: "Afficher à l'écran %1 Ligne 1: %2 Ligne 2: %3",
+                displayText: "Afficher le texte %1",
+                displayText2Lines: "Afficher le texte Ligne 1: %1 Ligne 2: %2",
 
                 readTemperature: "température ambiante",
                 getTemperature: "temperature du capteur %1",
@@ -136,6 +137,7 @@ var getContext = function (display, infos, curLevel) {
                 setLedState: "setLedState",
                 toggleLedState: "toggleLedState",
                 displayText: "displayText",
+                displayText2Lines: "displayText2Lines",
                 readTemperature: "readTemperature",
                 sleep: "sleep",
                 setServoAngle: "setServoAngle",
@@ -206,7 +208,8 @@ var getContext = function (display, infos, curLevel) {
                 buttonWasPressed: "buttonWasPressed(button): Returns true if the button has been pressed and will clear the value",
                 setLedState: "setLedState(led, state): Change led state in the given port",
                 toggleLedState: "toggleLedState(led): Toggles the led state",
-                displayText: "displayText(screen, line1, line2): Display text in LCD screen",
+                displayText: "displayText(line1, line2): Display text in LCD screen",
+                displayText2Lines: "displayText(text): Display text in LCD screen",
                 readTemperature: "readTemperature(thermometer): Read Ambient temperature",
                 sleep: "sleep(milliseconds): pause program execute for a number of seconds",
                 setServoAngle: "setServoAngle(servo, angle): Set servo motor to an specified angle",
@@ -427,6 +430,7 @@ var getContext = function (display, infos, curLevel) {
                 toggleLedState: "If led is on, turns it off, if it's off turns it on",
                 buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
                 displayText: "Display text in LCD screen",
+                displayText2Lines: "Display text in LCD screen (two lines)",
                 readTemperature: "Read Ambient temperature",
                 sleep: "pause program execute for a number of seconds",
                 setServoAngle: "Set servo motor to an specified angle",
@@ -723,11 +727,16 @@ var getContext = function (display, infos, curLevel) {
                     return false;
 
                 // Otherwise compare the strings
-                return state1.line1 == state2.line1 &&
-                    state1.line2 == state2.line2;
+                return (state1.line1 == state2.line1) &&
+                            ((state1.line2 == state2.line2) ||
+                             (!state1.line2 && !state2.line2)) ;
             },
             setLiveState: function (sensor, state, callback) {
-                var command = "displayText(\"" + sensor.name + "\"," + state.line1 + "\", \"" + state.line2 + "\")";
+                var line2 = state.line2;
+                if (!line2)
+                    line2 = "";
+
+                var command = "displayText(\"" + sensor.name + "\"," + state.line1 + "\", \"" + line2 + "\")";
 
                 context.quickPiConnection.sendCommand(command, callback);
             },
@@ -4018,10 +4027,10 @@ var getContext = function (display, infos, curLevel) {
                 if (sensor.state.line1.length > 16)
                     sensor.state.line1 = sensor.state.line1.substring(0, 16);
 
-                if (sensor.state.line2.length > 16)
+                if (sensor.state.line2 && sensor.state.line2.length > 16)
                     sensor.state.line2 = sensor.state.line2.substring(0, 16);
 
-                sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + sensor.state.line2);
+                sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
 
                 sensor.stateText.attr("")
             }
@@ -5600,12 +5609,35 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.displayText = function (name, line1, line2, callback) {
-        var sensor = findSensorByName(name, true);
+    context.quickpi.displayText = function (line1, callback) {
+        var sensor = findSensorByType("screen");
 
-        var command = "displayText(\"" + name + "\",\""  + line1 + "\", \"" + line2 + "\")";
+        var command = "displayText(\"" + line1 + "\", \"\")";
 
-        context.registerQuickPiEvent(name,
+        context.registerQuickPiEvent(sensor.name,
+            {
+                line1: line1,
+                line2: null
+            }
+        );
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand(command, function (retval) {
+                cb();
+            });
+        }
+    };
+
+    context.quickpi.displayText2Lines = function (line1, line2, callback) {
+        var sensor = findSensorByType("screen");
+
+        var command = "displayText(\"" + line1 + "\", \"" + line2 + "\")";
+
+        context.registerQuickPiEvent(sensor.name,
             {
                 line1: line1,
                 line2: line2
@@ -6696,16 +6728,26 @@ var getContext = function (display, infos, curLevel) {
             ],
             display: [
                 {
-                    name: "displayText", params: ["String", "String", "String"], blocklyJson: {
+                    name: "displayText", params: ["String", "String"], blocklyJson: {
                         "args0": [
-                            { "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("screen") },
-                            { "type": "input_value", "name": "PARAM_1", "text": "" },
-                            { "type": "input_value", "name": "PARAM_2", "text": "" },
+                            { "type": "input_value", "name": "PARAM_0", "text": "" },
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" +
-                        "<value name='PARAM_2'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" +
+                        "</block>"
+
+                },
+                {
+                    name: "displayText2Lines", params: ["String", "String"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", "text": "" },
+                            { "type": "input_value", "name": "PARAM_1", "text": "" },
+                        ]
+                    },
+                    blocklyXml: "<block type='displayText2Lines'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
                 },
