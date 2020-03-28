@@ -5082,6 +5082,11 @@ var getContext = function (display, infos, curLevel) {
         }
 
         drawCurrentTime();
+
+        if(context.runner) {
+            // Tell the runner an "action" happened
+            context.runner.signalAction();
+        }
     }
 
     context.increaseTimeBy = function (time) {
@@ -5111,6 +5116,11 @@ var getContext = function (display, infos, curLevel) {
                 context.currentTime = sensorState.time;
                 context.getSensorState(sensorState.name);
             }
+        }
+
+        if(context.runner) {
+            // Tell the runner an "action" happened
+            context.runner.signalAction();
         }
 
         context.currentTime = newTime;
