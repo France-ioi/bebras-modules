@@ -619,7 +619,7 @@ function PythonInterpreter(context, msgCallback) {
     this._resetCallstack();
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
-    var markDelay = this.context.infos ? this.context.infos.actionDelay/4 : 0;
+    var markDelay = this.context.infos ? Math.floor(this.context.infos.actionDelay/4) : 0;
     var realStepDelay = markDelay + (this.context.allowInfiniteLoop ? 50 : 0);
     if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
@@ -632,11 +632,11 @@ function PythonInterpreter(context, msgCallback) {
           "aceHighlight",
           "line");
       }
-      this._paused = true;
     } else {
       this.removeEditorMarker();
     }
     if(realStepDelay > 0) {
+      this._paused = true;
       setTimeout(this.realStep.bind(this), realStepDelay);
     } else {
       this.realStep();
