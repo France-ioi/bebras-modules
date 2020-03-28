@@ -63,23 +63,27 @@ var getContext = function (display, infos, curLevel) {
 
                 turnLedOn: "Allumer la LED",
                 turnLedOff: "Éteindre la LED",
+
+                setLedState: "Passer la LED %1 à %2 ",
+                toggleLedState: "Inverser la LED %1",
+
                 isLedOn: "LED allumée",
+                isLedOnWithName: "état de la LED %1",
+
                 setLedBrightness: "Set LED %1 brightness %2",
                 getLedBrightness: "Get LED brightness %1",
-                setLedState: "Passer la LED %1 à %2 ",
-                getLedState: "état de la LED %1",
-                toggleLedState: "Inverser la LED %1",
 
                 turnBuzzerOn: "Allumer le buzzer",
                 turnBuzzerOff: "Éteindre le buzzer",
-                isBuzzerOn: "buzzer allumé",
                 setBuzzerState: "mettre le buzzer %1 à %2",
-                getBuzzerState: "buzzer %1 allumé",
+                isBuzzerOn: "buzzer allumé",
+                isBuzzerOnWithName: "buzzer %1 allumé",
+
                 setBuzzerNote: "Jouer la fréquence %2 sur le buzzer %1",
                 getBuzzerNote: "fréquence du buzzer %1",
 
-                buttonState: "bouton enfoncé",
-                buttonStateInPort: "bouton  %1 enfoncé",
+                isButtonPressed: "bouton enfoncé",
+                isButtonPressedWithName: "bouton  %1 enfoncé",
                 waitForButton: "Attendre une pression sur le bouton",
                 buttonWasPressed: "Le bouton a été enfoncé",
 
@@ -130,11 +134,13 @@ var getContext = function (display, infos, curLevel) {
                 // Names of the functions in Python, or Blockly translated in JavaScript
                 turnLedOn: "turnLedOn",
                 turnLedOff: "turnLedOff",
-                buttonState: "buttonState",
-                buttonStateInPort : "buttonStateInPort",
+                setLedState: "setLedState",
+
+                isButtonPressed: "isButtonPressed",
+                isButtonPressedWithName : "isButtonPressed",
                 waitForButton: "waitForButton",
                 buttonWasPressed: "buttonWasPressed",
-                setLedState: "setLedState",
+
                 toggleLedState: "toggleLedState",
                 displayText: "displayText",
                 displayText2Lines: "displayText",
@@ -146,13 +152,10 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "readLightIntensity",
                 readHumidity: "readHumidity",
                 currentTime: "currentTime",
-                setBuzzerState: "setBuzzerState",
-                setBuzzerNote: "setBuzzerNote",
-                getBuzzerState: "getBuzzerState",
                 getTemperature: "getTemperature",
 
                 isLedOn: "isLedOn",
-                getLedState: "getLedState",
+                isLedOnWithName: "isLedOn",
 
                 setBuzzerNote: "setBuzzerNote",
                 getBuzzerNote: "getBuzzerNote",
@@ -160,9 +163,13 @@ var getContext = function (display, infos, curLevel) {
                 getLedBrightness: "getLedBrightness",
                 getServoAngle: "getServoAngle",
 
+                setBuzzerState: "setBuzzerState",
+                setBuzzerNote: "setBuzzerNote",
+
                 turnBuzzerOn: "turnBuzzerOn",
                 turnBuzzerOff: "turnBuzzerOff",
                 isBuzzerOn: "isBuzzerOn",
+                isBuzzerOnWithName: "isBuzzerOn",
 
 
                 drawPoint: "drawPoint",
@@ -202,8 +209,8 @@ var getContext = function (display, infos, curLevel) {
                 // Descriptions of the functions in Python (optional)
                 turnLedOn: "turnLedOn(): Turns on a light connected to Raspberry",
                 turnLedOff: "turnLedOff(): Turns off a light connected to Raspberry",
-                buttonState: "buttonState(): Returns the state of a button, Pressed means True and not pressed means False",
-                buttonStateInPort: "buttonStateInPort(button): Returns the state of a button, Pressed means True and not pressed means False",
+                isButtonPressed: "isButtonPressed(): Returns the state of a button, Pressed means True and not pressed means False",
+                isButtonPressedWithName: "isButtonPressed(button): Returns the state of a button, Pressed means True and not pressed means False",
                 waitForButton: "waitForButton(button): Stops program execution until a button is pressed",
                 buttonWasPressed: "buttonWasPressed(button): Returns true if the button has been pressed and will clear the value",
                 setLedState: "setLedState(led, state): Change led state in the given port",
@@ -218,24 +225,26 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "readLightIntensity(lightSensor): Lire l'intensité lumineuse",
                 readHumidity: "readHumidity(hygrometer): lire l'humidité ambiante",
                 currentTime: "currentTime(milliseconds): Temps actuel en millisecondes",
-                setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
-				setBuzzerNote: "setBuzzerNote(port, frequency): sonnerie",
-                getBuzzerState: "getBuzzerState(buzzer): get buzzer state",
-                getTemperature: "getTemperature(thermometer): Get temperature",
 
-                setBuzzerNote: "setBuzzerNote(buzzer, frequency): sonnerie",
-                getBuzzerNote: "getBuzzerNote(buzzer)",
                 setLedBrightness: "setLedBrightness(led, brightness)",
                 getLedBrightness: "setLedBrightness(led)",
                 getServoAngle: "getServoAngle(servo)",
 
                 isLedOn: "isLedOn(): get led state",
-                getLedState: "getLedState(led): Get led state",
+                isLedOnWithName: "isLedOn(led): Get led state",
 
                 turnBuzzerOn: "turnBuzzerOn(): Turn Buzzer On",
                 turnBuzzerOff: "turnBuzzerOff(): Turn Buzzer Off",
-                isBuzzerOn: "isBuzzerOn(): Is Buzzer On",
 
+                isBuzzerOn: "isBuzzerOn(): Is Buzzer On",
+                isBuzzerOnWithName: "isBuzzerOn(buzzer): get buzzer state",
+
+                setBuzzerState: "setBuzzerState(buzzer, state): sonnerie",
+				setBuzzerNote: "setBuzzerNote(port, frequency): sonnerie",
+                setBuzzerNote: "setBuzzerNote(buzzer, frequency): sonnerie",
+                getBuzzerNote: "getBuzzerNote(buzzer)",
+
+                getTemperature: "getTemperature(thermometer): Get temperature",
 
                 drawPoint: "drawPoint(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
@@ -423,12 +432,12 @@ var getContext = function (display, infos, curLevel) {
                 // Comments for each block, used in the auto-generated documentation for task writers
                 turnLedOn: "Turns on a light connected to Raspberry",
                 turnLedOff: "Turns off a light connected to Raspberry",
-                buttonState: "Returns the state of a button, Pressed means True and not pressed means False",
+                isButtonPressed: "Returns the state of a button, Pressed means True and not pressed means False",
                 waitForButton: "Stops program execution until a button is pressed",
                 buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
                 setLedState: "Change led state in the given port",
                 toggleLedState: "If led is on, turns it off, if it's off turns it on",
-                buttonStateInPort: "Returns the state of a button, Pressed means True and not pressed means False",
+                isButtonPressedWithName: "Returns the state of a button, Pressed means True and not pressed means False",
                 displayText: "Display text in LCD screen",
                 displayText2Lines: "Display text in LCD screen (two lines)",
                 readTemperature: "Read Ambient temperature",
@@ -441,7 +450,7 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
                 setBuzzerNote: "sonnerie note",
-                getBuzzerState: "get buzzer state",
+                
                 getTemperature: "Get temperature",
 
 
@@ -454,11 +463,12 @@ var getContext = function (display, infos, curLevel) {
 
 
                 isLedOn: "Get led state",
-                getLedState: "Get led state",
+                isLedOnWithName: "Get led state",
 
                 turnBuzzerOn: "Turn Buzzer on",
                 turnBuzzerOff: "Turn Buzzer off",
                 isBuzzerOn: "Is Buzzer On",
+                isBuzzerOnWithName: "get buzzer state",
 
 
                 drawPoint: "drawPoint",
@@ -5344,25 +5354,6 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.isBuzzerOn = function (callback) {
-        var sensor = findSensorByName("buzzer1", true);
-
-        var command = "isBuzzerOn()";
-
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("buzzer1");
-            context.waitDelay(callback, state);
-        } else {
-            var cb = context.runner.waitCallback(callback);
-
-            context.quickPiConnection.sendCommand(command, function(returnVal) {
-                returnVal = parseFloat(returnVal)
-                cb(returnVal);
-            });
-        }
-    };
-
-
     context.quickpi.waitForButton = function (name, callback) {
         //        context.registerQuickPiEvent("button", "D22", "wait", false);
         var sensor = findSensorByName(name, true);
@@ -5389,39 +5380,28 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.buttonState = function (callback) {
-        var sensor = findSensorByName("button1", true);
 
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("button1");
-
-            context.runner.noDelay(callback, state);
+    context.quickpi.isButtonPressed = function (arg1, arg2) {
+        if(typeof arg2 == "undefined") {
+            // no arguments
+            var callback = arg1;
+            var sensor = findSensorByType("button");
         } else {
-            var cb = context.runner.waitCallback(callback);
-
-            findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
-                sensor.state = returnVal != "0";
-                drawSensor(sensor);
-                cb(returnVal != "0");
-            });
+            var callback = arg2;
+            var sensor = findSensorByName(arg1, true);
         }
-    };
-
-    context.quickpi.buttonStateInPort = function (name, callback) {
-
-        var sensor = findSensorByName(name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             if (sensor.type == "stick") {
-                var state = context.getSensorState(name);
+                var state = context.getSensorState(sensor.name);
                 var stickDefinition = findSensorDefinition(sensor);
                 var buttonstate = stickDefinition.getButtonState(name, sensor.state);
 
 
                 context.runner.noDelay(callback, buttonstate);
             } else {
-                var state = context.getSensorState(name);
+                var state = context.getSensorState(sensor.name);
 
                 context.runner.noDelay(callback, state);
             }
@@ -5435,21 +5415,22 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state = returnVal;
                     drawSensor(sensor);
 
-                    var buttonstate = stickDefinition.getButtonState(name, sensor.state);
+                    var buttonstate = stickDefinition.getButtonState(sensor.name, sensor.state);
 
                     cb(buttonstate);
                 });
 
             } else {
                 findSensorDefinition(sensor).getLiveState(sensor, function(returnVal) {
-                    sensor.state = returnVal;
+                    sensor.state = returnVal != "0";
                     drawSensor(sensor);
-                    cb(returnVal);
+                    cb(returnVal != "0");
                 });
             }
         }
     };
 
+    context.quickpi.isButtonPressedWithName = context.quickpi.isButtonPressed;
 
     context.quickpi.toggleLedState = function (name, callback) {
         var sensor = findSensorByName(name, true);
@@ -5519,13 +5500,20 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.getBuzzerState = function (name, callback) {
-        var sensor = findSensorByName(name, true);
+    context.quickpi.isBuzzerOn = function (arg1, arg2) {
+        if(typeof arg2 == "undefined") {
+            // no arguments
+            var callback = arg1;
+            var sensor = findSensorByType("buzzer");
+        } else {
+            var callback = arg2;
+            var sensor = findSensorByName(arg1, true);
+        }
 
-        var command = "getBuzzerState(\"" + name + "\")";
+        var command = "isBuzzerOn(\"" + sensor.name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
+            var state = context.getSensorState("buzzer1");
             context.waitDelay(callback, state);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -5533,10 +5521,11 @@ var getContext = function (display, infos, curLevel) {
             context.quickPiConnection.sendCommand(command, function(returnVal) {
                 returnVal = parseFloat(returnVal)
                 cb(returnVal);
-
             });
         }
     };
+
+    context.quickpi.isBuzzerOnWithName = context.quickpi.isBuzzerOn;
 
     context.quickpi.setBuzzerNote = function (name, frequency, callback) {
         var sensor = findSensorByName(name, true);
@@ -5620,10 +5609,17 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.isLedOn = function (callback) {
-        var sensor = findSensorByName("led1", true);
+    context.quickpi.isLedOn = function (arg1, arg2) {
+        if(typeof arg2 == "undefined") {
+            // no arguments
+            var callback = arg1;
+            var sensor = findSensorByType("led");
+        } else {
+            var callback = arg2;
+            var sensor = findSensorByName(arg1, true);
+        }
 
-        var command = "isLedOn()";
+        var command = "getLedState(\"" + sensor.name + "\")";
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback, sensor.state);
@@ -5638,23 +5634,8 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.getLedState = function (name, callback) {
-        var sensor = findSensorByName(name, true);
+    context.quickpi.isLedOnWithName = context.quickpi.isLedOn;
 
-        var command = "getLedState(\"" + name + "\")";
-
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            context.waitDelay(callback, sensor.state);
-        } else {
-            var cb = context.runner.waitCallback(callback);
-
-            context.quickPiConnection.sendCommand(command, function(returnVal) {
-                returnVal = parseFloat(returnVal)
-                cb(returnVal);
-
-            });
-        }
-    };
 
     context.quickpi.toggleLedState = function (name, callback) {
         var sensor = findSensorByName(name, true);
@@ -6485,7 +6466,6 @@ var getContext = function (display, infos, curLevel) {
         quickpi: {
             // Categories are reflected in the Blockly menu
             sensors: [
-                { name: "buttonState", yieldsValue: true },
                 { name: "currentTime", yieldsValue: true },
 
                 {
@@ -6498,11 +6478,14 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
-                    name: "buttonStateInPort", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "isButtonPressed", yieldsValue: true
+                },
+                {
+                    name: "isButtonPressedWithName", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("button")
-                            }
+                            },
                         ]
                     }
                 },
@@ -6692,25 +6675,6 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "getBuzzerState", yieldsValue: true, params: ["String"], blocklyJson: {
-                        "args0": [
-                            {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
-                            },
-                        ]
-                    }
-                },
-
-                {
-                    name: "getLedState", yieldsValue: true, params: ["String"], blocklyJson: {
-                        "args0": [
-                            {
-                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
-                            },
-                        ]
-                    }
-                },
-                {
                     name: "getLedBrightness", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
@@ -6723,7 +6687,25 @@ var getContext = function (display, infos, curLevel) {
                     name: "isLedOn", yieldsValue: true
                 },
                 {
+                    name: "isLedOnWithName", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
+                            },
+                        ]
+                    }
+                },
+                {
                     name: "isBuzzerOn", yieldsValue: true
+                },
+                {
+                    name: "isBuzzerOnWithName", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            {
+                                "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
+                            },
+                        ]
+                    }
                 },
                 {
                     name: "toggleLedState", params: ["String"], blocklyJson: {
