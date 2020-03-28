@@ -1308,7 +1308,13 @@ var getContext = function (display, infos, curLevel) {
     var paper;
     context.offLineMode = true;
 
-    context.onExecutionEnd = function () {};
+    context.onExecutionEnd = function () {
+        if (context.autoGrading)
+        {
+            buzzerSound.stopAll();
+        }
+
+    };
 
     infos.checkEndEveryTurn = true;
     infos.checkEndCondition = function (context, lastTurn) {
