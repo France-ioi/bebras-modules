@@ -137,7 +137,7 @@ var getContext = function (display, infos, curLevel) {
                 setLedState: "setLedState",
                 toggleLedState: "toggleLedState",
                 displayText: "displayText",
-                displayText2Lines: "displayText2Lines",
+                displayText2Lines: "displayText",
                 readTemperature: "readTemperature",
                 sleep: "sleep",
                 setServoAngle: "setServoAngle",
@@ -5615,33 +5615,19 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.displayText = function (line1, callback) {
+    context.quickpi.displayText = function (line1, arg2, arg3) {
+        if(typeof arg3 == "undefined") {
+            // Only one argument
+            var line2 = null;
+            var callback = arg2;
+        } else {
+            var line2 = arg2;
+            var callback = arg3;
+        }
+
         var sensor = findSensorByType("screen");
 
         var command = "displayText(\"" + line1 + "\", \"\")";
-
-        context.registerQuickPiEvent(sensor.name,
-            {
-                line1: line1,
-                line2: null
-            }
-        );
-
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            context.waitDelay(callback);
-        } else {
-            var cb = context.runner.waitCallback(callback);
-
-            context.quickPiConnection.sendCommand(command, function (retval) {
-                cb();
-            });
-        }
-    };
-
-    context.quickpi.displayText2Lines = function (line1, line2, callback) {
-        var sensor = findSensorByType("screen");
-
-        var command = "displayText(\"" + line1 + "\", \"" + line2 + "\")";
 
         context.registerQuickPiEvent(sensor.name,
             {
@@ -5660,6 +5646,8 @@ var getContext = function (display, infos, curLevel) {
             });
         }
     };
+
+    context.quickpi.displayText2Lines = context.quickpi.displayText;
 
     context.quickpi.readTemperature = function (name, callback) {
         var sensor = findSensorByName(name, true);
@@ -6734,7 +6722,7 @@ var getContext = function (display, infos, curLevel) {
             ],
             display: [
                 {
-                    name: "displayText", params: ["String", "String"], blocklyJson: {
+                    name: "displayText", params: ["String", "String"], variants: [[null], [null, null]], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0", "text": "" },
                         ]
