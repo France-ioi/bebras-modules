@@ -676,6 +676,13 @@ var getContext = function (display, infos, curLevel) {
                 context.quickPiConnection.sendCommand(command, callback);
             },
             getStateString: function(state) {
+
+                if(typeof state == 'number' && 
+                    state != 1 &&
+                    state != 0) {
+
+                        return state.toString();
+                }               
                 return state ? "ON" : "OFF";
             },
             subTypes: [{
@@ -1667,7 +1674,7 @@ var getContext = function (display, infos, curLevel) {
             // Set initial state
             var sensorDef = findSensorDefinition(sensor);
             if(sensorDef && !sensorDef.isSensor) {
-                context.registerQuickPiEvent(sensor.name, sensorDef.initialState);
+                context.registerQuickPiEvent(sensor.name, sensorDef.initialState, true, true);
             }
         }
 
@@ -5049,7 +5056,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    context.registerQuickPiEvent = function (name, newState, setInSensor = true) {
+    context.registerQuickPiEvent = function (name, newState, setInSensor = true, allowFail = false) {
         var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
@@ -5085,15 +5092,18 @@ var getContext = function (display, infos, curLevel) {
             else if (expectedState != null) {
                 if (!findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
 
-                    if (expectedState.badonce)
+                    if (!allowFail)
                     {
-                        type = "wrong";
-                        fail = true;
-                        expectedState.badonce = false;
-                    }
-                    else {
-                        expectedState.badonce = true;
-                        expectedState.hit = false;
+                        if (expectedState.badonce)
+                        {
+                            type = "wrong";
+                            fail = true;
+                            expectedState.badonce = false;
+                        }
+                        else {
+                            expectedState.badonce = true;
+                            expectedState.hit = false;
+                        }
                     }
 
                     type = "wrong";
@@ -5111,7 +5121,8 @@ var getContext = function (display, infos, curLevel) {
             sensor.lastType = type;
 
             if (fail) {
-                context.failedMessage = getWrongStateText(expectedState);
+                if (!allowFail)
+                    context.failedMessage = getWrongStateText(expectedState);
             }
             else
                 context.increaseTime(sensor);
