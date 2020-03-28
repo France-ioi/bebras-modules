@@ -1951,7 +1951,7 @@ var getContext = function (display, infos, curLevel) {
                     timelinestate.startTime,
                     timelinestate.endTime,
                     timelinestate.type,
-                    true)
+                    true);
             }
         } else {
 
@@ -5013,33 +5013,39 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.lastStateChange == null) {
                 sensor.lastStateChange = 0;
                 sensor.lastState = 0;
-            }
-
-            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, type);
+            }           
 
             if (context.currentTime > context.maxTime) {
                 //context.success = true;
                 //throw (strings.messages.testSuccess);
             }
-            else if (expectedState != null &&
-                !findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
+            else if (expectedState != null) {
+                if (!findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
 
-                if (expectedState.badonce)
-                {
+                    if (expectedState.badonce)
+                    {
+                        type = "wrong";
+                        fail = true;
+                        expectedState.badonce = false;
+                    }
+                    else {
+                        expectedState.badonce = true;
+                        expectedState.hit = false;
+                    }
+
                     type = "wrong";
-                    fail = true;
-                    expectedState.badonce = false;
-                    drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime + 100, type);
+                } else {
+                    type = "actual";                    
                 }
-                else {
-                    expectedState.badonce = true;
-                    expectedState.hit = false;
-
-                }
+            } else {
+                type = "wrong";
             }
 
+            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, sensor.lastType);
+            
             sensor.lastStateChange = context.currentTime;
             sensor.lastState = newState;
+            sensor.lastType = type;
 
             if (fail) {
                 context.failedMessage =  (strings.messages.wrongState.format(sensor.name));
