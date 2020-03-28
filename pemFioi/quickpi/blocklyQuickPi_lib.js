@@ -3800,16 +3800,25 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
             });
 
+            if (sensor.showAsAnalog)
+            {
+                sensor.stateText = paper.text(state1x, state1y, sensor.state);
+            }
+            else
+            {
+                if (sensor.state) {
+                    sensor.stateText = paper.text(state1x, state1y, "ON");
+                } else {
+                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                }
+            }
+
             if (sensor.state) {
                 sensor.ledon.attr({ "opacity": 1 });
                 sensor.ledoff.attr({ "opacity": 0 });
-
-                sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.ledon.attr({ "opacity": 0 });
                 sensor.ledoff.attr({ "opacity": 1 });
-
-                sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
             var x = typeof sensor.state;
@@ -3905,10 +3914,17 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                 sensor.stateText.remove();
 
-            if (sensor.state) {
-                sensor.stateText = paper.text(state1x, state1y, "ON");
-            } else {
-                sensor.stateText = paper.text(state1x, state1y, "OFF");
+            if (sensor.showAsAnalog)
+            {
+                sensor.stateText = paper.text(state1x, state1y, sensor.state);
+            }
+            else
+            {
+                if (sensor.state) {
+                    sensor.stateText = paper.text(state1x, state1y, "ON");
+                } else {
+                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                }
             }
 
 
