@@ -606,6 +606,9 @@ var getContext = function (display, infos, curLevel) {
 
                 context.quickPiConnection.sendCommand(command, callback);
             },
+            getStateString: function(state) {
+                return state ? "ON" : "OFF";
+            },
             subTypes: [{
                 subType: "blue",
                 description: "LED bleue",
@@ -662,7 +665,9 @@ var getContext = function (display, infos, curLevel) {
 
                 context.quickPiConnection.sendCommand(command, callback);
             },
-
+            getStateString: function(state) {
+                return state ? "ON" : "OFF";
+            },
             subTypes: [{
                 subType: "active",
                 description: "Grove Buzzer",
@@ -698,6 +703,9 @@ var getContext = function (display, infos, curLevel) {
                 var command = "setServoAngle(\"" + sensor.name + "\"," + state + ")";
 
                 context.quickPiConnection.sendCommand(command, callback);
+            },
+            getStateString: function(state) {
+                return "" + state + "°";
             }
         },
         {
