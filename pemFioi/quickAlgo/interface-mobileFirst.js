@@ -984,11 +984,10 @@ var quickAlgoInterface = {
             data.value = data.initialValue;
             finished = true;
         } else if(btn == 'V') {
+            if(data.value == '') { data.value = '0'; }
             finished = true;
         } else if(btn == '0') {
-            if(data.value != '') {
-                data.value += '0';
-            }
+            data.value += '0';
         } else if(btn == '-') {
             if(data.value == '') {
                 data.value = '0';
