@@ -5386,22 +5386,24 @@ var getContext = function (display, infos, curLevel) {
             // no arguments
             var callback = arg1;
             var sensor = findSensorByType("button");
+            var name = sensor.name;
         } else {
             var callback = arg2;
             var sensor = findSensorByName(arg1, true);
+            var name = arg1;
         }
 
         if (!context.display || context.autoGrading || context.offLineMode) {
 
             if (sensor.type == "stick") {
-                var state = context.getSensorState(sensor.name);
+                var state = context.getSensorState(name);
                 var stickDefinition = findSensorDefinition(sensor);
                 var buttonstate = stickDefinition.getButtonState(name, sensor.state);
 
 
                 context.runner.noDelay(callback, buttonstate);
             } else {
-                var state = context.getSensorState(sensor.name);
+                var state = context.getSensorState(name);
 
                 context.runner.noDelay(callback, state);
             }
@@ -5415,7 +5417,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state = returnVal;
                     drawSensor(sensor);
 
-                    var buttonstate = stickDefinition.getButtonState(sensor.name, sensor.state);
+                    var buttonstate = stickDefinition.getButtonState(name, sensor.state);
 
                     cb(buttonstate);
                 });
