@@ -276,7 +276,7 @@ var getContext = function (display, infos, curLevel) {
                 sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
                 manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test échoué : {0} est dans un état invalide.",
+                wrongState: "Test échoué : {0} a été dans un l'état {1} au lieu de {2}.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -743,6 +743,10 @@ var getContext = function (display, infos, curLevel) {
                 var command = "displayText(\"" + sensor.name + "\"," + state.line1 + "\", \"" + line2 + "\")";
 
                 context.quickPiConnection.sendCommand(command, callback);
+            },
+            getStateString: function(state) {
+                if(!state) { return '""'; }
+                return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
             },
             subTypes: [{
                 subType: "16x2lcd",
@@ -1274,6 +1278,17 @@ var getContext = function (display, infos, curLevel) {
         return null;
     }
 
+    function getWrongStateText(state) {
+        var sensorDef = findSensorDefinition(state);
+        var badStateStr = "" + state.lastSeenState;
+        var expectedStateStr = "" + state.state;
+        if(sensorDef && sensorDef.getStateString) {
+            badStateStr = sensorDef.getStateString(state.lastSeenState);
+            expectedStateStr = sensorDef.getStateString(state.state);
+        }
+        return strings.messages.wrongState.format(state.name, badStateStr, expectedStateStr);
+    }
+
     function getCurrentBoard() {
         var found = boardDefinitions.find(function (element) {
             if (context.board == element.name)
@@ -1332,10 +1347,10 @@ var getContext = function (display, infos, curLevel) {
 
         if (context.autoGrading) {
             for (var sensorStates in context.gradingStatesBySensor) {
+                var sensor = findSensorByName(sensorStates);
 
                 if (lastTurn && context.display && !context.loopsForever)
                 {
-                    var sensor = findSensorByName(sensorStates);
                     drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.maxTime + 1000, "actual");
                 }
 
@@ -1345,13 +1360,13 @@ var getContext = function (display, infos, curLevel) {
                     if (testEnded) {
                         if (!state.hit) {
                             context.success = false;
-                            throw (strings.messages.wrongState.format(state.name));
+                            throw (getWrongStateText(state));
                         }
                     }
                     else if (state.time > context.currentTime) {
                         if (lastTurn) {
                             context.success = false;
-                            throw (strings.messages.wrongState.format(state.name));
+                            throw (getWrongStateText(state));
                         }
                     }
                 }
@@ -5015,10 +5030,14 @@ var getContext = function (display, infos, curLevel) {
         if (context.autoGrading && context.gradingStatesBySensor != undefined) {
             var fail = false;
             var type = "actual";
-            var expectedState = context.getSensorExpectedState(sensor.name);
+            var expectedStates = context.getSensorExpectedState(sensor.name, true);
+            var expectedState = expectedStates.length > 0 ? expectedStates[0] : null;
 
-            if (expectedState != null)
+            if(expectedState)
                 expectedState.hit = true;
+            for(var i = 0 ; i < expectedStates.length ; i++) {
+                expectedStates[i].lastSeenState = newState;
+            }
 
             if (sensor.lastStateChange == null) {
                 sensor.lastStateChange = 0;
@@ -5058,7 +5077,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.lastType = type;
 
             if (fail) {
-                context.failedMessage =  (strings.messages.wrongState.format(sensor.name));
+                context.failedMessage = getWrongStateText(expectedState);
             }
             else
                 context.increaseTime(sensor);
@@ -5136,7 +5155,7 @@ var getContext = function (display, infos, curLevel) {
         context.currentTime = newTime;
     }
 
-    context.getSensorExpectedState = function (name) {
+    context.getSensorExpectedState = function (name, getAll) {
         var state = null;
 
         if (!context.gradingStatesBySensor)
@@ -5158,25 +5177,30 @@ var getContext = function (display, infos, curLevel) {
 
         var lastState;
         var startTime = -1;
-        for (var i = 0; i < sensorStates.length; i++) {
+        for (var idx = 0; idx < sensorStates.length; idx++) {
             if (startTime >= 0) {
                 if (context.currentTime >= startTime &&
-                    context.currentTime < sensorStates[i].time) {
+                    context.currentTime < sensorStates[idx].time) {
                     state = lastState;
                     break;
                 }
             }
 
-            startTime = sensorStates[i].time;
-            lastState = sensorStates[i];
+            startTime = sensorStates[idx].time;
+            lastState = sensorStates[idx];
         }
 
         // This is the end state
         if (state == null && context.currentTime >= startTime) {
             state = lastState;
+            idx = sensorStates.length;
         }
 
-        return state;
+        if(getAll) {
+            return sensorStates.slice(idx-1);
+        } else {
+            return state;
+        }
     }
 
 
