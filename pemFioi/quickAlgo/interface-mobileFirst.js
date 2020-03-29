@@ -964,8 +964,10 @@ var quickAlgoInterface = {
                 btn = e.key;
             } else if(e.key == 'Backspace' || e.keyCode == 8) {
                 btn = 'R';
-            } else if(e.key == 'Enter' || e.keyCode == 13 || e.keyCode == 27) {
+            } else if(e.key == 'Enter' || e.keyCode == 13) {
                 btn = 'V';
+            } else if(e.key == 'Escape' || e.keyCode == 27) {
+                btn = 'C';
             } else if(e.key == '.' || e.key == ',' || e.keyCode == 110 || e.keyCode == 188 || e.keyCode == 190) {
                 btn = '.';
             } else if(e.key == '-' || e.keyCode == 54 || e.keyCode == 109) {
