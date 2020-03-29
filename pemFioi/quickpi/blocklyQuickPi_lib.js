@@ -4002,7 +4002,7 @@ var getContext = function (display, infos, curLevel) {
             if(sensor.muteBtn) {
                 sensor.muteBtn.remove();
             }
-            var muteBtnSize = sensor.drawInfo.width * 0.2;
+            var muteBtnSize = sensor.drawInfo.width * 0.15;
             sensor.muteBtn = paper.text(
                 state1x, 
                 state1y + imgh / 2, 
@@ -4010,6 +4010,8 @@ var getContext = function (display, infos, curLevel) {
             );
             sensor.muteBtn.node.style.fontWeight = "bold";           
             sensor.muteBtn.node.style.cursor = "default";           
+            sensor.muteBtn.node.style.MozUserSelect = "none";
+            sensor.muteBtn.node.style.WebkitUserSelect = "none";
             sensor.muteBtn.attr({
                 "font-size": muteBtnSize + "px",                
                 fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
