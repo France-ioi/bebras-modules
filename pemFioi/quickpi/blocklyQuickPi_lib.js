@@ -105,37 +105,37 @@ var getContext = function (display, infos, curLevel) {
         fr: { // French strings
             label: {
                 // Labels for the blocks
-                sleep: "Attendre %1 millisecondes",
+                sleep: "attendre %1 millisecondes",
                 currentTime: "temps écoulé en millisecondes",
 
-                turnLedOn: "Allumer la LED",
-                turnLedOff: "Éteindre la LED",
+                turnLedOn: "allumer la LED",
+                turnLedOff: "éteindre la LED",
 
-                setLedState: "Passer la LED %1 à %2 ",
-                toggleLedState: "Inverser la LED %1",
+                setLedState: "passer la LED %1 à %2 ",
+                toggleLedState: "inverser la LED %1",
 
                 isLedOn: "LED allumée",
                 isLedOnWithName: "LED %1 allumée",
 
-                setLedBrightness: "Mettre la luminosité de %1 à %2",
-                getLedBrightness: "Lire la luminosité de %1",
+                setLedBrightness: "mettre la luminosité de %1 à %2",
+                getLedBrightness: "lire la luminosité de %1",
 
-                turnBuzzerOn: "Allumer le buzzer",
-                turnBuzzerOff: "Éteindre le buzzer",
-                setBuzzerState: "Mettre le buzzer %1 à %2",
+                turnBuzzerOn: "allumer le buzzer",
+                turnBuzzerOff: "éteindre le buzzer",
+                setBuzzerState: "mettre le buzzer %1 à %2",
                 isBuzzerOn: "buzzer allumé",
                 isBuzzerOnWithName: "buzzer %1 allumé",
 
-                setBuzzerNote: "Jouer la fréquence %2 sur %1",
+                setBuzzerNote: "jouer la fréquence %2 sur %1",
                 getBuzzerNote: "fréquence du buzzer %1",
 
                 isButtonPressed: "bouton enfoncé",
                 isButtonPressedWithName: "bouton  %1 enfoncé",
-                waitForButton: "Attendre une pression sur le bouton",
-                buttonWasPressed: "Le bouton a été enfoncé",
+                waitForButton: "attendre une pression sur le bouton",
+                buttonWasPressed: "le bouton a été enfoncé",
 
-                displayText: "Afficher %1",
-                displayText2Lines: "Afficher Ligne 1: %1 Ligne 2: %2",
+                displayText: "afficher %1",
+                displayText2Lines: "afficher Ligne 1: %1 Ligne 2: %2",
 
                 readTemperature: "température ambiante",
                 getTemperature: "temperature de %1",
@@ -145,37 +145,37 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "intensité lumineuse",
                 readHumidity: "humidité ambiante",
 
-                setServoAngle: "Mettre le servo %1 à l'angle %2",
+                setServoAngle: "mettre le servo %1 à l'angle %2",
                 getServoAngle: "angle du servo %1",
 
 
-                drawPoint: "Draw pixel",
-                drawLine: "Draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
-                drawRectangle: "Draw Rectangle (x₀,y₀) %1 %2 (width,height) %3  %4",
-                drawCircle: "Draw circle (x₀,y₀) %1 %2 Diameter %3",
-                clearScreen: "Clear entiere screen",
-                updateScreen: "Update drawins to the screen",
-                autoUpdate: "Screen autoupdate mode",
+                drawPoint: "draw pixel",
+                drawLine: "draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
+                drawRectangle: "draw Rectangle (x₀,y₀) %1 %2 (width,height) %3  %4",
+                drawCircle: "draw circle (x₀,y₀) %1 %2 Diameter %3",
+                clearScreen: "clear entiere screen",
+                updateScreen: "update drawins to the screen",
+                autoUpdate: "screen autoupdate mode",
 
-                fill: "Set fill color",
-                noFill: "Do not fill shapes",
-                stroke: "Set stroke color",
-                noStroke: "Do not stroke",
+                fill: "set fill color",
+                noFill: "do not fill shapes",
+                stroke: "set stroke color",
+                noStroke: "do not stroke",
 
-                readAcceleration: "Read acceleration (m/s²)",
-                computeRotation: "Compute rotation from accelerometer (°) %1",
-                readSoundLevel: "Read sound intensity",
+                readAcceleration: "read acceleration (m/s²)",
+                computeRotation: "compute rotation from accelerometer (°) %1",
+                readSoundLevel: "read sound intensity",
 
-                readMagneticForce: "Read Magnetic Force (µT) %1",
-                computeCompassHeading: "Compute Compass Heading (°)",
+                readMagneticForce: "read Magnetic Force (µT) %1",
+                computeCompassHeading: "compute Compass Heading (°)",
 
-                readInfraredState: "Read Infrared Receiver State %1",
-                setInfraredState: "Set Infrared transmiter State %1",
+                readInfraredState: "read Infrared Receiver State %1",
+                setInfraredState: "set Infrared transmiter State %1",
 
                 // Gyroscope
-                readAngularVelocity: "Read angular velocity (°/s) %1",
-                setGyroZeroAngle: "Set the gyroscope zero point",
-                computeRotationGyro: "Compute rotation in the gyroscope %1",
+                readAngularVelocity: "read angular velocity (°/s) %1",
+                setGyroZeroAngle: "set the gyroscope zero point",
+                computeRotationGyro: "compute rotation in the gyroscope %1",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
