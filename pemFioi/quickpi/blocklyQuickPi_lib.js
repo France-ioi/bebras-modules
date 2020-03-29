@@ -2,8 +2,8 @@
 var buzzerSound = {
     context: null,
     default_freq: 200,
-    current_freq: null,
     channels: {},
+    muted: {},
 
     getContext: function() {
         if(!this.context) {
@@ -12,8 +12,23 @@ var buzzerSound = {
         return this.context;
     },
 
+    startOscillator: function(freq) {
+        var o = this.context.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = freq;
+        o.connect(this.context.destination);
+        o.start();
+        return o;
+    },
+
+
     start: function(channel, freq=this.default_freq) {
-        if(this.channels[channel] && this.channels[channel].frequency.value == freq) {
+        if(!this.channels[channel]) {
+            this.channels[channel] = {
+                muted: false
+            }
+        }
+        if(this.channels[channel].freq === freq) {
             return;
         }
         var context = this.getContext();
@@ -22,19 +37,55 @@ var buzzerSound = {
         }
         this.stop(channel);
 
-        if (freq > 0) {
-            var o = context.createOscillator();
-            o.type = 'sine';
-            o.frequency.value = freq;
-            o.connect(context.destination);
-            o.start();
-            this.channels[channel] = o;
+        if (freq == 0 || this.channels[channel].muted) {
+            return;
         }
+        
+        this.channels[channel].oscillator = this.startOscillator(freq);
+        this.channels[channel].freq = freq;
     },
 
     stop: function(channel) {
-        this.channels[channel] && this.channels[channel].stop();
-        delete this.channels[channel];
+        if(this.channels[channel]) {
+            this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
+            delete this.channels[channel].oscillator;
+            delete this.channels[channel].freq;
+        }
+    },
+
+    mute: function(channel) {
+        if(!this.channels[channel]) {
+            this.channels[channel] = {
+                muted: true
+            }
+            return;
+        }
+        this.channels[channel].muted = true;
+        this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
+        delete this.channels[channel].oscillator;
+        console.log(channel, this.channels[channel])
+    },
+
+    unmute: function(channel) {
+        if(!this.channels[channel]) {
+            this.channels[channel] = {
+                muted: false
+            }
+            return;
+        }
+        this.channels[channel].muted = false;
+        if(this.channels[channel].freq) {
+            this.channels[channel].oscillator = this.startOscillator(this.channels[channel].freq);
+        }
+
+        console.log(channel, this.channels[channel])
+    },
+
+    isMuted: function(channel) {
+        if(this.channels[channel]) {
+            return this.channels[channel].muted;
+        }
+        return false;
     },
 
     stopAll: function() {
@@ -43,7 +94,6 @@ var buzzerSound = {
                 this.stop(channel);
             }
         }
-        this.current_freq = null;
     }
 }
 
@@ -3986,6 +4036,33 @@ var getContext = function (display, infos, curLevel) {
             var stateText = findSensorDefinition(sensor).getStateString(sensor.state);
 
             sensor.stateText = paper.text(state1x, state1y, stateText);
+
+
+            if(sensor.muteBtn) {
+                sensor.muteBtn.remove();
+            }
+            var muteBtnSize = sensor.drawInfo.width * 0.2;
+            sensor.muteBtn = paper.text(
+                state1x, 
+                state1y + imgh / 2, 
+                buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028"
+            );
+            sensor.muteBtn.node.style.fontWeight = "bold";           
+            sensor.muteBtn.node.style.cursor = "default";           
+            sensor.muteBtn.attr({
+                "font-size": muteBtnSize + "px",                
+                fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
+                "font-family": '"Font Awesome 5 Free"',
+                'text-anchor': 'start'
+            });            
+            sensor.muteBtn.click(function () {
+                if(buzzerSound.isMuted(sensor.name)) {
+                    buzzerSound.unmute(sensor.name)
+                } else {
+                    buzzerSound.mute(sensor.name)
+                }
+                drawSensor(sensor);
+            });
 
 
             if ((!context.runner || !context.runner.isRunning())
