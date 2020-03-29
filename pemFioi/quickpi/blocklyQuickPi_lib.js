@@ -3414,36 +3414,26 @@ var getContext = function (display, infos, curLevel) {
                 });
             }
         } else if (percentage != 0) {
-
-            var startingpath = ["M", startx,
-                    ypositionmiddle,
-                    "L", startx,
-                    ypositionmiddle];
-
-            var targetpath = ["M", startx,
-                    ypositionmiddle,
-                    "L", startx + stateLenght,
-                    ypositionmiddle];
-
-
-            if (type == "expected")
-            {
-                var stateline = paper.path(targetpath);
-            }
-            else
-            {
-                var stateline = paper.path(startingpath);
-                stateline.animate({path: targetpath}, 200);
+            if (type == "wrong" || type == "actual") {
+                ypositionmiddle += 2;
             }
 
+            if (type == "expected") {
+                var c = paper.rect(startx, ypositionmiddle, stateLenght, strokewidth);
+                c.attr({
+                    "stroke": "none",
+                    "fill": color,
+                });
 
+            } else {
+                var c = paper.rect(startx, ypositionmiddle, 0, strokewidth);
+                c.attr({
+                    "stroke": "none",
+                    "fill": color,
+                });
 
-            stateline.attr({
-                "stroke-width": strokewidth,
-                "stroke": color,
-                "stroke-linejoin": "round",
-                "stroke-linecap": "round"
-            });
+                c.animate({ width: stateLenght }, 200);
+            }
         }
 
         if (type == "wrong") {
