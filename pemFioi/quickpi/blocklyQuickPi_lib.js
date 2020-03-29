@@ -1388,17 +1388,21 @@ var getContext = function (display, infos, curLevel) {
                 for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
                     var state = context.gradingStatesBySensor[sensorStates][i];
 
-                    if (testEnded) {
-                        if (!state.hit) {
-                            context.success = false;
-                            throw (getWrongStateText(state));
+                    if ((testEnded && !state.hit) || 
+                        (lastTurn && state.time > context.currentTime)) {
+
+                        if(typeof state.lastSeenState != 'undefined') {
+                            // Check whether the state has been validated
+                            // without state modification
+                            var sensorDef = findSensorDefinition(state);
+                            if(sensorDef.compareState(state.state, state.lastSeenState)) {
+                                continue;
+                            }
                         }
-                    }
-                    else if (state.time > context.currentTime) {
-                        if (lastTurn) {
-                            context.success = false;
-                            throw (getWrongStateText(state));
-                        }
+
+                        // Missed expected state
+                        context.success = false;
+                        throw (getWrongStateText(state));
                     }
                 }
             }
