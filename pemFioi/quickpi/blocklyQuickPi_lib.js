@@ -285,7 +285,7 @@ var getContext = function (display, infos, curLevel) {
                 sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
                 manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test échoué : {0} a été dans un l'état {1} au lieu de {2}.",
+                wrongState: "Test échoué : {0} a été dans un l'état {1} au lieu de {2} à t={3}ms.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -1317,7 +1317,7 @@ var getContext = function (display, infos, curLevel) {
             badStateStr = sensorDef.getStateString(state.lastSeenState);
             expectedStateStr = sensorDef.getStateString(state.state);
         }
-        return strings.messages.wrongState.format(state.name, badStateStr, expectedStateStr);
+        return strings.messages.wrongState.format(state.name, badStateStr, expectedStateStr, state.time);
     }
 
     function getCurrentBoard() {
