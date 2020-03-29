@@ -5476,23 +5476,6 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.isButtonPressedWithName = context.quickpi.isButtonPressed;
 
-    context.quickpi.toggleLedState = function (name, callback) {
-        var sensor = findSensorByName(name, true);
-
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState(name);
-
-            context.runner.noDelay(callback, state);
-        } else {
-            var cb = context.runner.waitCallback(callback);
-
-            context.quickPiConnection.sendCommand("toggleLedState(\"" + name + "\")", function (returnVal) {
-                cb(returnVal != "0");
-            });
-        }
-    };
-
-
     context.quickpi.buttonWasPressed = function (name, callback) {
         var sensor = findSensorByName(name, true);
 
@@ -5685,7 +5668,7 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByName(name, true);
 
         var command = "toggleLedState(\"" + name + "\")";
-        var state = context.getSensorState(name);
+        var state = sensor.state;
 
         context.registerQuickPiEvent(name, !state);
 
@@ -5694,7 +5677,7 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
 
-            context.quickPiConnection.sendCommand(command, cb);
+            context.quickPiConnection.sendCommand(command, function(returnVal) { return returnVal != "0"; });
         }
     };
 
