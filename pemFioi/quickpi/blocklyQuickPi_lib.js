@@ -63,7 +63,6 @@ var buzzerSound = {
         this.channels[channel].muted = true;
         this.channels[channel].oscillator && this.channels[channel].oscillator.stop();
         delete this.channels[channel].oscillator;
-        console.log(channel, this.channels[channel])
     },
 
     unmute: function(channel) {
@@ -77,8 +76,6 @@ var buzzerSound = {
         if(this.channels[channel].freq) {
             this.channels[channel].oscillator = this.startOscillator(this.channels[channel].freq);
         }
-
-        console.log(channel, this.channels[channel])
     },
 
     isMuted: function(channel) {
