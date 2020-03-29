@@ -607,9 +607,6 @@ var getContext = function (display, infos, curLevel) {
                 else
                     return 0;
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setLedState(\"" + sensor.name + "\"," + ledstate + ")";
@@ -672,9 +669,6 @@ var getContext = function (display, infos, curLevel) {
                 else
                     return 0;
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setBuzzerState(\"" + sensor.name + "\"," + ledstate + ")";
@@ -718,9 +712,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 180);
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             setLiveState: function (sensor, state, callback) {
                 var command = "setServoAngle(\"" + sensor.name + "\"," + state + ")";
@@ -806,9 +797,6 @@ var getContext = function (display, infos, curLevel) {
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 60);
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             setLiveState: function (sensor, state, callback) {
                 var ledstate = state ? 1 : 0;
                 var command = "setInfraredState(\"" + sensor.name + "\"," + ledstate + ")";
@@ -839,9 +827,6 @@ var getContext = function (display, infos, curLevel) {
                     return 1;
                 else
                     return 0;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("buttonStateInPort(\"" + sensor.name + "\")", function (retVal) {
@@ -924,9 +909,6 @@ var getContext = function (display, infos, curLevel) {
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 60);
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readTemperature(\"" + sensor.name + "\")", function(val) {
                     val = Math.round(val);
@@ -968,9 +950,6 @@ var getContext = function (display, infos, curLevel) {
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 100);
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readRotaryAngle(\"" + sensor.name + "\")", function(val) {
                     val = Math.round(val);
@@ -995,9 +974,6 @@ var getContext = function (display, infos, curLevel) {
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 100);
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readLightIntensity(\"" + sensor.name + "\")", function(val) {
                     val = Math.round(val);
@@ -1020,9 +996,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 500);
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readDistance(\"" + sensor.name + "\")", function(val) {
@@ -1060,9 +1033,6 @@ var getContext = function (display, infos, curLevel) {
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 100);
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readHumidity(\"" + sensor.name + "\")", function(val) {
                     val = Math.round(val);
@@ -1086,9 +1056,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 100);
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readSoundLevel(\"" + sensor.name + "\")", function(val) {
@@ -1115,9 +1082,6 @@ var getContext = function (display, infos, curLevel) {
                 var value = ((percentage * 156.96) - 78.48);
                 return parseFloat(value.toFixed(1));
             },
-            compareState: function (state1, state2) {
-                return state1 == state2;
-            },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readAccelBMI160()", function(val) {
                     var array = JSON.parse(val);
@@ -1140,9 +1104,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 250) - 125;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readGyroBMI160()", function(val) {
@@ -1170,9 +1131,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 3200) - 1600;
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("readMagnetometerLSM303C(False)", function(val) {
@@ -1202,9 +1160,6 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateFromPercentage: function (percentage) {
                 return Math.round(percentage * 60);
-            },
-            compareState: function (state1, state2) {
-                return state1 == state2;
             },
             getLiveState: function (sensor, callback) {
                 context.quickPiConnection.sendCommand("buttonStateInPort(\"" + sensor.name + "\")", function (retVal) {
@@ -1287,6 +1242,7 @@ var getContext = function (display, infos, curLevel) {
 
 
     function findSensorDefinition(sensor) {
+        var sensorDef = null;
         for (var iType = 0; iType < sensorDefinitions.length; iType++) {
             var type = sensorDefinitions[iType];
 
@@ -1297,16 +1253,22 @@ var getContext = function (display, infos, curLevel) {
                         var subType = type.subTypes[iSubType];
 
                         if (subType.subType == sensor.subType) {
-                            return $.extend({}, type, subType);
+                            sensorDef = $.extend({}, type, subType);
                         }
                     }
                 } else {
-                    return type;
+                    sensorDef = type;
                 }
             }
         }
 
-        return null;
+        if(sensorDef && !sensorDef.compareState) {
+            sensorDef.compareState = function(state1, state2) {
+                return state1 == state2;
+            };
+        }
+
+        return sensorDef;
     }
 
     function getWrongStateText(state) {
