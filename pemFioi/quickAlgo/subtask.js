@@ -396,10 +396,12 @@ var initBlocklySubTask = function(subTask, language) {
          if(this.context.runner) {
             this.context.runner.stop();
          }
-         window.quickAlgoInterface.displayError(null);
          initContextForLevel(newTest);
-         if(subTask.context.display) {
-            window.quickAlgoInterface.updateTestSelector(newTest);
+         if(window.quickAlgoInterface) {
+            window.quickAlgoInterface.displayError(null);
+            if(subTask.context.display) {
+               window.quickAlgoInterface.updateTestSelector(newTest);
+            }
          }
       }
    };

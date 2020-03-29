@@ -267,6 +267,10 @@ function initBlocklyRunner(context, messageCallback) {
             context.blocklyHelper.glowBlock(null);
          }
 
+         if(window.quickAlgoInterface) {
+            window.quickAlgoInterface.setPlayPause(false);
+         }
+
          runner.nbActions = 0;
          runner.stepInProgress = false;
          runner.stepMode = false;
