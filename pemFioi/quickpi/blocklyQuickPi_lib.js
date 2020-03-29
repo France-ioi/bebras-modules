@@ -1491,7 +1491,7 @@ var getContext = function (display, infos, curLevel) {
                     !context.findSensor(builtinsensor.type, builtinsensor.port, false))
                 {
                     sensor.port = builtinsensor.port;
-                    sensor.subType = builtinsensor.subType;
+                    return;
                 }
             }
 
@@ -1505,6 +1505,7 @@ var getContext = function (display, infos, curLevel) {
                 {
                     sensor.port = builtinsensor.port;
                     sensor.subType = builtinsensor.subType;
+                    return;
                 }
             }
 
@@ -1516,6 +1517,7 @@ var getContext = function (display, infos, curLevel) {
                     if (builtinsensor.type == "stick")
                     {
                         sensor.port = builtinsensor.port;
+                        return;
                     }
                 }
             }
@@ -1541,7 +1543,7 @@ var getContext = function (display, infos, curLevel) {
 
                                 if (!sensor.subType)
                                     sensor.subType = subTypeDefinition.subType;
-                                break;
+                                return;
                             }
                         }
                     }
@@ -1553,7 +1555,7 @@ var getContext = function (display, infos, curLevel) {
                         var port = sensorDefinition.portType + ports[iPorts];
                         if (!findSensorByPort(port)) {
                             sensor.port = port;
-                            break;
+                            return;
                         }
                     }
                 }
