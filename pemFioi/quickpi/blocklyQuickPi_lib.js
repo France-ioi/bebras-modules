@@ -1836,7 +1836,7 @@ var getContext = function (display, infos, curLevel) {
 
 
 
-    context.board = "grovepi";
+    context.board = "quickpi";
 
     if (getSessionStorage('board'))
         context.changeBoard(getSessionStorage('board'))
@@ -3297,21 +3297,30 @@ var getContext = function (display, infos, curLevel) {
                 "stroke-linecap": "round"
             });
         } else if (sensor.type == "stick") {
+            var stateToFA = [
+                "\uf062",
+                "\uf063",
+                "\uf060",
+                "\uf061",
+                "\uf111",
+            ]
+            
 
             var spacing = sensor.drawInfo.height / 5;
             for (var i = 0; i < 5; i++)
             {
                 if (state && state[i])
                 {
+                    var ypos = sensor.drawInfo.y + (i * spacing);
                     var startingpath = ["M", startx,
-                            sensor.drawInfo.y + (i * spacing),
+                            ypos,
                             "L", startx,
-                            sensor.drawInfo.y + (i * spacing)];
+                            ypos];
 
                     var targetpath = ["M", startx,
-                            sensor.drawInfo.y + (i * spacing),
+                            ypos,
                             "L", startx + stateLenght,
-                            sensor.drawInfo.y + (i * spacing)];
+                            ypos];
 
                     if (type == "expected")
                     {
@@ -3329,6 +3338,20 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linejoin": "round",
                         "stroke-linecap": "round"
                     });
+
+                    if (type == "expected") {
+                        sensor.stateArrow = paper.text(startx, ypos, stateToFA[i]);
+
+                        sensor.stateArrow.attr({
+                            "font": "Font Awesome 5 Free",
+                            "stroke": color,
+                            "fill": color,
+                            "font-size": (strokewidth * 2) + "px"
+                        });
+        
+                        sensor.stateArrow.node.style.fontFamily = '"Font Awesome 5 Free"';
+                        sensor.stateArrow.node.style.fontWeight = "bold";
+                    }
                 }
             }
 
@@ -4787,45 +4810,47 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.stateText)
                sensor.stateText.remove();
 
-            if (sensor.state) {
-                var stateString = "";
+            if (!sensor.state)
+                sensor.state = [false, false, false, false, false];
 
-                if (sensor.state[0]) {
-                    stateString += "UP\n"
-                    sensor.imgup.attr({ "opacity": 1 });
-                }
-                if (sensor.state[1]) {
-                    stateString += "DOWN\n"
-                    sensor.imgdown.attr({ "opacity": 1 });
-                }
-                if (sensor.state[2]) {
-                    stateString += "LEFT\n"
-                    sensor.imgleft.attr({ "opacity": 1 });
-                }
-                if (sensor.state[3]) {
-                    stateString += "RIGHT\n"
-                    sensor.imgright.attr({ "opacity": 1 });
-                }
-                if (sensor.state[4]) {
-                    stateString += "CENTER\n"
-                    sensor.imgcenter.attr({ "opacity": 1 });
-                }
+            var stateString = "";
+            if (sensor.state[0]) {
+                stateString += "UP\n"
+                sensor.imgup.attr({ "opacity": 1 });
+            }
+            if (sensor.state[1]) {
+                stateString += "DOWN\n"
+                sensor.imgdown.attr({ "opacity": 1 });
+            }
+            if (sensor.state[2]) {
+                stateString += "LEFT\n"
+                sensor.imgleft.attr({ "opacity": 1 });
+            }
+            if (sensor.state[3]) {
+                stateString += "RIGHT\n"
+                sensor.imgright.attr({ "opacity": 1 });
+            }
+            if (sensor.state[4]) {
+                stateString += "CENTER\n"
+                sensor.imgcenter.attr({ "opacity": 1 });
+            }
 
-                if (sensor.portText)
-                    sensor.portText.remove();
+            sensor.stateText = paper.text(state1x, state1y, stateString);
 
+            if (sensor.portText)
+                sensor.portText.remove();
 
-                drawPortText = false;
+            drawPortText = false;
 
-                if (sensor.portText)
-                    sensor.portText.remove();
+            if (sensor.portText)
+                sensor.portText.remove();
 
+            if (!context.autoGrading) {
                 var gpios = findSensorDefinition(sensor).gpios;
                 var min = 255;
                 var max = 0;
 
-                for (var i = 0; i < gpios.length; i++)
-                {
+                for (var i = 0; i < gpios.length; i++) {
                     if (gpios[i] > max)
                         max = gpios[i];
 
@@ -4833,18 +4858,18 @@ var getContext = function (display, infos, curLevel) {
                         min = gpios[i];
                 }
 
-
                 sensor.portText = paper.text(portx, porty, "D" + min.toString() + "-D" + max.toString() + "?");
                 sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
                 sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
                 var b = sensor.portText._getBBox();
-                sensor.portText.translate(0,b.height/2);
+                sensor.portText.translate(0, b.height / 2);
 
                 $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
                 $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
                 $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
                 $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
                 $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+
 
                 sensor.portText.click(function () {
                     window.displayHelper.showPopupDialog(strings.messages.stickPortsDialog);
@@ -4878,12 +4903,8 @@ var getContext = function (display, infos, curLevel) {
                     $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
 
                 });
-
-
-                sensor.stateText = paper.text(state1x, state1y, stateString);
-            } else {
-                sensor.state = [false, false, false, false, false];
             }
+
 
             function poinInRect(rect, x, y) {
 
