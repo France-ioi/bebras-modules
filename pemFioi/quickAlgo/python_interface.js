@@ -658,12 +658,6 @@ function LogicController(nbTestCases, maxInstructions) {
     });
     $('.pythonIntroSelect select').on('change', function() {
       updateIntroSelect(this);
-
-      var code = $(this).find('option:selected').attr('data-code');
-      if(controller._aceEditor) {
-        controller._aceEditor.insert(code);
-        controller._aceEditor.focus();
-      }
     });
   };
 
