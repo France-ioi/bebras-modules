@@ -1388,7 +1388,7 @@ var getContext = function (display, infos, curLevel) {
             if (!testEnded) { return; }
 
             if (lastTurn && context.display && !context.loopsForever) {
-                context.currentTime = context.maxTime;
+                context.currentTime = Math.floor(context.maxTime * 1.05);
                 drawNewStateChanges();
                 drawCurrentTime();
             }
@@ -2026,7 +2026,7 @@ var getContext = function (display, infos, curLevel) {
                 maxTime = 1000;
 
             if (!context.loopsForever)
-                maxTime = maxTime + 1000;
+                maxTime = Math.floor(maxTime * 1.05);
 
             context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
 
@@ -2061,7 +2061,7 @@ var getContext = function (display, infos, curLevel) {
                     drawSensorTimeLineState(sensor, lastState, state.time, context.maxTime, "expected", true);
                     
                     if (!context.loopsForever)
-                        drawSensorTimeLineState(sensor, lastState, startTime, state.time + 1000, "finnish", false);
+                        drawSensorTimeLineState(sensor, lastState, startTime, maxTime, "finnish", false);
 
                     sensor.lastAnalogState = null;
                 }
