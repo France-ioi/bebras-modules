@@ -429,12 +429,14 @@ var initBlocklySubTask = function(subTask, language) {
       // XXX :: Related to platform-pr.js#L67 : why does it start two
       // evaluations at the same time? This can cause serious issues with the
       // Python runner, and on some contexts such as quick-pi
-      if(subTask.isValidating) {
-         setTimeout(function() { subTask.getGrade(callback, display, mainTestCase); }, 2000);
-         console.log("Queueing validation...");
+      if(window.subTaskValidating && window.subTaskValidationAttempts < 5) {
+         setTimeout(function() { subTask.getGrade(callback, display, mainTestCase); }, 1000);
+         window.subTaskValidationAttempts += 1;
+         console.log("Queueing validation... (attempt " + window.subTaskValidationAttempts + ")");
          return;
       }
-      subTask.isValidating = true;
+      window.subTaskValidationAttempts = 0;
+      window.subTaskValidating = true;
 
       var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
@@ -450,7 +452,7 @@ var initBlocklySubTask = function(subTask, language) {
             iTestCase: 0
          };
          subTask.context.changeDelay(oldDelay);
-         subTask.isValidating = false;
+         window.subTaskValidating = false;
          callback(results);
          return;
       }
@@ -553,7 +555,7 @@ var initBlocklySubTask = function(subTask, language) {
             fullResults: subTask.testCaseResults
             };*/
          subTask.context.changeDelay(oldDelay);
-         subTask.isValidating = false;
+         window.subTaskValidating = false;
          callback(results);
          window.quickAlgoInterface.updateBestAnswerStatus();
       }
