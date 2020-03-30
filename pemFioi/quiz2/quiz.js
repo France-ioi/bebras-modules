@@ -230,11 +230,11 @@ Quiz.UI = function(params) {
         },
 
         toggleSolutions: function(visible) {
+            $('#solution').toggle(visible);
             $('#task').toggleClass('displaySolution', visible);
         },
 
         displayFeedback: function(feedback) {
-            console.log(feedback)
             for(var i=0; i<feedback.length; i++) {
                 if(!questions[i].checkAnswered(lang.translate('wrong_answer_msg_not_answered'))) {
                     continue;
