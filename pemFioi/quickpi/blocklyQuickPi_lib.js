@@ -3560,7 +3560,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state += step;
             }
 
-            drawSensor(sensor, sensor.state, true);
+            drawSensor(sensor, true);
         });
 
 
@@ -3591,7 +3591,7 @@ var getContext = function (display, infos, curLevel) {
                     sensor.state -= step;
             }
 
-            drawSensor(sensor, sensor.state, true);
+            drawSensor(sensor, true);
         });
 
 
@@ -3637,7 +3637,7 @@ var getContext = function (display, infos, curLevel) {
                 } else {
                     sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
                 }
-                drawSensor(sensor, sensor.state, true);
+                drawSensor(sensor, true);
             },
             function (x, y, event) {
                 sliderobj.sliderdata.zero = sliderobj.thumb.attr('y');
@@ -3708,7 +3708,7 @@ var getContext = function (display, infos, curLevel) {
                 var percentage = 1 - ((newy - sensor.sliders[0].sliderdata.insiderecty) / sensor.sliders[0].sliderdata.scale);
 
                 sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
-                drawSensor(sensor, sensor.state, true);
+                drawSensor(sensor, true);
 
                 actuallydragged++;
             },
@@ -3793,7 +3793,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function drawSensor(sensor, state = true, juststate = false, donotmovefocusrect = false) {
+    function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
 
@@ -3947,6 +3947,38 @@ var getContext = function (display, infos, curLevel) {
                 buzzerSound.stop(sensor.name);
             }
 
+            if(!juststate) {
+                if(sensor.muteBtn) {
+                    sensor.muteBtn.remove();
+                }
+                
+
+                var muteBtnSize = sensor.drawInfo.width * 0.15;
+                sensor.muteBtn = paper.text(
+                    state1x, 
+                    state1y + imgh / 2, 
+                    buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028"
+                );
+                sensor.muteBtn.node.style.fontWeight = "bold";           
+                sensor.muteBtn.node.style.cursor = "default";           
+                sensor.muteBtn.node.style.MozUserSelect = "none";
+                sensor.muteBtn.node.style.WebkitUserSelect = "none";
+                sensor.muteBtn.attr({
+                    "font-size": muteBtnSize + "px",                
+                    fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
+                    "font-family": '"Font Awesome 5 Free"',
+                    'text-anchor': 'start'
+                });            
+                sensor.muteBtn.click(function () {
+                    if(buzzerSound.isMuted(sensor.name)) {
+                        buzzerSound.unmute(sensor.name)
+                    } else {
+                        buzzerSound.mute(sensor.name)
+                    }
+                    drawSensor(sensor);
+                });
+            }            
+
 
             if (!sensor.buzzeron || !sensor.buzzeron.paper.canvas)
                 sensor.buzzeron = paper.image(getImg('buzzer-ringing.png'), imgx, imgy, imgw, imgh);
@@ -3970,7 +4002,7 @@ var getContext = function (display, infos, curLevel) {
 
                         if (!sensor.removed) {
                             sensor.ringingState = !sensor.ringingState;
-                            drawSensor(sensor, true, false, true);
+                            drawSensor(sensor, true, true);
                         } else {
                             clearInterval(sensor.buzzerInterval);
                         }
@@ -4017,35 +4049,6 @@ var getContext = function (display, infos, curLevel) {
             var stateText = findSensorDefinition(sensor).getStateString(sensor.state);
 
             sensor.stateText = paper.text(state1x, state1y, stateText);
-
-
-            if(sensor.muteBtn) {
-                sensor.muteBtn.remove();
-            }
-            var muteBtnSize = sensor.drawInfo.width * 0.15;
-            sensor.muteBtn = paper.text(
-                state1x, 
-                state1y + imgh / 2, 
-                buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028"
-            );
-            sensor.muteBtn.node.style.fontWeight = "bold";           
-            sensor.muteBtn.node.style.cursor = "default";           
-            sensor.muteBtn.node.style.MozUserSelect = "none";
-            sensor.muteBtn.node.style.WebkitUserSelect = "none";
-            sensor.muteBtn.attr({
-                "font-size": muteBtnSize + "px",                
-                fill: buzzerSound.isMuted(sensor.name) ? "lightgray" : "#468DDF",
-                "font-family": '"Font Awesome 5 Free"',
-                'text-anchor': 'start'
-            });            
-            sensor.muteBtn.click(function () {
-                if(buzzerSound.isMuted(sensor.name)) {
-                    buzzerSound.unmute(sensor.name)
-                } else {
-                    buzzerSound.mute(sensor.name)
-                }
-                drawSensor(sensor);
-            });
 
 
             if ((!context.runner || !context.runner.isRunning())
