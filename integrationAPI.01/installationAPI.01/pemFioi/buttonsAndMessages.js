@@ -1215,7 +1215,9 @@ window.displayHelper = {
    validate: function(mode) {
       this.stoppedShowingResult = false;
       var self = this;
-      if (mode == 'cancel') {
+      if (mode == 'log') {
+         // Ignore it? Do something?
+      } else if (mode == 'cancel') {
          this.savedAnswer = '';
          task.reloadAnswer('', function() {
             self.checkAnswerChanged();
