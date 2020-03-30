@@ -1317,15 +1317,15 @@ var getContext = function (display, infos, curLevel) {
         return sensorDef;
     }
 
-    function getWrongStateText(state) {
-        var sensorDef = findSensorDefinition(state);
-        var badStateStr = "" + state.lastSeenState;
-        var expectedStateStr = "" + state.state;
+    function getWrongStateText(failInfo) {
+        var actualStateStr = "" + failInfo.actual;
+        var expectedStateStr = "" + failInfo.expected;
+        var sensorDef = findSensorDefinition(failInfo);
         if(sensorDef && sensorDef.getStateString) {
-            badStateStr = sensorDef.getStateString(state.lastSeenState);
-            expectedStateStr = sensorDef.getStateString(state.state);
+            actualStateStr = sensorDef.getStateString(failInfo.actualState);
+            expectedStateStr = sensorDef.getStateString(failInfo.expectedState);
         }
-        return strings.messages.wrongState.format(state.name, badStateStr, expectedStateStr, state.time);
+        return strings.messages.wrongState.format(failInfo.name, actualStateStr, expectedStateStr, failInfo.time);
     }
 
     function getCurrentBoard() {
@@ -1385,53 +1385,91 @@ var getContext = function (display, infos, curLevel) {
         var testEnded = lastTurn || context.currentTime > context.maxTime;
 
         if (context.autoGrading) {
-            for (var sensorStates in context.gradingStatesBySensor) {
-                var sensor = findSensorByName(sensorStates);
+            if (!testEnded) { return; }
 
-                if (lastTurn && context.display && !context.loopsForever)
-                {
-                    drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.maxTime + 1000, "actual");
+            if (lastTurn && context.display && !context.loopsForever) {
+                context.currentTime = context.maxTime;
+                drawNewStateChanges();
+                drawCurrentTime();
+            }
+
+            var failInfo = null;
+
+            for(var sensorName in context.gradingStatesBySensor) {
+                // Cycle through each sensor from the grading states
+                var sensor = findSensorByName(sensorName);
+                var sensorDef = findSensorDefinition(sensor);
+
+                var expectedStates = context.gradingStatesBySensor[sensorName];
+                if(!expectedStates.length) { continue;}
+
+                var actualStates = context.actualStatesBySensor[sensorName];
+                var actualIdx = 0;
+
+                // Check that we went through all expected states
+                for (var i = 0; i < context.gradingStatesBySensor[sensorName].length; i++) {
+                    var expectedState = context.gradingStatesBySensor[sensorName][i];
+
+                    if(expectedState.hit) { continue; } // Was hit, valid
+                    var newFailInfo = null;
+                    if(actualStates) {
+                        // Scroll through actual states until we get the state at this time
+                        while(actualIdx + 1 < actualStates.length && actualStates[actualIdx+1].time <= expectedState.time) {
+                            actualIdx += 1;
+                        }
+                        if(!sensorDef.compareState(actualStates[actualIdx].state, expectedState.state)) {
+                            newFailInfo = {
+                                name: sensorName,
+                                time: expectedState.time,
+                                expected: expectedState.state,
+                                actual: actualStates[actualIdx].state
+                            };
+                        }
+                    } else {
+                        // No actual states to compare to
+                        newFailInfo = {
+                            name: sensorName,
+                            time: expectedState.time,
+                            expected: expectedState.state,
+                            actual: null
+                        };
+                    }
+
+                    if(newFailInfo) {
+                        // Only update failInfo if we found an error earlier
+                        failInfo = failInfo && failInfo.time < newFailInfo.time ? failInfo : newFailInfo;
+                    }
                 }
 
-                for (var i = 0; i < context.gradingStatesBySensor[sensorStates].length; i++) {
-                    var state = context.gradingStatesBySensor[sensorStates][i];
-
-                    if ((testEnded && !state.hit) || 
-                        (lastTurn && state.time > context.currentTime)) {
-
-                        if(typeof state.lastSeenState != 'undefined') {
-                            // Check whether the state has been validated
-                            // without state modification
-                            var sensorDef = findSensorDefinition(state);
-                            if(sensorDef.compareState(state.state, state.lastSeenState)) {
-                                continue;
-                            }
-                        }
-
-                        // Missed expected state
-                        context.success = false;
-                        throw (getWrongStateText(state));
+                // Check that no actual state conflicts an expected state
+                if(!actualStates) { continue; }
+                var expectedIdx = 0;
+                for(var i = 0; i < actualStates.length ; i++) {
+                    var actualState = actualStates[i];
+                    while(expectedIdx + 1 < expectedStates.length && expectedStates[expectedIdx+1].time <= actualState.time) {
+                        expectedIdx += 1;
+                    }
+                    if(!sensorDef.compareState(actualState.state, expectedStates[expectedIdx].state)) {
+                        // Got an unexpected state change
+                        var newFailInfo = {
+                            name: sensorName,
+                            time: actualState.time,
+                            expected: expectedStates[expectedIdx].state,
+                            actual: actualState.state
+                        };
+                        failInfo = failInfo && failInfo.time < newFailInfo.time ? failInfo : newFailInfo;
                     }
                 }
             }
 
-            if (lastTurn && context.display && !context.loopsForever)
-            {
-                context.currentTime += 1000;
-                drawCurrentTime();
-            }
-
-
-            if (testEnded) {
-                if (context.failedMessage) {
-                    context.success = false;
-                    throw (context.failedMessage);
-
-                }
-                else {
-                    context.success = true;
-                    throw (strings.messages.programEnded);
-                }
+            if(failInfo) {
+                // Missed expected state
+                context.success = false;
+                throw (getWrongStateText(failInfo));
+            } else {
+                // Success
+                context.success = true;
+                throw (strings.messages.programEnded);
             }
         } else {
             if (!context.offLineMode) {
@@ -1440,7 +1478,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = true;
-
                 throw (strings.messages.programEnded);
             }
         }
@@ -1618,14 +1655,14 @@ var getContext = function (display, infos, curLevel) {
             context.resetSensorTable();
         }
 
+        context.currentTime = 0;
         if (taskInfos != undefined) {
-            context.currentTime = 0;
+            context.actualStatesBySensor = {};
             context.tickIncrease = 0;
             context.autoGrading = taskInfos.autoGrading;
             context.loopsForever = taskInfos.loopsForever;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
-                context.failedMessage = null;
                 context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
@@ -1654,8 +1691,8 @@ var getContext = function (display, infos, curLevel) {
                         context.gradingStatesBySensor[state.name] = [];
 
                     context.gradingStatesBySensor[state.name].push(state);
-                    state.hit = false;
-                    state.badonce = false;
+//                    state.hit = false;
+//                    state.badonce = false;
 
                     if (state.time > context.maxTime)
                         context.maxTime = state.time;
@@ -1704,8 +1741,8 @@ var getContext = function (display, infos, curLevel) {
             var sensor = infos.quickPiSensors[iSensor];
 
             sensor.state = null;
-            sensor.lastState = 0;
-            sensor.lastStateChange = null;
+            sensor.lastDrawnTime = 0;
+            sensor.lastDrawnState = null;
             sensor.callsInTimeSlot = 0;
             sensor.lastTimeIncrease = 0;
             sensor.removed = false;
@@ -1829,8 +1866,6 @@ var getContext = function (display, infos, curLevel) {
                     newSensor.name = getSensorSuggestedName(sensor.type, sensor.suggestedName);
 
                     sensor.state = null;
-                    sensor.lastState = 0;
-                    sensor.lastStateChange = null;
                     sensor.callsInTimeSlot = 0;
                     sensor.lastTimeIncrease = 0;
 
@@ -1904,8 +1939,6 @@ var getContext = function (display, infos, curLevel) {
                     }
 
                     sensor.state = null;
-                    sensor.lastState = 0;
-                    sensor.lastStateChange = null;
                     sensor.callsInTimeSlot = 0;
                     sensor.lastTimeIncrease = 0;
 
@@ -2596,8 +2629,6 @@ var getContext = function (display, infos, curLevel) {
                 newSensor.name = getSensorSuggestedName(sensor.type, sensor.suggestedName);
 
                 sensor.state = null;
-                sensor.lastState = 0;
-                sensor.lastStateChange = null;
                 sensor.callsInTimeSlot = 0;
                 sensor.lastTimeIncrease = 0;
 
@@ -3454,7 +3485,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         // Make sure the current time bar is always on top of states
-        drawCurrentTime(sensor);
+        drawCurrentTime();
     }
 
     function getImg(filename) {
@@ -5151,64 +5182,73 @@ var getContext = function (display, infos, curLevel) {
         if (context.autoGrading && context.gradingStatesBySensor != undefined) {
             var fail = false;
             var type = "actual";
-            var expectedStates = context.getSensorExpectedState(sensor.name, true);
-            var expectedState = expectedStates.length > 0 ? expectedStates[0] : null;
 
-            if(expectedState)
-                expectedState.hit = true;
-            for(var i = 0 ; i < expectedStates.length ; i++) {
-                expectedStates[i].lastSeenState = newState;
+            if(!context.actualStatesBySensor[name]) {
+                context.actualStatesBySensor[name] = [];
             }
+            var actualStates = context.actualStatesBySensor[name];
 
-            if (sensor.lastStateChange == null) {
-                sensor.lastStateChange = 0;
-                sensor.lastState = 0;
-            }           
-
-            if (context.currentTime > context.maxTime) {
-                //context.success = true;
-                //throw (strings.messages.testSuccess);
-            }
-            else if (expectedState != null) {
-                if (!findSensorDefinition(sensor).compareState(expectedState.state, newState)) {
-
-                    if (!allowFail)
-                    {
-                        if (expectedState.badonce)
-                        {
-                            type = "wrong";
-                            fail = true;
-                            expectedState.badonce = false;
-                        }
-                        else {
-                            expectedState.badonce = true;
-                            expectedState.hit = false;
-                        }
-                    }
-
-                    type = "wrong";
+            var lastRealState = actualStates.length > 0 ? actualStates[actualStates.length-1] : null;
+            if(lastRealState) {
+                if(lastRealState.time == context.currentTime) {
+                    lastRealState.state = newState;
                 } else {
-                    type = "actual";                    
+                    actualStates.push({time: context.currentTime, state: newState});
                 }
             } else {
-                type = "wrong";
+                actualStates.push({time: context.currentTime, state: newState});
             }
 
-            drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, sensor.lastType);
-            
-            sensor.lastStateChange = context.currentTime;
-            sensor.lastState = newState;
-            sensor.lastType = type;
+            drawNewStateChangesSensor(name, newState);
 
-            if (fail) {
-                if (!allowFail)
-                    context.failedMessage = getWrongStateText(expectedState);
-            }
-            else
-                context.increaseTime(sensor);
+            context.increaseTime(sensor);
         }
     }
 
+    function drawNewStateChangesSensor(name, newState=null) {
+        var sensor = findSensorByName(name);
+        if (!sensor) {
+            context.success = false;
+            throw (strings.messages.sensorNotFound.format(name));
+        }
+
+        if(sensor.lastDrawnState !== null && context.currentTime > sensor.lastDrawnTime) {
+            // Draw the line up to now
+            var type = "actual";
+            // Check the previous state
+            var expectedState = context.getSensorExpectedState(name, sensor.lastDrawnTime);
+            if(expectedState !== null && sensor.lastDrawnState != expectedState.state) {
+                type = "wrong";
+            }
+            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type);
+        }
+
+        sensor.lastDrawnTime = context.currentTime;
+
+        if(newState !== null && sensor.lastDrawnState != newState) {
+            // Draw the new state change
+            if(sensor.lastDrawnState === null) {
+                sensor.lastDrawnState = newState;
+            }
+
+            var type = "actual";
+            // Check the new state
+            var expectedState = context.getSensorExpectedState(name, context.currentTime);
+            if(expectedState !== null && newState != expectedState.state) {
+                type = "wrong";
+            }
+            drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type);
+            sensor.lastDrawnState = newState;
+        }
+    }
+
+    function drawNewStateChanges() {
+        // Draw all sensors
+        if(!context.gradingStatesBySensor) { return; }
+        for(var sensorName in context.gradingStatesBySensor) {
+            drawNewStateChangesSensor(sensorName);
+        }
+    }
 
     context.increaseTime = function (sensor) {
         if(!context.autoGrading) { return; }
@@ -5236,6 +5276,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         drawCurrentTime();
+        drawNewStateChanges();
 
         if(context.runner) {
             // Tell the runner an "action" happened
@@ -5278,10 +5319,16 @@ var getContext = function (display, infos, curLevel) {
         }
 
         context.currentTime = newTime;
+
+        drawCurrentTime();
+        drawNewStateChanges();
     }
 
-    context.getSensorExpectedState = function (name, getAll) {
+    context.getSensorExpectedState = function (name, targetTime = null) {
         var state = null;
+        if(targetTime === null) {
+            targetTime = context.currentTime;
+        }
 
         if (!context.gradingStatesBySensor)
         {
@@ -5294,7 +5341,6 @@ var getContext = function (display, infos, curLevel) {
             actualname = parts[0];
         }
 
-
         var sensorStates = context.gradingStatesBySensor[actualname];
 
         if (!sensorStates)
@@ -5304,8 +5350,8 @@ var getContext = function (display, infos, curLevel) {
         var startTime = -1;
         for (var idx = 0; idx < sensorStates.length; idx++) {
             if (startTime >= 0) {
-                if (context.currentTime >= startTime &&
-                    context.currentTime < sensorStates[idx].time) {
+                if (targetTime >= startTime &&
+                    targetTime < sensorStates[idx].time) {
                     state = lastState;
                     break;
                 }
@@ -5316,16 +5362,11 @@ var getContext = function (display, infos, curLevel) {
         }
 
         // This is the end state
-        if (state == null && context.currentTime >= startTime) {
+        if (state == null && targetTime >= startTime) {
             state = lastState;
-            idx = sensorStates.length;
         }
 
-        if(getAll) {
-            return sensorStates.slice(idx-1);
-        } else {
-            return state;
-        }
+        return state;
     }
 
 
@@ -5358,14 +5399,7 @@ var getContext = function (display, infos, curLevel) {
             drawSensor(sensor);
         }
 
-        if (sensor.lastStateChange == null) {
-            sensor.lastStateChange = 0;
-            sensor.lastState = 0;
-        }
-
-        drawSensorTimeLineState(sensor, sensor.lastState, sensor.lastStateChange, context.currentTime, "actual");
-        sensor.lastStateChange = context.currentTime;
-        sensor.lastState = state;
+        drawNewStateChangesSensor(sensor.name, sensor.state);
 
         context.increaseTime(sensor);
 
