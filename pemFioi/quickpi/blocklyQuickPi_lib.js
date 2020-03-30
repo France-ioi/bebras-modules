@@ -1317,13 +1317,13 @@ var getContext = function (display, infos, curLevel) {
         return sensorDef;
     }
 
-    function getWrongStateText(failInfo) {
+    function getWrongStateText(sensor, failInfo) {
         var actualStateStr = "" + failInfo.actual;
         var expectedStateStr = "" + failInfo.expected;
-        var sensorDef = findSensorDefinition(failInfo);
+        var sensorDef = findSensorDefinition(sensor);
         if(sensorDef && sensorDef.getStateString) {
-            actualStateStr = sensorDef.getStateString(failInfo.actualState);
-            expectedStateStr = sensorDef.getStateString(failInfo.expectedState);
+            actualStateStr = sensorDef.getStateString(failInfo.actual);
+            expectedStateStr = sensorDef.getStateString(failInfo.expected);
         }
         return strings.messages.wrongState.format(failInfo.name, actualStateStr, expectedStateStr, failInfo.time);
     }
@@ -1465,7 +1465,7 @@ var getContext = function (display, infos, curLevel) {
             if(failInfo) {
                 // Missed expected state
                 context.success = false;
-                throw (getWrongStateText(failInfo));
+                throw (getWrongStateText(sensor, failInfo));
             } else {
                 // Success
                 context.success = true;
@@ -3416,7 +3416,7 @@ var getContext = function (display, infos, curLevel) {
 
                 function showPopup() {
                     if (!sensor.tooltip) {
-                        sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + state.line2);
+                        sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + (state.line2 ? state.line2 : ""));
 
                         var textDimensions = sensor.tooltipText.getBBox();
 
