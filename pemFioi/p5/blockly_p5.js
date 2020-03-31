@@ -169,7 +169,7 @@ var getContext = function(display, infos, curLevel) {
 
         player = new PlayerP5({
             parent: $('#grid')[0],
-            filesRepository: task_files.getFile
+            filesRepository: task_files
         });
 
         logger = new Logger({
