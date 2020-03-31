@@ -126,7 +126,7 @@ var getContext = function (display, infos, curLevel) {
                 isBuzzerOn: "buzzer allumé",
                 isBuzzerOnWithName: "buzzer %1 allumé",
 
-                setBuzzerNote: "jouer la fréquence %2 sur %1",
+                setBuzzerNote: "jouer la fréquence %2Hz sur %1",
                 getBuzzerNote: "fréquence du buzzer %1",
 
                 isButtonPressed: "bouton enfoncé",
@@ -331,7 +331,7 @@ var getContext = function (display, infos, curLevel) {
                 sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
                 manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test échoué : {0} a été dans un l'état {1} au lieu de {2} à t={3}ms.",
+                wrongState: "Test échoué : {0} a été dans l'état {1} au lieu de {2} à t={3}ms.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
