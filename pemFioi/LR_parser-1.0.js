@@ -56,6 +56,7 @@ function LR_Parser(settings,subTask,answer) {
    this.visualGraphJSON = settings.visualGraphJSON;
 
    this.stackPreview;
+   this.stackPreviewElements;
    var stackPreviewW = 50;
    var stackPreviewH;
 
@@ -96,7 +97,8 @@ function LR_Parser(settings,subTask,answer) {
       yellow: "#f7aa28",
       lightgrey: "#f2f2f2",
       blue: "#4990e2",
-      lightBlue: "#cbddf3"
+      lightBlue: "#cbddf3",
+      greyBlue: "#aec6e2"
    };
    this.unselectedTabAttr = {
       opacity: 0.5
@@ -245,7 +247,20 @@ function LR_Parser(settings,subTask,answer) {
       },
       symbol: {
          "font-size": 12,
-         "font-weight": "bold"
+         "font-weight": "bold",
+         fill: this.colors.black
+      },
+      previousCircle: {
+         fill: this.colors.greyBlue
+      },
+      previousLine: {
+         stroke: this.colors.greyBlue
+      },
+      previousSymbolCircle: {
+         stroke: this.colors.greyBlue
+      },
+      previousSymbol: {
+         fill: this.colors.greyBlue
       }
    };
 
@@ -1248,7 +1263,7 @@ function LR_Parser(settings,subTask,answer) {
             var rule = action.rule;
             // console.log(this.grammar.rules[rule])
             var nonTerminal = self.grammar.rules[rule].nonterminal;
-            self.updateParseTable({action:"startReduction",nonTerminal:nonTerminal,anim:anim});
+            self.updateParseTable({action:"startReduction",nonTerminal:nonTerminal,anim:anim,rule:rule,goto:action.goto});
             if(reverse){
                this.reverseReduction(rule);
                return;
@@ -2176,6 +2191,7 @@ function LR_Parser(settings,subTask,answer) {
 
       if(action == "startReduction" && anim){
          /* column selector change color + goto column selector appears */
+         this.updateStackPreview(data.rule,data.goto);
          if(this.removeGotoColHL){
             this.removeGotoColHL = false;
             this.gotoColHL.remove();
@@ -2242,45 +2258,72 @@ function LR_Parser(settings,subTask,answer) {
          }
       }
       // console.log(this.inputIndex+" "+this.input)
-      this.updateStackPreview();
+      if(!newStackElement){
+         this.updateStackPreview();
+      }
    };
 
-   this.updateStackPreview = function() {
-      this.stackPreview.clear();
+   this.updateStackPreview = function(rule,goto) {
       var attr = this.stackPreviewAttr;
+      var localStack = JSON.parse(JSON.stringify(this.stack));
+      if(rule || rule == 0){
+         this.stackPreviewElements.circle.attr(attr.previousCircle);
+         this.stackPreviewElements.line.attr(attr.previousLine);
+         this.stackPreviewElements.letterCircle.attr(attr.previousSymbolCircle);
+         this.stackPreviewElements.letter.attr(attr.previousSymbol);
+         var ruleData = this.grammar.rules[rule];
+         var dev = ruleData.development;
+         var nonTerminal = ruleData.nonterminal;
+         var newStackElement = [goto,nonTerminal];
+         var index = localStack.length - dev.length;
+         localStack.splice(index,dev.length,newStackElement);
+      }else{
+         // if(this.stackElements){
+         //    this.stackElements.remove();
+         // }
+         this.stackPreview.clear();
+      }
       var tableW = $("#"+this.parseTableID+" table").width();
       var tableH = $("#"+this.parseTableID+" table").height();
       var tablePos = $("#"+this.parseTableID+" table").position();
       var tableMarginLeft = ($("#"+this.parseTableID).width() - tableW)/2;
       var headerH = $("#"+this.parseTableID+" table th:first-child").outerHeight();
       stackPreviewH = tableH + 4;
-      stackPreviewW = this.stack.length*attr.colW;
+      stackPreviewW = Math.max(localStack.length,this.stack.length)*attr.colW;
       this.stackPreview.setSize(stackPreviewW,stackPreviewH);
       $("#stackPreview").css({
          position: "absolute",
          top: 0,
          left: tableMarginLeft - stackPreviewW - 2
       });
-      this.stackPreview.rect(0,headerH,stackPreviewW,stackPreviewH - headerH).attr(attr.background);
+      this.stackPreview.rect(0,headerH,stackPreviewW,stackPreviewH - headerH).attr(attr.background).toBack();
       var lastPos = null;
       var x = stackPreviewW/2;
-      for(var iElem = 0; iElem < this.stack.length; iElem++){
-         var elem = this.stack[iElem];
+
+      // this.stackPreview.setStart();
+      this.stackPreviewElements = {circle:this.stackPreview.set(),line:this.stackPreview.set(),letterCircle:this.stackPreview.set(),letter:this.stackPreview.set()};
+      for(var iElem = 0; iElem < localStack.length; iElem++){
+         var elem = localStack[iElem];
          var state = elem[0];
          var symbol = elem[1];
          var line = $("#"+this.parseTableID+" td[data_state=\""+state+"\"]");
          var x = (iElem + 1/2)*attr.colW;
          var y = line.position().top + line.outerHeight()/2;
-         this.stackPreview.circle(x,y).attr(attr.circle);
+         var circle = this.stackPreview.circle(x,y).attr(attr.circle);
+         this.stackPreviewElements.circle.push(circle);
          if(lastPos){
-            this.stackPreview.path("M"+lastPos.x+" "+lastPos.y+",L"+x+" "+y).attr(attr.line);
+            var line = this.stackPreview.path("M"+lastPos.x+" "+lastPos.y+",L"+x+" "+y).attr(attr.line);
             var xSymbol = (x + lastPos.x)/2;
             var ySymbol = (y + lastPos.y)/2;
-            this.stackPreview.circle(xSymbol,ySymbol).attr(attr.symbolCircle);
-            this.stackPreview.text(xSymbol,ySymbol,symbol).attr(attr.symbol);
+            var letterCircle = this.stackPreview.circle(xSymbol,ySymbol).attr(attr.symbolCircle);
+            var letter = this.stackPreview.text(xSymbol,ySymbol,symbol).attr(attr.symbol);
+            this.stackPreviewElements.line.push(line);
+            this.stackPreviewElements.letterCircle.push(letterCircle);
+            this.stackPreviewElements.letter.push(letter);
          }
          lastPos = { x: x, y: y };
       }
+      // this.stackElements = this.stackPreview.setFinish();
    };
 
    this.updateState = function(anim,action) {
