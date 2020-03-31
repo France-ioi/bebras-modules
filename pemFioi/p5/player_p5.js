@@ -110,17 +110,14 @@ function PlayerP5(options) {
             if(frequency < options.min_frequency || frequency > options.max_frequency) {
                 throw new Error('Frequency is out of range [' + options.min_frequency + '..' + options.max_frequency + ']');
             }
-
             if(url !== this.url) {
-                var file_path = parseInt(url, 10) == url && options.filesRepository ? options.filesRepository(url - 1) : url;
-                if(!file_path) {
+                if(!url) {
                     throw new Error('Wrong file param');
-                }
+                }                
                 this.reset();
-
                 this.url = url;
                 this.file = new p5.SoundFile(
-                    file_path,
+                    options.filesRepository.getFile(url),
                     onLoadEnd,
                     onLoadError,
                     onLoadProgress

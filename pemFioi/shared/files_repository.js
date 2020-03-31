@@ -74,10 +74,13 @@ function FilesRepository(options) {
     this.renderFiles = function() {
         var html = '';
 
+        var n = 1;
         for(var filename in this.files[this.level]) {
             html +=
-                '<tr><td>' + filename + '</td>' +
+                '<tr><td>' + n + ') </td>' +
+                '<td>' + filename + '</td>' +
                 '<td><button type="button" class="btn close" data-filename="'+ filename +'">x</button></td></tr>'
+            n++;
         }
         var el = $('#files_repository_list').empty().append(html);
         el.find('button.close').click(this.onRemoveFileClick.bind(this));
@@ -141,8 +144,23 @@ function FilesRepository(options) {
 
 
     this.getFile = function(filename) {
-        if(this.files[this.level] && filename in this.files[this.level]) {
-            return this.files[this.level][filename];
+        if(this.files[this.level]) {
+            if(parseInt(filename, 10) == filename) {
+                // filename is file number
+                var n = 1;
+                for(var k in this.files[this.level]) {
+                    if(!this.files[this.level].hasOwnProperty(k)) {
+                        continue;
+                    }
+                    if(n == filename) {
+                        return this.files[this.level][k];
+                    }
+                    n++;
+                }
+            } else if(filename in this.files[this.level]) {
+                // filename is string
+                return this.files[this.level][filename];
+            }
         }
         throw new Error(this.options.strings.file_not_found + filename);
     }
