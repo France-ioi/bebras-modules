@@ -150,9 +150,9 @@ var getContext = function (display, infos, curLevel) {
 
 
                 drawPoint: "draw pixel",
-                drawLine: "draw Line (x₀,y₀) %1 %2 (x₁,y₁) %3  %4",
-                drawRectangle: "draw Rectangle (x₀,y₀) %1 %2 (width,height) %3  %4",
-                drawCircle: "draw circle (x₀,y₀) %1 %2 Diameter %3",
+                drawLine: "draw Line x₀: %1 y₀: %2 x₁: %3 y₁: %4",
+                drawRectangle: "draw Rectangle x₀: %1 y₀: %2 width: %3 height: %4",
+                drawCircle: "draw circle x₀: %1 y₀: %2 Diameter %3",
                 clearScreen: "clear entiere screen",
                 updateScreen: "update drawins to the screen",
                 autoUpdate: "screen autoupdate mode",
@@ -637,7 +637,9 @@ var getContext = function (display, infos, curLevel) {
             isAnalog: false,
             isSensor: false,
             portType: "D",
-            initialState: false,
+            getInitialState: function (sensor) {
+                return false;
+            },
             selectorImages: ["ledon-red.png"],
             valueType: "boolean",
             pluggable: true,
@@ -693,7 +695,9 @@ var getContext = function (display, infos, curLevel) {
             description: "Buzzer",
             isAnalog: false,
             isSensor: false,
-            initialState: false,
+            getInitialState: function(sensor) {
+                return false;
+            },
             portType: "D",
             selectorImages: ["buzzer-ringing.png"],
             valueType: "boolean",
@@ -746,7 +750,9 @@ var getContext = function (display, infos, curLevel) {
             description: "Servo motor",
             isAnalog: true,
             isSensor: false,
-            initialState: 0,
+            getInitialState: function(sensor) {
+                return 0;
+            },
             portType: "D",
             valueType: "number",
             pluggable: true,
@@ -773,7 +779,12 @@ var getContext = function (display, infos, curLevel) {
             description: "Screen",
             isAnalog: false,
             isSensor: false,
-            initialState: {line1: "", line2: ""},
+            getInitialState: function(sensor) {
+                if (sensor.isDrawingScreen)
+                    return null;
+                else
+                    return {line1: "", line2: ""};
+            },
             cellsAmount: function(paper) {
                 if(context.board == 'grovepi') {
                     return 2;
@@ -798,10 +809,29 @@ var getContext = function (display, infos, curLevel) {
                     (state1 && state2 == null))
                     return false;
 
-                // Otherwise compare the strings
-                return (state1.line1 == state2.line1) &&
-                            ((state1.line2 == state2.line2) ||
-                             (!state1.line2 && !state2.line2)) ;
+                if (state1 && state1.isDrawingData) {
+                    // They are ImageData objects
+                    // The image data is RGBA so there are 4 bits per pixel
+
+                    var data1 = state1.getData(1).data;
+                    var data2 = state2.getData(1).data;
+
+                    for (var i = 0; i < data1.length; i+=4) {
+                        if (data1[i]  != data2[i] ||
+                            data1[i + 1]  != data2[i + 1] ||
+                            data1[i + 2]  != data2[i + 2] ||
+                            data1[i + 3]  != data2[i + 3])
+                            return false;
+                    }
+
+                    return true;
+                } else {
+
+                    // Otherwise compare the strings
+                    return (state1.line1 == state2.line1) &&
+                                ((state1.line2 == state2.line2) ||
+                                (!state1.line2 && !state2.line2));
+                }
             },
             setLiveState: function (sensor, state, callback) {
                 var line2 = state.line2;
@@ -1216,75 +1246,6 @@ var getContext = function (display, infos, curLevel) {
         },
     ];
 
-
-    var screenScaler = {
-
-        scale: 1,
-
-        setScale: function(scale) {
-            this.scale = scale;
-        },
-
-        getSize: function() {
-            return {
-                width: 128 * this.scale,
-                height: 32 * this.scale
-            }
-        },
-
-        drawPoint: function(sensor, x, y) {
-            var ctx = sensor.canvas.getContext('2d');
-
-            ctx.fillRect(
-                this.scale * x, this.scale * y, 1, 1);
-        },
-
-
-        drawLine: function(sensor, x0, y0, x1, y1) {
-            var ctx = sensor.canvas.getContext('2d');
-
-            ctx.beginPath();
-            ctx.moveTo(this.scale * x0, this.scale * y0);
-            ctx.lineTo(this.scale * x1, this.scale * y1);
-            ctx.closePath();
-            ctx.stroke();
-        },
-
-
-        drawRectangle: function(sensor, x0, y0, width, height) {
-            var ctx = sensor.canvas.getContext('2d');
-
-            ctx.beginPath();
-            ctx.rect(this.scale * x0, this.scale * y0, this.scale * width, this.scale * height);
-            ctx.closePath();
-
-            if (!context.noStroke) {
-                ctx.stroke();
-            }
-
-            if (!context.noFill) {
-                ctx.fill();
-            }
-        },
-
-        drawCircle: function(sensor, x0, y0, diameter) {
-            var ctx = sensor.canvas.getContext('2d');
-
-            ctx.beginPath();
-            ctx.arc(this.scale * x0, this.scale * y0, this.scale * diameter / 2, 0, Math.PI * 2);
-            ctx.closePath();
-
-            if (!context.noFill) {
-                ctx.fill();
-            }
-        },
-
-
-        clearScreen: function(sensor) {
-            var ctx = sensor.canvas.getContext('2d');
-            ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
-        }        
-    }
 
 
     function findSensorDefinition(sensor) {
@@ -1720,6 +1681,16 @@ var getContext = function (display, infos, curLevel) {
                             }
                         }
                     }
+
+                    if (sensor.type == "screen") {
+                        var states = context.gradingStatesBySensor[sensor.name];
+
+                        for (var iState = 0; iState < states.length; iState++) {
+                            var state = states[iState];
+                            if (state.state.isDrawingData)
+                                sensor.isDrawingScreen = true;
+                        }
+                    }
                 }
             }
 
@@ -1741,6 +1712,7 @@ var getContext = function (display, infos, curLevel) {
             var sensor = infos.quickPiSensors[iSensor];
 
             sensor.state = null;
+            sensor.screenDrawing = null;
             sensor.lastDrawnTime = 0;
             sensor.lastDrawnState = null;
             sensor.callsInTimeSlot = 0;
@@ -1755,7 +1727,7 @@ var getContext = function (display, infos, curLevel) {
             // Set initial state
             var sensorDef = findSensorDefinition(sensor);
             if(sensorDef && !sensorDef.isSensor) {
-                context.registerQuickPiEvent(sensor.name, sensorDef.initialState, true, true);
+                context.registerQuickPiEvent(sensor.name, sensorDef.getInitialState(sensor), true, true);
             }
         }
 
@@ -3063,8 +3035,8 @@ var getContext = function (display, infos, curLevel) {
             return;
         }
 
-        width = $('#virtualSensors').width();
-        height =  $('#virtualSensors').height();
+        var width = $('#virtualSensors').width();
+        var height =  $('#virtualSensors').height();
 
         if (!context.oldwidth ||
             !context.oldheight ||
@@ -3402,47 +3374,107 @@ var getContext = function (display, infos, curLevel) {
 
         } else if (sensor.type == "screen") {
             if (state) {
-                sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+                if (state.isDrawingData) {
+                    sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf303');
 
-                sensor.stateBubble.attr({
-                    "font": "Font Awesome 5 Free",
-                    "stroke": color,
-                    "fill": color,
-                    "font-size": (strokewidth * 2) + "px"
-                });
+                    sensor.stateBubble.attr({
+                        "font": "Font Awesome 5 Free",
+                        "stroke": color,
+                        "fill": color,
+                        "font-size": (strokewidth * 2) + "px"
+                    });
 
-                sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                sensor.stateBubble.node.style.fontWeight = "bold";
+                    sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                    sensor.stateBubble.node.style.fontWeight = "bold";
 
-                function showPopup() {
-                    if (!sensor.tooltip) {
-                        sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + (state.line2 ? state.line2 : ""));
+                    function showPopup(event) {
 
-                        var textDimensions = sensor.tooltipText.getBBox();
+                        if (!sensor.showingTooltip)
+                        {
+                            $( "body" ).append('<div id="screentooltip"></div>');
 
-                        sensor.tooltip = paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
-                        sensor.tooltip.attr({
-                            "stroke": "black",
-                            "stroke-width": 2,
-                            "fill": "white",
-                        });
+                            $('#screentooltip').css("position", "absolute");
+                            $('#screentooltip').css("border", "1px solid gray");
+                            $('#screentooltip').css("background-color", "#efefef");
+                            $('#screentooltip').css("padding", "3px");
+                            $('#screentooltip').css("z-index", "1000");
+                            $('#screentooltip').css("max-width", "200px");
 
-                        sensor.tooltipText.toFront();
-                    }
-                };
+                            $('#screentooltip').css("left", event.clientX+2).css("top", event.clientY+2);
 
-                sensor.stateBubble.click(showPopup);
+                            var canvas = document.createElement("canvas");
+                            globalcanvas = canvas;
+                            canvas.id = "tooltipcanvas";
+                            canvas.width = 128;
+                            canvas.height = 32;
+                            $('#screentooltip').append(canvas);
 
-                sensor.stateBubble.hover(showPopup, function () {
-                    if (sensor.tooltip) {
-                        sensor.tooltip.remove();
-                        sensor.tooltip = null;
-                    }
-                    if (sensor.tooltipText) {
-                        sensor.tooltipText.remove();
-                        sensor.tooltipText = null;
-                    }
-                });
+                            var ctx = canvas.getContext('2d');
+                            ctx.putImageData(state.getData(1), 0, 0);
+
+                            var e = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      
+                            sensor.showingTooltip = true;
+                        }
+
+                    };
+
+                    $(sensor.stateBubble.node).mouseenter(showPopup);
+                    $(sensor.stateBubble.node).click(showPopup);
+
+                    $(sensor.stateBubble.node).mouseleave(function(event) {
+                        var ctx = globalcanvas.getContext('2d');
+                        var e = ctx.getImageData(0, 0, globalcanvas.width, globalcanvas.height);
+                        var x = 1;
+
+
+                        sensor.showingTooltip = false;
+                        $('#screentooltip').remove();
+                    });
+
+                } else {
+                    sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+
+                    sensor.stateBubble.attr({
+                        "font": "Font Awesome 5 Free",
+                        "stroke": color,
+                        "fill": color,
+                        "font-size": (strokewidth * 2) + "px"
+                    });
+
+                    sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                    sensor.stateBubble.node.style.fontWeight = "bold";
+
+                    function showPopup() {
+                        if (!sensor.tooltip) {
+                            sensor.tooltipText = paper.text(startx, ypositionmiddle + 50, state.line1 + "\n" + (state.line2 ? state.line2 : ""));
+
+                            var textDimensions = sensor.tooltipText.getBBox();
+
+                            sensor.tooltip = paper.rect(textDimensions.x - 15, textDimensions.y - 15, textDimensions.width + 30, textDimensions.height + 30);
+                            sensor.tooltip.attr({
+                                "stroke": "black",
+                                "stroke-width": 2,
+                                "fill": "white",
+                            });
+
+                            sensor.tooltipText.toFront();
+                        }
+                    };
+
+                    sensor.stateBubble.click(showPopup);
+
+                    sensor.stateBubble.hover(showPopup, function () {
+                        if (sensor.tooltip) {
+                            sensor.tooltip.remove();
+                            sensor.tooltip = null;
+                        }
+                        if (sensor.tooltipText) {
+                            sensor.tooltipText.remove();
+                            sensor.tooltipText = null;
+                        }
+                    });
+                }
             }
         } else if (percentage != 0) {
             if (type == "wrong" || type == "actual") {
@@ -4139,9 +4171,11 @@ var getContext = function (display, infos, curLevel) {
             if(sensor.drawInfo.width < 150) {
                 screenScale = 0.5;
             }             
-            screenScaler.setScale(screenScale);
 
-            var screenScalerSize = screenScaler.getSize();
+            var screenScalerSize = {
+                width: 128 * screenScale,
+                height: 32 * screenScale
+            }
             borderSize = borderSize * screenScale;
 
             imgw = screenScalerSize.width + borderSize * 2;
@@ -4167,30 +4201,6 @@ var getContext = function (display, infos, curLevel) {
             }
                
 
-            if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
-                sensor.screenrect = paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
-
-                sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                sensor.canvasNode.setAttribute("x",imgx + borderSize); //Set rect data
-                sensor.canvasNode.setAttribute("y",imgy + borderSize); //Set rect data
-                sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
-                sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
-                paper.canvas.appendChild(sensor.canvasNode);
-
-                sensor.canvas = document.createElement("canvas");
-                sensor.canvas.id = "screencanvas";
-                sensor.canvas.width = screenScalerSize.width;
-                sensor.canvas.height = screenScalerSize.height;
-                sensor.canvasNode.appendChild(sensor.canvas);
-            }
-
-
-            sensor.screenrect.attr({
-                "x": imgx + borderSize,
-                "y": imgy + borderSize,
-                "width": 128,
-                "height": 32,
-            });
 
             sensor.img.attr({
                 "x": imgx,
@@ -4199,28 +4209,57 @@ var getContext = function (display, infos, curLevel) {
                 "height": imgh,
             });
 
-            sensor.screenrect.attr({ "opacity": 0 });
-
-            sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
-            sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
-            sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
-            sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
-
 
             if (sensor.state) {
-                var statex = imgx + (imgw * .05);
+                if (sensor.state.isDrawingData) {
+                    if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
+                        sensor.screenrect = paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
+        
+                        sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                        sensor.canvasNode.setAttribute("x",imgx + borderSize); //Set rect data
+                        sensor.canvasNode.setAttribute("y",imgy + borderSize); //Set rect data
+                        sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                        sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
+                        paper.canvas.appendChild(sensor.canvasNode);
+        
+                        sensor.canvas = document.createElement("canvas");
+                        sensor.canvas.id = "screencanvas";
+                        sensor.canvas.width = screenScalerSize.width;
+                        sensor.canvas.height = screenScalerSize.height;
+                        sensor.canvasNode.appendChild(sensor.canvas);
+                    }
 
-                var statey = imgy + (imgh * .2);
+                    sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
+                    sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
+                    sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
+                    sensor.canvasNode.setAttribute("height", screenScalerSize.height); //Set rect data
 
-                if (sensor.state.line1.length > 16)
-                    sensor.state.line1 = sensor.state.line1.substring(0, 16);
+                    sensor.screenrect.attr({
+                        "x": imgx + borderSize,
+                        "y": imgy + borderSize,
+                        "width": 128,
+                        "height": 32,
+                    });
+        
+                    sensor.screenrect.attr({ "opacity": 0 });
+        
 
-                if (sensor.state.line2 && sensor.state.line2.length > 16)
-                    sensor.state.line2 = sensor.state.line2.substring(0, 16);
+                    sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
+                } else {
+                    var statex = imgx + (imgw * .05);
 
-                sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
+                    var statey = imgy + (imgh * .2);
 
-                sensor.stateText.attr("")
+                    if (sensor.state.line1.length > 16)
+                        sensor.state.line1 = sensor.state.line1.substring(0, 16);
+
+                    if (sensor.state.line2 && sensor.state.line2.length > 16)
+                        sensor.state.line2 = sensor.state.line2.substring(0, 16);
+
+                    sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
+
+                    sensor.stateText.attr("")
+                }
             }
         } else if (sensor.type == "temperature") {
             if (sensor.stateText)
@@ -5220,7 +5259,9 @@ var getContext = function (display, infos, curLevel) {
             var type = "actual";
             // Check the previous state
             var expectedState = context.getSensorExpectedState(name, sensor.lastDrawnTime);
-            if(expectedState !== null && sensor.lastDrawnState != expectedState.state) {
+            var sensorDef = findSensorDefinition(sensor);
+            if(expectedState !== null &&
+                !sensorDef.compareState(sensor.lastDrawnState, expectedState.state)) {
                 type = "wrong";
             }
             drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type);
@@ -5237,7 +5278,10 @@ var getContext = function (display, infos, curLevel) {
             var type = "actual";
             // Check the new state
             var expectedState = context.getSensorExpectedState(name, context.currentTime);
-            if(expectedState !== null && newState != expectedState.state) {
+            var sensorDef = findSensorDefinition(sensor);
+
+            if (!sensorDef.compareState(expectedState.state, newState))
+            {
                 type = "wrong";
             }
             drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type);
@@ -5978,16 +6022,21 @@ var getContext = function (display, infos, curLevel) {
         context.waitDelay(callback, retVal);
     };
 
+    context.initScreenDrawing = function(sensor) {
+        if  (!sensor.screenDrawing)                
+            sensor.screenDrawing = new screenDrawing(sensor.canvas);
+    }    
+
 
     context.quickpi.drawPoint = function(x, y, callback) {
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.drawPoint(x, y);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+        
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var sensor = findSensorByType("screen");
-
-            if (sensor && sensor.canvas)
-            {
-                screenScaler.drawPoint(sensor, x, y);
-            }
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6000,14 +6049,13 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.drawLine(x0, y0, x1, y1);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
         if (!context.display || context.autoGrading || context.offLineMode) {
-
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                screenScaler.drawLine(sensor, x0, y0, x1, y1);
-            }
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6021,13 +6069,14 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.drawRectangle = function(x0, y0, width, height, callback) {
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                screenScaler.drawRectangle(sensor, x0, y0, width, height);
-            }
+        var sensor = findSensorByType("screen");
 
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.drawRectangle(x0, y0, width, height);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6039,16 +6088,16 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-
     context.quickpi.drawCircle = function(x0, y0, diameter, callback) {
+
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.drawCircle(x0, x0, y0, diameter);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+
         if (!context.display || context.autoGrading || context.offLineMode) {
-
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                screenScaler.drawCircle(sensor, x0, y0, diameter)
-            }
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6062,13 +6111,14 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.clearScreen = function(callback) {
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                screenScaler.clearScreen(sensor)
-            }
+        var sensor = findSensorByType("screen");
 
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.clearScreen();
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+        
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6083,16 +6133,6 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.updateScreen = function(callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            /*
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                var ctx = sensor.canvas.getContext('2d');
-
-                ctx.clearRect(0, 0, sensor.canvas.width, sensor.canvas.height);
-            }
-            */
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -6107,19 +6147,6 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.autoUpdate = function(autoupdate, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            /*
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                var ctx = sensor.canvas.getContext('2d');
-
-                context.noFill = false;
-                if (color)
-                    ctx.fillStyle = "black";
-                else
-                    ctx.fillStyle = "white";
-            }*/
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
