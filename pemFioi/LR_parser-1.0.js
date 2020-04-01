@@ -929,24 +929,27 @@ function LR_Parser(settings,subTask,answer) {
 
    this.disableShiftButton = function() {
       $("#shiftButton").off("click");   
-      $("#shiftButton").css("cursor","auto");   
+      $("#shiftButton").css({opacity:0.7,cursor:"auto"});   
+      $("#shiftBar .messageBackground").css({opacity:0.7});   
    };
 
    this.enableShiftButton = function() {
       $("#shiftButton").off("click");   
       $("#shiftButton").click(this.shift);
-      $("#shiftButton").css("cursor","pointer");   
+      $("#shiftButton").css({opacity:1,cursor:"pointer"});   
+      $("#shiftBar .messageBackground").css({opacity:1});   
+      // $("#shiftButton").css("cursor","pointer");   
    };
 
    this.disableAcceptButton = function() {
       $("#acceptButton").off("click");   
-      $("#acceptButton").css("cursor","auto");   
+      $("#acceptButton").css({opacity:0.7,cursor:"auto"});   
    };
    
    this.enableAcceptButton = function() {
       $("#acceptButton").off("click");  
       $("#acceptButton").click(this.acceptInput); 
-      $("#acceptButton").css("cursor","pointer");   
+      $("#acceptButton").css({opacity:1,cursor:"pointer"});   
    };
 
    this.disableUndoButton = function() {
@@ -1743,12 +1746,11 @@ function LR_Parser(settings,subTask,answer) {
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var animTime = this.animationTime/prevStates.length;
-         // $("#shiftButton").off("click");
-         // $("#shiftButton").css("cursor","auto");
-         this.disableShiftButton();
-         // $("#acceptButton").off("click");
-         // $("#acceptButton").css("cursor","auto");
-         this.disableAcceptButton();
+         if(this.mode == 2){
+            this.disableShiftButton();
+            this.disableAcceptButton();
+         }
+
          this.reductionAnimLoop(state,prevStates,animTime,newStackElement,firstStepOnly);
       }else{
          if(prevStates.length > 0){
@@ -1865,8 +1867,6 @@ function LR_Parser(settings,subTask,answer) {
             $("#reduceButton span").text("REDUCE");
             $("#reduceButton").off("click");
             $("#reduceButton").click(self.reduce);
-            self.enableShiftButton();
-            self.enableAcceptButton();
          }
       }
    };
@@ -1882,6 +1882,10 @@ function LR_Parser(settings,subTask,answer) {
       self.displayMessage("reduce","GOTO "+newState);
       self.currentVertex = self.getStateID(newState);
       self.arrangeEdgeHL();
+      if(this.mode == 2){
+         self.enableShiftButton();
+         self.enableAcceptButton();
+      }
    };
 
    this.reverseReduction = function(rule) {
