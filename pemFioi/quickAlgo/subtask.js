@@ -308,9 +308,8 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.context.runner) {
          this.context.runner.stop();
       }
-      subTask.blocklyHelper.resetDisplay();
-      window.quickAlgoInterface.displayError(null);
-      this.context.reset();
+      // Reset everything through changeTest
+      subTask.changeTest(0);
    };
 
    subTask.reloadStateObject = function(stateObj) {
