@@ -5419,7 +5419,7 @@ var getContext = function (display, infos, curLevel) {
         var sensorStates = context.gradingStatesBySensor[actualname];
 
         if (!sensorStates)
-            return; // Fail??
+            return null; // Fail??
 
         var lastState;
         var startTime = -1;
