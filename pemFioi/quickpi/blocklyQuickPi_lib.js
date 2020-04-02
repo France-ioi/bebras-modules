@@ -94,6 +94,88 @@ var buzzerSound = {
     }
 }
 
+
+
+var gyroscope3D = (function() {
+
+    var instance;
+
+    function createInstance(width, height) {
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        // debug code start
+        canvas.style.zIndex = 99999;
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        document.body.appendChild(canvas);
+        // debug code end
+
+        var renderer = new zen3d.Renderer(canvas, { antialias: true, alpha: true });
+        renderer.glCore.state.colorBuffer.setClear(0, 0, 0, 0);
+    
+        var scene = new zen3d.Scene();
+    
+        var lambert = new zen3d.LambertMaterial();
+        lambert.diffuse.setHex(0x468DDF);            
+       
+        var cube_geometry = new zen3d.CubeGeometry(10, 2, 10);
+        var cube = new zen3d.Mesh(cube_geometry, lambert);
+        cube.position.x = 0;
+        cube.position.y = 0;
+        cube.position.z = 0;
+        scene.add(cube);
+    
+        var ambientLight = new zen3d.AmbientLight(0xffffff, 2);
+        scene.add(ambientLight);
+    
+        var pointLight = new zen3d.PointLight(0xffffff, 1, 100);
+        pointLight.position.set(-20, 40, 10);
+        scene.add(pointLight);            
+    
+        var camera = new zen3d.Camera();
+        camera.position.set(0, 13, 13);
+        camera.lookAt(new zen3d.Vector3(0, 0, 0), new zen3d.Vector3(0, 1, 0));
+        camera.setPerspective(45 / 180 * Math.PI, width / height, 1, 1000);
+        scene.add(camera);    
+    
+    
+        return {
+            resize: function(width, height) {
+                camera.setPerspective(
+                    45 / 180 * Math.PI, 
+                    width / height, 
+                    1, 
+                    1000
+                );
+            },
+    
+            render: function(ax, ay, az) {
+                cube.euler.x = Math.PI * ax / 360;
+                cube.euler.y = Math.PI * ay / 360;
+                cube.euler.z = Math.PI * az / 360;
+                renderer.render(scene, camera);
+                return canvas;
+            }
+        }
+    }
+
+    return {
+        getInstance: function(width, height) {
+            if(!instance) {
+                instance = createInstance(width, height);
+            } else {
+                instance.resize(width, height)
+            }
+            return instance;
+        }
+    }
+
+})();
+
+
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
 
@@ -4672,29 +4754,64 @@ var getContext = function (display, infos, curLevel) {
                 removeSlider(sensor);
             }
         } else if (sensor.type == "gyroscope") {
-            if (sensor.stateText)
+            if (!sensor.state) {
+                sensor.state = [0, 0, 0];
+            }
+            if (sensor.stateText) {
                 sensor.stateText.remove();
+            }
+            sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
 
-            if (!sensor.img || !sensor.img.paper.canvas)
+
+
+            if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
+                sensor.screenrect = paper.rect(imgx, imgy, imgw, imgh);
+                sensor.screenrect.attr({ "opacity": 0 });
+
+                sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                sensor.canvasNode.setAttribute("x", imgx);
+                sensor.canvasNode.setAttribute("y", imgy);
+                sensor.canvasNode.setAttribute("width", imgw);
+                sensor.canvasNode.setAttribute("height", imgh);
+                paper.canvas.appendChild(sensor.canvasNode);
+
+                sensor.canvas = document.createElement("canvas");
+                sensor.canvas.width = imgw;
+                sensor.canvas.height = imgh;
+                sensor.canvasNode.appendChild(sensor.canvas);
+            }
+            
+
+            
+
+            var img3d = gyroscope3D.getInstance(imgw, imgh).render(                
+                sensor.state[0], 
+                sensor.state[2],
+                sensor.state[1]
+            );
+            var sensorCtx = sensor.canvas.getContext('2d');
+            sensorCtx.clearRect(0, 0, imgw, imgh);
+            sensorCtx.drawImage(img3d, 0, 0);
+            
+
+/*
+            sensor.gyroscope3D.render(
+                sensor.state[0], 
+                sensor.state[1], 
+                sensor.state[2]
+            );
+*/            
+/*            
+            if (!sensor.img || !sensor.img.paper.canvas) {
                 sensor.img = paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
-
+            }
             sensor.img.attr({
                 "x": imgx,
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
             });
-            if (sensor.stateText)
-                sensor.stateText.remove();
-
-            if (!sensor.state)
-            {
-                sensor.state = [0, 0, 0];
-            }
-
-            if (sensor.state) {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
-            }
+*/
 
             if (!context.autoGrading && context.offLineMode) {
                 setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
