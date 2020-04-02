@@ -408,8 +408,6 @@ function PythonInterpreter(context, msgCallback) {
       this._onStepError(window.languageStrings.tooManyIterationsWithoutAction);
     } else if (!this._paused && this._isRunning) {
       this.step();
-    } else {
-      this.delaySinceLast
     }
   };
 
@@ -654,7 +652,7 @@ function PythonInterpreter(context, msgCallback) {
         stepDelay = 10;
       }
     }
-    var realStepDelay = markDelay + stepDelay
+    var realStepDelay = markDelay + stepDelay;
 
     if(realStepDelay > 0) {
       this._paused = true;
