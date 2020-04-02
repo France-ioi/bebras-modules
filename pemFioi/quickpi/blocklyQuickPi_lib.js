@@ -1245,6 +1245,16 @@ var getContext = function (display, infos, curLevel) {
             valueMax: 100,
             step: 0.1,
             selectorImages: ["accel.png"],
+            getStateString: function (state) {
+
+                if (Array.isArray(state))
+                {
+                    return "X: " + sensor.state[0] + "m/s² Y: " + sensor.state[1] + "m/s² Z: " + sensor.state[2] + "m/s²";
+                }
+                else {
+                    return state.toString() + "m/s²";
+                }
+            },
             getPercentageFromState: function (state) {
                 return ((state + 78.48) / 156.96);
             },
@@ -3338,6 +3348,85 @@ var getContext = function (display, infos, curLevel) {
         var isAnalog = findSensorDefinition(sensor).isAnalog;
         var percentage = + state;
 
+        if (sensor.type == "accelerometer" ||
+            sensor.type == "gyroscope" ||
+            sensor.type == "magnetometer") {
+
+            if (sensor.state != null)
+            for (var i = 0; i < 3; i++) {
+
+                
+                var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
+                var stateLenght = (endTime - startTime) * context.pixelsPerTime;
+        
+                var yspace = sensor.drawInfo.height / 3;
+                var ypositiontop = sensor.drawInfo.y + (yspace * i)
+                var ypositionbottom = ypositiontop + yspace;
+        
+
+                if (type == "expected" || type == "finnish") {
+                    color = "lightgrey";
+                    strokewidth = 4;
+                } else  if (type == "wrong") {
+                    color = "red";
+                    strokewidth = 2;
+                }
+                else if (type == "actual") {
+                    color = "yellow";
+                    strokewidth = 2;
+                }
+
+                if (sensor.lastAnalogState &&
+                    sensor.lastAnalogState[i] != state[i]) {
+
+                    var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state[i], sensor);
+                    var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState[i], sensor);
+
+                    var previousOffset = (ypositionbottom - ypositiontop) * oldStatePercentage;
+
+                    var joinline = paper.path(["M", startx,
+                        ypositiontop + offset,
+                        "L", startx,
+                        ypositiontop + previousOffset]);
+
+                    joinline.attr({
+                        "stroke-width": strokewidth,
+                        "stroke": color,
+                        "stroke-linejoin": "round",
+                        "stroke-linecap": "round"
+                    });
+
+
+
+                    var sensorDef = findSensorDefinition(sensor);
+                    var stateText = state[i].toString();
+                    if (sensorDef && sensorDef.getStateString) {
+                       stateText = sensorDef.getStateString(state[i]);
+                    }
+
+                    paper.text(startx, ypositiontop + offset - 5, stateText);
+
+                    sensor.timelinelastxlabel = startx;
+                }
+
+                stateline = paper.path(["M", startx,
+                    ypositiontop + offset,
+                    "L", startx + stateLenght,
+                    ypositiontop + offset]);
+
+                stateline.attr({
+                    "stroke-width": strokewidth,
+                    "stroke": color,
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                });
+
+            }
+
+            
+            sensor.lastAnalogState = state == null ? [0, 0, 0] : state;
+
+        } else
         if (isAnalog || sensor.showAsAnalog) {
             var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state, sensor);
 
@@ -3997,7 +4086,7 @@ var getContext = function (display, infos, curLevel) {
             porty = imgy + (imgh / 2);
 
             portsize = imgh / 3;
-            statesize = imgh / 2;
+            statesize = sensor.drawInfo.height * 0.2;
 
             namex = portx;
             namesize = portsize;
