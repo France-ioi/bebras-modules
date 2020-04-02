@@ -101,9 +101,10 @@ class screenDrawing {
         }
 
         drawLine(x0, y0, x1, y1) {
-            this._drawLine(this.offScreenCanvashalfx, 0.5, x0, y0, x1, y1);
-            this._drawLine(this.offScreenCanvas1x, 1, x0, y0, x1, y1);
-            this._drawLine(this.offScreenCanvas2x, 2, x0, y0, x1, y1);
+            for (var i = 0; i < this.scales.length; i++) {
+                var scale = this.scales[i];
+                this._drawLine(this.canvas[i], scale, x0, y0, x1, y1);
+            }
         }
 
         _drawRectangle(canvas, scale, x0, y0, width, height) {

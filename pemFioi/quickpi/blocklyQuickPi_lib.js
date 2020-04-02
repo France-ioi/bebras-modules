@@ -1690,10 +1690,12 @@ var getContext = function (display, infos, curLevel) {
                     if (sensor.type == "screen") {
                         var states = context.gradingStatesBySensor[sensor.name];
 
-                        for (var iState = 0; iState < states.length; iState++) {
-                            var state = states[iState];
-                            if (state.state.isDrawingData)
-                                sensor.isDrawingScreen = true;
+                        if (states) {
+                            for (var iState = 0; iState < states.length; iState++) {
+                                var state = states[iState];
+                                if (state.state.isDrawingData)
+                                    sensor.isDrawingScreen = true;
+                            }
                         }
                     }
                 }
