@@ -4769,7 +4769,9 @@ var getContext = function (display, infos, curLevel) {
             }
             sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
 
-            var img3d = gyroscope3D.getInstance(imgw, imgh);
+            if (!context.autoGrading && context.offLineMode) {
+                var img3d = gyroscope3D.getInstance(imgw, imgh);
+            }
             if(img3d) {
                 if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
                     sensor.screenrect = paper.rect(imgx, imgy, imgw, imgh);
@@ -4798,11 +4800,16 @@ var getContext = function (display, infos, curLevel) {
                 ), 0, 0);
 
                 if(!juststate) {
-                    sensor.focusrect.drag(function(dx, dy, x, y, event) {
-                        sensor.state[0] = Math.max(-125, Math.min(125, dy));
-                        sensor.state[1] = Math.max(-125, Math.min(125, -dx));
-                        drawSensor(sensor, true)
-                    });
+                    sensor.focusrect.drag(
+                        function(dx, dy, x, y, event) {
+                            sensor.state[0] = Math.max(-125, Math.min(125, sensor.old_state[0] + dy));
+                            sensor.state[1] = Math.max(-125, Math.min(125, sensor.old_state[1] - dx));
+                            drawSensor(sensor, true)
+                        },
+                        function() {
+                            sensor.old_state = sensor.state.slice();
+                        }
+                    );
                 }
 
             } else {
@@ -4815,16 +4822,15 @@ var getContext = function (display, infos, curLevel) {
                     "width": imgw,
                     "height": imgh,
                 });
-
                 if (!context.autoGrading && context.offLineMode) {
                     setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
                 } else {
                     sensor.focusrect.click(function () {
                         sensorInConnectedModeError();
                     });
-
+    
                     removeSlider(sensor);
-                }
+                }                            
             }            
         } else if (sensor.type == "magnetometer") {
             if (sensor.stateText)
