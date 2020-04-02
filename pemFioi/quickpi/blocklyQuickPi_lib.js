@@ -115,7 +115,12 @@ var gyroscope3D = (function() {
         */
         // debug code end
 
-        var renderer = new zen3d.Renderer(canvas, { antialias: true, alpha: true });
+        try {
+            var renderer = new zen3d.Renderer(canvas, { antialias: true, alpha: true });
+        } catch(e) {
+            return false;
+        }
+        
         renderer.glCore.state.colorBuffer.setClear(0, 0, 0, 0);
     
         var scene = new zen3d.Scene();
@@ -4764,66 +4769,63 @@ var getContext = function (display, infos, curLevel) {
             }
             sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
 
+            var img3d = gyroscope3D.getInstance(imgw, imgh);
+            if(img3d) {
+                if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
+                    sensor.screenrect = paper.rect(imgx, imgy, imgw, imgh);
+                    sensor.screenrect.attr({ "opacity": 0 });
+    
+                    sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
+                    sensor.canvasNode.setAttribute("x", imgx);
+                    sensor.canvasNode.setAttribute("y", imgy);
+                    sensor.canvasNode.setAttribute("width", imgw);
+                    sensor.canvasNode.setAttribute("height", imgh);
+                    paper.canvas.appendChild(sensor.canvasNode);
+    
+                    sensor.canvas = document.createElement("canvas");
+                    sensor.canvas.width = imgw;
+                    sensor.canvas.height = imgh;
+                    sensor.canvasNode.appendChild(sensor.canvas);
+                }
 
+                var sensorCtx = sensor.canvas.getContext('2d');
+                sensorCtx.clearRect(0, 0, imgw, imgh);
+                
+                sensorCtx.drawImage(img3d.render(                
+                    sensor.state[0], 
+                    sensor.state[2],
+                    sensor.state[1]
+                ), 0, 0);
 
-            if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
-                sensor.screenrect = paper.rect(imgx, imgy, imgw, imgh);
-                sensor.screenrect.attr({ "opacity": 0 });
+                if(!juststate) {
+                    sensor.focusrect.drag(function(dx, dy, x, y, event) {
+                        sensor.state[0] = Math.max(-125, Math.min(125, dy));
+                        sensor.state[1] = Math.max(-125, Math.min(125, -dx));
+                        drawSensor(sensor, true)
+                    });
+                }
 
-                sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
-                sensor.canvasNode.setAttribute("x", imgx);
-                sensor.canvasNode.setAttribute("y", imgy);
-                sensor.canvasNode.setAttribute("width", imgw);
-                sensor.canvasNode.setAttribute("height", imgh);
-                paper.canvas.appendChild(sensor.canvasNode);
-
-                sensor.canvas = document.createElement("canvas");
-                sensor.canvas.width = imgw;
-                sensor.canvas.height = imgh;
-                sensor.canvasNode.appendChild(sensor.canvas);
-            }
-            
-
-            
-
-            var img3d = gyroscope3D.getInstance(imgw, imgh).render(                
-                sensor.state[0], 
-                sensor.state[2],
-                sensor.state[1]
-            );
-            var sensorCtx = sensor.canvas.getContext('2d');
-            sensorCtx.clearRect(0, 0, imgw, imgh);
-            sensorCtx.drawImage(img3d, 0, 0);
-            
-
-/*
-            sensor.gyroscope3D.render(
-                sensor.state[0], 
-                sensor.state[1], 
-                sensor.state[2]
-            );
-*/            
-/*            
-            if (!sensor.img || !sensor.img.paper.canvas) {
-                sensor.img = paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
-            }
-            sensor.img.attr({
-                "x": imgx,
-                "y": imgy,
-                "width": imgw,
-                "height": imgh,
-            });
-*/
-
-            if (!context.autoGrading && context.offLineMode) {
-                setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
             } else {
-                sensor.focusrect.click(function () {
-                    sensorInConnectedModeError();
+                if (!sensor.img || !sensor.img.paper.canvas) {
+                    sensor.img = paper.image(getImg('gyro.png'), imgx, imgy, imgw, imgh);
+                }
+                sensor.img.attr({
+                    "x": imgx,
+                    "y": imgy,
+                    "width": imgw,
+                    "height": imgh,
                 });
 
-                removeSlider(sensor);
-            }
+                if (!context.autoGrading && context.offLineMode) {
+                    setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
+                } else {
+                    sensor.focusrect.click(function () {
+                        sensorInConnectedModeError();
+                    });
+
+                    removeSlider(sensor);
+                }
+            }            
         } else if (sensor.type == "magnetometer") {
             if (sensor.stateText)
                 sensor.stateText.remove();
