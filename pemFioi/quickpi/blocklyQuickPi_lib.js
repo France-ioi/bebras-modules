@@ -150,21 +150,21 @@ var getContext = function (display, infos, curLevel) {
 
 
                 drawPoint: "draw pixel",
-                drawLine: "draw Line x₀: %1 y₀: %2 x₁: %3 y₁: %4",
-                drawRectangle: "draw Rectangle x₀: %1 y₀: %2 width: %3 height: %4",
-                drawCircle: "draw circle x₀: %1 y₀: %2 Diameter %3",
-                clearScreen: "clear entiere screen",
-                updateScreen: "update drawins to the screen",
-                autoUpdate: "screen autoupdate mode",
+                drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
+                drawRectangle: "rectangle x₀: %1 y₀: %2 width: %3 height: %4",
+                drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
+                clearScreen: "effacer tout l'écran",
+                updateScreen: "mettre à jour l'écran",
+                autoUpdate: "mode de mise à jour automatique de l'écran",
 
-                fill: "set fill color",
-                noFill: "do not fill shapes",
-                stroke: "set stroke color",
-                noStroke: "do not stroke",
+                fill: "mettre la couleur de fond à %1",
+                noFill: "ne pas remplir les formes",
+                stroke: "mettre la couleur de tracé à %1",
+                noStroke: "ne pas dessiner les contours",
 
-                readAcceleration: "read acceleration (m/s²)",
+                readAcceleration: "accélération en (m/s²) dans l'axe %1",
                 computeRotation: "compute rotation from accelerometer (°) %1",
-                readSoundLevel: "read sound intensity",
+                readSoundLevel: "volume sonore",
 
                 readMagneticForce: "read Magnetic Force (µT) %1",
                 computeCompassHeading: "compute Compass Heading (°)",
