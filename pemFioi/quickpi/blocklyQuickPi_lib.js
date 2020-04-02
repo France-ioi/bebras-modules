@@ -3212,7 +3212,7 @@ var getContext = function (display, infos, curLevel) {
     }
 
 
-    function drawSensorTimeLineState(sensor, state, startTime, endTime, type, skipsave = false) {
+    function drawSensorTimeLineState(sensor, state, startTime, endTime, type, skipsave = false, expectedState = null) {
         if (paper == undefined ||
             !context.display ||
             !context.autoGrading)
@@ -3403,21 +3403,50 @@ var getContext = function (display, infos, curLevel) {
                             $('#screentooltip').css("background-color", "#efefef");
                             $('#screentooltip').css("padding", "3px");
                             $('#screentooltip').css("z-index", "1000");
-                            $('#screentooltip').css("max-width", "200px");
+                            $('#screentooltip').css("width", "262px");
+                            $('#screentooltip').css("height", "70px");
 
                             $('#screentooltip').css("left", event.clientX+2).css("top", event.clientY+2);
 
                             var canvas = document.createElement("canvas");
-                            globalcanvas = canvas;
                             canvas.id = "tooltipcanvas";
                             canvas.width = 128 * 2;
                             canvas.height = 32 * 2;
                             $('#screentooltip').append(canvas);
 
+                            
+                            $(canvas).css("position", "absolute");
+                            $(canvas).css("z-index", "1500");
+                            $(canvas).css("left", 3).css("top", 3);
+
+
                             var ctx = canvas.getContext('2d');
                             ctx.putImageData(state.getData(2), 0, 0);
 
-                            var e = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            if (expectedState) {
+                                var expectedcanvas = document.createElement("canvas");
+                                expectedcanvas.id = "tooltipcanvas";
+                                expectedcanvas.width = 128 * 2;
+                                expectedcanvas.height = 32 * 2;
+                                $('#screentooltip').append(expectedcanvas);
+
+                                $(expectedcanvas).css("position", "absolute");
+                                $(expectedcanvas).css("z-index", "2000");
+                                $(expectedcanvas).css("left", 3).css("top", 3);
+    
+                                var ctx = expectedcanvas.getContext('2d');
+                                var expectedData = expectedState.getData(2);
+                                for (var i = 0; i < expectedData.data.length; i+=4) {
+                                    if (expectedData.data[i + 0] == 0 &&
+                                        expectedData.data[i + 1] == 0 &&
+                                        expectedData.data[i + 2] == 0) {
+                                            expectedData.data[i + 0] = 255;
+                                    }
+                                    expectedData.data[i + 3] = 128;
+                                }
+                                console.log("!!!!!!!!!!!!!!");
+                                ctx.putImageData(expectedData, 0, 0);
+                            }
       
                             sensor.showingTooltip = true;
                         }
@@ -5263,7 +5292,7 @@ var getContext = function (display, infos, curLevel) {
                 !sensorDef.compareState(sensor.lastDrawnState, expectedState.state)) {
                 type = "wrong";
             }
-            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type);
+            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type, false, expectedState.state);
         }
 
         sensor.lastDrawnTime = context.currentTime;
@@ -5283,7 +5312,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 type = "wrong";
             }
-            drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type);
+            drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type, false, expectedState.state);
             sensor.lastDrawnState = newState;
         }
     }
