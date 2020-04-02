@@ -5292,7 +5292,7 @@ var getContext = function (display, infos, curLevel) {
                 !sensorDef.compareState(sensor.lastDrawnState, expectedState.state)) {
                 type = "wrong";
             }
-            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type, false, expectedState.state);
+            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type, false, expectedState && expectedState.state);
         }
 
         sensor.lastDrawnTime = context.currentTime;
@@ -5308,11 +5308,11 @@ var getContext = function (display, infos, curLevel) {
             var expectedState = context.getSensorExpectedState(name, context.currentTime);
             var sensorDef = findSensorDefinition(sensor);
 
-            if (!sensorDef.compareState(expectedState.state, newState))
+            if (expectedState !== null && !sensorDef.compareState(expectedState.state, newState))
             {
                 type = "wrong";
             }
-            drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type, false, expectedState.state);
+            drawSensorTimeLineState(sensor, newState, context.currentTime, context.currentTime, type, false, expectedState && expectedState.state);
             sensor.lastDrawnState = newState;
         }
     }
