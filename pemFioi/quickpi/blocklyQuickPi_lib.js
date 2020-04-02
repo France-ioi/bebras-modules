@@ -350,6 +350,7 @@ var getContext = function (display, infos, curLevel) {
                 keep: "Garder",
                 minutesago: "Last seen {0} minutes ago",
                 hoursago: "Last seen more than one hour ago",
+                drawing: "drawing",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -844,7 +845,11 @@ var getContext = function (display, infos, curLevel) {
             },
             getStateString: function(state) {
                 if(!state) { return '""'; }
-                return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
+                
+                if (state.isDrawingData)
+                    return strings.messages.drawing;
+                else
+                    return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
             },
             subTypes: [{
                 subType: "16x2lcd",
@@ -3405,29 +3410,23 @@ var getContext = function (display, infos, curLevel) {
                             var canvas = document.createElement("canvas");
                             globalcanvas = canvas;
                             canvas.id = "tooltipcanvas";
-                            canvas.width = 128;
-                            canvas.height = 32;
+                            canvas.width = 128 * 2;
+                            canvas.height = 32 * 2;
                             $('#screentooltip').append(canvas);
 
                             var ctx = canvas.getContext('2d');
-                            ctx.putImageData(state.getData(1), 0, 0);
+                            ctx.putImageData(state.getData(2), 0, 0);
 
                             var e = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
                             sensor.showingTooltip = true;
                         }
-
                     };
 
                     $(sensor.stateBubble.node).mouseenter(showPopup);
                     $(sensor.stateBubble.node).click(showPopup);
 
                     $(sensor.stateBubble.node).mouseleave(function(event) {
-                        var ctx = globalcanvas.getContext('2d');
-                        var e = ctx.getImageData(0, 0, globalcanvas.width, globalcanvas.height);
-                        var x = 1;
-
-
                         sensor.showingTooltip = false;
                         $('#screentooltip').remove();
                     });
