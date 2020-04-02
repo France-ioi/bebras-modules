@@ -106,11 +106,13 @@ var gyroscope3D = (function() {
         canvas.height = height;
 
         // debug code start
+        /*
         canvas.style.zIndex = 99999;
         canvas.style.position = 'fixed';
         canvas.style.top = '0';
         canvas.style.left = '0';
         document.body.appendChild(canvas);
+        */
         // debug code end
 
         var renderer = new zen3d.Renderer(canvas, { antialias: true, alpha: true });
