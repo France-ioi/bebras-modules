@@ -133,7 +133,7 @@ function initBlocklyRunner(context, messageCallback) {
          }
          if(runner.stackCount > 100 || (infiniteLoopDelay && runner.stackCount > 5)) {
             // In case of an infinite loop, add some delay to slow down a bit
-            var delay = context.allowInfiniteLoop ? 50 : 0;
+            var delay = infiniteLoopDelay ? 50 : 0;
 
             runner.stackCount = 0;
             runner.stackResetting = true;
