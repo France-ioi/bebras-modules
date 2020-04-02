@@ -129,7 +129,7 @@ class screenDrawing {
 
         }
 
-        _drawCircle(canvas, x0, y0, diameter) {
+        _drawCircle(canvas, scale, x0, y0, diameter) {
             var ctx = canvas.getContext('2d');
 
             ctx.beginPath();
