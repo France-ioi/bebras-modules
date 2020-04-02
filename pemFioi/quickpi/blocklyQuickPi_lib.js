@@ -151,7 +151,7 @@ var getContext = function (display, infos, curLevel) {
 
                 drawPoint: "draw pixel",
                 drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
-                drawRectangle: "rectangle x₀: %1 y₀: %2 width: %3 height: %4",
+                drawRectangle: "rectangle x₀: %1 y₀: %2 largeur₀: %3 hauteur₀: %4",
                 drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
                 clearScreen: "effacer tout l'écran",
                 updateScreen: "mettre à jour l'écran",
@@ -6123,7 +6123,7 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByType("screen");
 
         context.initScreenDrawing(sensor);
-        sensor.screenDrawing.drawCircle(x0, x0, y0, diameter);
+        sensor.screenDrawing.drawCircle(x0, y0, diameter, diameter);
         context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
 
 
