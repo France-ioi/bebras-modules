@@ -17,6 +17,7 @@ function initBlocklyRunner(context, messageCallback) {
       // Iteration limits
       runner.maxIter = 400000;
       runner.maxIterWithoutAction = 500;
+      runner.allowStepsWithoutDelay = 0;
 
       // Counts the call stack depth to know when to reset it
       runner.stackCount = 0;
@@ -88,6 +89,7 @@ function initBlocklyRunner(context, messageCallback) {
                },
                delay
             );
+            runner.allowStepsWithoutDelay = Math.min(runner.allowStepsWithoutDelay + Math.ceil(delay/10), 100);
          } else {
             runner.noDelay(callback, value);
          }
@@ -121,7 +123,15 @@ function initBlocklyRunner(context, messageCallback) {
                primitive = value;
             }
          }
-         if(runner.stackCount > 100 || (context.allowInfiniteLoop && runner.stackCount > 5)) {
+         var infiniteLoopDelay = false;
+         if(context.allowInfiniteLoop) {
+            if(runner.allowStepsWithoutDelay > 0) {
+               runner.allowStepsWithoutDelay -= 1;
+            } else {
+               infiniteLoopDelay = true;
+            }
+         }
+         if(runner.stackCount > 100 || (infiniteLoopDelay && runner.stackCount > 5)) {
             // In case of an infinite loop, add some delay to slow down a bit
             var delay = context.allowInfiniteLoop ? 50 : 0;
 
@@ -380,6 +390,7 @@ function initBlocklyRunner(context, messageCallback) {
          runner.nbActions = 0;
          runner.stepInProgress = false;
          runner.stepMode = false;
+         runner.allowStepsWithoutDelay = 0;
          runner.firstHighlight = true;
          runner.stackCount = 0;
          context.programEnded = [];

@@ -23,6 +23,7 @@ function PythonInterpreter(context, msgCallback) {
   this._lastNbActions = null;
   this._hasActions = false;
   this._nbActions = 0;
+  this._allowStepsWithoutDelay = 0;
   this._timeouts = [];
   this._editorMarker = null;
   this.availableModules = [];
@@ -269,6 +270,8 @@ function PythonInterpreter(context, msgCallback) {
     if (delay > 0) {
       var _noDelay = this.noDelay.bind(this, callback, value);
       this._setTimeout(_noDelay, delay);
+      // We just waited some time, allow next steps to not be delayed
+      this._allowStepsWithoutDelay = Math.min(this._allowStepsWithoutDelay + Math.ceil(delay / 10), 100);
     } else {
       this.noDelay(callback, value);
     }
@@ -405,6 +408,8 @@ function PythonInterpreter(context, msgCallback) {
       this._onStepError(window.languageStrings.tooManyIterationsWithoutAction);
     } else if (!this._paused && this._isRunning) {
       this.step();
+    } else {
+      this.delaySinceLast
     }
   };
 
@@ -598,6 +603,7 @@ function PythonInterpreter(context, msgCallback) {
     this._stepsWithoutAction = 0;
     this._lastNbActions = 0;
     this._nbActions = 0;
+    this._allowStepsWithoutDelay = 0;
 
     this._isRunning = false;
     this.stepMode = false;
@@ -623,7 +629,6 @@ function PythonInterpreter(context, msgCallback) {
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? Math.floor(this.context.infos.actionDelay/4) : 0;
-    var realStepDelay = markDelay + (this.context.allowInfiniteLoop ? 50 : 0);
     if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
       if(curSusp && curSusp.lineno) {
@@ -638,6 +643,19 @@ function PythonInterpreter(context, msgCallback) {
     } else {
       this.removeEditorMarker();
     }
+
+    var stepDelay = 0;
+    if(!this.stepMode && this.context.allowInfiniteLoop) {
+      // Add a delay in infinite loops to avoid using all CPU
+      if(this._allowStepsWithoutDelay > 0) {
+        // We just had a waitDelay, don't delay further
+        this._allowStepsWithoutDelay -= 1;
+      } else {
+        stepDelay = 10;
+      }
+    }
+    var realStepDelay = markDelay + stepDelay
+
     if(realStepDelay > 0) {
       this._paused = true;
       setTimeout(this.realStep.bind(this), realStepDelay);
