@@ -150,7 +150,13 @@ class screenDrawing {
 
         _clearScreen(canvas, scale) {
             var ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, this.canvas[i].width, this.canvas[i].height);    
+
+            ctx.fillStyle = "black";
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = scale;
+
         }
 
         clearScreen() {
