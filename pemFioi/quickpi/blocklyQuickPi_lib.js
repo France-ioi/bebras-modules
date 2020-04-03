@@ -3500,6 +3500,7 @@ var getContext = function (display, infos, curLevel) {
         var percentage = + state;
 
         var drawnElements = [];
+        var deleteLastDrawnElements = true;
 
         if (sensor.type == "accelerometer" ||
             sensor.type == "gyroscope" ||
@@ -3546,8 +3547,6 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linejoin": "round",
                         "stroke-linecap": "round"
                     });
-
-                    drawnElements.push(joinline);
 
                     if (sensor.timelinelastxlabel == null)
                         sensor.timelinelastxlabel = [0, 0, 0];
@@ -3615,8 +3614,6 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linejoin": "round",
                     "stroke-linecap": "round"
                 });
-
-                drawnElements.push(joinline);
 
                 if (!sensor.timelinelastxlabel)
                     sensor.timelinelastxlabel = 0;
@@ -3722,25 +3719,23 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-        } else if (sensor.type == "screen") {
-            if (state) {
-
-                var sensorDef = findSensorDefinition(sensor);
-                if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) 
-                {
-                    sensor.lastScreenState = state;
+        } else if (sensor.type == "screen" && state) {
+            var sensorDef = findSensorDefinition(sensor);
+            if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) 
+            {
+                sensor.lastScreenState = state;
                 if (state.isDrawingData) {
-                    sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf303');
+                    var stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf303');
 
-                    sensor.stateBubble.attr({
+                    stateBubble.attr({
                         "font": "Font Awesome 5 Free",
                         "stroke": color,
                         "fill": color,
                         "font-size": (strokewidth * 2) + "px"
                     });
 
-                    sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                    sensor.stateBubble.node.style.fontWeight = "bold";
+                    stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                    stateBubble.node.style.fontWeight = "bold";
 
                     function showPopup(event) {
 
@@ -3803,26 +3798,26 @@ var getContext = function (display, infos, curLevel) {
                         }
                     };
 
-                    $(sensor.stateBubble.node).mouseenter(showPopup);
-                    $(sensor.stateBubble.node).click(showPopup);
+                    $(stateBubble.node).mouseenter(showPopup);
+                    $(stateBubble.node).click(showPopup);
 
-                    $(sensor.stateBubble.node).mouseleave(function(event) {
+                    $(stateBubble.node).mouseleave(function(event) {
                         sensor.showingTooltip = false;
                         $('#screentooltip').remove();
                     });
 
                 } else {
-                    sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
+                    var stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf27a');
 
-                    sensor.stateBubble.attr({
+                    stateBubble.attr({
                         "font": "Font Awesome 5 Free",
                         "stroke": color,
                         "fill": color,
                         "font-size": (strokewidth * 2) + "px"
                     });
 
-                    sensor.stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
-                    sensor.stateBubble.node.style.fontWeight = "bold";
+                    stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                    stateBubble.node.style.fontWeight = "bold";
 
                     function showPopup() {
                         if (!sensor.tooltip) {
@@ -3841,9 +3836,9 @@ var getContext = function (display, infos, curLevel) {
                         }
                     };
 
-                    sensor.stateBubble.click(showPopup);
+                    stateBubble.click(showPopup);
 
-                    sensor.stateBubble.hover(showPopup, function () {
+                    stateBubble.hover(showPopup, function () {
                         if (sensor.tooltip) {
                             sensor.tooltip.remove();
                             sensor.tooltip = null;
@@ -3854,7 +3849,9 @@ var getContext = function (display, infos, curLevel) {
                         }
                     });
                 }
-                }
+                drawnElements.push(stateBubble);
+            } else {
+                deleteLastDrawnElements = false;
             }
         } else if (percentage != 0) {
             if (type == "wrong" || type == "actual") {
@@ -3900,7 +3897,7 @@ var getContext = function (display, infos, curLevel) {
         if(type == 'actual' || type == 'wrong') {
             if(!sensor.drawnGradingElements) {
                 sensor.drawnGradingElements = [];
-            } else {
+            } else if(deleteLastDrawnElements) {
                 for(var i = 0; i < sensor.drawnGradingElements.length; i++) {
                     var dge = sensor.drawnGradingElements[i];
                     if(dge.time >= startTime) {
