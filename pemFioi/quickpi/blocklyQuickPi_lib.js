@@ -2257,7 +2257,7 @@ var getContext = function (display, infos, curLevel) {
             if (!context.loopsForever)
                 maxTime = Math.floor(maxTime * 1.05);
 
-            context.pixelsPerTime = (paper.width - context.timelineStartx - 10) / maxTime;
+            context.pixelsPerTime = (paper.width - context.timelineStartx - 20) / maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
@@ -3335,21 +3335,84 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
+        var step = 1000;
+        if (context.maxTime <= 1000)
+            step = 100;
+        else if (context.maxTime <= 3000)
+            step = 500;
+        else
+            step = 1000;
+
+
+        console.log("test");
         var i = 0;
-        for (; i <= context.maxTime; i += 1000) {
+        for (; i <= context.maxTime; i += step) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
 
-            var timelabel = paper.text(x, context.timeLineY, (i / 1000));
+            var timelabel = paper.text(x, context.timeLineY, (i / 1000).toString() + "s");
 
-            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            timelabel.attr({ "font-size": "15" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
 
             context.timelineText.push(timelabel);
-            /*
-                        paper.path(["M", x,
-                            paper.height - context.sensorSize / 2,
-                            "L", x,
-                            paper.height - context.sensorSize]);*/
         }
+
+        context.timeLineHoverPath = paper.path(["M", context.timelineStartx,
+                    context.timeLineY,
+                    "L", context.timelineStartx + (context.maxTime * context.pixelsPerTime),
+                    (context.timeLineY)]);
+
+        context.timeLineHoverPath.attr({
+            "stroke-width": 40,
+             "opacity": 0,
+             "stroke-linecap": "square",
+             "stroke-linejoin": "round",
+        });
+
+        context.timeLineHoverPath.mousemove(function(event){
+
+            $('#screentooltip').remove();
+
+            var ms = (event.clientX - context.timelineStartx) / context.pixelsPerTime;
+            ms = Math.round(ms);
+
+            if (ms < -4)
+                return;
+            if (ms < 0)
+                ms = 0;
+
+            $( "body" ).append('<div id="screentooltip"></div>');
+            $('#screentooltip').css("position", "absolute");
+            $('#screentooltip').css("border", "1px solid gray");
+            $('#screentooltip').css("background-color", "#efefef");
+            $('#screentooltip').css("padding", "3px");
+            $('#screentooltip').css("z-index", "1000");
+
+            $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
+
+            $('#screentooltip').text(ms.toString() + "ms");
+
+            if (context.timeLineHoverLine)
+                context.timeLineHoverLine.remove();
+            context.timeLineHoverLine = paper.path(["M", event.clientX,
+                                        0,
+                                        "L", event.clientX,
+                                        context.timeLineY]);
+            context.timeLineHoverLine.attr({
+                                           "stroke-width": 4,
+                                            "stroke": "blue",
+                                             "opacity": 0.2,
+                                             "stroke-linecap": "square",
+                                             "stroke-linejoin": "round",
+            });
+        });
+
+        context.timeLineHoverPath.mouseout(function() {
+            if (context.timeLineHoverLine)
+                context.timeLineHoverLine.remove();
+            $('#screentooltip').remove();
+        });
+
+
 
         if (!context.loopsForever) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
