@@ -1364,7 +1364,7 @@ var getContext = function (display, infos, curLevel) {
 
                 if (Array.isArray(state))
                 {
-                    return "X: " + sensor.state[0] + "m/s² Y: " + sensor.state[1] + "m/s² Z: " + sensor.state[2] + "m/s²";
+                    return "X: " + state[0] + "m/s² Y: " + state[1] + "m/s² Z: " + state[2] + "m/s²";
                 }
                 else {
                     return state.toString() + "m/s²";
@@ -3485,10 +3485,8 @@ var getContext = function (display, infos, curLevel) {
             sensor.type == "gyroscope" ||
             sensor.type == "magnetometer") {
 
-            if (sensor.state != null)
+            if (state != null) {
             for (var i = 0; i < 3; i++) {
-
-                
                 var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
                 var stateLenght = (endTime - startTime) * context.pixelsPerTime;
         
@@ -3496,7 +3494,8 @@ var getContext = function (display, infos, curLevel) {
                 var ypositiontop = sensor.drawInfo.y + (yspace * i)
                 var ypositionbottom = ypositiontop + yspace;
         
-
+                var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state[i], sensor);
+                
                 if (type == "expected" || type == "finnish") {
                     color = "lightgrey";
                     strokewidth = 4;
@@ -3509,10 +3508,9 @@ var getContext = function (display, infos, curLevel) {
                     strokewidth = 2;
                 }
 
-                if (sensor.lastAnalogState &&
+                if (sensor.lastAnalogState != null &&
                     sensor.lastAnalogState[i] != state[i]) {
 
-                    var offset = (ypositionbottom - ypositiontop) * findSensorDefinition(sensor).getPercentageFromState(state[i], sensor);
                     var oldStatePercentage = findSensorDefinition(sensor).getPercentageFromState(sensor.lastAnalogState[i], sensor);
 
                     var previousOffset = (ypositionbottom - ypositiontop) * oldStatePercentage;
@@ -3530,16 +3528,21 @@ var getContext = function (display, infos, curLevel) {
                     });
 
 
+                    if (sensor.timelinelastxlabel == null)
+                        sensor.timelinelastxlabel = [0, 0, 0];
+                
+                    if ((startx) - sensor.timelinelastxlabel[i] > 40)
+                    {
+                        var sensorDef = findSensorDefinition(sensor);
+                        var stateText = state.toString();
+                        if(sensorDef && sensorDef.getStateString) {
+                            stateText = sensorDef.getStateString(state[i]);
+                        }
 
-                    var sensorDef = findSensorDefinition(sensor);
-                    var stateText = state[i].toString();
-                    if (sensorDef && sensorDef.getStateString) {
-                       stateText = sensorDef.getStateString(state[i]);
+                        paper.text(startx, ypositiontop + offset - 10, stateText);
+
+                        sensor.timelinelastxlabel[i] = startx;
                     }
-
-                    paper.text(startx, ypositiontop + offset - 5, stateText);
-
-                    sensor.timelinelastxlabel = startx;
                 }
 
                 stateline = paper.path(["M", startx,
@@ -3555,9 +3558,9 @@ var getContext = function (display, infos, curLevel) {
                 });
 
             }
-
+                sensor.lastAnalogState = state == null ? [0, 0, 0] : state;
+            }
             
-            sensor.lastAnalogState = state == null ? [0, 0, 0] : state;
 
         } else
         if (isAnalog || sensor.showAsAnalog) {
@@ -3692,6 +3695,11 @@ var getContext = function (display, infos, curLevel) {
 
         } else if (sensor.type == "screen") {
             if (state) {
+
+                var sensorDef = findSensorDefinition(sensor);
+                if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) 
+                {
+                    sensor.lastScreenState = state;
                 if (state.isDrawingData) {
                     sensor.stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf303');
 
@@ -3757,7 +3765,6 @@ var getContext = function (display, infos, curLevel) {
                                     }
                                     expectedData.data[i + 3] = 128;
                                 }
-                                console.log("!!!!!!!!!!!!!!");
                                 ctx.putImageData(expectedData, 0, 0);
                             }
       
@@ -3815,6 +3822,7 @@ var getContext = function (display, infos, curLevel) {
                             sensor.tooltipText = null;
                         }
                     });
+                }
                 }
             }
         } else if (percentage != 0) {
