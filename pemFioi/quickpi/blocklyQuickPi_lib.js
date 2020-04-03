@@ -5782,7 +5782,7 @@ var getContext = function (display, infos, curLevel) {
 
         // Advance until current time, ignore everything in the past.
         while (iStates < context.gradingStatesByTime.length &&
-               context.gradingStatesByTime[iStates].time <= context.currentTime)
+               context.gradingStatesByTime[iStates].time < context.currentTime)
             iStates++;
 
         for (; iStates < context.gradingStatesByTime.length; iStates++) {
@@ -5794,8 +5794,8 @@ var getContext = function (display, infos, curLevel) {
 
             // Mark all inputs as hit
             if (sensorState.input) {
-                //sensorState.hit = true;
-                context.currentTime = sensorState.time;
+                sensorState.hit = true;
+//                context.currentTime = sensorState.time;
                 context.getSensorState(sensorState.name);
             }
         }
