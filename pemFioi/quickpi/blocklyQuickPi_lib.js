@@ -651,6 +651,119 @@ var getContext = function (display, infos, curLevel) {
     context.quickpi = {};
 
 
+    // List of concepts to be included by conceptViewer
+    context.conceptList = [
+        {id: 'language', ignore: true},
+        {
+           id: 'quickpi_start',
+           name: 'Créer un programme',
+           url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_start',
+           language: 'all',
+           isBase: true,
+           order: 1,
+           python: []
+        },
+        {
+            id: 'quickpi_validation',
+            name: 'Valider son programme',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_validation',
+            language: 'all',
+            isBase: true,
+            order: 2,
+            python: []
+        },
+        {
+            id: 'quickpi_buzzer',
+            name: 'Buzzer',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_buzzer',
+            language: 'all',
+            order: 200,
+            python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
+        },
+        {
+            id: 'quickpi_led',
+            name: 'LEDs',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_led',
+            language: 'all',
+            order: 201,
+            python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
+        },
+        {
+            id: 'quickpi_button',
+            name: 'Boutons et manette',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_button',
+            language: 'all',
+            order: 202,
+            python: ['isButtonPressed', 'isButtonPressedWithName']
+        },  
+        {   
+            id: 'quickpi_screen',
+            name: 'Écran',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_screen',
+            language: 'all',
+            order: 203,
+            python: ['displayText']
+        },
+        {
+            id: 'quickpi_range',
+            name: 'Capteur de distance',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_range',
+            language: 'all',
+            order: 204,
+            python: ['readDistance']
+        },
+        {
+            id: 'quickpi_servo',
+            name: 'Servomoteur',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_servo',
+            language: 'all',
+            order: 205,
+            python: ['setServoAngle', 'getServoAngle']
+        },
+        {
+            id: 'quickpi_thermometer',
+            name: 'Thermomètre',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_thermometer',
+            language: 'all',
+            order: 206,
+            python: ['readTemperature']
+        },
+        {
+            id: 'quickpi_microphone',
+            name: 'Microphone',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_microphone',
+            language: 'all',
+            order: 207,
+            python: ['readSoundLevel']
+        },
+        {
+            id: 'quickpi_light_sensor',
+            name: 'Capteur de luminosité',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_light_sensor',
+            language: 'all',
+            order: 208,
+            python: ['readLightIntensity']
+        },
+        {
+            id: 'quickpi_accelerometer',
+            name: 'Accéléromètre',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_accelerometer',
+            language: 'all',
+            order: 209,
+            python: ['readAcceleration']
+        },  
+        {
+            id: 'quickpi_wait',
+            name: 'Gestion du temps',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_wait',
+            language: 'all',
+            order: 250,
+            python: ['sleep']
+        }
+        ];
+
+
+
     var boardDefinitions = [
         {
             name: "grovepi",
