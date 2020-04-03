@@ -5800,19 +5800,23 @@ var getContext = function (display, infos, curLevel) {
     context.getSensorState = function (name) {
         var state = null;
 
+        var sensor = findSensorByName(name);
         if (!context.display || context.autoGrading) {
             var stateTime = context.getSensorExpectedState(name);
 
             if (stateTime != null) {
                 stateTime.hit = true;
                 state = stateTime.state;
+                if(sensor) {
+                    // Redraw from the beginning of this state
+                    sensor.lastDrawnTime = Math.min(sensor.lastDrawnTime, stateTime.time);
+                }
             }
             else {
                 state = 0;
             }
         }
 
-        var sensor = findSensorByName(name);
         if (!sensor) {
             context.success = false;
             throw (strings.messages.sensorNotFound.format(name));
