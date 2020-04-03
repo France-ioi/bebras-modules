@@ -3760,7 +3760,7 @@ var getContext = function (display, infos, curLevel) {
                             var ctx = canvas.getContext('2d');
                             ctx.putImageData(state.getData(2), 0, 0);
 
-                            if (expectedState) {
+                            if (expectedState && type == "wrong") {
                                 var expectedcanvas = document.createElement("canvas");
                                 expectedcanvas.id = "tooltipcanvas";
                                 expectedcanvas.width = 128 * 2;
@@ -3773,15 +3773,17 @@ var getContext = function (display, infos, curLevel) {
     
                                 var ctx = expectedcanvas.getContext('2d');
                                 var expectedData = expectedState.getData(2);
-                                for (var i = 0; i < expectedData.data.length; i+=4) {
-                                    if (expectedData.data[i + 0] == 0 &&
+                                var newData = ctx.createImageData(128 * 2, 32 * 2);
+                                newData.data.set(expectedData.data);
+                                for (var i = 0; i < newData.data.length; i+=4) {
+                                    if (newData.data[i + 0] == 0 &&
                                         expectedData.data[i + 1] == 0 &&
-                                        expectedData.data[i + 2] == 0) {
-                                            expectedData.data[i + 0] = 255;
+                                        newData.data[i + 2] == 0) {
+                                            newData.data[i + 0] = 255;
                                     }
-                                    expectedData.data[i + 3] = 128;
+                                    newData.data[i + 3] = 128;
                                 }
-                                ctx.putImageData(expectedData, 0, 0);
+                                ctx.putImageData(newData, 0, 0);
                             }
       
                             sensor.showingTooltip = true;
