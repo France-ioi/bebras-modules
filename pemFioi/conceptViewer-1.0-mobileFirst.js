@@ -306,22 +306,22 @@ var baseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
 
 
 var testConcepts = [
-    {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all'},
-    {id: 'language', name: "Création d'un programme", url: baseUrl+'#language'},
-    {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print'},
-    {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend'},
-    {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat'},
-    {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if'},
-    {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else'},
-    {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil'},
-    {id: 'blockly_controls_infiniteloop', name: 'Boucle infinie', url: baseUrl+'#blockly_controls_infiniteloop'},
-    {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation'},
-    {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat'},
-    {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable'},
-    {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list'},
-    {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function'},
-    {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands'},
-    {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments'}
+    {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', order: 100},
+    {id: 'language', name: "Création d'un programme", url: baseUrl+'#language', order: 110},
+    {id: 'blockly_text_print', name: 'Afficher du texte', url: baseUrl+'#blockly_text_print', order: 120},
+    {id: 'blockly_text_print_noend', name: 'Afficher consécutivement du texte', url: baseUrl+'#blockly_text_print_noend', order: 121},
+    {id: 'blockly_controls_repeat', name: 'Boucles de répétition', url: baseUrl+'#blockly_controls_repeat', order: 122},
+    {id: 'blockly_controls_if', name: 'Conditions si', url: baseUrl+'#blockly_controls_if', order: 123},
+    {id: 'blockly_controls_if_else', name: 'Conditions si/sinon', url: baseUrl+'#blockly_controls_if_else', order: 124},
+    {id: 'blockly_controls_whileUntil', name: 'Boucles tant que ou jusqu\'à', url: baseUrl+'#blockly_controls_whileUntil', order: 125},
+    {id: 'blockly_controls_infiniteloop', name: 'Boucle infinie', url: baseUrl+'#blockly_controls_infiniteloop', order: 126},
+    {id: 'blockly_logic_operation', name: 'Opérateurs logiques', url: baseUrl+'#blockly_logic_operation', order: 127},
+    {id: 'extra_nested_repeat', name: 'Boucles imbriquées', url: baseUrl+'#extra_nested_repeat', order: 130},
+    {id: 'extra_variable', name: 'Variables', url: baseUrl+'#extra_variable', order: 131},
+    {id: 'extra_list', name: 'Listes', url: baseUrl+'#extra_list', order: 132},
+    {id: 'extra_function', name: 'Fonctions', url: baseUrl+'#extra_function', order: 133},
+    {id: 'robot_commands', name: 'Commandes du robot', url: baseUrl+'#robot_commands', order: 200},
+    {id: 'arguments', name: 'Fonctions avec arguments', url: baseUrl+'#arguments', order: 140}
     ];
 
 
@@ -342,22 +342,32 @@ function conceptsFill(baseConcepts, allConcepts) {
     var fullConcept = allConcepts[c];
     if(baseConceptsById[fullConcept.id]) {
       var curConcept = baseConceptsById[fullConcept.id];
-      if(!conceptNames[curConcept.id]) {
-        curConcept.name = conceptNames[curConcept.id] = conceptNames[fullConcept.id];
-      } else {
-        curConcept.name = conceptNames[curConcept.id];
-      }
+      // Translate concept name if available
+      curConcept.name = conceptNames[curConcept.id] || fullConcept.name;
       if(!curConcept.url) {
         curConcept.url = fullConcept.url;
       }
-      concepts.push(curConcept);
+      if(!curConcept.order) {
+        curConcept.order = fullConcept.order;
+      }
+      if(!fullConcept.ignore) {
+        concepts.push(curConcept);
+      }
       delete baseConceptsById[fullConcept.id];
+    } else if(fullConcept.isBase && baseConceptsById['base']) {
+      concepts.push(fullConcept);
     }
   }
 
   for(var leftConcept in baseConceptsById) {
-    concepts.push(baseConceptsById[leftConcept]);
+    if(leftConcept != 'base') {
+      concepts.push(baseConceptsById[leftConcept]);
+    }
   }
+
+  concepts.sort(function(a,b) {
+    return !a.order || !b.order ? 0 : a.order - b.order;
+    });
 
   return concepts;
 }

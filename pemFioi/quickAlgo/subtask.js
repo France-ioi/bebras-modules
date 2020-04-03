@@ -93,7 +93,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(this.display && levelGridInfos.conceptViewer) {
          // TODO :: testConcepts is temporary-ish
          if(this.context.conceptList) {
-            var allConcepts = testConcepts.concat(this.context.conceptList);
+            var allConcepts = this.context.conceptList.concat(testConcepts);
          } else {
             var allConcepts = testConcepts;
          }
@@ -101,6 +101,8 @@ var initBlocklySubTask = function(subTask, language) {
          var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts, this.context);
          if(levelGridInfos.conceptViewer.length) {
             concepts = concepts.concat(levelGridInfos.conceptViewer);
+         } else {
+            concepts.push('base');
          }
          concepts = window.conceptsFill(concepts, allConcepts);
          window.conceptViewer.loadConcepts(concepts);
