@@ -1359,6 +1359,8 @@ var getContext = function (display, infos, curLevel) {
             step: 0.1,
             selectorImages: ["accel.png"],
             getStateString: function (state) {
+                if (state == null)
+                    return "0m/s²";
 
                 if (Array.isArray(state))
                 {
