@@ -1497,6 +1497,24 @@ var getContext = function (display, infos, curLevel) {
         return sensorDef;
     }
 
+    var defaultQuickPiOptions = {
+        disableConnection: false,
+        increaseTimeAfterCalls: 5
+        };
+    function getQuickPiOption(name) {
+        if(name == 'disableConnection') {
+            // TODO :: Legacy, remove when all tasks will have been updated
+            return (context.infos
+                && (context.infos.quickPiDisableConnection
+                || (context.infos.quickPi && context.infos.quickPi.disableConnection)));
+        }
+        if(context.infos && context.infos.quickPi && typeof context.infos.quickPi[name] != 'undefined') {
+            return context.infos.quickPi[name];
+        } else {
+            return defaultQuickPiOptions[name];
+        }
+    }
+
     function getWrongStateText(sensor, failInfo) {
         var actualStateStr = "" + failInfo.actual;
         var expectedStateStr = "" + failInfo.expected;
@@ -2157,7 +2175,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || !this.raphaelFactory)
             return;
 
-        var piUi = context.infos.quickPiDisableConnection ? '' : strings.messages.connectionHTML;
+        var piUi = getQuickPiOption('disableConnection') ? '' : strings.messages.connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
@@ -5676,7 +5694,8 @@ var getContext = function (display, infos, curLevel) {
             sensor.callsInTimeSlot = 1;
         }
 
-        if (sensor.callsInTimeSlot > 5) {
+        if (sensor.callsInTimeSlot > getQuickPiOption('increaseTimeAfterCalls')) {
+            console.log(sensor);
             context.currentTime += context.tickIncrease;
 
             sensor.lastTimeIncrease = context.currentTime;
