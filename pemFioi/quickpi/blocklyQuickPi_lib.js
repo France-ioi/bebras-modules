@@ -3499,6 +3499,8 @@ var getContext = function (display, infos, curLevel) {
         var isAnalog = findSensorDefinition(sensor).isAnalog;
         var percentage = + state;
 
+        var drawnElements = [];
+
         if (sensor.type == "accelerometer" ||
             sensor.type == "gyroscope" ||
             sensor.type == "magnetometer") {
@@ -3545,6 +3547,7 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linecap": "round"
                     });
 
+                    drawnElements.push(joinline);
 
                     if (sensor.timelinelastxlabel == null)
                         sensor.timelinelastxlabel = [0, 0, 0];
@@ -3557,13 +3560,14 @@ var getContext = function (display, infos, curLevel) {
                             stateText = sensorDef.getStateString(state[i]);
                         }
 
-                        paper.text(startx, ypositiontop + offset - 10, stateText);
+                        var paperText = paper.text(startx, ypositiontop + offset - 10, stateText);
+                        drawnElements.push(paperText);
 
                         sensor.timelinelastxlabel[i] = startx;
                     }
                 }
 
-                stateline = paper.path(["M", startx,
+                var stateline = paper.path(["M", startx,
                     ypositiontop + offset,
                     "L", startx + stateLenght,
                     ypositiontop + offset]);
@@ -3575,6 +3579,7 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
+                drawnElements.push(stateline);
             }
                 sensor.lastAnalogState = state == null ? [0, 0, 0] : state;
             }
@@ -3611,6 +3616,7 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
+                drawnElements.push(joinline);
 
                 if (!sensor.timelinelastxlabel)
                     sensor.timelinelastxlabel = 0;
@@ -3627,13 +3633,14 @@ var getContext = function (display, infos, curLevel) {
                     }
 
                     if (sensor.timelinestateup) {
-                        paper.text(startx, ypositiontop + offset - 10, stateText);
+                        var paperText = paper.text(startx, ypositiontop + offset - 10, stateText);
                         sensor.timelinestateup = false;
                     }
                     else {
-                        paper.text(startx, ypositiontop + offset + 20, stateText);
+                        var paperText = paper.text(startx, ypositiontop + offset + 20, stateText);
                         sensor.timelinestateup = true;
                     }
+                    drawnElements.push(paperText);
 
                     sensor.timelinelastxlabel = startx;
                 }
@@ -3641,7 +3648,7 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.lastAnalogState = state == null ? 0 : state;
 
-            stateline = paper.path(["M", startx,
+            var stateline = paper.path(["M", startx,
                 ypositiontop + offset,
                 "L", startx + stateLenght,
                 ypositiontop + offset]);
@@ -3652,6 +3659,8 @@ var getContext = function (display, infos, curLevel) {
                 "stroke-linejoin": "round",
                 "stroke-linecap": "round"
             });
+
+            drawnElements.push(stateline);
         } else if (sensor.type == "stick") {
             var stateToFA = [
                 "\uf062",
@@ -3694,6 +3703,8 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linejoin": "round",
                         "stroke-linecap": "round"
                     });
+
+                    drawnElements.push(stateline);
 
                     if (type == "expected") {
                         sensor.stateArrow = paper.text(startx, ypos, stateToFA[i]);
@@ -3866,6 +3877,7 @@ var getContext = function (display, infos, curLevel) {
 
                 c.animate({ width: stateLenght }, 200);
             }
+            drawnElements.push(c);
         }
 
         if (type == "wrong") {
@@ -3883,6 +3895,22 @@ var getContext = function (display, infos, curLevel) {
 
             wrongindicator.attr({
                 "stroke-width": 5, "stroke" : "red", "stroke-linecap": "round" });*/
+        }
+
+        if(type == 'actual' || type == 'wrong') {
+            if(!sensor.drawnGradingElements) {
+                sensor.drawnGradingElements = [];
+            } else {
+                for(var i = 0; i < sensor.drawnGradingElements.length; i++) {
+                    var dge = sensor.drawnGradingElements[i];
+                    if(dge.time >= startTime) {
+                        for(var j = 0; j < dge.elements.length; j++) {
+                            dge.elements[j].remove();
+                        }
+                    }
+                }
+            }
+            sensor.drawnGradingElements.push({time: startTime, elements: drawnElements});
         }
 
         // Make sure the current time bar is always on top of states
@@ -5661,17 +5689,22 @@ var getContext = function (display, infos, curLevel) {
             throw (strings.messages.sensorNotFound.format(name));
         }
 
-        if(sensor.lastDrawnState !== null && context.currentTime > sensor.lastDrawnTime) {
-            // Draw the line up to now
-            var type = "actual";
-            // Check the previous state
-            var expectedState = context.getSensorExpectedState(name, sensor.lastDrawnTime);
-            var sensorDef = findSensorDefinition(sensor);
-            if(expectedState !== null &&
-                !sensorDef.compareState(sensor.lastDrawnState, expectedState.state)) {
-                type = "wrong";
+        var sensorDef = findSensorDefinition(sensor);
+        if(sensor.lastDrawnState !== null) {
+            // Get all states between the last drawn time and now
+            var expectedStates = context.getSensorExpectedState(name, sensor.lastDrawnTime, context.currentTime);
+            for(var i = 0; expectedStates && i < expectedStates.length; i++) {
+                // Draw the line up to the next expected state
+                var expectedState = expectedStates[i];
+                var nextTime = i+1 < expectedStates.length ? expectedStates[i+1].time : context.currentTime;
+                var type = "actual";
+                // Check the previous state
+                if(!sensorDef.compareState(sensor.lastDrawnState, expectedState.state)) {
+                    type = "wrong";
+                }
+                drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, nextTime, type, false, expectedState.state);
+                sensor.lastDrawnTime = nextTime;
             }
-            drawSensorTimeLineState(sensor, sensor.lastDrawnState, sensor.lastDrawnTime, context.currentTime, type, false, expectedState && expectedState.state);
         }
 
         sensor.lastDrawnTime = context.currentTime;
@@ -5685,7 +5718,6 @@ var getContext = function (display, infos, curLevel) {
             var type = "actual";
             // Check the new state
             var expectedState = context.getSensorExpectedState(name, context.currentTime);
-            var sensorDef = findSensorDefinition(sensor);
 
             if (expectedState !== null && !sensorDef.compareState(expectedState.state, newState))
             {
@@ -5779,7 +5811,7 @@ var getContext = function (display, infos, curLevel) {
         drawNewStateChanges();
     }
 
-    context.getSensorExpectedState = function (name, targetTime = null) {
+    context.getSensorExpectedState = function (name, targetTime = null, upToTime = null) {
         var state = null;
         if(targetTime === null) {
             targetTime = context.currentTime;
@@ -5819,9 +5851,20 @@ var getContext = function (display, infos, curLevel) {
         // This is the end state
         if (state == null && targetTime >= startTime) {
             state = lastState;
+            idx = sensorStates.length-1;
         }
 
-        return state;
+        if(upToTime !== null) {
+            // If upToTime is given, return an array of states instead
+            for(var idx2 = idx; idx2 < sensorStates.length; idx2++) {
+                if(sensorStates[idx2].time >= upToTime) {
+                    break;
+                }
+            }
+            return sensorStates.slice(idx-1, idx2);
+        } else {
+            return state;
+        }
     }
 
 
