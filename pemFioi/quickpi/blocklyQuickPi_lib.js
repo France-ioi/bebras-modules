@@ -1930,6 +1930,22 @@ var getContext = function (display, infos, curLevel) {
                             }
                         }
                     }
+
+                    if (sensor.type == "buzzer") {
+                        var states = context.gradingStatesBySensor[sensor.name];
+
+                        if (states) {
+                            for (var iState = 0; iState < states.length; iState++) {
+                                var state = states[iState];
+                                
+                                if (typeof sensor.state == 'number' &&
+                                        sensor.state != 0 &&
+                                        sensor.state != 1)
+                                    sensor.showAsAnalog = true;
+                            }
+                        }
+                    }
+
                 }
             }
 
