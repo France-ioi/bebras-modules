@@ -1899,6 +1899,24 @@ var getContext = function (display, infos, curLevel) {
 
                 for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                     var sensor = infos.quickPiSensors[iSensor];
+                    
+                    if (sensor.type == "buzzer") {
+                        var states = context.gradingStatesBySensor[sensor.name];
+
+                        if (states) {
+                            for (var iState = 0; iState < states.length; iState++) {
+                                var state = states[iState].state;
+                                
+                                if (typeof state == 'number' &&
+                                        state != 0 &&
+                                        state != 1) {
+                                    sensor.showAsAnalog = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     var isAnalog = findSensorDefinition(sensor).isAnalog || sensor.showAsAnalog;
 
                     if (isAnalog) {
@@ -1930,22 +1948,6 @@ var getContext = function (display, infos, curLevel) {
                             }
                         }
                     }
-
-                    if (sensor.type == "buzzer") {
-                        var states = context.gradingStatesBySensor[sensor.name];
-
-                        if (states) {
-                            for (var iState = 0; iState < states.length; iState++) {
-                                var state = states[iState];
-                                
-                                if (typeof sensor.state == 'number' &&
-                                        sensor.state != 0 &&
-                                        sensor.state != 1)
-                                    sensor.showAsAnalog = true;
-                            }
-                        }
-                    }
-
                 }
             }
 
