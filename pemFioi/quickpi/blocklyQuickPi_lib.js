@@ -3731,7 +3731,7 @@ var getContext = function (display, infos, curLevel) {
                         "font": "Font Awesome 5 Free",
                         "stroke": color,
                         "fill": color,
-                        "font-size": (strokewidth * 2) + "px"
+                        "font-size": (4 * 2) + "px"
                     });
 
                     stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
@@ -3766,32 +3766,11 @@ var getContext = function (display, infos, curLevel) {
 
 
                             var ctx = canvas.getContext('2d');
-                            ctx.putImageData(state.getData(2), 0, 0);
 
                             if (expectedState && type == "wrong") {
-                                var expectedcanvas = document.createElement("canvas");
-                                expectedcanvas.id = "tooltipcanvas";
-                                expectedcanvas.width = 128 * 2;
-                                expectedcanvas.height = 32 * 2;
-                                $('#screentooltip').append(expectedcanvas);
-
-                                $(expectedcanvas).css("position", "absolute");
-                                $(expectedcanvas).css("z-index", "2000");
-                                $(expectedcanvas).css("left", 3).css("top", 3);
-    
-                                var ctx = expectedcanvas.getContext('2d');
-                                var expectedData = expectedState.getData(2);
-                                var newData = ctx.createImageData(128 * 2, 32 * 2);
-                                newData.data.set(expectedData.data);
-                                for (var i = 0; i < newData.data.length; i+=4) {
-                                    if (newData.data[i + 0] == 0 &&
-                                        expectedData.data[i + 1] == 0 &&
-                                        newData.data[i + 2] == 0) {
-                                            newData.data[i + 0] = 255;
-                                    }
-                                    newData.data[i + 3] = 128;
-                                }
-                                ctx.putImageData(newData, 0, 0);
+                                screenDrawing.renderDifferences(expectedState, state, canvas, 2);
+                            } else {
+                                screenDrawing.renderToCanvas(state, canvas, 2);
                             }
       
                             sensor.showingTooltip = true;

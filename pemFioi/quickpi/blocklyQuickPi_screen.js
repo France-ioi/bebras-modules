@@ -202,4 +202,58 @@ class screenDrawing {
                     }
                 }
         }
+
+        static renderToCanvas(state, canvas, scale) {
+            var ctx = canvas.getContext('2d');
+
+            ctx.putImageData(state.getData(scale), 0, 0);
+        }
+
+    static renderDifferences(dataExpected, dataWrong, canvas, scale) {
+        var ctx = canvas.getContext('2d');
+        var expectedData = dataExpected.getData(scale);
+        var actualData = dataWrong.getData(scale);
+
+        var newData = ctx.createImageData(canvas.width, canvas.height);
+
+        for (var i = 0; i < newData.data.length; i += 4) {
+            var actualSet = false;
+            var expectedSet = false;
+            if (expectedData.data[i + 0] != 255 &&
+                expectedData.data[i + 1] != 255 &&
+                expectedData.data[i + 2] != 255) {
+                expectedSet = true;
+            }
+
+            if (actualData.data[i + 0] != 255 &&
+                actualData.data[i + 1] != 255 &&
+                actualData.data[i + 2] != 255) {
+                actualSet = true;
+            }
+
+            if (expectedSet && actualSet) {
+                newData.data[i + 0] = 0;
+                newData.data[i + 1] = 0;
+                newData.data[i + 2] = 0;
+            }
+            else if (expectedSet) {
+                newData.data[i + 0] = 100;
+                newData.data[i + 1] = 100;
+                newData.data[i + 2] = 100;
+            }
+            else if (actualSet) {
+                newData.data[i + 0] = 255;
+                newData.data[i + 1] = 0;
+                newData.data[i + 2] = 0;
+            } else {
+                newData.data[i + 0] = 255;
+                newData.data[i + 1] = 255;
+                newData.data[i + 2] = 255;
+            }
+
+
+            newData.data[i + 3] = 255;
+        }
+        ctx.putImageData(newData, 0, 0);
+    }
 }
