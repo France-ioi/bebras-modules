@@ -421,6 +421,7 @@ var getContext = function (display, infos, curLevel) {
                 manualTestSuccess: "Test automatique validé.",
                 testSuccess: "Bravo ! La sortie est correcte",
                 wrongState: "Test échoué : {0} a été dans l'état {1} au lieu de {2} à t={3}ms.",
+                wrongStateDrawing: "Test échoué : {0} diffère de {1} pixels par rapport à l'affichage attendu à t={2}ms.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -439,7 +440,7 @@ var getContext = function (display, infos, curLevel) {
                 keep: "Garder",
                 minutesago: "Last seen {0} minutes ago",
                 hoursago: "Last seen more than one hour ago",
-                drawing: "drawing",
+                drawing: "dessin",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -1053,6 +1054,20 @@ var getContext = function (display, infos, curLevel) {
                 else
                     return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
             },
+            getWrongStateString: function(failInfo) {
+                if(!failInfo.expected.isDrawingData || !failInfo.actual.isDrawingData) {
+                    return null; // Use default message
+                }
+                var data1 = failInfo.expected.getData(1).data;
+                var data2 = failInfo.actual.getData(1).data;
+                var nbDiff = 0;
+                for (var i = 0; i < data1.length; i+=4) {
+                    if(data1[i] != data2[i]) {
+                        nbDiff += 1;
+                    }
+                }
+                return strings.messages.wrongStateDrawing.format(failInfo.name, nbDiff, failInfo.time);
+            },
             subTypes: [{
                 subType: "16x2lcd",
                 description: "Grove 16x2 LCD",
@@ -1519,9 +1534,17 @@ var getContext = function (display, infos, curLevel) {
         var actualStateStr = "" + failInfo.actual;
         var expectedStateStr = "" + failInfo.expected;
         var sensorDef = findSensorDefinition(sensor);
-        if(sensorDef && sensorDef.getStateString) {
-            actualStateStr = sensorDef.getStateString(failInfo.actual);
-            expectedStateStr = sensorDef.getStateString(failInfo.expected);
+        if(sensorDef) {
+            if(sensorDef.getWrongStateString) {
+                var sensorWrongStr = sensorDef.getWrongStateString(failInfo);
+                if(sensorWrongStr) {
+                    return sensorWrongStr;
+                }
+            }
+            if(sensorDef.getStateString) {
+                actualStateStr = sensorDef.getStateString(failInfo.actual);
+                expectedStateStr = sensorDef.getStateString(failInfo.expected);
+            }
         }
         return strings.messages.wrongState.format(failInfo.name, actualStateStr, expectedStateStr, failInfo.time);
     }
