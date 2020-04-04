@@ -935,7 +935,7 @@ var getContext = function (display, infos, curLevel) {
                     state != 1 &&
                     state != 0) {
 
-                        return state.toString();
+                        return state.toString() + "Hz";
                 }               
                 return state ? "ON" : "OFF";
             },
