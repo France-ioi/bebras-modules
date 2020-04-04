@@ -422,6 +422,7 @@ var getContext = function (display, infos, curLevel) {
                 testSuccess: "Bravo ! La sortie est correcte",
                 wrongState: "Test échoué : {0} a été dans l'état {1} au lieu de {2} à t={3}ms.",
                 wrongStateDrawing: "Test échoué : {0} diffère de {1} pixels par rapport à l'affichage attendu à t={2}ms.",
+                wrongStateSensor: "Test échoué : votre programme n'a pas lu l'état de {0} après t={1}ms.",
                 programEnded: "programme terminé.",
                 piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
                 cantConnect: "Impossible de se connecter à l'appareil.",
@@ -1530,11 +1531,14 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
-    function getWrongStateText(sensor, failInfo) {
+    function getWrongStateText(failInfo) {
         var actualStateStr = "" + failInfo.actual;
         var expectedStateStr = "" + failInfo.expected;
-        var sensorDef = findSensorDefinition(sensor);
+        var sensorDef = findSensorDefinition(failInfo.sensor);
         if(sensorDef) {
+            if(sensorDef.isSensor) {
+                return strings.messages.wrongStateSensor.format(failInfo.name, failInfo.time);
+            }
             if(sensorDef.getWrongStateString) {
                 var sensorWrongStr = sensorDef.getWrongStateString(failInfo);
                 if(sensorWrongStr) {
@@ -1640,6 +1644,7 @@ var getContext = function (display, infos, curLevel) {
                         }
                         if(!sensorDef.compareState(actualStates[actualIdx].state, expectedState.state)) {
                             newFailInfo = {
+                                sensor: sensor,
                                 name: sensorName,
                                 time: expectedState.time,
                                 expected: expectedState.state,
@@ -1649,6 +1654,7 @@ var getContext = function (display, infos, curLevel) {
                     } else {
                         // No actual states to compare to
                         newFailInfo = {
+                            sensor: sensor,
                             name: sensorName,
                             time: expectedState.time,
                             expected: expectedState.state,
@@ -1673,6 +1679,7 @@ var getContext = function (display, infos, curLevel) {
                     if(!sensorDef.compareState(actualState.state, expectedStates[expectedIdx].state)) {
                         // Got an unexpected state change
                         var newFailInfo = {
+                            sensor: sensor,
                             name: sensorName,
                             time: actualState.time,
                             expected: expectedStates[expectedIdx].state,
@@ -1686,7 +1693,7 @@ var getContext = function (display, infos, curLevel) {
             if(failInfo) {
                 // Missed expected state
                 context.success = false;
-                throw (getWrongStateText(sensor, failInfo));
+                throw (getWrongStateText(failInfo));
             } else {
                 // Success
                 context.success = true;
@@ -3370,7 +3377,6 @@ var getContext = function (display, infos, curLevel) {
             step = 1000;
 
 
-        console.log("test");
         var i = 0;
         for (; i <= context.maxTime; i += step) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
@@ -5856,7 +5862,6 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (sensor.callsInTimeSlot > getQuickPiOption('increaseTimeAfterCalls')) {
-            console.log(sensor);
             context.currentTime += context.tickIncrease;
 
             sensor.lastTimeIncrease = context.currentTime;
