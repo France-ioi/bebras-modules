@@ -279,6 +279,11 @@ function pythonFindLimited(code, limitedUses, blockToCode) {
    }
 
    for(var pyKey in limitedPointers) {
+      // Keys to ignore
+      if(pyKey == 'else' || pyKey == 'elif') {
+         continue;
+      }
+      // Special keys
       if(pyKey == 'list_brackets') {
          var re = /[\[\]]/g;
       } else if(pyKey == 'dict_brackets') {
