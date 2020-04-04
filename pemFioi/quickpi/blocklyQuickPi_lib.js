@@ -1879,7 +1879,7 @@ var getContext = function (display, infos, curLevel) {
         context.currentTime = 0;
         if (taskInfos != undefined) {
             context.actualStatesBySensor = {};
-            context.tickIncrease = 0;
+            context.tickIncrease = 100;
             context.autoGrading = taskInfos.autoGrading;
             context.loopsForever = taskInfos.loopsForever;
             context.allowInfiniteLoop = !context.autoGrading;
@@ -1887,7 +1887,6 @@ var getContext = function (display, infos, curLevel) {
                 context.gradingInput = taskInfos.input;
                 context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
-                context.tickIncrease = 100;
 
                 if (context.gradingInput)
                 {
@@ -2280,7 +2279,7 @@ var getContext = function (display, infos, curLevel) {
             if (!context.loopsForever)
                 maxTime = Math.floor(maxTime * 1.05);
 
-            context.pixelsPerTime = (paper.width - context.timelineStartx - 20) / maxTime;
+            context.pixelsPerTime = (paper.width - context.timelineStartx - 30) / maxTime;
 
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
@@ -3438,13 +3437,32 @@ var getContext = function (display, infos, curLevel) {
 
 
         if (!context.loopsForever) {
+            var endx = context.timelineStartx + (context.maxTime * context.pixelsPerTime);
             var x = context.timelineStartx + (i * context.pixelsPerTime);
             var timelabel = paper.text(x, context.timeLineY, '\uf11e');      
             timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
             timelabel.node.style.fontWeight = "bold";
 
-            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'middle', 'font-weight': 'bold', fill: "gray" });
             context.timelineText.push(timelabel);
+
+			if (context.timeLineEndLine)
+				context.timeLineEndLine.remove();
+
+            context.timeLineEndLine = paper.path(["M", endx,
+                                                0,
+                                                "L", endx,
+                                                context.timeLineY]);
+
+
+            if (context.endFlagEnd)
+                context.endFlagEnd.remove();
+            context.endFlagEnd = paper.rect(endx, 0, x, context.timeLineY + 10);
+            context.endFlagEnd.attr({
+                "fill": "lightgray",
+                "stroke": "none",
+                "opacity": 0.2,
+            });
         }
 
 
@@ -3459,7 +3477,18 @@ var getContext = function (display, infos, curLevel) {
     function drawCurrentTime() {
         if (!paper || !context.display || isNaN(context.currentTime))
             return;
+/*
+        if (context.currentTimeText)
+            context.currentTimeText.remove();
 
+        context.currentTimeText = paper.text(0, paper.height - 40, context.currentTime.toString() + "ms");
+        context.currentTimeText.attr({
+            "font-size": "10px",
+            'text-anchor': 'start'
+        });            */
+
+        if (!context.autoGrading)
+            return;
 
         var animationSpeed = 200; // ms
         var startx = context.timelineStartx + (context.currentTime * context.pixelsPerTime);
@@ -5803,8 +5832,6 @@ var getContext = function (display, infos, curLevel) {
     }
 
     context.increaseTime = function (sensor) {
-        if(!context.autoGrading) { return; }
-
         if (!sensor.lastTimeIncrease) {
             sensor.lastTimeIncrease = 0;
         }
@@ -5829,7 +5856,10 @@ var getContext = function (display, infos, curLevel) {
         }
 
         drawCurrentTime();
-        drawNewStateChanges();
+        if(context.autoGrading)
+        {
+            drawNewStateChanges();
+        }
 
         if(context.runner) {
             // Tell the runner an "action" happened
@@ -5843,26 +5873,25 @@ var getContext = function (display, infos, curLevel) {
 
         var newTime = context.currentTime + time;
 
-        if (!context.gradingStatesByTime)
-            return;
+        if (context.gradingStatesByTime) {
+            // Advance until current time, ignore everything in the past.
+            while (iStates < context.gradingStatesByTime.length &&
+                context.gradingStatesByTime[iStates].time < context.currentTime)
+                iStates++;
 
-        // Advance until current time, ignore everything in the past.
-        while (iStates < context.gradingStatesByTime.length &&
-               context.gradingStatesByTime[iStates].time < context.currentTime)
-            iStates++;
+            for (; iStates < context.gradingStatesByTime.length; iStates++) {
+                var sensorState = context.gradingStatesByTime[iStates];
 
-        for (; iStates < context.gradingStatesByTime.length; iStates++) {
-            var sensorState = context.gradingStatesByTime[iStates];
+                // Until the new time
+                if (sensorState.time >= newTime)
+                    break;
 
-            // Until the new time
-            if (sensorState.time >= newTime)
-                break;
-
-            // Mark all inputs as hit
-            if (sensorState.input) {
-                sensorState.hit = true;
-//                context.currentTime = sensorState.time;
-                context.getSensorState(sensorState.name);
+                // Mark all inputs as hit
+                if (sensorState.input) {
+                    sensorState.hit = true;
+    //                context.currentTime = sensorState.time;
+                    context.getSensorState(sensorState.name);
+                }
             }
         }
 
@@ -5874,7 +5903,9 @@ var getContext = function (display, infos, curLevel) {
         context.currentTime = newTime;
 
         drawCurrentTime();
-        drawNewStateChanges();
+        if (context.autoGrading) {
+            drawNewStateChanges();
+        }
     }
 
     context.getSensorExpectedState = function (name, targetTime = null, upToTime = null) {
@@ -6402,9 +6433,8 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.sleep = function (time, callback) {
+        context.increaseTimeBy(time);
         if (!context.display || context.autoGrading) {
-
-            context.increaseTimeBy(time);
             context.runner.noDelay(callback);
         }
         else {
