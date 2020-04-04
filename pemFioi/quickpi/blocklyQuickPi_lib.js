@@ -3969,10 +3969,14 @@ var getContext = function (display, infos, curLevel) {
                         for(var j = 0; j < dge.elements.length; j++) {
                             dge.elements[j].remove();
                         }
+                        sensor.drawnGradingElements.splice(i, 1);
+                        i -= 1;
                     }
                 }
             }
-            sensor.drawnGradingElements.push({time: startTime, elements: drawnElements});
+            if(drawnElements.length) {
+                sensor.drawnGradingElements.push({time: startTime, elements: drawnElements});
+            }
         }
 
         // Make sure the current time bar is always on top of states
@@ -5898,12 +5902,11 @@ var getContext = function (display, infos, curLevel) {
         var lastState;
         var startTime = -1;
         for (var idx = 0; idx < sensorStates.length; idx++) {
-            if (startTime >= 0) {
-                if (targetTime >= startTime &&
-                    targetTime < sensorStates[idx].time) {
+            if (startTime >= 0
+                && targetTime >= startTime
+                && targetTime < sensorStates[idx].time) {
                     state = lastState;
                     break;
-                }
             }
 
             startTime = sensorStates[idx].time;
@@ -5911,19 +5914,21 @@ var getContext = function (display, infos, curLevel) {
         }
 
         // This is the end state
-        if (state == null && targetTime >= startTime) {
+        if(state === null && targetTime >= startTime) {
             state = lastState;
-            idx = sensorStates.length-1;
         }
 
-        if(upToTime !== null) {
+        if(state && upToTime !== null) {
             // If upToTime is given, return an array of states instead
-            for(var idx2 = idx; idx2 < sensorStates.length; idx2++) {
-                if(sensorStates[idx2].time >= upToTime) {
+            var states = [state];
+            for(var idx2 = idx+1; idx2 < sensorStates.length; idx2++) {
+                if(sensorStates[idx2].time < upToTime) {
+                    states.push(sensorStates[idx2]);
+                } else {
                     break;
                 }
             }
-            return sensorStates.slice(idx-1, idx2);
+            return states;
         } else {
             return state;
         }
