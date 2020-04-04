@@ -3377,7 +3377,11 @@ var getContext = function (display, infos, curLevel) {
 
             var timelabel = paper.text(x, context.timeLineY, (i / 1000).toString() + "s");
 
-            timelabel.attr({ "font-size": "15" + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            var fontsize = context.pixelsPerTime * step * 0.4;
+            if (fontsize > 15)
+                fontsize = 15;
+
+            timelabel.attr({ "font-size": fontsize.toString() + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
 
             context.timelineText.push(timelabel);
         }
