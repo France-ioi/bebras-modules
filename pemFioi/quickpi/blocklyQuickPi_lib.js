@@ -1884,21 +1884,25 @@ var getContext = function (display, infos, curLevel) {
             context.loopsForever = taskInfos.loopsForever;
             context.allowInfiniteLoop = !context.autoGrading;
             if (context.autoGrading) {
-                context.gradingInput = taskInfos.input;
-                context.gradingOutput = taskInfos.output;
                 context.maxTime = 0;
 
-                if (context.gradingInput)
+                if (taskInfos.input)
                 {
-                    for (var i = 0; i < context.gradingInput.length; i++)
+                    for (var i = 0; i < taskInfos.input.length; i++)
                     {
-                        context.gradingInput[i].input = true;
+                        taskInfos.input[i].input = true;
                     }
-                    context.gradingStatesByTime = context.gradingInput.concat(context.gradingOutput);
+                    context.gradingStatesByTime = taskInfos.input.concat(taskInfos.output);
                 }
                 else {
-                    context.gradingStatesByTime = context.gradingOutput;
+                    context.gradingStatesByTime = taskInfos.output;
                 }
+
+                // Copy states to avoid modifying the taskInfos states
+                context.gradingStatesByTime = context.gradingStatesByTime.map(
+                    function(val) {
+                        return Object.assign({}, val);
+                    });
 
                 context.gradingStatesByTime.sort(function (a, b) { return a.time - b.time; });
 
