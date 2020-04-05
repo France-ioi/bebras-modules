@@ -1015,21 +1015,7 @@ var getContext = function (display, infos, curLevel) {
                     return false;
 
                 if (state1 && state1.isDrawingData) {
-                    // They are ImageData objects
-                    // The image data is RGBA so there are 4 bits per pixel
-
-                    var data1 = state1.getData(1).data;
-                    var data2 = state2.getData(1).data;
-
-                    for (var i = 0; i < data1.length; i+=4) {
-                        if (data1[i]  != data2[i] ||
-                            data1[i + 1]  != data2[i + 1] ||
-                            data1[i + 2]  != data2[i + 2] ||
-                            data1[i + 3]  != data2[i + 3])
-                            return false;
-                    }
-
-                    return true;
+                    return screenDrawing.compareStates(state1, state2);
                 } else {
 
                     // Otherwise compare the strings
@@ -1059,10 +1045,10 @@ var getContext = function (display, infos, curLevel) {
                 if(!failInfo.expected.isDrawingData || !failInfo.actual.isDrawingData) {
                     return null; // Use default message
                 }
-                var data1 = failInfo.expected.getData(1).data;
-                var data2 = failInfo.actual.getData(1).data;
+                var data1 = failInfo.expected.data;
+                var data2 = failInfo.actual.data;
                 var nbDiff = 0;
-                for (var i = 0; i < data1.length; i+=4) {
+                for (var i = 0; i < data1.length; i++) {
                     if(data1[i] != data2[i]) {
                         nbDiff += 1;
                     }
