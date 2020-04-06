@@ -1225,7 +1225,7 @@ function LR_Parser(settings,subTask,answer) {
             this.clearHighlight();
             // var animationTime = 0;
          }else{
-            var animationTime = (action.actionType == "r") ? 4*this.animationTime : this.animationTime;
+            var animationTime = (action.actionType == "r") ? 4.5*this.animationTime : 1.5*this.animationTime;
          }
          if(progressBarMove){
             var newPos = {width:progress+"%"};
@@ -2348,6 +2348,7 @@ function LR_Parser(settings,subTask,answer) {
          }
       }else{
          // var previousState = this.stack[this.stack.length - 2][0];
+         // var animTime = (action == "shift") ? this.animationTime*0.8 : this.animationTime;
          this.changeStateAnim(previousState,this.currentState,this.animationTime);
       }
       if(this.currentState == this.getTerminalState()){
