@@ -1544,6 +1544,10 @@ var getContext = function (display, infos, curLevel) {
             portType: "none",
             valueType: "object",
             selectorImages: ["cloudstore.png"],
+            getInitialState: function(sensor) {
+                return {};
+            },
+
             compareState: function (state1, state2) {
                 return quickPiStore.compareState(state1, state2);
             },
