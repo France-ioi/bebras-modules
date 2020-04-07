@@ -183,6 +183,41 @@ var gyroscope3D = (function() {
 })();
 
 
+
+function QuickStore(options) {
+    function post(path, data, callback) {
+        var url = options.host.replace(/\/$/, "") + path;
+        $.ajax({
+            type: 'POST',
+            url: url,
+            crossDomain: true,
+            data: data,
+            dataType: 'json',
+            success: callback
+        });
+    }
+
+    return {
+        read: function(key, callback) {
+            var data = {
+                prefix: options.prefix,
+                key: key
+            };
+            post('/api/data/read', data, callback);
+        },
+
+        write: function(key, value, callback) {
+            var data = {
+                prefix: options.prefix,
+                password: options.password,
+                key: key,
+                value: value
+            };
+            post('/api/data/write', data, callback);
+        }
+    }
+}
+
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
 
@@ -265,6 +300,11 @@ var getContext = function (display, infos, curLevel) {
                 readAngularVelocity: "read angular velocity (°/s) %1",
                 setGyroZeroAngle: "set the gyroscope zero point",
                 computeRotationGyro: "compute rotation in the gyroscope %1",
+
+                //Internet store
+                connectToCloudStore: "Connect to cloud store. Prefix %1 Password %2",
+                writeToCloudStore: "Write to cloud store. Key %1 Value %2",
+                readFromCloudStore: "Read from cloud store. Key %1",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
@@ -340,6 +380,11 @@ var getContext = function (display, infos, curLevel) {
                 setGyroZeroAngle: "setGyroZeroAngle",
                 computeRotationGyro: "computeRotationGyro",
 
+                //Internet store
+                connectToCloudStore: "connectToCloudStore",
+                writeToCloudStore: "writeToCloudStore",
+                readFromCloudStore: "readFromCloudStore",                
+
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -411,6 +456,11 @@ var getContext = function (display, infos, curLevel) {
                 readAngularVelocity: "readAngularVelocity()",
                 setGyroZeroAngle: "setGyroZeroAngle()",
                 computeRotationGyro: "computeRotationGyro()",
+
+                //Internet store
+                connectToCloudStore: "connectToCloudStore(prefix, password)",
+                writeToCloudStore: "writeToCloudStore(key, value)",
+                readFromCloudStore: "readFromCloudStore(key)",
             },
             constant: {
             },
@@ -638,6 +688,10 @@ var getContext = function (display, infos, curLevel) {
                 setGyroZeroAngle: "setGyroZeroAngle",
                 computeRotationGyro: "computeRotationGyro",
 
+                //Internet store
+                connectToCloudStore: "connectToCloudStore",
+                writeToCloudStore: "writeToCloudStore",
+                readFromCloudStore: "readFromCloudStore",
             }
         }
     }
@@ -1479,6 +1533,31 @@ var getContext = function (display, infos, curLevel) {
                 });
             },
         },
+        /******************************** */
+        /*             dummy sensors      */
+        /**********************************/
+        {
+            name: "cloudstore",
+            description: "Cloud store",
+            isAnalog: false,
+            isSensor: false,
+            portType: "none",
+            valueType: "object",
+            selectorImages: ["cloudstore.png"],
+            compareState: function (state1, state2) {
+                return quickPiStore.compareState(state1, state2);
+            },
+
+        },
+        {
+            name: "clock",
+            description: "Cloud store",
+            isAnalog: false,
+            isSensor: false,
+            portType: "none",
+            valueType: "object",
+            selectorImages: ["clock.png"],
+        },
     ];
 
 
@@ -1605,6 +1684,12 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display && !context.autoGrading) {
             context.success = true;
             throw (strings.messages.manualTestSuccess);
+        }
+
+        if (context.failImmediately)
+        {
+            context.success = false;
+            throw (context.failImmediately);
         }
 
         var testEnded = lastTurn || context.currentTime > context.maxTime;
@@ -1876,6 +1961,8 @@ var getContext = function (display, infos, curLevel) {
 
     context.reset = function (taskInfos) {
         buzzerSound.stopAll();
+
+        context.failImmediately  = null;
 
         if (!context.offLineMode) {
             $('#piinstallcheck').hide();
@@ -3961,6 +4048,68 @@ var getContext = function (display, infos, curLevel) {
             } else {
                 deleteLastDrawnElements = false;
             }
+        } else if (sensor.type == "cloudstore") {
+            var sensorDef = findSensorDefinition(sensor);
+            if (type != "actual" || !sensor.lastScreenState || !sensorDef.compareState(sensor.lastScreenState, state)) 
+            {
+                sensor.lastScreenState = state;
+                    var stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf044');
+
+                    stateBubble.attr({
+                        "font": "Font Awesome 5 Free",
+                        "stroke": color,
+                        "fill": color,
+                        "font-size": (4 * 2) + "px"
+                    });
+
+                    stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
+                    stateBubble.node.style.fontWeight = "bold";
+
+                    function showPopup(event) {
+
+                        if (!sensor.showingTooltip)
+                        {
+                            $( "body" ).append('<div id="screentooltip"></div>');
+
+                            $('#screentooltip').css("position", "absolute");
+                            $('#screentooltip').css("border", "1px solid gray");
+                            $('#screentooltip').css("background-color", "#efefef");
+                            $('#screentooltip').css("padding", "3px");
+                            $('#screentooltip').css("z-index", "1000");
+                            /*
+                            $('#screentooltip').css("width", "262px");
+                            $('#screentooltip').css("height", "70px");*/
+
+                            $('#screentooltip').css("left", event.clientX+2).css("top", event.clientY+2);
+
+
+                            if (expectedState && type == "wrong") {
+                                var div = quickPiStore.renderDifferences(expectedState, state);
+                                $('#screentooltip').append(div);
+                            } else {
+                                for (var property in state) {
+                                    var div = document.createElement("div");
+                                    $(div).text(property + " = " + state[property]);
+                                    $('#screentooltip').append(div);
+                                }
+                            }
+
+                            sensor.showingTooltip = true;
+                        }
+                    };
+
+                    $(stateBubble.node).mouseenter(showPopup);
+                    $(stateBubble.node).click(showPopup);
+
+                    $(stateBubble.node).mouseleave(function(event) {
+                        sensor.showingTooltip = false;
+                        $('#screentooltip').remove();
+                    });
+
+                drawnElements.push(stateBubble);
+            } else {
+                deleteLastDrawnElements = false;
+            }
         } else if (percentage != 0) {
             if (type == "wrong" || type == "actual") {
                 ypositionmiddle += 2;
@@ -4356,6 +4505,7 @@ var getContext = function (display, infos, curLevel) {
         var namesize = sensor.drawInfo.height * 0.10;
 
         var drawPortText = true;
+        var drawName = true;
 
         if (!sensor.focusrect || !sensor.focusrect.paper.canvas)
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
@@ -5662,6 +5812,35 @@ var getContext = function (display, infos, curLevel) {
 
             sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
             sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
+        } else if (sensor.type == "cloudstore") {
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('cloudstore.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+            
+            drawPortText = false;
+            drawName = false;
+
+        } else if (sensor.type == "clock") {
+            if (!sensor.img || !sensor.img.paper.canvas)
+                sensor.img = paper.image(getImg('clock.png'), imgx, imgy, imgw, imgh);
+
+            sensor.img.attr({
+                "x": imgx,
+                "y": imgy,
+                "width": imgw,
+                "height": imgh,
+            });
+
+            sensor.stateText = paper.text(state1x, state1y, context.currentTime.toString() + "ms");
+
+            drawPortText = false;
+            drawName = false;
         }
 
 
@@ -5738,10 +5917,12 @@ var getContext = function (display, infos, curLevel) {
         }
 
 
-        if (sensor.name) {
-            sensor.nameText = paper.text(namex, namey, sensor.name );
-            sensor.nameText.attr({ "font-size": namesize + "px", 'text-anchor': nameanchor, fill: "#7B7B7B" });
-            sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+        if (drawName) {
+            if (sensor.name) {
+                sensor.nameText = paper.text(namex, namey, sensor.name );
+                sensor.nameText.attr({ "font-size": namesize + "px", 'text-anchor': nameanchor, fill: "#7B7B7B" });
+                sensor.nameText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+            }
         }
 
 
@@ -7048,6 +7229,98 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
+    context.quickpi.connectToCloudStore = function (prefix, password, callback) {
+        var sensor = findSensorByType("cloudstore");
+
+        if (!context.display || context.autoGrading) {
+            sensor.quickStore = new quickPiStore();
+        } else {
+            sensor.quickStore = QuickStore({
+                host: "http://quick-store.mobydimk.space",
+                prefix: prefix,
+                password: password
+            });
+        }
+
+        context.runner.noDelay(callback, 0);
+    };
+
+    context.quickpi.writeToCloudStore = function (key, value, callback) {
+        var sensor = findSensorByType("cloudstore");
+
+        if (!sensor.quickStore)
+        {
+            context.success = false;
+            throw("Cloud store not connected");
+        }
+
+        if (!context.display || context.autoGrading) {
+
+            sensor.quickStore.write(key, value);
+
+            context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
+
+            context.runner.noDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            sensor.quickStore.write(key, value, function(data) {
+                if (!data || !data.success)
+                {
+                    if (data && data.message)
+                        context.failImmediately = "cloudstore: " + data.message;
+                    else
+                        context.failImmediately = "Error trying to communicate with cloud store";
+    
+                }
+                cb();
+            });
+        }
+    };
+
+    context.quickpi.readFromCloudStore = function (key, callback) {
+        var sensor = findSensorByType("cloudstore");
+
+        if (!sensor.quickStore)
+        {
+            context.success = false;
+            throw("Cloud store not connected");
+        }
+
+        if (!context.display || context.autoGrading) {
+            var state = context.getSensorState(sensor.name);
+            var value = "";
+
+            if (state.hasOwnProperty(key)) {
+                value = state[key];
+            }
+            else {
+                context.success = false;
+                throw("Key not found");    
+            }
+
+            context.runner.noDelay(callback, value);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+            sensor.quickStore.read(key, function(data) {
+                var value = "";
+                if (data && data.success)
+                {
+                    value = data.value;
+                }
+                else
+                {
+                    if (data && data.message)
+                        context.failImmediately = "cloudstore: " + data.message;
+                    else
+                        context.failImmediately = "Error trying to communicate with cloud store";
+                }
+
+                cb(value);
+            });
+        }
+    };
+
+
     /***** Blocks definitions *****/
     /* Here we define all blocks/functions of the library.
        Structure is as follows:
@@ -7177,7 +7450,7 @@ var getContext = function (display, infos, curLevel) {
 
         do {
             i++;
-            newname = type + i.toString();
+            newName = type + i.toString();
         } while (findSensorByName(newName));
 
         return newName;
@@ -7619,6 +7892,41 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                 },
+                {
+                    name: "connectToCloudStore", params: ["String", "String"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", text: ""},
+                            { "type": "input_value", "name": "PARAM_1", text: ""},
+                        ]
+                    },
+                    blocklyXml: "<block type='connectToCloudStore'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "writeToCloudStore", params: ["String", "String"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", text: ""},
+                            { "type": "input_value", "name": "PARAM_1", text: ""},
+                        ]
+                    },
+                    blocklyXml: "<block type='writeToCloudStore'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "readFromCloudStore", yieldsValue: true, params: ["String"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", text: ""},
+                        ]
+                    },
+                    blocklyXml: "<block type='readFromCloudStore'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
+                },
+
             ]
         }
         // We can add multiple namespaces by adding other keys to customBlocks.
