@@ -135,6 +135,7 @@ var importableModules = function () {
       'quickpi-board': { src: modulesPath + "/pemFioi/quickpi/quickpi_board.js", id: "quickpi_board" },
       'quickpi-connection': { src: modulesPath + "/ext/quickpi/quickpi.js", id: "quickpi_connection" },
       'quickpi-screen': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_screen.js", id: "quickpi-screen" },
+      'quickpi-store': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_store.js", id: "quickpi-store" },
    }
 }
 
