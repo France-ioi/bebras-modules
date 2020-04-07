@@ -13,6 +13,12 @@ var importableFonts = function () {
              src: mp+"/fonts/titilliumweb.css",
              embed: mp+"/fonts/embed-titilliumweb.css",
              cdn: "https://static4.castor-informatique.fr/modules/fonts/titilliumweb.css"
+        },
+        'segoe-ui-symbol': {
+            check: '"Segoe UI Symbol"',
+            src: mp+"/fonts/seguisym.css",
+            // embed: mp+"/fonts/embed-titilliumweb.css",
+            cdn: "https://static4.castor-informatique.fr/modules/fonts/seguisym.css"
         }
     };
 }
