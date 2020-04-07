@@ -89,8 +89,15 @@ function LR_Parser(settings,subTask,answer) {
    this.accept = false;
    this.error = false;
 
-   var arrow = "🡒";
-   var dot = "🞄";
+   // var arrow = "🡒";
+   // var dot = "🞄";
+   if(/Linux/.test(window.navigator.platform)){
+      var arrow = "→";
+      var dot = "・";
+   }else{
+      var arrow = "🡒";
+      var dot = "🞄";
+   }
 
    this.colors = {
       black: "#4a4a4a",
