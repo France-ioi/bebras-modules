@@ -242,7 +242,7 @@ var localLanguageStrings = {
       flagClicked: "Sobald %1 geklickt", // (scratch start flag, %1 is the flag icon)
       tooManyIterations: "Zu viele Anweisungen wurden ausgeführt!",
       tooManyIterationsWithoutAction: "Zu viele Anweisungen ohne eine Aktion wurden ausgeführt!",
-      submitProgram: "Ausführen und bewerten",
+      submitProgram: "Speichern, ausführen und bewerten",
       runProgram: "Testen",
       stopProgram: "|<",
       speedSliderSlower: "Slower",
