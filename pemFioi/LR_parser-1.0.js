@@ -89,8 +89,6 @@ function LR_Parser(settings,subTask,answer) {
    this.accept = false;
    this.error = false;
 
-   // var arrow = "🡒";
-   // var dot = "🞄";
    if(/Linux/.test(window.navigator.platform)){
       var arrow = "→";
       var dot = "・";
@@ -378,6 +376,8 @@ function LR_Parser(settings,subTask,answer) {
             };
             graphEditorSettings.callback = this.graphEditorCallback;
             graphEditorSettings.selectVertexCallback = this.selectVertexCallback;
+            graphEditorSettings.startDragCallbackCallback = this.startDragCallback;
+            graphEditorSettings.moveDragCallback = this.moveDragCallback;
             graphEditorSettings.contentValidation = this.contentValidation;
             graphEditorSettings.onDragEnd = this.graphEditorCallback;
             graphEditorSettings.vertexLabelPrefix = "";
@@ -593,7 +593,6 @@ function LR_Parser(settings,subTask,answer) {
          }
          html += "</tr>";
       }
-      // html += "<tr><td>"+terminalStateIndex+"</td></tr>";
       html += "</table>";
       $("#"+this.parseTableID).append(html);
       this.initStackPreview();
@@ -602,13 +601,7 @@ function LR_Parser(settings,subTask,answer) {
    this.initStackPreview = function() {
       $("#"+this.parseTableID).prepend("<div id=\"stackPreview\"></div>");
       stackPreviewH = $("#"+this.parseTableID).height();
-      // var parseTablePos = $("#"+this.parseTableID+" table").offset();
       this.stackPreview = subTask.raphaelFactory.create("stackPreview","stackPreview",stackPreviewW,stackPreviewH);
-      // $("#stackPreview").css({
-      //    position: "absolute",
-      //    left: parseTablePos.left - stackPreviewW,
-      //    top: 0
-      // });
    };
 
    this.initParseInfo = function() {
@@ -994,7 +987,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      if(info.terminal){
+      if(info.terminal && self.mode != 3){
          wCorr = 50;
          visualInfo.wCorr = wCorr;
          reductionInfo = "acc.";
@@ -2768,6 +2761,17 @@ function LR_Parser(settings,subTask,answer) {
       var vertex = self.visualGraph.getRaphaelsFromID(id);
       vertex[1].toFront();
       vertex[2].toFront();
+   };
+
+   this.moveDragCallback = function(id) {
+      var vertex = self.visualGraph.getRaphaelsFromID(id);
+      var labelHeight = 2*self.vertexLabelAttr["font-size"];
+      var w = vertex[0].attr("width");
+      var h = vertex[0].attr("height");
+      var xRect = vertex[0].attr("x");
+      var yRect = vertex[0].attr("y");
+
+      vertex[4].attr("clip-rect",xRect+" "+yRect+" "+w+" "+labelHeight);
    };
 
    function fixedCharAt(str, idx) {

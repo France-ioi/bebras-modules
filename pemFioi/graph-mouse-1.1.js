@@ -769,6 +769,7 @@ function VertexDragAndConnect(settings) {
    this.onDragEnd = settings.onDragEnd;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
+   this.moveDragCallback = settings.moveDragCallback;
    this.clickHandlerCallback = settings.clickHandlerCallback;
 
    this.gridEnabled = false;
@@ -933,6 +934,10 @@ function VertexDragAndConnect(settings) {
       }
 
       self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+
+      if(self.moveDragCallback){
+         self.moveDragCallback(self.elementID);
+      }
    };
 
    this.clickHandler = function(id,x,y) {
