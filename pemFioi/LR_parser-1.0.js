@@ -406,6 +406,7 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setLoopEnabled(false);
             this.graphEditor.setInitialEnabled(false);
             this.graphEditor.setAllowMultipleTerminal(false);
+            this.graphEditor.graphDragger.setMoveDragCallback(this.graphDraggerMoveDragCallback);
          }
          this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
@@ -2772,6 +2773,13 @@ function LR_Parser(settings,subTask,answer) {
       var yRect = vertex[0].attr("y");
 
       vertex[4].attr("clip-rect",xRect+" "+yRect+" "+w+" "+labelHeight);
+   };
+
+   this.graphDraggerMoveDragCallback = function() {
+      var vertices = self.graph.getAllVertices();
+      for(var vertex of vertices){
+         self.moveDragCallback(vertex);
+      }
    };
 
    function fixedCharAt(str, idx) {
