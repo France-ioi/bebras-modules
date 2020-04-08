@@ -211,7 +211,7 @@ function QuickStore(options) {
                 prefix: options.prefix,
                 password: options.password,
                 key: key,
-                value: value
+                value: JSON.stringify(value)
             };
             post('/api/data/write', data, callback);
         }
@@ -274,6 +274,7 @@ var getContext = function (display, infos, curLevel) {
 
 
                 drawPoint: "draw pixel",
+                isPointSet: "is pixel set in screen",
                 drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
                 drawRectangle: "rectangle x₀: %1 y₀: %2 largeur₀: %3 hauteur₀: %4",
                 drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
@@ -349,6 +350,7 @@ var getContext = function (display, infos, curLevel) {
 
 
                 drawPoint: "drawPoint",
+                isPointSet: "isPointSet",
                 drawLine: "drawLine",
                 drawRectangle: "drawRectangle",
                 drawCircle: "drawCircle",
@@ -427,6 +429,7 @@ var getContext = function (display, infos, curLevel) {
                 getTemperature: "getTemperature(thermometer) ",
 
                 drawPoint: "drawPoint(x, y)",
+                isPointSet: "isPointSet(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
                 drawRectangle: "drawRectangle(x0, y0, width, height)",
                 drawCircle: "drawCircle(x0, y0, diameter)",
@@ -660,6 +663,7 @@ var getContext = function (display, infos, curLevel) {
 
 
                 drawPoint: "drawPoint",
+                isPointSet: "isPointSet",
                 drawLine: "drawLine",
                 drawRectangle: "drawRectangle",
                 drawCircle: "drawCircle",
@@ -1110,7 +1114,10 @@ var getContext = function (display, infos, curLevel) {
                     return '"' + state.line1 + (state.line2 ? " / " + state.line2 : "") + '"';
             },
             getWrongStateString: function(failInfo) {
-                if(!failInfo.expected.isDrawingData || !failInfo.actual.isDrawingData) {
+                if(!failInfo.expected ||
+                   !failInfo.expected.isDrawingData ||
+                   !failInfo.actual ||
+                   !failInfo.actual.isDrawingData) {
                     return null; // Use default message
                 }
                 var data1 = failInfo.expected.getData(1).data;
@@ -6798,6 +6805,25 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.quickpi.isPointSet = function(x, y, callback) {
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        var value = sensor.screenDrawing.isPointSet(x, y);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback, value);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            var command = "drawPoint(" + x + "," + y + ")";
+            context.quickPiConnection.sendCommand(command, function () {
+                cb();
+            });
+        }
+    };
+
     context.quickpi.drawLine = function(x0, y0, x1, y1, callback) {
         var sensor = findSensorByType("screen");
 
@@ -7259,7 +7285,6 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (!context.display || context.autoGrading) {
-
             sensor.quickStore.write(key, value);
 
             context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
@@ -7267,7 +7292,18 @@ var getContext = function (display, infos, curLevel) {
             context.runner.noDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            sensor.quickStore.write(key, value, function(data) {
+            var type = "";
+
+            if (Array.isArray(value)) {
+                type = "array";
+            } else {
+                type = "single";
+            }
+
+            sensor.quickStore.write(key, {
+                type: type,
+                value: value
+            }, function(data) {
                 if (!data || !data.success)
                 {
                     if (data && data.message)
@@ -7309,7 +7345,8 @@ var getContext = function (display, infos, curLevel) {
                 var value = "";
                 if (data && data.success)
                 {
-                    value = data.value;
+                    var jsonobj = JSON.parse(data.value);
+                    value = jsonobj.value;
                 }
                 else
                 {
@@ -7793,6 +7830,18 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='drawPoint'>" +
+                        "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "isPointSet", yieldsValue: true, params: ["Number", "Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0"},
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='isPointSet'>" +
                         "<value name='PARAM_0'><shadow type='math_number'></shadow></value>" +
                         "<value name='PARAM_1'><shadow type='math_number'></shadow></value>" +
                         "</block>"
