@@ -106,6 +106,32 @@ class screenDrawing {
                 this._drawPoint(this.canvas[i], scale, x, y);
             }
         }
+
+        isPointSet(x, y) {
+            for (var i = 0; i < this.scales.length; i++) {
+                var scale = this.scales[i];
+
+                if (scale == 1) {
+
+                    var ctx = this.canvas[i].getContext('2d');
+                    var imagedata = ctx.getImageData(0, 0, this.canvas[i].width, this.canvas[i].height);
+
+                    var basepos = (x + (y * this.canvas[i].width)) * 4;
+
+                    var r = imagedata.data[basepos];
+                    var g = imagedata.data[basepos + 1];
+                    var b = imagedata.data[basepos + 2];
+                    var a = imagedata.data[basepos + 3];
+
+                    if (r != 255 && g != 255 && b != 255)
+                        return true;
+
+                    break;
+                }   
+            }
+
+            return false;
+        }
         
 
         _drawLine(canvas, scale, x0, y0, x1, y1) {
