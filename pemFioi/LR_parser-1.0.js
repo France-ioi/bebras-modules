@@ -2032,12 +2032,13 @@ function LR_Parser(settings,subTask,answer) {
    this.highlightPrevState = function(previousState) {
       var vertex = this.getStateID(previousState);
       var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
-      var x = raphObj[0].attr("x");
-      var y = raphObj[0].attr("y");
+      // var x = raphObj[0].attr("x");
+      // var y = raphObj[0].attr("y");
+      var pos = this.visualGraph.getVertexVisualInfo(vertex);
       var width = raphObj[0].attr("width");
       var height = raphObj[0].attr("height");
       var r = raphObj[0].attr("r");
-      this.prevStateHighlight = this.paper.rect(x,y,width,height,r).attr(this.previousStateAttr)
+      this.prevStateHighlight = this.paper.rect(pos.x - width/2,pos.y - height/2,width,height,r).attr(this.previousStateAttr)
    };
 
    this.highlightEdge = function(edgeID,back) {
