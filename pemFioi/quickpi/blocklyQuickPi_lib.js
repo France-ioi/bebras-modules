@@ -4879,7 +4879,9 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 if (sensor.state.isDrawingData) {
-                    if (!sensor.screenrect || !sensor.screenrect.paper.canvas) {
+                    if (!sensor.screenrect ||
+                        !sensor.screenrect.paper.canvas ||
+                        !sensor.canvasNode) {
                         sensor.screenrect = paper.rect(imgx, imgy, screenScalerSize.width, screenScalerSize.height);
         
                         sensor.canvasNode = document.createElementNS("http://www.w3.org/2000/svg", 'foreignObject');
@@ -4922,6 +4924,11 @@ var getContext = function (display, infos, curLevel) {
 
                     if (sensor.state.line2 && sensor.state.line2.length > 16)
                         sensor.state.line2 = sensor.state.line2.substring(0, 16);
+
+                    if (sensor.canvasNode) {
+                        $(sensor.canvasNode).remove();
+                        sensor.canvasNode = null;
+                    }
 
                     sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
 
