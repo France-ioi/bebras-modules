@@ -2115,7 +2115,9 @@ var getContext = function (display, infos, curLevel) {
             // Set initial state
             var sensorDef = findSensorDefinition(sensor);
             if(sensorDef && !sensorDef.isSensor && sensorDef.getInitialState) {
-                context.registerQuickPiEvent(sensor.name, sensorDef.getInitialState(sensor), true, true);
+                var initialState = sensorDef.getInitialState(sensor);
+                if (initialState != null)
+                    context.registerQuickPiEvent(sensor.name, initialState, true, true);
             }
         }
 
