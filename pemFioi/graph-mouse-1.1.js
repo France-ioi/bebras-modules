@@ -769,6 +769,7 @@ function VertexDragAndConnect(settings) {
    this.onDragEnd = settings.onDragEnd;
    this.arcDragger = settings.arcDragger;
    this.startDragCallback = settings.startDragCallback;
+   this.moveDragCallback = settings.moveDragCallback;
    this.clickHandlerCallback = settings.clickHandlerCallback;
 
    this.gridEnabled = false;
@@ -933,6 +934,10 @@ function VertexDragAndConnect(settings) {
       }
 
       self.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
+
+      if(self.moveDragCallback){
+         self.moveDragCallback(self.elementID);
+      }
    };
 
    this.clickHandler = function(id,x,y) {
@@ -1255,6 +1260,7 @@ function GraphDragger(settings) {
    this.vertInitPos = null;
    this.isShiftPressed = false;
    this.callback = settings.callback;
+   this.moveDragCallback = null;
 
    this.dragMove = new PaperMouseEvent(this.paperElementID, this.paper, "mousemove", onDragMove, false);
    this.dragEnd = new PaperMouseEvent(this.paperElementID, this.paper, "mouseup", onDragEnd, false);
@@ -1296,6 +1302,10 @@ function GraphDragger(settings) {
          this.gridX = gridX;
          this.gridY = gridY;
       }
+   };
+
+   this.setMoveDragCallback = function(fct) {
+      this.moveDragCallback = fct;
    };
 
    function onFuzzyClick(elementType, id, x, y, event){
@@ -1355,6 +1365,10 @@ function GraphDragger(settings) {
          $.each(self.vertInitPos, function(index, element) {
             self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x + dx, element.position.y + dy);
          });
+
+         if(self.moveDragCallback){
+            self.moveDragCallback();
+         }
       }
    }
    function onDragEnd(x,y,event){
