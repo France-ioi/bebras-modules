@@ -5553,6 +5553,32 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
+
+
+            if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
+                sensor.focusrect.node.onmousedown = function () {
+                    if (context.offLineMode) {
+                        sensor.state = true;
+                        drawSensor(sensor);
+                    } else
+                        sensorInConnectedModeError();
+                };
+
+
+                sensor.focusrect.node.onmouseup = function () {
+                    if (context.offLineMode) {
+                        sensor.state = false;
+                        drawSensor(sensor);
+
+                        if (sensor.onPressed)
+                            sensor.onPressed();
+                    } else
+                        sensorInConnectedModeError();
+                }
+
+                sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
+                sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
+            }
         } else if (sensor.type == "stick") {
             if (sensor.stateText)
                 sensor.stateText.remove();
@@ -7158,7 +7184,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
 
-            context.runner.noDelay(callback, state);
+            context.runner.noDelay(callback, state ? true : false);
         } else {
             var cb = context.runner.waitCallback(callback);
 
