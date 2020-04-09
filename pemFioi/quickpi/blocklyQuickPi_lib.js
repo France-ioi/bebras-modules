@@ -1551,9 +1551,9 @@ var getContext = function (display, infos, curLevel) {
             portType: "none",
             valueType: "object",
             selectorImages: ["cloudstore.png"],
-            getInitialState: function(sensor) {
+            /*getInitialState: function(sensor) {
                 return {};
-            },
+            },*/
 
             compareState: function (state1, state2) {
                 return quickPiStore.compareState(state1, state2);
@@ -2114,7 +2114,7 @@ var getContext = function (display, infos, curLevel) {
 
             // Set initial state
             var sensorDef = findSensorDefinition(sensor);
-            if(sensorDef && !sensorDef.isSensor) {
+            if(sensorDef && !sensorDef.isSensor && sensorDef.getInitialState) {
                 context.registerQuickPiEvent(sensor.name, sensorDef.getInitialState(sensor), true, true);
             }
         }
@@ -7338,6 +7338,9 @@ var getContext = function (display, infos, curLevel) {
                 throw("Key not found");    
             }
 
+            sensor.quickStore.write(key, value);
+            context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
+            
             context.runner.noDelay(callback, value);
         } else {
             var cb = context.runner.waitCallback(callback);
