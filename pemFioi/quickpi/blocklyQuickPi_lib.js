@@ -1520,7 +1520,7 @@ var getContext = function (display, infos, curLevel) {
         {
             name: "irrecv",
             description: "IR Receiver",
-            isAnalog: true,
+            isAnalog: false,
             isSensor: true,
             portType: "D",
             valueType: "number",
