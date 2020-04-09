@@ -89,8 +89,6 @@ function LR_Parser(settings,subTask,answer) {
    this.accept = false;
    this.error = false;
 
-   // var arrow = "🡒";
-   // var dot = "🞄";
    if(/Linux/.test(window.navigator.platform)){
       var arrow = "→";
       var dot = "・";
@@ -378,6 +376,8 @@ function LR_Parser(settings,subTask,answer) {
             };
             graphEditorSettings.callback = this.graphEditorCallback;
             graphEditorSettings.selectVertexCallback = this.selectVertexCallback;
+            graphEditorSettings.startDragCallbackCallback = this.startDragCallback;
+            graphEditorSettings.moveDragCallback = this.moveDragCallback;
             graphEditorSettings.contentValidation = this.contentValidation;
             graphEditorSettings.onDragEnd = this.graphEditorCallback;
             graphEditorSettings.vertexLabelPrefix = "";
@@ -406,6 +406,7 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setLoopEnabled(false);
             this.graphEditor.setInitialEnabled(false);
             this.graphEditor.setAllowMultipleTerminal(false);
+            this.graphEditor.graphDragger.setMoveDragCallback(this.graphDraggerMoveDragCallback);
          }
          this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
       }
@@ -593,7 +594,6 @@ function LR_Parser(settings,subTask,answer) {
          }
          html += "</tr>";
       }
-      // html += "<tr><td>"+terminalStateIndex+"</td></tr>";
       html += "</table>";
       $("#"+this.parseTableID).append(html);
       this.initStackPreview();
@@ -602,13 +602,7 @@ function LR_Parser(settings,subTask,answer) {
    this.initStackPreview = function() {
       $("#"+this.parseTableID).prepend("<div id=\"stackPreview\"></div>");
       stackPreviewH = $("#"+this.parseTableID).height();
-      // var parseTablePos = $("#"+this.parseTableID+" table").offset();
       this.stackPreview = subTask.raphaelFactory.create("stackPreview","stackPreview",stackPreviewW,stackPreviewH);
-      // $("#stackPreview").css({
-      //    position: "absolute",
-      //    left: parseTablePos.left - stackPreviewW,
-      //    top: 0
-      // });
    };
 
    this.initParseInfo = function() {
@@ -994,7 +988,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      if(info.terminal){
+      if(info.terminal && self.mode != 3){
          wCorr = 50;
          visualInfo.wCorr = wCorr;
          reductionInfo = "acc.";
@@ -2038,12 +2032,13 @@ function LR_Parser(settings,subTask,answer) {
    this.highlightPrevState = function(previousState) {
       var vertex = this.getStateID(previousState);
       var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
-      var x = raphObj[0].attr("x");
-      var y = raphObj[0].attr("y");
+      // var x = raphObj[0].attr("x");
+      // var y = raphObj[0].attr("y");
+      var pos = this.visualGraph.getVertexVisualInfo(vertex);
       var width = raphObj[0].attr("width");
       var height = raphObj[0].attr("height");
       var r = raphObj[0].attr("r");
-      this.prevStateHighlight = this.paper.rect(x,y,width,height,r).attr(this.previousStateAttr)
+      this.prevStateHighlight = this.paper.rect(pos.x - width/2,pos.y - height/2,width,height,r).attr(this.previousStateAttr)
    };
 
    this.highlightEdge = function(edgeID,back) {
@@ -2768,6 +2763,24 @@ function LR_Parser(settings,subTask,answer) {
       var vertex = self.visualGraph.getRaphaelsFromID(id);
       vertex[1].toFront();
       vertex[2].toFront();
+   };
+
+   this.moveDragCallback = function(id) {
+      var vertex = self.visualGraph.getRaphaelsFromID(id);
+      var labelHeight = 2*self.vertexLabelAttr["font-size"];
+      var w = vertex[0].attr("width");
+      var h = vertex[0].attr("height");
+      var xRect = vertex[0].attr("x");
+      var yRect = vertex[0].attr("y");
+
+      vertex[4].attr("clip-rect",xRect+" "+yRect+" "+w+" "+labelHeight);
+   };
+
+   this.graphDraggerMoveDragCallback = function() {
+      var vertices = self.graph.getAllVertices();
+      for(var vertex of vertices){
+         self.moveDragCallback(vertex);
+      }
    };
 
    function fixedCharAt(str, idx) {
