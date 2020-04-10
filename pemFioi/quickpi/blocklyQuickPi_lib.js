@@ -823,7 +823,7 @@ var getContext = function (display, infos, curLevel) {
             language: 'all',
             order: 209,
             python: ['readAcceleration']
-        },  
+        },
         {
             id: 'quickpi_wait',
             name: 'Gestion du temps',
@@ -831,6 +831,14 @@ var getContext = function (display, infos, curLevel) {
             language: 'all',
             order: 250,
             python: ['sleep']
+        },
+        {
+            id: 'quickpi_cloud',
+            name: 'Stockage dans le cloud',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_cloud',
+            language: 'all',
+            order: 250,
+            python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
         }
         ];
 
