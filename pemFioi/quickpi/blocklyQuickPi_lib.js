@@ -315,9 +315,9 @@ var getContext = function (display, infos, curLevel) {
                 computeRotationGyro: "compute rotation in the gyroscope %1",
 
                 //Internet store
-                connectToCloudStore: "Connect to cloud store. Identifier %1 Password %2",
-                writeToCloudStore: "Write to cloud store. Identifier %1 Key %2 Value %3",
-                readFromCloudStore: "Read from cloud store. Identifier %1 Key %2",
+                connectToCloudStore: "Se connecter au cloud. Identifiant %1 Mot de passe %2",
+                writeToCloudStore: "Écrire dans le cloud. Identifiant %1 Clé %2 Valeur %3",
+                readFromCloudStore: "Lire dans le cloud. Identifiant %1 Clé %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
