@@ -1168,7 +1168,7 @@ var getContext = function (display, infos, curLevel) {
         {
             name: "irtrans",
             description: "IR Transmiter",
-            isAnalog: true,
+            isAnalog: false,
             isSensor: true,
             portType: "D",
             valueType: "number",
