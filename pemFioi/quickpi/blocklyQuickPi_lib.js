@@ -968,7 +968,7 @@ var getContext = function (display, infos, curLevel) {
 
                 if (sensor.showAsAnalog)
                 {
-                    return state / (sensor.maxAnalog - sensor.minAnalog);
+                    return (state - sensor.minAnalog) / (sensor.maxAnalog - sensor.minAnalog);
                 } else {
                     if (state)
                         return 1;
