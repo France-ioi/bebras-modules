@@ -1,16 +1,19 @@
 ﻿class quickPiStore {
-        constructor() {
+        constructor(connected) {
             this.Store = {};
+            this.connected = true;
         }
 
-        write(prefix, value)
+        rwpassword = "dummy";
+
+        write(prefix, key, value)
         {
-            this.Store[prefix] = value;
+            this.Store[key] = value;
         }
     
-        read(prefix, value)
+        read(prefix, key, value)
         {
-            return this.Store[prefix];
+            return this.Store[key];
         }
 
         getStateData() {
