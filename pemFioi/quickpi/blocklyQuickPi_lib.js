@@ -315,9 +315,9 @@ var getContext = function (display, infos, curLevel) {
                 computeRotationGyro: "compute rotation in the gyroscope %1",
 
                 //Internet store
-                connectToCloudStore: "Connect to cloud store. Prefix %1 Password %2",
-                writeToCloudStore: "Write to cloud store. Prefix %1 Key %2 Value %3",
-                readFromCloudStore: "Read from cloud store. Prefix %1 Key %2",
+                connectToCloudStore: "Connect to cloud store. Identifier %1 Password %2",
+                writeToCloudStore: "Write to cloud store. Identifier %1 Key %2 Value %3",
+                readFromCloudStore: "Read from cloud store. Identifier %1 Key %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
@@ -473,9 +473,9 @@ var getContext = function (display, infos, curLevel) {
                 computeRotationGyro: "computeRotationGyro()",
 
                 //Internet store
-                connectToCloudStore: "connectToCloudStore(prefix, password)",
-                writeToCloudStore: "writeToCloudStore(prefix, key, value)",
-                readFromCloudStore: "readFromCloudStore(prefix, key)",
+                connectToCloudStore: "connectToCloudStore(identifier, password)",
+                writeToCloudStore: "writeToCloudStore(identifier, key, value)",
+                readFromCloudStore: "readFromCloudStore(identifier, key)",
             },
             constant: {
             },
