@@ -14,11 +14,9 @@
         }
 
         getStateData() {
-            var state = {};
-
-            Object.assign(state, this.Store);
-
-            return state;
+            // round trip this trought json so we actually copy everything
+            // without keeping any references to objects
+            return JSON.parse(JSON.stringify(this.Store));
         }
 
         static renderDifferences(expectedState, state)
@@ -67,37 +65,6 @@
                 state2 == null)
                 return false;
 
-            for (var p in state1)
-            {
-                if (state1.hasOwnProperty(p) && !state2.hasOwnProperty(p))
-                    return false;
-
-                if (Array.isArray(state1[p]))
-                {
-                    if (!Array.isArray(state2[p]))
-                        return false;
-
-                    if (state1[p].length != state2[p].length)
-                        return false;
-
-                    for (var i = 0; i < state1[p].length; i++) {
-                        if (state1[p][i] != state2[p][i])
-                            return false;
-                    }
-                }
-                else 
-                {
-                    if (state1[p] != state2[p])
-                        return false;
-                }
-            }
-
-            for (var p in state2)
-            {
-                if (state2.hasOwnProperty(p) && !state1.hasOwnProperty(p))
-                    return false;
-            }
-
-            return true;
+            return JSON.stringify(state1) === JSON.stringify(state1);
         }
 }
