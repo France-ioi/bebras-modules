@@ -184,12 +184,14 @@ var gyroscope3D = (function() {
 
 
 
-function QuickStore(options) {
+function QuickStore(rwidentifier, rwpassword) {
+    var url = 'http://cloud.quick-pi.org';
+    var connected = (rwidentifier === undefined);
+
     function post(path, data, callback) {
-        var url = options.host.replace(/\/$/, "") + path;
         $.ajax({
             type: 'POST',
-            url: url,
+            url: url + path,
             crossDomain: true,
             data: data,
             dataType: 'json',
@@ -198,22 +200,32 @@ function QuickStore(options) {
     }
 
     return {
-        read: function(key, callback) {
+        connected: rwpassword,
+        read: function(identifier, key, callback) {
             var data = {
-                prefix: options.prefix,
-                key: key
+                    prefix: identifier,
+                    key: key
             };
             post('/api/data/read', data, callback);
         },
 
-        write: function(key, value, callback) {
-            var data = {
-                prefix: options.prefix,
-                password: options.password,
-                key: key,
-                value: JSON.stringify(value)
-            };
-            post('/api/data/write', data, callback);
+        write: function(identifier, key, value, callback) {
+            if (identifier != rwidentifier)
+            {
+                callback({
+                    sucess: false,
+                    message: "Tried to write to read/only identifier",
+                });
+            }
+            else {
+                var data = {
+                    prefix: identifier,
+                    password: rwpassword,
+                    key: key,
+                    value: JSON.stringify(value)
+                };
+                post('/api/data/write', data, callback);
+            }
         }
     }
 }
@@ -304,8 +316,8 @@ var getContext = function (display, infos, curLevel) {
 
                 //Internet store
                 connectToCloudStore: "Connect to cloud store. Prefix %1 Password %2",
-                writeToCloudStore: "Write to cloud store. Key %1 Value %2",
-                readFromCloudStore: "Read from cloud store. Key %1",
+                writeToCloudStore: "Write to cloud store. Prefix %1 Key %2 Value %3",
+                readFromCloudStore: "Read from cloud store. Prefix %1 Key %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
@@ -462,8 +474,8 @@ var getContext = function (display, infos, curLevel) {
 
                 //Internet store
                 connectToCloudStore: "connectToCloudStore(prefix, password)",
-                writeToCloudStore: "writeToCloudStore(key, value)",
-                readFromCloudStore: "readFromCloudStore(key)",
+                writeToCloudStore: "writeToCloudStore(prefix, key, value)",
+                readFromCloudStore: "readFromCloudStore(prefix, key)",
             },
             constant: {
             },
@@ -2106,6 +2118,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.callsInTimeSlot = 0;
             sensor.lastTimeIncrease = 0;
             sensor.removed = false;
+            sensor.quickStore = null;
 
             // If the sensor has no port assign one
             if (!sensor.port) {
@@ -7298,47 +7311,33 @@ var getContext = function (display, infos, curLevel) {
         var sensor = findSensorByType("cloudstore");
 
         if (!context.display || context.autoGrading) {
-            sensor.quickStore = new quickPiStore();
+            sensor.quickStore = new quickPiStore(true);
         } else {
-            sensor.quickStore = QuickStore({
-                host: "http://quick-store.mobydimk.space",
-                prefix: prefix,
-                password: password
-            });
+            sensor.quickStore = QuickStore(prefix, password);
         }
 
         context.runner.noDelay(callback, 0);
     };
 
-    context.quickpi.writeToCloudStore = function (key, value, callback) {
+    context.quickpi.writeToCloudStore = function (identifier, key, value, callback) {
         var sensor = findSensorByType("cloudstore");
 
-        if (!sensor.quickStore)
+        if (!sensor.quickStore || !sensor.quickStore.connected)
         {
             context.success = false;
             throw("Cloud store not connected");
         }
 
         if (!context.display || context.autoGrading) {
-            sensor.quickStore.write(key, value);
+            sensor.quickStore.write(identifier, key, value);
 
             context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
 
             context.runner.noDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
-            var type = "";
 
-            if (Array.isArray(value)) {
-                type = "array";
-            } else {
-                type = "single";
-            }
-
-            sensor.quickStore.write(key, {
-                type: type,
-                value: value
-            }, function(data) {
+            sensor.quickStore.write(identifier, key, value, function(data) {
                 if (!data || !data.success)
                 {
                     if (data && data.message)
@@ -7352,13 +7351,16 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.quickpi.readFromCloudStore = function (key, callback) {
+    context.quickpi.readFromCloudStore = function (identifier, key, callback) {
         var sensor = findSensorByType("cloudstore");
 
         if (!sensor.quickStore)
         {
-            context.success = false;
-            throw("Cloud store not connected");
+            if (!context.display || context.autoGrading) {
+                sensor.quickStore = new quickPiStore();
+            } else {
+                sensor.quickStore = QuickStore();
+            }
         }
 
         if (!context.display || context.autoGrading) {
@@ -7373,18 +7375,17 @@ var getContext = function (display, infos, curLevel) {
                 throw("Key not found");    
             }
 
-            sensor.quickStore.write(key, value);
+            sensor.quickStore.write(identifier, key, value);
             context.registerQuickPiEvent(sensor.name, sensor.quickStore.getStateData());
             
             context.runner.noDelay(callback, value);
         } else {
             var cb = context.runner.waitCallback(callback);
-            sensor.quickStore.read(key, function(data) {
+            sensor.quickStore.read(identifier, key, function(data) {
                 var value = "";
                 if (data && data.success)
                 {
-                    var jsonobj = JSON.parse(data.value);
-                    value = jsonobj.value;
+                    value = JSON.parse(data.value);
                 }
                 else
                 {
@@ -7996,25 +7997,29 @@ var getContext = function (display, infos, curLevel) {
                         "</block>"
                 },
                 {
-                    name: "writeToCloudStore", params: ["String", "String"], blocklyJson: {
+                    name: "writeToCloudStore", params: ["String", "String", "String"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0", text: ""},
                             { "type": "input_value", "name": "PARAM_1", text: ""},
+                            { "type": "input_value", "name": "PARAM_2", text: ""},
                         ]
                     },
                     blocklyXml: "<block type='writeToCloudStore'>" +
                         "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_2'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
                 },
                 {
-                    name: "readFromCloudStore", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "readFromCloudStore", yieldsValue: true, params: ["String", "String"], blocklyJson: {
                         "args0": [
                             { "type": "input_value", "name": "PARAM_0", text: ""},
+                            { "type": "input_value", "name": "PARAM_1", text: ""},
                         ]
                     },
                     blocklyXml: "<block type='readFromCloudStore'>" +
                         "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
                 },
 
