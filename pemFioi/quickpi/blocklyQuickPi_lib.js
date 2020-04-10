@@ -1092,6 +1092,10 @@ var getContext = function (display, infos, curLevel) {
                     (state1 && state2 == null))
                     return false;
 
+                if (state1.isDrawingData != 
+                    state2.isDrawingData)
+                    return false;
+
                 if (state1 && state1.isDrawingData) {
                     // They are ImageData objects
                     // The image data is RGBA so there are 4 bits per pixel
