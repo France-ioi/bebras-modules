@@ -68,6 +68,6 @@
                 state2 == null)
                 return false;
 
-            return JSON.stringify(state1) === JSON.stringify(state1);
+            return JSON.stringify(state1) === JSON.stringify(state2);
         }
 }
