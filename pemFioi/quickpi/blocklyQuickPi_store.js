@@ -31,14 +31,14 @@
                 if (expectedState.hasOwnProperty(p) && !state.hasOwnProperty(p)) {
 
                     var div = document.createElement("div");
-                    $(div).text("Missing key " + p);
+                    $(div).text("La clé n'existe pas : " + p);
                     $(mainDiv).append(div);
                 }
 
                 if (expectedState[p] != state[p]) {
                     var div = document.createElement("div");
 
-                    var wrongValue = "Key: {0} value {1} is different {2}.";
+                    var wrongValue = "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.";
                     var message = wrongValue.format(p, expectedState[p], state[p]);
 
                     $(div).text(message);
@@ -50,7 +50,7 @@
             {
                 if (state.hasOwnProperty(p) && !expectedState.hasOwnProperty(p)) {
                     var div = document.createElement("div");
-                    $(div).text("Not expected key " + p);
+                    $(div).text("La clé " + p + " n'est pas une clé attendue");
                     $(mainDiv).append(div);
                 }
             }
