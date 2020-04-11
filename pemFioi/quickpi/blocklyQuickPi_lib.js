@@ -1755,7 +1755,7 @@ var getContext = function (display, infos, curLevel) {
                 for (var i = 0; i < context.gradingStatesBySensor[sensorName].length; i++) {
                     var expectedState = context.gradingStatesBySensor[sensorName][i];
 
-                    if(expectedState.hit) { continue; } // Was hit, valid
+                    if(expectedState.hit || expectedState.input ) { continue; } // Was hit, valid
                     var newFailInfo = null;
                     if(actualStates) {
                         // Scroll through actual states until we get the state at this time
@@ -7397,7 +7397,12 @@ var getContext = function (display, infos, curLevel) {
                 var value = "";
                 if (data && data.success)
                 {
-                    value = JSON.parse(data.value);
+                    try {
+                        value = JSON.parse(data.value);
+                    } catch(err)
+                    {
+                        value = data.value;
+                    }
                 }
                 else
                 {
