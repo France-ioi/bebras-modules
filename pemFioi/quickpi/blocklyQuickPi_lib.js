@@ -1213,7 +1213,7 @@ var getContext = function (display, infos, curLevel) {
                     return 0;
             },
             getLiveState: function (sensor, callback) {
-                context.quickPiConnection.sendCommand("buttonStateInPort(\"" + sensor.name + "\")", function (retVal) {
+                context.quickPiConnection.sendCommand("isButtonPressed(\"" + sensor.name + "\")", function (retVal) {
                     var intVal = parseInt(retVal, 10);
                     callback(intVal != 0);
                 });
@@ -1558,7 +1558,7 @@ var getContext = function (display, infos, curLevel) {
                 return Math.round(percentage * 60);
             },
             getLiveState: function (sensor, callback) {
-                context.quickPiConnection.sendCommand("buttonStateInPort(\"" + sensor.name + "\")", function (retVal) {
+                context.quickPiConnection.sendCommand("isButtonPressed(\"" + sensor.name + "\")", function (retVal) {
                     var intVal = parseInt(retVal, 10);
                     callback(intVal == 0);
                 });
@@ -6877,7 +6877,7 @@ var getContext = function (display, infos, curLevel) {
         } else {
             var cb = context.runner.waitCallback(callback);
 
-            var command = "drawPoint(" + x + "," + y + ")";
+            var command = "isPointSet(" + x + "," + y + ")";
             context.quickPiConnection.sendCommand(command, function () {
                 cb();
             });

@@ -555,14 +555,14 @@ def magnetOn(pin):
 def magnetOff(pin):
   changePinState(pin, 0)
 
-def buttonStateInPort(pin):
+def isButtonPressed(pin=None):
+    if pin == None:
+        pin = "button1"
+
     pin = normalizePin(pin)
 
     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     return GPIO.input(pin)
-
-def buttonState():
-    return buttonStateInPort(26)
 
 def waitForButton(pin):
     pin = normalizePin(pin)
@@ -829,7 +829,7 @@ def drawRectangle(x0, y0, width, height):
     global strokecolor
 
     initOLEDScreen()
-    oleddraw.rectangle((x0, y0, x0 + width, y0 + height), fill=fillcolor, outline=strokecolor)
+    oleddraw.rectangle((x0, y0, x0 + width - 1, y0 + height - 1), fill=fillcolor, outline=strokecolor)
 
     global oledautoupdate
     if oledautoupdate:
@@ -866,6 +866,16 @@ def clearScreen():
     global oledautoupdate
     if oledautoupdate:
         updateScreen()
+
+def isPointSet(x, y):
+    global oleddraw
+    global oledimage
+
+    initOLEDScreen()
+
+    pixels = oledimage.load()
+
+    return pixels[x,y] > 0
 
 def displayText16x2(line1, line2=""):
     global screenLine1
@@ -1917,7 +1927,6 @@ def setBuzzerNote(pin, frequency):
         pi.wave_send_repeat(a)
 
 def turnBuzzerOn(pin=12):
-
     setBuzzerState("buzzer1", 1)
 
 def turnBuzzerOff(pin=12):
@@ -2262,4 +2271,47 @@ def gyroThread():
         gyro_angles[1] += (values[1] - gyro_calibration[1]) * dt
         gyro_angles[2] += (values[2] - gyro_calibration[2]) * dt
         gyro_angles_lock.release()
+        
+import json
+import requests
+
+quickpi_cloudstoreurl = 'http://cloud.quick-pi.org'
+quickpi_cloudstoreid = ""
+quickpi_cloudstorepw = ""
+
+def connectToCloudStore(identifier, password):
+        global quickpi_cloudstoreid
+        global quickpi_cloudstorepw
+
+        quickpi_cloudstoreid = identifier
+        quickpi_cloudstorepw = password
+
+def writeToCloudStore(identifier, key, value):
+        global quickpi_cloudstoreid
+        global quickpi_cloudstorepw
+
+        data = { "prefix": identifier,
+                "password": quickpi_cloudstorepw,
+                "key": key,
+                "value": json.dumps(value) }
+
+        ret = requests.post(quickpi_cloudstoreurl + '/api/data/write', data = data)
+
+        pass
+
+def readFromCloudStore(identifier, key):
+        value = 0
+        data = {'prefix': identifier, 'key': key};
+
+        ret = requests.post(quickpi_cloudstoreurl + '/api/data/read', data = data)
+
+        #print (ret.json())
+        if ret.json()["success"]:
+                try:
+                        value = json.loads(ret.json()["value"])
+                except:
+                        value = ret.json()["value"]
+
+        return value
+
 `;
