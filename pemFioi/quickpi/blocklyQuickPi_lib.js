@@ -214,7 +214,7 @@ function QuickStore(rwidentifier, rwpassword) {
             {
                 callback({
                     sucess: false,
-                    message: "Tried to write to read/only identifier",
+                    message: "Écriture sur un identifiant en lecture seule : " + identifier,
                 });
             }
             else {
