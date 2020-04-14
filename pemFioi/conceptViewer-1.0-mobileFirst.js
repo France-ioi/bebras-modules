@@ -350,6 +350,9 @@ function conceptsFill(baseConcepts, allConcepts) {
       if(!curConcept.order) {
         curConcept.order = fullConcept.order;
       }
+      if(!curConcept.python) {
+        curConcept.python = fullConcept.python;
+      }
       if(!fullConcept.ignore) {
         concepts.push(curConcept);
       }
