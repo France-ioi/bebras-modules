@@ -1437,7 +1437,6 @@ function GraphEditor(settings) {
    this.edgeCross = null;
    this.terminalIcon = null;
    this.initialIcon = null;
-   this.pencil = null;
    // this.currentTerminal = null;
 
    this.textEditor = null;
@@ -1663,7 +1662,7 @@ function GraphEditor(settings) {
          }
       }else{
          attr = visualGraph.graphDrawer.circleAttr;
-         self.removeIcons();
+         self.removeIcons(vertexId);
       }
       if(visualGraph.getRaphaelsFromID(vertexId)[0]){
          visualGraph.getRaphaelsFromID(vertexId)[0].attr(attr);
@@ -1949,19 +1948,34 @@ function GraphEditor(settings) {
       }
       if(this.initialEnabled)
          this.addInitialIcon(vertexId);
-      var vInfo = visualGraph.getVertexVisualInfo(vertexId);
    };
-   this.removeIcons = function() {
-      if(self.loopIcon)
+   this.removeIcons = function(id) {
+      // console.log("removeIcons")
+      var raphObj = visualGraph.getRaphaelsFromID(id);
+      if(self.loopIcon){
+         // console.log("remove loop");
          self.loopIcon.remove();
-      if(self.cross)
+         self.loopIcon = null;
+         raphObj.pop();
+      }
+      if(self.cross){
+         // console.log("remove cross "+id);
          self.cross.remove();
-      if(self.terminalIcon)
+         self.cross = null;
+         raphObj.pop();
+      }
+      if(self.terminalIcon){
+         // console.log("remove terminal "+id);
          self.terminalIcon.remove();
-      if(self.initialIcon)
+         self.terminalIcon = null;
+         raphObj.pop();
+      }
+      if(self.initialIcon){
+         // console.log("remove initial");
          self.initialIcon.remove();
-      if(self.pencil)
-         self.pencil.remove();
+         self.initialIcon = null;
+         raphObj.pop();
+      }
    };
 
    this.addLoopIcon = function(vertexId) {
@@ -2022,6 +2036,7 @@ function GraphEditor(settings) {
       visualGraph.pushVertexRaphael(vertexId,self.cross);
       
       self.cross.mousedown(function(){
+         self.removeIcons(vertexId);
          if(self.vertexDragAndConnect){
             self.vertexDragAndConnect.selectionParent = null;
          }
@@ -2077,6 +2092,7 @@ function GraphEditor(settings) {
    };
 
    this.addTerminalIcon = function(vertexId) {
+      // console.log("add Terminal")
       var vertexPos = visualGraph.getVertexVisualInfo(vertexId);
       var vertexRadius = visualGraph.graphDrawer.circleAttr.r;
       var size = 20;
@@ -2098,7 +2114,10 @@ function GraphEditor(settings) {
       self.terminalIcon = self.drawTerminalIcon(X,Y,size);
       visualGraph.pushVertexRaphael(vertexId,self.terminalIcon);
       
-      self.terminalIcon.mousedown(self.setTerminal(vertexId));
+      self.terminalIcon.mousedown(function() {
+         self.removeIcons(vertexId);
+         self.setTerminal(vertexId)();
+      });
    };
 
    this.setTerminal = function(vID) {
@@ -2645,7 +2664,7 @@ function GraphEditor(settings) {
          });
       }
       var oldContent = info.content;
-      self.removeIcons();
+      self.removeIcons(id);
       info.content = text;
       self.addIcons(id);
       info.content = oldContent;
