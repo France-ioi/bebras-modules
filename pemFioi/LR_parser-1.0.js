@@ -2337,7 +2337,7 @@ function LR_Parser(settings,subTask,answer) {
       if(!id){
          return;
       }
-      // console.log("updateState")
+      // console.log("updateState "+anim)
       this.updateParseTable({anim:anim,action:action});
       this.resetStates();
       var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
@@ -2458,6 +2458,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.resetStates = function() {
+      // console.log("resetStates")
       var vertices = this.graph.getAllVertices();
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
@@ -2649,10 +2650,8 @@ function LR_Parser(settings,subTask,answer) {
       if(!selected && id == current){
          self.styleVertex(id,"current");
       }
-      if(self.mode == 3){
-         // var stateVertex = self.visualGraph.getRaphaelsFromID(id);
-         // stateVertex[1].toFront();
-         // console.log(stateVertex)
+      if(selected){
+         self.styleVertex(id,"selected");
       }
    };
 
@@ -2749,6 +2748,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.styleVertex = function(id,styleType) {
+      // console.log(styleType)
       var vertex = this.visualGraph.getRaphaelsFromID(id);
       switch(styleType){
          case "current":
@@ -2763,6 +2763,7 @@ function LR_Parser(settings,subTask,answer) {
             vertex[0].attr(this.defaultVertexAttr);
             vertex[4].attr(this.headerAttr);
       }
+      vertex[1].toFront();
    };
 
    this.startDragCallback = function(id) {
