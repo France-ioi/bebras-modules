@@ -2644,9 +2644,15 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.selectVertexCallback = function(id,selected) {
+      // console.log(id+" "+selected)
       var current = self.getStateID(self.currentState);
       if(!selected && id == current){
          self.styleVertex(id,"current");
+      }
+      if(self.mode == 3){
+         // var stateVertex = self.visualGraph.getRaphaelsFromID(id);
+         // stateVertex[1].toFront();
+         // console.log(stateVertex)
       }
    };
 
