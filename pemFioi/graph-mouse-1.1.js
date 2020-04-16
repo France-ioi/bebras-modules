@@ -1499,6 +1499,8 @@ function GraphEditor(settings) {
    this.defaultVertexLabelEnabled = false;
    this.defaultEdgeLabelEnabled = false;
    this.allowMutlipleTerminal = true;
+   this.allowMutlipleInitial = true;
+   this.allowSimultaneousInitialAndTerminal = true;
    this.enabled = false;
 
    this.setEnabled = function(enabled) {
@@ -1620,6 +1622,13 @@ function GraphEditor(settings) {
    this.setAllowMultipleTerminal = function(enabled) {
       this.allowMutlipleTerminal = enabled;
    };
+   this.setAllowMultipleInitial = function(enabled) {
+      this.allowMutlipleInitial = enabled;
+   };
+   this.setAllowSimultaneousInitialAndTerminal = function(enabled) {
+      this.allowSimultaneousInitialAndTerminal = enabled;
+   };
+
 
    this.checkVertexSelect = function() {
       if(!this.terminalEnabled && !this.initialEnabled && !this.removeVertexEnabled && !this.createEdgeEnabled && !this.vertexSelectEnabled){
@@ -1922,6 +1931,8 @@ function GraphEditor(settings) {
       }
    };
 
+   /* ICONS  */
+
    this.addIcons = function(vertexId) {
       if(this.createEdgeEnabled && this.loopEnabled)
          this.addLoopIcon(vertexId);
@@ -1931,23 +1942,36 @@ function GraphEditor(settings) {
          if(this.allowMutlipleTerminal){
             this.addTerminalIcon(vertexId);
          }else{
-            var vertices = graph.getAllVertices();
-            var terminal = null;
-            for(var iVertex = 0; iVertex < vertices.length; iVertex++){
-               var vertex = vertices[iVertex];
-               var info = graph.getVertexInfo(vertex);
-               if(info.terminal){
-                  terminal = vertex;
-                  break;
-               }
-            }
+            var terminal = this.getInitialOrTerminal(vertexId,"terminal");
             if(terminal == null || terminal == vertexId){
-               this.addTerminalIcon(vertexId);
+               if(this.allowSimultaneousInitialAndTerminal){
+                  this.addTerminalIcon(vertexId);
+               }else{
+                  var info = graph.getVertexInfo(vertexId);
+                  if(!info.initial){
+                     this.addTerminalIcon(vertexId);
+                  }
+               }
             }
          }
       }
-      if(this.initialEnabled)
-         this.addInitialIcon(vertexId);
+      if(this.initialEnabled){
+         if(this.allowMutlipleInitial){
+            this.addInitialIcon(vertexId);
+         }else{
+            var initial = this.getInitialOrTerminal(vertexId,"initial");
+            if(initial == null || initial == vertexId){
+               if(this.allowSimultaneousInitialAndTerminal){
+                  this.addInitialIcon(vertexId);
+               }else{
+                  var info = graph.getVertexInfo(vertexId);
+                  if(!info.terminal){
+                     this.addInitialIcon(vertexId);
+                  }
+               }
+            }
+         }
+      }
    };
    this.removeIcons = function(id) {
       // console.log("removeIcons")
@@ -1976,6 +2000,20 @@ function GraphEditor(settings) {
          self.initialIcon = null;
          raphObj.pop();
       }
+   };
+
+   this.getInitialOrTerminal = function(vID,state) {
+      var vertices = graph.getAllVertices();
+      var isState = null;
+      for(var iVertex = 0; iVertex < vertices.length; iVertex++){
+         var vertex = vertices[iVertex];
+         var info = graph.getVertexInfo(vertex);
+         if(info[state]){
+            isState = vertex;
+            break;
+         }
+      }
+      return isState;
    };
 
    this.addLoopIcon = function(vertexId) {
@@ -2116,23 +2154,21 @@ function GraphEditor(settings) {
       
       self.terminalIcon.mousedown(function() {
          self.removeIcons(vertexId);
-         self.setTerminal(vertexId)();
+         self.setTerminal(vertexId);
       });
    };
 
    this.setTerminal = function(vID) {
-      return function(){
-         var info = graph.getVertexInfo(vID);
-         info.terminal = !info.terminal;
-         
-         graph.setVertexInfo(vID,info);
-         visualGraph.redraw();
-         self.updateHandlers();
-         // self.currentTerminal = (info.terminal) ? vID : null;
-         
-         if(callback){
-            callback();
-         }
+      var info = graph.getVertexInfo(vID);
+      info.terminal = !info.terminal;
+      
+      graph.setVertexInfo(vID,info);
+      visualGraph.redraw();
+      self.updateHandlers();
+      // self.currentTerminal = (info.terminal) ? vID : null;
+      
+      if(callback){
+         callback();
       }
    };
 
@@ -2145,18 +2181,7 @@ function GraphEditor(settings) {
       }
       var circle1 = paper.circle(x + size/2,y + size/2,size/4).attr(attr);
       var circle2 = paper.circle(x + size/2,y + size/2,size/2).attr(attr);
-      // var icon = paper.set(circle1,circle2);
-      // var icon = paper.path(
-      //    "M" + x + "," + y +
-      //    "H" + (x + size) +
-      //    "V" + (y + qSize) +
-      //    "H" + (x + 5*qSize/2) + 
-      //    "V" + (y + size) +
-      //    "H" + (x + 3*qSize/2) +
-      //    "V" + (y + qSize) +
-      //    "H" + x +
-      //    "Z" 
-      //    ).attr(iconAttr);
+
       var overlay = paper.rect(x,y,size,size).attr(overlayAttr);
       return paper.set(circle1,circle2,overlay);
    };
@@ -2185,17 +2210,22 @@ function GraphEditor(settings) {
       visualGraph.pushVertexRaphael(vertexId,self.initialIcon);
       
       self.initialIcon.mousedown(function(){
-         var info = graph.getVertexInfo(vertexId);
-         info.initial = !info.initial;
-         
-         graph.setVertexInfo(vertexId,info);
-         visualGraph.redraw();
-         self.updateHandlers();
-         
-         if(callback){
-            callback();
-         }
+         self.removeIcons(vertexId);
+         self.setInitial(vertexId);
       });
+   };
+
+   this.setInitial = function(vID) {
+      var info = graph.getVertexInfo(vID);
+      info.initial = !info.initial;
+      
+      graph.setVertexInfo(vID,info);
+      visualGraph.redraw();
+      self.updateHandlers();
+      
+      if(callback){
+         callback();
+      }
    };
 
    this.drawInitialIcon = function(x,y,size) {
