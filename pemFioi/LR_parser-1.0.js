@@ -404,8 +404,10 @@ function LR_Parser(settings,subTask,answer) {
             this.graphEditor.setTableMode(true);
             this.graphEditor.setMultipleEdgesEnabled(false);
             this.graphEditor.setLoopEnabled(false);
-            this.graphEditor.setInitialEnabled(false);
+            // this.graphEditor.setInitialEnabled(false);
             this.graphEditor.setAllowMultipleTerminal(false);
+            this.graphEditor.setAllowMultipleInitial(false);
+            this.graphEditor.setAllowSimultaneousInitialAndTerminal(false);
             this.graphEditor.graphDragger.setMoveDragCallback(this.graphDraggerMoveDragCallback);
          }
          this.graphEditor.setIconAttr({fill:this.colors.yellow,stroke:"none"});
@@ -1010,8 +1012,8 @@ function LR_Parser(settings,subTask,answer) {
 
       var content = this.paper.text(contentX, y + labelHeight + (h - labelHeight)/2,content).attr(this.vertexContentAttr);
       if(info.initial && !info.terminal){
-         var initialArrow = this.paper.path("M" + (x - 2*this.circleAttr.r) + "," + pos.y + "H" + x).attr(this.lineAttr);
-         initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]+1);
+         var initialArrow = this.paper.path("M" + (x - 30) + "," + pos.y + "H" + x).attr(this.lineAttr);
+         initialArrow.attr("stroke-width",this.lineAttr["stroke-width"]);
          var result = [node,labelRaph,line,content,header,initialArrow];
       }else if(!info.initial && info.terminal){
          var terminalFrame = this.paper.rect(x - 5, y - 5, w + 10, h + 10, this.circleAttr.r + 5);
@@ -1356,11 +1358,13 @@ function LR_Parser(settings,subTask,answer) {
       $("#play i").removeClass("fa-pause").addClass("fa-play");
       self.initPlayerHandlers();
       if(self.mode == 3){
-         // console.log("enab");
          self.graphEditor.setEnabled(true);
          self.graphEditor.setMultipleEdgesEnabled(false);
          self.graphEditor.setLoopEnabled(false);
-         self.graphEditor.setInitialEnabled(false);
+         // self.graphEditor.setInitialEnabled(false);
+         self.graphEditor.setAllowMultipleTerminal(false);
+         self.graphEditor.setAllowMultipleInitial(false);
+         self.graphEditor.setAllowSimultaneousInitialAndTerminal(false);
       }
       self.resetParseTableHL();
    };
