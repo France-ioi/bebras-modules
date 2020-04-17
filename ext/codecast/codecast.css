@@ -1,0 +1,81 @@
+.skulpt-analysis-container {
+    position: fixed;
+    z-index: 10;
+    max-height: 400px;
+    font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.skulpt-analysis-container .panel-heading {
+    cursor: move;
+    padding: 2px 4px;
+    color: #333333;
+    background-color: #f5f5f5;
+    border-color: #dddddd;
+    border-bottom: 1px solid transparent;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.skulpt-analysis-container .panel-heading .icon {
+    float: right;
+}
+.skulpt-analysis-container .panel-heading span {
+    text-align: left;
+}
+.skulpt-analysis-container .panel-body {
+    overflow-x: auto;
+    max-height: 228px;
+}
+
+.skulpt-analysis-container .stack-view {
+    overflow-y: auto;
+}
+.skulpt-analysis-container .stack-view .scope-function-top {
+    font-weight: bold;
+}
+.skulpt-analysis-container .stack-view .scope-function-retval {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: bold;
+}
+.skulpt-analysis-container .stack-view .stack-bottom {
+    width: 100%;
+    height: 2px;
+    border: 2px solid #777;
+}
+.skulpt-analysis-container .stack-view ul {
+    padding-left: 20px;
+    margin: 0 0 2px 0;
+}
+.skulpt-analysis-container .stack-view  ul.global-scope {
+    padding-left: 2px;
+}
+.skulpt-analysis-container .stack-view li {
+    list-style-type: none;
+}
+.skulpt-analysis-container .stack-frame-focused {
+    background-color: #eee;
+}
+
+.skulpt-analysis-container .value-load {
+    font-weight: bold;
+}
+.skulpt-analysis-container .value-previous {
+    text-decoration: line-through;
+}
+.skulpt-analysis-container span + .value-previous {
+    padding-left: 0.5em;
+}
+
+.skulpt-analysis-container .vardecl {
+    overflow: hidden;
+    max-height: 50px;
+}

@@ -1,6 +1,6 @@
 // TODO :: move to quickAlgo
 
-/* 
+/*
 pythonCount:
    returns number of Blockly blocks corresponding to some Python code.
 

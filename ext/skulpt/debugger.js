@@ -4,13 +4,51 @@
 
 var Sk = Sk || {}; //jshint ignore:line
 
-function hasOwnProperty(obj, prop) {
+/**
+ * Changes :
+ *
+ * - Suspension.colno -> Suspension.$colno
+ * - Suspension.lineno -> Suspension.$lineno
+ * - Suspension.filename -> Suspension.$filename
+ *
+ * Modification on hasOwnProperty (or skulpt crash).
+ * Internal call to hasOwnProperty here moved to debuggerHasOwnProperty (origninal of hasOwnProperty).
+ *
+ * goog.exportSymbol -> Sk.exportSymbol
+ *
+ * Add :
+ * - this.output_callback._onStepError(e);
+ * - this.output_callback._onStepSuccess(e);
+ */
+
+var DEBUG_DEBUGGER = false;
+var debuggerLog = function() {
+  if (DEBUG_DEBUGGER) {
+    // 1. Convert args to a normal array
+    var args = Array.prototype.slice.call(arguments);
+
+    // 2. Prepend log prefix log string
+    args.unshift("[debugger.js] ");
+
+    // 3. Pass along arguments to console.log
+    console.log.apply(console, args);
+  }
+};
+
+function hasOwnProperty(prop) {
+  var obj = this;
   var proto = obj.constructor.prototype;
   return (prop in obj) &&
-    (!(prop in proto) || proto[prop] !== obj[prop]);
+      (!(prop in proto) || proto[prop] !== obj[prop]);
 }
 
-Sk.Breakpoint = function (filename, lineno, colno) {
+function debuggerHasOwnProperty(obj, prop) {
+  var proto = obj.constructor.prototype;
+  return (prop in obj) &&
+      (!(prop in proto) || proto[prop] !== obj[prop]);
+}
+
+Sk.Breakpoint = function(filename, lineno, colno) {
   this.filename = filename;
   this.lineno = lineno;
   this.colno = colno;
@@ -18,7 +56,7 @@ Sk.Breakpoint = function (filename, lineno, colno) {
   this.ignore_count = 0;
 };
 
-Sk.Debugger = function (filename, output_callback) {
+Sk.Debugger = function(filename, output_callback) {
   this.dbg_breakpoints = {};
   this.tmp_breakpoints = {};
   this.suspension_stack = [];
@@ -30,13 +68,13 @@ Sk.Debugger = function (filename, output_callback) {
   this.filename = filename;
 };
 
-Sk.Debugger.prototype.print = function (txt) {
+Sk.Debugger.prototype.print = function(txt) {
   if (this.output_callback != null) {
-    this.output_callback.print(txt);
+    this.output_callback.print(txt + "\n");
   }
 };
 
-Sk.Debugger.prototype.get_source_line = function (lineno) {
+Sk.Debugger.prototype.get_source_line = function(lineno) {
   if (this.output_callback != null) {
     return this.output_callback.get_source_line(lineno);
   }
@@ -44,27 +82,27 @@ Sk.Debugger.prototype.get_source_line = function (lineno) {
   return "";
 };
 
-Sk.Debugger.prototype.move_up_the_stack = function () {
+Sk.Debugger.prototype.move_up_the_stack = function() {
   this.current_suspension = Math.min(this.current_suspension + 1, this.suspension_stack.length - 1);
 };
 
-Sk.Debugger.prototype.move_down_the_stack = function () {
+Sk.Debugger.prototype.move_down_the_stack = function() {
   this.current_suspension = Math.max(this.current_suspension - 1, 0);
 };
 
-Sk.Debugger.prototype.enable_step_mode = function () {
+Sk.Debugger.prototype.enable_step_mode = function() {
   this.step_mode = true;
 };
 
-Sk.Debugger.prototype.disable_step_mode = function () {
+Sk.Debugger.prototype.disable_step_mode = function() {
   this.step_mode = false;
 };
 
-Sk.Debugger.prototype.get_suspension_stack = function () {
+Sk.Debugger.prototype.get_suspension_stack = function() {
   return this.suspension_stack;
 };
 
-Sk.Debugger.prototype.get_active_suspension = function () {
+Sk.Debugger.prototype.get_active_suspension = function() {
   if (this.suspension_stack.length === 0) {
     return null;
   }
@@ -72,12 +110,14 @@ Sk.Debugger.prototype.get_active_suspension = function () {
   return this.suspension_stack[this.current_suspension];
 };
 
-Sk.Debugger.prototype.generate_breakpoint_key = function (filename, lineno, colno) {
+Sk.Debugger.prototype.generate_breakpoint_key = function(filename, lineno, colno) {
   var key = filename + "-" + lineno;
   return key;
 };
 
-Sk.Debugger.prototype.check_breakpoints = function (filename, lineno, colno, globals, locals) {
+Sk.Debugger.prototype.check_breakpoints = function(filename, lineno, colno, globals, locals) {
+  // debuggerLog('check_breakpoints', filename, lineno, colno, globals, locals);
+
   // If Step mode is enabled then ignore breakpoints since we will just break
   // at every line.
   if (this.step_mode === true) {
@@ -85,10 +125,10 @@ Sk.Debugger.prototype.check_breakpoints = function (filename, lineno, colno, glo
   }
 
   var key = this.generate_breakpoint_key(filename, lineno, colno);
-  if (hasOwnProperty(this.dbg_breakpoints, key) &&
-    this.dbg_breakpoints[key].enabled === true) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key) &&
+      this.dbg_breakpoints[key].enabled === true) {
     var bp = null;
-    if (hasOwnProperty(this.tmp_breakpoints, key)) {
+    if (debuggerHasOwnProperty(this.tmp_breakpoints, key)) {
       delete this.dbg_breakpoints[key];
       delete this.tmp_breakpoints[key];
       return true;
@@ -107,29 +147,29 @@ Sk.Debugger.prototype.check_breakpoints = function (filename, lineno, colno, glo
   return false;
 };
 
-Sk.Debugger.prototype.get_breakpoints_list = function () {
+Sk.Debugger.prototype.get_breakpoints_list = function() {
   return this.dbg_breakpoints;
 };
 
-Sk.Debugger.prototype.disable_breakpoint = function (filename, lineno, colno) {
+Sk.Debugger.prototype.disable_breakpoint = function(filename, lineno, colno) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
 
-  if (hasOwnProperty(this.dbg_breakpoints, key)) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key)) {
     this.dbg_breakpoints[key].enabled = false;
   }
 };
 
-Sk.Debugger.prototype.enable_breakpoint = function (filename, lineno, colno) {
+Sk.Debugger.prototype.enable_breakpoint = function(filename, lineno, colno) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
 
-  if (hasOwnProperty(this.dbg_breakpoints, key)) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key)) {
     this.dbg_breakpoints[key].enabled = true;
   }
 };
 
-Sk.Debugger.prototype.clear_breakpoint = function (filename, lineno, colno) {
+Sk.Debugger.prototype.clear_breakpoint = function(filename, lineno, colno) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
-  if (hasOwnProperty(this.dbg_breakpoints, key)) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key)) {
     delete this.dbg_breakpoints[key];
     return null;
   } else {
@@ -137,23 +177,23 @@ Sk.Debugger.prototype.clear_breakpoint = function (filename, lineno, colno) {
   }
 };
 
-Sk.Debugger.prototype.clear_all_breakpoints = function () {
+Sk.Debugger.prototype.clear_all_breakpoints = function() {
   this.dbg_breakpoints = {};
   this.tmp_breakpoints = {};
 };
 
-Sk.Debugger.prototype.set_ignore_count = function (filename, lineno, colno, count) {
+Sk.Debugger.prototype.set_ignore_count = function(filename, lineno, colno, count) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
-  if (hasOwnProperty(this.dbg_breakpoints, key)) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key)) {
     var bp = this.dbg_breakpoints[key];
     bp.ignore_count = count;
   }
 };
 
-Sk.Debugger.prototype.set_condition = function (filename, lineno, colno, lhs, cond, rhs) {
+Sk.Debugger.prototype.set_condition = function(filename, lineno, colno, lhs, cond, rhs) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
   var bp;
-  if (hasOwnProperty(this.dbg_breakpoints, key)) {
+  if (debuggerHasOwnProperty(this.dbg_breakpoints, key)) {
     // Set a new condition
     bp = this.dbg_breakpoints[key];
   } else {
@@ -164,19 +204,24 @@ Sk.Debugger.prototype.set_condition = function (filename, lineno, colno, lhs, co
   this.dbg_breakpoints[key] = bp;
 };
 
-Sk.Debugger.prototype.print_suspension_info = function (suspension) {
-  var filename = suspension.filename;
-  var lineno = suspension.lineno;
-  var colno = suspension.colno;
-  // this.print("Hit Breakpoint at <" + filename + "> at line: " + lineno + " column: " + colno + "\n");
-  // this.print("----------------------------------------------------------------------------------\n");
-  // this.print(" ==> " + this.get_source_line(lineno - 1) + "\n");
-  // this.print("----------------------------------------------------------------------------------\n");
+Sk.Debugger.prototype.print_suspension_info = function(suspension) {
+  var filename = suspension.$filename;
+  var lineno = suspension.$lineno;
+  var colno = suspension.$colno;
+  if (DEBUG_DEBUGGER) {
+    console.log("Hit Breakpoint at <" + filename + "> at line: " + lineno + " column: " + colno + "\n");
+    console.log("----------------------------------------------------------------------------------\n");
+    console.log(" ==> " + this.get_source_line(lineno - 1) + "\n");
+    console.log("----------------------------------------------------------------------------------\n");
+    console.log(suspension);
+  }
 };
 
-Sk.Debugger.prototype.set_suspension = function (suspension) {
+Sk.Debugger.prototype.set_suspension = function(suspension) {
+  debuggerLog('set_suspension', suspension);
+
   var parent = null;
-  if (!hasOwnProperty(suspension, "filename") && suspension.child instanceof Sk.misceval.Suspension) {
+  if (!debuggerHasOwnProperty(suspension, "$filename") && suspension.child instanceof Sk.misceval.Suspension) {
     suspension = suspension.child;
   }
 
@@ -199,7 +244,7 @@ Sk.Debugger.prototype.set_suspension = function (suspension) {
   this.print_suspension_info(suspension);
 };
 
-Sk.Debugger.prototype.add_breakpoint = function (filename, lineno, colno, temporary) {
+Sk.Debugger.prototype.add_breakpoint = function(filename, lineno, colno, temporary) {
   var key = this.generate_breakpoint_key(filename, lineno, colno);
   this.dbg_breakpoints[key] = new Sk.Breakpoint(filename, lineno, colno);
   if (temporary) {
@@ -207,39 +252,50 @@ Sk.Debugger.prototype.add_breakpoint = function (filename, lineno, colno, tempor
   }
 };
 
-Sk.Debugger.prototype.suspension_handler = function (susp) {
-  return new Promise(function (resolve, reject) {
+Sk.Debugger.prototype.suspension_handler = function(susp) {
+  return new Promise(function(resolve, reject) {
     try {
       resolve(susp.resume());
-    } catch (e) {
+    } catch(e) {
       reject(e);
     }
   });
 };
 
-Sk.Debugger.prototype.resume = function () {
+Sk.Debugger.prototype.resume = function(resolve, reject) {
+  debuggerLog('resume');
+
   // Reset the suspension stack to the topmost
   this.current_suspension = this.suspension_stack.length - 1;
 
   if (this.suspension_stack.length === 0) {
     this.print("No running program");
+
+    resolve();
   } else {
     var promise = this.suspension_handler(this.get_active_suspension());
-    promise.then(this.success.bind(this), this.error.bind(this));
+    var self = this;
+    promise.then(function(value) {
+      self.success(value, resolve, reject);
+    }, function(error) {
+      self.error(error, reject);
+    });
   }
 };
 
-
-Sk.Debugger.prototype.pop_suspension_stack = function () {
+Sk.Debugger.prototype.pop_suspension_stack = function() {
   this.suspension_stack.pop();
   this.current_suspension -= 1;
 };
 
-Sk.Debugger.prototype.success = function (r) {
+Sk.Debugger.prototype.success = function(r, resolve, reject) {
+  debuggerLog('success', r, resolve);
+
   if (r instanceof Sk.misceval.Suspension) {
+    debuggerLog('success suspension');
     this.set_suspension(r);
     if (this.output_callback != null) {
-      this.output_callback._onStepSuccess();
+      this.output_callback._onStepSuccess(resolve);
     }
   } else {
     if (this.suspension_stack.length > 0) {
@@ -247,30 +303,48 @@ Sk.Debugger.prototype.success = function (r) {
       this.pop_suspension_stack();
 
       if (this.suspension_stack.length === 0) {
+        debuggerLog('success complete');
+
         this.print("Program execution complete");
+
+        if (typeof resolve === 'function') {
+          resolve();
+        }
+
         return;
       }
+
+      debuggerLog('here we are');
 
       var parent_suspension = this.get_active_suspension();
       // The child has completed the execution. So override the child's resume
       // so we can continue the execution.
-      parent_suspension.child.resume = function () {
+      parent_suspension.child.resume = function() {
         return r;
       };
-      this.resume();
+
+      this.resume(resolve, reject);
     } else {
+      debuggerLog('success complete 2');
+
       this.print("Program execution complete");
+
+      if (typeof resolve === 'function') {
+        resolve();
+      }
     }
   }
 };
 
-Sk.Debugger.prototype.error = function (e) {
+Sk.Debugger.prototype.error = function(e, reject) {
+  debuggerLog('error', e);
+
   if (this.output_callback != null) {
-    this.output_callback._onStepError(e);
+    this.output_callback._onStepError(e, reject);
   }
-  // this.print("Traceback (most recent call last):");
+  this.print("Traceback (most recent call last):");
   for (var idx = 0; idx < e.traceback.length; ++idx) {
-    // this.print("  File \"" + e.traceback[idx].filename + "\", line " + e.traceback[idx].lineno + ", in <module>");
+    this.print("  File \"" + e.traceback[idx].filename + "\", line " + e.traceback[idx].lineno + ", in <module>");
     var code = this.get_source_line(e.traceback[idx].lineno - 1);
     code = code.trim();
     code = "    " + code;
@@ -281,14 +355,18 @@ Sk.Debugger.prototype.error = function (e) {
   for (idx = 0; idx < e.args.v.length; ++idx) {
     this.print(err_ty + ": " + e.args.v[idx].v);
   }
+
+  if (typeof reject === 'function') {
+    reject();
+  }
 };
 
-Sk.Debugger.prototype.asyncToPromise = function (suspendablefn, suspHandlers, debugger_obj) {
-  return new Promise(function (resolve, reject) {
+Sk.Debugger.prototype.asyncToPromise = function(suspendablefn, suspHandlers, debugger_obj) {
+  return new Promise(function(resolve, reject) {
     try {
       var r = suspendablefn();
 
-      (function handleResponse(r) {
+      (function handleResponse (r) {
         try {
           while (r instanceof Sk.misceval.Suspension) {
             debugger_obj.set_suspension(r);
@@ -296,7 +374,7 @@ Sk.Debugger.prototype.asyncToPromise = function (suspendablefn, suspHandlers, de
           }
 
           resolve(r);
-        } catch (e) {
+        } catch(e) {
           reject(e);
         }
       })(r);
@@ -307,7 +385,7 @@ Sk.Debugger.prototype.asyncToPromise = function (suspendablefn, suspHandlers, de
   });
 };
 
-Sk.Debugger.prototype.execute = function (suspendablefn, suspHandlers) {
+Sk.Debugger.prototype.execute = function(suspendablefn, suspHandlers) {
   var r = suspendablefn();
 
   if (r instanceof Sk.misceval.Suspension) {
@@ -315,3 +393,5 @@ Sk.Debugger.prototype.execute = function (suspendablefn, suspHandlers) {
     this.eval_callback(r);
   }
 };
+
+Sk.exportSymbol("Sk.Debugger", Sk.Debugger);

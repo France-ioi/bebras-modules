@@ -891,9 +891,9 @@ var quickAlgoInterface = {
         svg.find('.blocklyFlyout, .blocklyMainBackground, .blocklyTrash, .blocklyBubbleCanvas, .blocklyScrollbarVertical, .blocklyScrollbarHorizontal, .blocklyScrollbarBackground').remove();
         var options = {
             backgroundColor: '#FFFFFF',
-            top: blocksBbox.top - svgBbox.top - 4, 
-            left: blocksBbox.left - svgBbox.left - 4, 
-            width: blocksBbox.width + 8, 
+            top: blocksBbox.top - svgBbox.top - 4,
+            left: blocksBbox.left - svgBbox.left - 4,
+            width: blocksBbox.width + 8,
             height: blocksBbox.height + 8
             };
         window.saveSvgAsPng(svg[0], name, options);
