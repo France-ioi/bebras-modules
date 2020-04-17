@@ -776,6 +776,14 @@ var getContext = function (display, infos, curLevel) {
             order: 203,
             python: ['displayText']
         },
+        {   
+            id: 'quickpi_draw',
+            name: 'Dessiner',
+            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_draw',
+            language: 'all',
+            order: 203,
+            python: ['drawRectangle','drawLine','drawCircle']
+        },
         {
             id: 'quickpi_range',
             name: 'Capteur de distance',
