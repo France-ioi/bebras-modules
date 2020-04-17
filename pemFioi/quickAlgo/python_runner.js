@@ -412,6 +412,9 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.initCodes = function (codes) {
+    // For reportValue in Skulpt.
+    window.currentPythonRunner = this;
+
     if(Sk.running) {
       if(typeof Sk.runQueue === 'undefined') {
         Sk.runQueue = [];
@@ -427,7 +430,14 @@ function PythonInterpreter(context, msgCallback) {
     this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
     this._injectFunctions();
-    this._code = codes[0];
+
+    /**
+     * Add a last instruction at the end of the code so Skupt will generate a Suspension state
+     * for after the user's last instruction. Otherwise it would be impossible to retrieve the
+     * modifications made by the last user's line. For skulpt analysis.
+     */
+    this._code = codes[0] + "\npass";
+
     this._setBreakpoint(1, false);
 
     if(typeof this.context.infos.maxIter !== 'undefined') {
@@ -469,10 +479,10 @@ function PythonInterpreter(context, msgCallback) {
     this.run();
   };
 
-  this.runStep = function () {
+  this.runStep = function (resolve, reject) {
     this.stepMode = true;
-    if(this._isRunning && !this._stepInProgress) {
-      this.step();
+    if (this._isRunning && !this._stepInProgress) {
+      this.step(resolve, reject);
     }
   };
 
@@ -622,19 +632,19 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this.step = function () {
+  this.step = function (resolve, reject) {
     this._resetCallstack();
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? Math.floor(this.context.infos.actionDelay/4) : 0;
     if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
-      if(curSusp && curSusp.lineno) {
+      if(curSusp && curSusp.$lineno) {
         this.removeEditorMarker();
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
         this._editorMarker = editor.session.addMarker(
-          new Range(curSusp.lineno-1, curSusp.colno, curSusp.lineno, 0),
+          new Range(curSusp.$lineno-1, curSusp.$colno, curSusp.$lineno, 0),
           "aceHighlight",
           "line");
       }
@@ -656,19 +666,20 @@ function PythonInterpreter(context, msgCallback) {
 
     if(realStepDelay > 0) {
       this._paused = true;
-      setTimeout(this.realStep.bind(this), realStepDelay);
+
+      var self = this;
+      setTimeout(function() {
+        self.realStep(resolve, reject);
+      }, realStepDelay);
     } else {
-      this.realStep();
+      this.realStep(resolve, reject);
     }
   };
 
-  this.realStep = function () {
-    // For reportValue in Skulpt
-    window.currentPythonRunner = this;
-
+  this.realStep = function (resolve, reject) {
     this._paused = this.stepMode;
     this._debugger.enable_step_mode();
-    this._debugger.resume.call(this._debugger);
+    this._debugger.resume.call(this._debugger, resolve, reject);
     this._steps += 1;
     if(this._lastNbActions != this._nbActions) {
       this._lastNbActions = this._nbActions;
@@ -678,13 +689,18 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this._onStepSuccess = function () {
+  this._onStepSuccess = function (callback) {
     // If there are still timeouts, there's still a step in progress
     this._stepInProgress = !!this._timeouts.length;
     this._continue();
+
+    if (typeof callback === 'function') {
+      callback();
+    }
   };
 
-  this._onStepError = function (message) {
+  this._onStepError = function (message, callback) {
+    console.log(message);
     context.onExecutionEnd && context.onExecutionEnd();
     // We always get there, even on a success
     this.stop();
@@ -708,6 +724,10 @@ function PythonInterpreter(context, msgCallback) {
     }
 
     this.messageCallback(message);
+
+    if (typeof callback === 'function') {
+      callback();
+    }
   };
 
   this._setBreakpoint = function (bp, isTemporary) {
@@ -715,7 +735,9 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._asyncCallback = function () {
-    return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
+    var dumpJS = false;
+
+    return Sk.importMainWithBody(this._editor_filename, dumpJS, this._code, true);
   };
 
   this.signalAction = function () {

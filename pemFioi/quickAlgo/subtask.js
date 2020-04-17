@@ -7,12 +7,12 @@ var initBlocklySubTask = function(subTask, language) {
    // Blockly tasks need to always have the level-specific behavior from
    // beaver-task-2.0
    subTask.assumeLevels = true;
-   
+
    if (window.forcedLevel != null) {
       for (var level in subTask.data) {
          if (window.forcedLevel != level) {
             subTask.data[level] = undefined;
-         }            
+         }
       }
       subTask.load = function(views, callback) {
          subTask.loadLevel(window.forcedLevel);
@@ -307,9 +307,12 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.stop = function() {
+      this.blocklyHelper.hideSkulptAnalysis();
+
       if(this.context.runner) {
          this.context.runner.stop();
       }
+
       // Reset everything through changeTest
       subTask.changeTest(0);
    };
@@ -359,11 +362,13 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.play = function() {
-    if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
-      this.run();
-    } else if (this.context.runner.stepMode) {
-      this.context.runner.run();
-    }
+     this.blocklyHelper.hideSkulptAnalysis();
+
+     if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
+       this.run();
+     } else if (this.context.runner.stepMode) {
+       this.context.runner.run();
+     }
    };
 
    subTask.getAnswerObject = function() {
@@ -416,7 +421,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.getGrade = function(callback, display, mainTestCase) {
       // mainTest : set to indicate the first iTestCase to test (typically,
-      // current iTestCase) before others; test will then stop if the 
+      // current iTestCase) before others; test will then stop if the
       if(subTask.context.infos && subTask.context.infos.hideValidate) {
          // There's no validation
          callback({

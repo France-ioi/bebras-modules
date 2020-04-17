@@ -27,6 +27,9 @@ function LogicController(nbTestCases, maxInstructions) {
   this._readOnly = false;
   this.includeBlocks = null;
 
+  /** @type {React.Component|null} */
+  this.analysisComponent = null;
+
   this.loadContext = function (mainContext) {
     this._mainContext = mainContext;
   }
@@ -59,6 +62,10 @@ function LogicController(nbTestCases, maxInstructions) {
     this._nbTestCases = nbTestCases;
     this._options = options;
     this._loadBasicEditor();
+
+    if (this._skulptAnalysisEnabled()) {
+      this._loadSkulptAnalysis();
+    }
 
     if(this._aceEditor && ! this._aceEditor.getValue()) {
       if(options.defaultCode !== undefined)
@@ -204,11 +211,25 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.step = function () {
+    var self = this;
+
     if(!this._mainContext.runner._isRunning) {
       this.prepareRun();
     }
-    this._mainContext.runner.runStep();
-  }
+
+    this._mainContext.runner.runStep(function() {
+      // After the step is complete.
+      if (self._skulptAnalysisEnabled()) {
+        // Compute and update the internal analysis.
+        var skulptSuspensions = self._mainContext.runner._debugger.suspension_stack;
+        var oldAnalysis = self.analysisComponent.props.analysis;
+
+        self.analysisComponent.props.analysis = analyseSkulptState(skulptSuspensions, oldAnalysis);
+
+        self.analysisComponent.forceUpdate();
+      }
+    });
+  };
 
   this.stop = function () {
     if(this._mainContext.runner) {
@@ -306,9 +327,10 @@ function LogicController(nbTestCases, maxInstructions) {
    * DOM specific operations
    */
   this._loadEditorWorkSpace = function () {
-    return "<div id='blocklyContainer'>" + // TODO :: change ID here and in CSS
-           "<div id='python-workspace' class='language_python' style='width: 100%; height: 100%'></div>" +
-           "</div>";
+    return "<div id='python-analysis'></div>" +
+        "<div id='blocklyContainer'>" + // TODO :: change ID here and in CSS
+        "<div id='python-workspace' class='language_python' style='width: 100%; height: 100%'></div>" +
+        "</div>";
   };
   this._loadBasicEditor = function () {
     if (this._mainContext.display) {
@@ -324,6 +346,55 @@ function LogicController(nbTestCases, maxInstructions) {
       this.updateTaskIntro();
     }
   };
+
+  /**
+   * Load the skulp analysis block in React.
+   */
+  this._loadSkulptAnalysis = function() {
+    var self = this;
+    var domContainer = document.querySelector('#python-analysis');
+
+    ReactDOM.render(React.createElement(PythonStackViewContainer, {
+      ref: function(componentReference) {
+        if (componentReference) {
+          self.analysisComponent = componentReference;
+
+          /**
+           * Move the analysis container with the mouse.
+           */
+          document.addEventListener('mouseup', function () {
+            self.analysisComponent.mouseUpHandler();
+          });
+          document.addEventListener('mousemove', function (event) {
+            event.preventDefault();
+
+            self.analysisComponent.mouseMoveHandler(event.clientX, event.clientY);
+          });
+        }
+      },
+      analysis: null
+    }), domContainer);
+  };
+
+  /**
+   * Whether skulpt analysis is enabled.
+   *
+   * @return {boolean}
+   */
+  this._skulptAnalysisEnabled = function() {
+    return (this.language === 'python' && this._mainContext.infos.skulptAnalysis);
+  };
+
+  /**
+   * Hides the skulpt analysis window.
+   */
+  this.hideSkulptAnalysis = function() {
+    if (this._skulptAnalysisEnabled()) {
+      this.analysisComponent.props.analysis = null;
+      this.analysisComponent.forceUpdate();
+    }
+  };
+
   this.onResize = function() {
     // On resize function to be called by the interface
     this._aceEditor.resize();
