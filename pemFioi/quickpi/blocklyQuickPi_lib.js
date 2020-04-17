@@ -185,7 +185,7 @@ var gyroscope3D = (function() {
 
 
 function QuickStore(rwidentifier, rwpassword) {
-    var url = 'http://cloud.quick-pi.org';
+    var url = 'https://cloud.quick-pi.org';
     var connected = (rwidentifier === undefined);
 
     function post(path, data, callback) {
