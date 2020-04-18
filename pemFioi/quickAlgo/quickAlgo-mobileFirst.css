@@ -1835,3 +1835,33 @@ button.showLongIntro .icon {
   color: #FFF;
   line-height: 40px;
 }
+
+
+#quickAlgo-altcode {
+    z-index: 50;
+    position: absolute;
+    top: calc(51% - (50vh / 2));
+    left: calc(50% - (50vw / 2));
+    width: 50vw;
+    height: 50vh;
+    background-color: #fff;
+    border-radius: 5px;
+    border: 2px solid #4a90e2;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    resize: both;
+    overflow: auto;
+    box-shadow: 2px 4px;
+}
+
+#quickAlgo-altcode textarea {
+    height: 100%;
+    width: 100%;
+    resize: none;
+}
+
+.panel-heading.panel-heading-nopadding {
+    padding: 0px;
+}

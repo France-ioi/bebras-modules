@@ -5,6 +5,7 @@
 
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
+      isBlockly: true,
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       maxBlocks: maxBlocks,
       textFile: null,
@@ -376,6 +377,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                   capacityInfo.popup = true;
                }
                window.quickAlgoInterface.displayCapacity(capacityInfo);
+               window.quickAlgoInterface.onEditorChange();
             } else {
                $('#capacity').html(capacityInfo.text);
             }
@@ -768,6 +770,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          // Note that when changing versions, the clipboard is checked for
          // compatibility
          return Blockly.clipboardXml_ === null ? null : !!Blockly.clipboardXml_;
+      },
+
+      canConvertBlocklyToPython: function() {
+         try {
+            var code = this.getCode("python", null, true);
+         } catch(e) {
+            return false;
+         }
+         return !!code.trim();
       },
 
       copyProgram: function() {
