@@ -68,6 +68,9 @@ var localLanguageStrings = {
       saveProgram: "Enregistrer",
       copy: "Copier",
       paste: "Coller",
+      blocklyToPython: "Convertir en Python",
+      blocklyToPythonTitle: "Code Python",
+      blocklyToPythonIntro: "Le code ci-dessous est l'équivalent dans le langage Python de votre programme Blockly. Vous pouvez utiliser ce code dans une version Python de cet exercice.",
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       limitElements: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
@@ -171,6 +174,9 @@ var localLanguageStrings = {
       saveProgram: "Save",
       copy: "Copy",
       paste: "Paste",
+      blocklyToPython: "Convert to Python",
+      blocklyToPythonTitle: "Python code",
+      blocklyToPythonIntro: "",
       limitBlocks: "{remainingBlocks} blocks remaining out of {maxBlocks} available.",
       limitBlocksOver: "{remainingBlocks} blocks over the limit of {maxBlocks} available.",
       limitElements: "{remainingBlocks} elements remaining out of {maxBlocks} available.",
@@ -274,6 +280,9 @@ var localLanguageStrings = {
       saveProgram: "Speichern",
       copy: "Copy", // TODO :: translate
       paste: "Paste",
+      blocklyToPython: "Convert to Python",
+      blocklyToPythonTitle: "Python code",
+      blocklyToPythonIntro: "",
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
       limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
@@ -376,6 +385,9 @@ var localLanguageStrings = {
       saveProgram: "Guardar",
       copy: "Copy", // TODO :: translate
       paste: "Paste",
+      blocklyToPython: "Convert to Python",
+      blocklyToPythonTitle: "Python code",
+      blocklyToPythonIntro: "",
       limitBlocks: "{remainingBlocks} bloques disponibles de {maxBlocks} autorizados.",
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
       limitElements: "{remainingBlocks} elementos disponibles de {maxBlocks} autorizados.",
@@ -478,6 +490,9 @@ var localLanguageStrings = {
       saveProgram: "Shrani",
       copy: "Copy", // TODO :: translate
       paste: "Paste",
+      blocklyToPython: "Convert to Python",
+      blocklyToPythonTitle: "Python code",
+      blocklyToPythonIntro: "",
       limitBlocks: "Delčkov na voljo: {remainingBlocks}",
       limitBlocksOver: "{remainingBlocks} delčkov preko meje {maxBlocks}",
       limitElements: "{remainingBlocks} elementov izmed {maxBlocks} imaš še na voljo.",
