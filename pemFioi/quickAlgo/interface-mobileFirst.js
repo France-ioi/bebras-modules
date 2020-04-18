@@ -300,7 +300,6 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
-        $('#editorMenu div[rel=blockly-python]').toggleClass('editorActionDisabled', !this.blocklyHelper || !this.blocklyHelper.canConvertBlocklyToPython());
 
         var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
         $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
@@ -1082,6 +1081,9 @@ var quickAlgoInterface = {
         }
 
         var code = this.blocklyHelper.getCode("python", null, true);
+
+        var strings = this.strings;
+        code = code.replace(/(\n\s*)pass *\n/g, function(m, w) { return w + strings.blocklyToPythonPassComment + '\n'; });
 
         if(!$('#quickAlgo-altcode').length) {
             var html = '' +
