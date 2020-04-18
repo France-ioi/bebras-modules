@@ -773,12 +773,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       canConvertBlocklyToPython: function() {
-         try {
-            var code = this.getCode("python", null, true);
-         } catch(e) {
-            return false;
-         }
-         return !!code.trim();
+         return true;
       },
 
       copyProgram: function() {
