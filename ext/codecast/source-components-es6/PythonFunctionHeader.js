@@ -1,6 +1,3 @@
-import * as React from 'react';
-import PythonVariableValue from "./PythonVariableValue";
-
 const PythonFunctionHeader = (props) => {
     const argCount = props.func.args.length;
 
@@ -26,5 +23,3 @@ const PythonFunctionHeader = (props) => {
         </div>
     );
 };
-
-export default PythonFunctionHeader;

@@ -1,8 +1,3 @@
-import * as React from 'react';
-import PythonFunctionHeader from "./PythonFunctionHeader";
-import classnames from "classnames";
-import PythonFunctionLocals from "./PythonFunctionLocals";
-
 const PythonFunctionView = (props) => {
     return (
         <div className="stack-frame stack-frame-focused">
@@ -11,5 +6,3 @@ const PythonFunctionView = (props) => {
         </div>
     );
 };
-
-export default PythonFunctionView;

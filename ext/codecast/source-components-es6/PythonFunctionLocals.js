@@ -1,6 +1,3 @@
-import * as React from 'react';
-import PythonVariable from "./PythonVariable";
-
 const PythonFunctionLocals = (props) => {
     return (
         <div className="scope-function-blocks">
@@ -16,5 +13,3 @@ const PythonFunctionLocals = (props) => {
         </div>
     );
 };
-
-export default PythonFunctionLocals;

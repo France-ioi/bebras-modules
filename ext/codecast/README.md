@@ -28,8 +28,8 @@ which is the directory you are reading this file, run the following commands :
 
 Install the babel tools and the required plugins :
 
-    npm install --save-dev @babel/core @babel/cli @babel/preset-react babel-plugin-remove-import-export
+    npm install --save-dev @babel/core @babel/cli @babel/preset-react
 
 Then, generate the files :
 
-    npx babel source-components-es6 --out-dir components --presets @babel/env,@babel/preset-react --plugins @babel/plugin-proposal-class-properties,remove-import-export
+    npx babel source-components-es6 --out-dir components --presets @babel/env,@babel/preset-react --plugins @babel/plugin-proposal-class-properties
