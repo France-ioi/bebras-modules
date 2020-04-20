@@ -1,6 +1,8 @@
-const PythonFunctionHeader = props => {
-  const argCount = props.func.args.length;
-  const args = props.func.args.map(name => {
+"use strict";
+
+var PythonFunctionHeader = function PythonFunctionHeader(props) {
+  var argCount = props.func.args.length;
+  var args = props.func.args.map(function (name) {
     return props.func.variables.get(name);
   });
   return /*#__PURE__*/React.createElement("div", {

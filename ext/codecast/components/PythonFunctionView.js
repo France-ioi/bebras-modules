@@ -1,4 +1,6 @@
-const PythonFunctionView = props => {
+"use strict";
+
+var PythonFunctionView = function PythonFunctionView(props) {
   return /*#__PURE__*/React.createElement("div", {
     className: "stack-frame stack-frame-focused"
   }, /*#__PURE__*/React.createElement(PythonFunctionHeader, {

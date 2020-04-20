@@ -32,4 +32,4 @@ Install the babel tools and the required plugins :
 
 Then, generate the files :
 
-    npx babel source-components-es6 --out-dir components --presets @babel/preset-react --plugins @babel/plugin-proposal-class-properties,remove-import-export
+    npx babel source-components-es6 --out-dir components --presets @babel/env,@babel/preset-react --plugins @babel/plugin-proposal-class-properties,remove-import-export
