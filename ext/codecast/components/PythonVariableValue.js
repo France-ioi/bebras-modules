@@ -1,69 +1,36 @@
-var PythonVariableValue = function PythonVariableValue(props) {
-    if (props.cur instanceof Sk.builtin.list) {
-        var nbElements = props.cur.v.length;
+const PythonVariableValue = props => {
+  if (props.cur instanceof Sk.builtin.list) {
+    const nbElements = props.cur.v.length;
+    const elements = [];
 
-        var elements = [];
-        for (var idx = 0; idx < props.cur.v.length; idx++) {
-            var old = undefined;
-            if (props.old && props.old instanceof Sk.builtin.list) {
-                old = props.old.v[idx];
-            }
+    for (let idx = 0; idx < props.cur.v.length; idx++) {
+      let old = undefined;
 
-            elements.push({
-                cur: props.cur.v[idx],
-                old: old
-            });
-        }
+      if (props.old && props.old instanceof Sk.builtin.list) {
+        old = props.old.v[idx];
+      }
 
-        return React.createElement(
-            React.Fragment,
-            null,
-            '[',
-            elements.map(function (element, index) {
-                return React.createElement(
-                    'span',
-                    { key: index },
-                    React.createElement(PythonVariableValue, { cur: element.cur, old: element.old }),
-                    index + 1 < nbElements ? ', ' : null
-                );
-            }),
-            ']'
-        );
+      elements.push({
+        cur: props.cur.v[idx],
+        old: old
+      });
     }
 
-    if (props.cur instanceof Sk.builtin.str) {
-        return React.createElement(
-            React.Fragment,
-            null,
-            React.createElement(
-                'span',
-                null,
-                '"',
-                props.cur.v,
-                '"'
-            ),
-            props.old && props.cur.v !== props.old.v ? React.createElement(
-                'span',
-                { className: 'value-previous' },
-                '"',
-                props.old.v,
-                '"'
-            ) : null
-        );
-    }
+    return /*#__PURE__*/React.createElement(React.Fragment, null, "[", elements.map((element, index) => /*#__PURE__*/React.createElement("span", {
+      key: index
+    }, /*#__PURE__*/React.createElement(PythonVariableValue, {
+      cur: element.cur,
+      old: element.old
+    }), index + 1 < nbElements ? ', ' : null)), "]");
+  }
 
-    return React.createElement(
-        React.Fragment,
-        null,
-        React.createElement(
-            'span',
-            null,
-            props.cur.v
-        ),
-        props.old && props.cur.v !== props.old.v ? React.createElement(
-            'span',
-            { className: 'value-previous' },
-            props.old.v
-        ) : null
-    );
+  if (props.cur instanceof Sk.builtin.str) {
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, "\"", props.cur.v, "\""), props.old && props.cur.v !== props.old.v ? /*#__PURE__*/React.createElement("span", {
+      className: "value-previous"
+    }, "\"", props.old.v, "\"") : null);
+  }
+
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", null, props.cur.v), props.old && props.cur.v !== props.old.v ? /*#__PURE__*/React.createElement("span", {
+    className: "value-previous"
+  }, props.old.v) : null);
 };

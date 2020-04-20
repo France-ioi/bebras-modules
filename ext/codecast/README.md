@@ -21,10 +21,15 @@ In task/index.html, load the <MODULES_DIR>/ext/codecast/loader.js and execute **
 
 ## Modify the React components related to analysis display
 
-The components are written using javascript ES6 and their source code is within the **source-components-es6** directory.
+The components are written using javascript ES6 and compiled using babel, their source code are within the **source-components-es6** directory.
 
 If you need to make any modifications to the components, modify the ES6 files, then **from the <MODULES_DIR>/ext/codecast**,
-which is the directory you are reading this file, the run the following commands :
+which is the directory you are reading this file, run the following commands :
 
-    npx babel source-components-es6 --out-dir components --presets react-app/prod
+Install the babel tools and the required plugins :
 
+    npm install --save-dev @babel/core @babel/cli @babel/preset-react babel-plugin-remove-import-export
+
+Then, generate the files :
+
+    npx babel source-components-es6 --out-dir components --presets @babel/preset-react --plugins @babel/plugin-proposal-class-properties,remove-import-export
