@@ -600,6 +600,7 @@ var quickAlgoInterface = {
 
     selectMode: function(mode) {
         if(mode === this.curMode) return;
+
         $('#modeSelector').children('div').removeClass('active');
         $('#modeSelector #' + mode).addClass('active');
         $('#task').removeClass(this.curMode).addClass(mode);
@@ -607,6 +608,13 @@ var quickAlgoInterface = {
         if(mode != 'mode-instructions' && this.blocklyHelper) {
             this.blocklyHelper.reload();
         }
+
+        if (mode === 'mode-editor') {
+            this.hideAnalysis();
+        } else if (mode === 'mode-player') {
+            this.showAnalysis();
+        }
+
         this.curMode = mode;
         this.onResize();
     },
@@ -862,6 +870,24 @@ var quickAlgoInterface = {
         $('button.videoBtn').on('click', this.videoBtnHandler).html('<span class="fas fa-play-circle icon"></span> ' + this.strings.displayVideo);
         $('a.videoBtn').off('click', this.videoBtnHandler);
         $('a.videoBtn').on('click', this.videoBtnHandler);
+    },
+
+    /**
+     * Shows the analysis container.
+     */
+    showAnalysis: function() {
+        if (this.blocklyHelper.showSkulptAnalysis) {
+            this.blocklyHelper.showSkulptAnalysis();
+        }
+    },
+
+    /**
+     * Hides the analysis container.
+     */
+    hideAnalysis: function() {
+        if (this.blocklyHelper.hideSkulptAnalysis) {
+            this.blocklyHelper.hideSkulptAnalysis();
+        }
     },
 
     videoBtnHandler: function() {

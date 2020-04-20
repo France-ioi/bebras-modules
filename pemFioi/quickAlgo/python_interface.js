@@ -63,10 +63,6 @@ function LogicController(nbTestCases, maxInstructions) {
     this._options = options;
     this._loadBasicEditor();
 
-    if (this._skulptAnalysisEnabled()) {
-      this._loadSkulptAnalysis();
-    }
-
     if(this._aceEditor && ! this._aceEditor.getValue()) {
       if(options.defaultCode !== undefined)
          this._aceEditor.setValue(options.defaultCode);
@@ -219,7 +215,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     this._mainContext.runner.runStep(function() {
       // After the step is complete.
-      if (self._skulptAnalysisEnabled()) {
+      if (self.skulptAnalysisEnabled()) {
         // Compute and update the internal analysis.
         var skulptSuspensions = self._mainContext.runner._debugger.suspension_stack;
         var oldAnalysis = self.analysisComponent.props.analysis;
@@ -350,7 +346,7 @@ function LogicController(nbTestCases, maxInstructions) {
   /**
    * Load the skulp analysis block in React.
    */
-  this._loadSkulptAnalysis = function() {
+  this.loadSkulptAnalysis = function() {
     var self = this;
     var domContainer = document.querySelector('#python-analysis');
 
@@ -366,13 +362,12 @@ function LogicController(nbTestCases, maxInstructions) {
             self.analysisComponent.mouseUpHandler();
           });
           document.addEventListener('mousemove', function (event) {
-            event.preventDefault();
-
             self.analysisComponent.mouseMoveHandler(event.clientX, event.clientY);
           });
         }
       },
-      analysis: null
+      analysis: null,
+      show: true
     }), domContainer);
   };
 
@@ -381,16 +376,36 @@ function LogicController(nbTestCases, maxInstructions) {
    *
    * @return {boolean}
    */
-  this._skulptAnalysisEnabled = function() {
-    return (this.language === 'python' && this._mainContext.infos.skulptAnalysis);
+  this.skulptAnalysisEnabled = function() {
+    return (this.language === 'python' && window.hasOwnProperty('analyseSkulptState'));
+  };
+
+  /**
+   * Clears the skulpt analysis window.
+   */
+  this.clearSkulptAnalysis = function() {
+    if (this.skulptAnalysisEnabled()) {
+      this.analysisComponent.props.analysis = null;
+      this.analysisComponent.forceUpdate();
+    }
+  };
+
+  /**
+   * Shows the skulpt analysis window.
+   */
+  this.showSkulptAnalysis = function() {
+    if (this.skulptAnalysisEnabled()) {
+      this.analysisComponent.props.show = true;
+      this.analysisComponent.forceUpdate();
+    }
   };
 
   /**
    * Hides the skulpt analysis window.
    */
   this.hideSkulptAnalysis = function() {
-    if (this._skulptAnalysisEnabled()) {
-      this.analysisComponent.props.analysis = null;
+    if (this.skulptAnalysisEnabled()) {
+      this.analysisComponent.props.show = false;
       this.analysisComponent.forceUpdate();
     }
   };
@@ -459,6 +474,8 @@ function LogicController(nbTestCases, maxInstructions) {
       if(!that._aceEditor) { return; }
 
       if(that._mainContext.runner && that._mainContext.runner._editorMarker) {
+        that.clearSkulptAnalysis();
+
         that._aceEditor.session.removeMarker(that._mainContext.runner._editorMarker);
         that._mainContext.runner._editorMarker = null;
       }
