@@ -145,6 +145,7 @@ var importableModules = function () {
       'scratch-base': {src: modulesPath+"bundles/scratch-base.js", id: "bundle-scratch-base"},
       'quickAlgo-all-blockly': {src: modulesPath+"bundles/quickAlgo-all-blockly.js", id: "bundle-quickAlgo-all-blockly"},
       'quickAlgo-all-python': {src: modulesPath+"bundles/quickAlgo-all-python.js", id: "bundle-quickAlgo-all-python"},
+      'skulpt-analysis': {src: modulesPath+"bundles/skulpt-analysis.js", id: "bundle-skulpt-analysis"},
 
       'blockly-quickpi': { src: modulesPath + "/pemFioi/quickpi/blocklyQuickPi_lib.js", id: "blocklyQuickPi_lib" },
       'quickpi-board': { src: modulesPath + "/pemFioi/quickpi/quickpi_board.js", id: "quickpi_board" },
@@ -206,17 +207,6 @@ var languageScripts = function () {
          'python_count',
          'ace',
          'ace_python',
-         'react',
-         'react_dom',
-         'immutable',
-         'codecast_analysis',
-         'codecast_python_stack_view_container',
-         'codecast_python_function_header',
-         'codecast_python_function_locals',
-         'codecast_python_function_view',
-         'codecast_python_stack_view',
-         'codecast_python_variable',
-         'codecast_python_variable_value',
          'codecast_css',
          'skulpt_quickAlgo',
          'skulpt_stdlib',
@@ -242,7 +232,8 @@ var bundledModules = function () {
       {name: 'bebras-interface', included: ['platform-pr', 'buttonsAndMessages', 'beav-1.0', 'installationAPI.01', 'miniPlatform']},
       {name: 'js-interpreter', included: ['acorn', 'acorn-walk', 'interpreter']},
       {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
-      {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']}
+      {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
+      {name: 'skulpt-analysis', included: ['react', 'react_dom', 'immutable', 'codecast_analysis', 'codecast_python_stack_view_container', 'codecast_python_function_header', 'codecast_python_function_locals', 'codecast_python_function_view', 'codecast_python_stack_view', 'codecast_python_variable', 'codecast_python_variable_value']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
 //      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}

@@ -151,6 +151,13 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.logActivity('loadLevel;' + curLevel);
          window.levelLogActivityTimeout = null;
       }, 1000);
+
+      /**
+       * Enable python analysis if the module is loaded.
+       */
+      if (this.blocklyHelper.skulptAnalysisEnabled && this.blocklyHelper.skulptAnalysisEnabled()) {
+         this.blocklyHelper.loadSkulptAnalysis();
+      }
    };
 
    subTask.updateScale = function() {
@@ -307,7 +314,7 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.stop = function() {
-      this.blocklyHelper.hideSkulptAnalysis();
+      this.clearAnalysis();
 
       if(this.context.runner) {
          this.context.runner.stop();
@@ -315,6 +322,15 @@ var initBlocklySubTask = function(subTask, language) {
 
       // Reset everything through changeTest
       subTask.changeTest(0);
+   };
+
+   /**
+    * Clears the analysis container.
+    */
+   subTask.clearAnalysis = function() {
+      if (this.blocklyHelper.clearSkulptAnalysis) {
+         this.blocklyHelper.clearSkulptAnalysis();
+      }
    };
 
    subTask.reloadStateObject = function(stateObj) {
@@ -362,7 +378,7 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.play = function() {
-     this.blocklyHelper.hideSkulptAnalysis();
+     this.clearAnalysis();
 
      if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
        this.run();

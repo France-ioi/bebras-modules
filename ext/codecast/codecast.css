@@ -8,6 +8,7 @@
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 .skulpt-analysis-container .panel-heading {
+    display: block;
     cursor: move;
     padding: 2px 4px;
     color: #333333;
@@ -26,13 +27,18 @@
 }
 .skulpt-analysis-container .panel-heading .icon {
     float: right;
+    cursor: pointer;
 }
 .skulpt-analysis-container .panel-heading span {
     text-align: left;
 }
 .skulpt-analysis-container .panel-body {
     overflow-x: auto;
-    max-height: 228px;
+    min-height: 25px;
+}
+.skulpt-analysis-container.collapsed .panel-body {
+    min-height: 0;
+    height: 0;
 }
 
 .skulpt-analysis-container .stack-view {
@@ -56,7 +62,7 @@
     margin: 0 0 2px 0;
 }
 .skulpt-analysis-container .stack-view  ul.global-scope {
-    padding-left: 2px;
+    padding-left: 3px;
 }
 .skulpt-analysis-container .stack-view li {
     list-style-type: none;
