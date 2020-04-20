@@ -1,6 +1,3 @@
-import * as React from 'react';
-import PythonFunctionView from "./PythonFunctionView";
-
 const PythonStackView = (props) => {
     const callReturn = null;
     const firstVisible = 0;
@@ -28,5 +25,3 @@ const PythonStackView = (props) => {
         </div>
     );
 };
-
-export default PythonStackView;

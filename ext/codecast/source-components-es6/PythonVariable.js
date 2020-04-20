@@ -1,6 +1,3 @@
-import * as React from 'react';
-import PythonVariableValue from "./PythonVariableValue";
-
 const PythonVariable = (props) => {
     return (
         <div className="vardecl">
@@ -16,5 +13,3 @@ const PythonVariable = (props) => {
         </div>
     );
 };
-
-export default PythonVariable;

@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 const PythonVariableValue = (props) => {
     if (props.cur instanceof Sk.builtin.list) {
         const nbElements = props.cur.v.length;
@@ -45,5 +43,3 @@ const PythonVariableValue = (props) => {
         </React.Fragment>
     );
 };
-
-export default PythonVariableValue;

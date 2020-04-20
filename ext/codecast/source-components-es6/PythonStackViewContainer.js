@@ -1,6 +1,3 @@
-import * as React from 'react';
-import PythonStackView from "./PythonStackView";
-
 class PythonStackViewContainer extends React.Component {
     constructor(props) {
         super(props);
@@ -154,5 +151,3 @@ class PythonStackViewContainer extends React.Component {
         );
     }
 };
-
-export default PythonStackViewContainer;
