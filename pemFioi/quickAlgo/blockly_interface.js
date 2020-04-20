@@ -798,7 +798,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(!Blockly.clipboardXml_) { return; }
          var xml = Blockly.Xml.textToDom('<xml>' + Blockly.Xml.domToText(Blockly.clipboardXml_) + '</xml>');
          this.loadProgramFromDom(xml);
-      }
+      },
+
+      hideSkulptAnalysis: function() {}
    }
 }
 
