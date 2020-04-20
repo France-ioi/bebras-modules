@@ -1,10 +1,12 @@
-const PythonVariableValue = props => {
-  if (props.cur instanceof Sk.builtin.list) {
-    const nbElements = props.cur.v.length;
-    const elements = [];
+"use strict";
 
-    for (let idx = 0; idx < props.cur.v.length; idx++) {
-      let old = undefined;
+var PythonVariableValue = function PythonVariableValue(props) {
+  if (props.cur instanceof Sk.builtin.list) {
+    var nbElements = props.cur.v.length;
+    var elements = [];
+
+    for (var idx = 0; idx < props.cur.v.length; idx++) {
+      var old = undefined;
 
       if (props.old && props.old instanceof Sk.builtin.list) {
         old = props.old.v[idx];
@@ -16,12 +18,14 @@ const PythonVariableValue = props => {
       });
     }
 
-    return /*#__PURE__*/React.createElement(React.Fragment, null, "[", elements.map((element, index) => /*#__PURE__*/React.createElement("span", {
-      key: index
-    }, /*#__PURE__*/React.createElement(PythonVariableValue, {
-      cur: element.cur,
-      old: element.old
-    }), index + 1 < nbElements ? ', ' : null)), "]");
+    return /*#__PURE__*/React.createElement(React.Fragment, null, "[", elements.map(function (element, index) {
+      return /*#__PURE__*/React.createElement("span", {
+        key: index
+      }, /*#__PURE__*/React.createElement(PythonVariableValue, {
+        cur: element.cur,
+        old: element.old
+      }), index + 1 < nbElements ? ', ' : null);
+    }), "]");
   }
 
   if (props.cur instanceof Sk.builtin.str) {
