@@ -215,7 +215,8 @@ var quickAlgoInterface = {
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
-                    "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer+ "</div>" +
+                    "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
+                    "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                 "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
@@ -259,6 +260,8 @@ var quickAlgoInterface = {
             displayHelper.restartAll();
         } else if(btn == 'best-answer') {
             displayHelper.retrieveAnswer();
+        } else if(btn == 'blockly-python') {
+            this.displayBlocklyPython();
         }
     },
 
@@ -296,6 +299,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
+        $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 
         var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
         $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
@@ -331,6 +335,16 @@ var quickAlgoInterface = {
         this.context.setScale(scaled ? 2 : 1);
     },
 
+    onEditorChangeFct: function() {
+        if(this.displayedAltCode == 'python') {
+            this.displayBlocklyPython();
+        }
+    },
+    onEditorChange: function() {
+        // This function will replace itself with the debounced onEditorChangeFct
+        this.onEditorChange = debounce(this.onEditorChangeFct.bind(this), 500, false);
+        this.onEditorChangeFct();
+    },
 
     blinkRemaining: function(times, red) {
         var capacity = $('.capacity');
@@ -1080,6 +1094,42 @@ var quickAlgoInterface = {
             callbackFinished: callbackFinished
             };
         quickAlgoInterface.handleKeypadKey(null);
+    },
+
+    hideAlternateCode: function() {
+        $('#quickAlgo-altcode').remove();
+        this.displayedAltCode = null;
+    },
+
+    displayBlocklyPython: function() {
+        if(!this.blocklyHelper || !this.blocklyHelper.canConvertBlocklyToPython()) {
+            return;
+        }
+
+        var code = this.blocklyHelper.getCode("python", null, true);
+
+        var strings = this.strings;
+        code = code.replace(/(\n\s*)pass *\n/g, function(m, w) { return w + strings.blocklyToPythonPassComment + '\n'; });
+
+        if(!$('#quickAlgo-altcode').length) {
+            var html = '' +
+                '<div id="quickAlgo-altcode" class="blanket">' +
+                '   <div id="quickAlgo-altcode-header" class="panel-heading panel-heading-nopadding">' +
+                '     <h2 class="sectionTitle"><span class="icon fas fa-code"></span>' + this.strings.blocklyToPythonTitle + '</h2>' +
+                '     <div class="exit" onclick="quickAlgoInterface.hideAlternateCode();"><span class="icon fas fa-times"></span></div>' +
+                '   </div>' +
+                '   <p>' + this.strings.blocklyToPythonIntro + '</p>' +
+                '   <textarea readonly></textarea>' +
+                '</div>';
+
+            $('#task').append(html);
+
+            dragElement($('#quickAlgo-altcode')[0]);
+
+            this.displayedAltCode = 'python';
+        }
+
+        $('#quickAlgo-altcode textarea').text(code.trim());
     }
 };
 
