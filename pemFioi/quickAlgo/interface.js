@@ -119,6 +119,7 @@ var quickAlgoInterface = {
       this.context.setScale(scaled ? 2 : 1);
    },
 
+   onEditorChange: function() {},
    onResize: function() {},
    updateBestAnswerStatus: function() {},
 

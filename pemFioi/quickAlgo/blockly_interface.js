@@ -5,6 +5,7 @@
 
 function getBlocklyInterface(maxBlocks, nbTestCases) {
    return {
+      isBlockly: true,
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       maxBlocks: maxBlocks,
       textFile: null,
@@ -376,6 +377,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                   capacityInfo.popup = true;
                }
                window.quickAlgoInterface.displayCapacity(capacityInfo);
+               window.quickAlgoInterface.onEditorChange();
             } else {
                $('#capacity').html(capacityInfo.text);
             }
@@ -770,6 +772,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          return Blockly.clipboardXml_ === null ? null : !!Blockly.clipboardXml_;
       },
 
+      canConvertBlocklyToPython: function() {
+         return true;
+      },
+
       copyProgram: function() {
          var block = Blockly.selected;
          if(!block) {
@@ -792,7 +798,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(!Blockly.clipboardXml_) { return; }
          var xml = Blockly.Xml.textToDom('<xml>' + Blockly.Xml.domToText(Blockly.clipboardXml_) + '</xml>');
          this.loadProgramFromDom(xml);
-      }
+      },
+
+      hideSkulptAnalysis: function() {}
    }
 }
 

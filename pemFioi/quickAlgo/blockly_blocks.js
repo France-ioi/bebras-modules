@@ -206,7 +206,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return code;
       },
 
-      getCode: function(language, codeWorkspace) {
+      getCode: function(language, codeWorkspace, noReportValue) {
          if (codeWorkspace == undefined) {
             codeWorkspace = this.workspace;
          }
@@ -223,6 +223,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             languageObj = Blockly.Python;
          }
          languageObj.init(codeWorkspace);
+
+         var oldReportValues = this.reportValues;
+         if(noReportValue) {
+            this.reportValues = false;
+         }
 
          var code = [];
          var comments = [];
@@ -245,6 +250,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var code = code.join("\n");
          code += "\n";
          code += comments.join("\n");
+
+         this.reportValues = oldReportValues;
+
          return code;
       },
 

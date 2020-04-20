@@ -813,6 +813,9 @@ function LogicController(nbTestCases, maxInstructions) {
   this.canPaste = function() {
     return window.pythonClipboard ? true : null;
   }
+  this.canConvertBlocklyToPython = function() {
+    return false;
+  }
   this.copyProgram = function() {
     var code = this._aceEditor.getSelectedText();
     if(!code) { code = this._aceEditor.getValue(); }
