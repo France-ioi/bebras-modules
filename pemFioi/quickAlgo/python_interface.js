@@ -398,7 +398,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * @return {boolean}
    */
   this.skulptAnalysisEnabled = function() {
-    return (window.hasOwnProperty('pythonAnalysisModulesLoaded') && window.pythonAnalysisModulesLoaded);
+    return (window.pythonAnalysisModulesLoaded !== undefined && window.pythonAnalysisModulesLoaded);
   };
 
   /**

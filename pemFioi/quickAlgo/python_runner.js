@@ -232,17 +232,17 @@ function PythonInterpreter(context, msgCallback) {
     } else {
       var retVal = val.v;
       if(val instanceof Sk.builtin.tuple || val instanceof Sk.builtin.list) {
-         retVal = [];
-         for(var i = 0; i < val.v.length; i++) {
-            retVal[i] = this.skToJs(val.v[i]);
-         }
+        retVal = [];
+        for(var i = 0; i < val.v.length; i++) {
+          retVal[i] = this.skToJs(val.v[i]);
+        }
       }
       if(val instanceof Sk.builtin.tuple) {
-         retVal.isTuple = true;
+        retVal.isTuple = true;
       }
       if(val instanceof Sk.builtin.float_) {
-         retVal = new this.pythonNumber(retVal);
-         retVal.isFloat = true;
+        retVal = new this.pythonNumber(retVal);
+        retVal.isFloat = true;
       }
       return retVal;
     }
@@ -412,9 +412,6 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this.initCodes = function (codes) {
-    // For reportValue in Skulpt.
-    window.currentPythonRunner = this;
-
     if(Sk.running) {
       if(typeof Sk.runQueue === 'undefined') {
         Sk.runQueue = [];
@@ -430,14 +427,7 @@ function PythonInterpreter(context, msgCallback) {
     this._debugger = new Sk.Debugger(this._editor_filename, this);
     this._configure();
     this._injectFunctions();
-
-    /**
-     * Add a last instruction at the end of the code so Skupt will generate a Suspension state
-     * for after the user's last instruction. Otherwise it would be impossible to retrieve the
-     * modifications made by the last user's line. For skulpt analysis.
-     */
-    this._code = codes[0] + "\npass";
-
+    this._code = codes[0];
     this._setBreakpoint(1, false);
 
     if(typeof this.context.infos.maxIter !== 'undefined') {
@@ -479,10 +469,10 @@ function PythonInterpreter(context, msgCallback) {
     this.run();
   };
 
-  this.runStep = function (resolve, reject) {
+  this.runStep = function () {
     this.stepMode = true;
-    if (this._isRunning && !this._stepInProgress) {
-      this.step(resolve, reject);
+    if(this._isRunning && !this._stepInProgress) {
+      this.step();
     }
   };
 
@@ -507,8 +497,8 @@ function PythonInterpreter(context, msgCallback) {
       var dictElems = [];
       for(var i=0; i<keys.length; i++) {
         if(keys[i] == 'size' || keys[i] == '__class__'
-                             || !origValue[keys[i]].items
-                             || !origValue[keys[i]].items[0]) {
+            || !origValue[keys[i]].items
+            || !origValue[keys[i]].items[0]) {
           continue;
         }
         var items = origValue[keys[i]].items[0];
@@ -560,21 +550,21 @@ function PythonInterpreter(context, msgCallback) {
 
     var displayStr = value.toString();
     if(typeof value == 'boolean') {
-       displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
+      displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
     }
     if(varName) {
-       displayStr = '' + varName + ' = ' + displayStr;
+      displayStr = '' + varName + ' = ' + displayStr;
     }
 
     var dropDownDiv = '' +
-      '<div class="blocklyDropDownDiv" style="transition: transform 0.25s, opacity 0.25s; background-color: rgb(255, 255, 255); border-color: rgb(170, 170, 170); left: '+leftPos+'px; top: '+topPos+'px; display: block; opacity: 1; transform: translate(0px, -20px);">' +
-      '  <div class="blocklyDropDownContent">' +
-      '    <div class="valueReportBox">' +
-      displayStr +
-      '    </div>' +
-      '  </div>' +
-      '  <div class="blocklyDropDownArrow arrowBottom" style="transform: translate(22px, 15px) rotate(45deg);"></div>' +
-      '</div>';
+        '<div class="blocklyDropDownDiv" style="transition: transform 0.25s, opacity 0.25s; background-color: rgb(255, 255, 255); border-color: rgb(170, 170, 170); left: '+leftPos+'px; top: '+topPos+'px; display: block; opacity: 1; transform: translate(0px, -20px);">' +
+        '  <div class="blocklyDropDownContent">' +
+        '    <div class="valueReportBox">' +
+        displayStr +
+        '    </div>' +
+        '  </div>' +
+        '  <div class="blocklyDropDownArrow arrowBottom" style="transform: translate(22px, 15px) rotate(45deg);"></div>' +
+        '</div>';
 
     $('.blocklyDropDownDiv').remove();
     $('body').append(dropDownDiv);
@@ -632,21 +622,21 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this.step = function (resolve, reject) {
+  this.step = function () {
     this._resetCallstack();
     this._stepInProgress = true;
     var editor = this.context.blocklyHelper._aceEditor;
     var markDelay = this.context.infos ? Math.floor(this.context.infos.actionDelay/4) : 0;
     if(this.context.display && (this.stepMode || markDelay > 30)) {
       var curSusp = this._debugger.suspension_stack[this._debugger.suspension_stack.length-1];
-      if(curSusp && curSusp.$lineno) {
+      if(curSusp && curSusp.lineno) {
         this.removeEditorMarker();
         var splitCode = this._code.split(/[\r\n]/);
         var Range = ace.require('ace/range').Range;
         this._editorMarker = editor.session.addMarker(
-          new Range(curSusp.$lineno-1, curSusp.$colno, curSusp.$lineno, 0),
-          "aceHighlight",
-          "line");
+            new Range(curSusp.lineno-1, curSusp.colno, curSusp.lineno, 0),
+            "aceHighlight",
+            "line");
       }
     } else {
       this.removeEditorMarker();
@@ -666,20 +656,19 @@ function PythonInterpreter(context, msgCallback) {
 
     if(realStepDelay > 0) {
       this._paused = true;
-
-      var self = this;
-      setTimeout(function() {
-        self.realStep(resolve, reject);
-      }, realStepDelay);
+      setTimeout(this.realStep.bind(this), realStepDelay);
     } else {
-      this.realStep(resolve, reject);
+      this.realStep();
     }
   };
 
-  this.realStep = function (resolve, reject) {
+  this.realStep = function () {
+    // For reportValue in Skulpt
+    window.currentPythonRunner = this;
+
     this._paused = this.stepMode;
     this._debugger.enable_step_mode();
-    this._debugger.resume.call(this._debugger, resolve, reject);
+    this._debugger.resume.call(this._debugger);
     this._steps += 1;
     if(this._lastNbActions != this._nbActions) {
       this._lastNbActions = this._nbActions;
@@ -689,18 +678,13 @@ function PythonInterpreter(context, msgCallback) {
     }
   };
 
-  this._onStepSuccess = function (callback) {
+  this._onStepSuccess = function () {
     // If there are still timeouts, there's still a step in progress
     this._stepInProgress = !!this._timeouts.length;
     this._continue();
-
-    if (typeof callback === 'function') {
-      callback();
-    }
   };
 
-  this._onStepError = function (message, callback) {
-    console.log(message);
+  this._onStepError = function (message) {
     context.onExecutionEnd && context.onExecutionEnd();
     // We always get there, even on a success
     this.stop();
@@ -724,10 +708,6 @@ function PythonInterpreter(context, msgCallback) {
     }
 
     this.messageCallback(message);
-
-    if (typeof callback === 'function') {
-      callback();
-    }
   };
 
   this._setBreakpoint = function (bp, isTemporary) {
@@ -735,9 +715,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._asyncCallback = function () {
-    var dumpJS = false;
-
-    return Sk.importMainWithBody(this._editor_filename, dumpJS, this._code, true);
+    return Sk.importMainWithBody(this._editor_filename, true, this._code, true);
   };
 
   this.signalAction = function () {
@@ -747,5 +725,5 @@ function PythonInterpreter(context, msgCallback) {
 }
 
 function initBlocklyRunner(context, msgCallback) {
-   return new PythonInterpreter(context, msgCallback);
+  return new PythonInterpreter(context, msgCallback);
 };
