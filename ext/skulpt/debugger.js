@@ -271,7 +271,9 @@ Sk.Debugger.prototype.resume = function(resolve, reject) {
   if (this.suspension_stack.length === 0) {
     this.print("No running program");
 
-    resolve();
+    if (typeof resolve === 'function') {
+      resolve();
+    }
   } else {
     var promise = this.suspension_handler(this.get_active_suspension());
     var self = this;
