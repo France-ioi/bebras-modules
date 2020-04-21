@@ -155,7 +155,7 @@ var initBlocklySubTask = function(subTask, language) {
       /**
        * Load the python analysis modules if required.
        */
-      if (!window.hasOwnProperty('pythonAnalysisModulesLoading') && this.blocklyHelper.skulptAnalysisShouldBeEnabled && this.blocklyHelper.skulptAnalysisShouldBeEnabled()) {
+      if (!window.hasOwnProperty('pythonAnalysisModulesLoading') && this.blocklyHelper.skulptAnalysisShouldBeEnabled && this.blocklyHelper.skulptAnalysisShouldBeEnabled() && window.importModules) {
          window.pythonAnalysisModulesLoading = true;
 
          importModules(['python-analysis'], true, function () {
