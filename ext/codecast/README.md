@@ -2,21 +2,33 @@
 
 ## Add the skulpt analysis to a task
 
-In task/index.html, load the <MODULES_DIR>/ext/codecast/loader.js and execute **loadPythonAnalysisModules()**  :
+In task/task.js, the "variables" whole category must be selected :
 
 ```
   ...
-  <script class="remove" type="text/javascript">
-    var modulesPath = '../../../_common/modules/'
-    importModules(...);
+  subTask.gridInfos = {
     ...
-  </script>
-
-  <script class="remove" type="text/javascript" src="../../../_common/modules/ext/codecast/loader.js"></script>
-  <script class="remove" type="text/javascript">
-      loadPythonAnalysisModules();
-  </script>
+    includeBlocks: {
+      ...
+      standardBlocks: {
+        ...
+        wholeCategories: [..."variables"...],
+      }
+      ...
+    }
+    ...
+  }
   ...
+```
+
+It is possible also to disable the modules in such case using the disableAnalysis option in gridInfos :
+
+```
+  subTask.gridInfos = {
+    ...
+    disableAnalysis: true,
+    ...
+  }
 ```
 
 ## Modify the React components related to analysis display
