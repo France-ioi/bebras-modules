@@ -207,7 +207,6 @@ var languageScripts = function () {
          'python_count',
          'ace',
          'ace_python',
-         'codecast_css',
          'skulpt_quickAlgo',
          'skulpt_stdlib',
          'skulpt_debugger',
@@ -233,7 +232,7 @@ var bundledModules = function () {
       {name: 'js-interpreter', included: ['acorn', 'acorn-walk', 'interpreter']},
       {name: 'blockly-base', included: ['blockly', 'blockly_blocks', 'blockly_javascript', 'blockly_python']},
       {name: 'scratch-base', included: ['scratch', 'scratch_blocks_common', 'scratch_blocks', 'blockly_javascript', 'blockly_python']},
-      {name: 'skulpt-analysis', included: ['react', 'react_dom', 'immutable', 'codecast_analysis', 'codecast_python_stack_view_container', 'codecast_python_function_header', 'codecast_python_function_locals', 'codecast_python_function_view', 'codecast_python_stack_view', 'codecast_python_variable', 'codecast_python_variable_value']}
+      {name: 'python-analysis', included: ['react', 'react_dom', 'immutable', 'codecast_analysis', 'codecast_python_stack_view_container', 'codecast_python_function_header', 'codecast_python_function_locals', 'codecast_python_function_view', 'codecast_python_stack_view', 'codecast_python_variable', 'codecast_python_variable_value', 'codecast_css']}
 // TODO :: bundles with mobileFirst interface
 //      {name: 'quickAlgo-all-blockly', included: ['quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_blockly_blocks','quickAlgo_blockly_interface', 'quickAlgo_blockly_runner', 'quickAlgo_subtask', 'quickAlgo_context']},
 //      {name: 'quickAlgo-all-python', included: ['python_count', 'ace', 'ace_python', 'skulpt_quickAlgo', 'skulpt_stdlib', 'skulpt_debugger', 'quickAlgo_utils', 'quickAlgo_i18n', 'quickAlgo_interface', 'quickAlgo_python_interface', 'quickAlgo_python_runner', 'quickAlgo_subtask', 'quickAlgo_context']}
@@ -330,8 +329,14 @@ function modulesToBundles(modulesList) {
    return modulesList;
 }
 
-
-function importModules(modulesList) {
+/**
+ * Imports a list of modules.
+ *
+ * @param {Array}    modulesList     An array listing the modules (defined in importableModules).
+ * @param {bool}     afterTaskLoaded Whether we load modules after the task has been loaded.
+ * @param {function} callback        A callback to execute after the modules have been loaded.
+ */
+function importModules(modulesList, afterTaskLoaded, callback) {
    if(typeof importableModules == 'function') {
       importableModules = importableModules();
    };
@@ -346,6 +351,7 @@ function importModules(modulesList) {
    }
 
    var modulesStr = '';
+   var files = [];
    for(var iMod in modulesList) {
       var moduleName = modulesList[iMod];
       var curModule = importableModules[moduleName];
@@ -364,18 +370,100 @@ function importModules(modulesList) {
             modSrc += (modSrc.indexOf('?') > -1 ? '&' : '?') + 'v=' + QueryString.v;
          }
          var modId = curModule.id ? curModule.id : moduleName;
-         if(curModule.type == 'stylesheet') {
-            modulesStr += '<link class="'+modClass+'" rel="stylesheet" type="text/css" href="'+modSrc+'" id="'+modId+'">';
+         if (curModule.type === 'stylesheet') {
+            if (afterTaskLoaded) {
+               files.push(modSrc);
+            } else {
+               modulesStr += '<link class="' + modClass + '" rel="stylesheet" type="text/css" href="' + modSrc + '" id="' + modId + '">';
+            }
          } else {
-            modulesStr += '<script class="'+modClass+'" type="text/javascript" src="'+modSrc+'" id="'+modId+'"></script>';
+            if (afterTaskLoaded) {
+               files.push(modSrc);
+            } else {
+               modulesStr += '<script class="' + modClass + '" type="text/javascript" src="' + modSrc + '" id="' + modId + '"></script>';
+            }
          }
       } else {
          console.error("Module '"+moduleName+"' unknown.");
       }
    }
-   document.write(modulesStr);
+
+   if (afterTaskLoaded) {
+      loadFiles(files, callback);
+   } else {
+      document.write(modulesStr);
+   }
 }
 
+/**
+ * Load a list of files.
+ *
+ * @param {Array}    files    The files.
+ * @param {function} callback The callback
+ */
+function loadFiles(files, callback) {
+   if (files.length) {
+      _loadFilesRec(files, 0, callback);
+   } else {
+      callback();
+   }
+}
+
+/**
+ * Load a JS file.
+ *
+ * @param {string}   url      The URL of the file.
+ * @param {function} callback The callback for after the file is loaded.
+ */
+function _loadJsFile(url, callback) {
+   var e = document.createElement('script');
+   e.src = url;
+   e.type = 'text/javascript';
+   e.addEventListener('load', callback);
+   document.getElementsByTagName('head')[0].appendChild(e);
+}
+
+/**
+ * Load a CSS file.
+ *
+ * @param {string}   url      The URL of the file.
+ * @param {function} callback The callback for after the file is loaded.
+ */
+function _loadCssFile(url, callback) {
+   var link = document.createElement( 'link');
+   link.setAttribute('href', url);
+   link.setAttribute('rel', 'stylesheet');
+   link.setAttribute('type', 'text/css');
+
+   document.getElementsByTagName('head')[0].appendChild(link);
+
+   callback();
+}
+
+/**
+ * Load a list of files.
+ *
+ * @param {Array}    files    The files.
+ * @param {int}      i        The index of the current file to load
+ * @param {function} callback The callback
+ */
+function _loadFilesRec(files, i, callback) {
+   var file = files[i];
+   var loadFunction = _loadJsFile;
+
+   var cssExt = '.css';
+   if (file.toLowerCase().indexOf(cssExt, file.length - cssExt.length) !== -1) {
+      loadFunction = _loadCssFile;
+   }
+
+   loadFunction(file, function() {
+      if (i < (files.length - 1)) {
+         _loadFilesRec(files, i + 1, callback);
+      } else {
+         callback();
+      }
+   });
+}
 
 function conditionalLanguageElements(lang) {
    var elemList = document.querySelectorAll('[data-lang]');

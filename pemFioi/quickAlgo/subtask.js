@@ -153,10 +153,14 @@ var initBlocklySubTask = function(subTask, language) {
       }, 1000);
 
       /**
-       * Enable python analysis if the module is loaded.
+       * Load the python analysis modules if required.
        */
-      if (this.blocklyHelper.skulptAnalysisEnabled && this.blocklyHelper.skulptAnalysisEnabled()) {
-         this.blocklyHelper.loadSkulptAnalysis();
+      if (!window.hasOwnProperty('pythonAnalysisModulesLoading') && this.blocklyHelper.skulptAnalysisShouldBeEnabled && this.blocklyHelper.skulptAnalysisShouldBeEnabled()) {
+         window.pythonAnalysisModulesLoading = true;
+
+         importModules(['python-analysis'], true, function () {
+            window.pythonAnalysisModulesLoaded = true;
+         });
       }
    };
 

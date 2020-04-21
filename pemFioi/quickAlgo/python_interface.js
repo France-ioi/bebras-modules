@@ -199,6 +199,10 @@ function LogicController(nbTestCases, maxInstructions) {
 
     // Initialize runner
     this._mainContext.runner.initCodes(codes);
+
+    if (this.skulptAnalysisEnabled()) {
+      this.loadSkulptAnalysis();
+    }
   };
 
   this.run = function () {
@@ -215,7 +219,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     this._mainContext.runner.runStep(function() {
       // After the step is complete.
-      if (self.skulptAnalysisEnabled()) {
+      if (self.skulptAnalysisEnabled() && self.analysisComponent) {
         // Compute and update the internal analysis.
         var skulptSuspensions = self._mainContext.runner._debugger.suspension_stack;
         var oldAnalysis = self.analysisComponent.props.analysis;
@@ -372,19 +376,36 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   /**
+   * Whether skulpt analysis should be enabled (doesn't check if modules are loaded).
+   *
+   * @return {boolean}
+   */
+  this.skulptAnalysisShouldBeEnabled = function() {
+    var variablesEnabled = false;
+    var taskInfos = this._mainContext.infos;
+    if (taskInfos.includeBlocks && taskInfos.includeBlocks.standardBlocks && taskInfos.includeBlocks.standardBlocks.wholeCategories) {
+      if (taskInfos.includeBlocks.standardBlocks.wholeCategories.includes('variables')) {
+        variablesEnabled = true;
+      }
+    }
+
+    return (this.language === 'python' && variablesEnabled && !taskInfos.disableAnalysis);
+  };
+
+  /**
    * Whether skulpt analysis is enabled.
    *
    * @return {boolean}
    */
   this.skulptAnalysisEnabled = function() {
-    return (this.language === 'python' && window.hasOwnProperty('analyseSkulptState'));
+    return (window.hasOwnProperty('pythonAnalysisModulesLoaded') && window.pythonAnalysisModulesLoaded);
   };
 
   /**
    * Clears the skulpt analysis window.
    */
   this.clearSkulptAnalysis = function() {
-    if (this.skulptAnalysisEnabled()) {
+    if (this.skulptAnalysisEnabled() && this.analysisComponent) {
       this.analysisComponent.props.analysis = null;
       this.analysisComponent.forceUpdate();
     }
@@ -394,7 +415,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * Shows the skulpt analysis window.
    */
   this.showSkulptAnalysis = function() {
-    if (this.skulptAnalysisEnabled()) {
+    if (this.skulptAnalysisEnabled() && this.analysisComponent) {
       this.analysisComponent.props.show = true;
       this.analysisComponent.forceUpdate();
     }
@@ -404,7 +425,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * Hides the skulpt analysis window.
    */
   this.hideSkulptAnalysis = function() {
-    if (this.skulptAnalysisEnabled()) {
+    if (this.skulptAnalysisEnabled() && this.analysisComponent) {
       this.analysisComponent.props.show = false;
       this.analysisComponent.forceUpdate();
     }
