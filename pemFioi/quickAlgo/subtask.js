@@ -155,6 +155,8 @@ var initBlocklySubTask = function(subTask, language) {
       /**
        * Load the python analysis modules if required.
        */
+      // TODO: Skulpt analysis
+      /*
       if (!window.hasOwnProperty('pythonAnalysisModulesLoading') && this.blocklyHelper.skulptAnalysisShouldBeEnabled && this.blocklyHelper.skulptAnalysisShouldBeEnabled()) {
          window.pythonAnalysisModulesLoading = true;
 
@@ -162,6 +164,7 @@ var initBlocklySubTask = function(subTask, language) {
             window.pythonAnalysisModulesLoaded = true;
          });
       }
+      */
    };
 
    subTask.updateScale = function() {
