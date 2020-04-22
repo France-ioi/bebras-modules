@@ -1400,6 +1400,7 @@ function GraphEditor(settings) {
    var callback = settings.callback;
    var selectVertexCallback = settings.selectVertexCallback;
    this.contentValidation = settings.contentValidation;
+   this.vertexLabelValidation = settings.vertexLabelValidation;
 
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -2507,6 +2508,11 @@ function GraphEditor(settings) {
                newLabel = oldLabel;
                break;
             }
+         }
+      }
+      if(type == "vertex" && self.vertexLabelValidation){
+         if(!self.vertexLabelValidation(id,newLabel)){
+            newLabel = oldLabel;
          }
       }
       var raphElement = visualGraph.getRaphaelsFromID(id);
