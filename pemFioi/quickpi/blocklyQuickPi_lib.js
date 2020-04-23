@@ -2276,7 +2276,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         context.resetSensorTable();
-        context.resetDisplay();
+        context.reset();
     };
 
 
@@ -2341,6 +2341,7 @@ var getContext = function (display, infos, curLevel) {
                     infos.quickPiSensors.push(sensor);
                 }
 
+                context.recreateDisplay = true;
                 this.resetDisplay();
             }
         }
@@ -2356,13 +2357,13 @@ var getContext = function (display, infos, curLevel) {
             context.recreateDisplay = false;
         }
 
-        paper.setSize($('#virtualSensors').width() * context.quickPiZoom, $('#virtualSensors').height());
+        paper.setSize(($('#virtualSensors').width() * context.quickPiZoom) - 10 , $('#virtualSensors').height() - 30);
 
         if (context.sensorDivisions) {
             context.sensorDivisions.remove();
-            context.sensorDivisions = null;
         }
 
+        context.sensorDivisions = paper.set();
 
         // Fix this so we don't have to recreate this.
         if (context.timeLineCurrent)
@@ -2383,11 +2384,18 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (context.autoGrading) {
-            paper.clear(); // Do this for now.
+            if (context.sensorStates)
+                context.sensorStates.remove();
+            context.sensorStates = paper.set();
+            //paper.clear(); // Do this for now.
 
             var numSensors = infos.quickPiSensors.length;
-            var sensorSize = Math.min(paper.height / numSensors * 0.80, paper.width / 10);
+            var sensorSize = Math.min(paper.height / numSensors * 0.80, $('#virtualSensors').width() / 10);
 
+            //var sensorSize = Math.min(paper.height / (numSensors + 1));
+
+
+            context.timeLineSlotHeight = Math.min(paper.height / (numSensors + 1));
             context.sensorSize = sensorSize * .90;
 
             context.timelineStartx = context.sensorSize * 3;
@@ -2401,15 +2409,30 @@ var getContext = function (display, infos, curLevel) {
 
             context.pixelsPerTime = (paper.width - context.timelineStartx - 30) / maxTime;
 
+            context.timeLineY = 10 + (context.timeLineSlotHeight * (infos.quickPiSensors.length));
+            drawTimeLine();
+
+            var color = true;
+
             for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                 var sensor = infos.quickPiSensors[iSensor];
 
                 sensor.drawInfo = {
                     x: 0,
-                    y: 10 + (sensorSize * iSensor),
+                    y: 10 + (context.timeLineSlotHeight * iSensor),
                     width: sensorSize * .90,
                     height: sensorSize * .90
                 }
+
+                var rect = paper.rect(0, sensor.drawInfo.y, paper.width, context.timeLineSlotHeight);
+
+                rect.attr({
+                        "fill": color ? "#0000FF" : "#00FF00",
+                        "stroke": "none",
+                        "opacity": 0.03,
+                    });
+                context.sensorDivisions.push(rect);
+                color = !color;
 
                 drawSensor(sensor);
                 sensor.timelinelastxlabel = 0;
@@ -2438,8 +2461,6 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
 
-            context.timeLineY = 10 + (sensorSize * (iSensor + 1));
-            drawTimeLine();
 
             for (var iState = 0; iState < context.timeLineStates.length; iState++) {
                 var timelinestate = context.timeLineStates[iState];
@@ -2452,8 +2473,6 @@ var getContext = function (display, infos, curLevel) {
                     true);
             }
         } else {
-            context.sensorDivisions = paper.set();
-
             var nSensors = infos.quickPiSensors.length;
 
             infos.quickPiSensors.forEach(function (sensor) {
@@ -2566,20 +2585,21 @@ var getContext = function (display, infos, curLevel) {
         $('#taskIntro').addClass('piui');
 
         $('#grid').html(`
-            <div id="virtualSensors" style="height: 90%; width: 90%; padding: 5px;">
+            <div id="virtualSensors" style="height: 90%; width: 90%; overflow-y: auto;">
             </div>
              `
         );
 
-        if (!context.quickPiZoom)
+
+        if (!context.quickPiZoom || !context.autoGrading)
             context.quickPiZoom = 1;
 
         this.raphaelFactory.destroyAll();
             paper = this.raphaelFactory.create(
                 "paperMain",
                 "virtualSensors",
-                $('#virtualSensors').width() * context.quickPiZoom,
-                $('#virtualSensors').height()
+                ($('#virtualSensors').width() * context.quickPiZoom) - 10,
+                $('#virtualSensors').height() - 10
             );
 
             if (context.autoGrading) {
@@ -2593,7 +2613,17 @@ var getContext = function (display, infos, curLevel) {
     
                         if (originalzoom != context.quickPiZoom)
                             context.resetDisplay();
-                };
+                };                
+
+                $('#virtualSensors').scroll(function(event) {
+                    console.log("a");
+
+                    for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                        var sensor = infos.quickPiSensors[iSensor];
+
+                        drawSensor(sensor);
+                    }
+                });        
             }
         
 
@@ -3543,20 +3573,34 @@ var getContext = function (display, infos, curLevel) {
 
         context.timelineText = [];
 
-        var step = 1000;
-        if (context.maxTime <= 1000)
-            step = 100;
-        else if (context.maxTime <= 3000)
-            step = 500;
-        else
-            step = 1000;
+        var timelinewidth = context.maxTime * context.pixelsPerTime;
 
+        
+        var step = (400 / timelinewidth) * 400;
+        if (step > 1000)
+        {
+            step = Math.round(step / 1000) * 1000;
+        }
+        else if (step > 500)
+        {
+            step = Math.round(step / 500) * 500;
+        }
+        else if (step > 100)
+        {
+            step = Math.round(step / 100) * 100;
+        }
+        else if (step > 10)
+        {
+            step = Math.round(step / 10) * 10;
+        }
 
         var i = 0;
+        var lastx = 0;
+        var color = false;
         for (; i <= context.maxTime; i += step) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
 
-            var timelabel = paper.text(x, context.timeLineY, (i / 1000).toString() + "s");
+            var timelabel = paper.text(x, context.timeLineY, (i / 1000).toFixed(2) + "s");
 
             var fontsize = context.pixelsPerTime * step * 0.4;
             if (fontsize > 15)
@@ -3565,25 +3609,40 @@ var getContext = function (display, infos, curLevel) {
             timelabel.attr({ "font-size": fontsize.toString() + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
 
             context.timelineText.push(timelabel);
+
+
+            var timelinedivisor = paper.path(["M", x,
+                                        0,
+                                        "L", x,
+                                        context.timeLineY]);
+                timelinedivisor.attr({
+                                           "stroke-width": 1,
+                                            "stroke": "lightgray",
+                                             "opacity": 0.2,
+                                             'z-index': 100,
+ 
+                                            });
+
+            context.sensorStates.push(timelinedivisor);
         }
 
-        context.timeLineHoverPath = paper.path(["M", context.timelineStartx,
-                    context.timeLineY,
-                    "L", context.timelineStartx + (context.maxTime * context.pixelsPerTime),
-                    (context.timeLineY)]);
 
+        context.timeLineHoverPath = paper.rect(context.timelineStartx, 0, context.maxTime * context.pixelsPerTime, context.timeLineY);
+        
         context.timeLineHoverPath.attr({
-            "stroke-width": 40,
-             "opacity": 0,
-             "stroke-linecap": "square",
-             "stroke-linejoin": "round",
+            "fill": "lightgray",
+            "stroke": "none",
+            "opacity": 0.0,
         });
+
+        $(context.timeLineHoverPath.node).css("z-index", "-5");
 
         context.timeLineHoverPath.mousemove(function(event){
 
             $('#screentooltip').remove();
+            var scrolloffset = $('#virtualSensors').scrollLeft();
 
-            var ms = (event.clientX - context.timelineStartx) / context.pixelsPerTime;
+            var ms = (event.clientX + scrolloffset - context.timelineStartx) / context.pixelsPerTime;
             ms = Math.round(ms);
 
             if (ms < -4)
@@ -3598,15 +3657,17 @@ var getContext = function (display, infos, curLevel) {
             $('#screentooltip').css("padding", "3px");
             $('#screentooltip').css("z-index", "1000");
 
+                        
             $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
 
             $('#screentooltip').text(ms.toString() + "ms");
+        
 
             if (context.timeLineHoverLine)
                 context.timeLineHoverLine.remove();
-            context.timeLineHoverLine = paper.path(["M", event.clientX,
+            context.timeLineHoverLine = paper.path(["M", event.clientX + scrolloffset,
                                         0,
-                                        "L", event.clientX,
+                                        "L", event.clientX + scrolloffset,
                                         context.timeLineY]);
             context.timeLineHoverLine.attr({
                                            "stroke-width": 4,
@@ -3622,7 +3683,6 @@ var getContext = function (display, infos, curLevel) {
                 context.timeLineHoverLine.remove();
             $('#screentooltip').remove();
         });
-
 
 
         if (!context.loopsForever) {
@@ -3781,10 +3841,10 @@ var getContext = function (display, infos, curLevel) {
         var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
         var stateLenght = (endTime - startTime) * context.pixelsPerTime;
 
-        var ypositionmiddle = ((sensor.drawInfo.y + (sensor.drawInfo.height * .5)) + (sensor.drawInfo.height * .20));
+        var ypositionmiddle = ((sensor.drawInfo.y + (context.timeLineSlotHeight * .5)));
 
         var ypositiontop = sensor.drawInfo.y
-        var ypositionbottom = sensor.drawInfo.y + sensor.drawInfo.height;
+        var ypositionbottom = sensor.drawInfo.y + context.timeLineSlotHeight;
 
         var color = "green";
         var strokewidth = 4;
@@ -3815,7 +3875,7 @@ var getContext = function (display, infos, curLevel) {
                 var startx = context.timelineStartx + (startTime * context.pixelsPerTime);
                 var stateLenght = (endTime - startTime) * context.pixelsPerTime;
         
-                var yspace = sensor.drawInfo.height / 3;
+                var yspace = context.timeLineSlotHeight / 3;
                 var ypositiontop = sensor.drawInfo.y + (yspace * i)
                 var ypositionbottom = ypositiontop + yspace;
         
@@ -3851,6 +3911,7 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linejoin": "round",
                         "stroke-linecap": "round"
                     });
+                    context.sensorStates.push(joinline);
 
                     if (sensor.timelinelastxlabel == null)
                         sensor.timelinelastxlabel = [0, 0, 0];
@@ -3865,6 +3926,7 @@ var getContext = function (display, infos, curLevel) {
 
                         var paperText = paper.text(startx, ypositiontop + offset - 10, stateText);
                         drawnElements.push(paperText);
+                        context.sensorStates.push(paperText);
 
                         sensor.timelinelastxlabel[i] = startx;
                     }
@@ -3883,6 +3945,7 @@ var getContext = function (display, infos, curLevel) {
                 });
 
                 drawnElements.push(stateline);
+                context.sensorStates.push(stateline);
             }
                 sensor.lastAnalogState = state == null ? [0, 0, 0] : state;
             }
@@ -3919,6 +3982,8 @@ var getContext = function (display, infos, curLevel) {
                     "stroke-linecap": "round"
                 });
 
+                context.sensorStates.push(joinline);
+
                 if (!sensor.timelinelastxlabel)
                     sensor.timelinelastxlabel = 0;
                 
@@ -3942,6 +4007,7 @@ var getContext = function (display, infos, curLevel) {
                         sensor.timelinestateup = true;
                     }
                     drawnElements.push(paperText);
+                    context.sensorStates.push(paperText);
 
                     sensor.timelinelastxlabel = startx;
                 }
@@ -3962,6 +4028,7 @@ var getContext = function (display, infos, curLevel) {
             });
 
             drawnElements.push(stateline);
+            context.sensorStates.push(stateline);
         } else if (sensor.type == "stick") {
             var stateToFA = [
                 "\uf062",
@@ -3972,7 +4039,7 @@ var getContext = function (display, infos, curLevel) {
             ]
             
 
-            var spacing = sensor.drawInfo.height / 5;
+            var spacing = context.timeLineSlotHeight / 5;
             for (var i = 0; i < 5; i++)
             {
                 if (state && state[i])
@@ -4006,11 +4073,14 @@ var getContext = function (display, infos, curLevel) {
                     });
 
                     drawnElements.push(stateline);
+                    context.sensorStates.push(stateline);
 
                     if (type == "expected") {
-                        sensor.stateArrow = paper.text(startx, ypos, stateToFA[i]);
+                        sensor.stateArrow = paper.text(startx, ypos + 7, stateToFA[i]);
+                        context.sensorStates.push(sensor.stateArrow);
 
                         sensor.stateArrow.attr({
+                            "text-anchor": "start",
                             "font": "Font Awesome 5 Free",
                             "stroke": color,
                             "fill": color,
@@ -4029,7 +4099,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 sensor.lastScreenState = state;
                 if (state.isDrawingData) {
-                    var stateBubble = paper.text(startx, ypositionmiddle + 10, '\uf303');
+                    var stateBubble = paper.text(startx, ypositiontop + 10, '\uf303');
 
                     stateBubble.attr({
                         "font": "Font Awesome 5 Free",
@@ -4040,6 +4110,8 @@ var getContext = function (display, infos, curLevel) {
 
                     stateBubble.node.style.fontFamily = '"Font Awesome 5 Free"';
                     stateBubble.node.style.fontWeight = "bold";
+
+                    $(stateBubble.node).css("z-index", "1");
 
                     function showPopup(event) {
 
@@ -4133,6 +4205,7 @@ var getContext = function (display, infos, curLevel) {
                     });
                 }
                 drawnElements.push(stateBubble);
+                context.sensorStates.push(stateBubble);
             } else {
                 deleteLastDrawnElements = false;
             }
@@ -4195,6 +4268,8 @@ var getContext = function (display, infos, curLevel) {
                     });
 
                 drawnElements.push(stateBubble);
+                context.sensorStates.push(stateBubble);
+                
             } else {
                 deleteLastDrawnElements = false;
             }
@@ -4220,6 +4295,7 @@ var getContext = function (display, infos, curLevel) {
                 c.animate({ width: stateLenght }, 200);
             }
             drawnElements.push(c);
+            context.sensorStates.push(c);
         }
 
         if (type == "wrong") {
@@ -4575,10 +4651,14 @@ var getContext = function (display, infos, curLevel) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
 
+        var faded = false;
+        var scrolloffset = 0;
+        var fadeopacity = 0.3;
+
         var imgw = sensor.drawInfo.width / 2;
         var imgh = sensor.drawInfo.height / 2;
 
-        var imgx = sensor.drawInfo.x + imgw / 6;
+        var imgx = sensor.drawInfo.x + (imgw / 6);
         var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
         var state1x =  (imgx + imgw) + 3;
@@ -4612,10 +4692,16 @@ var getContext = function (display, infos, curLevel) {
         });
 
         if (context.autoGrading) {
+
+            scrolloffset = $('#virtualSensors').scrollLeft();
+
+            if (scrolloffset > 0)
+                faded = true;
+
             imgw = sensor.drawInfo.width * .80;
             imgh = sensor.drawInfo.height * .80;
 
-            imgx = sensor.drawInfo.x + imgw * 0.75;
+            imgx = sensor.drawInfo.x + (imgw * 0.75) + scrolloffset;
             imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
             state1x = imgx + imgw * 1.2;
@@ -4927,7 +5013,7 @@ var getContext = function (display, infos, curLevel) {
 
             imgw = screenScalerSize.width + borderSize * 2;
             imgh = screenScalerSize.height + borderSize * 2;            
-            imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5);
+            imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5) + scrolloffset;
             imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
 
             portx = imgx + imgw + borderSize;
@@ -4954,6 +5040,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": faded ? fadeopacity : 1,
             });
 
 
@@ -5289,6 +5376,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": scrolloffset ? 0.3 : 1,
             });
 
             if (sensor.state == null)
@@ -5366,6 +5454,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": scrolloffset ? 0.3 : 1,
             });
 
 
@@ -5534,6 +5623,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": scrolloffset ? 0.3 : 1,
             });
 
             if (sensor.stateText)
@@ -5693,6 +5783,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": scrolloffset ? 0.3 : 1,
             });
 
             sensor.imgup.attr({
@@ -5945,6 +6036,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": scrolloffset ? 0.3 : 1,
             });
             
             drawPortText = false;

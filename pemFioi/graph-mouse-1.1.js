@@ -1400,6 +1400,9 @@ function GraphEditor(settings) {
    var callback = settings.callback;
    var selectVertexCallback = settings.selectVertexCallback;
    this.contentValidation = settings.contentValidation;
+   this.vertexLabelValidation = settings.vertexLabelValidation;
+   this.writeContentCallback = settings.writeContentCallback;
+   this.resizeTableVertexCallback = settings.resizeTableVertexCallback;
 
    var defaultSelectedVertexAttr = {
       "stroke": "blue",
@@ -2509,6 +2512,11 @@ function GraphEditor(settings) {
             }
          }
       }
+      if(type == "vertex" && self.vertexLabelValidation){
+         if(!self.vertexLabelValidation(id,newLabel)){
+            newLabel = oldLabel;
+         }
+      }
       var raphElement = visualGraph.getRaphaelsFromID(id);
       if(oldLabel !== newLabel){
          if(newLabel != ""){
@@ -2648,12 +2656,16 @@ function GraphEditor(settings) {
          // self.editInfo = {};
          self.vertexDragAndConnect.clickHandler(clickedVertex,x,y);
       }
+      if(self.writeContentCallback){
+         self.writeContentCallback(id,self.edited);
+      }
       if(callback){
          callback();
       }
    };
 
    this.resizeTableVertex = function(id,text) {
+      // console.log("resizeTableVertex")
       var raphElement = visualGraph.getRaphaelsFromID(id);
       var newBoxSize = visualGraph.graphDrawer.getBoxSize(text);
       var info = graph.getVertexInfo(id);
@@ -2676,6 +2688,7 @@ function GraphEditor(settings) {
       if(info.initial && !info.terminal){
 
       }else if(!info.initial && info.terminal){
+         raphElement[4].transform(""); 
          raphElement[4].attr({
             x: vertexPos.x - newBoxSize.w/2 - 5,
             y: vertexPos.y - newBoxSize.h/2 - 5,
@@ -2693,11 +2706,14 @@ function GraphEditor(settings) {
             height: newBoxSize.h - labelHeight
          });
       }
-      var oldContent = info.content;
+      // var oldContent = info.content;
       self.removeIcons(id);
-      info.content = text;
-      self.addIcons(id);
-      info.content = oldContent;
+      // info.content = text;
+      // self.addIcons(id);
+      // info.content = oldContent;
+      if(self.resizeTableVertexCallback){
+         self.resizeTableVertexCallback(id,vertexPos,newBoxSize);
+      }
    };
 
    this.startDragCallback = function(ID,x,y) {
