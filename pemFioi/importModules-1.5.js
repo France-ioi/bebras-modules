@@ -92,7 +92,7 @@
          'react': {src: modulesPath+"/ext/react/react.production.16.13.1.min.js", id: "react"},
          'react_dom': {src: modulesPath+"/ext/react/react-dom.production.16.13.1.min.js", id: "react_dom"},
 
-         'immutable': {src: modulesPath+"/ext/immutable/immutable-3.8.2.min.js", id: "react_dom"},
+         'immutable': {src: modulesPath+"/ext/immutable/immutable-3.8.2.min.js", id: "immutable"},
 
          'python_count': {src: modulesPath+"/pemFioi/pythonCount-1.0.js", id: "python_count"},
          'skulpt_quickAlgo': {src: modulesPath+"ext/skulpt/skulpt.quickAlgo_1.5.min.js", id: "skulpt_quickAlgo"},
