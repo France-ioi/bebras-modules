@@ -22,6 +22,7 @@ function LR_Parser(settings,subTask,answer) {
    this.inputIndex = 0;
    this.actionSequence = [];
    this.simulationStep = 0;
+   this.computedStates = {}; // mode 3
    
    this.derivationTree = [];
    this.treeHeight = 0;
@@ -65,7 +66,7 @@ function LR_Parser(settings,subTask,answer) {
    this.graph;
    this.graphMouse;
    this.graphEditor;
-   this.isLastActionAGraphEdit = false;
+   this.isLastActionAGraphEdit = true;
    this.isDragging = false;
    this.isAnimationRunning = false;
    this.waitingForGoto = false; // used only in mode 5 && 2
@@ -297,11 +298,13 @@ function LR_Parser(settings,subTask,answer) {
          this.initAutomata();
          if(this.mode != 3){
             this.initActionSequence(false,true);
+            this.initParseTable();
          }else{
-            this.initActionSequence(false,true);
+            this.initParseTable();
+            // this.initActionSequence(false,true);
             this.initActionSequence();
          }
-         this.initParseTable();
+         // this.initParseTable();
          this.showTab();
       }
       this.initParseInfo();
@@ -379,6 +382,9 @@ function LR_Parser(settings,subTask,answer) {
             graphEditorSettings.startDragCallbackCallback = this.startDragCallback;
             graphEditorSettings.moveDragCallback = this.moveDragCallback;
             graphEditorSettings.contentValidation = this.contentValidation;
+            graphEditorSettings.vertexLabelValidation = this.vertexLabelValidation;
+            graphEditorSettings.writeContentCallback = this.writeContentCallback;
+            graphEditorSettings.resizeTableVertexCallback = this.resizeTableVertexCallback;
             graphEditorSettings.onDragEnd = this.graphEditorCallback;
             graphEditorSettings.vertexLabelPrefix = "";
          }
@@ -428,7 +434,10 @@ function LR_Parser(settings,subTask,answer) {
          this.input += "$";
       }
       this.input = this.input.replace(/ /g,"");
-      var state = 0;
+      var state = this.getInitialState();
+      if(state == null){
+         return
+      }
       var iChar = 0;
       var symbol = this.input.charAt(iChar);
       var error = false;
@@ -438,9 +447,19 @@ function LR_Parser(settings,subTask,answer) {
       // console.log(this.lrTable.states);
       do{
          nLoop++;
-         var action = this.lrTable.states[state][symbol];
-         // console.log(nLoop+" "+action);
-         if(action && (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action)) || tree){
+         if(this.mode != 3){
+            var action = this.lrTable.states[state][symbol];
+         }else{
+            // console.log(state)
+            for(var compState in this.computedStates){
+               if(compState == state){
+                  var action = this.computedStates[compState][symbol];
+                  break;
+               }
+            }
+         }
+         // console.log(action);
+         if(action /*&& (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))*/ || tree){
             switch(action[0].actionType){
                case "s":
                   this.actionSequence.push({
@@ -544,7 +563,7 @@ function LR_Parser(settings,subTask,answer) {
             break;
          }
       }while(iChar < this.input.length && !error && !success && nLoop < 50);
-      this.stack = [["0","#"]];
+      this.stack = [[this.getInitialState(),"#"]];
       // console.log(this.derivationTree);
       // console.log(this.actionSequence);
       if((this.mode == 2 || this.mode == 5) && !validation){
@@ -553,6 +572,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initParseTable = function() {
+      // console.log("initParseTable")
       var colLabel = [];
       var terminalStateIndex = this.lrTable.states.length;
       var html = "<table><tr><th rowspan=2>State</th><th colspan=\""+(this.grammar.terminals.length + 1)+"\">Action</th><th colspan=\""+this.grammar.nonterminals.length+"\">Goto</th></tr>";
@@ -568,37 +588,44 @@ function LR_Parser(settings,subTask,answer) {
          colLabel.push(nonterminal);
       }
       html += "</tr>";
-      for(var iState = 0; iState <= this.lrTable.states.length; iState++){
-         var state = this.lrTable.states[iState];
-         var stateID = (state) ? state.index : terminalStateIndex;
-         html += "<tr>";
-         html += "<td data_state=\""+stateID+"\">"+stateID+"</td>";
-         for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
-            // html += (stateID == terminalStateIndex) ? "<td>" : "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
-            html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
-            if(this.mode != 4){
-               if(state && state[colLabel[iCol]]){
-                  var actionType = state[colLabel[iCol]][0]["actionType"];
-                  var actionValue = state[colLabel[iCol]][0]["actionValue"];
-                  if(actionType == "r"){
-                     var displayedRule = actionValue + 1;
-                     html += "<span class=\"ruleMarker\">"+actionType+"<span class=\"ruleMarkerIndex\">"+displayedRule+"</span>"+"</span>";
-                  }else{
-                     html += actionType+actionValue;
+      if(this.mode != 3){
+         for(var iState = 0; iState <= this.lrTable.states.length; iState++){
+            var state = this.lrTable.states[iState];
+            var stateID = (state) ? state.index : terminalStateIndex;
+            html += "<tr>";
+            html += "<td data_state=\""+stateID+"\">"+stateID+"</td>";
+            for(var iCol = 0; iCol < (this.grammar.terminals.length + 1 + this.grammar.nonterminals.length); iCol++){
+               // html += (stateID == terminalStateIndex) ? "<td>" : "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
+               html += "<td data_state=\""+stateID+"\" data_symbol=\""+colLabel[iCol]+"\">";
+               if(this.mode != 4){
+                  if(state && state[colLabel[iCol]]){
+                     var actionType = state[colLabel[iCol]][0]["actionType"];
+                     var actionValue = state[colLabel[iCol]][0]["actionValue"];
+                     if(actionType == "r"){
+                        var displayedRule = actionValue + 1;
+                        html += "<span class=\"ruleMarker\">"+actionType+"<span class=\"ruleMarkerIndex\">"+displayedRule+"</span>"+"</span>";
+                     }else{
+                        html += actionType+actionValue;
+                     }
+                  }else if(colLabel[iCol] == "S" && stateID == 0){
+                     html += terminalStateIndex;
+                  }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
+                     html += "<span class=\"ruleMarker ruleMarkerIndex\">acc.</span>";
                   }
-               }else if(colLabel[iCol] == "S" && stateID == 0){
-                  html += terminalStateIndex;
-               }else if(colLabel[iCol] == "$" && stateID == terminalStateIndex){
-                  html += "<span class=\"ruleMarker ruleMarkerIndex\">acc.</span>";
                }
+               html += "</td>";
             }
-            html += "</td>";
+            html += "</tr>";
          }
-         html += "</tr>";
       }
       html += "</table>";
       $("#"+this.parseTableID).append(html);
-      this.initStackPreview();
+      if(this.mode == 3){
+         this.initStackPreview();
+         this.updateParseTable();         
+      }else{
+         this.initStackPreview();
+      }
    };
 
    this.initStackPreview = function() {
@@ -779,7 +806,7 @@ function LR_Parser(settings,subTask,answer) {
          $("#"+this.tabsID+" #switchContainer").click(self.switchTab);
          $(window).resize(self.onResize);
       }
-      if(this.mode < 6 && this.mode > 2){
+      if(this.mode < 6 && this.mode > 2 /*&& this.mode != 3*/){
          $("#stackPreview").hide();
          $("#"+this.parseTableID+" table").hover(
             function(){
@@ -1148,7 +1175,7 @@ function LR_Parser(settings,subTask,answer) {
    this.onResize = function() {
       /* switch between table displays */
       // console.log("resize")
-      // self.updateParseTable();
+      // self.updateParseTableHL();
       if(self.mode >= 3){
          var width = $(window).width();
          var sideTable = true;
@@ -1167,11 +1194,11 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
       }
-      self.updateParseTable({action:"resize"});
+      self.updateParseTableHL({action:"resize"});
    };
 
    this.reset = function() {
-      this.stack = [["0", "#"]];
+      this.stack = [[this.getInitialState(), "#"]];
       this.inputIndex = 0;
       this.updateCursor(false);
       this.simulationStep = 0;
@@ -1193,7 +1220,11 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.runSimulation = function() {
+      // console.log(self.computedStates);
       if(self.mode == 3){
+         if(self.currentState == null){
+            return
+         }
          self.isLastActionAGraphEdit = false;
          self.showUndo();
       }
@@ -1221,12 +1252,10 @@ function LR_Parser(settings,subTask,answer) {
       var action = this.actionSequence[step];
       this.disablePlayerStepBack();
       this.disableProgressBarClick();
-      // console.log(progress);
       if(progress <= 100){
          if(!anim || action.actionType == "error"){
             var animationTime = (step == 0 && this.actionSequence.length <= 1) ? 100 : 0;
             this.clearHighlight();
-            // var animationTime = 0;
          }else{
             var animationTime = (action.actionType == "r") ? 4.5*this.animationTime : 1.5*this.animationTime;
          }
@@ -1243,7 +1272,6 @@ function LR_Parser(settings,subTask,answer) {
                }else{
                   self.simulationStep++;
                }
-               // console.log(self.simulationStep);
             }
             if(!loop){
                self.enablePlayerStepBack();
@@ -1269,7 +1297,7 @@ function LR_Parser(settings,subTask,answer) {
             var rule = action.rule;
             // console.log(this.grammar.rules[rule])
             var nonTerminal = self.grammar.rules[rule].nonterminal;
-            self.updateParseTable({action:"startReduction",nonTerminal:nonTerminal,anim:anim,rule:rule,goto:action.goto});
+            self.updateParseTableHL({action:"startReduction",nonTerminal:nonTerminal,anim:anim,rule:rule,goto:action.goto});
             if(reverse){
                this.reverseReduction(rule);
                return;
@@ -1584,7 +1612,7 @@ function LR_Parser(settings,subTask,answer) {
       $("#"+self.tabTag[self.selectedTab]).addClass("selectedTab");
       self.styleTabSwitch();
       self.showTab();
-      self.updateParseTable({action:"switchTab"});
+      self.updateParseTableHL({action:"switchTab"});
    };
 
    this.showTab = function() {
@@ -1599,6 +1627,9 @@ function LR_Parser(settings,subTask,answer) {
 
    this.getStateID = function(state) {
       /* get vertex ID from label*/
+      if(!state){
+         return false
+      }
       var vertices = this.graph.getAllVertices();
       for(var vertex of vertices){
          var info = this.graph.getVertexInfo(vertex);
@@ -1704,24 +1735,46 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.getTerminalState = function() {
-      var initVertex = this.getStateID(0);
-      if(initVertex){
-         var children = this.graph.getChildren(initVertex);
+      // var initVertex = this.getStateID(0);
+      // if(initVertex){
+      //    var children = this.graph.getChildren(initVertex);
 
-         for(var child of children){
-            var edges = this.graph.getEdgesFrom(initVertex,child);
-            if(edges.length > 0){
-               var edgeInfo = this.graph.getEdgeInfo(edges[0]);
-               if(edgeInfo.label == this.grammar.rules[0].nonterminal){
-                  var vertexInfo = this.graph.getVertexInfo(child);
-                  if(vertexInfo.terminal){
-                     return vertexInfo.label;
-                  }
-               }
-            }
+      //    for(var child of children){
+      //       var edges = this.graph.getEdgesFrom(initVertex,child);
+      //       if(edges.length > 0){
+      //          var edgeInfo = this.graph.getEdgeInfo(edges[0]);
+      //          if(edgeInfo.label == this.grammar.rules[0].nonterminal){
+      //             var vertexInfo = this.graph.getVertexInfo(child);
+      //             if(vertexInfo.terminal){
+      //                return vertexInfo.label;
+      //             }
+      //          }
+      //       }
+      //    }
+      // }
+      var vertices = this.graph.getAllVertices();
+      for(var vertex of vertices){
+         var info = this.graph.getVertexInfo(vertex);
+         if(info.terminal){
+            return info.label
          }
       }
       return null;
+   };
+
+   this.getInitialState = function() {
+      if(this.mode != 3){
+         return 0
+      }else{
+         var vertices = this.graph.getAllVertices();
+         for(var vertex of vertices){
+            var info = this.graph.getVertexInfo(vertex);
+            if(info.initial){
+               return info.label;
+            }
+         }
+      }
+      return null
    };
 
    this.getPreviousState = function() {
@@ -1813,7 +1866,7 @@ function LR_Parser(settings,subTask,answer) {
       if(prevStates.length == 0){
          this.currentState = prevState;
          // console.log(state+" "+newStackElement)
-         this.updateParseTable({action:"reduction",anim:true,newStackElement:newStackElement});
+         this.updateParseTableHL({action:"reduction",anim:true,newStackElement:newStackElement});
          if(firstStepOnly){
             reduc = false;
             this.waitingForGoto = true;
@@ -1988,6 +2041,7 @@ function LR_Parser(settings,subTask,answer) {
          this.currentState = this.stack[this.stack.length - 1][0];
          this.currentVertex = this.getStateID(this.currentState);
       }
+      // console.log("updateStack "+this.currentState);
    };
 
    this.updateCursor = function(anim) {
@@ -2146,8 +2200,6 @@ function LR_Parser(settings,subTask,answer) {
             if(edgeHL[dir]){
                edgeHL[dir].remove();
                delete edgeHL[dir];
-               // edgeHL[dir] = null;
-               // console.log("clear "+dir+" HL of "+edge)
             }
          }
       }
@@ -2171,7 +2223,21 @@ function LR_Parser(settings,subTask,answer) {
       }
    };
 
-   this.updateParseTable = function(data) {
+   this.updateParseTableHL = function(data) {
+      if(this.mode == 3){
+         if($("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").length == 0){
+            if(this.rowHL){
+               this.rowHL.remove();
+               this.rowHL = null;
+            }
+            if(this.colHL){
+               this.colHL.remove();
+               this.colHL = null;
+            }
+            this.updateStackPreview();
+            return
+         }
+      }
       if(data){
          var anim = data.anim;
          var newStackElement = data.newStackElement;
@@ -2196,8 +2262,14 @@ function LR_Parser(settings,subTask,answer) {
       var actionH = $("#"+this.parseTableID+" table th:nth-child(2)").outerHeight();
       var rowH = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").outerHeight();
       var colW = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").outerWidth();
-      var rowTop = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position().top;
-      var colLeft = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").position().left;
+      var rowTop = 0;
+      if($("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position()){
+         rowTop = $("#"+this.parseTableID+" td[data_state=\""+this.currentState+"\"]").position().top;
+      }
+      var colLeft = 0;
+      if($("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").position()){
+         var colLeft = $("#"+this.parseTableID+" td[data_symbol=\""+this.input[this.inputIndex]+"\"]").position().left;
+      }
 
       if(action == "startReduction" && anim){
          /* column selector change color + goto column selector appears */
@@ -2288,9 +2360,6 @@ function LR_Parser(settings,subTask,answer) {
          var index = localStack.length - dev.length;
          localStack.splice(index,dev.length,newStackElement);
       }else{
-         // if(this.stackElements){
-         //    this.stackElements.remove();
-         // }
          this.stackPreview.clear();
       }
       var tableW = $("#"+this.parseTableID+" table").width();
@@ -2317,33 +2386,297 @@ function LR_Parser(settings,subTask,answer) {
          var state = elem[0];
          var symbol = elem[1];
          var line = $("#"+this.parseTableID+" td[data_state=\""+state+"\"]");
-         var x = (iElem + 1/2)*attr.colW;
-         var y = line.position().top + line.outerHeight()/2;
-         var circle = this.stackPreview.circle(x,y).attr(attr.circle);
-         this.stackPreviewElements.circle.push(circle);
-         if(lastPos){
-            var line = this.stackPreview.path("M"+lastPos.x+" "+lastPos.y+",L"+x+" "+y).attr(attr.line);
-            var xSymbol = (x + lastPos.x)/2;
-            var ySymbol = (y + lastPos.y)/2;
-            var letterCircle = this.stackPreview.circle(xSymbol,ySymbol).attr(attr.symbolCircle);
-            var letter = this.stackPreview.text(xSymbol,ySymbol,symbol).attr(attr.symbol);
-            this.stackPreviewElements.line.push(line);
-            this.stackPreviewElements.letterCircle.push(letterCircle);
-            this.stackPreviewElements.letter.push(letter);
+         if(line.length > 0){
+            var x = (iElem + 1/2)*attr.colW;
+            var y = line.position().top + line.outerHeight()/2;
+            var circle = this.stackPreview.circle(x,y).attr(attr.circle);
+            this.stackPreviewElements.circle.push(circle);
+            if(lastPos){
+               var line = this.stackPreview.path("M"+lastPos.x+" "+lastPos.y+",L"+x+" "+y).attr(attr.line);
+               var xSymbol = (x + lastPos.x)/2;
+               var ySymbol = (y + lastPos.y)/2;
+               var letterCircle = this.stackPreview.circle(xSymbol,ySymbol).attr(attr.symbolCircle);
+               var letter = this.stackPreview.text(xSymbol,ySymbol,symbol).attr(attr.symbol);
+               this.stackPreviewElements.line.push(line);
+               this.stackPreviewElements.letterCircle.push(letterCircle);
+               this.stackPreviewElements.letter.push(letter);
+            }
+            lastPos = { x: x, y: y };
          }
-         lastPos = { x: x, y: y };
       }
       // this.stackElements = this.stackPreview.setFinish();
    };
 
+   /* UPDATE PARSE TABLE (mode 3) */
+
+   this.updateParseTable = function() {
+      // console.log("update Parse table");
+      // console.log(this.grammar);
+      this.clearParseTable();
+      this.computedStates = {};
+      var vertices = this.graph.getAllVertices();
+      for(var vertex of vertices){
+         this.addLineToParseTable(vertex);
+      }
+      for(var vertex of vertices){
+         var info = this.graph.getVertexInfo(vertex);
+         this.computedStates[info.label] = {};
+         var children = this.graph.getChildren(vertex);
+         if(children.length > 0){
+            for(var child of children){
+               var gotoOrShift = this.gotoOrShift(vertex,child);
+               if(gotoOrShift){
+                  var childInfo = this.graph.getVertexInfo(child);
+                  this.addGotoOrShift(gotoOrShift,info.label,childInfo.label);
+                  var action = (!this.grammar.terminals.includes(gotoOrShift)) ? "goto" : "shift";
+                  this.addComputedState({
+                     state1: info.label,
+                     symbol: gotoOrShift,
+                     state2: childInfo.label,
+                     action: action
+                  });
+                  if(childInfo.terminal && gotoOrShift == this.grammar.axiom){
+                     this.addAccept(childInfo.label);
+                  }
+               }
+            }
+         }
+         var rule = this.findReduction(vertex);
+         if(rule !== false){
+            var nonTerminal = this.grammar.rules[rule].nonterminal;
+            var follows = this.grammar.follows[nonTerminal];
+            this.addReduction(rule,follows,info.label);
+            this.addComputedState({
+               state1: info.label,
+               rule: rule,
+               follows: follows,
+               action: "reduction"
+            });
+         }
+      }
+      this.styleParseTable();
+      // this.updateStackPreview();
+      this.updateParseTableHL();
+   };
+
+   this.clearParseTable = function() {
+      $("#parseTable table tr").each(function(index) {
+         if(index > 1){
+            $(this).remove();
+         }
+      });
+   };
+
+   this.addLineToParseTable = function(vertex) {
+      var vInfo = this.graph.getVertexInfo(vertex);
+      var state = vInfo.label;
+      var html = "<tr><td data_state="+state+">"+state+"</td>";
+      $("#parseTable table tr:nth-child(2) th").each(function(index) {
+         var symbol = $(this).text();
+         html += "<td data_state="+state+" data_symbol="+symbol+"></td>";
+      });
+      html += "</tr>";
+      $("#parseTable table").append(html);
+   };
+
+   this.gotoOrShift = function(vertex,child) {
+      var edges = this.graph.getEdgesFrom(vertex,child);
+      var edge = edges[0];
+      var edgeInfo = this.graph.getEdgeInfo(edge);
+      var edgeLabel = edgeInfo.label;
+      if(edgeLabel.length == 1){
+         var vertexContent = this.readContent(vertex);
+         if(!vertexContent){
+            return false
+         }
+         var childContent = this.readContent(child);
+         if(!childContent){
+            return false
+         }
+         for(var vertexLine of vertexContent){
+            for(var childLine of childContent){
+               if(vertexLine.nonTerminal == childLine.nonTerminal && vertexLine.development.length == childLine.development.length){
+                  var match = true;
+                  for(var symbol of vertexLine.development){
+                     if(!childLine.development.includes(symbol)){
+                        match = false;
+                        break;
+                     }
+                  }
+                  var vertexDot = vertexLine.development.indexOf(dot);
+                  var childDot = childLine.development.indexOf(dot);
+                  if(match && vertexDot == childDot - 1 
+                     && vertexLine.development[childDot] == edgeLabel
+                     && childLine.development[vertexDot] == edgeLabel){
+                        return edgeLabel
+                  }
+               }
+            }
+         }
+      }
+      return false
+   };
+
+   this.findReduction = function(vertex) {
+      var vertexContent = this.readContent(vertex);
+      if(vertexContent.length > 0){
+         for(var vertexLine of vertexContent){
+            if(vertexLine.development[vertexLine.development.length - 1] == dot){
+               var rule = this.findRule(vertexLine);
+               // console.log("rule:"+rule+" state:"+this.graph.getVertexInfo(vertex).label);
+               if(rule !== false){
+                  var ruleData = this.grammar.rules[rule];
+                  if(ruleData.development.length == 1 && ruleData.development[0] == "''"){
+                     return rule
+                  }
+                  var parents = this.graph.getParents(vertex);
+                  for(var parent of parents){
+                     var findReductionPath = this.findReductionPath(vertex,parent,vertexLine,rule);
+                     if(findReductionPath){
+                        return rule;
+                     }
+                  }
+               }            
+            }
+         }
+      }
+      return false
+   };
+
+   this.findRule = function(line) {
+      for(var rule of this.grammar.rules){
+         if(line.nonTerminal == rule.nonterminal){
+            var dev = JSON.parse(JSON.stringify(line.development));
+            var dotIndex = dev.indexOf(dot);
+            dev.splice(dotIndex,1);
+            var match = true;
+            if(rule.development.length == 1 && rule.development[0] == "''" && dev.length == 0){
+               return rule.index
+            }
+            if(dev.length != rule.development.length){
+               match = false;
+            }else{
+               for(var iSymbol = 0; iSymbol < rule.development.length; iSymbol++){
+                  if(rule.development[iSymbol] != dev[iSymbol]){
+                     match = false;
+                     break;
+                  }
+               }
+            }
+            if(match){
+               return rule.index;
+            }
+         }
+      }
+      return false;
+   };
+
+   this.findReductionPath = function(vertex,parent,vertexLine,rule) {
+      var edges = this.graph.getEdgesFrom(parent,vertex);
+      var edge = edges[0];
+      var edgeInfo = this.graph.getEdgeInfo(edge);
+      var edgeLabel = edgeInfo.label;
+      if(edgeLabel.length != 1){
+         return false
+      }else{
+         var parentContent = this.readContent(parent);
+         for(var parentLine of parentContent){
+            if(vertexLine.nonTerminal == parentLine.nonTerminal && vertexLine.development.length == parentLine.development.length){
+               var match = true;
+               var dotIndex = parentLine.development.indexOf(dot);
+               if(dotIndex != vertexLine.development.indexOf(dot) - 1){
+                  match = false;
+               }else{
+                  var dev = JSON.parse(JSON.stringify(parentLine.development));
+                  dev.splice(dotIndex,1);
+                  var ruleData = this.grammar.rules[rule];
+                  for(var iSymbol = 0; iSymbol < ruleData.development.length; iSymbol++){
+                     if(ruleData.development[iSymbol] != dev[iSymbol]){
+                        match = false;
+                        break;
+                     }
+                  }
+               }
+               if(match){
+                  if(dotIndex == 0){
+                     return true;
+                  }else{
+                     var grandparents = this.graph.getParents(parent);
+                     for(var grandparent of grandparents){
+                        var findPath = this.findReductionPath(parent,grandparent,parentLine,rule);
+                        if(findPath){
+                           return findPath;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return false;
+   };
+
+   this.addGotoOrShift = function(symbol,state1,state2) {
+      if(this.grammar.terminals.includes(symbol)){
+         var text = "s"+state2;
+      }else{
+         var text = state2;
+      }
+      $("#parseTable [data_state="+state1+"][data_symbol=\""+symbol+"\"]").text(text);
+   };
+
+   this.addReduction = function(rule,follows,state) {
+      var displayedRule = rule + 1;
+      var html = "<span class=\"ruleMarker\">r<span class=\"ruleMarkerIndex\">"+displayedRule+"</span></span>";
+      for(var follow of follows){
+         $("#parseTable [data_state="+state+"][data_symbol=\""+follow+"\"]").html(html);
+      }
+   };
+
+   this.addAccept = function(state) {
+      var html = "<span class=\"ruleMarker\"><span class=\"ruleMarkerIndex\">acc.</span></span>";
+      $("#parseTable [data_state="+state+"][data_symbol=\"$\"]").html(html);
+   };
+
+   this.addComputedState = function(data) {
+      switch(data.action){
+         case "shift":
+            var actionType = "s";
+            var actionValue = data.state2;
+            break;
+         case "goto":
+            var actionType = "";
+            var actionValue = data.state2;
+            break;
+         case "reduction":
+            var actionType = "r";
+            var actionValue = data.rule;
+      }
+      if(data.action != "reduction"){
+         this.computedStates[data.state1][data.symbol] = [{
+            actionType: actionType,
+            actionValue: actionValue
+         }];
+      }else{
+         for(var follow of data.follows){
+            this.computedStates[data.state1][follow] = [{
+               actionType: actionType,
+               actionValue: actionValue
+            }];
+         }
+      }
+   };
+
+   /**/
+
    this.updateState = function(anim,action) {
       var id = this.getStateID(this.currentState);
+      // console.log("updateState "+anim)
+      this.updateParseTableHL({anim:anim,action:action});
+      this.resetStates();
       if(!id){
          return;
       }
-      // console.log("updateState "+anim)
-      this.updateParseTable({anim:anim,action:action});
-      this.resetStates();
       var previousState = (this.stack.length > 1) ? this.stack[this.stack.length - 2][0] : null;
       if(!anim){
          this.styleVertex(id,"current");
@@ -2615,7 +2948,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.readLine = function(line) {
-      /* return the rule and dot index */
+      /* return the rule and dot index (validation) */
       var ruleIndex = null;
       var developmentStr = line.development.join("");
       var dotIndex = developmentStr.indexOf(dot);
@@ -2633,19 +2966,26 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.graphEditorCallback = function() {
+      // console.log("graphEditorCallback ")
       self.clearHighlight();
       self.pauseSimulation(null,true);
       self.resetFeedback();
       self.actionSequence = [];
       self.reset();
 
-      self.formatContent();
-      self.initActionSequence();
+      // self.formatContent();
+      // self.graphEditor.resizeTableVertex(vertex,info.content);
+      // self.initActionSequence();
+      // self.updateStackTable();
       self.saveAnswer();
       self.isLastActionAGraphEdit = true;
+      self.updateParseTable();
+      self.initActionSequence();
       self.showUndo();
-      if(answer.visualGraphJSON.length > 1)
+      // console.log(self.computedStates);
+      if(answer.visualGraphJSON.length > 1){
          self.enableUndoButton()
+      }
    };
 
    this.selectVertexCallback = function(id,selected) {
@@ -2690,38 +3030,41 @@ function LR_Parser(settings,subTask,answer) {
    this.formatContent = function() {
       var vertices = this.graph.getAllVertices();
       for(var vertex of vertices){
-         var info = this.graph.getVertexInfo(vertex);
-         if(info.content){
-            info.content = info.content.replace(/->/g,arrow);
-            info.content = info.content.replace(/\./g,dot);
-            info.content = info.content.replace(/ /g,"");
-            var lines = info.content.split('\n');
-            var formatedContent = "";
-            for(var iLine in lines){
-               var line = lines[iLine];
-               var formatedLine = "";
-               for(var iChar = 0; iChar < line.length; iChar++){
-                  var char = fixedCharAt(line,iChar);
-                  if(iChar != line.length - 1 && char != " "){
-                     if(char == "S" && fixedCharAt(line,iChar + 1) == "'"){
-                        formatedLine += char;
-                     }else{
-                        formatedLine += char+" ";
-                     }
-                  }else if(char != " "){
+         this.formatVertexContent(vertex);
+      }
+   };
+
+   this.formatVertexContent = function(vertex) {
+      var info = this.graph.getVertexInfo(vertex);
+      if(info.content){
+         info.content = info.content.replace(/->/g,arrow);
+         info.content = info.content.replace(/\./g,dot);
+         info.content = info.content.replace(/ /g,"");
+         var lines = info.content.split('\n');
+         var formatedContent = "";
+         for(var iLine in lines){
+            var line = lines[iLine];
+            var formatedLine = "";
+            for(var iChar = 0; iChar < line.length; iChar++){
+               var char = fixedCharAt(line,iChar);
+               if(iChar != line.length - 1 && char != " "){
+                  if(char == "S" && fixedCharAt(line,iChar + 1) == "'"){
                      formatedLine += char;
+                  }else{
+                     formatedLine += char+" ";
                   }
-               }
-               formatedContent += formatedLine.trim();
-               if(iLine != lines.length - 1){
-                  formatedContent += "\n";
+               }else if(char != " "){
+                  formatedLine += char;
                }
             }
-            info.content = formatedContent;
-            var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
-            raphObj[3].attr({"text":info.content});
-            // this.graphEditor.resizeTableVertex(vertex,info.content);
+            formatedContent += formatedLine.trim();
+            if(iLine != lines.length - 1){
+               formatedContent += "\n";
+            }
          }
+         info.content = formatedContent;
+         var raphObj = this.visualGraph.getRaphaelsFromID(vertex);
+         raphObj[3].attr({"text":info.content});
       }
    };
 
@@ -2751,8 +3094,55 @@ function LR_Parser(settings,subTask,answer) {
       return true
    };
 
+   this.vertexLabelValidation = function(id,label) {
+      if(label.length == 0 || label.length > 2) {
+         return false
+      }
+      var vertices = self.graph.getAllVertices();
+      for(var vertex of vertices){
+         var info = self.graph.getVertexInfo(vertex);
+         if(vertex != id && info.label == label){
+            return false
+         }
+      }
+      return true
+   };
+
+   this.writeContentCallback = function(id,edited) {
+      self.formatVertexContent(id);
+      if(edited){
+         self.visualGraph.redraw();
+         self.graphEditor.updateHandlers();
+      }
+   };
+
+   this.resizeTableVertexCallback = function(id,vertexPos,newBoxSize) {
+      var info = self.graph.getVertexInfo(id);
+      var raphObj = self.visualGraph.getRaphaelsFromID(id);
+      if(info.terminal){
+         raphObj[5].transform("");
+         raphObj[5].attr({
+            x: vertexPos.x - newBoxSize.w/2 - 5,
+            y: vertexPos.y - newBoxSize.h/2 - 5,
+            height: newBoxSize.h + 10,
+            width: newBoxSize.w + 10
+         });
+      }
+      if(info.initial){
+         raphObj[5].hide();
+      }
+      raphObj[4].transform("");
+      raphObj[4].attr({
+         x: vertexPos.x - newBoxSize.w/2 ,
+         y: vertexPos.y - newBoxSize.h/2 ,
+         width: newBoxSize.w,
+         "clip-rect": (vertexPos.x - newBoxSize.w/2)+" "+(vertexPos.y - newBoxSize.h/2)+" "+newBoxSize.w+" "+2*self.vertexLabelAttr["font-size"]
+      });
+      
+   };
+
    this.styleVertex = function(id,styleType) {
-      // console.log(styleType)
+      // console.log(id+" "+styleType)
       var vertex = this.visualGraph.getRaphaelsFromID(id);
       switch(styleType){
          case "current":
@@ -2907,7 +3297,7 @@ function LR_Parser(settings,subTask,answer) {
                self.styleRules();
                var previousState = self.getPreviousState();
                var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-               self.updateParseTable({anim:true,action:"startReduction",nonTerminal:nonTerminal});
+               self.updateParseTableHL({anim:true,action:"startReduction",nonTerminal:nonTerminal});
                self.simulationStep++;
                self.applyReduction(nonTerminal,goto,true,true);
             }else{   // goto
@@ -3492,6 +3882,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.reloadAnswer = function() {
+      this.resetFeedback();
       switch(this.mode){
          case 2:
          case 5:
@@ -3507,6 +3898,8 @@ function LR_Parser(settings,subTask,answer) {
             this.visualGraphJSON = answer.visualGraphJSON[answer.visualGraphJSON.length - 1];
             this.initAutomata();
             this.updateState(false,"reloadAnswer");
+            // this.graphEditorCallback();
+            this.updateParseTable();
             break;
          case 4:
             for(var state in answer){
@@ -3581,7 +3974,6 @@ function LR_Parser(settings,subTask,answer) {
             break;
          case 3:
             this.pauseSimulation();
-            // console.log(this.lrClosureTable.kernels);
             var lrClosureTable = this.lrClosureTable.kernels;
             var vertices = this.graph.getAllVertices();
             var terminalState = this.getTerminalState();
@@ -3591,45 +3983,38 @@ function LR_Parser(settings,subTask,answer) {
                this.displayError("Wrong terminal state")
             }else{
                var success = true;
-               for(var state of lrClosureTable){
-                  var stateVertex = this.getStateID(state.index);
-                  if(!stateVertex){
-                     this.displayError("State "+state.index+" is missing");
+               for(var vertex of vertices){
+                  var info = this.graph.getVertexInfo(vertex);
+                  if(info.terminal){
+                     continue
+                  }
+                  var stateIndex = this.getStateIndex(vertex);
+                  if(stateIndex == null){
+                     this.displayError("Error in state "+info.label);
                      return
                   }
+                  if(stateIndex == 0 && !info.initial){
+                     this.displayError("State "+info.label+" is not set as initial");
+                     return
+                  }
+                  var state = lrClosureTable[stateIndex];
                   var nGoto = state.keys.length;
-                  var children = this.graph.getChildren(stateVertex);
+                  var children = this.graph.getChildren(vertex);
                   if((state.index == 0 && children.length != nGoto + 1) || (state.index != 0 && children.length != nGoto)){
-                     this.displayError("The number of transitions from state "+state.index+" is incorrect");
+                     this.displayError("The number of transitions from state "+info.label+" is incorrect");
                      return
                   }
                   for(var child of children){
-                     var edges = this.graph.getEdgesFrom(stateVertex,child);
+                     var edges = this.graph.getEdgesFrom(vertex,child);
                      var edgeInfo = this.graph.getEdgeInfo(edges[0]);
                      var childInfo = this.graph.getVertexInfo(child);
-                     if(state.gotos[edgeInfo.label] != childInfo.label && !(state.index == 0 && terminalState == childInfo.label)){
-                        this.displayError("Wrong transition from state "+state.index+" to state "+childInfo.label);
+                     var childState = this.getStateIndex(child);
+                     if(childState == null && !childInfo.terminal){
+                        this.displayError("Error in state "+childInfo.label);
                         return
                      }
-                  }
-                  var content = this.readContent(stateVertex);
-                  if((state.index != 0 && content.length != state.closure.length) || (state.index == 0 && (content.length > state.closure.length + 1 || content.length < state.closure.length))){
-                     this.displayError("The number of lines in state "+state.index+" is incorrect");
-                     return
-                  }
-                  for(var item of state.closure){
-                     var rule = item.rule.index;
-                     var dotIndex = item.dotIndex;
-                     var itemFound = false;
-                     for(var line of content){
-                        var lineInfo = this.readLine(line);
-                        if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dotIndex){
-                           itemFound = true;
-                           break;
-                        }
-                     }
-                     if(!itemFound){
-                        this.displayError("Error in the content of state "+state.index);
+                     if(state.gotos[edgeInfo.label] != childState && !(state.index == 0 && terminalState == childInfo.label)){
+                        this.displayError("Wrong transition from state "+info.label+" to state "+childInfo.label);
                         return
                      }
                   }
@@ -3664,6 +4049,43 @@ function LR_Parser(settings,subTask,answer) {
             }
             return true;
       }
+   };
+
+   this.getStateIndex = function(vID) {
+      /* validation in mode 3 */
+      var content = this.readContent(vID);
+      if(!content){
+         return null
+      }
+      var stateIndex = null;
+      for(var state of this.lrClosureTable.kernels){
+         if((state.index != 0 && content.length != state.closure.length) || 
+            (state.index == 0 && (content.length > state.closure.length + 1 || 
+               content.length < state.closure.length))){
+            continue
+         }
+         var match = true;
+         for(var item of state.closure){
+            var rule = item.rule.index;
+            var dotIndex = item.dotIndex;
+            var itemFound = false;
+            for(var line of content){
+               var lineInfo = this.readLine(line);
+               if(lineInfo.ruleIndex == rule && lineInfo.dotIndex == dotIndex){
+                  itemFound = true;
+                  break;
+               }
+            }
+            if(!itemFound){
+               match = false;
+               break;
+            }
+         }
+         if(match){
+            stateIndex = state.index;
+         }
+      }
+      return stateIndex;
    };
 
    this.displayMessage = function(type,message) {
