@@ -2341,6 +2341,7 @@ var getContext = function (display, infos, curLevel) {
                     infos.quickPiSensors.push(sensor);
                 }
 
+                context.recreateDisplay = true;
                 this.resetDisplay();
             }
         }
