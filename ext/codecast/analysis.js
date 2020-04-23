@@ -22,6 +22,9 @@ var analyseSkulptState = function analyseSkulptState(suspensions, lastAnalysis) 
     var functionCallStack = Immutable.List();
     for (var suspensionIdx = 0; suspensionIdx < suspensions.length; suspensionIdx++) {
         var suspension = suspensions[suspensionIdx];
+        if (!isProgramSuspension(suspension)) {
+            continue;
+        }
 
         var lastScopeAnalysis = null;
         if (lastAnalysis && lastAnalysis.functionCallStack.size > suspensionIdx) {
@@ -198,6 +201,18 @@ var valuesWithPrevious = function valuesWithPrevious(newValue, oldValue) {
             old: newOldValue
         };
     }
+};
+
+/**
+ * Checks whether a suspension is a program's suspension.
+ * It can also be only a promise encapsulated in a suspension when certain functions are called.
+ *
+ * @param {Object} suspension The suspension.
+ *
+ * @returns {boolean}
+ */
+var isProgramSuspension = function(suspension) {
+    return suspension.hasOwnProperty('$lineno');
 };
 
 /**
