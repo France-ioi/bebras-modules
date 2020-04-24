@@ -271,7 +271,7 @@ var getContext = function (display, infos, curLevel) {
                 buttonWasPressed: "le bouton a été enfoncé",
 
                 displayText: "afficher %1",
-                displayText2Lines: "afficher Ligne 1: %1 Ligne 2: %2",
+                displayText2Lines: "afficher Ligne 1 : %1 Ligne 2 : %2",
 
                 readTemperature: "température ambiante",
                 getTemperature: "temperature de %1",
@@ -300,24 +300,24 @@ var getContext = function (display, infos, curLevel) {
                 noStroke: "ne pas dessiner les contours",
 
                 readAcceleration: "accélération en (m/s²) dans l'axe %1",
-                computeRotation: "compute rotation from accelerometer (°) %1",
+                computeRotation: "calcul de l'angle de rotation (°) sur l'accéléromètre %1",
                 readSoundLevel: "volume sonore",
 
-                readMagneticForce: "read Magnetic Force (µT) %1",
-                computeCompassHeading: "compute Compass Heading (°)",
+                readMagneticForce: "champ magnétique (µT) sur %1",
+                computeCompassHeading: "direction de la boussole %1 en (°)",
 
-                readInfraredState: "read Infrared Receiver State %1",
-                setInfraredState: "set Infrared transmiter State %1",
+                readInfraredState: "infrarouge détecté sur %1",
+                setInfraredState: "mettre l'émetteur infrarouge %1 à %2",
 
                 // Gyroscope
-                readAngularVelocity: "read angular velocity (°/s) %1",
-                setGyroZeroAngle: "set the gyroscope zero point",
-                computeRotationGyro: "compute rotation in the gyroscope %1",
+                readAngularVelocity: "vitesse angulaire (°/s) du gyroscope %1",
+                setGyroZeroAngle: "initialiser le gyroscope à l'état zéro",
+                computeRotationGyro: "calculer la rotation du gyroscope %1",
 
                 //Internet store
-                connectToCloudStore: "Se connecter au cloud. Identifiant %1 Mot de passe %2",
-                writeToCloudStore: "Écrire dans le cloud. Identifiant %1 Clé %2 Valeur %3",
-                readFromCloudStore: "Lire dans le cloud. Identifiant %1 Clé %2",
+                connectToCloudStore: "se connecter au cloud. Identifiant %1 Mot de passe %2",
+                writeToCloudStore: "écrire dans le cloud : identifiant %1 clé %2 valeur %3",
+                readFromCloudStore: "lire dans le cloud : identifiant %1 clé %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
