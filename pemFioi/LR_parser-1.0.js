@@ -301,8 +301,8 @@ function LR_Parser(settings,subTask,answer) {
             this.initParseTable();
          }else{
             this.initParseTable();
-            // this.initActionSequence(false,true);
-            this.initActionSequence();
+            // this.initActionSequence();
+            this.initActionSequence(false,true);
          }
          // this.initParseTable();
          this.showTab();
@@ -459,7 +459,7 @@ function LR_Parser(settings,subTask,answer) {
             }
          }
          // console.log(action);
-         if(action /*&& (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))*/ || tree){
+         if(action /*&& (!this.mode == 3 || this.doesAutomatonAllowAction(state,symbol,action))*/ /*|| tree*/){
             switch(action[0].actionType){
                case "s":
                   this.actionSequence.push({
@@ -776,6 +776,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.initDerivationTree = function() {
+      // console.log("initDerivationTree");
       var html = "<div id=\"derivationTree\">";
       html += "<h4>Derivation Tree</h4>";
       html += "<div id=\"tree\"></div>";
@@ -1627,7 +1628,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.getStateID = function(state) {
       /* get vertex ID from label*/
-      if(!state){
+      if(state == null){
          return false
       }
       var vertices = this.graph.getAllVertices();
@@ -2980,7 +2981,9 @@ function LR_Parser(settings,subTask,answer) {
       self.saveAnswer();
       self.isLastActionAGraphEdit = true;
       self.updateParseTable();
-      self.initActionSequence();
+      self.derivationTree = [];
+      self.initActionSequence(false,true);
+      self.styleDerivationTree();
       self.showUndo();
       // console.log(self.computedStates);
       if(answer.visualGraphJSON.length > 1){
@@ -3375,6 +3378,7 @@ function LR_Parser(settings,subTask,answer) {
    /** derivation tree **/
 
    this.updateTree = function() {
+      // console.log("updateTree");
       this.updateTreePaper();
       this.fixConflict();
       this.treeClickableElements = {};
@@ -3397,6 +3401,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.displayTree = function(tree,level,parentCol) {
+      // console.log("displayTree");
       var children = [];
       for(var col in tree){
          if(col == "nonTerminal" || col == "path"){
@@ -4602,8 +4607,12 @@ function LR_Parser(settings,subTask,answer) {
          "font-weight": "bold",
          "fill": this.colors.blue
       };      
-      
-      this.treePaper = subTask.raphaelFactory.create("tree","tree",treeWidth,treeHeight);
+      if(!this.treePaper){
+         this.treePaper = subTask.raphaelFactory.create("tree","tree",treeWidth,treeHeight);
+      }else{
+         this.treePaper.clear();
+         this.treePaper.setSize(treeWidth,treeHeight);
+      }
 
       for(var iLine = 0; iLine < 2*this.treeHeight + 1; iLine++){
          // for(var iChar = 0; iChar < this.input.length - 1; iChar++){
