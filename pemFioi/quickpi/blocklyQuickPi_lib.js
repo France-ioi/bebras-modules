@@ -2129,6 +2129,13 @@ var getContext = function (display, infos, curLevel) {
         else
             context.doNotStartGrade = true;
 
+        if (context.autoGrading) {
+            if (context.sensorStates)
+                context.sensorStates.remove();
+            context.sensorStates = paper.set();
+        }
+    
+
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
 
