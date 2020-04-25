@@ -315,14 +315,14 @@
 
             task.getAnswer = function(callback) {
                 var answer = JSON.stringify(q.getAnswer());
-                console.log('task.getAnswer', answer)
+                //console.log('task.getAnswer', answer)
                 callback(answer);
             };
 
 
             task.reloadAnswer = function(answer, callback) {
                 try {
-                    console.log('task.reloadAnswer', answer)
+                    //console.log('task.reloadAnswer', answer)
                     answer = JSON.parse(answer);
                     q.setAnswer(answer);
                 } catch(e) {
