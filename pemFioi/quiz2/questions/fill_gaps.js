@@ -130,7 +130,7 @@
                     var placeholder = $(this);
                     var span = placeholder.find('span').first();
                     var text = span.length ? span.text() : null;
-                    var mistake = text != '' && feedback.mistakes.indexOf(text) !== -1;
+                    var mistake = text != '' && feedback.mistakes[i] === text;
                     if(mistake) {
                         if(Quiz.params.feedback_on_wrong_choices == 'first_under_question' || Quiz.params.feedback_on_wrong_choices == 'first_under_choice') {
                             !first_mistake_marked && placeholder.addClass('mistake');
