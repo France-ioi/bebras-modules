@@ -117,9 +117,12 @@
                         score: 'score' in fres ? parseFloat(fres.score) || 0 : 0,
                         feedback: {
                             correct_answer: [],
-                            mistakes: answer,
+                            mistakes: [],
                             messages: []
                         }
+                    }
+                    if(res.score == 0) {
+                        res.feedback.mistakes = answer;
                     }
                     if('message' in fres && fres.message) {
                         res.feedback.messages = [fres.message];
@@ -133,9 +136,12 @@
                         score: !!fres,
                         feedback: {
                             correct_answer: [],
-                            mistakes: answer,
+                            mistakes: [],
                             messages: []
                         }
+                    }
+                    if(!fres) {
+                        res.feedback.mistakes = answer;
                     }
                 }
                 return res;
