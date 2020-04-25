@@ -2,6 +2,16 @@
 
 ## Add the skulpt analysis to a task
 
+In task/index.html, load the python_analysis module that is available from importModules 1.5 :
+
+```
+  importModules([
+    ...'python-analysis'...
+  ]);
+```
+
+Note : The module will be loaded only if the python language is selected.
+
 In task/task.js, the "variables" whole category must be selected :
 
 ```
@@ -19,16 +29,6 @@ In task/task.js, the "variables" whole category must be selected :
     ...
   }
   ...
-```
-
-It is possible also to disable the modules in such case using the disableAnalysis option in gridInfos :
-
-```
-  subTask.gridInfos = {
-    ...
-    disableAnalysis: true,
-    ...
-  }
 ```
 
 ## Modify the React components related to analysis display

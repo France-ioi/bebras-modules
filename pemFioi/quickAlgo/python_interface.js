@@ -59,6 +59,10 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   this.load = function (language, display, nbTestCases, options) {
+    if (this.skulptAnalysisEnabled() && !this.skulptAnalysisShouldByEnabled()) {
+      console.log('Module "python-analysis" is loaded but not used.');
+    }
+
     this._nbTestCases = nbTestCases;
     this._options = options;
     this._loadBasicEditor();
@@ -376,20 +380,19 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 
   /**
-   * Whether skulpt analysis should be enabled (doesn't check if modules are loaded).
+   * Whether skulpt analysis should be enabled given the current task.
    *
    * @return {boolean}
    */
-  this.skulptAnalysisShouldBeEnabled = function() {
-    var variablesEnabled = false;
+  this.skulptAnalysisShouldByEnabled = function() {
+    var variablesEnabled = true;
     var taskInfos = this._mainContext.infos;
-    if (taskInfos.includeBlocks && taskInfos.includeBlocks.standardBlocks && taskInfos.includeBlocks.standardBlocks.wholeCategories) {
-      if (taskInfos.includeBlocks.standardBlocks.wholeCategories.includes('variables')) {
-        variablesEnabled = true;
-      }
+    var forbidden = pythonForbiddenLists(taskInfos.includeBlocks).forbidden;
+    if (forbidden.indexOf('var_assign') !== -1) {
+      variablesEnabled = false;
     }
 
-    return (this.language === 'python' && variablesEnabled && !taskInfos.disableAnalysis);
+    return variablesEnabled;
   };
 
   /**
@@ -398,7 +401,7 @@ function LogicController(nbTestCases, maxInstructions) {
    * @return {boolean}
    */
   this.skulptAnalysisEnabled = function() {
-    return (window.pythonAnalysisModulesLoaded !== undefined && window.pythonAnalysisModulesLoaded);
+    return (this.language === 'python' && typeof analyseSkulptState === 'function');
   };
 
   /**

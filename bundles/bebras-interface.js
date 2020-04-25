@@ -125,6 +125,27 @@ if (!isCrossDomain()) {
          console.error('cannot init task if jschannel is not present');
          return;
       }
+
+      var previousHeights = [];
+      var getHeightFiltered = function(success, error) {
+         // If the new height has already been returned just before the current
+         // height, we're in a loop between two heights, possibly because of a
+         // scrollbar.
+         // In that case we want to keep the largest of the two heights.
+         if(!task.getHeight) { error('task.getHeight not defined yet'); }
+         task.getHeight(function(h) {
+            if((previousHeights.length == 2) &&
+               (previousHeights[0] == h) &&
+               (previousHeights[1] >= h)) {
+                  success(previousHeights[1]);
+                  return;
+            }
+            previousHeights.push(h);
+            previousHeights = previousHeights.slice(-2);
+            success(h);
+         }, error);
+      }
+
       var gradeAnswer = function(params, success, error) {
          var newSuccess = function(score, message, scoreToken) {
             success([score, message, scoreToken]);
@@ -142,7 +163,7 @@ if (!isCrossDomain()) {
       platform.channelId = channelId;
       chan.bind('task.load', function(trans, views) {task.load(views, callAndTrigger(trans.complete, 'load', trans.error, [views]), trans.error);trans.delayReturn(true);});
       chan.bind('task.unload', function(trans) {task.unload(callAndTrigger(trans.complete, 'unload', trans.error, null), trans.error);trans.delayReturn(true);});
-      chan.bind('task.getHeight', function(trans) {task.getHeight(trans.complete, trans.error);trans.delayReturn(true);});
+      chan.bind('task.getHeight', function(trans) {getHeightFiltered(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getMetaData', function(trans) {task.getMetaData(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.getViews', function(trans) {task.getViews(trans.complete, trans.error);trans.delayReturn(true);});
       chan.bind('task.showViews', function(trans, views) {task.showViews(views, callAndTrigger(trans.complete, 'showViews', trans.error, [views]), trans.error);trans.delayReturn(true);});
@@ -293,6 +314,7 @@ window.displayHelper = {
    levels: ['easy', 'medium', 'hard'],
    levelsIdx: { easy: 0, medium: 1, hard: 2 },
    maxStars: 4,
+   popupMessageHandler: null,
 
    formatTranslation: function(s, args) { return s.replace(/\{([^}]+)\}/g, function(_, match){ return args[match]; }); },
 
@@ -331,6 +353,7 @@ window.displayHelper = {
          youDidBetterBefore: "Vous aviez fait mieux avant.",
          scoreStays2: "Votre score reste le même.",
          reloadBestAnswer: "Rechargez votre meilleure réponse.",
+         noAnswerSaved: "Aucune réponse actuellement enregistrée pour cette version.",
          validate: "Valider",
          restart: "Recommencer",
          harderLevelSolved: "Attention : vous avez déjà résolu une version plus difficile. Vous ne pourrez pas gagner de points supplémentaires avec cette version.",
@@ -400,6 +423,7 @@ window.displayHelper = {
          youDidBetterBefore: "You did better before.",
          scoreStays2: "Your score stays the same.",
          reloadBestAnswer: "Reload your best answer.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Validate",
          restart: "Restart",
          harderLevelSolved: "Warning: you already solved a harder version of this task. You won't be able to obtain extra points with this version.",
@@ -469,6 +493,7 @@ window.displayHelper = {
          youDidBetterBefore: "Det gick bättre tidigare.",
          scoreStays2: "Din poäng ändras inte.",
          reloadBestAnswer: "Ladda in ditt bästa svar.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Kontrollera svaret",
          restart: "Börja om",
          harderLevelSolved: "Varning: du har redan löst en svårare version av den här uppgiften. Du kommer inte kunna få mer poäng med den här versionen.",
@@ -538,6 +563,7 @@ window.displayHelper = {
          youDidBetterBefore: "Sait aiemmin enemmän pisteitä.",
          scoreStays2: "Pistemääräsi säilyy samana.",
          reloadBestAnswer: "Palauta paras aiempi vastauksesi.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Tarkista vastaus",
          restart: "Aloita alusta",
          harderLevelSolved: "Varoitus: olet jo ratkaissut vaikeamman version tästä tehtävästä. Tämän helpomman version ratkaiseminen ei voi korottaa pistemäärääsi.",
@@ -607,7 +633,8 @@ window.displayHelper = {
          youDidBetterBefore: "Du hast dich verbessern.",
          scoreStays2: "Dein Punktestand bleibt gleich.",
          reloadBestAnswer: "Deine beste Antwort wieder laden.",
-         validate: "Überprüfen",
+         noAnswerSaved: "Bisher noch keine Antwort für diese Version gespeichert.",
+         validate: "Erstellen",
          restart: "Neustarten",
          harderLevelSolved: "Achtung: Du hast schon eine schwerere Version gelöst. Du kannst mit dieser Version keine zusätzlichen Punkte bekommen.",
          showLevelAnyway: "Trotzdem anzeigen",
@@ -676,6 +703,7 @@ window.displayHelper = {
          youDidBetterBefore: "لقد قمت بها أفضل من هذا في وقت سابق",
          scoreStays2: "ما زالت نقاطك كما هي",
          reloadBestAnswer: "اعد تحميل إجابتك الأفضل",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "تحقق",
          restart: "ابدأ من جديد",
          harderLevelSolved: "لقد قمت بحل المستوى الأصعب في هذا السؤال, لن تتمكن من الحصول على درجات أعلى في هذا السؤال",
@@ -745,6 +773,7 @@ window.displayHelper = {
          youDidBetterBefore: "Realizó un mejor trabajo antes.",
          scoreStays2: "Su puntuación se mantiene igual.",
          reloadBestAnswer: "Recargar su mejor respuesta.",
+         noAnswerSaved: "Aún no hay respuesta guardada para esta versión.",
          validate: "Validar",
          restart: "Reiniciar",
          harderLevelSolved: "Atención: ya ha resuelto una versión más difícil. No puede ganar puntos extra con esta versión.",
@@ -814,6 +843,7 @@ window.displayHelper = {
          youDidBetterBefore: "Rešitev je boljša od prejšnje.",
          scoreStays2: "Tvoj rezultat ostaja enak.",
          reloadBestAnswer: "Znova naloži najboljšo rešitev.",
+         noAnswerSaved: "No answer saved so far for this version.",
          validate: "Preveri",
          restart: "Začni znova",
          harderLevelSolved: "Opozorilo: Rešil(-a) si že težjo stopnjo te naloge. S to stopnjo ne boš dobil(-a) dodatnih točk.",
@@ -882,7 +912,7 @@ window.displayHelper = {
          }
          addTaskHTML += '</div>';
          if (!document.getElementById('displayHelperAnswering')) {
-            $(self.taskSelector).append(addTaskHTML);   
+            $(self.taskSelector).append(addTaskHTML);
          }
          self.loaded = true;
          self.timeLoaded = new Date().getTime();
@@ -925,7 +955,7 @@ window.displayHelper = {
       this.popupMessageShown = false;
       this.hasLevels = false;
       this.pointsAsStars = true; // TODO: false as default
-      this.unlockedLevels = 3;
+      this.unlockedLevels = 4;
       this.neverHadHard = false;
       this.showMultiversionNotice = false;
       this.taskLevel = '';
@@ -959,20 +989,21 @@ window.displayHelper = {
          }
       }
       this.initLevelVars();
-      if (!initLevel) {
-         if (!this.taskParams) {
-            var self = this;
-            window.platform.getTaskParams(null, null, function(taskParams) {
-               self.taskParams = taskParams;
-               initLevel = taskParams.options.difficulty ? taskParams.options.difficulty : "easy";
-               self.doSetupLevels(initLevel);
-            });
-         } else {
-            initLevel = this.taskParams.options.difficulty ? this.taskParams.options.difficulty : "easy";
-            this.doSetupLevels(initLevel);
+
+      var self = this;
+      function callSetupLevels() {
+         if(!initLevel) {
+            initLevel = self.taskParams.options.difficulty ? self.taskParams.options.difficulty : "easy";
          }
+         self.doSetupLevels(initLevel);
+      };
+      if (!this.taskParams) {
+         window.platform.getTaskParams(null, null, function(taskParams) {
+            self.taskParams = taskParams;
+            callSetupLevels();
+         });
       } else {
-         this.doSetupLevels(initLevel);
+         callSetupLevels();
       }
    },
    doSetupLevels: function(initLevel) {
@@ -982,7 +1013,7 @@ window.displayHelper = {
          task.reloadStateObject(task.getDefaultStateObject(), true);
          task.reloadAnswerObject(task.getDefaultAnswerObject());
       }
-      
+
       this.setupParams();
       if (!document.getElementById('popupMessage')) {
          this.setupLevelsTabs();
@@ -1079,7 +1110,7 @@ window.displayHelper = {
       if (this.graderScore > this.levelsMaxScores[level]) {
          mode = 'useless';
       }
-      drawStars('stars_' + starsIdx, starsIdx, 18, rate, mode);
+      drawStars('stars_' + starsIdx, starsIdx, 14, rate, mode);
    },
 
    updateLayout: function() {
@@ -1101,11 +1132,15 @@ window.displayHelper = {
          }
      }
    },
-   
+
    useFullWidth: function() {
       // TODO: find a clean way to do this
       try {
          $('#question-iframe', window.parent.document).css('width', '100%');
+      } catch(e) {
+      }
+      // This try is probably not needed but avoid breaking just in case
+      try {
          $(document).ready(function () {displayHelper.updateLayout();});
          $(window).resize(function () {displayHelper.updateLayout();});
          this.bUseFullWidth = true;
@@ -1118,16 +1153,22 @@ window.displayHelper = {
       return this.levelsMaxScores;
    },
 
-   setLevel: function(newLevel) {
-      if (this.taskLevel == newLevel) {
-         return;
-      } else if (this.popupMessageShown) {
+   displayLevel: function(newLevel) {
+      // Only displays a level, without requesting a level change to the task
+      if (this.popupMessageShown) {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
          this.popupMessageShown = false;
       }
 
-      for (var curLevel in this.levelsRanks) {
+      var allLevels = ['basic', 'easy', 'medium', 'hard'];
+      if(this.levelsRanks) {
+         for(var lr in this.levelsRanks) {
+            allLevels.push(lr);
+         }
+      }
+      for(var i=0; i < allLevels.length; i++) {
+         var curLevel = allLevels[i];
          $('#tab_' + curLevel).removeClass('current');
          $('.' + curLevel).hide();
       }
@@ -1138,13 +1179,21 @@ window.displayHelper = {
       $('#tabsMenu .li').removeClass('prev next');
       $('#tabsMenu .li.current').prev().addClass('prev');
       $('#tabsMenu .li.current').next().addClass('next');
+   },
+
+   setLevel: function(newLevel) {
+      if (this.taskLevel == newLevel) {
+         return;
+      }
+
+      this.displayLevel(newLevel);
 
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;
       this.taskLevel = newLevel;
       var self = this;
-      
+
       var afterReload = function() {
          self.submittedScore = self.levelsScores[self.taskLevel];
          self.refreshMessages = true;
@@ -1157,7 +1206,7 @@ window.displayHelper = {
                self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
-               var easyVersionKey = "levelVersionName_easy"; 
+               var easyVersionKey = "levelVersionName_easy";
                if (self.pointsAsStars) {
                   hardVersionKey += "_stars";
                   easyVersionKey += "_stars";
@@ -1171,7 +1220,7 @@ window.displayHelper = {
             }
          }
       };
-      
+
       if(self.reloadWithCallbacks) {
          task.reloadStateObject(state, function() {
             task.reloadAnswerObject(answer, afterReload);
@@ -1183,9 +1232,24 @@ window.displayHelper = {
          afterReload();
       }
    },
+
+   getImgPath: function() {
+      if(window.contestsRoot) {
+         // Hack: when in the context of the platform, we need to change the path
+         return window.contestsRoot + '/' + window.contestFolder + '/';
+      } else if(window.modulesPath) {
+         var modulesPath = window.modulesPath[window.modulesPath.length-1] == '/' ? window.modulesPath : window.modulesPath + '/';
+         return modulesPath + 'img/';
+      } else {
+         return '../../../_common/modules/img/';
+      }
+   },
+
    getAvatar: function(mood) {
       if (displayHelper.avatarType == "beaver") {
          return "castor.png";
+      } else if (displayHelper.avatarType == "none") {
+        return "";
       } else {
          if (mood == "success") {
             return "laptop_success.png";
@@ -1196,7 +1260,46 @@ window.displayHelper = {
          }
       }
    },
+
+
+   showPopupDialog: function(message) {
+      if ($('#popupMessage').length == 0) {
+         $('#task').after('<div id="popupMessage"></div>');
+      }
+
+      $('#popupMessage').addClass('floatingMessage');
+
+      var imgPath = displayHelper.getImgPath();
+
+      var popupHtml = '<div class="container">' +
+         '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
+         '<div class="message">' + message + '</div></div>';
+
+      $('#popupMessage').html(popupHtml).show();
+
+      this.popupMessageShown = true;
+      try {
+         $(parent.document).scrollTop(0);
+      } catch (e) {
+      }
+   },
+
+
+   errorPopupAvatar: function() {
+      $('#popupMessage').addClass('noAvatar');
+   },
+
+
    showPopupMessage: function(message, mode, yesButtonText, agreeFunc, noButtonText, avatarMood, defaultText, disagreeFunc) {
+      if(this.popupMessageHandler) {
+         // A custom popupMessageHandler was defined, call it
+         // It must return true if it handled the popup, false if displayHelper
+         // should handle the popup instead
+         if(this.popupMessageHandler.apply(null, arguments)) {
+            return;
+         }
+      }
+
       if ($('#popupMessage').length == 0) {
          $('#task').after('<div id="popupMessage"></div>');
       }
@@ -1206,9 +1309,9 @@ window.displayHelper = {
          $('#taskContent, #displayHelperAnswering').hide();
          $('#popupMessage').removeClass('floatingMessage');
       }
+      $('#popupMessage').removeClass('noAvatar');
 
-      // Hack: when in the context of the platform, we need to change the path
-      var imgPath = window.contestsRoot ? window.contestsRoot + '/' + window.contestFolder + '/' : '../../../_common/modules/img/';
+      var imgPath = displayHelper.getImgPath();
       if(mode == 'lock') {
          var buttonYes = '';
       } else if (mode == 'input') {
@@ -1221,13 +1324,13 @@ window.displayHelper = {
          buttonNo = '<button class="buttonNo" style="margin-left: 10px;">' + noButtonText + '</button>';
       }
       var popupHtml = '<div class="container">' +
-         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '"/>' +
+         '<img class="beaver" src="' + imgPath + this.getAvatar(avatarMood) + '" onerror="displayHelper.errorPopupAvatar();"/>' +
          '<img class="messageArrow" src="' + imgPath + 'fleche-bulle.png"/>' +
          '<div class="message">' + message + '</div>';
       if(mode == 'input') {
          popupHtml += '<input id="popupInput" type="text" value="' + (defaultText ? defaultText : '') + '"></input>';
       }
-      popupHtml += buttonYes + buttonNo + '</div>';
+      popupHtml += '<div class="buttonsWrapper">' + buttonYes + buttonNo + '</div></div>';
       $('#popupMessage').html(popupHtml).show();
       if(mode == 'input') {
          $('#popupInput').focus();
@@ -1359,12 +1462,12 @@ window.displayHelper = {
          });
       }
    },
-   
+
    setValidateString: function(str) {
       this.customValidateString = str;
-      $("#displayHelper_validate > input").val(str);      
+      $("#displayHelper_validate > input").val(str);
    },
-   
+
    callValidate: function() {
       if (this.customValidate != undefined) {
          this.customValidate();
@@ -1376,7 +1479,9 @@ window.displayHelper = {
    validate: function(mode) {
       this.stoppedShowingResult = false;
       var self = this;
-      if (mode == 'cancel') {
+      if (mode == 'log') {
+         // Ignore it? Do something?
+      } else if (mode == 'cancel') {
          this.savedAnswer = '';
          task.reloadAnswer('', function() {
             self.checkAnswerChanged();
@@ -1640,7 +1745,7 @@ window.displayHelper = {
          if (!this.hasSolution) {
             if (this.prevSavedScore < this.submittedScore) {
                scoreDiffMsg = this.strings.yourScoreIsNow;
-            } else if (this.prevSavedScore > this.submittedScore) { 
+            } else if (this.prevSavedScore > this.submittedScore) {
                scoreDiffMsg = this.strings.worseScoreStays;
                showRetrieveAnswer = true;
             }
@@ -1711,7 +1816,7 @@ window.displayHelper = {
                   } else {
                      message += this.strings.forMorePointsMoveToNextLevel;
                   }
-               } else if (this.submittedScore < prevScore) { 
+               } else if (this.submittedScore < prevScore) {
                   message += this.strings.youDidBetterBefore;
                   showRetrieveAnswer = true;
                }
@@ -1738,7 +1843,7 @@ window.displayHelper = {
             if (this.graderMessage !== "") {
                if (!this.stoppedShowingResult) {
                   return '<div style="margin: .2em 0; color: ' + color + '; font-weight: bold;">' + this.graderMessage + '</div>';
-               } 
+               }
             }
             break;
       }
@@ -1792,7 +1897,7 @@ window.displayHelper = {
       this.initLanguage();
       var self = this;
       this.refreshMessages = false;
-      var suffix, prefix; 
+      var suffix, prefix;
       if (this.hasAnswerChanged) {
          suffix = 'changed';
       } else {
@@ -1867,22 +1972,47 @@ window.displayHelper = {
       });
    },
 
-   // Loads previously saved answer
-   retrieveAnswer: function() {
+   getSavedAnswer: function() {
+      // Gets the previously saved answer
       var retrievedAnswer;
       if (this.hasLevels) {
-         var retrievedAnswerObj = task.getAnswerObject();
-         var savedAnswerObj = $.parseJSON(this.savedAnswer);
-         retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
-         retrievedAnswer = JSON.stringify(retrievedAnswerObj);
+         var savedAnswerObj = this.savedAnswer && $.parseJSON(this.savedAnswer);
+         if(savedAnswerObj) {
+            var retrievedAnswerObj = task.getAnswerObject();
+            retrievedAnswerObj[this.taskLevel] = savedAnswerObj[this.taskLevel];
+            retrievedAnswer = retrievedAnswerObj[this.taskLevel] && JSON.stringify(retrievedAnswerObj);
+         } else {
+            retrievedAnswer = null;
+         }
       } else {
          retrievedAnswer = this.savedAnswer;
+      }
+      return retrievedAnswer;
+   },
+   retrieveAnswer: function() {
+      // Loads previously saved answer
+      var retrievedAnswer = this.getSavedAnswer();
+      if(!retrievedAnswer) {
+         this.showPopupMessage(this.strings.noAnswerSaved, 'blanket', this.strings.alright, null, null, "warning");
+         return;
       }
       var self = displayHelper;
       task.reloadAnswer(retrievedAnswer, function() {
          self.submittedAnswer = self.savedAnswer;
          self.updateScore(self.savedAnswer, false, function() {});
       });
+   },
+   hasSavedAnswer: function() {
+      // Returns whether a saved answer exists
+      if (this.hasLevels) {
+         var savedAnswerObj = this.savedAnswer && $.parseJSON(this.savedAnswer);
+         if(savedAnswerObj) {
+            return !!savedAnswerObj[this.taskLevel];
+         }
+      } else {
+         return !!this.savedAnswer;
+      }
+      return false;
    },
 
    sendBestScore: function(callback, scores, messages) {
@@ -1951,7 +2081,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
       [[22, 90], [50, 77], [78, 90], [75, 60], [25, 60]]
    ];
 
-   
+
    if ($('#' + id).length == 0) {
       return;
    }
@@ -1966,7 +2096,7 @@ function drawStars(id, nbStars, starWidth, rate, mode) {
          fill: fillColors[mode],
          stroke: 'none'
       }).transform('s' + scaleFactor + ',' + scaleFactor + ' 0,0 t' + (deltaX / scaleFactor) + ',0');
-      
+
       var ratio = Math.min(1, Math.max(0, rate * nbStars  - iStar));
       var xClip = ratio * 100;
       if (xClip > 0) {
@@ -2003,8 +2133,9 @@ Beav.Object.eq = function eq(x, y) {
    // assumes arguments to be of same type
    var tx = typeof(x);
    var ty = typeof(y);
-   if (tx != ty)
+   if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
+   }
    if (tx == "boolean" || tx == "number" || tx == "string" || tx == "undefined") {
       return x == y;
    }
@@ -2381,6 +2512,76 @@ Beav.Task.scoreInterpolate = function(minScore, maxScore, minResult, maxResult, 
 };
 
 
+/**********************************************************************************/
+/* Geometry */
+
+Beav.Geometry = new Object();
+
+Beav.Geometry.distance = function(x1,y1,x2,y2) {
+   return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
+};
+
+/*
+   This is used to handle drag on devices that have both a touch screen and a mouse.
+   Can be tested on chrome by loading a task in desktop mode, then switching to tablet mode.
+   To call instead of element.drag(onMove, onStart, onEnd);
+*/
+Beav.dragWithTouch = function(element, onMove, onStart, onEnd) {
+   var touchingX = 0;
+   var touchingY = 0;
+   var disabled = false;
+
+   function onTouchStart(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      touchingX = touches[0].pageX;
+      touchingY = touches[0].pageY;
+      onStart(touches[0].pageX, touches[0].pageY, evt);         
+   }
+
+   function onTouchEnd(evt) {
+      if (disabled) {
+         return;
+      }
+      onEnd(null);
+   }
+   
+   function onTouchMove(evt) {
+      if (disabled) {
+         return;
+      }
+      var touches = evt.changedTouches;
+      var dx = touches[0].pageX - touchingX;
+      var dy = touches[0].pageY - touchingY;
+      onMove(dx, dy, touches[0].pageX, touches[0].pageY, evt);
+   }
+   
+   function callOnStart(x,y,event) {
+      disabled = true;
+      onStart(x,y,event);
+   }
+   
+   function callOnMove(dx,dy,x,y,event) {
+      disabled = true;
+      onMove(dx,dy,x,y,event);
+   }
+   
+   function callOnEnd(event) {
+      disabled = false;
+      onEnd(event);
+   }
+
+   // element.undrag();
+   element.drag(callOnMove,callOnStart,callOnEnd);
+   if (element.touchstart) {
+      element.touchstart(onTouchStart);
+      element.touchend(onTouchEnd);
+      element.touchcancel(onTouchEnd);
+      element.touchmove(onTouchMove);
+   }
+}
 (function() {
 
 'use strict';
@@ -2557,7 +2758,12 @@ window.implementGetResources = function(task) {
       });
 
       taskResourcesLoaded = true;
-      callback(res);
+
+      if(window.taskGetResourcesPost) {
+        window.taskGetResourcesPost(res, callback);
+      } else {
+        callback(res);
+      }
    };
 }
 
@@ -2600,7 +2806,7 @@ $(document).ready(function() {
 
 
 function fillImages(text, images, res) {
-   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot"];
+   var extensions = ["png", "jpg", "gif", "ttf", "woff", "eot", "mp4", "zip"];
    for (var iExt = 0; iExt < extensions.length; iExt++) {
       var ext = extensions[iExt];
       var regexp = new RegExp("[\'\"]([^;\"\']*." + ext + ")[\'\"]", "g");
@@ -2637,8 +2843,8 @@ function fillImages(text, images, res) {
  *   - task.getMetaData(), as documented in the PEM
  */
 
-    // demo platform key
-    var demo_key = 'buddy'
+   // demo platform key
+   var demo_key = 'buddy'
 
 
    var languageStrings = {
@@ -2721,6 +2927,13 @@ function fillImages(text, images, res) {
       }
    };
 
+function getLanguageString(key) {
+   // Default to english strings
+   var ls = languageStrings[window.stringsLanguage] ? languageStrings[window.stringsLanguage] : languageStrings['en'];
+   var str = ls[key];
+   return str ? str : '';
+}
+
    /*
    * Create custom elements for platformless implementation
    */
@@ -2729,7 +2942,7 @@ function fillImages(text, images, res) {
          'header' : '\
             <div id="miniPlatformHeader">\
                <table>\
-                  <td><img src="../../../_common/modules/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/castor.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours castor</span></td>\
                   <td><a href="http://concours.castor-informatique.fr/" style="display:inline-block;text-align:right;">Le concours Castor</a></td>\
                </table>\
@@ -2739,11 +2952,14 @@ function fillImages(text, images, res) {
          'header' : '\
             <div style="width:100%; border-bottom:1px solid #B47238;overflow:hidden">\
                <table style="width:770px;margin: 10px auto;">\
-                  <td><img src="../../../_common/modules/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
+                  <td><img src="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/img/laptop.png" width="60px" style="display:inline-block;margin-right:20px;vertical-align:middle"/></td>\
                   <td><span class="platform">Concours Alkindi</span></td>\
                   <td><a href="http://concours-alkindi.fr/home.html#/" style="display:inline-block;text-align:right;">Le concours Alkindi</a></td>\
                </table>\
             </div>'
+      },
+      none: {
+         'header' : '<span></span>'
       }
    };
 
@@ -2757,35 +2973,76 @@ function fillImages(text, images, res) {
 
 
 
-    if(typeof window.signJWT == 'undefined') {
-        window.signJWT = function(data, key) {
-            return null
-        }
+    if(typeof window.jwt == 'undefined') {
+        window.jwt = {
+            isDummy: true,
+            sign: function() { return null; },
+            decode: function(token) { return token; }
+            };
     }
 
     function TaskToken(data, key) {
 
         this.data = data
-        this.data.hints_requested = []
+        this.data.sHintsRequested = "[]";
         this.key = key
 
+        var query = document.location.search.replace(/(^\?)/,'').split("&").map(function(n){return n = n.split("="),this[n[0]] = n[1],this}.bind({}))[0];
+        this.queryToken = query.sToken;
+
         this.addHintRequest = function(hint_params, callback) {
-            var jh = JSON.stringify(hint_params)
-            var exists = this.data.hints_requested.find(function(h) {
-                return JSON.stringify(h) === jh
-            })
+            try {
+                hint_params = jwt.decode(hint_params).askedHint;
+            } catch(e) {}
+            var hintsReq = JSON.parse(this.data.sHintsRequested);
+            var exists = hintsReq.find(function(h) {
+                return h == hint_params;
+            });
             if(!exists) {
-                this.data.hints_requested.push(hint_params)
+                hintsReq.push(hint_params);
+                this.data.sHintsRequested = JSON.stringify(hintsReq);
             }
-            this.get(callback)
-        },
+            return this.get(callback);
+        }
+
+        this.update = function(newData, callback) {
+            for(var key in newData) {
+                this.data[key] = newData[key];
+            }
+        }
+
+        this.getToken = function(data, callback) {
+            var res = jwt.sign(data, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0);
+            }
+            return res;
+        }
 
         this.get = function(callback) {
-            var res = signJWT(this.data, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            if(window.jwt.isDummy && this.queryToken) {
+                var token = this.queryToken;
+                if(callback) {
+                    // imitate async req
+                    setTimeout(function() {
+                        callback(token)
+                    }, 0);
+                }
+                return token;
+            }
+            return this.getToken(this.data, callback);
+        }
+
+        this.getAnswerToken = function(answer, callback) {
+            var answerData = {};
+            for(var key in this.data) {
+                answerData[key] = this.data[key];
+            }
+            answerData.sAnswer = answer;
+            return this.getToken(answerData, callback);
         }
     }
 
@@ -2793,11 +3050,14 @@ function fillImages(text, images, res) {
     function AnswerToken(key) {
         this.key = key
         this.get = function(answer, callback) {
-            var res = signJWT(answer, this.key)
-            // imitate async req
-            setTimeout(function() {
-                callback(res)
-            }, 100)
+            var res = jwt.sign(answer, this.key)
+            if(callback) {
+                // imitate async req
+                setTimeout(function() {
+                    callback(res)
+                }, 0)
+            }
+            return res;
         }
     }
 
@@ -2833,7 +3093,7 @@ function miniPlatformPreviewGrade(answer) {
             "<div style='padding:50px'><span id='previewScoreMessage'></span><br/><br/><input type='button' onclick='$(\"#previewScorePopup\").remove()' value='OK' /></div></div></div>").insertBefore("#solution");
       }
       $("#previewScorePopup").show();
-      $("#previewScoreMessage").html("<b>" + languageStrings[window.stringsLanguage].showSolution + " " + score + "/" + maxScore + "</b><br/>" + languageStrings[window.stringsLanguage].showSolution);
+      $("#previewScoreMessage").html("<b>" + getLanguageString('showSolution') + " " + score + "/" + maxScore + "</b><br/>" + getLanguageString('showSolution'));
    };
    // acceptedAnswers is not documented, but necessary for old Bebras tasks
    if (taskMetaData.acceptedAnswers && taskMetaData.acceptedAnswers[0]) {
@@ -2851,9 +3111,9 @@ function miniPlatformPreviewGrade(answer) {
 
 var alreadyStayed = false;
 
-var miniPlatformValidate = function(mode, success, error) {
+var miniPlatformValidate = function(task) { return function(mode, success, error) {
    //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate') {
+   if (mode == 'nextImmediate' || mode == 'log') {
       return;
    }
    if (mode == 'stay') {
@@ -2869,11 +3129,20 @@ var miniPlatformValidate = function(mode, success, error) {
    if (mode == 'cancel') {
       alreadyStayed = false;
    }
-   platform.trigger('validate', [mode]);
+   if(platform.registered_objects && platform.registered_objects.length > 0) {
+       platform.trigger('validate', [mode]);
+   } else {
+        // Try to validate
+        task.getAnswer(function(answer) {
+            task.gradeAnswer(answer, task_token.getAnswerToken(answer), function(score, message) {
+                if(success) { success(); }
+                })
+            });
+   }
    if (success) {
       success();
    }
-};
+}};
 
 function getUrlParameter(sParam)
 {
@@ -2918,14 +3187,14 @@ var chooseView = (function () {
          /*
          for(var viewName in views) {
             if (!views[viewName].requires) {
-               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + languageStrings[window.stringsLanguage][viewName] + '</button>')
+               var btn = $('<button id="choose-view-'+viewName+'" class="btn btn-default choose-view-button">' + getLanguageString(viewName) + '</button>')
                $("#choose-view").append(btn);
                btn.click(this.selectFactory(viewName));
             }
          }
          */
          $("#grade").remove();
-         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + languageStrings[window.stringsLanguage].gradeAnswer + '</button></center>');
+         var btnGradeAnswer = $('<center id="grade"><button class="btn btn-default">' + getLanguageString('gradeAnswer') + '</button></center>');
          // display grader button only if dev mode by adding URL hash 'dev'
          if (getHashParameter('dev')) {
             $(document.body).append(btnGradeAnswer);
@@ -2992,7 +3261,10 @@ var chooseView = (function () {
    };
 })();
 
-
+window.task_token = new TaskToken({
+   itemUrl: window.location.href,
+   randomSeed: Math.floor(Math.random() * 10)
+}, demo_key);
 
 
 
@@ -3008,16 +3280,12 @@ $(document).ready(function() {
        }
    }
    if (!hasPlatform) {
-    $('head').append('<link rel="stylesheet"type="text/css" \
-    href="../../../_common/modules/integrationAPI.01/official/miniPlatform.css">');
+      $('head').append('<link rel="stylesheet"type="text/css" href="' + (window.modulesPath?window.modulesPath:'../../../_common/modules') + '/integrationAPI.01/official/miniPlatform.css">');
       var platformLoad = function(task) {
-         window.task_token = new TaskToken({
-            id: taskMetaData.id,
-            random_seed: Math.floor(Math.random() * 10)
-         }, demo_key)
+         window.task_token.update({id: taskMetaData.id});
          window.answer_token = new AnswerToken(demo_key)
 
-         platform.validate = miniPlatformValidate;
+         platform.validate = miniPlatformValidate(task);
          platform.updateHeight = function(height,success,error) {if (success) {success();}};
          platform.updateDisplay = function(data,success,error) {
             if(data.views) {
@@ -3056,7 +3324,6 @@ $(document).ready(function() {
             }
          };
          platform.askHint = function(hint_params, success, error) {
-            success()
              /*
             $.post('updateTestToken.php', JSON.stringify({action: 'askHint'}), function(postRes){
                if (success) {success();}
@@ -3064,6 +3331,7 @@ $(document).ready(function() {
             */
             task_token.addHintRequest(hint_params, function(token) {
                 task.updateToken(token, function() {})
+                success(token)
             })
          };
 
@@ -3094,15 +3362,17 @@ $(document).ready(function() {
                     platform.trigger('showViews', [{"task": true}]);
                 });
                 if ($("#solution").length) {
-                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + languageStrings[window.stringsLanguage].showSolution + "</button></center>");
+                  $("#task").append("<center id='showSolutionButton'><button type='button' class='btn btn-default' onclick='miniPlatformShowSolution()'>" + getLanguageString('showSolution') + "</button></center>");
                 }
 
                 // add branded header to platformless task depending on avatarType
                 // defaults to beaver platform branding
-                if (miniPlatformWrapping[displayHelper.avatarType].header) {
-                  $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
-                } else {
-                  $('body').prepend(miniPlatformWrapping[beaver].header);
+                if(window.displayHelper) {
+                  if (miniPlatformWrapping[displayHelper.avatarType].header) {
+                    $('body').prepend(miniPlatformWrapping[displayHelper.avatarType].header);
+                  } else {
+                    $('body').prepend(miniPlatformWrapping[beaver].header);
+                  }
                 }
              },
              function(error) {

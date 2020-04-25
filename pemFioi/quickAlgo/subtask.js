@@ -68,16 +68,16 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       if (this.display) {
-        window.quickAlgoInterface.loadInterface(this.context, curLevel);
-        window.quickAlgoInterface.setOptions({
-           hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
-           conceptViewer: levelGridInfos.conceptViewer,
-           conceptViewerLang: this.blocklyHelper.language,
-           hasTestThumbnails: levelGridInfos.hasTestThumbnails,
-           hideControls: levelGridInfos.hideControls,
-           introMaxHeight: levelGridInfos.introMaxHeight
-           });
-        window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
+         window.quickAlgoInterface.loadInterface(this.context, curLevel);
+         window.quickAlgoInterface.setOptions({
+            hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
+            conceptViewer: levelGridInfos.conceptViewer,
+            conceptViewerLang: this.blocklyHelper.language,
+            hasTestThumbnails: levelGridInfos.hasTestThumbnails,
+            hideControls: levelGridInfos.hideControls,
+            introMaxHeight: levelGridInfos.introMaxHeight
+         });
+         window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }
 
       this.blocklyHelper.loadContext(this.context);
@@ -122,7 +122,7 @@ var initBlocklySubTask = function(subTask, language) {
       var zoomOptions = {
          controls: false,
          scale: maxInstructions > 20 ? 1 : 1.1
-         };
+      };
       if(this.context.infos && this.context.infos.zoom) {
          zoomOptions.controls = !!this.context.infos.zoom.controls;
          zoomOptions.scale = (typeof this.context.infos.zoom.scale != 'undefined') ? this.context.infos.zoom.scale : zoomOptions.scale;
@@ -151,20 +151,6 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.logActivity('loadLevel;' + curLevel);
          window.levelLogActivityTimeout = null;
       }, 1000);
-
-      /**
-       * Load the python analysis modules if required.
-       */
-      // TODO: Skulpt analysis
-      /*
-      if (!window.hasOwnProperty('pythonAnalysisModulesLoading') && this.blocklyHelper.skulptAnalysisShouldBeEnabled && this.blocklyHelper.skulptAnalysisShouldBeEnabled()) {
-         window.pythonAnalysisModulesLoading = true;
-
-         importModules(['python-analysis'], true, function () {
-            window.pythonAnalysisModulesLoaded = true;
-         });
-      }
-      */
    };
 
    subTask.updateScale = function() {
@@ -173,7 +159,7 @@ var initBlocklySubTask = function(subTask, language) {
             subTask.context.updateScale();
             subTask.blocklyHelper.updateSize();
          } catch(e) {}
-         }, 0);
+      }, 0);
    };
 
    var resetScores = function() {
@@ -265,8 +251,8 @@ var initBlocklySubTask = function(subTask, language) {
                // Display the execution message as it won't be shown through
                // validate
                window.quickAlgoInterface.displayResults(
-                  {iTestCase: initialTestCase, message: message, successRate: success ? 1 : 0},
-                  results
+                   {iTestCase: initialTestCase, message: message, successRate: success ? 1 : 0},
+                   results
                );
             }
          }
@@ -315,7 +301,7 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.step = function () {
       subTask.context.changeDelay(200);
       if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
-        this.initRun();
+         this.initRun();
       }
       subTask.blocklyHelper.step(subTask.context);
    };
@@ -373,25 +359,25 @@ var initBlocklySubTask = function(subTask, language) {
 
    // used in new playback controls with speed slider
    subTask.setStepDelay = function(delay) {
-    this.context.changeDelay(delay);
+      this.context.changeDelay(delay);
    };
 
    // used in new playback controls with speed slider
    subTask.pause = function() {
-    if(this.context.runner) {
-      this.context.runner.stepMode = true;
-    }
+      if(this.context.runner) {
+         this.context.runner.stepMode = true;
+      }
    };
 
    // used in new playback controls with speed slider
    subTask.play = function() {
-     this.clearAnalysis();
+      this.clearAnalysis();
 
-     if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
-       this.run();
-     } else if (this.context.runner.stepMode) {
-       this.context.runner.run();
-     }
+      if ((this.context.runner === undefined) || !this.context.runner.isRunning()) {
+         this.run();
+      } else if (this.context.runner.stepMode) {
+         this.context.runner.run();
+      }
    };
 
    subTask.getAnswerObject = function() {
@@ -403,9 +389,9 @@ var initBlocklySubTask = function(subTask, language) {
 
    subTask.reloadAnswerObject = function(answerObj) {
       if(typeof answerObj == "undefined") {
-        this.answer = this.getDefaultAnswerObject();
+         this.answer = this.getDefaultAnswerObject();
       } else {
-        this.answer = answerObj;
+         this.answer = answerObj;
       }
       this.blocklyHelper.programs = this.answer;
       if (this.answer != undefined) {
@@ -451,7 +437,7 @@ var initBlocklySubTask = function(subTask, language) {
             message: '',
             successRate: 1,
             iTestCase: 0
-            });
+         });
          return;
       }
 
@@ -489,15 +475,15 @@ var initBlocklySubTask = function(subTask, language) {
       var codes = [code]; // We only ever send one code to grade
       var oldTestCase = subTask.iTestCase;
 
-/*      var levelResultsCache = window.taskResultsCache[this.level];
+      /*      var levelResultsCache = window.taskResultsCache[this.level];
 
-      if(levelResultsCache[code]) {
-         // We already have a cached result for that
-         window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
-         subTask.context.changeDelay(oldDelay);
-         callback(levelResultsCache[code].results);
-         return;
-      }*/
+            if(levelResultsCache[code]) {
+               // We already have a cached result for that
+               window.quickAlgoInterface.updateTestScores(levelResultsCache[code].fullResults);
+               subTask.context.changeDelay(oldDelay);
+               callback(levelResultsCache[code].results);
+               return;
+            }*/
 
       function startEval() {
          // Start evaluation on iTestCase
@@ -567,7 +553,7 @@ var initBlocklySubTask = function(subTask, language) {
                var msg = languageStrings.resultsPartialSuccess.format({
                   nbSuccess: nbSuccess,
                   nbTests: subTask.nbTestCases
-                  });
+               });
             } else {
                var msg = languageStrings.resultsNoSuccess;
             }
