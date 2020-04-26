@@ -507,6 +507,7 @@ var getContext = function (display, infos, curLevel) {
                 minutesago: "Last seen {0} minutes ago",
                 hoursago: "Last seen more than one hour ago",
                 drawing: "dessin",
+                timeLabel: "Temps (secondes)",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -2002,6 +2003,22 @@ var getContext = function (display, infos, curLevel) {
         }
     }
 
+    context.resetSensors = function() {
+        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+            var sensor = infos.quickPiSensors[iSensor];
+
+            sensor.state = null;
+            sensor.screenDrawing = null;
+            sensor.lastDrawnTime = 0;
+            sensor.lastDrawnState = null;
+            sensor.callsInTimeSlot = 0;
+            sensor.lastTimeIncrease = 0;
+            sensor.removed = false;
+            sensor.quickStore = null;
+
+        }
+    }
+    
     context.reset = function (taskInfos) {
         context.recreateDisplay = true;
         buzzerSound.stopAll();
@@ -2136,17 +2153,10 @@ var getContext = function (display, infos, curLevel) {
         }
     
 
+        context.resetSensors();
+
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
-
-            sensor.state = null;
-            sensor.screenDrawing = null;
-            sensor.lastDrawnTime = 0;
-            sensor.lastDrawnState = null;
-            sensor.callsInTimeSlot = 0;
-            sensor.lastTimeIncrease = 0;
-            sensor.removed = false;
-            sensor.quickStore = null;
 
             // If the sensor has no port assign one
             if (!sensor.port) {
@@ -2416,8 +2426,8 @@ var getContext = function (display, infos, curLevel) {
 
             context.pixelsPerTime = (paper.width - context.timelineStartx - 30) / maxTime;
 
-            context.timeLineY = 10 + (context.timeLineSlotHeight * (infos.quickPiSensors.length));
-            drawTimeLine();
+            context.timeLineY = 25 + (context.timeLineSlotHeight * (infos.quickPiSensors.length));
+            
 
             var color = true;
 
@@ -2440,6 +2450,12 @@ var getContext = function (display, infos, curLevel) {
                     });
                 context.sensorDivisions.push(rect);
                 color = !color;
+            }
+
+            drawTimeLine();
+
+            for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                var sensor = infos.quickPiSensors[iSensor];
 
                 drawSensor(sensor);
                 sensor.timelinelastxlabel = 0;
@@ -2623,8 +2639,6 @@ var getContext = function (display, infos, curLevel) {
                 };                
 
                 $('#virtualSensors').scroll(function(event) {
-                    console.log("a");
-
                     for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
                         var sensor = infos.quickPiSensors[iSensor];
 
@@ -3582,8 +3596,10 @@ var getContext = function (display, infos, curLevel) {
 
         var timelinewidth = context.maxTime * context.pixelsPerTime;
 
-        
-        var step = (400 / timelinewidth) * 400;
+        var pixelsPerTick = 50;
+        var numberofTicks = timelinewidth / pixelsPerTick;
+        var step = context.maxTime / numberofTicks;
+
         if (step > 1000)
         {
             step = Math.round(step / 1000) * 1000;
@@ -3604,16 +3620,86 @@ var getContext = function (display, infos, curLevel) {
         var i = 0;
         var lastx = 0;
         var color = false;
+
+        var textStart = 0;
+
+        var timelabel = paper.text(textStart, context.timeLineY, strings.messages.timeLabel);
+        timelabel.attr({ "font-size": "10px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+        context.timelineText.push(timelabel);
+        timelabel.node.style.MozUserSelect = "none";
+        timelabel.node.style.WebkitUserSelect = "none";
+
+        var bbox = timelabel.getBBox();
+        textStart = bbox.x + bbox.width + 3;
+
+        var timelabel = paper.text(textStart, context.timeLineY, '\uf00e');      
+        timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
+        timelabel.node.style.fontWeight = "bold";
+        timelabel.node.style.MozUserSelect = "none";
+        timelabel.node.style.WebkitUserSelect = "none";
+
+        timelabel.attr({ "font-size": "20" + "px",
+        'text-anchor': 'start',
+         'font-weight': 'bold',
+         'fill': "#4A90E2",
+         });
+        context.timelineText.push(timelabel);
+
+        timelabel.click(function()
+        {
+            var originalzoom = context.quickPiZoom;
+            context.quickPiZoom += 0.3;
+        
+            if (context.quickPiZoom < 1)
+                context.quickPiZoom = 1;
+
+            if (originalzoom != context.quickPiZoom)
+                context.resetDisplay();
+        });
+
+
+        var bbox = timelabel.getBBox();
+        textStart = bbox.x + bbox.width + 3;
+
+        var timelabel = paper.text(textStart, context.timeLineY, '\uf010');      
+        timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
+        timelabel.node.style.fontWeight = "bold";
+        timelabel.node.style.MozUserSelect = "none";
+        timelabel.node.style.WebkitUserSelect = "none";
+
+        timelabel.attr({ "font-size": "20" + "px",
+         'text-anchor': 'start',
+          'font-weight': 'bold',
+           'fill': "#4A90E2",
+         });
+        context.timelineText.push(timelabel);
+
+        timelabel.click(function()
+        {
+            var originalzoom = context.quickPiZoom;
+            context.quickPiZoom -= 0.3;
+        
+            if (context.quickPiZoom < 1)
+                context.quickPiZoom = 1;
+
+            if (originalzoom != context.quickPiZoom)
+                context.resetDisplay();
+        });
+
+
+        
         for (; i <= context.maxTime; i += step) {
             var x = context.timelineStartx + (i * context.pixelsPerTime);
 
-            var timelabel = paper.text(x, context.timeLineY, (i / 1000).toFixed(2) + "s");
+            var labelText = (i / 1000).toFixed(2);
+            if (step >= 1000)
+                labelText = (i / 1000).toFixed(0);
 
-            var fontsize = context.pixelsPerTime * step * 0.4;
-            if (fontsize > 15)
-                fontsize = 15;
 
-            timelabel.attr({ "font-size": fontsize.toString() + "px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            var timelabel = paper.text(x, context.timeLineY, labelText);
+
+            timelabel.attr({ "font-size": "15px", 'text-anchor': 'center', 'font-weight': 'bold', fill: "gray" });
+            timelabel.node.style = "-moz-user-select: none; -webkit-user-select: none;";
 
             context.timelineText.push(timelabel);
 
@@ -3632,7 +3718,20 @@ var getContext = function (display, infos, curLevel) {
 
             context.sensorStates.push(timelinedivisor);
         }
+        if (!context.timeLineHoverLine || isElementRemoved(context.timeLineHoverLine)) {    
+            context.timeLineHoverLine = paper.rect(0, 0, 0, 0);
+        }
 
+        context.timeLineHoverLine.attr({
+                                            "stroke": "blue",
+                                             "opacity": 0.2,
+                                             "opacity": 0
+        });
+
+        
+        if (context.timeLineHoverPath) {
+            context.timeLineHoverPath.remove();
+        }
 
         context.timeLineHoverPath = paper.rect(context.timelineStartx, 0, context.maxTime * context.pixelsPerTime, context.timeLineY);
         
@@ -3642,9 +3741,12 @@ var getContext = function (display, infos, curLevel) {
             "opacity": 0.0,
         });
 
-        $(context.timeLineHoverPath.node).css("z-index", "-5");
+
 
         context.timeLineHoverPath.mousemove(function(event){
+
+            if (context.runner && context.runner.isRunning())
+                return;
 
             $('#screentooltip').remove();
             var scrolloffset = $('#virtualSensors').scrollLeft();
@@ -3668,27 +3770,72 @@ var getContext = function (display, infos, curLevel) {
             $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
 
             $('#screentooltip').text(ms.toString() + "ms");
-        
 
-            if (context.timeLineHoverLine)
-                context.timeLineHoverLine.remove();
-            context.timeLineHoverLine = paper.path(["M", event.clientX + scrolloffset,
-                                        0,
-                                        "L", event.clientX + scrolloffset,
-                                        context.timeLineY]);
+            
+            for(var sensorName in context.gradingStatesBySensor) {
+                // Cycle through each sensor from the grading states
+                var sensor = findSensorByName(sensorName);
+                var sensorDef = findSensorDefinition(sensor);
+
+                var expectedStates = context.gradingStatesBySensor[sensorName];
+                if(!expectedStates.length) { continue;}
+
+                var actualStates = context.actualStatesBySensor[sensorName];
+                var actualIdx = 0;
+
+                var currentSensorState = null;
+
+                // Check that we went through all expected states
+                for (var i = 0; i < context.gradingStatesBySensor[sensorName].length; i++) {
+                    var expectedState = context.gradingStatesBySensor[sensorName][i];
+
+                    if (expectedState.time >= ms)
+                    {
+                        break;
+                    }
+
+                    currentSensorState = expectedState;
+                }
+
+                if (currentSensorState)
+                {
+                    sensor.state = currentSensorState.state;
+                    drawSensor(sensor);
+                }
+            }
+
             context.timeLineHoverLine.attr({
+                        "x": event.clientX + scrolloffset,
+                        "y": 0,
+                        "width": 1,
+                        "height": context.timeLineY,
+
                                            "stroke-width": 4,
                                             "stroke": "blue",
                                              "opacity": 0.2,
                                              "stroke-linecap": "square",
                                              "stroke-linejoin": "round",
             });
+
         });
 
         context.timeLineHoverPath.mouseout(function() {
-            if (context.timeLineHoverLine)
-                context.timeLineHoverLine.remove();
+            if (context.runner && context.runner.isRunning())
+                return;
+
+            context.timeLineHoverLine.attr({
+                "opacity": 0.0,
+            });
+
             $('#screentooltip').remove();
+
+            context.resetSensors();
+            for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                var sensor = infos.quickPiSensors[iSensor];
+
+                drawSensor(sensor);
+            }
+            
         });
 
 
@@ -3698,6 +3845,9 @@ var getContext = function (display, infos, curLevel) {
             var timelabel = paper.text(x, context.timeLineY, '\uf11e');      
             timelabel.node.style.fontFamily = '"Font Awesome 5 Free"';
             timelabel.node.style.fontWeight = "bold";
+            timelabel.node.style.MozUserSelect = "none";
+            timelabel.node.style.WebkitUserSelect = "none";
+    
 
             timelabel.attr({ "font-size": "20" + "px", 'text-anchor': 'middle', 'font-weight': 'bold', fill: "gray" });
             context.timelineText.push(timelabel);
@@ -4658,9 +4808,8 @@ var getContext = function (display, infos, curLevel) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
 
-        var faded = false;
         var scrolloffset = 0;
-        var fadeopacity = 0.3;
+        var fadeopacity = 1;
 
         var imgw = sensor.drawInfo.width / 2;
         var imgh = sensor.drawInfo.height / 2;
@@ -4703,7 +4852,7 @@ var getContext = function (display, infos, curLevel) {
             scrolloffset = $('#virtualSensors').scrollLeft();
 
             if (scrolloffset > 0)
-                faded = true;
+                fadeopacity = 0.3;
 
             imgw = sensor.drawInfo.width * .80;
             imgh = sensor.drawInfo.height * .80;
@@ -4786,18 +4935,18 @@ var getContext = function (display, infos, curLevel) {
             }
 
             if (sensor.state) {
-                sensor.ledon.attr({ "opacity": 1 });
+                sensor.ledon.attr({ "opacity": fadeopacity });
                 sensor.ledoff.attr({ "opacity": 0 });
             } else {
                 sensor.ledon.attr({ "opacity": 0 });
-                sensor.ledoff.attr({ "opacity": 1 });
+                sensor.ledoff.attr({ "opacity": fadeopacity });
             }
 
             var x = typeof sensor.state;
 
             if(typeof sensor.state == 'number' ) {
-                sensor.ledon.attr({ "opacity": sensor.state });
-                sensor.ledoff.attr({ "opacity": 1 });
+                sensor.ledon.attr({ "opacity": sensor.state * fadeopacity });
+                sensor.ledoff.attr({ "opacity": fadeopacity });
             }
 
 
@@ -4906,13 +5055,13 @@ var getContext = function (display, infos, curLevel) {
                 drawState = sensor.ringingState;
 
             if (drawState) {
-                sensor.buzzeron.attr({ "opacity": 1 });
+                sensor.buzzeron.attr({ "opacity": fadeopacity });
                 sensor.buzzeroff.attr({ "opacity": 0 });
 
 
             } else {
                 sensor.buzzeron.attr({ "opacity": 0 });
-                sensor.buzzeroff.attr({ "opacity": 1 });
+                sensor.buzzeroff.attr({ "opacity": fadeopacity });
             }
 
             if (sensor.stateText)
@@ -4960,13 +5109,13 @@ var getContext = function (display, infos, curLevel) {
             });
 
             if (sensor.state) {
-                sensor.buttonon.attr({ "opacity": 1 });
+                sensor.buttonon.attr({ "opacity": fadeopacity });
                 sensor.buttonoff.attr({ "opacity": 0 });
 
                 sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.buttonon.attr({ "opacity": 0 });
-                sensor.buttonoff.attr({ "opacity": 1 });
+                sensor.buttonoff.attr({ "opacity": fadeopacity });
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
@@ -5047,7 +5196,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "opacity": faded ? fadeopacity : 1,
+                "opacity": fadeopacity,
             });
 
 
@@ -5072,6 +5221,7 @@ var getContext = function (display, infos, curLevel) {
                         sensor.canvasNode.appendChild(sensor.canvas);
                     }
 
+                    $(sensor.canvas).css({ opacity: fadeopacity });
                     sensor.canvasNode.setAttribute("x", imgx + borderSize); //Set rect data
                     sensor.canvasNode.setAttribute("y", imgy + borderSize); //Set rect data
                     sensor.canvasNode.setAttribute("width", screenScalerSize.width); //Set rect data
@@ -5086,8 +5236,9 @@ var getContext = function (display, infos, curLevel) {
         
                     sensor.screenrect.attr({ "opacity": 0 });
         
-
-                    sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
+                    context.initScreenDrawing(sensor);
+                    //sensor.screenDrawing.copyToCanvas(sensor.canvas, screenScale);
+                    screenDrawing.renderToCanvas(sensor.state, sensor.canvas, screenScale);
                 } else {
                     var statex = imgx + (imgw * .05);
 
@@ -5130,12 +5281,15 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
+                
             });
             sensor.img2.attr({
                 "x": imgx,
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             sensor.img3.attr({
@@ -5143,6 +5297,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             var scale = imgh / 60;
@@ -5189,19 +5344,22 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
             sensor.pale.attr({
                 "x": imgx,
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "transform": ""
+                "transform": "",
+                "opacity": fadeopacity,
             });
             sensor.center.attr({
                 "x": imgx,
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             sensor.pale.rotate(sensor.state);
@@ -5250,6 +5408,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             sensor.pale.attr({
@@ -5257,7 +5416,8 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "transform": ""
+                "transform": "",
+                "opacity": fadeopacity,
             });
 
             if (sensor.state == null)
@@ -5289,6 +5449,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             if (sensor.state == null)
@@ -5383,7 +5544,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "opacity": scrolloffset ? 0.3 : 1,
+                "opacity": fadeopacity,
             });
 
             if (sensor.state == null)
@@ -5396,7 +5557,7 @@ var getContext = function (display, infos, curLevel) {
                     "y": imgy,
                     "width": imgw,
                     "height": imgh,
-                    "opacity": opacity * .80
+                    "opacity": opacity * .80 * fadeopacity
                 });
                 sensor.moon.attr({ "opacity": 0 });
             }
@@ -5407,7 +5568,7 @@ var getContext = function (display, infos, curLevel) {
                     "y": imgy,
                     "width": imgw,
                     "height": imgh,
-                    "opacity": opacity * .80
+                    "opacity": opacity * .80 * fadeopacity
                 });
                 sensor.sun.attr({ "opacity": 0 });
             }
@@ -5434,6 +5595,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             if (sensor.state == null)
@@ -5461,7 +5623,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "opacity": scrolloffset ? 0.3 : 1,
+                "opacity": fadeopacity,
             });
 
 
@@ -5552,6 +5714,7 @@ var getContext = function (display, infos, curLevel) {
                     "y": imgy,
                     "width": imgw,
                     "height": imgh,
+                    "opacity": fadeopacity,
                 });
                 if (!context.autoGrading && context.offLineMode) {
                     setSlider(sensor, juststate, imgx, imgy, imgw, imgh, -125, 125);
@@ -5578,6 +5741,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
+                "opacity": fadeopacity,
             });
 
             sensor.needle.attr({
@@ -5585,7 +5749,8 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "transform": ""
+                "transform": "",
+                "opacity": fadeopacity,
             });
 
             if (!sensor.state)
@@ -5630,7 +5795,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "opacity": scrolloffset ? 0.3 : 1,
+                "opacity": fadeopacity,
             });
 
             if (sensor.stateText)
@@ -5686,13 +5851,13 @@ var getContext = function (display, infos, curLevel) {
             });
 
             if (sensor.state) {
-                sensor.ledon.attr({ "opacity": 1 });
+                sensor.ledon.attr({ "opacity": fadeopacity });
                 sensor.ledoff.attr({ "opacity": 0 });
 
                 sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.ledon.attr({ "opacity": 0 });
-                sensor.ledoff.attr({ "opacity": 1 });
+                sensor.ledoff.attr({ "opacity": fadeopacity });
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
@@ -5727,13 +5892,13 @@ var getContext = function (display, infos, curLevel) {
             });
 
             if (sensor.state) {
-                sensor.buttonon.attr({ "opacity": 1 });
+                sensor.buttonon.attr({ "opacity": fadeopacity });
                 sensor.buttonoff.attr({ "opacity": 0 });
 
                 sensor.stateText = paper.text(state1x, state1y, "ON");
             } else {
                 sensor.buttonon.attr({ "opacity": 0 });
-                sensor.buttonoff.attr({ "opacity": 1 });
+                sensor.buttonoff.attr({ "opacity": fadeopacity });
 
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
@@ -5790,7 +5955,7 @@ var getContext = function (display, infos, curLevel) {
                 "y": imgy,
                 "width": imgw,
                 "height": imgh,
-                "opacity": scrolloffset ? 0.3 : 1,
+                "opacity": fadeopacity,
             });
 
             sensor.imgup.attr({
