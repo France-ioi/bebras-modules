@@ -352,7 +352,8 @@ function PythonInterpreter(context, msgCallback) {
       yieldLimit: null,
       execLimit: null,
       debugging: true,
-      breakpoints: this._debugger.check_breakpoints.bind(this._debugger)
+      breakpoints: this._debugger.check_breakpoints.bind(this._debugger),
+      __future__: Sk.python3
     });
     Sk.pre = "edoutput";
     Sk.pre = "codeoutput";
@@ -422,9 +423,6 @@ function PythonInterpreter(context, msgCallback) {
       Sk.runQueue.push({ctrl: this, codes: codes});
       return;
     }
-
-    // Set Skulpt to Python 3
-    Sk.python3 = true;
 
     currentPythonContext = this.context;
     this._debugger = new Sk.Debugger(this._editor_filename, this);
