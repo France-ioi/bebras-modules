@@ -2,9 +2,8 @@
         constructor(connected) {
             this.Store = {};
             this.connected = true;
+            this.rwpassword = "dummy";
         }
-
-        rwpassword = "dummy";
 
         write(prefix, key, value)
         {
