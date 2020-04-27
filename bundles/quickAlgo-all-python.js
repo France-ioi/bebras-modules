@@ -3205,7 +3205,8 @@ function LogicController(nbTestCases, maxInstructions) {
   this.skulptAnalysisShouldByEnabled = function() {
     var variablesEnabled = true;
     var taskInfos = this._mainContext.infos;
-    if (pythonForbiddenLists(taskInfos.includeBlocks).forbidden.indexOf('variables_set') !== -1) {
+    var forbidden = pythonForbiddenLists(taskInfos.includeBlocks).forbidden;
+    if (forbidden.indexOf('var_assign') !== -1) {
       variablesEnabled = false;
     }
 
