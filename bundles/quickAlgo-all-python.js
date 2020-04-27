@@ -2033,7 +2033,7 @@ var localLanguageStrings = {
       paste: "Coller",
       blocklyToPython: "Afficher la traduction en Python",
       blocklyToPythonTitle: "Code Python",
-      blocklyToPythonIntro: "Le code ci-dessous est l'équivalent dans le langage Python de votre programme Blockly. Vous pouvez utiliser ce code dans une version Python de cet exercice.",
+      blocklyToPythonIntro: "Le code ci-dessous est l'équivalent dans le langage Python de votre programme Blockly.",
       blocklyToPythonPassComment: '# Insérer des instructions ici',
       limitBlocks: "{remainingBlocks} blocs restants sur {maxBlocks} autorisés.",
       limitBlocksOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",

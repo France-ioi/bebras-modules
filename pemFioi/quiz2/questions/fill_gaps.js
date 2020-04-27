@@ -23,11 +23,9 @@
         toolbar.insertAfter(parent.find('statement'));
 
         // drag & drop
-        var words_elements = {};
         var words_order = {};
         toolbar.find('span').each(function(i) {
             var el = $(this), text = el.text();
-            words_elements[text] = el;
             words_order[text] = i;
             el.draggable({
                 scope: uid,
@@ -80,6 +78,19 @@
         }
 
 
+        function getWordFromToolbar(text) {
+            var res;
+            toolbar.find('span').each(function() {
+                var el = $(this);
+                if(el.text() === text) {
+                    res = el;
+                    return false;
+                }
+            })
+            return res;
+        }
+
+
         return {
             getAnswer: function() {
                 var res = [];
@@ -96,7 +107,10 @@
                 placeholders.each(function(i) {
                     var placeholder = $(this);
                     if(answer[i]) {
-                        placeholder.append(words_elements[answer[i]])
+                        var el = getWordFromToolbar(answer[i]);
+                        if(el) {
+                            placeholder.append(el);
+                        }
                     }
                 });
             },
@@ -130,7 +144,7 @@
                     var placeholder = $(this);
                     var span = placeholder.find('span').first();
                     var text = span.length ? span.text() : null;
-                    var mistake = text != '' && feedback.mistakes.indexOf(text) !== -1;
+                    var mistake = text != '' && feedback.mistakes[i] === text;
                     if(mistake) {
                         if(Quiz.params.feedback_on_wrong_choices == 'first_under_question' || Quiz.params.feedback_on_wrong_choices == 'first_under_choice') {
                             !first_mistake_marked && placeholder.addClass('mistake');
