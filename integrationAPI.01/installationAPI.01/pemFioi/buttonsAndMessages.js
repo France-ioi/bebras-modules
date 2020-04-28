@@ -1753,9 +1753,11 @@ window.displayHelper = {
 
    sendBestScore: function(callback, scores, messages) {
       var bestLevel = 'easy';
+      var bestScore = null;
       for (var curLevel in scores) {
-         if (scores[bestLevel] <= scores[curLevel]) {
+         if (bestScore === null || bestScore <= scores[curLevel]) {
             bestLevel = curLevel;
+            bestScore = scores[curLevel];
          }
       }
       callback(scores[bestLevel], messages[bestLevel] + " (" + this.strings["levelVersionName_" + bestLevel] + ")");
