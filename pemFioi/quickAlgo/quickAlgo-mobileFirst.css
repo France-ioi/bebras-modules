@@ -1861,6 +1861,9 @@ button.showLongIntro .icon {
     width: 100%;
     resize: none;
 }
+#quickAlgo-altcode textarea:focus {
+    background-color: #DAE9F9;
+}
 
 .panel-heading.panel-heading-nopadding {
     padding: 0px;

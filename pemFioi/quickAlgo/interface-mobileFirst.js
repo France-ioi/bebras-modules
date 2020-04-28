@@ -1127,6 +1127,14 @@ var quickAlgoInterface = {
             dragElement($('#quickAlgo-altcode')[0]);
 
             this.displayedAltCode = 'python';
+
+            $('#quickAlgo-altcode').on('mouseenter', function() {
+                $('#quickAlgo-altcode textarea').focus();
+            });
+
+            $('#quickAlgo-altcode').on('mouseleave', function() {
+                $('#quickAlgo-altcode textarea').blur();
+            });
         }
 
         $('#quickAlgo-altcode textarea').text(code.trim());
