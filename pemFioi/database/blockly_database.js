@@ -435,8 +435,9 @@ var getContext = function(display, infos, curLevel) {
                 throw new Error(strings.messages.file_not_found + fileNumber);
             }
             var types_arr = Array.prototype.slice.call(types);
+            var cb = context.runner.waitCallback(callback);
             db_helper.loadCsv(file, types_arr, function(table) {
-                context.waitDelay(callback, table);
+                cb(table);
             });
         },
 
