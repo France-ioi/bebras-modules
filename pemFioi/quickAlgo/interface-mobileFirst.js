@@ -394,8 +394,8 @@ var quickAlgoInterface = {
     stepDelayMax: 250,
 
     refreshStepDelay: function() {
-        var v = parseInt($('.speedCursor').val(), 10),
-            delay = this.stepDelayMin + this.stepDelayMax - v;
+        var v = parseInt($('.speedCursor').val(), 10);
+        var delay = this.stepDelayMax - v;
         task.displayedSubTask.setStepDelay(delay);
     },
 
