@@ -116,8 +116,12 @@ function LogicController(nbTestCases, maxInstructions) {
       return false;
     }
     var limited = this.findLimited(code);
-    if(limited) {
-      display('Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited+'".');
+    if(limited && limited.type == 'uses') {
+      display('Vous utilisez trop souvent un mot-clé à utilisation limitée : "'+limited.name+'".');
+      return false;
+    } else if(limited && limited.type == 'assign') {
+      display('Vous n\'avez pas le droit de réassigner un mot-clé à utilisation limitée : "'+limited.name+'".');
+      return false;
     }
     if(pythonCount(code) <= 0) {
       display("Vous ne pouvez pas valider un programme vide !");
@@ -167,20 +171,24 @@ function LogicController(nbTestCases, maxInstructions) {
    */
   this.stopAndTryAgain = function () {
     this.stop();
-    window.setTimeout(this.run.bind(this), 100);
+    if(type == 'run') {
+      window.setTimeout(this.run.bind(this), 100);
+    } else if(type == 'step') {
+      window.setTimeout(this.step.bind(this), 100);
+    }
   };
 
   this.getLanguage = function () {
     return this.language;
   };
 
-  this.prepareRun = function () {
-    if (!this._mainContext) { return; }
+  this.prepareRun = function (type) {
+    if (!this._mainContext) { return false; }
 
     var nbRunning = this._mainContext.runner.nbRunning();
     if (nbRunning > 0) {
-      this.stopAndTryAgain();
-      return undefined;
+      this.stopAndTryAgain(type);
+      return false;
     }
 
     // Get code
@@ -198,7 +206,7 @@ function LogicController(nbTestCases, maxInstructions) {
         $('#errors').html(err);
       }
     })) {
-       return;
+       return false;
     }
 
     // Initialize runner
@@ -207,10 +215,14 @@ function LogicController(nbTestCases, maxInstructions) {
     if (this.skulptAnalysisEnabled()) {
       this.loadSkulptAnalysis();
     }
+
+    return true;
   };
 
   this.run = function () {
-    this.prepareRun();
+    if(!this.prepareRun('run')) {
+      return;
+    }
     this._mainContext.runner.run();
   };
 
@@ -218,7 +230,10 @@ function LogicController(nbTestCases, maxInstructions) {
     var self = this;
 
     if(!this._mainContext.runner._isRunning) {
-      this.prepareRun();
+      // No run in progress, start a new one
+      if(!this.prepareRun('step')) {
+        return;
+      }
     }
 
     this._mainContext.runner.runStep(function() {
