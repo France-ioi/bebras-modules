@@ -1774,8 +1774,11 @@ function GraphEditor(settings) {
          vertexGuid++;
       }
       var vertexId = "v_" + vertexGuid;
-      var point = {x: Math.round(x), y: Math.round(y), tableMode: self.localTableMode || self.tableMode };
-      visualGraph.setVertexVisualInfo(vertexId, point);
+      var vData = {x: Math.round(x), y: Math.round(y)};
+      if(self.localTableMode || self.tableMode){
+         vData.tableMode = true;
+      }
+      visualGraph.setVertexVisualInfo(vertexId, vData);
       if(self.defaultVertexLabelEnabled){
          var label = self.getDefaultLabel();
          graph.addVertex(vertexId,{label:label});
