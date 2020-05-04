@@ -1346,7 +1346,7 @@ function GraphDragger(settings) {
          var ratioX = x / self.mouseInitPos.x;
          var ratioY = y / self.mouseInitPos.y;
          $.each(self.vertInitPos, function(index, element) {
-            self.visualGraph.graphDrawer.moveVertex(element.id, element.position.x*ratioX, element.position.y*ratioY);
+            self.visualGraph.graphDrawer.moveVertex(element.id, Math.round(element.position.x*ratioX), Math.round(element.position.y*ratioY));
          });
       }else if(self.dragEnabled){
          var dx = x - self.mouseInitPos.x;
@@ -1776,6 +1776,7 @@ function GraphEditor(settings) {
       var vertexId = "v_" + vertexGuid;
       var vData = {x: Math.round(x), y: Math.round(y)};
       if(self.localTableMode || self.tableMode){
+         /* don't show table mode if false */
          vData.tableMode = true;
       }
       visualGraph.setVertexVisualInfo(vertexId, vData);
