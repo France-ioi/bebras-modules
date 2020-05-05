@@ -94,9 +94,7 @@
             for(var i=0; i<given_answer.length; i++) {
                 var correct = correct_answer[i] === given_answer[i];
                 res.score = res.score && correct;
-                if(!correct) {
-                    res.feedback.mistakes.push(given_answer[i]);
-                }
+                res.feedback.mistakes.push(correct ? null : given_answer[i]);
             }
             if(given_answer.length != correct_answer.length) {
                 res.score = false;
