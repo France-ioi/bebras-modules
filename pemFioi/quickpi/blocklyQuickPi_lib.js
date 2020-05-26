@@ -2146,7 +2146,7 @@ var getContext = function (display, infos, curLevel) {
         else
             context.doNotStartGrade = true;
 
-        if (paper && context.autoGrading) {
+        if (paper && context.autoGrading && context.display) {
             if (context.sensorStates)
                 context.sensorStates.remove();
             context.sensorStates = paper.set();
