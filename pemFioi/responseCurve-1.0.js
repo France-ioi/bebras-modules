@@ -7,6 +7,8 @@ function ResponseCurve(settings) {
    y0 = settings.y0;
    w = settings.width;
    h = settings.height;
+   this.updateCurveCallback;
+   this.dragEndCallback;
    this.curve;
    this.pointPos = [];
    this.points = [];
@@ -17,6 +19,12 @@ function ResponseCurve(settings) {
    dragOverlaySize = 20;
    nameIndex = 2;
 
+   this.setUpdateCurveCallback = function(fct) {
+      this.updateCurveCallback = fct;
+   };
+   this.setDragEndCallback = function(fct) {
+      this.dragEndCallback = fct;
+   };
 
    this.init = function() {
       paper.rect(x0,y0,w,h).attr(attr.background);
@@ -116,6 +124,47 @@ function ResponseCurve(settings) {
       return curvePos;
    };
 
+   this.getXFromY = function(y) {
+      var x = [];
+      var minY = Infinity;
+      var maxY = 0;
+      for(var length = 1; length < this.curve[0].getTotalLength(); length++){
+         var pos = this.curve[0].getPointAtLength(length);
+         var prevPos = this.curve[0].getPointAtLength(length - 1);
+         if(y >= Math.min(prevPos.y,pos.y) && y <= Math.max(prevPos.y,pos.y)){
+            x.push((prevPos.x + pos.x)/2);
+         }
+         minY = Math.min(minY,prevPos.y,pos.y);
+         maxY = Math.max(maxY,prevPos.y,pos.y);
+      }
+      if(y < minY){
+         x = [x0 + w];
+      }else if(y > maxY){
+         x = [x0];
+      }
+      return x
+   };
+
+   this.getCurveData = function() {
+      var xVsY= {};
+      var minY = Infinity;
+      var maxY = 0;
+      for(var length = 0; length < this.curve[0].getTotalLength(); length++){
+         var pos = this.curve[0].getPointAtLength(length);
+         var y = Math.round(pos.y);
+         var x = Math.round(pos.x);
+         if(!xVsY[y]){
+            xVsY[y] = [];
+         }
+         if(!xVsY[y].includes(x)){
+            xVsY[y].push({ x: x, alpha: pos.alpha });
+         }
+         minY = Math.min(minY,pos.y);
+         maxY = Math.max(maxY,pos.y);
+      }
+      return { xVsY: xVsY, minY: minY, maxY: maxY }
+   };
+
    this.getIndexFromName = function(name) {
       for(var iPoint = 0; iPoint < this.pointPos.length; iPoint++){
          if(name == this.pointPos[iPoint].id){
@@ -178,6 +227,9 @@ function ResponseCurve(settings) {
       if(d < 10){
          self.selectPoint(self.draggedID);
       }
+      if(self.dragEndCallback){
+         self.dragEndCallback();
+      }
    };
 
    this.selectPoint = function(name) {
@@ -237,6 +289,10 @@ function ResponseCurve(settings) {
       this.curve = paper.set(curve,clickArea);
       this.enableClickCurve();
       this.updatePoints();
+
+      if(this.updateCurveCallback){
+         this.updateCurveCallback();
+      }
    };
 
    this.updatePoints = function() {
