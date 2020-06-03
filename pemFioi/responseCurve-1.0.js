@@ -288,14 +288,14 @@ function ResponseCurve(settings) {
       var clickArea = paper.path(path).attr(attr.clickArea);
       this.curve = paper.set(curve,clickArea);
       this.enableClickCurve();
-      this.updatePoints();
+      this.pointsToFront();
 
       if(this.updateCurveCallback){
          this.updateCurveCallback();
       }
    };
 
-   this.updatePoints = function() {
+   this.pointsToFront = function() {
       for(var iPoint = 0; iPoint < this.points.length; iPoint++){
          this.points[iPoint].obj.toFront();
       }
