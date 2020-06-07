@@ -31,12 +31,12 @@ var blocklyToScratch = {
       'lists_setIndex': ['data_replaceitemoflist'],
       'logic_negate': ['operator_not'],
       'logic_boolean': [],
-      'logic_compare': ['operator_equals', 'operator_gt', 'operator_lt', 'operator_not'],
+      'logic_compare': ['operator_equals', 'operator_gt', 'operator_gte', 'operator_lt', 'operator_lte', 'operator_not'],
       'logic_operation': ['operator_and', 'operator_or'],
       'text': [],
       'text_append': [],
       'text_join': ['operator_join'],
-      'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide'],
+      'math_arithmetic': ['operator_add', 'operator_subtract', 'operator_multiply', 'operator_divide', 'operator_dividefloor'],
       'math_change': ['data_changevariableby'],
       'math_number': ['math_number'],
       'variables_get': ['data_variable'],
@@ -1672,6 +1672,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   },
                   {
+                     name: "operator_dividefloor",
+                     blocklyXml: "<block type='operator_dividefloor'>" +
+                                 "  <value name='NUM1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='NUM2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
                      name: "operator_equals",
                      blocklyXml: "<block type='operator_equals'>" +
                                  "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
@@ -1686,8 +1693,22 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "</block>"
                   },
                   {
+                     name: "operator_gte",
+                     blocklyXml: "<block type='operator_gte'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
                      name: "operator_lt",
                      blocklyXml: "<block type='operator_lt'>" +
+                                 "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
+                                 "</block>"
+                  },
+                  {
+                     name: "operator_lte",
+                     blocklyXml: "<block type='operator_lte'>" +
                                  "  <value name='OPERAND1'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
                                  "  <value name='OPERAND2'><shadow type='math_number'><field name='NUM'></field></shadow></value>" +
                                  "</block>"
