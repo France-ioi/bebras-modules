@@ -563,6 +563,50 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       this.unclickCell();
    };
 
+   this.display = function(show) {
+      var iRow, iCol;
+      for (iRow = 0; iRow < this.rows; iRow++) {
+         for (iCol = 0; iCol < this.cols; iCol++) {
+            var cell = this.table[iRow][iCol];
+            for (var iContent = 0; iContent < cell.length; iContent++) {
+               if(show){
+                  cell[iContent].show();
+               }else{
+                  cell[iContent].hide();
+               }
+            }
+         }
+      }
+      for (iRow = 0; iRow <= this.rows; iRow++) {
+         if(show){
+            this.horizontalLines[iRow].show();
+         }else{
+            this.horizontalLines[iRow].hide();
+         }
+      }
+      for (iCol = 0; iCol <= this.cols; iCol++) {
+         if(show){
+            this.verticalLines[iCol].show();
+         }else{
+            this.verticalLines[iCol].hide();
+         }
+      }
+      for(var iCell in this.cellHighlights) {
+         if(show){
+            this.cellHighlights[iCell].show();
+         }else{
+            this.cellHighlights[iCell].hide();
+         }
+      }
+   };
+
+   this.hide = function() {
+      this.display(0);
+   };
+   this.show = function() {
+      this.display(1);
+   };
+
    function getVectorLength(x, y) {
       return Math.sqrt(x * x + y * y);
    }
