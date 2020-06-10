@@ -53,6 +53,10 @@ Beav.Object.eq = function eq(x, y) {
    throw "Beav.Object.eq unsupported types";
 };
 
+Beav.Object.clone = function(obj) {
+   return JSON.parse(JSON.stringify(obj))
+};
+
 
 /**********************************************************************************/
 /* Array */
