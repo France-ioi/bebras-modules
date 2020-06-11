@@ -400,6 +400,16 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       return !!this.cellHighlights[id];
    };
 
+   this.unhighlightAllCells = function() {
+      for(var iRow = 0; iRow < this.rows; iRow++){
+         for(var iCol = 0; iCol < this.cols; iCol++){
+            if(this.isCellHighlighted(iRow,iCol)){
+               this.unhighlightCell(iRow,iCol);
+            }
+         }
+      }
+   };
+
    this._cellToHighlightID = function(row, col) {
       return row + "," + col;
    };
@@ -512,6 +522,14 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
       for (var iCol = 0; iCol <= this.cols; iCol++) {
          this.verticalLines[iCol].toBack();
+      }
+   };
+   this.linesToFront = function() {
+      for (var iRow = 0; iRow <= this.rows; iRow++) {
+         this.horizontalLines[iRow].toFront();
+      }
+      for (var iCol = 0; iCol <= this.cols; iCol++) {
+         this.verticalLines[iCol].toFront();
       }
    };
 
