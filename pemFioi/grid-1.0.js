@@ -563,40 +563,35 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       this.unclickCell();
    };
 
-   this.display = function(show) {
+   this.getRaphaelSet = function() {
+      var set = this.paper.set();
       var iRow, iCol;
       for (iRow = 0; iRow < this.rows; iRow++) {
          for (iCol = 0; iCol < this.cols; iCol++) {
             var cell = this.table[iRow][iCol];
             for (var iContent = 0; iContent < cell.length; iContent++) {
-               if(show){
-                  cell[iContent].show();
-               }else{
-                  cell[iContent].hide();
-               }
+               set.push(cell[iContent]);
             }
          }
       }
       for (iRow = 0; iRow <= this.rows; iRow++) {
-         if(show){
-            this.horizontalLines[iRow].show();
-         }else{
-            this.horizontalLines[iRow].hide();
-         }
+         set.push(this.horizontalLines[iRow]);
       }
       for (iCol = 0; iCol <= this.cols; iCol++) {
-         if(show){
-            this.verticalLines[iCol].show();
-         }else{
-            this.verticalLines[iCol].hide();
-         }
+         set.push(this.verticalLines[iCol].show());
       }
       for(var iCell in this.cellHighlights) {
-         if(show){
-            this.cellHighlights[iCell].show();
-         }else{
-            this.cellHighlights[iCell].hide();
-         }
+         set.push(this.cellHighlights[iCell].show());
+      }
+      return set
+   };
+
+   this.display = function(show) {
+      var raph = this.getRaphaelSet();
+      if(show){
+         raph.show();
+      }else{
+         raph.hide();
       }
    };
 
