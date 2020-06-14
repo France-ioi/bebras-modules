@@ -1462,7 +1462,9 @@ Blockly.Python['operators'] = function(block) {
     'operator_dividefloor': {op: '//', varname: 'NUM', order: Blockly.Python.ORDER_MULTIPLICATIVE},
     'operator_equals': {op: '==', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_gt': {op: '>', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_gte': {op: '>=', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_lt': {op: '<', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
+    'operator_lte': {op: '<=', varname: 'OPERAND', order: Blockly.Python.ORDER_RELATIONAL},
     'operator_and': {op: 'and', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_AND},
     'operator_or': {op: 'or', varname: 'OPERAND', order: Blockly.Python.ORDER_LOGICAL_OR}
   };
@@ -1482,7 +1484,9 @@ Blockly.Python['operator_divide'] = Blockly.Python['operators'];
 Blockly.Python['operator_dividefloor'] = Blockly.Python['operators'];
 Blockly.Python['operator_equals'] = Blockly.Python['operators'];
 Blockly.Python['operator_gt'] = Blockly.Python['operators'];
+Blockly.Python['operator_gte'] = Blockly.Python['operators'];
 Blockly.Python['operator_lt'] = Blockly.Python['operators'];
+Blockly.Python['operator_lte'] = Blockly.Python['operators'];
 Blockly.Python['operator_and'] = Blockly.Python['operators'];
 Blockly.Python['operator_or'] = Blockly.Python['operators'];
 
