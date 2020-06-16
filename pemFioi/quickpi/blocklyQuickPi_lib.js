@@ -507,7 +507,8 @@ var getContext = function (display, infos, curLevel) {
                 minutesago: "Last seen {0} minutes ago",
                 hoursago: "Last seen more than one hour ago",
                 drawing: "dessin",
-                timeLabel: "Temps (secondes)",
+                timeLabel: "Temps",
+                seconds: "secondes",
                 connectionHTML: `
                 <div id="piui">
                     <button type="button" id="piconnect" class="btn">
@@ -4155,14 +4156,19 @@ var getContext = function (display, infos, curLevel) {
                         stateText = sensorDef.getStateString(state);
                     }
 
+                    var y = 0;
+
                     if (sensor.timelinestateup) {
-                        var paperText = paper.text(startx, ypositiontop + offset - 10, stateText);
+                        y = ypositiontop + offset - 10;
                         sensor.timelinestateup = false;
                     }
                     else {
-                        var paperText = paper.text(startx, ypositiontop + offset + 20, stateText);
+                        y = ypositiontop + offset + 10;
+                        
                         sensor.timelinestateup = true;
                     }
+
+                    var paperText = paper.text(startx, y, stateText);
                     drawnElements.push(paperText);
                     context.sensorStates.push(paperText);
 
