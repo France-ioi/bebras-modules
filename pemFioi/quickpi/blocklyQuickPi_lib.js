@@ -2021,8 +2021,9 @@ var getContext = function (display, infos, curLevel) {
     }
     
     context.reset = function (taskInfos) {
-        context.recreateDisplay = true;
         buzzerSound.stopAll();
+
+        context.alreadyHere = true;
 
         context.failImmediately  = null;
 
@@ -2174,13 +2175,16 @@ var getContext = function (display, infos, curLevel) {
         }
 
         if (context.display) {
+            context.recreateDisplay = true;
+            context.displayAutoGrading = context.autoGrading;
+            context.timeLineStates = [];
             context.resetDisplay();
         } else {
 
             context.success = false;
         }
 
-        context.timeLineStates = [];
+        
 
         startSensorPollInterval();
     };
@@ -2368,6 +2372,9 @@ var getContext = function (display, infos, curLevel) {
     context.resetDisplay = function() {
         if (!context.display || !this.raphaelFactory)
             return;
+
+
+        context.autoGrading = context.displayAutoGrading;
 
         if (context.recreateDisplay || !paper)
         {
