@@ -84,7 +84,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.waitDelay = function(callback, value, delay) {
          if (delay > 0) {
             runner.stackCount = 0;
-            runner.delayFactory.createTimeout("wait" + context.curRobot + "_" + Math.random(), function() {
+            runner.delayFactory.createTimeout("wait" + context.curNode + "_" + Math.random(), function() {
                   runner.noDelay(callback, value);
                },
                delay
@@ -118,7 +118,7 @@ function initBlocklyRunner(context, messageCallback) {
          if (value !== undefined) {
             if(value && typeof value.length != 'undefined') {
                // It's an array, create a primitive out of it
-               primitive = interpreters[context.curRobot].nativeToPseudo(value);
+               primitive = interpreters[context.curNode].nativeToPseudo(value);
             } else {
                primitive = value;
             }
@@ -204,7 +204,7 @@ function initBlocklyRunner(context, messageCallback) {
                if (value != undefined) {
                   if(typeof value.length != 'undefined') {
                      // It's an array, create a primitive out of it
-                     primitive = interpreters[context.curRobot].nativeToPseudo(value);
+                     primitive = interpreters[context.curNode].nativeToPseudo(value);
                   } else {
                      primitive = value;
                   }
@@ -298,7 +298,7 @@ function initBlocklyRunner(context, messageCallback) {
 
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
-               context.curRobot = iInterpreter;
+               context.setCurNode(iInterpreter);
                if (context.infos.checkEndEveryTurn) {
                   context.infos.checkEndCondition(context, false);
                }
@@ -403,6 +403,7 @@ function initBlocklyRunner(context, messageCallback) {
                lastNbMoves: 0
             };
             context.programEnded[iInterpreter] = false;
+
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
             toStop[iInterpreter] = false;
