@@ -2,7 +2,8 @@ var quickAlgoContext = function(display, infos) {
   var context = {
     display: display,
     infos: infos,
-    nbRobots: 1
+    nbCodes: 1, // How many different codes the user can edit
+    nbNodes: 1 // How many nodes will be executing programs
     };
 
   // Set the localLanguageStrings for this context
@@ -69,6 +70,11 @@ var quickAlgoContext = function(display, infos) {
     }
   };
 
+  context.setCurNode = function(curNode) {
+    // Set the current node
+    context.curNode = curNode;
+  };
+
   context.debug_alert = function(message, callback) {
     // Display debug information
     message = message ? message.toString() : '';
@@ -104,9 +110,9 @@ var quickAlgoContext = function(display, infos) {
   };
 
   context.program_end = function(callback) {
-    var curRobot = context.curRobot;
-    if (!context.programEnded[curRobot]) {
-      context.programEnded[curRobot] = true;
+    var curNode = context.curNode;
+    if (!context.programEnded[curNode]) {
+      context.programEnded[curNode] = true;
       infos.checkEndCondition(context, true);
     }
     context.waitDelay(callback);

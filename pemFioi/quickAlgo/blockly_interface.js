@@ -16,7 +16,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       locale: 'fr',
       definitions: {},
       simpleGenerators: {},
-      player: 0,
+      codeId: 0, // Currently edited node code
       workspace: null,
       prevWidth: 0,
       options: {},
@@ -181,10 +181,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
 
          this.programs = [];
-         for (var iPlayer = this.mainContext.nbRobots - 1; iPlayer >= 0; iPlayer--) {
-            this.programs[iPlayer] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
-            this.languages[iPlayer] = "blockly";
-            this.setPlayer(iPlayer);
+         for (var iCode = this.mainContext.nbCodes - 1; iCode >= 0; iCode--) {
+            this.programs[iCode] = {blockly: null, blocklyJS: "", blocklyPython: "", javascript: ""};
+            this.languages[iCode] = "blockly";
+            this.setCodeId(iCode);
             if(this.startingBlock || options.startingExample) {
                var xml = this.getDefaultContent();
                Blockly.Events.recordUndo = false;
@@ -437,31 +437,33 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          return this.scratchMode ? {x: 4, y: 20} : {x: 2, y: 2};
       },
 
-      setPlayer: function(newPlayer) {
-         this.player = newPlayer;
-         $("#selectPlayer").val(this.player);
+      // TODO :: New version of these three functions when we'll have multiple
+      // node programs we can edit
+      setCodeId: function(newCodeId) {
+         this.codeId = newCodeId;
+         $("#selectCodeId").val(this.codeId);
          $(".robot0, .robot1").hide();
-         $(".robot" + this.player).show();
+         $(".robot" + this.codeId).show();
       },
 
-      changePlayer: function() {
-         this.loadPlayer($("#selectPlayer").val());
+      changeCodeId: function() {
+         this.loadCodeId($("#selectCodeId").val());
       },
 
-      loadPlayer: function(player) {
+      loadCodeId: function(codeId) {
          this.savePrograms();
-         this.player = player;
-         for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
-            $(".robot" + iRobot).hide();
+         this.codeId = codeId;
+         for (var iCode = 0; iCode < this.mainContext.nbCodes; iCode++) {
+            $(".robot" + iCode).hide();
          }
-         $(".robot" + this.player).show();
+         $(".robot" + this.codeId).show();
 
          $(".language_blockly, .language_javascript").hide();
-         $(".language_" + this.languages[this.player]).show();
+         $(".language_" + this.languages[this.codeId]).show();
 
          var blocklyElems = $(".blocklyToolboxDiv, .blocklyWidgetDiv");
-         $("#selectLanguage").val(this.languages[this.player]);
-         if (this.languages[this.player] == "blockly") {
+         $("#selectLanguage").val(this.languages[this.codeId]);
+         if (this.languages[this.codeId] == "blockly") {
             blocklyElems.show();
          } else {
             blocklyElems.hide();
@@ -483,7 +485,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          this.checkRobotStart();
 
-         this.programs[this.player].javascript = $("#program").val();
+         this.programs[this.codeId].javascript = $("#program").val();
          if (this.workspace != null) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
             this.cleanBlockAttributes(xml);
@@ -492,15 +494,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                this.mainContext.savePrograms(xml);
             }
 
-            this.programs[this.player].blockly = Blockly.Xml.domToText(xml);
-            this.programs[this.player].blocklyJS = this.getCode("javascript");
-            //this.programs[this.player].blocklyPython = this.getCode("python");
+            this.programs[this.codeId].blockly = Blockly.Xml.domToText(xml);
+            this.programs[this.codeId].blocklyJS = this.getCode("javascript");
+            //this.programs[this.codeId].blocklyPython = this.getCode("python");
          }
       },
 
       loadPrograms: function() {
          if (this.workspace != null) {
-            var xml = Blockly.Xml.textToDom(this.programs[this.player].blockly);
+            var xml = Blockly.Xml.textToDom(this.programs[this.codeId].blockly);
             this.workspace.clear();
             this.cleanBlockAttributes(xml, this.getOrigin());
             Blockly.Xml.domToWorkspace(xml, this.workspace);
@@ -509,7 +511,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                this.mainContext.loadPrograms(xml);
             }
          }
-         $("#program").val(this.programs[this.player].javascript);
+         $("#program").val(this.programs[this.codeId].javascript);
       },
 
       loadProgramFromDom: function(xml) {
@@ -553,15 +555,14 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       changeLanguage: function() {
-         this.languages[this.player] = $("#selectLanguage").val();
-         this.loadPlayer(this.player);
+         this.languages[this.codeId] = $("#selectLanguage").val();
+         this.loadCodeId(this.codeId);
       },
 
       importFromBlockly: function() {
-          //var player = $("#selectPlayer").val();
-          var player = 0;
-          this.programs[player].javascript = this.getCode("javascript");
-          $("#program").val(this.programs[player].javascript);
+          var codeId = 0;
+          this.programs[this.codeId].javascript = this.getCode("javascript");
+          $("#program").val(this.programs[this.codeId].javascript);
       },
 
       handleFiles: function(files) {
@@ -583,18 +584,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                      if(!that.checkBlocksAreAllowed(xml)) {
                         throw 'not allowed'; // TODO :: check it's working properly
                      }
-                     that.programs[that.player].blockly = code;
-                     that.languages[that.player] = "blockly";
+                     that.programs[that.codeId].blockly = code;
+                     that.languages[that.codeId] = "blockly";
                   } catch(e) {
                      that.displayError('<span class="testError">'+that.strings.invalidContent+'</span>');
                      that.keepDisplayedError = true;
                   }
                } else {
-                  that.programs[that.player].javascript = code;
-                  that.languages[that.player] = "javascript";
+                  that.programs[that.codeId].javascript = code;
+                  that.languages[that.codeId] = "javascript";
                }
                that.loadPrograms();
-               that.loadPlayer(that.player);
+               that.loadCodeId(that.codeId);
             }
 
             reader.readAsText(file);
@@ -606,7 +607,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
       saveProgram: function() {
          this.savePrograms();
-         var code = this.programs[this.player][this.languages[this.player]];
+         var code = this.programs[this.codeId][this.languages[this.codeId]];
          var data = new Blob([code], {type: 'text/plain'});
 
          // If we are replacing a previously generated file we need to
@@ -654,13 +655,13 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             return;
          }
          var panelWidth = 500;
-         if (this.languages[this.player] == "blockly") {
+         if (this.languages[this.codeId] == "blockly") {
             panelWidth = $("#blocklyDiv").width() - 10;
          } else {
             panelWidth = $("#program").width() + 20;
          }
          if (force || panelWidth != this.prevWidth) {
-            if (this.languages[this.player] == "blockly") {
+            if (this.languages[this.codeId] == "blockly") {
                if (this.trashInToolbox) {
                   Blockly.Trashcan.prototype.MARGIN_SIDE_ = panelWidth - 90;
                }
@@ -719,12 +720,17 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.savePrograms();
 
          var codes = [];
-         for (var iRobot = 0; iRobot < this.mainContext.nbRobots; iRobot++) {
-            var language = this.languages[iRobot];
+         for (var iNode = 0; iNode < this.mainContext.nbNodes; iNode++) {
+            if(this.mainContext.codeIdForNode) {
+               var iCode = this.mainContext.codeIdForNode(iNode);
+            } else {
+               var iCode = Math.min(iNode, this.mainContext.nbCodes-1);
+            }
+            var language = this.languages[iCode];
             if (language == "blockly") {
                language = "blocklyJS";
             }
-            codes[iRobot] = this.getFullCode(this.programs[iRobot][language]);
+            codes[iNode] = this.getFullCode(this.programs[iCode][language]);
          }
          this.highlightPause = false;
          if(this.getRemainingCapacity(that.workspace) < 0) {

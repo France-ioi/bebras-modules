@@ -272,6 +272,8 @@ function LogicController(nbTestCases, maxInstructions) {
       reader.onload = function (e) {
         var code = reader.result;
         if (code[0] == "<") {
+          // XXX :: what is this code about? Is it actually used? Blockly isn't
+          // even loaded
           try {
             var xml = Blockly.Xml.textToDom(code);
             that.programs[0][that.player].blockly = code;
