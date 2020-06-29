@@ -3071,7 +3071,7 @@ var getContext = function (display, infos, curLevel) {
         $('#piinstall').click(function () {
             context.blocklyHelper.reportValues = false;
 
-            python_code = context.generatePythonSensorTable();
+            var python_code = context.generatePythonSensorTable();
             python_code += "\n\n";
             python_code += window.task.displayedSubTask.blocklyHelper.getCode('python');
 
