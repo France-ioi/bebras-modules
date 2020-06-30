@@ -20,11 +20,11 @@ var getContext = function(display, infos, curLevel) {
                 printResult: 'printResult'
             },
             description: {
-                getPixelLuminosity: 'getPixelLuminosity',
-                setPixelLuminosity: 'setPixelLuminosity',
-                width: 'width',
-                height: 'height',                
-                printResult: 'printResult description'
+                getPixelLuminosity: '',
+                setPixelLuminosity: '',
+                width: '',
+                height: '',                
+                printResult: ''
             },
             startingBlockName: "Program",
             messages: {
