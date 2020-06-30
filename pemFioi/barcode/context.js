@@ -148,15 +148,11 @@ var getContext = function(display, infos, curLevel) {
         },        
 
         width: function(callback) {
-            context.waitDelay(callback, function() {
-                return context.barcodeDisplay.size().width
-            });
+            context.waitDelay(callback, context.barcodeDisplay.getSize().width);
         },        
 
         height: function(callback) {
-            context.waitDelay(callback, function() {
-                return context.barcodeDisplay.getSize().height
-            });
+            context.waitDelay(callback, context.barcodeDisplay.getSize().height);
         },
 
         printResult: function(v, callback) {
