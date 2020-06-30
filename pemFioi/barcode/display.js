@@ -31,7 +31,7 @@ function BarcodeDisplay(params) {
             }
             context2d.beginPath();
             context2d.strokeStyle = this.color;
-            context2d.lineWidth = 1;
+            context2d.lineWidth = scale > 20 ? 2 : 1;
             context2d.rect(
                 ofs_left + scale * this.position.x + 0.5, 
                 scale * this.position.y + 0.5, 
@@ -229,7 +229,7 @@ function UserDisplay(params) {
         },
 
         resize: function() {
-            
+
         }
     }
 }
