@@ -179,6 +179,35 @@ function UserDisplay(params) {
     }
 
 
+    var grid = {
+
+        color: '#888',
+        min_pixel_size: 6,
+
+        render: function(ofs_left, w, h, pixel_size) {
+            if(pixel_size < this.min_pixel_size) {
+                return;
+            }
+            context2d.strokeStyle = this.color;
+            context2d.lineWidth = 1;
+            for(var x=1; x<w; x++) {
+                var dx = ofs_left + x * pixel_size + 0.5;
+                context2d.beginPath();
+                context2d.moveTo(dx , 0);
+                context2d.lineTo(dx, h * pixel_size);
+                context2d.stroke();            
+            }
+            for(var y=1; y<h; y++) {
+                var dy = y * pixel_size + 0.5;
+                context2d.beginPath();
+                context2d.moveTo(ofs_left, dy);
+                context2d.lineTo(ofs_left + w * pixel_size, dy);
+                context2d.stroke();            
+            }            
+        }
+
+    }
+
 
     function render(valid_data) {
         if(!ready || !pixels) {
@@ -212,6 +241,8 @@ function UserDisplay(params) {
                 i++;
             }
         }
+
+        grid.render(ofs_left, data_size.width, data_size.height, pixel_size);
 
         if(valid_data) {
             var valid = true;
