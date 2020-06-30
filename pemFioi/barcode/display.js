@@ -91,8 +91,8 @@ function BarcodeDisplay(params, callback) {
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
         context2d.drawImage(image, ofs_left, 0, image_w, h);
-        cursor.render(ofs_left, scale);
         grid.render(scale, ofs_left, image_w, h)
+        cursor.render(ofs_left, scale);
     }
 
 
