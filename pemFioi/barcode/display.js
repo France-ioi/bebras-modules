@@ -17,10 +17,15 @@ function BarcodeDisplay(params, callback) {
             }
         },
 
+        reset: function() {
+            this.position = false;
+        },
+
         render: function(ofs_left, scale) {
             if(!this.position) {
                 return;
             }
+            
             context2d.strokeStyle = this.color;
             var s = scale + this.lineWidth * 2;
             context2d.lineWidth = this.lineWidth;
@@ -35,8 +40,45 @@ function BarcodeDisplay(params, callback) {
     }
 
 
+    var grid = {
+
+        color: 'rgb(0,0,0)',
+        min_scale: 6,
+
+        render: function(scale, ofs_left, w, h) {
+            if(scale < this.min_scale) {
+                return;
+            }
+            context2d.strokeStyle = this.color;
+            context2d.lineWidth = 1;
+            var lw = Math.floor(w / scale);
+            for(var x=1; x<lw; x++) {
+                var dx = ofs_left + x * scale + 0.5;
+                context2d.beginPath();
+                context2d.moveTo(dx , 0);
+                context2d.lineTo(dx, h);
+                context2d.stroke();            
+            }
+            var lh = Math.floor(h / scale);            
+            for(var y=1; y<lh; y++) {
+                var dy = y * scale + 0.5;
+                context2d.beginPath();
+                context2d.moveTo(ofs_left, dy);
+                context2d.lineTo(ofs_left + w, dy);
+                context2d.stroke();            
+            }            
+        }
+
+    }
+
+    
+
+
     function render() {
         var w = canvas.width = Math.floor(params.parent.width());
+        if(w == 0) {
+            return;
+        }
         if(w > image.width) {
             var scale = Math.floor(w / image.width);
         } else {
@@ -50,6 +92,7 @@ function BarcodeDisplay(params, callback) {
         context2d.mozImageSmoothingEnabled = false;        
         context2d.drawImage(image, ofs_left, 0, image_w, h);
         cursor.render(ofs_left, scale);
+        grid.render(scale, ofs_left, image_w, h)
     }
 
 
@@ -75,6 +118,12 @@ function BarcodeDisplay(params, callback) {
 
         setPixelLuminosity: function(x, y, v) {
 
+        },
+
+
+        resetCursor: function() {
+            cursor.reset();
+            render();
         }
 
     }    
