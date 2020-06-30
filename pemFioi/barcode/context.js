@@ -29,7 +29,7 @@ var getContext = function(display, infos, curLevel) {
             startingBlockName: "Program",
             messages: {
                 success: 'Success',
-                mistake: 'Mistake',
+                mistake: 'The digit with a red background is incorrect',
                 result: 'Result:'                
             },
             ui: {
@@ -52,8 +52,6 @@ var getContext = function(display, infos, curLevel) {
     var ready = false;
 
     context.reset = function(taskInfos) {
-        //console.log('context.reset', context.display, taskInfos)
-
         if(!ready) {
             $('#grid').empty();
 
@@ -111,7 +109,21 @@ var getContext = function(display, infos, curLevel) {
         set: function(str) {
             this.init();
             this.data = str;
-            this.element && this.element.html(str);
+            this.element.html(str);
+        },
+
+
+        diff: function(data) {
+            this.init();
+            var html = '';
+            for(var i=0; i<this.data.length; i++) {
+                if(this.data[i] !== data[i]) {
+                    html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
+                } else {
+                    html += this.data[i];
+                }
+            }
+            this.element.html(html);
         }
     }
 
@@ -122,6 +134,7 @@ var getContext = function(display, infos, curLevel) {
             return;
         }
         context.success = false;
+        result.diff(context.valid_result.data);
         throw new Error(strings.messages.mistake);
     }
 
