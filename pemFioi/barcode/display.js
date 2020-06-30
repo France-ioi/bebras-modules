@@ -8,42 +8,25 @@ function BarcodeDisplay(params, callback) {
     var cursor = {
         color: 'rgb(255,128,0)',
         lineWidth: 1,
-        position: false
-    }
+        position: false,
 
-    function setCursorPosition(x, y) {
-        cursor.position = {
-            x: x,
-            y: y
-        }
-        render();
-    }
+        set: function(x, y) {
+            this.position = {
+                x: x,
+                y: y
+            }
+        },
 
-
-
-    function render() {
-        var w = canvas.width = Math.floor(params.parent.width());
-
-        if(w > image.width) {
-            var scale = Math.floor(w / image.width);
-        } else {
-            var scale = 1;
-        }
-        var image_w = Math.floor(image.width * scale);
-        var ofs_left = Math.floor(0.5 * (w - image_w));
-        var h = canvas.height = image.height * scale;
-
-        context2d.scale(1, 1);
-        context2d.clearRect(0, 0, w, h);
-        context2d.drawImage(image, ofs_left, 0, image_w, h);
-
-        if(cursor.position) {
-            context2d.strokeStyle = cursor.color;
-            var s = scale + cursor.lineWidth;
-            context2d.lineWidth = cursor.lineWidth;
+        render: function(ofs_left, scale) {
+            if(!this.position) {
+                return;
+            }
+            context2d.strokeStyle = this.color;
+            var s = scale + this.lineWidth * 2;
+            context2d.lineWidth = this.lineWidth;
             context2d.rect(
-                ofs_left + cursor.position.x - cursor.lineWidth, 
-                cursor.position.y - cursor.lineWidth, 
+                ofs_left + scale * this.position.x - this.lineWidth, 
+                scale * this.position.y - this.lineWidth, 
                 s, 
                 s
             );
@@ -52,15 +35,46 @@ function BarcodeDisplay(params, callback) {
     }
 
 
+    function render() {
+        var w = canvas.width = Math.floor(params.parent.width());
+        if(w > image.width) {
+            var scale = Math.floor(w / image.width);
+        } else {
+            var scale = 1;
+        }
+        var image_w = Math.floor(image.width * scale);
+        var ofs_left = Math.floor(0.5 * (w - image_w));
+        var h = canvas.height = image.height * scale;
+        context2d.clearRect(0, 0, w, h);
+        context2d.imageSmoothingEnabled = false;
+        context2d.mozImageSmoothingEnabled = false;        
+        context2d.drawImage(image, ofs_left, 0, image_w, h);
+        cursor.render(ofs_left, scale);
+    }
+
+
     var api = {
 
         resize: render,
 
+        width: function() {
+            return image.width;
+        },
+
+        height: function() {
+            return image.height;
+        },
+
         getPixelLuminosity: function(x, y) {
-            setCursorPosition(x, y);
+            cursor.set(x, y);
+            render();
             var d = image_context2d.getImageData(x, y, 1, 1).data;
             // ITU BT.601
             return Math.floor(0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]);
+        },
+
+        setPixelLuminosity: function(x, y, v) {
+
         }
 
     }    
