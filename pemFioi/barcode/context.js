@@ -68,16 +68,17 @@ var getContext = function(display, infos, curLevel) {
             });
 
             $(window).resize(function() {
-                context.barcodeDisplay.resize();
-                context.userDisplay.resize();
+                context.barcodeDisplay && context.barcodeDisplay.resize();
+                context.userDisplay && context.userDisplay.resize();
             });
         }
         ready = true;
         
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
-            context.barcodeDisplay.loadImage(taskInfos.image);
-            context.userDisplay.setSize(context.barcodeDisplay.getSize());
+            context.barcodeDisplay.loadImage(taskInfos.image, function() {
+                context.userDisplay.setSize(context.barcodeDisplay.getSize());
+            });
         }
 
         context.barcodeDisplay && context.barcodeDisplay.resetCursor();
