@@ -64,11 +64,6 @@ var getContext = function(display, infos, curLevel) {
                 parent: $('#grid'),
                 size: context.barcodeDisplay.getSize()
             });
-
-            $(window).resize(function() {
-                context.barcodeDisplay && context.barcodeDisplay.resize();
-                context.userDisplay && context.userDisplay.resize();
-            });
         }
         ready = true;
         
@@ -86,7 +81,10 @@ var getContext = function(display, infos, curLevel) {
 
 
     context.setScale = function(scale) {}
-    context.updateScale = function() {}
+    context.updateScale = function() {
+        context.barcodeDisplay && context.barcodeDisplay.resize();
+        context.userDisplay && context.userDisplay.resize();
+    }
     context.resetDisplay = function() {}
     context.unload = function() {}
 
