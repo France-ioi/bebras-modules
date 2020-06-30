@@ -124,6 +124,10 @@
          'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
          'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
 
+         // Barcode
+         'barcode_context': {src: modulesPath+"/pemFioi/barcode/context.js", id: "barcode_context"},
+         'barcode_display': {src: modulesPath+"/pemFioi/barcode/display.js", id: "barcode_display"},
+
          // Bundles
          'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
          'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
