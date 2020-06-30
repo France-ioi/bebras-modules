@@ -59,6 +59,9 @@ var getContext = function(display, infos, curLevel) {
         if(ready) {
             return;
         }
+        
+        context.barcodeDisplay && context.barcodeDisplay.resetCursor();
+
         $('#grid').empty();
         ready = true;
 
@@ -66,7 +69,7 @@ var getContext = function(display, infos, curLevel) {
             parent: $('#grid'),
             image: taskInfos.image
         }, function(b) {
-            //console.log('getPixelLuminosity', b.getPixelLuminosity(10,10))
+            //console.log('getPixelLuminosity', b.getPixelLuminosity(2,2))
         })
 
         $(window).resize(function() {
