@@ -7,7 +7,6 @@ function BarcodeDisplay(params, callback) {
 
     var cursor = {
         color: 'rgb(255,128,0)',
-        lineWidth: 1,
         position: false,
 
         set: function(x, y) {
@@ -25,15 +24,14 @@ function BarcodeDisplay(params, callback) {
             if(!this.position) {
                 return;
             }
-            
+            context2d.beginPath();
             context2d.strokeStyle = this.color;
-            var s = scale + this.lineWidth * 2;
-            context2d.lineWidth = this.lineWidth;
+            context2d.lineWidth = 1;
             context2d.rect(
-                ofs_left + scale * this.position.x - this.lineWidth, 
-                scale * this.position.y - this.lineWidth, 
-                s, 
-                s
+                ofs_left + scale * this.position.x + 0.5, 
+                scale * this.position.y + 0.5, 
+                scale, 
+                scale
             );
             context2d.stroke();
         }
