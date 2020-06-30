@@ -129,7 +129,7 @@ function BarcodeDisplay(params) {
 
     return {
 
-        resize: render,
+        render: render,
 
         loadImage: loadImage,
 
@@ -161,24 +161,27 @@ function BarcodeDisplay(params) {
 
 function UserDisplay(params) {
 
-    var ready = false;
-    var pixels;
+    var pixels = [];
     var canvas, context2d;
-    var size = params.size || null;
+    var ready = false;
+    var data_size;
+    var viewport_size;
+
 
     function init() {
-        var canvas = document.createElement('canvas');
-        var context2d = canvas.getContext('2d');
-        params.parent.append($(canvas));
+        if(ready) {
+            return;
+        }
         ready = true;
+        canvas = document.createElement('canvas');
+        context2d = canvas.getContext('2d');
+        params.parent.append($(canvas));
     }
 
-    function clear() {
-        pixels = context2d.getImageData(0, 0, params.width, params.height);;
-    }
 
-    function render() {
-        if(!canvas) {
+
+    function render(valid_data) {
+        if(!ready || !pixels) {
             return;
         }
         var w = canvas.width = Math.floor(params.parent.width());
@@ -188,19 +191,48 @@ function UserDisplay(params) {
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
 
-        var scale = w > image.width ? Math.floor(w / image.width) : 1;
-        var ofs_left = Math.floor(0.5 * (w - image_w));
-        var h = canvas.height = params.height * scale;
+        var scale = w > viewport_size.width ? Math.floor(w / viewport_size.width) : 1;
+        var ofs_left = Math.floor(0.5 * (w - viewport_size.width * scale));
+        var h = canvas.height = viewport_size.height * scale;
+        context2d.clearRect(0, 0, w, h);        
 
+        var pixel_size = viewport_size.width * scale / data_size.width;
         var i=0;
-        for(var x=0; x<params.width; x++) {
-            for(var y=0; y<params.width; y++) {
-                fillRect(
-                    ofs_left + x * scale,
-                    y * scale,
-                    scale,
-                    scale
-                );
+        for(var y=0; y<viewport_size.height; y++) {
+            for(var x=0; x<viewport_size.width; x++) {
+                if(pixels[i] != 255) {
+                    context2d.fillStyle = 'rgb(' + pixels[i] + ',' + pixels[i] + ',' + pixels[i] + ')';
+                    context2d.fillRect(
+                        ofs_left + x * pixel_size,
+                        y * pixel_size,
+                        pixel_size,
+                        pixel_size
+                    );
+                }
+                i++;
+            }
+        }
+
+        if(valid_data) {
+            var valid = true;
+            var i=0;
+            for(var y=0; y<viewport_size.height; y++) {
+                for(var x=0; x<viewport_size.width; x++) {
+                    if(pixels[i] != valid_data[y][x]) {
+                        valid = false;
+                        context2d.beginPath();
+                        context2d.strokeStyle = '#F00';
+                        context2d.lineWidth = scale > 20 ? 2 : 1;
+                        context2d.rect(
+                            ofs_left + x * pixel_size,
+                            y * pixel_size,
+                            pixel_size,
+                            pixel_size
+                        );
+                        context2d.stroke();                        
+                    }
+                    i++;
+                }
             }
         }
     }    
@@ -208,28 +240,23 @@ function UserDisplay(params) {
 
     return {
 
-        clear: function() {
-            if(ready) {
-                reset();
-                render();
-            }
-        },
-
-        setPixelLuminosity: function(x, y, v) {
-            if(!ready) {
-                init();
-                ready = true;
-            }
-            pixels[y * params.width + x] = Math.max(0, Math.min(v, 255));
+         setPixelLuminosity: function(x, y, v) {
+            init();
+            var v = Math.max(0, Math.min(v, 255));
+            pixels[y * data_size.width + x] = v;
             render();
         },
 
-        setSize: function(new_size) {
-            size = new_size;
+        setSize: function(new_data_size, new_viewport_size) {
+            data_size = new_data_size;
+            viewport_size = new_viewport_size;
+            pixels = new Array(data_size.width * data_size.height).fill(255)
         },
 
-        resize: function() {
+        render: render,
 
+        diff: function(valid_data) {
+            render(valid_data);
         }
     }
 }
