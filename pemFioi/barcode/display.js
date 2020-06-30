@@ -107,7 +107,7 @@ function BarcodeDisplay(params) {
 
 
 
-    function loadImage(data) {
+    function loadImage(data, callback) {
         if(image_data === data) {
             return;
         }
@@ -118,9 +118,12 @@ function BarcodeDisplay(params) {
             image_context2d = image_canvas.getContext('2d');        
         }
         image = new Image();
+        image.onload = function() {
+            image_context2d.drawImage(image, 0, 0);
+            render();
+            callback && callback();
+        }
         image.src = data;
-        image_context2d.drawImage(image, 0, 0);
-        render();
     }
     
 
