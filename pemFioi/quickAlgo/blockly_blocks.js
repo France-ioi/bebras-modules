@@ -180,6 +180,32 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          }
       },
 
+      getAllCodes: function(answer) {
+         // Generate codes for each node
+         var codes = [];
+         for (var iNode = 0; iNode < this.mainContext.nbNodes; iNode++) {
+            if(this.mainContext.codeIdForNode) {
+               var iCode = this.mainContext.codeIdForNode(iNode);
+            } else {
+               var iCode = Math.min(iNode, this.mainContext.nbCodes-1);
+            }
+            var language = this.languages[iCode];
+            if (language == "blockly") {
+               language = "blocklyJS";
+            }
+            if(answer) {
+               // Generate codes for specified answer
+               var code = this.getCodeFromXml(answer[iCode].blockly, "javascript");
+               codes[iNode] = this.getFullCode(code);
+            } else {
+               // Generate codes for current program
+               codes[iNode] = this.getFullCode(this.programs[iCode][language]);
+            }
+         }
+
+         return codes;
+      },
+
       getCodeFromXml: function(xmlText, language) {
          try {
            var xml = Blockly.Xml.textToDom(xmlText)
@@ -2479,6 +2505,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          // TODO :: check a code is okay for validation; for now it's checked
          // by getCode so this function is not useful in the Blockly/Scratch
          // version
+         return true;
+      },
+
+      checkCodes: function(codes, display) {
+         // Check multiple codes
+         for(var i = 0; i < codes.length; i++) {
+            if(!this.checkCode(codes[i], display)) {
+               return false;
+            }
+         }
          return true;
       },
 
