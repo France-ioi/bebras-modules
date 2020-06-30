@@ -82,18 +82,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.unloadLevel = this.unload;
 
-  this.getCodeFromXml = function (code, lang) {
-    // TODO :: rename
-    return code;
-  };
-
-  this.getFullCode = function (code) {
-    // TODO :: simplify
-    return code;
-  }
-
   this.getCode = function(language) {
-
     if (language == "python")
       return this._aceEditor.getValue();
     return "";
@@ -152,6 +141,21 @@ function LogicController(nbTestCases, maxInstructions) {
        }
     }
     return true;
+  }
+
+  this.checkCodes = function(codes, display) {
+    // Check multiple codes before validation
+    for(var i = 0; i < codes.length; i++) {
+      if(!this.checkCode(codes[i], display)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  this.getAllCodes = function(answer) {
+    // TODO :: multi-node version
+    return [answer[0].blockly];
   }
 
   this.getDefaultContent = function () {

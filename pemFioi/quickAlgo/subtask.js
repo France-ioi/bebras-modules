@@ -455,12 +455,11 @@ var initBlocklySubTask = function(subTask, language) {
 
       var oldDelay = subTask.context.infos.actionDelay;
       subTask.context.changeDelay(0);
-      var code = subTask.blocklyHelper.getCodeFromXml(subTask.answer[0].blockly, "javascript");
-      code = subTask.blocklyHelper.getFullCode(code);
+      var codes = subTask.blocklyHelper.getAllCodes(subTask.answer);
 
       var checkError = '';
       var checkDisplay = function(err) { checkError = err; }
-      if(!subTask.blocklyHelper.checkCode(code, checkDisplay)) {
+      if(!subTask.blocklyHelper.checkCodes(codes, checkDisplay)) {
          var results = {
             message: checkError,
             successRate: 0,
@@ -472,7 +471,6 @@ var initBlocklySubTask = function(subTask, language) {
          return;
       }
 
-      var codes = [code]; // We only ever send one code to grade
       var oldTestCase = subTask.iTestCase;
 
       /*      var levelResultsCache = window.taskResultsCache[this.level];

@@ -290,6 +290,7 @@ function initBlocklyRunner(context, messageCallback) {
       runner.runSyncBlock = function() {
          runner.resetDone = false;
          runner.stepInProgress = true;
+         runner.oneStepDone = false;
          // Handle the callback from last highlightBlock
          if(runner.nextCallback) {
             runner.nextCallback();
@@ -298,11 +299,16 @@ function initBlocklyRunner(context, messageCallback) {
 
          try {
             for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
+               if(runner.stepMode && runner.oneStepDone) {
+                  runner.stepInProgress = false;
+                  break;
+               }
                context.setCurNode(iInterpreter);
                if (context.infos.checkEndEveryTurn) {
                   context.infos.checkEndCondition(context, false);
                }
                var interpreter = interpreters[iInterpreter];
+               var wasPaused = interpreter.paused_;
                while(!context.programEnded[iInterpreter]) {
                   if(!context.allowInfiniteLoop &&
                         (context.curSteps[iInterpreter].total >= runner.maxIter || context.curSteps[iInterpreter].withoutAction >= runner.maxIterWithoutAction)) {
@@ -313,6 +319,7 @@ function initBlocklyRunner(context, messageCallback) {
                      break;
                   }
                   if (interpreter.paused_) {
+                     runner.oneStepDone = !wasPaused;
                      break;
                   }
                   context.curSteps[iInterpreter].total++;
@@ -431,8 +438,11 @@ function initBlocklyRunner(context, messageCallback) {
       runner.run = function () {
          runner.stepMode = false;
          if(!runner.stepInProgress) {
-            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
-               interpreters[iInterpreter].paused_ = false;
+            // XXX :: left to avoid breaking tasks in case I'm wrong, but we
+            // should be able to remove this code (it breaks multi-interpreter
+            // step-by-step)
+            if(interpreters.length == 1) {
+               interpreters[0].paused_ = false;
             }
             runner.runSyncBlock();
          }
@@ -441,8 +451,11 @@ function initBlocklyRunner(context, messageCallback) {
       runner.step = function () {
          runner.stepMode = true;
          if(!runner.stepInProgress) {
-            for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
-               interpreters[iInterpreter].paused_ = false;
+            // XXX :: left to avoid breaking tasks in case I'm wrong, but we
+            // should be able to remove this code (it breaks multi-interpreter
+            // step-by-step)
+            if(interpreters.length == 1) {
+               interpreters[0].paused_ = false;
             }
             runner.runSyncBlock();
          }
