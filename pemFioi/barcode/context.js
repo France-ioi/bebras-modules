@@ -7,45 +7,23 @@ var getContext = function(display, infos, curLevel) {
             },
             label: {
                 getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
-                setPixelLuminosity: 'getPixelLuminosity(%1, %2, %3)',
-                printResult: 'printResult(%1)'
-            },
-            code: {
-                getPixelLuminosity: 'getPixelLuminosity',
-                setPixelLuminosity: 'getPixelLuminosity',
-                printResult: 'printResult'
-            },
-            description: {
-                getPixelLuminosity: 'getPixelLuminosity description',
-                setPixelLuminosity: 'getPixelLuminosity description',
-                printResult: 'printResult description'
-            },
-            startingBlockName: "Program",
-            messages: {
-                success: 'Success',
-                mistake: 'Mistake',
-                result: 'Result:'
-            },
-            ui: {
-            }
-        },
-        en: {
-            categories: {
-                barcode: 'Barcode'
-            },
-            label: {
-                getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
                 setPixelLuminosity: 'setPixelLuminosity(%1, %2, %3)',
+                width: 'width()',
+                height: 'height()',
                 printResult: 'printResult(%1)'
             },
             code: {
                 getPixelLuminosity: 'getPixelLuminosity',
                 setPixelLuminosity: 'setPixelLuminosity',
+                width: 'width',
+                height: 'height',
                 printResult: 'printResult'
             },
             description: {
                 getPixelLuminosity: 'getPixelLuminosity',
                 setPixelLuminosity: 'setPixelLuminosity',
+                width: 'width',
+                height: 'height',                
                 printResult: 'printResult description'
             },
             startingBlockName: "Program",
@@ -88,7 +66,7 @@ var getContext = function(display, infos, curLevel) {
             parent: $('#grid'),
             image: taskInfos.image
         }, function(b) {
-            //console.log('getPixelLuminosity', b.getPixelLuminosity(85,40))
+            //console.log('getPixelLuminosity', b.getPixelLuminosity(10,10))
         })
 
         $(window).resize(function() {
@@ -149,6 +127,14 @@ var getContext = function(display, infos, curLevel) {
             context.waitDelay(callback, function() {});
         },        
 
+        width: function(callback) {
+            context.waitDelay(callback, context.barcodeDisplay.width());
+        },        
+
+        height: function(callback) {
+            context.waitDelay(callback, context.barcodeDisplay.height());
+        },
+
         printResult: function(v, callback) {
             context.waitDelay(callback, result.set(v));
         },        
@@ -168,6 +154,16 @@ var getContext = function(display, infos, curLevel) {
                     params_names: ['x', 'y', 'value'],
                     yieldsValue: true
                 },
+                { name: 'width',
+                    params: [],
+                    params_names: [],
+                    yieldsValue: true
+                },                                
+                { name: 'height',
+                    params: [],
+                    params_names: [],
+                    yieldsValue: true
+                },                                                
                 { name: 'printResult',
                     params: ['String'],
                     params_names: ['v']
