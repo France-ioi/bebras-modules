@@ -30,7 +30,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                 success: 'Success',
                 mistake_digit: 'The digit with a red background is incorrect',
-                mistake_pixel: 'The pixel with a red background is incorrect',
+                mistake_pixel: 'The pixel with a red border is incorrect',
                 result: 'Result:'                
             },
             ui: {
