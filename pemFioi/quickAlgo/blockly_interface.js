@@ -719,19 +719,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          this.savePrograms();
 
-         var codes = [];
-         for (var iNode = 0; iNode < this.mainContext.nbNodes; iNode++) {
-            if(this.mainContext.codeIdForNode) {
-               var iCode = this.mainContext.codeIdForNode(iNode);
-            } else {
-               var iCode = Math.min(iNode, this.mainContext.nbCodes-1);
-            }
-            var language = this.languages[iCode];
-            if (language == "blockly") {
-               language = "blocklyJS";
-            }
-            codes[iNode] = this.getFullCode(this.programs[iCode][language]);
-         }
          this.highlightPause = false;
          if(this.getRemainingCapacity(that.workspace) < 0) {
             this.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');
@@ -746,6 +733,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.workspace.traceOn(true);
             this.workspace.highlightBlock(null);
          }
+         var codes = this.getAllCodes();
          this.mainContext.runner.initCodes(codes);
       },
 
