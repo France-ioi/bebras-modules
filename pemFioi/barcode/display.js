@@ -226,6 +226,10 @@ function UserDisplay(params) {
 
         setSize: function(new_size) {
             size = new_size;
+        },
+
+        resize: function() {
+            
         }
     }
 }
