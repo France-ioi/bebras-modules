@@ -29,7 +29,8 @@ var getContext = function(display, infos, curLevel) {
             startingBlockName: "Program",
             messages: {
                 success: 'Success',
-                mistake: 'The digit with a red background is incorrect',
+                mistake_digit: 'The digit with a red background is incorrect',
+                mistake_pixel: 'The pixel with a red background is incorrect',
                 result: 'Result:'                
             },
             ui: {
@@ -69,9 +70,10 @@ var getContext = function(display, infos, curLevel) {
         
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
-            context.barcodeDisplay.loadImage(taskInfos.image, function() {
-                context.userDisplay.setSize(context.barcodeDisplay.getSize());
-            });
+            context.barcodeDisplay.loadImage(taskInfos.image);
+            if(taskInfos.user_display) {
+                context.userDisplay.setSize(taskInfos.user_display, context.barcodeDisplay.getSize());
+            }
         }
 
         context.barcodeDisplay && context.barcodeDisplay.resetCursor();
@@ -82,14 +84,14 @@ var getContext = function(display, infos, curLevel) {
 
     context.setScale = function(scale) {}
     context.updateScale = function() {
-        context.barcodeDisplay && context.barcodeDisplay.resize();
-        context.userDisplay && context.userDisplay.resize();
+        context.barcodeDisplay && context.barcodeDisplay.render();
+        context.userDisplay && context.userDisplay.render();
     }
     context.resetDisplay = function() {}
     context.unload = function() {}
 
 
-    var result = {
+    var stringResult = {
 
         data: '',
         element: null,
@@ -114,26 +116,36 @@ var getContext = function(display, infos, curLevel) {
         diff: function(data) {
             this.init();
             var html = '';
+            var valid = true;
             for(var i=0; i<this.data.length; i++) {
                 if(this.data[i] !== data[i]) {
+                    valid = false;
                     html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
                 } else {
                     html += this.data[i];
                 }
             }
             this.element.html(html);
+            return valid;
         }
     }
 
     context.gradeResult = function() {
-        if(result.data == context.valid_result.data) {
-            context.success = true;
+        switch(context.valid_result.type) {
+            case 'string':
+                context.success = stringResult.diff(context.valid_result.data);
+                var error = strings.messages.mistake_digit;
+                break;
+            case 'array':
+                context.success = context.userDisplay.diff(context.valid_result.data);
+                var error = strings.messages.mistake_pixel;
+                break;
+        }
+        if(context.success) {
             throw(strings.messages.success);
             return;
         }
-        context.success = false;
-        result.diff(context.valid_result.data);
-        throw new Error(strings.messages.mistake);
+        throw new Error(error);                        
     }
 
 
@@ -156,8 +168,8 @@ var getContext = function(display, infos, curLevel) {
         },
 
         printResult: function(v, callback) {
-            context.waitDelay(callback, result.set(v));
-        },        
+            context.waitDelay(callback, stringResult.set(v));
+        }
     }
 
 
@@ -170,9 +182,8 @@ var getContext = function(display, infos, curLevel) {
                     yieldsValue: true
                 },                
                 { name: 'setPixelLuminosity',
-                    params: ['Number', 'Number', 'String'],
-                    params_names: ['x', 'y', 'value'],
-                    yieldsValue: true
+                    params: ['Number', 'Number', 'Number'],
+                    params_names: ['x', 'y', 'value']
                 },
                 { name: 'width',
                     params: [],
