@@ -52,32 +52,35 @@ var getContext = function(display, infos, curLevel) {
     var ready = false;
 
     context.reset = function(taskInfos) {
+        //console.log('context.reset', context.display, taskInfos)
+
+        if(!ready) {
+            $('#grid').empty();
+
+            context.barcodeDisplay = BarcodeDisplay({
+                parent: $('#grid'),
+                image: taskInfos.image
+            });
+
+            context.userDisplay = UserDisplay({
+                parent: $('#grid'),
+                size: context.barcodeDisplay.getSize()
+            });
+
+            $(window).resize(function() {
+                context.barcodeDisplay.resize();
+                context.userDisplay.resize();
+            });
+        }
+        ready = true;
+        
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
+            context.barcodeDisplay.loadImage(taskInfos.image);
+            context.userDisplay.setSize(context.barcodeDisplay.getSize());
         }
 
-        if(ready) {
-            return;
-        }
-        
         context.barcodeDisplay && context.barcodeDisplay.resetCursor();
-
-        $('#grid').empty();
-        ready = true;
-
-        context.barcodeDisplay = BarcodeDisplay({
-            parent: $('#grid'),
-            image: taskInfos.image
-        }, function(b) {
-            //console.log('getPixelLuminosity', b.getPixelLuminosity(2,2))
-        })
-
-        $(window).resize(function() {
-            context.barcodeDisplay.resize();
-        });
-
-        if(!context.display) return;
-
     }
 
 
@@ -115,7 +118,9 @@ var getContext = function(display, infos, curLevel) {
         if(result.data == context.valid_result.data) {
             context.success = true;
             throw(strings.messages.success);
+            return;
         }
+        context.success = false;
         throw new Error(strings.messages.mistake);
     }
 
@@ -127,15 +132,19 @@ var getContext = function(display, infos, curLevel) {
         },
 
         setPixelLuminosity: function(x, y, v, callback) {
-            context.waitDelay(callback, function() {});
+            context.waitDelay(callback, context.userDisplay.setPixelLuminosity(x, y, v));
         },        
 
         width: function(callback) {
-            context.waitDelay(callback, context.barcodeDisplay.width());
+            context.waitDelay(callback, function() {
+                return context.barcodeDisplay.size().width
+            });
         },        
 
         height: function(callback) {
-            context.waitDelay(callback, context.barcodeDisplay.height());
+            context.waitDelay(callback, function() {
+                return context.barcodeDisplay.getSize().height
+            });
         },
 
         printResult: function(v, callback) {
