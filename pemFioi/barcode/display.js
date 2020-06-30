@@ -1,8 +1,13 @@
-function BarcodeDisplay(params, callback) {
+function BarcodeDisplay(params) {
 
     var canvas = document.createElement('canvas');
     var context2d = canvas.getContext('2d');
     params.parent.append($(canvas));
+
+    var image_data = '';
+    var image;
+    var image_canvas;
+    var image_context2d;    
 
 
     var cursor = {
@@ -40,7 +45,7 @@ function BarcodeDisplay(params, callback) {
 
     var grid = {
 
-        color: 'rgb(0,0,0)',
+        color: '#888',
         min_scale: 6,
 
         render: function(scale, ofs_left, w, h) {
@@ -73,6 +78,9 @@ function BarcodeDisplay(params, callback) {
 
 
     function render() {
+        if(!image) {
+            return;
+        }
         var w = canvas.width = Math.floor(params.parent.width());
         if(w == 0) {
             return;
@@ -84,26 +92,49 @@ function BarcodeDisplay(params, callback) {
         }
         var image_w = Math.floor(image.width * scale);
         var ofs_left = Math.floor(0.5 * (w - image_w));
+        
         var h = canvas.height = image.height * scale;
-        context2d.clearRect(0, 0, w, h);
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
+
+        context2d.clearRect(0, 0, w, h);        
         context2d.drawImage(image, ofs_left, 0, image_w, h);
+        
         grid.render(scale, ofs_left, image_w, h)
         cursor.render(ofs_left, scale);
     }
 
 
-    var api = {
+
+
+    function loadImage(data) {
+        if(image_data === data) {
+            return;
+        }
+        image_data = data;
+        cursor.reset();
+        if(!image_canvas) {
+            image_canvas = document.createElement('canvas');
+            image_context2d = image_canvas.getContext('2d');        
+        }
+        image = new Image();
+        image.src = data;
+        image_context2d.drawImage(image, 0, 0);
+        render();
+    }
+    
+
+    return {
 
         resize: render,
 
-        width: function() {
-            return image.width;
-        },
+        loadImage: loadImage,
 
-        height: function() {
-            return image.height;
+        getSize: function() {
+            return {
+                width: image ? image.width : 0,
+                height: image ? image.height : 0
+            }
         },
 
         getPixelLuminosity: function(x, y) {
@@ -114,30 +145,84 @@ function BarcodeDisplay(params, callback) {
             return Math.floor(0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]);
         },
 
-        setPixelLuminosity: function(x, y, v) {
-
-        },
-
-
         resetCursor: function() {
             cursor.reset();
             render();
         }
 
     }    
+}
 
 
 
-    var image = new Image();
-    var image_canvas = document.createElement('canvas');
-    var image_context2d = image_canvas.getContext('2d');        
-    image.style.display = 'none';
-    image.onload = function() {
-        render();
-        image_context2d.drawImage(image, 0, 0);
-        callback && callback(api);
+
+function UserDisplay(params) {
+
+    var ready = false;
+    var pixels;
+    var canvas, context2d;
+    var size = params.size || null;
+
+    function init() {
+        var canvas = document.createElement('canvas');
+        var context2d = canvas.getContext('2d');
+        params.parent.append($(canvas));
+        ready = true;
     }
-    image.src = params.image;
-    
-    return api;
+
+    function clear() {
+        pixels = context2d.getImageData(0, 0, params.width, params.height);;
+    }
+
+    function render() {
+        if(!canvas) {
+            return;
+        }
+        var w = canvas.width = Math.floor(params.parent.width());
+        if(w == 0) {
+            return;
+        }
+        context2d.imageSmoothingEnabled = false;
+        context2d.mozImageSmoothingEnabled = false;        
+
+        var scale = w > image.width ? Math.floor(w / image.width) : 1;
+        var ofs_left = Math.floor(0.5 * (w - image_w));
+        var h = canvas.height = params.height * scale;
+
+        var i=0;
+        for(var x=0; x<params.width; x++) {
+            for(var y=0; y<params.width; y++) {
+                fillRect(
+                    ofs_left + x * scale,
+                    y * scale,
+                    scale,
+                    scale
+                );
+            }
+        }
+    }    
+
+
+    return {
+
+        clear: function() {
+            if(ready) {
+                reset();
+                render();
+            }
+        },
+
+        setPixelLuminosity: function(x, y, v) {
+            if(!ready) {
+                init();
+                ready = true;
+            }
+            pixels[y * params.width + x] = Math.max(0, Math.min(v, 255));
+            render();
+        },
+
+        setSize: function(new_size) {
+            size = new_size;
+        }
+    }
 }
