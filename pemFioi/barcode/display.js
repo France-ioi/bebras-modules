@@ -6,6 +6,7 @@ function BarcodeDisplay(params) {
 
     var image_data = '';
     var image;
+    var image_loaded;
     var image_canvas;
     var image_context2d;    
 
@@ -107,45 +108,61 @@ function BarcodeDisplay(params) {
 
 
 
-    function loadImage(data, callback) {
+    function init(data, callback) {
         if(image_data === data) {
             return;
         }
+        image = false;
+        image_loaded = false;
         image_data = data;
         cursor.reset();
         if(!image_canvas) {
             image_canvas = document.createElement('canvas');
             image_context2d = image_canvas.getContext('2d');        
         }
+        loadImage(callback);
+    }
+
+
+    function loadImage(callback) {
+        if(image_loaded) {
+            callback && callback();
+        }
         image = new Image();
         image.onload = function() {
             image_context2d.drawImage(image, 0, 0);
             render();
+            image_loaded = true;
             callback && callback();
         }
-        image.src = data;
+        image.src = image_data;        
     }
+
     
 
     return {
 
+        init: init,        
+
         render: render,
 
-        loadImage: loadImage,
-
-        getSize: function() {
-            return {
-                width: image ? image.width : 0,
-                height: image ? image.height : 0
-            }
+        getSize: function(callback) {
+            loadImage(function() {
+                callback({
+                    width: image ? image.width : 0,
+                    height: image ? image.height : 0
+                })
+            });
         },
 
-        getPixelLuminosity: function(x, y) {
-            cursor.set(x, y);
-            render();
-            var d = image_context2d.getImageData(x, y, 1, 1).data;
-            // ITU BT.601
-            return Math.floor(0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]);
+        getPixelLuminosity: function(x, y, callback) {
+            loadImage(function() {
+                cursor.set(x, y);
+                render();
+                var d = image_context2d.getImageData(x, y, 1, 1).data;
+                // ITU BT.601
+                callback(0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]);
+            })
         },
 
         resetCursor: function() {

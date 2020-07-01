@@ -57,23 +57,22 @@ var getContext = function(display, infos, curLevel) {
             $('#grid').empty();
 
             context.barcodeDisplay = BarcodeDisplay({
-                parent: $('#grid'),
-                image: taskInfos.image
+                parent: $('#grid')
             });
 
             context.userDisplay = UserDisplay({
-                parent: $('#grid'),
-                size: context.barcodeDisplay.getSize()
+                parent: $('#grid')
             });
         }
         ready = true;
         
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
-            context.barcodeDisplay.loadImage(taskInfos.image);
-            if(taskInfos.user_display) {
-                context.userDisplay.setSize(taskInfos.user_display, context.barcodeDisplay.getSize());
-            }
+            context.barcodeDisplay.init(taskInfos.image, function() {
+                if(taskInfos.user_display) {
+                    context.userDisplay.setSize(taskInfos.user_display, context.barcodeDisplay.getSize());
+                }
+            });
         }
 
         context.barcodeDisplay && context.barcodeDisplay.resetCursor();
@@ -89,6 +88,7 @@ var getContext = function(display, infos, curLevel) {
     }
     context.resetDisplay = function() {}
     context.unload = function() {}
+
 
 
     var stringResult = {
@@ -108,7 +108,7 @@ var getContext = function(display, infos, curLevel) {
         
         set: function(str) {
             this.init();
-            this.data = str;
+            this.data = '' + str;
             this.element.html(str);
         },
 
@@ -117,10 +117,13 @@ var getContext = function(display, infos, curLevel) {
             this.init();
             var html = '';
             var valid = true;
-            for(var i=0; i<this.data.length; i++) {
-                if(this.data[i] !== data[i]) {
+            var l = Math.max(data.length, this.data.length);
+            for(var i=0; i<l; i++) {
+                if(data[i] !== this.data[i]) {
                     valid = false;
-                    html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
+                    if(this.data[i]) {
+                        html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
+                    }                    
                 } else {
                     html += this.data[i];
                 }
@@ -152,7 +155,8 @@ var getContext = function(display, infos, curLevel) {
     context.barcode = {
 
         getPixelLuminosity: function(x, y, callback) {
-            context.waitDelay(callback, context.barcodeDisplay.getPixelLuminosity(x, y));
+            var cb = context.runner.waitCallback(callback);
+            context.barcodeDisplay.getPixelLuminosity(x, y, cb)
         },
 
         setPixelLuminosity: function(x, y, v, callback) {
@@ -160,11 +164,17 @@ var getContext = function(display, infos, curLevel) {
         },        
 
         width: function(callback) {
-            context.waitDelay(callback, context.barcodeDisplay.getSize().width);
+            var cb = context.runner.waitCallback(callback);
+            context.barcodeDisplay.getSize(function(size) {
+                cb(size.width);
+            });
         },        
 
         height: function(callback) {
-            context.waitDelay(callback, context.barcodeDisplay.getSize().height);
+            var cb = context.runner.waitCallback(callback);
+            context.barcodeDisplay.getSize(function(size) {
+                cb(size.height);
+            });            
         },
 
         printResult: function(v, callback) {
