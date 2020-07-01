@@ -70,7 +70,9 @@ var getContext = function(display, infos, curLevel) {
             context.valid_result = taskInfos.valid_result || {};
             context.barcodeDisplay.init(taskInfos.image, function() {
                 if(taskInfos.user_display) {
-                    context.userDisplay.setSize(taskInfos.user_display, context.barcodeDisplay.getSize());
+                    context.barcodeDisplay.getSize(function(size) {
+                        context.userDisplay.setSize(taskInfos.user_display, size);
+                    })
                 }
             });
         }
