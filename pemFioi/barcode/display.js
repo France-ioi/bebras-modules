@@ -282,6 +282,7 @@ function UserDisplay(params) {
                     i++;
                 }
             }
+            return valid;
         }
     }    
 
@@ -304,7 +305,7 @@ function UserDisplay(params) {
         render: render,
 
         diff: function(valid_data) {
-            render(valid_data);
+            return render(valid_data);
         }
     }
 }
