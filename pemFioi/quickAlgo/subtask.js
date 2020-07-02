@@ -202,14 +202,14 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    var initContextForLevel = function(iTestCase) {
+      //      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
       subTask.iTestCase = iTestCase;
-      subTask.context.reset(subTask.data[subTask.level][iTestCase]);
       subTask.context.iTestCase = iTestCase;
       subTask.context.nbTestCases = subTask.nbTestCases;
-      //      var prefix = "Test " + (subTask.iTestCase + 1) + "/" + subTask.nbTestCases + " : ";
       subTask.context.messagePrefixFailure = '';
       subTask.context.messagePrefixSuccess = '';
       subTask.context.linkBack = false;
+      subTask.context.reset(subTask.data[subTask.level][iTestCase]);
    };
 
    subTask.logActivity = function(details) {
