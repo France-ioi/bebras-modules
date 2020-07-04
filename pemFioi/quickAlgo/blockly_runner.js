@@ -414,6 +414,14 @@ function initBlocklyRunner(context, messageCallback) {
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             isRunning[iInterpreter] = true;
             toStop[iInterpreter] = false;
+
+            if(iInterpreter > 0) {
+               // This is a fix for pseudoToNative identity comparisons (===),
+               // as without that fix, pseudo-objects coming from another
+               // interpreter would not get recognized to the right type.
+               interpreters[iInterpreter].ARRAY = interpreters[0].ARRAY;
+               interpreters[iInterpreter].REGEXP = interpreters[0].REGEXP;
+            }
          }
          runner.maxIter = 400000;
          if (context.infos.maxIter != undefined) {
