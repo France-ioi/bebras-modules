@@ -1,8 +1,32 @@
+DisplaysManager = {
+
+    instances: {},
+
+    get: function(name, iTestCase, parent, params) {
+        var k = name + iTestCase;
+        if(!this.instances[k]) {
+            this.instances[k] = window[name](params);
+        }
+        this.instances[k].init(parent);
+        return this.instances[k];
+    }
+}
+
+
 function BarcodeDisplay(params) {
 
-    var canvas = document.createElement('canvas');
-    var context2d = canvas.getContext('2d');
-    params.parent.append($(canvas));
+    var parent;
+    var canvas;
+    var context2d;
+
+    function init(new_parent) {
+        parent = new_parent;
+        canvas = $('<canvas>');
+        parent.append(canvas);
+        context2d = canvas[0].getContext('2d');
+        cursor.reset();
+        render();
+    }
 
     var image_data = '';
     var image;
@@ -82,8 +106,8 @@ function BarcodeDisplay(params) {
         if(!image) {
             return;
         }
-        var w = canvas.width = Math.floor(params.parent.width());
-        var h = canvas.height = Math.floor(params.parent.height() * 0.5 - 10);
+        var w = canvas[0].width = Math.floor(parent.width());
+        var h = canvas[0].height = Math.floor(parent.height() * 0.5 - 10);
         if(w == 0) {
             return;
         }
@@ -105,7 +129,7 @@ function BarcodeDisplay(params) {
 
 
 
-    function init(data, callback) {
+    function setImage(data, callback) {
         if(image_data === data) {
             return;
         }
@@ -135,11 +159,14 @@ function BarcodeDisplay(params) {
         image.src = image_data;        
     }
 
-    
 
+    
+    
     return {
 
-        init: init,        
+        init: init,
+
+        setImage: setImage,        
 
         render: render,
 
@@ -177,19 +204,17 @@ function UserDisplay(params) {
 
     var pixels = [];
     var canvas, context2d;
-    var ready = false;
     var data_size;
-    var viewport_size;
+    var parent;
+    var valid_data;
 
 
-    function init() {
-        if(ready) {
-            return;
-        }
-        ready = true;
-        canvas = document.createElement('canvas');
-        context2d = canvas.getContext('2d');
-        params.parent.append($(canvas));
+    function init(new_parent) {
+        parent = new_parent;
+        canvas = $('<canvas>');
+        parent.append(canvas);
+        context2d = canvas[0].getContext('2d');
+        render();
     }
 
 
@@ -223,59 +248,55 @@ function UserDisplay(params) {
     }
 
 
-    function render(valid_data) {
-        if(!ready || !pixels) {
-            return;
-        }
-        if(w == 0) {
+    function render() {
+        if(!pixels || w == 0 || !data_size) {
             return;
         }
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
 
-        var w = canvas.width = Math.floor(params.parent.width());
-        var h = canvas.height = Math.floor(params.parent.height() * 0.5 - 10);
+        var w = canvas[0].width = Math.floor(parent.width());
+        var h = canvas[0].height = Math.floor(parent.height() * 0.5 - 10);
         if(w == 0) {
             return;
         }
-        var scale = Math.min(Math.floor(w / viewport_size.width), Math.floor(h / viewport_size.height));        
-        var ofs_left = Math.floor(0.5 * (w - viewport_size.width * scale));
+        var scale = Math.min(Math.floor(w / data_size.width), Math.floor(h / data_size.height));        
+        var ofs_left = Math.floor(0.5 * (w - data_size.width * scale));
         context2d.clearRect(0, 0, w, h);        
 
-        var pixel_size = viewport_size.width * scale / data_size.width;
         var i=0;
-        for(var y=0; y<viewport_size.height; y++) {
-            for(var x=0; x<viewport_size.width; x++) {
+        for(var y=0; y<data_size.height; y++) {
+            for(var x=0; x<data_size.width; x++) {
                 if(pixels[i] != 255) {
                     context2d.fillStyle = 'rgb(' + pixels[i] + ',' + pixels[i] + ',' + pixels[i] + ')';
                     context2d.fillRect(
-                        ofs_left + x * pixel_size,
-                        y * pixel_size,
-                        pixel_size,
-                        pixel_size
+                        ofs_left + x * scale,
+                        y * scale,
+                        scale,
+                        scale
                     );
                 }
                 i++;
             }
         }
 
-        grid.render(ofs_left, data_size.width, data_size.height, pixel_size);
+        grid.render(ofs_left, data_size.width, data_size.height, scale);
 
         if(valid_data) {
             var valid = true;
             var i=0;
-            for(var y=0; y<viewport_size.height; y++) {
-                for(var x=0; x<viewport_size.width; x++) {
+            for(var y=0; y<data_size.height; y++) {
+                for(var x=0; x<data_size.width; x++) {
                     if(pixels[i] != valid_data[y][x]) {
                         valid = false;
                         context2d.beginPath();
                         context2d.strokeStyle = '#F00';
                         context2d.lineWidth = scale > 20 ? 2 : 1;
                         context2d.rect(
-                            ofs_left + x * pixel_size,
-                            y * pixel_size,
-                            pixel_size,
-                            pixel_size
+                            ofs_left + x * scale,
+                            y * scale,
+                            scale,
+                            scale
                         );
                         context2d.stroke();                        
                     }
@@ -292,23 +313,34 @@ function UserDisplay(params) {
 
     return {
 
+        init: init,        
+
         setPixelLuminosity: function(x, y, v) {
-            init();
+            valid_data = null;
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
             render();
         },
 
-        setSize: function(new_data_size, new_viewport_size) {
+        setValidData: function(new_valid_data) {
+            valid_data = new_valid_data;
+        },
+
+        setSize: function(new_data_size) {
+            if(data_size && data_size.width == new_data_size.width && data_size.height == new_data_size.height) {
+                render();
+                return;
+            }
             data_size = new_data_size;
-            viewport_size = new_viewport_size;
             pixels = new Array(data_size.width * data_size.height).fill(255)
+            render();
         },
 
         render: render,
 
-        diff: function(valid_data) {
-            return render(valid_data);
+        diff: function(data) {
+            this.setValidData(data)
+            return render();
         }
     }
 }
@@ -317,71 +349,65 @@ function UserDisplay(params) {
 
 function StringDisplay(params) {
 
-    var data = [];
-    var diff_data = [];
+    var data = '';
+    var valid_data = '';
     var element;
     var wrapper;
-    var display = false;
-    var iTestCase = 0;    
 
 
-    function init() {
-        element = $('#barcode-result');
-        if(element.length == 0) {
-            element = $('<span id="barcode-result">')
-            wrapper = $('<div><span>' + params.strings.messages.result + '</span> </div>');
-            wrapper.append(element)
-            params.parent.append(wrapper);
+    function init(parent) {
+        element = $('<span>')
+        wrapper = $('<div><span>' + params.strings.messages.result + '</span> </div>');
+        wrapper.append(element).hide();
+        parent.append(wrapper);
+
+        if(data != '' && valid_data != '') {
+            this.diff(valid_data);
         } else {
-            wrapper = element.closest('div');            
-        }
+            render(data);
+        }        
     }
 
+
+    function isEmpty() {
+        return data == '';
+    }
+
+
     function render(html) {
-        /*
-        if(!display) {
-            return;
-        }        
-        */
-        init();
-        wrapper.toggle(typeof html != 'undefined' && html != '');
+        wrapper.toggle(data != '');
         element.html(html);
     }
 
 
     return {
 
-        setContextEnv: function(newTestCase, new_display) {
-            iTestCase = newTestCase;
-            display = new_display;
-            render(typeof diff_data[iTestCase] == 'undefined' ? data[iTestCase] : diff_data[iTestCase]);
-        },
-       
+        init: init,        
+
+        
         setData: function(str) {
             str = '' + str;
-            data[iTestCase] = str;
-            diff_data[iTestCase] = undefined;
+            data = str;
             render(str);
         },
 
 
-        diff: function(valid_data) {
+        diff: function(new_valid_data) {
             var html = '';
             var valid = true;
-            var case_data = data[iTestCase];
-            var l = Math.max(valid_data.length, case_data.length);
+            var l = Math.max(new_valid_data.length, data.length);
             for(var i=0; i<l; i++) {
-                if(valid_data[i] !== case_data[i]) {
+                if(new_valid_data[i] !== data[i]) {
                     valid = false;
-                    if(case_data[i]) {
-                        html += '<span style="background: red; color: #fff;">' + case_data[i] + '<span>';
+                    if(data[i]) {
+                        html += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
                     }                    
                 } else {
-                    html += case_data[i];
+                    html += data[i];
                 }
             }
-            diff_data[iTestCase] = html;
             render(html);
+            valid_data = new_valid_data;
             return valid;
         }
     }
