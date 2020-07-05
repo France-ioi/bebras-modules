@@ -89,6 +89,7 @@ function BarcodeDisplay(params) {
         }
         var scale = Math.min(Math.floor(w / image.width), Math.floor(h / image.height));
         var image_w = Math.floor(image.width * scale);
+        var image_h = Math.floor(image.height * scale);
         var ofs_left = Math.floor(0.5 * (w - image_w));
         
         //var h = canvas.height = image.height * scale;
@@ -96,9 +97,9 @@ function BarcodeDisplay(params) {
         context2d.mozImageSmoothingEnabled = false;        
 
         context2d.clearRect(0, 0, w, h);        
-        context2d.drawImage(image, ofs_left, 0, image_w, h);
+        context2d.drawImage(image, ofs_left, 0, image_w, image_h);
         
-        grid.render(scale, ofs_left, image_w, h)
+        grid.render(scale, ofs_left, image_w, image_h)
         cursor.render(ofs_left, scale);
     }
 
@@ -285,6 +286,9 @@ function UserDisplay(params) {
             return valid;
         }
     }    
+
+
+
 
 
     return {
