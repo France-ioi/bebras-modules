@@ -151,13 +151,13 @@ function BarcodeDisplay(params) {
 
     function loadImage(callback) {
         if(image_loaded) {
-            callback && callback();
+            return callback && callback();
         }
         image = new Image();
         image.onload = function() {
             image_context2d.drawImage(image, 0, 0);
+            image_loaded = true;            
             render();
-            image_loaded = true;
             callback && callback();
         }
         image.src = image_data;        
