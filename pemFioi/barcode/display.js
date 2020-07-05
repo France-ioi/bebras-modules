@@ -2,12 +2,12 @@ DisplaysManager = {
 
     instances: {},
 
-    get: function(name, iTestCase, parent, params) {
+    get: function(name, iTestCase, display, parent, params) {
         var k = name + iTestCase;
         if(!this.instances[k]) {
             this.instances[k] = window[name](params);
         }
-        this.instances[k].init(parent);
+        this.instances[k].init(parent, display);
         return this.instances[k];
     }
 }
@@ -19,8 +19,12 @@ function BarcodeDisplay(params) {
     var canvas;
     var context2d;
 
-    function init(new_parent) {
+    function init(new_parent, new_display) {
         parent = new_parent;
+        display = new_display;
+        if(!display) {
+            return;
+        }
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
@@ -103,7 +107,7 @@ function BarcodeDisplay(params) {
 
 
     function render() {
-        if(!image) {
+        if(!image || !display) {
             return;
         }
         var w = canvas[0].width = Math.floor(parent.width());
@@ -117,7 +121,7 @@ function BarcodeDisplay(params) {
         var ofs_left = Math.floor(0.5 * (w - image_w));
         
         context2d.imageSmoothingEnabled = false;
-        context2d.mozImageSmoothingEnabled = false;        
+        //context2d.mozImageSmoothingEnabled = false;        
 
         context2d.clearRect(0, 0, w, h);        
         context2d.drawImage(image, ofs_left, 0, image_w, image_h);
@@ -206,11 +210,14 @@ function UserDisplay(params) {
     var canvas, context2d;
     var data_size;
     var parent;
-    var valid_data;
 
 
-    function init(new_parent) {
+    function init(new_parent, new_display) {
         parent = new_parent;
+        display = new_display;
+        if(!display) {
+            return;
+        }
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
@@ -248,39 +255,42 @@ function UserDisplay(params) {
     }
 
 
-    function render() {
+    function render(valid_data) {
         if(!pixels || w == 0 || !data_size) {
             return;
         }
-        context2d.imageSmoothingEnabled = false;
-        context2d.mozImageSmoothingEnabled = false;        
 
-        var w = canvas[0].width = Math.floor(parent.width());
-        var h = canvas[0].height = Math.floor(parent.height() * 0.5 - 10);
-        if(w == 0) {
-            return;
-        }
-        var scale = Math.min(Math.floor(w / data_size.width), Math.floor(h / data_size.height));        
-        var ofs_left = Math.floor(0.5 * (w - data_size.width * scale));
-        context2d.clearRect(0, 0, w, h);        
+        if(display) {
+            context2d.imageSmoothingEnabled = false;
+            //context2d.mozImageSmoothingEnabled = false;        
 
-        var i=0;
-        for(var y=0; y<data_size.height; y++) {
-            for(var x=0; x<data_size.width; x++) {
-                if(pixels[i] != 255) {
-                    context2d.fillStyle = 'rgb(' + pixels[i] + ',' + pixels[i] + ',' + pixels[i] + ')';
-                    context2d.fillRect(
-                        ofs_left + x * scale,
-                        y * scale,
-                        scale,
-                        scale
-                    );
-                }
-                i++;
+            var w = canvas[0].width = Math.floor(parent.width());
+            var h = canvas[0].height = Math.floor(parent.height() * 0.5 - 10);
+            if(w == 0) {
+                return;
             }
-        }
+            var scale = Math.min(Math.floor(w / data_size.width), Math.floor(h / data_size.height));        
+            var ofs_left = Math.floor(0.5 * (w - data_size.width * scale));
+            context2d.clearRect(0, 0, w, h);        
 
-        grid.render(ofs_left, data_size.width, data_size.height, scale);
+            var i=0;
+            for(var y=0; y<data_size.height; y++) {
+                for(var x=0; x<data_size.width; x++) {
+                    if(pixels[i] != 255) {
+                        context2d.fillStyle = 'rgb(' + pixels[i] + ',' + pixels[i] + ',' + pixels[i] + ')';
+                        context2d.fillRect(
+                            ofs_left + x * scale,
+                            y * scale,
+                            scale,
+                            scale
+                        );
+                    }
+                    i++;
+                }
+            }
+
+            grid.render(ofs_left, data_size.width, data_size.height, scale);
+        }
 
         if(valid_data) {
             var valid = true;
@@ -289,16 +299,18 @@ function UserDisplay(params) {
                 for(var x=0; x<data_size.width; x++) {
                     if(pixels[i] != valid_data[y][x]) {
                         valid = false;
-                        context2d.beginPath();
-                        context2d.strokeStyle = '#F00';
-                        context2d.lineWidth = scale > 20 ? 2 : 1;
-                        context2d.rect(
-                            ofs_left + x * scale,
-                            y * scale,
-                            scale,
-                            scale
-                        );
-                        context2d.stroke();                        
+                        if(display) {
+                            context2d.beginPath();
+                            context2d.strokeStyle = '#F00';
+                            context2d.lineWidth = scale > 20 ? 2 : 1;
+                            context2d.rect(
+                                ofs_left + x * scale,
+                                y * scale,
+                                scale,
+                                scale
+                            );
+                            context2d.stroke();                        
+                        }
                     }
                     i++;
                 }
@@ -316,21 +328,12 @@ function UserDisplay(params) {
         init: init,        
 
         setPixelLuminosity: function(x, y, v) {
-            valid_data = null;
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
             render();
         },
 
-        setValidData: function(new_valid_data) {
-            valid_data = new_valid_data;
-        },
-
         setSize: function(new_data_size) {
-            if(data_size && data_size.width == new_data_size.width && data_size.height == new_data_size.height) {
-                render();
-                return;
-            }
             data_size = new_data_size;
             pixels = new Array(data_size.width * data_size.height).fill(255)
             render();
@@ -339,8 +342,7 @@ function UserDisplay(params) {
         render: render,
 
         diff: function(data) {
-            this.setValidData(data)
-            return render();
+            return render(data);
         }
     }
 }
@@ -350,22 +352,21 @@ function UserDisplay(params) {
 function StringDisplay(params) {
 
     var data = '';
-    var valid_data = '';
+    var diff = '';
     var element;
     var wrapper;
+    var display;
 
-
-    function init(parent) {
+    function init(parent, new_display) {
+        display = new_display;
+        data = '';
+        if(!display) {
+            return;
+        }
         element = $('<span>')
         wrapper = $('<div><span>' + params.strings.messages.result + '</span> </div>');
         wrapper.append(element).hide();
         parent.append(wrapper);
-
-        if(data != '' && valid_data != '') {
-            this.diff(valid_data);
-        } else {
-            render(data);
-        }        
     }
 
 
@@ -375,6 +376,9 @@ function StringDisplay(params) {
 
 
     function render(html) {
+        if(!display) {
+            return;
+        }        
         wrapper.toggle(data != '');
         element.html(html);
     }
@@ -392,22 +396,21 @@ function StringDisplay(params) {
         },
 
 
-        diff: function(new_valid_data) {
-            var html = '';
+        diff: function(valid_data) {
+            diff = '';
             var valid = true;
-            var l = Math.max(new_valid_data.length, data.length);
+            var l = Math.max(valid_data.length, data.length);
             for(var i=0; i<l; i++) {
-                if(new_valid_data[i] !== data[i]) {
+                if(valid_data[i] !== data[i]) {
                     valid = false;
                     if(data[i]) {
-                        html += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
+                        diff += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
                     }                    
                 } else {
-                    html += data[i];
+                    diff += data[i];
                 }
             }
-            render(html);
-            valid_data = new_valid_data;
+            render(diff);
             return valid;
         }
     }
