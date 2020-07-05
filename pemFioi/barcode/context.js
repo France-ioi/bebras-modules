@@ -32,8 +32,6 @@ var getContext = function(display, infos, curLevel) {
                 mistake_digit: 'The digit with a red background is incorrect',
                 mistake_pixel: 'The pixel with a red border is incorrect',
                 result: 'Result:'                
-            },
-            ui: {
             }
         }
     }
@@ -64,7 +62,7 @@ var getContext = function(display, infos, curLevel) {
                 parent: $('#grid')
             });
 
-            context.stringDisplay = new StringDisplay({
+            context.stringDisplay = StringDisplay({
                 parent: $('#grid'),
                 strings: strings
             });            
