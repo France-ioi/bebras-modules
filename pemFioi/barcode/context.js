@@ -50,11 +50,16 @@ var getContext = function(display, infos, curLevel) {
 
 
     context.reset = function(taskInfos) {
-        var grid = $('#grid').empty();
+        var grid = $('#grid');
+        if(context.display) {
+            grid.empty();
+        }        
+        
 
         context.barcodeDisplay = DisplaysManager.get(
             'BarcodeDisplay',
             context.iTestCase,
+            context.display,
             grid
         );
 
@@ -62,6 +67,7 @@ var getContext = function(display, infos, curLevel) {
         context.stringDisplay = DisplaysManager.get(
             'StringDisplay',
             context.iTestCase,
+            context.display,
             grid,
             {
                 strings: strings
@@ -71,6 +77,7 @@ var getContext = function(display, infos, curLevel) {
         context.userDisplay = DisplaysManager.get(
             'UserDisplay',
             context.iTestCase,
+            context.display,
             grid
         );        
         
