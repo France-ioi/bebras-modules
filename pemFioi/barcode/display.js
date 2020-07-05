@@ -83,18 +83,15 @@ function BarcodeDisplay(params) {
             return;
         }
         var w = canvas.width = Math.floor(params.parent.width());
+        var h = canvas.height = Math.floor(params.parent.height() * 0.5 - 10);
         if(w == 0) {
             return;
         }
-        if(w > image.width) {
-            var scale = Math.floor(w / image.width);
-        } else {
-            var scale = 1;
-        }
+        var scale = Math.min(Math.floor(w / image.width), Math.floor(h / image.height));
         var image_w = Math.floor(image.width * scale);
         var ofs_left = Math.floor(0.5 * (w - image_w));
         
-        var h = canvas.height = image.height * scale;
+        //var h = canvas.height = image.height * scale;
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
 
@@ -230,16 +227,19 @@ function UserDisplay(params) {
         if(!ready || !pixels) {
             return;
         }
-        var w = canvas.width = Math.floor(params.parent.width());
         if(w == 0) {
             return;
         }
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
 
-        var scale = w > viewport_size.width ? Math.floor(w / viewport_size.width) : 1;
+        var w = canvas.width = Math.floor(params.parent.width());
+        var h = canvas.height = Math.floor(params.parent.height() * 0.5 - 10);
+        if(w == 0) {
+            return;
+        }
+        var scale = Math.min(Math.floor(w / viewport_size.width), Math.floor(h / viewport_size.height));        
         var ofs_left = Math.floor(0.5 * (w - viewport_size.width * scale));
-        var h = canvas.height = viewport_size.height * scale;
         context2d.clearRect(0, 0, w, h);        
 
         var pixel_size = viewport_size.width * scale / data_size.width;
