@@ -116,7 +116,8 @@ function initBlocklyRunner(context, messageCallback) {
       runner.noDelay = function(callback, value) {
          var primitive = undefined;
          if (value !== undefined) {
-            if(value && typeof value.length != 'undefined') {
+            if(value && (typeof value.length != 'undefined' ||
+                         typeof value === 'object')) {
                // It's an array, create a primitive out of it
                primitive = interpreters[context.curNode].nativeToPseudo(value);
             } else {
@@ -420,6 +421,7 @@ function initBlocklyRunner(context, messageCallback) {
                // as without that fix, pseudo-objects coming from another
                // interpreter would not get recognized to the right type.
                interpreters[iInterpreter].ARRAY = interpreters[0].ARRAY;
+               interpreters[iInterpreter].ARRAY_PROTO = interpreters[0].ARRAY_PROTO;
                interpreters[iInterpreter].REGEXP = interpreters[0].REGEXP;
             }
          }
