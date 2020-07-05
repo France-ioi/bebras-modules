@@ -265,7 +265,7 @@ function initBlocklyRunner(context, messageCallback) {
 
       };
 
-      runner.stop = function() {
+      runner.stop = function(aboutToPlay) {
          for (var iInterpreter = 0; iInterpreter < interpreters.length; iInterpreter++) {
             if (isRunning[iInterpreter]) {
                toStop[iInterpreter] = true;
@@ -278,7 +278,7 @@ function initBlocklyRunner(context, messageCallback) {
             context.blocklyHelper.glowBlock(null);
          }
 
-         if(window.quickAlgoInterface) {
+         if(!aboutToPlay && window.quickAlgoInterface) {
             window.quickAlgoInterface.setPlayPause(false);
          }
 
@@ -403,7 +403,7 @@ function initBlocklyRunner(context, messageCallback) {
          runner.stackCount = 0;
          context.programEnded = [];
          context.curSteps = [];
-         runner.reset();
+         runner.reset(true);
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
             context.curSteps[iInterpreter] = {
                total: 0,
@@ -485,10 +485,10 @@ function initBlocklyRunner(context, messageCallback) {
          return this.nbRunning() > 0;
       };
 
-      runner.reset = function() {
+      runner.reset = function(aboutToPlay) {
          if(runner.resetDone) { return; }
          context.reset();
-         runner.stop();
+         runner.stop(aboutToPlay);
          runner.resetDone = true;
       };
 
