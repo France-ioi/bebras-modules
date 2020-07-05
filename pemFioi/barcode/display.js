@@ -92,7 +92,6 @@ function BarcodeDisplay(params) {
         var image_h = Math.floor(image.height * scale);
         var ofs_left = Math.floor(0.5 * (w - image_w));
         
-        //var h = canvas.height = image.height * scale;
         context2d.imageSmoothingEnabled = false;
         context2d.mozImageSmoothingEnabled = false;        
 
@@ -318,45 +317,50 @@ function UserDisplay(params) {
 
 function StringDisplay(params) {
 
-    this.data = [];
-    this.element;
-    this.wrapper;
-    this.display = false;
-    this.iTestCase = 0;    
+    var data = [];
+    var diff_data = [];
+    var element;
+    var wrapper;
+    var display = false;
+    var iTestCase = 0;    
 
-    var self = this;    
 
     function init() {
-        var el = params.parent.find('#barcode-result');
-        if(el.length == 0) {
-            self.element = $('<span>')
-            self.wrapper = $('<div id="barcode-result"><span>' + params.strings.messages.result + '</span> </div>');
-            self.wrapper.append(self.element)
-            params.parent.append(self.wrapper);
+        element = $('#barcode-result');
+        if(element.length == 0) {
+            element = $('<span id="barcode-result">')
+            wrapper = $('<div><span>' + params.strings.messages.result + '</span> </div>');
+            wrapper.append(element)
+            params.parent.append(wrapper);
+        } else {
+            wrapper = element.closest('div');            
         }
     }
 
     function render(html) {
-        if(!self.display) {
+        /*
+        if(!display) {
             return;
-        }
+        }        
+        */
         init();
-        self.wrapper.toggle(typeof html != 'undefined' && html != '');
-        self.element.html(html);
+        wrapper.toggle(typeof html != 'undefined' && html != '');
+        element.html(html);
     }
 
 
     return {
 
-        setContextEnv: function(iTestCase, display) {
-            self.iTestCase = iTestCase;
-            self.display = display;
-            render(self.data[self.iTestCase]);
+        setContextEnv: function(newTestCase, new_display) {
+            iTestCase = newTestCase;
+            display = new_display;
+            render(typeof diff_data[iTestCase] == 'undefined' ? data[iTestCase] : diff_data[iTestCase]);
         },
        
         setData: function(str) {
             str = '' + str;
-            self.data[self.iTestCase] = str;
+            data[iTestCase] = str;
+            diff_data[iTestCase] = undefined;
             render(str);
         },
 
@@ -364,19 +368,19 @@ function StringDisplay(params) {
         diff: function(valid_data) {
             var html = '';
             var valid = true;
-            var data = self.data[self.iTestCase]
-            var l = Math.max(valid_data.length, data.length);
+            var case_data = data[iTestCase];
+            var l = Math.max(valid_data.length, case_data.length);
             for(var i=0; i<l; i++) {
-                if(valid_data[i] !== data[i]) {
+                if(valid_data[i] !== case_data[i]) {
                     valid = false;
-                    if(data[i]) {
-                        html += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
+                    if(case_data[i]) {
+                        html += '<span style="background: red; color: #fff;">' + case_data[i] + '<span>';
                     }                    
                 } else {
-                    html += data[i];
+                    html += case_data[i];
                 }
             }
-            self.data[self.iTestCase] = html;
+            diff_data[iTestCase] = html;
             render(html);
             return valid;
         }
