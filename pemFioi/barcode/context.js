@@ -48,39 +48,39 @@ var getContext = function(display, infos, curLevel) {
     */
 
 
-    var ready = false;
 
     context.reset = function(taskInfos) {
-        if(!ready) {
-            $('#grid').empty();
+        var grid = $('#grid').empty();
 
-            context.barcodeDisplay = BarcodeDisplay({
-                parent: $('#grid')
-            });
+        context.barcodeDisplay = DisplaysManager.get(
+            'BarcodeDisplay',
+            context.iTestCase,
+            grid
+        );
 
-            context.userDisplay = UserDisplay({
-                parent: $('#grid')
-            });
 
-            context.stringDisplay = StringDisplay({
-                parent: $('#grid'),
+        context.stringDisplay = DisplaysManager.get(
+            'StringDisplay',
+            context.iTestCase,
+            grid,
+            {
                 strings: strings
-            });            
-        }
-        ready = true;
+            }
+        );            
 
-        context.stringDisplay.setContextEnv(context.iTestCase, context.display);
+        context.userDisplay = DisplaysManager.get(
+            'UserDisplay',
+            context.iTestCase,
+            grid
+        );        
         
+       
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
-            context.barcodeDisplay.init(taskInfos.image, function() {
-                taskInfos.user_display && context.barcodeDisplay.getSize(function(size) {
-                    context.userDisplay.setSize(taskInfos.user_display, size);
-                })
-            });
+            context.barcodeDisplay.setImage(taskInfos.image);
+            taskInfos.user_display && context.userDisplay.setSize(taskInfos.user_display);
         }
-
-        context.barcodeDisplay && context.barcodeDisplay.resetCursor();
+       
     }
 
 
