@@ -63,17 +63,22 @@ var getContext = function(display, infos, curLevel) {
             context.userDisplay = UserDisplay({
                 parent: $('#grid')
             });
+
+            context.stringDisplay = new StringDisplay({
+                parent: $('#grid'),
+                strings: strings
+            });            
         }
         ready = true;
+
+        context.stringDisplay.setContextEnv(context.iTestCase, context.display);
         
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
             context.barcodeDisplay.init(taskInfos.image, function() {
-                if(taskInfos.user_display) {
-                    context.barcodeDisplay.getSize(function(size) {
-                        context.userDisplay.setSize(taskInfos.user_display, size);
-                    })
-                }
+                taskInfos.user_display && context.barcodeDisplay.getSize(function(size) {
+                    context.userDisplay.setSize(taskInfos.user_display, size);
+                })
             });
         }
 
@@ -93,52 +98,12 @@ var getContext = function(display, infos, curLevel) {
 
 
 
-    var stringResult = {
 
-        data: '',
-        element: null,
-
-        init: function() {
-            var el = $('#barcode-result');
-            if(el.length == 0) {
-                this.element = $('<span>')
-                var wrapper = $('<div id="barcode-result"><span>' + strings.messages.result + '</span> </div>');
-                wrapper.append(this.element)
-                $('#grid').append(wrapper);
-            }
-        },
-        
-        set: function(str) {
-            this.init();
-            this.data = '' + str;
-            this.element.html(str);
-        },
-
-
-        diff: function(data) {
-            this.init();
-            var html = '';
-            var valid = true;
-            var l = Math.max(data.length, this.data.length);
-            for(var i=0; i<l; i++) {
-                if(data[i] !== this.data[i]) {
-                    valid = false;
-                    if(this.data[i]) {
-                        html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
-                    }                    
-                } else {
-                    html += this.data[i];
-                }
-            }
-            this.element.html(html);
-            return valid;
-        }
-    }
 
     context.gradeResult = function() {
         switch(context.valid_result.type) {
             case 'string':
-                context.success = stringResult.diff(context.valid_result.data);
+                context.success = context.stringDisplay.diff(context.valid_result.data);
                 var error = strings.messages.mistake_digit;
                 break;
             case 'array':
@@ -180,7 +145,7 @@ var getContext = function(display, infos, curLevel) {
         },
 
         printResult: function(v, callback) {
-            context.waitDelay(callback, stringResult.set(v));
+            context.waitDelay(callback, context.stringDisplay.setData(v));
         }
     }
 
