@@ -289,7 +289,7 @@ function UserDisplay(params) {
 
     return {
 
-         setPixelLuminosity: function(x, y, v) {
+        setPixelLuminosity: function(x, y, v) {
             init();
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
@@ -308,4 +308,74 @@ function UserDisplay(params) {
             return render(valid_data);
         }
     }
+}
+
+
+
+function StringDisplay(params) {
+
+    this.data = [];
+    this.element;
+    this.wrapper;
+    this.display = false;
+    this.iTestCase = 0;    
+
+    var self = this;    
+
+    function init() {
+        var el = params.parent.find('#barcode-result');
+        if(el.length == 0) {
+            self.element = $('<span>')
+            self.wrapper = $('<div id="barcode-result"><span>' + params.strings.messages.result + '</span> </div>');
+            self.wrapper.append(self.element)
+            params.parent.append(self.wrapper);
+        }
+    }
+
+    function render(html) {
+        if(!self.display) {
+            return;
+        }
+        init();
+        self.wrapper.toggle(typeof html != 'undefined' && html != '');
+        self.element.html(html);
+    }
+
+
+    return {
+
+        setContextEnv: function(iTestCase, display) {
+            self.iTestCase = iTestCase;
+            self.display = display;
+            render(self.data[self.iTestCase]);
+        },
+       
+        setData: function(str) {
+            str = '' + str;
+            self.data[self.iTestCase] = str;
+            render(str);
+        },
+
+
+        diff: function(valid_data) {
+            var html = '';
+            var valid = true;
+            var data = self.data[self.iTestCase]
+            var l = Math.max(valid_data.length, data.length);
+            for(var i=0; i<l; i++) {
+                if(valid_data[i] !== data[i]) {
+                    valid = false;
+                    if(data[i]) {
+                        html += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
+                    }                    
+                } else {
+                    html += data[i];
+                }
+            }
+            self.data[self.iTestCase] = html;
+            render(html);
+            return valid;
+        }
+    }
+
 }
