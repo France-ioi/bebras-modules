@@ -141,9 +141,11 @@ function ResponseCurve(settings) {
 
    var removePoint = function(name) {
       var id = getIndexFromName(name);
-      points[id].obj.remove();
-      points.splice(id,1);
-      pointPos.splice(id,1);
+      if(points[id]){
+         points[id].obj.remove();
+         points.splice(id,1);
+         pointPos.splice(id,1);
+      }
    };
 
    var getClosestCurvePointPos = function(x,y) {
