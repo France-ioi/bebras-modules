@@ -18,7 +18,7 @@ function ResponseCurve(settings) {
    var startPos;
    var selectedPoints = [];
    var pointSize = 10;
-   var dragOverlaySize = 20;
+   var dragOverlaySize = 30;
    var nameIndex = 2;
 
    this.setUpdateCurveCallback = function(fct) {
@@ -132,7 +132,8 @@ function ResponseCurve(settings) {
          pointPos.splice(index,0,{x:x,y:y,id:newID});
          nameIndex++;
          var point = paper.rect(x - pointSize/2,y - pointSize/2,pointSize,pointSize).attr(attr.point);
-         var dragOverlay = paper.rect(x - dragOverlaySize/2,y - dragOverlaySize/2,dragOverlaySize,dragOverlaySize).attr(attr.dragOverlay);
+         // var dragOverlay = paper.rect(x - dragOverlaySize/2,y - dragOverlaySize/2,dragOverlaySize,dragOverlaySize).attr(attr.dragOverlay);
+         var dragOverlay = paper.circle(x,y,dragOverlaySize/2).attr(attr.dragOverlay);
          points.splice(index,0,{ obj: paper.set(point,dragOverlay), id: newID });
          enableDragPoint(index);
       }
@@ -140,9 +141,11 @@ function ResponseCurve(settings) {
 
    var removePoint = function(name) {
       var id = getIndexFromName(name);
-      points[id].obj.remove();
-      points.splice(id,1);
-      pointPos.splice(id,1);
+      if(points[id]){
+         points[id].obj.remove();
+         points.splice(id,1);
+         pointPos.splice(id,1);
+      }
    };
 
    var getClosestCurvePointPos = function(x,y) {
@@ -252,8 +255,10 @@ function ResponseCurve(settings) {
          y: newY - pointSize/2
       });
       points[id].obj[1].attr({
-         x: newX - dragOverlaySize/2,
-         y: newY - dragOverlaySize/2
+         // x: newX - dragOverlaySize/2,
+         // y: newY - dragOverlaySize/2
+         cx: newX,
+         cy: newY
       });
       updateCurve("move");
    };
@@ -284,6 +289,11 @@ function ResponseCurve(settings) {
       }else{
          selectedPoints.push(name);
          points[id].obj[0].attr(attr.selectedPoint);
+         points[id].obj[1].undblclick();
+         points[id].obj[1].dblclick(function() {
+            removePoint(name);
+            updateCurve("keydown");
+         });
       }
    };
 
@@ -345,7 +355,8 @@ function ResponseCurve(settings) {
       for(var iPoint = 0; iPoint < pointPos.length; iPoint++){
          var pos = pointPos[iPoint];
          var point = paper.rect(pos.x - pointSize/2,pos.y - pointSize/2,pointSize,pointSize).attr(attr.point);
-         var dragOverlay = paper.rect(pos.x - dragOverlaySize/2,pos.y - dragOverlaySize/2,dragOverlaySize,dragOverlaySize).attr(attr.dragOverlay);
+         // var dragOverlay = paper.rect(pos.x - dragOverlaySize/2,pos.y - dragOverlaySize/2,dragOverlaySize,dragOverlaySize).attr(attr.dragOverlay);
+         var dragOverlay = paper.circle(pos.x,pos.y,dragOverlaySize/2).attr(attr.dragOverlay);
          points[iPoint] = { obj: paper.set(point,dragOverlay), id: pos.id };
       }
    };

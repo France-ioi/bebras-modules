@@ -32,8 +32,6 @@ var getContext = function(display, infos, curLevel) {
                 mistake_digit: 'The digit with a red background is incorrect',
                 mistake_pixel: 'The pixel with a red border is incorrect',
                 result: 'Result:'                
-            },
-            ui: {
             }
         }
     }
@@ -50,34 +48,46 @@ var getContext = function(display, infos, curLevel) {
     */
 
 
-    var ready = false;
 
     context.reset = function(taskInfos) {
-        if(!ready) {
-            $('#grid').empty();
-
-            context.barcodeDisplay = BarcodeDisplay({
-                parent: $('#grid')
-            });
-
-            context.userDisplay = UserDisplay({
-                parent: $('#grid')
-            });
-        }
-        ready = true;
+        var grid = $('#grid');
+        if(context.display) {
+            grid.empty();
+        }        
         
+
+        context.barcodeDisplay = DisplaysManager.get(
+            'BarcodeDisplay',
+            context.iTestCase,
+            context.display,
+            grid
+        );
+
+
+        context.stringDisplay = DisplaysManager.get(
+            'StringDisplay',
+            context.iTestCase,
+            context.display,
+            grid,
+            {
+                strings: strings
+            }
+        );            
+
+        context.userDisplay = DisplaysManager.get(
+            'UserDisplay',
+            context.iTestCase,
+            context.display,
+            grid
+        );        
+        
+       
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
-            context.barcodeDisplay.init(taskInfos.image, function() {
-                if(taskInfos.user_display) {
-                    context.barcodeDisplay.getSize(function(size) {
-                        context.userDisplay.setSize(taskInfos.user_display, size);
-                    })
-                }
-            });
+            context.barcodeDisplay.setImage(taskInfos.image);
+            taskInfos.user_display && context.userDisplay.setSize(taskInfos.user_display);
         }
-
-        context.barcodeDisplay && context.barcodeDisplay.resetCursor();
+       
     }
 
 
@@ -93,52 +103,12 @@ var getContext = function(display, infos, curLevel) {
 
 
 
-    var stringResult = {
 
-        data: '',
-        element: null,
-
-        init: function() {
-            var el = $('#barcode-result');
-            if(el.length == 0) {
-                this.element = $('<span>')
-                var wrapper = $('<div id="barcode-result"><span>' + strings.messages.result + '</span> </div>');
-                wrapper.append(this.element)
-                $('#grid').append(wrapper);
-            }
-        },
-        
-        set: function(str) {
-            this.init();
-            this.data = '' + str;
-            this.element.html(str);
-        },
-
-
-        diff: function(data) {
-            this.init();
-            var html = '';
-            var valid = true;
-            var l = Math.max(data.length, this.data.length);
-            for(var i=0; i<l; i++) {
-                if(data[i] !== this.data[i]) {
-                    valid = false;
-                    if(this.data[i]) {
-                        html += '<span style="background: red; color: #fff;">' + this.data[i] + '<span>';
-                    }                    
-                } else {
-                    html += this.data[i];
-                }
-            }
-            this.element.html(html);
-            return valid;
-        }
-    }
 
     context.gradeResult = function() {
         switch(context.valid_result.type) {
             case 'string':
-                context.success = stringResult.diff(context.valid_result.data);
+                context.success = context.stringDisplay.diff(context.valid_result.data);
                 var error = strings.messages.mistake_digit;
                 break;
             case 'array':
@@ -180,7 +150,7 @@ var getContext = function(display, infos, curLevel) {
         },
 
         printResult: function(v, callback) {
-            context.waitDelay(callback, stringResult.set(v));
+            context.waitDelay(callback, context.stringDisplay.setData(v));
         }
     }
 
