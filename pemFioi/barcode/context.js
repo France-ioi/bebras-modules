@@ -128,7 +128,12 @@ var getContext = function(display, infos, curLevel) {
 
         getPixelLuminosity: function(x, y, callback) {
             var cb = context.runner.waitCallback(callback);
-            context.barcodeDisplay.getPixelLuminosity(x, y, cb)
+            context.barcodeDisplay.getPixelLuminosity(x, y, function(value) {
+                // Add a delay
+                setTimeout(function() {
+                    cb(value);
+                }, context.infos.actionDelay);
+            })
         },
 
         setPixelLuminosity: function(x, y, v, callback) {
