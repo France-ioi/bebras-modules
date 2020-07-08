@@ -401,12 +401,13 @@ function StringDisplay(params) {
         diff: function(valid_data) {
             diff = '';
             var valid = true;
+            
             var l = Math.max(valid_data.length, data.length);
             for(var i=0; i<l; i++) {
                 if(valid_data[i] !== data[i]) {
                     valid = false;
-                    if(data[i]) {
-                        diff += '<span style="background: red; color: #fff;">' + data[i] + '<span>';
+                    if(i < data.length) {
+                        diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
                     }                    
                 } else {
                     diff += data[i];
