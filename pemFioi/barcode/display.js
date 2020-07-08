@@ -189,7 +189,9 @@ function BarcodeDisplay(params) {
                 render();
                 var d = image_context2d.getImageData(x, y, 1, 1).data;
                 // ITU BT.601
-                callback(0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2]);
+                var l = 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2];
+                l = Math.round(l);
+                callback(l);
             })
         },
 
