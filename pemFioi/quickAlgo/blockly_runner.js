@@ -107,7 +107,7 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.waitCallback = function(callback) {
          // Returns a callback to be called once we can continue the execution
-         runner.stackCount = 0;
+         //runner.stackCount = 0;
          return function(value) {
             runner.noDelay(callback, value);
          }
@@ -233,14 +233,11 @@ function initBlocklyRunner(context, messageCallback) {
 
             if (context.display) {
                try {
-                  if(!runner.scratchMode) {
-                     context.blocklyHelper.workspace.traceOn(true);
-                     context.blocklyHelper.workspace.highlightBlock(id);
-                     highlightPause = true;
-                  } else {
-                     context.blocklyHelper.glowBlock(id);
-                     highlightPause = true;
+                  if(context.infos && !context.infos.actionDelay) {
+                     id = null;
                   }
+                  context.blocklyHelper.highlightBlock(id);
+                  highlightPause = !!id;
                } catch(e) {}
             }
 
