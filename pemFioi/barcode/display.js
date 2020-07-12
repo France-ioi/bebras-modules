@@ -258,6 +258,7 @@ function UserDisplay(params) {
 
 
     function render(valid_data) {
+        var maxDiff = 5;
         if(!pixels || w == 0 || !data_size) {
             return;
         }
@@ -299,7 +300,7 @@ function UserDisplay(params) {
             var i=0;
             for(var y=0; y<data_size.height; y++) {
                 for(var x=0; x<data_size.width; x++) {
-                    if(pixels[i] != valid_data[y][x]) {
+                    if(Math.abs(pixels[i] - valid_data[y][x]) > maxDiff) {
                         valid = false;
                         if(display) {
                             context2d.beginPath();

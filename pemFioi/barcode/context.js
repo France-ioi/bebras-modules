@@ -3,7 +3,7 @@ var getContext = function(display, infos, curLevel) {
     var language_strings = {
         en: {
             categories: {
-                barcode: 'Barcode'
+                barcode: 'Image'
             },
             label: {
                 getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
@@ -32,6 +32,39 @@ var getContext = function(display, infos, curLevel) {
                 mistake_digit: 'The digit with a red background is incorrect',
                 mistake_pixel: 'The pixel with a red border is incorrect',
                 result: 'Result:'                
+            }
+        },
+        fr: {
+            categories: {
+                barcode: 'Image'
+            },
+            label: {
+                getPixelLuminosity: 'getPixelLuminosity(%1, %2)',
+                setPixelLuminosity: 'setPixelLuminosity(%1, %2, %3)',
+                width: 'width()',
+                height: 'height()',
+                printResult: 'printResult(%1)'
+            },
+            code: {
+                getPixelLuminosity: 'getPixelLuminosity',
+                setPixelLuminosity: 'setPixelLuminosity',
+                width: 'width',
+                height: 'height',
+                printResult: 'printResult'
+            },
+            description: {
+                getPixelLuminosity: 'obtenir la luminosité à la colonne et ligne données',
+                setPixelLuminosity: 'modifier la luminosité à la colonne et ligne données',
+                width: 'largeur de l\'image',
+                height: 'hauteur de l\'image',
+                printResult: 'afficher le résultat'
+            },
+            startingBlockName: "Programme",
+            messages: {
+                success: 'Success',
+                mistake_digit: 'Le chiffre sur fond rouge est incorrect',
+                mistake_pixel: 'Le(s) pixel(s) avec une bordure rouge sont incorrects',
+                result: 'Résultat :'
             }
         }
     }
