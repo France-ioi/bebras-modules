@@ -110,6 +110,7 @@ var getContext = function(display, infos, curLevel) {
             }
         );            
 
+        
         context.userDisplay = DisplaysManager.get(
             'UserDisplay',
             context.iTestCase,
@@ -124,7 +125,12 @@ var getContext = function(display, infos, curLevel) {
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
             context.barcodeDisplay.setImage(taskInfos.image);
-            taskInfos.user_display && context.userDisplay.setSize(taskInfos.user_display);
+           
+            if(taskInfos.user_display) {
+                context.userDisplay.setSize(taskInfos.user_display);
+            } else {
+                context.userDisplay.clear();
+            }
         }
        
     }
