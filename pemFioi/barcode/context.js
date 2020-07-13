@@ -23,7 +23,7 @@ var getContext = function(display, infos, curLevel) {
                 getPixelLuminosity: '',
                 setPixelLuminosity: '',
                 width: '',
-                height: '',                
+                height: '',
                 printResult: ''
             },
             startingBlockName: "Program",
@@ -89,8 +89,8 @@ var getContext = function(display, infos, curLevel) {
         var grid = $('#grid');
         if(context.display) {
             grid.empty();
-        }        
-        
+        }
+
 
         context.barcodeDisplay = DisplaysManager.get(
             'BarcodeDisplay',
@@ -111,9 +111,9 @@ var getContext = function(display, infos, curLevel) {
             {
                 strings: strings
             }
-        );            
+        );
 
-        
+
         context.userDisplay = DisplaysManager.get(
             'UserDisplay',
             context.iTestCase,
@@ -122,20 +122,20 @@ var getContext = function(display, infos, curLevel) {
             {
                 strings: strings
             }
-        );        
-        
-       
+        );
+
+
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
             context.barcodeDisplay.setImage(taskInfos.image);
-           
+
             if(taskInfos.user_display) {
                 context.userDisplay.setSize(taskInfos.user_display);
             } else {
                 context.userDisplay.clear();
             }
         }
-       
+
     }
 
 
@@ -167,7 +167,7 @@ var getContext = function(display, infos, curLevel) {
             throw(res.message);
             return;
         }
-        throw new Error(res.message);                        
+        throw new Error(res.message);
     }
 
 
@@ -185,20 +185,20 @@ var getContext = function(display, infos, curLevel) {
 
         setPixelLuminosity: function(x, y, v, callback) {
             context.waitDelay(callback, context.userDisplay.setPixelLuminosity(x, y, v));
-        },        
+        },
 
         width: function(callback) {
             var cb = context.runner.waitCallback(callback);
             context.barcodeDisplay.getSize(function(size) {
                 cb(size.width);
             });
-        },        
+        },
 
         height: function(callback) {
             var cb = context.runner.waitCallback(callback);
             context.barcodeDisplay.getSize(function(size) {
                 cb(size.height);
-            });            
+            });
         },
 
         printResult: function(v, callback) {
@@ -214,7 +214,7 @@ var getContext = function(display, infos, curLevel) {
                     params: ['Number', 'Number'],
                     params_names: ['x', 'y'],
                     yieldsValue: true
-                },                
+                },
                 { name: 'setPixelLuminosity',
                     params: ['Number', 'Number', 'Number'],
                     params_names: ['x', 'y', 'value']
@@ -223,12 +223,12 @@ var getContext = function(display, infos, curLevel) {
                     params: [],
                     params_names: [],
                     yieldsValue: true
-                },                                
+                },
                 { name: 'height',
                     params: [],
                     params_names: [],
                     yieldsValue: true
-                },                                                
+                },
                 { name: 'printResult',
                     params: ['String'],
                     params_names: ['v']
