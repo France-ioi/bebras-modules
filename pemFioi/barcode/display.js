@@ -435,7 +435,7 @@ function UserDisplay(params) {
             cursor && cursor.reset();            
             data_size = null;
             pixels = [];
-            context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
+            context2d && context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
         },
 
         render: render,
