@@ -39,7 +39,7 @@ function ContextCursor(params) {
         }
         params.context2d.beginPath();
         params.context2d.strokeStyle = params.color;
-        params.context2d.lineWidth = scale > 20 ? 2 : 1;
+        params.context2d.lineWidth = scale > 5 ? 3 : 1;
         params.context2d.rect(
             ofs_left + scale * this.position.x + 0.5, 
             scale * this.position.y + 0.5, 
@@ -227,7 +227,7 @@ function BarcodeDisplay(params) {
         image = false;
         image_loaded = false;
         image_data = data;
-        cursor.reset();
+        cursor && cursor.reset();
         if(!image_canvas) {
             image_canvas = document.createElement('canvas');
             image_context2d = image_canvas.getContext('2d');        
@@ -280,7 +280,7 @@ function BarcodeDisplay(params) {
 
         getPixelLuminosity: function(x, y, callback) {
             loadImage(function() {
-                cursor.set(x, y);
+                cursor && cursor.set(x, y);
                 render();
                 callback(calculatePixelLuminosity(x, y));
             })
@@ -419,7 +419,7 @@ function UserDisplay(params) {
         init: init,        
 
         setPixelLuminosity: function(x, y, v) {
-            cursor.set(x, y);
+            cursor && cursor.set(x, y);
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
             render();
@@ -432,7 +432,7 @@ function UserDisplay(params) {
         },
 
         clear: function() {
-            cursor.reset();            
+            cursor && cursor.reset();            
             data_size = null;
             pixels = [];
             context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
