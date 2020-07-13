@@ -31,7 +31,8 @@ var getContext = function(display, infos, curLevel) {
                 success: 'Success',
                 mistake_digit: 'The digit with a red background is incorrect',
                 mistake_pixel: 'The pixel with a red border has luminosity %1, but should have luminosity %2',
-                result: 'Result:'                
+                result: 'Result:',
+                tooltip: 'Coordinates (%1, %2), luminosity %3'
             }
         },
         fr: {
