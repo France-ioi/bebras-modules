@@ -65,7 +65,8 @@ var getContext = function(display, infos, curLevel) {
                 success: 'Success',
                 mistake_digit: 'Le chiffre sur fond rouge est incorrect',
                 mistake_pixel: 'Le(s) pixel(s) avec une bordure rouge sont incorrects',
-                result: 'Résultat :'
+                result: 'Résultat :',
+                tooltip: 'Coordinates (%1, %2), luminosity %3'
             }
         }
     }
