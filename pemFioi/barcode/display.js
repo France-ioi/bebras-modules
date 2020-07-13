@@ -13,15 +13,13 @@ DisplaysManager = {
 }
 
 
-function DisplayCursor(params) {
+function ContextCursor(params) {
     
     var defaults = {
         color: 'rgb(255,128,0)'
     }
-
     params = Object.assign({}, defaults, params);
 
-    this.color = params.color;;
     this.position = false;
 
     this.set = function(x, y) {
@@ -40,7 +38,7 @@ function DisplayCursor(params) {
             return;
         }
         params.context2d.beginPath();
-        params.context2d.strokeStyle = this.color;
+        params.context2d.strokeStyle = params.color;
         params.context2d.lineWidth = scale > 20 ? 2 : 1;
         params.context2d.rect(
             ofs_left + scale * this.position.x + 0.5, 
@@ -53,12 +51,48 @@ function DisplayCursor(params) {
 }
 
 
+
+function ContextGrid(params) {
+
+    var defaults = {
+        color: '#888',
+        min_scale: 6
+    }
+    params = Object.assign({}, defaults, params);    
+
+    this.render = function(ofs_left, scale, cols, rows) {
+        if(scale < params.min_scale) {
+            return;
+        }
+        params.context2d.strokeStyle = params.color;
+        params.context2d.lineWidth = 1;
+        for(var x=1; x<cols; x++) {
+            var dx = ofs_left + x * scale + 0.5;
+            params.context2d.beginPath();
+            params.context2d.moveTo(dx , 0);
+            params.context2d.lineTo(dx, rows * scale);
+            params.context2d.stroke();            
+        }
+        for(var y=1; y<rows; y++) {
+            var dy = y * scale + 0.5;
+            params.context2d.beginPath();
+            params.context2d.moveTo(ofs_left, dy);
+            params.context2d.lineTo(ofs_left + cols * scale, dy);
+            params.context2d.stroke();            
+        }            
+    }    
+}
+
+
+
+
 function BarcodeDisplay(params) {
 
     var parent;
     var canvas;
     var context2d;
     var cursor;
+    var grid;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -69,7 +103,10 @@ function BarcodeDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
-        cursor = new DisplayCursor({
+        cursor = new ContextCursor({
+            context2d: context2d
+        });
+        grid = new ContextGrid({
             context2d: context2d
         });
         render();
@@ -80,41 +117,6 @@ function BarcodeDisplay(params) {
     var image_loaded;
     var image_canvas;
     var image_context2d;    
-
-
-
-    var grid = {
-
-        color: '#888',
-        min_scale: 6,
-
-        render: function(scale, ofs_left, w, h) {
-            if(scale < this.min_scale) {
-                return;
-            }
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = 1;
-            var lw = Math.floor(w / scale);
-            for(var x=1; x<lw; x++) {
-                var dx = ofs_left + x * scale + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(dx , 0);
-                context2d.lineTo(dx, h);
-                context2d.stroke();            
-            }
-            var lh = Math.floor(h / scale);            
-            for(var y=1; y<lh; y++) {
-                var dy = y * scale + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(ofs_left, dy);
-                context2d.lineTo(ofs_left + w, dy);
-                context2d.stroke();            
-            }            
-        }
-
-    }
-
-    
 
 
     function render() {
@@ -137,7 +139,7 @@ function BarcodeDisplay(params) {
         context2d.clearRect(0, 0, w, h);        
         context2d.drawImage(image, ofs_left, 0, image_w, image_h);
         
-        grid.render(scale, ofs_left, image_w, image_h)
+        grid.render(ofs_left, scale, image.width, image.height)
         cursor.render(ofs_left, scale);
     }
 
@@ -219,6 +221,7 @@ function UserDisplay(params) {
     var data_size;
     var parent;
     var cursor;
+    var grid;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -229,41 +232,17 @@ function UserDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
-        cursor = new DisplayCursor({
+        cursor = new ContextCursor({
             context2d: context2d
         });
+        grid = new ContextGrid({
+            context2d: context2d
+        });        
         render();
     }
 
 
-    var grid = {
 
-        color: '#888',
-        min_pixel_size: 6,
-
-        render: function(ofs_left, w, h, pixel_size) {
-            if(pixel_size < this.min_pixel_size) {
-                return;
-            }
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = 1;
-            for(var x=1; x<w; x++) {
-                var dx = ofs_left + x * pixel_size + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(dx , 0);
-                context2d.lineTo(dx, h * pixel_size);
-                context2d.stroke();            
-            }
-            for(var y=1; y<h; y++) {
-                var dy = y * pixel_size + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(ofs_left, dy);
-                context2d.lineTo(ofs_left + w * pixel_size, dy);
-                context2d.stroke();            
-            }            
-        }
-
-    }
 
 
     function render(valid_result) {
@@ -300,7 +279,7 @@ function UserDisplay(params) {
                 }
             }
 
-            grid.render(ofs_left, data_size.width, data_size.height, scale);
+            grid.render(ofs_left, scale, data_size.width, data_size.height);
             cursor.render(ofs_left, scale);
         }
 
