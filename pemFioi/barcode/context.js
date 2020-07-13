@@ -30,7 +30,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                 success: 'Success',
                 mistake_digit: 'The digit with a red background is incorrect',
-                mistake_pixel: 'The pixel with a red border is incorrect',
+                mistake_pixel: 'The pixel with a red border has luminosity %1, but should have luminosity %2',
                 result: 'Result:'                
             }
         },
@@ -93,7 +93,10 @@ var getContext = function(display, infos, curLevel) {
             'BarcodeDisplay',
             context.iTestCase,
             context.display,
-            grid
+            grid,
+            {
+                strings: strings
+            }
         );
 
 
@@ -111,7 +114,10 @@ var getContext = function(display, infos, curLevel) {
             'UserDisplay',
             context.iTestCase,
             context.display,
-            grid
+            grid,
+            {
+                strings: strings
+            }
         );        
         
        
@@ -141,19 +147,18 @@ var getContext = function(display, infos, curLevel) {
     context.gradeResult = function() {
         switch(context.valid_result.type) {
             case 'string':
-                context.success = context.stringDisplay.diff(context.valid_result.data);
-                var error = strings.messages.mistake_digit;
+                var res = context.stringDisplay.diff(context.valid_result);
                 break;
             case 'array':
-                context.success = context.userDisplay.diff(context.valid_result.data);
-                var error = strings.messages.mistake_pixel;
+                var res = context.userDisplay.diff(context.valid_result);
                 break;
         }
+        context.success = res.success;
         if(context.success) {
-            throw(strings.messages.success);
+            throw(res.message);
             return;
         }
-        throw new Error(error);                        
+        throw new Error(res.message);                        
     }
 
 
