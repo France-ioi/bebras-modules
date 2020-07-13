@@ -350,6 +350,12 @@ function UserDisplay(params) {
             render();
         },
 
+        clear: function() {
+            data_size = null;
+            pixels = [];
+            context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
+        },
+
         render: render,
 
         diff: function(valid_result) {
