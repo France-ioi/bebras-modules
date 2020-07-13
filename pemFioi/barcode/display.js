@@ -85,6 +85,73 @@ function ContextGrid(params) {
 
 
 
+function CanvasTooltip(params) {
+
+    this.element = null;
+    this.bounds = null;
+
+    this.render = function() {
+        if(this.element) {
+            return;
+        }
+        this.element = $('<div>')
+            .css('position', 'fixed')
+            .css('z-index', '10000')
+            .css('background', '#4A90E2')
+            .css('color', '#FFF')
+            .css('padding', '10px')
+            .css('border-radius', '5px');
+        $(document.body).append(this.element);
+    }
+
+    this.setBounds = function(ofs_left, scale, cols, rows) {
+        this.bounds = {
+            ofs_left: ofs_left,
+            scale: scale,
+            cols: cols,
+            rows: rows
+        }
+    }
+
+
+    this.show = function(e) {
+        if(!this.bounds) {
+            return;
+        }
+        var canvas_offset = params.canvas.offset(); 
+        var x = e.pageX - canvas_offset.left - this.bounds.ofs_left;
+        var y = e.pageY - canvas_offset.top;
+        if(x < 0 || x > this.bounds.cols * this.bounds.scale) {
+            this.hide();
+            return;
+        }
+
+        var col = Math.floor(x / this.bounds.scale);
+        var row = Math.floor(y / this.bounds.scale);
+        var luminocity = params.getPixelLuminosity(col, row);
+
+        this.render();
+        this.element.show();
+        this.element.css({
+            left: e.pageX + 10,
+            top: e.pageY + 10
+        });
+        var str = params.strings.messages.tooltip;
+        str = str.replace('%1', col).replace('%2', row).replace('%3', luminocity);
+        this.element.text(str);
+    }
+
+
+    this.hide = function() {
+        this.element && this.element.hide();
+    }
+
+    params.canvas.mouseleave(this.hide.bind(this));
+    params.canvas.mousemove(this.show.bind(this));
+}
+
+
+
 
 function BarcodeDisplay(params) {
 
@@ -93,6 +160,7 @@ function BarcodeDisplay(params) {
     var context2d;
     var cursor;
     var grid;
+    var tooltip;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -108,6 +176,11 @@ function BarcodeDisplay(params) {
         });
         grid = new ContextGrid({
             context2d: context2d
+        });
+        tooltip = new CanvasTooltip({
+            canvas: canvas,
+            strings: params.strings,
+            getPixelLuminosity: calculatePixelLuminosity
         });
         render();
     }
@@ -139,7 +212,8 @@ function BarcodeDisplay(params) {
         context2d.clearRect(0, 0, w, h);        
         context2d.drawImage(image, ofs_left, 0, image_w, image_h);
         
-        grid.render(ofs_left, scale, image.width, image.height)
+        grid.render(ofs_left, scale, image.width, image.height);
+        tooltip.setBounds(ofs_left, scale, image.width, image.height);
         cursor.render(ofs_left, scale);
     }
 
@@ -177,6 +251,14 @@ function BarcodeDisplay(params) {
     }
 
 
+    function calculatePixelLuminosity(x, y) {
+        var d = image_context2d.getImageData(x, y, 1, 1).data;
+        // ITU BT.601
+        var l = 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2];
+        return Math.round(l);        
+    }
+
+
     
     
     return {
@@ -200,11 +282,7 @@ function BarcodeDisplay(params) {
             loadImage(function() {
                 cursor.set(x, y);
                 render();
-                var d = image_context2d.getImageData(x, y, 1, 1).data;
-                // ITU BT.601
-                var l = 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2];
-                l = Math.round(l);
-                callback(l);
+                callback(calculatePixelLuminosity(x, y));
             })
         }
 
@@ -222,6 +300,7 @@ function UserDisplay(params) {
     var parent;
     var cursor;
     var grid;
+    var tooltip;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -238,11 +317,22 @@ function UserDisplay(params) {
         grid = new ContextGrid({
             context2d: context2d
         });        
+        tooltip = new CanvasTooltip({
+            canvas: canvas,
+            strings: params.strings,
+            getPixelLuminosity: getPixelLuminosity
+        });        
         render();
     }
 
 
-
+    function getPixelLuminosity(x, y) {
+        if(!data_size) {
+            return 0;
+        }
+        var ofs = y * data_size.width + x;
+        return pixels[ofs];
+    }
 
 
     function render(valid_result) {
@@ -281,6 +371,7 @@ function UserDisplay(params) {
 
             grid.render(ofs_left, scale, data_size.width, data_size.height);
             cursor.render(ofs_left, scale);
+            tooltip.setBounds(ofs_left, scale, data_size.width, data_size.height);
         }
 
         if(valid_result && 'data' in valid_result) {
