@@ -64,9 +64,10 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                 success: 'Success',
                 mistake_digit: 'Le chiffre sur fond rouge est incorrect',
+                mistake_pixel: 'Le pixel encadré en rouge a la luminosité %1, mais devrait avoir la luminosité %2',
                 mistake_pixel: 'Le(s) pixel(s) avec une bordure rouge sont incorrects',
                 result: 'Résultat :',
-                tooltip: 'Coordinates (%1, %2), luminosity %3'
+                tooltip: 'Coordonnées (%1, %2), luminosité %3'
             }
         }
     }
