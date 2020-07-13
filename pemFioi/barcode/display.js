@@ -257,8 +257,7 @@ function UserDisplay(params) {
     }
 
 
-    function render(valid_data) {
-        var maxDiff = 5;
+    function render(valid_result) {
         if(!pixels || w == 0 || !data_size) {
             return;
         }
@@ -295,13 +294,12 @@ function UserDisplay(params) {
             grid.render(ofs_left, data_size.width, data_size.height, scale);
         }
 
-        if(valid_data) {
-            var valid = true;
+        if(valid_result && 'data' in valid_result) {
             var i=0;
+            var threshold = valid_result.threshold || 0;
             for(var y=0; y<data_size.height; y++) {
                 for(var x=0; x<data_size.width; x++) {
-                    if(Math.abs(pixels[i] - valid_data[y][x]) > maxDiff) {
-                        valid = false;
+                    if(Math.abs(pixels[i] - valid_result.data[y][x]) > threshold) {
                         if(display) {
                             context2d.beginPath();
                             context2d.strokeStyle = '#F00';
@@ -314,11 +312,21 @@ function UserDisplay(params) {
                             );
                             context2d.stroke();                        
                         }
+
+                        var msg = params.strings.messages.mistake_pixel;
+                        msg = msg.replace('%1', pixels[i]).replace('%2', valid_result.data[y][x]);
+                        return {
+                            success: false,
+                            message: msg
+                        }                        
                     }
                     i++;
                 }
             }
-            return valid;
+            return {
+                success: true,
+                message: params.strings.messages.success
+            }                        
         }
     }    
 
@@ -344,8 +352,8 @@ function UserDisplay(params) {
 
         render: render,
 
-        diff: function(data) {
-            return render(data);
+        diff: function(valid_result) {
+            return render(valid_result);
         }
     }
 }
@@ -399,13 +407,13 @@ function StringDisplay(params) {
         },
 
 
-        diff: function(valid_data) {
+        diff: function(valid_result) {
             diff = '';
             var valid = true;
             
-            var l = Math.max(valid_data.length, data.length);
+            var l = Math.max(valid_result.data.length, data.length);
             for(var i=0; i<l; i++) {
-                if(valid_data[i] !== data[i]) {
+                if(valid_result.data[i] !== data[i]) {
                     valid = false;
                     if(i < data.length) {
                         diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
@@ -415,7 +423,10 @@ function StringDisplay(params) {
                 }
             }
             render(diff);
-            return valid;
+            return {
+                success: valid,
+                message: valid ? params.strings.messages.success : params.strings.messages.mistake_digit
+            }
         }
     }
 
