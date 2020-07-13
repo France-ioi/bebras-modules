@@ -13,11 +13,52 @@ DisplaysManager = {
 }
 
 
+function DisplayCursor(params) {
+    
+    var defaults = {
+        color: 'rgb(255,128,0)'
+    }
+
+    params = Object.assign({}, defaults, params);
+
+    this.color = params.color;;
+    this.position = false;
+
+    this.set = function(x, y) {
+        this.position = {
+            x: x,
+            y: y
+        }
+    }
+
+    this.reset = function() {
+        this.position = false;
+    }
+
+    this.render = function(ofs_left, scale) {
+        if(!this.position || !params.context2d) {
+            return;
+        }
+        params.context2d.beginPath();
+        params.context2d.strokeStyle = this.color;
+        params.context2d.lineWidth = scale > 20 ? 2 : 1;
+        params.context2d.rect(
+            ofs_left + scale * this.position.x + 0.5, 
+            scale * this.position.y + 0.5, 
+            scale, 
+            scale
+        );
+        params.context2d.stroke();
+    }
+}
+
+
 function BarcodeDisplay(params) {
 
     var parent;
     var canvas;
     var context2d;
+    var cursor;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -28,7 +69,9 @@ function BarcodeDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
-        cursor.reset();
+        cursor = new DisplayCursor({
+            context2d: context2d
+        });
         render();
     }
 
@@ -38,38 +81,6 @@ function BarcodeDisplay(params) {
     var image_canvas;
     var image_context2d;    
 
-
-    var cursor = {
-        color: 'rgb(255,128,0)',
-        position: false,
-
-        set: function(x, y) {
-            this.position = {
-                x: x,
-                y: y
-            }
-        },
-
-        reset: function() {
-            this.position = false;
-        },
-
-        render: function(ofs_left, scale) {
-            if(!this.position) {
-                return;
-            }
-            context2d.beginPath();
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = scale > 20 ? 2 : 1;
-            context2d.rect(
-                ofs_left + scale * this.position.x + 0.5, 
-                scale * this.position.y + 0.5, 
-                scale, 
-                scale
-            );
-            context2d.stroke();
-        }
-    }
 
 
     var grid = {
@@ -193,11 +204,6 @@ function BarcodeDisplay(params) {
                 l = Math.round(l);
                 callback(l);
             })
-        },
-
-        resetCursor: function() {
-            cursor.reset();
-            render();
         }
 
     }    
@@ -212,7 +218,7 @@ function UserDisplay(params) {
     var canvas, context2d;
     var data_size;
     var parent;
-
+    var cursor;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -223,6 +229,9 @@ function UserDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
+        cursor = new DisplayCursor({
+            context2d: context2d
+        });
         render();
     }
 
@@ -292,6 +301,7 @@ function UserDisplay(params) {
             }
 
             grid.render(ofs_left, data_size.width, data_size.height, scale);
+            cursor.render(ofs_left, scale);
         }
 
         if(valid_result && 'data' in valid_result) {
@@ -339,6 +349,7 @@ function UserDisplay(params) {
         init: init,        
 
         setPixelLuminosity: function(x, y, v) {
+            cursor.set(x, y);
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
             render();
@@ -351,6 +362,7 @@ function UserDisplay(params) {
         },
 
         clear: function() {
+            cursor.reset();            
             data_size = null;
             pixels = [];
             context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
