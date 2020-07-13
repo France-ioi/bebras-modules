@@ -124,6 +124,12 @@ var getContext = function(display, infos, curLevel) {
             }
         );
 
+        if(context.display) {
+            // Save last displayed for updateScale
+            context.lastBarcodeDisplay = context.barcodeDisplay;
+            context.lastStringDisplay = context.stringDisplay;
+            context.lastUserDisplay = context.userDisplay;
+        }
 
         if(taskInfos) {
             context.valid_result = taskInfos.valid_result || {};
@@ -143,8 +149,8 @@ var getContext = function(display, infos, curLevel) {
 
     context.setScale = function(scale) {}
     context.updateScale = function() {
-        context.barcodeDisplay && context.barcodeDisplay.render();
-        context.userDisplay && context.userDisplay.render();
+        context.lastBarcodeDisplay && context.lastBarcodeDisplay.render();
+        context.lastUserDisplay && context.lastUserDisplay.render();
     }
     context.resetDisplay = function() {}
     context.unload = function() {}
