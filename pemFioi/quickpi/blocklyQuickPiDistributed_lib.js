@@ -171,68 +171,93 @@ var getContext = function (display, infos, curLevel) {
       }
    };
 
-
-   context.displayMessage = function (messageInfo) {
+   context.drawMessageInTimeLine = function(messageInfo) {
       var messageKey = messageInfo.fromId + "-" + messageInfo.toId;
       var fromNode = context.findNodeById(messageInfo.fromId);
       var toNode = context.findNodeById(messageInfo.toId);
 
-      if (context.displayTimeLine)
       {
          var timelinex = fromNode.timeLinePos.x + (context.currentTime * 50);
 
-         var messagepath = paper.path(["M", timelinex, fromNode.timeLinePos.y]);
-         messagepath.attr({"stroke-width": 5});
+         var messagepath = timelinePaper.path(["M", timelinex, fromNode.timeLinePos.y]);
+         messagepath.attr({ "stroke-width": 2,
+                            "stroke":  "#00A2E8",
+                          });
 
-         messagepath.animate({path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y ]},
-                         500, "linear", function() {
-                           var targetpath = ["M", timelinex, toNode.timeLinePos.y,
-                           "L", timelinex + 3, toNode.timeLinePos.y - 3,
-                           "L", timelinex - 3, toNode.timeLinePos.y - 3,
-                           "L", timelinex, toNode.timeLinePos.y];
+         var pointingdown = false;
+         if (fromNode.timeLinePos.y < toNode.timeLinePos.y)
+            pointingdown = true;
 
-                           circle = paper.circle(timelinex, toNode.timeLinePos.y, 5);
-/*
-                           
-                           var triangle = paper.path(targetpath);
+         messagepath.animate({ path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y] },
+            500, "linear", function () {
 
-                           triangle.attr({
-                                 "fill": "#678AB4",
-                                 "stroke": "#678AB4"
-                           });*/
+               var trinagleside = 8;
 
-         
-         });
+               if (pointingdown)
+               {
+                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
+                     "L", timelinex + trinagleside, toNode.timeLinePos.y - trinagleside,
+                     "L", timelinex - trinagleside, toNode.timeLinePos.y - trinagleside,
+                     "L", timelinex, toNode.timeLinePos.y];
+
+               }
+               else
+               {
+
+                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
+                     "L", timelinex - trinagleside, toNode.timeLinePos.y + trinagleside,
+                     "L", timelinex + trinagleside, toNode.timeLinePos.y + trinagleside,
+                     "L", timelinex, toNode.timeLinePos.y];
+               }
+
+              
+
+               var circle = timelinePaper.circle(timelinex, fromNode.timeLinePos.y, 5);
+               circle.attr({
+                  "fill": "#678AB4",
+                  "stroke": "#678AB4"
+               });
+                                         
+               var triangle = timelinePaper.path(targetpath);
+               triangle.attr({
+                     "fill": "#678AB4",
+                     "stroke": "#678AB4"
+               });
+
+
+            });
 
          messagepath.hover(
             // Enter hover
-         function(event) {
-            $('#screentooltip').remove();
-            $("body").append('<div id="screentooltip"></div>');
+            function (event) {
+               $('#screentooltip').remove();
+               $("body").append('<div id="screentooltip"></div>');
 
-            var html = "<p>Message:</p><p>From: " + messageInfo.fromId + "</p><p>To: " + messageInfo.toId + "</p><p>" + JSON.stringify(message) +"</p>";
+               var html = "<p>Message:</p><p>From: " + messageInfo.fromId + "</p><p>To: " + messageInfo.toId + "</p><p>" + JSON.stringify(messageInfo.message) + "</p>";
 
-            $('#screentooltip').html(html);
+               $('#screentooltip').html(html);
 
 
-            $('#screentooltip').css("position", "absolute");
-            $('#screentooltip').css("border", "1px solid gray");
-            $('#screentooltip').css("background-color", "#efefef");
-            $('#screentooltip').css("padding", "30px");
-            $('#screentooltip').css("z-index", "1000");
-            //$('#screentooltip').css("width", "262px");
-            //$('#screentooltip').css("height", "70px");
+               $('#screentooltip').css("position", "absolute");
+               $('#screentooltip').css("border", "1px solid gray");
+               $('#screentooltip').css("background-color", "#efefef");
+               $('#screentooltip').css("padding", "30px");
+               $('#screentooltip').css("z-index", "1000");
+               //$('#screentooltip').css("width", "262px");
+               //$('#screentooltip').css("height", "70px");
 
-            $('#screentooltip').css("left", event.clientX+2).css("top", event.clientY+2);
+               $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
 
-         },
-         // Exit
-         function ()
-         {
-            $('#screentooltip').remove();
-         });
+            },
+            // Exit
+            function () {
+               $('#screentooltip').remove();
+            });
       }
-      else
+   };
+
+
+   context.displayMessage = function (messageInfo) {
       {
          var table = document.getElementById("messageTable");
          var row = table.insertRow();
@@ -270,7 +295,7 @@ var getContext = function (display, infos, curLevel) {
          //context.nodeMessages[messageKey].push(event);
 
          if (context.display && display) {
-            context.displayMessage(messageInfo);  
+            context.displayMessage(messageInfo);
          }
       }
    };
@@ -292,14 +317,13 @@ var getContext = function (display, infos, curLevel) {
 
          var vertexObject = context.vGraph.getRaphaelsFromID(node.vertice)[0];
 
-         $("#node-" + nodeId + "-row").css("background-color", ""); 
+         $("#node-" + nodeId + "-row").css("background-color", "");
          if (status == "running") {
-            $("#node-" + nodeId + "-row").css("background-color", "lightblue"); 
+            $("#node-" + nodeId + "-row").css("background-color", "lightblue");
 
             vertexObject.attr({ fill: "lightblue" });
          }
-         else if (status == "sleeping")
-         {
+         else if (status == "sleeping") {
             vertexObject.attr({ fill: "lightgray" });
          }
          else if (status == "finnished") {
@@ -318,15 +342,54 @@ var getContext = function (display, infos, curLevel) {
       var node = context.findNodeById(nodeId);
       node.answer = answer;
 
-      if (context.display)
+      if (context.display) {
          $("#node-" + nodeId + "-answer").text(JSON.stringify(answer));
+
+
+         var pixelsPerTime = 50;
+         var pixelsPerTimeHalf = pixelsPerTime / 2;
+         var timelinex = node.timeLinePos.x + (context.currentTime * pixelsPerTime);
+         var timelinexhalf = node.timeLinePos.x + (context.currentTime * pixelsPerTime) - pixelsPerTime / 2;
+
+          
+         var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, pixelsPerTime, pixelsPerTime, 10);
+         answerRect.attr( { 
+            "fill": "#22B14C",
+            "fill-opacity": 1
+         });
+
+         var text = timelinePaper.text(timelinex, node.timeLinePos.y, JSON.stringify(answer));
+
+      }
    };
 
 
    infos.checkEndEveryTurn = false;
    infos.checkEndCondition = function (context, lastTurn) {
       if (lastTurn) {
+         var node = context.nodesAndNeighbors[context.curNode];
          var nodeId = context.nodesAndNeighbors[context.curNode].nodeId;
+
+         context.incTime();
+         if (context.display)
+         {
+            var pixelsPerTime = 50;
+            var rombussize = 35;
+            var pixelsPerTimeHalf = rombussize / 2;
+            var timelinex = node.timeLinePos.x + (context.currentTime * pixelsPerTime);
+            var timelinexhalf = node.timeLinePos.x + (context.currentTime * pixelsPerTime) - rombussize / 2;
+   
+             
+            var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, rombussize, rombussize);
+            answerRect.attr( { 
+               fill: "#F36D74"
+            });
+
+            answerRect.rotate(45);
+
+            var text = timelinePaper.text(timelinex, node.timeLinePos.y, "End");
+   
+         }
 
          //console.log (nodeId, "is done ");
 
@@ -352,13 +415,12 @@ var getContext = function (display, infos, curLevel) {
                context.success = false;
             }
 
-            if (!status.error)
-            {
+            if (!status.error) {
                if (context.success)
                   status.error = "All answers are correct";
                else
                   status.error = "Some node answers are wrong";
-                  
+
             }
             throw (status.error);
          }
@@ -369,8 +431,6 @@ var getContext = function (display, infos, curLevel) {
    // A context must have a reset function to get back to the initial state
    context.reset = function (taskInfos) {
       // Do something here
-
-      console.log("reset");
 
       if (taskInfos != undefined) {
 
@@ -434,7 +494,7 @@ var getContext = function (display, infos, curLevel) {
                messageId: messageId,
                circle: null
             };
-      
+
             context.sendMessage(messageInfo, false);
          }
       }
@@ -446,6 +506,152 @@ var getContext = function (display, infos, curLevel) {
       if (context.display) {
          context.resetDisplay();
       }
+   };
+
+   context.resetTimeLineDisplay = function () {
+
+      context.timeLineGraphW = 800;
+      context.timeLineGraphH = 800;
+
+      timelinePaper = this.raphaelFactory.create(
+         "paperTimeline",
+         "timeLineGraph",
+         context.timeLineGraphW,
+         context.timeLineGraphH,
+      );
+
+      context.timeLineVerticeRadius = context.verticeRadius / 1.5;
+
+
+      var vertexAttr = {
+         r: context.timeLineVerticeRadius,
+         stroke: "none",
+         fill: "lightgray"
+      };
+      var edgeAttr = {
+         stroke: '#a05000',
+         "stroke-width": 5
+      };
+
+      var straighEdges = [];
+      var vertices = context.Graph.getAllVertices();
+      var lastId = null;
+      $.each(vertices, function (index) {
+         var id = vertices[index];
+         if (lastId) {
+            var edges = context.Graph.getEdgesBetween(id, lastId);
+            if (edges.length > 0)
+               straighEdges.push(edges[0]);
+         }
+
+         lastId = id;
+      });
+
+      var timeLineedgeVisualInfo = {};
+      var edges = context.Graph.getAllEdges();
+      var sweep = 0;
+      $.each(edges, function (index) {
+         var id = edges[index];
+
+         timeLineedgeVisualInfo[id] = {};
+
+         if ($.inArray(id, straighEdges) == -1) {
+            timeLineedgeVisualInfo[id] = {
+               "sweep": sweep,
+               "large-arc": 0,
+               "radius-ratio": 1
+            };
+
+            if (sweep == 1)
+               sweep = 0;
+            else
+               sweep = 1;
+         }
+      });
+
+
+      var graphDrawer = new SimpleGraphDrawer(vertexAttr, edgeAttr);
+
+      var vertexVisualInfoTimeline = JSON.parse(JSON.stringify(context.graphDefinition.vertexVisualInfo));
+      context.vGraphTimeline = new VisualGraph("vGraphTimeline", timelinePaper, context.Graph, graphDrawer, true, vertexVisualInfoTimeline, timeLineedgeVisualInfo);
+
+      this.graphMouseTimeline = new GraphMouse("GraphMouseTimeline", context.Graph, context.vGraph);
+
+
+      var pixelsPerVertice = context.timeLineGraphH / context.nodesAndNeighbors.length;
+
+
+      $.each(vertices, function (index) {
+         var id = vertices[index];
+         var node = context.findNodeByVertice(id);
+         node.timeLinePos = {
+            x: context.verticeRadius * 4,
+            y: context.verticeRadius + (pixelsPerVertice * index),
+         };
+
+         context.vGraphTimeline.graphDrawer.moveVertex(id, node.timeLinePos.x, node.timeLinePos.y);
+      });
+
+      context.vGraphTimeline.redraw();
+      timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+      timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+
+
+      var draggingTimeline = false;
+      var draggingStartX = 0;
+      var draggingStartY = 0;
+      var viewBoxX = 0;
+      var viewBoxY = 0;
+      var dX = 0;
+
+      $('#timeLineGraph').mousedown(function(e){
+         if (timelinePaper.getElementByPoint( e.pageX, e.pageY ) != null) {
+            return;
+         }
+
+         draggingTimeline = true;
+         draggingStartX = e.pageX; 
+         draggingStartY = e.pageY;  
+     });
+
+      
+      $('#timeLineGraph').mousemove(function(e){
+         if (draggingTimeline == false)
+            return;
+
+         dX = draggingStartX - e.pageX;
+         var x = context.timeLineGraphW / timelinePaper.width; 
+
+         dX *= x; 
+         
+         if (viewBoxX + dX >= 0) {
+            timelinePaper.setViewBox(viewBoxX + dX, 0, context.timeLineGraphW, context.timeLineGraphH);
+
+            $.each(vertices, function (index) {
+               var id = vertices[index];
+               var pos = context.vGraphTimeline.graphDrawer.getVertexPosition(id);
+               var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
+
+               if (viewBoxX + dX == 0)
+                  vertexObject.attr({ opacity: 1 });
+               else
+                  vertexObject.attr({ opacity: 0.3 });
+                  
+               context.vGraphTimeline.graphDrawer.moveVertex(id, viewBoxX + dX + (context.verticeRadius * 4), pos.y);
+            });
+
+            context.vGraphTimeline.redraw();
+         }   
+       });
+            
+        $('#timeLineGraph').mouseup(function(e){
+            if (draggingTimeline == false)
+               return; 
+
+            viewBoxX += dX; 
+
+            draggingTimeline = false; 
+        });
    };
 
    // Reset the context's display
@@ -460,348 +666,259 @@ var getContext = function (display, infos, curLevel) {
          $('#taskIntro').append(`<div id="introControls"></div>`);
       }
 
-      $('#introControls').html("<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div>")
+      $('#introControls').html("<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div><button id=showGraphView>Graph View</button></div><button id=showTimelineView>Timeline</button></div>")
 
       $('#piconnect').click(function () {
          context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
       });
 
-      context.displayTimeLine = false;
+      $('#showGraphView').click(function () {
+         $('#timelineView').css("display", "none");
+         $('#graphView').css("display", "");
+
+         context.updateScale();
+      });
+
+      $('#showTimelineView').click(function () {
+         $('#timelineView').css("display", "");
+         $('#graphView').css("display", "none");
+
+         context.updateScale();
+      });
+
       context.verticeRadius = 35;
 
-      if (context.displayTimeLine) {
-         $('#grid').html(`
-         <div id="nodeGraph" style="height: 90%; width: 90%; overflow-y: auto;">
+      $('#grid').html(`
+         
+         <div style='height: 100%; width: 100%;' id='timelineView'>
+            <div style='height: 100%; width: 100%; overflow:hidden' id="timeLineGraph"></div>
          </div>
-          `);
- 
-          this.raphaelFactory.destroyAll();
-          paper = this.raphaelFactory.create(
-             "paperMain",
-             "nodeGraph",
-             $('#nodeGraph').width() - 10,
-             $('#nodeGraph').height() - 10,
-          );
-
- 
-         var vertexAttr = {
-            r: context.verticeRadius,
-            stroke: "none",
-            fill: "lightgray"
-         };
-         var edgeAttr = {
-            stroke: '#a05000',
-            "stroke-width": 5
-         };
-
-         var straighEdges = [];
-         var vertices = context.Graph.getAllVertices();
-         var lastId = null;
-         $.each(vertices, function (index) {
-            var id = vertices[index];
-            if (lastId)
-            {
-               var edges = context.Graph.getEdgesBetween(id, lastId);
-               if (edges.length > 0)
-                  straighEdges.push(edges[0]);
-            }
-
-            lastId = id;
-         });
-
-         var timeLineedgeVisualInfo = {};
-         var edges = context.Graph.getAllEdges();
-         var sweep = 0;
-         $.each(edges, function (index) {
-            var id = edges[index];
-
-            timeLineedgeVisualInfo[id] = {};
-
-            if ($.inArray(id, straighEdges) == -1) {
-               timeLineedgeVisualInfo[id] = {
-                  "sweep": sweep,
-                  "large-arc": 0,
-                  "radius-ratio": 1
-               };
-
-               if (sweep == 1)
-                  sweep = 0;
-               else
-                  sweep = 1;
-            }
-
-         });
-
-
-         var graphDrawer = new SimpleGraphDrawer(vertexAttr, edgeAttr);
-         context.vGraph = new VisualGraph("vGraph", paper, context.Graph, graphDrawer, true, context.graphDefinition.vertexVisualInfo, timeLineedgeVisualInfo);
-
-         this.graphMouse = new GraphMouse("GraphMouse", context.Graph, context.vGraph);
-
          
-         
-         var graphW = $('#nodeGraph').width() - 10;
-         var graphH =  $('#nodeGraph').height() - 10;
-
-         
-
-         var pixelsPerVertice = graphH / context.nodesAndNeighbors.length;
-
-         
-         $.each(vertices, function (index) {
-            var id = vertices[index];
-            var node = context.findNodeByVertice(id);
-            node.timeLinePos = {
-               x: context.verticeRadius * 4,
-               y: context.verticeRadius + (pixelsPerVertice * index),
-            };
-
-            context.vGraph.graphDrawer.moveVertex(id, node.timeLinePos.x, node.timeLinePos.y);
-         });
-
-         context.vGraph.redraw();
-      } else {
-         $('#grid').html(`
-         <div style='height: 100%; width: 100%;'>
+         <div id='graphView' style='height: 100%; width: 100%; display: none;'>
          <table style='height: 100%; width: 100%; table-layout:fixed;'>
          <tr>
          <td style='width: 50%; height: 50%;'>
-            <div style='height: 100%; width: 100%;' id="nodeGraph"></div>
+            <div style='height: 100%; width: 100%;' id="nodeGraph" ></div>
          </td>
          <td style='width: 50%; height: 50%;'>   
             <div style='height: 100%; width: 100%; overflow:auto;' id="nodeStatus">Hello 2</div>
          </td>
          </tr>
          <tr>
+         <!--
          <td colspan=2 style='width: 100%; height: 50%;'>
             <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
          </td>
+         -->
+         <!--
+         <td style='width: 100%; height: 50%;'>
+            <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
+         </td>
+         
+         <td style='width: 100%; height: 50%;'>
+         <div style='height: 100%; width: 100%;' id="timeLineGraph"></div>
+         </td>
+         -->
          </tr>
          </table>
          </div>
        `);
 
-         var tableStatus = "<table id='node-status-table' style='border-collapse: collapse; margin: auto;'><tr><th>#</th><th>ID</th><th>Status</th><th>Answer</th></tr></table>";
-         $('#nodeStatus').html(tableStatus);
-         var table = document.getElementById("node-status-table");
+      var tableStatus = "<table id='node-status-table' style='border-collapse: collapse; margin: auto;'><tr><th>#</th><th>ID</th><th>Status</th><th>Answer</th></tr></table>";
+      $('#nodeStatus').html(tableStatus);
+      var table = document.getElementById("node-status-table");
 
-         $.each(context.nodesAndNeighbors, function (index) {
-            //console.log(context.nodesAndNeighbors[index]);
-            var node = context.nodesAndNeighbors[index];
-            var row = table.insertRow();
-            row.id = "node-" + node.nodeId + "-row";
+      $.each(context.nodesAndNeighbors, function (index) {
+         //console.log(context.nodesAndNeighbors[index]);
+         var node = context.nodesAndNeighbors[index];
+         var row = table.insertRow();
+         row.id = "node-" + node.nodeId + "-row";
 
-            var indexCell = row.insertCell();
-            var nodeIdCell = row.insertCell();
-            var statusCell = row.insertCell();
-            var answerCell = row.insertCell();
+         var indexCell = row.insertCell();
+         var nodeIdCell = row.insertCell();
+         var statusCell = row.insertCell();
+         var answerCell = row.insertCell();
 
-            indexCell.appendChild(document.createTextNode((node.nodeIndex + 1)));
-            $(indexCell).css("padding", "7px");
+         indexCell.appendChild(document.createTextNode((node.nodeIndex + 1)));
+         $(indexCell).css("padding", "7px");
 
-            nodeIdCell.appendChild(document.createTextNode(node.nodeId));
-            $(nodeIdCell).css("padding", "7px");
+         nodeIdCell.appendChild(document.createTextNode(node.nodeId));
+         $(nodeIdCell).css("padding", "7px");
 
-            statusCell.appendChild(document.createTextNode(node.status));
-            $(statusCell).css("padding", "7px");
-            statusCell.id = "node-" + node.nodeId + "-status";
+         statusCell.appendChild(document.createTextNode(node.status));
+         $(statusCell).css("padding", "7px");
+         statusCell.id = "node-" + node.nodeId + "-status";
 
-            answerCell.appendChild(document.createTextNode(""));
-            $(answerCell).css("padding", "7px");
-            answerCell.id = "node-" + node.nodeId + "-answer";
+         answerCell.appendChild(document.createTextNode(""));
+         $(answerCell).css("padding", "7px");
+         answerCell.id = "node-" + node.nodeId + "-answer";
+      });
+
+
+      var tableMessages = "<table id='messageTable' style='border-spacing: 15px; margin: auto;'><tr><th>Source</th><th>Destination</th><th>Message</th><th>Status</th></tr></table>";
+      $('#nodeMessages').html(tableMessages);
+
+      $.each(context.nodeMessages, function (index) {
+         var messageInfo = context.nodeMessages[index];
+
+         context.displayMessage(messageInfo);
+      });
+
+      $('#piinstall').click(function () {
+         context.blocklyHelper.reportValues = false;
+
+
+         python_code = window.task.displayedSubTask.blocklyHelper.getCode('python');
+
+         python_code = python_code.replace("from quickpi import *", "");
+         python_code = python_code.replace("from distributed import *", "");
+
+         if (context.runner)
+            context.runner.stop();
+
+         context.quickPiConnection.runDistributed(python_code, context.nodesAndNeighbors, function () {
+            context.justinstalled = true;
          });
+      });
 
-         
-
-
-         var tableMessages = "<table id='messageTable' style='border-spacing: 15px; margin: auto;'><tr><th>Source</th><th>Destination</th><th>Message</th><th>Status</th></tr></table>";
-         $('#nodeMessages').html(tableMessages);
-
-         $.each(context.nodeMessages, function (index) {
-            var messageInfo = context.nodeMessages[index];
-
-            context.displayMessage (messageInfo);
-         });
+      var graphW = $('#nodeGraph').width();
+      var graphH = $('#nodeGraph').height();
 
 
 
-         $('#piinstall').click(function () {
-            context.blocklyHelper.reportValues = false;
+      this.raphaelFactory.destroyAll();
+      paper = this.raphaelFactory.create(
+         "paperMain",
+         "nodeGraph",
+         graphW,
+         graphH
+      );
+
+      var vertexAttr = {
+         r: context.verticeRadius,
+         stroke: "none",
+         fill: "lightgray"
+      };
+      var edgeAttr = {
+         stroke: '#a05000',
+         "stroke-width": 5
+      };
 
 
-            python_code = window.task.displayedSubTask.blocklyHelper.getCode('python');
+      var graphDrawer = new SimpleGraphDrawer(vertexAttr, edgeAttr);
+      context.vGraph = new VisualGraph("vGraph", paper, context.Graph, graphDrawer, true, context.graphDefinition.vertexVisualInfo, context.graphDefinition.edgeVisualInfo);
 
-            python_code = python_code.replace("from quickpi import *", "");
-            python_code = python_code.replace("from distributed import *", "");
+      this.graphMouse = new GraphMouse("GraphMouse", context.Graph, context.vGraph);
 
-            if (context.runner)
-               context.runner.stop();
-
-            context.quickPiConnection.runDistributed(python_code, context.nodesAndNeighbors, function () {
-               context.justinstalled = true;
-            });
+      var vertices = context.Graph.getAllVertices();
 
 
-            //var alledges = context.Graph.getAllEdges();
-            //console.log(alledges);
-
-         });
-
-         var graphW = $('#nodeGraph').width();
-         var graphH = $('#nodeGraph').height();
-
-         
-
-         this.raphaelFactory.destroyAll();
-         paper = this.raphaelFactory.create(
-            "paperMain",
-            "nodeGraph",
-            graphW,
-            graphH
-         );
-//         paper.setViewBox(0, 0, 400, 400, true);
-         
-
-         
-         var vertexAttr = {
-            r: context.verticeRadius,
-            stroke: "none",
-            fill: "lightgray"
-         };
-         var edgeAttr = {
-            stroke: '#a05000',
-            "stroke-width": 5
-         };
+      context.graphOriginalW = 0;
+      context.graphOriginalH = 0;
 
 
-         var graphDrawer = new SimpleGraphDrawer(vertexAttr, edgeAttr);
-         context.vGraph = new VisualGraph("vGraph", paper, context.Graph, graphDrawer, true, context.graphDefinition.vertexVisualInfo, context.graphDefinition.edgeVisualInfo);
+      $.each(vertices, function (index) {
+         var id = vertices[index];
 
-         this.graphMouse = new GraphMouse("GraphMouse", context.Graph, context.vGraph);
+         //var pos = vGraph.graphDrawer.getVertexPosition(id);
 
-         var vertices = context.Graph.getAllVertices();
+         var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
+         var r = vertexObject.attrs['r'];
+         var x = vertexObject.attrs['cx'] + r;
+         var y = vertexObject.attrs['cy'] + r;
 
+         if (x > context.graphOriginalW)
+            context.graphOriginalW = x;
 
-         context.graphOriginalW = 0;
-         context.graphOriginalH = 0;
+         if (y > context.graphOriginalH)
+            context.graphOriginalH = y;
+      });
 
+      var scaleFactorW = graphW / context.graphOriginalW;
+      var scaleFactorH = graphH / context.graphOriginalH;
 
-         $.each(vertices, function (index) {
-            var id = vertices[index];
+      $.each(vertices, function (index) {
+         var id = vertices[index];
+         var node = context.findNodeByVertice(id);
 
-            //var pos = vGraph.graphDrawer.getVertexPosition(id);
+         //var pos = context.vGraph.graphDrawer.getVertexPosition(id);
 
-            var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
-            var r = vertexObject.attrs['r'];
-            var x = vertexObject.attrs['cx'] + r;
-            var y = vertexObject.attrs['cy'] + r;
-
-            if (x > context.graphOriginalW)
-               context.graphOriginalW = x;
-
-            if (y > context.graphOriginalH)
-               context.graphOriginalH = y;
-         });
-
-         var scaleFactorW = graphW / context.graphOriginalW;
-         var scaleFactorH = graphH / context.graphOriginalH;
-
-         $.each(vertices, function (index) {
-            var id = vertices[index];
-            var node = context.findNodeByVertice(id);
-
-            //var pos = context.vGraph.graphDrawer.getVertexPosition(id);
-
-            //context.vGraph.graphDrawer.moveVertex(id, pos.x * scaleFactorW, pos.y * scaleFactorH);
+         //context.vGraph.graphDrawer.moveVertex(id, pos.x * scaleFactorW, pos.y * scaleFactorH);
 
 
-            var vertexInfo = context.Graph.getVertexInfo(id);
-            vertexInfo.label = (node.nodeIndex + 1).toString(10) + "\n" + node.nodeId.toString(10);
-         });
+         var vertexInfo = context.Graph.getVertexInfo(id);
+         vertexInfo.label = (node.nodeIndex + 1).toString(10) + "\n" + node.nodeId.toString(10);
+      });
 
-         //console.log("resetDisplay", graphW, scaleFactorW, graphW  / scaleFactorW, graphH, scaleFactorH, graphH / scaleFactorH);
-         
-         paper.setViewBox(0, 0, graphW  / scaleFactorW, graphH / scaleFactorH);
+      //console.log("resetDisplay", graphW, scaleFactorW, graphW  / scaleFactorW, graphH, scaleFactorH, graphH / scaleFactorH);
 
-
-/*
-         window.addEventListener("resize",  function() {
-            var graphW = $('#nodeGraph').width();
-            var graphH = $('#nodeGraph').height();
-   
-            var scaleFactorW = graphW / context.graphOriginalW;
-            var scaleFactorH = graphH / context.graphOriginalH;
-
-            console.log("resetCallback", graphW, scaleFactorW, graphW  / scaleFactorW, graphH, scaleFactorH, graphH / scaleFactorH);
-            paper.setViewBox(0, 0, graphW  / scaleFactorW, graphH / scaleFactorH);
-
-            context.resetDisplay();
-            
-            console.log("Set View Box");
-          });
-*/
-
-         context.vGraph.redraw();
-
-         var a = new PaperMouseEvent("paperMain", context.paper, "mousemove", function () {
-            console.log("Hello");
-         }, true);
+      paper.setViewBox(0, 0, graphW / scaleFactorW, graphH / scaleFactorH);
 
 
-         //this.graphMouse.addEvent("whatever", "click", "vertex", null, [function() { console.log("test") }]);
+      context.vGraph.redraw();
 
-         this.graphMouse.addEvent("whatever2", "click", "edge", null, [function (id) {
-            var id = (Beav.Navigator.isIE8()) ? elementID : this.data("id");
-            var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
-
-            var a = vertexObject.node.getBoundingClientRect();
-
-         }]);
-
-         //VertexToggler("whatever", context.Graph, context.vGraph, this.graphMouse, function(id, selected) {
-         this.graphMouse.addEvent("whatever", "hover", "vertex", null, [function (id) {
-            var id = (Beav.Navigator.isIE8()) ? elementID : this.data("id");
-            var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
-
-            var a = vertexObject.node.getBoundingClientRect();
-            var x = a.x + 50;
-            var y = a.y;
+      var a = new PaperMouseEvent("paperMain", paper, "mousemove", function () {
+         console.log("Hello");
+      }, true);
 
 
-            $('#screentooltip').remove();
-            $("body").append('<div id="screentooltip"></div>');
+      //this.graphMouse.addEvent("whatever", "click", "vertex", null, [function() { console.log("test") }]);
 
-            
-            var node = context.findNodeByVertice(id);
-            var html = "<p>Node Id: " + node.nodeId + "</p><p>Log:</p>";
-            for (var i = 0; i < node.log.length; i++) {
-               html += "" + JSON.stringify(node.log[i]) + "<br>";
+      this.graphMouse.addEvent("whatever2", "click", "edge", null, [function (id) {
+         var id = (Beav.Navigator.isIE8()) ? elementID : this.data("id");
+         var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
 
-               console.log(JSON.stringify(node.log[i]));
-            }
+         var a = vertexObject.node.getBoundingClientRect();
 
-            $('#screentooltip').html(html);
+      }]);
+
+      //VertexToggler("whatever", context.Graph, context.vGraph, this.graphMouse, function(id, selected) {
+      this.graphMouse.addEvent("whatever", "hover", "vertex", null, [function (id) {
+         var id = (Beav.Navigator.isIE8()) ? elementID : this.data("id");
+         var vertexObject = context.vGraph.getRaphaelsFromID(id)[0];
+
+         var a = vertexObject.node.getBoundingClientRect();
+         var x = a.x + 50;
+         var y = a.y;
 
 
-            $('#screentooltip').css("position", "absolute");
-            $('#screentooltip').css("border", "1px solid gray");
-            $('#screentooltip').css("background-color", "#efefef");
-            $('#screentooltip').css("padding", "30px");
-            $('#screentooltip').css("z-index", "1000");
-            //$('#screentooltip').css("width", "262px");
-            //$('#screentooltip').css("height", "70px");
+         $('#screentooltip').remove();
+         $("body").append('<div id="screentooltip"></div>');
 
-            $('#screentooltip').css("left", x).css("top", y);
-         },
-         function (a) {
-            $('#screentooltip').remove();
+
+         var node = context.findNodeByVertice(id);
+         var html = "<p>Node Id: " + node.nodeId + "</p><p>Log:</p>";
+         for (var i = 0; i < node.log.length; i++) {
+            html += "" + JSON.stringify(node.log[i]) + "<br>";
+
+            console.log(JSON.stringify(node.log[i]));
          }
-         ]);
+
+         $('#screentooltip').html(html);
+
+
+         $('#screentooltip').css("position", "absolute");
+         $('#screentooltip').css("border", "1px solid gray");
+         $('#screentooltip').css("background-color", "#efefef");
+         $('#screentooltip').css("padding", "30px");
+         $('#screentooltip').css("z-index", "1000");
+         //$('#screentooltip').css("width", "262px");
+         //$('#screentooltip').css("height", "70px");
+
+         $('#screentooltip').css("left", x).css("top", y);
+      },
+      function (a) {
+         $('#screentooltip').remove();
       }
+      ]);
+
+
+      context.resetTimeLineDisplay();
+
 
       // Ask the parent to update sizes
       context.blocklyHelper.updateSize();
-      //context.updateScale();
+      context.updateScale();
    };
 
    // Update the context's display to the new scale (after a window resize for instance)
@@ -821,15 +938,25 @@ var getContext = function (display, infos, curLevel) {
          context.oldwidth = width;
          context.oldheight = height;
 
-         
-         
+
+
          var scaleFactorW = width / context.graphOriginalW;
          var scaleFactorH = height / context.graphOriginalH;
 
          //console.log("resize to ", width, height);
-
-         paper.setViewBox(0, 0, width  / scaleFactorW, height / scaleFactorH);
+         paper.setViewBox(0, 0, width / scaleFactorW, height / scaleFactorH);
          paper.setSize(width, height);
+
+
+         //timelinePaper.setViewBox(0, 0, $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+
+         
+         
+         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         
+
+         timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          //context.resetDisplay();
       }
@@ -852,8 +979,7 @@ var getContext = function (display, infos, curLevel) {
 
       //console.log("Running ", node.nodeId, "current status", node.status);
 
-      if (node.status != "finnished")
-      {
+      if (node.status != "finnished") {
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
             if (context.nodesAndNeighbors[i].status == "running") {
 
@@ -862,25 +988,32 @@ var getContext = function (display, infos, curLevel) {
                break;
             }
          }
-   
+
          //console.log("Change node ", node.nodeId, "to running")
          context.setNodeStatus(node.nodeId, "running");
       }
    }
 
-   context.incTime = function() {
+   context.incTime = function () {
       context.currentTime++;
 
 
-      if (context.display && context.displayTimeLine) {
+      if (context.display) {
          $.each(context.nodesAndNeighbors, function (index) {
             var node = context.nodesAndNeighbors[index];
 
-            var messagepath = paper.path(["M", node.timeLinePos.x, node.timeLinePos.y]);
+            if (node.status == "finnished")
+               return;
 
-            messagepath.animate({path: ["M", node.timeLinePos.x, node.timeLinePos.y,
-                                       "L", node.timeLinePos.x + (context.currentTime * 50), node.timeLinePos.y]}, 100);
+            if (!node.messagepath)
+               node.messagepath = timelinePaper.path(["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y]);
 
+
+               
+            node.messagepath.animate({
+               path: ["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y,
+                  "L", node.timeLinePos.x + (context.currentTime * 50), node.timeLinePos.y]
+            }, 100);
          });
       }
    };
@@ -917,39 +1050,36 @@ var getContext = function (display, infos, curLevel) {
          if (context.display) {
             var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
-            if (message.circle)
-            {
+            if (message.circle) {
                message.circle.animate({ cx: toPos.x, cy: toPos.y }, 500, "linear", function () {
                   message.circle.remove();
                });
 
                message.messageCountText.remove();
                message.messageCountText = null;
-   
-               var messageCount = node.messages.reduce(function (acum, value)
-               {
+
+               var messageCount = node.messages.reduce(function (acum, value) {
                   if (value.fromId == message.fromId)
                      return acum + 1;
-   
-                   return acum;
+
+                  return acum;
                }, 0);
-   
+
                node.messages.forEach(function (element) {
                   if (element.fromId == message.fromId && element.messageCountText) {
-                     element.messageCountText.attr({"text": messageCount.toString()});
+                     element.messageCountText.attr({ "text": messageCount.toString() });
                   }
-               });   
+               });
             }
 
 
             context.runner.waitDelay(callback, { "from": message.fromId, "payload": message.message, "status": true }, 500);
          }
-         else
-         {
+         else {
             context.runner.noDelay(callback, { "from": message.fromId, "payload": message.message, "status": true })
          }
 
-         
+
       }
       else {
          //context.setNodeStatus(node.nodeId, "waitingformessage");
@@ -968,48 +1098,43 @@ var getContext = function (display, infos, curLevel) {
                if (context.display) {
                   var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
+                  if (message.messageCountText) {
+                     message.messageCountText.remove();
+                     message.messageCountText = null;
+                  }
+
+                  var messageCount = node.messages.reduce(function (acum, value) {
+                     if (value.fromId == message.fromId)
+                        return acum + 1;
+
+                     return acum;
+                  }, 0);
+
+                  node.messages.forEach(function (element) {
+                     if (element.fromId == message.fromId && element.messageCountText) {
+                        element.messageCountText.attr({ "text": messageCount.toString() });
+                     }
+                  });
+
                   message.circle.animate({ cx: toPos.x, cy: toPos.y }, 500, "linear", function () {
                      message.circle.remove();
                      message.circle = null;
 
-                     if (message.messageCountText)
-                     {
-                        message.messageCountText.remove();
-                        message.messageCountText = null;
-                     }
 
-                     var messageCount = node.messages.reduce(function (acum, value)
-                     {
-                        if (value.fromId == message.fromId)
-                           return acum + 1;
-      
-                         return acum;
-                     }, 0);
-
-                     node.messages.forEach(function (element) {
-                        if (element.fromId == message.fromId && element.messageCountText) {
-                           element.messageCountText.attr({"text": messageCount.toString()});
-                        }
-                     });
-
-                     console.log("------->", messageCount);
-
-                     
-      
-                     cb( { "from": message.fromId, "payload": message.message, "status": true });
+                     cb({ "from": message.fromId, "payload": message.message, "status": true });
                   });
                }
                else {
-                  cb( { "from": message.fromId, "payload": message.message, "status": true });
+                  cb({ "from": message.fromId, "payload": message.message, "status": true });
                }
             }
 
             ellapsedTime += 0.5;
             if (exitTimeout > 0 && ellapsedTime >= exitTimeout) {
                clearInterval(timeout);
-               cb( { "from": -1, "payload": 0, "status": false });
+               cb({ "from": -1, "payload": 0, "status": false });
             }
-            
+
          }, 500);
       }
    };
@@ -1047,8 +1172,9 @@ var getContext = function (display, infos, curLevel) {
          var edges = context.Graph.getEdgesBetween(fromVertice, toVertice);
 
 
-         if (edges.length > 0)
-         {
+         if (edges.length > 0) {
+            context.drawMessageInTimeLine(messageInfo);
+
             var verticesOrder = context.Graph.getEdgeVertices(edges[0]);
             var edgePath = context.vGraph.getRaphaelsFromID(edges[0])[0];
 
@@ -1065,8 +1191,8 @@ var getContext = function (display, infos, curLevel) {
             var fromPercentage = 1;
             var toPercentage = startAt;
             if (verticesOrder[0] == fromVertice) {
-                  fromPercentage = startAt;
-                  toPercentage = 1;
+               fromPercentage = startAt;
+               toPercentage = 1;
             }
 
             messageInfo.circle.animateAlong({
@@ -1078,24 +1204,23 @@ var getContext = function (display, infos, curLevel) {
                fromPercentage: fromPercentage,
                toPercentage: toPercentage,
             },
-            {         
-            },
-            function() {
-               var messageCount = toNode.messages.reduce(function (acum, value)
                {
-                  if (value.fromId == fromNode.nodeId)
-                     return acum + 1;
+               },
+               function () {
+                  var messageCount = toNode.messages.reduce(function (acum, value) {
+                     if (value.fromId == fromNode.nodeId)
+                        return acum + 1;
 
-                   return acum;
-               }, 0);
+                     return acum;
+                  }, 0);
 
-               messageInfo.messageCountText = paper.text(messageInfo.circle.attr("cx"),
-                          messageInfo.circle.attr("cy"),
-                          (messageCount + 1).toString());
+                  messageInfo.messageCountText = paper.text(messageInfo.circle.attr("cx"),
+                     messageInfo.circle.attr("cy"),
+                     (messageCount + 1).toString());
 
-               
-               context.sendMessage(messageInfo, true);
-            });
+
+                  context.sendMessage(messageInfo, true);
+               });
          }
 
          context.runner.waitDelay(callback, null, messageDelay);
@@ -1114,6 +1239,8 @@ var getContext = function (display, infos, curLevel) {
          context.success = false;
          throw ("Node " + node.nodeId + " already submitted an answer");
       }
+
+      context.incTime();
 
       context.setNodeAnswer(node.nodeId, answer);
 
@@ -1136,12 +1263,12 @@ var getContext = function (display, infos, curLevel) {
       var messageId = context.globaMessageCount++;
       var messageDelay = 1000;
 
-/*
-      if (!context.isNeighbor(fromNode, toNode.nodeId)) {
-         context.success = false;
-         throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbord");
-      }
-      */
+      /*
+            if (!context.isNeighbor(fromNode, toNode.nodeId)) {
+               context.success = false;
+               throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbord");
+            }
+            */
 
       context.incTime();
 
@@ -1149,37 +1276,35 @@ var getContext = function (display, infos, curLevel) {
 
          var fromPos = context.vGraph.graphDrawer.getVertexPosition(fromNode.vertice);
 
-         for (var index in context.nodesAndNeighbors)
-         {
+         for (var index in context.nodesAndNeighbors) {
             var node = context.nodesAndNeighbors[index];
             // Don't send to current sender
             if (node.nodeId == fromNode.nodeId)
                continue;
 
-               var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
+            var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
-               let messageInfo = {
-                  fromId: fromNode.nodeId,
-                  toId: node.nodeId,
-                  message: message,
-                  status: "queued",
-                  messageId: messageId,
-                  circle: null
-               };
-         
-               messageInfo.circle = paper.circle(fromPos.x, fromPos.y, 10);
-               messageInfo.circle.attr("fill", "lightblue");
+            let messageInfo = {
+               fromId: fromNode.nodeId,
+               toId: node.nodeId,
+               message: message,
+               status: "queued",
+               messageId: messageId,
+               circle: null
+            };
 
-               messageInfo.circle.animate({cx: toPos.x, cy: toPos.y}, messageDelay);
-   
-               context.sendMessage(messageInfo, true);
+            messageInfo.circle = paper.circle(fromPos.x, fromPos.y, 10);
+            messageInfo.circle.attr("fill", "lightblue");
+
+            messageInfo.circle.animate({ cx: toPos.x, cy: toPos.y }, messageDelay);
+
+            context.sendMessage(messageInfo, true);
          }
 
          context.runner.waitDelay(callback, null, messageDelay);
       }
       else {
-         for (var index in context.nodesAndNeighbors)
-         {
+         for (var index in context.nodesAndNeighbors) {
             var node = context.nodesAndNeighbors[index];
 
             let messageInfo = {
@@ -1248,15 +1373,16 @@ var getContext = function (display, infos, curLevel) {
          actions: [
             { name: "getNodeID", yieldsValue: true },
             { name: "getNeighbors", yieldsValue: true },
-            { name: "getNextMessage", yieldsValue: true, params: ["Number"],
+            {
+               name: "getNextMessage", yieldsValue: true, params: ["Number"],
                blocklyJson: {
                   "args0": [
-                     { "type": "input_value", "name": "PARAM_0"},
+                     { "type": "input_value", "name": "PARAM_0" },
                   ]
                },
                blocklyXml: "<block type='getNextMessage'>" +
-                   "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>5</field></shadow></value>" +
-                   "</block>"
+                  "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>5</field></shadow></value>" +
+                  "</block>"
             },
             { name: "sendMessage", params: [null, null] },
             { name: "submitAnswer", params: [null] },
@@ -1295,423 +1421,423 @@ var getContext = function (display, infos, curLevel) {
 var distributedTaskUtilities = {
    twoNodes: {
       "vertexVisualInfo": {
-        "v_0": {
-          "x": 34,
-          "y": 54
-        },
-        "v_1": {
-          "x": 206,
-          "y": 54
-        }
+         "v_0": {
+            "x": 34,
+            "y": 54
+         },
+         "v_1": {
+            "x": 206,
+            "y": 54
+         }
       },
       "edgeVisualInfo": {
-        "e_0": {}
+         "e_0": {}
       },
       "minGraph": {
-        "vertexInfo": {
-          "v_0": {
-            "content": "test, virgule\nTEST, VIRGULE\nAAAAAAAAAAAAA\ntest\ntest"
-          },
-          "v_1": {
-            "content": "test, virgule\ntest"
-          }
-        },
-        "edgeInfo": {
-          "e_0": {}
-        },
-        "edgeVertices": {
-          "e_0": [
-            "v_0",
-            "v_1"
-          ]
-        },
-        "directed": false
+         "vertexInfo": {
+            "v_0": {
+               "content": "test, virgule\nTEST, VIRGULE\nAAAAAAAAAAAAA\ntest\ntest"
+            },
+            "v_1": {
+               "content": "test, virgule\ntest"
+            }
+         },
+         "edgeInfo": {
+            "e_0": {}
+         },
+         "edgeVertices": {
+            "e_0": [
+               "v_0",
+               "v_1"
+            ]
+         },
+         "directed": false
       }
-    },
+   },
    ringGraph: {
       "vertexVisualInfo": {
          "v_0": {
             "x": 31,
             "y": 346
-          },
-          "v_1": {
+         },
+         "v_1": {
             "x": 35,
             "y": 143
-          },
-          "v_2": {
+         },
+         "v_2": {
             "x": 237,
             "y": 34
          },
-        "v_3": {
-          "x": 461,
-          "y": 88
-        },
-        "v_4": {
-          "x": 489,
-          "y": 242
-        },
+         "v_3": {
+            "x": 461,
+            "y": 88
+         },
+         "v_4": {
+            "x": 489,
+            "y": 242
+         },
 
-        "v_5": {
-          "x": 443,
-          "y": 413
-        },
-        "v_6": {
-          "x": 221,
-          "y": 465
-        }
+         "v_5": {
+            "x": 443,
+            "y": 413
+         },
+         "v_6": {
+            "x": 221,
+            "y": 465
+         }
       },
       "edgeVisualInfo": {
-        "e_1": {},
-        "e_0": {},
-        "e_4": {},
-        "e_5": {},
-        "e_6": {},
-        "e_7": {},
-        "e_2": {},
+         "e_1": {},
+         "e_0": {},
+         "e_4": {},
+         "e_5": {},
+         "e_6": {},
+         "e_7": {},
+         "e_2": {},
       },
       "minGraph": {
-        "vertexInfo": {
-         "v_0": {
-            "label": ""
-          },
-          "v_1": {
-            "label": ""
-          },
-          "v_2": {
-            "label": ""
-          },
-          "v_3": {
-            "label": ""
-          },
-          "v_4": {
-            "label": ""
-          },
+         "vertexInfo": {
+            "v_0": {
+               "label": ""
+            },
+            "v_1": {
+               "label": ""
+            },
+            "v_2": {
+               "label": ""
+            },
+            "v_3": {
+               "label": ""
+            },
+            "v_4": {
+               "label": ""
+            },
 
-          "v_5": {
-            "label": ""
-          },
-          "v_6": {
-            "label": ""
-          }
-        },
-        "edgeInfo": {
-          "e_1": { },
-          "e_0": {},
-          "e_4": {},
-          "e_5": {},
-          "e_6": {},
-          "e_7": {},
-          "e_2": {}
-        },
-        "edgeVertices": {
-          "e_1": [
-            "v_0",
-            "v_1"
-          ],
-          "e_0": [
-            "v_6",
-            "v_0"
-          ],
-          "e_4": [
-            "v_6",
-            "v_5"
-          ],
-          "e_5": [
-            "v_5",
-            "v_4"
-          ],
-          "e_6": [
-            "v_4",
-            "v_3"
-          ],
-          "e_7": [
-            "v_2",
-            "v_1"
-          ],
-          "e_2": [
-            "v_2",
-            "v_3"
-          ]
-        },
-        "directed": false
+            "v_5": {
+               "label": ""
+            },
+            "v_6": {
+               "label": ""
+            }
+         },
+         "edgeInfo": {
+            "e_1": {},
+            "e_0": {},
+            "e_4": {},
+            "e_5": {},
+            "e_6": {},
+            "e_7": {},
+            "e_2": {}
+         },
+         "edgeVertices": {
+            "e_1": [
+               "v_0",
+               "v_1"
+            ],
+            "e_0": [
+               "v_6",
+               "v_0"
+            ],
+            "e_4": [
+               "v_6",
+               "v_5"
+            ],
+            "e_5": [
+               "v_5",
+               "v_4"
+            ],
+            "e_6": [
+               "v_4",
+               "v_3"
+            ],
+            "e_7": [
+               "v_2",
+               "v_1"
+            ],
+            "e_2": [
+               "v_2",
+               "v_3"
+            ]
+         },
+         "directed": false
       }
    },
    allToAllGraph: {
       "vertexVisualInfo": {
-        "v_3": {
-          "x": 28,
-          "y": 346
-        },
-        "v_4": {
-          "x": 363,
-          "y": 346
-        },
-        "v_1": {
-          "x": 29,
-          "y": 29
-        },
-        "v_2": {
-          "x": 360,
-          "y": 29
-        },
-        "v_5": {
-          "x": 193,
-          "y": 190
-        }
+         "v_3": {
+            "x": 28,
+            "y": 346
+         },
+         "v_4": {
+            "x": 363,
+            "y": 346
+         },
+         "v_1": {
+            "x": 29,
+            "y": 29
+         },
+         "v_2": {
+            "x": 360,
+            "y": 29
+         },
+         "v_5": {
+            "x": 193,
+            "y": 190
+         }
       },
       "edgeVisualInfo": {
-        "e_0": {},
-        "e_1": {},
-        "e_2": {},
-        "e_3": {},
-        "e_4": {},
-        "e_5": {},
-        "e_6": {},
-        "e_7": {},
-        "e_8": {
-          "sweep": 1,
-          "large-arc": 0,
-          "radius-ratio": 0.75
-        },
-        "e_9": {
-          "sweep": 0,
-          "large-arc": 0,
-          "radius-ratio": 0.9
-        },
+         "e_0": {},
+         "e_1": {},
+         "e_2": {},
+         "e_3": {},
+         "e_4": {},
+         "e_5": {},
+         "e_6": {},
+         "e_7": {},
+         "e_8": {
+            "sweep": 1,
+            "large-arc": 0,
+            "radius-ratio": 0.75
+         },
+         "e_9": {
+            "sweep": 0,
+            "large-arc": 0,
+            "radius-ratio": 0.9
+         },
       },
       "minGraph": {
-        "vertexInfo": {
-          "v_3": {
-            "label": ""
-          },
-          "v_4": {
-            "label": ""
-          },
-          "v_1": {
-            "label": ""
-          },
-          "v_2": {
-            "label": ""
-          },
-          "v_5": {
-            "label": ""
-          }
-        },
-        "edgeInfo": {
-          "e_0": {},
-          "e_1": {},
-          "e_2": {},
-          "e_3": {},
-          "e_4": {},
-          "e_5": {},
-          "e_6": {},
-          "e_7": {},
-          "e_8": {},
-          "e_9": {}
-        },
-        "edgeVertices": {
-          "e_0": [
-            "v_1",
-            "v_2"
-          ],
-          "e_1": [
-            "v_2",
-            "v_4"
-          ],
-          "e_2": [
-            "v_4",
-            "v_5"
-          ],
-          "e_3": [
-            "v_4",
-            "v_3"
-          ],
-          "e_4": [
-            "v_3",
-            "v_1"
-          ],
-          "e_5": [
-            "v_3",
-            "v_5"
-          ],
-          "e_6": [
-            "v_5",
-            "v_1"
-          ],
-          "e_7": [
-            "v_5",
-            "v_2"
-          ],
-          "e_8": [
-            "v_3",
-            "v_2"
-          ],
-          "e_9": [
-            "v_4",
-            "v_1"
-          ]
-        },
-        "directed": false
+         "vertexInfo": {
+            "v_3": {
+               "label": ""
+            },
+            "v_4": {
+               "label": ""
+            },
+            "v_1": {
+               "label": ""
+            },
+            "v_2": {
+               "label": ""
+            },
+            "v_5": {
+               "label": ""
+            }
+         },
+         "edgeInfo": {
+            "e_0": {},
+            "e_1": {},
+            "e_2": {},
+            "e_3": {},
+            "e_4": {},
+            "e_5": {},
+            "e_6": {},
+            "e_7": {},
+            "e_8": {},
+            "e_9": {}
+         },
+         "edgeVertices": {
+            "e_0": [
+               "v_1",
+               "v_2"
+            ],
+            "e_1": [
+               "v_2",
+               "v_4"
+            ],
+            "e_2": [
+               "v_4",
+               "v_5"
+            ],
+            "e_3": [
+               "v_4",
+               "v_3"
+            ],
+            "e_4": [
+               "v_3",
+               "v_1"
+            ],
+            "e_5": [
+               "v_3",
+               "v_5"
+            ],
+            "e_6": [
+               "v_5",
+               "v_1"
+            ],
+            "e_7": [
+               "v_5",
+               "v_2"
+            ],
+            "e_8": [
+               "v_3",
+               "v_2"
+            ],
+            "e_9": [
+               "v_4",
+               "v_1"
+            ]
+         },
+         "directed": false
       }
    },
    singleMasterGraph: {
       "vertexVisualInfo": {
-        "v_3": {
-          "x": 115,
-          "y": 199
-        },
-        "v_4": {
-          "x": 212,
-          "y": 198
-        },
-        "v_0": {
-          "x": 505,
-          "y": 198
-        },
-        "v_1": {
-          "x": 262,
-          "y": 52
-        },
-        "v_2": {
-          "x": 26,
-          "y": 198
-        },
-        "v_5": {
-          "x": 315,
-          "y": 198
-        },
-        "v_6": {
-          "x": 409,
-          "y": 195
-        }
+         "v_3": {
+            "x": 115,
+            "y": 199
+         },
+         "v_4": {
+            "x": 212,
+            "y": 198
+         },
+         "v_0": {
+            "x": 505,
+            "y": 198
+         },
+         "v_1": {
+            "x": 262,
+            "y": 52
+         },
+         "v_2": {
+            "x": 26,
+            "y": 198
+         },
+         "v_5": {
+            "x": 315,
+            "y": 198
+         },
+         "v_6": {
+            "x": 409,
+            "y": 195
+         }
       },
       "edgeVisualInfo": {
-        "e_0": {},
-        "e_1": {},
-        "e_2": {},
-        "e_3": {},
-        "e_4": {},
-        "e_5": {}
+         "e_0": {},
+         "e_1": {},
+         "e_2": {},
+         "e_3": {},
+         "e_4": {},
+         "e_5": {}
       },
       "minGraph": {
-        "vertexInfo": {
-          "v_3": {
-            "label": ""
-          },
-          "v_4": {
-            "label": ""
-          },
-          "v_0": {
-            "label": ""
-          },
-          "v_1": {
-            "label": ""
-          },
-          "v_2": {
-            "label": ""
-          },
-          "v_5": {
-            "label": ""
-          },
-          "v_6": {
-            "label": ""
-          }
-        },
-        "edgeInfo": {
-          "e_0": {},
-          "e_1": {},
-          "e_2": {},
-          "e_3": {},
-          "e_4": {},
-          "e_5": {},
-        },
-        "edgeVertices": {
-          "e_0": [
-            "v_1",
-            "v_2"
-          ],
-          "e_1": [
-            "v_1",
-            "v_3"
-          ],
-          "e_2": [
-            "v_1",
-            "v_4"
-          ],
-          "e_3": [
-            "v_1",
-            "v_5"
-          ],
-          "e_4": [
-            "v_1",
-            "v_6"
-          ],
-          "e_5": [
-            "v_1",
-            "v_0"
-          ]
-        },
-        "directed": false
+         "vertexInfo": {
+            "v_3": {
+               "label": ""
+            },
+            "v_4": {
+               "label": ""
+            },
+            "v_0": {
+               "label": ""
+            },
+            "v_1": {
+               "label": ""
+            },
+            "v_2": {
+               "label": ""
+            },
+            "v_5": {
+               "label": ""
+            },
+            "v_6": {
+               "label": ""
+            }
+         },
+         "edgeInfo": {
+            "e_0": {},
+            "e_1": {},
+            "e_2": {},
+            "e_3": {},
+            "e_4": {},
+            "e_5": {},
+         },
+         "edgeVertices": {
+            "e_0": [
+               "v_1",
+               "v_2"
+            ],
+            "e_1": [
+               "v_1",
+               "v_3"
+            ],
+            "e_2": [
+               "v_1",
+               "v_4"
+            ],
+            "e_3": [
+               "v_1",
+               "v_5"
+            ],
+            "e_4": [
+               "v_1",
+               "v_6"
+            ],
+            "e_5": [
+               "v_1",
+               "v_0"
+            ]
+         },
+         "directed": false
       }
-    }
+   }
 }
 
-Raphael.el.animateAlong = function(params, props, callback) {
-	var element = this,
-		paper = element.paper,
-		path = params.path,
-		rotate = params.rotate,
-		duration = params.duration,
-		easing = params.easing,
+Raphael.el.animateAlong = function (params, props, callback) {
+   var element = this,
+      paper = element.paper,
+      path = params.path,
+      rotate = params.rotate,
+      duration = params.duration,
+      easing = params.easing,
       debug = params.debug,
       fromPercentage = params.fromPercentage,
       toPercentage = params.toPercentage,
-		isElem = typeof path !== 'string';
-	
-	element.path = 
-		isElem
-			? path
-			: paper.path(path);
-	element.pathLen = element.path.getTotalLength();
-	element.rotateWith = rotate;
-	
-	element.path.attr({
-		stroke: debug ? 'red' : isElem ? path.attr('stroke') : 'rgba(0,0,0,0)',
-		'stroke-width': debug ? 2 : isElem ? path.attr('stroke-width') : 0
-	});
+      isElem = typeof path !== 'string';
 
-	paper.customAttributes.along = function(v) {
-		var point = this.path.getPointAtLength(v * this.pathLen),
-			attrs = {
-				cx: point.x,
-				cy: point.y 
-			};
-		this.rotateWith && (attrs.transform = 'r'+point.alpha);
-		// TODO: rotate along a path while also not messing
-		//       up existing transformations
-		
-		return attrs;
+   element.path =
+      isElem
+         ? path
+         : paper.path(path);
+   element.pathLen = element.path.getTotalLength();
+   element.rotateWith = rotate;
+
+   element.path.attr({
+      stroke: debug ? 'red' : isElem ? path.attr('stroke') : 'rgba(0,0,0,0)',
+      'stroke-width': debug ? 2 : isElem ? path.attr('stroke-width') : 0
+   });
+
+   paper.customAttributes.along = function (v) {
+      var point = this.path.getPointAtLength(v * this.pathLen),
+         attrs = {
+            cx: point.x,
+            cy: point.y
+         };
+      this.rotateWith && (attrs.transform = 'r' + point.alpha);
+      // TODO: rotate along a path while also not messing
+      //       up existing transformations
+
+      return attrs;
    };
-   
-	if(props instanceof Function) {
-		callback = props;
-		props = null;
-	}
-	if(!props) {
-		props = {
-			along: toPercentage
-		};
-	} else {
-		props.along = toPercentage;	
-	}
-	
-	var startAlong = element.attr('along') || fromPercentage;
-	
-	element.attr({along: startAlong}).animate(props, duration, easing, function() {
-		!isElem && element.path.remove();
-		
-		callback && callback.call(element);
-	});
+
+   if (props instanceof Function) {
+      callback = props;
+      props = null;
+   }
+   if (!props) {
+      props = {
+         along: toPercentage
+      };
+   } else {
+      props.along = toPercentage;
+   }
+
+   var startAlong = element.attr('along') || fromPercentage;
+
+   element.attr({ along: startAlong }).animate(props, duration, easing, function () {
+      !isElem && element.path.remove();
+
+      callback && callback.call(element);
+   });
 };
 
 // Register the library; change "template" by the name of your library in lowercase
