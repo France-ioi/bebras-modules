@@ -302,7 +302,7 @@ var getContext = function (display, infos, curLevel) {
                 readSoundLevel: "volume sonore",
 
                 readMagneticForce: "champ magnétique (µT) sur %1",
-                computeCompassHeading: "direction de la boussole %1 en (°)",
+                computeCompassHeading: "direction de la boussole en (°)",
 
                 readInfraredState: "infrarouge détecté sur %1",
                 setInfraredState: "mettre l'émetteur infrarouge %1 à %2",
@@ -316,6 +316,11 @@ var getContext = function (display, infos, curLevel) {
                 connectToCloudStore: "se connecter au cloud. Identifiant %1 Mot de passe %2",
                 writeToCloudStore: "écrire dans le cloud : identifiant %1 clé %2 valeur %3",
                 readFromCloudStore: "lire dans le cloud : identifiant %1 clé %2",
+
+                // IR Remote
+                readIRMessage: "wait for IR message name: %1 timeout: %2 millisecondes",
+                sendIRMessage: "send IR message sensor: %1 preset name: %2",
+                presetIRMessage: "preset IR Message preset name: %1  data: %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
@@ -397,6 +402,10 @@ var getContext = function (display, infos, curLevel) {
                 writeToCloudStore: "writeToCloudStore",
                 readFromCloudStore: "readFromCloudStore",                
 
+                // IR Remote
+                readIRMessage: "readIRMessage",
+                sendIRMessage: "sendIRMessage",
+                presetIRMessage: "presetIRMessage",
             },
             description: {
                 // Descriptions of the functions in Python (optional)
@@ -474,6 +483,11 @@ var getContext = function (display, infos, curLevel) {
                 connectToCloudStore: "connectToCloudStore(identifier, password)",
                 writeToCloudStore: "writeToCloudStore(identifier, key, value)",
                 readFromCloudStore: "readFromCloudStore(identifier, key)",
+
+                // IR Remote
+                readIRMessage: "readIRMessage(irrec, timeout)",
+                sendIRMessage: "sendIRMessage(irtrans, name)",
+                presetIRMessage: "presetIRMessage(name, data)",
             },
             constant: {
             },
@@ -625,8 +639,54 @@ var getContext = function (display, infos, curLevel) {
                     <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
                 </div>
             </div>
-
                 `,
+                irLearnDialog: `
+                <div class="content qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        Learn Infrared codes
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div id="sensorPicker" class="panel-body">
+                    <div class="form-group">
+                        <p>Point your remote control to your Quick Pi board and press a button</p>
+                    </div>
+
+                    <div class="form-group">
+                        <p id=piircode></p>
+                    </div>
+                </div>
+                <div class="singleButton">
+                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>Learn code</button>
+                    <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>Fermer</button>
+                </div>
+            </div>
+                `,
+                irRemoteDialog: `
+                <div class="content qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        IR Remote control
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div id="sensorPicker" class="panel-body">
+                    <div id="piremotemessage" >
+                    </div>
+                    <div id="piremotecontent" >
+                    </div>
+                </div>
+                <div class="singleButton">
+                    <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
+                </div>
+            </div>
+                `,
+                noIrPresets: "Please use the preset IR function to add remote control messages",
+                irEnableContinous: "Continuous transmission enable",
+                irDisableContinous: "Continuous transmission disable",
 
             }
         },
@@ -708,6 +768,11 @@ var getContext = function (display, infos, curLevel) {
                 connectToCloudStore: "connectToCloudStore",
                 writeToCloudStore: "writeToCloudStore",
                 readFromCloudStore: "readFromCloudStore",
+
+                // IR Remote
+                readIRMessage: "readIRMessage",
+                sendIRMessage: "sendIRMessage",
+                presetIRMessage: "presetIRMessage",
             }
         }
     }
@@ -890,14 +955,14 @@ var getContext = function (display, infos, curLevel) {
                 { type: "led", subType: "red", port: "D4", suggestedName: "led1", },
                 { type: "led", subType: "green", port: "D17", suggestedName: "led2", },
                 { type: "led", subType: "blue", port: "D27",  suggestedName: "led3", },
-                { type: "irtrans", port: "D22",  suggestedName: "infraredtransmiter1", },
-                { type: "irrecv", port: "D23", suggestedName: "infraredreceiver1", },
-                { type: "sound", port: "A1", suggestedName: "microphone1", },
+                { type: "irtrans", port: "D22",  suggestedName: "irtran1", },
+                { type: "irrecv", port: "D23", suggestedName: "irrec1", },
+                { type: "sound", port: "A1", suggestedName: "micro1", },
                 { type: "buzzer", subType: "passive", port: "D12", suggestedName: "buzzer1", },
-                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: "accelerometer1", },
+                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: "accel1", },
                 { type: "gyroscope", subType: "BMI160", port: "i2c", suggestedName: "gryscope1", },
-                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: "magnetometer1", },
-                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: "temperature1", },
+                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: "magneto1", },
+                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: "temp1", },
                 { type: "range", subType: "vl53l0x", port: "i2c", suggestedName: "distance1", },
                 { type: "button", port: "D26", suggestedName: "button1", },
                 { type: "light", port: "A2", suggestedName: "light1", },
@@ -1085,7 +1150,11 @@ var getContext = function (display, infos, curLevel) {
                 } else if(paper.width < 350) {
                     return 3;
                 }
-                return 2;
+
+                if (context.compactLayout)
+                    return 3;
+                else
+                    return 2;
             },
             portType: "i2c",
             valueType: "object",
@@ -1283,7 +1352,10 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 return false;
-            }
+            },
+            cellsAmount: function(paper) {
+                return 2;
+            },
         },
         {
             name: "temperature",
@@ -1492,6 +1564,9 @@ var getContext = function (display, infos, curLevel) {
                     callback(array);
                 });
             },
+            cellsAmount: function(paper) {
+                return 2;
+            },
         },
         {
             name: "gyroscope",
@@ -1518,6 +1593,9 @@ var getContext = function (display, infos, curLevel) {
                     array[2] = Math.round(array[2]);
                     callback(array);
                 });
+            },
+            cellsAmount: function(paper) {
+                return 2;
             },
         },
         {
@@ -1547,6 +1625,9 @@ var getContext = function (display, infos, curLevel) {
 
                     callback(array);
                 });
+            },
+            cellsAmount: function(paper) {
+                return 2;
             },
         },
         {
@@ -2210,7 +2291,8 @@ var getContext = function (display, infos, curLevel) {
         context.sensorPollInterval = setInterval(function () {
             if((context.runner && context.runner.isRunning())
                 || context.offLineMode
-                || context.liveUpdateCount != 0) { return; }
+                || context.liveUpdateCount != 0
+                || context.stopLiveUpdate) { return; }
 
             context.quickPiConnection.startTransaction();
 
@@ -2384,7 +2466,14 @@ var getContext = function (display, infos, curLevel) {
             context.recreateDisplay = false;
         }
 
-        paper.setSize(($('#virtualSensors').width() * context.quickPiZoom) - 10 , $('#virtualSensors').height() - 30);
+        paper.setSize(($('#virtualSensors').width() * context.quickPiZoom), $('#virtualSensors').height());
+
+        var area = paper.width * paper.height;
+        context.compactLayout = false;
+        if (area < 218700)
+        {
+            context.compactLayout = true;
+        }
 
         if (context.sensorDivisions) {
             context.sensorDivisions.remove();
@@ -2522,7 +2611,10 @@ var getContext = function (display, infos, curLevel) {
             if (nSensors < 4)
                 nSensors = 4;
 
-            var geometry = squareSize(paper.width, paper.height, nSensors);
+            if (context.compactLayout)
+                var geometry = squareSize(paper.width, paper.height, nSensors, 2);
+            else
+                var geometry = squareSize(paper.width, paper.height, nSensors, 1);
 
             context.sensorSize = geometry.size * .10;
 
@@ -2547,7 +2639,18 @@ var getContext = function (display, infos, curLevel) {
                     var x = paper.width / geometry.rows * row;
                     var y1 = y + geometry.size / 4;
                     var y2 = y + geometry.size * 3 / 4;
+                    var cells = 1;
+                    var sensor = infos.quickPiSensors[iSensor];
+                    var foundsize = 0;
 
+                    var cellsAmount = null;
+                    if (sensor)
+                         cellsAmount = findSensorDefinition(sensor).cellsAmount;
+
+                    if (cellsAmount)
+                        cells = cellsAmount(paper);
+
+                    
                     line = paper.path(["M", x,
                         y1,
                         "L", x,
@@ -2560,29 +2663,55 @@ var getContext = function (display, infos, curLevel) {
                         "stroke-linecapstring": "round"
                     });
 
+                    var foundrows = false;
+                    var bump = false;
+
+                    while (!foundrows && !bump)
+                    {
+                        var rowsleft = geometry.rows - row;
+                        if (cells > rowsleft)
+                        {
+                            for (var iNewSensor = iSensor + 1; iNewSensor < infos.quickPiSensors.length; iNewSensor++)
+                            {
+                                var newSensor = infos.quickPiSensors[iNewSensor];
+
+                                cells = 1;
+                                cellsAmount = findSensorDefinition(newSensor).cellsAmount;
+                                
+                                if (cellsAmount)
+                                    cells = cellsAmount(paper);
+
+                                if (cells == 1)
+                                {
+                                    infos.quickPiSensors[iNewSensor] = sensor;
+                                    infos.quickPiSensors[iSensor] = newSensor;
+                                    sensor = newSensor;
+                                    foundrows = true;
+                                    break;
+                                }
+                            }
+                            bump = true;
+                        }
+                        else
+                        {
+                            foundrows = true;
+                        }
+                    }
+
+                    if (bump)
+                        continue;
+
+
                     if (iSensor == infos.quickPiSensors.length && infos.customSensors) {
                         drawCustomSensorAdder(x, y, geometry.size);
-                    } else if (infos.quickPiSensors[iSensor]) {
-                        var sensor = infos.quickPiSensors[iSensor];
+                    } else if (infos.quickPiSensors[iSensor]) {                        
+                        row += cells - 1;
 
-
-                        var cellsAmount = findSensorDefinition(sensor).cellsAmount;
-                        if (cellsAmount) {
-                            row += cellsAmount(paper) - 1;
-
-                            sensor.drawInfo = {
+                        sensor.drawInfo = {
                                 x: x,
                                 y: y,
-                                width: geometry.size * cellsAmount(paper),
+                                width: (paper.width / geometry.rows) * cells,
                                 height: geometry.size
-                            }
-                        } else {
-                            sensor.drawInfo = {
-                                x: x,
-                                y: y,
-                                width: geometry.size,
-                                height: geometry.size
-                            }
                         }
 
                         drawSensor(sensor);
@@ -2618,7 +2747,7 @@ var getContext = function (display, infos, curLevel) {
         $('#taskIntro').addClass('piui');
 
         $('#grid').html(`
-            <div id="virtualSensors" style="height: 90%; width: 90%; overflow-y: auto;">
+            <div id="virtualSensors" style="height: 100%; width: 100%;">
             </div>
              `
         );
@@ -2628,14 +2757,17 @@ var getContext = function (display, infos, curLevel) {
             context.quickPiZoom = 1;
 
         this.raphaelFactory.destroyAll();
-            paper = this.raphaelFactory.create(
+        paper = this.raphaelFactory.create(
                 "paperMain",
                 "virtualSensors",
-                ($('#virtualSensors').width() * context.quickPiZoom) - 10,
-                $('#virtualSensors').height() - 10
-            );
+                ($('#virtualSensors').width() * context.quickPiZoom),
+                $('#virtualSensors').height()
+        );
 
             if (context.autoGrading) {
+                $('#virtualSensors').css("overflow-y", "hidden");
+                $('#virtualSensors').css("overflow-x", "auto");
+
                 // Allow horizontal zoom on grading
                 paper.canvas.onwheel = function(event) {
                         var originalzoom = context.quickPiZoom;
@@ -2655,6 +2787,11 @@ var getContext = function (display, infos, curLevel) {
                         drawSensor(sensor);
                     }
                 });        
+            }
+            else
+            {
+                $('#virtualSensors').css("overflow-y", "hidden");
+                $('#virtualSensors').css("overflow", "hidden");
             }
         
 
@@ -3416,9 +3553,9 @@ var getContext = function (display, infos, curLevel) {
     };
 
     // Straight from stack overflow :)
-    function squareSize(x, y, n) {
+    function squareSize(x, y, n, ratio) {
         // Compute number of rows and columns, and cell size
-        var ratio = x / y;
+        var ratio = x / y * ratio;
         var ncols_float = Math.sqrt(n * ratio);
         var nrows_float = n / ncols_float;
 
@@ -3515,6 +3652,7 @@ var getContext = function (display, infos, curLevel) {
 
         setSessionStorage('autoConnect', "1");
 
+        context.recreateDisplay = true;
         context.resetDisplay();
 
         startSensorPollInterval();
@@ -4826,28 +4964,58 @@ var getContext = function (display, infos, curLevel) {
         var scrolloffset = 0;
         var fadeopacity = 1;
 
-        var imgw = sensor.drawInfo.width / 2;
+        var imgw = sensor.drawInfo.width / 1.8;
         var imgh = sensor.drawInfo.height / 2;
+        imgw = imgh;
 
-        var imgx = sensor.drawInfo.x + (imgw / 6);
+        var imgx = sensor.drawInfo.x - (imgw / 2) + (sensor.drawInfo.width / 2); 
         var imgy = sensor.drawInfo.y + (sensor.drawInfo.height / 2) - (imgh / 2);
 
         var state1x =  (imgx + imgw) + 3;
         var state1y = imgy + imgh / 3;
 
+        var state1x = sensor.drawInfo.x + (sensor.drawInfo.width / 2)
+        var state1y = imgy + imgh + 6;
+        var stateanchor = "middle";
+
+        if (sensor.type == "accelerometer" ||
+            sensor.type == "gyroscope" ||
+            sensor.type == "magnetometer" ||
+            sensor.type == "stick")
+        {
+            if (context.compactLayout)
+                imgx = sensor.drawInfo.x + 5;
+            else
+                imgx = sensor.drawInfo.x - (imgw / 4) + (sensor.drawInfo.width / 4); 
+
+            state1x =  (imgx + imgw) + 10;
+            state1y = imgy; 
+            stateanchor = 'start';
+        }
+
+
         var portx = state1x;
         var porty = imgy;
 
-        var namex = sensor.drawInfo.x + (sensor.drawInfo.height / 2);
+        var namex = sensor.drawInfo.x + (sensor.drawInfo.width / 2);
         var namey = sensor.drawInfo.y + (imgh * 0.20);
         var nameanchor = "middle";
 
-        var portsize = sensor.drawInfo.height * 0.10;
-        var statesize = sensor.drawInfo.height * 0.09;
-        var namesize = sensor.drawInfo.height * 0.10;
+        var portsize = sensor.drawInfo.height * 0.11;
+
+        if (context.compactLayout)
+            var statesize = sensor.drawInfo.height * 0.14;
+        else
+            var statesize = sensor.drawInfo.height * 0.10;
+
+        var namesize = sensor.drawInfo.height * 0.15;
+
+        
 
         var drawPortText = true;
         var drawName = true;
+
+        drawPortText = false;
 
         if (!sensor.focusrect || isElementRemoved(sensor.focusrect))
             sensor.focusrect = paper.rect(imgx, imgy, imgw, imgh);
@@ -4991,8 +5159,8 @@ var getContext = function (display, infos, curLevel) {
 
                 var muteBtnSize = sensor.drawInfo.width * 0.15;
                 sensor.muteBtn = paper.text(
-                    state1x, 
-                    state1y + imgh / 2, 
+                    imgx + imgw, 
+                    imgy + (imgh / 2), 
                     buzzerSound.isMuted(sensor.name) ? "\uf6a9" : "\uf028"
                 );
                 sensor.muteBtn.node.style.fontWeight = "bold";           
@@ -5185,6 +5353,7 @@ var getContext = function (display, infos, curLevel) {
             imgw = screenScalerSize.width + borderSize * 2;
             imgh = screenScalerSize.height + borderSize * 2;            
             imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5) + scrolloffset;
+            imgx = 0;
             imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
 
             portx = imgx + imgw + borderSize;
@@ -5271,7 +5440,7 @@ var getContext = function (display, infos, curLevel) {
                     }
 
                     sensor.stateText = paper.text(statex, statey, sensor.state.line1 + "\n" + (sensor.state.line2 ? sensor.state.line2 : ""));
-
+                    stateanchor = "start";
                     sensor.stateText.attr("")
                 }
             }
@@ -5843,9 +6012,88 @@ var getContext = function (display, infos, curLevel) {
                 sensor.ledoff = paper.image(getImg('irtransoff.png'), imgx, imgy, imgw, imgh);
 
                     sensor.focusrect.click(function () {
-                        if (!context.autoGrading && (!context.runner || !context.runner.isRunning())) {
-                            sensor.state = !sensor.state;
-                            drawSensor(sensor);
+                        if (!context.autoGrading && (!context.runner || !context.runner.isRunning())
+                            && !context.offLineMode) {
+                            //sensor.state = !sensor.state;
+                            //drawSensor(sensor);
+                            window.displayHelper.showPopupDialog(strings.messages.irRemoteDialog);
+
+                            $('#picancel').click(function () {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+                            });
+        
+                            $('#picancel2').click(function () {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+                            });
+        
+                            var addedSomeButtons = false;
+                            var remotecontent = document.getElementById('piremotecontent');
+                            var parentdiv = document.createElement("DIV");
+                            parentdiv.className  = "form-group";
+        
+                            remotecontent.appendChild(parentdiv);
+                            var count = 0;
+                            for (var code in context.remoteIRcodes)
+                            {
+                                addedSomeButtons = true;
+                                context.remoteIRcodes[code];
+        
+                                var btn = document.createElement("BUTTON");
+                                var t = document.createTextNode(code);
+        
+                                btn.className = "btn";
+                                btn.appendChild(t);
+                                parentdiv.appendChild(btn);
+        
+                                let capturedcode = code;
+                                let captureddata = context.remoteIRcodes[code];
+                                btn.onclick = function() {
+                                    $('#popupMessage').hide();
+                                    window.displayHelper.popupMessageShown = false;
+            
+                                    //if (sensor.waitingForIrMessage)
+                                        //sensor.waitingForIrMessage(capturedcode);
+
+                                    context.quickPiConnection.sendCommand("presetIRMessage(\"" + capturedcode + "\", '" + captureddata + "')", function(returnVal) {});
+                                    context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + capturedcode + "\")", function(returnVal) {});
+                            
+                                };
+        
+                                count += 1;
+        
+                                if (count == 4)
+                                {
+                                    count = 0;
+                                    parentdiv = document.createElement("DIV");
+                                    parentdiv.className  = "form-group";
+                                    remotecontent.appendChild(parentdiv);
+                                }
+                            }
+                            if (!addedSomeButtons)
+                            {
+                                $('#piremotemessage').text(strings.messages.noIrPresets);
+                            }
+        
+                            var btn = document.createElement("BUTTON");
+        
+                            if (sensor.state)
+                                var t = document.createTextNode(strings.messages.irDisableContinous);
+                            else
+                                var t = document.createTextNode(strings.messages.irEnableContinous);
+        
+                            
+                            btn.className = "btn";
+                            btn.appendChild(t);
+                            parentdiv.appendChild(btn);
+                            btn.onclick = function() {
+                                $('#popupMessage').hide();
+                                window.displayHelper.popupMessageShown = false;
+        
+                                sensor.state = !sensor.state;
+                                drawSensor(sensor);
+                            };
                         } else {
                             actuatorsInRunningModeError();
                         }
@@ -5918,7 +6166,117 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText = paper.text(state1x, state1y, "OFF");
             }
 
+            sensor.focusrect.click(function () {
+                if (context.offLineMode) {
+                    window.displayHelper.showPopupDialog(strings.messages.irRemoteDialog);
 
+                    $('#picancel').click(function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                    });
+
+                    $('#picancel2').click(function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                    });
+
+                    var addedSomeButtons = false;
+                    var remotecontent = document.getElementById('piremotecontent');
+                    var parentdiv = document.createElement("DIV");
+                    parentdiv.className  = "form-group";
+
+                    remotecontent.appendChild(parentdiv);
+                    var count = 0;
+                    for (var code in context.remoteIRcodes)
+                    {
+                        addedSomeButtons = true;
+                        context.remoteIRcodes[code];
+
+                        var btn = document.createElement("BUTTON");
+                        var t = document.createTextNode(code);
+
+                        btn.className = "btn";
+                        btn.appendChild(t);
+                        parentdiv.appendChild(btn);
+
+                        let capturedcode = code;
+                        btn.onclick = function() {
+                            $('#popupMessage').hide();
+                            window.displayHelper.popupMessageShown = false;
+    
+                            if (sensor.waitingForIrMessage)
+                                sensor.waitingForIrMessage(capturedcode);
+                        };
+
+                        count += 1;
+
+                        if (count == 4)
+                        {
+                            count = 0;
+                            parentdiv = document.createElement("DIV");
+                            parentdiv.className  = "form-group";
+                            remotecontent.appendChild(parentdiv);
+                        }
+                    }
+                    if (!addedSomeButtons)
+                    {
+                        $('#piremotemessage').text(strings.messages.noIrPresets);
+                    }
+
+                    var btn = document.createElement("BUTTON");
+
+                    if (sensor.state)
+                        var t = document.createTextNode(strings.messages.irDisableContinous);
+                    else
+                        var t = document.createTextNode(strings.messages.irEnableContinous);
+
+                    
+                    btn.className = "btn";
+                    btn.appendChild(t);
+                    parentdiv.appendChild(btn);
+                    btn.onclick = function() {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+
+                        sensor.state = !sensor.state;
+                        drawSensor(sensor);
+                    };
+
+                }
+                else{
+                    //sensorInConnectedModeError();
+
+                    context.stopLiveUpdate = true;
+
+                    window.displayHelper.showPopupDialog(strings.messages.irLearnDialog);
+
+                    $('#picancel').click(function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                        context.stopLiveUpdate = false;
+                    });
+
+                    $('#picancel2').click(function () {
+                        $('#popupMessage').hide();
+                        window.displayHelper.popupMessageShown = false;
+                        context.stopLiveUpdate = false;
+                    });
+
+                    $('#piirlearn').click(function () {
+
+                        $('#piirlearn').attr('disabled', true);
+
+                        $("#piircode").text("");
+                        context.quickPiConnection.sendCommand("readIRMessageCode(irrec1, 10000)", function(retval)
+                        {
+                            $('#piirlearn').attr('disabled', false);
+                            $("#piircode").text(retval);
+                        });
+                    });
+
+                }
+            });
+/*
             if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
                 sensor.focusrect.node.onmousedown = function () {
                     if (context.offLineMode) {
@@ -5942,7 +6300,7 @@ var getContext = function (display, infos, curLevel) {
 
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
                 sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
-            }
+            }*/
         } else if (sensor.type == "stick") {
             if (sensor.stateText)
                 sensor.stateText.remove();
@@ -6015,7 +6373,7 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.state)
                 sensor.state = [false, false, false, false, false];
 
-            var stateString = "";
+            var stateString = "\n";
             if (sensor.state[0]) {
                 stateString += "UP\n"
                 sensor.imgup.attr({ "opacity": 1 });
@@ -6060,7 +6418,7 @@ var getContext = function (display, infos, curLevel) {
                         min = gpios[i];
                 }
 
-                sensor.portText = paper.text(portx, porty, "D" + min.toString() + "-D" + max.toString() + "?");
+                sensor.portText = paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
                 sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
                 sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
                 var b = sensor.portText._getBBox();
@@ -6284,6 +6642,7 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors.splice(i, 1);
                                 }
                             }
+                            context.recreateDisplay = true
                             context.resetDisplay();
                         },
                         strings.messages.keep);
@@ -6295,7 +6654,11 @@ var getContext = function (display, infos, curLevel) {
 
         if (sensor.stateText) {
             try {
-                sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': 'start', 'font-weight': 'bold', fill: "gray" });
+                var statecolor = "gray";
+                if (context.compactLayout)
+                    statecolor = "black";
+
+                sensor.stateText.attr({ "font-size": statesize + "px", 'text-anchor': stateanchor, 'font-weight': 'bold', fill: statecolor });
                 var b = sensor.stateText._getBBox();
                 sensor.stateText.translate(0, b.height/2);
                 sensor.stateText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
@@ -7749,6 +8112,80 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
+
+    
+    context.quickpi.readIRMessage = function (name, timeout, callback) {
+        var sensor = findSensorByName(name, true);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            var state = context.getSensorState(name);
+
+            var cb = context.runner.waitCallback(callback);
+
+            sensor.waitingForIrMessage = function(command)
+            {
+                clearTimeout(sensor.waitingForIrMessageTimeout);
+                sensor.waitingForIrMessage = null;
+
+                cb(command);
+            }
+
+            sensor.waitingForIrMessageTimeout = setTimeout(function () {
+                if (sensor.waitingForIrMessage) {
+                    sensor.waitingForIrMessage = null;
+                    cb("none");
+                }
+            }, 
+            timeout);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("readIRMessage(\"irrec1\", " + timeout + ")", function(returnVal) {
+
+                if (typeof returnVal === 'string')
+                    returnVal = returnVal.replace(/['"]+/g, '')
+
+                cb(returnVal);
+            }, true);
+        }
+    };
+
+    context.quickpi.sendIRMessage = function (name, preset, callback) {
+        var sensor = findSensorByName(name, true);
+
+        //context.registerQuickPiEvent(name, state ? true : false);
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("sendIRMessage(\"irtran1\", \"" + preset + "\")", function(returnVal) {
+                cb();
+            }, true);
+        }
+    };
+
+    context.quickpi.presetIRMessage = function (preset, data, callback) {
+        //var sensor = findSensorByName(name, true);
+
+        //context.registerQuickPiEvent(name, state ? true : false);
+        if (!context.remoteIRcodes)
+
+            context.remoteIRcodes = {};
+
+        context.remoteIRcodes[preset] = data;
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
+            context.waitDelay(callback);
+        } else {
+            var cb = context.runner.waitCallback(callback);
+
+            context.quickPiConnection.sendCommand("presetIRMessage(\"" + preset + "\", \"" + JSON.stringify(JSON.parse(data)) + "\")", function(returnVal) {
+                cb();
+            }, true);
+        }
+    };
     /***** Blocks definitions *****/
     /* Here we define all blocks/functions of the library.
        Structure is as follows:
@@ -8016,6 +8453,17 @@ var getContext = function (display, infos, curLevel) {
                     }
                 },
                 {
+                    name: "readIRMessage", yieldsValue: true, params: ["String", "Number"], blocklyJson: {
+                        "args0": [
+                            { "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("irrecv") },
+                            { "type": "input_value", "name": "PARAM_1"},
+                        ]
+                    },
+                    blocklyXml: "<block type='readIRMessage'>" +
+                        "<value name='PARAM_1'><shadow type='math_number'><field name='NUM'>10000</field></shadow></value>" +
+                        "</block>"
+                },
+                {
                     name: "readAngularVelocity", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             {
@@ -8171,6 +8619,29 @@ var getContext = function (display, infos, curLevel) {
                             { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
                         ]
                     }
+                },
+                {
+                    name: "sendIRMessage", params: ["String", "String"], blocklyJson: {
+                        "args0": [
+                            {"type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("irtrans")},
+                            { "type": "input_value", "name": "PARAM_1", "text": "" },
+                        ]
+                    },
+                    blocklyXml: "<block type='sendIRMessage'>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
+                },
+                {
+                    name: "presetIRMessage", params: ["String", "String"], blocklyJson: {
+                        "args0": [
+                            { "type": "input_value", "name": "PARAM_0", "text": "" },
+                            { "type": "input_value", "name": "PARAM_1", "text": "" },
+                        ]
+                    },
+                    blocklyXml: "<block type='presetIRMessage'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
                 },
                 {
                     name: "sleep", params: ["Number"], blocklyJson: {

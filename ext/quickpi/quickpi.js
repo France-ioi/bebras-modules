@@ -27,6 +27,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     this.commandQueue = [];
     this.seq = 0;
     this.wrongVersion = false;
+    this.onDistributedEvent = null;
 
     this.connect = function(url) {
         if (this.wsSession != null) {
@@ -155,6 +156,11 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                         wsSession.close();
                 }
             }
+            else if (message.command == "distributedEvent")
+            {
+                if (onDistributedEvent)
+                    onDistributedEvent(message.event);
+            }
         }
 
         this.wsSession.onclose = function () {
@@ -247,6 +253,24 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
         {
             "command": "install",
             "program": fullProgram
+        }
+
+        this.wsSession.send(JSON.stringify(command));
+    }
+
+    this.runDistributed = function (pythonProgram, graphDefinition, oninstall) {
+        if (this.wsSession == null)
+            return;
+
+        this.commandMode = false;
+        this.oninstalled = oninstall;
+
+        var fullProgram = pythonLib + pythonProgram;
+        var command =
+        {
+            "command": "rundistributed",
+            "program": fullProgram,
+            "graph": graphDefinition
         }
 
         this.wsSession.send(JSON.stringify(command));
@@ -408,6 +432,7 @@ import smbus
 import math
 import pigpio
 import threading
+import argparse
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -450,6 +475,12 @@ compassScale = None
 
 
 pi = pigpio.pi()
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--nodeid', action='store')
+args = parser.parse_args()
+nodeId = args.nodeid
+
 
 def nameToPin(name):
     for sensor in sensorTable:
@@ -2314,4 +2345,266 @@ def readFromCloudStore(identifier, key):
 
         return value
 
+def getNodeID():
+    return nodeId
+
+def getNeighbors():
+    global nodeId
+
+    ret = requests.post('http://localhost:5000/api/v1/getNeighbors/{}'.format(nodeId))
+
+    return ret.json()
+    
+
+def getNextMessage():
+    global nodeId
+    while True:
+        ret = requests.post('http://localhost:5000/api/v1/getNextMessage/{}'.format(nodeId))
+        returnData = ret.json()
+        if returnData["hasmessage"]:
+            print(returnData["hasmessage"])
+            return returnData["value"]
+    
+        time.sleep(1)
+
+def sendMessage(toNodeId, message):
+    global nodeId
+    data = {'fromId': nodeId,
+            'message': message }
+
+    ret = requests.post('http://localhost:5000/api/v1/sendMessage/{}'.format(toNodeId), json = data)
+
+def submitAnswer(answer):
+    global nodeId
+    data = { 'answer': answer }
+
+    ret = requests.post('http://localhost:5000/api/v1/submitAnswer/{}'.format(nodeId), json = data)
+
+    print(ret)
+
+last_tick = 0
+in_code = False
+code = []
+fetching_code = False
+IRGPIOTRANS = 22
+IRGPIO = 23
+POST_MS = 15
+POST_US    = POST_MS * 1000
+PRE_MS     = 200
+PRE_US     = PRE_MS  * 1000
+SHORT = 10
+TOLERANCE  = 25
+TOLER_MIN =  (100 - TOLERANCE) / 100.0
+TOLER_MAX =  (100 + TOLERANCE) / 100.0
+GLITCH = 250
+FREQ = 38.0
+GAP_MS     = 100
+GAP_S      = GAP_MS  / 1000.0
+
+
+installed_callback = False
+
+IR_presets = {}
+
+def IR_compare(p1, p2):
+   """
+   Check that both recodings correspond in pulse length to within
+   TOLERANCE%.  If they do average the two recordings pulse lengths.
+
+   Input
+
+        M    S   M   S   M   S   M    S   M    S   M
+   1: 9000 4500 600 560 600 560 600 1700 600 1700 600
+   2: 9020 4570 590 550 590 550 590 1640 590 1640 590
+
+   Output
+
+   A: 9010 4535 595 555 595 555 595 1670 595 1670 595
+   """
+   if len(p1) != len(p2):
+      return False
+
+   for i in range(len(p1)):
+      v = p1[i] / p2[i]
+      if (v < TOLER_MIN) or (v > TOLER_MAX):
+         return False
+
+   for i in range(len(p1)):
+       p1[i] = int(round((p1[i]+p2[i])/2.0))
+
+   return True
+
+def IR_normalise(c):
+   entries = len(c)
+   p = [0]*entries # Set all entries not processed.
+   for i in range(entries):
+      if not p[i]: # Not processed?
+         v = c[i]
+         tot = v
+         similar = 1.0
+
+         # Find all pulses with similar lengths to the start pulse.
+         for j in range(i+2, entries, 2):
+            if not p[j]: # Unprocessed.
+               if (c[j]*TOLER_MIN) < v < (c[j]*TOLER_MAX): # Similar.
+                  tot = tot + c[j]
+                  similar += 1.0
+
+         # Calculate the average pulse length.
+         newv = round(tot / similar, 2)
+         c[i] = newv
+
+         # Set all similar pulses to the average value.
+         for j in range(i+2, entries, 2):
+            if not p[j]: # Unprocessed.
+               if (c[j]*TOLER_MIN) < v < (c[j]*TOLER_MAX): # Similar.
+                  c[j] = newv
+                  p[j] = 1
+
+def IR_end_of_code():
+   global code, fetching_code, SHORT
+   if len(code) > SHORT:
+      IR_normalise(code)
+      fetching_code = False
+   else:
+      code = []
+
+def IR_callback(gpio, level, tick):
+    global last_tick, in_code, code, fetching_code, IRGPIO, POST_MS, POST_US, PRE_US
+
+    if level != pigpio.TIMEOUT:
+        edge = pigpio.tickDiff(last_tick, tick)
+        last_tick = tick
+
+        if fetching_code:
+            if (edge > PRE_US) and (not in_code): # Start of a code.
+                in_code = True
+                pi.set_watchdog(IRGPIO, POST_MS) # Start watchdog.
+
+            elif (edge > POST_US) and in_code: # End of a code.
+                in_code = False
+                pi.set_watchdog(IRGPIO, 0) # Cancel watchdog.
+                IR_end_of_code()
+
+            elif in_code:
+                code.append(edge)
+
+    else:
+        pi.set_watchdog(IRGPIO, 0) # Cancel watchdog.
+        if in_code:
+            in_code = False
+            IR_end_of_code()
+
+def readIRMessageCode(sensorname, timeout):
+    global IRGPIO, fetching_code, code, installed_callback, GLITCH
+
+    if not installed_callback:
+        pi.set_mode(IRGPIO, pigpio.INPUT) # IR RX connected to this GPIO.
+        pi.set_glitch_filter(IRGPIO, GLITCH) # Ignore glitches.
+        cb = pi.callback(IRGPIO, pigpio.EITHER_EDGE, IR_callback)
+
+        installed_callback = True
+
+    fetching_code = True
+
+    start = time.time()
+    while fetching_code:
+        time.sleep(0.1)
+        if time.time() - start > timeout/1000:
+            break
+
+    returncode = code
+    code = []
+    return returncode
+
+def readIRMessage(remotecode, timeout):
+    start = time.time()
+
+    while time.time() - start < timeout / 1000:
+        code = readIRMessageCode(remotecode, timeout)
+
+        for presetname, presetcode in IR_presets.items():
+            if IR_compare(presetcode, code):
+                return presetname
+
+    return ""
+
+def IR_carrier(gpio, frequency, micros):
+    """
+    Generate carrier square wave.
+    """
+    wf = []
+    cycle = 1000.0 / frequency
+    cycles = int(round(micros/cycle))
+    on = int(round(cycle / 2.0))
+    sofar = 0
+    for c in range(cycles):
+       target = int(round((c+1)*cycle))
+       sofar += on
+       off = target - sofar
+       sofar += off
+       wf.append(pigpio.pulse(1<<gpio, 0, on))
+       wf.append(pigpio.pulse(0, 1<<gpio, off))
+    return wf
+ 
+def sendIRMessage(sensorname, name):
+    global IRGPIOTRANS, FREQ
+
+    try:
+        time.sleep(0.20) ## FIXME I need this otherwise this won't work if I read the distance sensor first ...
+        pi.set_mode(IRGPIOTRANS, pigpio.OUTPUT)
+        pi.wave_add_new()
+
+        emit_time = time.time()
+
+        code = IR_presets[name]
+
+        marks_wid = {}
+        spaces_wid = {}
+
+        wave = [0]*len(code)
+
+        for i in range(0, len(code)):
+            ci = int(code[i])
+            if i & 1: # Space
+                if ci not in spaces_wid:
+                    pi.wave_add_generic([pigpio.pulse(0, 0, ci)])
+                    spaces_wid[ci] = pi.wave_create()
+                wave[i] = spaces_wid[ci]
+            else: # Mark
+                if ci not in marks_wid:
+                    wf = IR_carrier(IRGPIOTRANS, FREQ, ci)
+                    pi.wave_add_generic(wf)
+                    marks_wid[ci] = pi.wave_create()
+                wave[i] = marks_wid[ci]
+
+        delay = emit_time - time.time()
+
+        if delay > 0.0:
+            time.sleep(delay)
+        
+        pi.wave_chain(wave)
+
+        while pi.wave_tx_busy():
+            time.sleep(0.002)
+
+        emit_time = time.time() + GAP_S
+
+        for i in marks_wid:
+            pi.wave_delete(marks_wid[i])
+
+        marks_wid = {}
+
+        for i in spaces_wid:
+            pi.wave_delete(spaces_wid[i])
+
+        spaces_wid = {}
+    except Exception  as e:
+        pass
+        print("------------------------------------------>", e)
+        
+def presetIRMessage(name, data):
+    global IR_presets
+
+    IR_presets[name] = json.loads(data)
 `;
