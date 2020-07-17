@@ -233,8 +233,6 @@ function QuickStore(rwidentifier, rwpassword) {
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
 
-    window.quickAlgoInterface.stepDelayMin = 1;
-
     // Local language strings for each language
     var introControls = null;
     var localLanguageStrings = {
@@ -1605,6 +1603,10 @@ var getContext = function (display, infos, curLevel) {
         },
     ];
 
+
+    if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.stepDelayMin = 1;
+    }
 
 
     function findSensorDefinition(sensor) {

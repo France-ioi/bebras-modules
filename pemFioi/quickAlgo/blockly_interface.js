@@ -303,9 +303,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          if(this.mainContext.runner) {
             this.mainContext.runner.reset();
          }
-         if(this.scratchMode) {
-            this.glowBlock(null);
-         }
+         this.highlightBlock(null);
          if(this.quickAlgoInterface && !this.reloading) {
             this.quickAlgoInterface.resetTestScores();
          }
@@ -324,9 +322,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       resetDisplay: function() {
-         if(this.scratchMode) {
-            this.glowBlock(null);
-         } else if(Blockly.selected) {
+         this.highlightBlock(null);
+         if(!this.scratchMode && Blockly.selected) {
             // Do not execute that while the user is moving blocks around
             Blockly.selected.unselect();
          }
@@ -682,6 +679,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.workspace.glowBlock(id, true);
          }
          this.glowingBlock = id;
+      },
+
+      highlightBlock: function(id) {
+         if(this.scratchMode) {
+            this.glowBlock(id);
+         } else {
+            this.workspace.traceOn(true);
+            this.workspace.highlightBlock(id);
+         }
       },
 
       initRun: function() {
