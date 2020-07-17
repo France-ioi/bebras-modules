@@ -13,11 +13,154 @@ DisplaysManager = {
 }
 
 
+function ContextCursor(params) {
+
+    var defaults = {
+        color: 'rgb(255,128,0)'
+    }
+    params = Object.assign({}, defaults, params);
+
+    this.position = false;
+
+    this.set = function(x, y) {
+        this.position = {
+            x: x,
+            y: y
+        }
+    }
+
+    this.reset = function() {
+        this.position = false;
+    }
+
+    this.render = function(ofs_left, scale) {
+        if(!this.position || !params.context2d) {
+            return;
+        }
+        params.context2d.beginPath();
+        params.context2d.strokeStyle = params.color;
+        params.context2d.lineWidth = scale > 5 ? 3 : 1;
+        params.context2d.rect(
+            ofs_left + scale * this.position.x + 0.5,
+            scale * this.position.y + 0.5,
+            scale,
+            scale
+        );
+        params.context2d.stroke();
+    }
+}
+
+
+
+function ContextGrid(params) {
+
+    var defaults = {
+        color: '#888',
+        min_scale: 6
+    }
+    params = Object.assign({}, defaults, params);
+
+    this.render = function(ofs_left, scale, cols, rows) {
+        if(scale < params.min_scale) {
+            return;
+        }
+        params.context2d.strokeStyle = params.color;
+        params.context2d.lineWidth = 1;
+        for(var x=1; x<cols; x++) {
+            var dx = ofs_left + x * scale + 0.5;
+            params.context2d.beginPath();
+            params.context2d.moveTo(dx , 0);
+            params.context2d.lineTo(dx, rows * scale);
+            params.context2d.stroke();
+        }
+        for(var y=1; y<rows; y++) {
+            var dy = y * scale + 0.5;
+            params.context2d.beginPath();
+            params.context2d.moveTo(ofs_left, dy);
+            params.context2d.lineTo(ofs_left + cols * scale, dy);
+            params.context2d.stroke();
+        }
+    }
+}
+
+
+
+function CanvasTooltip(params) {
+
+    this.element = null;
+    this.bounds = null;
+
+    this.render = function() {
+        if(this.element) {
+            return;
+        }
+        this.element = $('<div>')
+            .css('position', 'fixed')
+            .css('z-index', '10000')
+            .css('background', '#4A90E2')
+            .css('color', '#FFF')
+            .css('padding', '10px')
+            .css('border-radius', '5px');
+        $(document.body).append(this.element);
+    }
+
+    this.setBounds = function(ofs_left, scale, cols, rows) {
+        this.bounds = {
+            ofs_left: ofs_left,
+            scale: scale,
+            cols: cols,
+            rows: rows
+        }
+    }
+
+
+    this.show = function(e) {
+        if(!this.bounds) {
+            return;
+        }
+        var canvas_offset = params.canvas.offset();
+        var x = e.pageX - canvas_offset.left - this.bounds.ofs_left;
+        var y = e.pageY - canvas_offset.top;
+        if(x < 0 || x > this.bounds.cols * this.bounds.scale) {
+            this.hide();
+            return;
+        }
+
+        var col = Math.floor(x / this.bounds.scale);
+        var row = Math.floor(y / this.bounds.scale);
+        var luminocity = params.getPixelLuminosity(col, row);
+
+        this.render();
+        this.element.show();
+        this.element.css({
+            left: e.pageX + 10,
+            top: e.pageY + 10
+        });
+        var str = params.strings.messages.tooltip;
+        str = str.replace('%1', col).replace('%2', row).replace('%3', luminocity);
+        this.element.text(str);
+    }
+
+
+    this.hide = function() {
+        this.element && this.element.hide();
+    }
+
+    params.canvas.mouseleave(this.hide.bind(this));
+    params.canvas.mousemove(this.show.bind(this));
+}
+
+
+
+
 function BarcodeDisplay(params) {
 
     var parent;
     var canvas;
     var context2d;
+    var cursor;
+    var grid;
+    var tooltip;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -28,7 +171,17 @@ function BarcodeDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
-        cursor.reset();
+        cursor = new ContextCursor({
+            context2d: context2d
+        });
+        grid = new ContextGrid({
+            context2d: context2d
+        });
+        tooltip = new CanvasTooltip({
+            canvas: canvas,
+            strings: params.strings,
+            getPixelLuminosity: calculatePixelLuminosity
+        });
         render();
     }
 
@@ -36,74 +189,7 @@ function BarcodeDisplay(params) {
     var image;
     var image_loaded;
     var image_canvas;
-    var image_context2d;    
-
-
-    var cursor = {
-        color: 'rgb(255,128,0)',
-        position: false,
-
-        set: function(x, y) {
-            this.position = {
-                x: x,
-                y: y
-            }
-        },
-
-        reset: function() {
-            this.position = false;
-        },
-
-        render: function(ofs_left, scale) {
-            if(!this.position) {
-                return;
-            }
-            context2d.beginPath();
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = scale > 20 ? 2 : 1;
-            context2d.rect(
-                ofs_left + scale * this.position.x + 0.5, 
-                scale * this.position.y + 0.5, 
-                scale, 
-                scale
-            );
-            context2d.stroke();
-        }
-    }
-
-
-    var grid = {
-
-        color: '#888',
-        min_scale: 6,
-
-        render: function(scale, ofs_left, w, h) {
-            if(scale < this.min_scale) {
-                return;
-            }
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = 1;
-            var lw = Math.floor(w / scale);
-            for(var x=1; x<lw; x++) {
-                var dx = ofs_left + x * scale + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(dx , 0);
-                context2d.lineTo(dx, h);
-                context2d.stroke();            
-            }
-            var lh = Math.floor(h / scale);            
-            for(var y=1; y<lh; y++) {
-                var dy = y * scale + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(ofs_left, dy);
-                context2d.lineTo(ofs_left + w, dy);
-                context2d.stroke();            
-            }            
-        }
-
-    }
-
-    
+    var image_context2d;
 
 
     function render() {
@@ -119,14 +205,15 @@ function BarcodeDisplay(params) {
         var image_w = Math.floor(image.width * scale);
         var image_h = Math.floor(image.height * scale);
         var ofs_left = Math.floor(0.5 * (w - image_w));
-        
-        context2d.imageSmoothingEnabled = false;
-        //context2d.mozImageSmoothingEnabled = false;        
 
-        context2d.clearRect(0, 0, w, h);        
+        context2d.imageSmoothingEnabled = false;
+        //context2d.mozImageSmoothingEnabled = false;
+
+        context2d.clearRect(0, 0, w, h);
         context2d.drawImage(image, ofs_left, 0, image_w, image_h);
-        
-        grid.render(scale, ofs_left, image_w, image_h)
+
+        grid.render(ofs_left, scale, image.width, image.height);
+        tooltip.setBounds(ofs_left, scale, image.width, image.height);
         cursor.render(ofs_left, scale);
     }
 
@@ -140,10 +227,10 @@ function BarcodeDisplay(params) {
         image = false;
         image_loaded = false;
         image_data = data;
-        cursor.reset();
+        cursor && cursor.reset();
         if(!image_canvas) {
             image_canvas = document.createElement('canvas');
-            image_context2d = image_canvas.getContext('2d');        
+            image_context2d = image_canvas.getContext('2d');
         }
         loadImage(callback);
     }
@@ -156,21 +243,29 @@ function BarcodeDisplay(params) {
         image = new Image();
         image.onload = function() {
             image_context2d.drawImage(image, 0, 0);
-            image_loaded = true;            
+            image_loaded = true;
             render();
             callback && callback();
         }
-        image.src = image_data;        
+        image.src = image_data;
     }
 
 
-    
-    
+    function calculatePixelLuminosity(x, y) {
+        var d = image_context2d.getImageData(x, y, 1, 1).data;
+        // ITU BT.601
+        var l = 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2];
+        return Math.round(l);
+    }
+
+
+
+
     return {
 
         init: init,
 
-        setImage: setImage,        
+        setImage: setImage,
 
         render: render,
 
@@ -185,22 +280,13 @@ function BarcodeDisplay(params) {
 
         getPixelLuminosity: function(x, y, callback) {
             loadImage(function() {
-                cursor.set(x, y);
+                cursor && cursor.set(x, y);
                 render();
-                var d = image_context2d.getImageData(x, y, 1, 1).data;
-                // ITU BT.601
-                var l = 0.299 * d[0] + 0.587 * d[1] + 0.114 * d[2];
-                l = Math.round(l);
-                callback(l);
+                callback(calculatePixelLuminosity(x, y));
             })
-        },
-
-        resetCursor: function() {
-            cursor.reset();
-            render();
         }
 
-    }    
+    }
 }
 
 
@@ -212,7 +298,9 @@ function UserDisplay(params) {
     var canvas, context2d;
     var data_size;
     var parent;
-
+    var cursor;
+    var grid;
+    var tooltip;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -223,57 +311,47 @@ function UserDisplay(params) {
         canvas = $('<canvas>');
         parent.append(canvas);
         context2d = canvas[0].getContext('2d');
+        cursor = new ContextCursor({
+            context2d: context2d
+        });
+        grid = new ContextGrid({
+            context2d: context2d
+        });
+        tooltip = new CanvasTooltip({
+            canvas: canvas,
+            strings: params.strings,
+            getPixelLuminosity: getPixelLuminosity
+        });
         render();
     }
 
 
-    var grid = {
-
-        color: '#888',
-        min_pixel_size: 6,
-
-        render: function(ofs_left, w, h, pixel_size) {
-            if(pixel_size < this.min_pixel_size) {
-                return;
-            }
-            context2d.strokeStyle = this.color;
-            context2d.lineWidth = 1;
-            for(var x=1; x<w; x++) {
-                var dx = ofs_left + x * pixel_size + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(dx , 0);
-                context2d.lineTo(dx, h * pixel_size);
-                context2d.stroke();            
-            }
-            for(var y=1; y<h; y++) {
-                var dy = y * pixel_size + 0.5;
-                context2d.beginPath();
-                context2d.moveTo(ofs_left, dy);
-                context2d.lineTo(ofs_left + w * pixel_size, dy);
-                context2d.stroke();            
-            }            
+    function getPixelLuminosity(x, y) {
+        if(!data_size) {
+            return 0;
         }
-
+        var ofs = y * data_size.width + x;
+        return pixels[ofs];
     }
 
 
-    function render(valid_data) {
+    function render(valid_result) {
         if(!pixels || w == 0 || !data_size) {
             return;
         }
 
         if(display) {
             context2d.imageSmoothingEnabled = false;
-            //context2d.mozImageSmoothingEnabled = false;        
+            //context2d.mozImageSmoothingEnabled = false;
 
             var w = canvas[0].width = Math.floor(parent.width());
             var h = canvas[0].height = Math.floor(parent.height() * 0.5 - 10);
             if(w == 0) {
                 return;
             }
-            var scale = Math.min(Math.floor(w / data_size.width), Math.floor(h / data_size.height));        
+            var scale = Math.min(Math.floor(w / data_size.width), Math.floor(h / data_size.height));
             var ofs_left = Math.floor(0.5 * (w - data_size.width * scale));
-            context2d.clearRect(0, 0, w, h);        
+            context2d.clearRect(0, 0, w, h);
 
             var i=0;
             for(var y=0; y<data_size.height; y++) {
@@ -291,16 +369,17 @@ function UserDisplay(params) {
                 }
             }
 
-            grid.render(ofs_left, data_size.width, data_size.height, scale);
+            grid.render(ofs_left, scale, data_size.width, data_size.height);
+            cursor.render(ofs_left, scale);
+            tooltip.setBounds(ofs_left, scale, data_size.width, data_size.height);
         }
 
-        if(valid_data) {
-            var valid = true;
+        if(valid_result && 'data' in valid_result) {
             var i=0;
+            var threshold = valid_result.threshold || 0;
             for(var y=0; y<data_size.height; y++) {
                 for(var x=0; x<data_size.width; x++) {
-                    if(pixels[i] != valid_data[y][x]) {
-                        valid = false;
+                    if(Math.abs(pixels[i] - valid_result.data[y][x]) > threshold) {
                         if(display) {
                             context2d.beginPath();
                             context2d.strokeStyle = '#F00';
@@ -311,15 +390,25 @@ function UserDisplay(params) {
                                 scale,
                                 scale
                             );
-                            context2d.stroke();                        
+                            context2d.stroke();
+                        }
+
+                        var msg = params.strings.messages.mistake_pixel;
+                        msg = msg.replace('%1', pixels[i]).replace('%2', valid_result.data[y][x]);
+                        return {
+                            success: false,
+                            message: msg
                         }
                     }
                     i++;
                 }
             }
-            return valid;
+            return {
+                success: true,
+                message: params.strings.messages.success
+            }
         }
-    }    
+    }
 
 
 
@@ -327,9 +416,10 @@ function UserDisplay(params) {
 
     return {
 
-        init: init,        
+        init: init,
 
         setPixelLuminosity: function(x, y, v) {
+            cursor && cursor.set(x, y);
             var v = Math.max(0, Math.min(v, 255));
             pixels[y * data_size.width + x] = v;
             render();
@@ -341,10 +431,17 @@ function UserDisplay(params) {
             render();
         },
 
+        clear: function() {
+            cursor && cursor.reset();
+            data_size = null;
+            pixels = [];
+            context2d && context2d.clearRect(0, 0, canvas[0].width, canvas[0].height);
+        },
+
         render: render,
 
-        diff: function(data) {
-            return render(data);
+        diff: function(valid_result) {
+            return render(valid_result);
         }
     }
 }
@@ -380,7 +477,7 @@ function StringDisplay(params) {
     function render(html) {
         if(!display) {
             return;
-        }        
+        }
         wrapper.toggle(data != '');
         element.html(html);
     }
@@ -388,9 +485,9 @@ function StringDisplay(params) {
 
     return {
 
-        init: init,        
+        init: init,
 
-        
+
         setData: function(str) {
             str = '' + str;
             data = str;
@@ -398,23 +495,26 @@ function StringDisplay(params) {
         },
 
 
-        diff: function(valid_data) {
+        diff: function(valid_result) {
             diff = '';
             var valid = true;
-            
-            var l = Math.max(valid_data.length, data.length);
+
+            var l = Math.max(valid_result.data.length, data.length);
             for(var i=0; i<l; i++) {
-                if(valid_data[i] !== data[i]) {
+                if(valid_result.data[i] !== data[i]) {
                     valid = false;
                     if(i < data.length) {
                         diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
-                    }                    
+                    }
                 } else {
                     diff += data[i];
                 }
             }
             render(diff);
-            return valid;
+            return {
+                success: valid,
+                message: valid ? params.strings.messages.success : params.strings.messages.mistake_digit
+            }
         }
     }
 
