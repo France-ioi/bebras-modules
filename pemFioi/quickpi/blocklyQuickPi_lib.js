@@ -318,9 +318,9 @@ var getContext = function (display, infos, curLevel) {
                 readFromCloudStore: "lire dans le cloud : identifiant %1 clé %2",
 
                 // IR Remote
-                readIRMessage: "wait for IR message name: %1 timeout: %2 millisecondes",
-                sendIRMessage: "send IR message sensor: %1 preset name: %2",
-                presetIRMessage: "preset IR Message preset name: %1  data: %2",
+                readIRMessage: "attendre un message IR nom : %1 pendant : %2 ms",
+                sendIRMessage: "envoi du message préparé IR nommé %2 sur %1",
+                presetIRMessage: "préparer un message IR de nom %1 et contenu %2",
             },
             code: {
                 // Names of the functions in Python, or Blockly translated in JavaScript
@@ -603,7 +603,7 @@ var getContext = function (display, infos, curLevel) {
                 <div class="panel-heading">
                     <h2 class="sectionTitle">
                         <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Stick names and port
+                        Noms et ports de la manette
                     </h2>
                     <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
@@ -651,7 +651,7 @@ var getContext = function (display, infos, curLevel) {
                 </div>
                 <div id="sensorPicker" class="panel-body">
                     <div class="form-group">
-                        <p>Point your remote control to your Quick Pi board and press a button</p>
+                        <p>Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons</p>
                     </div>
 
                     <div class="form-group">
@@ -669,7 +669,7 @@ var getContext = function (display, infos, curLevel) {
                 <div class="panel-heading">
                     <h2 class="sectionTitle">
                         <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        IR Remote control
+                        Télécommande IR
                     </h2>
                     <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
@@ -684,9 +684,9 @@ var getContext = function (display, infos, curLevel) {
                 </div>
             </div>
                 `,
-                noIrPresets: "Please use the preset IR function to add remote control messages",
-                irEnableContinous: "Continuous transmission enable",
-                irDisableContinous: "Continuous transmission disable",
+                noIrPresets: "Veuillez utiliser la fonction de préparation de messages IR pour ajouter des commandes de télécommande",
+                irEnableContinous: "Activer l'émission IR en continu",
+                irDisableContinous: "Désactiver l'émission IR en continu",
 
             }
         },
@@ -2900,6 +2900,25 @@ var getContext = function (display, infos, curLevel) {
                 $('#pigetlist').attr("disabled", false);
             }
 
+            
+            function cleanUSBBTIP()
+            {
+                var ipaddress = $('#piaddress').val();
+
+                if (ipaddress == "192.168.233.1" ||
+                    ipaddress == "192.168.233.2")
+                {
+                        $('#piaddress').val("");
+                        $('#piaddress').trigger("input");
+                        
+                        var schoolkey = $('#schoolkey').val();
+                        if (schoolkey.length > 1)
+                            $('#pigetlist').trigger("click");
+                }
+            }
+
+            cleanUSBBTIP();
+
             $('#piconnectok').click(function () {
                 context.inUSBConnection = false;
                 context.inBTConnection = false;
@@ -2983,17 +3002,18 @@ var getContext = function (display, infos, curLevel) {
                     }
                 }
             });
-
             $('#piconwifi').click(function () {
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+
+
+                cleanUSBBTIP();
                 if (!context.quickPiConnection.isConnected()) {
                     setSessionStorage('connectionMethod', "WIFI");
                     $(this).addClass('active');
                     $('#pischoolcon').show("slow");
                     $('#piconnectionlabel').hide();
                 }
-
-                context.inUSBConnection = false;
-                context.inBTConnection = false;
 
             });
 
@@ -3024,7 +3044,9 @@ var getContext = function (display, infos, curLevel) {
                                 $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
                             }
 
-                            context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
+                            setTimeout(function() { 
+                                context.quickPiConnection.isAvailable("192.168.233.1", updateUSBAvailability);
+                            }, 1000);
                         }
                     }
 
@@ -3052,7 +3074,7 @@ var getContext = function (display, infos, curLevel) {
 
                     function updateBTAvailability(available) {
 
-                        if  (context.inUSBConnection && context.offLineMode) {
+                        if  (context.inBTConnection && context.offLineMode) {
                             if (available) {
                                 $('#piconnectok').attr('disabled', false);
 
@@ -3063,7 +3085,9 @@ var getContext = function (display, infos, curLevel) {
                                 $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
                             }
 
-                            context.quickPiConnection.isAvailable("192.168.233.2", updateUSBAvailability);
+                            setTimeout(function() { 
+                                context.quickPiConnection.isAvailable("192.168.233.2", updateBTAvailability);
+                            }, 1000);                            
                         }
                     }
 
@@ -3163,48 +3187,119 @@ var getContext = function (display, infos, curLevel) {
 
         $('#pihatsetup').click(function () {
 
-            var command = "getBuzzerAudioOutput()";
-            context.quickPiConnection.sendCommand(command, function(val) {
-                var buzzerstate = parseInt(val);
-
                 window.displayHelper.showPopupDialog(`
                 <div class="content connectPi qpi">
                 <div class="panel-heading">
                     <h2 class="sectionTitle">
                         <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        QuickPi Hat Settings
+                        Noms et ports des capteurs et actionneurs QuickPi
                     </h2>
                     <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
                 <div class="panel-body">
+                <table id='sensorTable' style="display:table-header-group;">
+                <tr>
+                <th>Name</th>
+                <th>Port</th>
+                <th>State</th>
+                </tr>
+                </table>
+                <!--
                     <div>
                         <input type="checkbox" id="buzzeraudio" value="buzzeron"> Output audio trought audio buzzer<br>
                     </div>
 
                     <div class="inlineButtons">
                         <button id="pisetupok" class="btn"><i class="fas fa-cog icon"></i>Set</button>
-                </div>
+                    </div>
+                -->
                 </div>
             </div>`);
 
-                $('#buzzeraudio').prop('checked', buzzerstate ? true : false);
 
+                var table = document.getElementById("sensorTable");
+                for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+                    var sensor = infos.quickPiSensors[iSensor];
+
+                    function addNewRow()
+                    {
+                        var row = table.insertRow();
+                        var type = row.insertCell();
+                        var name = row.insertCell();
+                        var port = row.insertCell();
+
+                        return [type, name, port];
+                    }
+
+                    
+                    if (sensor.type == "stick")
+                    {
+                        var gpios = findSensorDefinition(sensor).gpios;
+                        var cols = addNewRow();
+
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name + ".up"));
+                        cols[2].appendChild(document.createTextNode("D" + gpios[0]));
+
+                        var cols = addNewRow();
+
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name + ".down"));
+                        cols[2].appendChild(document.createTextNode("D" + gpios[1]));
+                        var cols = addNewRow();
+
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name + ".left"));
+                        cols[2].appendChild(document.createTextNode("D" + gpios[2]));
+                        var cols = addNewRow();
+
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name + ".right"));
+                        cols[2].appendChild(document.createTextNode("D" + gpios[3]));
+                        var cols = addNewRow();
+
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name + ".center"));
+                        cols[2].appendChild(document.createTextNode("D" + gpios[4]));
+
+/*
+                        $('#stickupname').text(sensor.name + ".up");
+
+                        $('#stickdownname').text(sensor.name + ".down");
+                        $('#stickleftname').text(sensor.name + ".left");
+                        $('#stickrightname').text(sensor.name + ".right");
+                        $('#stickcentername').text(sensor.name + ".center");
+    
+                        $('#stickupport').text("D" + gpios[0]);
+                        $('#stickdownport').text("D" + gpios[1]);
+                        $('#stickleftport').text("D" + gpios[2]);
+                        $('#stickrightport').text("D" + gpios[3]);
+                        $('#stickcenterport').text("D" + gpios[4]);
+    
+                        $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
+                        $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
+                        $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
+                        $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
+                        $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+    */
+                    }
+                    else
+                    {          
+                        var cols = addNewRow();
+    
+    
+                        cols[0].appendChild(document.createTextNode(sensor.type));
+                        cols[1].appendChild(document.createTextNode(sensor.name));
+                        cols[2].appendChild(document.createTextNode(sensor.port));
+                    }
+           
+                }
 
                 $('#picancel').click(function () {
                     $('#popupMessage').hide();
                     window.displayHelper.popupMessageShown = false;
                 });
 
-                $('#pisetupok').click(function () {
-                    $('#popupMessage').hide();
-                    window.displayHelper.popupMessageShown = false;
-
-                    var radioValue = $('#buzzeraudio').is(":checked");
-
-                    var command = "setBuzzerAudioOutput(" + (radioValue ? "True" : "False") + ")";
-                    context.quickPiConnection.sendCommand(command, function(x) {});
-                });
-            });
         });
 
         $('#piinstall').click(function () {
@@ -6418,17 +6513,19 @@ var getContext = function (display, infos, curLevel) {
                         min = gpios[i];
                 }
 
-                sensor.portText = paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
-                sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
-                sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
-                var b = sensor.portText._getBBox();
-                sensor.portText.translate(0, b.height / 2);
 
                 $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
                 $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
                 $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
                 $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
                 $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+
+/*
+                sensor.portText = paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
+                sensor.portText.attr({ "font-size": portsize + "px", 'text-anchor': 'start', fill: "blue" });
+                sensor.portText.node.style = "-moz-user-select: none; -webkit-user-select: none;";
+                var b = sensor.portText._getBBox();
+                sensor.portText.translate(0, b.height / 2);
 
 
                 sensor.portText.click(function () {
@@ -6463,6 +6560,7 @@ var getContext = function (display, infos, curLevel) {
                     $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
 
                 });
+                */
             }
 
 
