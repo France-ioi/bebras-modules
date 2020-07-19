@@ -72,7 +72,7 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
                     lastPingSend = + new Date();
                 }
 
-                }, 1000);
+                }, 4000);
 
         }
 
