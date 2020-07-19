@@ -645,7 +645,7 @@ var getContext = function (display, infos, curLevel) {
                 <div class="panel-heading">
                     <h2 class="sectionTitle">
                         <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Learn Infrared codes
+                        Recevoir des codes infrarouges
                     </h2>
                     <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
@@ -659,7 +659,7 @@ var getContext = function (display, infos, curLevel) {
                     </div>
                 </div>
                 <div class="singleButton">
-                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>Learn code</button>
+                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>Recevoir un code</button>
                     <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>Fermer</button>
                 </div>
             </div>
@@ -6362,7 +6362,7 @@ var getContext = function (display, infos, curLevel) {
                         $('#piirlearn').attr('disabled', true);
 
                         $("#piircode").text("");
-                        context.quickPiConnection.sendCommand("readIRMessageCode(irrec1, 10000)", function(retval)
+                        context.quickPiConnection.sendCommand("readIRMessageCode(\"irrec1\", 10000)", function(retval)
                         {
                             $('#piirlearn').attr('disabled', false);
                             $("#piircode").text(retval);
