@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>zen3d - earth</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		#view {
+			width: 400px;
+			height: 400px;
+			background: #ffffff;
+		}
+	</style>
+	<script src="../../../ext/zen3d/zen3d.min.js"></script>
+	<script src="../../../ext/zen3d/controls/OrbitControls.js"></script>
+	<script src="earth3d.js"></script>
+</head>
+<body>
+	<div>
+		<label>Lat: </label>
+		<input type="text" id="lat" value="45"/>
+	</div>
+	<div>
+		<label>Lng: </label>
+		<input type="text" id="lng" value="45"/>
+	</div>	
+	<div>
+		<label>Opacity: </label>
+		<input type="text" id="opacity" value="50"/>
+	</div>		
+	<button id="refresh">Refresh</button>
+	
+	<div id="view"></div>	
+
+	<script>
+		var earth = Earth3D({
+			parent: document.getElementById('view'),
+			camera: {
+				lat: 30,
+				lng: 30
+			}
+		})
+		
+
+		function refresh() {
+			function getValue(id, min, max) {
+				var el = document.getElementById(id);
+				var v = Math.floor(el.value) || 0;
+				v = Math.min(v, max);
+				v = Math.max(v, min);
+				el.value = v;
+				return v;
+			}
+			earth.setCursor(
+				getValue('lat', -90, 90), 
+				getValue('lng', -180, 180)
+			);
+			earth.setOpacity(
+				getValue('opacity', 0, 100) / 100
+			);
+		}
+		refresh();
+		
+		document.getElementById('refresh').addEventListener('click', refresh, false);
+	</script>
+</body>
+</html>
