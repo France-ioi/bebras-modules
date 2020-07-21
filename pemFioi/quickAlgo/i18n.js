@@ -225,11 +225,11 @@ var localLanguageStrings = {
          sensors: "Sensoren",
          debug: "Debug",
          colour: "Farben",
-         data: "Daten", // TODO :: translate
+         data: "Daten",
          dicts: "Hash-Map",
          input: "Eingabe",
          lists: "Listen",
-         tables: "Tables", // TODO :: translate
+         tables: "Tabellen",
          logic: "Logik",
          loops: "Schleifen",
          control: "Steuerung",
@@ -261,70 +261,70 @@ var localLanguageStrings = {
       mediumSpeed: ">>",
       fastSpeed: ">>>",
       ludicrousSpeed: ">|",
-      stopProgramDesc: "Von vorne anfangen", // TODO :: translate and next 5
+      stopProgramDesc: "Von vorne anfangen",
       stepProgramDesc: "Schritt für Schritt",
-      slowSpeedDesc: "Für diesen Test ausführen",
-      mediumSpeedDesc: "Mittlere Geschwindigkeit",
+      slowSpeedDesc: "Langsame",
+      mediumSpeedDesc: "Mittel",
       fastSpeedDesc: "Schnell",
       ludicrousSpeedDesc: "Sehr schnell",
       selectLanguage: "Sprache:",
       blocklyLanguage: "Blockly",
       javascriptLanguage: "Javascript",
       importFromBlockly: "Generiere von Blockly-Blöcken",
-      loadExample: "Insert example", // TODO :: translate
-      saveOrLoadButton: "Load / save", // TODO :: translate
+      loadExample: "Beispiel einfügen",
+      saveOrLoadButton: "Laden / Speichern",
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
-      restart: "Restart",  // TODO :: translate
-      loadBestAnswer: "Load best answer",  // TODO :: translate
+      restart: "Neustarten",
+      loadBestAnswer: "Lade beste Lösung",
       saveProgram: "Speichern",
-      copy: "Copy", // TODO :: translate
-      paste: "Paste",
+      copy: "Kopieren",
+      paste: "Einfügen",
       blocklyToPython: "Convert to Python",
       blocklyToPythonTitle: "Python code",
       blocklyToPythonIntro: "",
       blocklyToPythonPassComment: '# Insert instructions here',
       limitBlocks: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.",
       limitBlocksOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.", // TODO :: stimmt das?
-      limitElements: "Noch {remainingBlocks} von {maxBlocks} Bausteinen verfügbar.", // TODO :: check this one and next one (same strings as above but with "elements" instead of "blocks"
-      limitElementsOver: "{remainingBlocks} Bausteine zusätzlich zum Limit von {maxBlocks} verbraucht.",
-      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",  // TODO :: translate
-      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
+      limitElements: "Noch {remainingBlocks} von {maxBlocks} Elementen verfügbar.",
+      limitElementsOver: "{remainingBlocks} Elemente zusätzlich zum Limit von {maxBlocks} verbraucht.",
+      capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
+      clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.",
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
       errorEmptyProgram: "Das Programm enthält keine Befehle. Verbinde die Blöcke um ein Programm zu schreiben.",
       tooManyBlocks: "Du benutzt zu viele Bausteine!",
-      limitedBlock: "You use too many of a limited use block:", // TODO
+      limitedBlock: "Du verwendest zu viele Bausteine einer eingeschränkten Sorte:",
       uninitializedVar: "Nicht initialisierte Variable:",
-      undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.", // TODO :: translate
+      undefinedMsg: "This can be because of an access to an index out of a list, or an undefined variable.",
       valueTrue: 'wahr',
       valueFalse: 'unwahr',
-      evaluatingAnswer: 'Evaluation in progress', // TODO
+      evaluatingAnswer: 'Wird ausgewertet',
       correctAnswer: 'Richtige Antwort',
       partialAnswer: 'Teilweise richtige Antwort',
       wrongAnswer: 'Falsche Antwort',
       resultsNoSuccess: "Du hast keinen Testfall richtig.",
       resultsPartialSuccess: "Du hast {nbSuccess} von {nbTests} Testfällen richtig.",
       gradingInProgress: "Das Ergebnis wird ausgewertet …",
-      introTitle: "Your mission",  // TODO :: translate
-      introDetailsTitle: "Mission details",  // TODO :: translate
+      introTitle: "Deine Mission",
+      introDetailsTitle: "Missionsdetails",
       textVariable: "Text",
       listVariable: "Liste",
-      scaleDrawing: "Scale 2×",
+      scaleDrawing: "Vergrößere",
       loopRepeat: "wiederhole",
       loopDo: "mache",
-      displayVideo: "Display video", // TODO :: translate
-      showDetails: "Show details", // TODO :: translate
-      hideDetails: "Hide details",  // TODO :: translate
-      editor: "Editor",  // TODO :: translate
-      instructions: "Instructions",  // TODO :: translate
-      testLabel: "Test", // TODO :: translate
-      testError: "error",  // TODO :: translate
-      testSuccess: "valid",  // TODO :: translate
-      seeTest: "see test"  // TODO :: translate
+      displayVideo: "Zeige Video",
+      showDetails: "Zeige Details",
+      hideDetails: "Verstecke Details",
+      editor: "Editor",
+      instructions: "Anweisungen",
+      testLabel: "Test",
+      testError: "Fehler",
+      testSuccess: "gültig",
+      seeTest: "Siehe Test"
    },
    es: {
       categories: {
@@ -521,7 +521,7 @@ var localLanguageStrings = {
       resultsNoSuccess: "Noben test ni bil opravljen.",
       resultsPartialSuccess: "Opravljen(ih) {nbSuccess} test(ov) od {nbTests}.",
       gradingInProgress: "Ocenjevanje poteka",
-      introTitle: "Naloga",  
+      introTitle: "Naloga",
       introDetailsTitle: "Podrobnosti naloge",
       textVariable: "besedilo",
       listVariable: "tabela",
