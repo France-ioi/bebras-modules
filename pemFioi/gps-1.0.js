@@ -27,6 +27,11 @@ function GPS(settings) {
    this.distInfo = {};
    var draggedData;
 
+   this.setTimeShift = function(val) {
+      this.timeShift = val;
+      this.updateShiftCircles();
+   };
+
    this.init = function() {
       paper.rect(x0,y0,w,h).attr(attr.frame);
       for(var pos of firstTowersPos){
@@ -53,9 +58,12 @@ function GPS(settings) {
       var outCircle = paper.circle(x,y,minR).attr(attr.circle).attr("clip-rect",x0+","+y0+","+w+","+h);
       if(this.timeShiftEnabled){
          var shiftedCircle = paper.circle(x,y,minR + this.timeShift).attr(attr.shiftedCircle).attr("clip-rect",x0+","+y0+","+w+","+h);
+         var raphObj = paper.set(circle,label,outCircle,shiftedCircle);
+      }else{
+         var raphObj = paper.set(circle,label,outCircle);
       }
       var maxR = Math.max(Math.abs(pos.x),Math.abs(pos.x - w),Math.abs(pos.y),Math.abs(pos.y - h));
-      this.towers[pos.id] = { x: pos.x, y: pos.y, raphObj: paper.set(circle,label,outCircle), r: minR, maxR: maxR };
+      this.towers[pos.id] = { x: pos.x, y: pos.y, raphObj: raphObj, r: minR, maxR: maxR };
       this.towerID.push(pos.id);
       this.updateDistInfo(pos.id);
    };
@@ -108,6 +116,9 @@ function GPS(settings) {
          towerData.r = newR;
       }
       self.updateDistInfo(id);
+      if(self.timeShiftEnabled){
+         self.updateShiftCircle(id);
+      }
    };
    var onEnd = function() {
       
@@ -143,6 +154,19 @@ function GPS(settings) {
       }else{
          var val = paper.text(xVal,yVal,valText).attr(attr.distVal);
          this.distInfo[id] = { line: line, val: val };
+      }
+   };
+
+   this.updateShiftCircles = function() {
+      for(var id of this.towerID){
+         this.updateShiftCircle(id);
+      }
+   };
+
+   this.updateShiftCircle = function(id) {
+      var data = this.towers[id];
+      if(data.raphObj[3]){
+         data.raphObj[3].attr("r", Math.max(towerR,data.r + this.timeShift));
       }
    };
    
