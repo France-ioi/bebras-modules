@@ -590,8 +590,9 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var availableModules = this.getAvailableModules();
     if(availableModules.length) {
-      fullHtml += '<p>Votre programme doit commencer par ';
-      fullHtml += (availableModules.length > 1) ? 'les lignes' : 'la ligne';
+      fullHtml += '<p>' + (availableModules.length > 1) ? 
+                  window.languageStrings.startingLine :
+                  window.languageStrings.startingLines;
       fullHtml += ' :</p>'
                  +  '<p><code>'
                  +  'from ' + availableModules[0] + ' import *';
@@ -599,9 +600,9 @@ function LogicController(nbTestCases, maxInstructions) {
         fullHtml += '\nfrom ' + availableModules[i] + ' import *';
       }
       fullHtml += '</code></p>'
-                 +  '<p>Les fonctions disponibles pour contrôler le robot sont :</p>'
+                 +  '<p>' + window.languageStrings.availableFunctionsVerbose + '</p>'
                  +  '<ul>';
-      simpleHtml += 'Fonctions disponibles : ';
+      simpleHtml += window.languageStrings.availableFunctions;
 
       var availableConsts = [];
 
@@ -704,12 +705,13 @@ function LogicController(nbTestCases, maxInstructions) {
         }
       }
 
-      var word = allowed ? 'autorisé' : 'interdit';
+      var word = allowed ? window.languageStrings.keywordAllowed : window.languageStrings.keywordForbidden;
+      var words = allowed ? window.languageStrings.keywordsAllowed : window.languageStrings.keywordsForbidden;
       var cls = allowed ? '' : ' class="pflForbidden"';
       if(list.length == 1) {
-        fullHtml += '<p>Le mot-clé suivant est ' + word + ' : <code'+cls+'>' + list[0] + '</code>.</p>';
+        fullHtml += '<p>' + word + ' <code'+cls+'>' + list[0] + '</code>.</p>';
       } else if(list.length > 0) {
-        fullHtml += '<p>Les mots-clés suivants sont ' + word + 's : <code'+cls+'>' + list.join('</code>, <code'+cls+'>') + '</code>.</p>';
+        fullHtml += '<p>' + words + ' <code'+cls+'>' + list.join('</code>, <code'+cls+'>') + '</code>.</p>';
       }
       return list;
     }
@@ -720,12 +722,12 @@ function LogicController(nbTestCases, maxInstructions) {
     }
 
     if(pflInfos.allowed.indexOf('var_assign') > -1) {
-      fullHtml += '<p>Les variables sont autorisées.</p>';
+      fullHtml += '<p>' + window.languageStrings.variablesAllowed + '</p>';
     } else {
-      fullHtml += '<p>Les variables sont interdites.</p>';
+      fullHtml += '<p>' + window.languageStrings.variablesForbidden + '</p>';
     }
 
-    fullHtml += '<p>Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.</p>';
+    fullHtml += '<p>' + window.languageStrings.readDocumentation + '</p>';
 
     $('.pythonIntroSimple').html(simpleHtml);
     $('.pythonIntroFull').html(fullHtml);
@@ -798,11 +800,11 @@ function LogicController(nbTestCases, maxInstructions) {
     var that = this;
     var div = $('.pythonIntroBtn').html('');
     if(collapse) {
-      $('<a>Plus de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(false); });
+      $('<a>' + window.languageStrings.showDetails + '</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(false); });
       $('.pythonIntro .pythonIntroFull').hide();
       $('.pythonIntro .pythonIntroSimple').show();
     } else {
-      $('<a>Moins de détails</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(true); });
+      $('<a>' + window.languageStrings.hideDetails + '</a>').appendTo(div).on('click', function() { that.collapseTaskIntro(true); });
       $('.pythonIntro .pythonIntroFull').show();
       $('.pythonIntro .pythonIntroSimple').hide();
     }
