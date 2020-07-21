@@ -952,9 +952,9 @@ var getContext = function (display, infos, curLevel) {
             },
             builtinSensors: [
                 { type: "screen", subType: "oled128x32", port: "i2c",  suggestedName: "screen1", },
-                { type: "led", subType: "red", port: "D4", suggestedName: "led1", },
-                { type: "led", subType: "green", port: "D17", suggestedName: "led2", },
-                { type: "led", subType: "blue", port: "D27",  suggestedName: "led3", },
+                { type: "led", subType: "red", port: "D4", suggestedName: "redled1", },
+                { type: "led", subType: "green", port: "D17", suggestedName: "greenled1", },
+                { type: "led", subType: "blue", port: "D27",  suggestedName: "blueled1", },
                 { type: "irtrans", port: "D22",  suggestedName: "irtran1", },
                 { type: "irrecv", port: "D23", suggestedName: "irrec1", },
                 { type: "sound", port: "A1", suggestedName: "micro1", },
@@ -3783,8 +3783,12 @@ var getContext = function (display, infos, curLevel) {
     }
 
     function raspberryPiChangeBoard(board) {
-        window.task.displayedSubTask.context.changeBoard(board);
-        window.task.displayedSubTask.context.resetSensorTable();
+
+        if (board != "unknow")
+        {
+            window.task.displayedSubTask.context.changeBoard(board);
+            window.task.displayedSubTask.context.resetSensorTable();
+        }
     }
 
 
@@ -5447,8 +5451,8 @@ var getContext = function (display, infos, curLevel) {
 
             imgw = screenScalerSize.width + borderSize * 2;
             imgh = screenScalerSize.height + borderSize * 2;            
-            imgx = sensor.drawInfo.x + Math.max(0, (sensor.drawInfo.width - imgw) * 0.5) + scrolloffset;
-            imgx = 0;
+            imgx = sensor.drawInfo.x - (imgw / 2) + (sensor.drawInfo.width / 2); 
+
             imgy = sensor.drawInfo.y + Math.max(0, (sensor.drawInfo.height - imgh) * 0.5);            
 
             portx = imgx + imgw + borderSize;
