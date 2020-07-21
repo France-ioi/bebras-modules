@@ -43,7 +43,7 @@
 				lat: 30,
 				lng: 30
 			}
-		})
+		}, refresh)
 		
 
 		function refresh() {
@@ -63,7 +63,6 @@
 				getValue('opacity', 0, 100) / 100
 			);
 		}
-		refresh();
 		
 		document.getElementById('refresh').addEventListener('click', refresh, false);
 	</script>
