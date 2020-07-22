@@ -23,7 +23,7 @@ function Earth3D(params) {
         tesselation: 100,
         parent: document.body,
         text: {
-            font: '32px Arial',
+            font: '24px Arial',
             color: '#000000',
             border: '#00FFFF',
             background: '#FFFFFF99'
@@ -266,10 +266,11 @@ function Earth3D(params) {
 
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
-        context.font = params.text.font;        
+        
 
 
         function roundRect(x, y, width, height, radius) {
+            context.lineWidth = 2;
             context.beginPath();
             context.moveTo(x + radius, y);
             context.lineTo(x + width - radius, y);
@@ -293,30 +294,27 @@ function Earth3D(params) {
             cnt++;
             var text = params.labels[i].text.toString();
 
-            var size = Math.ceil(context.measureText(text).width) + 20;
+            canvas.width = 1000;
+            span.innerHTML = text;
+            //var size = Math.ceil(context.measureText(text).width) + 20;
+            var size = span.offsetWidth + 20;
             canvas.width = size;
             canvas.height = size;
-
-            // first time we need to do this twice
-            size = Math.ceil(context.measureText(text).width) + 20;
-            if(canvas.width != size) {
-                canvas.width = size;
-                canvas.height = size;
-            }
-
             context.clearRect(0, 0, size, size);
             
             context.strokeStyle = params.text.border;
             context.fillStyle = params.text.background;
             span.innerHTML = text;
+            var h = span.offsetHeight + 10;
             roundRect(
                 1, 
-                Math.round(size - span.offsetHeight) / 2, 
+                Math.round(size - h) / 2, 
                 size - 2, 
-                span.offsetHeight, 
-                Math.floor(span.offsetHeight / 6)
+                h, 
+                Math.floor(h / 4)
             );
             
+            context.font = params.text.font;        
             context.textBaseline = 'middle';            
             context.textAlign = 'center';            
             context.fillStyle = params.text.color;
@@ -384,7 +382,7 @@ function Earth3D(params) {
             sprite.position.x = sprite_pos.x;
             sprite.position.y = sprite_pos.y;
             sprite.position.z = sprite_pos.z;
-            sprite.scale.set(0.4, 0.4, 0.4);
+            sprite.scale.set(0.5, 0.5, 0.5);
             scene.add(sprite);
         }
     }
