@@ -14506,6 +14506,7 @@
 				inverseMatrix.getInverse(worldMatrix);
 				ray.copy(raycaster.ray).applyMatrix4(inverseMatrix);
 
+				// mobydimk: bugfix for raycaster and dots/lines
 				if(!geometry.index) {
 					return;
 				}

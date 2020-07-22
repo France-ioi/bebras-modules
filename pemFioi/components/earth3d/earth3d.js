@@ -1,5 +1,6 @@
 function Earth3D(params) { 
 
+    // params validation
 
     function validate(value, min, max) {
         return value >= min && value <= max;
@@ -18,6 +19,7 @@ function Earth3D(params) {
             lat: 0,
             lng: 0
         },
+        grid: {},
         texture: 'resources/earth4.jpg',
         opacity: 1,
         tesselation: 100,
@@ -50,10 +52,11 @@ function Earth3D(params) {
         return console.error('Tesselation is out of range: ', params.tesselation);
     }        
 
-    var cursor = Object.assign({}, params.cursor);
+    
+
+    // system 
 
     var materialMaker = {
-
 
         // texture: function(url) {
         texture: function(image) {
@@ -87,7 +90,7 @@ function Earth3D(params) {
             var mat = new zen3d.LineMaterial();
             mat.diffuse.setHex(color);
             if(loop) {
-                mat.drawMode = zen3d.DRAW_MODE.LINES;
+                mat.drawMode = zen3d.DRAW_MODE.LINE_LOOP;
             }
             return mat;
         },
@@ -102,12 +105,39 @@ function Earth3D(params) {
     }
 
 
+    function mesh(vertices, material) {
+        var geo = new zen3d.Geometry();
+        var buffer = new zen3d.InterleavedBuffer(new Float32Array(vertices), 3, 0);
+        geo.addAttribute('a_Position', new zen3d.InterleavedBufferAttribute(buffer));
+        geo.computeBoundingBox();
+        geo.computeBoundingSphere();
+        var m = new zen3d.Mesh(geo, material);
+        scene.add(m);                    
+        return m;
+    }    
 
+
+    function llToPos(lat, lng, r) {
+        r = r || 1;
+        lat = lat * Math.PI / 180;
+        lng = lng * Math.PI / 180;
+        return {
+            x: r * Math.cos(lat) * Math.sin(lng),
+            y: r * Math.sin(lat),
+            z: r * Math.cos(lat) * Math.cos(lng)
+        }
+    }
+    
+    
+
+
+    // main code
     var canvas;
     var renderer;
     var scene;
     var materials;
     var elements = {};
+    var cursor = Object.assign({}, params.cursor);
 
 
     function initCanvas() {
@@ -140,9 +170,11 @@ function Earth3D(params) {
             greenwich: materialMaker.dots(0xFFFF00, 0.5),
             lng: materialMaker.dots(0xFFFF00, 0.15),
             lng_angle: materialMaker.triangles(0xFFFF00),
+            lng_grid: materialMaker.line(0xFFFF00, true),
             equator: materialMaker.dots(0x00FF00, 0.5),
             lat: materialMaker.dots(0x00FF00, 0.15),
             lat_angle: materialMaker.triangles(0x00FF00),
+            lat_grid: materialMaker.line(0x00FF00, true),
             line: materialMaker.line(0x0000FF),
             point: materialMaker.color(0xFF0000),
             target: materialMaker.color(0x00FFFF),
@@ -178,6 +210,42 @@ function Earth3D(params) {
         var pos = llToPos(params.target.lat, params.target.lng);
         target.position.set(pos.x, pos.y, pos.z);
         scene.add(target);        
+
+
+        if(params.grid.lat > 0) {
+            var l = 0;
+            do {
+                var pos = llToPos(l, 0);                
+                var vertices1 = [];
+                var vertices2 = [];
+                for(var i=0; i<params.tesselation; i++) {
+                    var a = 2 * Math.PI * i / params.tesselation;
+                    var psin = pos.z * Math.sin(a);
+                    var pcos = pos.z * Math.cos(a);
+                    vertices1.push(psin, pos.y, pcos);
+                    vertices2.push(psin, -pos.y, pcos);
+                }
+                mesh(vertices1, materials.lat_grid)
+                i != 0 && mesh(vertices2, materials.lat_grid)                
+                l += params.grid.lat;
+            } while(l < 90);
+        }
+        if(params.grid.lng) {
+            var l = 0;
+            do {
+                var pos = llToPos(0, l);                
+                var vertices = [];
+                for(var i=0; i<params.tesselation; i++) {
+                    var a = 2 * Math.PI * i / params.tesselation;
+                    var psin = Math.sin(a);
+                    var pcos = Math.cos(a);
+                    vertices.push(psin, pcos, 0);
+                }
+                var m = mesh(vertices, materials.lng_grid);
+                m.euler.y =  l / 180 * Math.PI;
+                l += params.grid.lng;
+            } while(l < 180);            
+        }            
     }
 
 
@@ -186,19 +254,6 @@ function Earth3D(params) {
 
 
     function initControls() {
-        var group = new zen3d.Group();
-
-        function mesh(vertices, material) {
-            var geo = new zen3d.Geometry();
-            var buffer = new zen3d.InterleavedBuffer(new Float32Array(vertices), 3, 0);
-            geo.addAttribute('a_Position', new zen3d.InterleavedBufferAttribute(buffer));
-            geo.computeBoundingBox();
-            geo.computeBoundingSphere();
-            var m = new zen3d.Mesh(geo, material);
-            group.add(m);                    
-            return m;
-        }
-
         var t = params.tesselation * 8;
         var lat_vertices = [];
         for(var i=0; i<t; i++) {
@@ -252,28 +307,13 @@ function Earth3D(params) {
 
         // cursor point
         var point = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
-        elements.point = new zen3d.Mesh(point, materials.point);        
-        group.add(elements.point);                
-
-        scene.add(group)
+        elements.cursor = new zen3d.Mesh(point, materials.point);        
+        scene.add(elements.cursor);                
     }
 
 
     
     // controls
-
-    function llToPos(lat, lng, r) {
-        r = r || 1;
-        lat = lat * Math.PI / 180;
-        lng = lng * Math.PI / 180;
-        return {
-            x: r * Math.cos(lat) * Math.sin(lng),
-            y: r * Math.sin(lat),
-            z: r * Math.cos(lat) * Math.cos(lng)
-        }
-    }
-
-
     function refreshControls() {
         var lng_line_pos = llToPos(0, cursor.lng);
         with(elements.line_lng.geometry.attributes.a_Position) {
@@ -290,7 +330,7 @@ function Earth3D(params) {
             data.version++;        
         }
 
-        with(elements.point.position) {
+        with(elements.cursor.position) {
             x = cursor_pos.x;
             y = cursor_pos.y;
             z = cursor_pos.z;

@@ -61,10 +61,18 @@
 
 		var earth = Earth3D({
 			parent: document.getElementById('view'),
+
+			// optional location of blue target sphere
 			target: {
 				lat: 54.326967,
 				lng: 48.4237641
 			},
+			// optinal parameter, specify grid step for lat or/and lng
+			grid: {
+				lat: 10,
+				lng: 10
+			},
+			// initial camera position
 			camera: {
 				lat: 30,
 				lng: 30
