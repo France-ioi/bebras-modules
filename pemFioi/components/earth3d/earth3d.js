@@ -11,10 +11,7 @@ function Earth3D(params) {
             lat: 0,
             lng: 0
         },
-        cursor: {
-            lat: 0,
-            lng: 0
-        },
+        cursor: false,
         target: {
             lat: 0,
             lng: 0
@@ -33,11 +30,13 @@ function Earth3D(params) {
     if(!validate(params.camera.lng, -180, 180)) {
         return console.error('Camera lng is out of range: ', params.camera.lng);
     }                        
-    if(!validate(params.cursor.lat, -90, 90)) {
-        return console.error('Cursor lat is out of range: ', params.cursor.lat);
-    }                        
-    if(!validate(params.cursor.lng, -180, 180)) {
-        return console.error('Cursor lng is out of range: ', params.cursor.lng);
+    if(params.cursor) {
+        if(!validate(params.cursor.lat, -90, 90)) {
+            return console.error('Cursor lat is out of range: ', params.cursor.lat);
+        }                        
+        if(!validate(params.cursor.lng, -180, 180)) {
+            return console.error('Cursor lng is out of range: ', params.cursor.lng);
+        }
     }
     if(!validate(params.target.lat, -90, 90)) {
         return console.error('Target lat is out of range: ', params.target.lat);
@@ -251,9 +250,9 @@ function Earth3D(params) {
 
 
 
+    // cursor
 
-
-    function initControls() {
+    function initCursor() {
         var t = params.tesselation * 8;
         var lat_vertices = [];
         for(var i=0; i<t; i++) {
@@ -280,8 +279,6 @@ function Earth3D(params) {
 
         // greenwich
         mesh(lng_vertices, materials.greenwich)
-
-
 
         // cursor lat
         elements.lat = mesh(lat_vertices, materials.lat);
@@ -313,8 +310,8 @@ function Earth3D(params) {
 
 
     
-    // controls
-    function refreshControls() {
+
+    function refreshCursor() {
         var lng_line_pos = llToPos(0, cursor.lng);
         with(elements.line_lng.geometry.attributes.a_Position) {
             data.array[3] = lng_line_pos.x;
@@ -342,7 +339,6 @@ function Earth3D(params) {
         elements.lat.position.y = cursor_pos.y;
         elements.lat.scale.x = lat_line_pos.z;
         elements.lat.scale.z = lat_line_pos.z;
-
 
         
         var t = params.tesselation * 0.5;        
@@ -426,7 +422,7 @@ function Earth3D(params) {
         init3D();
         initMaterials(image);
         initEarth();
-        initControls();    
+        params.cursor && initCursor();    
         onResize();
         params.events.onMouseMove && initRaycaster();
 
@@ -446,6 +442,9 @@ function Earth3D(params) {
     // interface
     return {
         setCursor: function(point) {
+            if(!params.cursor) {
+                return;
+            }
             if(!validate(point.lat, -90, 90)) {
                 return console.error('Latituge is out of range: ', point.lat);
             }
@@ -454,7 +453,7 @@ function Earth3D(params) {
             }            
             cursor.lat = point.lat;
             cursor.lng = point.lng;
-            refreshControls();
+            refreshCursor();
         },
 
         setOpacity: function(opacity) {

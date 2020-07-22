@@ -62,6 +62,12 @@
 		var earth = Earth3D({
 			parent: document.getElementById('view'),
 
+			// optional, initial position of cursor. if false then cursor is hidden
+			cursor: {
+				lat: 20,
+				lng: 20
+			},
+
 			// optional location of blue target sphere
 			target: {
 				lat: 54.326967,
@@ -69,8 +75,8 @@
 			},
 			// optinal parameter, specify grid step for lat or/and lng
 			grid: {
-				lat: 10,
-				lng: 10
+				lat: 15,
+				lng: 30
 			},
 			// initial camera position
 			camera: {
