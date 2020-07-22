@@ -1,10 +1,14 @@
 function Earth3D(params) { 
 
-    // params validation
+    // params and validation
 
     function validate(value, min, max) {
         return value >= min && value <= max;
     }
+
+    function validateLatLng(point) {
+        return validate(point.lat, -90, 90) && validate(point.lng, -180, 180)
+    }    
 
     var defaults = {
         camera: {
@@ -12,37 +16,39 @@ function Earth3D(params) {
             lng: 0
         },
         cursor: false,
-        target: {
-            lat: 0,
-            lng: 0
-        },
+        labels: [],
         grid: {},
         texture: 'resources/earth4.jpg',
         opacity: 1,
         tesselation: 100,
         parent: document.body,
+        text: {
+            font: '32px Arial',
+            color: '#000000',
+            border: '#00FFFF',
+            background: '#FFFFFF99'
+        },
+        colors: {
+            pole: 0x000000,
+            lat: 0x00FF00,
+            lng: 0xFFFF00,
+            line: 0x0000FF,
+            point: 0xFF0000,
+            label: 0x00FFFF
+        },
         events: {}
     }
     var params = Object.assign({}, defaults, params);
-    if(!validate(params.camera.lat, -90, 90)) {
-        return console.error('Camera lat is out of range: ', params.camera.lat);
-    }                        
-    if(!validate(params.camera.lng, -180, 180)) {
-        return console.error('Camera lng is out of range: ', params.camera.lng);
+    if(!Array.isArray(params.labels)) {
+        params.labels = [];
+    }
+    if(!validateLatLng(params.camera)) {
+        return console.error('Invalid camera position: ', params.camera);
     }                        
     if(params.cursor) {
-        if(!validate(params.cursor.lat, -90, 90)) {
-            return console.error('Cursor lat is out of range: ', params.cursor.lat);
+        if(!validateLatLng(params.cursor)) {
+            return console.error('Invalid cursor position: ', params.cursor);
         }                        
-        if(!validate(params.cursor.lng, -180, 180)) {
-            return console.error('Cursor lng is out of range: ', params.cursor.lng);
-        }
-    }
-    if(!validate(params.target.lat, -90, 90)) {
-        return console.error('Target lat is out of range: ', params.target.lat);
-    }                        
-    if(!validate(params.target.lng, -180, 180)) {
-        return console.error('Target lng is out of range: ', params.target.lng);
     }
     if(!validate(params.opacity, 0, 1)) {
         return console.error('Opacity is out of range: ', params.opacity);
@@ -50,6 +56,11 @@ function Earth3D(params) {
     if(!validate(params.tesselation, 10, 1000)) {
         return console.error('Tesselation is out of range: ', params.tesselation);
     }        
+    for(var i=0; i<params.labels.length; i++) {
+        if(!validateLatLng(params.labels[i])) {
+            return console.error('Invalid label position: ', params.labels[i])
+        }
+    }
 
     
 
@@ -63,7 +74,6 @@ function Earth3D(params) {
             var texture = zen3d.Texture2D.fromImage(image);
             texture.encoding = zen3d.TEXEL_ENCODING_TYPE.LINEAR;
             mat = new zen3d.LambertMaterial();
-            mat.diffuse.setHex(0xffffff);
             mat.diffuseMap = texture;
             mat.transparent = true;
             mat.opacity = params.opacity;
@@ -164,24 +174,25 @@ function Earth3D(params) {
 
     function initMaterials(image) {
         materials = {
-            pole: materialMaker.color(0x000000),
+            pole: materialMaker.color(params.colors.pole),
             earth: materialMaker.texture(image),
-            greenwich: materialMaker.dots(0xFFFF00, 0.5),
-            lng: materialMaker.dots(0xFFFF00, 0.15),
-            lng_angle: materialMaker.triangles(0xFFFF00),
-            lng_grid: materialMaker.line(0xFFFF00, true),
-            equator: materialMaker.dots(0x00FF00, 0.5),
-            lat: materialMaker.dots(0x00FF00, 0.15),
-            lat_angle: materialMaker.triangles(0x00FF00),
-            lat_grid: materialMaker.line(0x00FF00, true),
-            line: materialMaker.line(0x0000FF),
-            point: materialMaker.color(0xFF0000),
-            target: materialMaker.color(0x00FFFF),
+            greenwich: materialMaker.dots(params.colors.lng, 0.5),
+            lng: materialMaker.dots(params.colors.lng, 0.15),
+            lng_angle: materialMaker.triangles(params.colors.lng),
+            lng_grid: materialMaker.line(params.colors.lng, true),
+            equator: materialMaker.dots(params.colors.lat, 0.5),
+            lat: materialMaker.dots(params.colors.lat, 0.15),
+            lat_angle: materialMaker.triangles(params.colors.lat),
+            lat_grid: materialMaker.line(params.colors.lat, true),
+            line: materialMaker.line(params.colors.line),
+            point: materialMaker.color(params.colors.point),
+            label_sphere: materialMaker.color(params.colors.label),
+            label_line: materialMaker.line(params.colors.label),
         }
     }    
 
 
-    function initEarth() {
+    function addEarth() {
         var earth_geo = new zen3d.SphereGeometry(1, params.tesselation, params.tesselation);
         elements.earth = new zen3d.Mesh(earth_geo, materials.earth);
         elements.earth.euler.y = - Math.PI * 0.5;
@@ -192,24 +203,15 @@ function Earth3D(params) {
         north.position.set(0, 1, 0);
         scene.add(north);
 
-
         var south_geo = new zen3d.SphereGeometry(0.04, params.tesselation / 5, params.tesselation / 5);
         var south = new zen3d.Mesh(south_geo, materials.pole);        
         south.position.set(0, -1, 0);
         scene.add(south);        
 
-
         var center_geo = new zen3d.SphereGeometry(0.04, params.tesselation / 5, params.tesselation / 5);
         var center = new zen3d.Mesh(center_geo, materials.point);        
         center.position.set(0, 0, 0);
         scene.add(center);        
-
-        var target_geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
-        var target = new zen3d.Mesh(target_geo, materials.target);        
-        var pos = llToPos(params.target.lat, params.target.lng);
-        target.position.set(pos.x, pos.y, pos.z);
-        scene.add(target);        
-
 
         if(params.grid.lat > 0) {
             var l = 0;
@@ -248,11 +250,150 @@ function Earth3D(params) {
     }
 
 
+    // labels
+    function renderLabels() {
+        if(!params.labels.length) {
+            return 0;
+        }
+        var cnt = 0;
+
+        var span = document.createElement('span');
+        span.style.font = params.text.font;
+        span.style.whiteSpace = 'nowrap';
+        span.style.display = 'inline';
+        span.style.visibility = 'hidden';
+        document.body.append(span);
+
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        context.font = params.text.font;        
+
+
+        function roundRect(x, y, width, height, radius) {
+            context.beginPath();
+            context.moveTo(x + radius, y);
+            context.lineTo(x + width - radius, y);
+            context.quadraticCurveTo(x + width, y, x + width, y + radius);
+            context.lineTo(x + width, y + height - radius);
+            context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            context.lineTo(x + radius, y + height);
+            context.quadraticCurveTo(x, y + height, x, y + height - radius);
+            context.lineTo(x, y + radius);
+            context.quadraticCurveTo(x, y, x + radius, y);
+            context.closePath();
+            context.fill();
+            context.stroke();
+        }        
+
+        
+        for(var i=0; i<params.labels.length; i++) {
+            if(!('text' in params.labels[i])) {
+                continue;
+            }
+            cnt++;
+            var text = params.labels[i].text.toString();
+
+            var size = Math.ceil(context.measureText(text).width) + 20;
+            canvas.width = size;
+            canvas.height = size;
+
+            // first time we need to do this twice
+            size = Math.ceil(context.measureText(text).width) + 20;
+            if(canvas.width != size) {
+                canvas.width = size;
+                canvas.height = size;
+            }
+
+            context.clearRect(0, 0, size, size);
+            
+            context.strokeStyle = params.text.border;
+            context.fillStyle = params.text.background;
+            span.innerHTML = text;
+            roundRect(
+                1, 
+                Math.round(size - span.offsetHeight) / 2, 
+                size - 2, 
+                span.offsetHeight, 
+                Math.floor(span.offsetHeight / 6)
+            );
+            
+            context.textBaseline = 'middle';            
+            context.textAlign = 'center';            
+            context.fillStyle = params.text.color;
+            context.fillText(text, size / 2, size / 2);
+
+
+            params.labels[i].image_src = canvas.toDataURL('image/png');
+        }
+        span.remove();
+        return cnt;
+    }
+
+
+    function loadLabelImages(callback) {
+        var total = renderLabels();
+        if(!total) {
+            callback();
+        }
+        for(var i=0; i<params.labels.length; i++) {
+            if(!params.labels[i].image_src) {
+                continue;
+            }
+            params.labels[i].image = new Image;
+            params.labels[i].image.onload = function() {
+                total--;
+                if(total == 0) {
+                    callback();
+                }
+            }
+            params.labels[i].image.src = params.labels[i].image_src;
+            delete params.labels[i].image_src;
+        }
+    }
+
+
+    function addLabels() {
+        for(var i=0; i<params.labels.length; i++) {
+            var ground_pos = llToPos(params.labels[i].lat, params.labels[i].lng);
+            var sprite_pos = llToPos(params.labels[i].lat, params.labels[i].lng, 1.3);
+            
+            var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
+            var ball = new zen3d.Mesh(geo, materials.label_sphere);        
+            ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
+            scene.add(ball);                    
+
+            if(!params.labels[i].image) {
+                continue;
+            }
+
+            // add spike
+            var vertices = [
+                ground_pos.x,
+                ground_pos.y,
+                ground_pos.z,
+                sprite_pos.x,
+                sprite_pos.y,
+                sprite_pos.z
+            ];
+            scene.add(mesh(vertices, materials.label_line));
+
+            // add text label
+            var sprite = new zen3d.Sprite();
+            sprite.material.diffuseMap = zen3d.Texture2D.fromImage(params.labels[i].image);
+            sprite.material.transparent = true;
+            sprite.position.x = sprite_pos.x;
+            sprite.position.y = sprite_pos.y;
+            sprite.position.z = sprite_pos.z;
+            sprite.scale.set(0.4, 0.4, 0.4);
+            scene.add(sprite);
+        }
+    }
+
 
 
     // cursor
 
-    function initCursor() {
+    function addCursor() {
         var t = params.tesselation * 8;
         var lat_vertices = [];
         for(var i=0; i<t; i++) {
@@ -414,28 +555,39 @@ function Earth3D(params) {
     }
   
 
-    // load texture and run
-    var image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.onload = function() {
-        initCanvas();
-        init3D();
-        initMaterials(image);
-        initEarth();
-        params.cursor && initCursor();    
-        onResize();
-        params.events.onMouseMove && initRaycaster();
-
-        var controller = new zen3d.OrbitControls(camera, canvas);
-        function loop(count) {
-            requestAnimationFrame(loop);
-            controller.update();
-            renderer.render(scene, camera);
+    // earth texture loader
+    function loadEarthImage(callback) {
+        var image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.onload = function() {
+            callback(image);
         }
-        loop(0);        
-        params.events.onLoad && params.events.onLoad();
+        image.src = Earth3DTexture;
     }
-    image.src = Earth3DTexture;
+
+
+
+    // run everything
+    loadEarthImage(function(earth_image) {
+        loadLabelImages(function() {
+            initCanvas();
+            init3D();
+            initMaterials(earth_image);
+            addEarth();
+            addLabels();
+            params.cursor && addCursor();    
+            onResize();
+            params.events.onMouseMove && initRaycaster();
+            var controller = new zen3d.OrbitControls(camera, canvas);
+            function loop(count) {
+                requestAnimationFrame(loop);
+                controller.update();
+                renderer.render(scene, camera);
+            }
+            loop(0);        
+            params.events.onLoad && params.events.onLoad();
+        })
+    });
     
     
 

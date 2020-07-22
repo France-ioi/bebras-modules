@@ -13,6 +13,7 @@
 	</style>
 	<script src="../../../ext/zen3d/zen3d.js"></script>
 	<script src="../../../ext/zen3d/controls/OrbitControls.js"></script>
+	<script src="../../../ext/zen3d/objects/Sprite.js"></script>
 	<script src="earth3d.js"></script>
 </head>
 <body>
@@ -62,27 +63,40 @@
 		var earth = Earth3D({
 			parent: document.getElementById('view'),
 
-			// optional, initial position of cursor. if false then cursor is hidden
+			// initial position of cursor, if false then cursor is hidden. optional
 			cursor: {
 				lat: 20,
 				lng: 20
 			},
-
-			// optional location of blue target sphere
-			target: {
-				lat: 54.326967,
-				lng: 48.4237641
-			},
-			// optinal parameter, specify grid step for lat or/and lng
+			// points and labels, optional
+			labels: [
+				{
+					text: 'Label text 1',
+					lat: 54.326967,
+					lng: 48.4237641					
+				},
+				{
+					text: 'Label text 2',
+					lat: 25,
+					lng: 40	
+				},				
+				{
+					text: 'Label text 3',
+					lat: -5,
+					lng: 20
+				},								
+			],
+			// grid steps for lat and lng, optinal
 			grid: {
 				lat: 15,
 				lng: 30
 			},
-			// initial camera position
+			// initial camera position, optional
 			camera: {
 				lat: 30,
 				lng: 30
 			},
+			// all evens are optional
 			events: {
 				onLoad: refresh,
 				onMouseMove: showCoordinates

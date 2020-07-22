@@ -14512,6 +14512,11 @@
 				}
 				var index = geometry.index.array;
 				var position = geometry.getAttribute("a_Position");
+
+				// mobydimk: bugfix for sprites
+				if(!position) {
+					return;
+				}
 				var uv = geometry.getAttribute("a_Uv");
 				var a, b, c;
 
