@@ -11,7 +11,7 @@
 			background: #ffffff;
 		}
 	</style>
-	<script src="../../../ext/zen3d/zen3d.min.js"></script>
+	<script src="../../../ext/zen3d/zen3d.js"></script>
 	<script src="../../../ext/zen3d/controls/OrbitControls.js"></script>
 	<script src="earth3d.js"></script>
 </head>
@@ -31,20 +31,13 @@
 	<button id="refresh">Refresh</button>
 	
 	<div id="view"></div>	
+	<div id="coordinates"></div>			
 
 	<script>
-		var earth = Earth3D({
-			parent: document.getElementById('view'),
-			target: {
-				lat: 54.326967,
-				lng: 48.4237641
-			},
-			camera: {
-				lat: 30,
-				lng: 30
-			}
-		}, refresh)
-		
+		function showCoordinates(point) {
+			document.getElementById('coordinates').innerHTML = 'Lat: ' + point.lat + ' Lng: ' + point.lng;
+		}
+	
 
 		function refresh() {
 			function getValue(id, min, max) {
@@ -55,16 +48,32 @@
 				el.value = v;
 				return v;
 			}
-			earth.setCursor(
-				getValue('lat', -90, 90), 
-				getValue('lng', -180, 180)
-			);
+			earth.setCursor({
+				lat: getValue('lat', -90, 90), 
+				lng: getValue('lng', -180, 180)
+			});
 			earth.setOpacity(
 				getValue('opacity', 0, 100) / 100
 			);
 		}
-		
 		document.getElementById('refresh').addEventListener('click', refresh, false);
+
+
+		var earth = Earth3D({
+			parent: document.getElementById('view'),
+			target: {
+				lat: 54.326967,
+				lng: 48.4237641
+			},
+			camera: {
+				lat: 30,
+				lng: 30
+			},
+			events: {
+				onLoad: refresh,
+				onMouseMove: showCoordinates
+			}
+		});		
 	</script>
 </body>
 </html>
