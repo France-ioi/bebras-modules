@@ -111,7 +111,18 @@ var localLanguageStrings = {
       testError: "erreur",
       testSuccess: "validé",
       seeTest: "voir",
-      infiniteLoop: "répéter indéfiniment"
+      infiniteLoop: "répéter indéfiniment",
+      availableFunctions: "Fonctions disponibles : ",
+      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :",
+      startingLine: "Votre programme doit commencer par la ligne",
+      startingLines: "Votre programme doit commencer par les lignes",
+      keywordAllowed: "Le mot-clé suivant est autorisé : ",
+      keywordForbidden: "Le mot-clé suivant est interdit : ",
+      keywordsAllowed: "Les mots-clés suivants sont autorisés : ",
+      keywordsForbidden: "Les mots-clés suivants sont interdits : ",
+      variablesAllowd: "Les variables sont autorisées.",
+      variablesForbidden: "Les variables sont interdites.",
+      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.",
    },
    en: {
       categories: {
@@ -217,7 +228,19 @@ var localLanguageStrings = {
       testLabel: "Test",
       testError: "error",
       testSuccess: "valid",
-      seeTest: "see test"
+      seeTest: "see test",
+      infiniteLoop: "répéter indéfiniment", // TODO :: translate
+      availableFunctions: "Fonctions disponibles : ", // TODO :: translate
+      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
+      startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
+      startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
+      keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
+      keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
+      keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
+      keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
+      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesForbidden: "Les variables sont interdites.", // TODO :: translate
+      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    },
    de: {
       categories: {
@@ -324,7 +347,19 @@ var localLanguageStrings = {
       testLabel: "Test",
       testError: "Fehler",
       testSuccess: "gültig",
-      seeTest: "Siehe Test"
+      seeTest: "Siehe Test",
+      infiniteLoop: "Endlosschleife", 
+      availableFunctions: "Verfügbare Funktionen:",
+      availableFunctionsVerbose: "Die verfügbaren Funktionen zum Steuern des Roboters sind:",
+      startingLine: "Dein Programm muss mit folgender Zeile beginnen:",
+      startingLines: "Dein Programm muss mit folgenden Zeilen beginnen",
+      keywordAllowed: "Erlaubtes Schlüsselwort:",
+      keywordForbidden: "Nicht erlaubtes Schlüsselwort:",
+      keywordsAllowed: "Erlaubte Schlüsselwörter:",
+      keywordsForbidden: "Nicht erlaubte Schlüsselwörter:",
+      variablesAllowd: "Du darfst Variable verwenden.",
+      variablesForbidden: "Du darfst keine Variablen verwenden",
+      readDocumentation: "Du darfst die Python-Dokumentation lesen.",
    },
    es: {
       categories: {
@@ -430,7 +465,19 @@ var localLanguageStrings = {
       testLabel: "Caso",
       testError: "error",
       testSuccess: "correcto",
-      seeTest: "ver"
+      seeTest: "ver",
+      infiniteLoop: "répéter indéfiniment", // TODO :: translate
+      availableFunctions: "Fonctions disponibles : ", // TODO :: translate
+      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
+      startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
+      startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
+      keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
+      keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
+      keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
+      keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
+      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesForbidden: "Les variables sont interdites.", // TODO :: translate
+      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    },
    sl: {
       categories: {
@@ -536,7 +583,19 @@ var localLanguageStrings = {
       testLabel: "Test",
       testError: "napaka",
       testSuccess: "pravilno",
-      seeTest: "poglej test"
+      seeTest: "poglej test",
+      infiniteLoop: "répéter indéfiniment", // TODO :: translate
+      availableFunctions: "Fonctions disponibles : ", // TODO :: translate
+      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
+      startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
+      startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
+      keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
+      keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
+      keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
+      keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
+      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesForbidden: "Les variables sont interdites.", // TODO :: translate
+      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    }
 };
 
