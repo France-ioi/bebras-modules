@@ -44,6 +44,7 @@ function GPS(settings) {
 
    this.initHandlers = function() {
       Beav.dragWithTouch(this.overlay, onMove, onStart, onEnd);
+      this.overlay.mousemove(self.mousemove);
    };
 
    this.addTower = function(pos) {
@@ -66,6 +67,23 @@ function GPS(settings) {
       this.towers[pos.id] = { x: pos.x, y: pos.y, raphObj: raphObj, r: minR, maxR: maxR };
       this.towerID.push(pos.id);
       this.updateDistInfo(pos.id);
+   };
+
+   this.mousemove = function(ev) {
+      var xMouse = ev.pageX - $("#"+paperID).offset().left - x0;
+      var yMouse = ev.pageY - $("#"+paperID).offset().top - y0;
+      var cursor = "auto";
+      for(var id of self.towerID){
+         var r = self.towers[id].r;
+         var x = self.towers[id].x;
+         var y = self.towers[id].y;
+         var d = Beav.Geometry.distance(x,y,xMouse,yMouse);
+         if(d > r - 10 && d < r + 10){
+            cursor = "grab";
+            break;
+         }
+      }
+      self.overlay.attr("cursor",cursor);
    };
 
    var onStart = function(x,y,ev) {
