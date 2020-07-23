@@ -10,6 +10,9 @@ function GPS(settings) {
    var scale = settings.scale;
    var unit = settings.unit;
    var fixed = settings.fixed;
+   var create = settings.create;
+   var hideTowerLabel = settings.hideTowerLabel;
+
    this.timeShiftEnabled = settings.timeShiftEnabled;
    this.timeShift = 0;
    var firstTowersPos = settings.towerPos;
@@ -17,6 +20,8 @@ function GPS(settings) {
    var towerH = settings.towerH;
    var towerW = settings.towerW;
    var callback = settings.callback;
+   var addTowerCallback = settings.addTowerCallback;
+   var dragEndCallback = settings.dragEndCallback;
    var dragMargin = 10;
    var minR = towerR + dragMargin;
 
@@ -34,8 +39,10 @@ function GPS(settings) {
 
    this.init = function() {
       paper.rect(x0,y0,w,h).attr(attr.frame);
-      for(var pos of firstTowersPos){
-         this.addTower(pos);
+      if(firstTowersPos){
+         for(var pos of firstTowersPos){
+            this.addTower(pos);
+         }
       }
       this.overlay = paper.rect(x0,y0,w,h).attr(attr.overlay);
 
@@ -48,25 +55,43 @@ function GPS(settings) {
    };
 
    this.addTower = function(pos) {
-      if(this.towerID.includes(pos.id)){
+      if(pos.id && this.towerID.includes(pos.id)){
          console.log(pos.id+" already exists")
          return
       }
       var x = x0 + pos.x;
       var y = y0 + pos.y;
       var circle = paper.circle(x,y,towerR).attr(attr.tower);
+      if(!pos.id){
+         var id = 1;
+         while(this.towerID.includes(id)){
+            id++;
+         };
+         pos.id = id;
+      }
       var label = paper.text(x,y,pos.id).attr(attr.towerLabel);
-      var outCircle = paper.circle(x,y,minR).attr(attr.circle).attr("clip-rect",x0+","+y0+","+w+","+h);
+      if(hideTowerLabel){
+         label.hide();
+      }
+      var circleR = pos.r || minR;
+      var outCircle = paper.circle(x,y,circleR).attr(attr.circle).attr("clip-rect",x0+","+y0+","+w+","+h);
       if(this.timeShiftEnabled){
-         var shiftedCircle = paper.circle(x,y,minR + this.timeShift).attr(attr.shiftedCircle).attr("clip-rect",x0+","+y0+","+w+","+h);
+         var shiftedCircle = paper.circle(x,y,circleR + this.timeShift).attr(attr.shiftedCircle).attr("clip-rect",x0+","+y0+","+w+","+h);
          var raphObj = paper.set(circle,label,outCircle,shiftedCircle);
       }else{
          var raphObj = paper.set(circle,label,outCircle);
       }
       var maxR = Math.max(Math.abs(pos.x),Math.abs(pos.x - w),Math.abs(pos.y),Math.abs(pos.y - h));
-      this.towers[pos.id] = { x: pos.x, y: pos.y, raphObj: raphObj, r: minR, maxR: maxR };
+      this.towers[pos.id] = { x: pos.x, y: pos.y, raphObj: raphObj, r: circleR, maxR: maxR };
       this.towerID.push(pos.id);
       this.updateDistInfo(pos.id);
+      if(this.overlay){
+         this.overlay.toFront();
+      }
+      if(addTowerCallback){
+         addTowerCallback();
+      }
+      return pos.id;
    };
 
    this.mousemove = function(ev) {
@@ -90,26 +115,28 @@ function GPS(settings) {
       var xMouseGps = x - $("#"+paperID).offset().left - x0;
       var yMouseGps = y - $("#"+paperID).offset().top - y0;
       var minDist = Infinity;
-      draggedData = {};
+      draggedData = null;
       for(var id of self.towerID){
          var towerData = self.towers[id];
          var distFromCenter = Beav.Geometry.distance(xMouseGps,yMouseGps,towerData.x,towerData.y);
-         if(distFromCenter < minDist){
-            minDist = distFromCenter;
-            draggedData.id = id;
-            draggedData.type = 0;
+
+         if(!fixed && distFromCenter <= towerR){
+            /* drag center */
+            minDist = 0;
+            draggedData = { id: id, type: 0};
+            break;
          }
          var distFromCircle = Math.abs(distFromCenter - towerData.r);
          if(distFromCircle < minDist){
             minDist = distFromCircle;
-            draggedData.id = id;
-            draggedData.type = 1;
-            draggedData.r0 = distFromCenter;
-            draggedData.ri = towerData.r;
+            draggedData = { id: id, type: 1, r0: distFromCenter, ri: towerData.r };
          }
       }
       if(minDist > dragMargin){
-         draggedData = null;
+         draggedData = (!create) ? null : { x: xMouseGps, y: yMouseGps, create: true };
+         if(draggedData){
+            // console.log(draggedData)
+         }
       }
       if(callback){
          callback();
@@ -121,25 +148,79 @@ function GPS(settings) {
       }
       var xMouseGps = x - $("#"+paperID).offset().left - x0;
       var yMouseGps = y - $("#"+paperID).offset().top - y0;
-      var id = draggedData.id;
+      if(draggedData.create){
+         if(Beav.Geometry.distance(xMouseGps,yMouseGps,draggedData.x,draggedData.y) < minR){
+            return
+         }
+         var id = self.addTower(draggedData);
+         draggedData = {
+            id: id,
+            type: 1,
+            r0: minR,
+            ri: minR
+         }
+      }else{
+         var id = draggedData.id;
+      }
       var ri = draggedData.ri;
       var towerData = self.towers[id];
 
       if(draggedData.type == 1){
+         /* drag circle */
          var r0 = draggedData.r0;
          var dR = Beav.Geometry.distance(xMouseGps,yMouseGps,towerData.x,towerData.y) - r0;
          var maxR = Math.max(Math.abs(towerData.x),Math.abs(towerData.x - w),Math.abs(towerData.y),Math.abs(towerData.y - h));
          var newR = Math.min(maxR,Math.max(minR,ri + dR));
          self.towers[id].raphObj[2].attr("r",newR);
          towerData.r = newR;
+         self.updateDistInfo(id);
+      }else{
+         /* drag center */
+         var newX = towerData.x + dx + x0;
+         var newY = towerData.y + dy + y0;
+         self.towers[id].raphObj.attr({ x: newX, y: newY, cx: newX, cy: newY });
+         self.distInfo[id].line.transform("t"+dx+" "+dy);
+         self.distInfo[id].val.transform("t"+dx+" "+dy);
       }
-      self.updateDistInfo(id);
       if(self.timeShiftEnabled){
          self.updateShiftCircle(id);
       }
    };
-   var onEnd = function() {
-      
+   var onEnd = function(ev) {
+      if(!draggedData){
+         return
+      }
+      if(draggedData.type == 0){
+         var id = draggedData.id;
+         var towerData = self.towers[id];
+         var x = self.towers[id].raphObj[0].attr("cx");
+         var y = self.towers[id].raphObj[0].attr("cy");
+         if(x < x0 || x > x0 + w || y < y0 || y > y0 + h){
+            self.deleteTower(id);
+            return
+         }
+         towerData.x = x - x0;
+         towerData.y = y - y0;
+         var maxR = Math.max(Math.abs(towerData.x),Math.abs(towerData.x - w),Math.abs(towerData.y),Math.abs(towerData.y - h));
+         towerData.maxR = maxR;
+         self.distInfo[id].line.remove();
+         self.distInfo[id].val.remove();
+         self.distInfo[id] = null;
+         self.updateDistInfo(id);
+      }
+      if(dragEndCallback){
+         dragEndCallback();
+      }
+   };
+
+   this.deleteTower = function(id) {
+      this.towers[id].raphObj.remove();
+      delete this.towers[id];
+      this.distInfo[id].line.remove();
+      this.distInfo[id].val.remove();
+      delete this.distInfo[id];
+      var index = this.towerID.indexOf(id);
+      this.towerID.splice(index,1);
    };
 
    this.updateDistInfo = function(id) {
