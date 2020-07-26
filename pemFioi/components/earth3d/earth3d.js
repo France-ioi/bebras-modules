@@ -34,7 +34,8 @@ function Earth3D(params) {
             lng: 0xFFFF00,
             line: 0x0000FF,
             point: 0xFF0000,
-            label: 0x00FFFF
+            label: 0x00FFFF,
+            marker: 0xFF00FF
         },
         events: {}
     }
@@ -126,10 +127,10 @@ function Earth3D(params) {
     }    
 
 
-    function llToPos(lat, lng, r) {
+    function llToPos(point, r) {
         r = r || 1;
-        lat = lat * Math.PI / 180;
-        lng = lng * Math.PI / 180;
+        var lat = point.lat * Math.PI / 180;
+        var lng = point.lng * Math.PI / 180;
         return {
             x: r * Math.cos(lat) * Math.sin(lng),
             y: r * Math.sin(lat),
@@ -165,7 +166,7 @@ function Earth3D(params) {
 	    scene.add(ambientLight);        
         
         camera = new zen3d.Camera();
-        var pos = llToPos(params.camera.lat, params.camera.lng, 20);
+        var pos = llToPos(params.camera, 20);
         camera.position.set(pos.x, pos.y, pos.z);
         camera.lookAt(new zen3d.Vector3(0, 0, 0), new zen3d.Vector3(0, 1, 0));
         scene.add(camera);
@@ -188,6 +189,7 @@ function Earth3D(params) {
             point: materialMaker.color(params.colors.point),
             label_sphere: materialMaker.color(params.colors.label),
             label_line: materialMaker.line(params.colors.label),
+            marker: materialMaker.color(params.colors.marker)
         }
     }    
 
@@ -216,7 +218,10 @@ function Earth3D(params) {
         if(params.grid.lat > 0) {
             var l = 0;
             do {
-                var pos = llToPos(l, 0);                
+                var pos = llToPos({
+                    lat: l, 
+                    lng: 0
+                });                
                 var vertices1 = [];
                 var vertices2 = [];
                 for(var i=0; i<params.tesselation; i++) {
@@ -234,7 +239,10 @@ function Earth3D(params) {
         if(params.grid.lng) {
             var l = 0;
             do {
-                var pos = llToPos(0, l);                
+                var pos = llToPos({
+                    lat: 0, 
+                    lng: l
+                });                
                 var vertices = [];
                 for(var i=0; i<params.tesselation; i++) {
                     var a = 2 * Math.PI * i / params.tesselation;
@@ -352,8 +360,8 @@ function Earth3D(params) {
 
     function addLabels() {
         for(var i=0; i<params.labels.length; i++) {
-            var ground_pos = llToPos(params.labels[i].lat, params.labels[i].lng);
-            var sprite_pos = llToPos(params.labels[i].lat, params.labels[i].lng, 1.3);
+            var ground_pos = llToPos(params.labels[i]);
+            var sprite_pos = llToPos(params.labels[i], 1.3);
             
             var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
             var ball = new zen3d.Mesh(geo, materials.label_sphere);        
@@ -451,14 +459,17 @@ function Earth3D(params) {
     
 
     function refreshCursor() {
-        var lng_line_pos = llToPos(0, cursor.lng);
+        var lng_line_pos = llToPos({
+            lat: 0, 
+            lng: cursor.lng
+        });
         with(elements.line_lng.geometry.attributes.a_Position) {
             data.array[3] = lng_line_pos.x;
             data.array[5] = lng_line_pos.z;
             data.version++;
         }
 
-        var cursor_pos = llToPos(cursor.lat, cursor.lng);
+        var cursor_pos = llToPos(cursor);
         with(elements.line_lat.geometry.attributes.a_Position) {
             data.array[3] = cursor_pos.x;
             data.array[4] = cursor_pos.y;
@@ -474,7 +485,10 @@ function Earth3D(params) {
 
         elements.lng.euler.y = cursor.lng / 180 * Math.PI;
 
-        var lat_line_pos = llToPos(cursor.lat, 0);
+        var lat_line_pos = llToPos({
+            lat: cursor.lat, 
+            lng: 0
+        });
         elements.lat.position.y = cursor_pos.y;
         elements.lat.scale.x = lat_line_pos.z;
         elements.lat.scale.z = lat_line_pos.z;
@@ -528,30 +542,124 @@ function Earth3D(params) {
     window.addEventListener('resize', onResize, false);
 
 
-    // mouse coordinates to lat lng
+
+    // mouse position to coordinates
+
+    var raycaster;
+    var mouse;
     function initRaycaster() {
-        var raycaster = new zen3d.Raycaster();
-        var mouse = new zen3d.Vector2();
-        canvas.addEventListener('mousemove', function(e) {
-            var rect = e.target.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            mouse.x = (x / rect.width) * 2 - 1;
-            mouse.y = - (y / rect.height) * 2 + 1;
-            raycaster.setFromCamera(mouse, camera);
-            var array = raycaster.intersectObject(scene, true);
-            for(var i=0; i<array.length; i++) {
-                if(array[i].object.uuid == elements.earth.uuid) {
-                    params.events.onMouseMove({
-                        lat: (array[i].uv.y - 0.5) * 180,
-                        lng: (array[i].uv.x - 0.5) * 360
-                    })
-                    break;
+        if(raycaster) {
+            return;
+        }
+        raycaster = new zen3d.Raycaster();
+        mouse = new zen3d.Vector2();
+    }
+
+
+    function updateRaycaster(mouse_event) {
+        var rect = mouse_event.target.getBoundingClientRect();
+        var x = mouse_event.clientX - rect.left;
+        var y = mouse_event.clientY - rect.top;
+        mouse.x = (x / rect.width) * 2 - 1;
+        mouse.y = - (y / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+    }
+
+
+    function mouseToCoodinates(array) {
+        for(var i=0; i<array.length; i++) {
+            if(array[i].object.uuid == elements.earth.uuid) {
+                return {
+                    lat: (array[i].uv.y - 0.5) * 180,
+                    lng: (array[i].uv.x - 0.5) * 360
                 }
             }
+        }
+        return null;
+    }
+
+
+    function initMouseMoveEvent() {
+        initRaycaster();
+        canvas.addEventListener('mousemove', function(e) {
+            updateRaycaster(e);
+            var array = raycaster.intersectObject(scene, true);            
+            var point = mouseToCoodinates(array);
+            if(point) {
+                params.events.onMouseMove(point);
+            }
+        });  
+    }
+
+
+    // user markers 
+    var markers = [];
+
+    function callMarkersCallback() {
+        if(!params.events.onMarkerChange) {
+            return;
+        }
+        var points = [];
+        for(var i=0; i<markers.length; i++) {
+            points.push(markers[i].point);
+        }
+        params.events.onMarkerChange(points);
+    }
+
+
+    function addMarker(point) {
+        var geo = new zen3d.SphereGeometry(0.04, params.tesselation / 5, params.tesselation / 5);
+        var marker = {
+            point: point,
+            mesh: new zen3d.Mesh(geo, materials.marker)
+        }
+        var pos = llToPos(point);
+        marker.mesh.position.set(pos.x, pos.y, pos.z);
+        scene.add(marker.mesh);        
+        markers.push(marker);
+        callMarkersCallback();
+    }
+
+
+    function removeMarker(idx) {
+        scene.remove(markers[idx].mesh);        
+        markers.splice(idx, 1);
+        callMarkersCallback();
+    }
+
+
+    function initMouseClickEvent() {
+        initRaycaster();
+        var moved_after_down = false;
+        canvas.addEventListener('mouseup', function(e) {
+            if(moved_after_down) {
+                return;
+            }
+            updateRaycaster(e);
+            var array = raycaster.intersectObject(scene, true);            
+            for(var i=0; i<array.length; i++) {
+                for(var j=0; j<markers.length; j++) {
+                    if(array[i].object.uuid == markers[j].mesh.uuid) {
+                        removeMarker(j);
+                        return;
+                    }
+                }
+            }
+            var point = mouseToCoodinates(array);
+            if(point) {
+                addMarker(point);
+            }
+            
+        });
+        canvas.addEventListener('mousedown', function(e) {
+            moved_after_down = false;
         });        
+        canvas.addEventListener('mousemove', function(e) {
+            moved_after_down = true;
+        });                
     }
   
+
 
     // earth texture loader
     function loadEarthImage(callback) {
@@ -576,7 +684,8 @@ function Earth3D(params) {
             addLabels();
             params.cursor && addCursor();    
             onResize();
-            params.events.onMouseMove && initRaycaster();
+            params.events.onMouseMove && initMouseMoveEvent();
+            params.events.onMarkerChange && initMouseClickEvent();
             orbit_controller = new zen3d.OrbitControls(camera, canvas);
             function loop(count) {
                 requestAnimationFrame(loop);

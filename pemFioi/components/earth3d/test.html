@@ -49,7 +49,12 @@
 		<hr/>		
 
 		<strong>mouseover coordinates</strong>
-		<div id="coordinates"></div>			
+		<pre id="coordinates"></pre>			
+		<hr/>		
+
+		<strong>mouseclick markers</strong>
+		<pre id="markers"></pre>			
+		<hr/>				
 	</div>
 
 	
@@ -83,6 +88,12 @@
 			earth.setRotation(
 				Math.PI * getValue('rotation-angle', -Infinity, Infinity) / 180
 			);			
+		}
+
+		function pointToString(point) {
+			var lat_postfix = (lat < 0) ? 'S' : 'N';
+			var lng_postfix = (lng < 0) ? 'W' : 'E';
+			return 'Lat: ' + point.lat + lat_postfix + ' Lng: ' + point.lng + lng_postfix;
 		}
 
 		var earth = Earth3D({
@@ -129,11 +140,14 @@
 					updateRotation();					
 				},
 				onMouseMove: function(point) {
-					var lat_postfix = (lat < 0) ? 'S' : 'N';
-					var lng_postfix = (lng < 0) ? 'W' : 'E';
-					document.getElementById('coordinates').innerHTML = 
-						'Lat: ' + point.lat + lat_postfix +
-						' Lng: ' + point.lng + lng_postfix;
+					document.getElementById('coordinates').innerHTML = pointToString(point)
+				},
+				onMarkerChange: function(points) {
+					var text = [];
+					for(var i=0; i<points.length; i++) {
+						text.push(pointToString(points[i]));
+					}
+					document.getElementById('markers').innerHTML = text.join('\n');
 				}
 			}
 		});		
