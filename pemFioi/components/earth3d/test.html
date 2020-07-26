@@ -91,9 +91,9 @@
 		}
 
 		function pointToString(point) {
-			var lat_postfix = (lat < 0) ? 'S' : 'N';
-			var lng_postfix = (lng < 0) ? 'W' : 'E';
-			return 'Lat: ' + point.lat + lat_postfix + ' Lng: ' + point.lng + lng_postfix;
+			var lat_postfix = (point.lat < 0) ? 'S' : 'N';
+			var lng_postfix = (point.lng < 0) ? 'W' : 'E';
+			return 'Lat: ' + Math.abs(point.lat) + lat_postfix + ' Lng: ' + Math.abs(point.lng) + lng_postfix;
 		}
 
 		var earth = Earth3D({
