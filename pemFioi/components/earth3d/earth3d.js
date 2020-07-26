@@ -566,6 +566,7 @@ function Earth3D(params) {
 
 
     // run everything
+    var orbit_controller;
     loadEarthImage(function(earth_image) {
         loadLabelImages(function() {
             initCanvas();
@@ -576,10 +577,10 @@ function Earth3D(params) {
             params.cursor && addCursor();    
             onResize();
             params.events.onMouseMove && initRaycaster();
-            var controller = new zen3d.OrbitControls(camera, canvas);
+            orbit_controller = new zen3d.OrbitControls(camera, canvas);
             function loop(count) {
                 requestAnimationFrame(loop);
-                controller.update();
+                orbit_controller.update();
                 renderer.render(scene, camera);
             }
             loop(0);        
@@ -611,6 +612,10 @@ function Earth3D(params) {
                 return console.error('Opacity is out of range: ', opacity);
             }                        
             materials.earth.opacity = opacity;
+        },
+
+        setRotation: function(azimutal_angle) {
+            orbit_controller.setAzimuthalAngle(azimutal_angle);
         }
     }
 }

@@ -89,6 +89,12 @@ zen3d.OrbitControls = function(object, domElement) {
 		return spherical.theta;
 	};
 
+	// modydimk: add public method for earth3d
+	this.setAzimuthalAngle = function (angle) {
+		sphericalDelta.theta = angle;
+		this.update();
+	}
+
 	this.saveState = function () {
 		scope.target0.copy(scope.target);
 		scope.position0.copy(scope.object.position);
