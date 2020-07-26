@@ -37,7 +37,12 @@ function Earth3D(params) {
             label: 0x00FFFF,
             marker: 0xFF00FF
         },
-        events: {}
+        events: {},
+        orbit: {
+            rotate: true,
+            zoom: true,
+            pan: true
+        }
     }
     var params = Object.assign({}, defaults, params);
     if(!Array.isArray(params.labels)) {
@@ -672,9 +677,16 @@ function Earth3D(params) {
     }
 
 
+    // orbit controller
+    var orbit_controller;
+    function initOrbitController() {
+        orbit_controller = new zen3d.OrbitControls(camera, canvas);
+        orbit_controller.enableDollying = params.orbit.zoom;
+        orbit_controller.enableRotate = params.orbit.rotate;
+        orbit_controller.enablePan = params.orbit.pan;
+    }
 
     // run everything
-    var orbit_controller;
     loadEarthImage(function(earth_image) {
         loadLabelImages(function() {
             initCanvas();
@@ -686,7 +698,7 @@ function Earth3D(params) {
             onResize();
             params.events.onMouseMove && initMouseMoveEvent();
             params.events.onMarkerChange && initMouseClickEvent();
-            orbit_controller = new zen3d.OrbitControls(camera, canvas);
+            initOrbitController();
             function loop(count) {
                 requestAnimationFrame(loop);
                 orbit_controller.update();
