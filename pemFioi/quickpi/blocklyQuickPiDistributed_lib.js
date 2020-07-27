@@ -258,7 +258,9 @@ var getContext = function (display, infos, curLevel) {
 
 
    context.displayMessage = function (messageInfo) {
-      {
+         var fromNode = context.findNodeById(messageInfo.fromId);
+         var toNode = context.findNodeById(messageInfo.toId);
+
          var table = document.getElementById("messageTable");
          var row = table.insertRow();
 
@@ -279,8 +281,6 @@ var getContext = function (display, infos, curLevel) {
          statusRow.id = "message-" + messageInfo.messageId + "-status";
 
          context.updateMessageStatus(messageInfo.messageId, messageInfo.status);
-      }
-
    };
 
    context.sendMessage = function (messageInfo, display) {
@@ -690,11 +690,11 @@ var getContext = function (display, infos, curLevel) {
 
       $('#grid').html(`
          
-         <div style='height: 100%; width: 100%;' id='timelineView'>
+         <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
             <div style='height: 100%; width: 100%; overflow:hidden' id="timeLineGraph"></div>
          </div>
          
-         <div id='graphView' style='height: 100%; width: 100%; display: none;'>
+         <div id='graphView' style='height: 100%; width: 100%; '>
          <table style='height: 100%; width: 100%; table-layout:fixed;'>
          <tr>
          <td style='width: 50%; height: 50%;'>
@@ -705,20 +705,10 @@ var getContext = function (display, infos, curLevel) {
          </td>
          </tr>
          <tr>
-         <!--
          <td colspan=2 style='width: 100%; height: 50%;'>
             <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
          </td>
-         -->
-         <!--
-         <td style='width: 100%; height: 50%;'>
-            <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
-         </td>
-         
-         <td style='width: 100%; height: 50%;'>
-         <div style='height: 100%; width: 100%;' id="timeLineGraph"></div>
-         </td>
-         -->
+
          </tr>
          </table>
          </div>
@@ -783,8 +773,6 @@ var getContext = function (display, infos, curLevel) {
 
       var graphW = $('#nodeGraph').width();
       var graphH = $('#nodeGraph').height();
-
-
 
       this.raphaelFactory.destroyAll();
       paper = this.raphaelFactory.create(
@@ -957,6 +945,8 @@ var getContext = function (display, infos, curLevel) {
 
          timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
          timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+
+         context.vGraphTimeline.redraw();
 
          //context.resetDisplay();
       }
