@@ -1,5 +1,33 @@
 function LR_Parser(settings,subTask,answer) {
    self = this;
+
+
+   this.strings = {
+      messages: {
+         shift: 'The lookahead symbol {symbol} is read from the input and state state is pushed onto the stack.',
+         reduce1: 'Lookahead symbol {symbol} is in the Follow set of the LHS non-terminal ({non_terminal}) for the item {item}, thus states {popped_states} are popped from the stack that represent {RHS} in the derivation.',
+         reduce2: 'The top element after popping {popped_states} is top state , that leads to state {new-state} with the non-terminal {non_terminal}, which is pushed onto the stack.',
+         error: 'No shift or reduce operations possible at state {state} for lookahead symbol {symbol}',
+         not_accepted: 'The input is fully read, and no reduction is possible, so the input is in the language of the grammar.',
+         accepted: 'The input is fully read, and the current state, {state} has the item {base_reduction_item}, so the input is accepted.'
+      }
+   }
+   this.formatMessage = function(key, values) {
+      var str = this.strings.messages[key] || null;
+      if(str === null) {
+         console.error('Message ' + key + ' not found.');
+         return str;
+      }
+      for(var i in values) {
+         if(!values.hasOwnProperty(i)) {
+            continue;
+         }
+         str = str.replace('{' + i + '}', values[i]);
+      }
+      return str;
+   }
+
+
    this.mode = settings.mode;
    /* 
    1: simulation
@@ -679,6 +707,15 @@ function LR_Parser(settings,subTask,answer) {
       $("#action").html(html);
    };
 
+   this.initMessages = function() {
+      var html = "<div id=\"message\"></div>";
+      $("#action").append(html);
+   }
+
+   this.displayMessage = function(key, values) {
+      $('#message').html(this.formatMessage(key, values));
+   }
+
    this.initActionInfo = function() {
       var html = "<div id=\"actionInfo\"></div>";
       $("#action").append(html);
@@ -1287,6 +1324,7 @@ function LR_Parser(settings,subTask,answer) {
          return;
       }
             
+      
       switch(action.actionType){
          case "s":
             self.applyShift(action.state,reverse,anim);
@@ -1298,7 +1336,13 @@ function LR_Parser(settings,subTask,answer) {
             var rule = action.rule;
             // console.log(this.grammar.rules[rule])
             var nonTerminal = self.grammar.rules[rule].nonterminal;
-            self.updateParseTableHL({action:"startReduction",nonTerminal:nonTerminal,anim:anim,rule:rule,goto:action.goto});
+            self.updateParseTableHL({
+               action: "startReduction",
+               nonTerminal: nonTerminal,
+               anim: anim,
+               rule: rule,
+               goto: action.goto
+            });
             if(reverse){
                this.reverseReduction(rule);
                return;
