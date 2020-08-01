@@ -14,7 +14,15 @@
 //    Dolly - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - right mouse, or arrow keys / touch: two-finger move
 
-zen3d.OrbitControls = function(object, domElement) {
+zen3d.OrbitControls = function(object, domElement, options) {
+
+	var defaultOptions = {
+		// How far you can dolly in and out
+		minDistance: 0,
+		maxDistance: Infinity
+	}
+
+	this.options = Object.assign({}, defaultOptions, options);
 	this.object = object;
 
 	this.domElement = (domElement !== undefined) ? domElement : document;
@@ -24,10 +32,6 @@ zen3d.OrbitControls = function(object, domElement) {
 
 	// "target" sets the location of focus, where the object orbits around
 	this.target = new zen3d.Vector3();
-
-	// How far you can dolly in and out
-	this.minDistance = 0;
-	this.maxDistance = Infinity;
 
 	// How far you can orbit vertically, upper and lower limits.
 	// Range is 0 to Math.PI radians.
@@ -144,7 +148,9 @@ zen3d.OrbitControls = function(object, domElement) {
 			spherical.radius *= scale;
 
 			// restrict radius to be between desired limits
-			spherical.radius = Math.max(scope.minDistance, Math.min(scope.maxDistance, spherical.radius));
+			spherical.radius = Math.max(scope.options.minDistance, Math.min(scope.options.maxDistance, spherical.radius));
+			callZoomCallback(spherical.radius);
+
 
 			// move target to panned location
 			scope.target.add(panOffset);
@@ -233,6 +239,18 @@ zen3d.OrbitControls = function(object, domElement) {
 	var dollyStart = new zen3d.Vector2();
 	var dollyEnd = new zen3d.Vector2();
 	var dollyDelta = new zen3d.Vector2();
+
+
+	var oldRadius = null;
+	function callZoomCallback(radius) {
+		radius = Math.round(radius * 1000) / 1000;
+		if(oldRadius === radius) {
+			return;
+		}
+		oldRadius = radius;
+ 		var d = (scope.options.maxDistance - scope.options.minDistance) || Infinity;
+		scope.options.onDistanceChange && scope.options.onDistanceChange((radius - scope.options.minDistance) / d)
+	}
 
 	function getAutoRotationAngle() {
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;

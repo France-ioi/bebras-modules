@@ -36,7 +36,7 @@
 
 		<div>
 			<label>Opacity: </label>
-			<input type="text" id="opacity" value="50"/>
+			<input type="text" id="opacity" value="100"/>
 		</div>		
 		<button onclick="updateOpacity()">Update</button>		
 		<hr/>
@@ -100,11 +100,14 @@
 			parent: document.getElementById('view'),
 
 			// initial position of cursor, if false then cursor is hidden. optional
+			/*
 			cursor: {
 				lat: 20,
 				lng: 20
 			},
+			*/
 			// points and labels, optional
+			/*
 			labels: [
 				{
 					text: 'Label text 1',
@@ -122,10 +125,12 @@
 					lng: 20
 				},								
 			],
+			*/
 			// grid steps for lat and lng, optinal
 			grid: {
-				lat: 15,
-				lng: 30
+				lat: 3, // amount of cells in range [0..90)
+				lng: 6, // amount of cells in range [0..180]
+				dynamic: true
 			},
 			// initial camera position, optional
 			camera: {

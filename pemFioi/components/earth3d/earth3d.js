@@ -41,7 +41,7 @@ function Earth3D(params) {
         orbit: {
             rotate: true,
             zoom: true,
-            pan: true
+            pan: false
         }
     }
     var params = Object.assign({}, defaults, params);
@@ -68,6 +68,11 @@ function Earth3D(params) {
         }
     }
 
+
+    // config
+    var config = {
+        zoom_levels: [0.4, 0.2, 0.1, 0] // distance
+    }
     
 
     // system 
@@ -120,14 +125,15 @@ function Earth3D(params) {
     }
 
 
-    function mesh(vertices, material) {
+    function mesh(vertices, material, parent) {
         var geo = new zen3d.Geometry();
         var buffer = new zen3d.InterleavedBuffer(new Float32Array(vertices), 3, 0);
         geo.addAttribute('a_Position', new zen3d.InterleavedBufferAttribute(buffer));
         geo.computeBoundingBox();
         geo.computeBoundingSphere();
         var m = new zen3d.Mesh(geo, material);
-        scene.add(m);                    
+        parent = parent || scene;
+        parent.add(m);                    
         return m;
     }    
 
@@ -220,47 +226,88 @@ function Earth3D(params) {
         center.position.set(0, 0, 0);
         scene.add(center);        
 
-        if(params.grid.lat > 0) {
-            var l = 0;
-            do {
-                var pos = llToPos({
-                    lat: l, 
-                    lng: 0
-                });                
+
+    }
+
+    // grid
+    var grid = [];
+    function createGrid() {
+        var r = 1.001;
+        elements.grid = [];
+
+        
+
+        function createParalles(group, level) {
+            var cells = params.grid.lat * Math.pow(2, level);
+            var da = 90 / cells;
+            for(var i=0; i<cells; i++) {
+                var pos = llToPos({ lat: i * da, lng: 0}, r);                
                 var vertices1 = [];
                 var vertices2 = [];
-                for(var i=0; i<params.tesselation; i++) {
-                    var a = 2 * Math.PI * i / params.tesselation;
+                for(var j=0; j<params.tesselation; j++) {
+                    var a = 2 * Math.PI * j / params.tesselation;
                     var psin = pos.z * Math.sin(a);
                     var pcos = pos.z * Math.cos(a);
                     vertices1.push(psin, pos.y, pcos);
                     vertices2.push(psin, -pos.y, pcos);
                 }
-                mesh(vertices1, materials.lat_grid)
-                i != 0 && mesh(vertices2, materials.lat_grid)                
-                l += params.grid.lat;
-            } while(l < 90);
-        }
-        if(params.grid.lng) {
-            var l = 0;
-            do {
-                var pos = llToPos({
-                    lat: 0, 
-                    lng: l
-                });                
-                var vertices = [];
-                for(var i=0; i<params.tesselation; i++) {
-                    var a = 2 * Math.PI * i / params.tesselation;
-                    var psin = Math.sin(a);
-                    var pcos = Math.cos(a);
-                    vertices.push(psin, pcos, 0);
+                mesh(vertices1, materials.lat_grid, group)
+                if(i != 0) {
+                    mesh(vertices2, materials.lat_grid, group)                
                 }
-                var m = mesh(vertices, materials.lng_grid);
-                m.euler.y =  l / 180 * Math.PI;
-                l += params.grid.lng;
-            } while(l < 180);            
-        }            
+            }
+        }
+
+        function createMeridians(group, level) {
+            var cells = params.grid.lng * Math.pow(2, level);
+            var da = 360 / cells;
+            for(var i=0; i<cells; i++) {
+                var vertices = [];
+                for(var j=0; j<params.tesselation; j++) {
+                    var a = 2 * Math.PI * j / params.tesselation;
+                    var psin = r * Math.sin(a);
+                    var pcos = r * Math.cos(a);
+                    vertices.push(0, psin, pcos);
+                }
+                var a = i * da / 360 * Math.PI
+                var m = mesh(vertices, materials.lng_grid, group);
+                m.euler.y = a;
+            }
+        }
+
+        for(var l=0; l<config.zoom_levels.length; l++) {
+            var group = new zen3d.Group();
+            if(params.grid.lat > 0) {
+                createParalles(group, l);
+            }
+            if(params.grid.lng > 0) {
+                createMeridians(group, l);
+            }            
+            elements.grid[l] = group;
+            if(!params.grid.dynamic) {
+                break;
+            }
+        }        
     }
+
+
+    var grid_level = null;
+    function refreshGrid(level) {
+        if(!params.grid || grid_level === level) {
+            return;
+        }
+        if(!params.grid.dynamic) {
+            level = 0;
+        }
+        if(grid_level !== null && elements.grid[grid_level]) {
+            scene.remove(elements.grid[grid_level]);
+        }
+        if(elements.grid[level]) {
+            scene.add(elements.grid[level]);
+        }
+        grid_level = level;        
+    }
+
 
 
     // labels
@@ -680,7 +727,21 @@ function Earth3D(params) {
     // orbit controller
     var orbit_controller;
     function initOrbitController() {
-        orbit_controller = new zen3d.OrbitControls(camera, canvas);
+        var options = {
+            minDistance: 2.1,
+            maxDistance: 20,
+            onDistanceChange: function(d) {
+                var level = 0;
+                for(var i=0; i < config.zoom_levels.length; i++) {
+                    if(d >= config.zoom_levels[i]) {
+                        level = i;
+                        break;
+                    }
+                }
+                refreshGrid(level);
+            }
+        }
+        orbit_controller = new zen3d.OrbitControls(camera, canvas, options);
         orbit_controller.enableDollying = params.orbit.zoom;
         orbit_controller.enableRotate = params.orbit.rotate;
         orbit_controller.enablePan = params.orbit.pan;
@@ -693,6 +754,8 @@ function Earth3D(params) {
             init3D();
             initMaterials(earth_image);
             addEarth();
+            createGrid();
+            refreshGrid(0);
             addLabels();
             params.cursor && addCursor();    
             onResize();
