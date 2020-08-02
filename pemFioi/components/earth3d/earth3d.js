@@ -29,7 +29,7 @@ function Earth3D(params) {
             background: '#FFFFFF99'
         },
         colors: {
-            pole: 0x000000,
+            //pole: 0x000000,
             lat: 0x00FF00,
             lng: 0xFFFF00,
             line: 0x0000FF,
@@ -71,6 +71,8 @@ function Earth3D(params) {
 
     // config
     var config = {
+        marker_size: 0.05,
+        fov: 0.035 * Math.PI,
         zoom_levels: [0.4, 0.2, 0.1, 0] // distance
     }
     
@@ -186,7 +188,7 @@ function Earth3D(params) {
 
     function initMaterials(image) {
         materials = {
-            pole: materialMaker.color(params.colors.pole),
+            //pole: materialMaker.color(params.colors.pole),
             earth: materialMaker.texture(image),
             greenwich: materialMaker.dots(params.colors.lng, 0.5),
             lng: materialMaker.dots(params.colors.lng, 0.15),
@@ -590,7 +592,7 @@ function Earth3D(params) {
         canvas.height = height * devicePixelRatio;
         canvas.style.width = width + 'px';
         canvas.style.height = height + 'px';
-        camera.setPerspective(0.035 * Math.PI, width / height, 1, 1000);
+        camera.setPerspective(config.fov, width / height, 1, 1000);
         renderer.backRenderTarget.resize(width, height);
     }
     window.addEventListener('resize', onResize, false);
@@ -669,8 +671,9 @@ function Earth3D(params) {
         }
         var pos = llToPos(point);
         marker.mesh.position.set(pos.x, pos.y, pos.z);
-        scene.add(marker.mesh);        
         markers.push(marker);
+        refreshMarkers();
+        scene.add(marker.mesh);        
         callMarkersCallback();
     }
 
@@ -714,6 +717,31 @@ function Earth3D(params) {
     }
   
 
+    function refreshMarkers() {
+        var s = config.marker_size * camera.position.getLength();
+        for(var i=0; i<markers.length; i++) {
+            markers[i].mesh.scale.set(s, s, s);
+        } 
+
+    }
+
+
+    // zoom handler
+    var distance = 1;
+    function onDistanceChange(d) {
+        distance = d;
+        refreshMarkers();
+        var level = 0;
+        for(var i=0; i < config.zoom_levels.length; i++) {
+            if(d >= config.zoom_levels[i]) {
+                level = i;
+                break;
+            }
+        }
+        refreshGrid(level);        
+    }
+
+
 
     // earth texture loader
     function loadEarthImage(callback) {
@@ -732,16 +760,7 @@ function Earth3D(params) {
         var options = {
             minDistance: 2.1,
             maxDistance: 20,
-            onDistanceChange: function(d) {
-                var level = 0;
-                for(var i=0; i < config.zoom_levels.length; i++) {
-                    if(d >= config.zoom_levels[i]) {
-                        level = i;
-                        break;
-                    }
-                }
-                refreshGrid(level);
-            }
+            onDistanceChange: onDistanceChange
         }
         orbit_controller = new zen3d.OrbitControls(camera, canvas, options);
         orbit_controller.enableDollying = params.orbit.zoom;
