@@ -248,7 +248,7 @@ zen3d.OrbitControls = function(object, domElement, options) {
 			return;
 		}
 		oldRadius = radius;
- 		var d = (scope.options.maxDistance - scope.options.minDistance) || Infinity;
+		var d = (scope.options.maxDistance - scope.options.minDistance) || Infinity;
 		scope.options.onDistanceChange && scope.options.onDistanceChange((radius - scope.options.minDistance) / d)
 	}
 
