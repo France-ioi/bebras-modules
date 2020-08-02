@@ -211,6 +211,7 @@ function Earth3D(params) {
         elements.earth.euler.y = - Math.PI * 0.5;
         scene.add(elements.earth);
 
+        /*
         var north_geo = new zen3d.SphereGeometry(0.04, params.tesselation / 5, params.tesselation / 5);
         var north = new zen3d.Mesh(north_geo, materials.pole);        
         north.position.set(0, 1, 0);
@@ -225,6 +226,7 @@ function Earth3D(params) {
         var center = new zen3d.Mesh(center_geo, materials.point);        
         center.position.set(0, 0, 0);
         scene.add(center);        
+        */
 
 
     }
