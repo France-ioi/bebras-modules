@@ -73,7 +73,7 @@ function Earth3D(params) {
     var config = {
         marker_size: 0.05,
         fov: 0.035 * Math.PI,
-        zoom_levels: [0.4, 0.2, 0.1, 0] // distance
+        grid_distance_levels: [13, 9, 5, 0] // distance
     }
     
 
@@ -237,9 +237,10 @@ function Earth3D(params) {
     var grid = [];
     function createGrid() {
         var r = 1.001;
-        elements.grid = [];
-
-        
+        elements.grid = {
+            lat: [],
+            lng: []
+        }
 
         function createParalles(group, level) {
             var cells = params.grid.lat * Math.pow(2, level);
@@ -279,15 +280,18 @@ function Earth3D(params) {
             }
         }
 
-        for(var l=0; l<config.zoom_levels.length; l++) {
-            var group = new zen3d.Group();
+        for(var l=0; l<config.grid_distance_levels.length; l++) {
             if(params.grid.lat > 0) {
+                var group = new zen3d.Group();
                 createParalles(group, l);
+                elements.grid.lat[l] = group;
             }
+            
             if(params.grid.lng > 0) {
+                var group = new zen3d.Group();
                 createMeridians(group, l);
+                elements.grid.lng[l] = group;
             }            
-            elements.grid[l] = group;
             if(!params.grid.dynamic) {
                 break;
             }
@@ -295,21 +299,49 @@ function Earth3D(params) {
     }
 
 
-    var grid_level = null;
-    function refreshGrid(level) {
-        if(!params.grid || grid_level === level) {
+    function getGridLevel() {
+        if(!params.grid.dynamic) {
+            return 0;
+        }        
+        var level = 0;
+        var d = camera.position.getLength();
+        for(var i=0; i < config.grid_distance_levels.length; i++) {
+            if(d >= config.grid_distance_levels[i]) {
+                level = i;
+                break;
+            }
+        }        
+        return level;
+    }
+
+    var grid_level_lat = null;
+    var grid_level_lng = null;
+    function refreshGrid(spherical) {
+        if(!params.grid) {
             return;
         }
-        if(!params.grid.dynamic) {
-            level = 0;
+        var level = getGridLevel();
+        if(grid_level_lat !== level) {
+            if(grid_level_lat !== null && elements.grid.lat[grid_level_lat]) {
+                scene.remove(elements.grid.lat[grid_level_lat]);
+            }            
+            if(elements.grid.lat[level]) {
+                scene.add(elements.grid.lat[level]);
+            }            
+            grid_level_lat = level;
         }
-        if(grid_level !== null && elements.grid[grid_level]) {
-            scene.remove(elements.grid[grid_level]);
+
+        var bias = Math.round(6 * Math.abs(spherical.phi / Math.PI - 0.5));
+        level = Math.max(0, level - bias);
+        if(grid_level_lng !== level) {
+            if(grid_level_lng !== null && elements.grid.lng[grid_level_lng]) {
+                scene.remove(elements.grid.lng[grid_level_lng]);
+            }            
+            if(elements.grid.lng[level]) {
+                scene.add(elements.grid.lng[level]);
+            }            
+            grid_level_lng = level;
         }
-        if(elements.grid[level]) {
-            scene.add(elements.grid[level]);
-        }
-        grid_level = level;        
     }
 
 
@@ -726,22 +758,6 @@ function Earth3D(params) {
     }
 
 
-    // zoom handler
-    var distance = 1;
-    function onDistanceChange(d) {
-        distance = d;
-        refreshMarkers();
-        var level = 0;
-        for(var i=0; i < config.zoom_levels.length; i++) {
-            if(d >= config.zoom_levels[i]) {
-                level = i;
-                break;
-            }
-        }
-        refreshGrid(level);        
-    }
-
-
 
     // earth texture loader
     function loadEarthImage(callback) {
@@ -760,7 +776,13 @@ function Earth3D(params) {
         var options = {
             minDistance: 2.1,
             maxDistance: 20,
-            onDistanceChange: onDistanceChange
+            onDistanceChange: function(spherical) {
+                refreshMarkers();
+                refreshGrid(spherical);                        
+            },
+            onRotate: function(spherical) {
+                refreshGrid(spherical);                        
+            },            
         }
         orbit_controller = new zen3d.OrbitControls(camera, canvas, options);
         orbit_controller.enableDollying = params.orbit.zoom;
