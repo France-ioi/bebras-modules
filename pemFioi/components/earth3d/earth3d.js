@@ -73,7 +73,7 @@ function Earth3D(params) {
     var config = {
         marker_size: 0.05,
         fov: 0.035 * Math.PI,
-        grid_distance_levels: [11, 7, 4, 0], // distance
+        grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15] // angle in radians
     }
     
