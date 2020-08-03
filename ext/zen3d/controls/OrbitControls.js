@@ -149,7 +149,8 @@ zen3d.OrbitControls = function(object, domElement, options) {
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max(scope.options.minDistance, Math.min(scope.options.maxDistance, spherical.radius));
-			callZoomCallback(spherical.radius);
+			//callZoomCallback(spherical.radius);
+			callCallbacks(spherical);
 
 
 			// move target to panned location
@@ -250,6 +251,22 @@ zen3d.OrbitControls = function(object, domElement, options) {
 		oldRadius = radius;
 		var d = (scope.options.maxDistance - scope.options.minDistance) || Infinity;
 		scope.options.onDistanceChange && scope.options.onDistanceChange((radius - scope.options.minDistance) / d)
+	}
+
+	var oldSpherical = spherical.clone();
+	function callCallbacks() {
+		var fl = false;
+		if(oldSpherical.phi != spherical.phi || oldSpherical.theta != spherical.theta) {
+			scope.options.onRotate && scope.options.onRotate(spherical);
+			fl = true;
+		}
+		if(oldSpherical.radius != spherical.radius) {
+			scope.options.onDistanceChange && scope.options.onDistanceChange(spherical);
+			fl = true;
+		}
+		if(fl) {
+			oldSpherical = spherical.clone();
+		}
 	}
 
 	function getAutoRotationAngle() {
