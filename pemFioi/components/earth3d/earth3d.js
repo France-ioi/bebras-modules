@@ -73,7 +73,8 @@ function Earth3D(params) {
     var config = {
         marker_size: 0.05,
         fov: 0.035 * Math.PI,
-        grid_distance_levels: [13, 9, 5, 0] // distance
+        grid_distance_levels: [13, 9, 5, 0], // distance
+        grid_angle_levels: [1.35, 1.12, 0.8, 0.15] // angle in radians
     }
     
 
@@ -314,6 +315,20 @@ function Earth3D(params) {
         return level;
     }
 
+
+    function getGridLevelBias(angle) {
+        angle = Math.abs(angle - Math.PI * 0.5);
+        var bias = config.grid_angle_levels.length - 1;
+        for(var i=0; i < config.grid_angle_levels.length; i++) {
+            if(angle >= config.grid_angle_levels[i]) {
+                bias = i;
+                break;
+            }
+        }        
+        bias = config.grid_angle_levels.length - 1 - bias;
+        return bias;        
+    }
+
     var grid_level_lat = null;
     var grid_level_lng = null;
     function refreshGrid(spherical) {
@@ -331,7 +346,7 @@ function Earth3D(params) {
             grid_level_lat = level;
         }
 
-        var bias = Math.round(6 * Math.abs(spherical.phi / Math.PI - 0.5));
+        var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
         if(grid_level_lng !== level) {
             if(grid_level_lng !== null && elements.grid.lng[grid_level_lng]) {
