@@ -73,6 +73,7 @@ function Earth3D(params) {
     var config = {
         marker_size: 0.05,
         fov: 0.035 * Math.PI,
+        distance: 20,
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15] // angle in radians
     }
@@ -180,7 +181,7 @@ function Earth3D(params) {
 	    scene.add(ambientLight);        
         
         camera = new zen3d.Camera();
-        var pos = llToPos(params.camera, 20);
+        var pos = llToPos(params.camera, config.distance);
         camera.position.set(pos.x, pos.y, pos.z);
         camera.lookAt(new zen3d.Vector3(0, 0, 0), new zen3d.Vector3(0, 1, 0));
         scene.add(camera);
@@ -791,7 +792,7 @@ function Earth3D(params) {
     function initOrbitController() {
         var options = {
             minDistance: 2.1,
-            maxDistance: 20,
+            maxDistance: config.distance,
             onDistanceChange: function(spherical) {
                 refreshMarkers();
                 refreshGrid(spherical);                        
