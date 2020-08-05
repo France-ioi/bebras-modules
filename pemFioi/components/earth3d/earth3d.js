@@ -27,11 +27,25 @@ function Earth3D(params) {
                 font: '24px Arial',
                 color: '#000000',
                 border: '#00FFFF',
-                background: '#FFFFFF99'
+                background: '#FFFFFF99',
+                rounded: true,
+                min_width: 0
             },
-            coordinate: {
+            lat_coordinates: {
                 font: '12px Arial',
                 color: '#000000',
+                border: false,
+                background: '#00FF00',
+                rounded: false,
+                min_width: 25
+            },
+            lng_coordinates: {
+                font: '12px Arial',
+                color: '#000000',
+                border: false,
+                background: '#FFFF00',
+                rounded: false,
+                min_width: 25
             }
         },
         colors: {
@@ -82,8 +96,8 @@ function Earth3D(params) {
         distance: 20,
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
-        grid_coordinate_size: 0.08,
-        grid_coordinate_radius: 1.01
+        grid_coordinate_radius: 1.04,
+        grid_coordinate_size: 0.007
     }
     
 
@@ -160,7 +174,115 @@ function Earth3D(params) {
             z: r * Math.cos(lat) * Math.cos(lng)
         }
     }
+
+    var format = {
+        lat: function(lat) {
+            var lat_postfix = lat == 0 ? '' : (lat < 0) ? 'S' : 'N';
+            lat = parseFloat(Math.abs(lat).toFixed(4));
+            return lat + lat_postfix;        
+        },
+
+        lng: function(lng) {
+            var lng_postfix = lng == 0 ? '' : (lng < 0) ? 'W' : 'E';
+            lng = parseFloat(Math.abs(lng).toFixed(4));
+            
+            return lng + lng_postfix
+        }
+    }    
     
+
+    var textRenderer = (function() {
+
+        var span = document.createElement('span');
+        span.style.whiteSpace = 'nowrap';
+        span.style.display = 'inline';
+        span.style.visibility = 'hidden';
+        document.body.append(span);
+
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        
+        var style;
+
+        function roundRect(x, y, width, height, radius) {
+            context.lineWidth = 2;
+            context.beginPath();
+            context.moveTo(x + radius, y);
+            context.lineTo(x + width - radius, y);
+            context.quadraticCurveTo(x + width, y, x + width, y + radius);
+            context.lineTo(x + width, y + height - radius);
+            context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            context.lineTo(x + radius, y + height);
+            context.quadraticCurveTo(x, y + height, x, y + height - radius);
+            context.lineTo(x, y + radius);
+            context.quadraticCurveTo(x, y, x + radius, y);
+            context.closePath();
+            context.fill();
+            if(style.stroke) {
+                context.stroke();
+            }
+        }                
+
+        function rect(x, y, width, height, radius) {
+            context.rect(x, y, width, height);
+            context.fill();
+            if(style.stroke) {
+                context.stroke();
+            }
+        }
+
+
+        return {
+            setStyle: function(new_style) {
+                style = new_style;
+                span.style.font = style.font;
+            },
+
+            render: function(text) {
+                canvas.width = 1000;
+                span.innerHTML = text;
+                //var size = Math.ceil(context.measureText(text).width) + 20;
+                var size = Math.max(span.offsetWidth, style.min_width) + (style.rounded ? 20 : 10);
+                canvas.width = size;
+                canvas.height = size;
+                context.clearRect(0, 0, size, size);
+                
+                if(style.border) {
+                    context.strokeStyle = style.border;
+                }
+                context.fillStyle = style.background;
+                span.innerHTML = text;
+                if(style.rounded) {
+                    var h = span.offsetHeight + 10;
+                    roundRect(
+                        1, 
+                        Math.round(size - h) / 2, 
+                        size - 2, 
+                        h, 
+                        Math.floor(h / 4)
+                    );
+                } else {
+                    var h = span.offsetHeight + 4;
+                    rect(
+                        1, 
+                        Math.round(size - h) / 2, 
+                        size - 2, 
+                        h
+                    );
+                }
+
+                context.font = style.font;        
+                context.textBaseline = 'middle';            
+                context.textAlign = 'center';            
+                context.fillStyle = style.color;
+                context.fillText(text, size / 2, size / 2);
+                return canvas.toDataURL('image/png');                
+            }
+        }
+    })();
+        
+
+
     
 
     // main code
@@ -170,7 +292,6 @@ function Earth3D(params) {
     var materials;
     var elements = {};
     var cursor = Object.assign({}, params.cursor);
-
 
     function initCanvas() {
         canvas = document.createElement('canvas');
@@ -242,19 +363,8 @@ function Earth3D(params) {
 
     }
 
+    
     // grid
-    function formatLatLng(point) {
-        var lat = parseFloat(Math.abs(point.lat).toFixed(4));
-        var lng = parseFloat(Math.abs(point.lng).toFixed(4));
-        var lat_postfix = (point.lat < 0) ? 'S' : 'N';
-        var lng_postfix = (point.lng < 0) ? 'W' : 'E';
-        return lat + lat_postfix + ' ' + lng + lng_postfix;        
-    }
-
-
-    function loadGridTextures(labels, callback) {
-
-    }
 
 
     function createGrid() {
@@ -307,19 +417,37 @@ function Earth3D(params) {
             return group;
         }
 
+
+        function makeSprite(point, text) {
+            var sprite = new zen3d.Sprite();
+
+            var image = new Image();
+            image.onload = function() {
+                sprite.material.diffuseMap = zen3d.Texture2D.fromImage(image);
+                sprite.material.transparent = true;
+                sprite.material.needsUpdate = true;
+            }
+            image.src = textRenderer.render(text);
+            sprite.scale.set(0.1, 0.1, 0.1);
+            sprite.position.set(point.x, point.y, point.z);
+            return sprite;            
+        }
+
          
         function createLatCoordinates(level) {
-            var group = new zen3d.Group();
+            textRenderer.setStyle(params.text.lat_coordinates);
+            var res = {
+                group: new zen3d.Group(),
+                sprites: []
+            }
             var cells = params.grid.lat * Math.pow(2, level);
             var a = 90 / cells;
             function addCoordinate(idx) {
-                var point = {
-                    lat: idx * a,
-                    lng: 0
-                }
-                var pos = llToPos(point, config.grid_coordinate_radius);
-                var vertices = [pos.x, pos.y, pos.z]
-                mesh(vertices, materials.equator, group)
+                var lat = idx * a; 
+                var pos = llToPos({ lat: lat, lng: 0 }, config.grid_coordinate_radius);
+                var sprite = makeSprite(pos, format.lat(lat));
+                res.group.add(sprite);
+                res.sprites.push(sprite);
             }
             for(var i=0; i<cells; i++) {
                 addCoordinate(i);
@@ -327,22 +455,24 @@ function Earth3D(params) {
                     addCoordinate(-i);
                 }
             }       
-            return group;
+            return res;
         }       
 
         function createLngCoordinates(level) {
-            var group = new zen3d.Group();
+            textRenderer.setStyle(params.text.lng_coordinates);
+            var res = {
+                group: new zen3d.Group(),
+                sprites: []
+            }
             var cells = params.grid.lng * Math.pow(2, level);
             var a = 180 / cells;
 
             function addCoordinate(idx) {
-                var point = {
-                    lat: 0,
-                    lng: idx * a
-                }
-                var pos = llToPos(point, config.grid_coordinate_radius);
-                var vertices = [pos.x, pos.y, pos.z]
-                mesh(vertices, materials.greenwich, group)
+                var lng = idx * a;
+                var pos = llToPos({ lat: 0, lng: idx * a }, config.grid_coordinate_radius);
+                var sprite = makeSprite(pos, format.lng(lng));
+                res.group.add(sprite);
+                res.sprites.push(sprite);
             }
 
             for(var i=0; i<=cells; i++) {
@@ -351,7 +481,7 @@ function Earth3D(params) {
                     addCoordinate(-i);
                 }
             }                   
-            return group;
+            return res;
         }       
 
 
@@ -413,11 +543,11 @@ function Earth3D(params) {
         if(grid_level_lat !== level) {
             if(grid_level_lat !== null && elements.grid.lat[grid_level_lat]) {
                 scene.remove(elements.grid.lat[grid_level_lat]);
-                scene.remove(elements.grid.lat_coordinates[grid_level_lat]);                
+                scene.remove(elements.grid.lat_coordinates[grid_level_lat].group);                
             }            
             if(elements.grid.lat[level]) {
                 scene.add(elements.grid.lat[level]);
-                scene.add(elements.grid.lat_coordinates[level]);
+                scene.add(elements.grid.lat_coordinates[level].group);
             }            
             grid_level_lat = level;
         }
@@ -425,35 +555,48 @@ function Earth3D(params) {
         // update lat coordinates position
         
         var l = Math.min(1, (camera_distance - config.grid_coordinate_radius) * Math.tan(config.fov / 2));
-        elements.grid.lat_coordinates[level].euler.y = spherical.theta - Math.asin(l) * 0.8;
+        elements.grid.lat_coordinates[level].group.euler.y = spherical.theta - Math.asin(l) * 0.5;
 
         var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
         if(grid_level_lng !== level) {
             if(grid_level_lng !== null && elements.grid.lng[grid_level_lng]) {
                 scene.remove(elements.grid.lng[grid_level_lng]);
-                scene.remove(elements.grid.lng_coordinates[grid_level_lng]);
+                scene.remove(elements.grid.lng_coordinates[grid_level_lng].group);
             }            
             if(elements.grid.lng[level]) {
                 scene.add(elements.grid.lng[level]);
-                scene.add(elements.grid.lng_coordinates[level]);
+                scene.add(elements.grid.lng_coordinates[level].group);
             }            
             grid_level_lng = level;
         }
 
         // update lng coordinates position
+        var group = elements.grid.lng_coordinates[level].group;
         var a = Math.PI / 2 -  spherical.phi;
         var y = config.grid_coordinate_radius * Math.sin(a);
         var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance;
         y = Math.min(y, m);
         y = Math.max(y, -m);
-        var scale = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
-        elements.grid.lng_coordinates[level].position.y = y;
-        elements.grid.lng_coordinates[level].scale.x = scale;
-        elements.grid.lng_coordinates[level].scale.z = scale;
-        
+        var s1 = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
+        group.position.y = y;
+        group.scale.x = s1;
+        group.scale.z = s1;
 
+        var sprites = elements.grid.lng_coordinates[grid_level_lng].sprites;
+        var s2 = config.grid_coordinate_size * camera_distance;
+        var sx = s2 / s1;
+        for(var i=0; i<sprites.length; i++) {
+            sprites[i].scale.set(sx, s2, 1);
+        }
+
+        var sprites = elements.grid.lat_coordinates[grid_level_lat].sprites;
+        for(var i=0; i<sprites.length; i++) {
+            sprites[i].scale.set(s2, s2, 1);
+        }        
     }
+
+
 
 
 
@@ -463,73 +606,15 @@ function Earth3D(params) {
             return 0;
         }
         var cnt = 0;
-
-        var span = document.createElement('span');
-        span.style.font = params.text.label.font;
-        span.style.whiteSpace = 'nowrap';
-        span.style.display = 'inline';
-        span.style.visibility = 'hidden';
-        document.body.append(span);
-
-        var canvas = document.createElement('canvas');
-        var context = canvas.getContext('2d');
-        
-
-        function roundRect(x, y, width, height, radius) {
-            context.lineWidth = 2;
-            context.beginPath();
-            context.moveTo(x + radius, y);
-            context.lineTo(x + width - radius, y);
-            context.quadraticCurveTo(x + width, y, x + width, y + radius);
-            context.lineTo(x + width, y + height - radius);
-            context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            context.lineTo(x + radius, y + height);
-            context.quadraticCurveTo(x, y + height, x, y + height - radius);
-            context.lineTo(x, y + radius);
-            context.quadraticCurveTo(x, y, x + radius, y);
-            context.closePath();
-            context.fill();
-            context.stroke();
-        }        
-
-        
+        textRenderer.setStyle(params.text.label);
         for(var i=0; i<params.labels.length; i++) {
             if(!('text' in params.labels[i])) {
                 continue;
             }
             cnt++;
             var text = params.labels[i].text.toString();
-
-            canvas.width = 1000;
-            span.innerHTML = text;
-            //var size = Math.ceil(context.measureText(text).width) + 20;
-            var size = span.offsetWidth + 20;
-            canvas.width = size;
-            canvas.height = size;
-            context.clearRect(0, 0, size, size);
-            
-            context.strokeStyle = params.text.label.border;
-            context.fillStyle = params.text.label.background;
-            span.innerHTML = text;
-            var h = span.offsetHeight + 10;
-            roundRect(
-                1, 
-                Math.round(size - h) / 2, 
-                size - 2, 
-                h, 
-                Math.floor(h / 4)
-            );
-            
-            context.font = params.text.label.font;        
-            context.textBaseline = 'middle';            
-            context.textAlign = 'center';            
-            context.fillStyle = params.text.label.color;
-            context.fillText(text, size / 2, size / 2);
-
-
-            params.labels[i].image_src = canvas.toDataURL('image/png');
+            params.labels[i].image_src = textRenderer.render(text);
         }
-        span.remove();
         return cnt;
     }
 
