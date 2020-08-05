@@ -424,9 +424,9 @@ function Earth3D(params) {
             var image = new Image();
             image.onload = function() {
                 sprite.material.diffuseMap = zen3d.Texture2D.fromImage(image);
-                sprite.material.transparent = true;
                 sprite.material.needsUpdate = true;
             }
+            sprite.material.transparent = true;
             image.src = textRenderer.render(text);
             sprite.scale.set(0.1, 0.1, 0.1);
             sprite.position.set(point.x, point.y, point.z);
@@ -642,6 +642,22 @@ function Earth3D(params) {
 
 
     function addLabels() {
+        textRenderer.setStyle(params.text.label);
+
+        function addSprite(pos, text) {
+            var sprite = new zen3d.Sprite();
+            var image = new Image();
+            image.onload = function() {
+                sprite.material.diffuseMap = zen3d.Texture2D.fromImage(image);
+                sprite.material.needsUpdate = true;
+            }
+            image.src = textRenderer.render(text);
+            sprite.material.transparent = true;
+            sprite.position.set(pos.x, pos.y, pos.z);
+            sprite.scale.set(0.5, 0.5, 0.5);
+            scene.add(sprite);            
+        }
+
         for(var i=0; i<params.labels.length; i++) {
             var ground_pos = llToPos(params.labels[i]);
             var sprite_pos = llToPos(params.labels[i], 1.3);
@@ -667,14 +683,7 @@ function Earth3D(params) {
             scene.add(mesh(vertices, materials.label_line));
 
             // add text label
-            var sprite = new zen3d.Sprite();
-            sprite.material.diffuseMap = zen3d.Texture2D.fromImage(params.labels[i].image);
-            sprite.material.transparent = true;
-            sprite.position.x = sprite_pos.x;
-            sprite.position.y = sprite_pos.y;
-            sprite.position.z = sprite_pos.z;
-            sprite.scale.set(0.5, 0.5, 0.5);
-            scene.add(sprite);
+            addSprite(sprite_pos, params.labels[i].text);
         }
     }
 
