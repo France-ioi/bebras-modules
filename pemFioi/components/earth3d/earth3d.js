@@ -82,7 +82,8 @@ function Earth3D(params) {
         distance: 20,
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
-        grid_coordinate_size: 0.08
+        grid_coordinate_size: 0.08,
+        grid_coordinate_radius: 1.01
     }
     
 
@@ -261,8 +262,8 @@ function Earth3D(params) {
         elements.grid = {
             lat: [],
             lng: [],
-            coordinates_lat: [],
-            coordinates_lng: [],
+            lat_coordinates: [],
+            lng_coordinates: [],
         }
 
         function createParalles(level) {
@@ -307,41 +308,62 @@ function Earth3D(params) {
         }
 
          
-        function createCoordinates(level) {
+        function createLatCoordinates(level) {
             var group = new zen3d.Group();
-            var lat_cells = params.grid.lat * Math.pow(2, level);
-            var lat_a = 90 / lat_cells;
-            var lng_a = 0;
-
-            function addCoordinate(lat_idx, lng_idx, group, material) {
+            var cells = params.grid.lat * Math.pow(2, level);
+            var a = 90 / cells;
+            function addCoordinate(idx) {
                 var point = {
-                    lat: lat_idx * lat_a,
-                    lng: lng_idx * lng_a
+                    lat: idx * a,
+                    lng: 0
                 }
-                var pos = llToPos(point, 1.02);
+                var pos = llToPos(point, config.grid_coordinate_radius);
                 var vertices = [pos.x, pos.y, pos.z]
-                mesh(vertices, material, group)
+                mesh(vertices, materials.equator, group)
             }
-            
-            for(var i=0; i<lat_cells; i++) {
-                addCoordinate(i, 0, group, materials.equator);
+            for(var i=0; i<cells; i++) {
+                addCoordinate(i);
                 if(i !== 0) {
-                    addCoordinate(-i, 0, group, materials.equator);
+                    addCoordinate(-i);
                 }
             }       
             return group;
         }       
 
+        function createLngCoordinates(level) {
+            var group = new zen3d.Group();
+            var cells = params.grid.lng * Math.pow(2, level);
+            var a = 180 / cells;
+
+            function addCoordinate(idx) {
+                var point = {
+                    lat: 0,
+                    lng: idx * a
+                }
+                var pos = llToPos(point, config.grid_coordinate_radius);
+                var vertices = [pos.x, pos.y, pos.z]
+                mesh(vertices, materials.greenwich, group)
+            }
+
+            for(var i=0; i<=cells; i++) {
+                addCoordinate(i);
+                if(i !== 0 && i !== cells) {
+                    addCoordinate(-i);
+                }
+            }                   
+            return group;
+        }       
+
+
         for(var l=0; l<config.grid_distance_levels.length; l++) {
             if(params.grid.lat > 0) {
                 elements.grid.lat[l] = createParalles(l);
+                elements.grid.lat_coordinates[l] = createLatCoordinates(l);
             }
             if(params.grid.lng > 0) {
                 elements.grid.lng[l] = createMeridians(l);
+                elements.grid.lng_coordinates[l] = createLngCoordinates(l);
             }            
-            if(params.grid.lat > 0 && params.grid.lng > 0) {
-                elements.grid.coordinates_lat[l] = createCoordinates(l);
-            }
             if(!params.grid.dynamic) {
                 break;
             }
@@ -385,33 +407,52 @@ function Earth3D(params) {
         if(!params.grid) {
             return;
         }
+        var camera_distance = camera.position.getLength();
+
         var level = getGridLevel();
         if(grid_level_lat !== level) {
             if(grid_level_lat !== null && elements.grid.lat[grid_level_lat]) {
                 scene.remove(elements.grid.lat[grid_level_lat]);
-                scene.remove(elements.grid.coordinates_lat[grid_level_lat]);                
+                scene.remove(elements.grid.lat_coordinates[grid_level_lat]);                
             }            
             if(elements.grid.lat[level]) {
                 scene.add(elements.grid.lat[level]);
-                scene.add(elements.grid.coordinates_lat[level]);
+                scene.add(elements.grid.lat_coordinates[level]);
             }            
             grid_level_lat = level;
         }
 
-        var l = Math.min(1, (camera.position.getLength() - 0.5) * Math.tan(config.fov / 2));
-        elements.grid.coordinates_lat[level].euler.y = spherical.theta - Math.asin(l) * 0.8;
+        // update lat coordinates position
+        
+        var l = Math.min(1, (camera_distance - config.grid_coordinate_radius) * Math.tan(config.fov / 2));
+        elements.grid.lat_coordinates[level].euler.y = spherical.theta - Math.asin(l) * 0.8;
 
         var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
         if(grid_level_lng !== level) {
             if(grid_level_lng !== null && elements.grid.lng[grid_level_lng]) {
                 scene.remove(elements.grid.lng[grid_level_lng]);
+                scene.remove(elements.grid.lng_coordinates[grid_level_lng]);
             }            
             if(elements.grid.lng[level]) {
                 scene.add(elements.grid.lng[level]);
+                scene.add(elements.grid.lng_coordinates[level]);
             }            
             grid_level_lng = level;
         }
+
+        // update lng coordinates position
+        var a = Math.PI / 2 -  spherical.phi;
+        var y = config.grid_coordinate_radius * Math.sin(a);
+        var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance;
+        y = Math.min(y, m);
+        y = Math.max(y, -m);
+        var scale = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
+        elements.grid.lng_coordinates[level].position.y = y;
+        elements.grid.lng_coordinates[level].scale.x = scale;
+        elements.grid.lng_coordinates[level].scale.z = scale;
+        
+
     }
 
 
