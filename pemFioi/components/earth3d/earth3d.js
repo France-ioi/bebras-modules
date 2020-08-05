@@ -18,7 +18,6 @@ function Earth3D(params) {
         cursor: false,
         labels: [],
         grid: {},
-        texture: 'resources/earth4.jpg',
         opacity: 1,
         tesselation: 100,
         parent: document.body,
