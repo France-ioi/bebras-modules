@@ -261,10 +261,12 @@ function Earth3D(params) {
         elements.grid = {
             lat: [],
             lng: [],
-            coordinates: []
+            coordinates_lat: [],
+            coordinates_lng: [],
         }
 
-        function createParalles(group, level) {
+        function createParalles(level) {
+            var group = new zen3d.Group();
             var cells = params.grid.lat * Math.pow(2, level);
             var lat_da = 90 / cells;
             for(var i=0; i<cells; i++) {
@@ -283,9 +285,11 @@ function Earth3D(params) {
                     mesh(vertices2, materials.lat_grid, group)                
                 }
             }
+            return group;
         }
 
-        function createMeridians(group, level) {
+        function createMeridians(level) {
+            var group = new zen3d.Group();
             var cells = params.grid.lng * Math.pow(2, level);
             var lng_da = 360 / cells;
             for(var i=0; i<cells; i++) {
@@ -299,106 +303,44 @@ function Earth3D(params) {
                 var m = mesh(vertices, materials.lng_grid, group);
                 m.euler.y = i * lng_da / 360 * Math.PI;
             }
+            return group;
         }
 
-        /*
-        function createCoordinates(group, level) {
-            var lat_cells = params.grid.lat * Math.pow(2, level);
-            var lat_da = 90 / lat_cells;
-            var lng_cells;
-            var lng_da;
-
-            function addCoordinate(lat_idx, lng_idx) {
-                var point = {
-                    lat: lat_idx * lat_da,
-                    lng: lng_idx * lng_da
-                }
-                var pos = llToPos(point, 1.01);
-                var vertices = [pos.x, pos.y, pos.z]
-                mesh(vertices, materials.greenwich, group)
-            }
-
-            for(var i=0; i<lat_cells; i++) {
-                var bias = getGridLevelBias(Math.PI * 0.5 * (1 - i / lat_cells));
-                var sublevel = Math.max(0, level - bias);
-                lng_cells = params.grid.lng * Math.pow(2, sublevel);
-                lng_da = 180 / lng_cells;
-                for(var j=0; j<=lng_cells; j++) {
-                    addCoordinate(i, j);
-                    addCoordinate(i, -j);
-                    if(j !== lng_cells) {
-                        addCoordinate(-i, j);
-                        addCoordinate(-i, -j);                        
-                    }
-                }
-            }        
-        }
-        */
-        
-        function createCoordinates(group, level) {
+         
+        function createCoordinates(level) {
+            var group = new zen3d.Group();
             var lat_cells = params.grid.lat * Math.pow(2, level);
             var lat_a = 90 / lat_cells;
-            var lng_cells;
-            var lng_a;
-var c = 0;
-            function addCoordinate(lat_idx, lng_idx, material) {
+            var lng_a = 0;
+
+            function addCoordinate(lat_idx, lng_idx, group, material) {
                 var point = {
                     lat: lat_idx * lat_a,
                     lng: lng_idx * lng_a
                 }
-                var pos = llToPos(point, 1.01);
+                var pos = llToPos(point, 1.02);
                 var vertices = [pos.x, pos.y, pos.z]
                 mesh(vertices, material, group)
-                c++;
             }
-
+            
             for(var i=0; i<lat_cells; i++) {
-                var bias = getGridLevelBias(Math.PI * 0.5 * (1 - i / lat_cells));
-                var sublevel = Math.max(0, level - bias);
-                lng_cells = params.grid.lng * Math.pow(2, sublevel);
-                lng_a = 180 / lng_cells;
-                for(var j=0; j<lng_cells; j++) {
-
-                    // lat
-                    if(j % 2 == 0) {
-                        addCoordinate(i, j + 0.5, materials.equator);
-                        addCoordinate(i, -j - 1.5, materials.equator);
-                        if(j != lng_cells && i != 0) {
-                            addCoordinate(-i, j + 0.5, materials.equator);
-                            addCoordinate(-i, -j - 1.5, materials.equator);
-                        }
-                    }
-
-
-
-                    // lng
-                    if(i % 2 == 0) {
-                        addCoordinate(i + 0.5, j, materials.greenwich);
-                        addCoordinate(-i - 0.5, j, materials.greenwich);
-                        addCoordinate(i + 0.5, -j-1, materials.greenwich);
-                        addCoordinate(-i - 0.5, -j-1, materials.greenwich);
-                    }
+                addCoordinate(i, 0, group, materials.equator);
+                if(i !== 0) {
+                    addCoordinate(-i, 0, group, materials.equator);
                 }
             }       
-            //alert(c) 
+            return group;
         }       
 
         for(var l=0; l<config.grid_distance_levels.length; l++) {
             if(params.grid.lat > 0) {
-                var group = new zen3d.Group();
-                createParalles(group, l);
-                elements.grid.lat[l] = group;
+                elements.grid.lat[l] = createParalles(l);
             }
-            
             if(params.grid.lng > 0) {
-                var group = new zen3d.Group();
-                createMeridians(group, l);
-                elements.grid.lng[l] = group;
+                elements.grid.lng[l] = createMeridians(l);
             }            
             if(params.grid.lat > 0 && params.grid.lng > 0) {
-                var group = new zen3d.Group();
-                createCoordinates(group, l);
-                elements.grid.coordinates[l] = group;
+                elements.grid.coordinates_lat[l] = createCoordinates(l);
             }
             if(!params.grid.dynamic) {
                 break;
@@ -447,20 +389,17 @@ var c = 0;
         if(grid_level_lat !== level) {
             if(grid_level_lat !== null && elements.grid.lat[grid_level_lat]) {
                 scene.remove(elements.grid.lat[grid_level_lat]);
-                scene.remove(elements.grid.coordinates[grid_level_lat]);                
+                scene.remove(elements.grid.coordinates_lat[grid_level_lat]);                
             }            
             if(elements.grid.lat[level]) {
                 scene.add(elements.grid.lat[level]);
-                scene.add(elements.grid.coordinates[level]);
+                scene.add(elements.grid.coordinates_lat[level]);
             }            
             grid_level_lat = level;
         }
-        /*
-        var s = config.grid_coordinate_size * camera.position.getLength();
-        for(var i=0; i<elements.grid.coordinates[level].children.length; i++) {
-            elements.grid.coordinates[level].children[i].scale.set(s, s, s);
-        }
-        */
+
+        var l = Math.min(1, (camera.position.getLength() - 0.5) * Math.tan(config.fov / 2));
+        elements.grid.coordinates_lat[level].euler.y = spherical.theta - Math.asin(l) * 0.8;
 
         var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
@@ -915,6 +854,7 @@ var c = 0;
             },
             onRotate: function(spherical) {
                 refreshGrid(spherical);                        
+                                
             },            
         }
         orbit_controller = new zen3d.OrbitControls(camera, canvas, options);
