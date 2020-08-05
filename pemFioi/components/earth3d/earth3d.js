@@ -23,10 +23,16 @@ function Earth3D(params) {
         tesselation: 100,
         parent: document.body,
         text: {
-            font: '24px Arial',
-            color: '#000000',
-            border: '#00FFFF',
-            background: '#FFFFFF99'
+            label: {
+                font: '24px Arial',
+                color: '#000000',
+                border: '#00FFFF',
+                background: '#FFFFFF99'
+            },
+            coordinate: {
+                font: '12px Arial',
+                color: '#000000',
+            }
         },
         colors: {
             //pole: 0x000000,
@@ -75,7 +81,8 @@ function Earth3D(params) {
         fov: 0.035 * Math.PI,
         distance: 20,
         grid_distance_levels: [11, 6.5, 4, 0], // distance
-        grid_angle_levels: [1.35, 1.12, 0.8, 0.15] // angle in radians
+        grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
+        grid_coordinate_size: 0.08
     }
     
 
@@ -154,7 +161,6 @@ function Earth3D(params) {
     }
     
     
-
 
     // main code
     var canvas;
@@ -236,19 +242,33 @@ function Earth3D(params) {
     }
 
     // grid
-    var grid = [];
+    function formatLatLng(point) {
+        var lat = parseFloat(Math.abs(point.lat).toFixed(4));
+        var lng = parseFloat(Math.abs(point.lng).toFixed(4));
+        var lat_postfix = (point.lat < 0) ? 'S' : 'N';
+        var lng_postfix = (point.lng < 0) ? 'W' : 'E';
+        return lat + lat_postfix + ' ' + lng + lng_postfix;        
+    }
+
+
+    function loadGridTextures(labels, callback) {
+
+    }
+
+
     function createGrid() {
         var r = 1.001;
         elements.grid = {
             lat: [],
-            lng: []
+            lng: [],
+            coordinates: []
         }
 
         function createParalles(group, level) {
             var cells = params.grid.lat * Math.pow(2, level);
-            var da = 90 / cells;
+            var lat_da = 90 / cells;
             for(var i=0; i<cells; i++) {
-                var pos = llToPos({ lat: i * da, lng: 0}, r);                
+                var pos = llToPos({ lat: i * lat_da, lng: 0}, r);                
                 var vertices1 = [];
                 var vertices2 = [];
                 for(var j=0; j<params.tesselation; j++) {
@@ -267,7 +287,7 @@ function Earth3D(params) {
 
         function createMeridians(group, level) {
             var cells = params.grid.lng * Math.pow(2, level);
-            var da = 360 / cells;
+            var lng_da = 360 / cells;
             for(var i=0; i<cells; i++) {
                 var vertices = [];
                 for(var j=0; j<params.tesselation; j++) {
@@ -276,11 +296,87 @@ function Earth3D(params) {
                     var pcos = r * Math.cos(a);
                     vertices.push(0, psin, pcos);
                 }
-                var a = i * da / 360 * Math.PI
                 var m = mesh(vertices, materials.lng_grid, group);
-                m.euler.y = a;
+                m.euler.y = i * lng_da / 360 * Math.PI;
             }
         }
+
+        /*
+        function createCoordinates(group, level) {
+            var lat_cells = params.grid.lat * Math.pow(2, level);
+            var lat_da = 90 / lat_cells;
+            var lng_cells;
+            var lng_da;
+
+            function addCoordinate(lat_idx, lng_idx) {
+                var point = {
+                    lat: lat_idx * lat_da,
+                    lng: lng_idx * lng_da
+                }
+                var pos = llToPos(point, 1.01);
+                var vertices = [pos.x, pos.y, pos.z]
+                mesh(vertices, materials.greenwich, group)
+            }
+
+            for(var i=0; i<lat_cells; i++) {
+                var bias = getGridLevelBias(Math.PI * 0.5 * (1 - i / lat_cells));
+                var sublevel = Math.max(0, level - bias);
+                lng_cells = params.grid.lng * Math.pow(2, sublevel);
+                lng_da = 180 / lng_cells;
+                for(var j=0; j<=lng_cells; j++) {
+                    addCoordinate(i, j);
+                    addCoordinate(i, -j);
+                    if(j !== lng_cells) {
+                        addCoordinate(-i, j);
+                        addCoordinate(-i, -j);                        
+                    }
+                }
+            }        
+        }
+        */
+        
+        function createCoordinates(group, level) {
+            var lat_cells = params.grid.lat * Math.pow(2, level);
+            var lat_a = 90 / lat_cells;
+            var lng_cells;
+            var lng_a;
+var c = 0;
+            function addCoordinate(lat_idx, lng_idx, material) {
+                var point = {
+                    lat: lat_idx * lat_a,
+                    lng: lng_idx * lng_a
+                }
+                var pos = llToPos(point, 1.01);
+                var vertices = [pos.x, pos.y, pos.z]
+                mesh(vertices, material, group)
+                c++;
+            }
+
+            for(var i=0; i<lat_cells; i++) {
+                var bias = getGridLevelBias(Math.PI * 0.5 * (1 - i / lat_cells));
+                var sublevel = Math.max(0, level - bias);
+                lng_cells = 0.5 * params.grid.lng * Math.pow(2, sublevel);
+                lng_a = 180 / lng_cells;
+                for(var j=0; j<lng_cells; j++) {
+
+                    // lat
+                    addCoordinate(i, j + 0.25, materials.equator);
+                    addCoordinate(i, -j - 0.75, materials.equator);
+                    if(j != lng_cells && i != 0) {
+                        addCoordinate(-i, j + 0.25, materials.equator);
+                        addCoordinate(-i, -j - 0.75, materials.equator);
+                    }
+
+
+                    // lng
+                    addCoordinate(i + 0.5, j, materials.greenwich);
+                    addCoordinate(-i - 0.5, j, materials.greenwich);
+                    addCoordinate(i + 0.5, -j-1, materials.greenwich);
+                    addCoordinate(-i - 0.5, -j-1, materials.greenwich);
+                }
+            }       
+            //alert(c) 
+        }       
 
         for(var l=0; l<config.grid_distance_levels.length; l++) {
             if(params.grid.lat > 0) {
@@ -294,6 +390,11 @@ function Earth3D(params) {
                 createMeridians(group, l);
                 elements.grid.lng[l] = group;
             }            
+            if(params.grid.lat > 0 && params.grid.lng > 0) {
+                var group = new zen3d.Group();
+                createCoordinates(group, l);
+                elements.grid.coordinates[l] = group;
+            }
             if(!params.grid.dynamic) {
                 break;
             }
@@ -341,12 +442,20 @@ function Earth3D(params) {
         if(grid_level_lat !== level) {
             if(grid_level_lat !== null && elements.grid.lat[grid_level_lat]) {
                 scene.remove(elements.grid.lat[grid_level_lat]);
+                scene.remove(elements.grid.coordinates[grid_level_lat]);                
             }            
             if(elements.grid.lat[level]) {
                 scene.add(elements.grid.lat[level]);
+                scene.add(elements.grid.coordinates[level]);
             }            
             grid_level_lat = level;
         }
+        /*
+        var s = config.grid_coordinate_size * camera.position.getLength();
+        for(var i=0; i<elements.grid.coordinates[level].children.length; i++) {
+            elements.grid.coordinates[level].children[i].scale.set(s, s, s);
+        }
+        */
 
         var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
@@ -371,7 +480,7 @@ function Earth3D(params) {
         var cnt = 0;
 
         var span = document.createElement('span');
-        span.style.font = params.text.font;
+        span.style.font = params.text.label.font;
         span.style.whiteSpace = 'nowrap';
         span.style.display = 'inline';
         span.style.visibility = 'hidden';
@@ -380,7 +489,6 @@ function Earth3D(params) {
         var canvas = document.createElement('canvas');
         var context = canvas.getContext('2d');
         
-
 
         function roundRect(x, y, width, height, radius) {
             context.lineWidth = 2;
@@ -415,8 +523,8 @@ function Earth3D(params) {
             canvas.height = size;
             context.clearRect(0, 0, size, size);
             
-            context.strokeStyle = params.text.border;
-            context.fillStyle = params.text.background;
+            context.strokeStyle = params.text.label.border;
+            context.fillStyle = params.text.label.background;
             span.innerHTML = text;
             var h = span.offsetHeight + 10;
             roundRect(
@@ -427,10 +535,10 @@ function Earth3D(params) {
                 Math.floor(h / 4)
             );
             
-            context.font = params.text.font;        
+            context.font = params.text.label.font;        
             context.textBaseline = 'middle';            
             context.textAlign = 'center';            
-            context.fillStyle = params.text.color;
+            context.fillStyle = params.text.label.color;
             context.fillText(text, size / 2, size / 2);
 
 
@@ -818,7 +926,6 @@ function Earth3D(params) {
             initMaterials(earth_image);
             addEarth();
             createGrid();
-            refreshGrid(0);
             addLabels();
             params.cursor && addCursor();    
             onResize();
