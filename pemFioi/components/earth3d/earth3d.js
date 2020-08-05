@@ -36,7 +36,7 @@ function Earth3D(params) {
                 color: '#000000',
                 border: false,
                 background: '#00FF00',
-                rounded: false,
+                rounded: true,
                 min_width: 25
             },
             lng_coordinates: {
@@ -44,7 +44,7 @@ function Earth3D(params) {
                 color: '#000000',
                 border: false,
                 background: '#FFFF00',
-                rounded: false,
+                rounded: true,
                 min_width: 25
             }
         },
@@ -96,7 +96,7 @@ function Earth3D(params) {
         distance: 20,
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
-        grid_coordinate_radius: 1.04,
+        grid_coordinate_radius: 1.01,
         grid_coordinate_size: 0.007
     }
     
@@ -427,6 +427,7 @@ function Earth3D(params) {
                 sprite.material.needsUpdate = true;
             }
             sprite.material.transparent = true;
+            sprite.material.depthTest = false;
             image.src = textRenderer.render(text);
             sprite.scale.set(0.1, 0.1, 0.1);
             sprite.position.set(point.x, point.y, point.z);
