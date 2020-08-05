@@ -961,24 +961,24 @@ function Earth3D(params) {
 
     // run everything
     loadEarthImage(function(earth_image) {
-            initCanvas();
-            init3D();
-            initMaterials(earth_image);
-            addEarth();
-            createGrid();
-            addLabels();
-            params.cursor && addCursor();    
-            onResize();
-            params.events.onMouseMove && initMouseMoveEvent();
-            params.events.onMarkerChange && initMouseClickEvent();
-            initOrbitController();
-            function loop(count) {
-                requestAnimationFrame(loop);
-                orbit_controller.update();
-                renderer.render(scene, camera);
-            }
-            loop(0);        
-            params.events.onLoad && params.events.onLoad();
+        initCanvas();
+        init3D();
+        initMaterials(earth_image);
+        addEarth();
+        createGrid();
+        addLabels();
+        params.cursor && addCursor();    
+        onResize();
+        params.events.onMouseMove && initMouseMoveEvent();
+        params.events.onMarkerChange && initMouseClickEvent();
+        initOrbitController();
+        function loop(count) {
+            requestAnimationFrame(loop);
+            orbit_controller.update();
+            renderer.render(scene, camera);
+        }
+        loop(0);        
+        params.events.onLoad && params.events.onLoad();
     });
     
     
