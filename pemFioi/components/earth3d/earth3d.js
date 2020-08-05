@@ -601,45 +601,6 @@ function Earth3D(params) {
 
 
     // labels
-    function renderLabels() {
-        if(!params.labels.length) {
-            return 0;
-        }
-        var cnt = 0;
-        textRenderer.setStyle(params.text.label);
-        for(var i=0; i<params.labels.length; i++) {
-            if(!('text' in params.labels[i])) {
-                continue;
-            }
-            cnt++;
-            var text = params.labels[i].text.toString();
-            params.labels[i].image_src = textRenderer.render(text);
-        }
-        return cnt;
-    }
-
-
-    function loadLabelImages(callback) {
-        var total = renderLabels();
-        if(!total) {
-            callback();
-        }
-        for(var i=0; i<params.labels.length; i++) {
-            if(!params.labels[i].image_src) {
-                continue;
-            }
-            params.labels[i].image = new Image;
-            params.labels[i].image.onload = function() {
-                total--;
-                if(total == 0) {
-                    callback();
-                }
-            }
-            params.labels[i].image.src = params.labels[i].image_src;
-            delete params.labels[i].image_src;
-        }
-    }
-
 
     function addLabels() {
         textRenderer.setStyle(params.text.label);
@@ -667,7 +628,7 @@ function Earth3D(params) {
             ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
             scene.add(ball);                    
 
-            if(!params.labels[i].image) {
+            if(!('text' in params.labels[i])) {
                 continue;
             }
 
@@ -1000,7 +961,6 @@ function Earth3D(params) {
 
     // run everything
     loadEarthImage(function(earth_image) {
-        loadLabelImages(function() {
             initCanvas();
             init3D();
             initMaterials(earth_image);
@@ -1019,7 +979,6 @@ function Earth3D(params) {
             }
             loop(0);        
             params.events.onLoad && params.events.onLoad();
-        })
     });
     
     
