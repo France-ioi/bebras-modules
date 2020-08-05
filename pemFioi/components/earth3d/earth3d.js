@@ -355,24 +355,29 @@ var c = 0;
             for(var i=0; i<lat_cells; i++) {
                 var bias = getGridLevelBias(Math.PI * 0.5 * (1 - i / lat_cells));
                 var sublevel = Math.max(0, level - bias);
-                lng_cells = 0.5 * params.grid.lng * Math.pow(2, sublevel);
+                lng_cells = params.grid.lng * Math.pow(2, sublevel);
                 lng_a = 180 / lng_cells;
                 for(var j=0; j<lng_cells; j++) {
 
                     // lat
-                    addCoordinate(i, j + 0.25, materials.equator);
-                    addCoordinate(i, -j - 0.75, materials.equator);
-                    if(j != lng_cells && i != 0) {
-                        addCoordinate(-i, j + 0.25, materials.equator);
-                        addCoordinate(-i, -j - 0.75, materials.equator);
+                    if(j % 2 == 0) {
+                        addCoordinate(i, j + 0.5, materials.equator);
+                        addCoordinate(i, -j - 1.5, materials.equator);
+                        if(j != lng_cells && i != 0) {
+                            addCoordinate(-i, j + 0.5, materials.equator);
+                            addCoordinate(-i, -j - 1.5, materials.equator);
+                        }
                     }
 
 
+
                     // lng
-                    addCoordinate(i + 0.5, j, materials.greenwich);
-                    addCoordinate(-i - 0.5, j, materials.greenwich);
-                    addCoordinate(i + 0.5, -j-1, materials.greenwich);
-                    addCoordinate(-i - 0.5, -j-1, materials.greenwich);
+                    if(i % 2 == 0) {
+                        addCoordinate(i + 0.5, j, materials.greenwich);
+                        addCoordinate(-i - 0.5, j, materials.greenwich);
+                        addCoordinate(i + 0.5, -j-1, materials.greenwich);
+                        addCoordinate(-i - 0.5, -j-1, materials.greenwich);
+                    }
                 }
             }       
             //alert(c) 
