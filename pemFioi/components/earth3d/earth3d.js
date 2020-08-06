@@ -621,7 +621,6 @@ function Earth3D(params) {
                 sprites[i].scale.set(s2, s2, 1);
             }        
         }
-
     }
 
 
@@ -629,10 +628,11 @@ function Earth3D(params) {
 
 
     // labels
+    var labels_group;
 
-    function addLabels() {
+    function addLabel(data) {
         textRenderer.setStyle(params.text.label);
-
+        
         function addSprite(pos, text) {
             var sprite = new zen3d.Sprite();
             var image = new Image();
@@ -647,32 +647,39 @@ function Earth3D(params) {
             scene.add(sprite);            
         }
 
+        
+        var ground_pos = llToPos(data);
+        var sprite_pos = llToPos(data, 1.3);
+        
+        var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
+        var ball = new zen3d.Mesh(geo, materials.label_sphere);        
+        ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
+        scene.add(ball);                    
+
+        if(!('text' in data)) {
+            return;
+        }
+
+        // add spike
+        var vertices = [
+            ground_pos.x,
+            ground_pos.y,
+            ground_pos.z,
+            sprite_pos.x,
+            sprite_pos.y,
+            sprite_pos.z
+        ];
+        scene.add(mesh(vertices, materials.label_line));
+
+        // add text label
+        addSprite(sprite_pos, data.text);
+    }
+
+
+
+    function addLabels() {
         for(var i=0; i<params.labels.length; i++) {
-            var ground_pos = llToPos(params.labels[i]);
-            var sprite_pos = llToPos(params.labels[i], 1.3);
-            
-            var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
-            var ball = new zen3d.Mesh(geo, materials.label_sphere);        
-            ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
-            scene.add(ball);                    
-
-            if(!('text' in params.labels[i])) {
-                continue;
-            }
-
-            // add spike
-            var vertices = [
-                ground_pos.x,
-                ground_pos.y,
-                ground_pos.z,
-                sprite_pos.x,
-                sprite_pos.y,
-                sprite_pos.z
-            ];
-            scene.add(mesh(vertices, materials.label_line));
-
-            // add text label
-            addSprite(sprite_pos, params.labels[i].text);
+            addLabel(params.labels[i]);
         }
     }
 
@@ -1101,6 +1108,8 @@ function Earth3D(params) {
         addPath: addPath,
 
         clearPaths: clearPaths,
+
+        addLabel: addLabel,
 
         destroy: function() {
             running = false;

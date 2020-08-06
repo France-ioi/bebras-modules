@@ -178,6 +178,7 @@
 	}
 ]			
 		</textarea>
+		<button onclick="addLabel()">Add random label</button>
 
 	</div>
 
@@ -236,6 +237,15 @@
 
 		function clearPaths() {
 			earth.clearPaths();	
+		}
+
+		function addLabel() {
+			var data = {
+				lat: Math.random() * 180 - 90,
+				lng: Math.random() * 360 - 180,
+				text: Math.round(1000000 * Math.random())
+			}				
+			earth.addLabel(data)
 		}
 
 		function pointToString(point) {
