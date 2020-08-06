@@ -106,6 +106,11 @@
 		<button onclick="updateRotation()">Update</button>		
 		<hr/>		
 
+		<strong>Paths</strong>
+		<button onclick="addPath()">Add random path</button>		
+		<button onclick="clearPaths()">Clear paths</button>		
+		<hr/>				
+
 		<strong>mouseover coordinates</strong>
 		<pre id="coordinates"></pre>			
 		<hr/>		
@@ -217,11 +222,29 @@
 			);			
 		}
 
+		function addPath() {
+			var p1 = {
+				lat: Math.random() * 180 - 90,
+				lng: Math.random() * 360 - 180
+			}
+			var p2 = {
+				lat: Math.random() * 180 - 90,
+				lng: Math.random() * 360 - 180
+			}	
+			earth.addPath(p1, p2);	
+		}
+
+		function clearPaths() {
+			earth.clearPaths();	
+		}
+
 		function pointToString(point) {
 			var lat_postfix = (point.lat < 0) ? 'S' : 'N';
 			var lng_postfix = (point.lng < 0) ? 'W' : 'E';
 			return 'Lat: ' + Math.abs(point.lat) + lat_postfix + ' Lng: ' + Math.abs(point.lng) + lng_postfix;
 		}
+
+
 
 		function getEarthParams() {
 			var res = {

@@ -60,7 +60,8 @@ function Earth3D(params) {
             line: 0x0000FF,
             point: 0xFF0000,
             label: 0x00FFFF,
-            marker: 0xFF00FF
+            marker: 0xFF00FF,
+            path: 0x00FFFF
         },
         events: {},
         orbit: {
@@ -347,7 +348,8 @@ function Earth3D(params) {
             point: materialMaker.color(params.colors.point),
             label_sphere: materialMaker.color(params.colors.label),
             label_line: materialMaker.line(params.colors.label),
-            marker: materialMaker.color(params.colors.marker)
+            marker: materialMaker.color(params.colors.marker),
+            path: materialMaker.dots(params.colors.path, 0.15)
         }
     }    
 
@@ -807,6 +809,7 @@ function Earth3D(params) {
 
 
     // resize
+
     function onResize() {
         var devicePixelRatio = 'devicePixelRatio' in window ? window.devicePixelRatio : 1;
         var width = params.parent.offsetWidth || 2;
@@ -945,9 +948,61 @@ function Earth3D(params) {
         for(var i=0; i<markers.length; i++) {
             markers[i].mesh.scale.set(s, s, s);
         } 
-
     }
 
+    // user path
+    var paths = [];
+
+    function addPath(point1, point2) {
+        var vertices = [];
+        var r = 1.005;
+
+        var dlat = point2.lat - point1.lat;
+        var dlng = point2.lng - point1.lng;        
+
+        var ca = Math.sin(dlat / 2) * Math.sin(dlat / 2) + 
+            Math.cos(point1.lat) * Math.cos(point2.lat) * Math.sin(dlng / 2) * Math.sin(dlng / 2);
+        var cb = 2 * Math.atan2(Math.sqrt(ca), Math.sqrt(1 - ca)); 
+        var cb_sin = Math.sin(cb);
+        
+        // normalized distance
+        var distance = 2 * Math.atan2(Math.sqrt(ca), Math.sqrt(1 - ca)) / Math.PI;
+        var tesselation = Math.round(2 * params.tesselation * distance);
+
+
+        var ax = Math.cos(point1.lat) * Math.cos(point1.lng);
+        var bx = Math.cos(point2.lat) * Math.cos(point2.lng);
+        var ay = Math.cos(point1.lat) * Math.sin(point1.lng);
+        var by = Math.cos(point2.lat) * Math.sin(point2.lng);
+        var az = Math.sin(point1.lat);
+        var bz = Math.sin(point2.lat);
+
+        var pos, a, b;
+        for(var i=0; i<=tesselation; i++) {
+            pos = i / tesselation;
+            a = Math.sin((1 - pos) * cb) / cb_sin;
+            b = Math.sin(pos * cb) / cb_sin;
+
+            vertices.push(
+                r * (a * ax + b * bx),
+                r * (a * ay + b * by),
+                r * (a * az + b * bz)
+            );
+        }
+
+        var m = mesh(vertices, materials.path);
+        paths.push(m);
+    }    
+
+
+
+
+    function clearPaths() {
+        for(var i=0; i<paths.length; i++) {
+            scene.remove(paths[i]);
+        }
+        paths = [];
+    }
 
 
     // earth texture loader
@@ -1042,6 +1097,10 @@ function Earth3D(params) {
         setRotation: function(azimutal_angle) {
             orbit_controller.setAzimuthalAngle(azimutal_angle);
         },
+
+        addPath: addPath,
+
+        clearPaths: clearPaths,
 
         destroy: function() {
             running = false;
