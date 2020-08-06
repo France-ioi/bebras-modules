@@ -222,7 +222,7 @@ function Earth3D(params) {
             context.quadraticCurveTo(x, y, x + radius, y);
             context.closePath();
             context.fill();
-            if(style.stroke) {
+            if(style.border !== false) {
                 context.stroke();
             }
         }                
@@ -230,7 +230,7 @@ function Earth3D(params) {
         function rect(x, y, width, height, radius) {
             context.rect(x, y, width, height);
             context.fill();
-            if(style.stroke) {
+            if(style.border !== false) {
                 context.stroke();
             }
         }
@@ -251,7 +251,7 @@ function Earth3D(params) {
                 canvas.height = size;
                 context.clearRect(0, 0, size, size);
                 
-                if(style.border) {
+                if(style.border != false) {
                     context.strokeStyle = style.border;
                 }
                 context.fillStyle = style.background;
