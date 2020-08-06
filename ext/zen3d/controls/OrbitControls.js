@@ -149,7 +149,6 @@ zen3d.OrbitControls = function(object, domElement, options) {
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max(scope.options.minDistance, Math.min(scope.options.maxDistance, spherical.radius));
-			//callZoomCallback(spherical.radius);
 			callCallbacks(spherical);
 
 
@@ -241,17 +240,6 @@ zen3d.OrbitControls = function(object, domElement, options) {
 	var dollyEnd = new zen3d.Vector2();
 	var dollyDelta = new zen3d.Vector2();
 
-
-	var oldRadius = null;
-	function callZoomCallback(radius) {
-		radius = Math.round(radius * 1000) / 1000;
-		if(oldRadius === radius) {
-			return;
-		}
-		oldRadius = radius;
-		var d = (scope.options.maxDistance - scope.options.minDistance) || Infinity;
-		scope.options.onDistanceChange && scope.options.onDistanceChange((radius - scope.options.minDistance) / d)
-	}
 
 	var oldSpherical = spherical.clone();
 	function callCallbacks() {

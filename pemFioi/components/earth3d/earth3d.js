@@ -28,7 +28,9 @@ function Earth3D(params) {
                 border: '#00FFFF',
                 background: '#FFFFFF99',
                 rounded: true,
-                min_width: 0
+                min_width: 0,
+                hmargin: 5,
+                vmargin: 10
             },
             lat_coordinates: {
                 font: '12px Arial',
@@ -36,7 +38,9 @@ function Earth3D(params) {
                 border: false,
                 background: '#00FF00',
                 rounded: true,
-                min_width: 25
+                min_width: 25,
+                hmargin: 5,
+                vmargin: 2
             },
             lng_coordinates: {
                 font: '12px Arial',
@@ -44,7 +48,9 @@ function Earth3D(params) {
                 border: false,
                 background: '#FFFF00',
                 rounded: true,
-                min_width: 25
+                min_width: 25,
+                hmargin: 5,
+                vmargin: 2
             }
         },
         colors: {
@@ -246,7 +252,7 @@ function Earth3D(params) {
                 canvas.width = 1000;
                 span.innerHTML = text;
                 //var size = Math.ceil(context.measureText(text).width) + 20;
-                var size = Math.max(span.offsetWidth, style.min_width) + (style.rounded ? 20 : 10);
+                var size = Math.max(span.offsetWidth, style.min_width) + style.hmargin * 2;
                 canvas.width = size;
                 canvas.height = size;
                 context.clearRect(0, 0, size, size);
@@ -257,7 +263,7 @@ function Earth3D(params) {
                 context.fillStyle = style.background;
                 span.innerHTML = text;
                 if(style.rounded) {
-                    var h = span.offsetHeight + 10;
+                    var h = span.offsetHeight + style.vmargin * 2;
                     roundRect(
                         1, 
                         Math.round(size - h) / 2, 
@@ -266,7 +272,7 @@ function Earth3D(params) {
                         Math.floor(h / 4)
                     );
                 } else {
-                    var h = span.offsetHeight + 4;
+                    var h = span.offsetHeight + style.vmargin * 2;
                     rect(
                         1, 
                         Math.round(size - h) / 2, 
@@ -383,6 +389,9 @@ function Earth3D(params) {
             lng: [],
             lat_coordinates: [],
             lng_coordinates: [],
+        }
+        if(!params.grid) {
+            return;
         }
 
         function createParalles(level) {
@@ -563,9 +572,11 @@ function Earth3D(params) {
         }
 
         // update lat coordinates position
-        
-        var l = Math.min(1, (camera_distance - config.grid_coordinate_radius) * Math.tan(config.fov / 2));
-        elements.grid.lat_coordinates[level].group.euler.y = spherical.theta - Math.asin(l) * 0.5;
+        if(elements.grid.lat_coordinates[level]) {
+            var l = Math.min(1, (camera_distance - config.grid_coordinate_radius) * Math.tan(config.fov / 2));
+            elements.grid.lat_coordinates[level].group.euler.y = spherical.theta - Math.asin(l) * 0.5;
+        }
+
 
         var bias = getGridLevelBias(spherical.phi);
         level = Math.max(0, level - bias);
@@ -582,28 +593,33 @@ function Earth3D(params) {
         }
 
         // update lng coordinates position
-        var group = elements.grid.lng_coordinates[level].group;
-        var a = Math.PI / 2 -  spherical.phi;
-        var y = config.grid_coordinate_radius * Math.sin(a);
-        var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance;
-        y = Math.min(y, m);
-        y = Math.max(y, -m);
-        var s1 = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
-        group.position.y = y;
-        group.scale.x = s1;
-        group.scale.z = s1;
-
-        var sprites = elements.grid.lng_coordinates[grid_level_lng].sprites;
-        var s2 = config.grid_coordinate_size * camera_distance;
-        var sx = s2 / s1;
-        for(var i=0; i<sprites.length; i++) {
-            sprites[i].scale.set(sx, s2, 1);
+        var s2 = config.grid_coordinate_size * camera_distance;        
+        if(elements.grid.lng_coordinates[level]) {
+            var group = elements.grid.lng_coordinates[level].group;
+            var a = Math.PI / 2 -  spherical.phi;
+            var y = config.grid_coordinate_radius * Math.sin(a);
+            var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance;
+            y = Math.min(y, m);
+            y = Math.max(y, -m);
+            var s1 = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
+            group.position.y = y;
+            group.scale.x = s1;
+            group.scale.z = s1;
+    
+            var sprites = elements.grid.lng_coordinates[grid_level_lng].sprites;
+            var sx = s2 / s1;
+            for(var i=0; i<sprites.length; i++) {
+                sprites[i].scale.set(sx, s2, 1);
+            }
+        }
+    
+        if(elements.grid.lat_coordinates[grid_level_lat]) {
+            var sprites = elements.grid.lat_coordinates[grid_level_lat].sprites;
+            for(var i=0; i<sprites.length; i++) {
+                sprites[i].scale.set(s2, s2, 1);
+            }        
         }
 
-        var sprites = elements.grid.lat_coordinates[grid_level_lat].sprites;
-        for(var i=0; i<sprites.length; i++) {
-            sprites[i].scale.set(s2, s2, 1);
-        }        
     }
 
 
@@ -985,7 +1001,10 @@ function Earth3D(params) {
         params.events.onMarkerChange && initMouseClickEvent();
         initOrbitController();
         function loop(count) {
-            running && requestAnimationFrame(loop);
+            if(!running){
+                return;
+            }
+            requestAnimationFrame(loop);
             orbit_controller.update();
             renderer.render(scene, camera);
         }
@@ -1027,9 +1046,11 @@ function Earth3D(params) {
         destroy: function() {
             running = false;
             textRenderer.destroy();
-            delete canvas;
+            orbit_controller.dispose();
             delete renderer;
             delete scene;
+            canvas.remove();
+            delete canvas;
             delete materials;
             delete elements;            
         }
