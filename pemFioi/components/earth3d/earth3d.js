@@ -118,7 +118,8 @@ function Earth3D(params) {
         },
 
         color: function(color) {
-	        var mat = new zen3d.LambertMaterial();
+            var mat = new zen3d.LambertMaterial();
+            mat.transparent = true;            
             mat.diffuse.setHex(color);            
             return mat;
         },
@@ -131,8 +132,9 @@ function Earth3D(params) {
             return mat;
         },
 
-        line: function(color, loop) {
+        line: function(color, loop, transparent) {
             var mat = new zen3d.LineMaterial();
+            mat.transparent = transparent;
             mat.diffuse.setHex(color);
             if(loop) {
                 mat.drawMode = zen3d.DRAW_MODE.LINE_LOOP;
@@ -140,11 +142,14 @@ function Earth3D(params) {
             return mat;
         },
 
+
+
         dots: function(color, size) {
             var mat = new zen3d.PointsMaterial();
             mat.acceptLight = false;
             mat.size = size;
             mat.diffuse.setHex(color);
+            mat.transparent = true;
             return mat;
         }
     }
@@ -276,6 +281,11 @@ function Earth3D(params) {
                 context.fillStyle = style.color;
                 context.fillText(text, size / 2, size / 2);
                 return canvas.toDataURL('image/png');                
+            },
+
+            destroy: function() {
+                span.remove();
+                delete canvas;
             }
         }
     })();
@@ -322,11 +332,11 @@ function Earth3D(params) {
             greenwich: materialMaker.dots(params.colors.lng, 0.5),
             lng: materialMaker.dots(params.colors.lng, 0.15),
             lng_angle: materialMaker.triangles(params.colors.lng),
-            lng_grid: materialMaker.line(params.colors.lng, true),
+            lng_grid: materialMaker.line(params.colors.lng, true, true),
             equator: materialMaker.dots(params.colors.lat, 0.5),
             lat: materialMaker.dots(params.colors.lat, 0.15),
             lat_angle: materialMaker.triangles(params.colors.lat),
-            lat_grid: materialMaker.line(params.colors.lat, true),
+            lat_grid: materialMaker.line(params.colors.lat, true, true),
             line: materialMaker.line(params.colors.line),
             point: materialMaker.color(params.colors.point),
             label_sphere: materialMaker.color(params.colors.label),
@@ -366,7 +376,7 @@ function Earth3D(params) {
     // grid
 
 
-    function createGrid() {
+    function initGrid() {
         var r = 1.001;
         elements.grid = {
             lat: [],
@@ -960,12 +970,14 @@ function Earth3D(params) {
     }
 
     // run everything
+
+    var running = false;
     loadEarthImage(function(earth_image) {
         initCanvas();
         init3D();
         initMaterials(earth_image);
         addEarth();
-        createGrid();
+        initGrid();
         addLabels();
         params.cursor && addCursor();    
         onResize();
@@ -973,10 +985,11 @@ function Earth3D(params) {
         params.events.onMarkerChange && initMouseClickEvent();
         initOrbitController();
         function loop(count) {
-            requestAnimationFrame(loop);
+            running && requestAnimationFrame(loop);
             orbit_controller.update();
             renderer.render(scene, camera);
         }
+        running = true;
         loop(0);        
         params.events.onLoad && params.events.onLoad();
     });
@@ -1009,6 +1022,16 @@ function Earth3D(params) {
 
         setRotation: function(azimutal_angle) {
             orbit_controller.setAzimuthalAngle(azimutal_angle);
+        },
+
+        destroy: function() {
+            running = false;
+            textRenderer.destroy();
+            delete canvas;
+            delete renderer;
+            delete scene;
+            delete materials;
+            delete elements;            
         }
     }
 }
