@@ -5,8 +5,12 @@
 	<title>zen3d - earth</title>
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style>
-		#controls {
-			width: 50%;
+		html {
+			font: 14px Arial;
+		}
+		.controls {
+			width: 25%;
+			float: left;
 		}		
 		#view {
 			position: fixed;
@@ -23,18 +27,71 @@
 	<script src="textures/512.js"></script>
 </head>
 <body>
-	<div id="controls">
+	
+
+	<div class="controls">
+		<button id="restart">Restart</button>
+		<hr/>	
+
+		<strong>Initial camera position</strong>
 		<div>
 			<label>Lat: </label>
-			<input type="text" id="lat" value="45"/>
+			<input type="text" id="camera.lat" value="0"/>
 		</div>
 		<div>
 			<label>Lng: </label>
-			<input type="text" id="lng" value="45"/>
+			<input type="text" id="camera.lng" value="0"/>
+		</div>		
+		<hr/>
+
+		<label>
+			<input type="checkbox" id="cursor"/>
+			Cursor
+		</label>
+		<div>
+			<label>Lat: </label>
+			<input type="text" id="cursor.lat" value="45"/>
+		</div>
+		<div>
+			<label>Lng: </label>
+			<input type="text" id="cursor.lng" value="45"/>
 		</div>	
 		<button onclick="updateCursor()">Update</button>		
 		<hr/>
 
+		<label>
+			<input type="checkbox" id="grid"/>
+			Grid
+		</label>
+		<div>
+			<label>Lat: </label>
+			<input type="text" id="grid.lat" value="3"/>
+		</div>
+		<div>
+			<label>Lng: </label>
+			<input type="text" id="grid.lng" value="6"/>
+		</div>		
+		<label>
+			<input type="checkbox" id="grid.dynamic"/>
+			Dynamic
+		</label>
+		<hr/>
+
+		<strong>Orbit control options</strong>
+		<label>
+			<input type="checkbox" id="orbit.rotate" checked="ckecked"/>
+			Roate
+		</label>
+		<label>
+			<input type="checkbox" id="orbit.zoom" checked="ckecked"/>
+			Zoom
+		</label>
+		<label>
+			<input type="checkbox" id="orbit.pan"/>
+			Pan
+		</label>		
+
+		<hr/>
 		<div>
 			<label>Opacity: </label>
 			<input type="text" id="opacity" value="100"/>
@@ -58,6 +115,67 @@
 		<hr/>				
 	</div>
 
+	<div class="controls">
+		<strong>Text styles JSON</strong>
+		<textarea id="text" style="width: 100%; height: 480px">
+{
+	"label": {
+		"font": "24px Arial",
+		"color": "#000000",
+		"border": "#00FFFF",
+		"background": "#FFFFFF99",
+		"rounded": true,
+		"min_width": 0,
+		"hmargin": 5,
+		"vmargin": 10
+	},
+	"lat_coordinates": {
+		"font": "12px Arial",
+		"color": "#000000",
+		"border": false,
+		"background": "#00FF00",
+		"rounded": true,
+		"min_width": 25,
+		"hmargin": 5,
+		"vmargin": 2
+	},
+	"lng_coordinates": {
+		"font": "12px Arial",
+		"color": "#000000",
+		"border": false,
+		"background": "#FFFF00",
+		"rounded": true,
+		"min_width": 25,
+		"hmargin": 5,
+		"vmargin": 2
+	}
+}
+		</textarea>
+		<hr/>		
+
+		<strong>Labels</strong>
+		<textarea id="labels" style="width: 100%; height: 260px">
+[
+	{
+		"text": "Label text 1",
+		"lat": 54.326965,
+		"lng": 48.423763
+	},
+	{
+		"text": "Label text 2",
+		"lat": 25,
+		"lng": 40
+	},
+	{
+		"text": "Label text 3",
+		"lat": -5,
+		"lng": 20
+	}
+]			
+		</textarea>
+
+	</div>
+
 	
 	<div id="view"></div>	
 	
@@ -65,6 +183,10 @@
 	<script>
 		function getValue(id, min, max) {
 			var el = document.getElementById(id);
+			if(!el) {
+				console.error('Element ' + id + ' not found');
+				return null;
+			}
 			var v = Math.floor(el.value) || 0;
 			v = Math.min(v, max);
 			v = Math.max(v, min);
@@ -72,10 +194,14 @@
 			return v;
 		}
 
+		function isChecked(id) {
+			return document.getElementById(id).checked;
+		}
+
 		function updateCursor() {
 			earth.setCursor({
-				lat: getValue('lat', -90, 90), 
-				lng: getValue('lng', -180, 180)
+				lat: getValue('cursor.lat', -90, 90), 
+				lng: getValue('cursor.lng', -180, 180)
 			});
 		}
 
@@ -97,68 +223,75 @@
 			return 'Lat: ' + Math.abs(point.lat) + lat_postfix + ' Lng: ' + Math.abs(point.lng) + lng_postfix;
 		}
 
-		var earth = Earth3D({
-			parent: document.getElementById('view'),
-
-			// initial position of cursor, if false then cursor is hidden. optional
-			
-			cursor: {
-				lat: 20,
-				lng: 20
-			},
-			
-			// points and labels, optional
-			
-			labels: [
-				{
-					text: 'Label text 1',
-					lat: 54.326967,
-					lng: 48.4237641					
-				},
-				{
-					text: 'Label text 2',
-					lat: 25,
-					lng: 40	
-				},				
-				{
-					text: 'Label text 3',
-					lat: -5,
-					lng: 20
-				},								
-			],
-			
-			
-			// grid steps for lat and lng, optinal
-			grid: {
-				lat: 3, // amount of cells in range [0..90)
-				lng: 6, // amount of cells in range [0..180]
-				
-				dynamic: true
-			},
-			// initial camera position, optional
-			camera: {
-				lat: 0,
-				lng: 0
-			},
-			// all evens are optional
-			events: {
-				onLoad: function() {
-					updateCursor();
-					updateOpacity();
-					updateRotation();					
-				},
-				onMouseMove: function(point) {
-					document.getElementById('coordinates').innerHTML = pointToString(point)
-				},
-				onMarkerChange: function(points) {
-					var text = [];
-					for(var i=0; i<points.length; i++) {
-						text.push(pointToString(points[i]));
+		function getEarthParams() {
+			var res = {
+				parent: document.getElementById('view'),
+				events: {
+					onLoad: function() {
+						updateCursor();
+						updateOpacity();
+						updateRotation();					
+					},
+					onMouseMove: function(point) {
+						document.getElementById('coordinates').innerHTML = pointToString(point)
+					},
+					onMarkerChange: function(points) {
+						var text = [];
+						for(var i=0; i<points.length; i++) {
+							text.push(pointToString(points[i]));
+						}
+						document.getElementById('markers').innerHTML = text.join('\n');
 					}
-					document.getElementById('markers').innerHTML = text.join('\n');
+				},
+				camera: {
+					lat: getValue('camera.lat', -90, 90), 
+					lng: getValue('camera.lng', -180, 180)					
+				},
+				orbit: {
+					rotate: isChecked('orbit.rotate'),
+            		zoom: isChecked('orbit.zoom'),
+            		pan: isChecked('orbit.pan'),
+				},
+				text: JSON.parse(document.getElementById('text').value)
+			}
+			
+
+			var labels = document.getElementById('labels').value.trim();
+			if(labels != '') {
+				res.labels = JSON.parse(labels)
+			}
+
+			if(isChecked('cursor')) {
+				res.cursor = {
+					lat: getValue('cursor.lat', -90, 90), 
+					lng: getValue('cursor.lng', -180, 180)
 				}
 			}
-		});		
+
+			if(isChecked('grid')) {
+				res.grid = {
+					lat: getValue('grid.lat', 0, 10), 
+					lng: getValue('grid.lng', 0, 10),
+					dynamic: isChecked('grid.dynamic')
+				}
+			}			
+			return res;
+		}
+
+
+		var earth;
+		function restart() {
+			document.getElementById('coordinates').innerHTML = '';
+			document.getElementById('markers').innerHTML = '';
+			if(earth) {
+				earth.destroy();
+				delete earth;
+			}
+			earth  = Earth3D(getEarthParams());
+		}
+
+		restart();
+		document.getElementById('restart').addEventListener('click', restart);
 	</script>
 </body>
 </html>
