@@ -41,6 +41,10 @@ var importableModules = function () {
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
       'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
+      'zen3d': { src: modulesPath + "/ext/zen3d/zen3d.min.js", id: "zen3d" },
+      'zen3d_OrbitControls': { src: modulesPath + "/ext/zen3d/controls/OrbitControls.js", id: "zen3d_OrbitControls" },
+      'zen3d_Sprite': { src: modulesPath + "/ext/zen3d/objects/Sprite.js", id: "zen3d_Sprite" },
+      
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1.css"},
 
@@ -118,6 +122,12 @@ var importableModules = function () {
       'taskVideo': {src: modulesPath+"/pemFioi/taskVideo/taskVideo.js", id: "taskVideo"},
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
       'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
+
+      // earth3d and earth textures
+      'earth3d': {src: modulesPath+"/pemFioi/components/earth3d/earth3d.js", id: "earth3d"},
+      'earth3d_512': {src: modulesPath+"/pemFioi/components/earth3d/textures/512.js", id: "earth3d_512"},
+      'earth3d_1024': {src: modulesPath+"/pemFioi/components/earth3d/textures/1024.js", id: "earth3d_1024"},
+      'earth3d_2048': {src: modulesPath+"/pemFioi/components/earth3d/textures/2048.js", id: "earth3d_2048"},
 
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},

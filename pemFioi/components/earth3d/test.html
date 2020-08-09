@@ -180,6 +180,7 @@
 ]			
 		</textarea>
 		<button onclick="addLabel()">Add random label</button>
+		<button onclick="clearLabels()">Clear labels</button>
 
 	</div>
 
@@ -246,7 +247,11 @@
 				lng: Math.random() * 360 - 180,
 				text: Math.round(1000000 * Math.random())
 			}				
-			earth.addLabel(data)
+			earth.addLabel(data);
+		}
+
+		function clearLabels() {
+			earth.clearLabels();
 		}
 
 		function pointToString(point) {
