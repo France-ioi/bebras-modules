@@ -183,14 +183,18 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
     this.isAvailable = function(ipaddress, callback) {
         url = "ws://" + ipaddress + ":5000/api/v1/commands";
 
-        var websocket = new WebSocket(url);
+        try {
+           var websocket = new WebSocket(url);
 
-        websocket.onopen = function () {
-            websocket.onclose = null;
-            websocket.close();
-            callback(true);
-        }
-        websocket.onclose = function () {
+           websocket.onopen = function () {
+               websocket.onclose = null;
+               websocket.close();
+               callback(true);
+           }
+           websocket.onclose = function () {
+               callback(false);
+           }
+        } catch(err) {
             callback(false);
         }
     }
