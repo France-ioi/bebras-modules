@@ -555,6 +555,7 @@ var getContext = function (display, infos, curLevel) {
                     <div class="panel-body">
                         <div id="piconnectionmainui">
                             <div class="switchRadio btn-group" id="piconsel">
+                                <button type="button" class="btn" id="piconlocal"><i class="fas fa-location-arrow icon"></i>Local</button>
                                 <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
                                 <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
                                 <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
@@ -587,8 +588,22 @@ var getContext = function (display, infos, curLevel) {
                                 </div>
                             </div>
 
-                            <div panel-body-usbbt>
+                            <div id="panel-body-usbbt">
                                 <label id="piconnectionlabel"></label>
+                            </div>
+
+                            <div id="panel-body-local">
+                                <label id="piconnectionlabellocal"></label>
+
+                                <div id="piconnectolocalhost">
+                                    <input type="radio" id="piconnectolocalhostcheckbox" name="pilocalconnectiontype" value="localhost">
+                                    Connecter l'interface à la machine sur laquelle tourne ce navigateur
+                                </div>
+
+                                <div id="piconnectocurrenturl">
+                                    <input type="radio" id="piconnectocurrenturlcheckbox" name="pilocalconnectiontype" value="currenturl">
+                                    Connecter au Raspberry Pi depuis lequel cette page est chargée
+                                </div>
                             </div>
                         </div>
                         <div class="inlineButtons">
@@ -688,6 +703,8 @@ var getContext = function (display, infos, curLevel) {
                 irEnableContinous: "Activer l'émission IR en continu",
                 irDisableContinous: "Désactiver l'émission IR en continu",
 
+                connectToLocalHost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
+                connectToCurrentServer: "Connecter au Raspberry Pi depuis lequel cette page est chargée",
             }
         },
         none: {
@@ -1793,6 +1810,15 @@ var getContext = function (display, infos, curLevel) {
         }
 
         context.quickPiConnection = getQuickPiConnection(lockstring, raspberryPiConnected, raspberryPiDisconnected, raspberryPiChangeBoard);
+
+        context.quickPiConnection.isAvailable("localhost", function(available) {
+            context.localhostAvailable = available;
+        });
+
+        context.quickPiConnection.isAvailable("window.location.hostname", function(available) {
+            context.windowLocationAvailable = available;
+        });
+
     }
 
     var paper;
@@ -2861,6 +2887,8 @@ var getContext = function (display, infos, curLevel) {
 
                     context.inUSBConnection = false;
                     context.inBTConnection = true;
+                } else if (getSessionStorage('connectionMethod') == "LOCAL") {
+                    $('#piconlocal').trigger("click");
                 }
             } else {
                 setSessionStorage('connectionMethod', "WIFI");
@@ -2879,12 +2907,6 @@ var getContext = function (display, infos, curLevel) {
                 }
             });
 
-            if (infos.runningOnQuickPi)
-            {
-                $('#piconnectionmainui').hide();
-                $('#piaddress').val(window.location.hostname);
-                $('#piaddress').trigger("input");
-            }
 
             if (getSessionStorage('pilist')) {
                 populatePiList(JSON.parse(getSessionStorage('pilist')));
@@ -2900,13 +2922,31 @@ var getContext = function (display, infos, curLevel) {
                 $('#pigetlist').attr("disabled", false);
             }
 
-            
+            function setLocalIp()
+            {
+                var localvalue = $('input[name=pilocalconnectiontype]:checked').val()
+
+                if (localvalue == "localhost") {
+                    $('#piaddress').val(localhost);
+                    $('#piaddress').trigger("input");
+                } else {
+                    $('#piaddress').val(window.location.hostname);
+                    $('#piaddress').trigger("input");
+                }
+            }
+
+            $('input[type=radio][name=pilocalconnectiontype]').change(function() {
+                setLocalIp();
+            });
+           
             function cleanUSBBTIP()
             {
                 var ipaddress = $('#piaddress').val();
 
                 if (ipaddress == "192.168.233.1" ||
-                    ipaddress == "192.168.233.2")
+                    ipaddress == "192.168.233.2" ||
+                    ipaddress == "localhost" ||
+                    ipaddress == window.location.hostname)
                 {
                         $('#piaddress').val("");
                         $('#piaddress').trigger("input");
@@ -2918,6 +2958,48 @@ var getContext = function (display, infos, curLevel) {
             }
 
             cleanUSBBTIP();
+
+            $('#panel-body-local').hide();
+
+            if (context.localhostAvailable || context.windowLocationAvailable)
+            {
+                if (!context.quickPiConnection.isConnected() ||
+                    getSessionStorage('connectionMethod') == "LOCAL")
+                {
+                    $('#piconsel .btn').removeClass('active');
+                    $('#piconlocal').addClass('active');
+
+                    
+                    $('#pischoolcon').hide();
+                    $('#piconnectionlabel').hide();
+                    $('#panel-body-local').show();
+                    setSessionStorage('connectionMethod', "LOCAL");
+
+                    if (context.localhostAvailable &&
+                        context.windowLocationAvailable)
+                    {
+                        $("#piconnectolocalhostcheckbox").prop("checked", true);
+
+                        setLocalIp();
+                    } else if (context.localhostAvailable) {
+                        $('#piconnectolocalhost').hide();
+                        $('#piconnectocurrenturlcheckbox').hide();
+
+                        setLocalIp();
+                    } else if (context.windowLocationAvailable) {
+                        $('#piconnectocurrenturl').hide();
+                        $('#piconnectolocalhostcheckbox').hide();
+
+                        setLocalIp();
+                    }
+                }
+            }
+            else
+            {
+                $('#panel-body-local').hide();
+                $("#piconlocal").hide();
+            }
+
 
             $('#piconnectok').click(function () {
                 context.inUSBConnection = false;
@@ -3002,16 +3084,37 @@ var getContext = function (display, infos, curLevel) {
                     }
                 }
             });
+
+            $('#piconlocal').click(function () {
+                context.inUSBConnection = false;
+                context.inBTConnection = false;
+
+                cleanUSBBTIP();
+
+                if (!context.quickPiConnection.isConnected()) {
+                    setLocalIp();
+                    setSessionStorage('connectionMethod', "LOCAL");
+                    $(this).addClass('active');
+                    $('#panel-body-local').show();
+                    $('#pischoolcon').hide();
+                    $('#piconnectionlabel').hide();
+
+                    $(this).addClass('active');
+                }
+
+            });
+
             $('#piconwifi').click(function () {
                 context.inUSBConnection = false;
                 context.inBTConnection = false;
 
-
                 cleanUSBBTIP();
+
                 if (!context.quickPiConnection.isConnected()) {
                     setSessionStorage('connectionMethod', "WIFI");
                     $(this).addClass('active');
-                    $('#pischoolcon').show("slow");
+                    $('#panel-body-local').hide();
+                    $('#pischoolcon').show();
                     $('#piconnectionlabel').hide();
                 }
 
@@ -3021,11 +3124,12 @@ var getContext = function (display, infos, curLevel) {
                 if (!context.quickPiConnection.isConnected()) {
                     setSessionStorage('connectionMethod', "USB");
                     $('#piconnectok').attr('disabled', true);
+                    $('#panel-body-local').hide();
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToUSB)
 
                     $(this).addClass('active');
-                    $('#pischoolcon').hide("slow");
+                    $('#pischoolcon').hide();
                     $('#piaddress').val("192.168.233.1");
 
                     context.inUSBConnection = true;
@@ -3061,11 +3165,12 @@ var getContext = function (display, infos, curLevel) {
                 if (!context.quickPiConnection.isConnected()) {
                     setSessionStorage('connectionMethod', "BT");
                     $('#piconnectok').attr('disabled', true);
+                    $('#panel-body-local').hide();
                     $('#piconnectionlabel').show();
                     $('#piconnectionlabel').html(strings.messages.cantConnectoToBT)
 
                     $(this).addClass('active');
-                    $('#pischoolcon').hide("slow");
+                    $('#pischoolcon').hide();
 
                     $('#piaddress').val("192.168.233.2");
 
