@@ -11,20 +11,26 @@ function Map(options) {
         parent: document.body,
         width: 400,
         height: 400,
+        map_lng_left: 0,
+        map_lng_right: 0,
+        map_lat_top: 0,
+        map_lat_bottom: 0,
+        unit: 'km',
+
+        // map2d options
         line_color: {r: 64, g: 64, b: 64},
         line_width: 4,
         background_color: {r: 255, g: 255, b: 255},
         text_color: {r: 255, g: 255, b: 255},
         pin_file: null,
         pin_scale: 0.385,
-        map_file: null,
-        map_lng_left: 0,
-        map_lng_right: 0,
-        map_lat_top: 0,
-        map_lat_bottom: 0,
-        unit: 'km'
+        map_file: null
     }
 
+    options = Object.assign({}, defaults, options);
+
+
+/*
     var options = (function() {
         var res = {}
         for(var k in defaults) {
@@ -32,12 +38,13 @@ function Map(options) {
         }
         return res
     })()
-
+*/
 
 
     // map renderer
 
-    function Renderer() {
+    function Renderer2D() {
+
 
         function ImageLoader(src, onLoad) {
             var loaded = false;
@@ -129,6 +136,38 @@ function Map(options) {
         var coordinates = new CoordinatesConverter();
     }
 
+
+
+    function Renderer3D() {
+        var earth = new Earth3D(options);
+
+
+        this.clear = function() {
+            earth.clearPaths();	
+            earth.clearLabels();	
+        }
+
+        this.line = function(lng1, lat1, lng2, lat2, opacity) {
+            var p1 = {
+                lat: lat1,
+                lng: lng1
+            }
+            var p2 = {
+                lat: lat2,
+                lng: lng2
+            }            
+            earth.addPath(p1, p2);
+        }
+
+        this.pin = function(lng, lat, label) {
+            var p = {
+                lat: lat,
+                lng: lng,
+                text: label
+            }
+            earth.addLabel(p);
+        }
+    }
 
 
 
@@ -270,7 +309,8 @@ function Map(options) {
     }
 
 
-    // params checking
+
+    // validation
 
     function validateLng(lng) {
         if(isNaN(lng)) {
@@ -288,8 +328,7 @@ function Map(options) {
         if(lat > options.map_lat_top || lat < options.map_lat_bottom) {
             throw new Error('Latitude is outside of the map')
         }
-    }
-
+    }        
 
 
     // interface
@@ -350,7 +389,14 @@ function Map(options) {
 
     // init
 
-    var renderer = new Renderer();
+    if(options.map3d) {
+        var renderer = new Renderer3D();
+    } else {
+        var renderer = new Renderer2D();
+    }
+    
+
+
     var geo = new GeoDistance(options.unit);
     var graph = new Graph();
 

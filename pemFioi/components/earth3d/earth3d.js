@@ -11,6 +11,8 @@ function Earth3D(params) {
     }    
 
     var defaults = {
+        width: null,
+        height: null,
         camera: {
             lat: 0,
             lng: 0
@@ -156,7 +158,7 @@ function Earth3D(params) {
             mat.acceptLight = false;
             mat.size = size;
             mat.diffuse.setHex(color);
-            mat.transparent = true;
+            //mat.transparent = true;
             return mat;
         }
     }
@@ -628,9 +630,12 @@ function Earth3D(params) {
 
 
     // labels
-    var labels_group;
-
+    var labels_group = null;
     function addLabel(data) {
+        if(labels_group == null) {
+            labels_group = new zen3d.Group();
+            scene.add(labels_group);
+        }
         textRenderer.setStyle(params.text.label);
         
         function addSprite(pos, text) {
@@ -644,7 +649,7 @@ function Earth3D(params) {
             sprite.material.transparent = true;
             sprite.position.set(pos.x, pos.y, pos.z);
             sprite.scale.set(0.5, 0.5, 0.5);
-            scene.add(sprite);            
+            labels_group.add(sprite);            
         }
 
         
@@ -654,7 +659,7 @@ function Earth3D(params) {
         var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
         var ball = new zen3d.Mesh(geo, materials.label_sphere);        
         ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
-        scene.add(ball);                    
+        labels_group.add(ball);                    
 
         if(!('text' in data)) {
             return;
@@ -669,7 +674,7 @@ function Earth3D(params) {
             sprite_pos.y,
             sprite_pos.z
         ];
-        scene.add(mesh(vertices, materials.label_line));
+        mesh(vertices, materials.label_line, labels_group);
 
         // add text label
         addSprite(sprite_pos, data.text);
@@ -681,6 +686,16 @@ function Earth3D(params) {
         for(var i=0; i<params.labels.length; i++) {
             addLabel(params.labels[i]);
         }
+    }
+
+
+    function clearLabels() {
+        if(!scene) {
+            return;
+        }
+        labels_group && scene.remove(labels_group);
+        labels_group = new zen3d.Group();
+        scene.add(labels_group);        
     }
 
 
@@ -819,8 +834,8 @@ function Earth3D(params) {
 
     function onResize() {
         var devicePixelRatio = 'devicePixelRatio' in window ? window.devicePixelRatio : 1;
-        var width = params.parent.offsetWidth || 2;
-        var height = params.parent.offsetHeight || 2;        
+        var width = params.width ? params.width : params.parent.offsetWidth || 2;
+        var height = params.height ? params.height : params.parent.offsetHeight || 2;        
         canvas.width = width * devicePixelRatio;
         canvas.height = height * devicePixelRatio;
         canvas.style.width = width + 'px';
@@ -828,7 +843,9 @@ function Earth3D(params) {
         camera.setPerspective(config.fov, width / height, 1, 1000);
         renderer.backRenderTarget.resize(width, height);
     }
-    window.addEventListener('resize', onResize, false);
+    if(!params.width && !params.height) {
+        window.addEventListener('resize', onResize, false);
+    }
 
 
 
@@ -964,11 +981,18 @@ function Earth3D(params) {
         var vertices = [];
         var r = 1.005;
 
-        var dlat = point2.lat - point1.lat;
-        var dlng = point2.lng - point1.lng;        
+        var lat1 = Math.PI * point1.lat / 180;
+        var lng1 = (point1.lng + 540) % 360 - 180;
+        lng1 = Math.PI * lng1 / 180;
+        var lat2 = Math.PI * point2.lat / 180;
+        var lng2 = (point2.lng + 540) % 360 - 180;
+        lng2 = Math.PI * lng2 / 180;        
+
+        var dlat = lat2 - lat1;
+        var dlng = lng2 - lng1;        
 
         var ca = Math.sin(dlat / 2) * Math.sin(dlat / 2) + 
-            Math.cos(point1.lat) * Math.cos(point2.lat) * Math.sin(dlng / 2) * Math.sin(dlng / 2);
+            Math.cos(lat1) * Math.cos(lat2) * Math.sin(dlng / 2) * Math.sin(dlng / 2);
         var cb = 2 * Math.atan2(Math.sqrt(ca), Math.sqrt(1 - ca)); 
         var cb_sin = Math.sin(cb);
         
@@ -976,24 +1000,22 @@ function Earth3D(params) {
         var distance = 2 * Math.atan2(Math.sqrt(ca), Math.sqrt(1 - ca)) / Math.PI;
         var tesselation = Math.round(2 * params.tesselation * distance);
 
-
-        var ax = Math.cos(point1.lat) * Math.cos(point1.lng);
-        var bx = Math.cos(point2.lat) * Math.cos(point2.lng);
-        var ay = Math.cos(point1.lat) * Math.sin(point1.lng);
-        var by = Math.cos(point2.lat) * Math.sin(point2.lng);
-        var az = Math.sin(point1.lat);
-        var bz = Math.sin(point2.lat);
+        var ax = Math.cos(lat1) * Math.sin(lng1);
+        var bx = Math.cos(lat2) * Math.sin(lng2);
+        var ay = Math.sin(lat1);
+        var by = Math.sin(lat2);
+        var az = Math.cos(lat1) * Math.cos(lng1);
+        var bz = Math.cos(lat2) * Math.cos(lng2);
 
         var pos, a, b;
         for(var i=0; i<=tesselation; i++) {
             pos = i / tesselation;
             a = Math.sin((1 - pos) * cb) / cb_sin;
             b = Math.sin(pos * cb) / cb_sin;
-
             vertices.push(
                 r * (a * ax + b * bx),
                 r * (a * ay + b * by),
-                r * (a * az + b * bz)
+                r * (a * az + b * bz),
             );
         }
 
@@ -1110,6 +1132,8 @@ function Earth3D(params) {
         clearPaths: clearPaths,
 
         addLabel: addLabel,
+
+        clearLabels: clearLabels,
 
         destroy: function() {
             running = false;
