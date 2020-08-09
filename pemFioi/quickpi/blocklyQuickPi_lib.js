@@ -1815,7 +1815,7 @@ var getContext = function (display, infos, curLevel) {
             context.localhostAvailable = available;
         });
 
-        context.quickPiConnection.isAvailable("window.location.hostname", function(available) {
+        context.quickPiConnection.isAvailable(window.location.hostname, function(available) {
             context.windowLocationAvailable = available;
         });
 
