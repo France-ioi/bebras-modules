@@ -40,6 +40,13 @@
     background: #FFAAAA;
 }
 
+.renderer_map {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    right: 0;
+    bottom: 5px;
+}
 
 .renderer_map canvas {
     margin: 0 auto;

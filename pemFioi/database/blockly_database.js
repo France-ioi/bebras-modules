@@ -422,7 +422,8 @@ var getContext = function(display, infos, curLevel) {
 
         loadTable: function(name, callback) {
             if(!task_tables[name] || !task_tables[name].public) throw new Error(strings.messages.table_not_found + name);
-            context.waitDelay(callback, Table(task_tables[name].data));
+            //context.waitDelay(callback, Table(task_tables[name].data));
+            callback(Table(task_tables[name].data));
         },
 
 
