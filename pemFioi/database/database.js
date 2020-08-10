@@ -17,8 +17,8 @@ function DatabaseHelper(options) {
         render_max_rows: 14,
 
         // map renderer
-        width: 400,
-        height: 400,
+//        width: 400,
+//        height: 400,
         background_color: {r: 255, g: 255, b: 255},
         text_color: {r: 48, g: 81, b: 171},
         mistake_color: {r: 170, g: 49, b: 51},
@@ -352,17 +352,23 @@ function TableRendererHtml(options) {
 
 function TableRendererMap(options) {
 
-    var container = $('<div class="renderer_map">');
+    var container = $('<div class="renderer_map"></div>');
     container.hide();
     options.parent.append(container);
+
     this.clear = function() {
-        renderer.clear("");
+        renderer.clear();
     }
     this.hide = function() {
         container.hide();
     }
 
-    function Renderer() {
+    function Renderer2D() {
+
+        var size = {
+            width: options.width || 400,
+            height: options.height || 400
+        }
 
         function ImageLoader(src, onLoad) {
             var loaded = false;
@@ -384,16 +390,16 @@ function TableRendererMap(options) {
         function CoordinatesConverter() {
             var map_lat_bottomRad = options.map_lat_bottom.toRad()
             var mapLngDelta = (options.map_lng_right - options.map_lng_left)
-            var worldMapWidth = ((options.width / mapLngDelta) * 360) / (2 * Math.PI)
+            var worldMapWidth = ((size.width / mapLngDelta) * 360) / (2 * Math.PI)
             var mapOffsetY = (worldMapWidth / 2 * Math.log((1 + Math.sin(map_lat_bottomRad)) / (1 - Math.sin(map_lat_bottomRad))))
 
             this.x = function(lng) {
-                return (parseFloat(lng) - options.map_lng_left) * (options.width / mapLngDelta);
+                return (parseFloat(lng) - options.map_lng_left) * (size.width / mapLngDelta);
             }
 
             this.y = function(lat) {
                 var latitudeRad = parseFloat(lat).toRad()
-                return options.height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - mapOffsetY)
+                return size.height - ((worldMapWidth / 2 * Math.log((1 + Math.sin(latitudeRad)) / (1 - Math.sin(latitudeRad)))) - mapOffsetY)
             }
         }
 
@@ -406,10 +412,11 @@ function TableRendererMap(options) {
         this.clear = function() {
             var img = images.map.get();
             if(img) {
-                context2d.drawImage(img, 0, 0, options.width, options.height)
+                context2d.drawImage(img, 0, 0, size.width, size.height)
+
             } else {
                 context2d.fillStyle = rgba(options.background_color, 1);
-                context2d.fillRect(0, 0, options.width, options.height)
+                context2d.fillRect(0, 0, size.width, size.height)
             }
         }
 
@@ -435,8 +442,13 @@ function TableRendererMap(options) {
             );
             context2d.fillStyle = rgba(valid ? options.text_color : options.mistake_color, 1);
             context2d.fillText(label, x, y + 10)
-
         }
+
+        this.destroy = function() {
+            $(canvas).remove();
+        }        
+
+        this.resize = function() {}        
 
         // init
         var images = {
@@ -447,8 +459,8 @@ function TableRendererMap(options) {
         var coordinates = new CoordinatesConverter();
 
         var canvas = document.createElement('canvas');
-        canvas.width = options.width;
-        canvas.height = options.height;
+        canvas.width = size.width;
+        canvas.height = size.height;
 
         container.append($(canvas));
         var context2d = canvas.getContext('2d');
@@ -456,6 +468,51 @@ function TableRendererMap(options) {
         context2d.textAlign = 'center';
         context2d.font = options.font_size + 'px sans-serif';
     }
+
+
+
+    function Renderer3D() {
+        var earth_options = Object.assign({}, options, {
+            parent: container[0]
+        });
+        var earth = new Earth3D(earth_options);
+
+
+        this.clear = function() {
+            earth.clearPaths();	
+            earth.clearLabels();	
+        }
+
+        this.line = function(lng1, lat1, lng2, lat2, opacity) {
+            var p1 = {
+                lat: lat1,
+                lng: lng1
+            }
+            var p2 = {
+                lat: lat2,
+                lng: lng2
+            }            
+            earth.addPath(p1, p2);
+        }
+
+        this.pin = function(lng, lat, label) {
+            var p = {
+                lat: lat,
+                lng: lng,
+                text: label
+            }
+            earth.addLabel(p);
+        }
+
+        this.destroy = function() {
+            earth.destroy();
+        }
+
+        this.resize = function() {
+            earth.resize();
+        }
+    }
+
 
     function validateLng(lng) {
         if(isNaN(lng)) {
@@ -503,16 +560,22 @@ function TableRendererMap(options) {
         }
         if(display) {
             container.show();
+            renderer.resize();
         }
         return valid_all;
     }
 
     this.destroy = function() {
         container.remove();
+        renderer.destroy();
     }
 
     // init
-    var renderer = new Renderer();
+    if(options.map3d) {
+        var renderer = new Renderer3D();
+    } else {
+        var renderer = new Renderer2D();
+    }
 }
 
 function TableRendererGraph(options) {

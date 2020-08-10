@@ -1138,13 +1138,15 @@ function Earth3D(params) {
         destroy: function() {
             running = false;
             textRenderer.destroy();
-            orbit_controller.dispose();
+            orbit_controller && orbit_controller.dispose();
             delete renderer;
             delete scene;
-            canvas.remove();
+            canvas && canvas.remove();
             delete canvas;
             delete materials;
             delete elements;            
-        }
+        },
+
+        resize: onResize
     }
 }
