@@ -312,6 +312,7 @@ function Earth3D(params) {
     var cursor = Object.assign({}, params.cursor);
 
     function initCanvas() {
+        params.parent.innerHTML = ''; // bug fix
         canvas = document.createElement('canvas');
         params.parent.appendChild(canvas);
     }
