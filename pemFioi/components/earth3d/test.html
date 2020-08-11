@@ -266,11 +266,6 @@
 			var res = {
 				parent: document.getElementById('view'),
 				events: {
-					onLoad: function() {
-						updateCursor();
-						updateOpacity();
-						updateRotation();					
-					},
 					onMouseMove: function(point) {
 						document.getElementById('coordinates').innerHTML = pointToString(point)
 					},
@@ -327,6 +322,9 @@
 				delete earth;
 			}
 			earth  = Earth3D(getEarthParams());
+			updateCursor();
+			updateOpacity();
+			updateRotation();								
 		}
 
 		restart();
