@@ -1043,19 +1043,6 @@ function Earth3D(params) {
     }
 
 
-    // earth texture loader
-    function loadEarthImage(callback) {
-        if(!('Earth3DTexture' in window)) {
-            return console.error('Earth3DTexture not found')
-        }
-        var image = new Image();
-        image.crossOrigin = 'anonymous';
-        image.onload = function() {
-            callback(image);
-        }
-        image.src = Earth3DTexture;
-    }
-
 
     // orbit controller
     var orbit_controller;
@@ -1078,33 +1065,30 @@ function Earth3D(params) {
         orbit_controller.enablePan = params.orbit.pan;
     }
 
+    
     // run everything
-
     var running = false;
-    //loadEarthImage(function(earth_image) {
-        initCanvas();
-        init3D();
-        initMaterials();
-        addEarth();
-        initGrid();
-        addLabels();
-        params.cursor && addCursor();    
-        onResize();
-        params.events.onMouseMove && initMouseMoveEvent();
-        params.events.onMarkerChange && initMouseClickEvent();
-        initOrbitController();
-        function loop(count) {
-            if(!running){
-                return;
-            }
-            requestAnimationFrame(loop);
-            orbit_controller.update();
-            renderer.render(scene, camera);
+    initCanvas();
+    init3D();
+    initMaterials();
+    addEarth();
+    initGrid();
+    addLabels();
+    params.cursor && addCursor();    
+    onResize();
+    params.events.onMouseMove && initMouseMoveEvent();
+    params.events.onMarkerChange && initMouseClickEvent();
+    initOrbitController();
+    function loop(count) {
+        if(!running){
+            return;
         }
-        running = true;
-        loop(0);        
-        //params.events.onLoad && params.events.onLoad();
-    //});
+        requestAnimationFrame(loop);
+        orbit_controller.update();
+        renderer.render(scene, camera);
+    }
+    running = true;
+    loop(0);        
     
     
 
