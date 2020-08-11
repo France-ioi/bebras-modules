@@ -114,12 +114,18 @@ function Earth3D(params) {
     var materialMaker = {
 
         // texture: function(url) {
-        texture: function(image) {
-            //var texture = zen3d.Texture2D.fromSrc(url);
-            var texture = zen3d.Texture2D.fromImage(image);
-            texture.encoding = zen3d.TEXEL_ENCODING_TYPE.LINEAR;
+        texture: function(image_src) {
             mat = new zen3d.LambertMaterial();
-            mat.diffuseMap = texture;
+
+            var image = new Image();
+            image.onload = function() {
+                var texture = zen3d.Texture2D.fromImage(image);
+                texture.encoding = zen3d.TEXEL_ENCODING_TYPE.LINEAR;            
+                mat.diffuseMap = texture;
+                mat.needsUpdate = true;
+            }
+            image.src = image_src;
+
             mat.transparent = true;
             mat.opacity = params.opacity;
             mat.premultipliedAlpha = true;        
@@ -312,7 +318,6 @@ function Earth3D(params) {
     var cursor = Object.assign({}, params.cursor);
 
     function initCanvas() {
-        params.parent.innerHTML = ''; // bug fix
         canvas = document.createElement('canvas');
         params.parent.appendChild(canvas);
     }
@@ -335,10 +340,13 @@ function Earth3D(params) {
     }
 
 
-    function initMaterials(image) {
+    function initMaterials() {
+        if(!('Earth3DTexture' in window)) {
+            return console.error('Earth3DTexture not found')
+        }        
         materials = {
             //pole: materialMaker.color(params.colors.pole),
-            earth: materialMaker.texture(image),
+            earth: materialMaker.texture(window.Earth3DTexture),
             greenwich: materialMaker.dots(params.colors.lng, 0.5),
             lng: materialMaker.dots(params.colors.lng, 0.15),
             lng_angle: materialMaker.triangles(params.colors.lng),
@@ -1073,10 +1081,10 @@ function Earth3D(params) {
     // run everything
 
     var running = false;
-    loadEarthImage(function(earth_image) {
+    //loadEarthImage(function(earth_image) {
         initCanvas();
         init3D();
-        initMaterials(earth_image);
+        initMaterials();
         addEarth();
         initGrid();
         addLabels();
@@ -1095,8 +1103,8 @@ function Earth3D(params) {
         }
         running = true;
         loop(0);        
-        params.events.onLoad && params.events.onLoad();
-    });
+        //params.events.onLoad && params.events.onLoad();
+    //});
     
     
 
