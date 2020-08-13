@@ -145,7 +145,13 @@ zen3d.OrbitControls = function(object, domElement, options) {
 			spherical.makeSafe();
 
 
-			spherical.radius *= scale;
+			if(targetSphericalRadius !== null) {
+				spherical.radius = targetSphericalRadius;
+				targetSphericalRadius = null;
+			} else {
+				spherical.radius *= scale;
+			}
+			
 
 			// restrict radius to be between desired limits
 			spherical.radius = Math.max(scope.options.minDistance, Math.min(scope.options.maxDistance, spherical.radius));
@@ -207,6 +213,10 @@ zen3d.OrbitControls = function(object, domElement, options) {
 		window.removeEventListener('keydown', onKeyDown, false);
 	};
 
+	this.setRadius = function(r) {
+		targetSphericalRadius = r;
+	}
+
 	//
 	// internals
 	//
@@ -226,6 +236,7 @@ zen3d.OrbitControls = function(object, domElement, options) {
 	var sphericalDelta = new zen3d.Spherical();
 
 	var scale = 1;
+	var targetSphericalRadius = null;
 	var panOffset = new zen3d.Vector3();
 
 	var rotateStart = new zen3d.Vector2();

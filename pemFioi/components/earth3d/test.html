@@ -39,7 +39,6 @@
 			Textured
 		</label>		
 		<hr/>		
-
 		<strong>Initial camera position</strong>
 		<div>
 			<label>Lat: </label>
@@ -50,7 +49,12 @@
 			<input type="text" id="camera.lng" value="0"/>
 		</div>		
 		<hr/>
-
+		<div>
+			<label>Distance (in range 0..1): </label>
+			<input type="text" id="distance" value="1"/>		
+			<button onclick="updateDistance()">Update</button>			
+		</div>		
+		<hr/>
 		<label>
 			<input type="checkbox" id="cursor"/>
 			Cursor
@@ -206,7 +210,10 @@
 				console.error('Element ' + id + ' not found');
 				return null;
 			}
-			var v = Math.floor(el.value) || 0;
+			var v = parseFloat(el.value);
+			if(isNaN(v)) {
+				v = 0;
+			}
 			v = Math.min(v, max);
 			v = Math.max(v, min);
 			el.value = v;
@@ -234,6 +241,12 @@
 			earth.setRotation(
 				Math.PI * getValue('rotation-angle', -Infinity, Infinity) / 180
 			);			
+		}
+
+		function updateDistance() {
+			earth.setDistance(
+				getValue('distance', 0, 1)
+			);
 		}
 
 		function addPath() {
@@ -291,8 +304,9 @@
 				},
 				camera: {
 					lat: getValue('camera.lat', -90, 90), 
-					lng: getValue('camera.lng', -180, 180)					
+					lng: getValue('camera.lng', -180, 180)
 				},
+				distance: getValue('distance', 0, 1),
 				orbit: {
 					rotate: isChecked('orbit.rotate'),
             		zoom: isChecked('orbit.zoom'),
