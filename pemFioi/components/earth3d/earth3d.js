@@ -23,6 +23,7 @@ function Earth3D(params) {
         opacity: 1,
         tesselation: 100,
         textured: true,
+        distance: 1,
         parent: document.body,
         text: {
             label: {
