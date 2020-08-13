@@ -22,6 +22,7 @@ function Earth3D(params) {
         grid: {},
         opacity: 1,
         tesselation: 100,
+        textured: true,
         parent: document.body,
         text: {
             label: {
@@ -262,7 +263,10 @@ function Earth3D(params) {
                 canvas.width = 1000;
                 span.innerHTML = text;
                 //var size = Math.ceil(context.measureText(text).width) + 20;
-                var size = Math.max(span.offsetWidth, style.min_width) + style.hmargin * 2;
+                
+                var size = Math.max(span.offsetWidth, style.min_width);
+                size = Math.max(size, span.offsetHeight);
+                size += style.hmargin * 2;
                 canvas.width = size;
                 canvas.height = size;
                 context.clearRect(0, 0, size, size);
@@ -272,8 +276,8 @@ function Earth3D(params) {
                 }
                 context.fillStyle = style.background;
                 span.innerHTML = text;
+                var h = span.offsetHeight + style.vmargin * 2;
                 if(style.rounded) {
-                    var h = span.offsetHeight + style.vmargin * 2;
                     roundRect(
                         1, 
                         Math.round(size - h) / 2, 
@@ -282,7 +286,6 @@ function Earth3D(params) {
                         Math.floor(h / 4)
                     );
                 } else {
-                    var h = span.offsetHeight + style.vmargin * 2;
                     rect(
                         1, 
                         Math.round(size - h) / 2, 
@@ -347,7 +350,7 @@ function Earth3D(params) {
     function initMaterials() {
         materials = {
             //pole: materialMaker.color(params.colors.pole),
-            
+            earth: null,
             greenwich: materialMaker.dots(params.colors.lng, 0.5),
             lng: materialMaker.dots(params.colors.lng, 0.15),
             lng_angle: materialMaker.triangles(params.colors.lng),
@@ -363,13 +366,16 @@ function Earth3D(params) {
             marker: materialMaker.color(params.colors.marker),
             path: materialMaker.dots(params.colors.path, 0.15)
         }
-        if('Earth3DTexture' in window) {
-            materials.earth = materialMaker.texture(window.Earth3DTexture);
-        } else {
-            console.warn('Earth3DTexture not found, solid color used.')
+        if(params.textured) {
+            if('Earth3DTexture' in window) {
+                materials.earth = materialMaker.texture(window.Earth3DTexture);
+            } else {
+                console.warn('Earth3DTexture not found, solid color used.')
+            }
+        }
+        if(!materials.earth)  {
             materials.earth = materialMaker.color(params.colors.earth);
         }
-        
     }    
 
 
@@ -659,13 +665,14 @@ function Earth3D(params) {
             var sprite = new zen3d.Sprite();
             var image = new Image();
             image.onload = function() {
+                var s = Math.min(image.width / 500, 1);
+                sprite.scale.set(s, s, 1);
                 sprite.material.diffuseMap = zen3d.Texture2D.fromImage(image);
                 sprite.material.needsUpdate = true;
             }
             image.src = textRenderer.render(text);
             sprite.material.transparent = true;
             sprite.position.set(pos.x, pos.y, pos.z);
-            sprite.scale.set(0.5, 0.5, 1);
             labels_group.add(sprite);            
         }
 

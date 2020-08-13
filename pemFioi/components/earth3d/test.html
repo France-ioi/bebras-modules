@@ -25,7 +25,7 @@
 	<script src="../../../ext/zen3d/controls/OrbitControls.js"></script>
 	<script src="../../../ext/zen3d/objects/Sprite.js"></script>
 	<script src="earth3d.js"></script>
-<!--	<script src="textures/512.js"></script>-->
+	<script src="textures/512.js"></script>
 </head>
 <body>
 	
@@ -33,6 +33,12 @@
 	<div class="controls">
 		<button id="restart">Restart</button>
 		<hr/>	
+
+		<label>
+			<input type="checkbox" id="textured" checked="checked"/>
+			Textured
+		</label>		
+		<hr/>		
 
 		<strong>Initial camera position</strong>
 		<div>
@@ -164,23 +170,23 @@
 [
 	{
 		"text": "1",
-		"lat": 54.326965,
-		"lng": 48.423763
+		"lat": 45,
+		"lng": 0
 	},
 	{
 		"text": "2222",
-		"lat": 25,
-		"lng": 40
+		"lat": 15,
+		"lng": 0
 	},
 	{
 		"text": "3333 3333 33333",
-		"lat": -5,
-		"lng": 20
+		"lat": -15,
+		"lng": 0
 	},
 	{
-		"text": "44444444 44444444 44444444 44444444",
-		"lat": -25,
-		"lng": 20
+		"text": "44444444 44444444 44444444 44444444 44444444 44444444",
+		"lat": -45,
+		"lng": 0
 	}
 ]			
 		</textarea>
@@ -270,6 +276,7 @@
 		function getEarthParams() {
 			var res = {
 				parent: document.getElementById('view'),
+				textured: isChecked('textured'),
 				events: {
 					onMouseMove: function(point) {
 						document.getElementById('coordinates').innerHTML = pointToString(point)
