@@ -103,7 +103,10 @@ function Earth3D(params) {
     var config = {
         marker_size: 0.05,
         fov: 0.035 * Math.PI,
-        distance: 20,
+        distance: {
+            max: 20,
+            min: 2.1
+        },
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
         grid_coordinate_radius: 1.01,
@@ -340,7 +343,8 @@ function Earth3D(params) {
 	    scene.add(ambientLight);        
         
         camera = new zen3d.Camera();
-        var pos = llToPos(params.camera, config.distance);
+        var distance = config.distance.min + params.distance * (config.distance.max - config.distance.min);
+        var pos = llToPos(params.camera, distance);
         camera.position.set(pos.x, pos.y, pos.z);
         camera.lookAt(new zen3d.Vector3(0, 0, 0), new zen3d.Vector3(0, 1, 0));
         scene.add(camera);
@@ -625,7 +629,7 @@ function Earth3D(params) {
             var group = elements.grid.lng_coordinates[level].group;
             var a = Math.PI / 2 -  spherical.phi;
             var y = config.grid_coordinate_radius * Math.sin(a);
-            var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance;
+            var m = config.grid_coordinate_radius - 0.01 * camera_distance / config.distance.max;
             y = Math.min(y, m);
             y = Math.max(y, -m);
             var s1 = Math.sqrt(config.grid_coordinate_radius * config.grid_coordinate_radius - y * y);
@@ -1063,8 +1067,8 @@ function Earth3D(params) {
     var orbit_controller;
     function initOrbitController() {
         var options = {
-            minDistance: 2.1,
-            maxDistance: config.distance,
+            minDistance: config.distance.min,
+            maxDistance: config.distance.max,
             onDistanceChange: function(spherical) {
                 refreshMarkers();
                 refreshGrid(spherical);                        
@@ -1133,6 +1137,11 @@ function Earth3D(params) {
 
         setRotation: function(azimutal_angle) {
             orbit_controller.setAzimuthalAngle(azimutal_angle);
+        },
+
+        setDistance: function(d) {
+            var r = config.distance.min + d * (config.distance.max - config.distance.min);
+            orbit_controller.setRadius(r);
         },
 
         addPath: addPath,
