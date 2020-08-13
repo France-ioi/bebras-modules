@@ -296,11 +296,14 @@ function Earth3D(params) {
                 context.textAlign = 'center';            
                 context.fillStyle = style.color;
                 context.fillText(text, size / 2, size / 2);
-                return canvas.toDataURL('image/png');                
+                var res = canvas.toDataURL('image/png');                
+                span.innerHTML = '';
+                return res;
             },
 
             destroy: function() {
-                span.remove();
+                span.parentNode.removeChild(span);
+                delete span;
                 delete canvas;
             }
         }
@@ -363,7 +366,7 @@ function Earth3D(params) {
         if('Earth3DTexture' in window) {
             materials.earth = materialMaker.texture(window.Earth3DTexture);
         } else {
-            console.warn('Earth3DTexture not found, color used.')
+            console.warn('Earth3DTexture not found, solid color used.')
             materials.earth = materialMaker.color(params.colors.earth);
         }
         
@@ -662,7 +665,7 @@ function Earth3D(params) {
             image.src = textRenderer.render(text);
             sprite.material.transparent = true;
             sprite.position.set(pos.x, pos.y, pos.z);
-            sprite.scale.set(0.5, 0.5, 0.5);
+            sprite.scale.set(0.5, 0.5, 1);
             labels_group.add(sprite);            
         }
 
@@ -1141,7 +1144,7 @@ function Earth3D(params) {
             orbit_controller && orbit_controller.dispose();
             delete renderer;
             delete scene;
-            canvas && canvas.remove();
+            canvas && canvas.parentNode.removeChild(canvas);
             delete canvas;
             delete materials;
             delete elements;            
