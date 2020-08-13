@@ -1122,6 +1122,8 @@ function Earth3D(params) {
 
         addPath: addPath,
 
+        addMarker: addMarker,
+
         clearPaths: clearPaths,
 
         addLabel: addLabel,
