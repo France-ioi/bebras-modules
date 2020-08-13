@@ -32,7 +32,6 @@ function Earth3D(params) {
                 border: '#00FFFF',
                 background: '#FFFFFF99',
                 rounded: true,
-                min_width: 0,
                 hmargin: 5,
                 vmargin: 10
             },
@@ -42,7 +41,6 @@ function Earth3D(params) {
                 border: false,
                 background: '#00FF00',
                 rounded: true,
-                min_width: 25,
                 hmargin: 5,
                 vmargin: 2
             },
@@ -52,7 +50,6 @@ function Earth3D(params) {
                 border: false,
                 background: '#FFFF00',
                 rounded: true,
-                min_width: 25,
                 hmargin: 5,
                 vmargin: 2
             }
@@ -102,11 +99,11 @@ function Earth3D(params) {
 
     // config
     var config = {
-        marker_size: 0.05,
+        ball_size: 0.05,
         fov: 0.035 * Math.PI,
         distance: {
             max: 20,
-            min: 2.1
+            min: 2.15
         },
         grid_distance_levels: [11, 6.5, 4, 0], // distance
         grid_angle_levels: [1.35, 1.12, 0.8, 0.15], // angle in radians
@@ -268,32 +265,32 @@ function Earth3D(params) {
                 span.innerHTML = text;
                 //var size = Math.ceil(context.measureText(text).width) + 20;
                 
-                var size = Math.max(span.offsetWidth, style.min_width);
-                size = Math.max(size, span.offsetHeight);
-                size += style.hmargin * 2;
-                canvas.width = size;
-                canvas.height = size;
-                context.clearRect(0, 0, size, size);
+                var w = span.offsetWidth + style.hmargin * 2;
+                var h = span.offsetHeight + style.vmargin * 2;
+                w = Math.max(w, h);
+                canvas.width = w;
+                canvas.height = w;
+                context.clearRect(0, 0, w, w);
                 
                 if(style.border != false) {
                     context.strokeStyle = style.border;
                 }
                 context.fillStyle = style.background;
                 span.innerHTML = text;
-                var h = span.offsetHeight + style.vmargin * 2;
+                
                 if(style.rounded) {
                     roundRect(
                         1, 
-                        Math.round(size - h) / 2, 
-                        size - 2, 
+                        Math.round(w - h) / 2, 
+                        w - 2, 
                         h, 
                         Math.floor(h / 4)
                     );
                 } else {
                     rect(
                         1, 
-                        Math.round(size - h) / 2, 
-                        size - 2, 
+                        Math.round(w - h) / 2, 
+                        w - 2, 
                         h
                     );
                 }
@@ -302,7 +299,7 @@ function Earth3D(params) {
                 context.textBaseline = 'middle';            
                 context.textAlign = 'center';            
                 context.fillStyle = style.color;
-                context.fillText(text, size / 2, size / 2);
+                context.fillText(text, w / 2, w / 2);
                 var res = canvas.toDataURL('image/png');                
                 span.innerHTML = '';
                 return res;
@@ -658,11 +655,20 @@ function Earth3D(params) {
 
 
     // labels
-    var labels_group = null;
+    var labels = [];
+    var refresh_labels_timeout;
+    function scheduleRefreshLabels() {
+        clearTimeout(refresh_labels_timeout);
+        refresh_labels_timeout = setTimeout(function() {
+            refreshLabels();
+        }, 100);
+    }
+
     function addLabel(data) {
-        if(labels_group == null) {
-            labels_group = new zen3d.Group();
-            scene.add(labels_group);
+        var label = {};
+        if(!elements.labels) {
+            elements.labels = new zen3d.Group();
+            scene.add(elements.labels);
         }
         textRenderer.setStyle(params.text.label);
         
@@ -670,25 +676,27 @@ function Earth3D(params) {
             var sprite = new zen3d.Sprite();
             var image = new Image();
             image.onload = function() {
-                var s = Math.min(image.width / 500, 1);
-                sprite.scale.set(s, s, 1);
                 sprite.material.diffuseMap = zen3d.Texture2D.fromImage(image);
                 sprite.material.needsUpdate = true;
+                sprite.scale_multiplier = config.ball_size * Math.min(image.width / 500, 1);
+                scheduleRefreshLabels();                
             }
             image.src = textRenderer.render(text);
             sprite.material.transparent = true;
             sprite.position.set(pos.x, pos.y, pos.z);
-            labels_group.add(sprite);            
+            elements.labels.add(sprite);            
+            
+            return sprite;
         }
 
         
         var ground_pos = llToPos(data);
-        var sprite_pos = llToPos(data, 1.3);
+        var sprite_pos = llToPos(data, 1.15);
         
         var geo = new zen3d.SphereGeometry(0.041, params.tesselation / 5, params.tesselation / 5);
-        var ball = new zen3d.Mesh(geo, materials.label_sphere);        
-        ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
-        labels_group.add(ball);                    
+        label.ball = new zen3d.Mesh(geo, materials.label_sphere);        
+        label.ball.position.set(ground_pos.x, ground_pos.y, ground_pos.z);
+        elements.labels.add(label.ball);                    
 
         if(!('text' in data)) {
             return;
@@ -703,10 +711,12 @@ function Earth3D(params) {
             sprite_pos.y,
             sprite_pos.z
         ];
-        mesh(vertices, materials.label_line, labels_group);
+        label.spike = mesh(vertices, materials.label_line, elements.labels);
 
         // add text label
-        addSprite(sprite_pos, data.text);
+        label.sprite = addSprite(sprite_pos, data.text);
+
+        labels.push(label);
     }
 
 
@@ -722,11 +732,25 @@ function Earth3D(params) {
         if(!scene) {
             return;
         }
-        labels_group && scene.remove(labels_group);
-        labels_group = new zen3d.Group();
-        scene.add(labels_group);        
+        labels = [];
+        elements.labels && scene.remove(elements.labels);
+        elements.labels = new zen3d.Group();
+        scene.add(elements.labels);
     }
 
+
+    function refreshLabels() {
+        var d = camera.position.getLength();
+        var ball_scale = config.ball_size * d;
+        var sprite_scale = 1;
+        for(var i=0; i<labels.length; i++) {
+            labels[i].ball.scale.set(ball_scale, ball_scale, ball_scale);
+            if(labels[i].sprite) {
+                sprite_scale = d * labels[i].sprite.scale_multiplier;
+                labels[i].sprite.scale.set(sprite_scale, sprite_scale, 1);
+            }
+        } 
+    }
 
 
     // cursor
@@ -997,7 +1021,7 @@ function Earth3D(params) {
   
 
     function refreshMarkers() {
-        var s = config.marker_size * camera.position.getLength();
+        var s = config.ball_size * camera.position.getLength();
         for(var i=0; i<markers.length; i++) {
             markers[i].mesh.scale.set(s, s, s);
         } 
@@ -1071,12 +1095,12 @@ function Earth3D(params) {
             minDistance: config.distance.min,
             maxDistance: config.distance.max,
             onDistanceChange: function(spherical) {
+                refreshLabels();
                 refreshMarkers();
                 refreshGrid(spherical);                        
             },
             onRotate: function(spherical) {
                 refreshGrid(spherical);                        
-                                
             },            
         }
         orbit_controller = new zen3d.OrbitControls(camera, canvas, options);
@@ -1151,7 +1175,10 @@ function Earth3D(params) {
 
         clearPaths: clearPaths,
 
-        addLabel: addLabel,
+        addLabel: function(data) {
+            addLabel(data);
+            refreshLabels();
+        },
 
         clearLabels: clearLabels,
 
