@@ -57,6 +57,7 @@ function Earth3D(params) {
         },
         colors: {
             //pole: 0x000000,
+            earth: 0x1D3870,
             lat: 0x00FF00,
             lng: 0xFFFF00,
             line: 0x0000FF,
@@ -341,12 +342,9 @@ function Earth3D(params) {
 
 
     function initMaterials() {
-        if(!('Earth3DTexture' in window)) {
-            return console.error('Earth3DTexture not found')
-        }        
         materials = {
             //pole: materialMaker.color(params.colors.pole),
-            earth: materialMaker.texture(window.Earth3DTexture),
+            
             greenwich: materialMaker.dots(params.colors.lng, 0.5),
             lng: materialMaker.dots(params.colors.lng, 0.15),
             lng_angle: materialMaker.triangles(params.colors.lng),
@@ -362,6 +360,13 @@ function Earth3D(params) {
             marker: materialMaker.color(params.colors.marker),
             path: materialMaker.dots(params.colors.path, 0.15)
         }
+        if('Earth3DTexture' in window) {
+            materials.earth = materialMaker.texture(window.Earth3DTexture);
+        } else {
+            console.warn('Earth3DTexture not found, color used.')
+            materials.earth = materialMaker.color(params.colors.earth);
+        }
+        
     }    
 
 
