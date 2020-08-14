@@ -5103,7 +5103,7 @@ var getContext = function (display, infos, curLevel) {
                      ((sensor.state.length - 1) * sensor.drawInfo.width / 5) < 0)
                 {
                     sign = 1;
-                    offset = sensor.drawInfo.width;
+                    offset = sensor.drawInfo.width * .70;
                 }
 
 
@@ -5111,9 +5111,9 @@ var getContext = function (display, infos, curLevel) {
                     sliderobj = createSlider(sensor,
                         max,
                         min,
-                        sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.width / 5) ,
+                        sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.height / 5) ,
                         sensor.drawInfo.y,
-                        sensor.drawInfo.width,
+                        sensor.drawInfo.height,
                         sensor.drawInfo.height,
                         i);
 
@@ -5125,7 +5125,7 @@ var getContext = function (display, infos, curLevel) {
                     min,
                     sensor.drawInfo.x,
                     sensor.drawInfo.y,
-                    sensor.drawInfo.width,
+                    sensor.drawInfo.height,
                     sensor.drawInfo.height,
                     0);
                 sensor.sliders.push(sliderobj);
