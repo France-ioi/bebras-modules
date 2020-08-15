@@ -2307,8 +2307,6 @@ def gyroThread():
         gyro_angles[2] += (values[2] - gyro_calibration[2]) * dt
         gyro_angles_lock.release()
         
-import json
-import requests
 
 quickpi_cloudstoreurl = 'http://cloud.quick-pi.org'
 quickpi_cloudstoreid = ""
@@ -2322,6 +2320,9 @@ def connectToCloudStore(identifier, password):
         quickpi_cloudstorepw = password
 
 def writeToCloudStore(identifier, key, value):
+        import requests
+        import json
+
         global quickpi_cloudstoreid
         global quickpi_cloudstorepw
 
@@ -2335,6 +2336,9 @@ def writeToCloudStore(identifier, key, value):
         pass
 
 def readFromCloudStore(identifier, key):
+        import requests
+        import json
+
         value = 0
         data = {'prefix': identifier, 'key': key};
 
@@ -2353,6 +2357,8 @@ def getNodeID():
     return nodeId
 
 def getNeighbors():
+    import json
+    import requests
     global nodeId
 
     ret = requests.post('http://localhost:5000/api/v1/getNeighbors/{}'.format(nodeId))
@@ -2361,6 +2367,7 @@ def getNeighbors():
     
 
 def getNextMessage():
+    import requests
     global nodeId
     while True:
         ret = requests.post('http://localhost:5000/api/v1/getNextMessage/{}'.format(nodeId))
@@ -2372,6 +2379,7 @@ def getNextMessage():
         time.sleep(1)
 
 def sendMessage(toNodeId, message):
+    import requests
     global nodeId
     data = {'fromId': nodeId,
             'message': message }
@@ -2379,6 +2387,7 @@ def sendMessage(toNodeId, message):
     ret = requests.post('http://localhost:5000/api/v1/sendMessage/{}'.format(toNodeId), json = data)
 
 def submitAnswer(answer):
+    import requests
     global nodeId
     data = { 'answer': answer }
 
@@ -2608,6 +2617,7 @@ def sendIRMessage(sensorname, name):
         print("------------------------------------------>", e)
         
 def presetIRMessage(name, data):
+    import json
     global IR_presets
 
     IR_presets[name] = json.loads(data)
