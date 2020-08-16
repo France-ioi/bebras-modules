@@ -20,6 +20,7 @@ function ResponseCurve(settings) {
    var pointSize = 10;
    var dragOverlaySize = 30;
    var nameIndex = 2;
+   var useBezier = settings.useBezier;
 
    this.setUpdateCurveCallback = function(fct) {
       updateCurveCallback = fct;
@@ -328,7 +329,11 @@ function ResponseCurve(settings) {
                xControl2 = x2;
                yControl2 = y2;
             }
-            path += ",C"+xControl1+" "+yControl1+" "+xControl2+" "+yControl2+" "+x2+" "+y2;
+            if (useBezier) {
+               path += ",C"+xControl1+" "+yControl1+" "+xControl2+" "+yControl2+" "+x2+" "+y2;
+            } else {
+               path += ",L"+x2+" "+y2;
+            }
          }
       }
       if(curve){
