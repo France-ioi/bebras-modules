@@ -314,6 +314,7 @@ h1 .stars {
 #popupMessage.noAvatar img.beaver, #popupMessage.noAvatar img.messageArrow {
    display: none;
 }
+
 #popupMessage.noAvatar .message {
    margin-left: 0px;
    max-width: 615px;
