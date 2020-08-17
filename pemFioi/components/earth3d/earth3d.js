@@ -1183,6 +1183,9 @@ function Earth3D(params) {
         clearLabels: clearLabels,
 
         destroy: function() {
+            if(!params.width && !params.height) {
+                window.removeEventListener('resize', onResize);
+            }            
             running = false;
             textRenderer.destroy();
             orbit_controller && orbit_controller.dispose();
