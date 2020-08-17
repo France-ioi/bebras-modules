@@ -4,93 +4,149 @@ function Map2D(params) {
     var defaults = {
         width: false,
         height: false,
-        zoom: -1,
-        max_zoom: 4,
+        zoom: -2,
+        max_zoom: 2,
         min_zoom: -2
     }
     params = Object.assign({}, defaults, params);
 
 
-    var wrapper = document.createElement('div');
-    wrapper.className = 'map2d';
+    // system
+    function createElement(tag, className, content) {
+        var el = document.createElement(tag);
+        el.className = className;
+        if(typeof content === 'string') {
+            el.innerHTML = content;
+        } else if(Array.isArray(content)) {
+            for(var i=0; i<content.length; i++) {
+                el.appendChild(content[i]);
+            }
+        }
+        return el;
+    }
+
+
+    var wrapper = createElement('div', 'map2d');
     params.parent.appendChild(wrapper);
 
 
 
-    function Map(image) {
+    // Viewport 
+    function Viewport(size, callback) {
 
         var zoom = params.zoom;
+        var prev_zoom = null;
+
+        var bounds = {
+            width: size.width,
+            height: size.height,
+            x: 0,
+            y: 0
+        }
         
-        var original_size = {
-            width: image.width,
-            height: image.height
-        }
+       
 
-
-        function refresh(rescale) {
-            var scale = Math.pow(2, zoom);
-            var width = Math.round(original_size.width * scale);
-            var height = Math.round(original_size.height * scale);            
-            if(rescale) {
-                image.style.width = width + 'px';
-                image.style.height = height + 'px';            
+        function refresh() {
+            bounds.resized = prev_zoom !== zoom;
+            if(bounds.resized) {
+                var scale = Math.pow(2, zoom);
+                bounds.width = size.width * scale;
+                bounds.height = size.height * scale;
+                bounds.resized = true;
+                prev_zoom = zoom;                
             }
-            var max_x = width - wrapper.clientWidth;
-            position.x = Math.min(max_x, position.x);
-            position.x = Math.max(0, position.x);
 
-            var max_y = height - wrapper.clientHeight;
-            position.y = Math.min(max_y, position.y);
-            position.y = Math.max(0, position.y);            
+            if(bounds.width < wrapper.clientWidth) {
+                bounds.x = (bounds.width - wrapper.clientWidth) * 0.5;
+            } else {
+                var max_x = bounds.width - wrapper.clientWidth;
+                bounds.x = Math.min(max_x, bounds.x);
+                bounds.x = Math.max(0, bounds.x);
+            }
 
-            image.style.left =  (-position.x) + 'px';
-            image.style.top = (-position.y) + 'px';
+            if(bounds.height < wrapper.clientHeight) {
+                bounds.y = (bounds.height - wrapper.clientHeight) * 0.5;
+            } else {
+                var max_y = bounds.height - wrapper.clientHeight;
+                bounds.y = Math.min(max_y, bounds.y);
+                bounds.y = Math.max(0, bounds.y);            
+            }
+
+            zoom_in.className = zoom == params.max_zoom ? 'button button-disabled' : 'button';
+            zoom_out.className = zoom == params.min_zoom ? 'button button-disabled' : 'button';            
+            callback(bounds);
         }
 
 
 
-        function setZoom(new_zoom) {
+        function changeZoom(ofs) {
+            var new_zoom = zoom + ofs;
             new_zoom = Math.max(new_zoom, params.min_zoom);
             new_zoom = Math.min(new_zoom, params.max_zoom);
             var hw = wrapper.clientWidth * 0.5;
             var hh = wrapper.clientHeight * 0.5;
             var scale = Math.pow(2, zoom);
             var k = Math.pow(2, new_zoom) / Math.pow(2, zoom);
-            position.x = (position.x + hw) * k - hw;
-            position.y = (position.y + hh) * k - hh;
+            bounds.x = (bounds.x + hw) * k - hw;
+            bounds.y = (bounds.y + hh) * k - hh;
             zoom = new_zoom;
-            refresh(true);
+            refresh();
         }
 
         
         // zoom controls
-        var controls = document.createElement('div');
-        controls.className = 'zoom';
-        var zoom_in = document.createElement('div')
-        zoom_in.innerHTML = '+';
-        zoom_in.className = 'button';
+        var zoom_in = createElement('div', 'button', '+');
         zoom_in.addEventListener('click', function(e) {
             e.stopPropagation();
-            setZoom(zoom + 1);
+            changeZoom(1);
         });
-        controls.appendChild(zoom_in);
-        var zoom_out = document.createElement('div')
-        zoom_out.innerHTML = '-';
-        zoom_out.className = 'button';
+        var zoom_out = createElement('div', 'button', '-')
         zoom_out.addEventListener('click', function(e) {
             e.stopPropagation();
-            setZoom(zoom - 1);
+            changeZoom(-1);
         });
-        controls.appendChild(zoom_out);        
-        wrapper.appendChild(controls);
+        wrapper.appendChild(
+            createElement('div', 'zoom', [zoom_in, zoom_out])
+        );
+        
+        refresh();
 
-        var position = {
-            x: (image.width - wrapper.clientWidth) * 0.5,
-            y: (image.height - wrapper.clientHeight) * 0.5
+
+        return {
+
+            refresh: refresh,
+
+            getBounds: function() {
+                return bounds;
+            },
+
+            move: function(position) {
+                bounds.x = position.x;
+                bounds.y = position.y;
+                refresh();
+            }
         }
+    }
+
+
+
+
+    // Map layer
+    function Map(image) {
+
+        var old_bounds;
+
+        function setBounds(bounds) {
+            if(bounds.resized) {
+                image.style.width = bounds.width + 'px';
+                image.style.height = bounds.height + 'px';            
+            }
+            image.style.left =  (-bounds.x) + 'px';
+            image.style.top = (-bounds.y) + 'px';
+        }
+
         image.className = 'map';
         wrapper.appendChild(image);
-        refresh(true);
 
 
         return {
@@ -99,18 +155,79 @@ function Map2D(params) {
                 delete image;
             },
 
-            refresh: refresh,
+            setBounds: setBounds
+        }
+    }
 
-            getPosition: function() {
-                return position;
-            },
 
-            setPosition: function(new_position) {
-                position = new_position;
-                refresh();
+
+
+    // Drawing editor layer
+    function Editor() {
+        var canvas = createElement('canvas', 'editor');
+        wrapper.appendChild(canvas);
+        var context2d = canvas.getContext('2d');
+
+        function draw() {
+            return;
+            context2d.beginPath();
+            context2d.strokeStyle = '#F00';
+            context2d.lineWidth = 2;
+            context2d.moveTo(0, 0);
+            context2d.lineTo(1000, 1000);        
+            context2d.stroke();        
+        }
+
+
+        function setBounds(bounds) {
+            if(bounds.resized) {
+                canvas.width = bounds.width;
+                canvas.height = bounds.height;
+                canvas.style.width = bounds.width + 'px';
+                canvas.style.height = bounds.height + 'px';
+            }
+            canvas.style.left =  (-bounds.x) + 'px';
+            canvas.style.top = (-bounds.y) + 'px';
+        }
+
+
+        return {
+            setBounds: setBounds,
+
+            destroy: function() {
+                wrapper.removeChild(canvas);
             }
         }
     }
+
+
+
+    //
+    function Toolbar() {
+        var elements = {
+            point: createElement('div', 'button', 'Point'),
+            line: createElement('div', 'button', 'Line'),
+            area: createElement('div', 'button', 'Area'),
+            undo: createElement('div', 'button', 'Undo'),
+            redo: createElement('div', 'button', 'Redo')
+        }
+
+        wrapper.appendChild(
+            createElement('div', 'toolbar', [
+                createElement('div', 'group', [
+                    elements.point,
+                    elements.line,
+                    elements.area
+                ]),
+                createElement('div', 'group', [
+                    elements.undo,
+                    elements.redo
+                ])
+            ])
+        )
+    }
+
+
 
 
 
@@ -119,7 +236,7 @@ function Map2D(params) {
         var height = params.height ? params.height : params.parent.clientHeight;        
         wrapper.style.width = width + 'px';
         wrapper.style.height = height + 'px';
-        map && map.refresh(true);
+        viewport && viewport.refresh();
     }
     
 
@@ -131,23 +248,36 @@ function Map2D(params) {
         image.src = src;
     }
 
-    
+    var loaded = false;
+    var viewport;
     var map;
+    var editor;
     loadImage(params.url, function(image) {
         onResize();
         if(!params.width && !params.height) {
             window.addEventListener('resize', onResize, false);
         }                
         map = Map(image);
+        editor = Editor();
+        viewport = Viewport({
+            width: image.width,
+            height: image.height
+        }, function(bounds) {
+            map.setBounds(bounds);
+            editor.setBounds(bounds);
+        })
+        toolbar = Toolbar();
+        onResize();
+
 
         var drag_start = false;
         wrapper.addEventListener('mousedown', function(e) {
             e.stopPropagation();
             e.preventDefault();
-            var map_pos = map.getPosition();
+            var bounds = viewport.getBounds();
             drag_start = {
-                x: map_pos.x + event.clientX,
-                y: map_pos.y + event.clientY
+                x: bounds.x + event.clientX,
+                y: bounds.y + event.clientY
             }
         });
 
@@ -155,7 +285,7 @@ function Map2D(params) {
             if(!drag_start) {
                 return;
             }
-            map.setPosition({
+            viewport.move({
                 x: drag_start.x - event.clientX,
                 y: drag_start.y - event.clientY
             })
@@ -170,12 +300,17 @@ function Map2D(params) {
         });        
         
 
+        loaded = true;
     })
 
 
     return {
         destroy: function() {
-            map && map.destroy();
+            if(loaded) {
+                map.destroy();
+                editor.destroy();
+                viport.destroy();
+            }
             if(!params.width && !params.height) {
                 window.removeEventListener('resize', onResize);
             }            
