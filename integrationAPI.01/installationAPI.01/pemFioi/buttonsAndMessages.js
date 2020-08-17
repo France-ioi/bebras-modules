@@ -875,6 +875,7 @@ window.displayHelper = {
          $('#question-iframe', window.parent.document).css('width', '100%');
       } catch(e) {
       }
+      $('body').css('width', '100%');
       // This try is probably not needed but avoid breaking just in case
       try {
          $(document).ready(function () {displayHelper.updateLayout();});

@@ -54,11 +54,11 @@ var getContext = function(display, infos, curLevel) {
                 printResult: 'printResult'
             },
             description: {
-                getPixelLuminosity: 'obtenir la luminosité à la colonne et ligne données',
-                setPixelLuminosity: 'modifier la luminosité à la colonne et ligne données',
-                width: 'largeur de l\'image',
-                height: 'hauteur de l\'image',
-                printResult: 'afficher le résultat'
+                getPixelLuminosity: 'getPixelLuminosity(col, line) obtient la luminosité à la colonne et ligne données',
+                setPixelLuminosity: 'setPixelLuminosity(col, line, luminosity) modifie la luminosité à la colonne et ligne données',
+                width: 'width() retourne la largeur de l\'image',
+                height: 'height() retourne la hauteur de l\'image',
+                printResult: 'printResult(string) affiche le résultat'
             },
             startingBlockName: "Programme",
             messages: {

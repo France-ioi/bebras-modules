@@ -653,9 +653,15 @@ function LogicController(nbTestCases, maxInstructions) {
               blockDesc = '<code>' + funcProto + '</code>';
             } else if (blockDesc.indexOf('</code>') < 0) {
               var funcProtoEnd = blockDesc.indexOf(')') + 1;
-              funcProto = blockDesc.substring(0, funcProtoEnd);
-              blockHelp = blockDesc.substring(funcProtoEnd);
-              blockDesc = '<code>' + funcProto + '</code>' + blockHelp;
+              if(funcProtoEnd > 0) {
+                funcProto = blockDesc.substring(0, funcProtoEnd);
+                blockHelp = blockDesc.substring(funcProtoEnd);
+                blockDesc = '<code>' + funcProto + '</code>' + blockHelp;
+              } else {
+                console.error("Description for block '" + blockName + "' needs to be of the format 'function() : description', auto-generated one used instead could be wrong.");
+                funcProto = blockName + '()';
+                blockDesc = '<code>' + funcProto + '</code> : ' + blockHelp;
+              }
             }
           }
           fullHtml += '<li>' + blockDesc + '</li>';
