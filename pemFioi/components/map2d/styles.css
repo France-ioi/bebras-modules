@@ -1,0 +1,85 @@
+.map2d {
+    font: 14px sans;
+    position: relative;
+    overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.map2d img.map {
+    position: absolute;
+    z-index: 10;
+}
+
+.map2d .toolbar {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 30;
+}
+
+.map2d .toolbar .group {
+    margin-right: 10px;
+    float: left;
+}
+
+.map2d .toolbar .button {
+    cursor: pointer;
+    float: left;
+    color: #000;
+    background: #fff;
+    border: 1px solid #000;
+    padding: 5px 10px;
+    margin-right: -1px;
+}
+
+.map2d .toolbar .button:hover {
+    background: #ddd;
+}
+
+.map2d .toolbar .active {
+    color: #fff;
+    background: #333;
+}
+
+.map2d .toolbar .button:first-child {
+    border-radius: 5px 0 0 5px;
+}
+
+.map2d .toolbar .button:last-child {
+    border-radius: 0 5px 5px 0;
+}
+
+
+.map2d .zoom {
+    position: absolute;
+    z-index: 30;
+    bottom: 10px;
+    right: 10px;   
+}
+
+.map2d .zoom .button {
+    cursor: pointer;
+    color: #000;
+    background: #fff;
+    border: 1px solid #000;    
+    padding: 5px 10px;
+    text-align: center;
+    margin-bottom: -1px;
+}
+
+.map2d .zoom .button:hover {
+    background: #ddd;
+}
+
+.map2d .zoom .button:first-child {
+    border-radius: 5px 5px 0 0 ;
+}
+
+.map2d .zoom .button:last-child {
+    border-radius: 0 0 5px 5px;
+}
