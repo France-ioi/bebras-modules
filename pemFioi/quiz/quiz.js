@@ -197,7 +197,16 @@ Quiz.UI = function(params) {
 
 
     // sys
+    function useFullWidth() {
+        // From buttonsAndMessages
+        try {
+            $('#question-iframe', window.parent.document).css('width', '100%');
+        } catch(e) {
+        }
+        $('body').css('width', '100%');
+    }
     FontsLoader.loadFonts(['fontawesome', 'titillium-web']);
+    useFullWidth();
     params.parent.show();
 
 
