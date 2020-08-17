@@ -501,11 +501,15 @@ function StringDisplay(params) {
 
             var l = Math.max(valid_result.data.length, data.length);
             for(var i=0; i<l; i++) {
-                if(valid_result.data[i] !== data[i]) {
-                    valid = false;
+                if((valid_result.data[i] !== data[i])) {
                     if(i < data.length) {
-                        diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
+                       if (valid) {
+                           diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
+                       } else {
+                           diff += data[i];
+                       }
                     }
+                    valid = false;
                 } else {
                     diff += data[i];
                 }
