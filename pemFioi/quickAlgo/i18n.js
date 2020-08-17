@@ -120,7 +120,7 @@ var localLanguageStrings = {
       keywordForbidden: "Le mot-clé suivant est interdit : ",
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ",
       keywordsForbidden: "Les mots-clés suivants sont interdits : ",
-      variablesAllowd: "Les variables sont autorisées.",
+      variablesAllowed: "Les variables sont autorisées.",
       variablesForbidden: "Les variables sont interdites.",
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.",
    },
@@ -238,7 +238,7 @@ var localLanguageStrings = {
       keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
       keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
-      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    },
@@ -357,7 +357,7 @@ var localLanguageStrings = {
       keywordForbidden: "Nicht erlaubtes Schlüsselwort:",
       keywordsAllowed: "Erlaubte Schlüsselwörter:",
       keywordsForbidden: "Nicht erlaubte Schlüsselwörter:",
-      variablesAllowd: "Du darfst Variable verwenden.",
+      variablesAllowed: "Du darfst Variable verwenden.",
       variablesForbidden: "Du darfst keine Variablen verwenden",
       readDocumentation: "Du darfst die Python-Dokumentation lesen.",
    },
@@ -475,7 +475,7 @@ var localLanguageStrings = {
       keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
       keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
-      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    },
@@ -593,7 +593,7 @@ var localLanguageStrings = {
       keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
       keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
-      variablesAllowd: "Les variables sont autorisées.", // TODO :: translate
+      variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
    }
