@@ -4,7 +4,7 @@ function LR_Parser(settings,subTask,answer) {
 
    this.strings = {
       explanations: {
-         shift: 'The lookahead symbol {symbol} is read from the input and state state is pushed onto the stack.',
+         shift: 'The lookahead symbol {symbol} is read from the input and state {state} is pushed onto the stack.',
          reduce1: 'Lookahead symbol {symbol} is in the Follow set of the LHS non-terminal ({non_terminal}) for the item {item}, thus states {popped_states} are popped from the stack that represent {RHS} in the derivation.',
          reduce2: 'The top element after popping {popped_states} is top state , that leads to state {new-state} with the non-terminal {non_terminal}, which is pushed onto the stack.',
          error: 'No shift or reduce operations possible at state {state} for lookahead symbol {symbol}',
@@ -13,7 +13,7 @@ function LR_Parser(settings,subTask,answer) {
       }
    }
    this.formatExplanation = function(key, values) {
-      var str = this.strings.messages[key] || null;
+      var str = this.strings.explanations[key] || null;
       if(str === null) {
          console.error('Explanation ' + key + ' not found.');
          return str;
@@ -22,7 +22,7 @@ function LR_Parser(settings,subTask,answer) {
          if(!values.hasOwnProperty(i)) {
             continue;
          }
-         str = str.replace('{' + i + '}', values[i]);
+         str = str.replace('{' + i + '}', '<strong>' + values[i] + '</strong>');
       }
       return str;
    }
@@ -101,7 +101,6 @@ function LR_Parser(settings,subTask,answer) {
 
    this.tabTag = [ "automatonTab", "parseTableTab" ];
    this.selectedTab = (this.mode != 4) ? 0 : 1;
-   this.cursor;
    this.selectedVertex = null;
    this.selectedRule = null;
    this.selectedStackElements = [];
@@ -719,7 +718,7 @@ function LR_Parser(settings,subTask,answer) {
    }
 
    this.displayExplanation = function(key, values) {
-      $('#explanation').html(key ? this.formatExplanation(key, values) : '');
+      $('#lr-explanation').html(key ? this.formatExplanation(key, values) : '');
    }
 
    this.initActionInfo = function() {
@@ -2051,6 +2050,10 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyShift = function(newState,reverse,anim) {
+      this.displayExplanation('shift', {
+         symbol: this.input[this.inputIndex],
+         state: newState
+      });
       this.clearHighlight();
       if(reverse){
          this.stack.pop();
