@@ -2050,10 +2050,12 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyShift = function(newState,reverse,anim) {
+      /*
       this.displayExplanation('shift', {
          symbol: this.input[this.inputIndex],
          state: newState
       });
+      */
       this.clearHighlight();
       if(reverse){
          this.stack.pop();
