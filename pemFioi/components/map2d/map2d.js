@@ -4,9 +4,16 @@ function Map2D(params) {
     var defaults = {
         width: false,
         height: false,
-        zoom: -2,
-        max_zoom: 2,
-        min_zoom: -2
+        zoom: 0,
+        max_zoom: 1,
+        min_zoom: -2,
+        styles: {
+            point_radius: 6,
+            line_width: 3,
+            line_color: '#000000',
+            pin_color: '#FFFFFF',
+            area_color: '#FFFFFF66'
+        }
     }
     params = Object.assign({}, defaults, params);
 
@@ -41,7 +48,8 @@ function Map2D(params) {
             width: size.width,
             height: size.height,
             x: 0,
-            y: 0
+            y: 0,
+            scale: 1
         }
         
        
@@ -49,9 +57,9 @@ function Map2D(params) {
         function refresh() {
             bounds.resized = prev_zoom !== zoom;
             if(bounds.resized) {
-                var scale = Math.pow(2, zoom);
-                bounds.width = size.width * scale;
-                bounds.height = size.height * scale;
+                bounds.scale = Math.pow(2, zoom);
+                bounds.width = size.width * bounds.scale;
+                bounds.height = size.height * bounds.scale;
                 bounds.resized = true;
                 prev_zoom = zoom;                
             }
@@ -98,11 +106,13 @@ function Map2D(params) {
         var zoom_in = createElement('div', 'button', '+');
         zoom_in.addEventListener('click', function(e) {
             e.stopPropagation();
+            e.preventDefault();
             changeZoom(1);
         });
         var zoom_out = createElement('div', 'button', '-')
         zoom_out.addEventListener('click', function(e) {
             e.stopPropagation();
+            e.preventDefault();
             changeZoom(-1);
         });
         wrapper.appendChild(
@@ -160,51 +170,9 @@ function Map2D(params) {
     }
 
 
-
-
-    // Drawing editor layer
-    function Editor() {
-        var canvas = createElement('canvas', 'editor');
-        wrapper.appendChild(canvas);
-        var context2d = canvas.getContext('2d');
-
-        function draw() {
-            return;
-            context2d.beginPath();
-            context2d.strokeStyle = '#F00';
-            context2d.lineWidth = 2;
-            context2d.moveTo(0, 0);
-            context2d.lineTo(1000, 1000);        
-            context2d.stroke();        
-        }
-
-
-        function setBounds(bounds) {
-            if(bounds.resized) {
-                canvas.width = bounds.width;
-                canvas.height = bounds.height;
-                canvas.style.width = bounds.width + 'px';
-                canvas.style.height = bounds.height + 'px';
-            }
-            canvas.style.left =  (-bounds.x) + 'px';
-            canvas.style.top = (-bounds.y) + 'px';
-        }
-
-
-        return {
-            setBounds: setBounds,
-
-            destroy: function() {
-                wrapper.removeChild(canvas);
-            }
-        }
-    }
-
-
-
-    //
-    function Toolbar() {
-        var elements = {
+    // Editor toolbar
+    function Toolbar(handlers) {
+        var buttons = {
             point: createElement('div', 'button', 'Point'),
             line: createElement('div', 'button', 'Line'),
             area: createElement('div', 'button', 'Area'),
@@ -212,22 +180,387 @@ function Map2D(params) {
             redo: createElement('div', 'button', 'Redo')
         }
 
-        wrapper.appendChild(
-            createElement('div', 'toolbar', [
-                createElement('div', 'group', [
-                    elements.point,
-                    elements.line,
-                    elements.area
-                ]),
-                createElement('div', 'group', [
-                    elements.undo,
-                    elements.redo
-                ])
+        var holder = createElement('div', 'toolbar', [
+            createElement('div', 'group', [
+                buttons.point,
+                buttons.line,
+                buttons.area
+            ]),
+            createElement('div', 'group', [
+                buttons.undo,
+                buttons.redo
             ])
-        )
+        ]);
+        wrapper.appendChild(holder);
+
+        function selectButton(name) {
+            var names = ['point', 'line', 'area'];
+            for(var i=0; i < names.length; i++) {        
+                buttons[names[i]].className = names[i] === name ? 'button button-selected' : 'button';
+            }                
+        }
+
+        function disableButton(name, diabled) {
+            buttons[name].className = diabled ? 'button button-disabled' : 'button';
+        }
+
+        var type;
+        function setType(new_type) {
+            if(new_type !== type) {
+                type = new_type;
+            }
+            selectButton(type);
+            handlers.onTypeChange(type);            
+        }
+
+
+        var commands = {
+            point: function() {
+                setType('point');
+            },
+            line: function() {
+                setType('line');
+            },
+            area: function() {
+                setType('area');
+            },
+            undo: handlers.onUndo,
+            redo: handlers.onRedo
+        }
+
+        for(var name in commands) {
+            buttons[name].addEventListener('click', (function(name) {
+                return function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    commands[name]();
+                }
+            })(name));
+        }
+
+        return {
+            selectButton: selectButton,
+
+            disableButton: disableButton,
+
+            destroy: function() {
+                wrapper.removeChild(holder);
+            }
+        }
     }
 
 
+
+    function State() {
+
+        var states = [];
+        var pointer = null;
+
+        function clone(data) {
+            return {
+                type: data.type,
+                pointer: data.pointer,
+                figures: data.figures.slice()
+            }
+        }
+
+        return {
+            push: function(data) {
+                if(pointer < states.length - 1) {
+                    states = states.slice(0, pointer);
+                }
+                states.push(clone(data));
+                pointer = states.length - 1;
+            },
+
+            undo: function() {
+                pointer--;
+                return clone(states[pointer]);
+            },
+
+            redo: function() {
+                pointer++;
+                return clone(states[pointer]);
+            },
+
+            getCapabilities: function() {
+                return {
+                    undo: pointer > 0,
+                    redo: pointer !== null && pointer < states.length - 1
+                }
+            }
+        }
+    }
+
+
+    // Drawing editor layer
+    function Editor(image) {
+
+        var canvas = createElement('canvas', 'editor');
+        wrapper.appendChild(canvas);
+        var context2d = canvas.getContext('2d');
+        var bounds;
+        var state = State();
+        var data = {
+            pointer: null,
+            type: null,
+            figures: params.figures || []
+        }
+
+        function saveState() {
+            state.push(data);
+            refreshToolbar();
+        }
+
+
+        var shapes = {
+
+            point: function(data) {
+                context2d.beginPath();
+                context2d.fillStyle = params.styles.pin_color;            
+                context2d.arc(data.x, data.y, params.styles.point_radius / bounds.scale, 0, 2 * Math.PI);
+                context2d.stroke();
+                context2d.fill();            
+            },
+
+            line: function(data) {
+                context2d.beginPath();
+                context2d.moveTo(data[0].x, data[0].y);
+                for(var i=1; i<data.length; i++) {
+                    context2d.lineTo(data[i].x, data[i].y);        
+                }
+                context2d.stroke();
+                for(var i=0; i<data.length; i++) {
+                    this.point(data[i]);
+                }
+            },
+
+            area: function(data) {
+                context2d.beginPath();
+                context2d.fillStyle = params.styles.area_color;                            
+                context2d.moveTo(data[0].x, data[0].y);
+                for(var i=1; i<data.length; i++) {
+                    context2d.lineTo(data[i].x, data[i].y);        
+                }
+                context2d.closePath();
+                context2d.stroke();
+                context2d.fill();
+                for(var i=0; i<data.length; i++) {
+                    this.point(data[i]);
+                }                
+            }
+
+        }
+
+
+
+        function draw() {
+            context2d.setTransform(1, 0, 0, 1, 0, 0);                
+            bounds && context2d.clearRect(0, 0, bounds.width, bounds.height);
+            context2d.setTransform(bounds.scale, 0, 0, bounds.scale, 0, 0);                
+
+            context2d.strokeStyle = params.styles.line_color;
+            context2d.lineWidth = params.styles.line_width / bounds.scale;
+            for(var i=0; i<data.figures.length; i++) {
+                shapes[data.figures[i].type](data.figures[i].data);
+            }
+        }
+
+
+        function setBounds(new_bounds) {
+            bounds = new_bounds;
+            if(bounds.resized) {
+                canvas.width = bounds.width;
+                canvas.height = bounds.height;
+                canvas.style.width = bounds.width + 'px';
+                canvas.style.height = bounds.height + 'px';
+                draw();                
+            }
+            canvas.style.left =  (-bounds.x) + 'px';
+            canvas.style.top = (-bounds.y) + 'px';
+        }
+
+
+        function isSamePoint(point1, point2) {
+            var d = params.styles.point_radius / bounds.scale;
+            return Math.abs(point1.x - point2.x) <= d && Math.abs(point1.y - point2.y) <= d;
+        }
+
+
+
+
+        function openFigure(point) {
+            switch(data.type) {
+                case 'point':
+                    data.figures.push({
+                        type: data.type,
+                        data: point
+                    });
+                    saveState();
+                    break;
+                case 'line':
+                case 'area':
+                    data.figures.push({
+                        type: data.type,
+                        data: [point]
+                    });                    
+                    data.pointer = data.figures.length - 1;
+                    saveState();
+                    break;
+            }
+        }
+
+        function modifyFigure(point) {
+            for(var i=0; i<data.figures[data.pointer].data.length; i++) {
+                if(isSamePoint(point, data.figures[data.pointer].data[i])) {
+                    closeFigure();
+                    return;
+                }
+            }
+            data.figures[data.pointer].data.push(point);
+            saveState();
+        }
+
+        function closeFigure() {
+            if(data.pointer === null) {
+                return;
+            }
+            switch(data.figures[data.pointer].type) {
+                case 'line':
+                    if(data.figures[data.pointer].data.length < 2) {
+                        data.figures.splice(data.pointer, 1);
+                    }
+                    break;
+                case 'area':
+                    if(data.figures[data.pointer].data.length < 3) {
+                        data.figures.splice(data.pointer, 1);
+                    }
+                    break;
+            }
+            data.pointer = null;
+            saveState();
+            draw();
+        }
+
+
+        var toolbar = Toolbar({
+            onTypeChange: function(new_type) {
+                closeFigure();
+                data.type = new_type;
+            },
+            onRedo: function() {
+                if(state.getCapabilities().redo) {
+                    data = state.redo();
+                    refreshToolbar();
+                    draw();
+                }
+            },
+            onUndo: function() {
+                if(state.getCapabilities().undo) {
+                    data = state.undo();
+                    console.log(data)
+                    refreshToolbar();
+                    draw();
+                }
+            }
+        });
+
+        function refreshToolbar() {
+            var caps = state.getCapabilities();
+            toolbar.disableButton('undo', !caps.undo);
+            toolbar.disableButton('redo', !caps.redo);
+            toolbar.selectButton(data.type);
+        }
+
+
+        function handleClick(point) {
+            point.x = (point.x + bounds.x) / bounds.scale;
+            point.y = (point.y + bounds.y) / bounds.scale;
+            if(point.x < 0 || point.x > image.width || point.y < 0 || point.y > image.height) {
+                return;
+            }
+            if(data.type === null) {
+                // TODO: click on exiting points
+                return;
+            }
+            if(data.pointer === null) {
+                openFigure(point);
+            } else {
+                modifyFigure(point);
+            }
+            draw();
+        }        
+
+
+        saveState();
+
+        return {
+            setBounds: setBounds,
+
+            handleClick: handleClick,
+
+            destroy: function() {
+                toolbar.destroy();
+                wrapper.removeChild(canvas);
+            }
+        }
+    }
+
+
+
+
+
+
+    function EeventsHandler() {
+
+        var drag_info = false;
+        var mouse_moved = false;
+
+        wrapper.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            var viewport_bounds = viewport.getBounds();
+            drag_info = {
+                x: viewport_bounds.x + event.clientX,
+                y: viewport_bounds.y + event.clientY
+            }
+            mouse_moved = false;
+        });
+
+        wrapper.addEventListener('mousemove', function(e) {
+            mouse_moved = true;
+            if(!drag_info) {
+                return;
+            }
+            viewport.move({
+                x: drag_info.x - event.clientX,
+                y: drag_info.y - event.clientY
+            })
+        });
+
+
+        wrapper.addEventListener('mouseup', function(e) {
+            drag_info = false;
+        });
+
+        wrapper.addEventListener('click', function(e) {
+            if(!mouse_moved) {
+                var bounds = wrapper.getBoundingClientRect();            
+                var point = {
+                    x: e.clientX - bounds.x,
+                    y: e.clientY - bounds.y
+                }
+                editor.handleClick(point);
+            }
+        });
+        
+
+        wrapper.addEventListener('mouseleave', function(e) {
+            drag_info = false;
+            mouse_moved = false;
+        });        
+
+    }
 
 
 
@@ -239,6 +572,8 @@ function Map2D(params) {
         viewport && viewport.refresh();
     }
     
+
+    // main 
 
     function loadImage(src, callback) {
         var image = new Image();
@@ -252,13 +587,15 @@ function Map2D(params) {
     var viewport;
     var map;
     var editor;
+    var events_handler;
+
     loadImage(params.url, function(image) {
         onResize();
         if(!params.width && !params.height) {
             window.addEventListener('resize', onResize, false);
         }                
         map = Map(image);
-        editor = Editor();
+        editor = Editor(image);
         viewport = Viewport({
             width: image.width,
             height: image.height
@@ -266,40 +603,8 @@ function Map2D(params) {
             map.setBounds(bounds);
             editor.setBounds(bounds);
         })
-        toolbar = Toolbar();
+        events_handler = EeventsHandler();        
         onResize();
-
-
-        var drag_start = false;
-        wrapper.addEventListener('mousedown', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            var bounds = viewport.getBounds();
-            drag_start = {
-                x: bounds.x + event.clientX,
-                y: bounds.y + event.clientY
-            }
-        });
-
-        wrapper.addEventListener('mousemove', function(e) {
-            if(!drag_start) {
-                return;
-            }
-            viewport.move({
-                x: drag_start.x - event.clientX,
-                y: drag_start.y - event.clientY
-            })
-        });
-
-        wrapper.addEventListener('mouseup', function(e) {
-            drag_start = false;
-        });
-
-        wrapper.addEventListener('mouseleave', function(e) {
-            drag_start = false;
-        });        
-        
-
         loaded = true;
     })
 

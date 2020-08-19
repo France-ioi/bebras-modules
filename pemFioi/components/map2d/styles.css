@@ -47,10 +47,17 @@
     background: #ddd;
 }
 
-.map2d .toolbar .active {
+.map2d .toolbar .button-selected,
+.map2d .toolbar .button-selected:hover {
     color: #fff;
     background: #333;
 }
+
+.map2d .toolbar .button-disabled,
+.map2d .toolbar .button-disabled:hover {
+    color: #ccc;
+}
+
 
 .map2d .toolbar .button:first-child {
     border-radius: 5px 0 0 5px;
