@@ -21,32 +21,48 @@
     </head>
     <body>
         <div id="map" style="left: 25%; top: 15%; right: 25%; bottom: 15%; border: 1px solid red; position: fixed;"></div>
-
         <script>
             var map2d = Map2D({
                 parent: document.getElementById('map'),
-                //url: 'map_lowres.jpg'
-                url: 'map.jpg'
+                url: 'map_lowres.jpg',
+                //url: 'map.jpg',
+                zoom: 1,
+/*
+                figures: [
+                    { 
+                        type: 'point',
+                        data: { x: 25, y: 25 }
+                    },
+                    { 
+                        type: 'point',
+                        data: { x: 25, y: 50 }
+                    },
+                    { 
+                        type: 'point',
+                        data: { x: 25, y: 50 }
+                    },
+                    {
+                        type: 'line',
+                        data: [
+                            { x: 50, y: 25 },
+                            { x: 75, y: 50 },
+                            { x: 100, y: 20 },
+                            { x: 125, y: 50 },
+                            { x: 150, y: 25 }
+                        ]
+                    },
+                    {
+                        type: 'area',
+                        data: [
+                            { x: 100, y: 75 },
+                            { x: 125, y: 100 },
+                            { x: 150, y: 100 },
+                            { x: 175, y: 75 },
+                        ]
+                    }
+                ]                
+                */
             });
         </script>
-<!--
-        <div class="map2d" style="width: 800px; height: 600px;">
-            <div class="toolbar">
-                <div class="group">
-                    <div class="button">Point</div>
-                    <div class="button">Line</div>
-                    <div class="button">Area</div>
-                </div>
-                <div class="group">
-                    <div class="button">Undo</div>
-                    <div class="button">Redo</div>
-                </div>                
-            </div>
-            <div class="zoom">
-                <div class="button">+</div>
-                <div class="button">-</div>                
-            </div>
-        </div>
--->        
     </body>
 </html>
