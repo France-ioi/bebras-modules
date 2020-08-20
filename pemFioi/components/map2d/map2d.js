@@ -251,36 +251,43 @@ function Map2D(params) {
 
 
 
-    function State() {
+    function State(default_state) {
 
         var states = [];
-        var pointer = null;
+        var pointer = 0;
 
-        function clone(data) {
-            return {
-                type: data.type,
-                pointer: data.pointer,
-                figures: data.figures.slice()
-            }
+
+        function read(new_pointer) {
+            pointer = new_pointer;
+            return JSON.parse(states[pointer]);
         }
 
+        function write(data) {
+            states.push(JSON.stringify(data));
+            pointer = states.length - 1;
+        }
+
+        write(default_state);
+
         return {
+            get: function() {
+                return read(pointer);
+            },
+
             push: function(data) {
+                console.log('push', pointer, states.length)
                 if(pointer < states.length - 1) {
-                    states = states.slice(0, pointer);
+                    states = states.slice(0, pointer + 1);
                 }
-                states.push(clone(data));
-                pointer = states.length - 1;
+                write(data);
             },
 
             undo: function() {
-                pointer--;
-                return clone(states[pointer]);
+                return read(pointer - 1);
             },
 
             redo: function() {
-                pointer++;
-                return clone(states[pointer]);
+                return read(pointer + 1);
             },
 
             getCapabilities: function() {
@@ -300,12 +307,12 @@ function Map2D(params) {
         wrapper.appendChild(canvas);
         var context2d = canvas.getContext('2d');
         var bounds;
-        var state = State();
-        var data = {
+        var state = State({
             pointer: null,
             type: null,
             figures: params.figures || []
-        }
+        });
+        var data = state.get();
 
         function saveState() {
             state.push(data);
@@ -458,7 +465,6 @@ function Map2D(params) {
             onUndo: function() {
                 if(state.getCapabilities().undo) {
                     data = state.undo();
-                    console.log(data)
                     refreshToolbar();
                     draw();
                 }
@@ -491,8 +497,7 @@ function Map2D(params) {
             draw();
         }        
 
-
-        saveState();
+        refreshToolbar();
 
         return {
             setBounds: setBounds,
