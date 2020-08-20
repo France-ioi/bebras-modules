@@ -982,11 +982,11 @@ function SimpleGraphDrawer(circleAttr, lineAttr, vertexDrawer, autoMove, vertexM
    }
 
    this.getLabelPos = function(edgeID,vertex1,vertex2) {
-      if(!vertex1 || !vertex2){
-         var edgeVertices = this.graph.getEdgeVertices(edgeID);
-         vertex1 = edgeVertices[0];
-         vertex2 = edgeVertices[1];
-      }
+
+      var edgeVertices = this.graph.getEdgeVertices(edgeID);
+      vertex1 = edgeVertices[0];
+      vertex2 = edgeVertices[1];
+
       var info = this.graph.getEdgeInfo(edgeID);
       var vInfo = this.visualGraph.getEdgeVisualInfo(edgeID);
       var vertex1Pos = this.visualGraph.getVertexVisualInfo(vertex1);
