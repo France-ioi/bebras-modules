@@ -617,6 +617,7 @@ var localLanguageStrings = {
          functions: "Funciones",
          read: "Lectura",
          print: "Escritura",
+         internet: "Internet",
          display: "Pantalla",
       },
       invalidContent: "Contenido inválido",
@@ -701,7 +702,8 @@ var localLanguageStrings = {
       testLabel: "Caso",
       testError: "error",
       testSuccess: "correcto",
-      seeTest: "ver"
+      seeTest: "ver",
+      infiniteLoop: "repetir indefinidamente"
    },
    sl: {
       categories: {

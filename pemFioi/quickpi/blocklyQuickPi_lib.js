@@ -612,6 +612,7 @@ var getContext = function (display, infos, curLevel) {
                 cloudKeyNotExists: "La clé n'existe pas : {0} ",
                 cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
                 cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
+                hello: "Bonjour",
             }
         },
         es: { // French strings
@@ -624,7 +625,7 @@ var getContext = function (display, infos, curLevel) {
                 turnLedOff: "apagar el LED",
 
                 setLedState: "cambiar el LED %1 a %2 ",
-                toggleLedState: "inverser la LED %1",
+                toggleLedState: "invertir el estado del LED %1",
 
                 isLedOn: "LED encendido",
                 isLedOnWithName: "LED %1 encendido",
@@ -638,7 +639,7 @@ var getContext = function (display, infos, curLevel) {
                 isBuzzerOn: "zumbador encendido",
                 isBuzzerOnWithName: "zumbador %1 encendido",
 
-                setBuzzerNote: "frequencia de reproducción %2Hz em %1",
+                setBuzzerNote: "frequencia de reproducción %2Hz en %1",
                 getBuzzerNote: "frequncia del zumbador %1",
 
                 isButtonPressed: "botón presionado",
@@ -657,7 +658,7 @@ var getContext = function (display, infos, curLevel) {
                 readLightIntensity: "intensidad de luz",
                 readHumidity: "humedad ambiental",
 
-                setServoAngle: "poner el servo %1 en el angulo %2",
+                setServoAngle: "cambiar el ángulo de el servo %1 a %2°",
                 getServoAngle: "ángulo del servo %1",
 
 
@@ -787,8 +788,8 @@ var getContext = function (display, infos, curLevel) {
             },
             description: {
                 // Descriptions of the functions in Python (optional)
-                turnLedOn: "turnLedOn() allume la LED",
-                turnLedOff: "turnLedOff() éteint la LED",
+                turnLedOn: "turnLedOn() enciende el LED",
+                turnLedOff: "turnLedOff() apaga el led LED",
                 isButtonPressed: "isButtonPressed() devuelve True si el boton esta presionado, False de otra manera",
                 isButtonPressedWithName: "isButtonPressed(button) devuelve True si el boton esta presionado, False de otra manera",
                 waitForButton: "waitForButton(button) pausa la ejecución hasta que se presiona el botón",
@@ -9327,7 +9328,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
                         "</block>"
 
                 },
@@ -9339,7 +9340,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText2Lines'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>Bonjour</field> </shadow></value>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
