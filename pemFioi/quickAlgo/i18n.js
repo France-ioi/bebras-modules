@@ -123,6 +123,7 @@ var localLanguageStrings = {
       variablesAllowed: "Les variables sont autorisées.",
       variablesForbidden: "Les variables sont interdites.",
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.",
+      autorizedKeyWords: "Mots-clés autorisés : ",
    },
    en: {
       categories: {
@@ -241,6 +242,7 @@ var localLanguageStrings = {
       variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
+      autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
    },
    de: {
       categories: {
@@ -360,6 +362,7 @@ var localLanguageStrings = {
       variablesAllowed: "Du darfst Variable verwenden.",
       variablesForbidden: "Du darfst keine Variablen verwenden",
       readDocumentation: "Du darfst die Python-Dokumentation lesen.",
+      autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
    },
    es: {
       categories: {
@@ -479,6 +482,7 @@ var localLanguageStrings = {
       variablesAllowd: "Se permiten variables.",
       variablesForbidden: "Las variables están prohibidas.",
       readDocumentation: "Se le permite leer la documentación de Python y utilizar un motor de búsqueda durante el concurso.",
+      autorizedKeyWords: "Palabras clave autorizadas: ",
    },
    sl: {
       categories: {
@@ -597,6 +601,7 @@ var localLanguageStrings = {
       variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
+      autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
    }
 };
 
