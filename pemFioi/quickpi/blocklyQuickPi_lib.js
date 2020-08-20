@@ -608,6 +608,10 @@ var getContext = function (display, infos, curLevel) {
                 name: "Name",
                 port: "Port",
                 state: "State",
+
+                cloudKeyNotExists: "La clé n'existe pas : {0} ",
+                cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
+                cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
             }
         },
         es: { // French strings
@@ -980,6 +984,9 @@ var getContext = function (display, infos, curLevel) {
                 name: "Nombre",
                 port: "Puerto",
                 state: "Estado",
+                cloudKeyNotExists: "La llave no existe : {0} ",
+                cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
+                cloudUnexpectedKey: "La llave {0} no es una llave esperada",
             }
         },
         
@@ -3826,6 +3833,11 @@ var getContext = function (display, infos, curLevel) {
                 infos.quickPiSensors.push(newSensor);
             }
 
+            var newSensor = {
+                "type": "cloudstore",
+                "name": "cloud1",
+            };
+            infos.quickPiSensors.push(newSensor);
         }
 
     };
