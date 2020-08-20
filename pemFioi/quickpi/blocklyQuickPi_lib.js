@@ -664,7 +664,7 @@ var getContext = function (display, infos, curLevel) {
 
                 drawPoint: "draw pixel",
                 isPointSet: "is pixel set in screen",
-                drawLine: "linea x₀: %1 y₀: %2 x₁: %3 y₁: %4",
+                drawLine: "linea desde x₀: %1 y₀: %2 hasta x₁: %3 y₁: %4",
                 drawRectangle: "rectángulo  x: %1 y: %2 largo: %3 alto: %4",
                 drawCircle: "circulo x₀: %1 y₀: %2 diametro: %3",
                 clearScreen: "limpiar toda la pantalla",
@@ -828,8 +828,8 @@ var getContext = function (display, infos, curLevel) {
 
                 drawPoint: "drawPoint(x, y) dibuja un punto en las coordenadas x, y",
                 isPointSet: "isPointSet(x, y) devuelve True se dibujó sobre el punto x, y, False de lo contrario",
-                drawLine: "drawLine(x0, y0, x1, y1) dibuja una semi recta empezando desde el punto x0, x1, hasta el punto x1, y1",
-                drawRectangle: "drawRectangle(x0, y0, width, height) dibuja un rectangulo empezando en el punto x0, y0 y con el ancho y altura dados",
+                drawLine: "drawLine(x0, y0, x1, y1) dibuja una linea empezando desde el punto x0, x1, hasta el punto x1, y1",
+                drawRectangle: "drawRectangle(x0, y0, width, height) dibuja un rectángulo empezando en el punto x0, y0 con el ancho y altura dados",
                 drawCircle: "drawCircle(x0, y0, diameter) dibuja un circulo con centro en x0, y0 y el diametro dado",
                 clearScreen: "clearScreen() limpia toda la pantalla",
                 updateScreen: "updateScreen() actualiza los contenidos de la pantalla",
@@ -988,6 +988,7 @@ var getContext = function (display, infos, curLevel) {
                 cloudKeyNotExists: "La llave no existe : {0} ",
                 cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
                 cloudUnexpectedKey: "La llave {0} no es una llave esperada",
+                hello: "Hola",
             }
         },
         

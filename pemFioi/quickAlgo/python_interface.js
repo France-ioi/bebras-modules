@@ -724,7 +724,7 @@ function LogicController(nbTestCases, maxInstructions) {
     var pflAllowed = processForbiddenList(pflInfos.allowed, true);
     processForbiddenList(pflInfos.forbidden, false);
     if(pflAllowed.length) {
-      simpleHtml += '<br />Mots-clés autorisés : ' + displaySimpleList(pflAllowed);
+      simpleHtml += '<br />' + this._strings.autorizedKeyWords + displaySimpleList(pflAllowed);
     }
 
     if(pflInfos.allowed.indexOf('var_assign') > -1) {
