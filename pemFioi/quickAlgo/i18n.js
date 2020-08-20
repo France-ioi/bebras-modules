@@ -144,7 +144,7 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Functions",
          read: "Reading",
-         print: "Writing"
+         print: "Writing",
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
@@ -381,7 +381,8 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Funciones",
          read: "Lectura",
-         print: "Escritura"
+         print: "Escritura",
+         display: "Pantalla",
       },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",
