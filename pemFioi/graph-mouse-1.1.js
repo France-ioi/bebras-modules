@@ -2455,6 +2455,7 @@ function GraphEditor(settings) {
             var labelHeight = 2*attr["font-size"];
          }
       }else if(type === "edge" && self.editEdgeLabelEnabled){
+         $(document).off("keydown");
          var info = graph.getEdgeInfo(id);
          var attr = visualGraph.graphDrawer.edgeLabelAttr;
          var labelPos = visualGraph.graphDrawer.getLabelPos(id);
