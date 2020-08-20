@@ -521,192 +521,475 @@ var getContext = function (display, infos, curLevel) {
                 drawing: "dessin",
                 timeLabel: "Temps",
                 seconds: "secondes",
-                connectionHTML: `
-                <div id="piui">
-                    <button type="button" id="piconnect" class="btn">
-                        <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">Connecter</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
-                    </button>
 
-                    <span id="piinstallui">
-                        <span class="fa fa-exchange-alt"></span>
-                        <button type="button" id="piinstall" class="btn">
-                            <span class="fa fa-upload"></span><span>Installer</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
-                        </button>
-                    </span>
+                changeBoard: "Changer de carte",
+                connect: "Connecter",
+                install: "Installer",
+                config: "Config",
 
-                    <span id="pichangehatui">
-                        <button type="button" id="pichangehat" class="btn">
-                            <span class="fas fa-hat-wizard"></span><span>Changer de carte</span></span></span>
-                        </button>
-                        <button type="button" id="pihatsetup" class="btn">
-                            <span class="fas fa-cog"></span><span>Config</span></span></span>
-                        </button>
-                    </span>
-                </div>`,
-                connectionDialogHTML: `
-                <div class="content connectPi qpi">
-                    <div class="panel-heading">
-                        <h2 class="sectionTitle">
-                            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                            Configuration du Raspberry Pi
-                        </h2>
-                        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                    </div>
-                    <div class="panel-body">
-                        <div id="piconnectionmainui">
-                            <div class="switchRadio btn-group" id="piconsel">
-                                <button type="button" class="btn" id="piconlocal"><i class="fas fa-location-arrow icon"></i>Local</button>
-                                <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
-                                <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
-                                <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
-                            </div>
-                            <div id="pischoolcon">
-                                <div class="form-group">
-                                    <label id="pischoolkeylabel">Indiquez un identifiant d'école</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">Aa</div>
-                                        <input type="text" id="schoolkey" class="form-control">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label id="pilistlabel">Sélectionnez un appareil à connecter dans la liste suivante</label>
-                                    <div class="input-group">
-                                        <button class="input-group-prepend" id=pigetlist disabled>Obtenir la liste</button>
-                                        <select id="pilist" class="custom-select" disabled>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label id="piiplabel">ou entrez son adesse IP</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">123</div>
-                                        <input id=piaddress type="text" class="form-control">
-                                    </div>
-                                </div>
-                                <div>
-                                    <input id="piusetunnel" disabled type="checkbox">Connecter à travers le France-ioi tunnel
-                                </div>
-                            </div>
+         
+                raspiConfig: "Configuration du Raspberry Pi",
+                local: "Local",
+                schoolKey: "Indiquez un identifiant d'école",
+                connectList: "Sélectionnez un appareil à connecter dans la liste suivante",
+                enterIpAddress: "ou entrez son adesse IP",
+                getPiList: "Obtenir la liste",
+                connectTroughtTunnel: "Connecter à travers le France-ioi tunnel",
+    
+                connectToLocalhost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
+                connectToWindowLocation: "Connecter au Raspberry Pi depuis lequel cette page est chargée",
+    
+                connectToDevice: "Connecter l'appareil",
+                disconnectFromDevice: "Déconnecter",
+           
 
-                            <div id="panel-body-usbbt">
-                                <label id="piconnectionlabel"></label>
-                            </div>
+                irReceiverTitle: "Recevoir des codes infrarouges",
+                directIrControl: "Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons",
+                getIrCode: "Recevoir un code",
+                closeDialog: "Fermer",
 
-                            <div id="panel-body-local">
-                                <label id="piconnectionlabellocal"></label>
-
-                                <div id="piconnectolocalhost">
-                                    <input type="radio" id="piconnectolocalhostcheckbox" name="pilocalconnectiontype" value="localhost">
-                                    Connecter l'interface à la machine sur laquelle tourne ce navigateur
-                                </div>
-
-                                <div id="piconnectocurrenturl">
-                                    <input type="radio" id="piconnectocurrenturlcheckbox" name="pilocalconnectiontype" value="currenturl">
-                                    Connecter au Raspberry Pi depuis lequel cette page est chargée
-                                </div>
-                            </div>
-                        </div>
-                        <div class="inlineButtons">
-                            <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>Connecter l'appareil</button>
-                            <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>Déconnecter</button>
-                        </div>
-                    </div>
-                </div>
-                `,
-                stickPortsDialog: `
-                <div class="content qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Noms et ports de la manette
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div id="sensorPicker" class="panel-body">
-                    <label></label>
-                    <div class="flex-container">
-                    <table style="display:table-header-group;">
-                    <tr>
-                    <th>Name</th>
-                    <th>Port</th>
-                    <th>State</th>
-                    <th>Direction</th>
-                    </tr>
-                    <tr>
-                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
-                    </tr>
-                    <tr>
-                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
-                    </tr>
-                    <tr>
-                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
-                    </tr>
-                    <tr>
-                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
-                    </tr>
-                    <tr>
-                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
-                    </tr>
-                    </table>
-                    </div>
-                </div>
-                <div class="singleButton">
-                    <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
-                </div>
-            </div>
-                `,
-                irLearnDialog: `
-                <div class="content qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Recevoir des codes infrarouges
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div id="sensorPicker" class="panel-body">
-                    <div class="form-group">
-                        <p>Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons</p>
-                    </div>
-
-                    <div class="form-group">
-                        <p id=piircode></p>
-                    </div>
-                </div>
-                <div class="singleButton">
-                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>Recevoir un code</button>
-                    <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>Fermer</button>
-                </div>
-            </div>
-                `,
-                irRemoteDialog: `
-                <div class="content qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Télécommande IR
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div id="sensorPicker" class="panel-body">
-                    <div id="piremotemessage" >
-                    </div>
-                    <div id="piremotecontent" >
-                    </div>
-                </div>
-                <div class="singleButton">
-                    <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
-                </div>
-            </div>
-                `,
+                irRemoteControl: "Télécommande IR",
+                
                 noIrPresets: "Veuillez utiliser la fonction de préparation de messages IR pour ajouter des commandes de télécommande",
                 irEnableContinous: "Activer l'émission IR en continu",
                 irDisableContinous: "Désactiver l'émission IR en continu",
 
                 connectToLocalHost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
-                connectToCurrentServer: "Connecter au Raspberry Pi depuis lequel cette page est chargée",
+
+                up: "up",
+                down: "down",
+                left: "left",
+                right: "right",
+                center: "center",
+
+                on: "On",
+                off: "Off",
+
+                grovehat: "Grove Base Hat for Raspberry Pi",
+                quickpihat: "France IOI QuickPi Hat",
+                pinohat: "Raspberry Pi without hat",
+                led: "LED",
+                blueled: "LED bleue",
+                greenled: "LED verte",
+                orangeled: "LED orange",
+                redled: "LED rouge",
+                buzzer: "Buzzer",
+                grovebuzzer: "Grove Buzzer",
+                quickpibuzzer: "Quick Pi Passive Buzzer",
+                servo: "Servo Motor",
+                screen: "Screen",
+                grove16x2lcd: "Grove 16x2 LCD",
+                oled128x32: "128x32 Oled Screen",
+                irtrans: "IR Transmiter",
+                button: "Button",
+                fivewaybutton: "5 way button",
+                tempsensor: "Temperature sensor",
+                groveanalogtempsensor: "Grove Analog tempeature sensor",
+                quickpigyrotempsensor: "Quick Pi Accelerometer+Gyroscope temperature sensor",
+                dht11tempsensor: "DHT11 Tempeature Sensor",
+                potentiometer: "Potentiometer",
+                lightsensor: "Light sensor",
+                distancesensor: "Capteur de distance",
+                timeofflightranger: "Time of flight distance sensor",
+                ultrasonicranger: "Capteur de distance à ultrason",
+                humiditysensor: "Humidity sensor",
+                soundsensor: "Sound sensor",
+                accelerometerbmi160: "Accelerometer sensor (BMI160)",
+                gyrobmi160: "Gyropscope sensor (BMI160)",
+                maglsm303c: "Magnetometer sensor (LSM303C)",
+                irreceiver: "IR Receiver",
+                cloudstore: "Cloud Store",
+                addcomponent: "Ajouter un composant",
+                selectcomponent: "Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.",
+                add: "Ajouter",
+                builtin: "(builtin)",
+                chooseBoard: "Choisissez votre carte",
+                nameandports: "Noms et ports des capteurs et actionneurs QuickPi",
+                name: "Name",
+                port: "Port",
+                state: "State",
+
+                cloudKeyNotExists: "La clé n'existe pas : {0} ",
+                cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
+                cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
             }
         },
+        es: { // French strings
+            label: {
+                // Labels for the blocks
+                sleep: "esperar %1 milisegundos",
+                currentTime: "tiempo transcurrido en milisegundos",
+
+                turnLedOn: "encender el LED",
+                turnLedOff: "apagar el LED",
+
+                setLedState: "cambiar el LED %1 a %2 ",
+                toggleLedState: "inverser la LED %1",
+
+                isLedOn: "LED encendido",
+                isLedOnWithName: "LED %1 encendido",
+
+                setLedBrightness: "Cambiar el brillo de %1 a %2",
+                getLedBrightness: "Obtener el brillo de %1",
+
+                turnBuzzerOn: "encender el zumbador",
+                turnBuzzerOff: "apagar el zumbador",
+                setBuzzerState: "cambiar el zumbador %1 a %2",
+                isBuzzerOn: "zumbador encendido",
+                isBuzzerOnWithName: "zumbador %1 encendido",
+
+                setBuzzerNote: "frequencia de reproducción %2Hz em %1",
+                getBuzzerNote: "frequncia del zumbador %1",
+
+                isButtonPressed: "botón presionado",
+                isButtonPressedWithName: "botón  %1 presionado",
+                waitForButton: "esperar a que se presione un botón",
+                buttonWasPressed: "el botón ha sido presionado",
+
+                displayText: "desplegar texto %1",
+                displayText2Lines: "desplegar texto Linea 1 : %1 Linea 2 : %2",
+
+                readTemperature: "temperatura ambiente",
+                getTemperature: "temperatura de %1",
+
+                readRotaryAngle: "estado del potenciómetro %1",
+                readDistance: "distancia medida por %1",
+                readLightIntensity: "intensidad de luz",
+                readHumidity: "humedad ambiental",
+
+                setServoAngle: "poner el servo %1 en el angulo %2",
+                getServoAngle: "ángulo del servo %1",
+
+
+                drawPoint: "draw pixel",
+                isPointSet: "is pixel set in screen",
+                drawLine: "linea x₀: %1 y₀: %2 x₁: %3 y₁: %4",
+                drawRectangle: "rectángulo  x: %1 y: %2 largo: %3 alto: %4",
+                drawCircle: "circulo x₀: %1 y₀: %2 diametro: %3",
+                clearScreen: "limpiar toda la pantalla",
+                updateScreen: "actualizar pantalla",
+                autoUpdate: "modo de actualización de pantalla automática",
+
+                fill: "establecer el color de fondo en %1",
+                noFill: "no rellenar figuras",
+                stroke: "color de los bordes %1",
+                noStroke: "no dibujar los contornos",
+
+                readAcceleration: "aceleración en m/s² en el eje %1",
+                computeRotation: "cálculo del ángulo de rotación (°) en el acelerómetro %1",
+                readSoundLevel: "volumen de sonido",
+
+                readMagneticForce: "campo magnético (µT) en %1",
+                computeCompassHeading: "dirección de la brújula en (°)",
+
+                readInfraredState: "infrarrojos detectados en %1",
+                setInfraredState: "poner emisor de infrarrojos %1 a %2",
+
+                // Gyroscope
+                readAngularVelocity: "velocidad angular (°/s) del guroscopio %1",
+                setGyroZeroAngle: "inicializar el giroscopio a estado cero",
+                computeRotationGyro: "calcular la rotación del giroscopio %1",
+
+                //Internet store
+                connectToCloudStore: "conéctese a la nube. Usuario %1 Contraseña %2",
+                writeToCloudStore: "escribir en la nube : Usuario %1 llave %2 valor %3",
+                readFromCloudStore: "leer de la nube : Usuario %1 llave %2",
+
+                // IR Remote
+                readIRMessage: "esperar un mensaje de infrarrojos : %1 durante : %2 ms",
+                sendIRMessage: "enviar el mensaje por infrarrojos %2 por %1",
+                presetIRMessage: "preparar un mensaje de infrarrojos con el nombre %1 y el contenido %2",
+            },
+            code: {
+                // Names of the functions in Python, or Blockly translated in JavaScript
+                turnLedOn: "turnLedOn",
+                turnLedOff: "turnLedOff",
+                setLedState: "setLedState",
+
+                isButtonPressed: "isButtonPressed",
+                isButtonPressedWithName : "isButtonPressed",
+                waitForButton: "waitForButton",
+                buttonWasPressed: "buttonWasPressed",
+
+                toggleLedState: "toggleLedState",
+                displayText: "displayText",
+                displayText2Lines: "displayText",
+                readTemperature: "readTemperature",
+                sleep: "sleep",
+                setServoAngle: "setServoAngle",
+                readRotaryAngle: "readRotaryAngle",
+                readDistance: "readDistance",
+                readLightIntensity: "readLightIntensity",
+                readHumidity: "readHumidity",
+                currentTime: "currentTime",
+                getTemperature: "getTemperature",
+
+                isLedOn: "isLedOn",
+                isLedOnWithName: "isLedOn",
+
+                setBuzzerNote: "setBuzzerNote",
+                getBuzzerNote: "getBuzzerNote",
+                setLedBrightness: "setLedBrightness",
+                getLedBrightness: "getLedBrightness",
+                getServoAngle: "getServoAngle",
+
+                setBuzzerState: "setBuzzerState",
+                setBuzzerNote: "setBuzzerNote",
+
+                turnBuzzerOn: "turnBuzzerOn",
+                turnBuzzerOff: "turnBuzzerOff",
+                isBuzzerOn: "isBuzzerOn",
+                isBuzzerOnWithName: "isBuzzerOn",
+
+
+                drawPoint: "drawPoint",
+                isPointSet: "isPointSet",
+                drawLine: "drawLine",
+                drawRectangle: "drawRectangle",
+                drawCircle: "drawCircle",
+                clearScreen: "clearScreen",
+                updateScreen: "updateScreen",
+                autoUpdate: "autoUpdate",
+
+                fill: "fill",
+                noFill: "noFill",
+                stroke: "stroke",
+                noStroke: "noStroke",
+
+
+                readAcceleration: "readAcceleration",
+                computeRotation: "computeRotation",
+
+                readSoundLevel: "readSoundLevel",
+
+
+                readMagneticForce: "readMagneticForce",
+                computeCompassHeading: "computeCompassHeading",
+
+                readInfraredState: "readInfraredState",
+                setInfraredState: "setInfraredState",
+
+
+                // Gyroscope
+                readAngularVelocity: "readAngularVelocity",
+                setGyroZeroAngle: "setGyroZeroAngle",
+                computeRotationGyro: "computeRotationGyro",
+
+                //Internet store
+                connectToCloudStore: "connectToCloudStore",
+                writeToCloudStore: "writeToCloudStore",
+                readFromCloudStore: "readFromCloudStore",                
+
+                // IR Remote
+                readIRMessage: "readIRMessage",
+                sendIRMessage: "sendIRMessage",
+                presetIRMessage: "presetIRMessage",
+            },
+            description: {
+                // Descriptions of the functions in Python (optional)
+                turnLedOn: "turnLedOn() allume la LED",
+                turnLedOff: "turnLedOff() éteint la LED",
+                isButtonPressed: "isButtonPressed() devuelve True si el boton esta presionado, False de otra manera",
+                isButtonPressedWithName: "isButtonPressed(button) devuelve True si el boton esta presionado, False de otra manera",
+                waitForButton: "waitForButton(button) pausa la ejecución hasta que se presiona el botón",
+                buttonWasPressed: "buttonWasPressed(button) indica si se ha pulsado el botón desde la última llamada a esta función",
+                setLedState: "setLedState(led, state) modifica el estado del LED: True para encenderlo, False para apagarlo",
+                toggleLedState: "toggleLedState(led) invierte el estado del LED",
+                displayText: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
+                displayText2Lines: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
+                readTemperature: "readTemperature(thermometer) devuelve la temperatura ambiente",
+                sleep: "sleep(milliseconds) pausa la ejecución por un tiempo en milisegundos",
+                setServoAngle: "setServoAngle(servo, angle) cambiar el ángulo del servomotor",
+                readRotaryAngle: "readRotaryAngle(potentiometer) devuelve la posición del potenciómetro",
+                readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
+                readLightIntensity: "readLightIntensity(lightSensor) devuelve la intensidad de la luz",
+                readHumidity: "readHumidity(hygrometer) devuelve la humedad ambiental",
+                currentTime: "currentTime(milliseconds) tiempo en milisegundos desde el inicio del programa",
+
+                setLedBrightness: "setLedBrightness(led, brightness) ajusta la intensidad de la luz del LED",
+                getLedBrightness: "getLedBrightness(led) devuelve la intensidad de luz del LED",
+                getServoAngle: "getServoAngle(servo) devuelve el ángulo del servomotor",
+
+                isLedOn: "isLedOn() devuelve True si el LED está encendido, False si está apagado",
+                isLedOnWithName: "isLedOn(led) devuelve True si el LED está encendido, False si está apagado",
+
+                turnBuzzerOn: "turnBuzzerOn() enciende el zumbador",
+                turnBuzzerOff: "turnBuzzerOff() apaga el zumbador",
+
+                isBuzzerOn: "isBuzzerOn() devuelve True si el zumbador está encendido, False si está apagado",
+                isBuzzerOnWithName: "isBuzzerOn(buzzer) devuelve True si el zumbador está encendido, False si está apagado",
+
+                setBuzzerState: "setBuzzerState(buzzer, state) modifica el estado del zumbador: Verdadero para encendido, Falso para apagado",
+                setBuzzerNote: "setBuzzerNote(buzzer, frequency) suena el zumbador en la frecuencia indicada",
+                getBuzzerNote: "getBuzzerNote(buzzer) devuelve la frecuencia actual del zumbador",
+
+                getTemperature: "getTemperature(thermometer) obtiene la temperatura del sensor",
+
+                drawPoint: "drawPoint(x, y) dibuja un punto en las coordenadas x, y",
+                isPointSet: "isPointSet(x, y) devuelve True se dibujó sobre el punto x, y, False de lo contrario",
+                drawLine: "drawLine(x0, y0, x1, y1) dibuja una semi recta empezando desde el punto x0, x1, hasta el punto x1, y1",
+                drawRectangle: "drawRectangle(x0, y0, width, height) dibuja un rectangulo empezando en el punto x0, y0 y con el ancho y altura dados",
+                drawCircle: "drawCircle(x0, y0, diameter) dibuja un circulo con centro en x0, y0 y el diametro dado",
+                clearScreen: "clearScreen() limpia toda la pantalla",
+                updateScreen: "updateScreen() actualiza los contenidos de la pantalla",
+                autoUpdate: "autoUpdate(auto) cambia el modo de actualización de pantalla automatica",
+
+                fill: "fill(color) rellenar las figuras con el color dado",
+                noFill: "noFill() no rellenar las figuras",
+                stroke: "stroke(color) dibujar los bordes de las figuras con el color dado",
+                noStroke: "noStroke() no dibujar los bordes de las figuras",
+
+
+                readAcceleration: "readAcceleration(axis) leer la acceleración (m/s²) en el eje (X, Y o Z)",
+                computeRotation: "computeRotation() calcular el ángulo de rotación (°) en el acelerómetro",
+
+                readSoundLevel: "readSoundLevel(port) devuelve el volumen del sonido ambiente",
+
+
+                readMagneticForce: "readMagneticForce(axis) devuelve el campo magnético (µT) en el eje (X, Y o Z)",
+                computeCompassHeading: "computeCompassHeading() devuelve la dirección de la brujula en grados",
+
+                readInfraredState: "readInfraredState() devuelve True si se detecta una señal infrarroja, Falso de otra manera",
+                setInfraredState: "setInfraredState(state) si se le pasa True enciende el transmisor infrarrojo, Falso lo apaga",
+
+                // Gyroscope
+                readAngularVelocity: "readAngularVelocity() devuelve la velocidad angular (°/s) del gyroscopio",
+                setGyroZeroAngle: "setGyroZeroAngle() inicializa el giroscopio a estado cero",
+                computeRotationGyro: "computeRotationGyro() calcula la rotación del giroscopio (°)",
+
+                //Internet store
+                connectToCloudStore: "connectToCloudStore(identifier, password) se conecta a la nube con el usuario y password dados",
+                writeToCloudStore: "writeToCloudStore(identifier, key, value) escribe un valor a un llave en la nube",
+                readFromCloudStore: "readFromCloudStore(identifier, key) devuelve un valor leido de la nube de la llave dada",
+
+                // IR Remote
+                readIRMessage: "readIRMessage(irrec, timeout) espera por un mensaje infrarrojo y lo devuelve durante el tiempo dado en milisegundos",
+                sendIRMessage: "sendIRMessage(irtrans, name) envia un mensaje infrarrojo previamente configurado con el nombre dado",
+                presetIRMessage: "presetIRMessage(name, data) configura un mensaje infrarrojo con el nombre y datos dados",
+            },
+            constant: {
+            },
+
+            startingBlockName: "Programa", // Name for the starting block
+            messages: {
+                sensorNotFound: "Acceso a un componente inexistente: {0}.",
+                manualTestSuccess: "Prueba automática validada.",
+                testSuccess: "Bien hecho! El resultado es correcto",
+                wrongState: "Prueba fallida: {0} estaba en etado {1} en lugar de {2} en t={3}ms.",
+                wrongStateDrawing: "Prueba fallida: {0} difiere en {1} píxeles de la visualización esperada en t = {2} ms.",
+                wrongStateSensor: "Prueba fallida: su programa no leyó el estado de {0} después de t = {1} ms.",
+                programEnded: "Programa completado.",
+                piPlocked: "El dispositivo está bloqueado. Desbloquear o reiniciar.",
+                cantConnect: "No se puede conectarse al dispositivo.",
+                wrongVersion: "El software en tu Raspberry Pi es demasiado antiguo, actualízalo.",
+                sensorInOnlineMode: "No se pueden modificar sensores en modo conectado.",
+                actuatorsWhenRunning: "No se pueden cambiar los actuadores mientras se ejecuta un programa",
+                cantConnectoToUSB: 'Intentado conectarse por USB, conecte su Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
+                cantConnectoToBT: 'Intentando conectarse por Bluetooth, conecte su Raspberry Pi por Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
+                canConnectoToUSB: "USB Conectado.",
+                canConnectoToBT: "Bluetooth Conectado.",
+                noPortsAvailable: "No hay ningún puerto compatible con {0} disponible (type {1})",
+                sensor: "Sensor",
+                actuator: "Actuador",
+                removeConfirmation: "¿Está seguro de que desea quitar este componente?",
+                remove: "Eliminar",
+                keep: "Mantener",
+                minutesago: "Visto por última vez hace {0} minutos",
+                hoursago: "Visto por ultima vez hace mas de una hora",
+                drawing: "dibujando",
+                timeLabel: "Tiempo",
+                seconds: "segundos",
+
+                changeBoard: "Cambiar tablero",
+                connect: "Conectar",
+                install: "Instalar",
+                config: "Configuración",
+
+         
+                raspiConfig: "Configuración de Raspberry Pi",
+                local: "Local",
+                schoolKey: "Ingrese una identificación de la escuela",
+                connectList: "Seleccione un dispositivo para conectarse de la siguiente lista",
+                enterIpAddress: "o ingrese una dirección IP",
+                getPiList: "Obtener la lista",
+                connectTroughtTunnel: "Conéctese a través del túnel de France-ioi",
+    
+                connectToLocalhost: "Conectarse al dispositivo que ejecuta este navegador",
+                connectToWindowLocation: "Conéctese a la Raspberry Pi desde la que se carga esta página",
+    
+                connectToDevice: "Conectar al dispositivo",
+                disconnectFromDevice: "Desconectar",
+           
+
+                irReceiverTitle: "Recibir códigos infrarrojos",
+                directIrControl: "Apunte su control remoto hace tu tablero QuickPi y presiona uno de los botones",
+                getIrCode: "Recibir un código",
+                closeDialog: "Cerrar",
+
+                irRemoteControl: "Control remoto Infrarrojo",
+                
+                noIrPresets: "Utilice la función de preparación de mensajes IR para agregar comandos de control remoto",
+                irEnableContinous: "Activar la emisión IR continua",
+                irDisableContinous: "Desactivar la emisión IR continua",
+
+                up: "arriba",
+                down: "abajo",
+                left: "izquierda",
+                right: "derecha",
+                center: "centro",
+
+                on: "Encendido",
+                off: "Apagado",
+
+                grovehat: "Sombrero Grove para Raspberry Pi",
+                quickpihat: "Sobrero QuickPi de France IOI",
+                pinohat: "Raspberry Pi sin sombrero",
+                led: "LED",
+                blueled: "LED azul",
+                greenled: "LED verde",
+                orangeled: "LED naranja",
+                redled: "LED rojo",
+                buzzer: "Zumbador",
+                grovebuzzer: "Zumbador Grove",
+                quickpibuzzer: "Zumbador passive de QuickPi",
+                servo: "Motor Servo",
+                screen: "Pantalla",
+                grove16x2lcd: "Pantalla Grove 16x2",
+                oled128x32: "Pantalla 128x32 Oled",
+                irtrans: "Transmisor de infrarrojos",
+                button: "Botón",
+                fivewaybutton: "Botón de 5 direcciones",
+                tempsensor: "Sensor de temperatura",
+                groveanalogtempsensor: "Sensor de temperatura analógico Grove",
+                quickpigyrotempsensor: "Sensor de temperaturea en el Acelerometro y Gyroscopio de QuickPi",
+                dht11tempsensor: "Sensor de Temperatura DHT11",
+                potentiometer: "Potenciómetro",
+                lightsensor: "Sensor de luz",
+                distancesensor: "Sensor de distancia",
+                timeofflightranger: "Sensor de distancia por rebote de luz",
+                ultrasonicranger: "Sensor de distancia por últrasonido",
+                humiditysensor: "Sensor de humedad",
+                soundsensor: "Sensor de sonido",
+                accelerometerbmi160: "Acelerómetro (BMI160)",
+                gyrobmi160: "Giroscopio (BMI160)",
+                maglsm303c: "Magnetómetro (LSM303C)",
+                irreceiver: "Receptor de infrarrojos",
+                cloudstore: "Almacenamiento en la nube",
+                addcomponent: "Agregar componente",
+                selectcomponent: "Seleccione un componente para agregar a su Raspberry Pi y conéctelo a un puerto.",
+                add: "Agregar",
+                builtin: "(incorporado)",
+                chooseBoard: "Elije tu tablero",
+                nameandports: "Nombres y puertos de sensores y actuadores QuickPi",
+                name: "Nombre",
+                port: "Puerto",
+                state: "Estado",
+                cloudKeyNotExists: "La llave no existe : {0} ",
+                cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
+                cloudUnexpectedKey: "La llave {0} no es una llave esperada",
+            }
+        },
+        
         none: {
             comment: {
                 // Comments for each block, used in the auto-generated documentation for task writers
@@ -730,27 +1013,18 @@ var getContext = function (display, infos, curLevel) {
                 currentTime: "returns current time",
                 setBuzzerState: "sonnerie",
                 setBuzzerNote: "sonnerie note",
-                
                 getTemperature: "Get temperature",
-
-
-
                 setBuzzerNote: "Set buzzer note",
                 getBuzzerNote: "Get buzzer note",
                 setLedBrightness: "Set Led Brightness",
                 getLedBrightness: "Get Led Brightness",
                 getServoAngle: "Get Servo Angle",
-
-
                 isLedOn: "Get led state",
                 isLedOnWithName: "Get led state",
-
                 turnBuzzerOn: "Turn Buzzer on",
                 turnBuzzerOff: "Turn Buzzer off",
                 isBuzzerOn: "Is Buzzer On",
                 isBuzzerOnWithName: "get buzzer state",
-
-
                 drawPoint: "drawPoint",
                 isPointSet: "isPointSet",
                 drawLine: "drawLine",
@@ -759,20 +1033,15 @@ var getContext = function (display, infos, curLevel) {
                 clearScreen: "clearScreen",
                 updateScreen: "updateScreen",
                 autoUpdate: "autoUpdate",
-
                 fill: "fill",
                 noFill: "noFill",
                 stroke: "stroke",
                 noStroke: "noStroke",
-
                 readAcceleration: "readAcceleration",
                 computeRotation: "computeRotation",
-
                 readSoundLevel: "readSoundLevel",
-
                 readMagneticForce: "readMagneticForce",
                 computeCompassHeading: "computeCompassHeading",
-
                 readInfraredState: "readInfraredState",
                 setInfraredState: "setInfraredState",
 
@@ -937,7 +1206,7 @@ var getContext = function (display, infos, curLevel) {
     var boardDefinitions = [
         {
             name: "grovepi",
-            friendlyName: "Grove Base Hat for Raspberry Pi",
+            friendlyName: strings.messages.grovehat,
             image: "grovepihat.png",
             adc: "grovepi",
             portTypes: {
@@ -960,7 +1229,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "quickpi",
-            friendlyName: "France IOI QuickPi Hat",
+            friendlyName: strings.messages.quickpihat,
             image: "quickpihat.png",
             adc: "ads1015",
             portTypes: {
@@ -989,7 +1258,7 @@ var getContext = function (display, infos, curLevel) {
         {
             name: "pinohat",
             image: "pinohat.png",
-            friendlyName: "Raspberry Pi without hat",
+            friendlyName: strings.messages.pinohat,
             adc: ["ads1015", "none"],
             portTypes: {
                 "D": [5, 16, 24],
@@ -1006,7 +1275,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "led",
-            description: "LED",
+            description: strings.messages.led,
             isAnalog: false,
             isSensor: false,
             portType: "D",
@@ -1035,29 +1304,29 @@ var getContext = function (display, infos, curLevel) {
                 context.quickPiConnection.sendCommand(command, callback);
             },
             getStateString: function(state) {
-                return state ? "ON" : "OFF";
+                return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
             },
             subTypes: [{
                 subType: "blue",
-                description: "LED bleue",
+                description: strings.messages.blueled,
                 selectorImages: ["ledon-blue.png"],
                 suggestedName: "blueled",
             },
             {
                 subType: "green",
-                description: "LED verte",
+                description: strings.messages.greenled,
                 selectorImages: ["ledon-green.png"],
                 suggestedName: "greenled",
             },
             {
                 subType: "orange",
-                description: "LED orange",
+                description: strings.messages.orangeled,
                 selectorImages: ["ledon-orange.png"],
                 suggestedName: "orangeled",
             },
             {
                 subType: "red",
-                description: "LED rouge",
+                description: strings.messages.redled,
                 selectorImages: ["ledon-red.png"],
                 suggestedName: "redled",
             }
@@ -1065,7 +1334,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "buzzer",
-            description: "Buzzer",
+            description: strings.messages.buzzer,
             isAnalog: false,
             isSensor: false,
             getInitialState: function(sensor) {
@@ -1106,21 +1375,21 @@ var getContext = function (display, infos, curLevel) {
 
                         return state.toString() + "Hz";
                 }               
-                return state ? "ON" : "OFF";
+                return state ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase();
             },
             subTypes: [{
                 subType: "active",
-                description: "Grove Buzzer",
+                description: strings.messages.grovebuzzer,
                 pluggable: true,
             },
             {
                 subType: "passive",
-                description: "Quick Pi Passive Buzzer",
+                description: strings.messages.quickpibuzzer,
             }],
         },
         {
             name: "servo",
-            description: "Servo motor",
+            description: strings.messages.servo,
             isAnalog: true,
             isSensor: false,
             getInitialState: function(sensor) {
@@ -1149,7 +1418,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "screen",
-            description: "Screen",
+            description: strings.messages.screen,
             isAnalog: false,
             isSensor: false,
             getInitialState: function(sensor) {
@@ -1250,18 +1519,18 @@ var getContext = function (display, infos, curLevel) {
             },
             subTypes: [{
                 subType: "16x2lcd",
-                description: "Grove 16x2 LCD",
+                description: strings.messages.grove16x2lcd,
                 pluggable: true,
             },
             {
                 subType: "oled128x32",
-                description: "128x32 Oled Screen",
+                description: strings.messages.oled128x32,
             }],
 
         },
         {
             name: "irtrans",
-            description: "IR Transmiter",
+            description: strings.messages.irtrans,
             isAnalog: false,
             isSensor: true,
             portType: "D",
@@ -1287,7 +1556,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "button",
-            description: "Button",
+            description: strings.messages.button,
             isAnalog: false,
             isSensor: true,
             portType: "D",
@@ -1315,7 +1584,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "stick",
-            description: "5 way button",
+            description: strings.messages.fivewaybutton,
             isAnalog: false,
             isSensor: true,
             portType: "D",
@@ -1376,7 +1645,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "temperature",
-            description: "Temperature sensor",
+            description: strings.messages.tempsensor,
             isAnalog: true,
             isSensor: true,
             portType: "A",
@@ -1398,25 +1667,25 @@ var getContext = function (display, infos, curLevel) {
             },
             subTypes: [{
                 subType: "groveanalog",
-                description: "Grove Analog tempeature sensor",
+                description: strings.messages.groveanalogtempsensor,
                 portType: "A",
                 pluggable: true,
             },
             {
                 subType: "BMI160",
-                description: "Quick Pi Accelerometer+Gyroscope temperature sensor",
+                description: strings.messages.quickpigyrotempsensor,
                 portType: "i2c",
             },
             {
                 subType: "DHT11",
-                description: "DHT11 Tempeature Sensor",
+                description: strings.messages.dht11tempsensor,
                 portType: "D",
                 pluggable: true,
             }],
         },
         {
             name: "potentiometer",
-            description: "Potentiometer",
+            description: strings.messages.potentiometer,
             isAnalog: true,
             isSensor: true,
             portType: "A",
@@ -1440,7 +1709,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "light",
-            description: "Light sensor",
+            description: strings.messages.lightsensor,
             isAnalog: true,
             isSensor: true,
             portType: "A",
@@ -1464,7 +1733,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "range",
-            description: "Capteur de distance",
+            description: strings.messages.distancesensor,
             isAnalog: true,
             isSensor: true,
             portType: "D",
@@ -1486,12 +1755,12 @@ var getContext = function (display, infos, curLevel) {
             },
             subTypes: [{
                 subType: "vl53l0x",
-                description: "Time of flight distance sensor",
+                description: strings.messages.timeofflightranger,
                 portType: "i2c",
             },
             {
                 subType: "ultrasonic",
-                description: "Capteur de distance à ultrason",
+                description: strings.messages.ultrasonicranger,
                 portType: "D",
                 pluggable: true,
             }],
@@ -1499,7 +1768,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "humidity",
-            description: "Humidity sensor",
+            description: strings.messages.humiditysensor,
             isAnalog: true,
             isSensor: true,
             portType: "D",
@@ -1523,7 +1792,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "sound",
-            description: "Sound sensor",
+            description: strings.messages.soundsensor,
             isAnalog: true,
             isSensor: true,
             portType: "A",
@@ -1547,7 +1816,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "accelerometer",
-            description: "Accelerometer sensor (BMI160)",
+            description: strings.messages.accelerometerbmi160,
             isAnalog: true,
             isSensor: true,
             portType: "i2c",
@@ -1587,7 +1856,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "gyroscope",
-            description: "Gyropscope sensor (BMI160)",
+            description: strings.messages.gyrobmi160,
             isAnalog: true,
             isSensor: true,
             portType: "i2c",
@@ -1617,7 +1886,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "magnetometer",
-            description: "Magnetometer sensor (LSM303C)",
+            description: strings.messages.maglsm303c,
             isAnalog: true,
             isSensor: true,
             portType: "i2c",
@@ -1649,7 +1918,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "irrecv",
-            description: "IR Receiver",
+            description: strings.messages.irreceiver,
             isAnalog: false,
             isSensor: true,
             portType: "D",
@@ -1675,7 +1944,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "cloudstore",
-            description: "Cloud store",
+            description: strings.messages.cloudstore,
             isAnalog: false,
             isSensor: false,
             portType: "none",
@@ -1692,7 +1961,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "clock",
-            description: "Cloud store",
+            description: strings.messages.cloudstore,
             isAnalog: false,
             isSensor: false,
             portType: "none",
@@ -2760,7 +3029,31 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || !this.raphaelFactory)
             return;
 
-        var piUi = getQuickPiOption('disableConnection') ? '' : strings.messages.connectionHTML;
+
+        var connectionHTML = `
+                <div id="piui">
+                    <button type="button" id="piconnect" class="btn">
+                        <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">${strings.messages.connect}</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
+                    </button>
+
+                    <span id="piinstallui">
+                        <span class="fa fa-exchange-alt"></span>
+                        <button type="button" id="piinstall" class="btn">
+                            <span class="fa fa-upload"></span><span>${strings.messages.install}</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
+                        </button>
+                    </span>
+
+                    <span id="pichangehatui">
+                        <button type="button" id="pichangehat" class="btn">
+                            <span class="fas fa-hat-wizard"></span><span>${strings.messages.changeBoard}</span></span></span>
+                        </button>
+                        <button type="button" id="pihatsetup" class="btn">
+                            <span class="fas fa-cog"></span><span>${strings.messages.config}</span></span></span>
+                        </button>
+                    </span>
+                </div>`;
+
+        var piUi = getQuickPiOption('disableConnection') ? '' : connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
@@ -2847,8 +3140,78 @@ var getContext = function (display, infos, curLevel) {
         }
 
         $('#piconnect').click(function () {
+            var connectionDialogHTML = `
+            <div class="content connectPi qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        ${strings.messages.raspiConfig}
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div class="panel-body">
+                    <div id="piconnectionmainui">
+                        <div class="switchRadio btn-group" id="piconsel">
+                            <button type="button" class="btn" id="piconlocal"><i class="fas fa-location-arrow icon"></i>${strings.messages.local}</button>
+                            <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
+                            <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
+                            <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
+                        </div>
+                        <div id="pischoolcon">
+                            <div class="form-group">
+                                <label id="pischoolkeylabel">${strings.messages.schoolKey}</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">Aa</div>
+                                    <input type="text" id="schoolkey" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="pilistlabel">${strings.messages.connectList}</label>
+                                <div class="input-group">
+                                    <button class="input-group-prepend" id=pigetlist disabled>${strings.messages.getPiList}</button>
+                                    <select id="pilist" class="custom-select" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label id="piiplabel">${strings.messages.enterIpAddress}</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">123</div>
+                                    <input id=piaddress type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div>
+                                <input id="piusetunnel" disabled type="checkbox">${strings.messages.connectTroughtTunnel}
+                            </div>
+                        </div>
 
-            window.displayHelper.showPopupDialog(strings.messages.connectionDialogHTML);
+                        <div id="panel-body-usbbt">
+                            <label id="piconnectionlabel"></label>
+                        </div>
+
+                        <div id="panel-body-local">
+                            <label id="piconnectionlabellocal"></label>
+
+                            <div id="piconnectolocalhost">
+                                <input type="radio" id="piconnectolocalhostcheckbox" name="pilocalconnectiontype" value="localhost">
+                                ${strings.messages.connectToLocalhost}
+                            </div>
+
+                            <div id="piconnectocurrenturl">
+                                <input type="radio" id="piconnectocurrenturlcheckbox" name="pilocalconnectiontype" value="currenturl">
+                                ${strings.messages.connectToWindowLocation}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="inlineButtons">
+                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>${strings.messages.connectToDevice}</button>
+                        <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>${strings.messages.disconnectFromDevice}</button>
+                    </div>
+                </div>
+            </div>
+            `;
+
+            window.displayHelper.showPopupDialog(connectionDialogHTML);
 
             if (context.offLineMode) {
                 $('#pirelease').attr('disabled', true);
@@ -3252,7 +3615,7 @@ var getContext = function (display, infos, curLevel) {
             <div class="panel-heading">
                 <h2 class="sectionTitle">
                     <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                    Choisissez votre carte
+                    ${strings.messages.chooseBoard}
                 </h2>
                 <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
             </div>
@@ -3297,16 +3660,16 @@ var getContext = function (display, infos, curLevel) {
                 <div class="panel-heading">
                     <h2 class="sectionTitle">
                         <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        Noms et ports des capteurs et actionneurs QuickPi
+                        ${strings.messages.nameandports}
                     </h2>
                     <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                 </div>
                 <div class="panel-body">
                 <table id='sensorTable' style="display:table-header-group;">
                 <tr>
-                <th>Name</th>
-                <th>Port</th>
-                <th>State</th>
+                <th>${strings.messages.name}</th>
+                <th>${strings.messages.port}</th>
+                <th>${strings.messages.state}</th>
                 </tr>
                 </table>
                 <!--
@@ -3470,6 +3833,11 @@ var getContext = function (display, infos, curLevel) {
                 infos.quickPiSensors.push(newSensor);
             }
 
+            var newSensor = {
+                "type": "cloudstore",
+                "name": "cloud1",
+            };
+            infos.quickPiSensors.push(newSensor);
         }
 
     };
@@ -3518,12 +3886,12 @@ var getContext = function (display, infos, curLevel) {
                     <div class="panel-heading">
                         <h2 class="sectionTitle">
                             <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                            Ajouter un composant
+                            ${strings.messages.addcomponent}
                         </h2>
                         <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
                     </div>
                     <div id="sensorPicker" class="panel-body">
-                        <label>Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.</label>
+                        <label>${strings.messages.selectcomponent}</label>
                         <div class="flex-container">
                             <div id="selector-image-container" class="flex-col half">
                                 <img id="selector-sensor-image">
@@ -3544,7 +3912,7 @@ var getContext = function (display, infos, curLevel) {
                         </div>
                     </div>
                     <div class="singleButton">
-                        <button id="selector-add-button" class="btn btn-centered"><i class="icon fa fa-check"></i>Ajouter</button>
+                        <button id="selector-add-button" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.add}</button>
                     </div>
                 </div>
             `);
@@ -3593,7 +3961,7 @@ var getContext = function (display, infos, curLevel) {
 
                     var el = document.createElement("option");
 
-                    el.textContent = sensorDefinition.description + "(builtin)";
+                    el.textContent = sensorDefinition.description + strings.messages.builtin;
                     el.value = sensorDefinition.name + "-";
 
                     if (sensor.subType)
@@ -5161,6 +5529,28 @@ var getContext = function (display, infos, curLevel) {
         return !element.paper.canvas || !element.node.parentElement;
     }
 
+    var irRemoteDialog = `
+    <div class="content qpi">
+    <div class="panel-heading">
+        <h2 class="sectionTitle">
+            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+            ${strings.messages.irRemoteControl}
+        </h2>
+        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+    </div>
+    <div id="sensorPicker" class="panel-body">
+        <div id="piremotemessage" >
+        </div>
+        <div id="piremotecontent" >
+        </div>
+    </div>
+    <div class="singleButton">
+        <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.closeDialog}</button>
+    </div>
+</div>
+    `;
+
+
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -5315,9 +5705,9 @@ var getContext = function (display, infos, curLevel) {
             else
             {
                 if (sensor.state) {
-                    sensor.stateText = paper.text(state1x, state1y, "ON");
+                    sensor.stateText = paper.text(state1x, state1y, strings.messages.on.toUpperCase());
                 } else {
-                    sensor.stateText = paper.text(state1x, state1y, "OFF");
+                    sensor.stateText = paper.text(state1x, state1y, strings.messages.off.toUpperCase());
                 }
             }
 
@@ -5499,12 +5889,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.buttonon.attr({ "opacity": fadeopacity });
                 sensor.buttonoff.attr({ "opacity": 0 });
 
-                sensor.stateText = paper.text(state1x, state1y, "ON");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.on.toUpperCase());
             } else {
                 sensor.buttonon.attr({ "opacity": 0 });
                 sensor.buttonoff.attr({ "opacity": fadeopacity });
 
-                sensor.stateText = paper.text(state1x, state1y, "OFF");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.off.toUpperCase());
             }
 
             if (!context.autoGrading && !sensor.buttonon.node.onmousedown) {
@@ -6220,7 +6610,7 @@ var getContext = function (display, infos, curLevel) {
                             && !context.offLineMode) {
                             //sensor.state = !sensor.state;
                             //drawSensor(sensor);
-                            window.displayHelper.showPopupDialog(strings.messages.irRemoteDialog);
+                            window.displayHelper.showPopupDialog(irRemoteDialog);
 
                             $('#picancel').click(function () {
                                 $('#popupMessage').hide();
@@ -6321,12 +6711,12 @@ var getContext = function (display, infos, curLevel) {
                 sensor.ledon.attr({ "opacity": fadeopacity });
                 sensor.ledoff.attr({ "opacity": 0 });
 
-                sensor.stateText = paper.text(state1x, state1y, "ON");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.on.toUpperCase());
             } else {
                 sensor.ledon.attr({ "opacity": 0 });
                 sensor.ledoff.attr({ "opacity": fadeopacity });
 
-                sensor.stateText = paper.text(state1x, state1y, "OFF");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.off.toUpperCase());
             }
 
 
@@ -6362,17 +6752,17 @@ var getContext = function (display, infos, curLevel) {
                 sensor.buttonon.attr({ "opacity": fadeopacity });
                 sensor.buttonoff.attr({ "opacity": 0 });
 
-                sensor.stateText = paper.text(state1x, state1y, "ON");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.on.toUpperCase());
             } else {
                 sensor.buttonon.attr({ "opacity": 0 });
                 sensor.buttonoff.attr({ "opacity": fadeopacity });
 
-                sensor.stateText = paper.text(state1x, state1y, "OFF");
+                sensor.stateText = paper.text(state1x, state1y, strings.messages.off.toUpperCase());
             }
 
             sensor.focusrect.click(function () {
                 if (context.offLineMode) {
-                    window.displayHelper.showPopupDialog(strings.messages.irRemoteDialog);
+                    window.displayHelper.showPopupDialog(irRemoteDialog);
 
                     $('#picancel').click(function () {
                         $('#popupMessage').hide();
@@ -6452,7 +6842,32 @@ var getContext = function (display, infos, curLevel) {
 
                     context.stopLiveUpdate = true;
 
-                    window.displayHelper.showPopupDialog(strings.messages.irLearnDialog);
+                    var irLearnDialog = `
+                <div class="content qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        ${strings.messages.irReceiverTitle}
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div id="sensorPicker" class="panel-body">
+                    <div class="form-group">
+                        <p>${strings.messages.directIrControl}</p>
+                    </div>
+
+                    <div class="form-group">
+                        <p id=piircode></p>
+                    </div>
+                </div>
+                <div class="singleButton">
+                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>${strings.messages.getIrCode}</button>
+                    <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>${strings.messages.closeDialog}</button>
+                </div>
+            </div>
+                `;
+
+                    window.displayHelper.showPopupDialog(irLearnDialog);
 
                     $('#picancel').click(function () {
                         $('#popupMessage').hide();
@@ -6579,23 +6994,23 @@ var getContext = function (display, infos, curLevel) {
 
             var stateString = "\n";
             if (sensor.state[0]) {
-                stateString += "UP\n"
+                stateString += strings.messages.up.toUpperCase() + "\n";
                 sensor.imgup.attr({ "opacity": 1 });
             }
             if (sensor.state[1]) {
-                stateString += "DOWN\n"
+                stateString += strings.messages.down.toUpperCase() + "\n";
                 sensor.imgdown.attr({ "opacity": 1 });
             }
             if (sensor.state[2]) {
-                stateString += "LEFT\n"
+                stateString += strings.messages.left.toUpperCase() + "\n";
                 sensor.imgleft.attr({ "opacity": 1 });
             }
             if (sensor.state[3]) {
-                stateString += "RIGHT\n"
+                stateString += strings.messages.right.toUpperCase() + "\n";
                 sensor.imgright.attr({ "opacity": 1 });
             }
             if (sensor.state[4]) {
-                stateString += "CENTER\n"
+                stateString += strings.messages.center.toUpperCase() + "\n";
                 sensor.imgcenter.attr({ "opacity": 1 });
             }
 
@@ -6623,11 +7038,11 @@ var getContext = function (display, infos, curLevel) {
                 }
 
 
-                $('#stickupstate').text(sensor.state[0] ? "ON" : "OFF");
-                $('#stickdownstate').text(sensor.state[1] ? "ON" : "OFF");
-                $('#stickleftstate').text(sensor.state[2] ? "ON" : "OFF");
-                $('#stickrightstate').text(sensor.state[3] ? "ON" : "OFF");
-                $('#stickcenterstate').text(sensor.state[4] ? "ON" : "OFF");
+                $('#stickupstate').text(sensor.state[0] ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase());
+                $('#stickdownstate').text(sensor.state[1] ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase());
+                $('#stickleftstate').text(sensor.state[2] ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase());
+                $('#stickrightstate').text(sensor.state[3] ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase());
+                $('#stickcenterstate').text(sensor.state[4] ? strings.messages.on.toUpperCase() : strings.messages.off.toUpperCase());
 
 /*
                 sensor.portText = paper.text(state1x, state1y, "D" + min.toString() + "-D" + max.toString() + "?");
@@ -6636,9 +7051,51 @@ var getContext = function (display, infos, curLevel) {
                 var b = sensor.portText._getBBox();
                 sensor.portText.translate(0, b.height / 2);
 
+                var stickPortsDialog = `
+                <div class="content qpi">
+                <div class="panel-heading">
+                    <h2 class="sectionTitle">
+                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
+                        Noms et ports de la manette
+                    </h2>
+                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
+                </div>
+                <div id="sensorPicker" class="panel-body">
+                    <label></label>
+                    <div class="flex-container">
+                    <table style="display:table-header-group;">
+                    <tr>
+                    <th>Name</th>
+                    <th>Port</th>
+                    <th>State</th>
+                    <th>Direction</th>
+                    </tr>
+                    <tr>
+                    <td><label id="stickupname"></td><td><label id="stickupport"></td><td><label id="stickupstate"></td><td><label id="stickupdirection"><i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickdownname"></td><td><label id="stickdownport"></td><td><label id="stickdownstate"></td><td><label id="stickdowndirection"><i class="fas fa-arrow-down"></i></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickleftname"></td><td><label id="stickleftport"></td><td><label id="stickleftstate"></td><td><label id="stickleftdirection"><i class="fas fa-arrow-left"></i></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickrightname"></td><td><label id="stickrightport"></td><td><label id="stickrightstate"></td><td><label id="stickrightdirection"><i class="fas fa-arrow-right"></i></td>
+                    </tr>
+                    <tr>
+                    <td><label id="stickcentername"></td><td><label id="stickcenterport"></td><td><label id="stickcenterstate"></td><td><label id="stickcenterdirection"><i class="fas fa-circle"></i></td>
+                    </tr>
+                    </table>
+                    </div>
+                </div>
+                <div class="singleButton">
+                    <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>Fermer</button>
+                </div>
+            </div>
+                `;
 
                 sensor.portText.click(function () {
-                    window.displayHelper.showPopupDialog(strings.messages.stickPortsDialog);
+                    window.displayHelper.showPopupDialog(stickPortsDialog);
 
                     $('#picancel').click(function () {
                         $('#popupMessage').hide();
@@ -8704,7 +9161,7 @@ var getContext = function (display, infos, curLevel) {
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("led")
                             },
-                            { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
+                            { "type": "field_dropdown", "name": "PARAM_1", "options": [[strings.messages.on.toUpperCase(), "1"], [strings.messages.off.toUpperCase(), "0"]] },
                         ]
                     }
                 },
@@ -8714,7 +9171,7 @@ var getContext = function (display, infos, curLevel) {
                             {
                                 "type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("buzzer")
                             },
-                            { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
+                            { "type": "field_dropdown", "name": "PARAM_1", "options": [[strings.messages.on.toUpperCase(), "1"], [strings.messages.off.toUpperCase(), "0"]] },
                         ]
                     }
                 },
@@ -8823,7 +9280,7 @@ var getContext = function (display, infos, curLevel) {
                     name: "setInfraredState", params: ["String", "Number"], blocklyJson: {
                         "args0": [
                             {"type": "field_dropdown", "name": "PARAM_0", "options": getSensorNames("irtrans")},
-                            { "type": "field_dropdown", "name": "PARAM_1", "options": [["ON", "1"], ["OFF", "0"]] },
+                            { "type": "field_dropdown", "name": "PARAM_1", "options": [[strings.messages.on.toUpperCase(), "1"], [strings.messages.off.toUpperCase(), "0"]] },
                         ]
                     }
                 },

@@ -144,7 +144,7 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Functions",
          read: "Reading",
-         print: "Writing"
+         print: "Writing",
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
@@ -381,7 +381,8 @@ var localLanguageStrings = {
          variables: "Variables",
          functions: "Funciones",
          read: "Lectura",
-         print: "Escritura"
+         print: "Escritura",
+         display: "Pantalla",
       },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",
@@ -466,18 +467,18 @@ var localLanguageStrings = {
       testError: "error",
       testSuccess: "correcto",
       seeTest: "ver",
-      infiniteLoop: "répéter indéfiniment", // TODO :: translate
-      availableFunctions: "Fonctions disponibles : ", // TODO :: translate
-      availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
-      startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
-      startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
-      keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
-      keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
-      keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
-      keywordsForbidden: "Les mots-clés suivants sont interdits : ", // TODO :: translate
-      variablesAllowed: "Les variables sont autorisées.", // TODO :: translate
-      variablesForbidden: "Les variables sont interdites.", // TODO :: translate
-      readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
+      infiniteLoop: "repetir indefinidamente",
+      availableFunctions: "Funciones disponibles : ",
+      availableFunctionsVerbose: "Las funciones disponibles para controlar el robot son:",
+      startingLine: "El programa debe comenzar con la línea",
+      startingLines: "Tu programa debe comenzar con las líneas",
+      keywordAllowed: "Se permite la siguiente palabra clave: ",
+      keywordForbidden: "La siguiente palabra clave está prohibida: ",
+      keywordsAllowed: "Se permiten las siguientes palabras clave: ",
+      keywordsForbidden: "Las siguientes palabras clave están prohibidas: ",
+      variablesAllowd: "Se permiten variables.",
+      variablesForbidden: "Las variables están prohibidas.",
+      readDocumentation: "Se le permite leer la documentación de Python y utilizar un motor de búsqueda durante el concurso.",
    },
    sl: {
       categories: {

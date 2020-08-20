@@ -5,7 +5,7 @@ var getContext = function (display, infos, curLevel) {
          label: {
             // Labels for the blocks
             getNodeID: "get Current Node ID",
-            getNeighbors: "Get list of neighbords",
+            getNeighbors: "Get list of neighbors",
             getNextMessage: "Get next message timeout %1 seconds",
             sendMessage: "Send Message",
             submitAnswer: "Submit Answer",
@@ -123,11 +123,11 @@ var getContext = function (display, infos, curLevel) {
       return null;
    }
 
-   context.isNeighbor = function (node, neighbordId) {
+   context.isNeighbor = function (node, neighborId) {
 
       for (var i = 0; i < node.neighbors.length; i++) {
 
-         if (node.neighbors[i] == neighbordId)
+         if (node.neighbors[i] == neighborId)
             return true;
       }
 
@@ -1140,7 +1140,7 @@ var getContext = function (display, infos, curLevel) {
 
       if (!context.isNeighbor(fromNode, toNode.nodeId)) {
          context.success = false;
-         throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbord");
+         throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbor");
       }
 
       context.incTime();
@@ -1256,7 +1256,7 @@ var getContext = function (display, infos, curLevel) {
       /*
             if (!context.isNeighbor(fromNode, toNode.nodeId)) {
                context.success = false;
-               throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbord");
+               throw ("Tried to send a message to node " + toNode.nodeId + " which is not a neighbor");
             }
             */
 

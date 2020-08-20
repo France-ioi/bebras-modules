@@ -1750,10 +1750,15 @@ function GraphEditor(settings) {
 
          self.addEdgeCross(edgeID);
          var info = graph.getEdgeInfo(edgeID);
-         if(!info.label || info.label.length == 0)
+         if(!info.label || info.label.length == 0){
             self.editLabel(edgeID,"edge");
+         }
          $(document).keydown(function(event){
             if(event.which == 46){  // if press delete
+               if(self.textEditor){
+                  self.textEditor.remove();
+                  self.editInfo = {};
+               }
                graph.removeEdge(edgeID);
                if(callback){
                   callback();
@@ -2450,6 +2455,7 @@ function GraphEditor(settings) {
             var labelHeight = 2*attr["font-size"];
          }
       }else if(type === "edge" && self.editEdgeLabelEnabled){
+         $(document).off("keydown");
          var info = graph.getEdgeInfo(id);
          var attr = visualGraph.graphDrawer.edgeLabelAttr;
          var labelPos = visualGraph.graphDrawer.getLabelPos(id);
