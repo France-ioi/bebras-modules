@@ -23,6 +23,7 @@
 
         static renderDifferences(expectedState, state)
         {
+            var strings = window.task.displayedSubTask.context.setLocalLanguageStrings(localLanguageStrings);
             var mainDiv = document.createElement("div");
 
             for (var p in expectedState)
@@ -30,7 +31,7 @@
                 if (expectedState.hasOwnProperty(p) && !state.hasOwnProperty(p)) {
 
                     var div = document.createElement("div");
-                    $(div).text("La clé n'existe pas : " + p);
+                    $(div).text(strings.messages.cloudKeyNotExists.format(p));
                     $(mainDiv).append(div);
                 }
 
@@ -38,7 +39,7 @@
                     var div = document.createElement("div");
 
                     var wrongValue = "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.";
-                    var message = wrongValue.format(p, expectedState[p], state[p]);
+                    var message = strings.messages.cloudWrongValue.format(p, expectedState[p], state[p]);
 
                     $(div).text(message);
                     $(mainDiv).append(div);
@@ -49,7 +50,7 @@
             {
                 if (state.hasOwnProperty(p) && !expectedState.hasOwnProperty(p)) {
                     var div = document.createElement("div");
-                    $(div).text("La clé " + p + " n'est pas une clé attendue");
+                    $(div).text(strings.messages.cloudUnexpectedKey.format(p));
                     $(mainDiv).append(div);
                 }
             }
