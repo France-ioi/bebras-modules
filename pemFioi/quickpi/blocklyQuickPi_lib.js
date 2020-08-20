@@ -684,7 +684,7 @@ var getContext = function (display, infos, curLevel) {
                 computeCompassHeading: "dirección de la brújula en (°)",
 
                 readInfraredState: "infrarrojos detectados en %1",
-                setInfraredState: "poner emisor de infrarrojos %1 a %2",
+                setInfraredState: "cambiar emisor de infrarrojos %1 a %2",
 
                 // Gyroscope
                 readAngularVelocity: "velocidad angular (°/s) del guroscopio %1",
@@ -692,9 +692,9 @@ var getContext = function (display, infos, curLevel) {
                 computeRotationGyro: "calcular la rotación del giroscopio %1",
 
                 //Internet store
-                connectToCloudStore: "conéctese a la nube. Usuario %1 Contraseña %2",
+                connectToCloudStore: "conectar a la nube. Usuario %1 Contraseña %2",
                 writeToCloudStore: "escribir en la nube : Usuario %1 llave %2 valor %3",
-                readFromCloudStore: "leer de la nube : Usuario %1 llave %2",
+                readFromCloudStore: "leer de la nube : Usuario %1 lave %2",
 
                 // IR Remote
                 readIRMessage: "esperar un mensaje de infrarrojos : %1 durante : %2 ms",
@@ -9329,7 +9329,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
+                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
                         "</block>"
 
                 },
@@ -9341,7 +9341,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText2Lines'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
+                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
