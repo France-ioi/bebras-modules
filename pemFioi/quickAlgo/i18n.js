@@ -385,6 +385,7 @@ var localLanguageStrings = {
          functions: "Funciones",
          read: "Lectura",
          print: "Escritura",
+         internet: "Internet",
          display: "Pantalla",
       },
       invalidContent: "Contenido inválido",
