@@ -1251,6 +1251,7 @@ function GraphDragger(settings) {
    this.isShiftPressed = false;
    this.callback = settings.callback;
    this.moveDragCallback = null;
+   this.unselectAllEdges = null;
 
    this.dragMove = new PaperMouseEvent(this.paperElementID, this.paper, "mousemove", onDragMove, false);
    this.dragEnd = new PaperMouseEvent(this.paperElementID, this.paper, "mouseup", onDragEnd, false);
@@ -1297,8 +1298,14 @@ function GraphDragger(settings) {
    this.setMoveDragCallback = function(fct) {
       this.moveDragCallback = fct;
    };
+   this.setUnselectAllEdges = function(fct) {
+      this.unselectAllEdges = fct;
+   };
 
    function onFuzzyClick(elementType, id, x, y, event){
+      if(self.unselectAllEdges){
+         self.unselectAllEdges();
+      }
       self.onDragStart(x,y,event);
    }
    this.onDragStart = function(x,y,event){
@@ -2827,6 +2834,7 @@ function GraphEditor(settings) {
       this.arcDragger.setStartDragCallback(this.startDragCallback);
       this.arcDragger.setEditEdgeLabel(this.editLabel);
       this.arcDragger.setUnselectAll(this.unselectAllEdges);
+      this.graphDragger.setUnselectAllEdges(this.unselectAllEdges);
    };
    
    this.setDefaultSettings();
