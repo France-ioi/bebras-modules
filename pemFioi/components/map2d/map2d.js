@@ -13,7 +13,7 @@ function Map2D(params) {
             line_color: '#000000',
             pin_color: '#FFFFFF',
             area_color: '#FFFFFF66',
-            selection_color: '#FF3333'
+            selection_color: '#CC3333'
         }
     }
     params = Object.assign({}, defaults, params);
@@ -190,6 +190,7 @@ function Map2D(params) {
             point: createElement('div', 'button', 'Point'),
             line: createElement('div', 'button', 'Line'),
             area: createElement('div', 'button', 'Area'),
+            delete: createElement('div', 'button', 'Delete'),
             undo: createElement('div', 'button', 'Undo'),
             redo: createElement('div', 'button', 'Redo')
         }
@@ -201,6 +202,7 @@ function Map2D(params) {
                 buttons.area
             ]),
             createElement('div', 'group', [
+                buttons.delete,
                 buttons.undo,
                 buttons.redo
             ])
@@ -238,6 +240,7 @@ function Map2D(params) {
             area: function() {
                 setType('area');
             },
+            delete: handlers.onDelete,
             undo: handlers.onUndo,
             redo: handlers.onRedo
         }
@@ -335,7 +338,11 @@ function Map2D(params) {
 
         function drawPoint(point) {
             context2d.beginPath();
-            context2d.fillStyle = params.styles.pin_color;            
+            if(selection && isSamePoint(point, selection.point)) {
+                context2d.fillStyle = params.styles.selection_color;            
+            } else {
+                context2d.fillStyle = params.styles.pin_color;            
+            }
             context2d.arc(point.x, point.y, params.styles.point_radius / bounds.scale, 0, 2 * Math.PI);
             context2d.stroke();
             context2d.fill();  
@@ -419,6 +426,7 @@ function Map2D(params) {
 
 
         function openFigure(point) {
+            selection = false;
             data.figures.push({
                 type: data.type,
                 points: [point]
@@ -430,6 +438,7 @@ function Map2D(params) {
         }
 
         function modifyFigure(point) {
+            selection = false;
             for(var i=0; i<data.figures[data.pointer].points.length; i++) {
                 if(isSamePoint(point, data.figures[data.pointer].points[i])) {
                     closeFigure();
@@ -441,6 +450,7 @@ function Map2D(params) {
         }
 
         function closeFigure() {
+            selection = false;
             if(data.pointer === null) {
                 return;
             }
@@ -467,6 +477,17 @@ function Map2D(params) {
                 closeFigure();
                 data.type = new_type;
             },
+            onDelete: function() {
+                if(selection) {
+                    data.figures[selection.figure_idx].points.splice(selection.point_idx, 1);
+                    if(!data.figures[selection.figure_idx].points.length) {
+                        data.figures.splice(selection.figure_idx, 1);
+                    }
+                    selection = false;
+                    saveState();
+                    draw();
+                }
+            },
             onRedo: function() {
                 if(state.getCapabilities().redo) {
                     data = state.redo();
@@ -487,6 +508,7 @@ function Map2D(params) {
             var caps = state.getCapabilities();
             toolbar.disableButton('undo', !caps.undo);
             toolbar.disableButton('redo', !caps.redo);
+            toolbar.disableButton('delete', !selection);
             toolbar.selectButton(data.type);
         }
 
@@ -515,25 +537,28 @@ function Map2D(params) {
         }
 
 
+        var selection;
+
         function handleClick(point) {
             point = normalizePoint(point);
             if(point.x < 0 || point.x > image.width || point.y < 0 || point.y > image.height) {
                 return;
             }
 
-            var selection = findFigure(point);
+            selection = findFigure(point);
             if(selection) {
-                console.log('click on', selection);
-            }
-             
-            if(data.type === null) {
-                return;
-            }
-
-            if(data.pointer === null) {
-                openFigure(point);
+                refreshToolbar();
+                // TODO show type and name inputs
             } else {
-                modifyFigure(point);
+                if(data.type === null) {
+                    return;
+                }
+
+                if(data.pointer === null) {
+                    openFigure(point);
+                } else {
+                    modifyFigure(point);
+                }
             }
             draw();
         }        
@@ -551,6 +576,7 @@ function Map2D(params) {
         }
 
         function handleDrag(point) {
+            selection = false;            
             point = normalizePoint(point);
             data.figures[drag.figure.figure_idx].points[drag.figure.point_idx] = {
                 x: drag.figure.point.x - drag.mouse.x + point.x,
@@ -623,7 +649,7 @@ function Map2D(params) {
 
 
         wrapper.addEventListener('mouseup', function(e) {
-            drag_handler && drag_handler.stopDrag();
+            mouse_moved && drag_handler && drag_handler.stopDrag();
             drag_handler = false;
         });
 
