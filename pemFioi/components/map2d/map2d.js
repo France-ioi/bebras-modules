@@ -13,7 +13,13 @@ function Map2D(params) {
             line_color: '#000000',
             pin_color: '#FFFFFF',
             area_color: '#FFFFFF66',
-            selection_color: '#CC3333'
+            selection_color: '#CC3333',
+            text_color: '#FFFFFF',
+            text_outline: '#000000',
+            font: {
+                size: 14,
+                face: 'sans'
+            }
         },
         strings: {
             point: 'Point',
@@ -359,10 +365,41 @@ function Map2D(params) {
             context2d.fill();  
         }
 
+
+        function drawFigureName(figure) {
+            var text_height = params.styles.font.size / bounds.scale;
+            var dx, dy;
+            if(figure.type == 'point' || figure.points.length < 2) {
+                dx = 0;
+                dy = text_height;
+                context2d.textAlign = 'center';
+                context2d.textBaseline = 'top';
+            } else {
+                dy = 0;
+                if(figure.points[1].y > figure.points[0].y) {
+                    context2d.textBaseline = 'bottom';
+                } else {
+                    context2d.textBaseline = 'top';
+                }
+                if(figure.points[1].x > figure.points[0].x) {
+                    context2d.textAlign = 'right';
+                    dx = -text_height;
+                } else {
+                    context2d.textAlign = 'left';
+                    dx = text_height;                    
+                }
+            }
+            context2d.strokeStyle = params.styles.text_outline;
+            context2d.strokeText(figure.name, figure.points[0].x + dx, figure.points[0].y + dy);
+            context2d.fillStyle = params.styles.text_color;
+            context2d.fillText(figure.name, figure.points[0].x + dx, figure.points[0].y + dy);            
+        }
+
+
         var shapes = {
 
             point: function(points) {
-                drawPoint(points[0])
+                drawPoint(points[0]);
             },
 
             line: function(points) {
@@ -397,19 +434,18 @@ function Map2D(params) {
 
 
         function draw() {
+            if(!bounds) {
+                return;
+            }
             context2d.setTransform(1, 0, 0, 1, 0, 0);                
-            bounds && context2d.clearRect(0, 0, bounds.width, bounds.height);
+            context2d.clearRect(0, 0, bounds.width, bounds.height);
             context2d.setTransform(bounds.scale, 0, 0, bounds.scale, 0, 0);                
-
+            context2d.font = 'bold ' + Math.round(params.styles.font.size / bounds.scale) + 'px ' + params.styles.font.face;
             context2d.strokeStyle = params.styles.line_color;
             context2d.lineWidth = params.styles.line_width / bounds.scale;
             for(var i=0; i<data.figures.length; i++) {
-                try {
-                    shapes[data.figures[i].type](data.figures[i].points);
-                } catch(e) {
-                    console.error(data.figures[i])
-                }
-                
+                shapes[data.figures[i].type](data.figures[i].points);
+                drawFigureName(data.figures[i]);
             }
         }
 
@@ -654,24 +690,31 @@ function Map2D(params) {
 
         wrapper.addEventListener('mousemove', function(e) {
             mouse_moved = true;
-            var point = getRelativePoint(e);            
-            drag_handler && drag_handler.handleDrag(point);
+            if(drag_handler) {
+                var point = getRelativePoint(e);            
+                drag_handler.handleDrag(point);
+            }
         });
 
 
         wrapper.addEventListener('mouseup', function(e) {
-            mouse_moved && drag_handler && drag_handler.stopDrag();
+            if(mouse_moved && drag_handler) {
+                drag_handler.stopDrag();
+            }
             drag_handler = false;
         });
+
+        wrapper.addEventListener('mouseleave', function(e) {
+            if(mouse_moved && drag_handler) {
+                drag_handler.stopDrag();
+            }
+            drag_handler = false;
+        });        
 
         wrapper.addEventListener('click', function(e) {
             if(!mouse_moved) {
                 editor.handleClick(getRelativePoint(e));
             }
-        });
-
-        wrapper.addEventListener('mouseleave', function(e) {
-            mouse_moved = false;
         });        
 
     }
