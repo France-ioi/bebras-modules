@@ -14,6 +14,17 @@ function Map2D(params) {
             pin_color: '#FFFFFF',
             area_color: '#FFFFFF66',
             selection_color: '#CC3333'
+        },
+        strings: {
+            point: 'Point',
+            line: 'Line',
+            area: 'Area',
+            delete: 'Delete',
+            undo: 'Undo',
+            redo: 'Redo',
+            type: 'Type',
+            name: 'Name',
+            save: 'Save'
         }
     }
     params = Object.assign({}, defaults, params);
@@ -187,12 +198,12 @@ function Map2D(params) {
     // Editor toolbar
     function Toolbar(handlers) {
         var buttons = {
-            point: createElement('div', 'button', 'Point'),
-            line: createElement('div', 'button', 'Line'),
-            area: createElement('div', 'button', 'Area'),
-            delete: createElement('div', 'button', 'Delete'),
-            undo: createElement('div', 'button', 'Undo'),
-            redo: createElement('div', 'button', 'Redo')
+            point: createElement('div', 'button', params.strings.point),
+            line: createElement('div', 'button', params.strings.line),
+            area: createElement('div', 'button', params.strings.area),
+            delete: createElement('div', 'button', params.strings.delete),
+            undo: createElement('div', 'button', params.strings.undo),
+            redo: createElement('div', 'button', params.strings.redo)
         }
 
         var holder = createElement('div', 'toolbar', [
