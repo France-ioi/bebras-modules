@@ -375,10 +375,11 @@ function Map2D(params) {
                 context2d.textAlign = 'center';
                 context2d.textBaseline = 'top';
             } else {
-                dy = 0;
                 if(figure.points[1].y > figure.points[0].y) {
                     context2d.textBaseline = 'bottom';
+                    dy = -params.styles.line_width / bounds.scale;
                 } else {
+                    dy = params.styles.line_width / bounds.scale;
                     context2d.textBaseline = 'top';
                 }
                 if(figure.points[1].x > figure.points[0].x) {
