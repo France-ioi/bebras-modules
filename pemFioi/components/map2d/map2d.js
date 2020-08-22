@@ -12,7 +12,8 @@ function Map2D(params) {
             line_width: 3,
             line_color: '#000000',
             pin_color: '#FFFFFF',
-            area_color: '#FFFFFF66'
+            area_color: '#FFFFFF66',
+            selection_color: '#FF3333'
         }
     }
     params = Object.assign({}, defaults, params);
@@ -122,19 +123,32 @@ function Map2D(params) {
         refresh();
 
 
-        return {
 
-            refresh: refresh,
+        var drag;
 
-            getBounds: function() {
-                return bounds;
-            },
-
-            move: function(position) {
-                bounds.x = position.x;
-                bounds.y = position.y;
-                refresh();
+        function startDrag(point) {
+            drag = {
+                x: bounds.x + point.x,
+                y: bounds.y + point.y
             }
+            return true;
+        }
+
+        function handleDrag(point) {
+            bounds.x = drag.x - point.x;
+            bounds.y = drag.y - point.y;
+            refresh();
+        }
+
+        function stopDrag() {}
+
+
+        return {
+            refresh: refresh,
+            
+            startDrag: startDrag,
+            handleDrag: handleDrag,
+            stopDrag: stopDrag
         }
     }
 
@@ -536,11 +550,11 @@ function Map2D(params) {
             return !!drag.figure;
         }
 
-        function handleDrag(offset) {
-            offset = normalizePoint(offset);
+        function handleDrag(point) {
+            point = normalizePoint(point);
             data.figures[drag.figure.figure_idx].points[drag.figure.point_idx] = {
-                x: drag.figure.point.x - drag.mouse.x + offset.x,
-                y: drag.figure.point.y - drag.mouse.y + offset.y
+                x: drag.figure.point.x - drag.mouse.x + point.x,
+                y: drag.figure.point.y - drag.mouse.y + point.y
             }
             draw();
         }
@@ -574,43 +588,17 @@ function Map2D(params) {
 
 
 
+    function MouseEventsHandler() {
 
-    function EeventsHandler() {
-
-        var drag_info = false;
         var mouse_moved = false;
 
-
         function getRelativePoint(e) {
-            var bounds = wrapper.getBoundingClientRect();            
+            var rect = wrapper.getBoundingClientRect();            
             return {
-                x: e.clientX - bounds.x,
-                y: e.clientY - bounds.y
+                x: e.clientX - rect.x,
+                y: e.clientY - rect.y
             }            
         }
-
-        var mapDragHandler = {
-            mousemove: function(e) {
-                viewport.move({
-                    x: drag_info.x - e.clientX,
-                    y: drag_info.y - e.clientY
-                })            
-            },
-            mouseup: function() {}
-        }
-
-
-        var editorDragHandler = {
-            mousemove: function (e) {
-                var point = getRelativePoint(e);
-                editor.handleDrag(point);
-            },
-            mouseup: function(e) {
-                editor.stopDrag();
-            }
-        }
-        
-
 
         var drag_handler;
 
@@ -620,27 +608,22 @@ function Map2D(params) {
 
             var point = getRelativePoint(e);
             if(editor.startDrag(point)) {
-                drag_handler = editorDragHandler;
-            } else {
-                // TODO: move this out
-                var viewport_bounds = viewport.getBounds();
-                drag_info = {
-                    x: viewport_bounds.x + e.clientX,
-                    y: viewport_bounds.y + e.clientY
-                }
-                drag_handler = mapDragHandler;
+                drag_handler = editor;
+            } else if(viewport.startDrag(point)) {
+                drag_handler = viewport;
             }
             mouse_moved = false;
         });
 
         wrapper.addEventListener('mousemove', function(e) {
             mouse_moved = true;
-            drag_handler && drag_handler.mousemove(e);
+            var point = getRelativePoint(e);            
+            drag_handler && drag_handler.handleDrag(point);
         });
 
 
         wrapper.addEventListener('mouseup', function(e) {
-            drag_handler && drag_handler.mouseup(e);
+            drag_handler && drag_handler.stopDrag();
             drag_handler = false;
         });
 
@@ -649,10 +632,8 @@ function Map2D(params) {
                 editor.handleClick(getRelativePoint(e));
             }
         });
-        
 
         wrapper.addEventListener('mouseleave', function(e) {
-            drag_info = false;
             mouse_moved = false;
         });        
 
@@ -683,7 +664,7 @@ function Map2D(params) {
     var viewport;
     var map;
     var editor;
-    var events_handler;
+    var mouse_events;
 
     loadImage(params.url, function(image) {
         onResize();
@@ -699,7 +680,7 @@ function Map2D(params) {
             map.setBounds(bounds);
             editor.setBounds(bounds);
         })
-        events_handler = EeventsHandler();        
+        mouse_events = MouseEventsHandler();        
         onResize();
         loaded = true;
     })
@@ -710,7 +691,7 @@ function Map2D(params) {
             if(loaded) {
                 map.destroy();
                 editor.destroy();
-                viport.destroy();
+                viewport.destroy();
             }
             if(!params.width && !params.height) {
                 window.removeEventListener('resize', onResize);
