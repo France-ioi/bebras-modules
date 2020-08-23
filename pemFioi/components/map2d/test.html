@@ -12,6 +12,7 @@
         <style>
             html, 
             body {
+                font: 14px sans;                
                 margin: 0;
                 padding: 0;
                 width: 100%;
@@ -28,27 +29,36 @@
                 //url: 'map.jpg',
                 zoom: 1,
 
+                tags: [
+                    'Tag 1',
+                    'Tag 2',
+                    'Tag 3'
+                ],
+
                 figures: [
                     { 
                         type: 'point',
                         points: [
                             { x: 225, y: 50 }
                         ],
-                        name: 'Point 1'
+                        name: 'Point 1',
+                        tag: ''
                     },
                     { 
                         type: 'point',
                         points: [
                             { x: 225, y: 75 }
                         ],
-                        name: 'Point 2'
+                        name: 'Point 2',
+                        tag: ''
                     },
                     { 
                         type: 'point',
                         points: [
                             { x: 225, y: 100 }
                         ],
-                        name: 'Point 3'
+                        name: 'Point 3',
+                        tag: ''
                     },
                     {
                         type: 'line',
@@ -59,7 +69,8 @@
                             { x: 125, y: 75 },
                             { x: 150, y: 50 }
                         ],
-                        name: 'Line 1'
+                        name: 'Line 1',
+                        tag: ''
                     },
                     {
                         type: 'area',
@@ -69,7 +80,8 @@
                             { x: 150, y: 150 },
                             { x: 175, y: 125 },
                         ],
-                        name: 'Area 1'
+                        name: 'Area 1',
+                        tag: ''
                     },
                     {
                         type: 'area',
@@ -79,7 +91,8 @@
                             { x: 350, y: 150 },
                             { x: 350, y: 125 },
                         ],
-                        name: 'Area 1'
+                        name: 'Area 2',
+                        tag: ''
                     }
                 ]                
 
