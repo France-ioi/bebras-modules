@@ -1,5 +1,4 @@
 .map2d {
-    font: 14px sans;
     position: relative;
     overflow: hidden;
     -webkit-touch-callout: none;
@@ -57,7 +56,6 @@
 .map2d .toolbar .button-disabled:hover {
     color: #ccc;
 }
-
 
 .map2d .toolbar .button:first-child {
     border-radius: 5px 0 0 5px;
