@@ -39,7 +39,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       reportValues: true,
       quickAlgoInterface: window.quickAlgoInterface,
 
-      glowingBlock: null,
+      highlightedBlocks: [],
 
       includeBlocks: {
          groupByCategory: true,
@@ -534,13 +534,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
          Blockly.Xml.domToWorkspace(xml, this.workspace);
 
-         if(this.scratchMode) {
-            this.glowBlock(this.glowingBlock);
-            this.glowingBlock = xml.firstChild.getAttribute('id');
-         } else {
-            this.workspace.traceOn(true);
-            this.workspace.highlightBlock(xml.firstChild.getAttribute('id'));
-         }
+         this.highlightBlock(xml.firstChild.getAttribute('id'));
       },
 
       loadExample: function(exampleObj) {
@@ -668,25 +662,40 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.prevWidth = panelWidth;
       },
 
-      glowBlock: function(id) {
-         // highlightBlock replacement for Scratch
-         if(this.glowingBlock) {
-            try {
-               this.workspace.glowBlock(this.glowingBlock, false);
-            } catch(e) {}
-         }
-         if(id) {
-            this.workspace.glowBlock(id, true);
-         }
-         this.glowingBlock = id;
-      },
+      highlightBlock: function(id, keep) {
+         if(!id) { keep = false; }
 
-      highlightBlock: function(id) {
+         if(!keep) {
+            for(var i = 0; i < this.highlightedBlocks.length; i++) {
+               var bid = this.highlightedBlocks[i];
+               if(this.scratchMode) {
+                  try {
+                     this.workspace.glowBlock(bid, false);
+                  } catch(e) {}
+               } else {
+                  var block = this.workspace.getBlockById(bid);
+                  if(block) { block.removeSelect(); }
+               }
+            }
+            this.highlightedBlocks = [];
+         }
+
          if(this.scratchMode) {
-            this.glowBlock(id);
+            if(id) {
+               this.workspace.glowBlock(id, true);
+            }
          } else {
             this.workspace.traceOn(true);
-            this.workspace.highlightBlock(id);
+            if(keep) {
+               var block = this.workspace.getBlockById(id);
+               if(block) { block.addSelect(); }
+            } else {
+               this.workspace.highlightBlock(id);
+            }
+         }
+
+         if(id) {
+            this.highlightedBlocks.push(id);
          }
       },
 
@@ -736,8 +745,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             return;
          }
          if(!this.scratchMode) {
-            this.workspace.traceOn(true);
-            this.workspace.highlightBlock(null);
+            this.highlightBlock(null);
          }
          var codes = this.getAllCodes();
          this.mainContext.runner.initCodes(codes);

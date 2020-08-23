@@ -282,6 +282,13 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return code;
       },
 
+      getPyfeCode: function() {
+         var that = this;
+         return Blockly.Python.blocksToCommentedCode(function() {
+            return that.getCode('python');
+            });
+      },
+
       completeBlockHandler: function(block, objectName, context) {
          if (typeof block.handler == "undefined") {
             block.handler = context[objectName][block.name];
