@@ -489,6 +489,7 @@ function Map2D(params) {
                 } else {
                     panel.close();
                 }
+                refreshToolbar();
             }
         }
 
@@ -497,7 +498,9 @@ function Map2D(params) {
             selection.set(false);
             data.figures.push({
                 type: data.type,
-                points: [point]
+                points: [point],
+                name: '',
+                tag: ''
             });          
             if(data.type != 'point') {
                 data.pointer = data.figures.length - 1;
@@ -546,10 +549,10 @@ function Map2D(params) {
                 data.type = new_type;
             },
             onDelete: function() {
-                if(selection) {
-                    data.figures[selection.figure_idx].points.splice(selection.point_idx, 1);
-                    if(!data.figures[selection.figure_idx].points.length) {
-                        data.figures.splice(selection.figure_idx, 1);
+                if(selection.data) {
+                    data.figures[selection.data.figure_idx].points.splice(selection.data.point_idx, 1);
+                    if(!data.figures[selection.data.figure_idx].points.length) {
+                        data.figures.splice(selection.data.figure_idx, 1);
                     }
                     selection.set(false);
                     saveState();
@@ -576,7 +579,7 @@ function Map2D(params) {
             var caps = state.getCapabilities();
             toolbar.disableButton('undo', !caps.undo);
             toolbar.disableButton('redo', !caps.redo);
-            toolbar.disableButton('delete', !selection);
+            toolbar.disableButton('delete', !selection.data);
             toolbar.selectButton(data.type);
         }
 
@@ -606,7 +609,6 @@ function Map2D(params) {
         }
 
 
-        var selection;
 
         function handleClick(point) {
             point = normalizePoint(point);
@@ -616,7 +618,6 @@ function Map2D(params) {
 
             var figure = findFigure(point);
             if(figure) {
-                refreshToolbar();
                 selection.set(figure);
             } else {
                 if(data.type === null) {
