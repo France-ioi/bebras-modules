@@ -272,7 +272,7 @@ function initBlocklyRunner(context, messageCallback) {
 
          if(runner.scratchMode) {
             Blockly.DropDownDiv.hide();
-            context.blocklyHelper.glowBlock(null);
+            context.blocklyHelper.highlightBlock(null);
          }
 
          if(!aboutToPlay && window.quickAlgoInterface) {
