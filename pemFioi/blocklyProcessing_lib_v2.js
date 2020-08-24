@@ -1263,6 +1263,7 @@ var getContext = function(display, infos) {
             //processing.stroke(0,0,0);
             //processing.noFill();
             processing.noLoop();
+            processing.noSmooth();
          }
       });
       p.stroke(0,0,0);
@@ -2489,6 +2490,7 @@ var getContext = function(display, infos) {
       buffer.noFill();
       buffer.fill = noop;
       buffer.stroke = noop;
+      buffer.noSmooth();
       this.state.initialDrawing && this.state.initialDrawing(buffer);
       buffer.loadPixels();
 
@@ -2540,6 +2542,7 @@ var getContext = function(display, infos) {
 
       var l=data.userPixels.getLength();
       var bias = data.options.drawingBias;
+
       for(var i=0; i<l; i++) {
          var upixel = data.userPixels.getPixel(i);
 
@@ -2562,8 +2565,9 @@ var getContext = function(display, infos) {
                if(ofs < 0 || ofs >= l) {
                   continue;
                }
-               //alert([i, x, y, ofs, tpixel, data.userPixels.getPixel(ofs)])
-               if(data.userPixels.getPixel(ofs) != tpixel) {
+               if(data.userPixels.getPixel(ofs) != 0) {
+                  // TODO: check how to disable smooth
+               //if(data.userPixels.getPixel(ofs) != tpixel) {
                   fl = true;
                   break bias_loops;
                }
@@ -2713,5 +2717,5 @@ pdebug = {
 
 
 $(document).ready(function() {
-   task.displayedSubTask.changeSpeed(5)
+   //task.displayedSubTask.changeSpeed(5)
 })
