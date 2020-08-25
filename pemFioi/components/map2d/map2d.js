@@ -990,9 +990,20 @@ function Map2D(params) {
 
         var ofs_table = (function() {
             var res = [];
-            for(var y=-target.bias; y<target.bias; y++) {
-                for(var x=-target.bias; x<target.bias; x++) {
-                    res.push(y * image.width + x);
+
+            function add(x, y) {
+                console.log(x,y)
+                res.push(y * image.width + x);
+            }
+            add(0, 0);
+            for(var b=1; b<target.bias; b++) {
+                for(var i=-b; i<=b; i++) {
+                    add(i, b);
+                    add(i, -b);    
+                    if(i != -b && i != b) {
+                        add(b, i);
+                        add(-b, i);                    
+                    }
                 }
             }
             return res;
