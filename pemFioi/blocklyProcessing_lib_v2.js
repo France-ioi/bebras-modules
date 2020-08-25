@@ -2567,6 +2567,16 @@ var getContext = function(display, infos) {
                }
                if(data.userPixels.getPixel(ofs) != 0) {
                   // TODO: check how to disable smooth
+
+                  /*
+                  may be make image sharpen?
+imageData = context2d.getImageData (0, 0, g.width, g.height);
+for (i = 0; i != imageData.data.length; i ++) {
+   if (imageData.data[i] != 0x00)
+       imageData.data[i] = 0xFF;
+}
+context2d.putImageData (imageData, 0, 0);
+*/
                //if(data.userPixels.getPixel(ofs) != tpixel) {
                   fl = true;
                   break bias_loops;
