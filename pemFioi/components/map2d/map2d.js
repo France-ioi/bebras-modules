@@ -17,7 +17,7 @@ function Map2D(params) {
             text_color: '#FFFFFF',
             text_outline: '#000000',
             marker_color: '#FF0000',
-            marker_size: 10,
+            marker_size: 30,
             font: {
                 size: 14,
                 face: 'sans'
@@ -699,13 +699,14 @@ function Map2D(params) {
                 }
                 context2d.strokeStyle = params.styles.marker_color;
                 context2d.lineWidth = params.styles.line_width / bounds.scale;                
-                context2d.beginPath();
                 var s = 0.5 * params.styles.marker_size / bounds.scale;                
-                if(type == 'extra') {
-                    context2d.arc(point.x, point.y, s, 0, 2 * Math.PI);
-                } else if(type == 'miss') {
-                    context2d.rect(point.x - s, point.y - s, 2 * s, 2 * s);
+                context2d.beginPath();                
+                if(this.data.type == 'extra') {
+                    context2d.arc(this.data.point.x, this.data.point.y, s, 0, 2 * Math.PI);
+                } else if(this.data.type == 'miss') {
+                    context2d.rect(this.data.point.x - s, this.data.point.y - s, 2 * s, 2 * s);
                 }
+                context2d.closePath();
                 context2d.stroke();
             }
         }
@@ -749,7 +750,9 @@ function Map2D(params) {
                 draw();
             },
 
-            setMarker: marker.set,
+            setMarker: function(point, type) {
+                marker.set(point, type);
+            },
 
             destroy: function() {
                 toolbar.destroy();
@@ -905,6 +908,8 @@ function Map2D(params) {
     function diff(image, target) {
         var editor_figures = editor.getFigures();
         var canvas = createElement('canvas', 'editor');
+        canvas.width = image.width;
+        canvas.height = image.height;
         var context2d = canvas.getContext('2d');
 
         var color = '#FF0000';
@@ -913,12 +918,15 @@ function Map2D(params) {
         var shapes = {
 
             point: function(points, size) {
+                context2d.beginPath();                
                 context2d.arc(points[0].x, points[0].y, size / 2, 0, 2 * Math.PI);
+                context2d.closePath();
+                context2d.stroke();
+                context2d.fill();                
             },
 
             line: function(points, size) {
-                context2d.lineWidth = size;
-                context2d.beginPath();
+                context2d.beginPath();                
                 context2d.moveTo(points[0].x, points[0].y);
                 for(var i=1; i<points.length; i++) {
                     context2d.lineTo(points[i].x, points[i].y);        
@@ -927,9 +935,7 @@ function Map2D(params) {
             },
 
             area: function(points, size) {
-                context2d.lineWidth = size;
-                context2d.beginPath();
-                context2d.fillStyle = color;                            
+                context2d.beginPath();                
                 context2d.moveTo(points[0].x, points[0].y);
                 for(var i=1; i<points.length; i++) {
                     context2d.lineTo(points[i].x, points[i].y);        
@@ -942,15 +948,20 @@ function Map2D(params) {
 
 
         function createMask(figures, bias) {
+            context2d.setTransform(1, 0, 0, 1, 0, 0);                
             context2d.clearRect(0, 0, image.width, image.height);
             context2d.strokeStyle = color;
+            context2d.fillStyle = color;  
+            context2d.lineWidth = bias * 2;            
             for(var i=0; i<figures.length; i++) {
                 shapes[figures[i].type](figures[i].points, bias);
             }
-            var data = context.getImageData(0, 0, image.width, image.height).data;
+            //debug.displayCanvas('img', canvas);
+
+            var pixels = context2d.getImageData(0, 0, image.width, image.height).data;
             var res = [];            
-            for(var i=0; i<data.length; i+=4) {
-                res.push(data[i] != 0 ? 1 : 0);
+            for(var i=0; i<pixels.length; i+=4) {
+                res.push(pixels[i] != 0 ? 1 : 0);
             }
             return res;
         }
@@ -961,7 +972,7 @@ function Map2D(params) {
             var res = [];
             for(var i=0; i<figures.length; i++) {
                 if(figures[i].tag == tag) {
-                    res.push(figures);
+                    res.push(figures[i]);
                 }
             }
             return res;
@@ -977,7 +988,7 @@ function Map2D(params) {
         }
 
 
-        var bias_table = (function() {
+        var ofs_table = (function() {
             var res = [];
             for(var y=-target.bias; y<target.bias; y++) {
                 for(var x=-target.bias; x<target.bias; x++) {
@@ -988,13 +999,17 @@ function Map2D(params) {
         })();
 
 
+        //debug.setSize({ width: image.width, height: image.height});
         var res = true;
         for(var i=0; i<params.tags.length; i++) {
             var figures = filterFiguresByTag(target.figures, params.tags[i]);
             var target_mask = createMask(figures, target.bias);
+            //debug.displayMask('target_mask ' + params.tags[i], target_mask)
             var target_drawing = createMask(figures, 1);
+            //debug.displayMask('target_drawing ' + params.tags[i], target_drawing)
             var figures = filterFiguresByTag(editor_figures, params.tags[i]);
             var editor_drawing = createMask(figures, 1);
+            //debug.displayMask('editor_drawing ' + params.tags[i], editor_drawing)
             for(var j=0; j<editor_drawing.length; j++) {
                 // check extra pixels in restricted area
                 if(editor_drawing[j] != 0 && target_mask[j] == 0) {
@@ -1006,7 +1021,7 @@ function Map2D(params) {
                 var l;
                 var fl = false;
                 bias_loops:
-                for(var k=0; k<bias_table.length; k++) {
+                for(var k=0; k<ofs_table.length; k++) {
                     l = j + ofs_table[k];
                     if(l < 0 || l >= editor_drawing.length) {
                         continue;
@@ -1017,7 +1032,7 @@ function Map2D(params) {
                     }
                 }
                 if(!fl) {
-                    displayMistake(j, 'missed');
+                    displayMistake(j, 'miss');
                     return false;
                 }
             }
@@ -1106,3 +1121,91 @@ function Map2D(params) {
     }
 
 }
+
+
+
+
+debug = {
+
+    wrapper: false,
+
+    setSize: function(size) {
+        this.size = size;
+    },
+
+    getWrapper: function() {
+        if(!this.wrapper) {
+            var el = document.createElement('div');
+            with(el.style) {
+                position = 'fixed';
+                zIndex = 1000;
+                top = 0;
+                bottom = 0;
+                right = 0;
+                padding = '10px 10px 10px 5px';
+                background = '#CCC';
+                overflow = 'scroll';            
+            }
+            document.body.appendChild(el);               
+            this.wrapper = el;
+        }
+        return this.wrapper;
+    },
+ 
+    addTitle: function(title) {
+        var el = document.createElement('div');
+        el.innerHTML = title;
+        this.getWrapper().appendChild(el);        
+    },
+ 
+    createCanvas: function(title) {
+        this.addTitle(title);
+
+        var canvas = document.createElement('canvas');
+        canvas.width = this.size.width;
+        canvas.height = this.size.height;
+        canvas.style.width = this.size.width + 'px';
+        canvas.style.height = this.size.height + 'px';        
+        canvas.style.border = '1px solid #000';        
+        var context2d = canvas.getContext('2d');
+        this.getWrapper().appendChild(canvas);        
+
+        return canvas;
+    },
+ 
+    displayMask: function(title, mask) {
+        var canvas = this.createCanvas(title);
+        var context2d = canvas.getContext('2d');
+
+        context2d.clearRect(0,0, this.size.width, this.size.height);        
+        
+        
+        var image_data = context2d.getImageData(0, 0, this.size.width, this.size.height);
+        var ofs_m = 0;
+        var ofs_i = 0;
+        for(var y=0; y<this.size.height; y++) {
+            for(var x=0; x<this.size.width; x++) {
+                var c = mask[ofs_m] * 255;
+                //var c = Math.floor(Math.random() * 256);
+                image_data.data[ofs_i] = c;
+                image_data.data[ofs_i + 1] = c;
+                image_data.data[ofs_i + 2] = c;
+                image_data.data[ofs_i + 3] = 255;
+                ofs_i += 4;
+                ofs_m += 1;
+            }
+        }
+        context2d.putImageData(image_data, 0, 0);
+    },
+
+    displayCanvas: function(title, canvas) {
+        this.addTitle(title);
+
+        var image = new Image();
+        image.width = this.size.width;
+        image.height = this.size.height;
+        image.src = canvas.toDataURL("image/png");
+        this.getWrapper().append(image);
+    }
+ 
+ }
