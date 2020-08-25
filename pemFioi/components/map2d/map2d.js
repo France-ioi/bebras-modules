@@ -968,10 +968,10 @@ function Map2D(params) {
         
 
 
-        function filterFiguresByTag(figures, tag) {
+        function filterFiguresByTag(figures, tag, include_empty_tags) {
             var res = [];
             for(var i=0; i<figures.length; i++) {
-                if(figures[i].tag == tag) {
+               if(figures[i].tag == tag || (include_empty_tags && figures[i].tag == '')) {
                     res.push(figures[i]);
                 }
             }
@@ -1007,7 +1007,7 @@ function Map2D(params) {
             //debug.displayMask('target_mask ' + params.tags[i], target_mask)
             var target_drawing = createMask(figures, 1);
             //debug.displayMask('target_drawing ' + params.tags[i], target_drawing)
-            var figures = filterFiguresByTag(editor_figures, params.tags[i]);
+            var figures = filterFiguresByTag(editor_figures, params.tags[i], true);
             var editor_drawing = createMask(figures, 1);
             //debug.displayMask('editor_drawing ' + params.tags[i], editor_drawing)
             for(var j=0; j<editor_drawing.length; j++) {
