@@ -523,15 +523,10 @@ function Map2D(params) {
 
         function modifyFigure(point) {
             selection.set(false);
-            for(var i=0; i<data.figures[data.pointer].points.length; i++) {
-                if(isSamePoint(point, data.figures[data.pointer].points[i])) {
-                    closeFigure();
-                    return;
-                }
-            }
             data.figures[data.pointer].points.push(point);
             saveState();
         }
+
 
         function closeFigure() {
             selection.set(false);
@@ -632,6 +627,12 @@ function Map2D(params) {
 
             var figure = findFigure(point);
             if(figure) {
+                if(data.pointer) {
+                    var points = data.figures[data.pointer].points;
+                    if(isSamePoint(point, points[points.length - 1])) {
+                        closeFigure();
+                    }
+                }                
                 selection.set(figure);
             } else {
                 if(data.type === null) {
@@ -992,7 +993,6 @@ function Map2D(params) {
             var res = [];
 
             function add(x, y) {
-                console.log(x,y)
                 res.push(y * image.width + x);
             }
             add(0, 0);
