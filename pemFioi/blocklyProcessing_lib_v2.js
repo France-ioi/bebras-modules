@@ -1283,7 +1283,7 @@ var getContext = function(display, infos) {
       var options = {
          dot_size: 6,
          dash_size_linear: 8,
-         dash_size_radial: 0.1 // part of PI
+         dash_size_radial: 0.12 // part of PI
       }
 
       var hints = [];
@@ -1299,7 +1299,6 @@ var getContext = function(display, infos) {
 
       function addDot(x, y, label) {
          buffer.fill(0x000000);
-         buffer.ellipseMode(Processing.CENTER);
          buffer.ellipse(x, y, options.dot_size, options.dot_size);
          hints.push({
             x: x,
@@ -1346,17 +1345,62 @@ var getContext = function(display, infos) {
             addDot(x - 0.5 * d, y, label);
          },
 
+
+         arc: function(x, y, w, h, start, stop) {
+            buffer.noFill();
+            var rl = Math.PI * options.dash_size_radial;
+            buffer.arc(x, y, w, h, start, start + rl);
+            buffer.arc(x, y, w, h, stop - rl, stop);
+            var label = formatLabel(strings.label.arc, x, y, w, h, start, stop);
+            addDot(x, y, label);
+            addDot(x + 0.5 * w * Math.cos(start), y + 0.5 * h * Math.sin(start), label);
+            addDot(x + 0.5 * w * Math.cos(stop), y + 0.5 * h * Math.sin(stop), label);
+         },
+
+         
+         ellipse: function(x, y, w, h) {
+            var rl = Math.PI * options.dash_size_radial;
+            buffer.noFill();
+            buffer.arc(x, y, w, h, -rl, rl);
+            buffer.arc(x, y, w, h, Math.PI * 0.5 - rl, Math.PI * 0.5 + rl);
+            buffer.arc(x, y, w, h, Math.PI - rl, Math.PI + rl);
+            buffer.arc(x, y, w, h, Math.PI * 1.5 - rl, Math.PI * 1.5 + rl);
+            var label = formatLabel(strings.label.ellipse, x, y, w, h);
+            addDot(x, y, label);
+            addDot(x - 0.5 * w, y, label);
+            addDot(x + 0.5 * w, y, label);
+            addDot(x, y - 0.5 * h, label);
+            addDot(x, y + 0.5 * h, label);
+
+         },
+
+
          line: function(x1, y1, x2, y2) {
             drawLineDashes(x1, y1, x2, y2);
             var label = formatLabel(strings.label.line, x1, y1, x2, y2);
             addDot(x1, y1, label);
             addDot(x2, y2, label);
          },
+         
 
          point: function(x, y) {
             var label = formatLabel(strings.label.point, x, y);
             addDot(x, y, label);
          },
+
+
+         quad: function(x1, y1, x2, y2, x3, y3, x4, y4) {
+            drawLineDashes(x1, y1, x2, y2);
+            drawLineDashes(x1, y1, x4, y4);            
+            drawLineDashes(x3, y3, x2, y2);
+            drawLineDashes(x3, y3, x4, y4);            
+            var label = formatLabel(strings.label.quad, x1, y1, x2, y2, x3, y3, x4, y4);
+            addDot(x1, y1, label);
+            addDot(x2, y2, label);
+            addDot(x3, y3, label);
+            addDot(x4, y4, label);            
+         },
+
 
          rect: function(x, y, w, h) {
             var x2 = x + w, y2 = y + h;
@@ -1370,6 +1414,7 @@ var getContext = function(display, infos) {
             addDot(x2, y, label);
             addDot(x2, y2, label);
          },
+
 
          triangle: function(x1, y1, x2, y2, x3, y3) {
             drawLineDashes(x1, y1, x2, y2);
@@ -1497,18 +1542,6 @@ var getContext = function(display, infos) {
       initHints(hints);
 
       context.renderers.user = createProcessing(canvas.user.get(0), canvasSize);
-
-
-      // DEBUG
-      /*
-      context.renderers.user.stroke(0,255,0);
-      context.renderers.user.noSmooth();
-      context.renderers.user.arc(50,50,20,20,0,Math.PI*2);
-      context.renderers.user.line(2,0,302,300);
-      context.renderers.user.stroke(0,0,255);
-      context.renderers.user.line(300,0,0,300);
-      */
-
 
       this.blocklyHelper.updateSize();
    };
@@ -2566,6 +2599,7 @@ var getContext = function(display, infos) {
                   continue;
                }
                if(data.userPixels.getPixel(ofs) != 0) {
+               //if(data.userPixels.getPixel(ofs) != tpixel) {                  
                   // TODO: check how to disable smooth
 
                   /*
@@ -2577,7 +2611,7 @@ for (i = 0; i != imageData.data.length; i ++) {
 }
 context2d.putImageData (imageData, 0, 0);
 */
-               //if(data.userPixels.getPixel(ofs) != tpixel) {
+
                   fl = true;
                   break bias_loops;
                }
