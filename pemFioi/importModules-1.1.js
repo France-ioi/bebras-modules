@@ -40,7 +40,7 @@ var importableModules = function () {
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
-      'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
+      'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
       'zen3d': { src: modulesPath + "/ext/zen3d/zen3d.min.js", id: "zen3d" },
       'zen3d_OrbitControls': { src: modulesPath + "/ext/zen3d/controls/OrbitControls.js", id: "zen3d_OrbitControls" },
       'zen3d_Sprite': { src: modulesPath + "/ext/zen3d/objects/Sprite.js", id: "zen3d_Sprite" },
