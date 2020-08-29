@@ -5,9 +5,6 @@
         <title>map2d</title>
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
         <link rel="stylesheet" href="styles.css">
-        
-        <script src="../../../ext/jquery/2.1/jquery.min.js"></script>
-        
         <script src="map2d.js"></script>
         <style>
             html, 
@@ -18,15 +15,35 @@
                 width: 100%;
                 height: 100%;
             }
+            #map {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 50%;
+                height: 100%;
+                border-right: 1px solid #000;
+            }
+
+            #json {
+                position: absolute;
+                right: 0;
+                top: 0;
+                width: 50%;
+                height: 100%;
+                overflow: scroll;
+                border: 0;
+                margin: 0;
+            }
         </style>
     </head>
     <body>
-        <div id="map" style="left: 25%; top: 15%; right: 25%; bottom: 15%; border: 1px solid red; position: fixed;"></div>
+        <div id="map"></div>
+        <textarea id="json"></textarea>
+
         <script>
             var map2d = Map2D({
                 parent: document.getElementById('map'),
-                url: 'map_lowres.jpg',
-                //url: 'map.jpg',
+                url: 'map.jpg',
                 zoom: 1,
 
                 tags: [
@@ -42,7 +59,7 @@
                             { x: 225, y: 50 }
                         ],
                         name: 'Point 1',
-                        tag: ''
+                        tag: 'Tag 1'
                     },
                     { 
                         type: 'point',
@@ -50,7 +67,7 @@
                             { x: 225, y: 75 }
                         ],
                         name: 'Point 2',
-                        tag: ''
+                        tag: 'Tag 1'
                     },
                     { 
                         type: 'point',
@@ -58,19 +75,19 @@
                             { x: 225, y: 100 }
                         ],
                         name: 'Point 3',
-                        tag: ''
+                        tag: 'Tag 1'
                     },
                     {
                         type: 'line',
                         points: [
-                            { x: 50, y: 50 },
-                            { x: 75, y: 75 },
-                            { x: 100, y: 50 },
-                            { x: 125, y: 75 },
-                            { x: 150, y: 50 }
+                            { x: 150, y: 200 },
+                            { x: 175, y: 225 },
+                            { x: 200, y: 200 },
+                            { x: 225, y: 225 },
+                            { x: 250, y: 200 }
                         ],
                         name: 'Line 1',
-                        tag: ''
+                        tag: 'Tag 2'
                     },
                     {
                         type: 'area',
@@ -81,7 +98,7 @@
                             { x: 175, y: 125 },
                         ],
                         name: 'Area 1',
-                        tag: ''
+                        tag: 'Tag 3'
                     },
                     {
                         type: 'area',
@@ -92,10 +109,12 @@
                             { x: 350, y: 125 },
                         ],
                         name: 'Area 2',
-                        tag: ''
+                        tag: 'Tag 3'
                     }
-                ]                
-
+                ],
+                onEdit: function(figures) {
+                    document.getElementById('json').value = JSON.stringify(figures); //JSON.stringify(figures, false, 4)
+                }
             });
         </script>
     </body>
