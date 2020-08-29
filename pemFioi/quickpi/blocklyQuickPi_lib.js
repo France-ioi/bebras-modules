@@ -7682,7 +7682,9 @@ var getContext = function (display, infos, curLevel) {
        function, hence we generally use this name for the functions. */
     context.quickpi.turnLedOn = function (callback) {
 
-        context.registerQuickPiEvent("led1", true);
+        var sensor = findSensorByType("led");
+
+        context.registerQuickPiEvent(sensor.name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -7695,7 +7697,10 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.turnLedOff = function (callback) {
-        context.registerQuickPiEvent("led1", false);
+
+        var sensor = findSensorByType("led");
+
+        context.registerQuickPiEvent(sensor.name, false);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
