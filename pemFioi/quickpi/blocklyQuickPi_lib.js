@@ -450,9 +450,9 @@ var getContext = function (display, infos, curLevel) {
                 drawPoint: "drawPoint(x, y)",
                 isPointSet: "isPointSet(x, y)",
                 drawLine: "drawLine(x0, y0, x1, y1)",
-                drawRectangle: "drawRectangle(x0, y0, width, height)",
+                drawRectangle: "drawRectangle(x0, y0, width, height) dessine un rectangle, de coin haut gauche (x0,y0)",
                 drawCircle: "drawCircle(x0, y0, diameter)",
-                clearScreen: "clearScreen()",
+                clearScreen: "clearScreen() efface le contenu de l'écran",
                 updateScreen: "updateScreen()",
                 autoUpdate: "autoUpdate(auto)",
 
@@ -471,8 +471,8 @@ var getContext = function (display, infos, curLevel) {
                 readMagneticForce: "readMagneticForce(axis)",
                 computeCompassHeading: "computeCompassHeading()",
 
-                readInfraredState: "readInfraredState()",
-                setInfraredState: "setInfraredState()",
+                readInfraredState: "readInfraredState(IRReceiver) retourne True si un signal infra-rouge est détecté, False sinon",
+                setInfraredState: "setInfraredState(IREmitter, state) modifie l'état de l'émetteur : True pour l'allumer, False pour l'éteindre",
 
                 // Gyroscope
                 readAngularVelocity: "readAngularVelocity()",
