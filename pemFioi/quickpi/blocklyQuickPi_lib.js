@@ -382,7 +382,31 @@ var quickPiLocalLanguageStrings = {
             validate: "Valider",
             validate1: "Valider 1",
             validate2: "Valider 2",
-            validate2: "Valider 3",        }
+            validate3: "Valider 3",
+
+            sensorNameBuzzer: "buzzer",
+            sensorNameLed: "led",
+            sensorNameRedLed: "redled",
+            sensorNameGreenLed: "greenled",
+            sensorNameBlueLed: "blueled",
+            sensorNameOrangeLed: "orangeled",
+            sensorNameScreen: "screen",
+            sensorNameIrTrans: "irtran",
+            sensorNameIrRecv: "irrec",
+            sensorNameMicrophone: "micro",
+            sensorNameTemperature: "temp",
+            sensorNameGyroscope: "gyroscope",
+            sensorNameMagnetometer: "magneto",
+            sensorNameDistance: "distance",
+            sensorNameAccelerometer: "accel",
+            sensorNameButton: "button",
+            sensorNameLight: "light",
+            sensorNameStick: "stick",
+            sensorNameServo: "servo",
+            sensorNameHumidity: "humidity",
+            sensorNamePotentiometer: "pot",
+            sensorNameCloudStore: "cloud",
+        }
     },
     es: { // French strings
         label: {
@@ -762,7 +786,29 @@ var quickPiLocalLanguageStrings = {
             validate: "Validar",
             validate1: "Validar 1",
             validate2: "Validar 2",
-            validate2: "Validar 3",
+            validate3: "Validar 3",
+
+            sensorNameBuzzer: "timbre",
+            sensorNameLed: "led",
+            sensorNameRedLed: "ledrojo",
+            sensorNameGreenLed: "ledverde",
+            sensorNameBlueLed: "ledazul",
+            sensorNameScreen: "pantalla",
+            sensorNameIrTrans: "tranir",
+            sensorNameIrRecv: "recir",
+            sensorNameMicrophone: "micro",
+            sensorNameTemperature: "temp",
+            sensorNameGyroscope: "gyro",
+            sensorNameMagnetometer: "magneto",
+            sensorNameDistance: "distancia",
+            sensorNameAccelerometer: "acel",
+            sensorNameButton: "boton",
+            sensorNameLight: "luz",
+            sensorNameStick: "stick",
+            sensorNameServo: "servo",
+            sensorNameHumidity: "humedad",
+            sensorNamePotentiometer: "pot",
+            sensorNameCloudStore: "nube",
         }
     },
     
@@ -1229,16 +1275,16 @@ var getContext = function (display, infos, curLevel) {
                 "i2c": ["i2c"],
             },
             default: [
-                { type: "screen", suggestedName: "screen1", port: "i2c", subType: "16x2lcd" },
-                { type: "led", suggestedName: "led1", port: 'D5', subType: "blue" },
-                { type: "servo", suggestedName: "servo1", port: "D16" },
-                { type: "range", suggestedName: "range1", port :"D18", subType: "ultrasonic"},
-                { type: "button", suggestedName: "button1", port: "D22" },
-                { type: "humidity", suggestedName: "humidity1", port: "D24"},
-                { type: "buzzer", suggestedName: "buzzer1", port: "D26", subType: "active"},
-                { type: "temperature", suggestedName: "temperature1", port: 'A0', subType: "groveanalog" },
-                { type: "potentiometer", suggestedName: "potentiometer1", port :"A4"},
-                { type: "light", suggestedName: "light1", port :"A6"},
+                { type: "screen", suggestedName: strings.messages.sensorNameScreen + "1", port: "i2c", subType: "16x2lcd" },
+                { type: "led", suggestedName: strings.messages.sensorNameLed + "1", port: 'D5', subType: "blue" },
+                { type: "servo", suggestedName: strings.messages.sensorNameServo + "1", port: "D16" },
+                { type: "range", suggestedName: strings.messages.sensorNameDistance + "1", port :"D18", subType: "ultrasonic"},
+                { type: "button", suggestedName: strings.messages.sensorNameButton + "1", port: "D22" },
+                { type: "humidity", suggestedName: strings.messages.sensorNameHumidity + "1", port: "D24"},
+                { type: "buzzer", suggestedName: strings.messages.sensorNameBuzzer + "1", port: "D26", subType: "active"},
+                { type: "temperature", suggestedName: strings.messages.sensorNameTemperature + "1", port: 'A0', subType: "groveanalog" },
+                { type: "potentiometer", suggestedName: strings.messages.sensorNamePotentiometer + "1", port :"A4"},
+                { type: "light", suggestedName: strings.messages.sensorNameLight + "1", port :"A6"},
             ]
         },
         {
@@ -1251,22 +1297,22 @@ var getContext = function (display, infos, curLevel) {
                 "A": [0],
             },
             builtinSensors: [
-                { type: "screen", subType: "oled128x32", port: "i2c",  suggestedName: "screen1", },
-                { type: "led", subType: "red", port: "D4", suggestedName: "redled1", },
-                { type: "led", subType: "green", port: "D17", suggestedName: "greenled1", },
-                { type: "led", subType: "blue", port: "D27",  suggestedName: "blueled1", },
-                { type: "irtrans", port: "D22",  suggestedName: "irtran1", },
-                { type: "irrecv", port: "D23", suggestedName: "irrec1", },
-                { type: "sound", port: "A1", suggestedName: "micro1", },
-                { type: "buzzer", subType: "passive", port: "D12", suggestedName: "buzzer1", },
-                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: "accel1", },
-                { type: "gyroscope", subType: "BMI160", port: "i2c", suggestedName: "gryscope1", },
-                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: "magneto1", },
-                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: "temp1", },
-                { type: "range", subType: "vl53l0x", port: "i2c", suggestedName: "distance1", },
-                { type: "button", port: "D26", suggestedName: "button1", },
-                { type: "light", port: "A2", suggestedName: "light1", },
-                { type: "stick", port: "D7", suggestedName: "stick1", }
+                { type: "screen", subType: "oled128x32", port: "i2c",  suggestedName: strings.messages.sensorNameScreen + "1", },
+                { type: "led", subType: "red", port: "D4", suggestedName: strings.messages.sensorNameRedLed + "1", },
+                { type: "led", subType: "green", port: "D17", suggestedName: strings.messages.sensorNameGreenLed + "1", },
+                { type: "led", subType: "blue", port: "D27",  suggestedName: strings.messages.sensorNameBlueLed + "1", },
+                { type: "irtrans", port: "D22",  suggestedName: strings.messages.sensorNameIrTrans + "1", },
+                { type: "irrecv", port: "D23", suggestedName: strings.messages.sensorNameIrRecv + "1", },
+                { type: "sound", port: "A1", suggestedName: strings.messages.sensorNameMicrophone + "1", },
+                { type: "buzzer", subType: "passive", port: "D12", suggestedName: strings.messages.sensorNameBuzzer + "1", },
+                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameAccelerometer + "1", },
+                { type: "gyroscope", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameGyroscope  + "1", },
+                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: strings.messages.sensorNameMagnetometer + "1", },
+                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameTemperature + "1", },
+                { type: "range", subType: "vl53l0x", port: "i2c", suggestedName: strings.messages.sensorNameDistance + "1", },
+                { type: "button", port: "D26", suggestedName: strings.messages.sensorNameButton + "1", },
+                { type: "light", port: "A2", suggestedName: strings.messages.sensorNameLight + "1", },
+                { type: "stick", port: "D7", suggestedName: strings.messages.sensorNameStick + "1", }
             ],
         },
         {
@@ -1289,6 +1335,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "led",
+            suggestedName: strings.messages.sensorNameLed,
             description: strings.messages.led,
             isAnalog: false,
             isSensor: false,
@@ -1324,30 +1371,31 @@ var getContext = function (display, infos, curLevel) {
                 subType: "blue",
                 description: strings.messages.blueled,
                 selectorImages: ["ledon-blue.png"],
-                suggestedName: "blueled",
+                suggestedName: strings.messages.sensorNameBlueLed,
             },
             {
                 subType: "green",
                 description: strings.messages.greenled,
                 selectorImages: ["ledon-green.png"],
-                suggestedName: "greenled",
+                suggestedName: strings.messages.sensorNameGreenLed,
             },
             {
                 subType: "orange",
                 description: strings.messages.orangeled,
                 selectorImages: ["ledon-orange.png"],
-                suggestedName: "orangeled",
+                suggestedName: strings.messages.sensorNameOrangeLed,
             },
             {
                 subType: "red",
                 description: strings.messages.redled,
                 selectorImages: ["ledon-red.png"],
-                suggestedName: "redled",
+                suggestedName: strings.messages.sensorNameRedLed,
             }
             ],
         },
         {
             name: "buzzer",
+            suggestedName: strings.messages.sensorNameBuzzer,
             description: strings.messages.buzzer,
             isAnalog: false,
             isSensor: false,
@@ -1403,6 +1451,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "servo",
+            suggestedName: strings.messages.sensorNameServo,
             description: strings.messages.servo,
             isAnalog: true,
             isSensor: false,
@@ -1432,6 +1481,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "screen",
+            suggestedName: strings.messages.sensorNameScreen,
             description: strings.messages.screen,
             isAnalog: false,
             isSensor: false,
@@ -1544,6 +1594,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "irtrans",
+            suggestedName: strings.messages.sensorNameIrTrans,
             description: strings.messages.irtrans,
             isAnalog: false,
             isSensor: true,
@@ -1570,6 +1621,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "button",
+            suggestedName: strings.messages.sensorNameButton,
             description: strings.messages.button,
             isAnalog: false,
             isSensor: true,
@@ -1598,6 +1650,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "stick",
+            suggestedName: strings.messages.sensorNameStick,
             description: strings.messages.fivewaybutton,
             isAnalog: false,
             isSensor: true,
@@ -1659,6 +1712,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "temperature",
+            suggestedName: strings.messages.sensorNameTemperature,
             description: strings.messages.tempsensor,
             isAnalog: true,
             isSensor: true,
@@ -1699,6 +1753,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "potentiometer",
+            suggestedName: strings.messages.sensorNamePotentiometer,
             description: strings.messages.potentiometer,
             isAnalog: true,
             isSensor: true,
@@ -1723,6 +1778,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "light",
+            suggestedName: strings.messages.sensorNameLight,
             description: strings.messages.lightsensor,
             isAnalog: true,
             isSensor: true,
@@ -1747,6 +1803,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "range",
+            suggestedName: strings.messages.sensorNameDistance,
             description: strings.messages.distancesensor,
             isAnalog: true,
             isSensor: true,
@@ -1782,6 +1839,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "humidity",
+            suggestedName: strings.messages.sensorNameHumidity,
             description: strings.messages.humiditysensor,
             isAnalog: true,
             isSensor: true,
@@ -1806,6 +1864,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "sound",
+            suggestedName: strings.messages.sensorNameMicrophone,
             description: strings.messages.soundsensor,
             isAnalog: true,
             isSensor: true,
@@ -1830,6 +1889,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "accelerometer",
+            suggestedName: strings.messages.sensorNameAccelerometer,
             description: strings.messages.accelerometerbmi160,
             isAnalog: true,
             isSensor: true,
@@ -1870,6 +1930,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "gyroscope",
+            suggestedName: strings.messages.sensorNameGyroscope,
             description: strings.messages.gyrobmi160,
             isAnalog: true,
             isSensor: true,
@@ -1900,6 +1961,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "magnetometer",
+            suggestedName: strings.messages.sensorNameMagnetometer,
             description: strings.messages.maglsm303c,
             isAnalog: true,
             isSensor: true,
@@ -1932,6 +1994,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "irrecv",
+            suggestedName: strings.messages.sensorNameIrRecv,
             description: strings.messages.irreceiver,
             isAnalog: false,
             isSensor: true,
@@ -1958,6 +2021,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "cloudstore",
+            suggestedName: strings.messages.sensorNameCloudStore,
             description: strings.messages.cloudstore,
             isAnalog: false,
             isSensor: false,
@@ -4078,7 +4142,7 @@ var getContext = function (display, infos, curLevel) {
 
 
                 var port = $("#selector-sensor-port option:selected").text();
-                var name = getNewSensorSuggestedName(sensorDefinition.name);
+                var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
 
                 if(name == 'screen1') {
                     // prepend screen because squareSize func can't handle cells wrap
