@@ -380,7 +380,7 @@ var localLanguageStrings = {
          control: "Control",
          operator: "Operadores",
          math: "Mate",
-         text: "Texto",
+         texts: "Texto",
          variables: "Variables",
          functions: "Funciones",
          read: "Lectura",
