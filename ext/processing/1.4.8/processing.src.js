@@ -14323,6 +14323,12 @@ module.exports = function setupParser(Processing, options) {
       if (curContext === undef) {
         // size() was called without p.init() default context, i.e. p.createGraphics()
         curContext = curElement.getContext("2d");
+        curContext['imageSmoothingEnabled'] = false;       /* standard */
+        curContext['mozImageSmoothingEnabled'] = false;    /* Firefox */
+        curContext['oImageSmoothingEnabled'] = false;      /* Opera */
+        curContext['webkitImageSmoothingEnabled'] = false; /* Safari */
+        curContext['msImageSmoothingEnabled'] = false;     /* IE */
+
         userMatrixStack = new PMatrixStack();
         userReverseMatrixStack = new PMatrixStack();
         modelView = new PMatrix2D();
