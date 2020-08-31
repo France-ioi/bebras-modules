@@ -1,4 +1,891 @@
 ﻿//"use strict";
+var quickPiLocalLanguageStrings = {
+    fr: { // French strings
+        label: {
+            // Labels for the blocks
+            sleep: "attendre %1 millisecondes",
+            currentTime: "temps écoulé en millisecondes",
+
+            turnLedOn: "allumer la LED",
+            turnLedOff: "éteindre la LED",
+
+            setLedState: "passer la LED %1 à %2 ",
+            toggleLedState: "inverser la LED %1",
+
+            isLedOn: "LED allumée",
+            isLedOnWithName: "LED %1 allumée",
+
+            setLedBrightness: "mettre la luminosité de %1 à %2",
+            getLedBrightness: "lire la luminosité de %1",
+
+            turnBuzzerOn: "allumer le buzzer",
+            turnBuzzerOff: "éteindre le buzzer",
+            setBuzzerState: "mettre le buzzer %1 à %2",
+            isBuzzerOn: "buzzer allumé",
+            isBuzzerOnWithName: "buzzer %1 allumé",
+
+            setBuzzerNote: "jouer la fréquence %2Hz sur %1",
+            getBuzzerNote: "fréquence du buzzer %1",
+
+            isButtonPressed: "bouton enfoncé",
+            isButtonPressedWithName: "bouton  %1 enfoncé",
+            waitForButton: "attendre une pression sur le bouton",
+            buttonWasPressed: "le bouton a été enfoncé",
+
+            displayText: "afficher %1",
+            displayText2Lines: "afficher Ligne 1 : %1 Ligne 2 : %2",
+
+            readTemperature: "température ambiante",
+            getTemperature: "temperature de %1",
+
+            readRotaryAngle: "état du potentiomètre %1",
+            readDistance: "distance mesurée par %1",
+            readLightIntensity: "intensité lumineuse",
+            readHumidity: "humidité ambiante",
+
+            setServoAngle: "mettre le servo %1 à l'angle %2",
+            getServoAngle: "angle du servo %1",
+
+
+            drawPoint: "draw pixel",
+            isPointSet: "is pixel set in screen",
+            drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
+            drawRectangle: "rectangle x₀: %1 y₀: %2 largeur₀: %3 hauteur₀: %4",
+            drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
+            clearScreen: "effacer tout l'écran",
+            updateScreen: "mettre à jour l'écran",
+            autoUpdate: "mode de mise à jour automatique de l'écran",
+
+            fill: "mettre la couleur de fond à %1",
+            noFill: "ne pas remplir les formes",
+            stroke: "mettre la couleur de tracé à %1",
+            noStroke: "ne pas dessiner les contours",
+
+            readAcceleration: "accélération en (m/s²) dans l'axe %1",
+            computeRotation: "calcul de l'angle de rotation (°) sur l'accéléromètre %1",
+            readSoundLevel: "volume sonore",
+
+            readMagneticForce: "champ magnétique (µT) sur %1",
+            computeCompassHeading: "direction de la boussole en (°)",
+
+            readInfraredState: "infrarouge détecté sur %1",
+            setInfraredState: "mettre l'émetteur infrarouge %1 à %2",
+
+            // Gyroscope
+            readAngularVelocity: "vitesse angulaire (°/s) du gyroscope %1",
+            setGyroZeroAngle: "initialiser le gyroscope à l'état zéro",
+            computeRotationGyro: "calculer la rotation du gyroscope %1",
+
+            //Internet store
+            connectToCloudStore: "se connecter au cloud. Identifiant %1 Mot de passe %2",
+            writeToCloudStore: "écrire dans le cloud : identifiant %1 clé %2 valeur %3",
+            readFromCloudStore: "lire dans le cloud : identifiant %1 clé %2",
+
+            // IR Remote
+            readIRMessage: "attendre un message IR nom : %1 pendant : %2 ms",
+            sendIRMessage: "envoi du message préparé IR nommé %2 sur %1",
+            presetIRMessage: "préparer un message IR de nom %1 et contenu %2",
+        },
+        code: {
+            // Names of the functions in Python, or Blockly translated in JavaScript
+            turnLedOn: "turnLedOn",
+            turnLedOff: "turnLedOff",
+            setLedState: "setLedState",
+
+            isButtonPressed: "isButtonPressed",
+            isButtonPressedWithName : "isButtonPressed",
+            waitForButton: "waitForButton",
+            buttonWasPressed: "buttonWasPressed",
+
+            toggleLedState: "toggleLedState",
+            displayText: "displayText",
+            displayText2Lines: "displayText",
+            readTemperature: "readTemperature",
+            sleep: "sleep",
+            setServoAngle: "setServoAngle",
+            readRotaryAngle: "readRotaryAngle",
+            readDistance: "readDistance",
+            readLightIntensity: "readLightIntensity",
+            readHumidity: "readHumidity",
+            currentTime: "currentTime",
+            getTemperature: "getTemperature",
+
+            isLedOn: "isLedOn",
+            isLedOnWithName: "isLedOn",
+
+            setBuzzerNote: "setBuzzerNote",
+            getBuzzerNote: "getBuzzerNote",
+            setLedBrightness: "setLedBrightness",
+            getLedBrightness: "getLedBrightness",
+            getServoAngle: "getServoAngle",
+
+            setBuzzerState: "setBuzzerState",
+            setBuzzerNote: "setBuzzerNote",
+
+            turnBuzzerOn: "turnBuzzerOn",
+            turnBuzzerOff: "turnBuzzerOff",
+            isBuzzerOn: "isBuzzerOn",
+            isBuzzerOnWithName: "isBuzzerOn",
+
+
+            drawPoint: "drawPoint",
+            isPointSet: "isPointSet",
+            drawLine: "drawLine",
+            drawRectangle: "drawRectangle",
+            drawCircle: "drawCircle",
+            clearScreen: "clearScreen",
+            updateScreen: "updateScreen",
+            autoUpdate: "autoUpdate",
+
+            fill: "fill",
+            noFill: "noFill",
+            stroke: "stroke",
+            noStroke: "noStroke",
+
+
+            readAcceleration: "readAcceleration",
+            computeRotation: "computeRotation",
+
+            readSoundLevel: "readSoundLevel",
+
+
+            readMagneticForce: "readMagneticForce",
+            computeCompassHeading: "computeCompassHeading",
+
+            readInfraredState: "readInfraredState",
+            setInfraredState: "setInfraredState",
+
+
+            // Gyroscope
+            readAngularVelocity: "readAngularVelocity",
+            setGyroZeroAngle: "setGyroZeroAngle",
+            computeRotationGyro: "computeRotationGyro",
+
+            //Internet store
+            connectToCloudStore: "connectToCloudStore",
+            writeToCloudStore: "writeToCloudStore",
+            readFromCloudStore: "readFromCloudStore",                
+
+            // IR Remote
+            readIRMessage: "readIRMessage",
+            sendIRMessage: "sendIRMessage",
+            presetIRMessage: "presetIRMessage",
+        },
+        description: {
+            // Descriptions of the functions in Python (optional)
+            turnLedOn: "turnLedOn() allume la LED",
+            turnLedOff: "turnLedOff() éteint la LED",
+            isButtonPressed: "isButtonPressed() retourne True si le bouton est enfoncé, False sinon",
+            isButtonPressedWithName: "isButtonPressed(button) retourne True si le bouton est enfoncé, False sinon",
+            waitForButton: "waitForButton(button) met en pause l'exécution jusqu'à ce que le bouton soit appuyé",
+            buttonWasPressed: "buttonWasPressed(button) indique si le bouton a été appuyé depuis le dernier appel à cette fonction",
+            setLedState: "setLedState(led, state) modifie l'état de la LED : True pour l'allumer, False pour l'éteindre",
+            toggleLedState: "toggleLedState(led) inverse l'état de la LED",
+            displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
+            displayText2Lines: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
+            readTemperature: "readTemperature(thermometer) retourne la température ambiante",
+            sleep: "sleep(milliseconds) met en pause l'exécution pendant une durée en ms",
+            setServoAngle: "setServoAngle(servo, angle) change l'angle du servomoteur",
+            readRotaryAngle: "readRotaryAngle(potentiometer) retourne la position potentiomètre",
+            readDistance: "readDistance(distanceSensor) retourne la distance mesurée",
+            readLightIntensity: "readLightIntensity(lightSensor) retourne l'intensité lumineuse",
+            readHumidity: "readHumidity(hygrometer) retourne l'humidité ambiante",
+            currentTime: "currentTime(milliseconds) temps en millisecondes depuis le début du programme",
+
+            setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
+            getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
+            getServoAngle: "getServoAngle(servo) retourne l'angle du servomoteur",
+
+            isLedOn: "isLedOn() retourne True si la LED est allumée, False si elle est éteinte",
+            isLedOnWithName: "isLedOn(led) retourne True si la LED est allumée, False sinon",
+
+            turnBuzzerOn: "turnBuzzerOn() allume le buzzer",
+            turnBuzzerOff: "turnBuzzerOff() éteint le buzzer",
+
+            isBuzzerOn: "isBuzzerOn() retourne True si le buzzer est allumé, False sinon",
+            isBuzzerOnWithName: "isBuzzerOn(buzzer) retourne True si le buzzer est allumé, False sinon",
+
+            setBuzzerState: "setBuzzerState(buzzer, state) modifie l'état du buzzer: True pour allumé, False sinon",
+            setBuzzerNote: "setBuzzerNote(buzzer, frequency) fait sonner le buzzer à la fréquence indiquée",
+            getBuzzerNote: "getBuzzerNote(buzzer) retourne la fréquence actuelle du buzzer",
+
+            getTemperature: "getTemperature(thermometer) ",
+
+            drawPoint: "drawPoint(x, y)",
+            isPointSet: "isPointSet(x, y)",
+            drawLine: "drawLine(x0, y0, x1, y1)",
+            drawRectangle: "drawRectangle(x0, y0, width, height) dessine un rectangle, de coin haut gauche (x0,y0)",
+            drawCircle: "drawCircle(x0, y0, diameter)",
+            clearScreen: "clearScreen() efface le contenu de l'écran",
+            updateScreen: "updateScreen()",
+            autoUpdate: "autoUpdate(auto)",
+
+            fill: "fill(color)",
+            noFill: "noFill()",
+            stroke: "stroke(color)",
+            noStroke: "noStroke()",
+
+
+            readAcceleration: "readAcceleration(axis)",
+            computeRotation: "computeRotation()",
+
+            readSoundLevel: "readSoundLevel(port)",
+
+
+            readMagneticForce: "readMagneticForce(axis)",
+            computeCompassHeading: "computeCompassHeading()",
+
+            readInfraredState: "readInfraredState(IRReceiver) retourne True si un signal infra-rouge est détecté, False sinon",
+            setInfraredState: "setInfraredState(IREmitter, state) modifie l'état de l'émetteur : True pour l'allumer, False pour l'éteindre",
+
+            // Gyroscope
+            readAngularVelocity: "readAngularVelocity()",
+            setGyroZeroAngle: "setGyroZeroAngle()",
+            computeRotationGyro: "computeRotationGyro()",
+
+            //Internet store
+            connectToCloudStore: "connectToCloudStore(identifier, password)",
+            writeToCloudStore: "writeToCloudStore(identifier, key, value)",
+            readFromCloudStore: "readFromCloudStore(identifier, key)",
+
+            // IR Remote
+            readIRMessage: "readIRMessage(irrec, timeout)",
+            sendIRMessage: "sendIRMessage(irtrans, name)",
+            presetIRMessage: "presetIRMessage(name, data)",
+        },
+        constant: {
+        },
+
+        startingBlockName: "Programme", // Name for the starting block
+        messages: {
+            sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
+            manualTestSuccess: "Test automatique validé.",
+            testSuccess: "Bravo ! La sortie est correcte",
+            wrongState: "Test échoué : {0} a été dans l'état {1} au lieu de {2} à t={3}ms.",
+            wrongStateDrawing: "Test échoué : {0} diffère de {1} pixels par rapport à l'affichage attendu à t={2}ms.",
+            wrongStateSensor: "Test échoué : votre programme n'a pas lu l'état de {0} après t={1}ms.",
+            programEnded: "programme terminé.",
+            piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
+            cantConnect: "Impossible de se connecter à l'appareil.",
+            wrongVersion: "Votre Raspberry Pi a une version trop ancienne, mettez le à jour.",
+            sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
+            actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
+            cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
+            cantConnectoToBT: 'Tentative de connection par Bluetooth, veuillez connecter votre appareil au Raspberry par Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
+            canConnectoToUSB: "Connecté en USB.",
+            canConnectoToBT: "Connecté en Bluetooth.",
+            noPortsAvailable: "Aucun port compatible avec ce {0} n'est disponible (type {1})",
+            sensor: "capteur",
+            actuator: "actionneur",
+            removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur?",
+            remove: "Retirer",
+            keep: "Garder",
+            minutesago: "Last seen {0} minutes ago",
+            hoursago: "Last seen more than one hour ago",
+            drawing: "dessin",
+            timeLabel: "Temps",
+            seconds: "secondes",
+
+            changeBoard: "Changer de carte",
+            connect: "Connecter",
+            install: "Installer",
+            config: "Config",
+
+     
+            raspiConfig: "Configuration du Raspberry Pi",
+            local: "Local",
+            schoolKey: "Indiquez un identifiant d'école",
+            connectList: "Sélectionnez un appareil à connecter dans la liste suivante",
+            enterIpAddress: "ou entrez son adesse IP",
+            getPiList: "Obtenir la liste",
+            connectTroughtTunnel: "Connecter à travers le France-ioi tunnel",
+
+            connectToLocalhost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
+            connectToWindowLocation: "Connecter au Raspberry Pi depuis lequel cette page est chargée",
+
+            connectToDevice: "Connecter l'appareil",
+            disconnectFromDevice: "Déconnecter",
+       
+
+            irReceiverTitle: "Recevoir des codes infrarouges",
+            directIrControl: "Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons",
+            getIrCode: "Recevoir un code",
+            closeDialog: "Fermer",
+
+            irRemoteControl: "Télécommande IR",
+            
+            noIrPresets: "Veuillez utiliser la fonction de préparation de messages IR pour ajouter des commandes de télécommande",
+            irEnableContinous: "Activer l'émission IR en continu",
+            irDisableContinous: "Désactiver l'émission IR en continu",
+
+            connectToLocalHost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
+
+            up: "up",
+            down: "down",
+            left: "left",
+            right: "right",
+            center: "center",
+
+            on: "On",
+            off: "Off",
+
+            grovehat: "Grove Base Hat for Raspberry Pi",
+            quickpihat: "France IOI QuickPi Hat",
+            pinohat: "Raspberry Pi without hat",
+            led: "LED",
+            blueled: "LED bleue",
+            greenled: "LED verte",
+            orangeled: "LED orange",
+            redled: "LED rouge",
+            buzzer: "Buzzer",
+            grovebuzzer: "Grove Buzzer",
+            quickpibuzzer: "Quick Pi Passive Buzzer",
+            servo: "Servo Motor",
+            screen: "Screen",
+            grove16x2lcd: "Grove 16x2 LCD",
+            oled128x32: "128x32 Oled Screen",
+            irtrans: "IR Transmiter",
+            button: "Button",
+            fivewaybutton: "5 way button",
+            tempsensor: "Temperature sensor",
+            groveanalogtempsensor: "Grove Analog tempeature sensor",
+            quickpigyrotempsensor: "Quick Pi Accelerometer+Gyroscope temperature sensor",
+            dht11tempsensor: "DHT11 Tempeature Sensor",
+            potentiometer: "Potentiometer",
+            lightsensor: "Light sensor",
+            distancesensor: "Capteur de distance",
+            timeofflightranger: "Time of flight distance sensor",
+            ultrasonicranger: "Capteur de distance à ultrason",
+            humiditysensor: "Humidity sensor",
+            soundsensor: "Sound sensor",
+            accelerometerbmi160: "Accelerometer sensor (BMI160)",
+            gyrobmi160: "Gyropscope sensor (BMI160)",
+            maglsm303c: "Magnetometer sensor (LSM303C)",
+            irreceiver: "IR Receiver",
+            cloudstore: "Cloud Store",
+            addcomponent: "Ajouter un composant",
+            selectcomponent: "Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.",
+            add: "Ajouter",
+            builtin: "(builtin)",
+            chooseBoard: "Choisissez votre carte",
+            nameandports: "Noms et ports des capteurs et actionneurs QuickPi",
+            name: "Name",
+            port: "Port",
+            state: "State",
+
+            cloudKeyNotExists: "La clé n'existe pas : {0} ",
+            cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
+            cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
+            hello: "Bonjour",
+
+            experiment: "Expérimenter",
+            validate: "Valider",
+            validate1: "Valider 1",
+            validate2: "Valider 2",
+            validate3: "Valider 3",
+
+            sensorNameBuzzer: "buzzer",
+            sensorNameLed: "led",
+            sensorNameRedLed: "redled",
+            sensorNameGreenLed: "greenled",
+            sensorNameBlueLed: "blueled",
+            sensorNameOrangeLed: "orangeled",
+            sensorNameScreen: "screen",
+            sensorNameIrTrans: "irtran",
+            sensorNameIrRecv: "irrec",
+            sensorNameMicrophone: "micro",
+            sensorNameTemperature: "temp",
+            sensorNameGyroscope: "gyroscope",
+            sensorNameMagnetometer: "magneto",
+            sensorNameDistance: "distance",
+            sensorNameAccelerometer: "accel",
+            sensorNameButton: "button",
+            sensorNameLight: "light",
+            sensorNameStick: "stick",
+            sensorNameServo: "servo",
+            sensorNameHumidity: "humidity",
+            sensorNamePotentiometer: "pot",
+            sensorNameCloudStore: "cloud",
+        }
+    },
+    es: { // French strings
+        label: {
+            // Labels for the blocks
+            sleep: "esperar %1 milisegundos",
+            currentTime: "tiempo transcurrido en milisegundos",
+
+            turnLedOn: "encender el LED",
+            turnLedOff: "apagar el LED",
+
+            setLedState: "cambiar el LED %1 a %2 ",
+            toggleLedState: "invertir el estado del LED %1",
+
+            isLedOn: "LED encendido",
+            isLedOnWithName: "LED %1 encendido",
+
+            setLedBrightness: "Cambiar el brillo de %1 a %2",
+            getLedBrightness: "Obtener el brillo de %1",
+
+            turnBuzzerOn: "encender el zumbador",
+            turnBuzzerOff: "apagar el zumbador",
+            setBuzzerState: "cambiar el zumbador %1 a %2",
+            isBuzzerOn: "zumbador encendido",
+            isBuzzerOnWithName: "zumbador %1 encendido",
+
+            setBuzzerNote: "frequencia de reproducción %2Hz en %1",
+            getBuzzerNote: "frequncia del zumbador %1",
+
+            isButtonPressed: "botón presionado",
+            isButtonPressedWithName: "botón  %1 presionado",
+            waitForButton: "esperar a que se presione un botón",
+            buttonWasPressed: "el botón ha sido presionado",
+
+            displayText: "desplegar texto %1",
+            displayText2Lines: "desplegar texto Linea 1 : %1 Linea 2 : %2",
+
+            readTemperature: "temperatura ambiente",
+            getTemperature: "temperatura de %1",
+
+            readRotaryAngle: "estado del potenciómetro %1",
+            readDistance: "distancia medida por %1",
+            readLightIntensity: "intensidad de luz",
+            readHumidity: "humedad ambiental",
+
+            setServoAngle: "cambiar el ángulo de el servo %1 a %2°",
+            getServoAngle: "ángulo del servo %1",
+
+
+            drawPoint: "dibuja un pixel",
+            isPointSet: "este pixel esta dibujado",
+            drawLine: "linea desde x₀: %1 y₀: %2 hasta x₁: %3 y₁: %4",
+            drawRectangle: "rectángulo  x: %1 y: %2 largo: %3 alto: %4",
+            drawCircle: "circulo x₀: %1 y₀: %2 diametro: %3",
+            clearScreen: "limpiar toda la pantalla",
+            updateScreen: "actualizar pantalla",
+            autoUpdate: "modo de actualización de pantalla automática",
+
+            fill: "establecer el color de fondo en %1",
+            noFill: "no rellenar figuras",
+            stroke: "color de los bordes %1",
+            noStroke: "no dibujar los contornos",
+
+            readAcceleration: "aceleración en m/s² en el eje %1",
+            computeRotation: "cálculo del ángulo de rotación (°) en el acelerómetro %1",
+            readSoundLevel: "volumen de sonido",
+
+            readMagneticForce: "campo magnético (µT) en %1",
+            computeCompassHeading: "dirección de la brújula en (°)",
+
+            readInfraredState: "infrarrojos detectados en %1",
+            setInfraredState: "cambiar emisor de infrarrojos %1 a %2",
+
+            // Gyroscope
+            readAngularVelocity: "velocidad angular (°/s) del guroscopio %1",
+            setGyroZeroAngle: "inicializar el giroscopio a estado cero",
+            computeRotationGyro: "calcular la rotación del giroscopio %1",
+
+            //Internet store
+            connectToCloudStore: "conectar a la nube. Usuario %1 Contraseña %2",
+            writeToCloudStore: "escribir en la nube : Usuario %1 llave %2 valor %3",
+            readFromCloudStore: "leer de la nube : Usuario %1 lave %2",
+
+            // IR Remote
+            readIRMessage: "esperar un mensaje de infrarrojos : %1 durante : %2 ms",
+            sendIRMessage: "enviar el mensaje por infrarrojos %2 por %1",
+            presetIRMessage: "preparar un mensaje de infrarrojos con el nombre %1 y el contenido %2",
+        },
+        code: {
+            // Names of the functions in Python, or Blockly translated in JavaScript
+            turnLedOn: "turnLedOn",
+            turnLedOff: "turnLedOff",
+            setLedState: "setLedState",
+
+            isButtonPressed: "isButtonPressed",
+            isButtonPressedWithName : "isButtonPressed",
+            waitForButton: "waitForButton",
+            buttonWasPressed: "buttonWasPressed",
+
+            toggleLedState: "toggleLedState",
+            displayText: "displayText",
+            displayText2Lines: "displayText",
+            readTemperature: "readTemperature",
+            sleep: "sleep",
+            setServoAngle: "setServoAngle",
+            readRotaryAngle: "readRotaryAngle",
+            readDistance: "readDistance",
+            readLightIntensity: "readLightIntensity",
+            readHumidity: "readHumidity",
+            currentTime: "currentTime",
+            getTemperature: "getTemperature",
+
+            isLedOn: "isLedOn",
+            isLedOnWithName: "isLedOn",
+
+            setBuzzerNote: "setBuzzerNote",
+            getBuzzerNote: "getBuzzerNote",
+            setLedBrightness: "setLedBrightness",
+            getLedBrightness: "getLedBrightness",
+            getServoAngle: "getServoAngle",
+
+            setBuzzerState: "setBuzzerState",
+            setBuzzerNote: "setBuzzerNote",
+
+            turnBuzzerOn: "turnBuzzerOn",
+            turnBuzzerOff: "turnBuzzerOff",
+            isBuzzerOn: "isBuzzerOn",
+            isBuzzerOnWithName: "isBuzzerOn",
+
+
+            drawPoint: "drawPoint",
+            isPointSet: "isPointSet",
+            drawLine: "drawLine",
+            drawRectangle: "drawRectangle",
+            drawCircle: "drawCircle",
+            clearScreen: "clearScreen",
+            updateScreen: "updateScreen",
+            autoUpdate: "autoUpdate",
+
+            fill: "fill",
+            noFill: "noFill",
+            stroke: "stroke",
+            noStroke: "noStroke",
+
+
+            readAcceleration: "readAcceleration",
+            computeRotation: "computeRotation",
+
+            readSoundLevel: "readSoundLevel",
+
+
+            readMagneticForce: "readMagneticForce",
+            computeCompassHeading: "computeCompassHeading",
+
+            readInfraredState: "readInfraredState",
+            setInfraredState: "setInfraredState",
+
+
+            // Gyroscope
+            readAngularVelocity: "readAngularVelocity",
+            setGyroZeroAngle: "setGyroZeroAngle",
+            computeRotationGyro: "computeRotationGyro",
+
+            //Internet store
+            connectToCloudStore: "connectToCloudStore",
+            writeToCloudStore: "writeToCloudStore",
+            readFromCloudStore: "readFromCloudStore",                
+
+            // IR Remote
+            readIRMessage: "readIRMessage",
+            sendIRMessage: "sendIRMessage",
+            presetIRMessage: "presetIRMessage",
+        },
+        description: {
+            // Descriptions of the functions in Python (optional)
+            turnLedOn: "turnLedOn() enciende el LED",
+            turnLedOff: "turnLedOff() apaga el led LED",
+            isButtonPressed: "isButtonPressed() devuelve True si el boton esta presionado, False de otra manera",
+            isButtonPressedWithName: "isButtonPressed(button) devuelve True si el boton esta presionado, False de otra manera",
+            waitForButton: "waitForButton(button) pausa la ejecución hasta que se presiona el botón",
+            buttonWasPressed: "buttonWasPressed(button) indica si se ha pulsado el botón desde la última llamada a esta función",
+            setLedState: "setLedState(led, state) modifica el estado del LED: True para encenderlo, False para apagarlo",
+            toggleLedState: "toggleLedState(led) invierte el estado del LED",
+            displayText: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
+            displayText2Lines: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
+            readTemperature: "readTemperature(thermometer) devuelve la temperatura ambiente",
+            sleep: "sleep(milliseconds) pausa la ejecución por un tiempo en milisegundos",
+            setServoAngle: "setServoAngle(servo, angle) cambiar el ángulo del servomotor",
+            readRotaryAngle: "readRotaryAngle(potentiometer) devuelve la posición del potenciómetro",
+            readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
+            readLightIntensity: "readLightIntensity(lightSensor) devuelve la intensidad de la luz",
+            readHumidity: "readHumidity(hygrometer) devuelve la humedad ambiental",
+            currentTime: "currentTime(milliseconds) tiempo en milisegundos desde el inicio del programa",
+
+            setLedBrightness: "setLedBrightness(led, brightness) ajusta la intensidad de la luz del LED",
+            getLedBrightness: "getLedBrightness(led) devuelve la intensidad de luz del LED",
+            getServoAngle: "getServoAngle(servo) devuelve el ángulo del servomotor",
+
+            isLedOn: "isLedOn() devuelve True si el LED está encendido, False si está apagado",
+            isLedOnWithName: "isLedOn(led) devuelve True si el LED está encendido, False si está apagado",
+
+            turnBuzzerOn: "turnBuzzerOn() enciende el zumbador",
+            turnBuzzerOff: "turnBuzzerOff() apaga el zumbador",
+
+            isBuzzerOn: "isBuzzerOn() devuelve True si el zumbador está encendido, False si está apagado",
+            isBuzzerOnWithName: "isBuzzerOn(buzzer) devuelve True si el zumbador está encendido, False si está apagado",
+
+            setBuzzerState: "setBuzzerState(buzzer, state) modifica el estado del zumbador: Verdadero para encendido, Falso para apagado",
+            setBuzzerNote: "setBuzzerNote(buzzer, frequency) suena el zumbador en la frecuencia indicada",
+            getBuzzerNote: "getBuzzerNote(buzzer) devuelve la frecuencia actual del zumbador",
+
+            getTemperature: "getTemperature(thermometer) obtiene la temperatura del sensor",
+
+            drawPoint: "drawPoint(x, y) dibuja un punto en las coordenadas x, y",
+            isPointSet: "isPointSet(x, y) devuelve True se dibujó sobre el punto x, y, False de lo contrario",
+            drawLine: "drawLine(x0, y0, x1, y1) dibuja una linea empezando desde el punto x0, x1, hasta el punto x1, y1",
+            drawRectangle: "drawRectangle(x0, y0, width, height) dibuja un rectángulo empezando en el punto x0, y0 con el ancho y altura dados",
+            drawCircle: "drawCircle(x0, y0, diameter) dibuja un circulo con centro en x0, y0 y el diametro dado",
+            clearScreen: "clearScreen() limpia toda la pantalla",
+            updateScreen: "updateScreen() actualiza los contenidos de la pantalla",
+            autoUpdate: "autoUpdate(auto) cambia el modo de actualización de pantalla automatica",
+
+            fill: "fill(color) rellenar las figuras con el color dado",
+            noFill: "noFill() no rellenar las figuras",
+            stroke: "stroke(color) dibujar los bordes de las figuras con el color dado",
+            noStroke: "noStroke() no dibujar los bordes de las figuras",
+
+
+            readAcceleration: "readAcceleration(axis) leer la acceleración (m/s²) en el eje (X, Y o Z)",
+            computeRotation: "computeRotation() calcular el ángulo de rotación (°) en el acelerómetro",
+
+            readSoundLevel: "readSoundLevel(port) devuelve el volumen del sonido ambiente",
+
+
+            readMagneticForce: "readMagneticForce(axis) devuelve el campo magnético (µT) en el eje (X, Y o Z)",
+            computeCompassHeading: "computeCompassHeading() devuelve la dirección de la brujula en grados",
+
+            readInfraredState: "readInfraredState() devuelve True si se detecta una señal infrarroja, Falso de otra manera",
+            setInfraredState: "setInfraredState(state) si se le pasa True enciende el transmisor infrarrojo, Falso lo apaga",
+
+            // Gyroscope
+            readAngularVelocity: "readAngularVelocity() devuelve la velocidad angular (°/s) del gyroscopio",
+            setGyroZeroAngle: "setGyroZeroAngle() inicializa el giroscopio a estado cero",
+            computeRotationGyro: "computeRotationGyro() calcula la rotación del giroscopio (°)",
+
+            //Internet store
+            connectToCloudStore: "connectToCloudStore(identifier, password) se conecta a la nube con el usuario y password dados",
+            writeToCloudStore: "writeToCloudStore(identifier, key, value) escribe un valor a un llave en la nube",
+            readFromCloudStore: "readFromCloudStore(identifier, key) devuelve un valor leido de la nube de la llave dada",
+
+            // IR Remote
+            readIRMessage: "readIRMessage(irrec, timeout) espera por un mensaje infrarrojo y lo devuelve durante el tiempo dado en milisegundos",
+            sendIRMessage: "sendIRMessage(irtrans, name) envia un mensaje infrarrojo previamente configurado con el nombre dado",
+            presetIRMessage: "presetIRMessage(name, data) configura un mensaje infrarrojo con el nombre y datos dados",
+        },
+        constant: {
+        },
+
+        startingBlockName: "Programa", // Name for the starting block
+        messages: {
+            sensorNotFound: "Acceso a un componente inexistente: {0}.",
+            manualTestSuccess: "Prueba automática validada.",
+            testSuccess: "Bien hecho! El resultado es correcto",
+            wrongState: "Prueba fallida: {0} estaba en etado {1} en lugar de {2} en t={3}ms.",
+            wrongStateDrawing: "Prueba fallida: {0} difiere en {1} píxeles de la visualización esperada en t = {2} ms.",
+            wrongStateSensor: "Prueba fallida: su programa no leyó el estado de {0} después de t = {1} ms.",
+            programEnded: "Programa completado.",
+            piPlocked: "El dispositivo está bloqueado. Desbloquear o reiniciar.",
+            cantConnect: "No se puede conectarse al dispositivo.",
+            wrongVersion: "El software en tu Raspberry Pi es demasiado antiguo, actualízalo.",
+            sensorInOnlineMode: "No se pueden modificar sensores en modo conectado.",
+            actuatorsWhenRunning: "No se pueden cambiar los actuadores mientras se ejecuta un programa",
+            cantConnectoToUSB: 'Intentado conectarse por USB, conecte su Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
+            cantConnectoToBT: 'Intentando conectarse por Bluetooth, conecte su Raspberry Pi por Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
+            canConnectoToUSB: "USB Conectado.",
+            canConnectoToBT: "Bluetooth Conectado.",
+            noPortsAvailable: "No hay ningún puerto compatible con {0} disponible (type {1})",
+            sensor: "Sensor",
+            actuator: "Actuador",
+            removeConfirmation: "¿Está seguro de que desea quitar este componente?",
+            remove: "Eliminar",
+            keep: "Mantener",
+            minutesago: "Visto por última vez hace {0} minutos",
+            hoursago: "Visto por ultima vez hace mas de una hora",
+            drawing: "dibujando",
+            timeLabel: "Tiempo",
+            seconds: "segundos",
+
+            changeBoard: "Cambiar tablero",
+            connect: "Conectar",
+            install: "Instalar",
+            config: "Configuración",
+
+     
+            raspiConfig: "Configuración de Raspberry Pi",
+            local: "Local",
+            schoolKey: "Ingrese una identificación de la escuela",
+            connectList: "Seleccione un dispositivo para conectarse de la siguiente lista",
+            enterIpAddress: "o ingrese una dirección IP",
+            getPiList: "Obtener la lista",
+            connectTroughtTunnel: "Conéctese a través del túnel de France-ioi",
+
+            connectToLocalhost: "Conectarse al dispositivo que ejecuta este navegador",
+            connectToWindowLocation: "Conéctese a la Raspberry Pi desde la que se carga esta página",
+
+            connectToDevice: "Conectar al dispositivo",
+            disconnectFromDevice: "Desconectar",
+       
+
+            irReceiverTitle: "Recibir códigos infrarrojos",
+            directIrControl: "Apunte su control remoto hace tu tablero QuickPi y presiona uno de los botones",
+            getIrCode: "Recibir un código",
+            closeDialog: "Cerrar",
+
+            irRemoteControl: "Control remoto Infrarrojo",
+            
+            noIrPresets: "Utilice la función de preparación de mensajes IR para agregar comandos de control remoto",
+            irEnableContinous: "Activar la emisión IR continua",
+            irDisableContinous: "Desactivar la emisión IR continua",
+
+            up: "arriba",
+            down: "abajo",
+            left: "izquierda",
+            right: "derecha",
+            center: "centro",
+
+            on: "Encendido",
+            off: "Apagado",
+
+            grovehat: "Sombrero Grove para Raspberry Pi",
+            quickpihat: "Sobrero QuickPi de France IOI",
+            pinohat: "Raspberry Pi sin sombrero",
+            led: "LED",
+            blueled: "LED azul",
+            greenled: "LED verde",
+            orangeled: "LED naranja",
+            redled: "LED rojo",
+            buzzer: "Zumbador",
+            grovebuzzer: "Zumbador Grove",
+            quickpibuzzer: "Zumbador passive de QuickPi",
+            servo: "Motor Servo",
+            screen: "Pantalla",
+            grove16x2lcd: "Pantalla Grove 16x2",
+            oled128x32: "Pantalla 128x32 Oled",
+            irtrans: "Transmisor de infrarrojos",
+            button: "Botón",
+            fivewaybutton: "Botón de 5 direcciones",
+            tempsensor: "Sensor de temperatura",
+            groveanalogtempsensor: "Sensor de temperatura analógico Grove",
+            quickpigyrotempsensor: "Sensor de temperaturea en el Acelerometro y Gyroscopio de QuickPi",
+            dht11tempsensor: "Sensor de Temperatura DHT11",
+            potentiometer: "Potenciómetro",
+            lightsensor: "Sensor de luz",
+            distancesensor: "Sensor de distancia",
+            timeofflightranger: "Sensor de distancia por rebote de luz",
+            ultrasonicranger: "Sensor de distancia por últrasonido",
+            humiditysensor: "Sensor de humedad",
+            soundsensor: "Sensor de sonido",
+            accelerometerbmi160: "Acelerómetro (BMI160)",
+            gyrobmi160: "Giroscopio (BMI160)",
+            maglsm303c: "Magnetómetro (LSM303C)",
+            irreceiver: "Receptor de infrarrojos",
+            cloudstore: "Almacenamiento en la nube",
+            addcomponent: "Agregar componente",
+            selectcomponent: "Seleccione un componente para agregar a su Raspberry Pi y conéctelo a un puerto.",
+            add: "Agregar",
+            builtin: "(incorporado)",
+            chooseBoard: "Elije tu tablero",
+            nameandports: "Nombres y puertos de sensores y actuadores QuickPi",
+            name: "Nombre",
+            port: "Puerto",
+            state: "Estado",
+            cloudKeyNotExists: "La llave no existe : {0} ",
+            cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
+            cloudUnexpectedKey: "La llave {0} no es una llave esperada",
+            hello: "Hola",
+            experiment: "Experimentar",
+            validate: "Validar",
+            validate1: "Validar 1",
+            validate2: "Validar 2",
+            validate3: "Validar 3",
+
+            sensorNameBuzzer: "timbre",
+            sensorNameLed: "led",
+            sensorNameRedLed: "ledrojo",
+            sensorNameGreenLed: "ledverde",
+            sensorNameBlueLed: "ledazul",
+            sensorNameScreen: "pantalla",
+            sensorNameIrTrans: "tranir",
+            sensorNameIrRecv: "recir",
+            sensorNameMicrophone: "micro",
+            sensorNameTemperature: "temp",
+            sensorNameGyroscope: "gyro",
+            sensorNameMagnetometer: "magneto",
+            sensorNameDistance: "distancia",
+            sensorNameAccelerometer: "acel",
+            sensorNameButton: "boton",
+            sensorNameLight: "luz",
+            sensorNameStick: "stick",
+            sensorNameServo: "servo",
+            sensorNameHumidity: "humedad",
+            sensorNamePotentiometer: "pot",
+            sensorNameCloudStore: "nube",
+        }
+    },
+    
+    none: {
+        comment: {
+            // Comments for each block, used in the auto-generated documentation for task writers
+            turnLedOn: "Turns on a light connected to Raspberry",
+            turnLedOff: "Turns off a light connected to Raspberry",
+            isButtonPressed: "Returns the state of a button, Pressed means True and not pressed means False",
+            waitForButton: "Stops program execution until a button is pressed",
+            buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
+            setLedState: "Change led state in the given port",
+            toggleLedState: "If led is on, turns it off, if it's off turns it on",
+            isButtonPressedWithName: "Returns the state of a button, Pressed means True and not pressed means False",
+            displayText: "Display text in LCD screen",
+            displayText2Lines: "Display text in LCD screen (two lines)",
+            readTemperature: "Read Ambient temperature",
+            sleep: "pause program execute for a number of seconds",
+            setServoAngle: "Set servo motor to an specified angle",
+            readRotaryAngle: "Read state of potentiometer",
+            readDistance: "Read distance using ultrasonic sensor",
+            readLightIntensity: "Read light intensity",
+            readHumidity: "lire l'humidité ambiante",
+            currentTime: "returns current time",
+            setBuzzerState: "sonnerie",
+            setBuzzerNote: "sonnerie note",
+            getTemperature: "Get temperature",
+            setBuzzerNote: "Set buzzer note",
+            getBuzzerNote: "Get buzzer note",
+            setLedBrightness: "Set Led Brightness",
+            getLedBrightness: "Get Led Brightness",
+            getServoAngle: "Get Servo Angle",
+            isLedOn: "Get led state",
+            isLedOnWithName: "Get led state",
+            turnBuzzerOn: "Turn Buzzer on",
+            turnBuzzerOff: "Turn Buzzer off",
+            isBuzzerOn: "Is Buzzer On",
+            isBuzzerOnWithName: "get buzzer state",
+            drawPoint: "drawPoint",
+            isPointSet: "isPointSet",
+            drawLine: "drawLine",
+            drawRectangle: "drawRectangle",
+            drawCircle: "drawCircle",
+            clearScreen: "clearScreen",
+            updateScreen: "updateScreen",
+            autoUpdate: "autoUpdate",
+            fill: "fill",
+            noFill: "noFill",
+            stroke: "stroke",
+            noStroke: "noStroke",
+            readAcceleration: "readAcceleration",
+            computeRotation: "computeRotation",
+            readSoundLevel: "readSoundLevel",
+            readMagneticForce: "readMagneticForce",
+            computeCompassHeading: "computeCompassHeading",
+            readInfraredState: "readInfraredState",
+            setInfraredState: "setInfraredState",
+
+            // Gyroscope
+            readAngularVelocity: "readAngularVelocity",
+            setGyroZeroAngle: "setGyroZeroAngle",
+            computeRotationGyro: "computeRotationGyro",
+
+            //Internet store
+            connectToCloudStore: "connectToCloudStore",
+            writeToCloudStore: "writeToCloudStore",
+            readFromCloudStore: "readFromCloudStore",
+
+            // IR Remote
+            readIRMessage: "readIRMessage",
+            sendIRMessage: "sendIRMessage",
+            presetIRMessage: "presetIRMessage",
+        }
+    }
+}
+
+
 var buzzerSound = {
     context: null,
     default_freq: 200,
@@ -235,841 +1122,12 @@ var getContext = function (display, infos, curLevel) {
 
     // Local language strings for each language
     var introControls = null;
-    var localLanguageStrings = {
-        fr: { // French strings
-            label: {
-                // Labels for the blocks
-                sleep: "attendre %1 millisecondes",
-                currentTime: "temps écoulé en millisecondes",
-
-                turnLedOn: "allumer la LED",
-                turnLedOff: "éteindre la LED",
-
-                setLedState: "passer la LED %1 à %2 ",
-                toggleLedState: "inverser la LED %1",
-
-                isLedOn: "LED allumée",
-                isLedOnWithName: "LED %1 allumée",
-
-                setLedBrightness: "mettre la luminosité de %1 à %2",
-                getLedBrightness: "lire la luminosité de %1",
-
-                turnBuzzerOn: "allumer le buzzer",
-                turnBuzzerOff: "éteindre le buzzer",
-                setBuzzerState: "mettre le buzzer %1 à %2",
-                isBuzzerOn: "buzzer allumé",
-                isBuzzerOnWithName: "buzzer %1 allumé",
-
-                setBuzzerNote: "jouer la fréquence %2Hz sur %1",
-                getBuzzerNote: "fréquence du buzzer %1",
-
-                isButtonPressed: "bouton enfoncé",
-                isButtonPressedWithName: "bouton  %1 enfoncé",
-                waitForButton: "attendre une pression sur le bouton",
-                buttonWasPressed: "le bouton a été enfoncé",
-
-                displayText: "afficher %1",
-                displayText2Lines: "afficher Ligne 1 : %1 Ligne 2 : %2",
-
-                readTemperature: "température ambiante",
-                getTemperature: "temperature de %1",
-
-                readRotaryAngle: "état du potentiomètre %1",
-                readDistance: "distance mesurée par %1",
-                readLightIntensity: "intensité lumineuse",
-                readHumidity: "humidité ambiante",
-
-                setServoAngle: "mettre le servo %1 à l'angle %2",
-                getServoAngle: "angle du servo %1",
-
-
-                drawPoint: "draw pixel",
-                isPointSet: "is pixel set in screen",
-                drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
-                drawRectangle: "rectangle x₀: %1 y₀: %2 largeur₀: %3 hauteur₀: %4",
-                drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
-                clearScreen: "effacer tout l'écran",
-                updateScreen: "mettre à jour l'écran",
-                autoUpdate: "mode de mise à jour automatique de l'écran",
-
-                fill: "mettre la couleur de fond à %1",
-                noFill: "ne pas remplir les formes",
-                stroke: "mettre la couleur de tracé à %1",
-                noStroke: "ne pas dessiner les contours",
-
-                readAcceleration: "accélération en (m/s²) dans l'axe %1",
-                computeRotation: "calcul de l'angle de rotation (°) sur l'accéléromètre %1",
-                readSoundLevel: "volume sonore",
-
-                readMagneticForce: "champ magnétique (µT) sur %1",
-                computeCompassHeading: "direction de la boussole en (°)",
-
-                readInfraredState: "infrarouge détecté sur %1",
-                setInfraredState: "mettre l'émetteur infrarouge %1 à %2",
-
-                // Gyroscope
-                readAngularVelocity: "vitesse angulaire (°/s) du gyroscope %1",
-                setGyroZeroAngle: "initialiser le gyroscope à l'état zéro",
-                computeRotationGyro: "calculer la rotation du gyroscope %1",
-
-                //Internet store
-                connectToCloudStore: "se connecter au cloud. Identifiant %1 Mot de passe %2",
-                writeToCloudStore: "écrire dans le cloud : identifiant %1 clé %2 valeur %3",
-                readFromCloudStore: "lire dans le cloud : identifiant %1 clé %2",
-
-                // IR Remote
-                readIRMessage: "attendre un message IR nom : %1 pendant : %2 ms",
-                sendIRMessage: "envoi du message préparé IR nommé %2 sur %1",
-                presetIRMessage: "préparer un message IR de nom %1 et contenu %2",
-            },
-            code: {
-                // Names of the functions in Python, or Blockly translated in JavaScript
-                turnLedOn: "turnLedOn",
-                turnLedOff: "turnLedOff",
-                setLedState: "setLedState",
-
-                isButtonPressed: "isButtonPressed",
-                isButtonPressedWithName : "isButtonPressed",
-                waitForButton: "waitForButton",
-                buttonWasPressed: "buttonWasPressed",
-
-                toggleLedState: "toggleLedState",
-                displayText: "displayText",
-                displayText2Lines: "displayText",
-                readTemperature: "readTemperature",
-                sleep: "sleep",
-                setServoAngle: "setServoAngle",
-                readRotaryAngle: "readRotaryAngle",
-                readDistance: "readDistance",
-                readLightIntensity: "readLightIntensity",
-                readHumidity: "readHumidity",
-                currentTime: "currentTime",
-                getTemperature: "getTemperature",
-
-                isLedOn: "isLedOn",
-                isLedOnWithName: "isLedOn",
-
-                setBuzzerNote: "setBuzzerNote",
-                getBuzzerNote: "getBuzzerNote",
-                setLedBrightness: "setLedBrightness",
-                getLedBrightness: "getLedBrightness",
-                getServoAngle: "getServoAngle",
-
-                setBuzzerState: "setBuzzerState",
-                setBuzzerNote: "setBuzzerNote",
-
-                turnBuzzerOn: "turnBuzzerOn",
-                turnBuzzerOff: "turnBuzzerOff",
-                isBuzzerOn: "isBuzzerOn",
-                isBuzzerOnWithName: "isBuzzerOn",
-
-
-                drawPoint: "drawPoint",
-                isPointSet: "isPointSet",
-                drawLine: "drawLine",
-                drawRectangle: "drawRectangle",
-                drawCircle: "drawCircle",
-                clearScreen: "clearScreen",
-                updateScreen: "updateScreen",
-                autoUpdate: "autoUpdate",
-
-                fill: "fill",
-                noFill: "noFill",
-                stroke: "stroke",
-                noStroke: "noStroke",
-
-
-                readAcceleration: "readAcceleration",
-                computeRotation: "computeRotation",
-
-                readSoundLevel: "readSoundLevel",
-
-
-                readMagneticForce: "readMagneticForce",
-                computeCompassHeading: "computeCompassHeading",
-
-                readInfraredState: "readInfraredState",
-                setInfraredState: "setInfraredState",
-
-
-                // Gyroscope
-                readAngularVelocity: "readAngularVelocity",
-                setGyroZeroAngle: "setGyroZeroAngle",
-                computeRotationGyro: "computeRotationGyro",
-
-                //Internet store
-                connectToCloudStore: "connectToCloudStore",
-                writeToCloudStore: "writeToCloudStore",
-                readFromCloudStore: "readFromCloudStore",                
-
-                // IR Remote
-                readIRMessage: "readIRMessage",
-                sendIRMessage: "sendIRMessage",
-                presetIRMessage: "presetIRMessage",
-            },
-            description: {
-                // Descriptions of the functions in Python (optional)
-                turnLedOn: "turnLedOn() allume la LED",
-                turnLedOff: "turnLedOff() éteint la LED",
-                isButtonPressed: "isButtonPressed() retourne True si le bouton est enfoncé, False sinon",
-                isButtonPressedWithName: "isButtonPressed(button) retourne True si le bouton est enfoncé, False sinon",
-                waitForButton: "waitForButton(button) met en pause l'exécution jusqu'à ce que le bouton soit appuyé",
-                buttonWasPressed: "buttonWasPressed(button) indique si le bouton a été appuyé depuis le dernier appel à cette fonction",
-                setLedState: "setLedState(led, state) modifie l'état de la LED : True pour l'allumer, False pour l'éteindre",
-                toggleLedState: "toggleLedState(led) inverse l'état de la LED",
-                displayText: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
-                displayText2Lines: "displayText(line1, line2) affiche une ou deux lignes de texte. line2 est optionnel",
-                readTemperature: "readTemperature(thermometer) retourne la température ambiante",
-                sleep: "sleep(milliseconds) met en pause l'exécution pendant une durée en ms",
-                setServoAngle: "setServoAngle(servo, angle) change l'angle du servomoteur",
-                readRotaryAngle: "readRotaryAngle(potentiometer) retourne la position potentiomètre",
-                readDistance: "readDistance(distanceSensor) retourne la distance mesurée",
-                readLightIntensity: "readLightIntensity(lightSensor) retourne l'intensité lumineuse",
-                readHumidity: "readHumidity(hygrometer) retourne l'humidité ambiante",
-                currentTime: "currentTime(milliseconds) temps en millisecondes depuis le début du programme",
-
-                setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
-                getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
-                getServoAngle: "getServoAngle(servo) retourne l'angle du servomoteur",
-
-                isLedOn: "isLedOn() retourne True si la LED est allumée, False si elle est éteinte",
-                isLedOnWithName: "isLedOn(led) retourne True si la LED est allumée, False sinon",
-
-                turnBuzzerOn: "turnBuzzerOn() allume le buzzer",
-                turnBuzzerOff: "turnBuzzerOff() éteint le buzzer",
-
-                isBuzzerOn: "isBuzzerOn() retourne True si le buzzer est allumé, False sinon",
-                isBuzzerOnWithName: "isBuzzerOn(buzzer) retourne True si le buzzer est allumé, False sinon",
-
-                setBuzzerState: "setBuzzerState(buzzer, state) modifie l'état du buzzer: True pour allumé, False sinon",
-                setBuzzerNote: "setBuzzerNote(buzzer, frequency) fait sonner le buzzer à la fréquence indiquée",
-                getBuzzerNote: "getBuzzerNote(buzzer) retourne la fréquence actuelle du buzzer",
-
-                getTemperature: "getTemperature(thermometer) ",
-
-                drawPoint: "drawPoint(x, y)",
-                isPointSet: "isPointSet(x, y)",
-                drawLine: "drawLine(x0, y0, x1, y1)",
-                drawRectangle: "drawRectangle(x0, y0, width, height)",
-                drawCircle: "drawCircle(x0, y0, diameter)",
-                clearScreen: "clearScreen()",
-                updateScreen: "updateScreen()",
-                autoUpdate: "autoUpdate(auto)",
-
-                fill: "fill(color)",
-                noFill: "noFill()",
-                stroke: "stroke(color)",
-                noStroke: "noStroke()",
-
-
-                readAcceleration: "readAcceleration(axis)",
-                computeRotation: "computeRotation()",
-
-                readSoundLevel: "readSoundLevel(port)",
-
-
-                readMagneticForce: "readMagneticForce(axis)",
-                computeCompassHeading: "computeCompassHeading()",
-
-                readInfraredState: "readInfraredState()",
-                setInfraredState: "setInfraredState()",
-
-                // Gyroscope
-                readAngularVelocity: "readAngularVelocity()",
-                setGyroZeroAngle: "setGyroZeroAngle()",
-                computeRotationGyro: "computeRotationGyro()",
-
-                //Internet store
-                connectToCloudStore: "connectToCloudStore(identifier, password)",
-                writeToCloudStore: "writeToCloudStore(identifier, key, value)",
-                readFromCloudStore: "readFromCloudStore(identifier, key)",
-
-                // IR Remote
-                readIRMessage: "readIRMessage(irrec, timeout)",
-                sendIRMessage: "sendIRMessage(irtrans, name)",
-                presetIRMessage: "presetIRMessage(name, data)",
-            },
-            constant: {
-            },
-
-            startingBlockName: "Programme", // Name for the starting block
-            messages: {
-                sensorNotFound: "Accès à un capteur ou actuateur inexistant : {0}.",
-                manualTestSuccess: "Test automatique validé.",
-                testSuccess: "Bravo ! La sortie est correcte",
-                wrongState: "Test échoué : {0} a été dans l'état {1} au lieu de {2} à t={3}ms.",
-                wrongStateDrawing: "Test échoué : {0} diffère de {1} pixels par rapport à l'affichage attendu à t={2}ms.",
-                wrongStateSensor: "Test échoué : votre programme n'a pas lu l'état de {0} après t={1}ms.",
-                programEnded: "programme terminé.",
-                piPlocked: "L'appareil est verrouillé. Déverrouillez ou redémarrez.",
-                cantConnect: "Impossible de se connecter à l'appareil.",
-                wrongVersion: "Votre Raspberry Pi a une version trop ancienne, mettez le à jour.",
-                sensorInOnlineMode: "Vous ne pouvez pas agir sur les capteurs en mode connecté.",
-                actuatorsWhenRunning: "Impossible de modifier les actionneurs lors de l'exécution d'un programme",
-                cantConnectoToUSB: 'Tentative de connexion par USB en cours, veuillez brancher votre Raspberry sur le port USB <i class="fas fa-circle-notch fa-spin"></i>',
-                cantConnectoToBT: 'Tentative de connection par Bluetooth, veuillez connecter votre appareil au Raspberry par Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
-                canConnectoToUSB: "Connecté en USB.",
-                canConnectoToBT: "Connecté en Bluetooth.",
-                noPortsAvailable: "Aucun port compatible avec ce {0} n'est disponible (type {1})",
-                sensor: "capteur",
-                actuator: "actionneur",
-                removeConfirmation: "Êtes-vous certain de vouloir retirer ce capteur ou actuateur?",
-                remove: "Retirer",
-                keep: "Garder",
-                minutesago: "Last seen {0} minutes ago",
-                hoursago: "Last seen more than one hour ago",
-                drawing: "dessin",
-                timeLabel: "Temps",
-                seconds: "secondes",
-
-                changeBoard: "Changer de carte",
-                connect: "Connecter",
-                install: "Installer",
-                config: "Config",
-
-         
-                raspiConfig: "Configuration du Raspberry Pi",
-                local: "Local",
-                schoolKey: "Indiquez un identifiant d'école",
-                connectList: "Sélectionnez un appareil à connecter dans la liste suivante",
-                enterIpAddress: "ou entrez son adesse IP",
-                getPiList: "Obtenir la liste",
-                connectTroughtTunnel: "Connecter à travers le France-ioi tunnel",
-    
-                connectToLocalhost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
-                connectToWindowLocation: "Connecter au Raspberry Pi depuis lequel cette page est chargée",
-    
-                connectToDevice: "Connecter l'appareil",
-                disconnectFromDevice: "Déconnecter",
-           
-
-                irReceiverTitle: "Recevoir des codes infrarouges",
-                directIrControl: "Dirigez votre télécommande vers votre carte QuickPi et appuyez sur un des boutons",
-                getIrCode: "Recevoir un code",
-                closeDialog: "Fermer",
-
-                irRemoteControl: "Télécommande IR",
-                
-                noIrPresets: "Veuillez utiliser la fonction de préparation de messages IR pour ajouter des commandes de télécommande",
-                irEnableContinous: "Activer l'émission IR en continu",
-                irDisableContinous: "Désactiver l'émission IR en continu",
-
-                connectToLocalHost: "Connecter l'interface à la machine sur laquelle tourne ce navigateur",
-
-                up: "up",
-                down: "down",
-                left: "left",
-                right: "right",
-                center: "center",
-
-                on: "On",
-                off: "Off",
-
-                grovehat: "Grove Base Hat for Raspberry Pi",
-                quickpihat: "France IOI QuickPi Hat",
-                pinohat: "Raspberry Pi without hat",
-                led: "LED",
-                blueled: "LED bleue",
-                greenled: "LED verte",
-                orangeled: "LED orange",
-                redled: "LED rouge",
-                buzzer: "Buzzer",
-                grovebuzzer: "Grove Buzzer",
-                quickpibuzzer: "Quick Pi Passive Buzzer",
-                servo: "Servo Motor",
-                screen: "Screen",
-                grove16x2lcd: "Grove 16x2 LCD",
-                oled128x32: "128x32 Oled Screen",
-                irtrans: "IR Transmiter",
-                button: "Button",
-                fivewaybutton: "5 way button",
-                tempsensor: "Temperature sensor",
-                groveanalogtempsensor: "Grove Analog tempeature sensor",
-                quickpigyrotempsensor: "Quick Pi Accelerometer+Gyroscope temperature sensor",
-                dht11tempsensor: "DHT11 Tempeature Sensor",
-                potentiometer: "Potentiometer",
-                lightsensor: "Light sensor",
-                distancesensor: "Capteur de distance",
-                timeofflightranger: "Time of flight distance sensor",
-                ultrasonicranger: "Capteur de distance à ultrason",
-                humiditysensor: "Humidity sensor",
-                soundsensor: "Sound sensor",
-                accelerometerbmi160: "Accelerometer sensor (BMI160)",
-                gyrobmi160: "Gyropscope sensor (BMI160)",
-                maglsm303c: "Magnetometer sensor (LSM303C)",
-                irreceiver: "IR Receiver",
-                cloudstore: "Cloud Store",
-                addcomponent: "Ajouter un composant",
-                selectcomponent: "Sélectionnez un composant à ajouter à votre Raspberry Pi et attachez-le à un port.",
-                add: "Ajouter",
-                builtin: "(builtin)",
-                chooseBoard: "Choisissez votre carte",
-                nameandports: "Noms et ports des capteurs et actionneurs QuickPi",
-                name: "Name",
-                port: "Port",
-                state: "State",
-
-                cloudKeyNotExists: "La clé n'existe pas : {0} ",
-                cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
-                cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
-                hello: "Bonjour",
-            }
-        },
-        es: { // French strings
-            label: {
-                // Labels for the blocks
-                sleep: "esperar %1 milisegundos",
-                currentTime: "tiempo transcurrido en milisegundos",
-
-                turnLedOn: "encender el LED",
-                turnLedOff: "apagar el LED",
-
-                setLedState: "cambiar el LED %1 a %2 ",
-                toggleLedState: "invertir el estado del LED %1",
-
-                isLedOn: "LED encendido",
-                isLedOnWithName: "LED %1 encendido",
-
-                setLedBrightness: "Cambiar el brillo de %1 a %2",
-                getLedBrightness: "Obtener el brillo de %1",
-
-                turnBuzzerOn: "encender el zumbador",
-                turnBuzzerOff: "apagar el zumbador",
-                setBuzzerState: "cambiar el zumbador %1 a %2",
-                isBuzzerOn: "zumbador encendido",
-                isBuzzerOnWithName: "zumbador %1 encendido",
-
-                setBuzzerNote: "frequencia de reproducción %2Hz en %1",
-                getBuzzerNote: "frequncia del zumbador %1",
-
-                isButtonPressed: "botón presionado",
-                isButtonPressedWithName: "botón  %1 presionado",
-                waitForButton: "esperar a que se presione un botón",
-                buttonWasPressed: "el botón ha sido presionado",
-
-                displayText: "desplegar texto %1",
-                displayText2Lines: "desplegar texto Linea 1 : %1 Linea 2 : %2",
-
-                readTemperature: "temperatura ambiente",
-                getTemperature: "temperatura de %1",
-
-                readRotaryAngle: "estado del potenciómetro %1",
-                readDistance: "distancia medida por %1",
-                readLightIntensity: "intensidad de luz",
-                readHumidity: "humedad ambiental",
-
-                setServoAngle: "cambiar el ángulo de el servo %1 a %2°",
-                getServoAngle: "ángulo del servo %1",
-
-
-                drawPoint: "draw pixel",
-                isPointSet: "is pixel set in screen",
-                drawLine: "linea desde x₀: %1 y₀: %2 hasta x₁: %3 y₁: %4",
-                drawRectangle: "rectángulo  x: %1 y: %2 largo: %3 alto: %4",
-                drawCircle: "circulo x₀: %1 y₀: %2 diametro: %3",
-                clearScreen: "limpiar toda la pantalla",
-                updateScreen: "actualizar pantalla",
-                autoUpdate: "modo de actualización de pantalla automática",
-
-                fill: "establecer el color de fondo en %1",
-                noFill: "no rellenar figuras",
-                stroke: "color de los bordes %1",
-                noStroke: "no dibujar los contornos",
-
-                readAcceleration: "aceleración en m/s² en el eje %1",
-                computeRotation: "cálculo del ángulo de rotación (°) en el acelerómetro %1",
-                readSoundLevel: "volumen de sonido",
-
-                readMagneticForce: "campo magnético (µT) en %1",
-                computeCompassHeading: "dirección de la brújula en (°)",
-
-                readInfraredState: "infrarrojos detectados en %1",
-                setInfraredState: "poner emisor de infrarrojos %1 a %2",
-
-                // Gyroscope
-                readAngularVelocity: "velocidad angular (°/s) del guroscopio %1",
-                setGyroZeroAngle: "inicializar el giroscopio a estado cero",
-                computeRotationGyro: "calcular la rotación del giroscopio %1",
-
-                //Internet store
-                connectToCloudStore: "conéctese a la nube. Usuario %1 Contraseña %2",
-                writeToCloudStore: "escribir en la nube : Usuario %1 llave %2 valor %3",
-                readFromCloudStore: "leer de la nube : Usuario %1 llave %2",
-
-                // IR Remote
-                readIRMessage: "esperar un mensaje de infrarrojos : %1 durante : %2 ms",
-                sendIRMessage: "enviar el mensaje por infrarrojos %2 por %1",
-                presetIRMessage: "preparar un mensaje de infrarrojos con el nombre %1 y el contenido %2",
-            },
-            code: {
-                // Names of the functions in Python, or Blockly translated in JavaScript
-                turnLedOn: "turnLedOn",
-                turnLedOff: "turnLedOff",
-                setLedState: "setLedState",
-
-                isButtonPressed: "isButtonPressed",
-                isButtonPressedWithName : "isButtonPressed",
-                waitForButton: "waitForButton",
-                buttonWasPressed: "buttonWasPressed",
-
-                toggleLedState: "toggleLedState",
-                displayText: "displayText",
-                displayText2Lines: "displayText",
-                readTemperature: "readTemperature",
-                sleep: "sleep",
-                setServoAngle: "setServoAngle",
-                readRotaryAngle: "readRotaryAngle",
-                readDistance: "readDistance",
-                readLightIntensity: "readLightIntensity",
-                readHumidity: "readHumidity",
-                currentTime: "currentTime",
-                getTemperature: "getTemperature",
-
-                isLedOn: "isLedOn",
-                isLedOnWithName: "isLedOn",
-
-                setBuzzerNote: "setBuzzerNote",
-                getBuzzerNote: "getBuzzerNote",
-                setLedBrightness: "setLedBrightness",
-                getLedBrightness: "getLedBrightness",
-                getServoAngle: "getServoAngle",
-
-                setBuzzerState: "setBuzzerState",
-                setBuzzerNote: "setBuzzerNote",
-
-                turnBuzzerOn: "turnBuzzerOn",
-                turnBuzzerOff: "turnBuzzerOff",
-                isBuzzerOn: "isBuzzerOn",
-                isBuzzerOnWithName: "isBuzzerOn",
-
-
-                drawPoint: "drawPoint",
-                isPointSet: "isPointSet",
-                drawLine: "drawLine",
-                drawRectangle: "drawRectangle",
-                drawCircle: "drawCircle",
-                clearScreen: "clearScreen",
-                updateScreen: "updateScreen",
-                autoUpdate: "autoUpdate",
-
-                fill: "fill",
-                noFill: "noFill",
-                stroke: "stroke",
-                noStroke: "noStroke",
-
-
-                readAcceleration: "readAcceleration",
-                computeRotation: "computeRotation",
-
-                readSoundLevel: "readSoundLevel",
-
-
-                readMagneticForce: "readMagneticForce",
-                computeCompassHeading: "computeCompassHeading",
-
-                readInfraredState: "readInfraredState",
-                setInfraredState: "setInfraredState",
-
-
-                // Gyroscope
-                readAngularVelocity: "readAngularVelocity",
-                setGyroZeroAngle: "setGyroZeroAngle",
-                computeRotationGyro: "computeRotationGyro",
-
-                //Internet store
-                connectToCloudStore: "connectToCloudStore",
-                writeToCloudStore: "writeToCloudStore",
-                readFromCloudStore: "readFromCloudStore",                
-
-                // IR Remote
-                readIRMessage: "readIRMessage",
-                sendIRMessage: "sendIRMessage",
-                presetIRMessage: "presetIRMessage",
-            },
-            description: {
-                // Descriptions of the functions in Python (optional)
-                turnLedOn: "turnLedOn() enciende el LED",
-                turnLedOff: "turnLedOff() apaga el led LED",
-                isButtonPressed: "isButtonPressed() devuelve True si el boton esta presionado, False de otra manera",
-                isButtonPressedWithName: "isButtonPressed(button) devuelve True si el boton esta presionado, False de otra manera",
-                waitForButton: "waitForButton(button) pausa la ejecución hasta que se presiona el botón",
-                buttonWasPressed: "buttonWasPressed(button) indica si se ha pulsado el botón desde la última llamada a esta función",
-                setLedState: "setLedState(led, state) modifica el estado del LED: True para encenderlo, False para apagarlo",
-                toggleLedState: "toggleLedState(led) invierte el estado del LED",
-                displayText: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
-                displayText2Lines: "displayText(line1, line2) muestra una o dos líneas de texto. line2 es opcional",
-                readTemperature: "readTemperature(thermometer) devuelve la temperatura ambiente",
-                sleep: "sleep(milliseconds) pausa la ejecución por un tiempo en milisegundos",
-                setServoAngle: "setServoAngle(servo, angle) cambiar el ángulo del servomotor",
-                readRotaryAngle: "readRotaryAngle(potentiometer) devuelve la posición del potenciómetro",
-                readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
-                readLightIntensity: "readLightIntensity(lightSensor) devuelve la intensidad de la luz",
-                readHumidity: "readHumidity(hygrometer) devuelve la humedad ambiental",
-                currentTime: "currentTime(milliseconds) tiempo en milisegundos desde el inicio del programa",
-
-                setLedBrightness: "setLedBrightness(led, brightness) ajusta la intensidad de la luz del LED",
-                getLedBrightness: "getLedBrightness(led) devuelve la intensidad de luz del LED",
-                getServoAngle: "getServoAngle(servo) devuelve el ángulo del servomotor",
-
-                isLedOn: "isLedOn() devuelve True si el LED está encendido, False si está apagado",
-                isLedOnWithName: "isLedOn(led) devuelve True si el LED está encendido, False si está apagado",
-
-                turnBuzzerOn: "turnBuzzerOn() enciende el zumbador",
-                turnBuzzerOff: "turnBuzzerOff() apaga el zumbador",
-
-                isBuzzerOn: "isBuzzerOn() devuelve True si el zumbador está encendido, False si está apagado",
-                isBuzzerOnWithName: "isBuzzerOn(buzzer) devuelve True si el zumbador está encendido, False si está apagado",
-
-                setBuzzerState: "setBuzzerState(buzzer, state) modifica el estado del zumbador: Verdadero para encendido, Falso para apagado",
-                setBuzzerNote: "setBuzzerNote(buzzer, frequency) suena el zumbador en la frecuencia indicada",
-                getBuzzerNote: "getBuzzerNote(buzzer) devuelve la frecuencia actual del zumbador",
-
-                getTemperature: "getTemperature(thermometer) obtiene la temperatura del sensor",
-
-                drawPoint: "drawPoint(x, y) dibuja un punto en las coordenadas x, y",
-                isPointSet: "isPointSet(x, y) devuelve True se dibujó sobre el punto x, y, False de lo contrario",
-                drawLine: "drawLine(x0, y0, x1, y1) dibuja una linea empezando desde el punto x0, x1, hasta el punto x1, y1",
-                drawRectangle: "drawRectangle(x0, y0, width, height) dibuja un rectángulo empezando en el punto x0, y0 con el ancho y altura dados",
-                drawCircle: "drawCircle(x0, y0, diameter) dibuja un circulo con centro en x0, y0 y el diametro dado",
-                clearScreen: "clearScreen() limpia toda la pantalla",
-                updateScreen: "updateScreen() actualiza los contenidos de la pantalla",
-                autoUpdate: "autoUpdate(auto) cambia el modo de actualización de pantalla automatica",
-
-                fill: "fill(color) rellenar las figuras con el color dado",
-                noFill: "noFill() no rellenar las figuras",
-                stroke: "stroke(color) dibujar los bordes de las figuras con el color dado",
-                noStroke: "noStroke() no dibujar los bordes de las figuras",
-
-
-                readAcceleration: "readAcceleration(axis) leer la acceleración (m/s²) en el eje (X, Y o Z)",
-                computeRotation: "computeRotation() calcular el ángulo de rotación (°) en el acelerómetro",
-
-                readSoundLevel: "readSoundLevel(port) devuelve el volumen del sonido ambiente",
-
-
-                readMagneticForce: "readMagneticForce(axis) devuelve el campo magnético (µT) en el eje (X, Y o Z)",
-                computeCompassHeading: "computeCompassHeading() devuelve la dirección de la brujula en grados",
-
-                readInfraredState: "readInfraredState() devuelve True si se detecta una señal infrarroja, Falso de otra manera",
-                setInfraredState: "setInfraredState(state) si se le pasa True enciende el transmisor infrarrojo, Falso lo apaga",
-
-                // Gyroscope
-                readAngularVelocity: "readAngularVelocity() devuelve la velocidad angular (°/s) del gyroscopio",
-                setGyroZeroAngle: "setGyroZeroAngle() inicializa el giroscopio a estado cero",
-                computeRotationGyro: "computeRotationGyro() calcula la rotación del giroscopio (°)",
-
-                //Internet store
-                connectToCloudStore: "connectToCloudStore(identifier, password) se conecta a la nube con el usuario y password dados",
-                writeToCloudStore: "writeToCloudStore(identifier, key, value) escribe un valor a un llave en la nube",
-                readFromCloudStore: "readFromCloudStore(identifier, key) devuelve un valor leido de la nube de la llave dada",
-
-                // IR Remote
-                readIRMessage: "readIRMessage(irrec, timeout) espera por un mensaje infrarrojo y lo devuelve durante el tiempo dado en milisegundos",
-                sendIRMessage: "sendIRMessage(irtrans, name) envia un mensaje infrarrojo previamente configurado con el nombre dado",
-                presetIRMessage: "presetIRMessage(name, data) configura un mensaje infrarrojo con el nombre y datos dados",
-            },
-            constant: {
-            },
-
-            startingBlockName: "Programa", // Name for the starting block
-            messages: {
-                sensorNotFound: "Acceso a un componente inexistente: {0}.",
-                manualTestSuccess: "Prueba automática validada.",
-                testSuccess: "Bien hecho! El resultado es correcto",
-                wrongState: "Prueba fallida: {0} estaba en etado {1} en lugar de {2} en t={3}ms.",
-                wrongStateDrawing: "Prueba fallida: {0} difiere en {1} píxeles de la visualización esperada en t = {2} ms.",
-                wrongStateSensor: "Prueba fallida: su programa no leyó el estado de {0} después de t = {1} ms.",
-                programEnded: "Programa completado.",
-                piPlocked: "El dispositivo está bloqueado. Desbloquear o reiniciar.",
-                cantConnect: "No se puede conectarse al dispositivo.",
-                wrongVersion: "El software en tu Raspberry Pi es demasiado antiguo, actualízalo.",
-                sensorInOnlineMode: "No se pueden modificar sensores en modo conectado.",
-                actuatorsWhenRunning: "No se pueden cambiar los actuadores mientras se ejecuta un programa",
-                cantConnectoToUSB: 'Intentado conectarse por USB, conecte su Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
-                cantConnectoToBT: 'Intentando conectarse por Bluetooth, conecte su Raspberry Pi por Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
-                canConnectoToUSB: "USB Conectado.",
-                canConnectoToBT: "Bluetooth Conectado.",
-                noPortsAvailable: "No hay ningún puerto compatible con {0} disponible (type {1})",
-                sensor: "Sensor",
-                actuator: "Actuador",
-                removeConfirmation: "¿Está seguro de que desea quitar este componente?",
-                remove: "Eliminar",
-                keep: "Mantener",
-                minutesago: "Visto por última vez hace {0} minutos",
-                hoursago: "Visto por ultima vez hace mas de una hora",
-                drawing: "dibujando",
-                timeLabel: "Tiempo",
-                seconds: "segundos",
-
-                changeBoard: "Cambiar tablero",
-                connect: "Conectar",
-                install: "Instalar",
-                config: "Configuración",
-
-         
-                raspiConfig: "Configuración de Raspberry Pi",
-                local: "Local",
-                schoolKey: "Ingrese una identificación de la escuela",
-                connectList: "Seleccione un dispositivo para conectarse de la siguiente lista",
-                enterIpAddress: "o ingrese una dirección IP",
-                getPiList: "Obtener la lista",
-                connectTroughtTunnel: "Conéctese a través del túnel de France-ioi",
-    
-                connectToLocalhost: "Conectarse al dispositivo que ejecuta este navegador",
-                connectToWindowLocation: "Conéctese a la Raspberry Pi desde la que se carga esta página",
-    
-                connectToDevice: "Conectar al dispositivo",
-                disconnectFromDevice: "Desconectar",
-           
-
-                irReceiverTitle: "Recibir códigos infrarrojos",
-                directIrControl: "Apunte su control remoto hace tu tablero QuickPi y presiona uno de los botones",
-                getIrCode: "Recibir un código",
-                closeDialog: "Cerrar",
-
-                irRemoteControl: "Control remoto Infrarrojo",
-                
-                noIrPresets: "Utilice la función de preparación de mensajes IR para agregar comandos de control remoto",
-                irEnableContinous: "Activar la emisión IR continua",
-                irDisableContinous: "Desactivar la emisión IR continua",
-
-                up: "arriba",
-                down: "abajo",
-                left: "izquierda",
-                right: "derecha",
-                center: "centro",
-
-                on: "Encendido",
-                off: "Apagado",
-
-                grovehat: "Sombrero Grove para Raspberry Pi",
-                quickpihat: "Sobrero QuickPi de France IOI",
-                pinohat: "Raspberry Pi sin sombrero",
-                led: "LED",
-                blueled: "LED azul",
-                greenled: "LED verde",
-                orangeled: "LED naranja",
-                redled: "LED rojo",
-                buzzer: "Zumbador",
-                grovebuzzer: "Zumbador Grove",
-                quickpibuzzer: "Zumbador passive de QuickPi",
-                servo: "Motor Servo",
-                screen: "Pantalla",
-                grove16x2lcd: "Pantalla Grove 16x2",
-                oled128x32: "Pantalla 128x32 Oled",
-                irtrans: "Transmisor de infrarrojos",
-                button: "Botón",
-                fivewaybutton: "Botón de 5 direcciones",
-                tempsensor: "Sensor de temperatura",
-                groveanalogtempsensor: "Sensor de temperatura analógico Grove",
-                quickpigyrotempsensor: "Sensor de temperaturea en el Acelerometro y Gyroscopio de QuickPi",
-                dht11tempsensor: "Sensor de Temperatura DHT11",
-                potentiometer: "Potenciómetro",
-                lightsensor: "Sensor de luz",
-                distancesensor: "Sensor de distancia",
-                timeofflightranger: "Sensor de distancia por rebote de luz",
-                ultrasonicranger: "Sensor de distancia por últrasonido",
-                humiditysensor: "Sensor de humedad",
-                soundsensor: "Sensor de sonido",
-                accelerometerbmi160: "Acelerómetro (BMI160)",
-                gyrobmi160: "Giroscopio (BMI160)",
-                maglsm303c: "Magnetómetro (LSM303C)",
-                irreceiver: "Receptor de infrarrojos",
-                cloudstore: "Almacenamiento en la nube",
-                addcomponent: "Agregar componente",
-                selectcomponent: "Seleccione un componente para agregar a su Raspberry Pi y conéctelo a un puerto.",
-                add: "Agregar",
-                builtin: "(incorporado)",
-                chooseBoard: "Elije tu tablero",
-                nameandports: "Nombres y puertos de sensores y actuadores QuickPi",
-                name: "Nombre",
-                port: "Puerto",
-                state: "Estado",
-                cloudKeyNotExists: "La llave no existe : {0} ",
-                cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
-                cloudUnexpectedKey: "La llave {0} no es una llave esperada",
-                hello: "Hola",
-            }
-        },
-        
-        none: {
-            comment: {
-                // Comments for each block, used in the auto-generated documentation for task writers
-                turnLedOn: "Turns on a light connected to Raspberry",
-                turnLedOff: "Turns off a light connected to Raspberry",
-                isButtonPressed: "Returns the state of a button, Pressed means True and not pressed means False",
-                waitForButton: "Stops program execution until a button is pressed",
-                buttonWasPressed: "Returns true if the button has been pressed and will clear the value",
-                setLedState: "Change led state in the given port",
-                toggleLedState: "If led is on, turns it off, if it's off turns it on",
-                isButtonPressedWithName: "Returns the state of a button, Pressed means True and not pressed means False",
-                displayText: "Display text in LCD screen",
-                displayText2Lines: "Display text in LCD screen (two lines)",
-                readTemperature: "Read Ambient temperature",
-                sleep: "pause program execute for a number of seconds",
-                setServoAngle: "Set servo motor to an specified angle",
-                readRotaryAngle: "Read state of potentiometer",
-                readDistance: "Read distance using ultrasonic sensor",
-                readLightIntensity: "Read light intensity",
-                readHumidity: "lire l'humidité ambiante",
-                currentTime: "returns current time",
-                setBuzzerState: "sonnerie",
-                setBuzzerNote: "sonnerie note",
-                getTemperature: "Get temperature",
-                setBuzzerNote: "Set buzzer note",
-                getBuzzerNote: "Get buzzer note",
-                setLedBrightness: "Set Led Brightness",
-                getLedBrightness: "Get Led Brightness",
-                getServoAngle: "Get Servo Angle",
-                isLedOn: "Get led state",
-                isLedOnWithName: "Get led state",
-                turnBuzzerOn: "Turn Buzzer on",
-                turnBuzzerOff: "Turn Buzzer off",
-                isBuzzerOn: "Is Buzzer On",
-                isBuzzerOnWithName: "get buzzer state",
-                drawPoint: "drawPoint",
-                isPointSet: "isPointSet",
-                drawLine: "drawLine",
-                drawRectangle: "drawRectangle",
-                drawCircle: "drawCircle",
-                clearScreen: "clearScreen",
-                updateScreen: "updateScreen",
-                autoUpdate: "autoUpdate",
-                fill: "fill",
-                noFill: "noFill",
-                stroke: "stroke",
-                noStroke: "noStroke",
-                readAcceleration: "readAcceleration",
-                computeRotation: "computeRotation",
-                readSoundLevel: "readSoundLevel",
-                readMagneticForce: "readMagneticForce",
-                computeCompassHeading: "computeCompassHeading",
-                readInfraredState: "readInfraredState",
-                setInfraredState: "setInfraredState",
-
-                // Gyroscope
-                readAngularVelocity: "readAngularVelocity",
-                setGyroZeroAngle: "setGyroZeroAngle",
-                computeRotationGyro: "computeRotationGyro",
-
-                //Internet store
-                connectToCloudStore: "connectToCloudStore",
-                writeToCloudStore: "writeToCloudStore",
-                readFromCloudStore: "readFromCloudStore",
-
-                // IR Remote
-                readIRMessage: "readIRMessage",
-                sendIRMessage: "sendIRMessage",
-                presetIRMessage: "presetIRMessage",
-            }
-        }
-    }
 
     // Create a base context
     var context = quickAlgoContext(display, infos);
 
     // Import our localLanguageStrings into the global scope
-    var strings = context.setLocalLanguageStrings(localLanguageStrings);
+    var strings = context.setLocalLanguageStrings(quickPiLocalLanguageStrings);
 
 
     // Some data can be made accessible by the library through the context object
@@ -1217,16 +1275,16 @@ var getContext = function (display, infos, curLevel) {
                 "i2c": ["i2c"],
             },
             default: [
-                { type: "screen", suggestedName: "screen1", port: "i2c", subType: "16x2lcd" },
-                { type: "led", suggestedName: "led1", port: 'D5', subType: "blue" },
-                { type: "servo", suggestedName: "servo1", port: "D16" },
-                { type: "range", suggestedName: "range1", port :"D18", subType: "ultrasonic"},
-                { type: "button", suggestedName: "button1", port: "D22" },
-                { type: "humidity", suggestedName: "humidity1", port: "D24"},
-                { type: "buzzer", suggestedName: "buzzer1", port: "D26", subType: "active"},
-                { type: "temperature", suggestedName: "temperature1", port: 'A0', subType: "groveanalog" },
-                { type: "potentiometer", suggestedName: "potentiometer1", port :"A4"},
-                { type: "light", suggestedName: "light1", port :"A6"},
+                { type: "screen", suggestedName: strings.messages.sensorNameScreen + "1", port: "i2c", subType: "16x2lcd" },
+                { type: "led", suggestedName: strings.messages.sensorNameLed + "1", port: 'D5', subType: "blue" },
+                { type: "servo", suggestedName: strings.messages.sensorNameServo + "1", port: "D16" },
+                { type: "range", suggestedName: strings.messages.sensorNameDistance + "1", port :"D18", subType: "ultrasonic"},
+                { type: "button", suggestedName: strings.messages.sensorNameButton + "1", port: "D22" },
+                { type: "humidity", suggestedName: strings.messages.sensorNameHumidity + "1", port: "D24"},
+                { type: "buzzer", suggestedName: strings.messages.sensorNameBuzzer + "1", port: "D26", subType: "active"},
+                { type: "temperature", suggestedName: strings.messages.sensorNameTemperature + "1", port: 'A0', subType: "groveanalog" },
+                { type: "potentiometer", suggestedName: strings.messages.sensorNamePotentiometer + "1", port :"A4"},
+                { type: "light", suggestedName: strings.messages.sensorNameLight + "1", port :"A6"},
             ]
         },
         {
@@ -1239,22 +1297,22 @@ var getContext = function (display, infos, curLevel) {
                 "A": [0],
             },
             builtinSensors: [
-                { type: "screen", subType: "oled128x32", port: "i2c",  suggestedName: "screen1", },
-                { type: "led", subType: "red", port: "D4", suggestedName: "redled1", },
-                { type: "led", subType: "green", port: "D17", suggestedName: "greenled1", },
-                { type: "led", subType: "blue", port: "D27",  suggestedName: "blueled1", },
-                { type: "irtrans", port: "D22",  suggestedName: "irtran1", },
-                { type: "irrecv", port: "D23", suggestedName: "irrec1", },
-                { type: "sound", port: "A1", suggestedName: "micro1", },
-                { type: "buzzer", subType: "passive", port: "D12", suggestedName: "buzzer1", },
-                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: "accel1", },
-                { type: "gyroscope", subType: "BMI160", port: "i2c", suggestedName: "gryscope1", },
-                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: "magneto1", },
-                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: "temp1", },
-                { type: "range", subType: "vl53l0x", port: "i2c", suggestedName: "distance1", },
-                { type: "button", port: "D26", suggestedName: "button1", },
-                { type: "light", port: "A2", suggestedName: "light1", },
-                { type: "stick", port: "D7", suggestedName: "stick1", }
+                { type: "screen", subType: "oled128x32", port: "i2c",  suggestedName: strings.messages.sensorNameScreen + "1", },
+                { type: "led", subType: "red", port: "D4", suggestedName: strings.messages.sensorNameRedLed + "1", },
+                { type: "led", subType: "green", port: "D17", suggestedName: strings.messages.sensorNameGreenLed + "1", },
+                { type: "led", subType: "blue", port: "D27",  suggestedName: strings.messages.sensorNameBlueLed + "1", },
+                { type: "irtrans", port: "D22",  suggestedName: strings.messages.sensorNameIrTrans + "1", },
+                { type: "irrecv", port: "D23", suggestedName: strings.messages.sensorNameIrRecv + "1", },
+                { type: "sound", port: "A1", suggestedName: strings.messages.sensorNameMicrophone + "1", },
+                { type: "buzzer", subType: "passive", port: "D12", suggestedName: strings.messages.sensorNameBuzzer + "1", },
+                { type: "accelerometer", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameAccelerometer + "1", },
+                { type: "gyroscope", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameGyroscope  + "1", },
+                { type: "magnetometer", subType: "LSM303C", port: "i2c", suggestedName: strings.messages.sensorNameMagnetometer + "1", },
+                { type: "temperature", subType: "BMI160", port: "i2c", suggestedName: strings.messages.sensorNameTemperature + "1", },
+                { type: "range", subType: "vl53l0x", port: "i2c", suggestedName: strings.messages.sensorNameDistance + "1", },
+                { type: "button", port: "D26", suggestedName: strings.messages.sensorNameButton + "1", },
+                { type: "light", port: "A2", suggestedName: strings.messages.sensorNameLight + "1", },
+                { type: "stick", port: "D7", suggestedName: strings.messages.sensorNameStick + "1", }
             ],
         },
         {
@@ -1277,6 +1335,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "led",
+            suggestedName: strings.messages.sensorNameLed,
             description: strings.messages.led,
             isAnalog: false,
             isSensor: false,
@@ -1312,30 +1371,31 @@ var getContext = function (display, infos, curLevel) {
                 subType: "blue",
                 description: strings.messages.blueled,
                 selectorImages: ["ledon-blue.png"],
-                suggestedName: "blueled",
+                suggestedName: strings.messages.sensorNameBlueLed,
             },
             {
                 subType: "green",
                 description: strings.messages.greenled,
                 selectorImages: ["ledon-green.png"],
-                suggestedName: "greenled",
+                suggestedName: strings.messages.sensorNameGreenLed,
             },
             {
                 subType: "orange",
                 description: strings.messages.orangeled,
                 selectorImages: ["ledon-orange.png"],
-                suggestedName: "orangeled",
+                suggestedName: strings.messages.sensorNameOrangeLed,
             },
             {
                 subType: "red",
                 description: strings.messages.redled,
                 selectorImages: ["ledon-red.png"],
-                suggestedName: "redled",
+                suggestedName: strings.messages.sensorNameRedLed,
             }
             ],
         },
         {
             name: "buzzer",
+            suggestedName: strings.messages.sensorNameBuzzer,
             description: strings.messages.buzzer,
             isAnalog: false,
             isSensor: false,
@@ -1391,6 +1451,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "servo",
+            suggestedName: strings.messages.sensorNameServo,
             description: strings.messages.servo,
             isAnalog: true,
             isSensor: false,
@@ -1420,6 +1481,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "screen",
+            suggestedName: strings.messages.sensorNameScreen,
             description: strings.messages.screen,
             isAnalog: false,
             isSensor: false,
@@ -1532,6 +1594,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "irtrans",
+            suggestedName: strings.messages.sensorNameIrTrans,
             description: strings.messages.irtrans,
             isAnalog: false,
             isSensor: true,
@@ -1558,6 +1621,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "button",
+            suggestedName: strings.messages.sensorNameButton,
             description: strings.messages.button,
             isAnalog: false,
             isSensor: true,
@@ -1586,6 +1650,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "stick",
+            suggestedName: strings.messages.sensorNameStick,
             description: strings.messages.fivewaybutton,
             isAnalog: false,
             isSensor: true,
@@ -1647,6 +1712,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "temperature",
+            suggestedName: strings.messages.sensorNameTemperature,
             description: strings.messages.tempsensor,
             isAnalog: true,
             isSensor: true,
@@ -1687,6 +1753,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "potentiometer",
+            suggestedName: strings.messages.sensorNamePotentiometer,
             description: strings.messages.potentiometer,
             isAnalog: true,
             isSensor: true,
@@ -1711,6 +1778,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "light",
+            suggestedName: strings.messages.sensorNameLight,
             description: strings.messages.lightsensor,
             isAnalog: true,
             isSensor: true,
@@ -1735,6 +1803,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "range",
+            suggestedName: strings.messages.sensorNameDistance,
             description: strings.messages.distancesensor,
             isAnalog: true,
             isSensor: true,
@@ -1770,6 +1839,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "humidity",
+            suggestedName: strings.messages.sensorNameHumidity,
             description: strings.messages.humiditysensor,
             isAnalog: true,
             isSensor: true,
@@ -1794,6 +1864,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "sound",
+            suggestedName: strings.messages.sensorNameMicrophone,
             description: strings.messages.soundsensor,
             isAnalog: true,
             isSensor: true,
@@ -1818,6 +1889,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "accelerometer",
+            suggestedName: strings.messages.sensorNameAccelerometer,
             description: strings.messages.accelerometerbmi160,
             isAnalog: true,
             isSensor: true,
@@ -1858,6 +1930,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "gyroscope",
+            suggestedName: strings.messages.sensorNameGyroscope,
             description: strings.messages.gyrobmi160,
             isAnalog: true,
             isSensor: true,
@@ -1888,6 +1961,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "magnetometer",
+            suggestedName: strings.messages.sensorNameMagnetometer,
             description: strings.messages.maglsm303c,
             isAnalog: true,
             isSensor: true,
@@ -1920,6 +1994,7 @@ var getContext = function (display, infos, curLevel) {
         },
         {
             name: "irrecv",
+            suggestedName: strings.messages.sensorNameIrRecv,
             description: strings.messages.irreceiver,
             isAnalog: false,
             isSensor: true,
@@ -1946,6 +2021,7 @@ var getContext = function (display, infos, curLevel) {
         /**********************************/
         {
             name: "cloudstore",
+            suggestedName: strings.messages.sensorNameCloudStore,
             description: strings.messages.cloudstore,
             isAnalog: false,
             isSensor: false,
@@ -4066,7 +4142,7 @@ var getContext = function (display, infos, curLevel) {
 
 
                 var port = $("#selector-sensor-port option:selected").text();
-                var name = getNewSensorSuggestedName(sensorDefinition.name);
+                var name = getNewSensorSuggestedName(sensorDefinition.suggestedName);
 
                 if(name == 'screen1') {
                     // prepend screen because squareSize func can't handle cells wrap
@@ -7670,7 +7746,9 @@ var getContext = function (display, infos, curLevel) {
        function, hence we generally use this name for the functions. */
     context.quickpi.turnLedOn = function (callback) {
 
-        context.registerQuickPiEvent("led1", true);
+        var sensor = findSensorByType("led");
+
+        context.registerQuickPiEvent(sensor.name, true);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -7683,7 +7761,10 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.turnLedOff = function (callback) {
-        context.registerQuickPiEvent("led1", false);
+
+        var sensor = findSensorByType("led");
+
+        context.registerQuickPiEvent(sensor.name, false);
 
         if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
@@ -9329,7 +9410,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
+                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
                         "</block>"
 
                 },
@@ -9341,7 +9422,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText2Lines'>" +
-                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${hello}</field> </shadow></value>" +
+                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
