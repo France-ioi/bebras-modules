@@ -2514,6 +2514,35 @@ var getContext = function(display, infos) {
 
 
    // drading
+   /*
+   function normalizePixels(buffer) {
+      buffer.loadPixels();
+      var l = buffer.pixels.getLength();
+      var r, g, b, c, t = 64;
+
+      for(var i=0; i<l; i++) {
+         c = buffer.pixels.getPixel(i);
+         
+         a = (c & buffer.PConstants.ALPHA_MASK) >>> 24;
+         r = (c & buffer.PConstants.RED_MASK) >> 16;
+         g = (c & buffer.PConstants.GREEN_MASK) >> 8;
+         b = (c & buffer.PConstants.BLUE_MASK);
+
+         r = r >= t ? 255 : 0;         
+         g = g >= t ? 255 : 0;
+         b = b >= t ? 255 : 0;
+
+         c = (a << 24) & buffer.PConstants.ALPHA_MASK | 
+            (r << 16) & buffer.PConstants.RED_MASK | 
+            (g << 8) & buffer.PConstants.GREEN_MASK | 
+            b & buffer.PConstants.BLUE_MASK;
+
+         buffer.pixels.setPixel(i, c);
+      }
+      buffer.updatePixels();
+   }
+   */
+
    context.getGradingData = function() {
       var canvasSize = this.getCanvasSize();
       var buffer = this.renderers.user.createGraphics(canvasSize.width, canvasSize.height);
@@ -2557,6 +2586,9 @@ var getContext = function(display, infos) {
       }
 
       this.renderers.user.loadPixels();
+      buffer.filter(buffer.PConstants.THRESHOLD, 0.5);
+      //normalizePixels(buffer);
+      //normalizePixels(this.renderers.user);
       return {
          targetPixels: buffer.pixels,
          mask: mask,
