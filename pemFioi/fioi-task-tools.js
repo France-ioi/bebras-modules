@@ -16,6 +16,7 @@
  */
 
 var extensionToLanguage = {
+   adb:  'ada',
    cpp:  'cpp',
    c:    'c',
    pas:  'pascal',
@@ -383,6 +384,7 @@ function includeSingleSources(resources, currentLang, urlMode) {
 }
 
 var langToPrint = {
+   'ada': 'ADA',
    'cpp': 'C++',
    'c':   'C',
    'python': 'Python',
