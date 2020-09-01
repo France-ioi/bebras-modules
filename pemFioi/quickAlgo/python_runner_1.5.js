@@ -556,9 +556,12 @@ function PythonInterpreter(context, msgCallback) {
     var leftPos = bbox.left+10;
     var topPos = bbox.top-14;
 
-    var displayStr = value.toString();
     if(typeof value == 'boolean') {
-      displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
+      var displayStr = value ? window.languageStrings.valueTrue : window.languageStrings.valueFalse;
+    } else if(value === null) {
+      var displayStr = "None"
+    } else {
+      var displayStr = value.toString();
     }
     if(varName) {
       displayStr = '' + varName + ' = ' + displayStr;
