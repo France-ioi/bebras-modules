@@ -298,11 +298,16 @@ var conceptViewer = {
 
 // Specific configuration to go through the domain itself if there's a 'p=1'
 // argument or we are on concours2.castor-informatique.fr
-var baseUrl = (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//'
-    + ((window.location.search.indexOf('p=1') > -1
+function makeConceptViewerBaseUrl() {
+    var baseUrl = '';
+    baseUrl += (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//';
+    baseUrl += ((window.location.search.indexOf('p=1') > -1
         || window.location.hostname == 'concours2.castor-informatique.fr')
-       ? window.location.host : 'static4.castor-informatique.fr')
-    + '/help/index.html';
+       ? window.location.host : 'static4.castor-informatique.fr');
+    baseUrl += '/help/';
+    baseUrl += window.stringsLanguage == 'es' ? 'index_es.html' : 'index.html';
+}
+var baseUrl = makeConceptViewerBaseUrl(); 
 
 
 var testConcepts = [
