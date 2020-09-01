@@ -134,9 +134,9 @@ function LogicController(nbTestCases, maxInstructions) {
        foundFuncs.push(match[1]);
     }
     for(var j=0; j<foundFuncs.length; j++) {
-       var re = new RegExp('\\W' + foundFuncs[j] + '([^A-Za-z0-9_(]|$)');
+       var re = new RegExp('\\W' + foundFuncs[j] + '([^A-Za-z0-9_( ]| +[^ (]|$)');
        if(re.exec(code)) {
-          display("Vous utilisez un nom de fonction sans les parenthèses. Ajoutez les parenthèses pour appeler la fonction.");
+          display("Vous utilisez la fonction '" + foundFuncs[j] + "' sans les parenthèses. Ajoutez les parenthèses pour appeler la fonction.");
           return false;
        }
     }
