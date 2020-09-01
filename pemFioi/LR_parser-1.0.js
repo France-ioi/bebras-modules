@@ -4,12 +4,17 @@ function LR_Parser(settings,subTask,answer) {
 
    this.strings = {
       explanations: {
+         // +
          shift: 'The lookahead symbol {symbol} is read from the input and state {state} is pushed onto the stack.',
+         //         
          reduce1: 'Lookahead symbol {symbol} is in the Follow set of the LHS non-terminal ({non_terminal}) for the item {item}, thus states {popped_states} are popped from the stack that represent {RHS} in the derivation.',
-         reduce2: 'The top element after popping {popped_states} is top state , that leads to state {new-state} with the non-terminal {non_terminal}, which is pushed onto the stack.',
+         reduce2: 'The top element after popping {popped_states} is {top_state}, that leads to state {new_state} with the non-terminal {non_terminal}, which is pushed onto the stack.',
+         //+
          error: 'No shift or reduce operations possible at state {state} for lookahead symbol {symbol}',
+         //?
          not_accepted: 'The input is fully read, and no reduction is possible, so the input is in the language of the grammar.',
-         accepted: 'The input is fully read, and the current state, {state} has the item {base_reduction_item}, so the input is accepted.'
+         //+
+         accepted: 'The input is fully read, and the current state {state} has the item {base_reduction_item}, so the input is accepted.'
       }
    }
    this.formatExplanation = function(key, values) {
@@ -18,6 +23,7 @@ function LR_Parser(settings,subTask,answer) {
          console.error('Explanation ' + key + ' not found.');
          return str;
       }
+      values = values || {};
       for(var i in values) {
          if(!values.hasOwnProperty(i)) {
             continue;
@@ -717,7 +723,17 @@ function LR_Parser(settings,subTask,answer) {
       }
    }
 
+      /*
+      this.displayExplanation('reduce1', {
+         symbol: this.input.charAt(this.inputIndex),
+         non_terminal: nonTerminal,
+         item: this.grammar.rules[this.selectedRule].toString(),
+         popped_states: prevStates.slice(1).join(', '),
+         RHS: 'TODO'
+      });      
+      */   
    this.displayExplanation = function(key, values) {
+      return;
       $('#lr-explanation').html(key ? this.formatExplanation(key, values) : '');
    }
 
@@ -1361,7 +1377,6 @@ function LR_Parser(settings,subTask,answer) {
             }
             self.styleStackTable();
             self.selectRule($(".rule[data_rule="+rule+"]"));
-            // console.log(anim)
             if(anim){
                this.timeOutID = setTimeout(function() {
                   // var nonTerminal = self.grammar.rules[rule].nonterminal;
@@ -1713,7 +1728,6 @@ function LR_Parser(settings,subTask,answer) {
                return
             }
             var goto = (nonTerminal != "S") ? self.lrTable.states[previousState][nonTerminal][0].actionValue : self.getTerminalState();
-            
             self.treeAnim(self.simulationStep,false,true);
             self.applyReduction(nonTerminal,goto,true,true);
          }
@@ -1849,7 +1863,17 @@ function LR_Parser(settings,subTask,answer) {
       for(var col of this.selectedStackElements){
          prevStates.push(this.stack[col][0]);
       }
+
+      this.displayExplanation('reduce2', {
+         popped_states: prevStates.slice(1).join(', '),
+         non_terminal: nonTerminal,
+         top_state: prevStates[0],
+         new_state: goto
+      });               
+
       var state = prevStates.pop();
+   
+
       if(anim){
          this.displayMessage("reduce","REDUCE "+this.selectedRule);
          var animTime = this.animationTime/prevStates.length;
@@ -1857,7 +1881,6 @@ function LR_Parser(settings,subTask,answer) {
             this.disableShiftButton();
             this.disableAcceptButton();
          }
-
          this.reductionAnimLoop(state,prevStates,animTime,newStackElement,firstStepOnly);
       }else{
          if(prevStates.length > 0){
@@ -2050,12 +2073,10 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.applyShift = function(newState,reverse,anim) {
-      /*
       this.displayExplanation('shift', {
          symbol: this.input[this.inputIndex],
          state: newState
       });
-      */
       this.clearHighlight();
       if(reverse){
          this.stack.pop();
@@ -2850,7 +2871,6 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.resetStates = function() {
-      // console.log("resetStates")
       var vertices = this.graph.getAllVertices();
       for(var vertexID of vertices){
          var info = this.graph.getVertexInfo(vertexID);
@@ -2878,6 +2898,11 @@ function LR_Parser(settings,subTask,answer) {
          });
          if(self.error){
             self.refuseInput();
+         } else {
+            this.displayExplanation('accepted', {
+               state: this.currentState,
+               base_reduction_item: this.stack[this.stack.length - 1][1]
+            });            
          }
       }else{
          $("#acceptButton").css({
@@ -2902,6 +2927,11 @@ function LR_Parser(settings,subTask,answer) {
          });
          if(self.accept){
             self.acceptInput();
+         } else {
+            this.displayExplanation('error', {
+               symbol: this.input[this.inputIndex],
+               state: this.currentState
+            });         
          }
       }else{
          $("#errorButton").css({
@@ -2910,6 +2940,7 @@ function LR_Parser(settings,subTask,answer) {
          $("#errorMessage").parent().css({
             "background-color": self.colors.blue
          });
+         this.displayExplanation('not_accepted');                              
       }
       self.saveAnswer();
    };
@@ -4164,6 +4195,7 @@ function LR_Parser(settings,subTask,answer) {
       // console.log("reset")
       self.displayMessage("reset");
       self.displayError("");
+      self.displayExplanation(false);
    };
 
    this.style = function() {
