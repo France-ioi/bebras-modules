@@ -406,6 +406,23 @@ var quickPiLocalLanguageStrings = {
             sensorNameHumidity: "humidity",
             sensorNamePotentiometer: "pot",
             sensorNameCloudStore: "cloud",
+        },
+        concepts: {
+            quickpi_start: 'Créer un programme',
+            quickpi_validation: 'Valider son programme',
+            quickpi_buzzer: 'Buzzer',
+            quickpi_led: 'LEDs',
+            quickpi_button: 'Boutons et manette',
+            quickpi_screen: 'Écran',
+            quickpi_draw: 'Dessiner',
+            quickpi_range: 'Capteur de distance',
+            quickpi_servo: 'Servomoteur',
+            quickpi_thermometer: 'Thermomètre',
+            quickpi_microphone: 'Microphone',
+            quickpi_light_sensor: 'Capteur de luminosité',
+            quickpi_accelerometer: 'Accéléromètre',
+            quickpi_wait: 'Gestion du temps',
+            quickpi_cloud: 'Stockage dans le cloud'
         }
     },
     es: { // French strings
@@ -809,6 +826,23 @@ var quickPiLocalLanguageStrings = {
             sensorNameHumidity: "humedad",
             sensorNamePotentiometer: "pot",
             sensorNameCloudStore: "nube",
+        },
+        concepts: {
+            quickpi_start: 'Crea tu primer programa y ejecútalo',
+            quickpi_validation: 'Pruebe y valide sus programas',
+            quickpi_buzzer: 'Zumbador',
+            quickpi_led: 'LEDs o diodos electroluminiscentes',
+            quickpi_button: 'Botón',
+            quickpi_screen: 'Pantalla',
+            quickpi_draw: 'Dibujar sobre la pantalla',
+            quickpi_range: 'Sensor de distancia',
+            quickpi_servo: 'Servo motor',
+            quickpi_thermometer: 'Termómetro',
+            quickpi_microphone: 'Micrófono',
+            quickpi_light_sensor: 'Sensor de luz',
+            quickpi_accelerometer: 'Acelerómetro',
+            quickpi_wait: 'Gestión del tiempo',
+            quickpi_cloud: 'Almacenamiento en la nube'
         }
     },
     
@@ -1135,12 +1169,15 @@ var getContext = function (display, infos, curLevel) {
 
 
     // List of concepts to be included by conceptViewer
+    var conceptIndex = 'quickpi.html';
+    if(window.stringsLanguage == 'es') { conceptIndex = 'quickpi_es.html'; }
+    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/'+conceptIndex;
     context.conceptList = [
         {id: 'language', ignore: true},
         {
            id: 'quickpi_start',
            name: 'Créer un programme',
-           url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_start',
+           url: conceptBaseUrl+'#quickpi_start',
            language: 'all',
            isBase: true,
            order: 1,
@@ -1149,7 +1186,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_validation',
             name: 'Valider son programme',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_validation',
+            url: conceptBaseUrl+'#quickpi_validation',
             language: 'all',
             isBase: true,
             order: 2,
@@ -1158,7 +1195,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_buzzer',
             name: 'Buzzer',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_buzzer',
+            url: conceptBaseUrl+'#quickpi_buzzer',
             language: 'all',
             order: 200,
             python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
@@ -1166,7 +1203,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_led',
             name: 'LEDs',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_led',
+            url: conceptBaseUrl+'#quickpi_led',
             language: 'all',
             order: 201,
             python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
@@ -1174,7 +1211,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_button',
             name: 'Boutons et manette',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_button',
+            url: conceptBaseUrl+'#quickpi_button',
             language: 'all',
             order: 202,
             python: ['isButtonPressed', 'isButtonPressedWithName']
@@ -1182,7 +1219,7 @@ var getContext = function (display, infos, curLevel) {
         {   
             id: 'quickpi_screen',
             name: 'Écran',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_screen',
+            url: conceptBaseUrl+'#quickpi_screen',
             language: 'all',
             order: 203,
             python: ['displayText']
@@ -1190,7 +1227,7 @@ var getContext = function (display, infos, curLevel) {
         {   
             id: 'quickpi_draw',
             name: 'Dessiner',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_draw',
+            url: conceptBaseUrl+'#quickpi_draw',
             language: 'all',
             order: 203,
             python: ['drawRectangle','drawLine','drawCircle']
@@ -1198,7 +1235,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_range',
             name: 'Capteur de distance',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_range',
+            url: conceptBaseUrl+'#quickpi_range',
             language: 'all',
             order: 204,
             python: ['readDistance']
@@ -1206,7 +1243,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_servo',
             name: 'Servomoteur',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_servo',
+            url: conceptBaseUrl+'#quickpi_servo',
             language: 'all',
             order: 205,
             python: ['setServoAngle', 'getServoAngle']
@@ -1214,7 +1251,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_thermometer',
             name: 'Thermomètre',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_thermometer',
+            url: conceptBaseUrl+'#quickpi_thermometer',
             language: 'all',
             order: 206,
             python: ['readTemperature']
@@ -1222,7 +1259,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_microphone',
             name: 'Microphone',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_microphone',
+            url: conceptBaseUrl+'#quickpi_microphone',
             language: 'all',
             order: 207,
             python: ['readSoundLevel']
@@ -1230,7 +1267,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_light_sensor',
             name: 'Capteur de luminosité',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_light_sensor',
+            url: conceptBaseUrl+'#quickpi_light_sensor',
             language: 'all',
             order: 208,
             python: ['readLightIntensity']
@@ -1238,7 +1275,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_accelerometer',
             name: 'Accéléromètre',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_accelerometer',
+            url: conceptBaseUrl+'#quickpi_accelerometer',
             language: 'all',
             order: 209,
             python: ['readAcceleration']
@@ -1246,7 +1283,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_wait',
             name: 'Gestion du temps',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_wait',
+            url: conceptBaseUrl+'#quickpi_wait',
             language: 'all',
             order: 250,
             python: ['sleep']
@@ -1254,13 +1291,21 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_cloud',
             name: 'Stockage dans le cloud',
-            url: 'https://static4.castor-informatique.fr/help/quickpi.html#quickpi_cloud',
+            url: conceptBaseUrl+'#quickpi_cloud',
             language: 'all',
             order: 250,
             python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
         }
         ];
 
+    function addConceptNames() {
+        var conceptStrings = strings.concepts ? strings.concepts : quickPiLocalLanguageStrings.fr.concepts;
+        for(var i = 0; i < context.conceptList.length; i++) {
+            var concept = context.conceptList[i];
+            concept.name = conceptStrings[concept.id];
+        }
+    }
+    addConceptNames();
 
 
     var boardDefinitions = [
