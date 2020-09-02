@@ -1169,143 +1169,102 @@ var getContext = function (display, infos, curLevel) {
 
 
     // List of concepts to be included by conceptViewer
-    var conceptIndex = 'quickpi.html';
-    if(window.stringsLanguage == 'es') { conceptIndex = 'quickpi_es.html'; }
-    var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/'+conceptIndex;
-    context.conceptList = [
-        {id: 'language', ignore: true},
-        {
-           id: 'quickpi_start',
-           name: 'Créer un programme',
-           url: conceptBaseUrl+'#quickpi_start',
-           language: 'all',
-           isBase: true,
-           order: 1,
-           python: []
-        },
-        {
-            id: 'quickpi_validation',
-            name: 'Valider son programme',
-            url: conceptBaseUrl+'#quickpi_validation',
-            language: 'all',
-            isBase: true,
-            order: 2,
-            python: []
-        },
-        {
-            id: 'quickpi_buzzer',
-            name: 'Buzzer',
-            url: conceptBaseUrl+'#quickpi_buzzer',
-            language: 'all',
-            order: 200,
-            python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
-        },
-        {
-            id: 'quickpi_led',
-            name: 'LEDs',
-            url: conceptBaseUrl+'#quickpi_led',
-            language: 'all',
-            order: 201,
-            python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
-        },
-        {
-            id: 'quickpi_button',
-            name: 'Boutons et manette',
-            url: conceptBaseUrl+'#quickpi_button',
-            language: 'all',
-            order: 202,
-            python: ['isButtonPressed', 'isButtonPressedWithName']
-        },  
-        {   
-            id: 'quickpi_screen',
-            name: 'Écran',
-            url: conceptBaseUrl+'#quickpi_screen',
-            language: 'all',
-            order: 203,
-            python: ['displayText']
-        },
-        {   
-            id: 'quickpi_draw',
-            name: 'Dessiner',
-            url: conceptBaseUrl+'#quickpi_draw',
-            language: 'all',
-            order: 203,
-            python: ['drawRectangle','drawLine','drawCircle']
-        },
-        {
-            id: 'quickpi_range',
-            name: 'Capteur de distance',
-            url: conceptBaseUrl+'#quickpi_range',
-            language: 'all',
-            order: 204,
-            python: ['readDistance']
-        },
-        {
-            id: 'quickpi_servo',
-            name: 'Servomoteur',
-            url: conceptBaseUrl+'#quickpi_servo',
-            language: 'all',
-            order: 205,
-            python: ['setServoAngle', 'getServoAngle']
-        },
-        {
-            id: 'quickpi_thermometer',
-            name: 'Thermomètre',
-            url: conceptBaseUrl+'#quickpi_thermometer',
-            language: 'all',
-            order: 206,
-            python: ['readTemperature']
-        },
-        {
-            id: 'quickpi_microphone',
-            name: 'Microphone',
-            url: conceptBaseUrl+'#quickpi_microphone',
-            language: 'all',
-            order: 207,
-            python: ['readSoundLevel']
-        },
-        {
-            id: 'quickpi_light_sensor',
-            name: 'Capteur de luminosité',
-            url: conceptBaseUrl+'#quickpi_light_sensor',
-            language: 'all',
-            order: 208,
-            python: ['readLightIntensity']
-        },
-        {
-            id: 'quickpi_accelerometer',
-            name: 'Accéléromètre',
-            url: conceptBaseUrl+'#quickpi_accelerometer',
-            language: 'all',
-            order: 209,
-            python: ['readAcceleration']
-        },
-        {
-            id: 'quickpi_wait',
-            name: 'Gestion du temps',
-            url: conceptBaseUrl+'#quickpi_wait',
-            language: 'all',
-            order: 250,
-            python: ['sleep']
-        },
-        {
-            id: 'quickpi_cloud',
-            name: 'Stockage dans le cloud',
-            url: conceptBaseUrl+'#quickpi_cloud',
-            language: 'all',
-            order: 250,
-            python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
-        }
+    context.getConceptList = function() {
+        var conceptList = [{id: 'language', ignore: true}];
+        var quickPiConceptList = [
+            {
+                id: 'quickpi_start',
+                isBase: true,
+                order: 1,
+                python: []
+            },
+            {
+                id: 'quickpi_validation',
+                isBase: true,
+                order: 2,
+                python: []
+            },
+            {
+                id: 'quickpi_buzzer',
+                order: 200,
+                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
+            },
+            {
+                id: 'quickpi_led',
+                order: 201,
+                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
+            },
+            {
+                id: 'quickpi_button',
+                order: 202,
+                python: ['isButtonPressed', 'isButtonPressedWithName']
+            },  
+            {   
+                id: 'quickpi_screen',
+                order: 203,
+                python: ['displayText']
+            },
+            {   
+                id: 'quickpi_draw',
+                order: 203,
+                python: ['drawRectangle','drawLine','drawCircle']
+            },
+            {
+                id: 'quickpi_range',
+                order: 204,
+                python: ['readDistance']
+            },
+            {
+                id: 'quickpi_servo',
+                order: 205,
+                python: ['setServoAngle', 'getServoAngle']
+            },
+            {
+                id: 'quickpi_thermometer',
+                order: 206,
+                python: ['readTemperature']
+            },
+            {
+                id: 'quickpi_microphone',
+                order: 207,
+                python: ['readSoundLevel']
+            },
+            {
+                id: 'quickpi_light_sensor',
+                order: 208,
+                python: ['readLightIntensity']
+            },
+            {
+                id: 'quickpi_accelerometer',
+                order: 209,
+                python: ['readAcceleration']
+            },
+            {
+                id: 'quickpi_wait',
+                order: 250,
+                python: ['sleep']
+            },
+            {
+                id: 'quickpi_cloud',
+                order: 210,
+                python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
+            }
         ];
 
-    function addConceptNames() {
+        var conceptIndex = 'quickpi.html';
+        if(window.stringsLanguage == 'es') { conceptIndex = 'quickpi_es.html'; }
+        var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/'+conceptIndex;
+
         var conceptStrings = strings.concepts ? strings.concepts : quickPiLocalLanguageStrings.fr.concepts;
-        for(var i = 0; i < context.conceptList.length; i++) {
-            var concept = context.conceptList[i];
+        for(var i = 0; i < quickPiConceptList.length; i++) {
+            var concept = quickPiConceptList[i];
             concept.name = conceptStrings[concept.id];
+            concept.url = conceptBaseUrl + '#' + concept.id;
+            if(!concept.language) { concept.language = 'all'; }
+            conceptList.push(concept);
         }
+        return conceptList;
     }
-    addConceptNames();
 
 
     var boardDefinitions = [
