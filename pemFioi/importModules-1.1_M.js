@@ -121,6 +121,13 @@ var importableModules = function () {
       'taskVideoPlayer': {src: modulesPath+"/pemFioi/taskVideo/player.js", id: "taskVideoPlayer"},
       'taskVideo_css': {type: "stylesheet", src: modulesPath+"/pemFioi/taskVideo/player.css", id: "taskVideo_css"},
 
+      // map2d
+      'map2d': {src: modulesPath+"/pemFioi/components/map2d/map2d.js", id: "map2d"},
+      'map2d_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/map2d/styles.css", id: "map2d_styles"},
+
+      // openstreetmap
+      'openstreetmap': {src: modulesPath+"/pemFioi/openstreetmap/task.js", id: "openstreetmap"},
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
