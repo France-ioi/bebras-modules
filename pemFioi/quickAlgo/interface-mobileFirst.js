@@ -1145,10 +1145,6 @@ var quickAlgoInterface = {
 window.quickAlgoResponsive = true;
 
 $(document).ready(function() {
-
-/*    $('head').append('\
-        <link rel="stylesheet"\
-        href="' + (window.modulesPath ? window.modulesPath : '../../modules') + '/fonts/fontAwesome/css/all.css">');*/
     FontsLoader.loadFonts(['fontawesome', 'titillium-web']);
 
     var taskTitleTarget = $("#miniPlatformHeader table td").first();
