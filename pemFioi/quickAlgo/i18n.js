@@ -3,7 +3,7 @@
         Translations for the various strings in quickAlgo
 */
 
-var localLanguageStrings = {
+var quickAlgoLanguageStrings = {
    fr: {
       categories: {
          actions: "Actions",
@@ -610,9 +610,18 @@ var localLanguageStrings = {
 window.stringsLanguage = window.stringsLanguage || "fr";
 window.languageStrings = window.languageStrings || {};
 
-if (typeof window.languageStrings != "object") {
-   console.error("window.languageStrings is not an object");
+function quickAlgoImportLanguage() {
+   if (typeof window.languageStrings != "object") {
+      console.error("window.languageStrings is not an object");
+      return;
+   }
+   var strings = quickAlgoLanguageStrings[window.stringsLanguage];
+   if(!strings) {
+      console.error("Language '" + window.stringsLanguage + "' not translated for quickAlgo, defaulting to 'fr'.");
+      strings = quickAlgoLanguageStrings.fr;
+   }
+   // Merge translations
+   $.extend(true, window.languageStrings, strings);
 }
-else { // merge translations
-   $.extend(true, window.languageStrings, localLanguageStrings[window.stringsLanguage]);
-}
+
+quickAlgoImportLanguage();
