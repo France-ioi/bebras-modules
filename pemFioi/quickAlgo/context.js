@@ -44,6 +44,13 @@ var quickAlgoContext = function(display, infos) {
     }
   };
 
+  // Get the list of concepts
+  // List can be defined either in context.conceptList, or by redefining this
+  // function
+  context.getConceptList = function() {
+    return context.conceptList || [];
+  };
+
   // Default implementations
   context.changeDelay = function(newDelay) {
     // Change the action delay while displaying

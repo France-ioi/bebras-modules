@@ -91,12 +91,8 @@ var initBlocklySubTask = function(subTask, language) {
       // Load concepts into conceptViewer; must be done before loading
       // Blockly/Scratch, as scratch-mode will modify includeBlocks
       if(this.display && levelGridInfos.conceptViewer) {
-         // TODO :: testConcepts is temporary-ish
-         if(this.context.conceptList) {
-            var allConcepts = this.context.conceptList.concat(testConcepts);
-         } else {
-            var allConcepts = testConcepts;
-         }
+         var allConcepts = this.context.getConceptList();
+         allConcepts = allConcepts.concat(getConceptViewerBaseConcepts());
 
          var concepts = window.getConceptsFromBlocks(curIncludeBlocks, allConcepts, this.context);
          if(levelGridInfos.conceptViewer.length) {
