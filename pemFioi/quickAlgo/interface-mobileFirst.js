@@ -114,6 +114,7 @@ var quickAlgoInterface = {
         ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
         this.context = context;
+        quickAlgoImportLanguage();
         this.strings = window.languageStrings;
         this.level = level;
 

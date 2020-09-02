@@ -11,6 +11,7 @@ var quickAlgoInterface = {
    loadInterface: function(context) {
       // Load quickAlgo interface into the DOM
       this.context = context;
+      quickAlgoImportLanguage();
       this.strings = window.languageStrings;
 
       var gridHtml = "<center>";
