@@ -1070,6 +1070,46 @@ function Map2D(params) {
         wrapper.style.height = height + 'px';
         viewport && viewport.refresh();
     }
+
+
+    var converter = {
+
+        collapse: function(figures) {
+            var res = [], item;
+            for(var i=0; i<figures.length; i++) {
+                item.type = figures[i].type;
+                if(item.type == 'point') {
+                    item.x = figures[i].points[0].x;
+                    item.y = figures[i].points[0].y;
+                } else {
+                    item.points = figures[i].points.slice();
+                }
+                res.push(item);
+            }
+            return res;
+        },
+
+
+        expand: function(figures) {
+            var res = [], item;
+            for(var i=0; i<figures.length; i++) {
+                item.type = figures[i].type;
+                item.tag = '';
+                item.name = '';
+                if(item.type == 'point') {
+                    item.points = {
+                        x: figures[i].x,
+                        y: figures[i].y
+                    }
+                } else {
+                    item.points = figures[i].points.slice();
+                }
+                res.push(item);
+            }
+            return res;            
+        }
+
+    }
     
 
     // main 
@@ -1128,6 +1168,8 @@ function Map2D(params) {
         diff: function(target, silent) {
             return diff(image, target, silent);
         },
+
+        converter: converter,
 
         destroy: function() {
             destroyed = true;
