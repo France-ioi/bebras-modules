@@ -35,7 +35,7 @@ function Map2D(params) {
             save: 'Save',
             cancel: 'Cancel'
         },
-        tags: []
+        tags: ['']
     }
     params = Object.assign({}, defaults, params);
 
@@ -141,10 +141,9 @@ function Map2D(params) {
             e.preventDefault();
             changeZoom(-1);
         });
-        wrapper.appendChild(
-            createElement('div', 'zoom', [zoom_in, zoom_out])
-        );
-        
+        var holder = createElement('div', 'zoom', [zoom_in, zoom_out]);
+        wrapper.appendChild(holder);
+       
         refresh();
 
 
@@ -173,7 +172,11 @@ function Map2D(params) {
             
             startDrag: startDrag,
             handleDrag: handleDrag,
-            stopDrag: stopDrag
+            stopDrag: stopDrag,
+
+            destroy: function() {
+                wrapper && wrapper.removeChild(holder);
+            }
         }
     }
 
@@ -1010,17 +1013,17 @@ function Map2D(params) {
         })();
 
 
-        //debug.setSize({ width: image.width, height: image.height});
+        debug.setSize({ width: image.width, height: image.height});
         var res = true;
         for(var i=0; i<params.tags.length; i++) {
             var figures = filterFiguresByTag(target.figures, params.tags[i]);
             var target_mask = createMask(figures, target.bias);
-            //debug.displayMask('target_mask ' + params.tags[i], target_mask)
+            debug.displayMask('target_mask ' + params.tags[i], target_mask)
             var target_drawing = createMask(figures, 1);
-            //debug.displayMask('target_drawing ' + params.tags[i], target_drawing)
+            debug.displayMask('target_drawing ' + params.tags[i], target_drawing)
             var figures = filterFiguresByTag(editor_figures, params.tags[i], true);
             var editor_drawing = createMask(figures, 1);
-            //debug.displayMask('editor_drawing ' + params.tags[i], editor_drawing)
+            debug.displayMask('editor_drawing ' + params.tags[i], editor_drawing)
             for(var j=0; j<editor_drawing.length; j++) {
                 // check extra pixels in restricted area
                 if(editor_drawing[j] != 0 && target_mask[j] == 0) {
@@ -1066,7 +1069,7 @@ function Map2D(params) {
 
     // main 
 
-    var loaded = false;
+    var destroyed = false;
     var viewport;
     var map;
     var editor;
@@ -1090,6 +1093,9 @@ function Map2D(params) {
     }    
 
     loadImage(params.url, function() {
+        if(destroyed) {
+            return;
+        }
         onResize();
         if(!params.width && !params.height) {
             window.addEventListener('resize', onResize, false);
@@ -1100,7 +1106,6 @@ function Map2D(params) {
         viewport = Viewport(image);
         mouse_events = MouseEventsHandler();        
         onResize();
-        loaded = true;
         params.onLoad && params.onLoad();
     })
 
@@ -1120,11 +1125,11 @@ function Map2D(params) {
         },
 
         destroy: function() {
-            if(loaded) {
-                map.destroy();
-                editor.destroy();
-                viewport.destroy();
-            }
+            destroyed = true;
+            map && map.destroy();
+            editor && editor.destroy();
+            viewport && viewport.destroy();
+            wrapper.parentNode && wrapper.parentNode.removeChild(wrapper);
             if(!params.width && !params.height) {
                 window.removeEventListener('resize', onResize);
             }            
@@ -1138,6 +1143,7 @@ function Map2D(params) {
 
 debug = {
 
+    //enabled: true,
     wrapper: false,
 
     setSize: function(size) {
@@ -1185,6 +1191,9 @@ debug = {
     },
  
     displayMask: function(title, mask) {
+        if(!this.enabled) {
+            return;
+        }        
         var canvas = this.createCanvas(title);
         var context2d = canvas.getContext('2d');
 
@@ -1210,6 +1219,9 @@ debug = {
     },
 
     displayCanvas: function(title, canvas) {
+        if(!this.enabled) {
+            return;
+        }
         this.addTitle(title);
 
         var image = new Image();
