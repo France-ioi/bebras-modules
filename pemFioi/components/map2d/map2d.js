@@ -623,6 +623,7 @@ function Map2D(params) {
 
 
         function handleClick(point) {
+            marker.set(false);
             point = normalizePoint(point);
             if(point.x < 0 || point.x > image.width || point.y < 0 || point.y > image.height) {
                 return;
@@ -654,6 +655,7 @@ function Map2D(params) {
         var drag;
 
         function startDrag(point) {
+            marker.set(false);
             point = normalizePoint(point);
             drag = {
                 figure: findFigure(point),
