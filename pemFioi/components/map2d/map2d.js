@@ -911,7 +911,7 @@ function Map2D(params) {
 
 
     // comparator
-    function diff(image, target) {
+    function diff(image, target, silent) {
         var editor_figures = editor.getFigures();
         var canvas = createElement('canvas', 'editor');
         canvas.width = image.width;
@@ -986,6 +986,9 @@ function Map2D(params) {
 
 
         function displayMistake(ofs, type) {
+            if(silent) {
+                return;
+            }
             var point = {
                 x: ofs % image.width, 
                 y: Math.floor(ofs / image.width)
@@ -1122,8 +1125,8 @@ function Map2D(params) {
             editor && editor.setFigures(figures);
         },        
 
-        diff: function(target) {
-            return diff(image, target);
+        diff: function(target, silent) {
+            return diff(image, target, silent);
         },
 
         destroy: function() {
