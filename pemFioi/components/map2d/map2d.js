@@ -685,7 +685,7 @@ function Map2D(params) {
 
         var marker = {
             
-            data: null, // { point: ..., type: 'extra' || 'missed' }
+            data: null, // { point: ..., type: 'extra' || 'miss' }
 
             set: function(point, type) {
                 if(point) {
@@ -1178,6 +1178,10 @@ function Map2D(params) {
         },
 
         converter: converter,
+
+        resetMarker: function() {
+            editor && editor.setMarker(false);
+        },
 
         destroy: function() {
             destroyed = true;
