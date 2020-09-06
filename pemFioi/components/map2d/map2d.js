@@ -925,18 +925,21 @@ function Map2D(params) {
         canvas.width = image.width;
         canvas.height = image.height;
         var context2d = canvas.getContext('2d');
-
         var color = '#FF0000';
+
+
+        function drawPoint(point, size) {
+            context2d.beginPath();                
+            context2d.arc(point.x, point.y, size, 0, 2 * Math.PI);
+            context2d.closePath();
+            context2d.fill();                            
+        }
 
 
         var shapes = {
 
             point: function(points, size) {
-                context2d.beginPath();                
-                context2d.arc(points[0].x, points[0].y, size / 2, 0, 2 * Math.PI);
-                context2d.closePath();
-                context2d.stroke();
-                context2d.fill();                
+                drawPoint(points[0], size);
             },
 
             line: function(points, size) {
@@ -946,6 +949,9 @@ function Map2D(params) {
                     context2d.lineTo(points[i].x, points[i].y);        
                 }
                 context2d.stroke();
+                for(var i=0; i<points.length; i++) {
+                    drawPoint(points[i], size);
+                }
             },
 
             area: function(points, size) {
@@ -957,6 +963,9 @@ function Map2D(params) {
                 context2d.closePath();
                 context2d.stroke();
                 context2d.fill();
+                for(var i=0; i<points.length; i++) {
+                    drawPoint(points[i], size);
+                }                
             }
         }
 
@@ -966,7 +975,7 @@ function Map2D(params) {
             context2d.clearRect(0, 0, image.width, image.height);
             context2d.strokeStyle = color;
             context2d.fillStyle = color;  
-            context2d.lineWidth = bias * 2;            
+            context2d.lineWidth = bias * 2;                 
             for(var i=0; i<figures.length; i++) {
                 shapes[figures[i].type](figures[i].points, bias);
             }
