@@ -248,24 +248,16 @@ function Map2D(params) {
             buttons[name].className = diabled ? 'button button-disabled' : 'button';
         }
 
-        var type;
-        function setType(new_type) {
-            if(new_type !== type) {
-                type = new_type;
-                handlers.onTypeChange(type);            
-            }
-        }
-
 
         var commands = {
             point: function() {
-                setType('point');
+                handlers.onTypeChange('point');
             },
             line: function() {
-                setType('line');
+                handlers.onTypeChange('line');
             },
             area: function() {
-                setType('area');
+                handlers.onTypeChange('area');
             },
             delete: handlers.onDelete,
             undo: handlers.onUndo,
@@ -764,6 +756,13 @@ function Map2D(params) {
                 draw();
             },
 
+            refresh: function() {
+                data.pointer = null;
+                data.type = null;
+                selection.set(false);
+                refreshToolbar();
+            },
+
             setMarker: function(point, type) {
                 marker.set(point, type);
             },
@@ -1183,6 +1182,7 @@ function Map2D(params) {
         },        
 
         diff: function(target, silent) {
+            editor && editor.refresh();
             return diff(image, target, silent);
         },
 
