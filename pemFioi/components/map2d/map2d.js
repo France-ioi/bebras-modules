@@ -699,21 +699,29 @@ function Map2D(params) {
                 draw();
             },
 
+            markerRenderer: function(context2d, point, type, scale) {
+                context2d.strokeStyle = params.styles.marker_color;
+                context2d.lineWidth = params.styles.line_width / scale;                
+                var s = 0.5 * params.styles.marker_size / scale;                
+                context2d.beginPath();                
+                if(type == 'extra') {
+                    context2d.arc(point.x, point.y, s, 0, 2 * Math.PI);
+                } else if(type == 'miss') {
+                    context2d.rect(point.x - s, point.y - s, 2 * s, 2 * s);
+                }
+                context2d.closePath();
+                context2d.stroke();
+            },
+
             draw: function() {
                 if(!this.data) {
                     return;
                 }
-                context2d.strokeStyle = params.styles.marker_color;
-                context2d.lineWidth = params.styles.line_width / bounds.scale;                
-                var s = 0.5 * params.styles.marker_size / bounds.scale;                
-                context2d.beginPath();                
-                if(this.data.type == 'extra') {
-                    context2d.arc(this.data.point.x, this.data.point.y, s, 0, 2 * Math.PI);
-                } else if(this.data.type == 'miss') {
-                    context2d.rect(this.data.point.x - s, this.data.point.y - s, 2 * s, 2 * s);
+                if(params.markerRenderer) {
+                    params.markerRenderer(context2d, this.data.point, this.data.type, bounds.scale);
+                } else {
+                    this.markerRenderer(context2d, this.data.point, this.data.type, bounds.scale);
                 }
-                context2d.closePath();
-                context2d.stroke();
             }
         }
 
