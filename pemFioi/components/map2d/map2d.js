@@ -7,6 +7,7 @@ function Map2D(params) {
         zoom: 0,
         max_zoom: 1,
         min_zoom: -2,
+        simple_mode: false,
         styles: {
             point_radius: 6,
             line_width: 3,
@@ -38,7 +39,10 @@ function Map2D(params) {
         tags: ['']
     }
     params = Object.assign({}, defaults, params);
-
+    
+    if(params.figures && params.simple_mode) {
+        params.figures = converter.expand(params.figures);
+    }
 
     // system
     function createElement(tag, className, content) {
@@ -214,30 +218,40 @@ function Map2D(params) {
 
     // Editor toolbar
     function Toolbar(handlers) {
-        var buttons = {
-            point: createElement('div', 'button', params.strings.point),
-            line: createElement('div', 'button', params.strings.line),
-            area: createElement('div', 'button', params.strings.area),
-            delete: createElement('div', 'button', params.strings.delete),
-            undo: createElement('div', 'button', params.strings.undo),
-            redo: createElement('div', 'button', params.strings.redo)
+
+        var holder;
+        var buttons = {}
+
+        if(!params.simple_mode) {
+            buttons = {
+                point: createElement('div', 'button', params.strings.point),
+                line: createElement('div', 'button', params.strings.line),
+                area: createElement('div', 'button', params.strings.area),
+                delete: createElement('div', 'button', params.strings.delete),
+                undo: createElement('div', 'button', params.strings.undo),
+                redo: createElement('div', 'button', params.strings.redo)
+            }
+    
+            holder = createElement('div', 'toolbar', [
+                createElement('div', 'group', [
+                    buttons.point,
+                    buttons.line,
+                    buttons.area
+                ]),
+                createElement('div', 'group', [
+                    buttons.delete,
+                    buttons.undo,
+                    buttons.redo
+                ])
+            ]);
+            wrapper.appendChild(holder);
         }
 
-        var holder = createElement('div', 'toolbar', [
-            createElement('div', 'group', [
-                buttons.point,
-                buttons.line,
-                buttons.area
-            ]),
-            createElement('div', 'group', [
-                buttons.delete,
-                buttons.undo,
-                buttons.redo
-            ])
-        ]);
-        wrapper.appendChild(holder);
 
         function selectButton(name) {
+            if(params.simple_mode) {
+                return;
+            }
             var names = ['point', 'line', 'area'];
             for(var i=0; i < names.length; i++) {        
                 buttons[names[i]].className = names[i] === name ? 'button button-selected' : 'button';
@@ -245,6 +259,9 @@ function Map2D(params) {
         }
 
         function disableButton(name, diabled) {
+            if(params.simple_mode) {
+                return;
+            }
             buttons[name].className = diabled ? 'button button-disabled' : 'button';
         }
 
@@ -280,7 +297,7 @@ function Map2D(params) {
             disableButton: disableButton,
 
             destroy: function() {
-                wrapper.removeChild(holder);
+                holder && holder.parentNode.removeChild(holder);
             }
         }
     }
@@ -1109,9 +1126,11 @@ function Map2D(params) {
         expand: function(figures) {
             var res = [], item;
             for(var i=0; i<figures.length; i++) {
-                item.type = figures[i].type;
-                item.tag = '';
-                item.name = '';
+                item = {
+                    type: figures[i].type,
+                    tag: '',
+                    name: ''
+                }
                 if(item.type == 'point') {
                     item.points = {
                         x: figures[i].x,
@@ -1174,19 +1193,29 @@ function Map2D(params) {
     return {
 
         getFigures: function() {
-            return editor ? editor.getFigures() : null;
+            if(!editor) {
+                return [];
+            }
+            var figures = editor.getFigures();
+            if(params.simple_mode) {
+                figures = converter.collapse(figures);            
+            }
+            return figures;
         },
 
         setFigures: function(figures) {
-            editor && editor.setFigures(figures);
+            if(editor) {
+                if(params.simple_mode) {
+                    figures = converter.expand(figures);                        
+                }
+                editor.setFigures(figures);                
+            }
         },        
 
         diff: function(target, silent) {
             editor && editor.refresh();
             return diff(image, target, silent);
         },
-
-        converter: converter,
 
         resetMarker: function() {
             editor && editor.setMarker(false);
