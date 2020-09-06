@@ -1,6 +1,5 @@
 function Map2D(params) {
 
-
     var defaults = {
         width: false,
         height: false,
@@ -42,6 +41,7 @@ function Map2D(params) {
     
     if(params.figures && params.simple_mode) {
         params.figures = converter.expand(params.figures);
+        params.tags = [''];
     }
 
     // system
@@ -222,32 +222,7 @@ function Map2D(params) {
         var holder;
         var buttons = {}
 
-        if(!params.simple_mode) {
-            buttons = {
-                point: createElement('div', 'button', params.strings.point),
-                line: createElement('div', 'button', params.strings.line),
-                area: createElement('div', 'button', params.strings.area),
-                delete: createElement('div', 'button', params.strings.delete),
-                undo: createElement('div', 'button', params.strings.undo),
-                redo: createElement('div', 'button', params.strings.redo)
-            }
-    
-            holder = createElement('div', 'toolbar', [
-                createElement('div', 'group', [
-                    buttons.point,
-                    buttons.line,
-                    buttons.area
-                ]),
-                createElement('div', 'group', [
-                    buttons.delete,
-                    buttons.undo,
-                    buttons.redo
-                ])
-            ]);
-            wrapper.appendChild(holder);
-        }
-
-
+        
         function selectButton(name) {
             if(params.simple_mode) {
                 return;
@@ -281,15 +256,41 @@ function Map2D(params) {
             redo: handlers.onRedo
         }
 
-        for(var name in commands) {
-            buttons[name].addEventListener('click', (function(name) {
-                return function(e) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    commands[name]();
-                }
-            })(name));
-        }
+        if(!params.simple_mode) {
+            buttons = {
+                point: createElement('div', 'button', params.strings.point),
+                line: createElement('div', 'button', params.strings.line),
+                area: createElement('div', 'button', params.strings.area),
+                delete: createElement('div', 'button', params.strings.delete),
+                undo: createElement('div', 'button', params.strings.undo),
+                redo: createElement('div', 'button', params.strings.redo)
+            }
+    
+            holder = createElement('div', 'toolbar', [
+                createElement('div', 'group', [
+                    buttons.point,
+                    buttons.line,
+                    buttons.area
+                ]),
+                createElement('div', 'group', [
+                    buttons.delete,
+                    buttons.undo,
+                    buttons.redo
+                ])
+            ]);
+            wrapper.appendChild(holder);
+
+            for(var name in commands) {
+                buttons[name].addEventListener('click', (function(name) {
+                    return function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        commands[name]();
+                    }
+                })(name));
+            }            
+        }        
+
 
         return {
             selectButton: selectButton,
@@ -1132,10 +1133,10 @@ function Map2D(params) {
                     name: ''
                 }
                 if(item.type == 'point') {
-                    item.points = {
+                    item.points = [{
                         x: figures[i].x,
                         y: figures[i].y
-                    }
+                    }]
                 } else {
                     item.points = figures[i].points.slice();
                 }
@@ -1214,6 +1215,9 @@ function Map2D(params) {
 
         diff: function(target, silent) {
             editor && editor.refresh();
+            if(params.simple_mode) {
+                target.figures = converter.expand(target.figures);
+            }            
             return diff(image, target, silent);
         },
 
