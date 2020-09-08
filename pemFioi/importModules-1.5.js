@@ -59,7 +59,8 @@
          'blockly_fr': {src: modulesPath+"/ext/blockly/fr.js", id: "blockly_fr"},
          'blockly_en': {src: modulesPath+"/ext/blockly/en.js", id: "blockly_en"},
          'blockly_de': {src: modulesPath+"/ext/blockly/de.js", id: "blockly_de"},
-         'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},         'blockly_it': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_it"},
+         'blockly_es': {src: modulesPath+"/ext/blockly/es.js", id: "blockly_es"},
+         'blockly_it': {src: modulesPath+"/ext/blockly/it.js", id: "blockly_it"},
          'blockly_sl': {src: modulesPath+"/ext/blockly/sl.js", id: "blockly_sl"},
          'blockly_fioi': {src: modulesPath+"/ext/blockly-fioi/fioi-blockly.min.js", id: "blockly_fioi"},
 
