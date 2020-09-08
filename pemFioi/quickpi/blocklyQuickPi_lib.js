@@ -1676,11 +1676,15 @@ var getContext = function (display, infos, curLevel) {
             }
         ];
 
-        var conceptIndex = 'quickpi.html';
-        if(window.stringsLanguage == 'es') { conceptIndex = 'quickpi_es.html'; }
+        if(window.stringsLanguage == 'fr' || !strings.concepts) {
+            var conceptStrings = quickPiLocalLanguageStrings.fr.concepts;
+            var conceptIndex = 'quickpi.html';
+        } else {
+            var conceptStrings = strings.concepts;
+            var conceptIndex = 'quickpi_' + window.stringsLanguage + '.html';
+        }
         var conceptBaseUrl = 'https://static4.castor-informatique.fr/help/'+conceptIndex;
 
-        var conceptStrings = strings.concepts ? strings.concepts : quickPiLocalLanguageStrings.fr.concepts;
         for(var i = 0; i < quickPiConceptList.length; i++) {
             var concept = quickPiConceptList[i];
             concept.name = conceptStrings[concept.id];
