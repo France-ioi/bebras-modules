@@ -16,11 +16,18 @@ function Map2D(params) {
             selection_color: '#CC3333',
             text_color: '#FFFFFF',
             text_outline: '#000000',
-            marker_color: '#FF0000',
-            marker_size: 30,
             font: {
                 size: 14,
                 face: 'sans'
+            },
+            mistake: {
+                color: '#FF0000',
+                size: 30
+            },
+            marker: {
+                color: '#3366FF',
+                radius: 15,
+                line_width: 5
             }
         },
         strings: {
@@ -353,6 +360,7 @@ function Map2D(params) {
     }
 
 
+
     // Drawing editor layer
     function Editor(image) {
 
@@ -479,7 +487,8 @@ function Map2D(params) {
                 shapes[data.figures[i].type](data.figures[i].points);
                 drawFigureName(data.figures[i]);
             }
-            marker.draw();
+            mistake.draw();
+            markers.draw();
         }
 
 
@@ -633,7 +642,7 @@ function Map2D(params) {
 
 
         function handleClick(point) {
-            marker.set(false);
+            mistake.set(false);
             point = normalizePoint(point);
             if(point.x < 0 || point.x > image.width || point.y < 0 || point.y > image.height) {
                 return;
@@ -665,7 +674,7 @@ function Map2D(params) {
         var drag;
 
         function startDrag(point) {
-            marker.set(false);
+            mistake.set(false);
             point = normalizePoint(point);
             drag = {
                 figure: findFigure(point),
@@ -691,9 +700,7 @@ function Map2D(params) {
         }
 
 
-        refreshToolbar();
-
-        var marker = {
+        var mistake = {
             
             data: null, // { point: ..., type: 'extra' || 'miss' }
 
@@ -709,31 +716,61 @@ function Map2D(params) {
                 draw();
             },
 
-            markerRenderer: function(context2d, point, type, scale) {
-                context2d.strokeStyle = params.styles.marker_color;
-                context2d.lineWidth = params.styles.line_width / scale;                
-                var s = 0.5 * params.styles.marker_size / scale;                
-                context2d.beginPath();                
-                if(type == 'extra') {
-                    context2d.arc(point.x, point.y, s, 0, 2 * Math.PI);
-                } else if(type == 'miss') {
-                    context2d.rect(point.x - s, point.y - s, 2 * s, 2 * s);
-                }
-                context2d.closePath();
-                context2d.stroke();
-            },
-
             draw: function() {
                 if(!this.data) {
                     return;
                 }
-                if(params.markerRenderer) {
-                    params.markerRenderer(context2d, this.data.point, this.data.type, bounds.scale);
-                } else {
-                    this.markerRenderer(context2d, this.data.point, this.data.type, bounds.scale);
+                context2d.strokeStyle = params.styles.mistake.color;
+                context2d.lineWidth = params.styles.line_width / bounds.scale;                
+                var s = 0.5 * params.styles.mistake.size / bounds.scale;                
+                context2d.beginPath();                
+                if(this.data.type == 'extra') {
+                    context2d.arc(this.data.point.x, this.data.point.y, s, 0, 2 * Math.PI);
+                } else if(this.data.type == 'miss') {
+                    context2d.rect(this.data.point.x - s, this.data.point.y - s, 2 * s, 2 * s);
                 }
+                context2d.closePath();
+                context2d.stroke();                
             }
         }
+
+
+        var markers = {
+
+            data: [],
+
+            renderMarker: function(data) {
+                context2d.strokeStyle = data.color || params.styles.marker.color;
+                context2d.lineWidth = (data.line_width || params.styles.marker.line_width) / bounds.scale;                
+                context2d.beginPath();                
+                context2d.arc(
+                    data.x, 
+                    data.y, 
+                    (data.radius || params.styles.marker.radius) / bounds.scale, 
+                    0, 
+                    2 * Math.PI
+                );
+                context2d.closePath();
+                context2d.stroke();                
+            },
+
+            draw: function() {
+                for(var i=0; i<this.data.length; i++) {
+                    this.renderMarker(this.data[i]);
+                }
+            },
+
+            add: function(data) {
+                this.data.push(data);
+            },
+
+            clear: function() {
+                this.data = [];
+            }
+        }
+
+
+        refreshToolbar();
 
         return {
             setBounds: setBounds,
@@ -781,8 +818,18 @@ function Map2D(params) {
                 refreshToolbar();
             },
 
-            setMarker: function(point, type) {
-                marker.set(point, type);
+            setMistake: function(point, type) {
+                mistake.set(point, type);
+            },
+
+            addMarker: function(data) {
+                markers.add(data);
+                draw();
+            },
+
+            clearMarkers: function() {
+                markers.clear();
+                draw();
             },
 
             destroy: function() {
@@ -1027,7 +1074,7 @@ function Map2D(params) {
                 x: ofs % image.width, 
                 y: Math.floor(ofs / image.width)
             }
-            editor.setMarker(point, type);
+            editor.setMistake(point, type);
         }
 
 
@@ -1144,8 +1191,12 @@ function Map2D(params) {
             }
             return res;            
         }
-
     }
+
+
+    // marker
+
+    
     
 
     // main 
@@ -1213,16 +1264,20 @@ function Map2D(params) {
             }
         },        
 
+        addMarker: function(data) {
+            editor && editor.addMarker(data);
+        },
+
+        clearMarkers: function() {                    
+            editor && editor.clearMarkers();
+        },
+
         diff: function(target, silent) {
             editor && editor.refresh();
             if(params.simple_mode) {
                 target.figures = converter.expand(target.figures);
             }            
             return diff(image, target, silent);
-        },
-
-        resetMarker: function() {
-            editor && editor.setMarker(false);
         },
 
         destroy: function() {
@@ -1238,7 +1293,6 @@ function Map2D(params) {
     }
 
 }
-
 
 
 

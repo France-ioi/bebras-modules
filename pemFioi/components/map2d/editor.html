@@ -114,8 +114,30 @@
                 ],
                 onEdit: function(figures) {
                     document.getElementById('json').value = JSON.stringify(figures); //JSON.stringify(figures, false, 4)
+                },
+                onLoad: function() {
+                    /*
+                    map2d.addMarker({ 
+                        x: 50, 
+                        y: 50, 
+                        color: '#FF0000', 
+                        radius: 30,
+                        line_width: 5
+                    });
+
+                    map2d.addMarker({ 
+                        x: 150, 
+                        y: 50
+                    });                                
+
+                    setTimeout(function() {
+                        map2d.clearMarkers();
+                    }, 2000)
+                    */
                 }
             });
+
+
         </script>
     </body>
 </html>
