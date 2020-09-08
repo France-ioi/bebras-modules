@@ -68,6 +68,15 @@ function Map2D(params) {
     }
 
 
+    function addEventListener(obj, evt, handler) {
+        if(obj.addEventListener) {
+            obj.addEventListener(evt, handler, false);
+        } else if(obj.attachEvent) {
+            return obj.attachEvent('on' + evt, handler);
+        }        
+    }
+
+
     var wrapper = createElement('div', 'map2d');
     params.parent.appendChild(wrapper);
 
@@ -141,13 +150,13 @@ function Map2D(params) {
         
         // zoom controls
         var zoom_in = createElement('div', 'button', '+');
-        zoom_in.addEventListener('click', function(e) {
+        addEventListener(zoom_in, 'click', function(e) {
             e.stopPropagation();
             e.preventDefault();
             changeZoom(1);
         });
         var zoom_out = createElement('div', 'button', '-')
-        zoom_out.addEventListener('click', function(e) {
+        addEventListener(zoom_out, 'click', function(e) {
             e.stopPropagation();
             e.preventDefault();
             changeZoom(-1);
@@ -288,7 +297,7 @@ function Map2D(params) {
             wrapper.appendChild(holder);
 
             for(var name in commands) {
-                buttons[name].addEventListener('click', (function(name) {
+                addEventListener(buttons[name], 'click', (function(name) {
                     return function(e) {
                         e.stopPropagation();
                         e.preventDefault();
@@ -864,8 +873,8 @@ function Map2D(params) {
             }
             controls.name.type = 'input';
             
-            controls.save.addEventListener('click', save);
-            controls.cancel.addEventListener('click', function() {
+            addEventListener(controls.save, 'click', save);
+            addEventListener(controls.cancel, 'click', function() {
                 hide();
                 editor.clearSelection();
             });
@@ -938,7 +947,7 @@ function Map2D(params) {
 
         var drag_handler;
 
-        wrapper.addEventListener('mousedown', function(e) {
+        addEventListener(wrapper, 'mousedown', function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -951,7 +960,7 @@ function Map2D(params) {
             mouse_moved = false;
         });
 
-        wrapper.addEventListener('mousemove', function(e) {
+        addEventListener(wrapper, 'mousemove', function(e) {
             mouse_moved = true;
             if(drag_handler) {
                 var point = getRelativePoint(e);            
@@ -960,21 +969,21 @@ function Map2D(params) {
         });
 
 
-        wrapper.addEventListener('mouseup', function(e) {
+        addEventListener(wrapper, 'mouseup', function(e) {
             if(mouse_moved && drag_handler) {
                 drag_handler.stopDrag();
             }
             drag_handler = false;
         });
 
-        wrapper.addEventListener('mouseleave', function(e) {
+        addEventListener(wrapper, 'mouseleave', function(e) {
             if(mouse_moved && drag_handler) {
                 drag_handler.stopDrag();
             }
             drag_handler = false;
         });        
 
-        wrapper.addEventListener('click', function(e) {
+        addEventListener(wrapper, 'click', function(e) {
             if(!mouse_moved) {
                 editor.handleClick(getRelativePoint(e));
             }
@@ -1230,7 +1239,7 @@ function Map2D(params) {
         }
         onResize();
         if(!params.width && !params.height) {
-            window.addEventListener('resize', onResize, false);
+            addEventListener(window, 'resize', onResize);
         }                
         map = Map(image);
         editor = Editor(image);
