@@ -32,15 +32,15 @@ function Map2D(params) {
         },
         strings: {
             point: 'Point',
-            line: 'Line',
-            area: 'Area',
-            delete: 'Delete',
-            undo: 'Undo',
-            redo: 'Redo',
-            tag: 'Tag',
-            name: 'Name',
-            save: 'Save',
-            cancel: 'Cancel'
+            line: 'Ligne',
+            area: 'Zone',
+            delete: 'Supprimer',
+            undo: 'Annuler',
+            redo: 'Refaire',
+            tag: 'Type',
+            name: 'Nom',
+            save: 'Enregistrer',
+            cancel: 'Annuler'
         },
         tags: ['']
     }
