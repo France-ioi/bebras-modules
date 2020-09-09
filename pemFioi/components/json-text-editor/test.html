@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>JSON text editor test</title>
+        <!--
+        <link href="editor.css" rel="stylesheet">
+        -->
+        
+       
+            <script src="jsonlint.js"></script>
+       <!--
+        <script src="clarinet.js"></script>
+        -->
+        <script src="editor.js"></script>
+        <style>
+            html, 
+            body {
+                font: 14px sans;                
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }            
+            .column {
+                float: left;
+                width: 50%;
+            }
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            #output {
+                width: 99%;
+                height: 500px;
+            }
+        </style>        
+    </head>
+    <body>
+        <div class="row">
+            <div class="column" id="editor"></div>
+            <div class="column">
+                <textarea id="output"></textarea>                        
+            </div>
+        </div>
+        <script type="text/javascript">
+            var editor = JSONTextEditor({
+                parent: document.getElementById('editor'),
+                height: 500
+            });
+
+            editor.setContent([
+                { 
+                    type: 'point',
+                    x: 225, 
+                    y: 100
+                },
+                {
+                    type: 'line',
+                    points: [
+                        { x: 150, y: 200 },
+                        { x: 175, y: 225 },
+                        { x: 200, y: 200 },
+                        { x: 225, y: 225 },
+                        { x: 250, y: 200 }
+                    ]
+                },                
+                {
+                    type: 'line',
+                    points: [
+                        { x: 150, y: 200 },
+                        { x: 175, y: 225 },
+                        { x: 200, y: 200 },
+                        { x: 225, y: 225 },
+                        { x: 250, y: 200 }
+                    ]
+                },               
+            ])
+        </script>
+    </body>
+</html>
