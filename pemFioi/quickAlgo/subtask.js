@@ -48,6 +48,7 @@ var initBlocklySubTask = function(subTask, language) {
       if(!window.taskResultsCache[curLevel]) {
          window.taskResultsCache[curLevel] = {};
       }
+      window.modulesLanguage = subTask.blocklyHelper.language;
 
       this.level = curLevel;
 
