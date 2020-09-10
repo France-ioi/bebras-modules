@@ -344,38 +344,6 @@ var getContext = function(display, infos, curLevel) {
                 imported: []
             }
         });
-
-
-        /*
-        context.blocklyHelper.loadExample({
-            blockly: '<xml xmlns="http://www.w3.org/1999/xhtml"><block type="robot_start" id="xLC,-=/@KAQ[.hz?OV:h" deletable="false" movable="false" editable="false" x="0" y="0"><next><block type="displayTable" id="VdvCAZO?CsIU?U_arMsl"><value name="PARAM_0"><block type="loadTable" id="HbABJ+[UOm0O(0`[}+S7"><value name="PARAM_0"><shadow type="text" id="2QX-i)zyR}Znz+D/vI3R"><field name="TEXT">test_table</field></shadow></value></block></value></block></next></block></xml>'
-        });
-        */
-
-
-
-        //subTask.blocklyHelper.loadExample(exampleObj ? exampleObj : subTask.levelGridInfos.example);
-        /*
-                //test html render
-                setTimeout(function() {
-                    context.database.loadTable('test_table', function(table, callback) {
-                        context.database.displayTable(table, null, function() {
-                            context.expectTable('valid_table')
-                        });
-                    })
-                }, 1500);
-        */
-        /*
-                //test map render
-                setTimeout(function() {
-                    context.database.loadTable('valid_table3', function(table, callback) {
-                        context.database.displayTableOnMap(table, 'nom', 'longitude', 'latitude', function() {
-                            context.expectTable('valid_table3');
-                        });
-
-                    })
-                }, 500)
-        */
     }
 
 
@@ -416,13 +384,25 @@ var getContext = function(display, infos, curLevel) {
     }
 
 
+    var tables_cache = [null];
+    function saveTable(table) {
+        tables_cache.push(table);
+        return tables_cache.length - 1;
+    }
+    function loadTable(idx) {
+        return tables_cache[idx];
+    }
 
 
     context.database = {
 
         loadTable: function(name, callback) {
             if(!task_tables[name] || !task_tables[name].public) throw new Error(strings.messages.table_not_found + name);
-            context.waitDelay(callback, Table(task_tables[name].data));
+            var table = Table(task_tables[name].data);
+            context.waitDelay(
+                callback, 
+                saveTable(table)
+            );
             //callback(Table(task_tables[name].data));
         },
 
@@ -438,7 +418,7 @@ var getContext = function(display, infos, curLevel) {
             var types_arr = Array.prototype.slice.call(types);
             var cb = context.runner.waitCallback(callback);
             db_helper.loadCsv(file, types_arr, function(table) {
-                cb(table);
+                cb(saveTable(table));
             });
         },
 
@@ -447,21 +427,35 @@ var getContext = function(display, infos, curLevel) {
         },
 
         getRecords: function(table, callback) {
-            context.waitDelay(callback, table.getRecords());
+            context.waitDelay(
+                callback, 
+                loadTable(table).getRecords()
+            );
         },
 
         selectByColumn: function(table, columnName, value, callback) {
-            context.waitDelay(callback, table.selectByColumn(columnName, value));
+            var new_table = loadTable(table).selectByColumn(columnName, value);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         selectByFunction: function(table, filterFunction, callback) {
-            table.selectByFunction(filterFunction, function(val) {
-                context.waitDelay(callback, val);
+            loadTable(table).selectByFunction(filterFunction, function(new_table) {
+                context.waitDelay(
+                    callback, 
+                    saveTable(new_table)
+                );
             });
         },
 
         selectTopRows: function(table, amount, callback) {
-            context.waitDelay(callback, table.selectTopRows(amount));
+            var new_table = loadTable(table).selectTopRows(amount);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         getColumn: function(record, columnName, callback) {
@@ -473,39 +467,70 @@ var getContext = function(display, infos, curLevel) {
         },
 
         sortByColumn: function(table, columnName, direction, callback) {
-            context.waitDelay(callback, table.sortByColumn(columnName, direction));
+            var new_table = loadTable(table).sortByColumn(columnName, direction);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         sortByFunction: function(table, compareFunction, callback) {
-            table.sortByFunction(compareFunction, function(val) {
-                context.waitDelay(callback, val);
+            loadTable(table).sortByFunction(compareFunction, function(new_table) {
+                context.waitDelay(
+                    callback, 
+                    saveTable(new_table)
+                );
             });
         },
 
         selectColumns: function(table, columns, callback) {
-            context.waitDelay(callback, table.selectColumns(columns));
+            var new_table = loadTable(table).selectColumns(columns)
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         joinTables: function(table1, column1, table2, column2, type, callback) {
-            context.waitDelay(callback, table1.join(column1, table2, column2, type));
+            var new_table = loadTable(table1).join(column1, loadTable(table2), column2, type);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         displayTable: function(table, callback) {
-            if (Array.isArray(table)) {table = db_helper.listToTable(table);}
+            if(Array.isArray(table)) {
+                table = db_helper.listToTable(table);
+            } else {
+                table = loadTable(table);
+            }
             db_helper.displayTable(table, context.display);
             context.waitDelay(callback);
         },
 
         updateWhere: function(table, filterFunction, updateFunction, callback) {
-            context.waitDelay(callback, table.updateWhere(filterFunction, updateFunction));
+            var new_table = loadTable(table).updateWhere(filterFunction, updateFunction);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         insertRecord: function(table, record, callback) {
-            context.waitDelay(callback, table.insertRecord(record));
+            var new_table = loadTable(table).insertRecord(record);
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         unionTables: function(table1, table2, callback) {
-            context.waitDelay(callback, table1.union(table2));
+            var new_table = loadTable(table1).union(loadTable(table2))
+            context.waitDelay(
+                callback, 
+                saveTable(new_table)
+            );
         },
 
         displayRecord: function(record, callback) {
@@ -525,7 +550,7 @@ var getContext = function(display, infos, curLevel) {
 
         displayTableOnMap: function(table, nameColumn, longitudeColumn, latitudeColumn, callback) {
             db_helper.displayTableOnMap(
-                table.selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
+                loadTable(table).selectColumns([nameColumn, longitudeColumn, latitudeColumn]),
                 context.display
             );
             context.waitDelay(callback);
@@ -537,7 +562,12 @@ var getContext = function(display, infos, curLevel) {
         },
 
         displayTableOnGraph: function(table, nameColumn, minY, maxY, type, callback) {
-            if (Array.isArray(table)) {table = db_helper.listToTable(table);nameColumn = 'value';}
+            if (Array.isArray(table)) {
+                table = db_helper.listToTable(table);
+                nameColumn = 'value';
+            } else {
+                table = loadTable(table);
+            }
             db_helper.displayTableOnGraph(
                 table.selectColumns([nameColumn]),
                 minY,maxY,type,context.display
@@ -546,7 +576,13 @@ var getContext = function(display, infos, curLevel) {
         },
 
         displayTablesOnGraph: function(table, nameColumn1, minX, maxX, nameColumn2, minY, maxY, callback) {
-            if (Array.isArray(table)) {table = db_helper.listToTable(table);nameColumn1 = 'index';nameColumn2 = 'value';}
+            if (Array.isArray(table)) {
+                table = db_helper.listToTable(table);
+                nameColumn1 = 'index';
+                nameColumn2 = 'value';
+            } else {
+                table = loadTable(table);
+            }
             db_helper.displayTablesOnGraph(
                 table.selectColumns([nameColumn1,nameColumn2]),
                 minX, maxX, minY, maxY
