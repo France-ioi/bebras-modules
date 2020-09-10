@@ -87,6 +87,7 @@ var getContext = function(display, infos, curLevel) {
 
     context.reset = function(taskInfos) {
         var grid = $('#grid');
+        
         if(context.display) {
             grid.empty();
         }
@@ -140,6 +141,9 @@ var getContext = function(display, infos, curLevel) {
             } else {
                 context.userDisplay.clear();
             }
+        } else {
+            context.stringDisplay.reset();
+            context.userDisplay.reset();
         }
 
     }

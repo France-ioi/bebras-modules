@@ -125,9 +125,14 @@ function CanvasTooltip(params) {
             this.hide();
             return;
         }
-
         var col = Math.floor(x / this.bounds.scale);
+        if(isNaN(col)) {
+            return;
+        }
         var row = Math.floor(y / this.bounds.scale);
+        if(isNaN(row)) {
+            return;
+        }        
         var luminocity = params.getPixelLuminosity(col, row);
 
         this.render();
@@ -161,6 +166,7 @@ function BarcodeDisplay(params) {
     var cursor;
     var grid;
     var tooltip;
+    var display;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -301,6 +307,7 @@ function UserDisplay(params) {
     var cursor;
     var grid;
     var tooltip;
+    var valid_result;
 
     function init(new_parent, new_display) {
         parent = new_parent;
@@ -335,7 +342,7 @@ function UserDisplay(params) {
     }
 
 
-    function render(valid_result) {
+    function render() {
         if(!pixels || w == 0 || !data_size) {
             return;
         }
@@ -426,8 +433,12 @@ function UserDisplay(params) {
         },
 
         setSize: function(new_data_size) {
+            var l = new_data_size.width * new_data_size.height
+            if(pixels.length == l) {
+                return;
+            }            
             data_size = new_data_size;
-            pixels = new Array(data_size.width * data_size.height).fill(255)
+            pixels = new Array(l).fill(255)
             render();
         },
 
@@ -440,8 +451,17 @@ function UserDisplay(params) {
 
         render: render,
 
-        diff: function(valid_result) {
-            return render(valid_result);
+        diff: function(new_valid_result) {
+            valid_result = new_valid_result;
+            return render();
+        },
+
+        reset: function() {
+            if(data_size) {
+                pixels = new Array(data_size.width * data_size.height).fill(255)
+            }
+            valid_result = null;
+            render();
         }
     }
 }
@@ -458,7 +478,7 @@ function StringDisplay(params) {
 
     function init(parent, new_display) {
         display = new_display;
-        data = '';
+        //data = '';
         if(!display) {
             return;
         }
@@ -466,6 +486,7 @@ function StringDisplay(params) {
         wrapper = $('<div><span>' + params.strings.messages.result + '</span> </div>');
         wrapper.append(element).hide();
         parent.append(wrapper);
+        render();
     }
 
 
@@ -474,12 +495,13 @@ function StringDisplay(params) {
     }
 
 
-    function render(html) {
+    function render() {
         if(!display) {
             return;
         }
-        wrapper.toggle(data != '');
-        element.html(html);
+        var visible = data != '' || diff != '';
+        wrapper.toggle(visible);
+        element.html(diff == '' ? data : diff);
     }
 
 
@@ -489,9 +511,8 @@ function StringDisplay(params) {
 
 
         setData: function(str) {
-            str = '' + str;
-            data = str;
-            render(str);
+            data = '' + str;
+            render();
         },
 
 
@@ -514,11 +535,17 @@ function StringDisplay(params) {
                     diff += data[i];
                 }
             }
-            render(diff);
+            render();
             return {
                 success: valid,
                 message: valid ? params.strings.messages.success : params.strings.messages.mistake_digit
             }
+        },
+
+        reset: function() {
+            diff = '';
+            data = '';
+            render();
         }
     }
 
