@@ -1,7 +1,7 @@
 var jsonlint = (function () {
 
     function ParserException(message, metadata) {
-        const error = new Error(message);
+        var error = new Error(message);
         error.metadata = metadata;
         return error;
     }
