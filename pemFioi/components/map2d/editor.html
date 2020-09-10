@@ -41,81 +41,93 @@
         <textarea id="json"></textarea>
 
         <script>
+            var figures = [
+                { 
+                    type: 'point',
+                    points: [
+                        { x: 225, y: 50 }
+                    ],
+                    name: 'Point 1',
+                    tag: 'Tag 1'
+                },
+                { 
+                    type: 'point',
+                    points: [
+                        { x: 225, y: 75 }
+                    ],
+                    name: 'Point 2',
+                    tag: 'Tag 1'
+                },
+                { 
+                    type: 'point',
+                    points: [
+                        { x: 225, y: 100 }
+                    ],
+                    name: 'Point 3',
+                    tag: 'Tag 1'
+                },
+                {
+                    type: 'line',
+                    points: [
+                        { x: 150, y: 200 },
+                        { x: 175, y: 225 },
+                        { x: 200, y: 200 },
+                        { x: 225, y: 225 },
+                        { x: 250, y: 200 }
+                    ],
+                    name: 'Line 1',
+                    tag: 'Tag 2'
+                },
+                {
+                    type: 'area',
+                    points: [
+                        { x: 100, y: 125 },
+                        { x: 125, y: 150 },
+                        { x: 150, y: 150 },
+                        { x: 175, y: 125 },
+                    ],
+                    name: 'Area 1',
+                    tag: 'Tag 3'
+                },
+                {
+                    type: 'area',
+                    points: [
+                        { x: 300, y: 125 },
+                        { x: 300, y: 150 },
+                        { x: 350, y: 150 },
+                        { x: 350, y: 125 },
+                    ],
+                    name: 'Area 2',
+                    tag: 'Tag 3'
+                }
+            ];
+
+
             var map2d = Map2D({
                 parent: document.getElementById('map'),
                 url: 'map.jpg',
                 zoom: 1,
-
+                figures: figures,
                 tags: [
                     'Tag 1',
                     'Tag 2',
                     'Tag 3'
                 ],
-
-                figures: [
-                    { 
-                        type: 'point',
-                        points: [
-                            { x: 225, y: 50 }
-                        ],
-                        name: 'Point 1',
-                        tag: 'Tag 1'
-                    },
-                    { 
-                        type: 'point',
-                        points: [
-                            { x: 225, y: 75 }
-                        ],
-                        name: 'Point 2',
-                        tag: 'Tag 1'
-                    },
-                    { 
-                        type: 'point',
-                        points: [
-                            { x: 225, y: 100 }
-                        ],
-                        name: 'Point 3',
-                        tag: 'Tag 1'
-                    },
-                    {
-                        type: 'line',
-                        points: [
-                            { x: 150, y: 200 },
-                            { x: 175, y: 225 },
-                            { x: 200, y: 200 },
-                            { x: 225, y: 225 },
-                            { x: 250, y: 200 }
-                        ],
-                        name: 'Line 1',
-                        tag: 'Tag 2'
-                    },
-                    {
-                        type: 'area',
-                        points: [
-                            { x: 100, y: 125 },
-                            { x: 125, y: 150 },
-                            { x: 150, y: 150 },
-                            { x: 175, y: 125 },
-                        ],
-                        name: 'Area 1',
-                        tag: 'Tag 3'
-                    },
-                    {
-                        type: 'area',
-                        points: [
-                            { x: 300, y: 125 },
-                            { x: 300, y: 150 },
-                            { x: 350, y: 150 },
-                            { x: 350, y: 125 },
-                        ],
-                        name: 'Area 2',
-                        tag: 'Tag 3'
-                    }
-                ],
                 onEdit: function(figures) {
                     document.getElementById('json').value = JSON.stringify(figures); //JSON.stringify(figures, false, 4)
                 },
                 onLoad: function() {
+
+                    /*
+                    var res = map2d.diff({
+                        bias: 10,
+                        figures: []
+                    }, true);
+                    console.log('diff', res);
+                    console.log('mistake', map2d.getMistake());
+                    */
+
+
                     /*
                     map2d.addMarker({ 
                         x: 50, 

@@ -712,21 +712,20 @@ function Map2D(params) {
         var mistake = {
             
             data: null, // { point: ..., type: 'extra' || 'miss' }
+            silent: false,
 
-            set: function(point, type) {
-                if(point) {
-                    this.data = {
-                        point: point,
-                        type: type
-                    }
-                } else {
-                    this.data = null;
-                }
+            set: function(data, silent) {
+                this.data = data;
+                this.silent = silent;
                 draw();
             },
 
+            get: function() {
+                return this.data;
+            },
+
             draw: function() {
-                if(!this.data) {
+                if(!this.data || this.silent) {
                     return;
                 }
                 context2d.strokeStyle = params.styles.mistake.color;
@@ -827,8 +826,12 @@ function Map2D(params) {
                 refreshToolbar();
             },
 
-            setMistake: function(point, type) {
-                mistake.set(point, type);
+            setMistake: function(data, silent) {
+                mistake.set(data, silent);
+            },
+
+            getMistake: function() {
+                return mistake.get();
             },
 
             addMarker: function(data) {
@@ -1076,14 +1079,14 @@ function Map2D(params) {
 
 
         function displayMistake(ofs, type) {
-            if(silent) {
-                return;
+            var mistake = {
+                point: {
+                    x: ofs % image.width, 
+                    y: Math.floor(ofs / image.width)
+                },
+                type: type
             }
-            var point = {
-                x: ofs % image.width, 
-                y: Math.floor(ofs / image.width)
-            }
-            editor.setMistake(point, type);
+            editor.setMistake(mistake, silent);
         }
 
 
@@ -1287,6 +1290,10 @@ function Map2D(params) {
                 target.figures = converter.expand(target.figures);
             }            
             return diff(image, target, silent);
+        },
+
+        getMistake: function() {
+            return editor.getMistake();
         },
 
         destroy: function() {
