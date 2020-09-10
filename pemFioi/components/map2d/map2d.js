@@ -527,6 +527,9 @@ function Map2D(params) {
             data: null,
 
             set: function(data) {
+                if(params.simple_mode) {
+                    return;
+                }
                 this.data = data;
                 if(this.data) {
                     panel.open(data);
@@ -683,6 +686,9 @@ function Map2D(params) {
         var drag;
 
         function startDrag(point) {
+            if(params.simple_mode) {
+                return false;
+            }                        
             mistake.set(false);
             point = normalizePoint(point);
             drag = {
