@@ -128,6 +128,11 @@ var importableModules = function () {
       // openstreetmap
       'openstreetmap': {src: modulesPath+"/pemFioi/openstreetmap/task.js", id: "openstreetmap"},
 
+
+      // json text editor
+      'json-text-editor': {src: modulesPath+"/pemFioi/components/json-text-editor/editor.js", id: "json-text-editor"},
+      'jsonlint': {src: modulesPath+"/pemFioi/components/json-text-editor/jsonlint.js", id: "jsonlint"},      
+
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},

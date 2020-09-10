@@ -1,161 +1,149 @@
 function JSONTextEditor(params) {
 
-    var el = document.createElement('pre');
-    el.className = 'json-editor';
-    el.contentEditable = true;
-    el.spellcheck = false;
-    el.style.height = '500px';
-
-
-    function enterKeyPressHandler(evt) {
-        var sel, range, br, addedBr = false;
-        evt = evt || window.event;
-        var charCode = evt.which || evt.keyCode;
-        if (charCode == 13) {
-            if (typeof window.getSelection != "undefined") {
-                console.log(1)
-                sel = window.getSelection();
-                if (sel.getRangeAt && sel.rangeCount) {
-                    range = sel.getRangeAt(0);
-                    range.deleteContents();
-                    br = document.createElement("br");
-                    range.insertNode(br);
-                    range.setEndAfter(br);
-                    range.setStartAfter(br);                   
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                    addedBr = true;
-                }
-            } else if (typeof document.selection != "undefined") {
-                console.log(2)
-                sel = document.selection;
-                if (sel.createRange) {
-                    range = sel.createRange();
-                    range.pasteHTML("\n");
-                    range.select();
-                    addedBr = true;
-                }
-            }
-    
-            // If successful, prevent the browser's default handling of the keypress
-            if (addedBr) {
-                if (typeof evt.preventDefault != "undefined") {
-                    console.log('preventDefault')
-                    evt.preventDefault();
-                } else {
-                    evt.returnValue = false;
-                }
-            }
+    var defaults = {
+        width: '100%',
+        min_height: '100px',
+        styles: {
+            error_line: 'background: #FFAAAA',
+            error_char: 'background: #990000; color: #FFFFFF', 
+            border: '1px solid #000000'
         }
     }
+    params = Object.assign({}, defaults, params);
 
+    var el = document.createElement('pre');
+    el.contentEditable = true;
+    el.spellcheck = false;
+    el.style.width = params.width;
+    el.style.minHeight = params.min_height;
+    el.style.border = params.styles.border;
+    params.parent.appendChild(el);
 
+    // sys 
     function addEventListener(obj, evt, handler) {
         if(obj.addEventListener) {
             obj.addEventListener(evt, handler, false);
         } else if(obj.attachEvent) {
             return obj.attachEvent('on' + evt, handler);
         }        
+    }    
+
+    function stripTags(text) {
+        text = text.replace(/<br>/gi, '\n');
+        text = text.replace(/(<([^>]+)>)/gi, '');        
+        return text;
     }
 
 
-    addEventListener(el, 'keyup', enterKeyPressHandler);
-    
-
-/*
-    function getJSONParseError(json) {
-        var parser = clarinet.parser(),
-          firstError = undefined;
-    
-        // generate a detailed error using the parser's state
-        function makeError(e) {
-          var currentNL = 0, nextNL= json.indexOf('\n'), line = 1;
-          while (line < parser.line) {
-            currentNL = nextNL;
-            nextNL = json.indexOf('\n', currentNL + 1);
-            ++line;
-          }
-          return {
-            snippet:json.substr(currentNL + 1, nextNL - currentNL - 1),
-            message: (e.message || '').split('\n', 1)[0],
-            line:parser.line,
-            column:parser.column
-          }
+    // editor
+    function enterKeyPressHandler(event) {
+        var sel, range, br, added = false;
+        event = event || window.event;
+        var charCode = event.which || event.keyCode;
+        if(charCode != 13) {
+            return;
         }
-        
-        // trigger the parse error
-        parser.onerror = function(e) {
-          firstError = makeError(e);
-          parser.close();
-        };
-        try {
-          parser.write(json).close();
-        } catch(e) {
-          if (firstError === undefined) {
-            return makeError(e);
-          } else {
-            return firstError;
-          }
+        if(typeof window.getSelection != 'undefined') {
+            sel = window.getSelection();
+            if(sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                br = document.createElement('br');
+                range.insertNode(br);
+                range.setEndAfter(br);
+                range.setStartAfter(br);                   
+                sel.removeAllRanges();
+                sel.addRange(range);
+                added = true;
+            }
+        } else if(typeof document.selection != 'undefined') {
+            sel = document.selection;
+            if (sel.createRange) {
+                range = sel.createRange();
+                range.pasteHTML('<br>');
+                range.select();
+                added = true;
+            }
         }
-        
-        return firstError;
-      }
-      */
 
-    function validate() {
-        var str = el.innerHTML;
-        str = str.replace(/<br>/gi, '\n');
-        str = str.replace(/(<([^>]+)>)/gi, '');
+        if(added) {
+            if(typeof evt.preventDefault != 'undefined') {
+                evt.preventDefault();
+            } else {
+                evt.returnValue = false;
+            }
+        }
+    }
+    addEventListener(el, 'keypress', enterKeyPressHandler);
 
-        /*
-        var err = getJSONParseError(str);
-        console.log(err)
-        */
-        
+
+    function focusHandler(event) {
+        el.innerHTML = stripTags(el.innerHTML);
+    }
+    addEventListener(el, 'focus', focusHandler);
+
+
+    function pasteHandler(event) {
+        event = event || window.event;
+        var paste = (event.clipboardData || window.clipboardData).getData('text');
+        paste = stripTags(paste);
+        if(typeof window.getSelection != 'undefined') {
+            var sel = window.getSelection();
+            if(!sel.rangeCount) {
+                return false;
+            }
+            sel.deleteFromDocument();
+            sel.getRangeAt(0).insertNode(document.createTextNode(paste));
+            sel.removeAllRanges();
+        } else if(typeof document.selection != 'undefined') {
+            var sel = document.selection;
+            if (sel.createRange) {
+                range = sel.createRange();
+                range.pasteHTML(paste);
+                range.select();
+            }
+        }
+        event.preventDefault();
+    }
+    addEventListener(el, 'paste', pasteHandler);
+
+
+
+
+    function getContent() {
+        var str = stripTags(el.innerHTML);
         try {
             var res = jsonlint.parse(str);
         } catch(e) {
             var lines = str.split('\n');
-            line = lines[e.metadata.line];
-            var c1 = e.metadata.loc.first_column + 1;
-            var c2 = e.metadata.loc.last_column + 1;
+            var line = lines[e.metadata.line];
             line = 
-                '<span style="background: #FFAAAA">' + 
-                line.substr(0, c1) + 
-                '<span style="background: #990000; color: #FFFFFF;">' + 
-                line.substr(c1, c2 - c1) + 
-                '</span>' +
-                line.substr(c2) + 
+                '<span style="' + params.styles.error_line + '">' + 
+                line.replace(e.metadata.text, '<span style="' + params.styles.error_char + '">' + e.metadata.text + '</span>') +
                 '</span>';
             lines[e.metadata.line] = line;
             el.innerHTML = lines.join('\n');
-            console.error(e.metadata)
+            return undefined;
         }
-        
-        document.getElementById('output').value = str;
+        return res;        
     }
 
-    addEventListener(el, 'blur', validate);
 
-
-
-    params.parent.appendChild(el);
+    function setContent(obj) {
+        var str = JSON.stringify(obj, null, 4);
+        str = str.replace(/\n/g, '<br>');
+        el.innerHTML = str;
+    }
+    if('content' in params) {
+        setContent(params.content);
+    }
 
 
     return {
-
-
-        setContent: function(obj) {
-            var str = JSON.stringify(obj, null, 4);
-            console.log(str)
-            str = str.replace(/\n/g, '<br>')
-            console.log(str)
-            el.innerHTML = str;
-        },
-
-
-        getContent: function() {
-
+        setContent: setContent,
+        getContent: getContent,
+        destroy: function() {
+            el.parentNode.removeChild(el);
         }
     }
 
