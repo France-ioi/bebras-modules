@@ -1072,11 +1072,23 @@ function Map2D(params) {
         }
         
 
+        function getFigureKey(figure) {
+            return figure.tag + '\n' + figure.name
+        }
 
-        function filterFiguresByTag(figures, tag, include_empty_tags) {
+        function collectFilters(figures) {
+            var res = {};
+            for(var i=0; i<figures.length; i++) {
+                res[getFigureKey(figures[i])] = true;
+            }
+            return Object.keys(res);
+        }
+
+
+        function filterFigures(figures, filter) {
             var res = [];
             for(var i=0; i<figures.length; i++) {
-               if(figures[i].tag == tag || (include_empty_tags && figures[i].tag == '')) {
+                if(getFigureKey(figures[i]) === filter) {
                     res.push(figures[i]);
                 }
             }
@@ -1084,13 +1096,16 @@ function Map2D(params) {
         }
 
 
-        function displayMistake(ofs, type) {
+        function displayMistake(ofs, type, filter) {
+            var tmp = filter.split('\n');
             var mistake = {
                 point: {
                     x: ofs % image.width, 
                     y: Math.floor(ofs / image.width)
                 },
-                type: type
+                type: type,
+                tag: tmp[0],
+                name: tmp[1]
             }
             editor.setMistake(mistake, silent);
         }
@@ -1117,21 +1132,12 @@ function Map2D(params) {
         })();
 
 
-        debug.setSize({ width: image.width, height: image.height});
-        var res = true;
-        for(var i=0; i<params.tags.length; i++) {
-            var figures = filterFiguresByTag(target.figures, params.tags[i]);
-            var target_mask = createMask(figures, target.bias);
-            debug.displayMask('target_mask ' + params.tags[i], target_mask)
-            var target_drawing = createMask(figures, 1);
-            debug.displayMask('target_drawing ' + params.tags[i], target_drawing)
-            var figures = filterFiguresByTag(editor_figures, params.tags[i], true);
-            var editor_drawing = createMask(figures, 1);
-            debug.displayMask('editor_drawing ' + params.tags[i], editor_drawing)
+
+        function compareDrawing(editor_drawing, target_mask, target_drawing, filter) {
             for(var j=0; j<editor_drawing.length; j++) {
                 // check extra pixels in restricted area
                 if(editor_drawing[j] != 0 && target_mask[j] == 0) {
-                    displayMistake(j, 'extra');
+                    displayMistake(j, 'extra', filter);
                     return false;
                 }
 
@@ -1150,9 +1156,27 @@ function Map2D(params) {
                     }
                 }
                 if(!fl) {
-                    displayMistake(j, 'miss');
+                    displayMistake(j, 'miss', filter);
                     return false;
                 }
+            }
+            return true;
+        }
+
+
+        debug.setSize({ width: image.width, height: image.height});
+        var filters = collectFilters(target.figures);
+        for(var i=0; i<filters.length; i++) {
+            var figures = filterFigures(target.figures, filters[i]);
+            var target_mask = createMask(figures, target.bias);
+            debug.displayMask('target_mask ' + filters[i], target_mask)
+            var target_drawing = createMask(figures, 1);
+            debug.displayMask('target_drawing ' + filters[i], target_drawing)
+            var figures = filterFigures(editor_figures, filters[i], true);
+            var editor_drawing = createMask(figures, 1);
+            debug.displayMask('editor_drawing ' + filters[i], editor_drawing)
+            if(!compareDrawing(editor_drawing, target_mask, target_drawing, filters[i])) {
+                return false;
             }
         }
         return true;
