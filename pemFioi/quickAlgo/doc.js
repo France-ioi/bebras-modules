@@ -97,7 +97,7 @@ var docBlockly = {
 // Generate the documentation for a specific category
 function generateCategory(context, lang, strings, category) {
   var ctxStr = context.localLanguageStrings[lang];
-  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
+  var globalStr = quickAlgoLanguageStrings[lang] || quickAlgoLanguageStrings['en'];
 
   var html = '';
   html += '<h3>' + strings.category.replace('{}', category) + '</h3>';
@@ -188,7 +188,7 @@ function generateBlocklyDocumentation() {
   var lang = $('#lang').val();
   if(!lang) { lang = 'en'; }
   var strings = docLanguageStrings[lang] ? docLanguageStrings[lang] : docLanguageStrings['en'];
-  var globalStr = localLanguageStrings[lang] || localLanguageStrings['en'];
+  var globalStr = quickAlgoLanguageStrings[lang] || quickAlgoLanguageStrings['en'];
 
   var blocklyBlocks = getBlocklyBlockFunctions(0, 1);
   var scratchMode = $('#blocklySelector').val() == 'scratch';
