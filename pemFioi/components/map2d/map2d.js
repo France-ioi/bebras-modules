@@ -1072,23 +1072,45 @@ function Map2D(params) {
         }
         
 
-        function getFigureKey(figure) {
-            return figure.tag + '\n' + figure.name
-        }
-
-        function collectFilters(figures) {
-            var res = {};
-            for(var i=0; i<figures.length; i++) {
-                res[getFigureKey(figures[i])] = true;
+        function getFigureCenter(figure) {
+            var center = {
+                x: 0,
+                y: 0
             }
-            return Object.keys(res);
+            for(var i=0; i<figure.points.length; i++) {
+                center.x += figure.points[i].x;
+                center.y += figure.points[i].y;
+            }
+            center.x = center.x / figure.points.length;
+            center.y = center.y / figure.points.length;
+            return center;
         }
 
-
-        function filterFigures(figures, filter) {
+        function collectLayers(figures) {
             var res = [];
             for(var i=0; i<figures.length; i++) {
-                if(getFigureKey(figures[i]) === filter) {
+                var exists = false;
+                for(var j=0; j<res.length; j++) {
+                    if(res[j].name === figures[i].name && res[j].tag === figures[i].tag) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if(!exists) {
+                    res.push({
+                        name: figures[i].name,
+                        tag: figures[i].tag
+                    })
+                }
+            }
+            return res;
+        }
+
+
+        function filterFigures(figures, layer) {
+            var res = [];
+            for(var i=0; i<figures.length; i++) {
+                if(figures[i].name === layer.name && figures[i].tag === layer.tag) {
                     res.push(figures[i]);
                 }
             }
@@ -1096,16 +1118,16 @@ function Map2D(params) {
         }
 
 
-        function displayMistake(ofs, type, filter) {
-            var tmp = filter.split('\n');
+        function setPixelMistake(ofs, type, layer) {
             var mistake = {
                 point: {
                     x: ofs % image.width, 
                     y: Math.floor(ofs / image.width)
                 },
                 type: type,
-                tag: tmp[0],
-                name: tmp[1]
+                attribute: 'pixel',
+                tag: layer.tag,
+                name: layer.name
             }
             editor.setMistake(mistake, silent);
         }
@@ -1133,11 +1155,11 @@ function Map2D(params) {
 
 
 
-        function compareDrawing(editor_drawing, target_mask, target_drawing, filter) {
+        function compareDrawing(editor_drawing, target_mask, target_drawing, layer) {
             for(var j=0; j<editor_drawing.length; j++) {
                 // check extra pixels in restricted area
                 if(editor_drawing[j] != 0 && target_mask[j] == 0) {
-                    displayMistake(j, 'extra', filter);
+                    setPixelMistake(j, 'extra', layer);
                     return false;
                 }
 
@@ -1156,7 +1178,7 @@ function Map2D(params) {
                     }
                 }
                 if(!fl) {
-                    displayMistake(j, 'miss', filter);
+                    setPixelMistake(j, 'miss', layer);
                     return false;
                 }
             }
@@ -1164,18 +1186,53 @@ function Map2D(params) {
         }
 
 
+
+        var layers = collectLayers(target.figures);
+        
+        // check extra names or tags
+        for(var i=0; i<editor_figures.length; i++) {
+            var extra_tag = true;
+            var extra_name = true;
+            for(var j=0; j<layers.length; j++) {
+                if(editor_figures[i].tag === layers[j].tag) {
+                    extra_tag = false;
+                }                
+                if(editor_figures[i].name === layers[j].name) {
+                    extra_name = false;
+                }
+            }
+            if(extra_tag || extra_name) {
+                var mistake = {
+                    point: getFigureCenter(editor_figures[i]),
+                    type: 'extra',
+                    attribute: extra_tag ? 'tag' : 'name',
+                    tag: editor_figures[i].tag,
+                    name: editor_figures[i].name
+                }
+                editor.setMistake(mistake, silent);
+                return false;                
+            }
+        }
+
+
+
+        // check pixels per layer
         debug.setSize({ width: image.width, height: image.height});
-        var filters = collectFilters(target.figures);
-        for(var i=0; i<filters.length; i++) {
-            var figures = filterFigures(target.figures, filters[i]);
+        for(var i=0; i<layers.length; i++) {
+            var figures = filterFigures(target.figures, layers[i]);
+            
             var target_mask = createMask(figures, target.bias);
-            debug.displayMask('target_mask ' + filters[i], target_mask)
+            debug.displayMask('target_mask ' + JSON.stringify(layers[i]), target_mask)
+
             var target_drawing = createMask(figures, 1);
-            debug.displayMask('target_drawing ' + filters[i], target_drawing)
-            var figures = filterFigures(editor_figures, filters[i], true);
+            debug.displayMask('target_drawing ' + JSON.stringify(layers[i]), target_drawing)
+
+            var figures = filterFigures(editor_figures, layers[i], true);
             var editor_drawing = createMask(figures, 1);
-            debug.displayMask('editor_drawing ' + filters[i], editor_drawing)
-            if(!compareDrawing(editor_drawing, target_mask, target_drawing, filters[i])) {
+
+            debug.displayMask('editor_drawing ' + JSON.stringify(layers[i]), editor_drawing)
+
+            if(!compareDrawing(editor_drawing, target_mask, target_drawing, layers[i])) {
                 return false;
             }
         }

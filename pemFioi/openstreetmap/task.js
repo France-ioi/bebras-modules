@@ -132,6 +132,9 @@
             var answer = JSON.parse(answer);
             window.map2d.setFigures(answer);
             var valid = window.map2d.diff(map2d_grader_data);
+            if(!valid) {
+                console.error(window.map2d.getMistake());
+            }
             var score = valid ? taskParams.noScore : taskParams.maxScore;
             var msg = valid ? lang.translate('validation_success') : lang.translate('validation_mistake');
             $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
