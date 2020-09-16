@@ -3053,14 +3053,6 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.port) {
                 sensorAssignPort(sensor);
             }
-
-            // Set initial state
-            var sensorDef = findSensorDefinition(sensor);
-            if(sensorDef && !sensorDef.isSensor && sensorDef.getInitialState) {
-                var initialState = sensorDef.getInitialState(sensor);
-                if (initialState != null)
-                    context.registerQuickPiEvent(sensor.name, initialState, true, true);
-            }
         }
 
         if (context.display) {
@@ -3073,7 +3065,18 @@ var getContext = function (display, infos, curLevel) {
             context.success = false;
         }
 
-        
+        // Needs display to be reset before calling registerQuickPiEvent
+        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+            var sensor = infos.quickPiSensors[iSensor];
+
+            // Set initial state
+            var sensorDef = findSensorDefinition(sensor);
+            if(sensorDef && !sensorDef.isSensor && sensorDef.getInitialState) {
+                var initialState = sensorDef.getInitialState(sensor);
+                if (initialState != null)
+                    context.registerQuickPiEvent(sensor.name, initialState, true, true);
+            }
+        }
 
         startSensorPollInterval();
     };
