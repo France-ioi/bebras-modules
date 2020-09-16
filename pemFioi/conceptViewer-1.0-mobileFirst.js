@@ -299,7 +299,7 @@ function getConceptViewerBaseUrl() {
     // Specific configuration to go through the domain itself if there's a 'p=1'
     // argument or we are on concours2.castor-informatique.fr
     var baseUrl = '';
-    baseUrl += (window.location.protocol == 'https:' ? 'https:' : 'http:') + '//';
+    baseUrl += (window.location.protocol == 'http:' ? 'http:' : 'https:') + '//';
     baseUrl += ((window.location.search.indexOf('p=1') > -1
         || window.location.hostname == 'concours2.castor-informatique.fr')
        ? window.location.host : 'static4.castor-informatique.fr');
