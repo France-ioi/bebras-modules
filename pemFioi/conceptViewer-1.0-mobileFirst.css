@@ -40,10 +40,12 @@
     height: 100%;
     min-height: 0;
 }
-#conceptViewer .navigationContent {
-    overflow-x: hidden;
-    overflow-y: auto;
-    height: 100%;
+@media screen and (min-width: 481px){
+    #conceptViewer .navigationContent {
+        overflow-x: hidden;
+        overflow-y: auto;
+        height: 100%;
+    }
 }
 #conceptViewer .navigation {
     border-right: 1px solid rgba(0,0,0,0.1);
