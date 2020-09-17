@@ -513,6 +513,8 @@ $(document).ready(function() {
          }
          if (!taskOptions.hideTitle) {
             $("#task h1").show();
+            if ($("#task h1").length)
+                document.title = $("#task h1:first").text();
          }
 
          if (taskMetaData.fullFeedback) {
