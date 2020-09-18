@@ -201,7 +201,11 @@ function getConceptViewerBaseUrl() {
         || window.location.hostname == 'concours2.castor-informatique.fr')
        ? window.location.host : 'static4.castor-informatique.fr');
     baseUrl += '/help/';
-    baseUrl += window.stringsLanguage == 'es' ? 'index_es.html' : 'index.html';
+    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
+        baseUrl += 'index_' + window.stringsLanguage + '.html';
+    } else {
+        baseUrl += 'index.html';
+    }
     return baseUrl;
 }
 
