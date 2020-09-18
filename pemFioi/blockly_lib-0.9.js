@@ -294,7 +294,7 @@ var languageStrings = {
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
-      emptyProgram: "¡El programa está vacío! Conecte algunos bloques.",
+      emptyProgram: "¡El programa está vacio! Conecta algunos bloques",
       emptyProgram: "Le programme est vide ! Connectez des blocs.", // TODO :: translate this one and next 6
       uninitializedVar: "Uninitialized variable:",
       valueTrue: 'true',
