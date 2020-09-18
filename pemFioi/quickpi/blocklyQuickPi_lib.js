@@ -888,8 +888,8 @@ var quickPiLocalLanguageStrings = {
             readLightIntensity: "intensità luminosa",
             readHumidity: "umidità ambiente",
 
-            setServoAngle: "metti il servo %1 all'angolo %2",
-            getServoAngle: "angolo del servo %1",
+            setServoAngle: "metti il servomotore %1 all'angolo %2",
+            getServoAngle: "angolo del servomotore %1",
 
 
             drawPoint: "draw pixel",
@@ -1185,7 +1185,7 @@ var quickPiLocalLanguageStrings = {
             buzzer: "Buzzer",
             grovebuzzer: "Grove Buzzer",
             quickpibuzzer: "Quick Pi Passive Buzzer",
-            servo: "Servo Motor",
+            servo: "Servomotore",
             screen: "Screen",
             grove16x2lcd: "Grove 16x2 LCD",
             oled128x32: "128x32 Oled Screen",
