@@ -500,7 +500,7 @@ window.displayHelper = {
          worseScoreStays: "Esto no está tan bien como antes; su puntuación se mantiene en :",
          scoreStays: "Su puntuación se mantiene igual :",
          score: "Puntuación :",
-         noPointsForLevel: "Aún no ha recibido puntos en esta versión.",
+         noPointsForLevel: "Aún no has recibido puntos en esta versión.",
          outOf: " de ",
          tryToDoBetterOrChangeTask: "Intente nuevamente para obtener una mejor puntuación, o pase a la siguiente pregunta.",
          tryToDoBetterOrMoveToNextLevel: "Intente nuevamente para obtener una mejor puntuación, o pase una versión más difícil.",
@@ -546,7 +546,7 @@ window.displayHelper = {
          enemyWarning: "<strong>Advertencia:</strong> en este desafío, la computadora se asegurará que no encuentre la respuesta por casualidad."
       },
       it: {
-         version: "Version",
+         version: "Versione",
          levelVersionName_easy: "versione facile",
          levelVersionName_medium: "versione media",
          levelVersionName_hard: "versione difficile",

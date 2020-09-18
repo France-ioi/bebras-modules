@@ -668,7 +668,7 @@ var localLanguageStrings = {
       limitBlocksOver: "{remainingBlocks} bloques sobre el límite de {maxBlocks} autorizados.",
       limitElements: "{remainingBlocks} elementos disponibles de {maxBlocks} autorizados.",
       limitElementsOver: "{remainingBlocks} elementos sobre el límite de {maxBlocks} autorizados.",
-      capacityWarning: "Advertencia: su programa es inválido porque utiliza demasiados bloques. Ponga atención al límite de bloques permitidos mostrados en la parte superior derecha del editor.",
+      capacityWarning: "Advertencia: tu programa está inválido porque ha utilizado demasiados bloques. Pon atención al límite de bloques permitidos mostrados en la parte superior derecha del editor.",
       clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
