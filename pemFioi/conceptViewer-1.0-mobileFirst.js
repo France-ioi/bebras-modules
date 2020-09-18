@@ -67,6 +67,29 @@ var conceptViewerStrings = {
       "robot_commands": 'Comandos del robot',
       "arguments": 'Funciones con argumentos',
     }
+  },
+  it: {
+    viewerTitle: "Aiuto online",
+    selectLanguage: "Seleziona una lingua…",
+    selectTopic: "Seleziona un argomento…",
+    concepts: {
+      "taskplatform": 'Solving exercises',
+      "language": "Programmazione",
+      "blockly_text_print": 'Visualizzazione del testo',
+      "blockly_text_print_noend": 'Visualizzazione del testo sequenziale',
+      "blockly_controls_repeat": 'Ciclo di ripetizione',
+      "blockly_controls_if": 'Istruzione if',
+      "blockly_controls_if_else": 'Istruzione if / else',
+      "blockly_controls_whileUntil": 'Ripetere fino a quando',
+      "blockly_controls_infiniteloop": 'Loop infinito',
+      "blockly_logic_operation": 'Operatori logici (booleani)',
+      "extra_nested_repeat": 'Loop nidificati',
+      "extra_variable": 'Variabili',
+      "extra_list": 'Elenchi',
+      "extra_function": 'Funzioni',
+      "robot_commands": 'Robot commands',
+      "arguments": 'Funzioni conargomenti',
+    }
   }
 };
 
@@ -304,7 +327,11 @@ function getConceptViewerBaseUrl() {
         || window.location.hostname == 'concours2.castor-informatique.fr')
        ? window.location.host : 'static4.castor-informatique.fr');
     baseUrl += '/help/';
-    baseUrl += window.stringsLanguage == 'es' ? 'index_es.html' : 'index.html';
+    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
+        baseUrl += 'index_' + window.stringsLanguage + '.html';
+    } else {
+        baseUrl += 'index.html';
+    }
     return baseUrl;
 }
 
