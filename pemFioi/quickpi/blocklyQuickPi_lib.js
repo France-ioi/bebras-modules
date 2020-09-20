@@ -425,7 +425,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_cloud: 'Stockage dans le cloud'
         }
     },
-    es: { // French strings
+    es: {
         label: {
             // Labels for the blocks
             sleep: "esperar %1 milisegundos",
@@ -691,18 +691,18 @@ var quickPiLocalLanguageStrings = {
             wrongStateSensor: "Prueba fallida: su programa no leyó el estado de <code>{0}</code> después de t = {1} ms.",
             programEnded: "Programa completado.",
             piPlocked: "El dispositivo está bloqueado. Desbloquear o reiniciar.",
-            cantConnect: "No se puede conectarse al dispositivo.",
+            cantConnect: "No puede conectarse al dispositivo.",
             wrongVersion: "El software en tu Raspberry Pi es demasiado antiguo, actualízalo.",
             sensorInOnlineMode: "No se pueden modificar sensores en modo conectado.",
             actuatorsWhenRunning: "No se pueden cambiar los actuadores mientras se ejecuta un programa",
-            cantConnectoToUSB: 'Intentado conectarse por USB, conecte su Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
-            cantConnectoToBT: 'Intentando conectarse por Bluetooth, conecte su Raspberry Pi por Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
+            cantConnectoToUSB: 'Intentado conectarse por USB, conecta tu Raspberry Pi al puerto USB <i class="fas fa-circle-notch fa-spin"></i>',
+            cantConnectoToBT: 'Intentando conectarse por Bluetooth, conecta tu Raspberry Pi por Bluetooth <i class="fas fa-circle-notch fa-spin"></i>',
             canConnectoToUSB: "USB Conectado.",
             canConnectoToBT: "Bluetooth Conectado.",
             noPortsAvailable: "No hay ningún puerto compatible con {0} disponible (type {1})",
             sensor: "Sensor",
             actuator: "Actuador",
-            removeConfirmation: "¿Está seguro de que desea quitar este componente?",
+            removeConfirmation: "¿Estás seguro de que deseas quitar este componente?",
             remove: "Eliminar",
             keep: "Mantener",
             minutesago: "Visto por última vez hace {0} minutos",
@@ -719,27 +719,27 @@ var quickPiLocalLanguageStrings = {
      
             raspiConfig: "Configuración de Raspberry Pi",
             local: "Local",
-            schoolKey: "Ingrese una identificación de la escuela",
-            connectList: "Seleccione un dispositivo para conectarse de la siguiente lista",
-            enterIpAddress: "o ingrese una dirección IP",
+            schoolKey: "Ingresa una identificación de la escuela",
+            connectList: "Selecciona un dispositivo para conectarte de la siguiente lista",
+            enterIpAddress: "o ingresa una dirección IP",
             getPiList: "Obtener la lista",
-            connectTroughtTunnel: "Conéctese a través del túnel de France-ioi",
+            connectTroughtTunnel: "Conéctate a través del túnel de France-ioi",
 
             connectToLocalhost: "Conectarse al dispositivo que ejecuta este navegador",
-            connectToWindowLocation: "Conéctese a la Raspberry Pi desde la que se carga esta página",
+            connectToWindowLocation: "Conéctate a la Raspberry Pi desde la que se carga esta página",
 
             connectToDevice: "Conectar al dispositivo",
             disconnectFromDevice: "Desconectar",
        
 
             irReceiverTitle: "Recibir códigos infrarrojos",
-            directIrControl: "Apunte su control remoto hace tu tablero QuickPi y presiona uno de los botones",
+            directIrControl: "Apunta tu control remoto a tu tablero QuickPi y presiona uno de los botones",
             getIrCode: "Recibir un código",
             closeDialog: "Cerrar",
 
             irRemoteControl: "Control remoto Infrarrojo",
             
-            noIrPresets: "Utilice la función de preparación de mensajes IR para agregar comandos de control remoto",
+            noIrPresets: "Utiliza la función de preparación de mensajes IR para agregar comandos de control remoto",
             irEnableContinous: "Activar la emisión IR continua",
             irDisableContinous: "Desactivar la emisión IR continua",
 
@@ -787,7 +787,7 @@ var quickPiLocalLanguageStrings = {
             irreceiver: "Receptor de infrarrojos",
             cloudstore: "Almacenamiento en la nube",
             addcomponent: "Agregar componente",
-            selectcomponent: "Seleccione un componente para agregar a su Raspberry Pi y conéctelo a un puerto.",
+            selectcomponent: "Selecciona un componente para agregar a tu Raspberry Pi y conéctalo a un puerto.",
             add: "Agregar",
             builtin: "(incorporado)",
             chooseBoard: "Elije tu tablero",
@@ -829,7 +829,7 @@ var quickPiLocalLanguageStrings = {
         },
         concepts: {
             quickpi_start: 'Crea tu primer programa y ejecútalo',
-            quickpi_validation: 'Pruebe y valide sus programas',
+            quickpi_validation: 'Prueba y valida tus programas',
             quickpi_buzzer: 'Zumbador',
             quickpi_led: 'LEDs o diodos electroluminiscentes',
             quickpi_button: 'Botón',
