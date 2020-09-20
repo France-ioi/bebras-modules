@@ -8967,8 +8967,10 @@ var getContext = function (display, infos, curLevel) {
 
             var state = context.getSensorState(sensor.name);
 
-
-            context.waitDelay(callback, state[index]);
+            if (Array.isArray(state))
+                context.waitDelay(callback, state[index]);
+            else
+                context.waitDelay(callback, 0);
         } else {
             var cb = context.runner.waitCallback(callback);
 
