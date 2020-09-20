@@ -1406,6 +1406,10 @@ body.fullscreen #taskToolbar {
         flex: 1 1 auto;
   margin: 0;
 }
+.notificationMessage .messageWrapper code {
+  color: #777777;
+}
+
 .notificationMessage .notificationMessageClose {
   position: absolute;
   top: 4px;
