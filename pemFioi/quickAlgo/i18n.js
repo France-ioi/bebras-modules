@@ -6,7 +6,8 @@
 var quickAlgoLanguageStrings = {
    fr: {
       categories: {
-         actions: "Actions",
+         actions: "Action",
+         actuator: "Actionneurs",
          sensors: "Capteurs",
          debug: "Débogage",
          colour: "Couleurs",
@@ -128,6 +129,7 @@ var quickAlgoLanguageStrings = {
    en: {
       categories: {
          actions: "Actions",
+         actuator: "Actuators",
          sensors: "Sensors",
          debug: "Debug",
          colour: "Colors",
@@ -247,6 +249,7 @@ var quickAlgoLanguageStrings = {
    de: {
       categories: {
          actions: "Aktionen",
+         actuator: "Actuators",
          sensors: "Sensoren",
          debug: "Debug",
          colour: "Farben",
@@ -367,6 +370,7 @@ var quickAlgoLanguageStrings = {
    es: {
       categories: {
          actions: "Acciones",
+         actuator: "Actuators",
          sensors: "Sensores",
          debug: "Depurar",
          colour: "Colores",
@@ -488,6 +492,7 @@ var quickAlgoLanguageStrings = {
    sl: {
       categories: {
          actions: "Dejanja",
+         actuator: "Actuators",
          sensors: "Senzorji",
          debug: "Razhroščevanje",
          colour: "Barve",
@@ -607,6 +612,7 @@ var quickAlgoLanguageStrings = {
    it: {
       categories: {
          actions: "Azioni",
+         actuator: "Actuators",
          sensors: "Sensori",
          debug: "Debug",
          colour: "Colori",
