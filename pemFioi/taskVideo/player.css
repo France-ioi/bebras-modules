@@ -38,6 +38,25 @@
     color: #999;
 }
 
+.task-video .section .description.hasImage {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.task-video .section .description.hasImage div.image {
+    width: 200px;
+    height: 100%;
+    margin: 0px 8px;
+    white-space: nowrap;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.task-video .section .description.hasImage div.image img {
+    width: 200px;
+}
+
 .task-video .time-link {
     color: #36F;
     cursor: pointer;
