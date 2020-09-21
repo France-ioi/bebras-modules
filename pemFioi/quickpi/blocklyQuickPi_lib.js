@@ -48,7 +48,7 @@ var quickPiLocalLanguageStrings = {
 
 
             drawPoint: "dessiner un pixel en x₀: %1 y₀: %2",
-            isPointSet: "le pixel est-il affiché sur l'écran x₀: %1 y₀: %2",
+            isPointSet: "pixel affiché en x₀: %1 y₀: %2",
             drawLine: "ligne x₀: %1 y₀: %2 x₁: %3 y₁: %4",
             drawRectangle: "rectangle x₀: %1 y₀: %2 largeur₀: %3 hauteur₀: %4",
             drawCircle: "cercle x₀: %1 y₀: %2 diamètre₀: %3",
