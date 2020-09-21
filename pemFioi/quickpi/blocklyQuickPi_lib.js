@@ -8323,7 +8323,10 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
 
-            context.runner.noDelay(callback, state);
+            var wasPressed = sensor.wasPressed;
+            sensor.wasPressed = false;
+
+            context.runner.noDelay(callback, wasPressed);
         } else {
             var cb = context.runner.waitCallback(callback);
             context.quickPiConnection.sendCommand("buttonWasPressed(\"" + name + "\")", function (returnVal) {
