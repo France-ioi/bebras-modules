@@ -54,9 +54,8 @@ class screenDrawing {
 
             this.resetCanvas();
             
-            this.noFill = false;
-            this.noStroke = false;
-
+            this.noFillStatus = false;
+            this.noStrokeStatus = false;
         }
 
         resetCanvas() {
@@ -90,6 +89,42 @@ class screenDrawing {
             }
 
             return imageData;
+        }
+        
+        fill(color) {
+            this.noFillStatus = false;
+
+            for (var i = 0; i < this.scales.length; i++) {
+                var canvas = this.canvas[i];
+                var ctx = canvas.getContext('2d');
+
+                if (color)
+                    ctx.fillStyle = "black";
+                else
+                    ctx.fillStyle = "white";
+            }
+        }
+
+        noFill(color) {
+            this.noFillStatus = true;
+        }
+
+        stroke(color) {
+            this.noStrokeStatus = false;
+
+            for (var i = 0; i < this.scales.length; i++) {
+                var canvas = this.canvas[i];
+                var ctx = canvas.getContext('2d');
+
+                if (color)
+                    ctx.strokeStyle = "black";
+                else
+                    ctx.strokeStyle = "white";
+            }
+        }
+
+        noStroke(color) {
+            this.noStrokeStatus = true;
         }
 
 
@@ -154,15 +189,13 @@ class screenDrawing {
         _drawRectangle(canvas, scale, x0, y0, width, height) {
             var ctx = canvas.getContext('2d');
 
-            /*
-            if (!this.noStroke) {
+            if (!this.noStrokeStatus) {
                 ctx.strokeRect(scale * x0, scale * y0, scale * width, scale * height);
-            }*/
-
-            if (!this.noFill) {
-                ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
             }
 
+            if (!this.noFillStatus) {
+                ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
+            }
         }
 
         drawRectangle(x0, y0, width, height) {
@@ -180,8 +213,12 @@ class screenDrawing {
             ctx.arc(scale * x0, scale * y0, scale * diameter / 2, 0, Math.PI * 2);
             ctx.closePath();
 
-            if (!this.noFill) {
+            if (!this.noFillStatus) {
                 ctx.fill();
+            }
+
+            if (!this.noStrokeStatus) {
+                ctx.stroke();
             }
         }
 
