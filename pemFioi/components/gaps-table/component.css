@@ -1,0 +1,52 @@
+.gaps-table {
+
+}
+
+.gaps-table .value {
+    display: inline-block;
+    border: 1px solid #4a90e2;
+    background: white;
+    text-align: center;
+    cursor: move;
+    padding: 4px 20px;
+}
+
+
+.gaps-table .gaps-toolbar .value {
+    margin: 0 10px 0 0;
+}
+  
+
+.gaps-table table {
+    margin-top: 20px;
+}
+
+.gaps-table table td {
+    min-width: 60px;
+    padding: 0;
+    padding: 5px;
+    text-align: center;        
+
+}
+ 
+.gaps-table table .placeholder {
+    border: 1px solid #4a90e2;
+}
+  
+.gaps-table table .placeholder-hover {
+    background: #4a90e2;
+    padding: 5px 0px;
+}
+  
+.gaps-table table .placeholder:empty:before {
+    content: "\00a0";
+}
+
+.gaps-table table .value {
+    display: block;    
+    margin: -5px;
+}
+
+.gaps-table table .mistake {
+    background: #FF6666;
+}
