@@ -423,7 +423,7 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
     var concepts = ['language'];
     if(includeBlocks.standardBlocks.includeAll) {
       for(var c = 0; c<allConcepts.length; c++) {
-        if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
+        if(allConcepts[c].id.substr(0, 8) == 'blockly_') {
           concepts.push(allConcepts[c]);
         }
       }
