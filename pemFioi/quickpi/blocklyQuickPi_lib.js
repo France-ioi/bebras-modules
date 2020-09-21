@@ -8872,19 +8872,14 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.quickpi.fill = function(color, callback) {
+
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.fill(color);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                var ctx = sensor.canvas.getContext('2d');
-
-                context.noFill = false;
-                if (color)
-                    ctx.fillStyle = "black";
-                else
-                    ctx.fillStyle = "white";
-            }
-
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -8898,9 +8893,14 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.noFill = function(callback) {
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            context.noFill = true;
+        var sensor = findSensorByType("screen");
 
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.noFill();
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
@@ -8914,18 +8914,13 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.stroke = function(color, callback) {
-        if (!context.display || context.autoGrading || context.offLineMode) {
-            var sensor = findSensorByType("screen");
-            if (sensor && sensor.canvas)
-            {
-                var ctx = sensor.canvas.getContext('2d');
+        var sensor = findSensorByType("screen");
 
-                context.noStroke = false;
-                if (color)
-                    ctx.strokeStyle = "black";
-                else
-                    ctx.strokeStyle = "white";
-            }
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.stroke(color);
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData()); 
+
+        if (!context.display || context.autoGrading || context.offLineMode) {
 
             context.waitDelay(callback);
         } else {
@@ -8939,8 +8934,13 @@ var getContext = function (display, infos, curLevel) {
 
 
     context.quickpi.noStroke = function(callback) {
+        var sensor = findSensorByType("screen");
+
+        context.initScreenDrawing(sensor);
+        sensor.screenDrawing.noStroke();
+        context.registerQuickPiEvent(sensor.name, sensor.screenDrawing.getStateData());        
+
         if (!context.display || context.autoGrading || context.offLineMode) {
-            context.noStroke = true;
             context.waitDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
