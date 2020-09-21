@@ -285,8 +285,12 @@ var getContext = function(display, infos, curLevel) {
     }
 
 
+    var wrapper;
 
     context.reset = function(taskInfos) {
+        if(wrapper) {
+            wrapper.removeClass('highlight-result');
+        }
         if(taskInfos) {
             task_tables = taskInfos.tables || {};
         }
@@ -306,7 +310,7 @@ var getContext = function(display, infos, curLevel) {
             window.db_helper && window.db_helper.destroy();
         }
 
-        var wrapper = $('<div class="renderers_wrapper"></div>');
+        wrapper = $('<div class="renderers_wrapper"></div>');
         $('#grid').append(wrapper);
 
         window.db_helper = new DatabaseHelper(
@@ -332,14 +336,15 @@ var getContext = function(display, infos, curLevel) {
         tables_list.init({
             parent: $('#database_controls'),
             callback: function(filename, is_imported) {
+                wrapper.addClass('highlight-result');
                 if(is_imported) {
                     var file = task_files.getFile(filename);
                     db_helper.loadCsv(file, [], function(table) {
-                        db_helper.displayTable(table, true, true);
+                        db_helper.displayTable(table, true);
                     });
                 } else {
                     var table = Table(task_tables[filename].data);
-                    db_helper.displayTable(table, true, true);
+                    db_helper.displayTable(table, true);
                 }
             },
             tables: {

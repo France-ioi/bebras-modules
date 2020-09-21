@@ -70,8 +70,7 @@ function DatabaseHelper(options) {
         return(Table(params));
     }
 
-    this.displayTable = function(table, display, highlight) {
-        options.parent.toggleClass('highlight-result', !!highlight);
+    this.displayTable = function(table, display) {
         last_table = table;
         this.hide(display);
         if(options.calculate_hash) {
