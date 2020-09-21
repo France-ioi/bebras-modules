@@ -11,19 +11,23 @@
     float: right;
 }
 
-.database {
+.renderers_wrapper {
+    position: relative;
+}
+
+.renderer_html {
     width: 100%;
     overflow: auto;
 }
 
-.database table {
+.renderer_html table {
     width: 100%;
     border: 1px solid #999999;
     border-collapse: collapse;
 }
 
-.database th,
-.database td {
+.renderer_html th,
+.renderer_html td {
     border: 1px solid #999999;
     border-collapse: collapse;
     padding: 2px;
@@ -36,7 +40,7 @@
     max-width: 200px;
 }
 
-.database td.invalid {
+.renderer_html td.invalid {
     background: #FFAAAA;
 }
 
