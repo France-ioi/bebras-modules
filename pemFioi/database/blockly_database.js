@@ -306,9 +306,12 @@ var getContext = function(display, infos, curLevel) {
             window.db_helper && window.db_helper.destroy();
         }
 
+        var wrapper = $('<div class="renderers_wrapper"></div>');
+        $('#grid').append(wrapper);
+
         window.db_helper = new DatabaseHelper(
             Object.assign({
-                parent: $('#grid'),
+                parent: wrapper,
                 strings: strings.ui.db_helper
             }, infos.databaseConfig)
         );

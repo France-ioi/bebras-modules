@@ -263,7 +263,7 @@ function DatabaseHelper(options) {
 
 
 function TableRendererHtml(options) {
-    var container = $('<div class="database">');
+    var container = $('<div class="renderer_html">');
     container.hide();
     options.parent.append(container);
     this.clear = function() {
