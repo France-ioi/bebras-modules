@@ -196,10 +196,10 @@
         },
 
         renderDescription: function(parent, idx, section) {
-            if(!section.description) {
+            if(!section.image && !section.description) {
                 return;
             }
-            var html = section.description.replace(/\{[^\}]+\}/g, function(m) {
+            var description = section.description.replace(/\{[^\}]+\}/g, function(m) {
                 m = m.substr(1, m.length - 2).split('|');
                 if(m.length > 1) {
                     var time = time_string.parse(m[1]);
@@ -210,8 +210,24 @@
                 }
 
                 return '<span class="time-link" data-time="' + time + '">' + title + '</span>';
-            })
-            var el = $('<div class="description">' + html + '</div>');
+            });
+            if(section.image) { 
+                // section.image is either an URL to an image, or a #id
+                // identifier for an image tag to fetch the URL from
+                var html = '<div class="description hasImage">';
+                var imgSrc = section.image;
+                if(imgSrc[0] == '#') {
+                    imgSrc = $('img' + imgSrc).attr('src');
+                }
+                html += '<div class="image"><img src="' + imgSrc + '"></img></div>';
+                html += '<div>' + description + '</div>';
+                html += '</div>';
+            } else {
+                var html = '<div class="description">';
+                html += description;
+                html += '</div>';
+            }
+            var el = $(html);
 
             function makeClickCallback(link) {
                 var time = parseFloat($(link).data('time'));
