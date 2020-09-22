@@ -413,7 +413,7 @@ function conceptsFill(baseConcepts, allConcepts) {
 
 function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
   if(!includeBlocks) { return []; }
-
+  
   if(includeBlocks.standardBlocks) {
     var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
@@ -439,35 +439,68 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
 
   if(includeBlocks.generatedBlocks) {
     for(var genName in includeBlocks.generatedBlocks) {
-      var categoriesByBlocks = {};
+      // this variable is used in order to make sure that we don't include two
+      // times a documentation
       var includedCategories = [];
-      if(context && context.customBlocks && context.customBlocks[genName]) {
-        for(var catName in context.customBlocks[genName]) {
-          var categoryConceptName = genName + '_' + catName;
-          if(!allConceptsById[categoryConceptName]) { continue; }
-          var blockList = context.customBlocks[genName][catName];
-          for(var i=0; i<blockList.length; i++) {
-            categoriesByBlocks[blockList[i].name] = categoryConceptName;
+      var cleanedConcepts = cleanAllConcept(allConcepts);
+      for (var functionKey in includeBlocks.generatedBlocks[genName]) {
+        var functionName = includeBlocks.generatedBlocks[genName][functionKey];
+        var concept = findConceptByFunction(cleanedConcepts, functionName);
+        if (concept) {
+          // if we does not have the concept already pushed, we push it.
+          if (includedCategories.indexOf(concept.id) == -1) {
+            includedCategories.push(concept.id);
+            concepts.push(concept);
           }
-        }
-      }
-      if(allConceptsById[genName + '_introduction']) {
-        concepts.push(allConceptsById[genName + '_introduction']);
-      }
-      for(var i=0; i<includeBlocks.generatedBlocks[genName].length; i++) {
-        var blockName = includeBlocks.generatedBlocks[genName][i];
-        if(categoriesByBlocks[blockName] && includedCategories.indexOf(categoriesByBlocks[blockName]) == -1) {
-          concepts.push(allConceptsById[categoriesByBlocks[blockName]]);
-        }
-        var conceptRef = genName + '_' + blockName;
-        if(allConceptsById[conceptRef]) {
-          concepts.push(allConceptsById[conceptRef]);
+        } else {
+          // here you can print the function name for which the documentation is missing
+          // for debug:
+          // console.log("conceptViewer - function getConceptsFromBlocks : the function named: "
+          //    + functionName + " is was not found in the documentation, please consider adding it inside of the "
+          //    + "conceptList.python array.");
         }
       }
     }
   }
 
   return concepts;
+}
+
+/**
+ * This function allow us to remove useless concept from the concept list.
+ * The "useless concepts" are concept who don't have a "python" list of all
+ * their functions or in which this list is empty.
+ * @param allConcepts All of the concepts.
+ * @return A new list of concepts but cleaned.
+ */
+function cleanAllConcept(allConcepts) {
+  var ret = [];
+  for (var concept in allConcepts) {
+    if (allConcepts[concept].python && allConcepts[concept].python != []) {
+      ret.push(allConcepts[concept]);
+    }
+  }
+  return ret;
+}
+
+/**
+ * This function allow us to find a concept by his function name.
+ * The function name is in the python list of a concept.
+ * @param cleanedConcepts The list of all the concepts, previously cleaned
+ * with cleanAllConcept(AllConcept)
+ * @param functionName The name of the function we have to look for
+ * @return A concept if found, false otherwise.
+ */
+function findConceptByFunction(cleanedConcepts, functionName) {
+  for (var concept in cleanedConcepts) {
+    for (var conceptFunctionName in cleanedConcepts[concept].python) {
+      if (cleanedConcepts[concept].python[conceptFunctionName] === functionName) {
+        return cleanedConcepts[concept];
+      }
+    }
+  }
+
+  return false;
 }
 
 function getConceptsFromTask(allConcepts) {
