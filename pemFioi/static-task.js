@@ -86,7 +86,7 @@ task.load = function(views, success, error) {
 };
 
 task.gradeAnswer = function(answer, answerToken, success, error) {
-   if(!window.staticTaskOptions || !window.staticTaskOptions.autoValidateAfterMs) {
+   if(!window.staticTaskOptions || !window.staticTaskOptions.autoValidate) {
       success(0, '');
       return;
    }
@@ -158,7 +158,7 @@ if(window.$) {
             } catch(e) {}
          }, typeof sto.autoValidate == 'number' ? sto.autoValidate : 5000);
       }
-      if(sto.addReturnButton) {
+      if(sto.addReturnButton && !$('div.return-button').length) {
          var btnHtml = '<div class="return-button"><button onclick="platform.validate(\'top\');">';
          btnHtml += typeof sto.addReturnButton == 'string' ? sto.addReturnButton : 'Revenir à la liste des questions';
          btnHtml += '</button></div>';
