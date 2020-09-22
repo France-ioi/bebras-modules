@@ -2,7 +2,10 @@ function GapsTable(params) {
 
     var defaults = {
         placeholder: '*',
-        random: false
+        random: false,
+        values: false,
+        valid: [[]],
+        cell_min_width: 50
     }
     params = Object.assign({}, defaults, params);
 
@@ -28,6 +31,21 @@ function GapsTable(params) {
     params.parent.append(wrapper);
 
 
+    // init values if empty
+    var resizable = false;
+    if(!params.values) {
+        resizable = true;
+        params.values = [];
+        for(var i=0; i<params.valid.length; i++) {
+            var row = [];
+            for(var j=0; j<params.valid[i].length; j++) {
+                row.push(params.valid[i][j] !== '' ? '*' : '');
+            }
+            params.values.push(row);
+        }
+    }
+
+
     // toolbar
     var values = [];
     for(var i=0; i<params.valid.length; i++) {
@@ -46,7 +64,7 @@ function GapsTable(params) {
     }        
     wrapper.append(toolbar);
 
-    toolbar.find('span').each(function(i) {
+    toolbar.find('.value').each(function(i) {
         var el = $(this), text = el.text();
         el.draggable({
             scope: uid,
@@ -70,6 +88,8 @@ function GapsTable(params) {
     // table
     var cells = [];
     var table = $('<table/>');
+    var table_container = $('<div class="table-container"/>')
+    table_container.append(table);
     for(var i=0; i<params.values.length; i++) {
         var row = $('<tr/>');
         var cells_row = [];
@@ -87,7 +107,7 @@ function GapsTable(params) {
         cells.push(cells_row);
         table.append(row);
     }
-    wrapper.append(table);
+    wrapper.append(table_container);
 
     table.find('.placeholder').each(function() {
         var placeholder = $(this)
@@ -103,7 +123,47 @@ function GapsTable(params) {
     });            
 
 
+/*
+    function resize(rows, cols) {
+        if(cells.length == rows && cells[0].length == cols) {
+            return;
+        }
+        // expand height
+        while (this.value.tiles.length < h) {
+            this.value.tiles.push(new Array(w).fill(0));
+        }
+        // reduce height
+        if (this.value.tiles.length > h) {
+            this.value.tiles = this.value.tiles.slice(0, h);
+        }
+        for (var i = 0; i < this.value.tiles.length; i++) {
+            if (this.value.tiles[i].length < w) {
+                // expand width
+                this.value.tiles[i] = this.value.tiles[i].concat(new Array(w - this.value.tiles[i].length).fill(0));
+            } else if (this.value.tiles[i].length > w) {
+                // reduce width
+                this.value.tiles[i] = this.value.tiles[i].slice(0, w);
+            }
+        }
+        this.display.render(this.value);
+        this.onChange(true);        
+    }
+*/
 
+
+    if(resizable) {
+        /*
+        table_container.resizable({
+            grid: [params.values[0].length, params.values.length],
+            stop: function(event, ui) {
+                table_container.width('');
+                table_container.height('auto');
+                console.log(ui.size.width, ui.size.height);
+                //resize(rows, cols);
+            }
+        });
+        */
+    }
 
 
 
@@ -126,9 +186,49 @@ function GapsTable(params) {
 
 
 
+    function getAnswer() {
+        var res = [];
+        for(var i=0; i<params.values.length; i++) {
+            var row = [];
+            for(var j=0; j<params.values[i].length; j++) {
+                row.push(params.values[i][j] === params.placeholder ? cells[i][j].text() : '');
+            }
+            res.push(row);
+        }
+        return res;
+    }
+
+
+    function setAnswer(answer) {
+        reset();
+        var values = toolbar.find('.value').toArray();
+        for(var i=0; i<params.values.length; i++) {
+            for(var j=0; j<params.values[i].length; j++) {
+                if(params.values[i][j] !== params.placeholder) {
+                    continue;
+                }
+                for(var k=0; k<values.length; k++) {
+                    if(values[k].innerText === answer[i][j]) {
+                        cells[i][j].append(values[k]);
+                        values.splice(k, 1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    function reset() {
+        table.find('td').removeClass('mistake');
+        toolbar.append(table.find('.value'));
+    }
+
+
     return {
 
-        validate: validate
-
+        validate: validate,
+        getAnswer: getAnswer,
+        setAnswer: setAnswer
     }
 }
