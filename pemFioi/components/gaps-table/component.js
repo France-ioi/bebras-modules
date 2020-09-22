@@ -4,9 +4,16 @@ function GapsTable(params) {
         header: true,
         placeholder: '*',
         random: false,
+
+        //TODO: add multiple tables support
         values: false,
         valid: [[]],
-        cell_min_width: 50
+
+        cell_min_width: 100,
+        table_min_size: {
+            rows: 2,
+            cols: 2
+        }
     }
     params = Object.assign({}, defaults, params);
 
@@ -41,7 +48,7 @@ function GapsTable(params) {
         for(var i=0; i<params.valid.length; i++) {
             var row = [];
             for(var j=0; j<params.valid[i].length; j++) {
-                row.push(params.valid[i][j] !== '' ? '*' : '');
+                row.push(params.valid[i][j] !== '' ? params.placeholder : '');
             }
             params.values.push(row);
         }
@@ -92,28 +99,51 @@ function GapsTable(params) {
     var table = $('<table/>');
     var table_container = $('<div class="table-container"/>')
     table_container.append(table);
-    for(var i=0; i<params.values.length; i++) {
+
+
+    function createCell(value, is_header) {
+        var cell = $(is_header ? '<th/>' : '<td/>');
+        cell.css({
+            'min-width': params.cell_min_width + 'px',
+        });
+        if(value == params.placeholder) {
+            cell.addClass('placeholder');
+            cell.droppable({
+                scope: uid,
+                hoverClass: 'placeholder-hover',
+                drop: function(event, ui) {
+                    toolbar.append(cell.find('.value').first());
+                    ui.draggable.detach().css({top: 0,left: 0}).appendTo(cell);
+                }
+            });
+        } else if(value !== '') {
+            cell.html(value);
+        }
+        return cell;
+    }
+
+    function renderRow(values, is_header) {
         var row = $('<tr/>');
         var cells_row = [];
-        for(var j=0; j<params.values[i].length; j++) {
-            var cell = (i == 0 && params.header) ? $('<th/>') : $('<td/>');
-            var v = params.values[i][j];
-            if(v == params.placeholder) {
-                cell.addClass('placeholder');
-            } else if(v !== '') {
-                cell.html(v);
-            }
+        for(var j=0; j<values.length; j++) {
+            var cell = createCell(values[j], is_header);
             cells_row.push(cell);
             row.append(cell);
         }
         cells.push(cells_row);
         table.append(row);
     }
+
+
+    for(var i=0; i<params.values.length; i++) {
+        renderRow(params.values[i], params.header && i == 0)
+    }
+
     wrapper.append(table_container);
 
+    /*
     table.find('.placeholder').each(function() {
         var placeholder = $(this)
-        placeholder.html('');
         placeholder.droppable({
             scope: uid,
             hoverClass: 'placeholder-hover',
@@ -123,32 +153,61 @@ function GapsTable(params) {
             }
         });
     });            
+    */
 
 
-/*
-    function resize(rows, cols) {
-        if(cells.length == rows && cells[0].length == cols) {
-            return;
-        }
+
+    function resize(cols, rows) {
+        cols = Math.max(cols, params.table_min_size.cols);
+        rows = Math.max(rows, params.table_min_size.rows);
+
         // expand height
-        while (this.value.tiles.length < h) {
-            this.value.tiles.push(new Array(w).fill(0));
+        while(cells.length < rows) {
+            params.values.push(new Array(cols).fill(params.placeholder));
+            var idx = params.values.length - 1;
+            renderRow(params.values[idx], params.header && idx == 0)
         }
-        // reduce height
-        if (this.value.tiles.length > h) {
-            this.value.tiles = this.value.tiles.slice(0, h);
+
+        // collapse height
+        if(cells.length > rows) {
+            for(var i=rows; i<cells.length; i++) {
+                var tr = cells[i][0].parent();
+                for(var j=0; j<cells[i].length; j++) {
+                    toolbar.append(cells[i][j].find('.value'));
+                    cells[i][j].remove();
+                }
+                tr.remove();
+            }
+            cells = cells.slice(0, rows);
         }
-        for (var i = 0; i < this.value.tiles.length; i++) {
-            if (this.value.tiles[i].length < w) {
+
+        if(!cells.length || cells[0].length == cols) {
+            return;
+        }        
+
+        
+        for(var i=0; i<cells.length; i++) {
+            var is_header = i == 0 && params.header;
+            var tr = cells[i][0].parent();
+            if(cells[i].length < cols) {
                 // expand width
-                this.value.tiles[i] = this.value.tiles[i].concat(new Array(w - this.value.tiles[i].length).fill(0));
-            } else if (this.value.tiles[i].length > w) {
-                // reduce width
-                this.value.tiles[i] = this.value.tiles[i].slice(0, w);
+                var l = cells[i].length;                            
+                params.values[i] = params.values[i].concat(new Array(cols - l).fill(params.placeholder));
+                for(var j=l; j<cols; j++) {
+                    var cell = createCell(params.values[i][j], is_header);
+                    cells[i][j] = cell;
+                    tr.append(cell);
+                }
+            } else if (cells[i].length > cols) {
+                // collapse width
+                params.values[i] = params.values[i].slice(0, cols);
+                for(var j=cols; j<cells[i].length; j++) {
+                    toolbar.append(cells[i][j].find('.value'));
+                    cells[i][j].remove();
+                }
+                cells[i] = cells[i].slice(0, cols);
             }
         }
-        this.display.render(this.value);
-        this.onChange(true);        
     }
 
 
@@ -157,26 +216,49 @@ function GapsTable(params) {
         table_container.resizable({
             grid: [params.values[0].length, params.values.length],
             stop: function(event, ui) {
+                var cols = 0;
+                var w = 0;
+                while(w < ui.size.width) {
+                    if(cells.length && cols < cells[0].length) {
+                        w += cells[0][cols].outerWidth();
+                    } else {
+                        w += params.cell_min_width;
+                    }
+                    cols++;
+                }
+                var rows = 0;
+                var h = 0;
+                while(h < ui.size.height) {
+                    if(rows < cells.length) {
+                        h += cells[rows][0].outerHeight();
+                    } else {
+                        h += 30; // TODO: add to config somehow ?
+                    }
+                    rows++;
+                }                
+                resize(cols - 1, rows - 1);
                 table_container.width('');
-                table_container.height('auto');
-                console.log(ui.size.width, ui.size.height);
-                //resize(rows, cols);
+                table_container.height('');                
             }
         });
     }
-*/
+
 
 
     function validate(silent) {
         var res = true;
-        for(var i=0; i<params.valid.length; i++) {
-            for(var j=0; j<params.valid[i].length; j++) {
-                if(params.values[i][j] !== params.placeholder) {
+        var valid;
+        for(var i=0; i<cells.length; i++) {
+            for(var j=0; j<cells[i].length; j++) {
+                if(i > params.valid.length || j > params.valid[i].length) {
+                    valid = false;
+                } else if(params.values[i][j] !== params.placeholder) {
                     continue;
+                } else {
+                    var v1 = params.valid[i][j];
+                    var v2 = cells[i][j].text();
+                    valid = v1 !== '' && v1 === v2;
                 }
-                var v1 = params.valid[i][j];
-                var v2 = cells[i][j].text();
-                var valid = v1 !== '' && v1 === v2;
                 cells[i][j].toggleClass('mistake', !valid);
                 res = res && valid;
             }
