@@ -250,7 +250,7 @@ function GapsTable(params) {
         var valid;
         for(var i=0; i<cells.length; i++) {
             for(var j=0; j<cells[i].length; j++) {
-                if(i > params.valid.length || j > params.valid[i].length) {
+                if(i >= params.valid.length || j > params.valid[i].length) {
                     valid = false;
                 } else if(params.values[i][j] !== params.placeholder) {
                     continue;
