@@ -50,8 +50,7 @@ function GapsTable(params) {
 
     // toolbar
     var values = [];
-    var first_row = params.header ? 1 : 0;
-    for(var i=first_row; i<params.valid.length; i++) {
+    for(var i=0; i<params.valid.length; i++) {
         for(var j=0; j<params.valid[i].length; j++) {
             var v = params.valid[i][j];
             if(v !== '' && v !== params.placeholder) {
@@ -170,7 +169,7 @@ function GapsTable(params) {
 
     function validate(silent) {
         var res = true;
-        for(var i=first_row; i<params.valid.length; i++) {
+        for(var i=0; i<params.valid.length; i++) {
             for(var j=0; j<params.valid[i].length; j++) {
                 if(params.values[i][j] !== params.placeholder) {
                     continue;
@@ -189,7 +188,7 @@ function GapsTable(params) {
 
     function getAnswer() {
         var res = [];
-        for(var i=first_row; i<params.values.length; i++) {
+        for(var i=0; i<params.values.length; i++) {
             var row = [];
             for(var j=0; j<params.values[i].length; j++) {
                 row.push(params.values[i][j] === params.placeholder ? cells[i][j].text() : '');
@@ -203,7 +202,7 @@ function GapsTable(params) {
     function setAnswer(answer) {
         reset();
         var values = toolbar.find('.value').toArray();
-        for(var i=first_row; i<params.values.length; i++) {
+        for(var i=0; i<params.values.length; i++) {
             for(var j=0; j<params.values[i].length; j++) {
                 if(params.values[i][j] !== params.placeholder) {
                     continue;
