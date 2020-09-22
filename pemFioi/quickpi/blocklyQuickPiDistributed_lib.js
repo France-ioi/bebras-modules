@@ -1360,7 +1360,7 @@ var getContext = function (display, infos, curLevel) {
       // Define our blocks for our namespace "distributed"
       distributed: {
          // Categories are reflected in the Blockly menu
-         actions: [
+         actuator: [
             { name: "getNodeID", yieldsValue: true },
             { name: "getNeighbors", yieldsValue: true },
             {
@@ -1390,7 +1390,7 @@ var getContext = function (display, infos, curLevel) {
    context.provideBlocklyColours = function () {
       return {
          categories: {
-            actions: 0,
+            actuator: 0,
             sensors: 100
          }
       };

@@ -9674,7 +9674,7 @@ var getContext = function (display, infos, curLevel) {
                 },
 
             ],
-            actions: [
+            actuator: [
                 { name: "turnLedOn" },
                 { name: "turnLedOff" },
                 { name: "turnBuzzerOn" },
@@ -10039,7 +10039,7 @@ var getContext = function (display, infos, curLevel) {
     context.provideBlocklyColours = function () {
         return {
             categories: {
-                actions: 0,
+                actuator: 0,
                 sensors: 100,
                 internet: 200,
                 display: 300,
