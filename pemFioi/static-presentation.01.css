@@ -1,0 +1,93 @@
+h2 {
+   color: #af2765;
+   padding-bottom: 30px;
+   font-weight: bold;
+}
+p {
+   font-size: 16px;
+}
+li {
+   font-size: 16px;
+   margin: 10px;
+}
+div.return-button {
+   text-align: center;
+}
+.bouton, div.return-button button {
+   background-color: #af2765;
+   height: 50px;
+   padding-left: 5px;
+   border: 3px solid #af2765;
+   border-radius: 10px;
+   box-shadow: 0px 5px 5px black;
+   text-align: center;
+   color: white;
+   display: inline-block;
+
+}
+.bouton:hover, div.return-button button:hover {
+   background-color: #aeaeae;
+   border: 3px solid #aeaeae;
+}
+.bouton p {
+   line-height: 45px;
+   vertical-align: middle;
+}
+.b_type1 {
+   width: 300px;
+   margin-top: 20px;
+   margin-bottom: 30px;
+}
+.b_type2 {
+   width: 150px;
+   margin: 10px;
+}
+.b_type2 p {
+   font-size: 1.5em;
+   text-align: center;
+}
+.paragraphe {
+   box-shadow: 0px 20px 15px #aeaeae;
+   max-width: 800px;
+   margin-right: auto;
+   margin-left: auto;
+   margin-top: 20px;
+   margin-bottom: 40px;
+   padding: 20px;
+}
+.visuel  {
+   border: 1px solid #af2765;
+   margin: 20px auto;
+}
+.instructions {
+   display: inline-block;
+   width: 30%;
+   min-width: 300px;
+   margin-top: 10px;
+}
+table {
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
+td.component-img {
+   text-align: center;
+   font-size: 16px;
+   padding: 10px;
+}
+.component td {
+   font-size: 16px;
+   padding: 10px;
+}
+.controls td {
+   padding: 5px;
+   text-align: left;
+}
+td.control-img {
+   text-align: center;
+}
+.pedagogie {
+   background-color: #f6cbde;
+   padding: 10px;
+   margin-top: 10px;
+   margin-bottom: 10px;r
+}
