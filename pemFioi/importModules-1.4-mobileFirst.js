@@ -147,9 +147,12 @@
          // map2d
          'map2d': {src: modulesPath+"/pemFioi/components/map2d/map2d.js", id: "map2d"},
          'map2d_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/map2d/styles.css", id: "map2d_styles"},
+         'openstreetmap_task': {src: modulesPath+"/pemFioi/components/map2d/task.js", id: "openstreetmap_task"},
 
-         // openstreetmap
-         'openstreetmap': {src: modulesPath+"/pemFioi/openstreetmap/task.js", id: "openstreetmap"},
+         // gaps table
+         'gaps_table': {src: modulesPath+"/pemFioi/components/gaps-table/component.js", id: "gaps_table"},
+         'gaps_table_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/gaps-table/styles.css", id: "gaps_table_styles"},
+         'gaps_table_task': {src: modulesPath+"/pemFioi/components/gaps-table/task.js", id: "gaps_table_task"},         
 
          // Bundles
          'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},

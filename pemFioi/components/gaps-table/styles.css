@@ -50,3 +50,8 @@
 .gaps-table table .mistake {
     background: #FF6666;
 }
+
+.gaps-table table .mistake .value {
+    background: #FF6666;
+    border-color: #FF6666;
+}

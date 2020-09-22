@@ -124,9 +124,7 @@ var importableModules = function () {
       // map2d
       'map2d': {src: modulesPath+"/pemFioi/components/map2d/map2d.js", id: "map2d"},
       'map2d_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/map2d/styles.css", id: "map2d_styles"},
-
-      // openstreetmap
-      'openstreetmap': {src: modulesPath+"/pemFioi/openstreetmap/task.js", id: "openstreetmap"},
+      'openstreetmap_task': {src: modulesPath+"/pemFioi/components/map2d/task.js", id: "openstreetmap_task"},
 
 
       // json text editor
