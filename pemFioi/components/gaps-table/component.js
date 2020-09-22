@@ -1,6 +1,7 @@
 function GapsTable(params) {
 
     var defaults = {
+        header: true,
         placeholder: '*',
         random: false,
         values: false,
@@ -34,6 +35,7 @@ function GapsTable(params) {
     // init values if empty
     var resizable = false;
     if(!params.values) {
+        params.header = false;
         resizable = true;
         params.values = [];
         for(var i=0; i<params.valid.length; i++) {
@@ -48,7 +50,8 @@ function GapsTable(params) {
 
     // toolbar
     var values = [];
-    for(var i=0; i<params.valid.length; i++) {
+    var first_row = params.header ? 1 : 0;
+    for(var i=first_row; i<params.valid.length; i++) {
         for(var j=0; j<params.valid[i].length; j++) {
             var v = params.valid[i][j];
             if(v !== '' && v !== params.placeholder) {
@@ -94,7 +97,7 @@ function GapsTable(params) {
         var row = $('<tr/>');
         var cells_row = [];
         for(var j=0; j<params.values[i].length; j++) {
-            var cell = $('<td/>');
+            var cell = (i == 0 && params.header) ? $('<th/>') : $('<td/>');
             var v = params.values[i][j];
             if(v == params.placeholder) {
                 cell.addClass('placeholder');
@@ -148,11 +151,10 @@ function GapsTable(params) {
         this.display.render(this.value);
         this.onChange(true);        
     }
-*/
+
 
 
     if(resizable) {
-        /*
         table_container.resizable({
             grid: [params.values[0].length, params.values.length],
             stop: function(event, ui) {
@@ -162,14 +164,13 @@ function GapsTable(params) {
                 //resize(rows, cols);
             }
         });
-        */
     }
-
+*/
 
 
     function validate(silent) {
         var res = true;
-        for(var i=0; i<params.valid.length; i++) {
+        for(var i=first_row; i<params.valid.length; i++) {
             for(var j=0; j<params.valid[i].length; j++) {
                 if(params.values[i][j] !== params.placeholder) {
                     continue;
@@ -188,12 +189,12 @@ function GapsTable(params) {
 
     function getAnswer() {
         var res = [];
-        for(var i=0; i<params.values.length; i++) {
+        for(var i=first_row; i<params.values.length; i++) {
             var row = [];
             for(var j=0; j<params.values[i].length; j++) {
                 row.push(params.values[i][j] === params.placeholder ? cells[i][j].text() : '');
             }
-            res.push(row);
+            res[i] = row;
         }
         return res;
     }
@@ -202,7 +203,7 @@ function GapsTable(params) {
     function setAnswer(answer) {
         reset();
         var values = toolbar.find('.value').toArray();
-        for(var i=0; i<params.values.length; i++) {
+        for(var i=first_row; i<params.values.length; i++) {
             for(var j=0; j<params.values[i].length; j++) {
                 if(params.values[i][j] !== params.placeholder) {
                     continue;
