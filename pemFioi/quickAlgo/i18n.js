@@ -6,7 +6,7 @@
 var quickAlgoLanguageStrings = {
    fr: {
       categories: {
-         actions: "Action",
+         actions: "Actions",
          actuator: "Actionneurs",
          sensors: "Capteurs",
          debug: "Débogage",
