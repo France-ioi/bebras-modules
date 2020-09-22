@@ -4,7 +4,14 @@
  *
  * Task can overwrite these definitions.
  *
+ * Behavior can be configured through window.staticTaskOptions, an object which
+ * can contain :
+ * - autoValidate: validate after X ms, default is 5000 ms if autoValidate is
+ * true but not a number
+ * - addReturnButton: add a return button at the bottom of the page, set to a
+ * string to customize the button text
  */
+
 
 var task = {};
 
@@ -63,8 +70,10 @@ task.reloadState = function(state, success, error) {
    success();
 };
 
+window.staticTaskAnswer = '';
+
 task.getAnswer = function(success, error) {
-   success('');
+   success(window.staticTaskAnswer);
 };
 
 task.reloadAnswerObject = function(answerObj) {}
@@ -76,7 +85,25 @@ task.load = function(views, success, error) {
    success();
 };
 
-task.gradeAnswer = function(answer, answerToken, success, error) {success(0, '');}
+task.gradeAnswer = function(answer, answerToken, success, error) {
+   if(!window.staticTaskOptions || !window.staticTaskOptions.autoValidateAfterMs) {
+      success(0, '');
+      return;
+   }
+
+   // Auto-validate
+   try {
+      platform.getTaskParams(null, null, function(taskParams) {
+         try {
+            success(taskParams.maxScore ? taskParams.maxScore : 40, "");
+         } catch(e) {
+            success(40, "");
+         }
+      }, function(){});
+   } catch(e) {
+       success(40, "");
+   }
+}
 
 var grader = {
    gradeTask: task.gradeAnswer
@@ -121,6 +148,22 @@ if(window.$) {
       } catch(e) {
       }
       $('body').css('width', '');
+
+      var sto = window.staticTaskOptions || {};
+      if(sto.autoValidate) {
+         setTimeout(function() {
+            window.staticTaskAnswer = "page_read";
+            try {
+                platform.validate("done");
+            } catch(e) {}
+         }, typeof sto.autoValidate == 'number' ? sto.autoValidate : 5000);
+      }
+      if(sto.addReturnButton) {
+         var btnHtml = '<div class="return-button"><button onclick="platform.validate(\'top\');">';
+         btnHtml += typeof sto.addReturnButton == 'string' ? sto.addReturnButton : 'Revenir à la liste des questions';
+         btnHtml += '</button></div>';
+         $(btnHtml).appendTo('body');
+      }
    });
 } else if(window.platform) {
    platform.initWithTask(task);
