@@ -5,10 +5,10 @@ function GapsTable(params) {
         placeholder: '*',
         random: false,
 
-        //TODO: add multiple tables support
         values: false,
         valid: [[]],
 
+        cell_min_width: 100,
         cell_min_width: 100,
 
         table_min_size: {
@@ -18,7 +18,9 @@ function GapsTable(params) {
         table_max_size: {
             rows: 10,
             cols: 10
-        }
+        },
+
+        csv_separator: ','
     }
     params = Object.assign({}, defaults, params);
 
@@ -232,11 +234,14 @@ function GapsTable(params) {
                     }
                     var rows = 0;
                     var h = 0;
+                    var avg_h = 1;
                     while(h < ui.size.height) {
                         if(rows < cells.length) {
-                            h += cells[rows][0].outerHeight();
+                            var ch = cells[rows][0].outerHeight();
+                            avg_h += ch / cells.length;
+                            h += ch;
                         } else {
-                            h += 30; // TODO: add to config somehow ?
+                            h += avg_h;
                         }
                         rows++;
                     }                
@@ -343,6 +348,17 @@ function GapsTable(params) {
     var tables = [];
     var values = [];
     for(var i=0; i<params.tables.length; i++) {
+        var data = params.tables[i];
+        if(typeof data.values == 'string') {
+            data.values = $.csv.toArrays(data.values, {
+                separator: params.csv_separator
+            });
+        }
+        if('schema' in data && typeof data.schema == 'string') {
+            data.schema = $.csv.toArrays(data.schema, {
+                separator: params.csv_separator
+            });
+        }        
         var table = Table(params.tables[i]);
         tables.push(table);
         values = values.concat(table.getValues());

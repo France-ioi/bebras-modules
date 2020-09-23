@@ -4,10 +4,9 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Gaps table test - prefilled</title>
+        <title>Gaps table test - data in CSV format</title>
         <script type="text/javascript" src="../../../../ext/jquery/2.1/jquery.min.js"></script>
         <script type="text/javascript" src="../../../../ext/jquery-ui/1.10/jquery-ui-1.10.3.custom.min.js"></script>
-        <link href="../../../../ext/jquery-ui/1.10/jquery-ui.css" rel="stylesheet">
         <script type="text/javascript" src="../../../../ext/jquery-csv/jquery.csv.js"></script>
         <script src="../component.js"></script>
         <link href="../styles.css" rel="stylesheet">
@@ -29,21 +28,16 @@
         <div id="msg"></div>
 
         <script type="text/javascript">
+
+
+
             var table = GapsTable({
                 parent: $('#table'),
                 tables: [
                     {
-                        values: [
-                            ['cell A1', 'cell B1', 'cell C1'],
-                            ['cell A2', 'cell B2', 'cell C2'],
-                        ]
-                    },
-                    {
-                        values: [
-                            ['cell A1', 'cell B1', 'cell C1'],
-                            ['cell A2', 'cell B2', 'cell C2'],
-                        ]
-                    }                    
+                        schema: '*,"static ""cell 1"\n"*","*"',
+                        values: '"cell A1",\ncell A2,cell B2'
+                    }
                 ]
             });
 
