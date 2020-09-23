@@ -158,7 +158,7 @@ function GapsTable(params) {
 
 
 
-        function resize(cols, rows) {
+        function resize(rows, cols) {
             cols = Math.max(cols, params.table_min_size.cols);
             cols = Math.min(cols, params.table_max_size.cols);
             rows = Math.max(rows, params.table_min_size.rows);
@@ -244,7 +244,7 @@ function GapsTable(params) {
                         }
                         rows++;
                     }                
-                    resize(cols - 1, rows - 1);
+                    resize(rows - 1, cols - 1);
                     table_outline.width('');
                     table_outline.height('');                
                 }
