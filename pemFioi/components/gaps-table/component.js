@@ -219,7 +219,6 @@ function GapsTable(params) {
             for(var i=0; i<params.table_min_size.rows; i++) {
                 createRow(i, params.table_min_size.cols);
             }
-
             table_outline.resizable({
                 stop: function(event, ui) {
                     var cols = 0;
