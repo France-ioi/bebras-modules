@@ -1,16 +1,14 @@
 function GapsTable(params) {
 
     var defaults = {
-        header: true,
-        placeholder: '*',
+        display_output_csv: false,
+        display_input_csv: false,
         random: false,
-
-        values: false,
-        valid: [[]],
-
+        header: true,
+        tables: [],
+        placeholder: '*',
         cell_min_width: 100,
         cell_min_width: 100,
-
         table_min_size: {
             rows: 2,
             cols: 2
@@ -19,7 +17,6 @@ function GapsTable(params) {
             rows: 10,
             cols: 10
         },
-
         csv_separator: ','
     }
     params = Object.assign({}, defaults, params);
@@ -109,17 +106,61 @@ function GapsTable(params) {
 
 
 
+    function formatCSV(data, mistakes) {
+        var lines = [];
+        for(var i=0; i<data.length; i++) {
+            var cells = [], v;
+            for(var j=0; j<data[i].length; j++) {
+                v = data[i][j];
+                if(v.indexOf(params.csv_separator) !== -1) {
+                    v = '"' + v.replace(/"/g, '""') + '"';
+                }
+                if(mistakes && mistakes[i][j]) {
+                    if(v === '') {
+                        v = '&nbsp;';
+                    }
+                    v = '<span class="mistake">' + v + '</span>';
+                }
+                cells.push(v);
+            }
+            lines[i] = cells.join(params.csv_separator);
+        }
+        return lines.join('<br>');
+    }
+
+
+
+
 
     function Table(data) {
 
+        var answer;
+        var mistakes;
         var cells = [];
+
+        if(params.display_output_csv) {
+            var input_display = $('<div class="csv"/>');
+            wrapper.append(input_display);
+            input_display.html(formatCSV(data.values));
+        }        
         var table = $('<table/>');
         var table_outline = $('<div class="table-outline"/>').append(table);
         var table_container = $('<div class="table-container"/>').append(table_outline);
         wrapper.append(table_container);
-
         var schema = Schema(data.schema);
        
+
+        var display;
+        if(params.display_output_csv) {
+            display = $('<div class="csv"/>');
+            wrapper.append(display);
+        }
+        function updateCSV() {
+            if(!params.display_output_csv) {
+                return;
+            }
+            display.html(formatCSV(answer, mistakes));
+        }
 
 
         function createCell(row, col) {
@@ -137,6 +178,7 @@ function GapsTable(params) {
                         resetMistakes();                        
                         toolbar.append(cell.find('.value').first());
                         ui.draggable.detach().css({top: 0,left: 0}).appendTo(cell);
+                        refreshAnswer();
                     }
                 });
             } else {
@@ -245,6 +287,7 @@ function GapsTable(params) {
                         rows++;
                     }                
                     resize(rows - 1, cols - 1);
+                    refreshAnswer();
                     table_outline.width('');
                     table_outline.height('');                
                 }
@@ -252,16 +295,20 @@ function GapsTable(params) {
         }
     
 
-
-        function getAnswer() {
-            var res = [];
+        function refreshAnswer() {
+            answer = [];
             for(var i=0; i<cells.length; i++) {
-                res[i] = [];
+                answer[i] = [];
                 for(var j=0; j<cells[i].length; j++) {
-                    res[i][j] = schema.isPlaceholder(i, j) ? cells[i][j].text() : '';
+                    answer[i][j] = schema.isPlaceholder(i, j) ? cells[i][j].text() : '';
                 }
             }
-            return res;
+            updateCSV();
+        }
+
+
+        function getAnswer() {
+            return answer;
         }
     
     
@@ -285,23 +332,29 @@ function GapsTable(params) {
                     }
                 }
             }
+            refreshAnswer();
         }
 
 
         function resetMistakes() {
+            mistakes = false;
             table.find('td').removeClass('mistake');
+            updateCSV();
         }
     
     
         function resetValues() {
             toolbar.append(table.find('.value'));
+            refreshAnswer();
         }
     
 
         function validate(silent) {
             var res = true;
             var valid;
+            mistakes = [];
             for(var i=0; i<cells.length; i++) {
+                mistakes[i] = [];
                 for(var j=0; j<cells[i].length; j++) {
                     if(i >= data.values.length || j > data.values[i].length) {
                         valid = false;
@@ -312,10 +365,14 @@ function GapsTable(params) {
                         var v2 = cells[i][j].text();
                         valid = v1 !== '' && v1 === v2;
                     }
-                    cells[i][j].toggleClass('mistake', !valid);
+                    if(!silent) {
+                        cells[i][j].toggleClass('mistake', !valid);
+                    }
+                    mistakes[i][j] = !valid;
                     res = res && valid;
                 }
             }
+            updateCSV();
             return res;
         }        
 
@@ -330,6 +387,8 @@ function GapsTable(params) {
             return res;
         }
 
+
+        refreshAnswer();
 
         return {
             getAnswer: getAnswer,
