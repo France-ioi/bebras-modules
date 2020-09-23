@@ -189,13 +189,14 @@ class screenDrawing {
         _drawRectangle(canvas, scale, x0, y0, width, height) {
             var ctx = canvas.getContext('2d');
 
+            if (!this.noFillStatus) {
+                ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
+            }
+
             if (!this.noStrokeStatus) {
                 ctx.strokeRect(scale * x0, scale * y0, scale * width, scale * height);
             }
 
-            if (!this.noFillStatus) {
-                ctx.fillRect(scale * x0, scale * y0, scale * width, scale * height);
-            }
         }
 
         drawRectangle(x0, y0, width, height) {
