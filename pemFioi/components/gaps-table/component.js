@@ -401,6 +401,7 @@ function GapsTable(params) {
         for(var i=0; i<tables.length; i++) {
             res.push(tables[i].getAnswer());
         }
+        return res;
     }
 
 
