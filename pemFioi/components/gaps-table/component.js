@@ -47,7 +47,11 @@ function GapsTable(params) {
     }
 
     function makeArray(length, value) {
-        return new Array(length).fill(value);
+        var arr = new Array(length);
+        for(var i=0; i<length; i++){
+            arr[i] = value;
+        }
+        return arr;
     }
 
     function getTableArraySize(arr) {
