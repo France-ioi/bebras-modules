@@ -11,14 +11,21 @@
     padding: 4px 20px;
 }
 
+.gaps-table .gaps-toolbar {
+    min-height: 28px;
+}
 
 .gaps-table .gaps-toolbar .value {
     margin: 0 10px 0 0;
 }
-  
+
 .gaps-table .table-container {
+    display: block;
+    margin: 10px 0 10px 0;
+}
+  
+.gaps-table .table-outline {
     display: inline-block;
-    margin-top: 20px;
     border: 1px dotted #000;
 }
 
