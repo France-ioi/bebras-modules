@@ -27,23 +27,35 @@
         <div id="msg"></div>
 
         <script type="text/javascript">
-            var values = [
-                ['', 'static cell 1', '*'],
-                ['*', '*', '*'],
-                ['*', '*', 'static cell 2']
-            ]
 
-            var valid = [
-                ['', '', 'cell C1'],
-                ['cell A2', 'cell B2', 'cell C2'],
-                ['cell A3', 'cell B3', '']
-            ]
 
 
             var table = GapsTable({
                 parent: $('#table'),
-                values: values,
-                valid: valid
+                tables: [
+                    {
+                        schema: [
+                            ['*', 'static cell 1'],
+                            ['*', '*'],
+                        ],
+                        values: [
+                            ['cell A1', ''],
+                            ['cell A2', 'cell B2']
+                        ]
+                    },
+                    {
+                        schema: [
+                            ['', 'static cell 1', '*'],
+                            ['*', '*', '*'],
+                            ['*', '*', 'static cell 2']
+                        ],
+                        values: [
+                            ['', '', 'cell C1'],
+                            ['cell A2', 'cell B2', 'cell C2'],
+                            ['cell A3', 'cell B3', '']
+                        ]
+                    }                    
+                ]
             });
 
 
