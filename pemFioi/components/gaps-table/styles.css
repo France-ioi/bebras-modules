@@ -70,3 +70,14 @@
     background: #FF6666;
     border-color: #FF6666;
 }
+
+.gaps-table .csv {
+    display: block;
+    margin: 5px 0 10px 0;
+    padding: 5px;
+    border: 1px solid #999;
+}
+
+.gaps-table .csv .mistake {
+    background: #FF6666;
+}
