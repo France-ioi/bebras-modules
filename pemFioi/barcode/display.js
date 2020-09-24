@@ -519,7 +519,6 @@ function StringDisplay(params) {
         diff: function(valid_result) {
             diff = '';
             var valid = true;
-
             var l = Math.max(valid_result.data.length, data.length);
             for(var i=0; i<l; i++) {
                 if((valid_result.data[i] !== data[i])) {
@@ -536,9 +535,16 @@ function StringDisplay(params) {
                 }
             }
             render();
+
+            var msg;
+            if(valid) {
+                msg = params.strings.messages.success
+            } else {
+                msg = data.length ? params.strings.messages.mistake_digit : params.strings.messages.mistake_empty;
+            }
             return {
                 success: valid,
-                message: valid ? params.strings.messages.success : params.strings.messages.mistake_digit
+                message: msg
             }
         },
 

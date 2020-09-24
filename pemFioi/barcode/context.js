@@ -30,6 +30,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                 success: 'Success',
                 mistake_digit: 'The digit with a red background is incorrect',
+                mistake_empty: 'Your program didn\'t print anything',
                 mistake_pixel: 'The pixel with a red border has luminosity %1, but should have luminosity %2',
                 result: 'Result:',
                 tooltip: 'Coordinates (%1, %2), luminosity %3'
@@ -64,6 +65,7 @@ var getContext = function(display, infos, curLevel) {
             messages: {
                 success: 'Success',
                 mistake_digit: 'Le chiffre sur fond rouge est incorrect',
+                mistake_empty: 'Votre programme n\'a rien affiché',
                 mistake_pixel: 'Le pixel encadré en rouge a la luminosité %1, mais devrait avoir la luminosité %2',
                 mistake_pixel: 'Le(s) pixel(s) avec une bordure rouge sont incorrects',
                 result: 'Résultat :',
