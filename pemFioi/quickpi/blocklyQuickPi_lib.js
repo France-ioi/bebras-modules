@@ -56,7 +56,7 @@ var quickPiLocalLanguageStrings = {
             updateScreen: "mettre à jour l'écran",
             autoUpdate: "mode de mise à jour automatique de l'écran",
 
-            fill: "mettre la couleur de fond à %1",
+            fill: "mettre la couleur de remplissage à %1",
             noFill: "ne pas remplir les formes",
             stroke: "mettre la couleur de tracé à %1",
             noStroke: "ne pas dessiner les contours",
