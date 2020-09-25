@@ -519,15 +519,17 @@ function StringDisplay(params) {
         diff: function(valid_result) {
             diff = '';
             var valid = true;
+            var has_red_digit = false;
             var l = Math.max(valid_result.data.length, data.length);
             for(var i=0; i<l; i++) {
                 if((valid_result.data[i] !== data[i])) {
                     if(i < data.length) {
-                       if (valid) {
-                           diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
-                       } else {
-                           diff += data[i];
-                       }
+                        if (valid) {
+                            has_red_digit = true;
+                            diff += '<span style="background: red; color: #fff;">' + data[i] + '</span>';
+                        } else {
+                            diff += data[i];
+                        }
                     }
                     valid = false;
                 } else {
@@ -539,8 +541,12 @@ function StringDisplay(params) {
             var msg;
             if(valid) {
                 msg = params.strings.messages.success
+            } else if(!data.length) {
+                msg = params.strings.messages.mistake_empty;
+            } else if(has_red_digit) {
+                msg = params.strings.messages.mistake_digit;
             } else {
-                msg = data.length ? params.strings.messages.mistake_digit : params.strings.messages.mistake_empty;
+                msg = params.strings.messages.mistake_length;
             }
             return {
                 success: valid,
