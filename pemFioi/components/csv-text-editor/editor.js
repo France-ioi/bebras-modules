@@ -204,15 +204,24 @@ function CSVTextEditor(params) {
         el.html(lines.join('\n'));
     }
 
+
+    function getValidValue(row, col) {
+        if(row < params.valid_data.length && col < params.valid_data[row].length) {
+            return params.valid_data[row][col];
+        } 
+        return undefined;
+    }
+
+
     function diff(data, silent) {
         var mistakes = [];
-        var fl = true;
+        var fl = data.length == params.valid_data.length;
         var rows = Math.max(data.length, params.valid_data.length);
         for(var i=0; i<rows; i++) {
-            var cols = Math.max(data[i].length, params.valid_data[i].length);
+            var cols = Math.max(data[i].length, i < params.valid_data.length ? params.valid_data[i].length : 0);
             mistakes[i] = [];
             for(var j=0; j<cols; j++) {
-                mistakes[i][j] = data[i][j] != params.valid_data[i][j];
+                mistakes[i][j] = getValidValue(i, j) !== data[i][j];
                 fl = fl && !mistakes[i][j];
             }
         }
