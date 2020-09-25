@@ -422,6 +422,8 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Capteur de luminosité',
             quickpi_accelerometer: 'Accéléromètre',
             quickpi_wait: 'Gestion du temps',
+            quickpi_magneto: 'Magnétomètre',
+            quickpi_ir_receiver: 'Récepteur infrarouge',
             quickpi_cloud: 'Stockage dans le cloud'
         }
     },
@@ -842,6 +844,8 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Sensor de luz',
             quickpi_accelerometer: 'Acelerómetro',
             quickpi_wait: 'Gestión del tiempo',
+            quickpi_magneto: 'Magnetómetro', // TODO: verify
+            quickpi_ir_receiver: 'Receptor de infrarrojos', // TODO: verify
             quickpi_cloud: 'Almacenamiento en la nube'
         }
     },
@@ -1267,6 +1271,8 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Sensore di luminosità',
             quickpi_accelerometer: 'Accelerometro',
             quickpi_wait: 'Gestione del tempo',
+            quickpi_magneto: 'Magnetometro', // TODO: verify
+            quickpi_ir_receiver: 'Ricevitore a infrarossi', // TODO: verify
             quickpi_cloud: 'Memorizzazione nel cloud'
         }
     },
@@ -1670,10 +1676,20 @@ var getContext = function (display, infos, curLevel) {
                 python: ['sleep']
             },
             {
-                id: 'quickpi_cloud',
+                id: 'quickpi_magneto',
                 order: 210,
+                python: ['readMagneticForce', 'computeCompassHeading']
+            },
+            {
+                id: 'quickpi_ir_receiver',
+                order: 211,
+                python: ['readInfraredState', 'readIRMessage']
+            },
+            {
+                id: 'quickpi_cloud',
+                order: 212,
                 python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
-            }
+            },
         ];
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
