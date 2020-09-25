@@ -67,10 +67,10 @@ function JSONTextEditor(params) {
         }
 
         if(added) {
-            if(typeof evt.preventDefault != 'undefined') {
-                evt.preventDefault();
+            if(typeof event.preventDefault != 'undefined') {
+                event.preventDefault();
             } else {
-                evt.returnValue = false;
+                event.returnValue = false;
             }
         }
     }

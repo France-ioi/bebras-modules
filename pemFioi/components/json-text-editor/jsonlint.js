@@ -1,3 +1,6 @@
+/*
+  lib modified, ParserException added
+*/
 var jsonlint = (function () {
 
     function ParserException(message, metadata) {
