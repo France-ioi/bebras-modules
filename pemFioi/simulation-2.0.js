@@ -1,4 +1,5 @@
 function Simulation(id, delayFactory) {
+   this.id = id;
    this.stepIndex = 0;
    this.steps = [];
    this.autoPlaying = false;
