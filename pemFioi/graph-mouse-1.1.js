@@ -348,6 +348,9 @@ function VertexDragger(settings) {
       self.elementID = this.data("id");
       self.originalPosition = settings.visualGraph.graphDrawer.getVertexPosition(self.elementID);
       settings.visualGraph.elementToFront(self.elementID);
+      if(settings.startCallback) {
+         settings.startCallback(self.elementID);
+      }
    };
 
    this.endHandler = function(event) {
