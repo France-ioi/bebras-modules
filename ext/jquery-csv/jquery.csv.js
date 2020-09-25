@@ -1,3 +1,7 @@
+/*
+  lib modified, ParserException added
+*/
+
 /* eslint no-prototype-builtins: 0 */
 /**
  * jQuery-csv (jQuery Plugin)
@@ -42,6 +46,18 @@ RegExp.escape = function (s) {
     } else {
       $ = {};
     }
+
+    function ParserException(message, tag, state, offset, token) {
+      var error = new Error(message);
+      error.metadata = {
+        tag: tag,
+        row: state.rowNum,
+        col: 'colNum' in state ? state.colNum : null,
+        offset: offset, 
+        token: token
+      }
+      return error;
+    }    
   
     /**
      * jQuery.csv.defaults
@@ -170,7 +186,14 @@ RegExp.escape = function (s) {
   
           // put on your fancy pants...
           // process control chars individually, use look-ahead on non-control chars
-          csv.replace(match, function (m0) {
+          csv.replace(match, function (m0, token, offset) {
+            /*
+            console.log('csv', csv);
+            console.log('m0', m0);
+            console.log('offset', offset);
+            console.log('token', token);
+            */
+            
             if (exit) {
               return;
             }
@@ -231,7 +254,14 @@ RegExp.escape = function (s) {
                   break;
                 }
                 // broken paser?
-                throw Error('CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'illegal_state',
+                  options.state,
+                  offset,
+                  token
+                );
   
               // un-delimited input
               case 3:
@@ -248,13 +278,34 @@ RegExp.escape = function (s) {
                 }
                 if (m0 === delimiter) {
                 // non-compliant data
-                  throw Error('CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                  //throw Error('CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                  throw ParserException(
+                    'CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                    'illegal_quote',
+                    options.state,
+                    offset,
+                    token
+                  );                  
                 }
                 // broken parser?
-                throw Error('CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'illegal_data',
+                  options.state,
+                  offset,
+                  token
+                );                                  
               default:
                 // shenanigans
-                throw Error('CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'unknown_state',
+                  options.state,
+                  offset,
+                  token
+                );                             
             }
             // console.log('val:' + m0 + ' state:' + state);
           });
@@ -341,7 +392,7 @@ RegExp.escape = function (s) {
   
           // put on your fancy pants...
           // process control chars individually, use look-ahead on non-control chars
-          csv.replace(match, function (m0) {
+          csv.replace(match, function (m0, token, offset) {
             if (exit) {
               return;
             }
@@ -412,7 +463,14 @@ RegExp.escape = function (s) {
                   break;
                 }
                 // broken paser?
-                throw Error('CSVDataError: Illegal state [Row:' + options.state.rowNum + ']');
+                //throw Error('CSVDataError: Illegal state [Row:' + options.state.rowNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal state [Row:' + options.state.rowNum + ']',
+                  'illegal_state',
+                  options.state,
+                  offset,
+                  token
+                );                
   
               // un-delimited input
               case 3:
@@ -433,13 +491,34 @@ RegExp.escape = function (s) {
                 }
                 // non-compliant data
                 if (m0 === delimiter) {
-                  throw Error('CSVDataError: Illegal quote [Row:' + options.state.rowNum + ']');
+                  //throw Error('CSVDataError: Illegal quote [Row:' + options.state.rowNum + ']');
+                  throw ParserException(
+                    'CSVDataError: Illegal quote [Row:' + options.state.rowNum + ']',
+                    'illegal_quote',
+                    options.state,
+                    offset,
+                    token
+                  );                                  
                 }
                 // broken parser?
-                throw Error('CSVDataError: Illegal state [Row:' + options.state.rowNum + ']');
+                //throw Error('CSVDataError: Illegal state [Row:' + options.state.rowNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal state [Row:' + options.state.rowNum + ']',
+                  'illegal_state',
+                  options.state,
+                  offset,
+                  token                  
+                );                                                  
               default:
                 // shenanigans
-                throw Error('CSVDataError: Unknown state [Row:' + options.state.rowNum + ']');
+                //throw Error('CSVDataError: Unknown state [Row:' + options.state.rowNum + ']');
+                throw ParserException(
+                  'CSVDataError: Unknown state [Row:' + options.state.rowNum + ']',
+                  'unknown_state',
+                  options.state,
+                  offset,
+                  token                  
+                );                
             }
             // console.log('val:' + m0 + ' state:' + state);
           });
@@ -506,7 +585,7 @@ RegExp.escape = function (s) {
   
           // put on your fancy pants...
           // process control chars individually, use look-ahead on non-control chars
-          csv.replace(options.match, function (m0) {
+          csv.replace(options.match, function (m0, token, offset) {
             switch (state) {
               // the start of a value
               case 0:
@@ -560,7 +639,14 @@ RegExp.escape = function (s) {
                   break;
                 }
                 // broken paser?
-                throw Error('CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'illegal_state',
+                  options.state,
+                  offset,
+                  token                  
+                );                
   
               // un-delimited input
               case 3:
@@ -575,13 +661,34 @@ RegExp.escape = function (s) {
                 }
                 // non-compliant data
                 if (m0 === delimiter) {
-                  throw Error('CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                  //throw Error('CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                  throw ParserException(
+                    'CSVDataError: Illegal Quote [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                    'illegal_quote',
+                    options.state,
+                    offset,
+                    token                  
+                  );
                 }
                 // broken parser?
-                throw Error('CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Illegal Data [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'illegal_data',
+                  options.state,
+                  offset,
+                  token
+                );
               default:
                 // shenanigans
-                throw Error('CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                //throw Error('CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']');
+                throw ParserException(
+                  'CSVDataError: Unknown State [Row:' + options.state.rowNum + '][Col:' + options.state.colNum + ']',
+                  'unknown_state',
+                  options.state,
+                  offset,
+                  token
+                );
             }
             // console.log('val:' + m0 + ' state:' + state);
           });
