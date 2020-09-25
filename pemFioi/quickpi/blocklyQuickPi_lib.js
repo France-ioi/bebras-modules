@@ -425,6 +425,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_magneto: 'Magnétomètre',
             quickpi_ir_receiver: 'Récepteur infrarouge',
             quickpi_ir_emitter: 'émetteur infrarouge',
+            quickpi_potentiometer: "Potentiomètre",
             quickpi_cloud: 'Stockage dans le cloud'
         }
     },
@@ -848,6 +849,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_magneto: 'Magnetómetro', // TODO: verify
             quickpi_ir_receiver: 'Receptor de infrarrojos', // TODO: verify
             quickpi_ir_emitter: 'emisor de infrarrojos', // TODO: verify
+            quickpi_potentiometer: "Potenciómetro", // TODO: verify
             quickpi_cloud: 'Almacenamiento en la nube'
         }
     },
@@ -1276,6 +1278,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_magneto: 'Magnetometro', // TODO: verify
             quickpi_ir_receiver: 'Ricevitore a infrarossi', // TODO: verify
             quickpi_ir_emitter: 'emettitore a infrarossi', // TODO: verify
+            quickpi_potentiometer: "Potenziometro", // TODO: verify
             quickpi_cloud: 'Memorizzazione nel cloud'
         }
     },
@@ -1692,6 +1695,11 @@ var getContext = function (display, infos, curLevel) {
                 id: "quickpi_ir_emitter",
                 order: 212,
                 python: ["setInfraredState", "sendIRMessage"]
+            },
+            {
+                id: "quickpi_potentiometer",
+                order: 213,
+                python: ["readRotaryAngle"]
             },
             {
                 id: 'quickpi_cloud',
