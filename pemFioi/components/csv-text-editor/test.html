@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CSV text editor test</title>
+        <script src="editor.js"></script>
+        <script type="text/javascript" src="../../../ext/jquery/2.1/jquery.min.js"></script>
+        <script type="text/javascript" src="../../../ext/jquery-csv/jquery.csv.js"></script>
+    </head>
+    <body>
+        <div id="editor"></div>
+        <button id="validate">Validate</button>
+        <div id="msg"></div>
+
+        <script type="text/javascript">
+            var editor = CSVTextEditor({
+                parent: $('#editor'),
+//                content: 'a"aa,bbbbbb,ccc\n"ddd,ddd",e"ee,'
+                content: 'aaa,"bbb2""bbb",ccc\n"ddd,ddd",eee,2',
+                valid_data: 'aaa,"bbb""bbb",ccc\n"ddd,ddd",eee,'
+            });
+            function validate() {
+                var valid = editor.validate();
+                $('#msg').html(valid ? 'Valid' : 'Mistake');
+            }
+            validate();
+            $('#validate').click(validate);            
+        </script>
+    </body>
+</html>

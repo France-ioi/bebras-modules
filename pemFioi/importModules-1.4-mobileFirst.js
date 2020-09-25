@@ -10,6 +10,7 @@
          'jquery-ui-1.10.3-styles': {type: "stylesheet", src: modulesPath+"/ext/jquery-ui/1.10/jquery-ui.css", id: "https://code.jquery.com/ui/1.10/jquery-ui.css"},
          'jquery-ui.touch-punch': {src: modulesPath+"/ext/jquery-ui/jquery.ui.touch-punch.min.js", id: "jquery.ui.touch-punch.min.js"},
          'jquery-ui.touch-punch.fixed': {src: modulesPath+"/ext/jquery-ui/jquery.ui.touch-punch.fixed.js", id: "jquery.ui.touch-punch.fixed.js"},
+         'jquery.csv': {src: modulesPath+"/ext/jquery-csv/jquery.csv.js", id: "jquery.csv.js"},
          'JSON-js': {src: modulesPath+"/ext/json/json2.min.js", id: "https://github.com/douglascrockford/JSON-js"},
          'raphael-2.2.1': {src: modulesPath+"/ext/raphael/2.2.1/raphael.min.js", id: "http://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.1/raphael.min.js"},
          'beaver-task-2.0': {src: modulesPath+"/pemFioi/beaver-task-2.0.js", id: "http://www.france-ioi.org/modules/pemFioi/beaver-task-2.0.js"},
@@ -154,6 +155,10 @@
          'gaps_table': {src: modulesPath+"/pemFioi/components/gaps-table/component.js", id: "gaps_table"},
          'gaps_table_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/gaps-table/styles.css", id: "gaps_table_styles"},
          'gaps_table_task': {src: modulesPath+"/pemFioi/components/gaps-table/task.js", id: "gaps_table_task"},         
+
+         // csv editor
+         'csv_editor': {src: modulesPath+"/pemFioi/components/csv-text-editor/editor.js", id: "csv_editor"},
+         'csv_editor_task': {src: modulesPath+"/pemFioi/components/csv-text-editor/task.js", id: "csv_editor_task"},
 
          // Bundles
          'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
