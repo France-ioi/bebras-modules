@@ -1195,7 +1195,7 @@ var getContext = function(display, infos, curLevel) {
                successContainersFilled: "Bravo, votre dessin est identique au modèle. Quel artiste !",
                failureContainersFilled: "Regardez bien le modèle, votre dessin n'est pas identique.",
 				   failureContainersFilledLess: "Le dessin n'est pas fini !",
-				   failureDropObject: "Le robot n'a pas peint cette case de la bonne couleur.",
+				   failureDropObject: "Le robot n'a pas peint la case de la bonne couleur.",
             }
          }
       },
@@ -1656,7 +1656,11 @@ var getContext = function(display, infos, curLevel) {
             red_robot: { img: "red_robot.png", side: 90, nbStates: 1, isRobot: true, offsetX: -15, offsetY: 15, zOrder: 2 },
             obstacle: { num: 2, img: "obstacle.png", side: 60, isObstacle: true },
             green: { num: 3, color: "#b5e61d", side: 60, isExit: true, zOrder: 0 },
-            gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 }
+            gem: { num: 4, img: "gem.png", side: 60, isWithdrawable: true, autoWithdraw: true, zOrder: 1 },
+            north: { num: 5, img: "north.png", side: 60, zOrder: 0 },
+            south: { num: 6, img: "south.png", side: 60, zOrder: 0 },
+            east: { num: 7, img: "east.png", side: 60, zOrder: 0 },
+            west: { num: 8, img: "west.png", side: 60, zOrder: 0 },
          },
          checkEndCondition: robotEndConditions.checkBothReachAndCollect
       },
@@ -1877,6 +1881,7 @@ var getContext = function(display, infos, curLevel) {
             gears: { num: 4, img: "gears.png", side: 60, isContainer: true, zOrder: 1},
             wheel: { num:5, img: "wheel.png", side: 60, isWithdrawable: true, zOrder: 2},
             projectile: {num: 6, img: "projectile.png", side: 60, zOrder: 4, action: function(item, time) { this.moveProjectile(item); }, isProjectile: true},
+            door: { num: 8, img: "door.png", side: 60, isExit: true, zOrder: 1},
             dispersion: {img: "dispersion.png", side: 60, zOrder: 4, action: function(item, time) { this.destroy(item); }, isProjectile: true},
             dispersion_robot: {img: "dispersion.png", side: 60, zOrder: 4, offsetY: -15, action: function(item, time) { this.destroy(item); }, isProjectile: true},
             projectile_generator: {num: 7, side: 60, action: function(item, time) {
@@ -2069,6 +2074,7 @@ var getContext = function(display, infos, curLevel) {
             {fr: ["rouge", "bleu", "jaune", "blanc", "vert", "orange", "rose", "violet", "marron", "gris", "noir"]}),
          backgroundColor: "#ece4ce",
          ignoreBag: true,
+         blockingFilter: false,
          itemTypes: {
             green_robot: { img: "cursor.png", side: 60, nbStates: 9, isRobot: true, zOrder: 2 },
             marker_red: { num: 2, side: 60, isContainer: true, zOrder: 0, containerFilter: function(item) {return item.color === "#ff0000";} },
@@ -3482,7 +3488,7 @@ var getContext = function(display, infos, curLevel) {
          
 
          if(container.containerFilter != undefined) {
-            if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) })) {
+            if(context.hasOn(coords.row, coords.col, function(obj) { return obj.isWithdrawable === true && !container.containerFilter(obj) }) && (context.infos.blockingFilter !== false)) {
 
                throw(window.languageStrings.messages.failureDropObject);
                return;
