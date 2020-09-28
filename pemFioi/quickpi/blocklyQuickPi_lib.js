@@ -1624,17 +1624,18 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_buzzer',
                 order: 200,
-                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
+                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff', 'setBuzzerState',
+                    'getBuzzerNote', 'isBuzzerOn']
             },
             {
                 id: 'quickpi_led',
                 order: 201,
-                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
+                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness', 'getLedBrightness', 'isLedOn']
             },
             {
                 id: 'quickpi_button',
                 order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName']
+                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton']
             },  
             {   
                 id: 'quickpi_screen',
@@ -1644,7 +1645,8 @@ var getContext = function (display, infos, curLevel) {
             {   
                 id: 'quickpi_draw',
                 order: 203,
-                python: ['drawRectangle','drawLine','drawCircle']
+                python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
+                    'stroke', 'updateScreen', 'autoUpdate', 'isPointSet']
             },
             {
                 id: 'quickpi_range',
