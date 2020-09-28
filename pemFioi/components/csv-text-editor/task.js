@@ -9,13 +9,29 @@
         strings: {
             en: {
                 validate: 'Validate',
-                validation_success: 'Success',
-                validation_mistake: 'Mistake'
+                success: 'Success',
+                mistake_rows_lack: 'Too few rows',
+                mistake_rows_excess: 'Too many rows',
+                mistake_cols_lack: 'Too few columns',
+                mistake_cols_excess: 'Too many columns',
+                mistake_incorrect_data: 'Incorrect data',
+                mistake_illegal_state: 'Incorrect CSV',
+                mistake_illegal_quote: 'Illegal quote',
+                mistake_illegal_data: 'Illegal data',
+                mistake_unknown_state: 'Incorrect CSV'
             },
             fr: {
                 validate: 'Validate',
-                validation_success: 'Success',
-                validation_mistake: 'Mistake'                
+                success: 'Success',
+                mistake_rows_lack: 'Too few rows',
+                mistake_rows_excess: 'Too many rows',
+                mistake_cols_lack: 'Too few columns',
+                mistake_cols_excess: 'Too many columns',
+                mistake_incorrect_data: 'Incorrect data',
+                mistake_illegal_state: 'Incorrect CSV',
+                mistake_illegal_quote: 'Illegal quote',
+                mistake_illegal_data: 'Illegal data',
+                mistake_unknown_state: 'Incorrect CSV'
             },
         },
 
@@ -106,12 +122,20 @@
         };
 
 
+        function getMistakeMessage() {
+            var mistake = window.csv_editor.getMistake();
+            return lang.translate('mistake_' + mistake.tag);
+        }
 
         task.gradeAnswer = function(answer, answer_token, callback) {
             window.csv_editor.setContent(answer);
             var valid = window.csv_editor.validate();
             var score = valid ? taskParams.noScore : taskParams.maxScore;
-            var msg = valid ? lang.translate('validation_success') : lang.translate('validation_mistake');
+            if(valid) {
+                var msg = lang.translate('success');
+            } else {
+                var msg = getMistakeMessage();
+            }
             $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
             $('#validate-btn').remove();
             callback(score, msg, null);

@@ -6,13 +6,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>CSV text editor test</title>
         <script src="editor.js"></script>
+        <link href="styles.css" rel="stylesheet">
         <script type="text/javascript" src="../../../ext/jquery/2.1/jquery.min.js"></script>
         <script type="text/javascript" src="../../../ext/jquery-csv/jquery.csv.js"></script>
+        <style>
+            html, 
+            body {
+                font: 14px sans;                
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }            
+            .panel {
+                margin-top: 20px;
+            }
+        </style>        
     </head>
     <body>
         <div id="editor"></div>
-        <button id="validate">Validate</button>
-        <div id="msg"></div>
+        <div class="panel">
+            <button id="validate">Validate</button>
+            <div id="msg"></div>
+        </div>
 
         <script type="text/javascript">
             var editor = CSVTextEditor({

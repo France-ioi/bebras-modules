@@ -10,11 +10,6 @@ function CSVTextEditor(params) {
     var defaults = {
         width: '100%',
         min_height: '100px',
-        styles: {
-            error_line: 'background: #FFAAAA',
-            error_char: 'background: #990000; color: #FFFFFF', 
-            border: '1px solid #000000'
-        },
         csv_separator: ',',
         content: null
     }
@@ -28,25 +23,20 @@ function CSVTextEditor(params) {
         console.error(e.message);
     }                
 
-    // element
-    var el = $('<pre/>')
+
+    var wrapper = $('<div class="csv-text-editor"/>')
+    params.parent.append(wrapper);
+
+    // editor element    
+    var editor = $('<pre class="editor"/>')
         .attr('contentEditable', true)
-        .attr('spellcheck', false)
-        .css('width', params.width + 'px')
-        .css('min-height', params.min_height + 'px')
-        .css('border', params.styles.border)
-    params.parent.append(el);
+        .attr('spellcheck', false);
+    params.width && editor.css('width', params.width + 'px')
+    params.min_height && editor.css('min-height', params.min_height + 'px')
+    wrapper.append(editor);
 
 
     // sys 
-    function addEventListener(obj, evt, handler) {
-        if(obj.addEventListener) {
-            obj.addEventListener(evt, handler, false);
-        } else if(obj.attachEvent) {
-            return obj.attachEvent('on' + evt, handler);
-        }        
-    }    
-
     function stripTags(text) {
         text = text.replace(/<br>/gi, '\n');
         text = text.replace(/(<([^>]+)>)/gi, '');        
@@ -93,12 +83,12 @@ function CSVTextEditor(params) {
             }
         }
     }
-    el.on('keypress', enterKeyPressHandler)
+    editor.on('keypress', enterKeyPressHandler)
 
     function focusHandler(event) {
-        el.text(stripTags(el.text()));
+        editor.text(stripTags(editor.text()));
     }
-    el.on('focus', focusHandler)
+    editor.on('focus', focusHandler)
 
 
     function pasteHandler(event) {
@@ -123,42 +113,90 @@ function CSVTextEditor(params) {
         }
         event.preventDefault();
     }
-    el.on('paste', pasteHandler);
+    editor.on('paste', pasteHandler);
 
 
 
-    // interface
     function getContent() {
-        return stripTags(el.text());
+        return stripTags(editor.text());
     }
 
     function setContent(content) {
-        el.text(stripTags(content));
+        editor.text(stripTags(content));
     }
 
 
 
     // validation
-    function displayParseError(data, mistakes) {
-        var lines = [];
-        for(var i=0; i<data.length; i++) {
-            var cells = [], v;
-            for(var j=0; j<data[i].length; j++) {
-                v = data[i][j];
-                if(v.indexOf(params.csv_separator) !== -1) {
-                    v = '"' + v.replace(/"/g, '""') + '"';
-                }
-                if(mistakes && mistakes[i][j]) {
-                    if(v === '') {
-                        v = '&nbsp;';
-                    }
-                    v = '<span class="mistake">' + v + '</span>';
-                }
-                cells.push(v);
-            }
-            lines[i] = cells.join(params.csv_separator);
+
+    var mistake;
+    var table;
+
+    function diff(data, valid_data, silent) {
+
+        function getValidValue(row, col) {
+            if(row < valid_data.length && col < valid_data[row].length) {
+                return valid_data[row][col];
+            } 
+            return false;
+        }        
+
+        function getDataValue(row, col) {
+            if(row < data.length && col < data[row].length) {
+                return data[row][col];
+            } 
+            return false;
+        }                
+
+        function formatCell(value, valid) {
+            return '<td' + (valid ? '' : ' class="mistake"') + '>' + 
+                (v1 === false ? '' : '<pre>' + value + '</pre>') + 
+                '</td>';
         }
-        return lines.join('<br>');
+
+       
+        var res = true;
+        if(data.length != params.valid_data.length) {
+            mistake = {
+                tag: data.length < params.valid_data.length ? 'rows_lack' : 'rows_excess'
+            }
+            res = false;
+        }
+
+        var html = '';
+        var rows = Math.max(data.length, params.valid_data.length);
+        var v1, v2, valid, cols;        
+        for(var i=0; i<rows; i++) {
+            html += '<tr>';
+            if(i < params.valid_data.length && data[i].length != params.valid_data[i].length) {
+                mistake = {
+                    tag: data[i].length < params.valid_data[i].length ? 'cols_lack' : 'cols_excess'
+                }                
+                res = false;
+            }
+            var cols = Math.max(data[i].length, i < params.valid_data.length ? params.valid_data[i].length : 0);
+            for(var j=0; j<cols; j++) {
+                v1 = getDataValue(i, j);
+                v2 = getValidValue(i, j);
+                valid = v1 === v2 && v1 !== false && v2 !== false;
+                res = res && valid;
+                html += formatCell(v1, valid);
+            }
+            html += '</tr>';
+        }
+        if(!silent) {
+            if(!table) {
+                table = $('<table>');
+                wrapper.append(table);
+            }
+            table.html(html);      
+        }
+        if(!res) {
+            mistake = {
+                tag: 'incorrect_data'
+            }
+        }
+        return res;
     }
 
 
@@ -170,73 +208,25 @@ function CSVTextEditor(params) {
                 separator: params.csv_separator
             });
         } catch(e) {
+            mistake = e.metadata;
             if(!silent) {
                 content = 
                     content.substr(0, e.metadata.offset) + 
-                    '<span style="background: #F00; color: #FFF">' + e.metadata.token + '</span>' + 
+                    '<span class="mistake">' + e.metadata.token + '</span>' + 
                     content.substr(e.metadata.offset + e.metadata.token.length)
-                el.html(content);                    
+                editor.html(content);                    
             }
         }
         return data;
-    }
-
-
-    function displayDiffError(data, mistakes) {
-        var lines = [];
-        for(var i=0; i<data.length; i++) {
-            var cells = [], v;
-            for(var j=0; j<data[i].length; j++) {
-                v = data[i][j];
-                if(v.indexOf(params.csv_separator) !== -1) {
-                    v = '"' + v.replace(/"/g, '""') + '"';
-                }
-                if(mistakes[i][j]) {
-                    if(v === '') {
-                        v = '&nbsp;';
-                    }
-                    v = '<span style="background: #F00; color: #FFF">' + v + '</span>';
-                }
-                cells.push(v);
-            }
-            lines[i] = cells.join(params.csv_separator);
-        }
-        el.html(lines.join('\n'));
-    }
-
-
-    function getValidValue(row, col) {
-        if(row < params.valid_data.length && col < params.valid_data[row].length) {
-            return params.valid_data[row][col];
-        } 
-        return undefined;
-    }
-
-
-    function diff(data, silent) {
-        var mistakes = [];
-        var fl = data.length == params.valid_data.length;
-        var rows = Math.max(data.length, params.valid_data.length);
-        for(var i=0; i<rows; i++) {
-            var cols = Math.max(data[i].length, i < params.valid_data.length ? params.valid_data[i].length : 0);
-            mistakes[i] = [];
-            for(var j=0; j<cols; j++) {
-                mistakes[i][j] = getValidValue(i, j) !== data[i][j];
-                fl = fl && !mistakes[i][j];
-            }
-        }
-        if(!silent && !fl) {
-            displayDiffError(data, mistakes);
-        }
-        return fl;
-    }
-
+    }    
 
 
     function validate(valid_csv, silent) {
+        table && table.html('');
+        mistake = null;
         var data = parseEditorContent(silent);
         if(data) {
-            return diff(data, silent);
+            return diff(data, params.valid_data, silent);
         }
         return false;
     }
@@ -250,8 +240,11 @@ function CSVTextEditor(params) {
         setContent: setContent,
         getContent: getContent,
         validate: validate,
+        getMistake: function() {
+            return mistake;
+        },
         destroy: function() {
-            el.remove();
+            wrapper.remove();
         }
     }
 
