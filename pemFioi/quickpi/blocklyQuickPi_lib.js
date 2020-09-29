@@ -1707,7 +1707,7 @@ var getContext = function (display, infos, curLevel) {
                 id: 'quickpi_cloud',
                 order: 220,
                 python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
-            },
+            }
         ];
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
