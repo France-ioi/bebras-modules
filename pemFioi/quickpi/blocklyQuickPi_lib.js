@@ -422,6 +422,10 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Capteur de luminosité',
             quickpi_accelerometer: 'Accéléromètre',
             quickpi_wait: 'Gestion du temps',
+            quickpi_magneto: 'Magnétomètre',
+            quickpi_ir_receiver: 'Récepteur infrarouge',
+            quickpi_ir_emitter: 'Émetteur infrarouge',
+            quickpi_potentiometer: "Potentiomètre",
             quickpi_cloud: 'Stockage dans le cloud'
         }
     },
@@ -842,6 +846,10 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Sensor de luz',
             quickpi_accelerometer: 'Acelerómetro',
             quickpi_wait: 'Gestión del tiempo',
+            quickpi_magneto: 'Magnetómetro', // TODO: verify
+            quickpi_ir_receiver: 'Receptor de infrarrojos', // TODO: verify
+            quickpi_ir_emitter: 'Emisor de infrarrojos', // TODO: verify
+            quickpi_potentiometer: "Potenciómetro", // TODO: verify
             quickpi_cloud: 'Almacenamiento en la nube'
         }
     },
@@ -1267,6 +1275,10 @@ var quickPiLocalLanguageStrings = {
             quickpi_light_sensor: 'Sensore di luminosità',
             quickpi_accelerometer: 'Accelerometro',
             quickpi_wait: 'Gestione del tempo',
+            quickpi_magneto: 'Magnetometro', // TODO: verify
+            quickpi_ir_receiver: 'Ricevitore a infrarossi', // TODO: verify
+            quickpi_ir_emitter: 'Emettitore a infrarossi', // TODO: verify
+            quickpi_potentiometer: "Potenziometro", // TODO: verify
             quickpi_cloud: 'Memorizzazione nel cloud'
         }
     },
@@ -1612,17 +1624,18 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_buzzer',
                 order: 200,
-                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff']
+                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff', 'setBuzzerState',
+                    'getBuzzerNote', 'isBuzzerOn']
             },
             {
                 id: 'quickpi_led',
                 order: 201,
-                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff']
+                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness', 'getLedBrightness', 'isLedOn']
             },
             {
                 id: 'quickpi_button',
                 order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName']
+                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton']
             },  
             {   
                 id: 'quickpi_screen',
@@ -1632,7 +1645,8 @@ var getContext = function (display, infos, curLevel) {
             {   
                 id: 'quickpi_draw',
                 order: 203,
-                python: ['drawRectangle','drawLine','drawCircle']
+                python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
+                    'stroke', 'updateScreen', 'autoUpdate', 'isPointSet']
             },
             {
                 id: 'quickpi_range',
@@ -1670,8 +1684,28 @@ var getContext = function (display, infos, curLevel) {
                 python: ['sleep']
             },
             {
-                id: 'quickpi_cloud',
+                id: 'quickpi_magneto',
                 order: 210,
+                python: ['readMagneticForce', 'computeCompassHeading']
+            },
+            {
+                id: 'quickpi_ir_receiver',
+                order: 211,
+                python: ['readInfraredState', 'readIRMessage']
+            },
+            {
+                id: "quickpi_ir_emitter",
+                order: 212,
+                python: ["setInfraredState", "sendIRMessage"]
+            },
+            {
+                id: "quickpi_potentiometer",
+                order: 213,
+                python: ["readRotaryAngle"]
+            },
+            {
+                id: 'quickpi_cloud',
+                order: 220,
                 python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
             }
         ];
