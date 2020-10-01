@@ -461,7 +461,50 @@ function LogicController(nbTestCases, maxInstructions) {
   };
   this._loadAceEditor = function () {
     this._aceEditor = ace.edit('python-workspace');
-    this._aceEditor.setOption('readOnly', !!this._options.readOnly);
+
+    var langTools = ace.require("ace/ext/language_tools");
+    var completer = {
+      getCompletions : function(editor, session, pos, prefix, callback) {
+        callback(null, [{name: "readTemperature", value: "readTemperature(thermometer)", score: 1, meta: "retourne la température ambiante"},
+          {
+            caption: "setLedState(led, state)",
+            snippet: "setLedState(${1:led}, ${2:state})",
+            type: "snippet",
+            docHTML: "<b>setledState(led, state)</b><hr></hr>Modifie l'état de la LED : <br/>True pour l'allumer, False pour l'éteindre"
+          }]);
+      }/*,
+      getDocTooltip: function(item) {
+        if (item.type == "snippet" && !item.docHTML) {
+          item.docHTML = [
+            "<b>", lang.escapeHTML(item.caption), "</b>", "<hr></hr>",
+            lang.escapeHTML(item.snippet)
+          ].join("");
+        }
+      }*/
+
+    }
+    // we need to do that in order to remove a lot of noisy keywords which are pure python and not relevant for the student
+    langTools.setCompleters([completer]);
+
+/*
+    var snippetManager = ace.require("ace/snippets").snippetManager;
+    var config = ace.require("ace/config");
+
+    ace.config.loadModule("ace/snippets/python", function(m) {
+      if (m) {
+        m.snippetText += "#Change state of led\nsnippet setLedState\n\tsetLedState(${1:led}, ${2:state})"
+        m.snippets = snippetManager.parseSnippetFile(m.snippetText);
+
+        snippetManager.register(m.snippets, m.scope);
+      }
+    });*/
+
+    this._aceEditor.setOptions({
+      readOnly: !!this._options.readOnly,
+      enableBasicAutocompletion: true,
+      enableLiveAutocompletion: true,
+      enableSnippets: true
+    });
     this._aceEditor.$blockScrolling = Infinity;
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
