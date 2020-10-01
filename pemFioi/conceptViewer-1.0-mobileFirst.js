@@ -413,14 +413,13 @@ function conceptsFill(baseConcepts, allConcepts) {
 
 function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
   if(!includeBlocks) { return []; }
-  
+  var concepts = ['language'];
+
   if(includeBlocks.standardBlocks) {
     var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
       allConceptsById[allConcepts[c].id] = allConcepts[c];
     }
-
-    var concepts = ['language'];
     if(includeBlocks.standardBlocks.includeAll) {
       for(var c = 0; c<allConcepts.length; c++) {
         if(allConcepts[c].name.substr(0, 7) == 'blockly_') {
@@ -441,15 +440,16 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
     for(var genName in includeBlocks.generatedBlocks) {
       // this variable is used in order to make sure that we don't include two
       // times a documentation
-      var includedCategories = [];
-      var cleanedConcepts = cleanAllConcept(allConcepts);
+      var includedConceptIds = [];
+      // We remove all concepts which have no "python" attribute
+      var filteredConcepts = allConcepts.filter(concept => concept.python && concept.python != []);
       for (var functionKey in includeBlocks.generatedBlocks[genName]) {
         var functionName = includeBlocks.generatedBlocks[genName][functionKey];
-        var concept = findConceptByFunction(cleanedConcepts, functionName);
+        var concept = findConceptByFunction(filteredConcepts, functionName);
         if (concept) {
           // if we does not have the concept already pushed, we push it.
-          if (includedCategories.indexOf(concept.id) == -1) {
-            includedCategories.push(concept.id);
+          if (includedConceptIds.indexOf(concept.id) == -1) {
+            includedConceptIds.push(concept.id);
             concepts.push(concept);
           }
         } else {
@@ -467,35 +467,17 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
 }
 
 /**
- * This function allow us to remove useless concept from the concept list.
- * The "useless concepts" are concept who don't have a "python" list of all
- * their functions or in which this list is empty.
- * @param allConcepts All of the concepts.
- * @return A new list of concepts but cleaned.
- */
-function cleanAllConcept(allConcepts) {
-  var ret = [];
-  for (var concept in allConcepts) {
-    if (allConcepts[concept].python && allConcepts[concept].python != []) {
-      ret.push(allConcepts[concept]);
-    }
-  }
-  return ret;
-}
-
-/**
  * This function allow us to find a concept by his function name.
  * The function name is in the python list of a concept.
- * @param cleanedConcepts The list of all the concepts, previously cleaned
- * with cleanAllConcept(AllConcept)
+ * @param filteredConcepts The list of all the concepts which have the "python" attribute
  * @param functionName The name of the function we have to look for
  * @return A concept if found, false otherwise.
  */
-function findConceptByFunction(cleanedConcepts, functionName) {
-  for (var concept in cleanedConcepts) {
-    for (var conceptFunctionName in cleanedConcepts[concept].python) {
-      if (cleanedConcepts[concept].python[conceptFunctionName] === functionName) {
-        return cleanedConcepts[concept];
+function findConceptByFunction(filteredConcepts, functionName) {
+  for (var conceptId in filteredConcepts) {
+    for (var conceptFunctionId in filteredConcepts[conceptId].python) {
+      if (filteredConcepts[conceptId].python[conceptFunctionId] === functionName) {
+        return filteredConcepts[conceptId];
       }
     }
   }
