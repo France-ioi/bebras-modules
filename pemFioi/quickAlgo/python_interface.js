@@ -521,7 +521,6 @@ function LogicController(nbTestCases, maxInstructions) {
             caption: funProto,
             snippet: funSnippet,
             type: "snippet",
-            // TODO: funHelp, retourner à la ligne si c'est trop long.
             docHTML: "<b>" + funProto + "</b><hr></hr>" + funHelp
           })
         }
@@ -542,7 +541,38 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
 
-    // TODO: keywords + True and False and some other keywords which are not really keywords.
+    // Adding allowed consts (for, while...)
+    var allowedConsts = pythonForbiddenLists(this.includeBlocks).allowed;
+    hideHiddenWords(allowedConsts);
+
+    // This blocks are blocks which are not special but must be added
+    var toAdd = ["True", "False"];
+    for (var toAddId = 0; toAddId < toAdd.length; toAddId++) {
+      allowedConsts.push(toAdd[toAddId]);
+    }
+
+    var specialSnippets = { list_brackets: '[$1]', dict_brackets: '{$1}', var_assign: 'x = $1',
+      if: "if ${1:condition}:\n\t${2:pass}", while: "while ${1:condition}:\n\t${2:pass}",
+      elif: "elif ${1:condition}:\n\t${2:pass}"};
+    for (var constId = 0; constId < allowedConsts.length; constId++) {
+
+      if (specialSnippets.hasOwnProperty(allowedConsts[constId])) {
+        // special constant, need to create snippet
+        completions.push({
+          caption: allowedConsts[constId],
+          snippet: specialSnippets[allowedConsts[constId]],
+          type: "snippet"
+          // TODO: doc HTML + meta const
+        })
+      } else {
+        // basic constant (just printed)
+        completions.push({
+          name: allowedConsts[constId],
+          value: allowedConsts[constId]
+          // TODO: meta: depending on language write the world "keyword"
+        })
+      }
+    }
 
 
     var completer = {
@@ -722,6 +752,17 @@ function LogicController(nbTestCases, maxInstructions) {
     };
   }
 
+  function hideHiddenWords(list) {
+    var hiddenWords = ['__getitem__', '__setitem__'];
+    for(var i = 0; i < hiddenWords.length; i++) {
+      var word = hiddenWords[i];
+      var wIdx = list.indexOf(word);
+      if(wIdx > -1) {
+        list.splice(wIdx, 1);
+      }
+    }
+  }
+
   this.updateTaskIntro = function () {
     if(!this._mainContext.display) { return; }
     if($('.pythonIntro').length == 0) {
@@ -829,14 +870,7 @@ function LogicController(nbTestCases, maxInstructions) {
     function processForbiddenList(origList, allowed) {
       var list = origList.slice();
 
-      var hiddenWords = ['__getitem__', '__setitem__'];
-      for(var i = 0; i < hiddenWords.length; i++) {
-        var word = hiddenWords[i];
-        var wIdx = list.indexOf(word);
-        if(wIdx > -1) {
-          list.splice(wIdx, 1);
-        }
-      }
+      hideHiddenWords(list);
 
       var bracketsWords = { list_brackets: 'crochets [ ]+[]', dict_brackets: 'accolades { }+{}', var_assign: 'variables+x =' };
       for(var bracketsCode in bracketsWords) {
