@@ -464,7 +464,7 @@ function LogicController(nbTestCases, maxInstructions) {
     function getSnippet(proto) {
       var parenthesisOpenIndex = proto.indexOf("(");
       if (proto.charAt(parenthesisOpenIndex + 1) == ')') {
-        return proto;
+        return proto + "\n";
       } else {
         var ret = proto.substring(0, parenthesisOpenIndex + 1);
         var commaIndex = parenthesisOpenIndex;
