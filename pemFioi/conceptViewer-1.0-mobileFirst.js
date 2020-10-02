@@ -442,7 +442,7 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
       // times a documentation
       var includedConceptIds = [];
       // We remove all concepts which have no "python" attribute
-      var filteredConcepts = allConcepts.filter(concept => concept.python && concept.python != []);
+      var filteredConcepts = allConcepts.filter(function(concept) { return concept.python && concept.python != [] });
       for (var functionKey in includeBlocks.generatedBlocks[genName]) {
         var functionName = includeBlocks.generatedBlocks[genName][functionKey];
         var concept = findConceptByFunction(filteredConcepts, functionName);
