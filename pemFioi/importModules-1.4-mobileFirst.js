@@ -232,7 +232,7 @@
             'python_count',
             'ace',
             'ace_python',
-             'ace_language_tools',
+            'ace_language_tools',
             'skulpt_quickAlgo',
             'skulpt_stdlib',
             'skulpt_debugger',
