@@ -534,8 +534,9 @@ function LogicController(nbTestCases, maxInstructions) {
           }
           completions.push({
             name: name,
-            value: name
-            // TODO: meta: depending on language string for "constants"
+            value: name,
+            meta: quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("constant")
+                    ? quickAlgoLanguageStrings[stringsLanguage].constant : "constant"
           })
         }
       }
@@ -554,6 +555,10 @@ function LogicController(nbTestCases, maxInstructions) {
     var specialSnippets = { list_brackets: '[$1]', dict_brackets: '{$1}', var_assign: 'x = $1',
       if: "if ${1:condition}:\n\t${2:pass}", while: "while ${1:condition}:\n\t${2:pass}",
       elif: "elif ${1:condition}:\n\t${2:pass}"};
+
+    var keywordi18n = quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("keyword")
+        ? quickAlgoLanguageStrings[stringsLanguage].keyword : "keyword"
+
     for (var constId = 0; constId < allowedConsts.length; constId++) {
 
       if (specialSnippets.hasOwnProperty(allowedConsts[constId])) {
@@ -561,15 +566,15 @@ function LogicController(nbTestCases, maxInstructions) {
         completions.push({
           caption: allowedConsts[constId],
           snippet: specialSnippets[allowedConsts[constId]],
-          type: "snippet"
-          // TODO: doc HTML + meta const
+          type: "snippet",
+          meta: keywordi18n
         })
       } else {
         // basic constant (just printed)
         completions.push({
           name: allowedConsts[constId],
-          value: allowedConsts[constId]
-          // TODO: meta: depending on language write the world "keyword"
+          value: allowedConsts[constId],
+          meta: keywordi18n
         })
       }
     }
