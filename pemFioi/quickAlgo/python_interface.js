@@ -26,7 +26,6 @@ function LogicController(nbTestCases, maxInstructions) {
   this._options = {};
   this._readOnly = false;
   this.includeBlocks = null;
-  this._mainContext = null;
 
   /** @type {React.Component|null} */
   this.analysisComponent = null;
@@ -553,6 +552,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     // if we want to modify the result of certain keys
     var specialSnippets = {
+      // list_brackets and dict_brackets are not working
       list_brackets:
           {
             name: "[]",
