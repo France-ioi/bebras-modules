@@ -498,10 +498,6 @@ function LogicController(nbTestCases, maxInstructions) {
         return ret;
       }
     }
-    function addFunctionCompletion() {
-
-    }
-
 
     var langTools = ace.require("ace/ext/language_tools");
 
@@ -552,23 +548,53 @@ function LogicController(nbTestCases, maxInstructions) {
       allowedConsts.push(toAdd[toAddId]);
     }
 
-    var specialSnippets = { list_brackets: '[$1]', dict_brackets: '{$1}', var_assign: 'x = $1',
-      if: "if ${1:condition}:\n\t${2:pass}", while: "while ${1:condition}:\n\t${2:pass}",
-      elif: "elif ${1:condition}:\n\t${2:pass}"};
-
     var keywordi18n = quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("keyword")
         ? quickAlgoLanguageStrings[stringsLanguage].keyword : "keyword"
+
+    // if we want to modify the result of certain keys
+    var specialSnippets = {
+      list_brackets:
+          {
+            name: "[]",
+            value: "[]",
+            meta: keywordi18n
+          },
+      dict_brackets: {
+        name: "{}",
+        value: "{}",
+        meta: keywordi18n
+      },
+      var_assign: {
+        caption: "x =",
+        snippet: "x = $1",
+        type: "snippet",
+        meta: "variables"
+      },
+      if: {
+        caption: "if",
+        snippet: "if ${1:condition}:\n\t${2:pass}",
+        type: "snippet",
+        meta: keywordi18n
+      },
+      while: {
+        caption: "while",
+        snippet: "while ${1:condition}:\n\t${2:pass}",
+        type: "snippet",
+        meta: keywordi18n
+      },
+      elif: {
+        caption: "elif",
+        snippet: "elif ${1:condition}:\n\t${2:pass}",
+        type: "snippet",
+        meta: keywordi18n
+      }
+    };
 
     for (var constId = 0; constId < allowedConsts.length; constId++) {
 
       if (specialSnippets.hasOwnProperty(allowedConsts[constId])) {
         // special constant, need to create snippet
-        completions.push({
-          caption: allowedConsts[constId],
-          snippet: specialSnippets[allowedConsts[constId]],
-          type: "snippet",
-          meta: keywordi18n
-        })
+        completions.push(specialSnippets[allowedConsts[constId]]);
       } else {
         // basic constant (just printed)
         completions.push({
@@ -579,26 +605,14 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
 
-
+    // creating the completer
     var completer = {
       getCompletions : function(editor, session, pos, prefix, callback) {
         callback(null, completions);
       }
     }
 
-    /*
-    var completer = {
-      getCompletions : function(editor, session, pos, prefix, callback) {
-        callback(null, [{name: "readTemperature", value: "readTemperature(thermometer)", score: 1, meta: "retourne la température ambiante"},
-          {
-            caption: "setLedState(led, state)",
-            snippet: "setLedState(${1:led}, ${2:state})",
-            type: "snippet",
-            docHTML: "<b>setledState(led, state)</b><hr></hr>Modifie l'état de la LED : <br/>True pour l'allumer, False pour l'éteindre"
-          }]);
-      }
-    }*/
-    // we need to do that in order to remove a lot of noisy keywords which are pure python and not relevant for the student
+    // we set the completer to only what we want instead of all the noisy default stuff
     langTools.setCompleters([completer]);
   }
 
@@ -616,6 +630,16 @@ function LogicController(nbTestCases, maxInstructions) {
     this._aceEditor.$blockScrolling = Infinity;
     this._aceEditor.getSession().setMode("ace/mode/python");
     this._aceEditor.setFontSize(16);
+
+    if (!this._mainContext.disableAutoCompletion) {
+      // we resize the completer window, because some functions are too big so we need more place:
+      if (!this._aceEditor.completer) {
+        // make sure completer is initialized
+        this._aceEditor.execCommand("startAutocomplete")
+        this._aceEditor.completer.detach()
+      }
+      this._aceEditor.completer.popup.container.style.width = "22%"
+    }
   };
 
   this.findLimited = function(code) {
