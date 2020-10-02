@@ -26,6 +26,7 @@ function LogicController(nbTestCases, maxInstructions) {
   this._options = {};
   this._readOnly = false;
   this.includeBlocks = null;
+  this._mainContext = null;
 
   /** @type {React.Component|null} */
   this.analysisComponent = null;
@@ -459,10 +460,98 @@ function LogicController(nbTestCases, maxInstructions) {
     // On resize function to be called by the interface
     this._aceEditor.resize();
   };
-  this._loadAceEditor = function () {
-    this._aceEditor = ace.edit('python-workspace');
+
+  this._addAutoCompletion = function() {
+    function getSnippet(proto) {
+      var parenthesisOpenIndex = proto.indexOf("(");
+      if (proto.charAt(parenthesisOpenIndex + 1) == ')') {
+        return proto;
+      } else {
+        var ret = proto.substring(0, parenthesisOpenIndex + 1);
+        var commaIndex = parenthesisOpenIndex;
+        var snippetIndex = 1;
+        while (proto.indexOf(',', commaIndex + 1) != -1) {
+          var newCommaIndex = proto.indexOf(',', commaIndex + 1);
+          // we want to keep the space.
+          if (proto.charAt(commaIndex + 1) == ' ') {
+            commaIndex += 1;
+            ret += ' ';
+          }
+          ret += "${" + snippetIndex + ':';
+          ret += proto.substring(commaIndex + 1, newCommaIndex);
+          ret += "},";
+
+          commaIndex = newCommaIndex;
+          snippetIndex += 1;
+        }
+
+        // the last one is with the closing parenthesis.
+        var parenthesisCloseIndex = proto.indexOf(')');
+        if (proto.charAt(commaIndex + 1) == ' ') {
+          commaIndex += 1;
+          ret += ' ';
+        }
+        ret += "${" + snippetIndex + ':';
+        ret += proto.substring(commaIndex + 1, parenthesisCloseIndex);
+        ret += "})";
+
+        return ret;
+      }
+    }
+    function addFunctionCompletion() {
+
+    }
+
 
     var langTools = ace.require("ace/ext/language_tools");
+
+    // This array will contain all functions for which we must add autocompletion
+    var completions = [];
+
+    // we add completion on functions
+    if (this.includeBlocks && this.includeBlocks.generatedBlocks) {
+      for (var categoryIndex in this.includeBlocks.generatedBlocks) {
+        for (var funIndex in this.includeBlocks.generatedBlocks[categoryIndex]) {
+          var fun = this.includeBlocks.generatedBlocks[categoryIndex][funIndex];
+          var funInfos = this._getFunctionsInfo(fun);
+          var funProto = funInfos.proto;
+          var funHelp = funInfos.help;
+          var funSnippet = getSnippet(funProto);
+          completions.push({
+            caption: funProto,
+            snippet: funSnippet,
+            type: "snippet",
+            // TODO: funHelp, retourner à la ligne si c'est trop long.
+            docHTML: "<b>" + funProto + "</b><hr></hr>" + funHelp
+          })
+        }
+      }
+      if(this._mainContext.customConstants && this._mainContext.customConstants[categoryIndex]) {
+        var constList = this._mainContext.customConstants[categoryIndex];
+        for(var iConst=0; iConst < constList.length; iConst++) {
+          var name = constList[iConst].name;
+          if(this._mainContext.strings.constant && this._mainContext.strings.constant[name]) {
+            name = this._mainContext.strings.constant[name];
+          }
+          completions.push({
+            name: name,
+            value: name
+            // TODO: meta: depending on language string for "constants"
+          })
+        }
+      }
+    }
+
+    // TODO: keywords + True and False and some other keywords which are not really keywords.
+
+
+    var completer = {
+      getCompletions : function(editor, session, pos, prefix, callback) {
+        callback(null, completions);
+      }
+    }
+
+    /*
     var completer = {
       getCompletions : function(editor, session, pos, prefix, callback) {
         callback(null, [{name: "readTemperature", value: "readTemperature(thermometer)", score: 1, meta: "retourne la température ambiante"},
@@ -472,38 +561,22 @@ function LogicController(nbTestCases, maxInstructions) {
             type: "snippet",
             docHTML: "<b>setledState(led, state)</b><hr></hr>Modifie l'état de la LED : <br/>True pour l'allumer, False pour l'éteindre"
           }]);
-      }/*,
-      getDocTooltip: function(item) {
-        if (item.type == "snippet" && !item.docHTML) {
-          item.docHTML = [
-            "<b>", lang.escapeHTML(item.caption), "</b>", "<hr></hr>",
-            lang.escapeHTML(item.snippet)
-          ].join("");
-        }
-      }*/
-
-    }
+      }
+    }*/
     // we need to do that in order to remove a lot of noisy keywords which are pure python and not relevant for the student
     langTools.setCompleters([completer]);
+  }
 
-/*
-    var snippetManager = ace.require("ace/snippets").snippetManager;
-    var config = ace.require("ace/config");
-
-    ace.config.loadModule("ace/snippets/python", function(m) {
-      if (m) {
-        m.snippetText += "#Change state of led\nsnippet setLedState\n\tsetLedState(${1:led}, ${2:state})"
-        m.snippets = snippetManager.parseSnippetFile(m.snippetText);
-
-        snippetManager.register(m.snippets, m.scope);
-      }
-    });*/
+  this._loadAceEditor = function () {
+    this._aceEditor = ace.edit('python-workspace');
+    if (!this._mainContext.disableAutoCompletion)
+      this._addAutoCompletion();
 
     this._aceEditor.setOptions({
       readOnly: !!this._options.readOnly,
-      enableBasicAutocompletion: true,
-      enableLiveAutocompletion: true,
-      enableSnippets: true
+      enableBasicAutocompletion: !this._mainContext.disableAutoCompletion,
+      enableLiveAutocompletion: !this._mainContext.disableAutoCompletion,
+      enableSnippets: false
     });
     this._aceEditor.$blockScrolling = Infinity;
     this._aceEditor.getSession().setMode("ace/mode/python");
@@ -610,6 +683,45 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
 
+  /**
+   * This method allow us to get the informations about the function, pasted from updateTaskIntro
+   * This function was separated from updateTaskIntro because it will also be used by the
+   * autocompletion generator.
+   * @param functionName The name of the function
+   * @return {{help: string, proto: string, desc: *}} The informations about the function
+   */
+  this._getFunctionsInfo = function(functionName) {
+    var blockDesc = '', funcProto = '', blockHelp = '';
+    if (this._mainContext.docGenerator) {
+      blockDesc = this._mainContext.docGenerator.blockDescription(functionName);
+      funcProto = blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
+      blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
+    } else {
+      var blockName = functionName;
+      blockDesc = this._mainContext.strings.description[blockName];
+      if (!blockDesc) {
+        funcProto = (this._mainContext.strings.code[blockName] || blockName) + '()';
+        blockDesc = '<code>' + funcProto + '</code>';
+      } else if (blockDesc.indexOf('</code>') < 0) {
+        var funcProtoEnd = blockDesc.indexOf(')') + 1;
+        if(funcProtoEnd > 0) {
+          funcProto = blockDesc.substring(0, funcProtoEnd);
+          blockHelp = blockDesc.substring(funcProtoEnd);
+          blockDesc = '<code>' + funcProto + '</code>' + blockHelp;
+        } else {
+          console.error("Description for block '" + blockName + "' needs to be of the format 'function() : description', auto-generated one used instead could be wrong.");
+          funcProto = blockName + '()';
+          blockDesc = '<code>' + funcProto + '</code> : ' + blockHelp;
+        }
+      }
+    }
+    return {
+      desc: blockDesc,
+      proto: funcProto,
+      help: blockHelp
+    };
+  }
+
   this.updateTaskIntro = function () {
     if(!this._mainContext.display) { return; }
     if($('.pythonIntro').length == 0) {
@@ -683,30 +795,10 @@ function LogicController(nbTestCases, maxInstructions) {
       for (var generatorName in this.includeBlocks.generatedBlocks) {
         var blockList = this.includeBlocks.generatedBlocks[generatorName];
         for (var iBlock=0; iBlock < blockList.length; iBlock++) {
-          var blockDesc = '', funcProto = '', blockHelp = '';
-          if (this._mainContext.docGenerator) {
-            blockDesc = this._mainContext.docGenerator.blockDescription(blockList[iBlock]);
-            funcProto = blockDesc.substring(blockDesc.indexOf('<code>') + 6, blockDesc.indexOf('</code>'));
-            blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
-          } else {
-            var blockName = blockList[iBlock];
-            blockDesc = this._mainContext.strings.description[blockName];
-            if (!blockDesc) {
-              funcProto = (this._mainContext.strings.code[blockName] || blockName) + '()';
-              blockDesc = '<code>' + funcProto + '</code>';
-            } else if (blockDesc.indexOf('</code>') < 0) {
-              var funcProtoEnd = blockDesc.indexOf(')') + 1;
-              if(funcProtoEnd > 0) {
-                funcProto = blockDesc.substring(0, funcProtoEnd);
-                blockHelp = blockDesc.substring(funcProtoEnd);
-                blockDesc = '<code>' + funcProto + '</code>' + blockHelp;
-              } else {
-                console.error("Description for block '" + blockName + "' needs to be of the format 'function() : description', auto-generated one used instead could be wrong.");
-                funcProto = blockName + '()';
-                blockDesc = '<code>' + funcProto + '</code> : ' + blockHelp;
-              }
-            }
-          }
+          var infos = this._getFunctionsInfo(blockList[iBlock]);
+          var blockDesc = infos.desc;
+          var funcProto = infos.proto;
+          var blockHelp = infos.help;
           fullHtml += '<li>' + blockDesc + '</li>';
           simpleElements.push({func: funcProto, desc: blockHelp});
         }

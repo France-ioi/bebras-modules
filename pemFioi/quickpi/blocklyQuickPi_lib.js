@@ -1600,6 +1600,7 @@ var getContext = function (display, infos, curLevel) {
     // Import our localLanguageStrings into the global scope
     var strings = context.setLocalLanguageStrings(quickPiLocalLanguageStrings);
 
+    context.disableAutoCompletion = false;
 
     // Some data can be made accessible by the library through the context object
     context.quickpi = {};
