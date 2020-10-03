@@ -1699,7 +1699,8 @@ var getContext = function(display, infos, curLevel) {
             green_robot: { img: "green_robot.png", side: 80, nbStates: 9, isRobot: true, offsetX: -11, zOrder: 2 },
             marker: { num: 2, img: "marker.png", side: 60, isContainer: true, zOrder: 0 },
             flower: { num: 3, img: "flower.png", side: 60, isWithdrawable: true, isObstacle: true, zOrder: 1 },
-            fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 }
+            fixed_flower: { num: 5, img: "fixed_flower.png", side: 60, isObstacle: true, zOrder: 1 },
+            number: { num: 6, side: 60, zOrder: 1 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
