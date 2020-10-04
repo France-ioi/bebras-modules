@@ -126,6 +126,15 @@ var importableModules = function () {
       'map2d_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/map2d/styles.css", id: "map2d_styles"},
       'openstreetmap_task': {src: modulesPath+"/pemFioi/components/map2d/task.js", id: "openstreetmap_task"},
 
+      // LR_parser
+      'lr_parser-1.0': {src: modulesPath+"/pemFioi/LR_parser-1.0.js", id: "lr_parser-1.0"},
+      'lr_parser-1.0-css': {type: "stylesheet", src: modulesPath+"/pemFioi/LR_parser-1.0.css", id: "lr_parser-1.0-css"},
+      'machines-grammar': {src: modulesPath+"/ext/machines/js/grammar.js", id: "machines-grammar"},
+      'machines-lrclosuretable': {src: modulesPath+"/ext/machines/js/lrclosuretable.js", id: "machines-lrclosuretable"},
+      'machines-lrtable': {src: modulesPath+"/ext/machines/js/lrtable.js", id: "machines-lrtable"},
+      'machines-tools-alt': {src: modulesPath+"/ext/machines/js/tools-alt.js", id: "machines-tools-alt"},
+      'machines-slritem': {src: modulesPath+"/ext/machines/js/slritem.js", id: "machines-slritem"},
+      'machines-underscore': {src: modulesPath+"/ext/machines/js/underscore.js", id: "machines-underscore"},
 
       // json text editor
       'json-text-editor': {src: modulesPath+"/pemFioi/components/json-text-editor/editor.js", id: "json-text-editor"},

@@ -311,6 +311,11 @@ function LR_Parser(settings,subTask,answer) {
    this.selectedEdgeAttr = settings.selectedEdgeAttr || this.defaultSelectedEdgeAttr;
 
    this.init = function() {
+      if(window.FontsLoader) {
+         FontsLoader.loadFonts(['fontawesome']);
+         FontsLoader.checkFonts();
+      }
+
       var html = "";
       if(this.mode < 6){
          html += "<div id=\""+this.tabsID+"\"></div>";
@@ -4199,6 +4204,7 @@ function LR_Parser(settings,subTask,answer) {
    };
 
    this.style = function() {
+      // TODO :: put all that into the CSS file...
       // console.log("style")
       $("#"+this.divID).css({
          "font-size": "80%"
