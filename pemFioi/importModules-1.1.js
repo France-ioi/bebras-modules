@@ -108,8 +108,13 @@ var importableModules = function () {
       'player_p5': {src: modulesPath+"/pemFioi/p5/player_p5.js", id: "player_p5"},
       'blockly_p5': {src: modulesPath+"/pemFioi/p5/blockly_p5.js", id: "blockly_p5"},
 
+      'geography': {src: modulesPath+"/pemFioi/components/geography/geography.js", id: "geography"},
+
       'blockly_map': {src: modulesPath+"/pemFioi/map/blockly_map.js", id: "blockly_map"},
       'map': {src: modulesPath+"/pemFioi/map/map.js", id: "map"},
+
+      'blockly_map_v2': {src: modulesPath+"/pemFioi/map_v2/blockly_map.js", id: "blockly_map_v2"},
+      'map_v2': {src: modulesPath+"/pemFioi/map_v2/map.js", id: "map_v2"},            
 
       'blockly_database': {src: modulesPath+"/pemFioi/database/blockly_database.js", id: "blockly_database"},
       'database': {src: modulesPath+"/pemFioi/database/database.js", id: "database"},
