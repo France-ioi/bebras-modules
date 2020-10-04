@@ -105,7 +105,7 @@ function Map(options) {
             city_idx_2: city_idx_2,
             highlighted: false
         });
-        renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 0.4);
+        renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 0.33);
     }
 
 
