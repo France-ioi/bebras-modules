@@ -95,21 +95,28 @@ function Map(options) {
     
 
     this.addRoad = function(city_idx_1, city_idx_2) {
+        if(city_idx_1 == city_idx_2) {
+            throw new Error('The road must connect different cities')
+        }
         var city1 = db.getCity(city_idx_1);
         var city2 = db.getCity(city_idx_2);        
-        db.roads.push([city_idx_1, city_idx_2]);
+        db.roads.push({
+            city_idx_1: city_idx_1,
+            city_idx_2: city_idx_2,
+            highlighted: false
+        });
         renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 0.4);
     }
 
 
     this.getNbRoads = function(city_idx) {
-        return this.getCityRoads().length;
+        return this.getCityRoads(city_idx).length;
     }
 
     this.getCityRoads = function(city_idx) {
         var res = [];
         for(var i=0; i<db.roads.length; i++) {
-            if(db.roads[i][0] == city_idx || db.roads[i][1] == city_idx) {
+            if(db.roads[i].city_idx_1 == city_idx || db.roads[i].city_idx_2 == city_idx) {
                 res.push(i);
             }
         }
@@ -131,25 +138,26 @@ function Map(options) {
 
     this.getRoadLength = function(road_idx) {
         var road = db.getRoad(road_idx);
-        var city1 = db.getCity(road[0]);
-        var city2 = db.getCity(road[1]);
+        var city1 = db.getCity(road.city_idx_1);
+        var city2 = db.getCity(road.city_idx_2);
         return distance_calc.calculate(city1.lng, city1.lat, city2.lng, city2.lat);
     }
     
 
     this.highlightRoad = function(road_idx) {
         var road = db.getRoad(road_idx);
-        var city1 = db.getCity(road[0]);
-        var city2 = db.getCity(road[1]);
+        road.highlighted = true;
+        var city1 = db.getCity(road.city_idx_1);
+        var city2 = db.getCity(road.city_idx_1);
         renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 1);        
     }
     
     this.getDestinationCity = function(city_idx, road_idx) {
         var road = db.getRoad(road_idx);
-        if(road[0] == city_idx) {
-            return road[1];
-        } else if(road[1] == city_idx) {
-            return road[0];
+        if(road.city_idx_1 == city_idx) {
+            return road.city_idx_2;
+        } else if(road.city_idx_2 == city_idx) {
+            return road.city_idx_1;
         }
         throw new Error('Road not found');
     }
@@ -160,4 +168,78 @@ function Map(options) {
     }
 
 
+
+    /*
+    data: {
+        cities: array of cities,
+        roads: array of roads,
+        bias: distance in kilometers by default (check options.unit param)
+    }
+    */
+    this.validate = function(valid_data) {
+       
+        // check cities
+        if(db.cities.length != valid_data.cities.length) {
+            return {
+                success: false,
+                message: 'Wrong amount of cities'
+            }            
+        }
+        for(var i=0; i<valid_data.cities.length; i++) {
+            var city1 = valid_data.cities[i], 
+                city2, 
+                distance, 
+                found = false;
+            for(var j=0; j<db.cities.length; j++) {
+                city2 = db.cities[j];
+                distance = distance_calc.calculate(city1.lng, city1.lat, city2.lng, city2.lat);
+                if(distance <= valid_data.bias) {
+                    found = true;
+                }
+            }
+            if(!found) {
+                return {
+                    success: false,
+                    message: 'City missed'
+                }                            
+            }
+        }
+
+        // check roads
+        if(db.cities.length != valid_data.cities.length) {
+            return {
+                success: false,
+                message: 'Wrong amount of roads'
+            }                                        
+        }        
+        for(var i=0; i<valid_data.roads.length; i++) {
+            var road1 = valid_data.roads[i], 
+                road2, 
+                found = false;
+            for(var j=0; j<db.roads.length; j++) {
+                road2 = db.roads[j];
+                var fl1 = road1.city_idx_1 == road2_city_idx_1 && road1.city_idx_2 == road2_city_idx_2;
+                var fl2 = road1.city_idx_1 == road2_city_idx_2 && road1.city_idx_2 == road2_city_idx_1;
+                if(fl1 || fl2) {
+                    found = true;
+                }
+            }
+            if(!found) {
+                return {
+                    success: false,
+                    message: 'Road missed'
+                }                                                        
+            }
+        }
+
+        return {
+            success: true,
+            message: 'Success'
+        }
+    }
+
+
+    this.destroy = function() {
+        renderer.destroy();
+    }
 }

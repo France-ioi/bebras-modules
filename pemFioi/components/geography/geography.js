@@ -129,6 +129,11 @@ Geography.Renderer2D = function(options) {
     options.parent.appendChild(canvas);
     var context = canvas.getContext('2d');
     var coordinates = new CoordinatesConverter();
+
+    this.destroy = function() {
+        options.parent.removeChild(canvas);
+        canvas = null;
+    }    
 }
 
 
@@ -161,5 +166,9 @@ Geography.Renderer3D = function(options) {
             text: label
         }
         earth.addLabel(p);
+    }
+
+    this.destroy = function() {
+        earth.destroy();
     }
 }
