@@ -1,10 +1,27 @@
+body {
+   width: 90%;
+   max-width: 1200px;
+   font-size: 16px;
+}
 h2 {
    color: #af2765;
    padding-bottom: 30px;
    font-weight: bold;
 }
+h3 {
+   font-weight: bold;
+   font-style: italic;
+   margin-left: 10px;
+}
+h4 {
+   color: #af2765;
+   font-weight: bold;
+}
 p {
    font-size: 16px;
+}
+ol {
+   list-style: none;
 }
 li {
    font-size: 16px;
@@ -35,7 +52,7 @@ div.return-button {
 }
 .b_type1 {
    width: 300px;
-   margin-top: 20px;
+   margin: 20px;
    margin-bottom: 30px;
 }
 .b_type2 {
@@ -48,7 +65,7 @@ div.return-button {
 }
 .paragraphe {
    box-shadow: 0px 20px 15px #aeaeae;
-   max-width: 800px;
+   max-width: 1200px;
    margin-right: auto;
    margin-left: auto;
    margin-top: 20px;
@@ -58,6 +75,12 @@ div.return-button {
 .visuel  {
    border: 1px solid #af2765;
    margin: 20px auto;
+}
+.capture {
+   border: 1px solid #af2765;
+   max-width: 100%;
+   display: inline-block;
+   margin: 0 1%;
 }
 .instructions {
    display: inline-block;
@@ -85,9 +108,114 @@ td.component-img {
 td.control-img {
    text-align: center;
 }
+.objectif {
+   background-color: #eeefd1;
+   font-size: 18px;
+   font-weight: bold;
+   margin-top: 20px;
+   margin-bottom: 10px;
+   margin-left: 20px;
+}
 .pedagogie {
    background-color: #f6cbde;
    padding: 10px;
    margin-top: 10px;
-   margin-bottom: 10px;r
+   margin-bottom: 10px;
+}
+.programme_SNT {
+   background-color: #dbe9f9;
+}
+.programme_SNT img {
+   width: 30px;
+   float: left;
+   margin-right: 5px;
+}
+#notions th {
+   white-space: nowrap;
+   text-align: center;
+   width: 4%;
+   min-width: 40px;
+}
+#notions th span {
+   writing-mode: vertical-rl;
+   display: inline-block;
+}
+.debat_objectif {
+   margin-bottom: 30px;
+}
+.ressources li {
+   margin-bottom: 15px;   
+}
+.question {
+   color: #4a90e2;
+   padding-left: 10px;
+   font-size: 22px;
+}
+.puce_question {
+   background-color: #000000; 
+   border-radius: 50%; 
+   color: #ffffff; 
+   font-size: 20px; 
+   font-weight: bold; 
+   padding: 1px 6px;
+}
+.stars img {
+   width: 15px;
+}
+.check {
+   text-align: center;
+}
+.table_component {
+   width: 100%;
+   margin-bottom : 30px;
+}
+.table_component td, .table_component th {
+   border: 1px solid #aeaeae;
+   padding: 4px;
+}
+.table_component th {
+   text-align: center;
+}
+.table_component thead {
+   color: #af2765;
+}
+.ressource {
+   margin: 30px;
+}
+.titre_ressource {
+   font-size : 25px;
+   font-weight: bold;
+   vertical-align: top;
+}
+.cartouche {
+   width: 30%;
+   padding-right: 10px;
+   padding-bottom: 10px;
+}
+.groupe_blocs {
+   background-color: #eaeaea;
+   padding: 10px;
+   margin-top: 10px;
+   margin-bottom: 20px;
+}
+.contenant_bloc {
+   position: relative;
+   display: inline-block;
+}
+.description {
+   display: none;
+   background-color: #ffffff;
+   border: 1px solid #af2765;
+   padding: 4px;
+   width: 200px;
+}
+.img_bloc img {
+   max-width: 200px;
+}
+.img_bloc:hover+.description {
+   display: block;
+   position: absolute;
+   z-index: 1;
+   top: 50px;
+   left: 10px;
 }
