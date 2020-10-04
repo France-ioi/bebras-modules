@@ -6,36 +6,42 @@ var getContext = function(display, infos) {
                 map: 'Carte'
             },
             label: {
-                clearMap: 'clearMap()',
-                addLocation: 'addLocation(%1, %2, %3)',
-                addRoad: 'addRoad(%1, %2, %3, %4, %5)',
-                geoDistance: 'geoDistance(%1, %2, %3, %4)',
-                getLatitude: 'getLatitude(%1)',
-                getLongitude: 'getLongitude(%1)',
-                getNeighbors: 'getNeighbors(%1)',
-                shortestPath: 'shortestPath(%1, %2)',
+                addCity: 'addCity(%1, %2, %3)',
+                getNbCities: 'getNbCities()',
+                addRoad: 'addRoad(%1, %2)',
+                getNbRoads: 'getNbRoads(%1)',
+                getCityRoads: 'getCityRoads(%1)',
+                getCityLongitude: 'getCityLongitude(%1)',
+                getCityLatitude: 'getCityLatitude(%1)',
+                getRoadLength: 'getRoadLength(%1)',
+                highlightRoad: 'highlightRoad(%1)',
+                getDestinationCity: 'getDestinationCity(%1, %2)',
                 echo: 'afficher(%1)'
             },
             code: {
-                clearMap: 'clearMap',
-                addLocation: 'addLocation',
+                addCity: 'addCity',
+                getNbCities: 'getNbCities',
                 addRoad: 'addRoad',
-                geoDistance: 'geoDistance',
-                getLatitude: 'getLatitude',
-                getLongitude: 'getLongitude',
-                getNeighbors: 'getNeighbors',
-                shortestPath: 'shortestPath',
+                getNbRoads: 'getNbRoads',
+                getCityRoads: 'getCityRoads',
+                getCityLongitude: 'getCityLongitude',
+                getCityLatitude: 'getCityLatitude',
+                getRoadLength: 'getRoadLength',
+                highlightRoad: 'highlightRoad',
+                getDestinationCity: 'getDestinationCity',
                 echo: 'afficher'
             },
             description: {
-                clearMap: 'Delete everything from the map (roads and locations)',
-                addLocation: 'Draw a pin with a 1 or 2 letter label at the given coordinates',
-                addRoad: 'Draw a road (a straight line) between the two locations, with given opacity (between 0 and 1)',
-                geoDistance: 'returns the geo distance between the two locations, in km.',
-                getLatitude: 'Returns the latitude of the city',
-                getLongitude: 'Returns the longitude of the city',
-                getNeighbors: 'Returns the list of neighbors of the city',
-                shortestPath: 'Returns the shortest path between the two cities, using geoDistance',
+                addCity: 'Add city',
+                getNbCities: 'Return amount of cities',
+                addRoad: 'Add road between the two cities',
+                getNbRoads: 'Returns the amount of roads to the city',
+                getCityRoads: 'Returns the list of roads to the city',
+                getCityLongitude: 'Returns the longitude of the city',
+                getCityLatitude: 'Returns the latitude of the city',
+                getRoadLength: 'Return the road length',
+                highlightRoad: 'Highlight the toad',
+                getDestinationCity: 'Return destination city',
                 echo: 'Afficher'
             },
             startingBlockName: "Program",
@@ -55,25 +61,15 @@ var getContext = function(display, infos) {
     var map;
     var logger;
 
-    var conceptBaseUrl = window.location.protocol + '//'
-        + 'static4.castor-informatique.fr/help/index.html';
-    context.conceptList = [
-        {id: 'map_introduction', name: 'La proglet gogleMaps', url: conceptBaseUrl+'#map_introduction'},
-        {id: 'map_clearMap', name: 'Effacer la carte', url: conceptBaseUrl+'#map_mapDisplay'},
-        {id: 'map_addLocation', name: 'Mettre en évidence un point de la carte', url: conceptBaseUrl+'#map_mapDisplay'},
-        {id: 'map_addRoad', name: 'Tracer une ligne droite', url: conceptBaseUrl+'#map_mapDisplay'},
-        {id: 'map_getLatitude', name: 'Table des latitudes', url: conceptBaseUrl+'#map_geoData'},
-        {id: 'map_getLongitude', name: 'Table des longitudes', url: conceptBaseUrl+'#map_geoData'},
-        {id: 'map_getNeighbors', name: 'Table des voisins', url: conceptBaseUrl+'#map_geoData'},
-        {id: 'map_geoDistance', name: 'Distance entre deux points', url: conceptBaseUrl+'#map_geoComputing'},
-        {id: 'map_shortestPath', name: 'Chemin entre deux villes', url: conceptBaseUrl+'#map_geoComputing'}
-        ];
 
 
     context.reset = function(taskInfos) {
         if(!context.display) return
         if(!map) {
-            var options = $.extend({ parent: $('#grid')[0] }, infos.mapConfig);
+            var options = Object.assign({ 
+                parent: $('#grid')[0] 
+            }, infos.mapConfig);
+            
             map = new Map(options);
             logger = new Logger({
                 parent: $('#gridContainer')
@@ -99,39 +95,52 @@ var getContext = function(display, infos) {
     context.customBlocks = {
         map: {
             map: [
-                { name: 'clearMap' },
-                { name: 'addLocation',
+                { name: 'addCity',
                     params: ['Number', 'Number', 'String'],
-                    params_names: ['longitude', 'latitude', 'label']
+                    params_names: ['longitude', 'latitude', 'name']
+                },
+                { name: 'getNbCities',
+                    yieldsValue: true,
+                    params: [],
+                    params_names: []
                 },
                 { name: 'addRoad',
-                    params: ['Number', 'Number', 'Number', 'Number', 'Number'],
-                    params_names: ['longitude1', 'latitude1', 'longitude2', 'latitude2', 'opacity']
+                    params: ['Number', 'Number'],
+                    params_names: ['city_idx_1', 'city_idx_2']
                 },
-                { name: 'geoDistance',
+                { name: 'getNbRoads',
                     yieldsValue: true,
-                    params: ['Number', 'Number', 'Number', 'Number'],
-                    params_names: ['longitude1', 'latitude1', 'longitude2', 'latitude2']
+                    params: ['Number'],
+                    params_names: ['city_idx']
                 },
-                { name: 'getLatitude',
+                { name: 'getCityRoads',
                     yieldsValue: true,
-                    params: ['String'],
-                    params_names: ['cityName']
+                    params: ['Number'],
+                    params_names: ['city_idx']
                 },
-                { name: 'getLongitude',
-                  yieldsValue: true,
-                    params: ['String'],
-                    params_names: ['cityName']
-                },
-                { name: 'getNeighbors',
+                { name: 'getCityLongitude',
                     yieldsValue: true,
-                    params: ['String'],
-                    params_names: ['cityName']
+                    params: ['Number'],
+                    params_names: ['city_idx']
                 },
-                { name: 'shortestPath',
+                { name: 'getCityLatitude',
                     yieldsValue: true,
-                    params: ['String', 'String'],
-                    params_names: ['cityName1', 'cityName2']
+                    params: ['Number'],
+                    params_names: ['city_idx']
+                },
+                { name: 'getRoadLength',
+                    yieldsValue: true,
+                    params: ['Number'],
+                    params_names: ['road_idx']
+                },
+                { name: 'highlightRoad',
+                    params: ['Number'],
+                    params_names: ['road_idx']
+                },
+                { name: 'getDestinationCity',
+                    yieldsValue: true,
+                    params: ['Number', 'Number'],
+                    params_names: ['city_idx', 'road_idx']                    
                 },
                 { name: 'echo',
                     params: ['String'],
