@@ -148,7 +148,7 @@ function Map(options) {
         var road = db.getRoad(road_idx);
         road.highlighted = true;
         var city1 = db.getCity(road.city_idx_1);
-        var city2 = db.getCity(road.city_idx_1);
+        var city2 = db.getCity(road.city_idx_2);
         renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 1);        
     }
     
