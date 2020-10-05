@@ -109,14 +109,17 @@ var grader = {
    gradeTask: task.gradeAnswer
 };
 
-if(!window.preprocessingFunctions) {
-   window.preprocessingFunctions = [];
-}
-window.preprocessingFunctions.push(function() {
+function staticTaskPreprocess() {
+   $('body').addClass('static-task');
    if($('#task').length == 0) {
       $('body').attr('id', 'task');
    }
-});
+};
+
+if(!window.preprocessingFunctions) {
+   window.preprocessingFunctions = [];
+}
+window.preprocessingFunctions.push(staticTaskPreprocess);
 
 window.taskGetResourcesPost = function(res, callback) {
     res.task[0].content = $('body').html();
@@ -141,6 +144,8 @@ if(window.$) {
       if(window.platform) {
          platform.initWithTask(task);
       }
+
+      staticTaskPreprocess();
 
       // Copy of displayHelper.useFullWidth
       try {
