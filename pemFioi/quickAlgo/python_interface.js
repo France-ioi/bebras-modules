@@ -32,7 +32,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.loadContext = function (mainContext) {
     this._mainContext = mainContext;
-  }
+  };
 
   this.savePrograms = function () {
     if(this._aceEditor) {
@@ -86,7 +86,7 @@ function LogicController(nbTestCases, maxInstructions) {
     if (language == "python")
       return this._aceEditor.getValue();
     return "";
-  }
+  };
 
   this.checkCode = function(code, display) {
     // Check a code before validation; display is a function which will get
@@ -141,7 +141,7 @@ function LogicController(nbTestCases, maxInstructions) {
        }
     }
     return true;
-  }
+  };
 
   this.checkCodes = function(codes, display) {
     // Check multiple codes before validation
@@ -151,12 +151,12 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
     return true;
-  }
+  };
 
   this.getAllCodes = function(answer) {
     // TODO :: multi-node version
     return [answer[0].blockly];
-  }
+  };
 
   this.getDefaultContent = function () {
     if(this._options.startingExample && this._options.startingExample.python) {
@@ -258,7 +258,7 @@ function LogicController(nbTestCases, maxInstructions) {
     if(this._mainContext.runner) {
       this._mainContext.runner.stop();
     }
-  }
+  };
 
   /**
    *  IO specific operations
@@ -549,7 +549,7 @@ function LogicController(nbTestCases, maxInstructions) {
     }
 
     var keywordi18n = quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("keyword")
-        ? quickAlgoLanguageStrings[stringsLanguage].keyword : "keyword"
+        ? quickAlgoLanguageStrings[stringsLanguage].keyword : "keyword";
 
     // if we want to modify the result of certain keys
     var specialSnippets = {
@@ -611,11 +611,11 @@ function LogicController(nbTestCases, maxInstructions) {
       getCompletions : function(editor, session, pos, prefix, callback) {
         callback(null, completions);
       }
-    }
+    };
 
     // we set the completer to only what we want instead of all the noisy default stuff
     langTools.setCompleters([completer]);
-  }
+  };
 
   this._loadAceEditor = function () {
     this._aceEditor = ace.edit('python-workspace');
@@ -690,7 +690,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this._removeDropDownDiv = function() {
     $('.blocklyDropDownDiv').remove();
-  }
+  };
 
   this._bindEditorEvents = function () {
     $('body').on('click', this._removeDropDownDiv);
@@ -725,13 +725,13 @@ function LogicController(nbTestCases, maxInstructions) {
 
       // Close reportValue popups
       $('.blocklyDropDownDiv').remove();
-    }
+    };
     this._aceEditor.getSession().on('change', debounce(onEditorChange, 500, false))
   };
 
   this._unbindEditorEvents = function () {
     $('body').off('click', this._removeDropDownDiv);
-  }
+  };
 
   this.getAvailableModules = function () {
     if(this.includeBlocks && this.includeBlocks.generatedBlocks) {
@@ -784,7 +784,7 @@ function LogicController(nbTestCases, maxInstructions) {
       proto: funcProto,
       help: blockHelp
     };
-  }
+  };
 
   function hideHiddenWords(list) {
     var hiddenWords = ['__getitem__', '__setitem__'];
@@ -1068,22 +1068,22 @@ function LogicController(nbTestCases, maxInstructions) {
 
   this.canPaste = function() {
     return window.pythonClipboard ? true : null;
-  }
+  };
   this.canConvertBlocklyToPython = function() {
     return false;
-  }
+  };
   this.copyProgram = function() {
     var code = this._aceEditor.getSelectedText();
     if(!code) { code = this._aceEditor.getValue(); }
     window.pythonClipboard = code;
-  }
+  };
   this.pasteProgram = function() {
     if(!window.pythonClipboard) { return; }
     var curCode = this._aceEditor.getValue();
     this._aceEditor.setValue(curCode + '\n\n' + window.pythonClipboard);
     var Range = ace.require('ace/range').Range;
     this._aceEditor.selection.setRange(new Range(curCode.split(/\r\n|\r|\n/).length + 1, 0, this._aceEditor.getValue().split(/\r\n|\r|\n/).length, 0), true);
-  }
+  };
 }
 
 function getBlocklyHelper(maxBlocks, nbTestCases) {
