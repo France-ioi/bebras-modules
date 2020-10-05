@@ -1,29 +1,31 @@
-body {
+body.static-task {
    width: 90%;
    max-width: 1200px;
    font-size: 16px;
+   margin-left: auto;
+   margin-right: auto;
 }
-h2 {
+body.static-task h2 {
    color: #af2765;
    padding-bottom: 30px;
    font-weight: bold;
 }
-h3 {
+body.static-task h3 {
    font-weight: bold;
    font-style: italic;
    margin-left: 10px;
 }
-h4 {
+body.static-task h4 {
    color: #af2765;
    font-weight: bold;
 }
-p {
+body.static-task p {
    font-size: 16px;
 }
-ol {
+body.static-task ol {
    list-style: none;
 }
-li {
+body.static-task li {
    font-size: 16px;
    margin: 10px;
 }
@@ -88,7 +90,7 @@ div.return-button {
    min-width: 300px;
    margin-top: 10px;
 }
-table {
+body.static-task table {
    margin-top: 10px;
    margin-bottom: 10px;
 }
