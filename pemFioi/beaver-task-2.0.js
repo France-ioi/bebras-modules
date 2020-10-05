@@ -88,6 +88,7 @@ function getUrlParameter(sParam) {
 };
 
 window.forcedLevel = getUrlParameter("level");
+window.initialLevel = getUrlParameter("initialLevel");
 
 function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
    // Create a subTask instance, possibly operating on an existing object.
@@ -164,8 +165,26 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(taskParams.options && taskParams.options.level) {
             window.forcedLevel = taskParams.options.level;
          }
+         if(taskParams.options && taskParams.options.initialLevel) {
+            window.initialLevel = taskParams.options.initialLevel;
+         }
          if(window.forcedLevel) {
+            window.initialLevel = window.forcedLevel;
             levels = [window.forcedLevel];
+         }
+         if(window.initialLevel) {
+            defaultLevel = window.initialLevel;
+         }
+
+         if(levels) {
+            var found = false;
+            for(var i = 0; i < levels.length ; i++) {
+               if(levels[i] == window.initialLevel) {
+                  found = true;
+                  break;
+               }
+            }
+            if(!found) { window.initialLevel = levels[0]; }
          }
 
          mainTask = createTask(true);
@@ -174,16 +193,11 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          task.displayedSubTask = mainTask;
 
          if(levels || window.forcedLevel) {
-            // TODO okay to assume default level is the first level, if not supplied?
+            if (window.forcedLevel) {
+               $("." + window.forcedLevel).show(); // TODO: why is it needed here?
+            }
             if(defaultLevel === null || defaultLevel === undefined) {
-               if (window.forcedLevel) {
-                  defaultLevel = window.forcedLevel;
-                  $("." + window.forcedLevel).show(); // TODO: why is it needed here?
-               } else if(mainTask.assumeLevels) {
-                  defaultLevel = "easy";
-               } else {
-                  defaultLevel = levels[0];
-               }
+               defaultLevel = window.initialLevel;
             }
 
             // The objects levelAnswers and levelStates are indexed by level names.
@@ -237,9 +251,9 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          hasJustLoaded = false;
          task.gradeAnswer(strAnswer, null, function(score, message) {
             var maxScores = displayHelper.getLevelsMaxScores();
-            var level = levels[0];
+            var level = window.initialLevel;
             for(var i=1; i < levels.length; i++) {
-               if(score >= maxScores[levels[i-1]] || (level == 'basic' && levels[i] == 'easy')) {
+               if(score >= maxScores[levels[i-1]]) {
                   level = levels[i];
                }
             }
@@ -337,11 +351,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          if(!state.levelStates) { state.levelStates = {}; }
          if(!state.levelAnswers) { state.levelAnswers = {}; }
          if(!state.level) {
-            if (window.forcedLevel != null) {
-               state.level = window.forcedLevel;
-            } else {
-               state.level = 'easy';
-            }
+            state.level = window.forcedLevel || window.initialLevel;
          }
          var level = state.level;
          var levelState = state.levelStates[level];
