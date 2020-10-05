@@ -777,7 +777,12 @@ window.displayHelper = {
       for(var i=0; i < this.levels.length; i++) {
          var levelName = this.levels[i];
          if(typeof this.levelsRanks[levelName] == 'undefined') {
-            this.levelsRanks[levelName] = defaultLevelsRanks[levelName];
+            if(i == this.levels.length - 1) {
+               // The highest level always gets the max stars
+               this.levelsRanks[levelName] = this.maxStars;
+            } else {
+               this.levelsRanks[levelName] = defaultLevelsRanks[levelName];
+            }
          }
          this.levelsScores[levelName] = 0;
          this.prevLevelsScores[levelName] = 0;
@@ -875,19 +880,24 @@ window.displayHelper = {
       }
 
       var tabsStarContainers = [];
-      var tabsHTML = '<div id="tabsMenu">';
       var curLevel;
+      // We only render the tabs if there is more than one level ; but we
+      // keep tabsMenu as some interfaces depend on that
+      var tabsInnerHTML = '';
+      var nbLevels = 0;
       for (curLevel in this.levelsRanks) {
-         tabsHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
+         nbLevels++;
+         tabsInnerHTML += '<span class="li" id="tab_' + curLevel + '"><a href="#' + curLevel + '">';
          if (this.pointsAsStars) {
-            tabsHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
+            tabsInnerHTML += '<span class="levelLabel">' + this.strings.version + '</span><span id="stars_' + this.levelsRanks[curLevel] + '"></span>';
          } else {
-            tabsHTML += this.strings["levelName_" + curLevel] + ' — ' +
+            tabsInnerHTML += this.strings["levelName_" + curLevel] + ' — ' +
                '<span id="tabScore_' + curLevel + '">0</span> / ' + maxScores[curLevel];
          }
-         tabsHTML += '</a></span>';
+         tabsInnerHTML += '</a></span>';
       }
-      tabsHTML += '</div>';
+      if(nbLevels < 2) { tabsInnerHTML = ''; }
+      var tabsHTML = '<div id="tabsMenu">' + tabsInnerHTML + '</div>';
       $('#tabsContainer').append(tabsHTML);
 
       var self = this;
@@ -1397,7 +1407,11 @@ window.displayHelper = {
       var maxScores = this.levelsMaxScores;
       if (this.pointsAsStars) {
          this.updateStarsAtLevel(gradedLevel);
-         drawStars('titleStars', this.maxStars, 24, this.graderScore / maxScores.hard, 'normal');
+         var maxMaxScore = 0;
+         for(var lvl in maxScores) {
+            maxMaxScore = Math.max(maxScores[lvl], maxMaxScore);
+         }
+         drawStars('titleStars', this.maxStars, 24, this.graderScore / maxMaxScore, 'normal');
       } else {
          $('#tabScore_' + gradedLevel).html(scores[gradedLevel]);
          $('#bestScore').html(this.graderScore);
