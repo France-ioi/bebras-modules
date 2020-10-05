@@ -177,14 +177,13 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          }
 
          if(levels) {
-            var found = false;
+            var found = {};
             for(var i = 0; i < levels.length ; i++) {
-               if(levels[i] == window.initialLevel) {
-                  found = true;
-                  break;
-               }
+               found[levels[i]] = true;
             }
-            if(!found) { window.initialLevel = levels[0]; }
+            if(!found[window.initialLevel]) {
+               window.initialLevel = found['easy'] ? 'easy' : levels[0];
+            }
          }
 
          mainTask = createTask(true);
