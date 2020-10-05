@@ -380,8 +380,10 @@ function VertexDragger(settings) {
          }
       }
       if(settings.dragLimits) {
-         newX = Math.max(settings.dragLimits.minX, Math.min(settings.dragLimits.maxX, newX));
-         newY = Math.max(settings.dragLimits.minY, Math.min(settings.dragLimits.maxY, newY));
+         var raphObj = settings.visualGraph.getRaphaelsFromID(self.elementID);
+         var strW = raphObj[0].attr("stroke-width");
+         newX = Math.max(settings.dragLimits.minX + strW/2, Math.min(settings.dragLimits.maxX - strW/2, newX));
+         newY = Math.max(settings.dragLimits.minY + strW/2, Math.min(settings.dragLimits.maxY - strW/2, newY));
       }
       settings.visualGraph.graphDrawer.moveVertex(self.elementID, newX, newY);
    };
