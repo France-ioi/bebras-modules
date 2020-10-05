@@ -636,10 +636,14 @@ function LogicController(nbTestCases, maxInstructions) {
       // we resize the completer window, because some functions are too big so we need more place:
       if (!this._aceEditor.completer) {
         // make sure completer is initialized
-        this._aceEditor.execCommand("startAutocomplete")
-        this._aceEditor.completer.detach()
+        this._aceEditor.execCommand("startAutocomplete");
+        this._aceEditor.completer.detach();
       }
-      this._aceEditor.completer.popup.container.style.width = "22%"
+      this._aceEditor.completer.popup.container.style.width = "22%";
+
+      // removal of return for autocomplete
+      if (this._aceEditor.completer.keyboardHandler.commandKeyBinding.return)
+        delete this._aceEditor.completer.keyboardHandler.commandKeyBinding.return;
     }
   };
 
