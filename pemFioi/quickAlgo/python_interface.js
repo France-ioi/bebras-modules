@@ -500,6 +500,7 @@ function LogicController(nbTestCases, maxInstructions) {
 
     var langTools = ace.require("ace/ext/language_tools");
 
+
     // This array will contain all functions for which we must add autocompletion
     var completions = [];
 
