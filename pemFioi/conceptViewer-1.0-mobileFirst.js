@@ -413,14 +413,13 @@ function conceptsFill(baseConcepts, allConcepts) {
 
 function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
   if(!includeBlocks) { return []; }
+  var concepts = ['language'];
 
   if(includeBlocks.standardBlocks) {
     var allConceptsById = {};
     for(var c = 0; c<allConcepts.length; c++) {
       allConceptsById[allConcepts[c].id] = allConcepts[c];
     }
-
-    var concepts = ['language'];
     if(includeBlocks.standardBlocks.includeAll) {
       for(var c = 0; c<allConcepts.length; c++) {
         if(allConcepts[c].id.substr(0, 8) === 'blockly_') {
@@ -439,35 +438,51 @@ function getConceptsFromBlocks(includeBlocks, allConcepts, context) {
 
   if(includeBlocks.generatedBlocks) {
     for(var genName in includeBlocks.generatedBlocks) {
-      var categoriesByBlocks = {};
-      var includedCategories = [];
-      if(context && context.customBlocks && context.customBlocks[genName]) {
-        for(var catName in context.customBlocks[genName]) {
-          var categoryConceptName = genName + '_' + catName;
-          if(!allConceptsById[categoryConceptName]) { continue; }
-          var blockList = context.customBlocks[genName][catName];
-          for(var i=0; i<blockList.length; i++) {
-            categoriesByBlocks[blockList[i].name] = categoryConceptName;
+      // this variable is used in order to make sure that we don't include two
+      // times a documentation
+      var includedConceptIds = [];
+      // We remove all concepts which have no "python" attribute
+      var filteredConcepts = allConcepts.filter(function(concept) { return concept.python && concept.python != []; });
+      for (var functionKey in includeBlocks.generatedBlocks[genName]) {
+        var functionName = includeBlocks.generatedBlocks[genName][functionKey];
+        var concept = findConceptByFunction(filteredConcepts, functionName);
+        if (concept) {
+          // if we does not have the concept already pushed, we push it.
+          if (includedConceptIds.indexOf(concept.id) == -1) {
+            includedConceptIds.push(concept.id);
+            concepts.push(concept);
           }
-        }
-      }
-      if(allConceptsById[genName + '_introduction']) {
-        concepts.push(allConceptsById[genName + '_introduction']);
-      }
-      for(var i=0; i<includeBlocks.generatedBlocks[genName].length; i++) {
-        var blockName = includeBlocks.generatedBlocks[genName][i];
-        if(categoriesByBlocks[blockName] && includedCategories.indexOf(categoriesByBlocks[blockName]) == -1) {
-          concepts.push(allConceptsById[categoriesByBlocks[blockName]]);
-        }
-        var conceptRef = genName + '_' + blockName;
-        if(allConceptsById[conceptRef]) {
-          concepts.push(allConceptsById[conceptRef]);
+        } else {
+          // here you can print the function name for which the documentation is missing
+          // for debug:
+          // console.log("conceptViewer - function getConceptsFromBlocks : the function named: "
+          //    + functionName + " is was not found in the documentation, please consider adding it inside of the "
+          //    + "conceptList.python array.");
         }
       }
     }
   }
 
   return concepts;
+}
+
+/**
+ * This function allow us to find a concept by his function name.
+ * The function name is in the python list of a concept.
+ * @param filteredConcepts The list of all the concepts which have the "python" attribute
+ * @param functionName The name of the function we have to look for
+ * @return A concept if found, false otherwise.
+ */
+function findConceptByFunction(filteredConcepts, functionName) {
+  for (var conceptId in filteredConcepts) {
+    for (var conceptFunctionId in filteredConcepts[conceptId].python) {
+      if (filteredConcepts[conceptId].python[conceptFunctionId] === functionName) {
+        return filteredConcepts[conceptId];
+      }
+    }
+  }
+
+  return false;
 }
 
 function getConceptsFromTask(allConcepts) {
