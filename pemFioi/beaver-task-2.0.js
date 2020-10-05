@@ -165,7 +165,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
             window.forcedLevel = taskParams.options.level;
          }
          if(window.forcedLevel) {
-            levels = null;
+            levels = [window.forcedLevel];
          }
 
          mainTask = createTask(true);
@@ -173,7 +173,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          mainTaskParams = taskParams;
          task.displayedSubTask = mainTask;
 
-         if(levels || mainTask.assumeLevels) {
+         if(levels || window.forcedLevel) {
             // TODO okay to assume default level is the first level, if not supplied?
             if(defaultLevel === null || defaultLevel === undefined) {
                if (window.forcedLevel) {
@@ -442,7 +442,7 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
       if(answer === undefined || answer === null) {
          answer = gradingTask.getDefaultAnswerObject();
       }
-      if (window.forcedLevel != null) {
+      if (window.forcedLevel != null && answer[window.forcedLevel]) {
          answer = answer[window.forcedLevel];
       } else if(!levels && mainTask.assumeLevels && answer.easy) {
          answer = answer.easy;
