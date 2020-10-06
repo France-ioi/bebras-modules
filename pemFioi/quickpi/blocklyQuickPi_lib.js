@@ -2759,10 +2759,68 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = true;
+                context.restoreSensors();
                 throw (strings.messages.programEnded);
             }
         }
    };
+
+    context.sensorsSaved = [];
+
+    context.saveSensors = function() {
+        context.sensorSaved = [];
+        console.log(infos.quickPiSensors);
+        for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
+            var sensor = infos.quickPiSensors[iSensor];
+            if (sensor.isSensor) {
+                context.sensorsSaved.push({
+                    name: sensor.name,
+                    state: sensor.state,
+                    screenDrawing: sensor.screenDrawing,
+                    lastDrawnTime: sensor.lastDrawnTime,
+                    lastDrawnState: sensor.lastDrawnState,
+                    callsInTimeSlot: sensor.callsInTimeSlot,
+                    lastTimeIncrease: sensor.lastTimeIncrease,
+                    removed: sensor.removed,
+                    quickStore: sensor.quickStore
+                });
+            }
+        }
+        console.log(context.sensorSaved);
+    };
+
+    context.restoreSensors = function() {
+        if (!Array.prototype.findFirst) {
+            Array.prototype.findFirst = function (predicateCallback) {
+                if (typeof predicateCallback != 'function') {
+                    return undefined;
+                }
+
+                for (var i = 0; i < this.length; i++) {
+                    if (predicateCallback(this[i])) {
+                        return this[i];
+                    }
+                }
+
+                return undefined;
+            }
+        }
+        function restoreSensor(source, target) {
+            target.state = source.state;
+            target.screenDrawing = source.screenDrawing;
+            target.lastDrawnTime = source.lastDrawnTime;
+            target.lastDrawnState = source.lastDrawnState;
+            target.callsInTimeSlot = source.callsInTimeSlot;
+            target.lastTimeIncrease = source.lastTimeIncrease;
+            target.removed = source.removed;
+            target.quickStore = source.quickStore;
+        }
+        context.sensorsSaved.forEach(function(sensorSaved) {
+            restoreSensor(sensorSaved, infos.quickPiSensors.findFirst(function(sensorDetected) {
+                return sensorSaved.name == sensorDetected.name;
+            }));
+        });
+    };
 
    context.generatePythonSensorTable = function()
    {
@@ -2810,14 +2868,14 @@ var getContext = function (display, infos, curLevel) {
         pythonSensorTable += "]; currentADC = \"" + board.adc + "\"";
 
         return pythonSensorTable;
-   }
+   };
 
     context.resetSensorTable = function()
     {
         var pythonSensorTable = context.generatePythonSensorTable();
 
         context.quickPiConnection.sendCommand(pythonSensorTable, function(x) {});
-    }
+    };
 
 
     context.findSensor = function findSensor(type, port, error=true) {
@@ -2834,7 +2892,7 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return null;
-    }
+    };
 
 
     function sensorAssignPort(sensor)
@@ -3058,6 +3116,8 @@ var getContext = function (display, infos, curLevel) {
                 }
 
                 context.resetSensors();
+            } else {
+                context.saveSensors();
             }
 
 
