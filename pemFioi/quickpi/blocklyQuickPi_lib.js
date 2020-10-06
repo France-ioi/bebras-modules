@@ -1793,7 +1793,7 @@ var getContext = function (display, infos, curLevel) {
                 "i2c": ["i2c"],
             },
         }
-    ]
+    ];
 
 
     var sensorDefinitions = [
@@ -2768,11 +2768,30 @@ var getContext = function (display, infos, curLevel) {
     context.sensorsSaved = [];
 
     context.saveSensors = function() {
-        context.sensorSaved = [];
-        console.log(infos.quickPiSensors);
+        if (!Array.prototype.findFirst) {
+            Array.prototype.findFirst = function (predicateCallback) {
+                if (typeof predicateCallback != 'function') {
+                    return undefined;
+                }
+
+                for (var i = 0; i < this.length; i++) {
+                    if (predicateCallback(this[i])) {
+                        return this[i];
+                    }
+                }
+
+                return undefined;
+            }
+        }
+        context.sensorsSaved = [];
+        if (!infos.quickPiSensors || infos.quickPiSensors === "default") {
+            return;
+        }
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
-            if (sensor.isSensor) {
+            if (sensorDefinitions.findFirst(function(globalSensor) {
+                return globalSensor.name === sensor.type;
+            }).isSensor) {
                 context.sensorsSaved.push({
                     name: sensor.name,
                     state: sensor.state,
@@ -2786,7 +2805,6 @@ var getContext = function (display, infos, curLevel) {
                 });
             }
         }
-        console.log(context.sensorSaved);
     };
 
     context.restoreSensors = function() {
@@ -2806,6 +2824,8 @@ var getContext = function (display, infos, curLevel) {
             }
         }
         function restoreSensor(source, target) {
+            if (target.name == "temp1")
+                console.log(target);
             target.state = source.state;
             target.screenDrawing = source.screenDrawing;
             target.lastDrawnTime = source.lastDrawnTime;
@@ -2814,12 +2834,16 @@ var getContext = function (display, infos, curLevel) {
             target.lastTimeIncrease = source.lastTimeIncrease;
             target.removed = source.removed;
             target.quickStore = source.quickStore;
+            if (target.name == "temp1")
+                console.log(target);
         }
         context.sensorsSaved.forEach(function(sensorSaved) {
             restoreSensor(sensorSaved, infos.quickPiSensors.findFirst(function(sensorDetected) {
                 return sensorSaved.name == sensorDetected.name;
             }));
         });
+        if (context.display)
+            context.resetDisplay();
     };
 
    context.generatePythonSensorTable = function()
