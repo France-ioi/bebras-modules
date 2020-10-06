@@ -2931,6 +2931,7 @@ var getContext = function (display, infos, curLevel) {
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
 
+
             sensor.state = null;
             sensor.screenDrawing = null;
             sensor.lastDrawnTime = 0;
@@ -2941,7 +2942,7 @@ var getContext = function (display, infos, curLevel) {
             sensor.quickStore = null;
 
         }
-    }
+    };
     
     context.reset = function (taskInfos) {
         buzzerSound.stopAll();
@@ -3055,6 +3056,8 @@ var getContext = function (display, infos, curLevel) {
                         }
                     }
                 }
+
+                context.resetSensors();
             }
 
 
@@ -3063,6 +3066,7 @@ var getContext = function (display, infos, curLevel) {
                 infos.quickPiSensors = [];
                 addDefaultBoardSensors();
             }
+
         }
 
         context.success = false;
@@ -3076,9 +3080,6 @@ var getContext = function (display, infos, curLevel) {
                 context.sensorStates.remove();
             context.sensorStates = paper.set();
         }
-    
-
-        context.resetSensors();
 
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
