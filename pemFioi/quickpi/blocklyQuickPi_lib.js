@@ -2767,23 +2767,15 @@ var getContext = function (display, infos, curLevel) {
 
     context.sensorsSaved = [];
 
-    context.saveSensors = function() {
-        // Find first not supported by all browsers, we need to add it if not present
-        if (!Array.prototype.findFirst) {
-            Array.prototype.findFirst = function (predicateCallback) {
-                if (typeof predicateCallback != 'function') {
-                    return undefined;
-                }
-
-                for (var i = 0; i < this.length; i++) {
-                    if (predicateCallback(this[i])) {
-                        return this[i];
-                    }
-                }
-
-                return undefined;
-            };
+    function _findFirst(array, func) {
+        for (var i = 0; i < array.length; i++) {
+            if (func(array[i]))
+                return array[i];
         }
+        return undefined;
+    }
+
+    context.saveSensors = function() {
         context.sensorsSaved = [];
         if (!infos.quickPiSensors || infos.quickPiSensors === "default") {
             return;
@@ -2791,8 +2783,9 @@ var getContext = function (display, infos, curLevel) {
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
 
-            // we must retrieve the right sensor
-            if (sensorDefinitions.findFirst(function(globalSensor) {
+            // we must retrieve the sensor's definition. _findFirst will never return undefined
+            // in this case.
+            if (_findFirst(sensorDefinitions, function(globalSensor) {
                 return globalSensor.name === sensor.type;
             }).isSensor) {
                 context.sensorsSaved.push({
@@ -2811,21 +2804,6 @@ var getContext = function (display, infos, curLevel) {
     };
 
     context.restoreSensors = function() {
-        if (!Array.prototype.findFirst) {
-            Array.prototype.findFirst = function (predicateCallback) {
-                if (typeof predicateCallback != 'function') {
-                    return undefined;
-                }
-
-                for (var i = 0; i < this.length; i++) {
-                    if (predicateCallback(this[i])) {
-                        return this[i];
-                    }
-                }
-
-                return undefined;
-            }
-        }
         function restoreSensor(source, target) {
             target.state = source.state;
             target.screenDrawing = source.screenDrawing;
@@ -2837,7 +2815,7 @@ var getContext = function (display, infos, curLevel) {
             target.quickStore = source.quickStore;
         }
         context.sensorsSaved.forEach(function(sensorSaved) {
-            restoreSensor(sensorSaved, infos.quickPiSensors.findFirst(function(sensorDetected) {
+            restoreSensor(sensorSaved, _findFirst(infos.quickPiSensors, function(sensorDetected) {
                 return sensorSaved.name === sensorDetected.name;
             }));
         });
@@ -3137,10 +3115,6 @@ var getContext = function (display, infos, curLevel) {
                         }
                     }
                 }
-
-                context.resetSensors();
-            } else {
-                context.saveSensors();
             }
 
 
@@ -3149,7 +3123,10 @@ var getContext = function (display, infos, curLevel) {
                 infos.quickPiSensors = [];
                 addDefaultBoardSensors();
             }
-
+            if (context.autoGrading)
+                context.resetSensors();
+            else
+                context.saveSensors();
         }
 
         context.success = false;
