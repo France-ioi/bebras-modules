@@ -191,9 +191,15 @@ function initWrapper(initSubTask, levels, defaultLevel, reloadWithCallbacks) {
          mainTaskParams = taskParams;
          task.displayedSubTask = mainTask;
 
-         if(levels || window.forcedLevel) {
+         if(levels || mainTask.assumeLevels) {
+            // mainTask.assumeLevels is used for some quickAlgo tasks which
+            // don't declare any levels at all
             if (window.forcedLevel) {
                $("." + window.forcedLevel).show(); // TODO: why is it needed here?
+            }
+            if(!window.initialLevel) {
+               // Should happen only if mainTask.assumeLevels
+               window.initialLevel = "easy";
             }
             if(defaultLevel === null || defaultLevel === undefined) {
                defaultLevel = window.initialLevel;
