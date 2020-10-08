@@ -262,9 +262,7 @@ var conceptViewer = {
   },
 
   openInNewWidget: function() {
-    // TODO :: replace by real URL
-    // var url = "file:///home/nicolas/stage/tasks/v01/LanguagesHelp/display-documentation.html";
-    var url = "file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html";
+    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
     window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
         + "&selectedlang=" + this.selectedLanguage
         + "&shownconcept=" + this.shownConcept
