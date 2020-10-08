@@ -100,13 +100,16 @@ var conceptViewer = {
   loaded: false,
   shownConcept: null,
   selectedLanguage: null,
+  fullScreen: false,
   allLangs: [
     {id: 'blockly', lbl: 'Blockly'},
     {id: 'scratch', lbl: 'Scratch'},
     {id: 'python', lbl: 'Python'}
     ],
 
-  load: function (fullscreen) {
+  load: function (fullscreenLoad) {
+    if (!this.fullScreen)
+      this.fullScreen = fullscreenLoad;
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
@@ -129,7 +132,7 @@ var conceptViewer = {
     }
     navLanguage += '</ul>';
 
-    if (!fullscreen) {
+    if (!fullscreenLoad) {
       $('body').append(''
           + '<div id="conceptViewer" style="display: none;">'
           + '  <div class="content">'
@@ -181,7 +184,7 @@ var conceptViewer = {
 
     var that = this;
     $('#conceptViewer').on('click', function (event) {
-      if (!fullscreen && !$(event.target).closest('#conceptViewer .content').length) {
+      if (!fullscreenLoad && !$(event.target).closest('#conceptViewer .content').length) {
         that.hide();
       }
     });
@@ -259,10 +262,12 @@ var conceptViewer = {
 
   openInNewWidget: function() {
     // TODO :: replace by real URL
-    var url = "file:///home/nicolas/stage/tasks/v01/Tests/nicolas-doc-test/display-documentation.html";
+    // var url = "file:///home/nicolas/stage/tasks/v01/LanguagesHelp/display-documentation.html";
+    var url = "file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html";
     window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
         + "&selectedlang=" + this.selectedLanguage
-        + "&shownconcept=" + this.shownConcept, '_blank');
+        + "&shownconcept=" + this.shownConcept
+        + "&stringlanguage=" + window.stringsLanguage, '_blank');
   },
 
   showConcept: function (concept, show) {
@@ -271,14 +276,17 @@ var conceptViewer = {
     // directly
     var conceptUrl = null;
     var conceptId = null;
+    var conceptName = null;
     if (concept.url) {
       conceptUrl = concept.url;
       conceptId = concept.id;
+      conceptName = concept.name;
     } else {
       conceptId = concept.id ? concept.id : concept;
       for (var i=0; i<this.concepts.length; i++) {
         if(this.concepts[i].id == conceptId) {
           conceptUrl = this.concepts[i].url;
+          conceptName = this.concepts[i].name;
         }
       }
     }
@@ -299,6 +307,10 @@ var conceptViewer = {
       $('#conceptViewer .navigationContent ul li').removeClass('selected');
       $('#conceptViewer .navigationContent ul li[data-id='+conceptId+']').addClass('selected');
       $('#showNavigationContent').prop('checked', false);
+
+      if (this.fullScreen) {
+        document.title = conceptViewerStrings[window.stringsLanguage].viewerTitle + ' - ' + conceptName;
+      }
       return true;
     } else {
       return false;
