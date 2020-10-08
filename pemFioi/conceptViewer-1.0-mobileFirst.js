@@ -96,6 +96,7 @@ var conceptViewerStrings = {
 window.stringsLanguage = window.stringsLanguage || "fr";
 
 var conceptViewer = {
+
   concepts: {},
   loaded: false,
   shownConcept: null,
@@ -137,7 +138,7 @@ var conceptViewer = {
           + '<div id="conceptViewer" style="display: none;">'
           + '  <div class="content">'
           + '   <div class="panel-heading">'
-          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + window.lib + " " + this.strings.viewerTitle + '</h2>'
           + '     <div class="section-external-exit">'
           + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
           + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
@@ -161,7 +162,7 @@ var conceptViewer = {
           + '<div id="conceptViewer">'
           + '  <div class="content" style="top: 0px;left:0px;width:100%;height:100%; overflow: hidden;">'
           + '   <div class="panel-heading">'
-          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + (window.lib ? window.lib + " &ndash; " : "") + this.strings.viewerTitle + '</h2>'
           + '   </div>'
           + '   <div class="panel-body">'
           + '     <div class="navigation">'
@@ -267,7 +268,8 @@ var conceptViewer = {
     window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
         + "&selectedlang=" + this.selectedLanguage
         + "&shownconcept=" + this.shownConcept
-        + "&stringlanguage=" + window.stringsLanguage, '_blank');
+        + "&stringlanguage=" + window.stringsLanguage
+        + "&lib=" + (window.lib ? window.lib : "undefined"), '_blank');
   },
 
   showConcept: function (concept, show) {
