@@ -27,8 +27,12 @@
     padding: 15px;
     border-bottom: 1px solid rgba(0,0,0,0.1);
 }
+#conceptViewer .section-external-exit {
+    display: inline-flex;
+}
 #conceptViewer .exit {
   cursor: pointer;
+    margin: 0 3px;
 }
 #conceptViewer .exit .icon {
     font-size: 18px;

@@ -106,7 +106,7 @@ var conceptViewer = {
     {id: 'python', lbl: 'Python'}
     ],
 
-  load: function () {
+  load: function (fullscreen) {
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
@@ -129,26 +129,51 @@ var conceptViewer = {
     }
     navLanguage += '</ul>';
 
-    $('body').append(''
-      + '<div id="conceptViewer" style="display: none;">'
-      + '  <div class="content">'
-      + '   <div class="panel-heading">'
-      + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
-      + '     <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
-      + '   </div>'
-      + '   <div class="panel-body">'
-      + '     <div class="navigation">'
-      + '      <div class="navigationLanguage">'
-      + navLanguage
-      + '      </div>'
-      + '      <div class="navigationContent"></div>'
-      + '    </div>'
-      + '    <div class="viewer">'
-      + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
-      + '    </div>'
-      + '   </div>'
-      + '  </div>'
-      + '</div>');
+    if (!fullscreen) {
+      $('body').append(''
+          + '<div id="conceptViewer" style="display: none;">'
+          + '  <div class="content">'
+          + '   <div class="panel-heading">'
+          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+          + '     <div class="section-external-exit">'
+          + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
+          + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
+          + '     </div>'
+          + '   </div>'
+          + '   <div class="panel-body">'
+          + '     <div class="navigation">'
+          + '      <div class="navigationLanguage">'
+          + navLanguage
+          + '      </div>'
+          + '      <div class="navigationContent"></div>'
+          + '    </div>'
+          + '    <div class="viewer">'
+          + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
+          + '    </div>'
+          + '   </div>'
+          + '  </div>'
+          + '</div>');
+    } else {
+      $('body').append(''
+          + '<div id="conceptViewer">'
+          + '  <div class="content" style="top: 0px;left:0px;width:100%;height:100%;">'
+          + '   <div class="panel-heading">'
+          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+          + '   </div>'
+          + '   <div class="panel-body">'
+          + '     <div class="navigation">'
+          + '      <div class="navigationLanguage">'
+          + navLanguage
+          + '      </div>'
+          + '      <div class="navigationContent"></div>'
+          + '    </div>'
+          + '    <div class="viewer">'
+          + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
+          + '    </div>'
+          + '   </div>'
+          + '  </div>'
+          + '</div>');
+    }
 
     if(curLangLbl) {
        $('#showNavigationLanguageLabel').text(curLangLbl);
@@ -156,7 +181,7 @@ var conceptViewer = {
 
     var that = this;
     $('#conceptViewer').on('click', function (event) {
-      if (!$(event.target).closest('#conceptViewer .content').length) {
+      if (!fullscreen && !$(event.target).closest('#conceptViewer .content').length) {
         that.hide();
       }
     });
@@ -230,6 +255,12 @@ var conceptViewer = {
     this.load();
     $('#conceptViewer').fadeOut(500);
     this.loadUrl('');
+  },
+
+  openInNewWidget: function() {
+    // TODO :: replace by real URL
+    var url = "file:///home/nicolas/stage/tasks/v01/Tests/nicolas-doc-test/display-documentation.html";
+    window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts)), '_blank');
   },
 
   showConcept: function (concept, show) {
@@ -315,7 +346,7 @@ var conceptViewer = {
     $('#conceptViewer').remove();
     this.loaded = false;
   }
-}
+};
 
 
 function getConceptViewerBaseUrl() {
