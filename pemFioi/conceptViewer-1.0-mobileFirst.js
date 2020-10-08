@@ -138,7 +138,7 @@ var conceptViewer = {
           + '<div id="conceptViewer" style="display: none;">'
           + '  <div class="content">'
           + '   <div class="panel-heading">'
-          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + window.lib + " " + this.strings.viewerTitle + '</h2>'
+          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
           + '     <div class="section-external-exit">'
           + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
           + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
