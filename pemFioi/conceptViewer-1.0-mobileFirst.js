@@ -96,7 +96,6 @@ var conceptViewerStrings = {
 window.stringsLanguage = window.stringsLanguage || "fr";
 
 var conceptViewer = {
-
   concepts: {},
   loaded: false,
   shownConcept: null,
@@ -185,7 +184,7 @@ var conceptViewer = {
 
     var that = this;
     $('#conceptViewer').on('click', function (event) {
-      if (!fullscreenLoad && !$(event.target).closest('#conceptViewer .content').length) {
+      if (!conceptViewer.fullScreen && !$(event.target).closest('#conceptViewer .content').length) {
         that.hide();
       }
     });
