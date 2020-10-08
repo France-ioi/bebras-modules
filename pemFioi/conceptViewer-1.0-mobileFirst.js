@@ -156,7 +156,7 @@ var conceptViewer = {
     } else {
       $('body').append(''
           + '<div id="conceptViewer">'
-          + '  <div class="content" style="top: 0px;left:0px;width:100%;height:100%;">'
+          + '  <div class="content" style="top: 0px;left:0px;width:100%;height:100%; overflow: hidden;">'
           + '   <div class="panel-heading">'
           + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
           + '   </div>'
@@ -260,7 +260,9 @@ var conceptViewer = {
   openInNewWidget: function() {
     // TODO :: replace by real URL
     var url = "file:///home/nicolas/stage/tasks/v01/Tests/nicolas-doc-test/display-documentation.html";
-    window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts)), '_blank');
+    window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
+        + "&selectedlang=" + this.selectedLanguage
+        + "&shownconcept=" + this.shownConcept, '_blank');
   },
 
   showConcept: function (concept, show) {
