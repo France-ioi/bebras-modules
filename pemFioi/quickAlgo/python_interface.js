@@ -531,8 +531,7 @@ function LogicController(nbTestCases, maxInstructions) {
           completions.push({
             name: name,
             value: name,
-            meta: quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("constant")
-                    ? quickAlgoLanguageStrings[stringsLanguage].constant : "constant"
+            meta: this._strings.constant
           })
         }
       }
@@ -548,8 +547,7 @@ function LogicController(nbTestCases, maxInstructions) {
       allowedConsts.push(toAdd[toAddId]);
     }
 
-    var keywordi18n = quickAlgoLanguageStrings[stringsLanguage].hasOwnProperty("keyword")
-        ? quickAlgoLanguageStrings[stringsLanguage].keyword : "keyword";
+    var keywordi18n = this._strings.keyword;
 
     // if we want to modify the result of certain keys
     var specialSnippets = {
@@ -569,7 +567,7 @@ function LogicController(nbTestCases, maxInstructions) {
         caption: "x =",
         snippet: "x = $1",
         type: "snippet",
-        meta: "variables"
+        meta: this._strings.variable
       },
       if: {
         caption: "if",

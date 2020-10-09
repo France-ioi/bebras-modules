@@ -126,7 +126,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.",
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.",
       autorizedKeyWords: "Mots-clés autorisés : ",
-      constant: "constante"
+      constant: "constante",
+      variable: "variable"
    },
    en: {
       categories: {
@@ -248,7 +249,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
-      constant: "constant" // TODO :: verify
+      constant: "constant", // TODO :: verify
+      variable: "variable"
    },
    de: {
       categories: {
@@ -371,7 +373,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Du darfst keine Variablen verwenden",
       readDocumentation: "Du darfst die Python-Dokumentation lesen.",
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
-      constant: "constant" // TODO :: verify
+      constant: "constant", // TODO :: verify
+      variable: "variable" // TODO: verify
    },
    es: {
       categories: {
@@ -495,7 +498,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Las variables están prohibidas.",
       readDocumentation: "Se le permite leer la documentación de Python y utilizar un motor de búsqueda durante el concurso.",
       autorizedKeyWords: "Palabras clave autorizadas: ",
-      constant: "constante" // TODO :: verify
+      constant: "constante", // TODO :: verify
+      variable: "variable" // TODO :: verify
    },
    sl: {
       categories: {
@@ -617,7 +621,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
-      constant: "konstanten" // TODO :: verify
+      constant: "konstanten", // TODO :: verify
+      variable: "spremenljivka" // TODO :: verify
    },
    it: {
       categories: {
@@ -741,7 +746,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Le variabili sono vietate.",
       readDocumentation: "Sei autorizzato(a) a leggere la documentazione su Python e a utilizzare un motore di ricerca durante il concorso.",
       autorizedKeyWords: "Parole-chiave autorizzate: ",
-      constant: "costante" // TODO :: verify
+      constant: "costante", // TODO :: verify
+      variable: "variabile" // TODO :: verify
    }
 };
 
