@@ -117,6 +117,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :",
       startingLine: "Votre programme doit commencer par la ligne",
       startingLines: "Votre programme doit commencer par les lignes",
+      keyword: "mot-clé",
       keywordAllowed: "Le mot-clé suivant est autorisé : ",
       keywordForbidden: "Le mot-clé suivant est interdit : ",
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ",
@@ -125,6 +126,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.",
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.",
       autorizedKeyWords: "Mots-clés autorisés : ",
+      constant: "constante",
+      variable: "variable"
    },
    en: {
       categories: {
@@ -237,6 +240,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
       startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
       startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
+      keyword: "keyword", // TODO :: verify
       keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
       keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
@@ -245,6 +249,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
+      constant: "constant", // TODO :: verify
+      variable: "variable"
    },
    de: {
       categories: {
@@ -358,6 +364,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Die verfügbaren Funktionen zum Steuern des Roboters sind:",
       startingLine: "Dein Programm muss mit folgender Zeile beginnen:",
       startingLines: "Dein Programm muss mit folgenden Zeilen beginnen",
+      keyword: "Schlüsselwort", // TODO :: verify
       keywordAllowed: "Erlaubtes Schlüsselwort:",
       keywordForbidden: "Nicht erlaubtes Schlüsselwort:",
       keywordsAllowed: "Erlaubte Schlüsselwörter:",
@@ -366,6 +373,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Du darfst keine Variablen verwenden",
       readDocumentation: "Du darfst die Python-Dokumentation lesen.",
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
+      constant: "constant", // TODO :: verify
+      variable: "variable" // TODO: verify
    },
    es: {
       categories: {
@@ -480,6 +489,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Las funciones disponibles para controlar el robot son:",
       startingLine: "El programa debe comenzar con la línea",
       startingLines: "Tu programa debe comenzar con las líneas",
+      keyword: "palabra clave", // TODO :: verify
       keywordAllowed: "Se permite la siguiente palabra clave: ",
       keywordForbidden: "La siguiente palabra clave está prohibida: ",
       keywordsAllowed: "Se permiten las siguientes palabras clave: ",
@@ -488,6 +498,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Las variables están prohibidas.",
       readDocumentation: "Se le permite leer la documentación de Python y utilizar un motor de búsqueda durante el concurso.",
       autorizedKeyWords: "Palabras clave autorizadas: ",
+      constant: "constante", // TODO :: verify
+      variable: "variable" // TODO :: verify
    },
    sl: {
       categories: {
@@ -600,6 +612,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Les fonctions disponibles pour contrôler le robot sont :", // TODO :: translate
       startingLine: "Votre programme doit commencer par la ligne", // TODO :: translate
       startingLines: "Votre programme doit commencer par les lignes", // TODO :: translate
+      keyword: "ključna beseda", // TODO :: verify
       keywordAllowed: "Le mot-clé suivant est autorisé : ", // TODO :: translate
       keywordForbidden: "Le mot-clé suivant est interdit : ", // TODO :: translate
       keywordsAllowed: "Les mots-clés suivants sont autorisés : ", // TODO :: translate
@@ -608,6 +621,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Les variables sont interdites.", // TODO :: translate
       readDocumentation: "Vous êtes autorisé(e) à lire de la documentation sur Python et à utiliser un moteur de recherche pendant le concours.", // TODO :: translate
       autorizedKeyWords: "Mots-clés autorisés : ", // TODO :: translate,
+      constant: "konstanten", // TODO :: verify
+      variable: "spremenljivka" // TODO :: verify
    },
    it: {
       categories: {
@@ -722,6 +737,7 @@ var quickAlgoLanguageStrings = {
       availableFunctionsVerbose: "Le funzioni disponibili per controllare il robot sono:",
       startingLine: "Il tuo programma dovrebbe iniziare con la frase",
       startingLines: "Il tuo programma dovrebbe iniziare con le frasi",
+      keyword: "parola chiave", // TODO :: verify
       keywordAllowed: "La seguente parola-chiave è autorizzata: ",
       keywordForbidden: "La seguente parola chiave è vietata: ",
       keywordsAllowed: "Le seguenti parole-chiave sono autorizzate: ",
@@ -730,6 +746,8 @@ var quickAlgoLanguageStrings = {
       variablesForbidden: "Le variabili sono vietate.",
       readDocumentation: "Sei autorizzato(a) a leggere la documentazione su Python e a utilizzare un motore di ricerca durante il concorso.",
       autorizedKeyWords: "Parole-chiave autorizzate: ",
+      constant: "costante", // TODO :: verify
+      variable: "variabile" // TODO :: verify
    }
 };
 
