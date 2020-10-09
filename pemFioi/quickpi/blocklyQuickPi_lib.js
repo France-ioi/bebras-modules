@@ -8357,7 +8357,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var state = context.getSensorState(name);
 
-            var wasPressed = sensor.wasPressed;
+            var wasPressed = !!sensor.wasPressed;
             sensor.wasPressed = false;
 
             context.runner.noDelay(callback, wasPressed);
