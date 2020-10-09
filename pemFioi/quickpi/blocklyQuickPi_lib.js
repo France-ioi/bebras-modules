@@ -190,7 +190,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) retourne la distance mesurée",
             readLightIntensity: "readLightIntensity(lightSensor) retourne l'intensité lumineuse",
             readHumidity: "readHumidity(hygrometer) retourne l'humidité ambiante",
-            currentTime: "currentTime(milliseconds) temps en millisecondes depuis le début du programme",
+            currentTime: "currentTime() temps en millisecondes depuis le début du programme",
 
             setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
             getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
@@ -619,7 +619,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
             readLightIntensity: "readLightIntensity(lightSensor) devuelve la intensidad de la luz",
             readHumidity: "readHumidity(hygrometer) devuelve la humedad ambiental",
-            currentTime: "currentTime(milliseconds) tiempo en milisegundos desde el inicio del programa",
+            currentTime: "currentTime() tiempo en milisegundos desde el inicio del programa",
 
             setLedBrightness: "setLedBrightness(led, brightness) ajusta la intensidad de la luz del LED",
             getLedBrightness: "getLedBrightness(led) devuelve la intensidad de luz del LED",
@@ -1043,7 +1043,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) riporta la distanza misurata",
             readLightIntensity: "readLightIntensity(lightSensor) riporta l'intensità luminosa",
             readHumidity: "readHumidity(hygrometer) riporta l'umidità dell'ambiente",
-            currentTime: "currentTime(milliseconds) tempo in millisecondi dall'avvio del programma",
+            currentTime: "currentTime() tempo in millisecondi dall'avvio del programma",
 
             setLedBrightness: "setLedBrightness(led, brightness) regola l'intensità luminosa del LED",
             getLedBrightness: "getLedBrightness(led) riporta l'intensità luminosa del LED",
@@ -1635,7 +1635,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_button',
                 order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton']
+                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed']
             },  
             {   
                 id: 'quickpi_screen',
