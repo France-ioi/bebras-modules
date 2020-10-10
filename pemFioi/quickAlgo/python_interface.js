@@ -612,7 +612,7 @@ function LogicController(nbTestCases, maxInstructions) {
     };
 
     // we set the completer to only what we want instead of all the noisy default stuff
-    langTools.setCompleters([completer]);
+    if(langTools) { langTools.setCompleters([completer]); }
   };
 
   this._loadAceEditor = function () {
