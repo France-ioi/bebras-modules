@@ -43,6 +43,7 @@ var importableModules = function () {
       'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
       'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
       'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
+      'ace_language_tools': {src: modulesPath+"/ext/ace/ext-language_tools.js", id: "ace_language_tools"},
       'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
 
       'taskStyles-0.1': {type: "stylesheet", src: modulesPath+"/pemFioi/taskStyles-0.1_M.css", id: "http://www.france-ioi.org/modules/pemFioi/taskStyles-0.1_M.css"},
@@ -201,6 +202,7 @@ var languageScripts = function () {
          'python_count',
          'ace',
          'ace_python',
+         'ace_language_tools',
          'skulpt_quickAlgo',
          'skulpt_stdlib',
          'skulpt_debugger',
