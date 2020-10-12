@@ -5915,10 +5915,7 @@ var getContext = function (display, infos, curLevel) {
                 var percentage = 1 - ((newy - sliderobj.sliderdata.insiderecty) / sliderobj.sliderdata.scale);
 
                 if (Array.isArray(sensor.state)) {
-                    if (sensor.reverseSlider)
-                        sensor.state[Math.abs(sliderobj.index + 1 - sensor.sliders.length)] = findSensorDefinition(sensor).getStateFromPercentage(percentage);
-                    else
-                        sensor.state[sliderobj.index] = findSensorDefinition(sensor).getStateFromPercentage(percentage);
+                    sensor.state[sliderobj.index] = findSensorDefinition(sensor).getStateFromPercentage(percentage);
                 } else {
                     sensor.state = findSensorDefinition(sensor).getStateFromPercentage(percentage);
                 }
@@ -5945,15 +5942,13 @@ var getContext = function (display, infos, curLevel) {
                         continue;
 
                     var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state[i], sensor);
-                    var Isensor = i;
-                    if (sensor.reverseSlider)
-                        Isensor = Math.abs(i + 1 - sensor.state.length);
-                    thumby = sensor.sliders[Isensor].sliderdata.insiderecty +
-                        sensor.sliders[Isensor].sliderdata.insideheight -
-                        sensor.sliders[Isensor].sliderdata.thumbheight -
-                        (percentage * sensor.sliders[Isensor].sliderdata.scale);
 
-                    sensor.sliders[Isensor].thumb.attr('y', thumby);
+                    thumby = sensor.sliders[i].sliderdata.insiderecty +
+                        sensor.sliders[i].sliderdata.insideheight -
+                        sensor.sliders[i].sliderdata.thumbheight -
+                        (percentage * sensor.sliders[i].sliderdata.scale);
+
+                    sensor.sliders[i].thumb.attr('y', thumby);
                 }
             } else {
                 var percentage = findSensorDefinition(sensor).getPercentageFromState(sensor.state, sensor);
@@ -6030,21 +6025,20 @@ var getContext = function (display, infos, curLevel) {
 
                 // if offset is equal to 0, we need to reverse
                 if (offset == 0) {
-                    sensor.reverseSlider = true;
-                    for (var i = sensor.state.length - 1; i >= 0; i--) {
+                    for (var i = 0; i < sensor.state.length; i++) {
                         var sliderobj = createSlider(sensor,
                             max,
                             min,
-                            sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.height / 5),
+                            sensor.drawInfo.x + offset + (sign * Math.abs(i + 1 - sensor.state.length) * sensor.drawInfo.height / 5),
                             sensor.drawInfo.y,
                             sensor.drawInfo.height,
                             sensor.drawInfo.height,
                             i);
-                        sensor.sliders.unshift(sliderobj);
+
+                        sensor.sliders.push(sliderobj);
                     }
                 }
                 else {
-                    sensor.reverseSlider = false;
                     for (var i = 0; i < sensor.state.length; i++) {
                         var sliderobj = createSlider(sensor,
                             max,
