@@ -2643,7 +2643,6 @@ var getContext = function (display, infos, curLevel) {
         {
             buzzerSound.stopAll();
         }
-
     };
 
     infos.checkEndEveryTurn = true;
@@ -3125,9 +3124,16 @@ var getContext = function (display, infos, curLevel) {
             }
             if (context.autoGrading)
                 context.resetSensors();
-            else
+            else if (!context.sensorsSaved || context.sensorsSaved == []) {
                 context.saveSensors();
+            } else {
+                context.restoreSensors();
+                context.sensorsSaved = [];
+            }
         }
+
+        console.log(taskInfos);
+        console.log(context.sensorsSaved);
 
         context.success = false;
         if (context.autoGrading)
@@ -6160,6 +6166,10 @@ var getContext = function (display, infos, curLevel) {
     `;
 
 
+    function saveSensor(sensor) {
+        
+    }
+
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -6526,7 +6536,7 @@ var getContext = function (display, infos, curLevel) {
                             sensor.onPressed();
                     } else
                         sensorInConnectedModeError();
-                }
+                };
 
                 sensor.focusrect.node.ontouchstart = sensor.focusrect.node.onmousedown;
                 sensor.focusrect.node.ontouchend = sensor.focusrect.node.onmouseup;
@@ -7969,6 +7979,8 @@ var getContext = function (display, infos, curLevel) {
             // This needs to be in front of everything
             sensor.focusrect.toFront();
         }
+
+        saveSensor(sensor);
     }
 
 
