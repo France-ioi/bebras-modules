@@ -9,13 +9,13 @@
         strings: {
             en: {
                 validate: 'Validate',
-                validation_success: 'Success',
-                validation_mistake: 'Mistake'
+                validation_success: 'Congratulations, you succeded!',
+                validation_mistake: 'You have some errors, highlighted in red.'
             },
             fr: {
-                validate: 'Validate',
-                validation_success: 'Success',
-                validation_mistake: 'Mistake'                
+                validate: 'Valider',
+                validation_success: 'Bravo, vous avez réussi !',
+                validation_mistake: 'Votre réponse contient des erreurs, indiquées en rouge.'                
             },
         },
 
@@ -115,7 +115,7 @@
             var score = valid ? taskParams.noScore : taskParams.maxScore;
             var msg = valid ? lang.translate('validation_success') : lang.translate('validation_mistake');
             $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
-            $('#validate-btn').remove();
+            //$('#validate-btn').remove();
             callback(score, msg, null);
         };
 

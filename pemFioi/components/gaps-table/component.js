@@ -343,6 +343,7 @@ function GapsTable(params) {
         function resetMistakes() {
             mistakes = false;
             table.find('td').removeClass('mistake');
+            table.find('th').removeClass('mistake');
             updateCSV();
         }
     
