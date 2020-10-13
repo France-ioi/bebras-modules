@@ -8376,6 +8376,12 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.onInit = function() {
+        if (!context.autoGrading) {
+            context.resetSensors();
+        }
+    };
+
     context.quickpi.isButtonPressed = function (arg1, arg2) {
         if(typeof arg2 == "undefined") {
             // no arguments
