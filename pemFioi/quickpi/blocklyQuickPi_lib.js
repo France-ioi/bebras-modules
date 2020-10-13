@@ -2775,6 +2775,16 @@ var getContext = function (display, infos, curLevel) {
     }
 
     context.saveSensors = function() {
+        // the method Array.from(), is not compatible for IE8 sor we need to create our own copy method
+        // if one day we store array of objects, this will not work we need to find another way to do
+        // a deep copy.
+        function copyArray(src) {
+            var ret = [];
+            for (var i = 0; i < src.length; i++) {
+                ret.push(src[i]);
+            }
+            return ret;
+        }
         context.sensorsSaved = [];
         if (!infos.quickPiSensors || infos.quickPiSensors === "default") {
             return;
@@ -2789,7 +2799,7 @@ var getContext = function (display, infos, curLevel) {
             }).isSensor) {
                 context.sensorsSaved.push({
                     name: sensor.name,
-                    state: sensor.state,
+                    state: Array.isArray(sensor.state) ? copyArray(sensor.state) : sensor.state,
                     screenDrawing: sensor.screenDrawing,
                     lastDrawnTime: sensor.lastDrawnTime,
                     lastDrawnState: sensor.lastDrawnState,
@@ -8376,7 +8386,7 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.onInit = function() {
+    context.onLoad = function() {
         if (!context.autoGrading) {
             context.resetSensors();
         }

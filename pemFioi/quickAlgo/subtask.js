@@ -148,6 +148,9 @@ var initBlocklySubTask = function(subTask, language) {
          subTask.logActivity('loadLevel;' + curLevel);
          window.levelLogActivityTimeout = null;
       }, 1000);
+
+      if (subTask.context.onLoad)
+         subTask.context.onLoad();
    };
 
    subTask.updateScale = function() {
@@ -206,8 +209,6 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.messagePrefixFailure = '';
       subTask.context.messagePrefixSuccess = '';
       subTask.context.linkBack = false;
-      if (subTask.context.onInit)
-         subTask.context.onInit;
 
       subTask.context.reset(subTask.data[subTask.level][iTestCase]);
    };
