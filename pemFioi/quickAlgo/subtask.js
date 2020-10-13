@@ -209,7 +209,6 @@ var initBlocklySubTask = function(subTask, language) {
       subTask.context.messagePrefixFailure = '';
       subTask.context.messagePrefixSuccess = '';
       subTask.context.linkBack = false;
-
       subTask.context.reset(subTask.data[subTask.level][iTestCase]);
    };
 
@@ -238,7 +237,6 @@ var initBlocklySubTask = function(subTask, language) {
       if (subTask.context.onStart) {
          subTask.context.onStart();
       }
-
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
          if(typeof success == 'undefined') {

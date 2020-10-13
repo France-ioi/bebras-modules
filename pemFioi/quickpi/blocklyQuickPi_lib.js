@@ -6168,11 +6168,6 @@ var getContext = function (display, infos, curLevel) {
 </div>
     `;
 
-
-    function saveSensor(sensor) {
-        
-    }
-
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
             return;
@@ -7982,8 +7977,6 @@ var getContext = function (display, infos, curLevel) {
             // This needs to be in front of everything
             sensor.focusrect.toFront();
         }
-
-        saveSensor(sensor);
     }
 
 
