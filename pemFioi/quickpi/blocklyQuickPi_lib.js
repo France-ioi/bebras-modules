@@ -2758,7 +2758,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (lastTurn) {
                 context.success = true;
-                context.restoreSensors();
+                context.onStop();
                 throw (strings.messages.programEnded);
             }
         }
@@ -2801,6 +2801,8 @@ var getContext = function (display, infos, curLevel) {
             }
         }
     };
+
+
 
     context.restoreSensors = function() {
         function restoreSensor(source, target) {
@@ -3124,16 +3126,7 @@ var getContext = function (display, infos, curLevel) {
             }
             if (context.autoGrading)
                 context.resetSensors();
-            else if (!context.sensorsSaved || context.sensorsSaved == []) {
-                context.saveSensors();
-            } else {
-                context.restoreSensors();
-                context.sensorsSaved = [];
-            }
         }
-
-        console.log(taskInfos);
-        console.log(context.sensorsSaved);
 
         context.success = false;
         if (context.autoGrading)
@@ -8370,6 +8363,18 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.onStop = function() {
+        if (!context.autoGrading) {
+            context.restoreSensors();
+        }
+    };
+
+    context.onStart = function() {
+        // even called when the program starts
+        if (!context.autoGrading) {
+            context.saveSensors();
+        }
+    };
 
     context.quickpi.isButtonPressed = function (arg1, arg2) {
         if(typeof arg2 == "undefined") {

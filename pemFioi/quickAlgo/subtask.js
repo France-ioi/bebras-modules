@@ -231,6 +231,10 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.initRun = function(callback) {
+      if (subTask.context.onStart) {
+         subTask.context.onStart();
+      }
+
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
          if(typeof success == 'undefined') {
@@ -304,6 +308,9 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.stop = function() {
+      if (subTask.context.onStop) {
+         subTask.context.onStop();
+      }
       this.clearAnalysis();
 
       if(this.context.runner) {
