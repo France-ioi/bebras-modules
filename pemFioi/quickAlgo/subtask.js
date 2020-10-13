@@ -68,6 +68,10 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
 
+      if (this.context.updateGridInfosFromUri) {
+         this.context.updateGridInfosFromUri(subTask.levelGridInfos);
+      }
+
       if (this.display) {
          window.quickAlgoInterface.loadInterface(this.context, curLevel);
          window.quickAlgoInterface.setOptions({
@@ -141,6 +145,8 @@ var initBlocklySubTask = function(subTask, language) {
       }
 
       subTask.changeTest(0);
+
+
 
       // Log the loaded level after a second
       if(window.levelLogActivityTimeout) { clearTimeout(window.levelLogActivityTimeout); }

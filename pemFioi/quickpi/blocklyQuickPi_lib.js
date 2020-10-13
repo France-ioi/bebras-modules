@@ -9235,6 +9235,42 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    context.updateGridInfosFromUri = function(gridInfos) {
+        function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1));
+            var sURLVariables = sPageURL.split('&');
+
+            for (var i = 0; i < sURLVariables.length; i++) {
+                var sParameterName = sURLVariables[i].split('=');
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        }
+        var sensorsUri = getUrlParameter("sensors");
+        if (sensorsUri) {
+            var sensorsReal = JSON.parse(decodeURIComponent(sensorsUri));
+            gridInfos.quickPiSensors = sensorsReal;
+        }
+    };
+
+    context.share = function() {
+        var url = window.location.href.split('?')[0]; // url without query
+        var sensors = [];
+        for (var Isensor = 0; Isensor < infos.quickPiSensors.length; Isensor++) {
+            var toPush = {
+                type: infos.quickPiSensors[Isensor].type,
+                name: infos.quickPiSensors[Isensor].name
+            };
+
+            if (infos.quickPiSensors[Isensor].subType)
+                toPush.subType = infos.quickPiSensors[Isensor].subType;
+
+            sensors.push(toPush);
+        }
+        url += "?sensors=" + encodeURIComponent(JSON.stringify(sensors));
+        return url;
+    };
 
     context.quickpi.connectToCloudStore = function (prefix, password, callback) {
         var sensor = findSensorByType("cloudstore");

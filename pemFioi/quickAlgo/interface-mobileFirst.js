@@ -218,7 +218,8 @@ var quickAlgoInterface = {
                     "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
-                "</div>" +
+                    "<div rel='share' class='item' onclick='quickAlgoInterface.editorBtn(\"share\");'><span class='fas fa-share-square'></span>Partager</div>" +
+            "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
         );
@@ -263,6 +264,21 @@ var quickAlgoInterface = {
             displayHelper.retrieveAnswer();
         } else if(btn == 'blockly-python') {
             this.displayBlocklyPython();
+        } else if (btn == 'share') {
+            if (this.context.share) {
+                var url = this.context.share();
+                var html = '' +
+                    '<div id="quickAlgo-altcode" class="blanket">' +
+                    '   <div id="quickAlgo-altcode-header" class="panel-heading panel-heading-nopadding">' +
+                    '     <h2 class="sectionTitle"><span class="icon fas fa-share-alt"></span>' + "Partager" + '</h2>' +
+                    '     <div class="exit" onclick="quickAlgoInterface.hideAlternateCode();"><span class="icon fas fa-times"></span></div>' +
+                    '   </div>' +
+                    '   <p>' + "Pour partager votre code veuillez copier le lien ci-dessus pour le donner à quelqu'un d'autre :" + '</p>' +
+                    '   <textarea readonly>' + url + '</textarea>' +
+                    '</div>';
+
+                $('#task').append(html);
+            }
         }
     },
 
