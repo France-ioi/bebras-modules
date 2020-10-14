@@ -12,8 +12,10 @@ function LogicController(nbTestCases, maxInstructions) {
   this.language = 'python';
   this._textFile = null;
   this._extended = false;
+  // for quickpi additional will contain the string containing all sensors in xml
   this.programs = [{
     blockly: null,
+    additional: null,
     blocklyJS: null,
     javascript: null
   }];
@@ -34,9 +36,15 @@ function LogicController(nbTestCases, maxInstructions) {
     this._mainContext = mainContext;
   };
 
-  this.savePrograms = function () {
+  this.savePrograms = function (full) {
     if(this._aceEditor) {
       this.programs[0].blockly = this._aceEditor.getValue();
+      if (full) {
+        var emptyXml = document.implementation.createDocument("", "", null);
+        this._mainContext.savePrograms(emptyXml);
+        this.programs[0].additional = (new XMLSerializer()).serializeToString(emptyXml);
+      }
+
     }
   };
 
@@ -44,6 +52,9 @@ function LogicController(nbTestCases, maxInstructions) {
     if(this._aceEditor && this.programs[0].blockly) {
       this._aceEditor.setValue(''+this.programs[0].blockly);
       this._aceEditor.selection.clearSelection();
+    }
+    if (this._aceEditor && this.programs[0].additional) {
+      this._mainContext.loadPrograms((new DOMParser()).parseFromString(this.programs[0].additional, "text/xml"));
     }
   };
 
@@ -290,7 +301,15 @@ function LogicController(nbTestCases, maxInstructions) {
             }
           }
         } else {
-          that.programs[0].blockly = code;
+          if (that._mainContext.loadPrograms && code[0] === '#') {
+            var xmlStr = code.substring(2, code.indexOf('\n'));
+            var newCode = code.substring(code.indexOf('\n') + 1);
+            that.programs[0].additional = xmlStr;
+            that.programs[0].blockly = newCode;
+          } else {
+            that.programs[0].blockly = code;
+          }
+
         }
         that.loadPrograms();
       };
@@ -305,9 +324,12 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
   };
+  this.getCodeWithSensors = function() {
+    return "# " + this.programs[0].additional + "\n" + this.programs[0].blockly;
+  };
   this.saveProgram = function () {
-    this.savePrograms();
-    var code = this.programs[0].blockly;
+    this.savePrograms(true);
+    var code = this.getCodeWithSensors();
     var data = new Blob([code], { type: 'text/plain' });
 
     // If we are replacing a previously generated file we need to
