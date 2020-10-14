@@ -3234,18 +3234,20 @@ var getContext = function (display, infos, curLevel) {
     context.board = "quickpi";
 
     if (getSessionStorage('board'))
-        context.changeBoard(getSessionStorage('board'))
+        context.changeBoard(getSessionStorage('board'));
 
     context.savePrograms = function(xml) {
         if (context.infos.customSensors)
         {
-            var node = goog.dom.createElement("quickpi");
+            // var node = goog.dom.createElement("quickpi");
+            var  node = document.createElement("quickpi");
             xml.appendChild(node);
 
             for (var i = 0; i < infos.quickPiSensors.length; i++) {
                 var currentSensor = infos.quickPiSensors[i];
 
-                var node = goog.dom.createElement("sensor");
+                // var node = goog.dom.createElement("sensor");
+                var node = document.createElement("sensor");
 
                 node.setAttribute("type", currentSensor.type);
                 node.setAttribute("port", currentSensor.port);
@@ -3259,7 +3261,7 @@ var getContext = function (display, infos, curLevel) {
                 elements[0].appendChild(node);
             }
         }
-    }
+    };
 
     context.loadPrograms = function(xml) {
         if (context.infos.customSensors) {
