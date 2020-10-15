@@ -1,9 +1,10 @@
 function Map(options) {
-
+    
     var defaults = {
         parent: document.body,
         width: 400,
         height: 400,
+        strings: {},
         map_lng_left: 0,
         map_lng_right: 0,
         map_lat_top: 0,
@@ -14,42 +15,42 @@ function Map(options) {
         line_color: {r: 0, g: 0, b: 0},
         line_width: 4,
         background_color: {r: 255, g: 255, b: 255},
-        text_color: {r: 255, g: 255, b: 255},
+        text_color: {r: 0, g: 0, b: 0},
+        font: '14px sans',
         pin_file: null,
         pin_scale: 0.385,
-        map_file: null
+        map_file: null,
+        
     }
 
     options = Object.assign({}, defaults, options);
 
-    // init
+    var renderer = new Geography.Renderer2D(options);
+    var calc = new Geography.DistanceCalculator(options.unit);    
 
-    if(options.map3d) {
-        var renderer = new Geography.Renderer3D(options);
-    } else {
-        var renderer = new Geography.Renderer2D(options);
+
+    function trans(key) {
+        return key in options.strings ? options.strings[key] : key;
     }
-
-    var distance_calc = new Geography.DistanceCalculator(options.unit);    
-
+    
 
     // validation
 
     function validateLng(lng) {
         if(isNaN(lng)) {
-            throw new Error('Longitude is not a number')
+            throw new Error(trans('lng_not_number'))
         }
         if(lng < options.map_lng_left || lng > options.map_lng_right) {
-            throw new Error('Longitude is outside of the map')
+            throw new Error(trans('lng_out_of_range'))
         }
     }
 
     function validateLat(lat) {
         if(isNaN(lat)) {
-            throw new Error('Latitude is not a number')
+            throw new Error(trans('lat_not_number'))
         }
         if(lat > options.map_lat_top || lat < options.map_lat_bottom) {
-            throw new Error('Latitude is outside of the map')
+            throw new Error(trans('lat_out_of_range'))
         }
     }        
 
@@ -62,14 +63,14 @@ function Map(options) {
             if(this.cities[idx]) {
                 return this.cities[idx];
             }
-            throw new Error('City not found')
+            throw new Error(trans('city_not_found'));
         },
 
         getRoad: function(idx) {
             if(this.roads[idx]) {
                 return this.roads[idx];
             }
-            throw new Error('City not found')
+            throw new Error(trans('road_not_found'));
         }
     }
 
@@ -96,7 +97,14 @@ function Map(options) {
 
     this.addRoad = function(city_idx_1, city_idx_2) {
         if(city_idx_1 == city_idx_2) {
-            throw new Error('The road must connect different cities')
+            throw new Error(trans('road_end_error'));
+        }
+        for(var i=0; i<db.roads.length; i++) {
+            var fl1 = db.roads[i].city_idx_1 == city_idx_1 && db.roads[i].city_idx_2 == city_idx_2;
+            var fl2 = db.roads[i].city_idx_1 == city_idx_2 && db.roads[i].city_idx_2 == city_idx_1;
+            if(fl1 || fl2) {
+                throw new Error(trans('road_exists'));
+            }
         }
         var city1 = db.getCity(city_idx_1);
         var city2 = db.getCity(city_idx_2);        
@@ -140,7 +148,7 @@ function Map(options) {
         var road = db.getRoad(road_idx);
         var city1 = db.getCity(road.city_idx_1);
         var city2 = db.getCity(road.city_idx_2);
-        return distance_calc.calculate(city1.lng, city1.lat, city2.lng, city2.lat);
+        return calc.getDistance(city1, city2);
     }
     
 
@@ -152,6 +160,7 @@ function Map(options) {
         renderer.line(city1.lng, city1.lat, city2.lng, city2.lat, 1);        
     }
     
+    
     this.getDestinationCity = function(city_idx, road_idx) {
         var road = db.getRoad(road_idx);
         if(road.city_idx_1 == city_idx) {
@@ -159,7 +168,7 @@ function Map(options) {
         } else if(road.city_idx_2 == city_idx) {
             return road.city_idx_1;
         }
-        throw new Error('Road not found');
+        throw new Error(trans('road_not_found'));
     }
 
 
@@ -177,12 +186,11 @@ function Map(options) {
     }
     */
     this.validate = function(valid_data) {
-       
         // check cities
         if(db.cities.length != valid_data.cities.length) {
             return {
                 success: false,
-                message: 'Wrong amount of cities'
+                message: trans('mistake_cities_amount')
             }            
         }
         for(var i=0; i<valid_data.cities.length; i++) {
@@ -192,7 +200,7 @@ function Map(options) {
                 found = false;
             for(var j=0; j<db.cities.length; j++) {
                 city2 = db.cities[j];
-                distance = distance_calc.calculate(city1.lng, city1.lat, city2.lng, city2.lat);
+                distance = calc.getDistance(city1, city2);
                 if(distance <= valid_data.bias) {
                     found = true;
                 }
@@ -200,7 +208,7 @@ function Map(options) {
             if(!found) {
                 return {
                     success: false,
-                    message: 'City missed'
+                    message: trans('mistake_city_missed')
                 }                            
             }
         }
@@ -209,7 +217,7 @@ function Map(options) {
         if(db.cities.length != valid_data.cities.length) {
             return {
                 success: false,
-                message: 'Wrong amount of roads'
+                message: trans('mistake_roads_amount')
             }                                        
         }        
         for(var i=0; i<valid_data.roads.length; i++) {
@@ -227,14 +235,14 @@ function Map(options) {
             if(!found) {
                 return {
                     success: false,
-                    message: 'Road missed'
+                    message: trans('mistake_road_missed')
                 }                                                        
             }
         }
 
         return {
             success: true,
-            message: 'Success'
+            message: trans('success')
         }
     }
 

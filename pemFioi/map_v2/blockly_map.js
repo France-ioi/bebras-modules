@@ -3,7 +3,7 @@ var getContext = function(display, infos) {
     var map_strings = {
         en: {
             categories: {
-                map: 'Carte'
+                map: 'Map'
             },
             label: {
                 addCity: 'addCity(%1, %2, %3)',
@@ -48,6 +48,21 @@ var getContext = function(display, infos) {
             constantLabel: {
             },
             messages: {
+            },
+            map: {
+                lng_not_number: 'Longitude is not a number',
+                lng_out_of_range: 'Longitude is outside of the map',
+                lat_not_number: 'Latitude is not a number',
+                lat_out_of_range: 'Latitude is outside of the map',
+                city_not_found: 'City not found',
+                road_not_found: 'Road not found',
+                road_end_error: 'The road must connect different cities',
+                road_exists: 'The road already exists',
+                mistake_cities_amount: 'Wrong amount of cities',
+                mistake_city_missed: 'City missed',
+                mistake_roads_amount: 'Wrong amount of roads',
+                mistake_road_missed: 'Road missed',
+                success: 'Success'
             }
         }
     }
@@ -63,11 +78,12 @@ var getContext = function(display, infos) {
 
 
 
-    context.reset = function(taskInfos) {
+    context.reset = function() {
         if(!context.display) return
         if(!map) {
             var options = Object.assign({ 
-                parent: $('#grid')[0] 
+                parent: $('#grid')[0],
+                strings: strings.map
             }, infos.mapConfig);
             
             map = new Map(options);
@@ -76,6 +92,16 @@ var getContext = function(display, infos) {
             });
         }
         map.clearMap();
+    }
+
+    context.validateMap = function(valid_data) {
+        var res = map.validate(valid_data);
+        context.success = res.success;
+        if(res.success) {
+            throw(res.message);
+        } else {
+            throw new Error(res.message)
+        }
     }
 
 
