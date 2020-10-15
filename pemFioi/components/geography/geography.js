@@ -22,16 +22,37 @@ Geography.DistanceCalculator = function(unit) {
         return deg * (Math.PI / 180)
     }
 
-    // haversine formula
-    this.calculate = function(lng1, lat1, lng2, lat2) {
-        var dLat = deg2rad(lat2 - lat1);
-        var dLon = deg2rad(lng2 - lng1);
+
+    this.getDistance = function(point1, point2) {
+        var dlat = deg2rad(point2.lat - point1.lat);
+        var dlon = deg2rad(point2.lng - point1.lng);
         var a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            Math.sin(dlat / 2) * Math.sin(dlat / 2) +
+            Math.cos(deg2rad(point1.lat)) * Math.cos(deg2rad(point2.lat)) *
+            Math.sin(dlon / 2) * Math.sin(dlon / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return r * c;
+    }
+
+
+    this.getMidPoint = function(point1, point2) {
+        var lat1 = deg2rad(point1.lat);
+        var lng1 = deg2rad(point1.lng);
+        var lat2 = deg2rad(point2.lat);
+        var lng2 = deg2rad(point2.lng);
+        var dlng = lng2 - lng1;
+        var bx = Math.cos(lat2) * Math.cos(dlng);
+        var by = Math.cos(lat2) * Math.sin(dlng);
+        var lat = Math.atan2(
+            Math.sin(lat1) + Math.sin(lat2), 
+            Math.sqrt((Math.cos(lat1) + bx) * (Math.cos(lat1) + bx) + by * by)
+        );
+        var lng = lng1 + Math.atan2(by, Math.cos(lat1) + bx);
+
+        return {
+            lat: lat * 180 / Math.PI,
+            lng: lng * 180 / Math.PI
+        }
     }
 
 }
@@ -40,6 +61,7 @@ Geography.DistanceCalculator = function(unit) {
 
 // map renderer 2D
 Geography.Renderer2D = function(options) {
+
 
     function ImageLoader(src, onLoad) {
         var loaded = false;
@@ -56,6 +78,24 @@ Geography.Renderer2D = function(options) {
             return loaded ? img : null;
         }
     }
+
+
+    // measure text size 
+    var span = document.createElement('span');
+    span.style.whiteSpace = 'nowrap';
+    span.style.display = 'inline';
+    span.style.visibility = 'hidden';
+    span.style.font = options.font;
+    document.body.append(span);
+
+    function getTextSize(text) {
+        span.innerHTML = text;
+        return {
+            width: span.offsetWidth,
+            height: span.offsetHeight
+        }
+    }
+
 
 
     function CoordinatesConverter() {
@@ -102,19 +142,54 @@ Geography.Renderer2D = function(options) {
 
 
     this.pin = function(lng, lat, label) {
-        label = label.substr(0, 2);
         var x = coordinates.x(lng);
         var y = coordinates.y(lat);
-
         var img = images.pin.get();
-        var w = options.pin_scale * img.width;
-        var h = options.pin_scale * img.height;
+
         if(img) {
+            var w = options.pin_scale * img.width;
+            var h = options.pin_scale * img.height;            
             context.drawImage(img, x - w * 0.5, y - h, w, h);
-        }
-        context.fillStyle = rgba(options.text_color, 1);
+        }        
         context.textAlign = 'center';
-        context.fillText(label, x, y - h * 0.6)
+        context.font = options.font;
+        if(options.truncate_labels) {
+            label = label.substr(0, 2);
+            context.fillStyle = rgba(options.text_color, 1);
+            context.fillText(label, x, y - h * 0.6)            
+        } else {
+            var ts = getTextSize(label);
+            context.fillStyle = rgba(options.background_color, 1);
+            var tl = x - 0.5 * ts.width;
+            if(tl < 0) {
+                x -= tl;
+                tl = 0;
+            } else if(tl + ts.width > options.width) {
+                x = options.width - ts.width * 0.5;
+                tl = options.width - ts.width;
+            }
+            
+            context.fillRect(
+                tl,
+                y + 4,
+                ts.width,
+                ts.height
+            );
+            context.fillStyle = rgba(options.text_color, 1);
+            context.textBaseline = 'middle';
+            context.fillText(label, x, y + 4 + ts.height * 0.5);
+        }
+    }
+
+
+    this.addMistake = function(lng, lat, type) {
+        var x = coordinates.x(lng);
+        var y = coordinates.y(lat);
+        context.strokeStyle = '#FF0000';
+        context.lineWidth = options.line_width;
+        context.beginPath();
+        context.arc(x, y, 20, 20, 0, 2 * Math.PI);
+        context.stroke();
     }
 
 
@@ -167,6 +242,10 @@ Geography.Renderer3D = function(options) {
         }
         earth.addLabel(p);
     }
+
+    this.addMistake = function(lat, lng, type) {
+
+    }    
 
     this.destroy = function() {
         earth.destroy();
