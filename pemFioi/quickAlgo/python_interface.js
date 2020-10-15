@@ -44,7 +44,6 @@ function LogicController(nbTestCases, maxInstructions) {
         this._mainContext.savePrograms(emptyXml);
         this.programs[0].additional = (new XMLSerializer()).serializeToString(emptyXml);
       }
-
     }
   };
 
