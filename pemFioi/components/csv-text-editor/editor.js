@@ -155,6 +155,7 @@ function CSVTextEditor(params) {
         }
 
        
+        mistake = false;
         var res = true;
         if(data.length != params.valid_data.length) {
             mistake = {
@@ -191,7 +192,7 @@ function CSVTextEditor(params) {
             }
             table.html(html);      
         }
-        if(!res) {
+        if(!res && !mistake) {
             mistake = {
                 tag: 'incorrect_data'
             }
