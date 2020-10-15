@@ -150,7 +150,7 @@ function CSVTextEditor(params) {
 
         function formatCell(value, valid) {
             return '<td' + (valid ? '' : ' class="mistake"') + '>' + 
-                (v1 === false ? '' : '<pre>' + value + '</pre>') + 
+                (v1 === false ? '&nbsp;' : '<pre>' + value + '</pre>') + 
                 '</td>';
         }
 
@@ -169,13 +169,13 @@ function CSVTextEditor(params) {
         var v1, v2, valid, cols;        
         for(var i=0; i<rows; i++) {
             html += '<tr>';
-            if(i < params.valid_data.length && data[i].length != params.valid_data[i].length) {
+            if(i < params.valid_data.length && i < data.length && data[i].length != params.valid_data[i].length) {
                 mistake = {
                     tag: data[i].length < params.valid_data[i].length ? 'cols_lack' : 'cols_excess'
                 }                
                 res = false;
             }
-            var cols = Math.max(data[i].length, i < params.valid_data.length ? params.valid_data[i].length : 0);
+            var cols = Math.max(i < data.length ? data[i].length : 0, i < params.valid_data.length ? params.valid_data[i].length : 0);
             for(var j=0; j<cols; j++) {
                 v1 = getDataValue(i, j);
                 v2 = getValidValue(i, j);
