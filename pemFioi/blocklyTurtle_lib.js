@@ -133,7 +133,7 @@ var getContext = function(display, infos) {
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
-            inputvalue: "Eingabewert"
+            inputvalue: "lire un nombre sur l'entrée"
          },
          code: {
             move: "avancer",
@@ -168,7 +168,20 @@ var getContext = function(display, infos) {
             inputvalue: "eingabewert"
          },
          description: {
-            moveamountvalue: 'forward() : la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            moveamount: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            moveamountvalue: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            movebackamount: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
+            movebackamountvalue: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
+            turnleftamount: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
+            turnleftamountvalue: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
+            turnrightamount: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
+            turnrightamountvalue: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
+            row: 'row() capteur qui renvoie la ligne sur laquelle se trouve la tortue',
+            col: 'col() capteur qui renvoie la colonne sur laquelle se trouve la tortue',
+            penup: 'liftBrush() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
+            pendown: 'lowerBrush() la tortue place son pinceau dans la position où il laisse une trace.',
+            colourvalue: 'color() la trace du pinceau aura la couleur indiquée en paramètre. Exemple : color(\'red\')',
+            inputvalue: 'inputvalue() lire un nombre en entrée.'
          },
          startingBlockName: "Programme de la tortue",
          messages: {
