@@ -405,6 +405,21 @@ function PythonInterpreter(context, msgCallback) {
         skl.push(this._createPrimitive(data[i]));
       }
       result = new Sk.builtin.list(skl);
+    } else if (data) {
+      // Create a dict if it's an object with properties
+      var props = [];
+      for(var prop in data) {
+        if(data.hasOwnProperty(prop)) {
+          // We can pass a list [prop1name, prop1val, ...] to Skulpt's dict
+          // constructor ; however to work properly they need to be Skulpt
+          // primitives too
+          props.push(this._createPrimitive(prop));
+          props.push(this._createPrimitive(data[prop]));
+        }
+      }
+      if(props.length > 0) {
+        result = new Sk.builtin.dict(props);
+      }
     }
     return result;
   };
