@@ -6023,21 +6023,37 @@ var getContext = function (display, infos, curLevel) {
                     offset = sensor.drawInfo.width * .70;
                 }
 
-
-                for (var i = 0; i < sensor.state.length; i++) {
-                    sliderobj = createSlider(sensor,
-                        max,
-                        min,
-                        sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.height / 5) ,
-                        sensor.drawInfo.y,
-                        sensor.drawInfo.height,
-                        sensor.drawInfo.height,
-                        i);
+                // if offset is equal to 0, we need to reverse
+                if (offset == 0) {
+                    for (var i = 0; i < sensor.state.length; i++) {
+                        var sliderobj = createSlider(sensor,
+                            max,
+                            min,
+                            sensor.drawInfo.x + offset + (sign * Math.abs(i + 1 - sensor.state.length) * sensor.drawInfo.height / 5),
+                            sensor.drawInfo.y,
+                            sensor.drawInfo.height,
+                            sensor.drawInfo.height,
+                            i);
 
                         sensor.sliders.push(sliderobj);
+                    }
+                }
+                else {
+                    for (var i = 0; i < sensor.state.length; i++) {
+                        var sliderobj = createSlider(sensor,
+                            max,
+                            min,
+                            sensor.drawInfo.x + offset + (sign * i * sensor.drawInfo.height / 5),
+                            sensor.drawInfo.y,
+                            sensor.drawInfo.height,
+                            sensor.drawInfo.height,
+                            i);
+
+                        sensor.sliders.push(sliderobj);
+                    }
                 }
             } else {
-                sliderobj = createSlider(sensor,
+                var sliderobj = createSlider(sensor,
                     max,
                     min,
                     sensor.drawInfo.x,
