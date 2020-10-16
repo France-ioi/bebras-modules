@@ -71,6 +71,11 @@ function Map(options) {
                 return this.roads[idx];
             }
             throw new Error(trans('road_not_found'));
+        },
+
+        clear: function() {
+            this.cities = [];
+            this.roads = [];
         }
     }
 
@@ -173,6 +178,7 @@ function Map(options) {
 
 
     this.clearMap = function() {
+        db.clear();
         renderer.clear();
     }
 
@@ -186,6 +192,8 @@ function Map(options) {
     }
     */
     this.validate = function(valid_data) {
+        console.log(valid_data)
+        var bias = parseInt(valid_data.bias, 10) || 0;
         // check cities
         if(db.cities.length != valid_data.cities.length) {
             return {
@@ -201,11 +209,13 @@ function Map(options) {
             for(var j=0; j<db.cities.length; j++) {
                 city2 = db.cities[j];
                 distance = calc.getDistance(city1, city2);
-                if(distance <= valid_data.bias) {
+                if(distance <= bias) {
                     found = true;
+                    break;
                 }
             }
             if(!found) {
+                renderer.addMistake(valid_data.cities[i].lng, valid_data.cities[i].lat);
                 return {
                     success: false,
                     message: trans('mistake_city_missed')
@@ -226,16 +236,21 @@ function Map(options) {
                 found = false;
             for(var j=0; j<db.roads.length; j++) {
                 road2 = db.roads[j];
-                var fl1 = road1.city_idx_1 == road2_city_idx_1 && road1.city_idx_2 == road2_city_idx_2;
-                var fl2 = road1.city_idx_1 == road2_city_idx_2 && road1.city_idx_2 == road2_city_idx_1;
-                if(fl1 || fl2) {
+                var fl1 = road1.city_idx_1 == road2.city_idx_1 && road1.city_idx_2 == road2.city_idx_2;
+                var fl2 = road1.city_idx_1 == road2.city_idx_2 && road1.city_idx_2 == road2.city_idx_1;
+                if((fl1 || fl2) && (road1.highlighted === road2.highlighted)) {
                     found = true;
+                    break;
                 }
             }
             if(!found) {
+                var city1 = db.getCity(road1.city_idx_1);
+                var city2 = db.getCity(road1.city_idx_2);
+                var mpos = calc.getMidPoint(city1, city2);
+                renderer.addMistake(mpos.lng, mpos.lat);
                 return {
                     success: false,
-                    message: trans('mistake_road_missed')
+                    message: trans('mistake_road')
                 }                                                        
             }
         }

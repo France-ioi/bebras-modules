@@ -59,9 +59,9 @@ var getContext = function(display, infos) {
                 road_end_error: 'The road must connect different cities',
                 road_exists: 'The road already exists',
                 mistake_cities_amount: 'Wrong amount of cities',
-                mistake_city_missed: 'City missed',
+                mistake_city_missed: 'The city is missed',
                 mistake_roads_amount: 'Wrong amount of roads',
-                mistake_road_missed: 'Road missed',
+                mistake_road: 'The road is missed or highlighting error',
                 success: 'Success'
             }
         }
@@ -79,29 +79,30 @@ var getContext = function(display, infos) {
 
 
     context.reset = function() {
-        if(!context.display) return;
         if(!map) {
             var options = Object.assign({ 
                 parent: $('#grid')[0],
-                strings: strings.map
+                strings: strings.map,
+                display: display
             }, infos.mapConfig);
             
             map = new Map(options);
+        }
+        if(!logger) {
             logger = new Logger({
-                parent: $('#gridContainer')
+                parent: $('#gridContainer'),
+                display: display
             });
         }
-        map.clearMap();
+        if(context.display) {
+            map.clearMap();            
+        }
     }
 
     infos.checkEndCondition = function(context, lastTurn) {
-        context.success = false;
-        throw ('test');        
-        /*
         var res = map.validate(infos.mapValidData);
         context.success = res.success;
         throw(res.message);
-        */
     }
 
 
@@ -179,7 +180,7 @@ var getContext = function(display, infos) {
 
     context.map = {
         echo: function(msg, callback) {
-            logger.put(msg);
+            logger && logger.put(msg);
             callback();
         }
     }

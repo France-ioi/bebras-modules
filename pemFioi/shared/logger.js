@@ -3,6 +3,7 @@ function Logger(options) {
     var defaults = {
         size: 10,
         collapsed: true,
+        display: false,
         styles: {
             container: 'position: relative; font-size: 75%;',
             expander: 'position: absolute; right: 0; bottom: 0; padding: 2px; font-weight: bold; border: 1px solid #000; border-radius: 3px; cursor: pointer; display: none;'
@@ -11,7 +12,9 @@ function Logger(options) {
     options = Object.assign(defaults, options);
 
     var container = $('<div style="' + options.styles.container + '"></div>');
-    $(options.parent).append(container);
+    if(options.display) {
+        $(options.parent).append(container);
+    }
     var expander = $('<div style="' + options.styles.expander + '">^</div>');
     container.append(expander);
 
