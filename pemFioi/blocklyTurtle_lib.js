@@ -370,7 +370,14 @@ var getContext = function(display, infos) {
 
    var context = quickAlgoContext(display, infos);
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
-   
+
+   if(infos.turtleInputValueLabel) {
+      strings.label.inputvalue = infos.turtleInputValueLabel;
+   }
+   if(infos.turtleInputValueDescription) {
+      strings.description.inputvalue = infos.turtleInputValueDescription;
+   }
+
    var cells = [];
    var texts = [];
    var scale = 1;
