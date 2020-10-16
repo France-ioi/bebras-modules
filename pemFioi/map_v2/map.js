@@ -192,7 +192,6 @@ function Map(options) {
     }
     */
     this.validate = function(valid_data) {
-        console.log(valid_data)
         var bias = parseInt(valid_data.bias, 10) || 0;
         // check cities
         if(db.cities.length != valid_data.cities.length) {
