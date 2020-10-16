@@ -3498,6 +3498,8 @@ var getContext = function (display, infos, curLevel) {
 
                     // Particular case if we have a screen and only 2 columns, we can put the
                     // cells of the screen at 2 because the display is still good with it.
+                    // I used rows, because I think that for geometry, rows and cols are reversed. You can try to change
+                    // it and see the result in animal connecte.
                     if (sensor && sensor.type === "screen" && cells > geometry.rows && cells == 3 && geometry.rows == 2)
                         cells = 2;
 
