@@ -29,10 +29,3 @@ highlightRoad(road_idx)
     
 getDestinationCity(city_idx, road_idx)
     return: find all roads where city_idx_1 == city_idx or city_idx_2 == city_idx, take road with index = road_idx, return another city idx from road link
-
-
-TODO:
-+remove earth3d renderer
-+2 modes for pin: short (2chars) and full length
-grading: mark mistake on the map with red circle (centered in the middle of the road when it's a road)
-+display an error "Road already exists" if user add existing road
