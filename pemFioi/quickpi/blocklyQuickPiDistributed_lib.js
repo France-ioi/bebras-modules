@@ -334,7 +334,7 @@ var getContext = function (display, infos, curLevel) {
          else if (status == "sleeping") {
             vertexObject.attr({ fill: "lightgray" });
          }
-         else if (status == "finnished") {
+         else if (status == "finished") {
             vertexObject.attr({ fill: "green" });
          }
          else if (status == "waitingformessage") {
@@ -401,12 +401,12 @@ var getContext = function (display, infos, curLevel) {
 
          //console.log (nodeId, "is done ");
 
-         context.setNodeStatus(nodeId, "finnished");
+         context.setNodeStatus(nodeId, "finished");
          var allFinnished = true;
 
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
 
-            if (context.nodesAndNeighbors[i].status != "finnished") {
+            if (context.nodesAndNeighbors[i].status != "finished") {
                allFinnished = false;
                break;
             }
@@ -978,7 +978,7 @@ var getContext = function (display, infos, curLevel) {
 
       //console.log("Running ", node.nodeId, "current status", node.status);
 
-      if (node.status != "finnished") {
+      if (node.status != "finished") {
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
             if (context.nodesAndNeighbors[i].status == "running") {
 
@@ -1001,7 +1001,7 @@ var getContext = function (display, infos, curLevel) {
          $.each(context.nodesAndNeighbors, function (index) {
             var node = context.nodesAndNeighbors[index];
 
-            if (node.status == "finnished")
+            if (node.status == "finished")
                return;
 
             if (!node.messagepath)
