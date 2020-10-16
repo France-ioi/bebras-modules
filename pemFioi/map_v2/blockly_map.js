@@ -79,7 +79,7 @@ var getContext = function(display, infos) {
 
 
     context.reset = function() {
-        if(!context.display) return
+        if(!context.display) return;
         if(!map) {
             var options = Object.assign({ 
                 parent: $('#grid')[0],
@@ -94,14 +94,14 @@ var getContext = function(display, infos) {
         map.clearMap();
     }
 
-    context.validateMap = function(valid_data) {
-        var res = map.validate(valid_data);
+    infos.checkEndCondition = function(context, lastTurn) {
+        context.success = false;
+        throw ('test');        
+        /*
+        var res = map.validate(infos.mapValidData);
         context.success = res.success;
-        if(res.success) {
-            throw(res.message);
-        } else {
-            throw new Error(res.message)
-        }
+        throw(res.message);
+        */
     }
 
 
