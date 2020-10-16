@@ -86,7 +86,10 @@ Geography.Renderer2D = function(options) {
     span.style.display = 'inline';
     span.style.visibility = 'hidden';
     span.style.font = options.font;
-    document.body.append(span);
+    if(options.display) {
+        document.body.append(span);
+    }
+    
 
     function getTextSize(text) {
         span.innerHTML = text;
@@ -182,7 +185,7 @@ Geography.Renderer2D = function(options) {
     }
 
 
-    this.addMistake = function(lng, lat, type) {
+    this.addMistake = function(lng, lat) {
         var x = coordinates.x(lng);
         var y = coordinates.y(lat);
         context.strokeStyle = '#FF0000';
@@ -201,7 +204,9 @@ Geography.Renderer2D = function(options) {
     var canvas = document.createElement('canvas');
     canvas.width = options.width;
     canvas.height = options.height;
-    options.parent.appendChild(canvas);
+    if(options.display) {
+        options.parent.appendChild(canvas);
+    }
     var context = canvas.getContext('2d');
     var coordinates = new CoordinatesConverter();
 
@@ -209,45 +214,4 @@ Geography.Renderer2D = function(options) {
         options.parent.removeChild(canvas);
         canvas = null;
     }    
-}
-
-
-// map renderer 3D
-Geography.Renderer3D = function(options) {
-    var earth = new Earth3D(options);
-
-
-    this.clear = function() {
-        earth.clearPaths();	
-        earth.clearLabels();	
-    }
-
-    this.line = function(lng1, lat1, lng2, lat2, opacity) {
-        var p1 = {
-            lat: lat1,
-            lng: lng1
-        }
-        var p2 = {
-            lat: lat2,
-            lng: lng2
-        }            
-        earth.addPath(p1, p2);
-    }
-
-    this.pin = function(lng, lat, label) {
-        var p = {
-            lat: lat,
-            lng: lng,
-            text: label
-        }
-        earth.addLabel(p);
-    }
-
-    this.addMistake = function(lat, lng, type) {
-
-    }    
-
-    this.destroy = function() {
-        earth.destroy();
-    }
 }
