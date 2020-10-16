@@ -1,12 +1,13 @@
 
 
 var makeTurtle = function(coords) {
-   this.reset = function(stepsize) {
+   this.reset = function(stepsize, newcoords) {
       this.x = 150;
       this.y = 150;
-      if(coords !== undefined) {
-         this.x = coords.x;
-         this.y = coords.y;
+      var initcoords = newcoords || coords;
+      if(initcoords) {
+         this.x = initcoords.x;
+         this.y = initcoords.y;
       }
       this.stepsize = 1;
       this.direction = 0;
@@ -133,7 +134,7 @@ var getContext = function(display, infos) {
             turn: "drehe (Grad) ",
             alert: "messagebox",
             log: "logge",
-            inputvalue: "Eingabewert"
+            inputvalue: "lire un nombre sur l'entrée"
          },
          code: {
             move: "avancer",
@@ -168,7 +169,20 @@ var getContext = function(display, infos) {
             inputvalue: "eingabewert"
          },
          description: {
-            moveamountvalue: 'forward() : la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            moveamount: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            moveamountvalue: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
+            movebackamount: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
+            movebackamountvalue: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
+            turnleftamount: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
+            turnleftamountvalue: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
+            turnrightamount: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
+            turnrightamountvalue: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
+            row: 'row() capteur qui renvoie la ligne sur laquelle se trouve la tortue',
+            col: 'col() capteur qui renvoie la colonne sur laquelle se trouve la tortue',
+            penup: 'liftBrush() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
+            pendown: 'lowerBrush() la tortue place son pinceau dans la position où il laisse une trace.',
+            colourvalue: 'color() la trace du pinceau aura la couleur indiquée en paramètre. Exemple : color(\'red\')',
+            inputvalue: 'inputvalue() lire un nombre en entrée.'
          },
          startingBlockName: "Programme de la tortue",
          messages: {
@@ -356,7 +370,14 @@ var getContext = function(display, infos) {
 
    var context = quickAlgoContext(display, infos);
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
-   
+
+   if(infos.turtleInputValueLabel) {
+      strings.label.inputvalue = infos.turtleInputValueLabel;
+   }
+   if(infos.turtleInputValueDescription) {
+      strings.description.inputvalue = infos.turtleInputValueDescription;
+   }
+
    var cells = [];
    var texts = [];
    var scale = 1;
@@ -415,8 +436,8 @@ var getContext = function(display, infos) {
          context.turtle.displayTurtle.setDrawingContext(document.getElementById('displayfield').getContext('2d'));
          context.turtle.displaySolutionTurtle.setDrawingContext(document.getElementById('solutionfield').getContext('2d'));
 
-         context.turtle.displayTurtle.reset(context.infos.turtleStepSize);
-         context.turtle.displaySolutionTurtle.reset(context.infos.turtleStepSize);
+         context.turtle.displayTurtle.reset(context.infos.turtleStepSize, gridInfos.coords || infos.coords);
+         context.turtle.displaySolutionTurtle.reset(context.infos.turtleStepSize, gridInfos.coords || infos.coords);
       }
     
       function createMeACanvas() {
@@ -436,8 +457,8 @@ var getContext = function(display, infos) {
          context.turtle.invisibleTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
          context.turtle.invisibleSolutionTurtle.setDrawingContext(createMeACanvas().getContext('2d'));
 
-         context.turtle.invisibleTurtle.reset(context.infos.turtleStepSize);
-         context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize);
+         context.turtle.invisibleTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
+         context.turtle.invisibleSolutionTurtle.reset(context.infos.turtleStepSize, gridInfos.coords);
          
          context.drawSolution = gridInfos.drawSolution;
          context.inputValue   = gridInfos.inputValue;

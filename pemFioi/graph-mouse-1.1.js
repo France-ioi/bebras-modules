@@ -323,6 +323,7 @@ function VertexDragger(settings) {
    this.enabled = false;
    this.occupiedSnapPositions = {};
    this.vertexToSnapPosition = {};
+   this.stillVertices = settings.stillVertices || [];
    this.setEnabled = function(enabled) {
       if(enabled == this.enabled) {
          return;
@@ -346,6 +347,9 @@ function VertexDragger(settings) {
 
    this.startHandler = function(x, y, event) {
       self.elementID = this.data("id");
+      if(Beav.Array.has(self.stillVertices,self.elementID)){
+         return
+      }
       self.originalPosition = settings.visualGraph.graphDrawer.getVertexPosition(self.elementID);
       settings.visualGraph.elementToFront(self.elementID);
       if(settings.startCallback) {
@@ -354,6 +358,9 @@ function VertexDragger(settings) {
    };
 
    this.endHandler = function(event) {
+      if(Beav.Array.has(self.stillVertices,self.elementID)){
+         return
+      }
       if(settings.snapPositions) {
          self.updateOccupiedSnap();
       }
@@ -363,6 +370,9 @@ function VertexDragger(settings) {
    };
 
    this.moveHandler = function(dx, dy, x, y, event) {
+      if(Beav.Array.has(self.stillVertices,self.elementID)){
+         return
+      }
       var newX = self.originalPosition.x + dx;
       var newY = self.originalPosition.y + dy;
       if(self.gridEnabled) {
