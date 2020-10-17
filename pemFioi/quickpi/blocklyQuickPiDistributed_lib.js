@@ -64,6 +64,9 @@ var getContext = function (display, infos, curLevel) {
    // Some data can be made accessible by the library through the context object
    context.distributed = {};
 
+   if(window.quickAlgoInterface) {
+      window.quickAlgoInterface.stepDelayMax = 500;
+  }
 
    function getSessionStorage(name) {
       // Use a try in case it gets blocked
@@ -188,6 +191,13 @@ var getContext = function (display, infos, curLevel) {
          if (fromNode.timeLinePos.y < toNode.timeLinePos.y)
             pointingdown = true;
 
+
+         var circle = timelinePaper.circle(timelinex, fromNode.timeLinePos.y, 5);
+         circle.attr({
+            "fill": "#678AB4",
+            "stroke": "#678AB4"
+         });
+
          messagepath.animate({ path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y] },
             500, "linear", function () {
 
@@ -209,14 +219,6 @@ var getContext = function (display, infos, curLevel) {
                      "L", timelinex + trinagleside, toNode.timeLinePos.y + trinagleside,
                      "L", timelinex, toNode.timeLinePos.y];
                }
-
-              
-
-               var circle = timelinePaper.circle(timelinex, fromNode.timeLinePos.y, 5);
-               circle.attr({
-                  "fill": "#678AB4",
-                  "stroke": "#678AB4"
-               });
                                          
                var triangle = timelinePaper.path(targetpath);
                triangle.attr({
@@ -674,25 +676,37 @@ var getContext = function (display, infos, curLevel) {
       if (!hasIntroControls) {
          $('#taskIntro').append(`<div id="introControls"></div>`);
       }
-
-      $('#introControls').html("<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div><button id=showGraphView>Graph View</button></div><button id=showTimelineView>Timeline</button></div>")
+      
+      $('#introControls').html(`
+      <!--<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div>-->
+      <div id="piui">
+      <button class="btn" type="button" id="showGraphView">Graph View</button>
+      <button class="btn" type="button" id="showTimelineView">Timeline</button>
+      </div>
+      `);
 
       $('#piconnect').click(function () {
          context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
       });
 
       $('#showGraphView').click(function () {
-         $('#timelineView').css("display", "none");
-         $('#graphView').css("display", "");
+         if ($('#timelineView').css("display") != "none")
+         {
+            $('#timelineView').css("display", "none");
+            $('#graphView').css("display", "");
 
-         context.updateScale();
+            context.updateScale();
+         }
       });
 
       $('#showTimelineView').click(function () {
-         $('#timelineView').css("display", "");
-         $('#graphView').css("display", "none");
+         if ($('#graphView').css("display") != "none")
+         {
+            $('#timelineView').css("display", "");
+            $('#graphView').css("display", "none");
 
-         context.updateScale();
+            context.updateScale();
+         }
       });
 
       context.verticeRadius = 35;
@@ -700,7 +714,7 @@ var getContext = function (display, infos, curLevel) {
       $('#grid').html(`
          
          <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
-            <div style='height: 100%; width: 100%; overflow:hidden' id="timeLineGraph"></div>
+            <div style='height: 100%; width: 100%; overflow-x: auto; overflow-y:hidden' id="timeLineGraph"></div>
          </div>
          
          <div id='graphView' style='height: 100%; width: 100%; '>
@@ -940,20 +954,15 @@ var getContext = function (display, infos, curLevel) {
          var scaleFactorW = width / context.graphOriginalW;
          var scaleFactorH = height / context.graphOriginalH;
 
-         //console.log("resize to ", width, height);
          paper.setViewBox(0, 0, width / scaleFactorW, height / scaleFactorH);
          paper.setSize(width, height);
 
 
-         //timelinePaper.setViewBox(0, 0, $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
-
-         
-         
-         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
-         
-
          timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
          timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         
+
+         console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          context.vGraphTimeline.redraw();
 
@@ -996,8 +1005,15 @@ var getContext = function (display, infos, curLevel) {
    context.incTime = function () {
       context.currentTime++;
 
-
       if (context.display) {
+
+         console.log(context.currentTime * 50, $('#timeLineGraph').width() - 10);
+         var timelinewidth = Math.max(context.currentTime * 50, $('#timeLineGraph').width() - 10);
+         timelinePaper.setSize(timelinewidth, $('#timeLineGraph').height() - 10);
+
+         $('#timeLineGraph').scrollLeft(timelinewidth);
+
+
          $.each(context.nodesAndNeighbors, function (index) {
             var node = context.nodesAndNeighbors[index];
 
@@ -1006,8 +1022,6 @@ var getContext = function (display, infos, curLevel) {
 
             if (!node.messagepath)
                node.messagepath = timelinePaper.path(["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y]);
-
-
                
             node.messagepath.animate({
                path: ["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y,
@@ -1058,7 +1072,7 @@ var getContext = function (display, infos, curLevel) {
             var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
             if (message.circle) {
-               message.circle.animate({ cx: toPos.x, cy: toPos.y }, 500, "linear", function () {
+               message.circle.animate({ cx: toPos.x, cy: toPos.y }, context.infos.actionDelay, "linear", function () {
                   message.circle.remove();
                });
 
@@ -1080,7 +1094,7 @@ var getContext = function (display, infos, curLevel) {
             }
 
 
-            context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, 500);
+            context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, context.infos.actionDelay);
          }
          else {
             context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true })
@@ -1098,7 +1112,7 @@ var getContext = function (display, infos, curLevel) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
       var toNode = context.findNodeById(recipientId);
       var messageId = context.globaMessageCount++;
-      var messageDelay = 1000;
+      var messageDelay = context.infos.actionDelay;
 
       //console.log("sendMessage");
 
@@ -1273,7 +1287,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.sendMessage(messageInfo, true);
          }
-
+            
          context.runner.noDelay(callback);
       }
    };
