@@ -102,7 +102,8 @@ var getContext = function(display, infos) {
          penup: "lever le pinceau",
          pendown: "baisser le pinceau",
          categories: {
-            turtle: "Tortue"
+            turtle: "Tortue",
+            turtleInput: "Entrée"
          },
          label: {
             move: "avancer",
@@ -340,8 +341,8 @@ var getContext = function(display, infos) {
             turnrightamountvalue_moreoptions: "dreheRechtsGrad",
             turneitheramount: "turn",
             turneitheramountvalue: "turn",
-            row: "turtleRow",
-            col: "turtleColumn",
+            row: "row",
+            col: "col",
             penup: "liftBrush",
             pendown: "lowerBrush",
             peneither: "stift",
@@ -350,7 +351,7 @@ var getContext = function(display, infos) {
             turn: "drehe",
             alert: "alert",
             log: "log",
-            inputvalue: "eingabewert"
+            inputvalue: "inputvalue"
          },
          description: {
             
