@@ -131,7 +131,43 @@ var conceptViewer = {
       navLanguage += '</li>';
     }
     navLanguage += '</ul>';
+    $('body').append(''
+        + '<div id="conceptViewer"">'
+        + '  <div class="content">'
+        + '   <div class="panel-heading">'
+        + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+        + '     <div class="section-external-exit">'
+        + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
+        + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
+        + '     </div>'
+        + '   </div>'
+        + '   <div class="panel-body">'
+        + '     <div class="navigation">'
+        + '      <div class="navigationLanguage">'
+        + navLanguage
+        + '      </div>'
+        + '      <div class="navigationContent"></div>'
+        + '    </div>'
+        + '    <div class="viewer">'
+        + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
+        + '    </div>'
+        + '   </div>'
+        + '  </div>'
+        + '</div>');
 
+    if (!this.fullScreen) {
+      $('#conceptViewer').hide();
+    } else {
+      $('#conceptViewer .content').css({
+        'top': '0px',
+        'left': '0px',
+        'width': '100%',
+        'height': '100%',
+        'overflow': 'hidden'
+      });
+      $('#conceptViewer .section-external-exit .exit').hide();
+    }
+    /*
     if (!fullscreenLoad) {
       $('body').append(''
           + '<div id="conceptViewer" style="display: none;">'
@@ -176,18 +212,21 @@ var conceptViewer = {
           + '   </div>'
           + '  </div>'
           + '</div>');
-    }
+    }*/
 
     if(curLangLbl) {
        $('#showNavigationLanguageLabel').text(curLangLbl);
     }
 
     var that = this;
-    $('#conceptViewer').on('click', function (event) {
-      if (!conceptViewer.fullScreen && !$(event.target).closest('#conceptViewer .content').length) {
-        that.hide();
-      }
-    });
+
+    if (!conceptViewer.fullScreen) {
+      $('#conceptViewer').on('click', function (event) {
+        if (!$(event.target).closest('#conceptViewer .content').length) {
+          that.hide();
+        }
+      });
+    }
     this.loaded = true;
 
     $('#conceptViewer .navigationLanguage ul li').click(function(){
@@ -261,7 +300,8 @@ var conceptViewer = {
   },
 
   openInNewWidget: function() {
-    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
+    // var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
+    var url = 'file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html';
     window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
         + "&selectedlang=" + this.selectedLanguage
         + "&shownconcept=" + this.shownConcept
