@@ -1591,14 +1591,16 @@ function QuickStore(rwidentifier, rwpassword) {
 // This is a template of library for use with quickAlgo.
 var getContext = function (display, infos, curLevel) {
 
-    // we set the lib involved to Quick-Pi
-    window.lib = "Quick-Pi";
-
     // Local language strings for each language
     var introControls = null;
 
     // Create a base context
     var context = quickAlgoContext(display, infos);
+
+    // we set the lib involved to Quick-Pi
+    context.title = "Quick-Pi";
+
+    window.conceptViewer.contextTitle = context.title;
 
     // Import our localLanguageStrings into the global scope
     var strings = context.setLocalLanguageStrings(quickPiLocalLanguageStrings);
