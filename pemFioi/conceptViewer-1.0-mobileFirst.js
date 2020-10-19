@@ -101,6 +101,7 @@ var conceptViewer = {
   shownConcept: null,
   selectedLanguage: null,
   fullScreen: false,
+  contextTitle: undefined,
   allLangs: [
     {id: 'blockly', lbl: 'Blockly'},
     {id: 'scratch', lbl: 'Scratch'},
@@ -131,11 +132,14 @@ var conceptViewer = {
       navLanguage += '</li>';
     }
     navLanguage += '</ul>';
+
     $('body').append(''
         + '<div id="conceptViewer"">'
         + '  <div class="content">'
         + '   <div class="panel-heading">'
-        + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
+        + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>'
+        +         (this.fullScreen ? (this.contextTitle ? this.contextTitle + " &ndash; " : "") : "") + this.strings.viewerTitle
+        + '     </h2>'
         + '     <div class="section-external-exit">'
         + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
         + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
@@ -154,7 +158,6 @@ var conceptViewer = {
         + '   </div>'
         + '  </div>'
         + '</div>');
-
     if (!this.fullScreen) {
       $('#conceptViewer').hide();
     } else {
@@ -165,54 +168,8 @@ var conceptViewer = {
         'height': '100%',
         'overflow': 'hidden'
       });
-      $('#conceptViewer .section-external-exit .exit').hide();
+      $('#conceptViewer .section-external-exit').hide();
     }
-    /*
-    if (!fullscreenLoad) {
-      $('body').append(''
-          + '<div id="conceptViewer" style="display: none;">'
-          + '  <div class="content">'
-          + '   <div class="panel-heading">'
-          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
-          + '     <div class="section-external-exit">'
-          + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
-          + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
-          + '     </div>'
-          + '   </div>'
-          + '   <div class="panel-body">'
-          + '     <div class="navigation">'
-          + '      <div class="navigationLanguage">'
-          + navLanguage
-          + '      </div>'
-          + '      <div class="navigationContent"></div>'
-          + '    </div>'
-          + '    <div class="viewer">'
-          + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
-          + '    </div>'
-          + '   </div>'
-          + '  </div>'
-          + '</div>');
-    } else {
-      $('body').append(''
-          + '<div id="conceptViewer">'
-          + '  <div class="content" style="top: 0px;left:0px;width:100%;height:100%; overflow: hidden;">'
-          + '   <div class="panel-heading">'
-          + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + (window.lib ? window.lib + " &ndash; " : "") + this.strings.viewerTitle + '</h2>'
-          + '   </div>'
-          + '   <div class="panel-body">'
-          + '     <div class="navigation">'
-          + '      <div class="navigationLanguage">'
-          + navLanguage
-          + '      </div>'
-          + '      <div class="navigationContent"></div>'
-          + '    </div>'
-          + '    <div class="viewer">'
-          + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
-          + '    </div>'
-          + '   </div>'
-          + '  </div>'
-          + '</div>');
-    }*/
 
     if(curLangLbl) {
        $('#showNavigationLanguageLabel').text(curLangLbl);
@@ -306,7 +263,7 @@ var conceptViewer = {
         + "&selectedlang=" + this.selectedLanguage
         + "&shownconcept=" + this.shownConcept
         + "&stringlanguage=" + window.stringsLanguage
-        + "&lib=" + (window.lib ? window.lib : "undefined"), '_blank');
+        + "&lib=" + (this.contextTitle ? this.contextTitle : "undefined"), '_blank');
   },
 
   showConcept: function (concept, show) {
