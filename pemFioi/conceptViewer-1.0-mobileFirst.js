@@ -259,11 +259,14 @@ var conceptViewer = {
   openInNewWidget: function() {
     // var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
     var url = 'file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html';
-    window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
+    var x = window.open(url + "?concepts=" + encodeURIComponent(JSON.stringify(this.concepts))
         + "&selectedlang=" + this.selectedLanguage
         + "&shownconcept=" + this.shownConcept
         + "&stringlanguage=" + window.stringsLanguage
         + "&lib=" + (this.contextTitle ? this.contextTitle : "undefined"), '_blank');
+
+    var c = Channel.build({window: x, origin: '*', scope: 'test'});
+    c.bind('test', function() { return 'ok'; });
   },
 
   showConcept: function (concept, show) {
