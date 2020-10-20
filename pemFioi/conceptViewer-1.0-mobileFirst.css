@@ -31,7 +31,7 @@
     display: inline-flex;
 }
 #conceptViewer .exit {
-  cursor: pointer;
+    cursor: pointer;
     margin: 0 3px;
 }
 #conceptViewer .exit .icon {
