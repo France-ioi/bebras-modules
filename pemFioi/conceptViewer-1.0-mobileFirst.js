@@ -261,8 +261,7 @@ var conceptViewer = {
   },
 
   openInNewWidget: function() {
-    // var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
-    var url = 'file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html';
+    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
 
     // we put the language so we can do some operations faster and not depending on the jschannel
     var x = window.open(url + "?lang=" + window.stringsLanguage);
