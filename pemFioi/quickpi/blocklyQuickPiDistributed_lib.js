@@ -199,7 +199,7 @@ var getContext = function (display, infos, curLevel) {
          });
 
          messagepath.animate({ path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y] },
-            500, "linear", function () {
+            context.infos.actionDelay, "linear", function () {
 
                var trinagleside = 8;
 
@@ -962,7 +962,7 @@ var getContext = function (display, infos, curLevel) {
          timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
          
 
-         console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         //console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          context.vGraphTimeline.redraw();
 
@@ -982,6 +982,7 @@ var getContext = function (display, infos, curLevel) {
 
 
    context.setCurNode = function (curNode) {
+      console.log("context.setCurNode", curNode);
       context.curNode = curNode;
       var node = context.nodesAndNeighbors[context.curNode];
 
@@ -1007,7 +1008,7 @@ var getContext = function (display, infos, curLevel) {
 
       if (context.display) {
 
-         console.log(context.currentTime * 50, $('#timeLineGraph').width() - 10);
+//         console.log(context.currentTime * 50, $('#timeLineGraph').width() - 10);
          var timelinewidth = Math.max(context.currentTime * 50, $('#timeLineGraph').width() - 10);
          timelinePaper.setSize(timelinewidth, $('#timeLineGraph').height() - 10);
 
@@ -1045,6 +1046,8 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.getNeighbors = function (callback) {
       var node = context.nodesAndNeighbors[context.curNode];
 
+      console.log("current node: ", context.curNode, "neighbords: ", node.neighbors);
+
       context.runner.waitDelay(callback, node.neighbors);
    };
 
@@ -1062,49 +1065,69 @@ var getContext = function (display, infos, curLevel) {
       var ready = context.runner.allowSwitch(callback);
 
       function processMessage(cb) {
-         var message = node.messages.shift();
-         message.status = "read";
+         if(node.messages.length > 0) {
+            var message = node.messages.shift();
+            message.status = "read";
 
 
-         context.updateMessageStatus(message.messageId, message.status);
+            context.updateMessageStatus(message.messageId, message.status);
 
-         if (context.display) {
-            var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
+            if (context.display) {
+               var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
-            if (message.circle) {
-               message.circle.animate({ cx: toPos.x, cy: toPos.y }, context.infos.actionDelay, "linear", function () {
-                  message.circle.remove();
-               });
+               if (message.circle) {
+                  message.circle.animate({ cx: toPos.x, cy: toPos.y }, context.infos.actionDelay, "linear", function () {
+                     message.circle.remove();
+                  });
 
-               message.messageCountText.remove();
-               message.messageCountText = null;
+                  message.messageCountText.remove();
+                  message.messageCountText = null;
 
-               var messageCount = node.messages.reduce(function (acum, value) {
-                  if (value.fromId == message.fromId)
-                     return acum + 1;
+                  var messageCount = node.messages.reduce(function (acum, value) {
+                     if (value.fromId == message.fromId)
+                        return acum + 1;
 
-                  return acum;
-               }, 0);
+                     return acum;
+                  }, 0);
 
-               node.messages.forEach(function (element) {
-                  if (element.fromId == message.fromId && element.messageCountText) {
-                     element.messageCountText.attr({ "text": messageCount.toString() });
-                  }
-               });
+                  node.messages.forEach(function (element) {
+                     if (element.fromId == message.fromId && element.messageCountText) {
+                        element.messageCountText.attr({ "text": messageCount.toString() });
+                     }
+                  });
+               }
+
+               context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, context.infos.actionDelay);
             }
-
-
-            context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, context.infos.actionDelay);
+            else {
+               context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true });
+            }
          }
-         else {
-            context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true })
+         else
+         {
+            console.log("return status = false");
+            context.runner.waitDelay(cb, { "status": false }, context.infos.actionDelay);
+            //context.runner.noDelay(cb, { "status": false });
          }
       }
 
-      if(node.messages.length > 0) {
+      if(node.messages.length > 0 || timeout == 0) {
          ready(processMessage);
       } else {
-         context.onMessageReceived[node.nodeId] = function () { ready(processMessage); };
+         var timeoutID = 0;
+
+         if (timeout > 0)
+            timeoutID = setTimeout(function() {
+               console.log("timeout!");
+               context.onMessageReceived[node.nodeId] = null;
+               ready(processMessage);
+            }, timeout * 1000);
+
+         context.onMessageReceived[node.nodeId] = function () { 
+            if (timeoutID != 0)
+               clearTimeout(timeoutID);
+            ready(processMessage); 
+         };
       }
    };
 
@@ -1203,6 +1226,8 @@ var getContext = function (display, infos, curLevel) {
 
    context.distributed.submitAnswer = function (answer, callback) {
       var node = context.nodesAndNeighbors[context.curNode];
+
+      console.log("submitAnswer");
 
       if (node.answer != null) {
          context.success = false;
