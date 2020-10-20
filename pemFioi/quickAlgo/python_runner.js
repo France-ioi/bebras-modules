@@ -723,6 +723,7 @@ function PythonInterpreter(context, msgCallback) {
     this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
+    this.waitingOnReadyNode = false;
     Sk.running = false;
 
     if(Sk.runQueue && Sk.runQueue.length > 0) {
