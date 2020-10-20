@@ -162,6 +162,7 @@ function initBlocklyRunner(context, messageCallback) {
          var ready = function(readyCallback) {
             if(runner.waitingOnReadyNode) {
                runner.curNode = curNode;
+               runner.waitingOnReadyNode = false;
                context.setCurNode(curNode);
                readyCallback(callback);
             } else {
