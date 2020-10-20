@@ -339,14 +339,15 @@ function PythonInterpreter(context, msgCallback) {
 
   this.defaultSelectNextNode = function(runner, previousNode) {
     var i = previousNode + 1;
-    while(i != previousNode) {
-      if(i >= runner.nbNodes) { i = 0; }
+    if(i >= runner.nbNodes) { i = 0; }
+    do {
       if(runner.readyNodes[i]) {
         break;
       } else {
         i++;
       }
-    }
+      if(i >= runner.nbNodes) { i = 0; }
+    } while(i != previousNode);
     return i;
   };
 
