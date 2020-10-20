@@ -178,13 +178,14 @@ function initBlocklyRunner(context, messageCallback) {
 
       runner.defaultSelectNextNode = function(runner, previousNode) {
          var i = previousNode + 1;
+         if(i >= runner.nbNodes) { i = 0; }
          while(i != previousNode) {
-            if(i >= runner.nbNodes) { i = 0; }
             if(runner.nodesReady[i]) {
                break;
             } else {
                i++;
             }
+            if(i >= runner.nbNodes) { i = 0; }
          }
          return i;
       };
