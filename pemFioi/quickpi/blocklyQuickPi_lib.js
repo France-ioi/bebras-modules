@@ -3015,10 +3015,10 @@ var getContext = function (display, infos, curLevel) {
     };
     
     context.reset = function (taskInfos) {
+        console.log("RESET");
         buzzerSound.stopAll();
 
         context.alreadyHere = true;
-
         context.failImmediately  = null;
 
         if (!context.offLineMode) {
@@ -8370,6 +8370,7 @@ var getContext = function (display, infos, curLevel) {
         if (!context.autoGrading) {
             context.restoreSensors();
         }
+        console.log("STOPPED");
     };
 
     context.onStart = function() {
@@ -8377,12 +8378,14 @@ var getContext = function (display, infos, curLevel) {
         if (!context.autoGrading) {
             context.saveSensors();
         }
+        console.log("START")
     };
 
     context.onLoad = function() {
         if (!context.autoGrading) {
             context.resetSensors();
         }
+        console.log("LOAD");
     };
 
     context.quickpi.isButtonPressed = function (arg1, arg2) {
