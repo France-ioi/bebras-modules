@@ -208,6 +208,7 @@ function PythonInterpreter(context, msgCallback) {
 
   this.skToJs = function(val) {
     // Convert Skulpt item to JavaScript
+    // TODO :: Might be partly replaceable with Sk.ffi.remapToJs
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else if(val instanceof Sk.builtin.func) {
@@ -322,6 +323,7 @@ function PythonInterpreter(context, msgCallback) {
     var ready = function(readyCallback) {
       if(that.waitingOnReadyNode) {
         that.curNode = curNode;
+        that.waitingOnReadyNode = false;
         context.setCurNode(curNode);
         readyCallback(callback);
       } else {
@@ -384,6 +386,7 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._createPrimitive = function (data) {
+    // TODO :: Might be replaceable with Sk.ffi.remapToPy
     if (data === undefined || data === null) {
       return Sk.builtin.none.none$;  // Reuse the same object.
     }
