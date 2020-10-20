@@ -3,6 +3,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aide",
     selectLanguage: "Sélectionnez un langage…",
     selectTopic: "Sélectionnez une rubrique…",
+    reloadFromExercice: "Merci de recharger la page depuis votre exercice.",
     concepts: {
       "taskplatform": 'Résolution des exercices',
       "language": "Création d'un programme",
@@ -26,6 +27,7 @@ var conceptViewerStrings = {
     viewerTitle: "Help",
     selectLanguage: "Select a language…",
     selectTopic: "Select a topic…",
+    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: verify
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Program creation",
@@ -49,6 +51,7 @@ var conceptViewerStrings = {
     viewerTitle: "Ayuda",
     selectLanguage: "Seleccione un lenguaje…",
     selectTopic: "Seleccione un tema…",
+    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Resolución de ejercicios',
       "language": "Creación de un programa",
@@ -72,6 +75,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aiuto online",
     selectLanguage: "Seleziona una lingua…",
     selectTopic: "Seleziona un argomento…",
+    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Programmazione",
@@ -259,7 +263,9 @@ var conceptViewer = {
   openInNewWidget: function() {
     // var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
     var url = 'file:///home/nicolas/stage/test/v01/Tests/nicolas-doc-test/display-documentation.html';
-    var x = window.open(url);
+
+    // we put the language so we can do some operations faster and not depending on the jschannel
+    var x = window.open(url + "?lang=" + window.stringsLanguage);
     var c = Channel.build({window: x, origin: '*', scope: 'test'});
 
     var that = this;
@@ -269,7 +275,6 @@ var conceptViewer = {
       concepts: that.concepts,
       selectedLang: that.selectedLanguage,
       shownConcept: that.shownConcept,
-      stringsLanguage: window.stringsLanguage,
       contextTitle: that.contextTitle
     };
 
