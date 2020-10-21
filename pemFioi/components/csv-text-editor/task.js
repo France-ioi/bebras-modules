@@ -21,17 +21,17 @@
                 mistake_unknown_state: 'Incorrect CSV'
             },
             fr: {
-                validate: 'Validate',
-                success: 'Success',
-                mistake_rows_lack: 'Too few rows',
-                mistake_rows_excess: 'Too many rows',
-                mistake_cols_lack: 'Too few columns',
-                mistake_cols_excess: 'Too many columns',
-                mistake_incorrect_data: 'Incorrect data',
-                mistake_illegal_state: 'Incorrect CSV',
-                mistake_illegal_quote: 'Illegal quote',
-                mistake_illegal_data: 'Illegal data',
-                mistake_unknown_state: 'Incorrect CSV'
+                validate: 'Valider',
+                success: 'Bravo, vous avez réussi !',
+                mistake_rows_lack: 'La table ne contient pas assez de lignes',
+                mistake_rows_excess: 'La table contient trop de lignes',
+                mistake_cols_lack: 'La table ne contient pas assez de colonnes',
+                mistake_cols_excess: 'La table contient trop de colonnes',
+                mistake_incorrect_data: 'Les données sont invalides',
+                mistake_illegal_state: 'Le format du CSV est invalide',
+                mistake_illegal_quote: 'Erreur de guillemets',
+                mistake_illegal_data: 'Données non autorisées',
+                mistake_unknown_state: 'Le format du CSV est invalide'
             },
         },
 
@@ -136,8 +136,9 @@
             } else {
                 var msg = getMistakeMessage();
             }
-            $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
-            $('#validate-btn').remove();
+            $("#error").remove();
+            $('<div id="error">' + msg + '</div>').insertAfter($('.taskContent'));
+            //$('#validate-btn').remove();
             callback(score, msg, null);
         };
 
