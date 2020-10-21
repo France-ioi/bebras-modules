@@ -183,9 +183,11 @@
                 });
                 this.buttons.solution.hide();
             }
-            this.addButton(this.holder, 'restart', function() {
-                self.showPopup();
-            });
+            if(!quiz_settings.hide_restart) {
+                this.addButton(this.holder, 'restart', function() {
+                    self.showPopup();
+                });
+            }
             if(quiz_settings.display_return_to_top) {
                 this.holder.append('<br><br>');
                 this.addButton(this.holder, 'return_to_top', function() {
@@ -420,6 +422,7 @@
     };
 
     $(function() {
+        if(!window.quiz_settings) { window.quiz_settings = {}; }
         if(window.platform) {
             platform.initWithTask(task);
             task_toolbar.init();
