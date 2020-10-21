@@ -3,7 +3,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aide",
     selectLanguage: "Sélectionnez un langage…",
     selectTopic: "Sélectionnez une rubrique…",
-    reloadFromExercice: "Merci de recharger la page depuis votre exercice.",
+    reloadFromTask: "Merci d'ouvrir cette documentation directement depuis l'exercice. Vous pouvez fermer cette fenêtre.",
     concepts: {
       "taskplatform": 'Résolution des exercices',
       "language": "Création d'un programme",
@@ -27,7 +27,7 @@ var conceptViewerStrings = {
     viewerTitle: "Help",
     selectLanguage: "Select a language…",
     selectTopic: "Select a topic…",
-    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: verify
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: verify
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Program creation",
@@ -51,7 +51,7 @@ var conceptViewerStrings = {
     viewerTitle: "Ayuda",
     selectLanguage: "Seleccione un lenguaje…",
     selectTopic: "Seleccione un tema…",
-    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: Translate
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Resolución de ejercicios',
       "language": "Creación de un programa",
@@ -75,7 +75,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aiuto online",
     selectLanguage: "Seleziona una lingua…",
     selectTopic: "Seleziona un argomento…",
-    reloadFromExercice: "Please reload this page from your exercice.", // TODO :: Translate
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Programmazione",
@@ -165,14 +165,7 @@ var conceptViewer = {
     if (!this.fullScreen) {
       $('#conceptViewer').hide();
     } else {
-      $('#conceptViewer .content').css({
-        'top': '0px',
-        'left': '0px',
-        'width': '100%',
-        'height': '100%',
-        'overflow': 'hidden'
-      });
-      $('#conceptViewer .section-external-exit').hide();
+      $('#conceptViewer').addClass('conceptViewer-fullscreen');
     }
 
     if(curLangLbl) {
@@ -264,8 +257,8 @@ var conceptViewer = {
     var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
 
     // we put the language so we can do some operations faster and not depending on the jschannel
-    var x = window.open(url + "?lang=" + window.stringsLanguage);
-    var c = Channel.build({window: x, origin: '*', scope: 'test'});
+    var fullscreenWindow = window.open(url + "?lang=" + window.stringsLanguage);
+    var channel = Channel.build({window: fullscreenWindow, origin: '*', scope: 'test'});
 
     var that = this;
 
@@ -277,7 +270,7 @@ var conceptViewer = {
       contextTitle: that.contextTitle
     };
 
-    c.bind('getConceptViewerConfigs', function() {
+    channel.bind('getConceptViewerConfigs', function() {
       return conceptViewerConfigs;
     });
 
