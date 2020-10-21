@@ -1600,8 +1600,6 @@ var getContext = function (display, infos, curLevel) {
     // we set the lib involved to Quick-Pi
     context.title = "Quick-Pi";
 
-    window.conceptViewer.contextTitle = context.title;
-
     // Import our localLanguageStrings into the global scope
     var strings = context.setLocalLanguageStrings(quickPiLocalLanguageStrings);
 
