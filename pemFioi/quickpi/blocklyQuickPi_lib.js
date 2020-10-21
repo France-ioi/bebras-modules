@@ -2931,18 +2931,28 @@ var getContext = function (display, infos, curLevel) {
     context.resetSensors = function() {
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
-
-            sensor.state = null;
-            sensor.screenDrawing = null;
-            sensor.lastDrawnTime = 0;
-            sensor.lastDrawnState = null;
-            sensor.callsInTimeSlot = 0;
-            sensor.lastTimeIncrease = 0;
-            sensor.removed = false;
-            sensor.quickStore = null;
-
+            if (context.sensorsSaved[sensor.name]) {
+                var save = context.sensorsSaved[sensor.name];
+                sensor.state = save.state;
+                sensor.screenDrawing = save.screenDrawing;
+                sensor.lastDrawnTime = save.lastDrawnTime;
+                sensor.lastDrawnState = save.lastDrawnState;
+                sensor.callsInTimeSlot = save.callsInTimeSlot;
+                sensor.lastTimeIncrease = save.lastTimeIncrease;
+                sensor.removed = save.removed;
+                sensor.quickStore = save.quickStore;
+            } else {
+                sensor.state = null;
+                sensor.screenDrawing = null;
+                sensor.lastDrawnTime = 0;
+                sensor.lastDrawnState = null;
+                sensor.callsInTimeSlot = 0;
+                sensor.lastTimeIncrease = 0;
+                sensor.removed = false;
+                sensor.quickStore = null;
+            }
         }
-    }
+    };
     
     context.reset = function (taskInfos) {
         buzzerSound.stopAll();
@@ -7933,8 +7943,43 @@ var getContext = function (display, infos, curLevel) {
             // This needs to be in front of everything
             sensor.focusrect.toFront();
         }
+
+        // save the sensor if we are not running
+        if (!(context.runner && context.runner.isRunning())) {
+            if (_findFirst(sensorDefinitions, function(globalSensor) {
+                return globalSensor.name === sensor.type;
+            }).isSensor) {
+                context.sensorsSaved[sensor.name] = {
+                    state: Array.isArray(sensor.state) ? _copyArray(sensor.state) : sensor.state,
+                    screenDrawing: sensor.screenDrawing,
+                    lastDrawnTime: sensor.lastDrawnTime,
+                    lastDrawnState: sensor.lastDrawnState,
+                    callsInTimeSlot: sensor.callsInTimeSlot,
+                    lastTimeIncrease: sensor.lastTimeIncrease,
+                    removed: sensor.removed,
+                    quickStore: sensor.quickStore
+                };
+            }
+        }
     }
 
+    function _copyArray(src) {
+        var ret = [];
+        for (var i = 0; i < src.length; i++) {
+            ret.push(src[i]);
+        }
+        return ret;
+    }
+
+    function _findFirst(array, func) {
+        for (var i = 0; i < array.length; i++) {
+            if (func(array[i]))
+                return array[i];
+        }
+        return undefined;
+    }
+
+    context.sensorsSaved = {};
 
     context.registerQuickPiEvent = function (name, newState, setInSensor = true, allowFail = false) {
         var sensor = findSensorByName(name);
