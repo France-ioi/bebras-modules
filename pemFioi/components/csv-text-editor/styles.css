@@ -1,5 +1,6 @@
 .csv-text-editor pre.editor {
     border: 1px solid #333;
+    padding: 3px;
 }
 
 .csv-text-editor .mistake {
