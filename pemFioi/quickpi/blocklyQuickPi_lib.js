@@ -3382,7 +3382,7 @@ var getContext = function (display, infos, curLevel) {
                     y: 10 + (context.timeLineSlotHeight * iSensor),
                     width: sensorSize * .90,
                     height: sensorSize * .90
-                }
+                };
 
                 var rect = paper.rect(0, sensor.drawInfo.y, paper.width, context.timeLineSlotHeight);
 
@@ -3455,10 +3455,12 @@ var getContext = function (display, infos, curLevel) {
             if (nSensors < 4)
                 nSensors = 4;
 
+            // TODO : be carefull, the geometry is reversed for cols and rows I think
+            var geometry = null;
             if (context.compactLayout)
-                var geometry = squareSize(paper.width, paper.height, nSensors, 2);
+                geometry = squareSize(paper.width, paper.height, nSensors, 2);
             else
-                var geometry = squareSize(paper.width, paper.height, nSensors, 1);
+                geometry = squareSize(paper.width, paper.height, nSensors, 1);
 
             context.sensorSize = geometry.size * .10;
 
@@ -3494,7 +3496,13 @@ var getContext = function (display, infos, curLevel) {
                     if (cellsAmount)
                         cells = cellsAmount(paper);
 
-                    
+                    // Particular case if we have a screen and only 2 columns, we can put the
+                    // cells of the screen at 2 because the display is still good with it.
+                    // I used rows, because I think that for geometry, rows and cols are reversed. You can try to change
+                    // it and see the result in animal connecte.
+                    if (sensor && sensor.type === "screen" && cells > geometry.rows && cells == 3 && geometry.rows == 2)
+                        cells = 2;
+
                     line = paper.path(["M", x,
                         y1,
                         "L", x,
@@ -3611,7 +3619,7 @@ var getContext = function (display, infos, curLevel) {
         if (introControls === null) {
             introControls = piUi + $('#introControls').html();
         }
-        $('#introControls').html(introControls)
+        $('#introControls').html(introControls);
         $('#taskIntro').addClass('piui');
 
         $('#grid').html(`
