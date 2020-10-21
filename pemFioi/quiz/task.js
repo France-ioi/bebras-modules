@@ -19,6 +19,7 @@
                 'restart': 'Restart',
                 'restart_scratch': 'Restart from scratch',
                 'restart_current': 'Restart from current answer',
+                'return_to_top': 'Return to the list of questions',
                 'placeholder_text': 'Enter text',
                 'placeholder_number': 'Enter number',
                 'error_number': 'Must be a number',
@@ -40,6 +41,7 @@
                 'restart': 'Recommencer',
                 'restart_scratch': 'Recommencer au début',
                 'restart_current': 'Recommencer la question',
+                'return_to_top': 'Retour à la liste des questions',
                 'cancel' : 'Annuler',
                 'placeholder_text': 'Entrez du texte',
                 'placeholder_number': 'Entrez un nombre',
@@ -184,6 +186,12 @@
             this.addButton(this.holder, 'restart', function() {
                 self.showPopup();
             });
+            if(quiz_settings.display_return_to_top) {
+                this.holder.append('<br><br>');
+                this.addButton(this.holder, 'return_to_top', function() {
+                    platform.validate('top');
+                });
+            }
             this.holder.insertAfter($('.taskContent'));
         }
 
