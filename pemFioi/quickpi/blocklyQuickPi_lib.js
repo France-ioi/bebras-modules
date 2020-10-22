@@ -9222,6 +9222,11 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.setGyroZeroAngle = function (callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
+            var sensor = findSensorByType("gyroscope");
+
+            sensor.rotationAngles = [0, 0, 0];
+            sensor.lastSpeedChange = new Date();
+
             context.runner.noDelay(callback);
         } else {
             var cb = context.runner.waitCallback(callback);
