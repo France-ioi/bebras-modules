@@ -1840,6 +1840,39 @@ button.showLongIntro .icon {
   line-height: 40px;
 }
 
+#quickAlgo-editExercise {
+  z-index: 50;
+  position: absolute;
+  top: calc(51% - (50vh / 2));
+  left: calc(50% - (50vw / 2));
+  width: 50vw;
+  height: 50vh;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 2px solid #4a90e2;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  overflow: auto;
+  box-shadow: 2px 4px;
+}
+
+#quickAlgo-editExercise-title {
+  width: 90%;
+  resize: none;
+  font-size: 15px;
+}
+
+#quickAlgo-editExercise-description {
+  width: 100%;
+  height: 100%;
+}
+
+#quickAlgo-editExercise-description textarea {
+  width: 100%;
+  height: 100%;
+}
 
 #quickAlgo-altcode {
     z-index: 50;
@@ -1860,15 +1893,19 @@ button.showLongIntro .icon {
     box-shadow: 2px 4px;
 }
 
-#quickAlgo-altcode textarea {
+#quickAlgo-altcode .blocklyToPython textarea {
     height: 100%;
     width: 100%;
     resize: none;
 }
-#quickAlgo-altcode textarea:focus {
+#quickAlgo-altcode .blocklyToPython textarea:focus {
     background-color: #DAE9F9;
 }
 
 .panel-heading.panel-heading-nopadding {
     padding: 0px;
+}
+.editExerciseIcon {
+  float: right;
+  cursor: pointer;
 }

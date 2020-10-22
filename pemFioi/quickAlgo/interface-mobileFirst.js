@@ -266,6 +266,65 @@ var quickAlgoInterface = {
         }
     },
 
+    closeEditExercise: function() {
+        var title = $('textarea#quickAlgo-editExercise-title').val();
+        var description = $('textarea#quickAlgo-editExercise-description').val();
+        document.title = title;
+
+        $(".exerciceText").text(description);
+
+        $('#quickAlgo-editExercise').remove();
+    },
+
+    openEditExercise: function() {
+
+        var description = $(".exerciceText").text();
+
+        if (!$('#quickAlgo-editExercise').length) {
+            var html = '' +
+                '<div id="quickAlgo-editExercise">' +
+                '   <div class="panel-heading">' +
+                '       <h2 class="sectionTitle">Titre :</h2>' +
+                '       <textarea rows="1" id="quickAlgo-editExercise-title">' + document.title + '</textarea>' +
+                '       <div class="exit" onclick="quickAlgoInterface.closeEditExercise();"><span class="icon fas fa-times"></span></div>' +
+                '   </div>' +
+                '   <h2 class="sectionTitle">Description</h2>' +
+                '   <textarea id="quickAlgo-editExercise-description">' + description + '</textarea>' +
+                '</div>';
+
+            $('#task').append(html);
+        }
+
+        /*
+        if(!$('#quickAlgo-altcode').length) {
+            var html = '' +
+                '<div id="quickAlgo-altcode" class="blanket">' +
+                '   <div id="quickAlgo-altcode-header" class="panel-heading panel-heading-nopadding">' +
+                '     <h2 class="sectionTitle"><span class="icon fas fa-code"></span>' + this.strings.blocklyToPythonTitle + '</h2>' +
+                '     <div class="exit" onclick="quickAlgoInterface.hideAlternateCode();"><span class="icon fas fa-times"></span></div>' +
+                '   </div>' +
+                '   <p>' + this.strings.blocklyToPythonIntro + '</p>' +
+                '   <textarea readonly></textarea>' +
+                '</div>';
+
+            $('#task').append(html);
+
+            dragElement($('#quickAlgo-altcode')[0]);
+
+            this.displayedAltCode = 'python';
+
+            $('#quickAlgo-altcode').on('mouseenter', function() {
+                $('#quickAlgo-altcode textarea').focus();
+            });
+
+            $('#quickAlgo-altcode').on('mouseleave', function() {
+                $('#quickAlgo-altcode textarea').blur();
+            });
+        }
+
+        $('#quickAlgo-altcode textarea').text(code.trim());*/
+    },
+
     loadPrograms: function(formElement) {
         this.blocklyHelper.handleFiles(formElement.files);
         resetFormElement($(formElement));
