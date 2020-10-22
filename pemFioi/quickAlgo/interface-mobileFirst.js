@@ -294,35 +294,6 @@ var quickAlgoInterface = {
 
             $('#task').append(html);
         }
-
-        /*
-        if(!$('#quickAlgo-altcode').length) {
-            var html = '' +
-                '<div id="quickAlgo-altcode" class="blanket">' +
-                '   <div id="quickAlgo-altcode-header" class="panel-heading panel-heading-nopadding">' +
-                '     <h2 class="sectionTitle"><span class="icon fas fa-code"></span>' + this.strings.blocklyToPythonTitle + '</h2>' +
-                '     <div class="exit" onclick="quickAlgoInterface.hideAlternateCode();"><span class="icon fas fa-times"></span></div>' +
-                '   </div>' +
-                '   <p>' + this.strings.blocklyToPythonIntro + '</p>' +
-                '   <textarea readonly></textarea>' +
-                '</div>';
-
-            $('#task').append(html);
-
-            dragElement($('#quickAlgo-altcode')[0]);
-
-            this.displayedAltCode = 'python';
-
-            $('#quickAlgo-altcode').on('mouseenter', function() {
-                $('#quickAlgo-altcode textarea').focus();
-            });
-
-            $('#quickAlgo-altcode').on('mouseleave', function() {
-                $('#quickAlgo-altcode textarea').blur();
-            });
-        }
-
-        $('#quickAlgo-altcode textarea').text(code.trim());*/
     },
 
     loadPrograms: function(formElement) {
