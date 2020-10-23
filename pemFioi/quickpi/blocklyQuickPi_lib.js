@@ -1597,6 +1597,9 @@ var getContext = function (display, infos, curLevel) {
     // Create a base context
     var context = quickAlgoContext(display, infos);
 
+    // we set the lib involved to Quick-Pi
+    context.title = "Quick-Pi";
+
     // Import our localLanguageStrings into the global scope
     var strings = context.setLocalLanguageStrings(quickPiLocalLanguageStrings);
 

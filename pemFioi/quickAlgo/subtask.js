@@ -103,6 +103,7 @@ var initBlocklySubTask = function(subTask, language) {
          }
          concepts = window.conceptsFill(concepts, allConcepts);
          window.conceptViewer.loadConcepts(concepts);
+         window.conceptViewer.contextTitle = this.context.title;
       }
 
       this.blocklyHelper.setIncludeBlocks(curIncludeBlocks);
