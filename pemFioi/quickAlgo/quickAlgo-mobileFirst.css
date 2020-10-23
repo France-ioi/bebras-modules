@@ -1867,11 +1867,6 @@ button.showLongIntro .icon {
 #quickAlgo-editExercise-description {
   width: 100%;
   height: 100%;
-}
-
-#quickAlgo-editExercise-description textarea {
-  width: 100%;
-  height: 100%;
   resize: none;
 }
 
@@ -1907,6 +1902,11 @@ button.showLongIntro .icon {
     padding: 0px;
 }
 .editExerciseIcon {
+  float: right;
+  cursor: pointer;
+  padding-right: 5px;
+}
+.saveEditExerciseIcon {
   float: right;
   cursor: pointer;
   padding-right: 5px;

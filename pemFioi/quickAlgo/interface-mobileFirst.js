@@ -266,6 +266,25 @@ var quickAlgoInterface = {
         }
     },
 
+    openEditExercise: function() {
+        var content = $(".exerciceText").text();
+
+        $(".exerciceText").hide();
+        $(".exerciceText").parent().append('<textarea id="quickAlgo-editExercise-description">' + content + '</textarea>');
+
+        $(".editExerciseIcon").hide();
+        $(".editExerciseIcon").parent().append(`<span class="fas fa-check saveEditExerciseIcon" onclick="quickAlgoInterface.saveEdition()"></span>`)
+    },
+
+    saveEdition: function() {
+        var description = $('textarea#quickAlgo-editExercise-description').val();
+        $('textarea#quickAlgo-editExercise-description').remove();
+        $(".saveEditExerciseIcon").remove();
+        $(".exerciceText").text(description).show();
+        $(".editExerciseIcon").show();
+    },
+
+    /*
     closeEditExercise: function() {
         var title = $('textarea#quickAlgo-editExercise-title').val();
         var description = $('textarea#quickAlgo-editExercise-description').val();
@@ -294,7 +313,7 @@ var quickAlgoInterface = {
 
             $('#task').append(html);
         }
-    },
+    },*/
 
     loadPrograms: function(formElement) {
         this.blocklyHelper.handleFiles(formElement.files);
