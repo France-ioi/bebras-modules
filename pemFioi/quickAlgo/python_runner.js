@@ -355,12 +355,12 @@ function PythonInterpreter(context, msgCallback) {
   this.startNextNode = function(curNode) {
     // Start the next node when one has been switched from
     var newNode = this.selectNextNode(this, curNode);
+    this._paused = true;
     if(newNode == curNode) {
       // No ready node
       this.waitingOnReadyNode = true;
     } else {
       // TODO :: switch execution
-      this._paused = true;
       console.log('about to switch from ' + curNode + '/' + this.context.curNode + ' to ' + newNode);
       this.startNode(curNode, newNode);
     }
