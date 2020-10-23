@@ -318,6 +318,15 @@ var quickAlgoInterface = {
         } else {
             this.hasHelp = false;
         }
+
+        // add the button for edit subject
+        if (opt.canEditSubject) {
+            var hasIntroControls = $('#taskIntro').find('#introControls').length;
+            if (!hasIntroControls) {
+                $('#taskIntro').append(`<div id="introControls"></div>`);
+            }
+            $('#introControls').append(`<span class="fas fa-pencil-alt editExerciseIcon" onclick="quickAlgoInterface.openEditExercise()"></span>`);
+        }
     },
 
     updateControlsDisplay: function() {

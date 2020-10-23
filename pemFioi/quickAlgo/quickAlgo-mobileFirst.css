@@ -1872,6 +1872,7 @@ button.showLongIntro .icon {
 #quickAlgo-editExercise-description textarea {
   width: 100%;
   height: 100%;
+  resize: none;
 }
 
 #quickAlgo-altcode {
@@ -1908,4 +1909,5 @@ button.showLongIntro .icon {
 .editExerciseIcon {
   float: right;
   cursor: pointer;
+  padding-right: 5px;
 }
