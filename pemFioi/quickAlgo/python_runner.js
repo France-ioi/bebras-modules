@@ -17,6 +17,7 @@ function PythonInterpreter(context, msgCallback) {
   this._paused = false;
   this._isRunning = false;
   this._stepInProgress = false;
+  this._resetDone = true;
   this.stepMode = false;
   this._steps = 0;
   this._stepsWithoutAction = 0;
@@ -610,6 +611,7 @@ function PythonInterpreter(context, msgCallback) {
     this._allowStepsWithoutDelay = 0;
 
     this._isRunning = false;
+    this._resetDone = false;
     this.stepMode = false;
     this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
@@ -626,6 +628,15 @@ function PythonInterpreter(context, msgCallback) {
       this._resetCallstackOnNextStep = false;
       this._debugger.suspension_stack.pop();
     }
+  };
+
+  this.reset = function() {
+    if(this._resetDone) { return; }
+    if(this.isRunning()) {
+      this.stop();
+    }
+    this.context.reset();
+    this._resetDone = true;
   };
 
   this.step = function () {
