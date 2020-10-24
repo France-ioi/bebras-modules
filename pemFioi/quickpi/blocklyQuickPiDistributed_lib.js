@@ -6,7 +6,8 @@ var getContext = function (display, infos, curLevel) {
             // Labels for the blocks
             getNodeID: "get Current Node ID",
             getNeighbors: "Get list of neighbors",
-            getNextMessage: "Get next message timeout %1 seconds",
+            getNextMessage: "Get next message",
+            getNextMessageWithTimeout: "Get next message timeout %1 seconds",
             sendMessage: "Send Message",
             submitAnswer: "Submit Answer",
             isMessageWaiting: "Is there a message waiting",
@@ -18,6 +19,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "getNodeID",
             getNeighbors: "getNeighbors",
             getNextMessage: "getNextMessage",
+            getNextMessageWithTimeout: "getNextMessage",
             sendMessage: "sendMessage",
             submitAnswer: "submitAnswer",
             isMessageWaiting: "isMessageWaiting",
@@ -29,6 +31,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "getNodeID() Get current node ID",
             getNeighbors: "getNeighbors() Get list of Neighbors",
             getNextMessage: "getNextMessage() Get next message sent to this node",
+            getNextMessageWithTimeout: "getNextMessage(timeout) Get next message sent to this node",
             sendMessage: "sendMessage(nodeID, message) Send a message to a neighbor",
             submitAnswer: "submitAnswer(answer) Submit answer",
             isMessageWaiting: "isMessageWaiting() Returns true if we have a message waiting on the current node queue",
@@ -47,6 +50,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "Get current node ID",
             getNeighbors: "Get list of Neighbors",
             getNextMessage: "Get next message sent to this node",
+            getNextMessageWithTimeout: "Get next message sent to this node",
             sendMessage: "Send a message to a neighbor",
             submitAnswer: "Submit answer",
             isMessageWaiting: "Is a message waiting in the queue",
@@ -56,6 +60,7 @@ var getContext = function (display, infos, curLevel) {
       }
    }
 
+   var introControls = null;
    // Create a base context
    var context = quickAlgoContext(display, infos);
    // Import our localLanguageStrings into the global scope
@@ -183,7 +188,7 @@ var getContext = function (display, infos, curLevel) {
          var timelinex = fromNode.timeLinePos.x + (context.currentTime * 50);
 
          var messagepath = timelinePaper.path(["M", timelinex, fromNode.timeLinePos.y]);
-         messagepath.attr({ "stroke-width": 2,
+         messagepath.attr({ "stroke-width": 3,
                             "stroke":  "#00A2E8",
                           });
 
@@ -198,36 +203,42 @@ var getContext = function (display, infos, curLevel) {
             "stroke": "#678AB4"
          });
 
+
+         var trinaglesize = 8;
+
+         if (pointingdown)
+         {
+            var targetpath = ["M", timelinex, fromNode.timeLinePos.y,
+               "L", timelinex + trinaglesize, fromNode.timeLinePos.y - trinaglesize,
+               "L", timelinex - trinaglesize, fromNode.timeLinePos.y - trinaglesize,
+               "L", timelinex, fromNode.timeLinePos.y];
+
+         }
+         else
+         {
+
+            var targetpath = ["M", timelinex, fromNode.timeLinePos.y,
+               "L", timelinex - trinaglesize, fromNode.timeLinePos.y + trinaglesize,
+               "L", timelinex + trinaglesize, fromNode.timeLinePos.y + trinaglesize,
+               "L", timelinex, fromNode.timeLinePos.y];
+         }
+
+         var triangle = timelinePaper.path(targetpath);
+         triangle.attr({
+               "fill": "#678AB4",
+               "stroke": "#678AB4"
+         });
+
+         var linesize = toNode.timeLinePos.y - fromNode.timeLinePos.y;
+
+         var _transformedPath = Raphael.transformPath(targetpath, 'T0,' + linesize);
+         triangle.animate({path: _transformedPath}, context.infos.actionDelay);
+
+
          messagepath.animate({ path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y] },
             context.infos.actionDelay, "linear", function () {
-
-               var trinagleside = 8;
-
-               if (pointingdown)
-               {
-                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
-                     "L", timelinex + trinagleside, toNode.timeLinePos.y - trinagleside,
-                     "L", timelinex - trinagleside, toNode.timeLinePos.y - trinagleside,
-                     "L", timelinex, toNode.timeLinePos.y];
-
-               }
-               else
-               {
-
-                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
-                     "L", timelinex - trinagleside, toNode.timeLinePos.y + trinagleside,
-                     "L", timelinex + trinagleside, toNode.timeLinePos.y + trinagleside,
-                     "L", timelinex, toNode.timeLinePos.y];
-               }
-                                         
-               var triangle = timelinePaper.path(targetpath);
-               triangle.attr({
-                     "fill": "#678AB4",
-                     "stroke": "#678AB4"
-               });
-
-
-            });
+            }
+         );
 
          messagepath.hover(
             // Enter hover
@@ -254,7 +265,8 @@ var getContext = function (display, infos, curLevel) {
             // Exit
             function () {
                $('#screentooltip').remove();
-            });
+            }
+         );
       }
    };
 
@@ -283,6 +295,8 @@ var getContext = function (display, infos, curLevel) {
          statusRow.id = "message-" + messageInfo.messageId + "-status";
 
          context.updateMessageStatus(messageInfo.messageId, messageInfo.status);
+
+         $('#nodeMessages').scrollTop($('#nodeMessages')[0].scrollHeight); 
    };
 
    context.sendMessage = function (messageInfo, display) {
@@ -356,20 +370,55 @@ var getContext = function (display, infos, curLevel) {
          $("#node-" + nodeId + "-answer").text(JSON.stringify(answer));
 
 
+         var answerRectWidth = 100;
          var pixelsPerTime = 50;
          var pixelsPerTimeHalf = pixelsPerTime / 2;
          var timelinex = node.timeLinePos.x + (context.currentTime * pixelsPerTime);
          var timelinexhalf = node.timeLinePos.x + (context.currentTime * pixelsPerTime) - pixelsPerTime / 2;
 
           
-         var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, pixelsPerTime, pixelsPerTime, 10);
+         var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, answerRectWidth, pixelsPerTime, 10);
          answerRect.attr( { 
             "fill": "#22B14C",
             "fill-opacity": 1
          });
 
-         var text = timelinePaper.text(timelinex, node.timeLinePos.y, JSON.stringify(answer));
+         var answerText = JSON.stringify(answer);
+         var text = timelinePaper.text(timelinexhalf + 2, node.timeLinePos.y, answerText);
 
+         text.attr( {
+            "font-size": pixelsPerTime / 3,
+            "text-anchor" : "start"
+         });
+
+         var bbox = text.getBBox();
+
+         while ((bbox.width + 2) > answerRectWidth && answerText.length > 0) {
+            answerText = answerText.substring(0, answerText.length - 1);
+            text.attr( { text: (answerText + "...") } );
+
+            bbox = text.getBBox();
+         }
+
+         text.click(function()
+         {
+            $('#screentooltip').remove();
+            $("body").append('<div id="screentooltip"></div>');
+
+            var html = JSON.stringify(answer);
+
+            $('#screentooltip').html(html);
+
+            $('#screentooltip').css("position", "absolute");
+            $('#screentooltip').css("border", "1px solid gray");
+            $('#screentooltip').css("background-color", "#efefef");
+            $('#screentooltip').css("padding", "0px");
+            $('#screentooltip').css("z-index", "1000");
+            //$('#screentooltip').css("width", "262px");
+            //$('#screentooltip').css("height", "70px");
+
+            $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
+         });
       }
    };
 
@@ -398,23 +447,26 @@ var getContext = function (display, infos, curLevel) {
             answerRect.rotate(45);
 
             var text = timelinePaper.text(timelinex, node.timeLinePos.y, "End");
-   
+            text.attr( {
+               "font-size": rombussize / 2
+            });
          }
 
          //console.log (nodeId, "is done ");
 
          context.setNodeStatus(nodeId, "finished");
-         var allFinnished = true;
+         context.maybeWakeUpNodeInGrading(nodeId);
+         var allFinished = true;
 
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
 
             if (context.nodesAndNeighbors[i].status != "finished") {
-               allFinnished = false;
+               allFinished = false;
                break;
             }
          }
 
-         if (allFinnished) {
+         if (allFinished) {
             console.log("All nodes are done!");
 
             if (context.validateAnswer) {
@@ -604,10 +656,59 @@ var getContext = function (display, infos, curLevel) {
       });
 
       context.vGraphTimeline.redraw();
-      timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
-      timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+      //timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+      //timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+      context.updateTimeLineScale();
+
+      $('#timeLineGraph').scroll(function (event) {
+
+         $('#screentooltip').remove();
+         var scrolloffset = $('#timeLineGraph').scrollLeft();
+
+         console.log("scrolloffset ", scrolloffset);
 
 
+         $.each(vertices, function (index) {
+            var id = vertices[index];
+            var pos = context.vGraphTimeline.graphDrawer.getVertexPosition(id);
+            var vertexObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+
+            context.vGraphTimeline.graphDrawer.moveVertex(id, scrolloffset + (context.verticeRadius * 4), pos.y);
+
+            if (scrolloffset == 0)
+               vertexObject.attr({ opacity: 1 });
+            else
+               vertexObject.attr({ opacity: 0.3 });
+         });
+
+         context.vGraphTimeline.redraw();
+
+         $.each(vertices, function (index) {
+            var id = vertices[index];
+            var pos = context.vGraphTimeline.graphDrawer.getVertexPosition(id);
+            var vertexObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+
+            if (scrolloffset == 0)
+               vertexObject.attr({ opacity: 1 });
+            else
+               vertexObject.attr({ opacity: 0.3 });
+         });
+
+         var edges = context.Graph.getAllEdges();
+         $.each(edges, function (index) {
+            var id = edges[index];
+            var edgeObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+            if (scrolloffset == 0)
+               edgeObject.attr({ opacity: 1 });
+            else
+               edgeObject.attr({ opacity: 0.3 });
+
+         });
+   
+   
+      });
+
+      `
       var draggingTimeline = false;
       var draggingStartX = 0;
       var draggingStartY = 0;
@@ -663,6 +764,7 @@ var getContext = function (display, infos, curLevel) {
 
             draggingTimeline = false; 
         });
+      `
    };
 
    // Reset the context's display
@@ -670,6 +772,7 @@ var getContext = function (display, infos, curLevel) {
       if (!context.display || !this.raphaelFactory)
          return;
 
+      $('#screentooltip').remove();
 
       // Do something here
       var hasIntroControls = $('#taskIntro').find('#introControls').length;
@@ -677,65 +780,78 @@ var getContext = function (display, infos, curLevel) {
          $('#taskIntro').append(`<div id="introControls"></div>`);
       }
       
-      $('#introControls').html(`
-      <!--<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div>-->
-      <div id="piui">
-      <button class="btn" type="button" id="showGraphView">Graph View</button>
-      <button class="btn" type="button" id="showTimelineView">Timeline</button>
-      </div>
-      `);
+      if (introControls === null) {
+         introControls = true;
 
-      $('#piconnect').click(function () {
-         context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
-      });
+    
+         $('#introControls').html(`
+         <!--<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div>-->
+         <div id="piui">
+         <button class="btn" type="button" id="showGraphView">Graph View</button>
+         <button class="btn" type="button" id="showTimelineView">Timeline</button>
+         </div>
+         `);
 
-      $('#showGraphView').click(function () {
-         if ($('#timelineView').css("display") != "none")
-         {
-            $('#timelineView').css("display", "none");
-            $('#graphView').css("display", "");
+         $('#piconnect').click(function () {
+            context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
+         });
 
-            context.updateScale();
-         }
-      });
+         $('#showGraphView').click(function () {
+            $('#screentooltip').remove();
+            if ($('#timelineView').css("display") != "none")
+            {
+               $('#timelineView').css("display", "none");
+               $('#graphView').css("display", "");
 
-      $('#showTimelineView').click(function () {
-         if ($('#graphView').css("display") != "none")
-         {
-            $('#timelineView').css("display", "");
-            $('#graphView').css("display", "none");
+               context.updateScale();
+               
+               context.vGraph.redraw();
+            }
+         });
 
-            context.updateScale();
-         }
-      });
+         $('#showTimelineView').click(function () {
+            $('#screentooltip').remove();
+            if ($('#graphView').css("display") != "none")
+            {
+               $('#timelineView').css("display", "");
+               $('#graphView').css("display", "none");
+
+               context.updateScale();
+               context.updateTimeLineScale();
+               context.vGraphTimeline.redraw();
+            }
+         });      
+
+         $('#grid').html(`
+         
+            <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
+               <div style='height: 100%; width: 100%; overflow-x: auto; overflow-y:hidden' id="timeLineGraph"></div>
+            </div>
+      
+            <div id='graphView' style='height: 100%; width: 100%; '>
+            <table style='height: 100%; width: 100%; table-layout:fixed;'>
+            <tr>
+            <td style='width: 50%; height: 50%; position:relative;'>
+               <div style='height: 100%; width: 100%; position: absolute;   top: 0; left: 0;' id="nodeGraph" ></div>
+            </td>
+            <td style='width: 50%; height: 50%;'>   
+               <div style='height: 100%; width: 100%; overflow:auto;' id="nodeStatus">Hello 2</div>
+            </td>
+            </tr>
+            <tr>
+            <td colspan=2 style='width: 100%; height: 50%;'>
+               <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
+            </td>
+
+            </tr>
+            </table>
+            </div>
+         `);
+      }
+
+
 
       context.verticeRadius = 35;
-
-      $('#grid').html(`
-         
-         <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
-            <div style='height: 100%; width: 100%; overflow-x: auto; overflow-y:hidden' id="timeLineGraph"></div>
-         </div>
-         
-         <div id='graphView' style='height: 100%; width: 100%; '>
-         <table style='height: 100%; width: 100%; table-layout:fixed;'>
-         <tr>
-         <td style='width: 50%; height: 50%;'>
-            <div style='height: 100%; width: 100%;' id="nodeGraph" ></div>
-         </td>
-         <td style='width: 50%; height: 50%;'>   
-            <div style='height: 100%; width: 100%; overflow:auto;' id="nodeStatus">Hello 2</div>
-         </td>
-         </tr>
-         <tr>
-         <td colspan=2 style='width: 100%; height: 50%;'>
-            <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
-         </td>
-
-         </tr>
-         </table>
-         </div>
-       `);
 
       var tableStatus = "<table id='node-status-table' style='border-collapse: collapse; margin: auto;'><tr><th>#</th><th>ID</th><th>Status</th><th>Answer</th></tr></table>";
       $('#nodeStatus').html(tableStatus);
@@ -958,17 +1074,26 @@ var getContext = function (display, infos, curLevel) {
          paper.setSize(width, height);
 
 
-         timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
-         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         context.updateTimeLineScale();
+         //timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+         //timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
          
 
-         //console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          context.vGraphTimeline.redraw();
 
          //context.resetDisplay();
       }
    };
+
+   context.updateTimeLineScale = function() {
+      timelinePaper.setSize(timelinePaper.width - 15, $('#timeLineGraph').height() - 10);
+      timelinePaper.setViewBox(0, 0, timelinePaper.width /*context.timeLineGraphW*/, context.timeLineGraphH, false);
+      
+      timelinePaper.canvas.setAttribute('preserveAspectRatio', 'none'); 
+      
+   }
 
    // When the context is unloaded, this function is called to clean up
    // anything the context may have created
@@ -1008,9 +1133,17 @@ var getContext = function (display, infos, curLevel) {
 
       if (context.display) {
 
-//         console.log(context.currentTime * 50, $('#timeLineGraph').width() - 10);
-         var timelinewidth = Math.max(context.currentTime * 50, $('#timeLineGraph').width() - 10);
+
+
+         var node = context.nodesAndNeighbors[0];
+
+         var timelinewidth = Math.max(node.timeLinePos.x + (context.currentTime * 50) + 30, $('#timeLineGraph').width() - 10);
+
+         console.log("set timelight width to ", timelinewidth);
+
          timelinePaper.setSize(timelinewidth, $('#timeLineGraph').height() - 10);
+
+         context.updateTimeLineScale();
 
          $('#timeLineGraph').scrollLeft(timelinewidth);
 
@@ -1029,6 +1162,34 @@ var getContext = function (display, infos, curLevel) {
                   "L", node.timeLinePos.x + (context.currentTime * 50), node.timeLinePos.y]
             }, 100);
          });
+      }
+   };
+
+
+   context.maybeWakeUpNodeInGrading = function (nodeIdToSkip) {
+      if (context.display)
+         return;
+
+      var allsleepingordone = true;
+      var nodeToWakeup = null;
+      for(var i = 0; i < context.nodesAndNeighbors.length; i++) {
+         var node = context.nodesAndNeighbors[i];
+
+         if (node.nodeId != nodeIdToSkip && context.onMessageReceived[node.nodeId])
+            nodeToWakeup = node;
+
+         if (!context.onMessageReceived[node.nodeId] && node.status != "finished") {
+            allsleepingordone = false;
+            break;
+         }
+      }
+
+      console.log("All nodes are sleep ?!",allsleepingordone );
+      if (allsleepingordone && nodeToWakeup) {
+         var omr = context.onMessageReceived[nodeToWakeup.nodeId];
+         context.onMessageReceived[nodeToWakeup.nodeId] = null;
+
+         setTimeout(omr, 0);
       }
    };
 
@@ -1128,8 +1289,11 @@ var getContext = function (display, infos, curLevel) {
                clearTimeout(timeoutID);
             ready(processMessage); 
          };
+         context.maybeWakeUpNodeInGrading(node.nodeId);
       }
    };
+
+   context.distributed.getNextMessageWithTimeout = context.distributed.getNextMessage;
 
    context.distributed.sendMessage = function (recipientId, message, callback) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
@@ -1237,6 +1401,8 @@ var getContext = function (display, infos, curLevel) {
       context.incTime();
 
       context.setNodeAnswer(node.nodeId, answer);
+
+      context.incTime();
 
       context.runner.waitDelay(callback);
    };
@@ -1367,14 +1533,15 @@ var getContext = function (display, infos, curLevel) {
          actions: [
             { name: "getNodeID", yieldsValue: true },
             { name: "getNeighbors", yieldsValue: true },
+            { name: "getNextMessage", yieldsValue: true },
             {
-               name: "getNextMessage", yieldsValue: true, params: ["Number"],
+               name: "getNextMessageWithTimeout", yieldsValue: true, params: ["Number"],
                blocklyJson: {
                   "args0": [
                      { "type": "input_value", "name": "PARAM_0" },
                   ]
                },
-               blocklyXml: "<block type='getNextMessage'>" +
+               blocklyXml: "<block type='getNextMessageWithTimeout'>" +
                   "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>5</field></shadow></value>" +
                   "</block>"
             },
