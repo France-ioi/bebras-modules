@@ -3,7 +3,7 @@
     font-weight: bold;
 }
 
-.csv-text-editor pre.editor {
+.csv-text-editor .editor {
     border: 1px solid #333;
     padding: 3px;
 }
