@@ -153,11 +153,6 @@ function LogicController(nbTestCases, maxInstructions) {
     return true;
   }
 
-  this.getAllCodes = function(answer) {
-    // TODO :: multi-node version
-    return [answer[0].blockly];
-  }
-
   this.getDefaultContent = function () {
     if(this._options.startingExample && this._options.startingExample.python) {
       return this._options.startingExample.python;
