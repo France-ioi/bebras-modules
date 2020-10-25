@@ -4,14 +4,14 @@ step1: validate csv
 step2: diff with valid data
 
 */
-
 function CSVTextEditor(params) {
 
     var defaults = {
         width: '100%',
         min_height: '100px',
         csv_separator: ',',
-        content: null
+        content: null,
+        labels: {}
     }
     params = Object.assign({}, defaults, params);
     try {
@@ -23,17 +23,27 @@ function CSVTextEditor(params) {
         console.error(e.message);
     }                
 
-
     var wrapper = $('<div class="csv-text-editor"/>')
     params.parent.append(wrapper);
 
+    function addLabel(section) {
+        if(section in params.labels) {
+            var label = $('<div class="label"/>');
+            label.html(params.labels[section]);
+            wrapper.append(label);
+        }
+    }
+
+
     // editor element    
+    addLabel('editor');
     var editor = $('<pre class="editor"/>')
         .attr('contentEditable', true)
         .attr('spellcheck', false);
     params.width && editor.css('width', params.width + 'px')
     params.min_height && editor.css('min-height', params.min_height + 'px')
     wrapper.append(editor);
+    
 
 
     // sys 
@@ -188,6 +198,7 @@ function CSVTextEditor(params) {
         if(!silent) {
             if(!table) {
                 table = $('<table>');
+                addLabel('table');
                 wrapper.append(table);
             }
             table.html(html);      

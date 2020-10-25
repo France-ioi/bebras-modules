@@ -1,3 +1,8 @@
+.csv-text-editor .label {
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
 .csv-text-editor pre.editor {
     border: 1px solid #333;
     padding: 3px;

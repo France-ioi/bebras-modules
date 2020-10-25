@@ -171,7 +171,11 @@
     task.load = function(views, success) {
         platform.getTaskParams(null, null, function(taskParams) {
             var params = Object.assign(csv_editor_options, {
-                parent: $('.taskContent')
+                parent: $('.taskContent'),
+                labels: {
+                    editor: 'CSV Editor:',
+                    table: 'Result table:'
+                }
             })
             window.csv_editor = CSVTextEditor(params);
             setupTask(taskParams, success)

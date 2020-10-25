@@ -144,7 +144,12 @@
     task.load = function(views, success) {
         platform.getTaskParams(null, null, function(taskParams) {
             var params = Object.assign(gaps_table_options, {
-                parent: $('.taskContent')
+                parent: $('.taskContent'),
+                labels: {
+                    output: 'Output CSV:',
+                    input: 'Input CSV:',
+                    table: 'Table:'
+                }
             })
             window.gaps_table = GapsTable(params);
             setupTask(taskParams, success)

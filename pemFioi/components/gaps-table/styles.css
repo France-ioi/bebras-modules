@@ -1,5 +1,6 @@
-.gaps-table {
-
+.gaps-table .label {
+    margin: 10px 0 5px;
+    font-weight: bold;
 }
 
 .gaps-table .value {
