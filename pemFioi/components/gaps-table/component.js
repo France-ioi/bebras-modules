@@ -17,7 +17,8 @@ function GapsTable(params) {
             rows: 10,
             cols: 10
         },
-        csv_separator: ','
+        csv_separator: ',',
+        labels: {}
     }
     params = Object.assign({}, defaults, params);
 
@@ -81,7 +82,13 @@ function GapsTable(params) {
     var wrapper = $('<div class="gaps-table"/>');
     params.parent.append(wrapper);
 
-
+    function addLabel(section) {
+        if(section in params.labels) {
+            var label = $('<div class="label"/>');
+            label.html(params.labels[section]);
+            wrapper.append(label);
+        }
+    }
 
 
 
@@ -144,18 +151,21 @@ function GapsTable(params) {
 
         if(params.display_output_csv) {
             var input_display = $('<div class="csv"/>');
+            addLabel('input');
             wrapper.append(input_display);
             input_display.html(formatCSV(data.values));
         }        
         var table = $('<table/>');
         var table_outline = $('<div class="table-outline"/>').append(table);
         var table_container = $('<div class="table-container"/>').append(table_outline);
+        addLabel('table');
         wrapper.append(table_container);
         var schema = Schema(data.schema);
        
 
         var display;
         if(params.display_output_csv) {
+            addLabel('output');
             display = $('<div class="csv"/>');
             wrapper.append(display);
         }
