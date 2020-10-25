@@ -18,7 +18,8 @@ function GapsTable(params) {
             cols: 10
         },
         csv_separator: ',',
-        labels: {}
+        labels: {},
+        answer: false
     }
     params = Object.assign({}, defaults, params);
 
@@ -189,7 +190,7 @@ function GapsTable(params) {
                     scope: uid,
                     hoverClass: 'placeholder-hover',
                     drop: function(event, ui) {
-                        resetMistakes();                        
+                        resetMistakes();
                         toolbar.append(cell.find('.value').first());
                         ui.draggable.detach().css({top: 0,left: 0}).appendTo(cell);
                         refreshAnswer();
@@ -317,6 +318,7 @@ function GapsTable(params) {
                     answer[i][j] = schema.isPlaceholder(i, j) ? cells[i][j].text() : '';
                 }
             }
+            callOnChange();
             updateCSV();
         }
 
@@ -410,7 +412,8 @@ function GapsTable(params) {
             setAnswer: setAnswer,
             getValues: getValues,
             validate: validate,
-            resetValues: resetValues
+            resetValues: resetValues,
+            resetMistakes: resetMistakes
         }
 
     }
@@ -461,6 +464,7 @@ function GapsTable(params) {
     toolbar.droppable({
         scope: uid,
         drop: function(event, ui) {
+            resetMistakes();
             ui.draggable.detach().css({top: 0,left: 0}).appendTo(toolbar);
         }
     });        
@@ -499,13 +503,30 @@ function GapsTable(params) {
     }
 
 
+    function destroy() {
+        wrapper.remove();
+    }
 
+    function resetMistakes() {
+        for(var i=0; i<tables.length; i++) {
+            tables[i].resetMistakes();
+        }
+    }
 
+    function callOnChange() {
+        if('onChange' in params) {
+            params.onChange(getAnswer())
+        }
+    }
+
+    if(params.answer) {
+        setAnswer(params.answer);
+    }
 
     return {
-
         validate: validate,
         getAnswer: getAnswer,
-        setAnswer: setAnswer
+        setAnswer: setAnswer,
+        destroy: destroy
     }
 }
