@@ -254,7 +254,8 @@ var conceptViewer = {
   },
 
   openInNewWidget: function() {
-    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
+    // we use the function to get the base url in order to support http and https.
+    var url = getConceptViewerBaseUrl().replace("index.html", "display-documentation.html");
 
     // we put the language so we can do some operations faster and not depending on the jschannel
     var fullscreenWindow = window.open(url + "?lang=" + window.stringsLanguage);
