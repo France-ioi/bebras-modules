@@ -2931,7 +2931,7 @@ var getContext = function (display, infos, curLevel) {
     context.resetSensors = function() {
         for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
             var sensor = infos.quickPiSensors[iSensor];
-            if (context.sensorsSaved[sensor.name]) {
+            if (context.sensorsSaved[sensor.name] && !context.autoGrading) {
                 var save = context.sensorsSaved[sensor.name];
                 sensor.state = save.state;
                 sensor.screenDrawing = save.screenDrawing;
@@ -7950,7 +7950,7 @@ var getContext = function (display, infos, curLevel) {
                 return globalSensor.name === sensor.type;
             }).isSensor) {
                 context.sensorsSaved[sensor.name] = {
-                    state: Array.isArray(sensor.state) ? _copyArray(sensor.state) : sensor.state,
+                    state: Array.isArray(sensor.state) ? sensor.state.slice() : sensor.state,
                     screenDrawing: sensor.screenDrawing,
                     lastDrawnTime: sensor.lastDrawnTime,
                     lastDrawnState: sensor.lastDrawnState,
@@ -7961,14 +7961,6 @@ var getContext = function (display, infos, curLevel) {
                 };
             }
         }
-    }
-
-    function _copyArray(src) {
-        var ret = [];
-        for (var i = 0; i < src.length; i++) {
-            ret.push(src[i]);
-        }
-        return ret;
     }
 
     function _findFirst(array, func) {
