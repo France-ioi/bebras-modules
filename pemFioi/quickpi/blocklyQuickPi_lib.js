@@ -2941,6 +2941,9 @@ var getContext = function (display, infos, curLevel) {
             sensor.removed = false;
             sensor.quickStore = null;
 
+            if (sensor.name == "gyroscope")
+                sensor.rotationAngles = undefined;
+
         }
     }
     
@@ -7008,18 +7011,24 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.state) {
                 sensor.state = [0, 0, 0];
             }
-            if (!sensor.rotationAngles)
-                sensor.rotationAngles = [0, 0, 0];
             if (sensor.stateText) {
                 sensor.stateText.remove();
             }
             sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
+            if (!sensor.previousState)
+                sensor.previousState = [0, 0, 0];
 
-            // update the rotation angle
-            for (var i = 0; i < 3; i++)
-                sensor.rotationAngles[i] = sensor.state[i] * (new Date() - sensor.lastSpeedChange);
+            if (sensor.rotationAngles != undefined) {
 
-            sensor.lastSpeedChange = new Date();
+                // update the rotation angle
+                for (var i = 0; i < 3; i++)
+                    sensor.rotationAngles[i] += sensor.previousState[i] * ((new Date() - sensor.lastSpeedChange) / 1000);
+
+                sensor.lastSpeedChange = new Date();
+            }
+
+
+            sensor.previousState = sensor.state;
 
             if (!context.autoGrading && context.offLineMode) {
                 var img3d = gyroscope3D.getInstance(imgw, imgh);
@@ -9249,18 +9258,22 @@ var getContext = function (display, infos, curLevel) {
         if (!context.display || context.autoGrading || context.offLineMode) {
             var sensor = findSensorByType("gyroscope");
 
-            for (var i = 0; i < 3; i++)
-                sensor.rotationAngles[i] = sensor.state[i] * (new Date() - sensor.lastSpeedChange);
-
-            sensor.lastSpeedChange = new Date();
 
             var ret = 0;
-            if (axis == "x")
-                ret = sensor.rotationAngles[0];
-            else if (axis == "y")
-                ret = sensor.rotationAngles[1];
-            else if (axis == "z")
-                ret = sensor.rotationAngles[2];
+
+            if (sensor.rotationAngles != undefined) {
+                for (var i = 0; i < 3; i++)
+                    sensor.rotationAngles[i] += sensor.state[i] * ((new Date() - sensor.lastSpeedChange) / 1000);
+
+                sensor.lastSpeedChange = new Date();
+
+                if (axis == "x")
+                    ret = sensor.rotationAngles[0];
+                else if (axis == "y")
+                    ret = sensor.rotationAngles[1];
+                else if (axis == "z")
+                    ret = sensor.rotationAngles[2];
+            }
 
             context.runner.noDelay(callback, ret);
         } else {
