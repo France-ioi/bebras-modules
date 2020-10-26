@@ -79,7 +79,8 @@ function setupCSVEditorTask(csv_editor_options) {
     
         function getMistakeMessage() {
             var mistake = csv_editor.getMistake();
-            return taskStrings['mistake_' + mistake.tag];
+            var key = 'mistake_' + mistake.tag;
+            return key in taskStrings ? taskStrings[key] : taskStrings.fail;
         }        
     
         function checkResult(noVisual, callback) {
