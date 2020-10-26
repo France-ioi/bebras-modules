@@ -7008,10 +7008,18 @@ var getContext = function (display, infos, curLevel) {
             if (!sensor.state) {
                 sensor.state = [0, 0, 0];
             }
+            if (!sensor.rotationAngles)
+                sensor.rotationAngles = [0, 0, 0];
             if (sensor.stateText) {
                 sensor.stateText.remove();
             }
             sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "°/s\nY: " + sensor.state[1] + "°/s\nZ: " + sensor.state[2] + "°/s");
+
+            // update the rotation angle
+            for (var i = 0; i < 3; i++)
+                sensor.rotationAngles[i] = sensor.state[i] * (new Date() - sensor.lastSpeedChange);
+
+            sensor.lastSpeedChange = new Date();
 
             if (!context.autoGrading && context.offLineMode) {
                 var img3d = gyroscope3D.getInstance(imgw, imgh);
@@ -9239,9 +9247,22 @@ var getContext = function (display, infos, curLevel) {
 
     context.quickpi.computeRotationGyro = function (axis, callback) {
         if (!context.display || context.autoGrading || context.offLineMode) {
-            var state = context.getSensorState("gyroscope", "i2c");
+            var sensor = findSensorByType("gyroscope");
 
-            context.runner.noDelay(callback, 0);
+            for (var i = 0; i < 3; i++)
+                sensor.rotationAngles[i] = sensor.state[i] * (new Date() - sensor.lastSpeedChange);
+
+            sensor.lastSpeedChange = new Date();
+
+            var ret = 0;
+            if (axis == "x")
+                ret = sensor.rotationAngles[0];
+            else if (axis == "y")
+                ret = sensor.rotationAngles[1];
+            else if (axis == "z")
+                ret = sensor.rotationAngles[2];
+
+            context.runner.noDelay(callback, ret);
         } else {
             var cb = context.runner.waitCallback(callback);
             var sensor = context.findSensor("gyroscope", "i2c");
