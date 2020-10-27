@@ -6,7 +6,8 @@ var getContext = function (display, infos, curLevel) {
             // Labels for the blocks
             getNodeID: "get Current Node ID",
             getNeighbors: "Get list of neighbors",
-            getNextMessage: "Get next message timeout %1 seconds",
+            getNextMessage: "Get next message",
+            getNextMessageWithTimeout: "Get next message timeout %1 seconds",
             sendMessage: "Send Message",
             submitAnswer: "Submit Answer",
             isMessageWaiting: "Is there a message waiting",
@@ -18,6 +19,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "getNodeID",
             getNeighbors: "getNeighbors",
             getNextMessage: "getNextMessage",
+            getNextMessageWithTimeout: "getNextMessage",
             sendMessage: "sendMessage",
             submitAnswer: "submitAnswer",
             isMessageWaiting: "isMessageWaiting",
@@ -29,6 +31,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "getNodeID() Get current node ID",
             getNeighbors: "getNeighbors() Get list of Neighbors",
             getNextMessage: "getNextMessage() Get next message sent to this node",
+            getNextMessageWithTimeout: "getNextMessage(timeout) Get next message sent to this node",
             sendMessage: "sendMessage(nodeID, message) Send a message to a neighbor",
             submitAnswer: "submitAnswer(answer) Submit answer",
             isMessageWaiting: "isMessageWaiting() Returns true if we have a message waiting on the current node queue",
@@ -47,6 +50,7 @@ var getContext = function (display, infos, curLevel) {
             getNodeID: "Get current node ID",
             getNeighbors: "Get list of Neighbors",
             getNextMessage: "Get next message sent to this node",
+            getNextMessageWithTimeout: "Get next message sent to this node",
             sendMessage: "Send a message to a neighbor",
             submitAnswer: "Submit answer",
             isMessageWaiting: "Is a message waiting in the queue",
@@ -56,6 +60,7 @@ var getContext = function (display, infos, curLevel) {
       }
    }
 
+   var introControls = null;
    // Create a base context
    var context = quickAlgoContext(display, infos);
    // Import our localLanguageStrings into the global scope
@@ -64,6 +69,9 @@ var getContext = function (display, infos, curLevel) {
    // Some data can be made accessible by the library through the context object
    context.distributed = {};
 
+   if(window.quickAlgoInterface) {
+      window.quickAlgoInterface.stepDelayMax = 500;
+  }
 
    function getSessionStorage(name) {
       // Use a try in case it gets blocked
@@ -180,7 +188,7 @@ var getContext = function (display, infos, curLevel) {
          var timelinex = fromNode.timeLinePos.x + (context.currentTime * 50);
 
          var messagepath = timelinePaper.path(["M", timelinex, fromNode.timeLinePos.y]);
-         messagepath.attr({ "stroke-width": 2,
+         messagepath.attr({ "stroke-width": 3,
                             "stroke":  "#00A2E8",
                           });
 
@@ -188,44 +196,49 @@ var getContext = function (display, infos, curLevel) {
          if (fromNode.timeLinePos.y < toNode.timeLinePos.y)
             pointingdown = true;
 
+
+         var circle = timelinePaper.circle(timelinex, fromNode.timeLinePos.y, 5);
+         circle.attr({
+            "fill": "#678AB4",
+            "stroke": "#678AB4"
+         });
+
+
+         var trinaglesize = 8;
+
+         if (pointingdown)
+         {
+            var targetpath = ["M", timelinex, fromNode.timeLinePos.y,
+               "L", timelinex + trinaglesize, fromNode.timeLinePos.y - trinaglesize,
+               "L", timelinex - trinaglesize, fromNode.timeLinePos.y - trinaglesize,
+               "L", timelinex, fromNode.timeLinePos.y];
+
+         }
+         else
+         {
+
+            var targetpath = ["M", timelinex, fromNode.timeLinePos.y,
+               "L", timelinex - trinaglesize, fromNode.timeLinePos.y + trinaglesize,
+               "L", timelinex + trinaglesize, fromNode.timeLinePos.y + trinaglesize,
+               "L", timelinex, fromNode.timeLinePos.y];
+         }
+
+         var triangle = timelinePaper.path(targetpath);
+         triangle.attr({
+               "fill": "#678AB4",
+               "stroke": "#678AB4"
+         });
+
+         var linesize = toNode.timeLinePos.y - fromNode.timeLinePos.y;
+
+         var _transformedPath = Raphael.transformPath(targetpath, 'T0,' + linesize);
+         triangle.animate({path: _transformedPath}, context.infos.actionDelay);
+
+
          messagepath.animate({ path: ["M", timelinex, fromNode.timeLinePos.y, "L", timelinex, toNode.timeLinePos.y] },
-            500, "linear", function () {
-
-               var trinagleside = 8;
-
-               if (pointingdown)
-               {
-                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
-                     "L", timelinex + trinagleside, toNode.timeLinePos.y - trinagleside,
-                     "L", timelinex - trinagleside, toNode.timeLinePos.y - trinagleside,
-                     "L", timelinex, toNode.timeLinePos.y];
-
-               }
-               else
-               {
-
-                  var targetpath = ["M", timelinex, toNode.timeLinePos.y,
-                     "L", timelinex - trinagleside, toNode.timeLinePos.y + trinagleside,
-                     "L", timelinex + trinagleside, toNode.timeLinePos.y + trinagleside,
-                     "L", timelinex, toNode.timeLinePos.y];
-               }
-
-              
-
-               var circle = timelinePaper.circle(timelinex, fromNode.timeLinePos.y, 5);
-               circle.attr({
-                  "fill": "#678AB4",
-                  "stroke": "#678AB4"
-               });
-                                         
-               var triangle = timelinePaper.path(targetpath);
-               triangle.attr({
-                     "fill": "#678AB4",
-                     "stroke": "#678AB4"
-               });
-
-
-            });
+            context.infos.actionDelay, "linear", function () {
+            }
+         );
 
          messagepath.hover(
             // Enter hover
@@ -252,7 +265,8 @@ var getContext = function (display, infos, curLevel) {
             // Exit
             function () {
                $('#screentooltip').remove();
-            });
+            }
+         );
       }
    };
 
@@ -281,6 +295,8 @@ var getContext = function (display, infos, curLevel) {
          statusRow.id = "message-" + messageInfo.messageId + "-status";
 
          context.updateMessageStatus(messageInfo.messageId, messageInfo.status);
+
+         $('#nodeMessages').scrollTop($('#nodeMessages')[0].scrollHeight); 
    };
 
    context.sendMessage = function (messageInfo, display) {
@@ -334,7 +350,7 @@ var getContext = function (display, infos, curLevel) {
          else if (status == "sleeping") {
             vertexObject.attr({ fill: "lightgray" });
          }
-         else if (status == "finnished") {
+         else if (status == "finished") {
             vertexObject.attr({ fill: "green" });
          }
          else if (status == "waitingformessage") {
@@ -354,20 +370,55 @@ var getContext = function (display, infos, curLevel) {
          $("#node-" + nodeId + "-answer").text(JSON.stringify(answer));
 
 
+         var answerRectWidth = 100;
          var pixelsPerTime = 50;
          var pixelsPerTimeHalf = pixelsPerTime / 2;
          var timelinex = node.timeLinePos.x + (context.currentTime * pixelsPerTime);
          var timelinexhalf = node.timeLinePos.x + (context.currentTime * pixelsPerTime) - pixelsPerTime / 2;
 
           
-         var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, pixelsPerTime, pixelsPerTime, 10);
+         var answerRect = timelinePaper.rect(timelinexhalf, node.timeLinePos.y - pixelsPerTimeHalf, answerRectWidth, pixelsPerTime, 10);
          answerRect.attr( { 
             "fill": "#22B14C",
             "fill-opacity": 1
          });
 
-         var text = timelinePaper.text(timelinex, node.timeLinePos.y, JSON.stringify(answer));
+         var answerText = JSON.stringify(answer);
+         var text = timelinePaper.text(timelinexhalf + 2, node.timeLinePos.y, answerText);
 
+         text.attr( {
+            "font-size": pixelsPerTime / 3,
+            "text-anchor" : "start"
+         });
+
+         var bbox = text.getBBox();
+
+         while ((bbox.width + 2) > answerRectWidth && answerText.length > 0) {
+            answerText = answerText.substring(0, answerText.length - 1);
+            text.attr( { text: (answerText + "...") } );
+
+            bbox = text.getBBox();
+         }
+
+         text.click(function()
+         {
+            $('#screentooltip').remove();
+            $("body").append('<div id="screentooltip"></div>');
+
+            var html = JSON.stringify(answer);
+
+            $('#screentooltip').html(html);
+
+            $('#screentooltip').css("position", "absolute");
+            $('#screentooltip').css("border", "1px solid gray");
+            $('#screentooltip').css("background-color", "#efefef");
+            $('#screentooltip').css("padding", "0px");
+            $('#screentooltip').css("z-index", "1000");
+            //$('#screentooltip').css("width", "262px");
+            //$('#screentooltip').css("height", "70px");
+
+            $('#screentooltip').css("left", event.clientX + 2).css("top", event.clientY + 2);
+         });
       }
    };
 
@@ -396,23 +447,26 @@ var getContext = function (display, infos, curLevel) {
             answerRect.rotate(45);
 
             var text = timelinePaper.text(timelinex, node.timeLinePos.y, "End");
-   
+            text.attr( {
+               "font-size": rombussize / 2
+            });
          }
 
          //console.log (nodeId, "is done ");
 
-         context.setNodeStatus(nodeId, "finnished");
-         var allFinnished = true;
+         context.setNodeStatus(nodeId, "finished");
+         context.maybeWakeUpNodeInGrading(nodeId);
+         var allFinished = true;
 
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
 
-            if (context.nodesAndNeighbors[i].status != "finnished") {
-               allFinnished = false;
+            if (context.nodesAndNeighbors[i].status != "finished") {
+               allFinished = false;
                break;
             }
          }
 
-         if (allFinnished) {
+         if (allFinished) {
             console.log("All nodes are done!");
 
             if (context.validateAnswer) {
@@ -602,10 +656,59 @@ var getContext = function (display, infos, curLevel) {
       });
 
       context.vGraphTimeline.redraw();
-      timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
-      timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+      //timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+      //timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+      context.updateTimeLineScale();
+
+      $('#timeLineGraph').scroll(function (event) {
+
+         $('#screentooltip').remove();
+         var scrolloffset = $('#timeLineGraph').scrollLeft();
+
+         console.log("scrolloffset ", scrolloffset);
 
 
+         $.each(vertices, function (index) {
+            var id = vertices[index];
+            var pos = context.vGraphTimeline.graphDrawer.getVertexPosition(id);
+            var vertexObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+
+            context.vGraphTimeline.graphDrawer.moveVertex(id, scrolloffset + (context.verticeRadius * 4), pos.y);
+
+            if (scrolloffset == 0)
+               vertexObject.attr({ opacity: 1 });
+            else
+               vertexObject.attr({ opacity: 0.3 });
+         });
+
+         context.vGraphTimeline.redraw();
+
+         $.each(vertices, function (index) {
+            var id = vertices[index];
+            var pos = context.vGraphTimeline.graphDrawer.getVertexPosition(id);
+            var vertexObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+
+            if (scrolloffset == 0)
+               vertexObject.attr({ opacity: 1 });
+            else
+               vertexObject.attr({ opacity: 0.3 });
+         });
+
+         var edges = context.Graph.getAllEdges();
+         $.each(edges, function (index) {
+            var id = edges[index];
+            var edgeObject = context.vGraphTimeline.getRaphaelsFromID(id)[0];
+            if (scrolloffset == 0)
+               edgeObject.attr({ opacity: 1 });
+            else
+               edgeObject.attr({ opacity: 0.3 });
+
+         });
+   
+   
+      });
+
+      `
       var draggingTimeline = false;
       var draggingStartX = 0;
       var draggingStartY = 0;
@@ -661,6 +764,7 @@ var getContext = function (display, infos, curLevel) {
 
             draggingTimeline = false; 
         });
+      `
    };
 
    // Reset the context's display
@@ -668,60 +772,86 @@ var getContext = function (display, infos, curLevel) {
       if (!context.display || !this.raphaelFactory)
          return;
 
+      $('#screentooltip').remove();
 
       // Do something here
       var hasIntroControls = $('#taskIntro').find('#introControls').length;
       if (!hasIntroControls) {
          $('#taskIntro').append(`<div id="introControls"></div>`);
       }
+      
+      if (introControls === null) {
+         introControls = true;
 
-      $('#introControls').html("<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div><button id=showGraphView>Graph View</button></div><button id=showTimelineView>Timeline</button></div>")
+    
+         $('#introControls').html(`
+         <!--<div><button id=piconnect>Connect</button><button id=piinstall>Install</button></div>-->
+         <div id="piui">
+         <button class="btn" type="button" id="showGraphView">Graph View</button>
+         <button class="btn" type="button" id="showTimelineView">Timeline</button>
+         </div>
+         `);
 
-      $('#piconnect').click(function () {
-         context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
-      });
+         $('#piconnect').click(function () {
+            context.quickPiConnection.connect("ws://192.168.0.5/api/v1/commands");
+         });
 
-      $('#showGraphView').click(function () {
-         $('#timelineView').css("display", "none");
-         $('#graphView').css("display", "");
+         $('#showGraphView').click(function () {
+            $('#screentooltip').remove();
+            if ($('#timelineView').css("display") != "none")
+            {
+               $('#timelineView').css("display", "none");
+               $('#graphView').css("display", "");
 
-         context.updateScale();
-      });
+               context.updateScale();
+               
+               context.vGraph.redraw();
+            }
+         });
 
-      $('#showTimelineView').click(function () {
-         $('#timelineView').css("display", "");
-         $('#graphView').css("display", "none");
+         $('#showTimelineView').click(function () {
+            $('#screentooltip').remove();
+            if ($('#graphView').css("display") != "none")
+            {
+               $('#timelineView').css("display", "");
+               $('#graphView').css("display", "none");
 
-         context.updateScale();
-      });
+               context.updateScale();
+               context.updateTimeLineScale();
+               context.vGraphTimeline.redraw();
+            }
+         });      
+
+         $('#grid').html(`
+         
+            <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
+               <div style='height: 100%; width: 100%; overflow-x: auto; overflow-y:hidden' id="timeLineGraph"></div>
+            </div>
+      
+            <div id='graphView' style='height: 100%; width: 100%; '>
+            <table style='height: 100%; width: 100%; table-layout:fixed;'>
+            <tr>
+            <td style='width: 50%; height: 50%; position:relative;'>
+               <div style='height: 100%; width: 100%; position: absolute;   top: 0; left: 0;' id="nodeGraph" ></div>
+            </td>
+            <td style='width: 50%; height: 50%;'>   
+               <div style='height: 100%; width: 100%; overflow:auto;' id="nodeStatus">Hello 2</div>
+            </td>
+            </tr>
+            <tr>
+            <td colspan=2 style='width: 100%; height: 50%;'>
+               <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
+            </td>
+
+            </tr>
+            </table>
+            </div>
+         `);
+      }
+
+
 
       context.verticeRadius = 35;
-
-      $('#grid').html(`
-         
-         <div style='height: 100%; width: 100%; display: none;' id='timelineView'>
-            <div style='height: 100%; width: 100%; overflow:hidden' id="timeLineGraph"></div>
-         </div>
-         
-         <div id='graphView' style='height: 100%; width: 100%; '>
-         <table style='height: 100%; width: 100%; table-layout:fixed;'>
-         <tr>
-         <td style='width: 50%; height: 50%;'>
-            <div style='height: 100%; width: 100%;' id="nodeGraph" ></div>
-         </td>
-         <td style='width: 50%; height: 50%;'>   
-            <div style='height: 100%; width: 100%; overflow:auto;' id="nodeStatus">Hello 2</div>
-         </td>
-         </tr>
-         <tr>
-         <td colspan=2 style='width: 100%; height: 50%;'>
-            <div style='height: 100%; width: 100%; overflow:auto;'  id="nodeMessages" >Hello 3</div>
-         </td>
-
-         </tr>
-         </table>
-         </div>
-       `);
 
       var tableStatus = "<table id='node-status-table' style='border-collapse: collapse; margin: auto;'><tr><th>#</th><th>ID</th><th>Status</th><th>Answer</th></tr></table>";
       $('#nodeStatus').html(tableStatus);
@@ -940,26 +1070,30 @@ var getContext = function (display, infos, curLevel) {
          var scaleFactorW = width / context.graphOriginalW;
          var scaleFactorH = height / context.graphOriginalH;
 
-         //console.log("resize to ", width, height);
          paper.setViewBox(0, 0, width / scaleFactorW, height / scaleFactorH);
          paper.setSize(width, height);
 
 
-         //timelinePaper.setViewBox(0, 0, $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
-
-         
-         
-         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         context.updateTimeLineScale();
+         //timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
+         //timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
          
 
-         timelinePaper.setViewBox(0, 0, context.timeLineGraphW, context.timeLineGraphH);
-         timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          context.vGraphTimeline.redraw();
 
          //context.resetDisplay();
       }
    };
+
+   context.updateTimeLineScale = function() {
+      timelinePaper.setSize(timelinePaper.width - 15, $('#timeLineGraph').height() - 10);
+      timelinePaper.setViewBox(0, 0, timelinePaper.width /*context.timeLineGraphW*/, context.timeLineGraphH, false);
+      
+      timelinePaper.canvas.setAttribute('preserveAspectRatio', 'none'); 
+      
+   }
 
    // When the context is unloaded, this function is called to clean up
    // anything the context may have created
@@ -973,12 +1107,13 @@ var getContext = function (display, infos, curLevel) {
 
 
    context.setCurNode = function (curNode) {
+      console.log("context.setCurNode", curNode);
       context.curNode = curNode;
       var node = context.nodesAndNeighbors[context.curNode];
 
       //console.log("Running ", node.nodeId, "current status", node.status);
 
-      if (node.status != "finnished") {
+      if (node.status != "finished") {
          for (var i = 0; i < context.nodesAndNeighbors.length; i++) {
             if (context.nodesAndNeighbors[i].status == "running") {
 
@@ -996,24 +1131,65 @@ var getContext = function (display, infos, curLevel) {
    context.incTime = function () {
       context.currentTime++;
 
-
       if (context.display) {
+
+
+
+         var node = context.nodesAndNeighbors[0];
+
+         var timelinewidth = Math.max(node.timeLinePos.x + (context.currentTime * 50) + 30, $('#timeLineGraph').width() - 10);
+
+         console.log("set timelight width to ", timelinewidth);
+
+         timelinePaper.setSize(timelinewidth, $('#timeLineGraph').height() - 10);
+
+         context.updateTimeLineScale();
+
+         $('#timeLineGraph').scrollLeft(timelinewidth);
+
+
          $.each(context.nodesAndNeighbors, function (index) {
             var node = context.nodesAndNeighbors[index];
 
-            if (node.status == "finnished")
+            if (node.status == "finished")
                return;
 
             if (!node.messagepath)
                node.messagepath = timelinePaper.path(["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y]);
-
-
                
             node.messagepath.animate({
                path: ["M", node.timeLinePos.x + context.timeLineVerticeRadius, node.timeLinePos.y,
                   "L", node.timeLinePos.x + (context.currentTime * 50), node.timeLinePos.y]
             }, 100);
          });
+      }
+   };
+
+
+   context.maybeWakeUpNodeInGrading = function (nodeIdToSkip) {
+      if (context.display)
+         return;
+
+      var allsleepingordone = true;
+      var nodeToWakeup = null;
+      for(var i = 0; i < context.nodesAndNeighbors.length; i++) {
+         var node = context.nodesAndNeighbors[i];
+
+         if (node.nodeId != nodeIdToSkip && context.onMessageReceived[node.nodeId])
+            nodeToWakeup = node;
+
+         if (!context.onMessageReceived[node.nodeId] && node.status != "finished") {
+            allsleepingordone = false;
+            break;
+         }
+      }
+
+      console.log("All nodes are sleep ?!",allsleepingordone );
+      if (allsleepingordone && nodeToWakeup) {
+         var omr = context.onMessageReceived[nodeToWakeup.nodeId];
+         context.onMessageReceived[nodeToWakeup.nodeId] = null;
+
+         setTimeout(omr, 0);
       }
    };
 
@@ -1030,6 +1206,8 @@ var getContext = function (display, infos, curLevel) {
    };
    context.distributed.getNeighbors = function (callback) {
       var node = context.nodesAndNeighbors[context.curNode];
+
+      console.log("current node: ", context.curNode, "neighbords: ", node.neighbors);
 
       context.runner.waitDelay(callback, node.neighbors);
    };
@@ -1048,57 +1226,80 @@ var getContext = function (display, infos, curLevel) {
       var ready = context.runner.allowSwitch(callback);
 
       function processMessage(cb) {
-         var message = node.messages.shift();
-         message.status = "read";
+         if(node.messages.length > 0) {
+            var message = node.messages.shift();
+            message.status = "read";
 
 
-         context.updateMessageStatus(message.messageId, message.status);
+            context.updateMessageStatus(message.messageId, message.status);
 
-         if (context.display) {
-            var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
+            if (context.display) {
+               var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
 
-            if (message.circle) {
-               message.circle.animate({ cx: toPos.x, cy: toPos.y }, 500, "linear", function () {
-                  message.circle.remove();
-               });
+               if (message.circle) {
+                  message.circle.animate({ cx: toPos.x, cy: toPos.y }, context.infos.actionDelay, "linear", function () {
+                     message.circle.remove();
+                  });
 
-               message.messageCountText.remove();
-               message.messageCountText = null;
+                  message.messageCountText.remove();
+                  message.messageCountText = null;
 
-               var messageCount = node.messages.reduce(function (acum, value) {
-                  if (value.fromId == message.fromId)
-                     return acum + 1;
+                  var messageCount = node.messages.reduce(function (acum, value) {
+                     if (value.fromId == message.fromId)
+                        return acum + 1;
 
-                  return acum;
-               }, 0);
+                     return acum;
+                  }, 0);
 
-               node.messages.forEach(function (element) {
-                  if (element.fromId == message.fromId && element.messageCountText) {
-                     element.messageCountText.attr({ "text": messageCount.toString() });
-                  }
-               });
+                  node.messages.forEach(function (element) {
+                     if (element.fromId == message.fromId && element.messageCountText) {
+                        element.messageCountText.attr({ "text": messageCount.toString() });
+                     }
+                  });
+               }
+
+               context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, context.infos.actionDelay);
             }
-
-
-            context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, 500);
+            else {
+               context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true });
+            }
          }
-         else {
-            context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true })
+         else
+         {
+            console.log("return status = false");
+            context.runner.waitDelay(cb, { "status": false }, context.infos.actionDelay);
+            //context.runner.noDelay(cb, { "status": false });
          }
       }
 
-      if(node.messages.length > 0) {
+      if(node.messages.length > 0 || timeout == 0) {
          ready(processMessage);
       } else {
-         context.onMessageReceived[node.nodeId] = function () { ready(processMessage); };
+         var timeoutID = 0;
+
+         if (timeout > 0)
+            timeoutID = setTimeout(function() {
+               console.log("timeout!");
+               context.onMessageReceived[node.nodeId] = null;
+               ready(processMessage);
+            }, timeout * 1000);
+
+         context.onMessageReceived[node.nodeId] = function () { 
+            if (timeoutID != 0)
+               clearTimeout(timeoutID);
+            ready(processMessage); 
+         };
+         context.maybeWakeUpNodeInGrading(node.nodeId);
       }
    };
+
+   context.distributed.getNextMessageWithTimeout = context.distributed.getNextMessage;
 
    context.distributed.sendMessage = function (recipientId, message, callback) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
       var toNode = context.findNodeById(recipientId);
       var messageId = context.globaMessageCount++;
-      var messageDelay = 1000;
+      var messageDelay = context.infos.actionDelay;
 
       //console.log("sendMessage");
 
@@ -1190,6 +1391,8 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.submitAnswer = function (answer, callback) {
       var node = context.nodesAndNeighbors[context.curNode];
 
+      console.log("submitAnswer");
+
       if (node.answer != null) {
          context.success = false;
          throw ("Node " + node.nodeId + " already submitted an answer");
@@ -1198,6 +1401,8 @@ var getContext = function (display, infos, curLevel) {
       context.incTime();
 
       context.setNodeAnswer(node.nodeId, answer);
+
+      context.incTime();
 
       context.runner.waitDelay(callback);
    };
@@ -1273,7 +1478,7 @@ var getContext = function (display, infos, curLevel) {
 
             context.sendMessage(messageInfo, true);
          }
-
+            
          context.runner.noDelay(callback);
       }
    };
@@ -1328,14 +1533,15 @@ var getContext = function (display, infos, curLevel) {
          actuator: [
             { name: "getNodeID", yieldsValue: true },
             { name: "getNeighbors", yieldsValue: true },
+            { name: "getNextMessage", yieldsValue: true },
             {
-               name: "getNextMessage", yieldsValue: true, params: ["Number"],
+               name: "getNextMessageWithTimeout", yieldsValue: true, params: ["Number"],
                blocklyJson: {
                   "args0": [
                      { "type": "input_value", "name": "PARAM_0" },
                   ]
                },
-               blocklyXml: "<block type='getNextMessage'>" +
+               blocklyXml: "<block type='getNextMessageWithTimeout'>" +
                   "<value name='PARAM_0'><shadow type='math_number'><field name='NUM'>5</field></shadow></value>" +
                   "</block>"
             },
