@@ -502,6 +502,8 @@ var getContext = function (display, infos, curLevel) {
 
          context.validateAnswer = taskInfos.validateAnswer;
          context.systemMessages = taskInfos.systemMessages;
+
+         context.failures = taskInfos.failures;
       }
 
 
@@ -927,7 +929,7 @@ var getContext = function (display, infos, curLevel) {
          fill: "lightgray"
       };
       var edgeAttr = {
-         stroke: '#a05000',
+         stroke: 'yellowgreen',
          "stroke-width": 5
       };
 
@@ -1079,7 +1081,7 @@ var getContext = function (display, infos, curLevel) {
          //timelinePaper.setSize($('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
          
 
-         console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
+         //console.log("timeline paper", $('#timeLineGraph').width() - 10, $('#timeLineGraph').height() - 10);
 
          context.vGraphTimeline.redraw();
 
@@ -1107,7 +1109,7 @@ var getContext = function (display, infos, curLevel) {
 
 
    context.setCurNode = function (curNode) {
-      console.log("context.setCurNode", curNode);
+      //console.log("context.setCurNode", curNode);
       context.curNode = curNode;
       var node = context.nodesAndNeighbors[context.curNode];
 
@@ -1128,18 +1130,121 @@ var getContext = function (display, infos, curLevel) {
       }
    }
 
+   context.findEdgeObject = function(node1, node2)
+   {
+      var edges = context.Graph.getEdgesBetween(node1.vertice, node2.vertice);
+
+      if (edges.length > 0) {
+         var edgePath = context.vGraph.getRaphaelsFromID(edges[0])[0];
+
+         return edgePath;
+      }
+
+      return null;
+   }
+
+   context.findVerticeObject = function(node)
+   {
+      var vertexObject = context.vGraph.getRaphaelsFromID(node.vertice)[0];
+
+      return vertexObject;
+   }
+
+
    context.incTime = function () {
       context.currentTime++;
 
+      console.log("current time", context.currentTime);
+      for (var i = 0; i < context.failures.length; i++) {
+         var currentFailure = context.failures[i];
+
+         if (context.currentTime >= currentFailure.startTime &&
+             context.currentTime <= currentFailure.endTime) {
+
+            if (!currentFailure.active)
+            {
+               currentFailure.active = true;
+               console.log("Matched failiure ", i);
+
+               if (currentFailure.type == "nodeboth") {
+                  var node = context.nodesAndNeighbors[currentFailure.node];
+
+                  var vertexObject = context.findVerticeObject(node);
+
+                  vertexObject.attr({
+                     "opacity": 0.3,
+                  });
+
+                  function animateVertex()
+                  {
+                     var targetOpacity = 0.1;
+                     
+                     if (vertexObject.attr('opacity') >= 0.1)
+                     {
+                        targetOpacity = 0.01;
+                     }
+
+                     vertexObject.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
+                  
+                        animateVertex();
+                     });
+                  }
+
+                  animateVertex();
+
+               }
+               else if (currentFailure.type == "connection") {
+                  var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
+                  var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
+
+                  var edgePath = context.findEdgeObject(node1, node2);
+
+                  edgePath.attr({
+                        "stroke": "red",
+                        "opacity": 0.1
+                  });
+
+                  function animateEdge()
+                  {
+                     var targetOpacity = 0.1;
+                     
+                     if (edgePath.attr('opacity') >= 0.1)
+                     {
+                        targetOpacity = 0.01;
+                     }
+
+                     edgePath.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
+                  
+                        animateEdge();
+                     });
+                  }
+
+                  animateEdge();
+               }
+            }
+         }
+         else if (currentFailure.active) {
+            currentFailure.active = false;
+
+            var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
+            var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
+
+            var edgePath = context.findEdgeObject(node1, node2);
+
+            edgePath.stop();
+            edgePath.attr({
+                  "stroke": "yellowgreen",
+                  "opacity": 1
+            });
+         }
+      }
+
+
       if (context.display) {
-
-
 
          var node = context.nodesAndNeighbors[0];
 
          var timelinewidth = Math.max(node.timeLinePos.x + (context.currentTime * 50) + 30, $('#timeLineGraph').width() - 10);
-
-         console.log("set timelight width to ", timelinewidth);
 
          timelinePaper.setSize(timelinewidth, $('#timeLineGraph').height() - 10);
 
@@ -1295,6 +1400,27 @@ var getContext = function (display, infos, curLevel) {
 
    context.distributed.getNextMessageWithTimeout = context.distributed.getNextMessage;
 
+
+   context.canNodeSendMessages = function(fromNode, toNode) {
+      for (var i = 0; i < context.failures.length; i++) {
+         var currentFailure = context.failures[i];
+
+         if (currentFailure.active)
+         {
+            if (currentFailure.type == "connection") { 
+
+               if ((currentFailure.nodes[0] == fromNode.nodeIndex && currentFailure.nodes[1] == toNode.nodeIndex) ||
+                   (currentFailure.nodes[1] == fromNode.nodeIndex && currentFailure.nodes[0] == toNode.nodeIndex)) {
+                  
+                  return false;
+               }
+            }
+         }
+      }
+
+      return true;
+   };
+
    context.distributed.sendMessage = function (recipientId, message, callback) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
       var toNode = context.findNodeById(recipientId);
@@ -1319,6 +1445,8 @@ var getContext = function (display, infos, curLevel) {
          messageId: messageId,
          circle: null
       };
+
+      var canSendMessage = context.canNodeSendMessages(fromNode, toNode);
 
       if (context.display) {
          var fromVertice = fromNode.vertice;
@@ -1351,38 +1479,81 @@ var getContext = function (display, infos, curLevel) {
                toPercentage = 1;
             }
 
-            messageInfo.circle.animateAlong({
-               path: s,
-               rotate: false,
-               duration: messageDelay,
-               easing: 'linear',
-               debug: false,
-               fromPercentage: fromPercentage,
-               toPercentage: toPercentage,
-            },
-               {
+            if (canSendMessage) {
+               messageInfo.circle.animateAlong({
+                  path: s,
+                  rotate: false,
+                  duration: messageDelay,
+                  easing: 'linear',
+                  debug: false,
+                  fromPercentage: fromPercentage,
+                  toPercentage: toPercentage,
                },
-               function () {
-                  var messageCount = toNode.messages.reduce(function (acum, value) {
-                     if (value.fromId == fromNode.nodeId)
-                        return acum + 1;
+                  {
+                  },
+                  function () {
+                     var messageCount = toNode.messages.reduce(function (acum, value) {
+                        if (value.fromId == fromNode.nodeId)
+                           return acum + 1;
 
-                     return acum;
-                  }, 0);
+                        return acum;
+                     }, 0);
 
-                  messageInfo.messageCountText = paper.text(messageInfo.circle.attr("cx"),
-                     messageInfo.circle.attr("cy"),
-                     (messageCount + 1).toString());
+                     messageInfo.messageCountText = paper.text(messageInfo.circle.attr("cx"),
+                        messageInfo.circle.attr("cy"),
+                        (messageCount + 1).toString());
 
+                     context.sendMessage(messageInfo, true);
+                  });
+            } else  {
+               console.log("Failing message!");
 
-                  context.sendMessage(messageInfo, true);
-               });
+               if (fromPercentage == 1)
+               {
+                  toPercentage = 0.7;
+               }
+               else if (toPercentage == 1)
+               {
+                  toPercentage = 0.3;
+               }
+
+               messageInfo.circle.animateAlong({
+                  path: s,
+                  rotate: false,
+                  duration: messageDelay,
+                  easing: 'linear',
+                  debug: false,
+                  fromPercentage: fromPercentage,
+                  toPercentage: toPercentage,
+               },
+                  {
+                  },
+                  function () {
+                     var messageCount = toNode.messages.reduce(function (acum, value) {
+                        if (value.fromId == fromNode.nodeId)
+                           return acum + 1;
+
+                        return acum;
+                     }, 0);
+
+                     messageInfo.circle.attr("fill", "red");
+                     messageInfo.circle.animate({ "opacity": 0 }, messageDelay, "linear", function() {                  
+                        messageInfo.circle.remove();
+                     });
+
+                     messageInfo.status = "failed";
+                     context.displayMessage(messageInfo);
+
+                     //context.sendMessage(messageInfo, true);
+                  });
+            }
          }
 
          context.runner.waitDelay(callback, null, messageDelay);
       }
       else {
-         context.sendMessage(messageInfo, true);
+         if (canSendMessage)
+            context.sendMessage(messageInfo, true);
 
          context.runner.noDelay(callback);
       }
