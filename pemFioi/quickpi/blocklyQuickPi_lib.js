@@ -1704,6 +1704,11 @@ var getContext = function (display, infos, curLevel) {
                 python: ["readRotaryAngle"]
             },
             {
+                id: "quickpi_gyroscope",
+                order: 214,
+                python: ["readAngularVelocity", "setGyroZeroAngle", "computeRotationGyro"]
+            },
+            {
                 id: 'quickpi_cloud',
                 order: 220,
                 python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
