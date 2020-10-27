@@ -362,7 +362,6 @@ function PythonInterpreter(context, msgCallback) {
       this.waitingOnReadyNode = true;
     } else {
       // TODO :: switch execution
-      console.log('about to switch from ' + curNode + '/' + this.context.curNode + ' to ' + newNode);
       this.startNode(curNode, newNode);
     }
   };
@@ -373,7 +372,6 @@ function PythonInterpreter(context, msgCallback) {
       that._debugger.suspension_stack = that.nodeStates[newNode];
       that.curNode = newNode;
       var ready = that.readyNodes[newNode];
-      console.log('switching to ' + newNode);
       if(ready) {
         that.readyNodes[newNode] = false;
         context.setCurNode(newNode);
