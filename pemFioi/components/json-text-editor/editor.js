@@ -7,7 +7,8 @@ function JSONTextEditor(params) {
             error_line: 'background: #FFAAAA',
             error_char: 'background: #990000; color: #FFFFFF', 
             border: '1px solid #000000'
-        }
+        },
+        space: 4
     }
     params = Object.assign({}, defaults, params);
 
@@ -35,7 +36,55 @@ function JSONTextEditor(params) {
     }
 
 
-    // editor
+    function saveCaretPosition(context){
+        try {
+            var selection = window.getSelection();
+            var range = selection.getRangeAt(0);
+            range.setStart(  context, 0 );
+            var len = range.toString().length;
+        } catch(e) {
+            return function() {}
+        }
+    
+        return function() {
+            var pos = getTextNodeAtPosition(context, len);
+            selection.removeAllRanges();
+            var range = new Range();
+            range.setStart(pos.node ,pos.position);
+            selection.addRange(range);
+        }
+    }    
+
+    function getTextNodeAtPosition(root, index){
+        var NODE_TYPE = NodeFilter.SHOW_TEXT;
+        var treeWalker = document.createTreeWalker(root, NODE_TYPE, function next(elem) {
+            if(index > elem.textContent.length){
+                index -= elem.textContent.length;
+                return NodeFilter.FILTER_REJECT
+            }
+            return NodeFilter.FILTER_ACCEPT;
+        });
+        var c = treeWalker.nextNode();
+        return {
+            node: c? c: root,
+            position: index
+        };
+    }    
+
+    // onChange handler
+    function handleOnChange() {
+        if(!params.onChange) {
+            return;
+        }
+        params.onChange(
+            getContent(), 
+            getError()
+        );
+    }
+
+
+    // editor events
+
     function enterKeyPressHandler(event) {
         var sel, range, br, added = false;
         event = event || window.event;
@@ -77,10 +126,13 @@ function JSONTextEditor(params) {
     addEventListener(el, 'keypress', enterKeyPressHandler);
 
 
-    function focusHandler(event) {
-        el.innerHTML = stripTags(el.innerHTML);
+
+    function inputHandler(event) {
+        handleOnChange();
     }
-    addEventListener(el, 'focus', focusHandler);
+    addEventListener(el, 'input', inputHandler);
+    
+
 
 
     function pasteHandler(event) {
@@ -104,17 +156,35 @@ function JSONTextEditor(params) {
             }
         }
         event.preventDefault();
+        handleOnChange();
     }
     addEventListener(el, 'paste', pasteHandler);
 
 
+    // parsing error
+    var last_error = false;
+    function getError() {
+        return last_error;
+    }
+
+    function setError(err) {
+        last_error = err;
+    }
 
 
+
+    // content
     function getContent() {
+        var restoreCaret = saveCaretPosition(el);        
+        setError(false);
         var str = stripTags(el.innerHTML);
+        var res = undefined;
         try {
-            var res = jsonlint.parse(str);
+            res = jsonlint.parse(str);
+            el.innerHTML = str;
+            restoreCaret();
         } catch(e) {
+            setError(e);
             var lines = str.split('\n');
             var line = lines[e.metadata.line];
             line = 
@@ -123,14 +193,14 @@ function JSONTextEditor(params) {
                 '</span>';
             lines[e.metadata.line] = line;
             el.innerHTML = lines.join('\n');
-            return undefined;
         }
+        restoreCaret();
         return res;        
     }
 
 
     function setContent(obj) {
-        var str = JSON.stringify(obj, null, 4);
+        var str = JSON.stringify(obj, null, params.space);
         str = str.replace(/\n/g, '<br>');
         el.innerHTML = str;
     }
@@ -138,10 +208,17 @@ function JSONTextEditor(params) {
         setContent(params.content);
     }
 
+    
+
+
+
+
+    // interface
 
     return {
         setContent: setContent,
         getContent: getContent,
+        getError: getError,
         destroy: function() {
             el.parentNode.removeChild(el);
         }

@@ -1,161 +1,112 @@
-(function() {
+function setupGapsTableTask(gaps_table_options) {
 
-    window.lang = {
+    function initTask(subTask) {
 
-        default_language: 'en',
-        language: 'en',
-        language_set: false,
+        $("#gaps-table").empty();
+    
+        var state = {};
+        var level;
+        var answer = null;
 
-        strings: {
-            en: {
-                validate: 'Validate',
-                validation_success: 'Congratulations, you succeded!',
-                validation_mistake: 'You have some errors, highlighted in red.'
-            },
-            fr: {
-                validate: 'Valider',
-                validation_success: 'Bravo, vous avez réussi !',
-                validation_mistake: 'Votre réponse contient des erreurs, indiquées en rouge.'                
-            },
-        },
+        var gaps_table;
+        var level_options;
 
-        set: function(lng) {
-            if(!lng) {
-                lng = window.stringsLanguage;
-            }
-            this.language = lng;
-            this.language_set = true;
-        },
-
-        translate: function() {
-            if(!this.language_set) {
-                this.set();
-            }
-            var str = '', key = arguments[0];
-            if(this.strings[this.language] && this.strings[this.language][key]) {
-                str = this.strings[this.language][key];
-            } else {
-                str = this.strings[this.default_language][key] || key;
-            }
-            return str.replace('%%', arguments[1]);
-        },
-
-        getStrings: function() {
-            if(!this.language_set) {
-                this.set();
-            }            
-            return this.strings[this.language] || this.strings[this.default_language];
-        }
-    }
-
-
-
-    window.task = {}
-
-    task.getViews = function(success, error) {
-        var views = {
-            task: {}
+        
+        subTask.loadLevel = function(curLevel) {
+            displayHelper.avatarType = "none";
+            level = curLevel;
+            level_options = gaps_table_options[level];
         };
-        success(views);
-    };
-
-    task.updateToken = function(token, success, error) {
-        success();
-    };
-
-    task.getHeight = function(success, error) {
-        var d = document;
-        var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-        success(h);
-    };
-
-    task.getMetaData = function(success, error) {
-        if (typeof json !== 'undefined') {
-            success(json);
-        } else {
-            success({nbHints: 0});
-        }
-    };
-
-    task.reloadState = function(state, success, error) { success() }
-    task.getState = function(success, error) { success("{}")  }
-    task.reloadStateObject = function(obj) { }
-    task.getStateObject = function() { return {} }
-    task.getDefaultStateObject = function() { return {} }
-    task.showViews = function(views, callback) {
-        $('#solution').toggle(!!views.solution);
-        callback()
-    }
-
-
-    function setupTask(taskParams, success) {
-
-
-        task.getAnswer = function(callback) {
-            var answer = JSON.stringify(window.gaps_table.getAnswer());
-            //console.log('task.getAnswer', answer)
-            callback(answer);
+    
+        subTask.getStateObject = function() {
+            return state;
         };
-
-        task.reloadAnswer = function(answer, callback) {
-            try {
-                //console.log('task.reloadAnswer', answer)
-                answer = JSON.parse(answer);
-                window.gaps_table.setAnswer(answer);
-            } catch(e) {}
+    
+        subTask.reloadAnswerObject = function(answerObj) {
+            answer = answerObj;
+            if(!answer) {
+                return;
+            }
+        };
+    
+        subTask.resetDisplay = function() {
+            gaps_table && gaps_table.destroy();
+            initGapsTable(function() {
+                displayHelper.customValidate = checkResult;    
+            })
+        };
+    
+        subTask.getAnswerObject = function() {
+            return answer;
+        };
+    
+        subTask.getDefaultAnswerObject = function() {
+            var defaultAnswer = { 
+                data: []
+            };
+            
+            return defaultAnswer;
+        };
+    
+        subTask.unloadLevel = function(callback) {
+            gaps_table && gaps_table.destroy();
             callback();
         };
-
-
-
-        task.gradeAnswer = function(answer, answer_token, callback) {
-            var answer = JSON.parse(answer);
-            window.gaps_table.setAnswer(answer);
-            var valid = window.gaps_table.validate();
-            var score = valid ? taskParams.noScore : taskParams.maxScore;
-            var msg = valid ? lang.translate('validation_success') : lang.translate('validation_mistake');
-            $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
-            //$('#validate-btn').remove();
-            callback(score, msg, null);
+    
+        subTask.getGrade = function(callback) {
+            checkResult(true, function(res) {
+                callback(res)
+            });      
         };
+    
+    
+        function initGapsTable(callback) {
+            if(gaps_table) {
+                gaps_table.setAnswer(answer.data);
+                return callback();
+            } 
 
-        task.reloadAnswerObject = function(answerObj) {
-            return window.gaps_table.setAnswer(answerObj);
-        }
-
-        task.getAnswerObject = function() {
-            return window.gaps_table.getAnswer();
-        }
-
-        task.getDefaultAnswerObject = function() {
-            return [];
-        }
-
-        var btn = $('<button id="validate-btn">' + lang.translate('validate') + '</button>');
-        btn.on('click', function() {
-            platform.validate('done');
-        });
-        btn.insertAfter($('.taskContent'));
-
-        success();
+            var options = Object.assign({}, level_options, {
+                parent: $('#gaps-table'),
+                labels: taskStrings.table_labels,
+                onChange: function(data) {
+                    answer.data = data;
+                },
+                answer: answer.data || []
+            })
+            gaps_table = GapsTable(options);       
+            callback();
+        };
+    
+    
+        function checkResult(noVisual, callback) {
+            initGapsTable(function() {
+                var valid = gaps_table.validate(noVisual);
+                if(!valid) {
+                    if(!noVisual){
+                        displayHelper.showPopupMessage(taskStrings.fail, "blanket");
+                    }
+                    callback && callback({ 
+                        successRate: 0, 
+                        message: taskStrings.fail
+                    });
+                    return;            
+                }
+                if(!noVisual){
+                    platform.validate("done");
+                }
+                callback && callback({ 
+                    successRate: 1, 
+                    message: taskStrings.success 
+                });            
+            })
+        };
+    
     }
 
-
-    task.load = function(views, success) {
-        platform.getTaskParams(null, null, function(taskParams) {
-            var params = Object.assign(gaps_table_options, {
-                parent: $('.taskContent')
-            })
-            window.gaps_table = GapsTable(params);
-            setupTask(taskParams, success)
-        });
-    };
-
-
-    $(function() {
-        if(window.platform) {
-            platform.initWithTask(task);
-        }
-    })
-
-})();
+    initWrapper(
+        initTask, 
+        Object.keys(gaps_table_options)
+    );
+    displayHelper.useFullWidth(); 
+}

@@ -1,187 +1,117 @@
-(function() {
+function setupCSVEditorTask(csv_editor_options) {
 
-    window.lang = {
+    function initTask(subTask) {
 
-        default_language: 'en',
-        language: 'en',
-        language_set: false,
+        $("#csv-editor").empty();
+    
+        var state = {};
+        var level;
+        var answer = null;
 
-        strings: {
-            en: {
-                validate: 'Validate',
-                success: 'Success',
-                mistake_rows_lack: 'Too few rows',
-                mistake_rows_excess: 'Too many rows',
-                mistake_cols_lack: 'Too few columns',
-                mistake_cols_excess: 'Too many columns',
-                mistake_incorrect_data: 'Incorrect data',
-                mistake_illegal_state: 'Incorrect CSV',
-                mistake_illegal_quote: 'Illegal quote',
-                mistake_illegal_data: 'Illegal data',
-                mistake_unknown_state: 'Incorrect CSV'
-            },
-            fr: {
-                validate: 'Validate',
-                success: 'Success',
-                mistake_rows_lack: 'Too few rows',
-                mistake_rows_excess: 'Too many rows',
-                mistake_cols_lack: 'Too few columns',
-                mistake_cols_excess: 'Too many columns',
-                mistake_incorrect_data: 'Incorrect data',
-                mistake_illegal_state: 'Incorrect CSV',
-                mistake_illegal_quote: 'Illegal quote',
-                mistake_illegal_data: 'Illegal data',
-                mistake_unknown_state: 'Incorrect CSV'
-            },
-        },
+        var csv_editor;
+        var level_options;
 
-        set: function(lng) {
-            if(!lng) {
-                lng = window.stringsLanguage;
-            }
-            this.language = lng;
-            this.language_set = true;
-        },
-
-        translate: function() {
-            if(!this.language_set) {
-                this.set();
-            }
-            var str = '', key = arguments[0];
-            if(this.strings[this.language] && this.strings[this.language][key]) {
-                str = this.strings[this.language][key];
-            } else {
-                str = this.strings[this.default_language][key] || key;
-            }
-            return str.replace('%%', arguments[1]);
-        },
-
-        getStrings: function() {
-            if(!this.language_set) {
-                this.set();
-            }            
-            return this.strings[this.language] || this.strings[this.default_language];
-        }
-    }
-
-
-
-    window.task = {}
-
-    task.getViews = function(success, error) {
-        var views = {
-            task: {}
+        
+        subTask.loadLevel = function(curLevel) {
+            displayHelper.avatarType = "none";
+            level = curLevel;
+            level_options = csv_editor_options[level];
         };
-        success(views);
-    };
-
-    task.updateToken = function(token, success, error) {
-        success();
-    };
-
-    task.getHeight = function(success, error) {
-        var d = document;
-        var h = Math.max(d.body.offsetHeight, d.documentElement.offsetHeight);
-        success(h);
-    };
-
-    task.getMetaData = function(success, error) {
-        if (typeof json !== 'undefined') {
-            success(json);
-        } else {
-            success({nbHints: 0});
-        }
-    };
-
-    task.reloadState = function(state, success, error) { success() }
-    task.getState = function(success, error) { success("{}")  }
-    task.reloadStateObject = function(obj) { }
-    task.getStateObject = function() { return {} }
-    task.getDefaultStateObject = function() { return {} }
-    task.showViews = function(views, callback) {
-        $('#solution').toggle(!!views.solution);
-        callback()
-    }
-
-
-    function setupTask(taskParams, success) {
-
-
-        task.getAnswer = function(callback) {
-            var answer = window.csv_editor.getContent();
-            //console.log('task.getAnswer', answer)
-            callback(answer);
+    
+        subTask.getStateObject = function() {
+            return state;
         };
-
-        task.reloadAnswer = function(answer, callback) {
-            try {
-                //console.log('task.reloadAnswer', answer)
-                window.csv_editor.setContent(answer);
-            } catch(e) {}
+    
+        subTask.reloadAnswerObject = function(answerObj) {
+            answer = answerObj;
+            if(!answer) {
+                return;
+            }
+        };
+    
+        subTask.resetDisplay = function() {
+            csv_editor && csv_editor.destroy();
+            initEditor(function() {
+                displayHelper.customValidate = checkResult;    
+            })
+        };
+    
+        subTask.getAnswerObject = function() {
+            return answer;
+        };
+    
+        subTask.getDefaultAnswerObject = function() {
+            var defaultAnswer = { 
+                csv: ''
+            };
+            return defaultAnswer;
+        };
+    
+        subTask.unloadLevel = function(callback) {
+            csv_editor && csv_editor.destroy();
             callback();
         };
-
-
-        function getMistakeMessage() {
-            var mistake = window.csv_editor.getMistake();
-            return lang.translate('mistake_' + mistake.tag);
-        }
-
-        task.gradeAnswer = function(answer, answer_token, callback) {
-            window.csv_editor.setContent(answer);
-            var valid = window.csv_editor.validate();
-            var score = valid ? taskParams.noScore : taskParams.maxScore;
-            if(valid) {
-                var msg = lang.translate('success');
-            } else {
-                var msg = getMistakeMessage();
-            }
-            $('<div>' + msg + '</div>').insertAfter($('.taskContent'));
-            $('#validate-btn').remove();
-            callback(score, msg, null);
+    
+        subTask.getGrade = function(callback) {
+            checkResult(true, function(res) {
+                callback(res)
+            });      
         };
+    
+    
+        function initEditor(callback) {
+            if(csv_editor) {
+                csv_editor.setContent(answer.csv);
+                return callback();
+            } 
 
-        task.reloadAnswerObject = function(answerObj) {
-            return window.csv_editor.setAnswer(answerObj.content);
-        }
-
-        task.getAnswerObject = function() {
-            return {
-                content: window.csv_editor.getContent()
-            }
-        }
-
-        task.getDefaultAnswerObject = function() {
-            return {
-                content: ''
-            };
-        }
-
-        var btn = $('<button id="validate-btn">' + lang.translate('validate') + '</button>');
-        btn.on('click', function() {
-            platform.validate('done');
-        });
-        btn.insertAfter($('.taskContent'));
-
-        success();
+            var options = Object.assign({}, level_options, {
+                parent: $('#csv-editor'),
+                labels: taskStrings.labels,
+                onChange: function(content) {
+                    answer.csv = content;
+                },
+                content: answer.csv
+            })
+            csv_editor = CSVTextEditor(options);       
+            callback();
+        };
+    
+        function getMistakeMessage() {
+            var mistake = csv_editor.getMistake();
+            var key = 'mistake_' + mistake.tag;
+            return key in taskStrings ? taskStrings[key] : taskStrings.fail;
+        }        
+    
+        function checkResult(noVisual, callback) {
+            initEditor(function() {
+                var valid = csv_editor.validate(level_options.valid_data, noVisual);
+                if(!valid) {
+                    var msg = getMistakeMessage();
+                    if(!noVisual){
+                        displayHelper.showPopupMessage(msg, "blanket");
+                    }
+                    callback && callback({ 
+                        successRate: 0, 
+                        message: msg
+                    });
+                    return;            
+                }
+                if(!noVisual){
+                    platform.validate("done");
+                }
+                callback && callback({ 
+                    successRate: 1, 
+                    message: taskStrings.success 
+                });            
+            })
+        };
+    
     }
 
-
-    task.load = function(views, success) {
-        platform.getTaskParams(null, null, function(taskParams) {
-            var params = Object.assign(csv_editor_options, {
-                parent: $('.taskContent')
-            })
-            window.csv_editor = CSVTextEditor(params);
-            setupTask(taskParams, success)
-        });
-    };
-
-
-    $(function() {
-        if(window.platform) {
-            platform.initWithTask(task);
-        }
-    })
-
-})();
+    initWrapper(
+        initTask, 
+        Object.keys(csv_editor_options)
+    );
+    displayHelper.useFullWidth(); 
+}

@@ -4,14 +4,15 @@ step1: validate csv
 step2: diff with valid data
 
 */
-
 function CSVTextEditor(params) {
 
     var defaults = {
         width: '100%',
         min_height: '100px',
         csv_separator: ',',
-        content: null
+        content: null,
+        labels: {},
+        onChange: null
     }
     params = Object.assign({}, defaults, params);
     try {
@@ -23,17 +24,35 @@ function CSVTextEditor(params) {
         console.error(e.message);
     }                
 
-
     var wrapper = $('<div class="csv-text-editor"/>')
     params.parent.append(wrapper);
 
+    function addLabel(section) {
+        if(section in params.labels) {
+            var label = $('<div class="label"/>');
+            label.html(params.labels[section]);
+            wrapper.append(label);
+        }
+    }
+
+    // onChange handler
+    function handleOnChange() {
+        if(!params.onChange) {
+            return;
+        }
+        params.onChange(getContent());
+    }    
+
+
     // editor element    
+    addLabel('editor');
     var editor = $('<pre class="editor"/>')
         .attr('contentEditable', true)
         .attr('spellcheck', false);
-    params.width && editor.css('width', params.width + 'px')
-    params.min_height && editor.css('min-height', params.min_height + 'px')
+    params.width && editor.css('width', params.width)
+    params.min_height && editor.css('min-height', params.min_height)
     wrapper.append(editor);
+    
 
 
     // sys 
@@ -76,6 +95,7 @@ function CSVTextEditor(params) {
         }
 
         if(added) {
+            handleOnChange();
             if(typeof event.preventDefault != 'undefined') {
                 event.preventDefault();
             } else {
@@ -112,10 +132,18 @@ function CSVTextEditor(params) {
             }
         }
         event.preventDefault();
+        handleOnChange();
     }
     editor.on('paste', pasteHandler);
 
 
+    function inputHandler(event) {
+        handleOnChange();
+    }
+    editor.on('input', inputHandler);    
+
+
+    // content
 
     function getContent() {
         return stripTags(editor.text());
@@ -188,6 +216,7 @@ function CSVTextEditor(params) {
         if(!silent) {
             if(!table) {
                 table = $('<table>');
+                addLabel('preview');
                 wrapper.append(table);
             }
             table.html(html);      
@@ -233,7 +262,7 @@ function CSVTextEditor(params) {
     }
 
 
-    if('content' in params) {
+    if('content' in params && typeof params.content == 'string') {
         setContent(params.content);
     }
     
