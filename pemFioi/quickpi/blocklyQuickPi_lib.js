@@ -7180,7 +7180,7 @@ var getContext = function (display, infos, curLevel) {
 
             // if we just do sensor.state, if it is equal to 0 then the state is not displayed
             if (sensor.state != null) {
-                sensor.stateText = paper.text(state1x, state1y, sensor.state + "dB");
+                sensor.stateText = paper.text(state1x, state1y, sensor.state + " dB");
             }
 
             if (!context.autoGrading && context.offLineMode) {
