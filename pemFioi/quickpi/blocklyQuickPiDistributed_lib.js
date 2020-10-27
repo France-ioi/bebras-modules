@@ -294,6 +294,14 @@ var getContext = function (display, infos, curLevel) {
 
          //context.nodeMessages[messageKey].push(event);
 
+         // Call ready function for recipient node
+         var omr = context.onMessageReceived[toNode.nodeId];
+         if(omr) {
+            console.log("omr for " + toNode.nodeId);
+            omr();
+            context.onMessageReceived[toNode.nodeId] = null;
+         }
+
          if (context.display && display) {
             context.displayMessage(messageInfo);
          }
@@ -410,19 +418,19 @@ var getContext = function (display, infos, curLevel) {
             if (context.validateAnswer) {
                var status = context.validateAnswer(context.nodesAndNeighbors);
                context.success = status.status;
+               if (!status.error) {
+                  if (context.success)
+                     status.error = "All answers are correct";
+                  else
+                     status.error = "Some node answers are wrong";
+               }
+               throw (status.error);
             }
             else {
                context.success = false;
+               throw "All nodes are done (no validation for this task)";
             }
 
-            if (!status.error) {
-               if (context.success)
-                  status.error = "All answers are correct";
-               else
-                  status.error = "Some node answers are wrong";
-
-            }
-            throw (status.error);
          }
       }
    };
@@ -446,6 +454,7 @@ var getContext = function (display, infos, curLevel) {
       var vertices = context.Graph.getAllVertices();
       context.nodesAndNeighbors = [];
       context.nodeMessages = [];
+      context.onMessageReceived = {};
       context.currentTime = 0;
 
       for (var iVertices = 0; iVertices < vertices.length; iVertices++) {
@@ -1025,13 +1034,21 @@ var getContext = function (display, infos, curLevel) {
       context.runner.waitDelay(callback, node.neighbors);
    };
 
-   context.distributed.getNextMessage = function (exitTimeout, callback) {
+   context.distributed.getNextMessage = function() {
+      if(typeof arguments[0] == 'function') {
+         var timeout = -1;
+         var callback = arguments[0];
+      } else {
+         var timeout = arguments[0];
+         var callback = arguments[1];
+      }
       var node = context.nodesAndNeighbors[context.curNode];
-      var message = null;
       //console.log("getNextMessage");
 
-      if (node.messages.length > 0) {
-         message = node.messages.shift();
+      var ready = context.runner.allowSwitch(callback);
+
+      function processMessage(cb) {
+         var message = node.messages.shift();
          message.status = "read";
 
 
@@ -1063,69 +1080,17 @@ var getContext = function (display, infos, curLevel) {
             }
 
 
-            context.runner.waitDelay(callback, { "from": message.fromId, "payload": message.message, "status": true }, 500);
+            context.runner.waitDelay(cb, { "from": message.fromId, "payload": message.message, "status": true }, 500);
          }
          else {
-            context.runner.noDelay(callback, { "from": message.fromId, "payload": message.message, "status": true })
+            context.runner.noDelay(cb, { "from": message.fromId, "payload": message.message, "status": true })
          }
-
-
       }
-      else {
-         //context.setNodeStatus(node.nodeId, "waitingformessage");
 
-         var cb = context.runner.waitCallback(callback);
-         var ellapsedTime = 0;
-
-         var timeout = setInterval(function () {
-            if (node.messages.length > 0) {
-               clearInterval(timeout);
-               message = node.messages.shift();
-               message.status = "read";
-               context.updateMessageStatus(message.messageId, message.status)
-               //context.setNodeStatus(node.nodeId, "running");
-
-               if (context.display) {
-                  var toPos = context.vGraph.graphDrawer.getVertexPosition(node.vertice);
-
-                  if (message.messageCountText) {
-                     message.messageCountText.remove();
-                     message.messageCountText = null;
-                  }
-
-                  var messageCount = node.messages.reduce(function (acum, value) {
-                     if (value.fromId == message.fromId)
-                        return acum + 1;
-
-                     return acum;
-                  }, 0);
-
-                  node.messages.forEach(function (element) {
-                     if (element.fromId == message.fromId && element.messageCountText) {
-                        element.messageCountText.attr({ "text": messageCount.toString() });
-                     }
-                  });
-
-                  message.circle.animate({ cx: toPos.x, cy: toPos.y }, 500, "linear", function () {
-                     message.circle.remove();
-                     message.circle = null;
-
-
-                     cb({ "from": message.fromId, "payload": message.message, "status": true });
-                  });
-               }
-               else {
-                  cb({ "from": message.fromId, "payload": message.message, "status": true });
-               }
-            }
-
-            ellapsedTime += 0.5;
-            if (exitTimeout > 0 && ellapsedTime >= exitTimeout) {
-               clearInterval(timeout);
-               cb({ "from": -1, "payload": 0, "status": false });
-            }
-
-         }, 500);
+      if(node.messages.length > 0) {
+         ready(processMessage);
+      } else {
+         context.onMessageReceived[node.nodeId] = function () { ready(processMessage); };
       }
    };
 
