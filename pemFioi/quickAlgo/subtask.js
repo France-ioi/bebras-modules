@@ -488,6 +488,7 @@ var initBlocklySubTask = function(subTask, language) {
          if(display) {
             window.quickAlgoInterface.updateTestScores(subTask.testCaseResults);
          }
+         var codes = subTask.blocklyHelper.getAllCodes(subTask.answer);
          subTask.context.runner.runCodes(codes);
       }
 

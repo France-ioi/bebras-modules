@@ -34,6 +34,7 @@ function PythonInterpreter(context, msgCallback) {
   this.nbNodes = 0;
   this.curNode = 0;
   this.readyNodes = [];
+  this.finishedNodes = [];
   this.nodeStates = [];
   this.waitingOnReadyNode = false;
 
@@ -209,6 +210,7 @@ function PythonInterpreter(context, msgCallback) {
 
   this.skToJs = function(val) {
     // Convert Skulpt item to JavaScript
+    // TODO :: Might be partly replaceable with Sk.ffi.remapToJs
     if(val instanceof Sk.builtin.bool) {
       return val.v ? true : false;
     } else if(val instanceof Sk.builtin.func) {
@@ -321,14 +323,12 @@ function PythonInterpreter(context, msgCallback) {
     // Tells the runner that we can switch the execution to another node
     var curNode = context.curNode;
     var ready = function(readyCallback) {
-      if(that.waitingOnReadyNode) {
-        that.curNode = curNode;
-        context.setCurNode(curNode);
+      that.readyNodes[curNode] = function() {
         readyCallback(callback);
-      } else {
-        that.readyNodes[curNode] = function() {
-          readyCallback(callback);
-        };
+      };
+      if(that.waitingOnReadyNode) {
+        that.waitingOnReadyNode = false;
+        that.startNode(that.curNode, curNode);
       }
     };
     this.readyNodes[curNode] = false;
@@ -338,14 +338,15 @@ function PythonInterpreter(context, msgCallback) {
 
   this.defaultSelectNextNode = function(runner, previousNode) {
     var i = previousNode + 1;
-    while(i != previousNode) {
-      if(i >= runner.nbNodes) { i = 0; }
+    if(i >= runner.nbNodes) { i = 0; }
+    do {
       if(runner.readyNodes[i]) {
         break;
       } else {
         i++;
       }
-    }
+      if(i >= runner.nbNodes) { i = 0; }
+    } while(i != previousNode);
     return i;
   };
 
@@ -355,36 +356,41 @@ function PythonInterpreter(context, msgCallback) {
   this.startNextNode = function(curNode) {
     // Start the next node when one has been switched from
     var newNode = this.selectNextNode(this, curNode);
+    this._paused = true;
     if(newNode == curNode) {
       // No ready node
       this.waitingOnReadyNode = true;
     } else {
       // TODO :: switch execution
-      this._paused = true;
       console.log('about to switch from ' + curNode + '/' + this.context.curNode + ' to ' + newNode);
-      setTimeout(function() {
-        that.nodeStates[curNode] = that._debugger.suspension_stack.slice();
-        that._debugger.suspension_stack = that.nodeStates[newNode];
-        that.curNode = newNode;
-        var ready = that.readyNodes[newNode];
-        console.log('switching to ' + newNode);
-        if(ready) {
-          that.readyNodes[newNode] = false;
-          context.setCurNode(newNode);
-          if(typeof ready == 'function') {
-            ready();
-          } else {
-            that._paused = false;
-            that._continue();
-          }
-        } else {
-          that.waitingOnReadyNode = true;
-        }
-      }, 0);
+      this.startNode(curNode, newNode);
     }
   };
 
+  this.startNode = function(curNode, newNode) {
+    setTimeout(function() {
+      that.nodeStates[curNode] = that._debugger.suspension_stack.slice();
+      that._debugger.suspension_stack = that.nodeStates[newNode];
+      that.curNode = newNode;
+      var ready = that.readyNodes[newNode];
+      console.log('switching to ' + newNode);
+      if(ready) {
+        that.readyNodes[newNode] = false;
+        context.setCurNode(newNode);
+        if(typeof ready == 'function') {
+          ready();
+        } else {
+          that._paused = false;
+          that._continue();
+        }
+      } else {
+        that.waitingOnReadyNode = true;
+      }
+    }, 0);
+  };
+
   this._createPrimitive = function (data) {
+    // TODO :: Might be replaceable with Sk.ffi.remapToPy
     if (data === undefined || data === null) {
       return Sk.builtin.none.none$;  // Reuse the same object.
     }
@@ -406,6 +412,21 @@ function PythonInterpreter(context, msgCallback) {
         skl.push(this._createPrimitive(data[i]));
       }
       result = new Sk.builtin.list(skl);
+    } else if (data) {
+      // Create a dict if it's an object with properties
+      var props = [];
+      for(var prop in data) {
+        if(data.hasOwnProperty(prop)) {
+          // We can pass a list [prop1name, prop1val, ...] to Skulpt's dict
+          // constructor ; however to work properly they need to be Skulpt
+          // primitives too
+          props.push(this._createPrimitive(prop));
+          props.push(this._createPrimitive(data[prop]));
+        }
+      }
+      if(props.length > 0) {
+        result = new Sk.builtin.dict(props);
+      }
     }
     return result;
   };
@@ -449,10 +470,17 @@ function PythonInterpreter(context, msgCallback) {
   };
 
   this._onFinished = function () {
-    this.startNextNode(this.curNode);
-    if(this.waitingOnReadyNode) {
+    this.finishedNodes[this.curNode] = true;
+    this.readyNodes[this.curNode] = false;
+
+    if(this.finishedNodes.indexOf(false) != -1) {
+      // At least one node is not finished
+      this.startNextNode(this.curNode);
+    } else {
+      // All nodes are finished, stop the execution
       this.stop();
     }
+
     try {
       this.context.infos.checkEndCondition(this.context, true);
     } catch (e) {
@@ -525,10 +553,12 @@ function PythonInterpreter(context, msgCallback) {
     this.curNode = 0;
     context.setCurNode(this.curNode);
     this.readyNodes = [];
+    this.finishedNodes = [];
     this.nodeStates = [];
     
     for(var i = 0; i < codes.length ; i++) {
       this.readyNodes.push(true);
+      this.finishedNodes.push(false);
 
       try {
         var promise = this._debugger.asyncToPromise(this._asyncCallback(this._editor_filename, codes[i]), susp_handlers, this._debugger);
@@ -707,6 +737,7 @@ function PythonInterpreter(context, msgCallback) {
     this._stepInProgress = false;
     this._resetCallstackOnNextStep = false;
     this._paused = false;
+    this.waitingOnReadyNode = false;
     Sk.running = false;
 
     if(Sk.runQueue && Sk.runQueue.length > 0) {
