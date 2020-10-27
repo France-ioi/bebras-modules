@@ -186,6 +186,28 @@ function LogicController(nbTestCases, maxInstructions) {
     return this.language;
   };
 
+  this.getAllCodes = function(answer) {
+     // Generate codes for each node
+     var codes = [];
+     for (var iNode = 0; iNode < this._mainContext.nbNodes; iNode++) {
+        if(this._mainContext.codeIdForNode) {
+           var iCode = this._mainContext.codeIdForNode(iNode);
+        } else {
+           var iCode = Math.min(iNode, this._mainContext.nbCodes-1);
+        }
+        if(answer) {
+           // Generate codes for specified answer
+           codes[iNode] = answer[iCode].blockly;
+        } else {
+           // Generate codes for current program
+           codes[iNode] = this.programs[iCode].blockly;
+        }
+     }
+
+     return codes;
+  },
+
+
   this.prepareRun = function (type) {
     if (!this._mainContext) { return false; }
 
@@ -197,9 +219,9 @@ function LogicController(nbTestCases, maxInstructions) {
 
     // Get code
     this.savePrograms();
-    var codes = [];
-    codes.push(this.programs[0].blockly);
+    var codes = this.getAllCodes();
     var code = codes[0];
+    // TODO :: check all codes
 
     // Abort if code is not valid
     if(!this.checkCode(code, function(err) {
