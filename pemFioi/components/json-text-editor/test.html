@@ -27,14 +27,21 @@
             .column {
                 float: left;
                 width: 50%;
+
             }
             .row:after {
                 content: "";
                 display: table;
                 clear: both;
             }
+            #error {
+                margin: 0 0 10px 10px;
+                width: 90%;
+                height: 100px;
+            }            
             #output {
-                width: 99%;
+                margin: 0 0 10px 10px;
+                width: 90%;
                 height: 500px;
             }
         </style>        
@@ -43,13 +50,23 @@
         <div class="row">
             <div class="column" id="editor"></div>
             <div class="column">
+                <textarea id="error"></textarea>
                 <textarea id="output"></textarea>                        
             </div>
         </div>
         <script type="text/javascript">
+            var elements = {
+                output: document.getElementById('output'),
+                error: document.getElementById('error'),
+                editor: document.getElementById('editor'),
+            }
             var editor = JSONTextEditor({
-                parent: document.getElementById('editor'),
-                height: 500
+                parent: elements.editor,
+                height: 500,
+                onChange: function(obj, error) {
+                    elements.output.value = JSON.stringify(obj, null, 2);
+                    elements.error.value = error ? error.message : '';
+                }
             });
 
             editor.setContent([

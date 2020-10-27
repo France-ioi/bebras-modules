@@ -3,6 +3,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aide",
     selectLanguage: "Sélectionnez un langage…",
     selectTopic: "Sélectionnez une rubrique…",
+    reloadFromTask: "Merci d'ouvrir cette documentation directement depuis l'exercice. Vous pouvez fermer cette fenêtre.",
     concepts: {
       "taskplatform": 'Résolution des exercices',
       "language": "Création d'un programme",
@@ -26,6 +27,7 @@ var conceptViewerStrings = {
     viewerTitle: "Help",
     selectLanguage: "Select a language…",
     selectTopic: "Select a topic…",
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: verify
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Program creation",
@@ -49,6 +51,7 @@ var conceptViewerStrings = {
     viewerTitle: "Ayuda",
     selectLanguage: "Seleccione un lenguaje…",
     selectTopic: "Seleccione un tema…",
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Resolución de ejercicios',
       "language": "Creación de un programa",
@@ -72,6 +75,7 @@ var conceptViewerStrings = {
     viewerTitle: "Aiuto online",
     selectLanguage: "Seleziona una lingua…",
     selectTopic: "Seleziona un argomento…",
+    reloadFromTask: "Please open this documentation from your exercise. You can close this window.", // TODO :: Translate
     concepts: {
       "taskplatform": 'Solving exercises',
       "language": "Programmazione",
@@ -100,13 +104,17 @@ var conceptViewer = {
   loaded: false,
   shownConcept: null,
   selectedLanguage: null,
+  fullScreen: false,
+  contextTitle: undefined,
   allLangs: [
     {id: 'blockly', lbl: 'Blockly'},
     {id: 'scratch', lbl: 'Scratch'},
     {id: 'python', lbl: 'Python'}
     ],
 
-  load: function () {
+  load: function (fullscreenLoad) {
+    if (!this.fullScreen)
+      this.fullScreen = fullscreenLoad;
     // Load the conceptViewer into the DOM
     if(this.loaded) { return; }
 
@@ -130,36 +138,49 @@ var conceptViewer = {
     navLanguage += '</ul>';
 
     $('body').append(''
-      + '<div id="conceptViewer" style="display: none;">'
-      + '  <div class="content">'
-      + '   <div class="panel-heading">'
-      + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>' + this.strings.viewerTitle + '</h2>'
-      + '     <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
-      + '   </div>'
-      + '   <div class="panel-body">'
-      + '     <div class="navigation">'
-      + '      <div class="navigationLanguage">'
-      + navLanguage
-      + '      </div>'
-      + '      <div class="navigationContent"></div>'
-      + '    </div>'
-      + '    <div class="viewer">'
-      + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
-      + '    </div>'
-      + '   </div>'
-      + '  </div>'
-      + '</div>');
+        + '<div id="conceptViewer"">'
+        + '  <div class="content">'
+        + '   <div class="panel-heading">'
+        + '     <h2 class="sectionTitle"><span class="icon fas fa-list-ul"></span>'
+        +         (this.fullScreen ? (this.contextTitle ? this.contextTitle + " &ndash; " : "") : "") + this.strings.viewerTitle
+        + '     </h2>'
+        + '     <div class="section-external-exit">'
+        + '       <div class="exit" onclick="conceptViewer.openInNewWidget();"><span class="icon fas fa-external-link-alt"></span></div>'
+        + '       <div class="exit" onclick="conceptViewer.hide();"><span class="icon fas fa-times"></span></div>'
+        + '     </div>'
+        + '   </div>'
+        + '   <div class="panel-body">'
+        + '     <div class="navigation">'
+        + '      <div class="navigationLanguage">'
+        + navLanguage
+        + '      </div>'
+        + '      <div class="navigationContent"></div>'
+        + '    </div>'
+        + '    <div class="viewer">'
+        + '      <iframe class="viewerContent" name="viewerContent"></iframe>'
+        + '    </div>'
+        + '   </div>'
+        + '  </div>'
+        + '</div>');
+    if (!this.fullScreen) {
+      $('#conceptViewer').hide();
+    } else {
+      $('#conceptViewer').addClass('conceptViewer-fullscreen');
+    }
 
     if(curLangLbl) {
        $('#showNavigationLanguageLabel').text(curLangLbl);
     }
 
     var that = this;
-    $('#conceptViewer').on('click', function (event) {
-      if (!$(event.target).closest('#conceptViewer .content').length) {
-        that.hide();
-      }
-    });
+
+    if (!conceptViewer.fullScreen) {
+      $('#conceptViewer').on('click', function (event) {
+        if (!$(event.target).closest('#conceptViewer .content').length) {
+          that.hide();
+        }
+      });
+    }
     this.loaded = true;
 
     $('#conceptViewer .navigationLanguage ul li').click(function(){
@@ -232,20 +253,46 @@ var conceptViewer = {
     this.loadUrl('');
   },
 
+  openInNewWidget: function() {
+    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
+
+    // we put the language so we can do some operations faster and not depending on the jschannel
+    var fullscreenWindow = window.open(url + "?lang=" + window.stringsLanguage);
+    var channel = Channel.build({window: fullscreenWindow, origin: '*', scope: 'test'});
+
+    var that = this;
+
+    // The object sent from this page to the fullscreen concept viewer in order to get all the options.
+    var conceptViewerConfigs = {
+      concepts: that.concepts,
+      selectedLang: that.selectedLanguage,
+      shownConcept: that.shownConcept,
+      contextTitle: that.contextTitle
+    };
+
+    channel.bind('getConceptViewerConfigs', function() {
+      return conceptViewerConfigs;
+    });
+
+  },
+
   showConcept: function (concept, show) {
     // Show a specific concept
     // Either a concept object can be given, either a concept ID can be given
     // directly
     var conceptUrl = null;
     var conceptId = null;
+    var conceptName = null;
     if (concept.url) {
       conceptUrl = concept.url;
       conceptId = concept.id;
+      conceptName = concept.name;
     } else {
       conceptId = concept.id ? concept.id : concept;
       for (var i=0; i<this.concepts.length; i++) {
         if(this.concepts[i].id == conceptId) {
           conceptUrl = this.concepts[i].url;
+          conceptName = this.concepts[i].name;
         }
       }
     }
@@ -266,6 +313,10 @@ var conceptViewer = {
       $('#conceptViewer .navigationContent ul li').removeClass('selected');
       $('#conceptViewer .navigationContent ul li[data-id='+conceptId+']').addClass('selected');
       $('#showNavigationContent').prop('checked', false);
+
+      if (this.fullScreen) {
+        document.title = conceptViewerStrings[window.stringsLanguage].viewerTitle + ' - ' + conceptName;
+      }
       return true;
     } else {
       return false;
@@ -315,7 +366,7 @@ var conceptViewer = {
     $('#conceptViewer').remove();
     this.loaded = false;
   }
-}
+};
 
 
 function getConceptViewerBaseUrl() {
