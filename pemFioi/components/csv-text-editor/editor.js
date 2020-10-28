@@ -15,14 +15,19 @@ function CSVTextEditor(params) {
         onChange: null
     }
     params = Object.assign({}, defaults, params);
-    try {
-        params.valid_data = $.csv.toArrays(params.valid_data, {
-            separator: params.csv_separator
-        });
-    } catch(e) {
-        console.error('Invalid valid_data parameter');
-        console.error(e.message);
-    }                
+
+
+    // parse valid_data
+    var d = Papa.parse(params.valid_data, {
+        delimiter: params.csv_separator
+    });
+    if(d.errors.length) {
+        console.error('CSV Editor Error: Invalid valid_data parameter', d.errors)
+        params.valid_data = [[]];
+    } else {
+        params.valid_data = d.data;
+    }
+
 
     var wrapper = $('<div class="csv-text-editor"/>')
     params.parent.append(wrapper);
@@ -232,22 +237,23 @@ function CSVTextEditor(params) {
 
     function parseEditorContent(silent) {
         var content = getContent();
-        var data = null;
-        try {
-            data = $.csv.toArrays(content, {
-                separator: params.csv_separator
-            });
-        } catch(e) {
-            mistake = e.metadata;
-            if(!silent) {
-                content = 
-                    content.substr(0, e.metadata.offset) + 
-                    '<span class="mistake">' + e.metadata.token + '</span>' + 
-                    content.substr(e.metadata.offset + e.metadata.token.length)
-                editor.html(content);                    
+        var d = Papa.parse(content, {
+            delimiter: params.csv_separator
+        });
+        if(d.errors.length) {
+            var err = d.errors[0];
+            mistake = {
+                tag: err[0].code
             }
+            if(!silent) {
+                var lines = content.split('\n');
+                lines[err.row] = '<span class="mistake">' + lines[err.row] + '</span>';
+                content = lines.join('\n');
+                editor.html(content);
+            }
+            return null;
         }
-        return data;
+        return d.data;
     }    
 
 
