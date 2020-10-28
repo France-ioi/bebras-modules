@@ -330,7 +330,7 @@
             }            
 
             task.getAnswer = function(callback) {
-                var answer = task.getAnswerObject();
+                var answer = this.getAnswerObject();
                 answer = JSON.stringify(answer);
                 //console.log('task.getAnswer', answer)
                 callback(answer);
@@ -350,7 +350,7 @@
                 try {
                     //console.log('task.reloadAnswer', answer)
                     answer = JSON.parse(answer);
-                    task.reloadAnswerObject(answer);
+                    this.reloadAnswerObject(answer);
                 } catch(e) {
                     console.error('Quiz: answer parsing error.')
                 }
