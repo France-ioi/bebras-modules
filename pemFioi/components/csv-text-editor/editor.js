@@ -243,7 +243,7 @@ function CSVTextEditor(params) {
         if(d.errors.length) {
             var err = d.errors[0];
             mistake = {
-                tag: err[0].code
+                tag: err.code
             }
             if(!silent) {
                 var lines = content.split('\n');
