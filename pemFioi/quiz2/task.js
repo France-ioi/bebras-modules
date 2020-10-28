@@ -325,7 +325,7 @@
             task.getDefaultAnswerObject = function() {
                 return {
                     data: [],
-                    versions: []
+                    versions: {}
                 }
             }            
 
