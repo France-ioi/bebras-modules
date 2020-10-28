@@ -211,47 +211,47 @@ var quickPiLocalLanguageStrings = {
 
             getTemperature: "getTemperature(thermometer) ",
 
-            drawPoint: "drawPoint(x, y)",
-            isPointSet: "isPointSet(x, y)",
-            drawLine: "drawLine(x0, y0, x1, y1)",
+            drawPoint: "drawPoint(x, y) dessine un point de un pixel aux coordonnées données",
+            isPointSet: "isPointSet(x, y) retourne True si le point aux coordonées x, y est actif",
+            drawLine: "drawLine(x0, y0, x1, y1) dessine un segment commençant en x0, y0 jusqu'à x1, y1",
             drawRectangle: "drawRectangle(x0, y0, width, height) dessine un rectangle, de coin haut gauche (x0,y0)",
-            drawCircle: "drawCircle(x0, y0, diameter)",
+            drawCircle: "drawCircle(x0, y0, diameter) dessine un cercle de centre x0, y0 et de diamètre donné",
             clearScreen: "clearScreen() efface le contenu de l'écran",
-            updateScreen: "updateScreen()",
-            autoUpdate: "autoUpdate(auto)",
+            updateScreen: "updateScreen() mettre à jour l'écran",
+            autoUpdate: "autoUpdate(auto) change le mode d'actualisation de l'écran",
 
-            fill: "fill(color)",
-            noFill: "noFill()",
-            stroke: "stroke(color)",
-            noStroke: "noStroke()",
-
-
-            readAcceleration: "readAcceleration(axis)",
-            computeRotation: "computeRotation()",
-
-            readSoundLevel: "readSoundLevel(port)",
+            fill: "fill(color) Remplir les formes avec la couleur donnée",
+            noFill: "noFill() Ne pas remplir les formes",
+            stroke: "stroke(color) dessiner les bords des figures avec la couleur donnée",
+            noStroke: "noStroke() ne pas dessiner les bordures des figures",
 
 
-            readMagneticForce: "readMagneticForce(axis)",
-            computeCompassHeading: "computeCompassHeading()",
+            readAcceleration: "readAcceleration(axis) lit l'accélération en m/s² sur l'axe (X, Y ou Z)",
+            computeRotation: "computeRotation() calcule l'angle de rotation en degrés sur l'accéléromètre",
+
+            readSoundLevel: "readSoundLevel(port) retourne le volume ambiant",
+
+
+            readMagneticForce: "readMagneticForce(axis) retourne le champ magnétique (µT) sur l'axe (X, Y ou Z)",
+            computeCompassHeading: "computeCompassHeading() retourne la direction de la boussole en degrés",
 
             readInfraredState: "readInfraredState(IRReceiver) retourne True si un signal infra-rouge est détecté, False sinon",
             setInfraredState: "setInfraredState(IREmitter, state) modifie l'état de l'émetteur : True pour l'allumer, False pour l'éteindre",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity()",
-            setGyroZeroAngle: "setGyroZeroAngle()",
-            computeRotationGyro: "computeRotationGyro()",
+            readAngularVelocity: "readAngularVelocity() retourne la vitesse engulairee (°/s) du gyroscope",
+            setGyroZeroAngle: "setGyroZeroAngle() initialize le gyroscope à l'état 0",
+            computeRotationGyro: "computeRotationGyro() calcule la rotation du gyroscope en degrés",
 
             //Internet store
-            connectToCloudStore: "connectToCloudStore(identifier, password)",
-            writeToCloudStore: "writeToCloudStore(identifier, key, value)",
-            readFromCloudStore: "readFromCloudStore(identifier, key)",
+            connectToCloudStore: "connectToCloudStore(identifier, password) se connecter au cloud avec le nom d'utilisateur et le mot de passe donnés",
+            writeToCloudStore: "writeToCloudStore(identifier, key, value) écrire une valeur sur une clé dans le cloud",
+            readFromCloudStore: "readFromCloudStore(identifier, key) retourne la valeur lue dans le cloud de la clé donnée",
 
             // IR Remote
-            readIRMessage: "readIRMessage(irrec, timeout)",
-            sendIRMessage: "sendIRMessage(irtrans, name)",
-            presetIRMessage: "presetIRMessage(name, data)",
+            readIRMessage: "readIRMessage(irrec, timeout) attends un message infrarouge pendant le temps donné en millisecondes et le renvois",
+            sendIRMessage: "sendIRMessage(irtrans, name) envoi un message infrarouge précédement configurer avec le nom donné",
+            presetIRMessage: "presetIRMessage(name, data) configure un message infrarouge de nom name et de donné data",
         },
         constant: {
         },
@@ -1066,47 +1066,47 @@ var quickPiLocalLanguageStrings = {
 
             getTemperature: "getTemperature(thermometer) ",
 
-            drawPoint: "drawPoint(x, y)",
-            isPointSet: "isPointSet(x, y)",
-            drawLine: "drawLine(x0, y0, x1, y1)",
+            drawPoint: "drawPoint(x, y) draw a point of 1 pixel at given coordinates", // TODO: Translate
+            isPointSet: "isPointSet(x, y) return True if the point at coordinates x, y is on", // TODO: Translate
+            drawLine: "drawLine(x0, y0, x1, y1) draw a line starting at x0, y0 to x1, y1", // TODO: Translate
             drawRectangle: "drawRectangle(x0, y0, width, height) disegna un rettangolo, con angolo in alto a sinistra (x0,y0)",
-            drawCircle: "drawCircle(x0, y0, diameter)",
+            drawCircle: "drawCircle(x0, y0, diameter) draw a circle of center x0, y0 and of given diameter", // TODO: Translate
             clearScreen: "clearScreen() cancella il contenuto della schermata",
-            updateScreen: "updateScreen()",
-            autoUpdate: "autoUpdate(auto)",
+            updateScreen: "updateScreen() update screen content", // TODO: Translate
+            autoUpdate: "autoUpdate(auto) change the screen actualisation mode", // TODO: Translate
 
-            fill: "fill(color)",
-            noFill: "noFill()",
-            stroke: "stroke(color)",
-            noStroke: "noStroke()",
-
-
-            readAcceleration: "readAcceleration(axis)",
-            computeRotation: "computeRotation()",
-
-            readSoundLevel: "readSoundLevel(port)",
+            fill: "fill(color) fill the shapes with the color given", // TODO: Translate
+            noFill: "noFill() do not fill the shapes", // TODO: Translate
+            stroke: "stroke(color) draw the borders of shapes with the color given", // TODO: Translate
+            noStroke: "noStroke() do not draw the borders of shapes", // TODO: Translate
 
 
-            readMagneticForce: "readMagneticForce(axis)",
-            computeCompassHeading: "computeCompassHeading()",
+            readAcceleration: "readAcceleration(axis) read the acceleration (m/s²) in the axis (X, Y or Z)", // TODO: Translate
+            computeRotation: "computeRotation() compute the rotation angle (°) in the accelerometro", // TODO: Translate
+
+            readSoundLevel: "readSoundLevel(port) return the ambien sound", // TODO: Translate
+
+
+            readMagneticForce: "readMagneticForce(axis) return the magnetic force (µT) in the axis (X, Y ou Z)", // TODO : Translate
+            computeCompassHeading: "computeCompassHeading() return the compass direction in degres", // TODO: Translate
 
             readInfraredState: "readInfraredState(IRReceiver) riporta True se viene rilevato un segnale infrarosso, False nel caso in contrario",
             setInfraredState: "setInfraredState(IREmitter, state) modifica lo stato del trasmettitore : True per accenderlo, False per spegnerlo",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity()",
-            setGyroZeroAngle: "setGyroZeroAngle()",
-            computeRotationGyro: "computeRotationGyro()",
+            readAngularVelocity: "readAngularVelocity() return the angular speed (°/s) of the gyroscope", // TODO: Translate
+            setGyroZeroAngle: "setGyroZeroAngle() initialize the gyroscope at the 0 state", // TODO: Translate
+            computeRotationGyro: "computeRotationGyro() compute the rotations of the gyroscope in degres", // TODO: Translate
 
             //Internet store
-            connectToCloudStore: "connectToCloudStore(identifier, password)",
-            writeToCloudStore: "writeToCloudStore(identifier, key, value)",
-            readFromCloudStore: "readFromCloudStore(identifier, key)",
+            connectToCloudStore: "connectToCloudStore(identifier, password) connect to cloud store with the given username and password", // TODO: Translate
+            writeToCloudStore: "writeToCloudStore(identifier, key, value) write a value at a key to the cloud", // TODO: Translate
+            readFromCloudStore: "readFromCloudStore(identifier, key) read the value at the given key from the cloud", // TODO: Translate
 
             // IR Remote
-            readIRMessage: "readIRMessage(irrec, timeout)",
-            sendIRMessage: "sendIRMessage(irtrans, name)",
-            presetIRMessage: "presetIRMessage(name, data)",
+            readIRMessage: "readIRMessage(irrec, timeout) wait for an IR message during the given time and then return it", // TODO: Translate
+            sendIRMessage: "sendIRMessage(irtrans, name) send an IR message previously configured with the given name", // TODO: Translate
+            presetIRMessage: "presetIRMessage(name, data) configure an IR message with the given name and data" // TODO: Translate
         },
         constant: {
         },
@@ -1684,7 +1684,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_wait',
                 order: 250,
-                python: ['sleep']
+                python: ['sleep', 'currentTime']
             },
             {
                 id: 'quickpi_magneto',
