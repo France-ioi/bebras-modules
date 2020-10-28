@@ -6678,7 +6678,7 @@ var getContext = function (display, infos, curLevel) {
                     cliph
             });
 
-            sensor.stateText = paper.text(state1x, state1y, sensor.state + "°C");
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + " °C");
 
             if (!context.autoGrading && context.offLineMode) {
                 setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
