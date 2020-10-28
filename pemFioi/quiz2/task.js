@@ -330,27 +330,38 @@
             }            
 
             task.getAnswer = function(callback) {
-                var answer = {
+                var answer = task.getAnswerObject();
+                answer = JSON.stringify(answer);
+                //console.log('task.getAnswer', answer)
+                callback(answer);
+            };
+
+            task.getAnswerObject = function() {
+                var answerObj = {
                     data: q.getAnswer(),
                     versions: Quiz.versions.get()
                 }
-                //console.log('task.getAnswer', answer)
-                answer = JSON.stringify(answer);
-                callback(answer);
-            };
+                //console.log('task.getAnswerObject', answerObj)
+                return answerObj;
+            };            
 
 
             task.reloadAnswer = function(answer, callback) {
                 try {
                     //console.log('task.reloadAnswer', answer)
                     answer = JSON.parse(answer);
-                    var new_format = answer !== null && typeof answer === 'object' && 'data' in answer;
-                    q.setAnswer(new_format ? answer.data : answer);
+                    task.reloadAnswerObject(answer);
                 } catch(e) {
                     console.error('Quiz: answer parsing error.')
                 }
                 callback();
             };
+
+
+            task.reloadAnswerObject = function(answerObj) {
+                var new_format = answerObj !== null && typeof answerObj === 'object' && 'data' in answerObj;
+                q.setAnswer(new_format ? answerObj.data : answerObj);
+            }
 
 
 
