@@ -494,6 +494,7 @@ var getContext = function (display, infos, curLevel) {
    context.reset = function (taskInfos) {
       // Do something here
 
+      context.failures = null;
       if (taskInfos != undefined) {
 
          // Copy graph to avoid modifying the taskInfos orignal
@@ -1155,87 +1156,87 @@ var getContext = function (display, infos, curLevel) {
       context.currentTime++;
 
       console.log("current time", context.currentTime);
-      for (var i = 0; i < context.failures.length; i++) {
-         var currentFailure = context.failures[i];
+      if (context.failures) {
+         for (var i = 0; i < context.failures.length; i++) {
+            var currentFailure = context.failures[i];
 
-         if (context.currentTime >= currentFailure.startTime &&
-             context.currentTime <= currentFailure.endTime) {
+            if (context.currentTime >= currentFailure.startTime &&
+               context.currentTime <= currentFailure.endTime) {
 
-            if (!currentFailure.active)
-            {
-               currentFailure.active = true;
-               console.log("Matched failiure ", i);
+               if (!currentFailure.active)
+               {
+                  currentFailure.active = true;
+                  console.log("Matched failiure ", i);
 
-               if (currentFailure.type == "nodeboth") {
-                  var node = context.nodesAndNeighbors[currentFailure.node];
+                  if (currentFailure.type == "nodeboth") {
+                     var node = context.nodesAndNeighbors[currentFailure.node];
 
-                  var vertexObject = context.findVerticeObject(node);
+                     var vertexObject = context.findVerticeObject(node);
 
-                  vertexObject.attr({
-                     "opacity": 0.3,
-                  });
+                     vertexObject.attr({
+                        "opacity": 0.3,
+                     });
 
-                  function animateVertex()
-                  {
-                     var targetOpacity = 0.1;
-                     
-                     if (vertexObject.attr('opacity') >= 0.1)
+                     function animateVertex()
                      {
-                        targetOpacity = 0.01;
+                        var targetOpacity = 0.1;
+                     
+                        if (vertexObject.attr('opacity') >= 0.1)
+                        {
+                           targetOpacity = 0.01;
+                        }
+
+                        vertexObject.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
+                           animateVertex();
+                        });
                      }
 
-                     vertexObject.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
-                  
-                        animateVertex();
-                     });
+                     animateVertex();
                   }
+                  else if (currentFailure.type == "connection") {
+                     var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
+                     var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
 
-                  animateVertex();
+                     var edgePath = context.findEdgeObject(node1, node2);
 
-               }
-               else if (currentFailure.type == "connection") {
-                  var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
-                  var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
+                     edgePath.attr({
+                           "stroke": "red",
+                           "opacity": 0.1
+                     });
 
-                  var edgePath = context.findEdgeObject(node1, node2);
-
-                  edgePath.attr({
-                        "stroke": "red",
-                        "opacity": 0.1
-                  });
-
-                  function animateEdge()
-                  {
-                     var targetOpacity = 0.1;
-                     
-                     if (edgePath.attr('opacity') >= 0.1)
+                     function animateEdge()
                      {
-                        targetOpacity = 0.01;
+                        var targetOpacity = 0.1;
+                     
+                        if (edgePath.attr('opacity') >= 0.1)
+                        {
+                           targetOpacity = 0.01;
+                        }
+
+                        edgePath.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
+                  
+                           animateEdge();
+                        });
                      }
 
-                     edgePath.animate({ "opacity": targetOpacity }, 1000, "linear", function() {
-                  
-                        animateEdge();
-                     });
+                     animateEdge();
                   }
-
-                  animateEdge();
                }
             }
-         }
-         else if (currentFailure.active) {
-            currentFailure.active = false;
+            else if (currentFailure.active) {
+               currentFailure.active = false;
 
-            var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
-            var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
+               var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
+               var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
 
-            var edgePath = context.findEdgeObject(node1, node2);
+               var edgePath = context.findEdgeObject(node1, node2);
 
-            edgePath.stop();
-            edgePath.attr({
-                  "stroke": "yellowgreen",
-                  "opacity": 1
-            });
+               edgePath.stop();
+               edgePath.attr({
+                     "stroke": "yellowgreen",
+                     "opacity": 1
+               });
+            }
          }
       }
 
@@ -1402,6 +1403,9 @@ var getContext = function (display, infos, curLevel) {
 
 
    context.canNodeSendMessages = function(fromNode, toNode) {
+      if (!context.failures)
+         return true;
+         
       for (var i = 0; i < context.failures.length; i++) {
          var currentFailure = context.failures[i];
 
