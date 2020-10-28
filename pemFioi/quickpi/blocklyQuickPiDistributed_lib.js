@@ -13,6 +13,7 @@ var getContext = function (display, infos, curLevel) {
             isMessageWaiting: "Is there a message waiting",
             broadcastMessage: "Broadcast Message",
             log: "Log",
+            currentTime: "Time in milliseconds",
          },
          code: {
             // Names of the functions in Python, or Blockly translated in JavaScript
@@ -24,7 +25,8 @@ var getContext = function (display, infos, curLevel) {
             submitAnswer: "submitAnswer",
             isMessageWaiting: "isMessageWaiting",
             broadcastMessage: "broadcastMessage",
-            log: "log"
+            log: "log",
+            currentTime: "currentTime",
          },
          description: {
             // Descriptions of the functions in Python (optional)
@@ -36,7 +38,8 @@ var getContext = function (display, infos, curLevel) {
             submitAnswer: "submitAnswer(answer) Submit answer",
             isMessageWaiting: "isMessageWaiting() Returns true if we have a message waiting on the current node queue",
             broadcastMessage: "broadcastMessage() Broadcast a message to all nodes",
-            log: "log(string) Prints a string for debugging purposes"
+            log: "log(string) Prints a string for debugging purposes",
+            currentTime: "currentTime(milliseconds) Time in milliseconds",
          },
          constant: {
          },
@@ -494,6 +497,8 @@ var getContext = function (display, infos, curLevel) {
    context.reset = function (taskInfos) {
       // Do something here
 
+      
+      context.currentWallTime = new Date().getTime();
       context.failures = null;
       if (taskInfos != undefined) {
 
@@ -1226,16 +1231,19 @@ var getContext = function (display, infos, curLevel) {
             else if (currentFailure.active) {
                currentFailure.active = false;
 
-               var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
-               var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
+               if (currentFailure.type == "connection")
+               {
+                  var node1 = context.nodesAndNeighbors[currentFailure.nodes[0]];
+                  var node2 = context.nodesAndNeighbors[currentFailure.nodes[1]];
 
-               var edgePath = context.findEdgeObject(node1, node2);
+                  var edgePath = context.findEdgeObject(node1, node2);
 
-               edgePath.stop();
-               edgePath.attr({
-                     "stroke": "yellowgreen",
-                     "opacity": 1
-               });
+                  edgePath.stop();
+                  edgePath.attr({
+                        "stroke": "yellowgreen",
+                        "opacity": 1
+                  });
+               }
             }
          }
       }
@@ -1661,10 +1669,21 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.log = function (string, callback) {
       var node = context.nodesAndNeighbors[context.curNode];
 
-      node.log.push(string);
+      if (context.display)
+         node.log.push(string);
 
       context.runner.waitDelay(callback);
    };
+
+   context.distributed.currentTime = function (callback) {
+      var millis = new Date().getTime() - context.currentWallTime;
+
+      console.log("millis", millis);
+
+      context.runner.waitDelay(callback, millis);
+  };
+
+
    /*
     * Each function must end its main execution thread by calling one of :
     * `context.runner.noDelay(callback, value)` : return value `value`
@@ -1725,6 +1744,7 @@ var getContext = function (display, infos, curLevel) {
             { name: "isMessageWaiting", yieldsValue: true },
             { name: "broadcastMessage", params: [null] },
             { name: "log", params: [null] },
+            { name: "currentTime", yieldsValue: true },
          ],
          sensors: [
          ]
@@ -1897,6 +1917,258 @@ var distributedTaskUtilities = {
          },
          "directed": false
       }
+   },
+   ringGraph14: {
+      "vertexVisualInfo": {
+         "v_0": {
+           "x": 276,
+           "y": 449
+         },
+         "v_1": {
+           "x": 173,
+           "y": 429
+         },
+         "v_2": {
+           "x": 450,
+           "y": 91
+         },
+         "v_3": {
+           "x": 494,
+           "y": 161
+         },
+         "v_4": {
+           "x": 498,
+           "y": 259
+         },
+         "v_5": {
+           "x": 471,
+           "y": 368
+         },
+         "v_6": {
+           "x": 382,
+           "y": 432
+         },
+         "v_7": {
+           "x": 52,
+           "y": 286
+         },
+         "v_8": {
+           "x": 83,
+           "y": 372
+         },
+         "v_9": {
+           "x": 53,
+           "y": 190
+         },
+         "v_10": {
+           "x": 97,
+           "y": 111
+         },
+         "v_11": {
+           "x": 175,
+           "y": 54
+         },
+         "v_12": {
+           "x": 268,
+           "y": 29
+         },
+         "v_13": {
+           "x": 376,
+           "y": 38
+         }
+       },
+       "edgeVisualInfo": {
+         "e_1": {},
+         "e_0": {},
+         "e_4": {},
+         "e_5": {},
+         "e_6": {},
+         "e_2": {},
+         "e_3": {},
+         "e_7": {},
+         "e_8": {},
+         "e_9": {},
+         "e_10": {},
+         "e_11": {},
+         "e_12": {},
+         "e_13": {}
+       },
+       "minGraph": {
+         "vertexInfo": {
+           "v_0": {
+             "label": ""
+           },
+           "v_1": {
+             "label": ""
+           },
+           "v_2": {
+             "label": ""
+           },
+           "v_3": {
+             "label": ""
+           },
+           "v_4": {
+             "label": ""
+           },
+           "v_5": {
+             "label": ""
+           },
+           "v_6": {
+             "label": ""
+           },
+           "v_7": {},
+           "v_8": {},
+           "v_9": {},
+           "v_10": {},
+           "v_11": {},
+           "v_12": {},
+           "v_13": {}
+         },
+         "edgeInfo": {
+           "e_1": {},
+           "e_0": {},
+           "e_4": {},
+           "e_5": {},
+           "e_6": {},
+           "e_2": {},
+           "e_3": {},
+           "e_7": {},
+           "e_8": {},
+           "e_9": {},
+           "e_10": {},
+           "e_11": {},
+           "e_12": {
+             "selected": false
+           },
+           "e_13": {}
+         },
+         "edgeVertices": {
+           "e_1": [
+             "v_0",
+             "v_1"
+           ],
+           "e_0": [
+             "v_6",
+             "v_0"
+           ],
+           "e_4": [
+             "v_6",
+             "v_5"
+           ],
+           "e_5": [
+             "v_5",
+             "v_4"
+           ],
+           "e_6": [
+             "v_4",
+             "v_3"
+           ],
+           "e_2": [
+             "v_2",
+             "v_3"
+           ],
+           "e_3": [
+             "v_8",
+             "v_7"
+           ],
+           "e_7": [
+             "v_1",
+             "v_8"
+           ],
+           "e_8": [
+             "v_7",
+             "v_9"
+           ],
+           "e_9": [
+             "v_9",
+             "v_10"
+           ],
+           "e_10": [
+             "v_10",
+             "v_11"
+           ],
+           "e_11": [
+             "v_11",
+             "v_12"
+           ],
+           "e_12": [
+             "v_12",
+             "v_13"
+           ],
+           "e_13": [
+             "v_13",
+             "v_2"
+           ]
+         },
+         "directed": false
+       }
+   },
+   ringGraph4: {
+      "vertexVisualInfo": {
+         "v_0": {
+           "x": 31,
+           "y": 288
+         },
+         "v_1": {
+           "x": 34,
+           "y": 33
+         },
+         "v_2": {
+           "x": 288,
+           "y": 32
+         },
+         "v_3": {
+           "x": 287,
+           "y": 288
+         }
+       },
+       "edgeVisualInfo": {
+         "e_1": {},
+         "e_7": {},
+         "e_2": {},
+         "e_0": {}
+       },
+       "minGraph": {
+         "vertexInfo": {
+           "v_0": {
+             "label": ""
+           },
+           "v_1": {
+             "label": ""
+           },
+           "v_2": {
+             "label": ""
+           },
+           "v_3": {
+             "label": ""
+           }
+         },
+         "edgeInfo": {
+           "e_1": {},
+           "e_7": {},
+           "e_2": {},
+           "e_0": {}
+         },
+         "edgeVertices": {
+           "e_1": [
+             "v_0",
+             "v_1"
+           ],
+           "e_7": [
+             "v_2",
+             "v_1"
+           ],
+           "e_2": [
+             "v_2",
+             "v_3"
+           ],
+           "e_0": [
+             "v_3",
+             "v_0"
+           ]
+         },
+         "directed": false
+       }
    },
    allToAllGraph: {
       "vertexVisualInfo": {
