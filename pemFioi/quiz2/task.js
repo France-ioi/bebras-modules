@@ -322,24 +322,46 @@
                 callback()
             }
 
+            task.getDefaultAnswerObject = function() {
+                return {
+                    data: [],
+                    versions: {}
+                }
+            }            
 
             task.getAnswer = function(callback) {
-                var answer = JSON.stringify(q.getAnswer());
+                var answer = this.getAnswerObject();
+                answer = JSON.stringify(answer);
                 //console.log('task.getAnswer', answer)
                 callback(answer);
             };
+
+            task.getAnswerObject = function() {
+                var answerObj = {
+                    data: q.getAnswer(),
+                    versions: Quiz.versions.get()
+                }
+                //console.log('task.getAnswerObject', answerObj)
+                return answerObj;
+            };            
 
 
             task.reloadAnswer = function(answer, callback) {
                 try {
                     //console.log('task.reloadAnswer', answer)
                     answer = JSON.parse(answer);
-                    q.setAnswer(answer);
+                    this.reloadAnswerObject(answer);
                 } catch(e) {
-
+                    console.error('Quiz: answer parsing error.')
                 }
                 callback();
             };
+
+
+            task.reloadAnswerObject = function(answerObj) {
+                var new_format = answerObj !== null && typeof answerObj === 'object' && 'data' in answerObj;
+                q.setAnswer(new_format ? answerObj.data : answerObj);
+            }
 
 
 
@@ -379,6 +401,7 @@
 
             task.gradeAnswer = function(answer, answer_token, callback) {
                 answer = JSON.parse(answer);
+                var new_format = answer !== null && typeof answer === 'object' && 'data' in answer;
                 function onGrade(result) {
                     q.displayFeedback(result.feedback);
                     displayScore(result.score, taskParams.maxScore);
@@ -398,36 +421,22 @@
                     useGraderUrl(
                         quiz_settings.graderUrl,
                         token,
-                        answer,
-                        Quiz.versions.get(),
+                        new_format ? answer.data : answer,
+                        new_format ? answer.versions : Quiz.versions.get(),
                         scoreSettings,
                         onGrade,
                         onError
                     );
                 } else {
                     useGraderData(
-                        answer,
-                        Quiz.versions.get(),
+                        new_format ? answer.data : answer,
+                        new_format ? answer.versions : Quiz.versions.get(),
                         scoreSettings,
                         onGrade,
                         onError
                     );
                 }
             };
-
-
-            task.reloadAnswerObject = function(answerObj) {
-                return q.setAnswer(answerObj);
-            }
-
-
-            task.getAnswerObject = function() {
-                return q.getAnswer();
-            }
-
-            task.getDefaultAnswerObject = function() {
-                return [];
-            }
 
             success();
         });

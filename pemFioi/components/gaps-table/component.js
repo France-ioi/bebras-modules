@@ -315,7 +315,7 @@ function GapsTable(params) {
             for(var i=0; i<cells.length; i++) {
                 answer[i] = [];
                 for(var j=0; j<cells[i].length; j++) {
-                    answer[i][j] = schema.isPlaceholder(i, j) ? cells[i][j].text() : '';
+                    answer[i][j] = schema.isPlaceholder(i, j) ? cells[i][j].text() : schema.getContent(i, j);
                 }
             }
             callOnChange();
