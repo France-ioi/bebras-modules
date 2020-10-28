@@ -254,7 +254,8 @@ var conceptViewer = {
   },
 
   openInNewWidget: function() {
-    var url = "https://static4.castor-informatique.fr/help/display-documentation.html";
+    // we use the function to get the base url in order to support http and https.
+    var url = getConceptViewerBaseUrl() + "display-documentation.html";
 
     // we put the language so we can do some operations faster and not depending on the jschannel
     var fullscreenWindow = window.open(url + "?lang=" + window.stringsLanguage);
@@ -378,11 +379,6 @@ function getConceptViewerBaseUrl() {
         || window.location.hostname == 'concours2.castor-informatique.fr')
        ? window.location.host : 'static4.castor-informatique.fr');
     baseUrl += '/help/';
-    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
-        baseUrl += 'index_' + window.stringsLanguage + '.html';
-    } else {
-        baseUrl += 'index.html';
-    }
     return baseUrl;
 }
 
@@ -390,6 +386,11 @@ function getConceptViewerBaseUrl() {
 function getConceptViewerBaseConcepts() {
     // Get base concepts in the default help
     var baseUrl = getConceptViewerBaseUrl();
+    if(window.stringsLanguage == 'es' || window.stringsLanguage == 'it') {
+        baseUrl += 'index_' + window.stringsLanguage + '.html';
+    } else {
+        baseUrl += 'index.html';
+    }
     var baseConcepts = [
         {id: 'taskplatform', name: 'Résolution des exercices', url: baseUrl+'#taskplatform', language: 'all', order: 100},
         {id: 'language', name: "Création d'un programme", url: baseUrl+'#language', order: 101},
