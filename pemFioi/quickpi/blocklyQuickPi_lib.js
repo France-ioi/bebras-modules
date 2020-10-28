@@ -227,7 +227,7 @@ var quickPiLocalLanguageStrings = {
 
 
             readAcceleration: "readAcceleration(axis) lit l'accélération en m/s² sur l'axe (X, Y ou Z)",
-            computeRotation: "computeRotation() calcule l'angle de rotation en degrés sur l'accéléromètre",
+            computeRotation: "computeRotation(axis) calcule l'angle de rotation en degrés sur l'accéléromètre",
 
             readSoundLevel: "readSoundLevel(port) retourne le volume ambiant",
 
@@ -239,9 +239,9 @@ var quickPiLocalLanguageStrings = {
             setInfraredState: "setInfraredState(IREmitter, state) modifie l'état de l'émetteur : True pour l'allumer, False pour l'éteindre",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity() retourne la vitesse engulairee (°/s) du gyroscope",
+            readAngularVelocity: "readAngularVelocity(axis) retourne la vitesse engulairee (°/s) du gyroscope",
             setGyroZeroAngle: "setGyroZeroAngle() initialize le gyroscope à l'état 0",
-            computeRotationGyro: "computeRotationGyro() calcule la rotation du gyroscope en degrés",
+            computeRotationGyro: "computeRotationGyro(axis) calcule la rotation du gyroscope en degrés",
 
             //Internet store
             connectToCloudStore: "connectToCloudStore(identifier, password) se connecter au cloud avec le nom d'utilisateur et le mot de passe donnés",
@@ -657,7 +657,7 @@ var quickPiLocalLanguageStrings = {
 
 
             readAcceleration: "readAcceleration(axis) leer la acceleración (m/s²) en el eje (X, Y o Z)",
-            computeRotation: "computeRotation() calcular el ángulo de rotación (°) en el acelerómetro",
+            computeRotation: "computeRotation(axis) calcular el ángulo de rotación (°) en el acelerómetro",
 
             readSoundLevel: "readSoundLevel(port) devuelve el volumen del sonido ambiente",
 
@@ -669,9 +669,9 @@ var quickPiLocalLanguageStrings = {
             setInfraredState: "setInfraredState(state) si se le pasa True enciende el transmisor infrarrojo, Falso lo apaga",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity() devuelve la velocidad angular (°/s) del gyroscopio",
+            readAngularVelocity: "readAngularVelocity(axis) devuelve la velocidad angular (°/s) del gyroscopio",
             setGyroZeroAngle: "setGyroZeroAngle() inicializa el giroscopio a estado cero",
-            computeRotationGyro: "computeRotationGyro() calcula la rotación del giroscopio (°)",
+            computeRotationGyro: "computeRotationGyro(axis) calcula la rotación del giroscopio (°)",
 
             //Internet store
             connectToCloudStore: "connectToCloudStore(identifier, password) se conecta a la nube con el usuario y password dados",
@@ -1082,7 +1082,7 @@ var quickPiLocalLanguageStrings = {
 
 
             readAcceleration: "readAcceleration(axis) read the acceleration (m/s²) in the axis (X, Y or Z)", // TODO: Translate
-            computeRotation: "computeRotation() compute the rotation angle (°) in the accelerometro", // TODO: Translate
+            computeRotation: "computeRotation(axis) compute the rotation angle (°) in the accelerometro", // TODO: Translate
 
             readSoundLevel: "readSoundLevel(port) return the ambien sound", // TODO: Translate
 
@@ -1094,9 +1094,9 @@ var quickPiLocalLanguageStrings = {
             setInfraredState: "setInfraredState(IREmitter, state) modifica lo stato del trasmettitore : True per accenderlo, False per spegnerlo",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity() return the angular speed (°/s) of the gyroscope", // TODO: Translate
+            readAngularVelocity: "readAngularVelocity(axis) return the angular speed (°/s) of the gyroscope", // TODO: Translate
             setGyroZeroAngle: "setGyroZeroAngle() initialize the gyroscope at the 0 state", // TODO: Translate
-            computeRotationGyro: "computeRotationGyro() compute the rotations of the gyroscope in degres", // TODO: Translate
+            computeRotationGyro: "computeRotationGyro(axis) compute the rotations of the gyroscope in degres", // TODO: Translate
 
             //Internet store
             connectToCloudStore: "connectToCloudStore(identifier, password) connect to cloud store with the given username and password", // TODO: Translate
@@ -1649,7 +1649,7 @@ var getContext = function (display, infos, curLevel) {
                 id: 'quickpi_draw',
                 order: 203,
                 python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
-                    'stroke', 'updateScreen', 'autoUpdate', 'isPointSet']
+                    'stroke', 'noStroke','updateScreen', 'autoUpdate', 'isPointSet']
             },
             {
                 id: 'quickpi_range',
@@ -1679,7 +1679,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_accelerometer',
                 order: 209,
-                python: ['readAcceleration']
+                python: ['readAcceleration', 'computeRotation']
             },
             {
                 id: 'quickpi_wait',
@@ -1699,7 +1699,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: "quickpi_ir_emitter",
                 order: 212,
-                python: ["setInfraredState", "sendIRMessage"]
+                python: ["setInfraredState", "sendIRMessage", "presetIRMessage"]
             },
             {
                 id: "quickpi_potentiometer",
