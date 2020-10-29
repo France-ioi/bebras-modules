@@ -588,7 +588,7 @@ var getContext = function (display, infos, curLevel) {
          "paperTimeline",
          "timeLineGraph",
          context.timeLineGraphW,
-         context.timeLineGraphH,
+         context.timeLineGraphH
       );
 
       context.timeLineVerticeRadius = context.verticeRadius / 1.5;
