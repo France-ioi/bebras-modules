@@ -116,15 +116,6 @@ var quickAlgoContext = function(display, infos) {
     return {};
   };
 
-  context.program_end = function(callback) {
-    var curNode = context.curNode;
-    if (!context.programEnded[curNode]) {
-      context.programEnded[curNode] = true;
-      infos.checkEndCondition(context, true);
-    }
-    context.waitDelay(callback);
-  };
-
   // Properties we expect the context to have
   context.localLanguageStrings = {};
   context.customBlocks = {};
