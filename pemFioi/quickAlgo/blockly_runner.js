@@ -160,6 +160,7 @@ function initBlocklyRunner(context, messageCallback) {
          // Tells the runner that we can switch the execution to another node
          var curNode = context.curNode;
          var ready = function(readyCallback) {
+            if(!runner.isRunning()) { return; }
             if(runner.waitingOnReadyNode) {
                runner.curNode = curNode;
                runner.waitingOnReadyNode = false;
@@ -216,11 +217,12 @@ function initBlocklyRunner(context, messageCallback) {
             var ready = runner.nodesReady[newNode];
             if(ready) {
                context.setCurNode(newNode);
+               runner.nodesReady[newNode] = false;
                if(typeof ready == 'function') {
                   ready();
+               } else {
+                  runner.runSyncBlock();
                }
-               runner.nodesReady[newNode] = false;
-               runner.runSyncBlock();
             } else {
                setWaiting();
             }
@@ -303,7 +305,7 @@ function initBlocklyRunner(context, messageCallback) {
                interpreter.setProperty(scope, objectName + "_" + generator.labelEn, interpreter.createAsyncFunction(generator.fct));
             }
          }*/
-         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(createAsync(context.program_end)));
+         interpreter.setProperty(scope, "program_end", interpreter.createAsyncFunction(createAsync(runner.program_end)));
 
          function highlightBlock(id, callback) {
             id = id ? id.toString() : '';
@@ -337,6 +339,17 @@ function initBlocklyRunner(context, messageCallback) {
          // Add an API function to report a value.
          interpreter.setProperty(scope, 'reportBlockValue', interpreter.createNativeFunction(runner.reportBlockValue));
 
+      };
+
+      runner.program_end = function(callback) {
+         var curNode = context.curNode;
+         if(!context.programEnded[curNode]) {
+            context.programEnded[curNode] = true;
+            if(context.programEnded.indexOf(false) == -1) {
+               context.infos.checkEndCondition(context, true);
+            }
+         }
+         runner.noDelay(callback);
       };
 
       runner.stop = function(aboutToPlay) {
@@ -416,7 +429,8 @@ function initBlocklyRunner(context, messageCallback) {
                }
             }
 
-            if(context.programEnded[iInterpreter]) {
+            if(context.programEnded[iInterpreter] && !runner.interpreterEnded[iInterpreter]) {
+               runner.interpreterEnded[iInterpreter] = true;
                runner.startNextNode(iInterpreter);
             }
          } catch (e) {
@@ -483,6 +497,7 @@ function initBlocklyRunner(context, messageCallback) {
          runner.firstHighlight = true;
          runner.stackCount = 0;
          context.programEnded = [];
+         runner.interpreterEnded = [];
          context.curSteps = [];
          runner.reset(true);
          for (var iInterpreter = 0; iInterpreter < codes.length; iInterpreter++) {
@@ -492,6 +507,7 @@ function initBlocklyRunner(context, messageCallback) {
                lastNbMoves: 0
             };
             context.programEnded[iInterpreter] = false;
+            runner.interpreterEnded[iInterpreter] = false;
 
             interpreters.push(new Interpreter(codes[iInterpreter], runner.initInterpreter));
             runner.nodesReady.push(true);

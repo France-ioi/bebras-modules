@@ -1243,15 +1243,6 @@ var getContext = function(display, infos, curLevel) {
       context.callCallback(callback, dirNames[item.dir]);
    };
 
-   context.program_end = function(callback) {
-      var curRobot = context.curRobot;
-      if (!context.programEnded[curRobot]) {
-         context.programEnded[curRobot] = true;
-         infos.checkEndCondition(context, true);
-      }
-      context.waitDelay(callback);
-   };
-
    context.reset = function(gridInfos) {
       if (gridInfos) {
          context.tiles = gridInfos.tiles;
