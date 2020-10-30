@@ -29,6 +29,7 @@
          'interpreter': {src: modulesPath+"/ext/js-interpreter/interpreter.js", id: "interpreter"},
          'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
          'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
+         'ace_json': {src: modulesPath+"/ext/ace/mode-json.js", id: "ace_json"},
          'ace_language_tools': {src: modulesPath+"/ext/ace/ext-language_tools.js", id: "ace_language_tools"},
          'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
          'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},
@@ -161,6 +162,9 @@
          'csv_editor': {src: modulesPath+"/pemFioi/components/csv-text-editor/editor.js", id: "csv_editor"},
          'csv_editor_styles': {type: "stylesheet", src: modulesPath+"/pemFioi/components/csv-text-editor/styles.css", id: "csv_editor_styles"},
          'csv_editor_task': {src: modulesPath+"/pemFioi/components/csv-text-editor/task.js", id: "csv_editor_task"},
+
+         // json text editor
+         'json-text-editor': {src: modulesPath+"/pemFioi/components/json-text-editor/editor.js", id: "json-text-editor"},
 
          // Bundles
          'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
