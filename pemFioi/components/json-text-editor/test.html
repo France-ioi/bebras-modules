@@ -5,15 +5,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>JSON text editor test</title>
-        <!--
-        <link href="editor.css" rel="stylesheet">
-        -->
-        
-       
-            <script src="jsonlint.js"></script>
-       <!--
-        <script src="clarinet.js"></script>
-        -->
+        <script src="../../../ext/ace/ace.js"></script>
+        <script src="../../../ext/ace/mode-json.js"></script>
+        <script src="../../../ext/ace/ext-language_tools.js"></script>
         <script src="editor.js"></script>
         <style>
             html, 
@@ -24,48 +18,50 @@
                 width: 100%;
                 height: 100%;
             }            
-            .column {
-                float: left;
+            .column1 {
+                position: absolute;
+                left: 0;
+                top: 0;
                 width: 50%;
-
+                height: 100%;
             }
-            .row:after {
-                content: "";
-                display: table;
-                clear: both;
+            .column2 {
+                position: absolute;
+                left: 50%;
+                top: 0;
+                width: 50%;
+                height: 100%;
             }
-            #error {
-                margin: 0 0 10px 10px;
-                width: 90%;
-                height: 100px;
-            }            
+            #editor {
+                width: 100%;
+                height: 100%;
+            }
             #output {
-                margin: 0 0 10px 10px;
-                width: 90%;
-                height: 500px;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+                border: 0;
             }
         </style>        
     </head>
     <body>
-        <div class="row">
-            <div class="column" id="editor"></div>
-            <div class="column">
-                <textarea id="error"></textarea>
-                <textarea id="output"></textarea>                        
-            </div>
+        <div class="column1">
+            <div id="editor"></div>
+        </div>
+        <div class="column2">
+            <textarea id="output"></textarea>                        
         </div>
         <script type="text/javascript">
             var elements = {
                 output: document.getElementById('output'),
-                error: document.getElementById('error'),
                 editor: document.getElementById('editor'),
             }
             var editor = JSONTextEditor({
                 parent: elements.editor,
                 height: 500,
-                onChange: function(obj, error) {
+                onChange: function(obj) {
                     elements.output.value = JSON.stringify(obj, null, 2);
-                    elements.error.value = error ? error.message : '';
                 }
             });
 
