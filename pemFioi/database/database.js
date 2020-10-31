@@ -36,7 +36,10 @@ function DatabaseHelper(options) {
         margin_x:40,
         margin_y:40,
         graph_width:360,
-        graph_height:360
+        graph_height:360,
+
+        // histogram renderer
+        histogram_height: '300px'
     }
 
     var options = Object.assign(defaults, options || {})
@@ -48,6 +51,7 @@ function DatabaseHelper(options) {
             graph: new TableRendererGraph(options),
             graphDouble: new TableRendererGraphDouble(options),
             console: new ConsoleRenderer(options),
+            histogram: new HistogramRenderer(options),
         }
     }
 
@@ -62,6 +66,7 @@ function DatabaseHelper(options) {
         db_renderers.graph.hide();
         db_renderers.graphDouble.hide();
         db_renderers.console.hide();
+        db_renderers.histogram.hide();
     };
 
     this.listToTable = function(list) {
@@ -122,6 +127,17 @@ function DatabaseHelper(options) {
         this.hide(display);
         db_renderers.console.print(variable, display);
     };
+
+
+    this.initHistogram = function(records_amount, max_value, display) {
+        this.hide(display);
+        db_renderers.histogram.init(records_amount, max_value, display);
+    }
+
+    this.setHistogramBar = function(record_idx, label, value, display) {
+        this.hide(display);
+        db_renderers.histogram.setBar(record_idx, label, value, display);
+    }    
 
     this.validateResultByTable = function(reference_table) {
         //this.hide();
@@ -371,17 +387,22 @@ function TableRendererMap(options) {
 
         function ImageLoader(src, onLoad) {
             var loaded = false;
-            var img = new Image();
-            img.src = src;
-            img.onload = function() {
-                loaded = true;
-                onLoad && onLoad();
-            }
-            img.onerror = function() {
-                console.error('Error loading image: ' + src);
-            }
+            var img;
             this.get = function() {
                 return loaded ? img : null;
+            }            
+            if(src) {
+                var img = new Image();
+                img.src = src;
+                img.onload = function() {
+                    loaded = true;
+                    onLoad && onLoad();
+                }
+                img.onerror = function() {
+                    console.error('Error loading image: ' + src);
+                }
+            } else {
+                onLoad && onLoad();   
             }
         }
 
@@ -409,11 +430,10 @@ function TableRendererMap(options) {
 
 
         this.clear = function() {
-            var img = images.map.get();
-            if(img) {
-                context2d.drawImage(img, 0, 0, size.width, size.height)
-
-            } else {
+            if(images) {
+                var img = images.map.get();
+                img && context2d.drawImage(img, 0, 0, size.width, size.height)
+            } else if(context2d) {
                 context2d.fillStyle = rgba(options.background_color, 1);
                 context2d.fillRect(0, 0, size.width, size.height)
             }
@@ -891,6 +911,157 @@ function ConsoleRenderer(options) {
 
 }
 
+
+function HistogramRenderer(options) {
+
+    var max = 0;
+
+    var container = $('<div class="histogram"/>');
+    container.hide();
+    options.parent.append(container);
+
+    var chart;
+
+    function initChart() {
+        var canvas = $('<canvas/>');
+        canvas.width('100%');
+        canvas.height(options.histogram_height);
+        container.append(canvas);    
+
+        var chart_initial_data = {
+            labels: [],
+            datasets: [
+                {
+                    fillColor: "#79D1CF",
+                    strokeColor: "#79D1CF",
+                    data: []
+                }
+            ]
+        };
+
+
+        var animationEndHandler = function() {
+            var ctx = this.chart.ctx;
+            ctx.font = Chart.helpers.fontString(
+                Chart.defaults.global.defaultFontFamily, 
+                'normal', 
+                Chart.defaults.global.defaultFontFamily
+            );
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+
+
+            this.data.datasets.forEach(function (dataset) {
+                var key = Object.keys(dataset._meta)[0];
+                var meta_data = dataset._meta[key].data;                            
+                for (var i = 0; i<dataset.data.length; i++) {
+                    var model = meta_data[i]._model,
+                        scale_max = meta_data[i]._yScale.maxHeight;
+                        left = meta_data[i]._xScale.left;
+                        offset = meta_data[i]._xScale.longestLabelWidth;
+                    ctx.fillStyle = '#444';
+                    var y_pos = model.y - 5;
+                    var label = model.label;
+                    // Make sure data value does not get overflown and hidden
+                    // when the bar's value is too close to max value of scale
+                    // Note: The y value is reverse, it counts from top down
+                    if ((scale_max - model.y) / scale_max >= 0.93) {
+                        y_pos = model.y + 20; 
+                    }
+                    // ctx.fillText(dataset.data[i], model.x, y_pos);
+                    ctx.fillText(label, left + 10, model.y + 8);
+                }
+            });               
+        }                        
+
+        var chart_options = {
+            responsive: true,
+            events: false,
+            showTooltips: false,
+            legend: {
+                display: false
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        display: false
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 1
+                    }                        
+                }]
+            },                    
+            animation: {
+                duration: 500,
+                easing: "easeOutQuart",
+                onComplete: animationEndHandler
+            }
+        }
+
+        chart = new Chart(
+            canvas[0].getContext('2d'), 
+            {
+                type: 'horizontalBar',
+                data: chart_initial_data,
+                options: chart_options
+            }
+        );
+    }
+
+    if('Chart' in window) {
+        initChart();
+    }        
+
+    function render() {
+        container.show();
+        chart.update();        
+    }
+    
+    this.clear = function() {
+        container.html("");
+    };
+    this.hide = function() {
+        container.hide();
+    };
+
+    this.init = function(records_amount, max_value, display) {
+        if(!chart) {
+            return console.error('Chart.js lib not loaded.')
+        }        
+        max = max_value;
+        chart.options.scales.xAxes[0].ticks.max = max;
+        var values = [];
+        var labels = [];
+        for(var i=0; i<records_amount; i++) {
+            values[i] = 0;
+            labels[i] = '';
+        }
+        chart.data.datasets[0].data = values;
+        chart.data.labels = labels;
+        display && render();
+    }
+
+    this.setBar = function(record_idx, label, value, display) {
+        if(!chart) {
+            return console.error('Chart.js lib not loaded.')
+        }
+        value = Math.min(value, max);
+        chart.data.datasets[0].data[record_idx] = value;
+        chart.data.labels[record_idx] = label;
+        display && render();
+    }
+
+
+    this.destroy = function() {
+        chart && chart.destroy();
+        container.remove();
+    }
+
+}
+    
 
 
 if(typeof(Number.prototype.toRad) === "undefined") {

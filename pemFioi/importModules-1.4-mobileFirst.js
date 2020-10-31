@@ -49,6 +49,8 @@
          'graph-mouse-1.0': {src: modulesPath+"/pemFioi/graph-mouse-1.0.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.0.js"},
          'graph-mouse-1.1': {src: modulesPath+"/pemFioi/graph-mouse-1.1.js", id: "http://www.france-ioi.org/modules/pemFioi/graph-mouse-1.1.js"},
          'papaparse': {src: modulesPath+"/ext/PapaParse/papaparse.js", id: "papaparse.js"}, // csv parser
+         'chartjs': {src: modulesPath+"/ext/chartjs/Chart.min.js", id: "Chart.js"},
+         'chartjs_styles': {type: "stylesheet", src: modulesPath+"/ext/chartjs/Chart.min.css", id: "Chart.css"},
 
          'showdown': {src: modulesPath+"/ext/showdown/showdown.min.js", id: "showdown"},
          'showdownConvert': {src: modulesPath+"/pemFioi/showdownConvert.js", id: "showdownConvert"},

@@ -3,7 +3,8 @@ var getContext = function(display, infos, curLevel) {
     var language_strings = {
         en: {
             categories: {
-                database: 'Database'
+                database: 'Database',
+                histogram: 'Histograms'
             },
             label: {
                 loadTable: 'loadTable(%1)',
@@ -26,7 +27,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap(%1, %2, %3, %4)',
                 printConsole: 'printConsole(%1)',
                 displayTableOnGraph: 'displayTableOnGraph(%1, %2, %3, %4, %5)',
-                displayTablesOnGraph: 'displayTablesOnGraph(%1, %2, %3, %4, %5, %6, %7)'
+                displayTablesOnGraph: 'displayTablesOnGraph(%1, %2, %3, %4, %5, %6, %7)',
+                initHistogram: 'initHistogram(%1, %2)',
+                setHistogramBar: 'setHistogramBar(%1, %2, %3)'
             },
             code: {
                 loadTable: 'loadTable',
@@ -49,7 +52,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap',
                 printConsole: 'printConsole',
                 displayTableOnGraph: 'displayTableOnGraph',
-                displayTablesOnGraph: 'displayTablesOnGraph'
+                displayTablesOnGraph: 'displayTablesOnGraph',
+                initHistogram: 'initHistogram',
+                setHistogramBar: 'setHistogramBar'
             },
             description: {
                 loadTable: 'EN text text %loadTable(...) text %loadTable loadTable',
@@ -72,7 +77,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap()',
                 printConsole: 'printConsole()',
                 displayTableOnGraph: 'displayTableOnGraph()',
-                displayTablesOnGraph: 'displayTablesOnGraph()'
+                displayTablesOnGraph: 'displayTablesOnGraph()',
+                initHistogram: 'initHistogram()',
+                setHistogramBar: 'setHistogramBar()'                
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -111,7 +118,8 @@ var getContext = function(display, infos, curLevel) {
         },
         fr: {
             categories: {
-                database: 'Base de données'
+                database: 'Base de données',
+                histogram: 'Histograms'
             },
             label: {
                 loadTable: 'charger la table(%1)',
@@ -134,7 +142,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'visualiser la table sur une carte(%1, %2, %3, %4)',
                 printConsole: 'afficher dans la console(%1)',
                 displayTableOnGraph: 'visualiser la table sur un graphe(%1, %2, %3, %4, %5)',
-                displayTablesOnGraph: 'visualiser les tables sur un graphe(%1, %2, %3, %4, %5, %6, %7)'
+                displayTablesOnGraph: 'visualiser les tables sur un graphe(%1, %2, %3, %4, %5, %6, %7)',
+                initHistogram: 'initHistogram(%1, %2)',
+                setHistogramBar: 'setHistogramBar(%1, %2, %3)'                
             },
             code: {
                 loadTable: 'loadTable',
@@ -157,7 +167,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: 'displayTableOnMap',
                 printConsole: 'printConsole',
                 displayTableOnGraph: 'displayTableOnGraph',
-                displayTablesOnGraph: 'displayTablesOnGraph'
+                displayTablesOnGraph: 'displayTablesOnGraph',
+                initHistogram: 'initHistogram',
+                setHistogramBar: 'setHistogramBar'                
             },
             description: {
                 loadTable: '%loadTable(tableName) : renvoie la table dont le nom est passé en paramètre sous forme de chaîne de caractères.',
@@ -180,7 +192,9 @@ var getContext = function(display, infos, curLevel) {
                 displayTableOnMap: '%displayTableOnMap(table,nameColumn,longitudeColumn,latitudeColumn) : permet de visualiser les éléments de la colonne passée en deuxième paramètre sur une carte.',
                 printConsole: '%printConsole()',
                 displayTableOnGraph: '%displayTableOnGraph()',
-                displayTablesOnGraph: '%displayTablesOnGraph()'
+                displayTablesOnGraph: '%displayTablesOnGraph()',
+                initHistogram: '%initHistogram()',
+                setHistogramBar: '%setHistogramBar()'                
             },
             startingBlockName: "Programme",
             constantLabel: {
@@ -391,6 +405,11 @@ var getContext = function(display, infos, curLevel) {
         throw new Error(strings.messages[status]);
     }
 
+    context.expectHistogram = function(data) {
+        context.success = true;
+        throw strings.messages.success;
+    }
+
 
     var tables_cache = [null];
     function saveTable(table) {
@@ -597,6 +616,18 @@ var getContext = function(display, infos, curLevel) {
             );
             context.waitDelay(callback);
         },
+
+
+        // Histogram
+        initHistogram: function(records_amount, max_value, callback) {
+            db_helper.initHistogram(records_amount, max_value, context.display);            
+            context.waitDelay(callback);
+        },
+
+        setHistogramBar: function(record_idx, label, value, callback) {
+            db_helper.setHistogramBar(record_idx, label, value, context.display);            
+            context.waitDelay(callback);
+        }
     }
 
 
@@ -704,6 +735,16 @@ var getContext = function(display, infos, curLevel) {
                     params: ['String'],
                     params_names: ['text'],
                 },
+            ],
+            histogram: [
+                { name: 'initHistogram',
+                    params: ['Number', 'Number'],
+                    params_names: ['records_amount', 'max_value'],
+                },
+                { name: 'setHistogramBar',
+                    params: ['Number', 'String', 'Number'],
+                    params_names: ['record_idx', 'label', 'value'],
+                }
             ]
         }
     }
