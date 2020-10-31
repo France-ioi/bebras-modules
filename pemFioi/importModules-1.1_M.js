@@ -150,10 +150,6 @@ var importableModules = function () {
       'machines-slritem': {src: modulesPath+"/ext/machines/js/slritem.js", id: "machines-slritem"},
       'machines-underscore': {src: modulesPath+"/ext/machines/js/underscore.js", id: "machines-underscore"},
 
-      // json text editor
-      'json-text-editor': {src: modulesPath+"/pemFioi/components/json-text-editor/editor.js", id: "json-text-editor"},
-      'jsonlint': {src: modulesPath+"/pemFioi/components/json-text-editor/jsonlint.js", id: "jsonlint"},      
-
       // Bundles
       'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
       'bebras-interface': {src: modulesPath+"bundles/bebras-interface.js", id: "bundle-bebras-interface"},
