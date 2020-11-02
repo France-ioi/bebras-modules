@@ -26,7 +26,7 @@ function Automata(settings) {
 
    this.circleAttr = settings.circleAttr;
    this.edgeAttr = settings.edgeAttr;
-   this.graphDrawer = settings.graphDrawer || new SimpleGraphDrawer(this.circleAttr,this.edgeAttr,null,true);
+   this.graphDrawer = settings.graphDrawer || (this.circleAttr && this.edgeAttr && new SimpleGraphDrawer(this.circleAttr,this.edgeAttr,null,true)) || null;
 
    this.startID = [];
    this.endID = [];
@@ -857,3 +857,126 @@ function Automata(settings) {
       this.setEnabled(true);
    }
 };
+
+
+function AutomataTask(subTask, loadLevel, loadAnswer, saveAnswer, initPaper, getAutomataSettings) {
+   // Implements all common functions to automata tasks
+   var answer = null;
+   var containers = [];
+
+   subTask.loadLevel = function(curLevel) {
+      $('#displayHelper_graderMessage').appendTo('#feedback');
+      loadLevel(curLevel);
+      subTask.reset();
+   };
+
+   subTask.getStateObject = function() {
+      return {};
+   };
+
+   subTask.getDefaultAnswerObject = function() {
+      return null;
+   };
+
+   subTask.getAnswerObject = function() {
+      answer = saveAnswer();
+      return answer;
+   };
+
+   subTask.reloadAnswerObject = function(answerObj) {
+      answer = answerObj;
+      if(answer) {
+         loadAnswer(answer);
+         subTask.reset();
+      }
+   };
+
+   subTask.getGrade = function(callback) {
+      var res = subTask.automata.validate(answer);
+      if(res.error){
+         callback({successRate: 0, message: res.error});
+      } else {
+         callback({successRate: 1, message: taskStrings.success});
+      }
+   };
+
+   subTask.reset = function() {
+      if(subTask.automata) {
+         subTask.automata.stopAnimation();
+         subTask.automata.setEnabled(false);
+      }
+      subTask.raphaelFactory.destroyAll();
+      $('.automata-container' + getSuffix()).remove();
+      subTask.resetDisplay();
+
+      initPaper();
+      initAutomata();
+   };
+
+   if(!subTask.resetDisplay) {
+      subTask.resetDisplay = function() {
+      };
+   }
+
+   function resetCallback() {
+      $("#feedback").empty();
+   };
+
+   subTask.unloadLevel = function(callback) {
+      if(subTask.automata){
+         subTask.automata.stopAnimation();
+         subTask.automata.setEnabled(false);
+      }
+      resetCallback();
+      callback();
+   };
+
+   function getSuffix() {
+      return subTask.display ? '-inner' : '-nodisplay';
+   };
+
+   subTask.raphael = function() {
+      var args = Array.prototype.slice.call(arguments);
+      var base = args[1];
+      var suffix = getSuffix();
+      args[0] += suffix;
+      args[1] += suffix;
+      if(!$('#' + args[1]).length) {
+         $('#' + base).append(
+            '<div id="' + args[1] + '"'
+            + ' class="automata-container' + suffix + '"'
+            + (subTask.display ? '' : ' style="display: none;"')
+            + '></div>');
+      }
+      return subTask.raphaelFactory.create.apply(subTask.raphaelFactory, args);
+   };
+
+   function initAutomata() {
+      var settings = getAutomataSettings();
+      settings.subTask = subTask;
+      var cb = settings.callback;
+      settings.callback = function() {
+         saveAnswer();
+         if(cb) cb();
+      }
+      settings.resetCallback = resetCallback;
+
+      settings.graphPaperElementID += getSuffix();
+
+      subTask.automata = new Automata(settings);
+      if(typeof settings.editEnabled != 'undefined') {
+         subTask.automata.setEditEnabled(settings.editEnabled);
+      }
+   };
+
+   displayHelper.customValidate = function() {
+      answer = saveAnswer();
+      subTask.getGrade(function(res) {
+         if(res.successRate < 1) {
+            $("#feedback").text(res.message);
+         } else {
+            displayHelper.validate("stay");
+         }
+      });
+   };
+}
