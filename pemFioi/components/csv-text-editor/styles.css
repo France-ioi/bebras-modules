@@ -3,14 +3,17 @@
     font-weight: bold;
 }
 
+.csv-text-editor .mistake {
+    background: #900; 
+}
+
 .csv-text-editor .editor {
     border: 1px solid #333;
     padding: 3px;
 }
 
-.csv-text-editor .mistake {
-    background: #900; 
-    color: #FFF;
+.csv-text-editor .editor .mistake {
+    position: absolute;
 }
 
 .csv-text-editor table {
