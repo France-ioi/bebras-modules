@@ -8841,13 +8841,44 @@ var getContext = function (display, infos, curLevel) {
         context.quickpi.getTemperatureSupportedTowns = towns;
     });
 
-    
+    // We create a cache so there is less calls to the api and we get the results of the temperature faster
+    context.quickpi.getTemperatureCache = [];
 
     context.quickpi.getTemperature = function(location, callback) {
+
+        function _updateGetTemperatureCache(cache, location, newVal) {
+            for (var i = 0; i < cache.length; i++) {
+                var curr = cache[i];
+                if (curr.location === location) {
+                    curr.lastUpdate = Date.now();
+                    curr.temperature = newVal;
+                    return;
+                }
+            }
+            cache.push({
+                location: location,
+                lastUpdate: Date.now(),
+                temperature: newVal
+            });
+        }
+
         var url = context.quickpi.getTemperatureUrl;
 
         if (!context.quickpi.getTemperatureSupportedTowns.includes(location))
             throw strings.messages.getTemperatureWrongValue.format(location);
+
+        var cache = context.quickpi.getTemperatureCache;
+        for (var i = 0; i < cache.length; i++) {
+            var curr = cache[i];
+            if (curr.location === location) {
+                // if last update was less than 10 min
+                if (((Date.now() - curr.lastUpdate) / 1000) / 60 < 10) {
+                    context.waitDelay(callback, curr.temperature);
+                    return;
+                }
+                break;
+            }
+        }
 
         var cb = context.runner.waitCallback(callback);
         $.get(url + "?q=" + location, function(data) {
@@ -8855,6 +8886,8 @@ var getContext = function (display, infos, curLevel) {
             if (data === "invalid") {
                 cb(0);
             } else {
+                _updateGetTemperatureCache(cache, location, data);
+
                 cb(data);
             }
         });
