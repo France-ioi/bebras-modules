@@ -14,7 +14,8 @@ function JSONTextEditor(params) {
     editor.getSession().setOptions({
         mode: 'ace/mode/json',
         tabSize: params.tab_size,
-        useSoftTabs: true
+        useSoftTabs: true,
+        useWorker: false
     })
     var Range = ace.require('ace/range').Range;
     var mistake_marker;
@@ -54,6 +55,26 @@ function JSONTextEditor(params) {
         if(mistake_marker) {
             editor.getSession().removeMarker(mistake_marker);
             mistake_marker = false;
+        }                
+        var content = getContent();
+        try {	
+            res = jsonlint.parse(content);        
+        } catch(e) {
+            if(!silent) {
+                var row = e.metadata.line;
+                editor.getSelection().setRange(new Range(0, 0, 0, 0)); // important string :)
+                var range = new Range(row, 0, row, 1);                
+                mistake_marker = editor.getSession().addMarker(range, 'mistake', 'fullLine');                            
+            }
+            return e.metadata;
+        }
+
+        return false;
+
+/*
+        if(mistake_marker) {
+            editor.getSession().removeMarker(mistake_marker);
+            mistake_marker = false;
         }        
         var annotations = editor.getSession().getAnnotations();
         if(!annotations.length) {
@@ -68,6 +89,7 @@ function JSONTextEditor(params) {
         return {
             msg: a.text
         }
+        */
     }
 
 
