@@ -378,6 +378,8 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
             hello: "Bonjour",
 
+            getTemperatureWrongValue: "getTemperature: {0} n'est pas une ville supportée par getTemperature",
+
             experiment: "Expérimenter",
             validate: "Valider",
             validate1: "Valider 1",
@@ -746,6 +748,8 @@ var quickPiLocalLanguageStrings = {
             noIrPresets: "Utiliza la función de preparación de mensajes IR para agregar comandos de control remoto",
             irEnableContinous: "Activar la emisión IR continua",
             irDisableContinous: "Desactivar la emisión IR continua",
+
+            getTemperatureWrongValue: "getTemperature: {0} is not a town supported by getTemperature", // TODO: translate
 
             up: "arriba",
             down: "abajo",
@@ -1181,6 +1185,8 @@ var quickPiLocalLanguageStrings = {
 
             on: "On",
             off: "Off",
+
+            getTemperatureWrongValue: "getTemperature: {0} is not a town supported by getTemperature", // TODO: translate
 
             grovehat: "Grove Base Hat for Raspberry Pi",
             quickpihat: "France IOI QuickPi Hat",
@@ -8730,7 +8736,7 @@ var getContext = function (display, infos, curLevel) {
             var cb = context.runner.waitCallback(callback);
 
             context.quickPiConnection.sendCommand(command, function(returnVal) {
-                returnVal = parseFloat(returnVal)
+                returnVal = parseFloat(returnVal);
                 cb(returnVal);
 
             });
@@ -8826,10 +8832,30 @@ var getContext = function (display, infos, curLevel) {
         context.runner.waitDelay(callback, millis);
     };
 
-    context.quickpi.getTemperature = function(location, callback) {
-        var retVal =  25;
 
-        context.waitDelay(callback, retVal);
+    // TODO: change url to the "prod" one
+    context.quickpi.getTemperatureUrl = "https://mapadev.com/nicolastest/weather.php";
+
+    // setup the supported towns
+    $.get(context.quickpi.getTemperatureUrl + "?q=" + "supportedtowns", function(towns) {
+        context.quickpi.getTemperatureSupportedTowns = towns;
+    });
+
+    context.quickpi.getTemperature = function(location, callback) {
+        var url = context.quickpi.getTemperatureUrl;
+
+        if (!context.quickpi.getTemperatureSupportedTowns.includes(location))
+            throw strings.messages.getTemperatureWrongValue.format(location);
+
+        var cb = context.runner.waitCallback(callback);
+        $.get(url + "?q=" + location, function(data) {
+            // If the server return invalid it mean that the town given is not supported
+            if (data === "invalid") {
+                cb(0);
+            } else {
+                cb(data);
+            }
+        });
     };
 
     context.initScreenDrawing = function(sensor) {
