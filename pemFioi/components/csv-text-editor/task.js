@@ -61,7 +61,7 @@ function setupCSVEditorTask(csv_editor_options) {
     
         function initEditor(callback) {
             if(csv_editor) {
-                csv_editor.setContent(answer.csv);
+                csv_editor.setContent(answer.csv.trim());
                 return callback();
             } 
 
