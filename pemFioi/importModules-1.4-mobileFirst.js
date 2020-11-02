@@ -169,6 +169,7 @@
 
          // json text editor
          'json-text-editor': {src: modulesPath+"/pemFioi/components/json-text-editor/editor.js", id: "json-text-editor"},
+         'json-text-editor-jsonlint': {src: modulesPath+"/pemFioi/components/json-text-editor/jsonlint.js", id: "json-text-editor-jsonlint"},
 
          // Bundles
          'bebras-base': {src: modulesPath+"bundles/bebras-base.js", id: "bundle-bebras-base"},
