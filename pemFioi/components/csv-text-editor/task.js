@@ -42,7 +42,7 @@ function setupCSVEditorTask(csv_editor_options) {
     
         subTask.getDefaultAnswerObject = function() {
             var defaultAnswer = { 
-                csv: 'aaa,""bbb",ccc\n"ddd,ddd",eee,2'
+                csv: ''
             };
             return defaultAnswer;
         };
