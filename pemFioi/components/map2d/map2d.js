@@ -47,6 +47,7 @@ function Map2D(params) {
     params = Object.assign({}, defaults, params);
     
     if(params.figures && params.simple_mode) {
+        params.figures = Object.assign({}, params.figures);
         params.figures = converter.expand(params.figures);
         params.tags = [''];
     }
@@ -1009,7 +1010,6 @@ function Map2D(params) {
         var context2d = canvas.getContext('2d');
         var color = '#FF0000';
 
-
         function drawPoint(point, size) {
             context2d.beginPath();                
             context2d.arc(point.x, point.y, size, 0, 2 * Math.PI);
@@ -1374,8 +1374,9 @@ function Map2D(params) {
         diff: function(target, silent) {
             editor && editor.refresh();
             if(params.simple_mode) {
+                target = Object.assign({}, target);
                 target.figures = converter.expand(target.figures);
-            }            
+            }   
             return diff(image, target, silent);
         },
 
