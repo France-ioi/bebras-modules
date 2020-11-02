@@ -8841,6 +8841,8 @@ var getContext = function (display, infos, curLevel) {
         context.quickpi.getTemperatureSupportedTowns = towns;
     });
 
+    
+
     context.quickpi.getTemperature = function(location, callback) {
         var url = context.quickpi.getTemperatureUrl;
 
