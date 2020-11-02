@@ -30,6 +30,7 @@
          'ace': {src: modulesPath+"/ext/ace/ace.js", id: "ace"},
          'ace_python': {src: modulesPath+"/ext/ace/mode-python.js", id: "ace_python"},
          'ace_json': {src: modulesPath+"/ext/ace/mode-json.js", id: "ace_json"},
+         'ace_plain_text': {src: modulesPath+"/ext/ace/mode-plain_text.js", id: "ace_plain_text"},
          'ace_language_tools': {src: modulesPath+"/ext/ace/ext-language_tools.js", id: "ace_language_tools"},
          'processing-1.4.8': {src: modulesPath+"/ext/processing/1.4.8/processing.min.js", id: "https://raw.github.com/processing-js/processing-js/v1.4.8/processing.min.js"},
          'save-svg-as-png': {src: modulesPath+"/ext/save-svg-as-png/saveSvgAsPng.js", id: "save-svg-as-png"},

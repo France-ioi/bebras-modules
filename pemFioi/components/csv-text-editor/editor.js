@@ -8,7 +8,10 @@ function CSVTextEditor(params) {
 
     var defaults = {
         width: '100%',
-        min_height: '100px',
+        height: '200px',
+        tab_size: 4,
+        font_size: 16,
+        validation_interval: 200,        
         csv_separator: ',',
         content: null,
         labels: {},
@@ -49,113 +52,49 @@ function CSVTextEditor(params) {
     }    
 
 
-    // editor element    
+    // ace editor 
     addLabel('editor');
-    var editor = $('<pre class="editor"/>')
-        .attr('contentEditable', true)
-        .attr('spellcheck', false);
-    params.width && editor.css('width', params.width)
-    params.min_height && editor.css('min-height', params.min_height)
-    wrapper.append(editor);
+    var editor_wrapper = $('<div class="editor"/>').css('width', params.width).css('height', params.height);
+    wrapper.append(editor_wrapper);
+
+    var editor = ace.edit(editor_wrapper[0]);
+    editor.$blockScrolling = Infinity;
+    editor.setFontSize(params.font_size);
+    editor.getSession().setOptions({
+        mode: 'ace/mode/plain_text',
+        tabSize: params.tab_size,
+        useSoftTabs: true
+    })
+    var Range = ace.require('ace/range').Range;
+    var mistake_marker;
+
+    var on_change_timeout;
+    editor.getSession().on('change', function(e) {
+        clearTimeout(on_change_timeout);
+        on_change_timeout = setTimeout(
+            handleOnChange, 
+            params.validation_interval
+        );
+    });
+
+
+    function handleOnChange() {
+        params.onChange && params.onChange(
+            getContent()
+        );
+    }    
+
     
-
-
-    // sys 
-    function stripTags(text) {
-        text = text.replace(/<br>/gi, '\n');
-        text = text.replace(/(<([^>]+)>)/gi, '');        
-        return text;
-    }
-
-
-    // events
-    function enterKeyPressHandler(event) {
-        var sel, range, br, added = false;
-        event = event ? event.originalEvent : window.event;
-        var charCode = event.which || event.keyCode;
-        if(charCode != 13) {
-            return;
-        }
-        if(typeof window.getSelection != 'undefined') {
-            sel = window.getSelection();
-            if(sel.getRangeAt && sel.rangeCount) {
-                range = sel.getRangeAt(0);
-                range.deleteContents();
-                br = document.createTextNode('\n');
-                range.insertNode(br);
-                range.setEndAfter(br);
-                range.setStartAfter(br);                   
-                sel.removeAllRanges();
-                sel.addRange(range);
-                added = true;
-            }
-        } else if(typeof document.selection != 'undefined') {
-            sel = document.selection;
-            if (sel.createRange) {
-                range = sel.createRange();
-                range.pasteHTML('\n');
-                range.select();
-                added = true;
-            }
-        }
-
-        if(added) {
-            handleOnChange();
-            if(typeof event.preventDefault != 'undefined') {
-                event.preventDefault();
-            } else {
-                event.returnValue = false;
-            }
-        }
-    }
-    editor.on('keypress', enterKeyPressHandler)
-
-    function focusHandler(event) {
-        editor.text(stripTags(editor.text()));
-    }
-    editor.on('focus', focusHandler)
-
-
-    function pasteHandler(event) {
-        event = event ? event.originalEvent : window.event;
-        var paste = (event.clipboardData || window.clipboardData).getData('text');
-        paste = stripTags(paste);
-        if(typeof window.getSelection != 'undefined') {
-            var sel = window.getSelection();
-            if(!sel.rangeCount) {
-                return false;
-            }
-            sel.deleteFromDocument();
-            sel.getRangeAt(0).insertNode(document.createTextNode(paste));
-            sel.removeAllRanges();
-        } else if(typeof document.selection != 'undefined') {
-            var sel = document.selection;
-            if (sel.createRange) {
-                range = sel.createRange();
-                range.pasteHTML(paste);
-                range.select();
-            }
-        }
-        event.preventDefault();
-        handleOnChange();
-    }
-    editor.on('paste', pasteHandler);
-
-
-    function inputHandler(event) {
-        handleOnChange();
-    }
-    editor.on('input', inputHandler);    
 
 
     // content
 
     function getContent() {
-        return stripTags(editor.text());
+        return editor.getValue();
     }
 
     function setContent(content) {
-        editor.text(stripTags(content));
+        editor.setValue(content);
     }
 
 
@@ -236,7 +175,12 @@ function CSVTextEditor(params) {
 
 
     function parseEditorContent(silent) {
-        var content = getContent();
+        if(!silent && mistake_marker) {
+            editor.getSession().removeMarker(mistake_marker);
+            mistake_marker = false;
+        }
+
+        var content = getContent(); // .trim(); //TODO
         var d = Papa.parse(content, {
             delimiter: params.csv_separator
         });
@@ -246,10 +190,9 @@ function CSVTextEditor(params) {
                 tag: err.code
             }
             if(!silent) {
-                var lines = content.split('\n');
-                lines[err.row] = '<span class="mistake">' + lines[err.row] + '</span>';
-                content = lines.join('\n');
-                editor.html(content);
+                editor.getSelection().setRange(new Range(0, 0, 0, 0)); // important string :)
+                var range = new Range(err.row, err.index, err.row, err.index + 1);                
+                mistake_marker = editor.getSession().addMarker(range, 'mistake', 'text');
             }
             return null;
         }
@@ -280,6 +223,8 @@ function CSVTextEditor(params) {
             return mistake;
         },
         destroy: function() {
+            clearTimeout(on_change_timeout);
+            editor.destroy();
             wrapper.remove();
         }
     }

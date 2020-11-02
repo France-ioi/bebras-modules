@@ -30,7 +30,7 @@ function setupCSVEditorTask(csv_editor_options) {
         };
     
         subTask.resetDisplay = function() {
-            csv_editor && csv_editor.destroy();
+            //csv_editor && csv_editor.destroy();
             initEditor(function() {
                 displayHelper.customValidate = checkResult;    
             })
@@ -42,7 +42,7 @@ function setupCSVEditorTask(csv_editor_options) {
     
         subTask.getDefaultAnswerObject = function() {
             var defaultAnswer = { 
-                csv: ''
+                csv: 'aaa,""bbb",ccc\n"ddd,ddd",eee,2'
             };
             return defaultAnswer;
         };
