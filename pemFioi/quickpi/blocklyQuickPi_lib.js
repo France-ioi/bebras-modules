@@ -190,7 +190,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) retourne la distance mesurée",
             readLightIntensity: "readLightIntensity(lightSensor) retourne l'intensité lumineuse",
             readHumidity: "readHumidity(hygrometer) retourne l'humidité ambiante",
-            currentTime: "currentTime(milliseconds) temps en millisecondes depuis le début du programme",
+            currentTime: "currentTime() temps en millisecondes depuis le début du programme",
 
             setLedBrightness: "setLedBrightness(led, brightness) règle l'intensité lumineuse de la LED",
             getLedBrightness: "getLedBrightness(led) retourne l'intensité lumineuse de la LED",
@@ -211,47 +211,47 @@ var quickPiLocalLanguageStrings = {
 
             getTemperature: "getTemperature(thermometer) ",
 
-            drawPoint: "drawPoint(x, y)",
-            isPointSet: "isPointSet(x, y)",
-            drawLine: "drawLine(x0, y0, x1, y1)",
+            drawPoint: "drawPoint(x, y) dessine un point de un pixel aux coordonnées données",
+            isPointSet: "isPointSet(x, y) retourne True si le point aux coordonées x, y est actif",
+            drawLine: "drawLine(x0, y0, x1, y1) dessine un segment commençant en x0, y0 jusqu'à x1, y1",
             drawRectangle: "drawRectangle(x0, y0, width, height) dessine un rectangle, de coin haut gauche (x0,y0)",
-            drawCircle: "drawCircle(x0, y0, diameter)",
+            drawCircle: "drawCircle(x0, y0, diameter) dessine un cercle de centre x0, y0 et de diamètre donné",
             clearScreen: "clearScreen() efface le contenu de l'écran",
-            updateScreen: "updateScreen()",
-            autoUpdate: "autoUpdate(auto)",
+            updateScreen: "updateScreen() mettre à jour l'écran",
+            autoUpdate: "autoUpdate(auto) change le mode d'actualisation de l'écran",
 
-            fill: "fill(color)",
-            noFill: "noFill()",
-            stroke: "stroke(color)",
-            noStroke: "noStroke()",
-
-
-            readAcceleration: "readAcceleration(axis)",
-            computeRotation: "computeRotation()",
-
-            readSoundLevel: "readSoundLevel(port)",
+            fill: "fill(color) Remplir les formes avec la couleur donnée",
+            noFill: "noFill() Ne pas remplir les formes",
+            stroke: "stroke(color) dessiner les bords des figures avec la couleur donnée",
+            noStroke: "noStroke() ne pas dessiner les bordures des figures",
 
 
-            readMagneticForce: "readMagneticForce(axis)",
-            computeCompassHeading: "computeCompassHeading()",
+            readAcceleration: "readAcceleration(axis) lit l'accélération en m/s² sur l'axe (X, Y ou Z)",
+            computeRotation: "computeRotation(axis) calcule l'angle de rotation en degrés sur l'accéléromètre",
+
+            readSoundLevel: "readSoundLevel(port) retourne le volume ambiant",
+
+
+            readMagneticForce: "readMagneticForce(axis) retourne le champ magnétique (µT) sur l'axe (X, Y ou Z)",
+            computeCompassHeading: "computeCompassHeading() retourne la direction de la boussole en degrés",
 
             readInfraredState: "readInfraredState(IRReceiver) retourne True si un signal infra-rouge est détecté, False sinon",
             setInfraredState: "setInfraredState(IREmitter, state) modifie l'état de l'émetteur : True pour l'allumer, False pour l'éteindre",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity()",
-            setGyroZeroAngle: "setGyroZeroAngle()",
-            computeRotationGyro: "computeRotationGyro()",
+            readAngularVelocity: "readAngularVelocity(axis) retourne la vitesse engulairee (°/s) du gyroscope",
+            setGyroZeroAngle: "setGyroZeroAngle() initialize le gyroscope à l'état 0",
+            computeRotationGyro: "computeRotationGyro(axis) calcule la rotation du gyroscope en degrés",
 
             //Internet store
-            connectToCloudStore: "connectToCloudStore(identifier, password)",
-            writeToCloudStore: "writeToCloudStore(identifier, key, value)",
-            readFromCloudStore: "readFromCloudStore(identifier, key)",
+            connectToCloudStore: "connectToCloudStore(identifier, password) se connecter au cloud avec le nom d'utilisateur et le mot de passe donnés",
+            writeToCloudStore: "writeToCloudStore(identifier, key, value) écrire une valeur sur une clé dans le cloud",
+            readFromCloudStore: "readFromCloudStore(identifier, key) retourne la valeur lue dans le cloud de la clé donnée",
 
             // IR Remote
-            readIRMessage: "readIRMessage(irrec, timeout)",
-            sendIRMessage: "sendIRMessage(irtrans, name)",
-            presetIRMessage: "presetIRMessage(name, data)",
+            readIRMessage: "readIRMessage(irrec, timeout) attends un message infrarouge pendant le temps donné en millisecondes et le renvois",
+            sendIRMessage: "sendIRMessage(irtrans, name) envoi un message infrarouge précédement configurer avec le nom donné",
+            presetIRMessage: "presetIRMessage(name, data) configure un message infrarouge de nom name et de donné data",
         },
         constant: {
         },
@@ -426,6 +426,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_ir_receiver: 'Récepteur infrarouge',
             quickpi_ir_emitter: 'Émetteur infrarouge',
             quickpi_potentiometer: "Potentiomètre",
+            quickpi_gyroscope: "Gyroscope",
             quickpi_cloud: 'Stockage dans le cloud'
         }
     },
@@ -619,7 +620,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) devuelve la distancia medida",
             readLightIntensity: "readLightIntensity(lightSensor) devuelve la intensidad de la luz",
             readHumidity: "readHumidity(hygrometer) devuelve la humedad ambiental",
-            currentTime: "currentTime(milliseconds) tiempo en milisegundos desde el inicio del programa",
+            currentTime: "currentTime() tiempo en milisegundos desde el inicio del programa",
 
             setLedBrightness: "setLedBrightness(led, brightness) ajusta la intensidad de la luz del LED",
             getLedBrightness: "getLedBrightness(led) devuelve la intensidad de luz del LED",
@@ -656,7 +657,7 @@ var quickPiLocalLanguageStrings = {
 
 
             readAcceleration: "readAcceleration(axis) leer la acceleración (m/s²) en el eje (X, Y o Z)",
-            computeRotation: "computeRotation() calcular el ángulo de rotación (°) en el acelerómetro",
+            computeRotation: "computeRotation(axis) calcular el ángulo de rotación (°) en el acelerómetro",
 
             readSoundLevel: "readSoundLevel(port) devuelve el volumen del sonido ambiente",
 
@@ -668,9 +669,9 @@ var quickPiLocalLanguageStrings = {
             setInfraredState: "setInfraredState(state) si se le pasa True enciende el transmisor infrarrojo, Falso lo apaga",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity() devuelve la velocidad angular (°/s) del gyroscopio",
+            readAngularVelocity: "readAngularVelocity(axis) devuelve la velocidad angular (°/s) del gyroscopio",
             setGyroZeroAngle: "setGyroZeroAngle() inicializa el giroscopio a estado cero",
-            computeRotationGyro: "computeRotationGyro() calcula la rotación del giroscopio (°)",
+            computeRotationGyro: "computeRotationGyro(axis) calcula la rotación del giroscopio (°)",
 
             //Internet store
             connectToCloudStore: "connectToCloudStore(identifier, password) se conecta a la nube con el usuario y password dados",
@@ -850,6 +851,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_ir_receiver: 'Receptor de infrarrojos', // TODO: verify
             quickpi_ir_emitter: 'Emisor de infrarrojos', // TODO: verify
             quickpi_potentiometer: "Potenciómetro", // TODO: verify
+            quickpi_gyroscope: "giroscopio", // TODO: verify
             quickpi_cloud: 'Almacenamiento en la nube'
         }
     },
@@ -1043,7 +1045,7 @@ var quickPiLocalLanguageStrings = {
             readDistance: "readDistance(distanceSensor) riporta la distanza misurata",
             readLightIntensity: "readLightIntensity(lightSensor) riporta l'intensità luminosa",
             readHumidity: "readHumidity(hygrometer) riporta l'umidità dell'ambiente",
-            currentTime: "currentTime(milliseconds) tempo in millisecondi dall'avvio del programma",
+            currentTime: "currentTime() tempo in millisecondi dall'avvio del programma",
 
             setLedBrightness: "setLedBrightness(led, brightness) regola l'intensità luminosa del LED",
             getLedBrightness: "getLedBrightness(led) riporta l'intensità luminosa del LED",
@@ -1064,47 +1066,47 @@ var quickPiLocalLanguageStrings = {
 
             getTemperature: "getTemperature(thermometer) ",
 
-            drawPoint: "drawPoint(x, y)",
-            isPointSet: "isPointSet(x, y)",
-            drawLine: "drawLine(x0, y0, x1, y1)",
+            drawPoint: "drawPoint(x, y) draw a point of 1 pixel at given coordinates", // TODO: Translate
+            isPointSet: "isPointSet(x, y) return True if the point at coordinates x, y is on", // TODO: Translate
+            drawLine: "drawLine(x0, y0, x1, y1) draw a line starting at x0, y0 to x1, y1", // TODO: Translate
             drawRectangle: "drawRectangle(x0, y0, width, height) disegna un rettangolo, con angolo in alto a sinistra (x0,y0)",
-            drawCircle: "drawCircle(x0, y0, diameter)",
+            drawCircle: "drawCircle(x0, y0, diameter) draw a circle of center x0, y0 and of given diameter", // TODO: Translate
             clearScreen: "clearScreen() cancella il contenuto della schermata",
-            updateScreen: "updateScreen()",
-            autoUpdate: "autoUpdate(auto)",
+            updateScreen: "updateScreen() update screen content", // TODO: Translate
+            autoUpdate: "autoUpdate(auto) change the screen actualisation mode", // TODO: Translate
 
-            fill: "fill(color)",
-            noFill: "noFill()",
-            stroke: "stroke(color)",
-            noStroke: "noStroke()",
-
-
-            readAcceleration: "readAcceleration(axis)",
-            computeRotation: "computeRotation()",
-
-            readSoundLevel: "readSoundLevel(port)",
+            fill: "fill(color) fill the shapes with the color given", // TODO: Translate
+            noFill: "noFill() do not fill the shapes", // TODO: Translate
+            stroke: "stroke(color) draw the borders of shapes with the color given", // TODO: Translate
+            noStroke: "noStroke() do not draw the borders of shapes", // TODO: Translate
 
 
-            readMagneticForce: "readMagneticForce(axis)",
-            computeCompassHeading: "computeCompassHeading()",
+            readAcceleration: "readAcceleration(axis) read the acceleration (m/s²) in the axis (X, Y or Z)", // TODO: Translate
+            computeRotation: "computeRotation(axis) compute the rotation angle (°) in the accelerometro", // TODO: Translate
+
+            readSoundLevel: "readSoundLevel(port) return the ambien sound", // TODO: Translate
+
+
+            readMagneticForce: "readMagneticForce(axis) return the magnetic force (µT) in the axis (X, Y ou Z)", // TODO : Translate
+            computeCompassHeading: "computeCompassHeading() return the compass direction in degres", // TODO: Translate
 
             readInfraredState: "readInfraredState(IRReceiver) riporta True se viene rilevato un segnale infrarosso, False nel caso in contrario",
             setInfraredState: "setInfraredState(IREmitter, state) modifica lo stato del trasmettitore : True per accenderlo, False per spegnerlo",
 
             // Gyroscope
-            readAngularVelocity: "readAngularVelocity()",
-            setGyroZeroAngle: "setGyroZeroAngle()",
-            computeRotationGyro: "computeRotationGyro()",
+            readAngularVelocity: "readAngularVelocity(axis) return the angular speed (°/s) of the gyroscope", // TODO: Translate
+            setGyroZeroAngle: "setGyroZeroAngle() initialize the gyroscope at the 0 state", // TODO: Translate
+            computeRotationGyro: "computeRotationGyro(axis) compute the rotations of the gyroscope in degres", // TODO: Translate
 
             //Internet store
-            connectToCloudStore: "connectToCloudStore(identifier, password)",
-            writeToCloudStore: "writeToCloudStore(identifier, key, value)",
-            readFromCloudStore: "readFromCloudStore(identifier, key)",
+            connectToCloudStore: "connectToCloudStore(identifier, password) connect to cloud store with the given username and password", // TODO: Translate
+            writeToCloudStore: "writeToCloudStore(identifier, key, value) write a value at a key to the cloud", // TODO: Translate
+            readFromCloudStore: "readFromCloudStore(identifier, key) read the value at the given key from the cloud", // TODO: Translate
 
             // IR Remote
-            readIRMessage: "readIRMessage(irrec, timeout)",
-            sendIRMessage: "sendIRMessage(irtrans, name)",
-            presetIRMessage: "presetIRMessage(name, data)",
+            readIRMessage: "readIRMessage(irrec, timeout) wait for an IR message during the given time and then return it", // TODO: Translate
+            sendIRMessage: "sendIRMessage(irtrans, name) send an IR message previously configured with the given name", // TODO: Translate
+            presetIRMessage: "presetIRMessage(name, data) configure an IR message with the given name and data" // TODO: Translate
         },
         constant: {
         },
@@ -1279,6 +1281,7 @@ var quickPiLocalLanguageStrings = {
             quickpi_ir_receiver: 'Ricevitore a infrarossi', // TODO: verify
             quickpi_ir_emitter: 'Emettitore a infrarossi', // TODO: verify
             quickpi_potentiometer: "Potenziometro", // TODO: verify
+            quickpi_gyroscope: "giroscopio", // TODO: verify
             quickpi_cloud: 'Memorizzazione nel cloud'
         }
     },
@@ -1639,7 +1642,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_button',
                 order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton']
+                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed']
             },  
             {   
                 id: 'quickpi_screen',
@@ -1650,7 +1653,7 @@ var getContext = function (display, infos, curLevel) {
                 id: 'quickpi_draw',
                 order: 203,
                 python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
-                    'stroke', 'updateScreen', 'autoUpdate', 'isPointSet']
+                    'stroke', 'noStroke','updateScreen', 'autoUpdate', 'isPointSet']
             },
             {
                 id: 'quickpi_range',
@@ -1680,12 +1683,12 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_accelerometer',
                 order: 209,
-                python: ['readAcceleration']
+                python: ['readAcceleration', 'computeRotation']
             },
             {
                 id: 'quickpi_wait',
                 order: 250,
-                python: ['sleep']
+                python: ['sleep', 'currentTime']
             },
             {
                 id: 'quickpi_magneto',
@@ -1700,12 +1703,17 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: "quickpi_ir_emitter",
                 order: 212,
-                python: ["setInfraredState", "sendIRMessage"]
+                python: ["setInfraredState", "sendIRMessage", "presetIRMessage"]
             },
             {
                 id: "quickpi_potentiometer",
                 order: 213,
                 python: ["readRotaryAngle"]
+            },
+            {
+                id: "quickpi_gyroscope",
+                order: 214,
+                python: ["readAngularVelocity", "setGyroZeroAngle", "computeRotationGyro"]
             },
             {
                 id: 'quickpi_cloud',
