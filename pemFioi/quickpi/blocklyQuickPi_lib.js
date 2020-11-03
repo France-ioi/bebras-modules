@@ -6678,7 +6678,7 @@ var getContext = function (display, infos, curLevel) {
                     cliph
             });
 
-            sensor.stateText = paper.text(state1x, state1y, sensor.state + "C");
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + " °C");
 
             if (!context.autoGrading && context.offLineMode) {
                 setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 60);
@@ -6882,7 +6882,7 @@ var getContext = function (display, infos, curLevel) {
             if (sensor.state >= 10)
                 sensor.state = Math.round(sensor.state);
 
-            sensor.stateText = paper.text(state1x, state1y, sensor.state + "cm");
+            sensor.stateText = paper.text(state1x, state1y, sensor.state + " cm");
             if (!context.autoGrading && context.offLineMode) {
                 setSlider(sensor, juststate, imgx, imgy, imgw, imgh, 0, 500);
             } else {
@@ -7003,7 +7003,7 @@ var getContext = function (display, infos, curLevel) {
 
             if (sensor.state) {
                 try {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "m/s²\nY: " + sensor.state[1] + "m/s²\nZ: " + sensor.state[2] + "m/s²");
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " m/s²\nY: " + sensor.state[1] + " m/s²\nZ: " + sensor.state[2] + " m/s²");
                 } catch (Err)
                 {
                     var a = 1;
@@ -7148,7 +7148,7 @@ var getContext = function (display, infos, curLevel) {
                 sensor.stateText.remove();
 
             if (sensor.state) {
-                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + "μT\nY: " + sensor.state[1] + "μT\nZ: " + sensor.state[2] + "μT");
+                sensor.stateText = paper.text(state1x, state1y, "X: " + sensor.state[0] + " μT\nY: " + sensor.state[1] + " μT\nZ: " + sensor.state[2] + " μT");
             }
 
             if (!context.autoGrading && context.offLineMode) {
@@ -7906,7 +7906,7 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors.splice(i, 1);
                                 }
                             }
-                            context.recreateDisplay = true
+                            context.recreateDisplay = true;
                             context.resetDisplay();
                         },
                         strings.messages.keep);
