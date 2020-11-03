@@ -1034,6 +1034,8 @@ function HistogramRenderer(options) {
         container.hide();
     };
 
+    var user_values = [];
+
     this.init = function(records_amount, max_value, display) {
         if(!chart) {
             return console.error('Chart.js lib not loaded.')
@@ -1049,6 +1051,7 @@ function HistogramRenderer(options) {
             colors[i] = options.histogram_bar_color;
         }
         chart.data.datasets[0].data = values;
+        user_values = values.slice();
         chart.data.datasets[0].backgroundColor = colors;
         chart.data.labels = labels;
         display && render();
@@ -1058,35 +1061,49 @@ function HistogramRenderer(options) {
         if(!chart) {
             return console.error('Chart.js lib not loaded.')
         }
-        value = Math.min(value, max);
-        chart.data.datasets[0].data[record_idx] = value;
+        user_values[record_idx] = value;
+        chart.data.datasets[0].data[record_idx] = Math.min(value, max);
         chart.data.labels[record_idx] = label;
         display && render();
     }
 
+
+
+
     this.validate = function(target) {
         if('max_value' in target) {
-            var max_value = chart.options.scales.xAxes[0].ticks.max;
             if(typeof target.max_value === 'object' && target.max_value !== null) {
-                if(target.max_value.min > max_value || target.max_value.max < max_value) {
-                    return 'histogram_max_value_mistake';
+                var range = target.max_value;
+            } else {
+                var range = {
+                    min: target.max_value * 2 / 3,
+                    max: target.max_value
                 }
-            } else if(max_value != target.max_value) {
-                return 'histogram_max_value_mistake';
+            }
+            var mistake = false;
+            for(var i=0; i<user_values.length; i++) {
+                if(range.min > user_values[i] || range.max < user_values[i]) {
+                    chart.data.datasets[0].backgroundColor[i] = options.histogram_mistake_color;
+                    mistake = true;
+                }
+            }
+            if(mistake) {
+                chart.update();
+                return 'incorrect_results';
             }
         }
+
         
-        var values = chart.data.datasets[0].data;
-        var labels = chart.data.labels;
+        var user_labels = chart.data.labels;
         if('labels' in target && Array.isArray(target.labels)) {
             var target_labels = target.labels;
         } else {
-            var target_labels = labels.slice();            
+            var target_labels = user_labels.slice();            
         }
         if('values' in target && Array.isArray(target.values)) {
             var target_values = target.values;
         } else {
-            var target_values = values.slice();            
+            var target_values = user_values.slice();            
         }        
 
         function validateRecord(value, label, idx) {
@@ -1102,12 +1119,12 @@ function HistogramRenderer(options) {
 
         
 
-        if(values.length !== target.values.length) {
-            return values.length < target.values.length ? 'some_results_missing' : 'incorrect_results';
+        if(user_values.length !== target.values.length) {
+            return user_values.length < target.values.length ? 'some_results_missing' : 'incorrect_results';
         }
         var mistake = false;
-        for(var i=0; i<values.length; i++) {
-            if(!validateRecord(values[i], labels[i], i)) {
+        for(var i=0; i<user_values.length; i++) {
+            if(!validateRecord(user_values[i], user_labels[i], i)) {
                 mistake = true;
                 chart.data.datasets[0].backgroundColor[i] = options.histogram_mistake_color;
             }

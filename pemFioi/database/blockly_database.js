@@ -98,8 +98,7 @@ var getContext = function(display, infos, curLevel) {
                 file_not_found: 'CSV file not found: ',
                 incorrect_results: 'Incorrect results',
                 some_results_missing: 'Some results are missing',
-                success: 'Success',
-                histogram_max_value_mistake: 'Incorrect max_value'
+                success: 'Success'
             },
             ui: {
                 'btn_diplay_table': 'Display',
@@ -215,8 +214,7 @@ var getContext = function(display, infos, curLevel) {
                 file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
                 some_results_missing: 'Il manque une partie des résultats',
-                success: 'Succès',
-                histogram_max_value_mistake: 'Incorrect max_value'
+                success: 'Succès'
             },
             ui: {
                 'btn_diplay_table': 'Visualiser',
