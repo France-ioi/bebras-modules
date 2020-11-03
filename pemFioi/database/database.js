@@ -947,7 +947,7 @@ function HistogramRenderer(options) {
         };
 
 
-        var animationEndHandler = function() {
+        var animationHandler = function() {
             var ctx = this.chart.ctx;
             ctx.font = Chart.helpers.fontString(
                 Chart.defaults.global.defaultFontFamily, 
@@ -1003,7 +1003,8 @@ function HistogramRenderer(options) {
             animation: {
                 duration: 500,
                 easing: "easeOutQuart",
-                onComplete: animationEndHandler
+                onComplete: animationHandler,
+                onProgress: animationHandler
             }
         }
 
