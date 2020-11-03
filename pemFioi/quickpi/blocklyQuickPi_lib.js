@@ -378,7 +378,7 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
             hello: "Bonjour",
 
-            getTemperatureWrongValue: "getTemperatureFromCloud: {0} n'est pas une ville supportée par getTemperatureFromCloud",
+            getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} n'est pas une ville supportée par getTemperatureFromCloud",
 
             experiment: "Expérimenter",
             validate: "Valider",
@@ -749,7 +749,7 @@ var quickPiLocalLanguageStrings = {
             irEnableContinous: "Activar la emisión IR continua",
             irDisableContinous: "Desactivar la emisión IR continua",
 
-            getTemperatureWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
+            getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
 
             up: "arriba",
             down: "abajo",
@@ -1186,7 +1186,7 @@ var quickPiLocalLanguageStrings = {
             on: "On",
             off: "Off",
 
-            getTemperatureWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
+            getTemperatureFromCloudWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
 
             grovehat: "Grove Base Hat for Raspberry Pi",
             quickpihat: "France IOI QuickPi Hat",
@@ -8865,7 +8865,7 @@ var getContext = function (display, infos, curLevel) {
         var url = context.quickpi.getTemperatureFromCloudUrl;
 
         if (!context.quickpi.getTemperatureFromCloudSupportedTowns.includes(location))
-            throw strings.messages.getTemperatureWrongValue.format(location);
+            throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
 
         var cache = context.quickpi.getTemperatureFromCloudCache;
         for (var i = 0; i < cache.length; i++) {
@@ -10183,7 +10183,7 @@ var getContext = function (display, infos, curLevel) {
                 {
                     name: "getTemperatureFromCloud", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
-                            { "type": "field_input", "name": "PARAM_0", text: "Paris, France"},
+                            { "type": "field_input", "name": "PARAM_0", text: "Paris"},
                         ]
                     },
                     blocklyXml: "<block type='getTemperatureFromCloud'>" +
