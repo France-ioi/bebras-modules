@@ -39,7 +39,9 @@ function DatabaseHelper(options) {
         graph_height:360,
 
         // histogram renderer
-        histogram_height: '300px'
+        histogram_height: '300px',
+        histogram_bar_color: '#ACF',
+        histogram_mistake_color: '#F99'
     }
 
     var options = Object.assign(defaults, options || {})
@@ -169,7 +171,6 @@ function DatabaseHelper(options) {
         return true;
     }
 
-
     function hashString(str) {
         var hash = 0, i = 0, len = str.length;
         while(i < len) {
@@ -185,11 +186,17 @@ function DatabaseHelper(options) {
     }
 
 
+    this.validateHistogram = function(data) {
+        return db_renderers.histogram.validate(data);
+    }
+
+
     this.destroy = function() {
         db_renderers.html.destroy();
         db_renderers.map.destroy();
         db_renderers.graph.destroy();
         db_renderers.console.destroy();
+        db_renderers.histogram.destroy();
         window.db_renderers = null;
     }
 
@@ -959,7 +966,6 @@ function HistogramRenderer(options) {
                         scale_max = meta_data[i]._yScale.maxHeight;
                         left = meta_data[i]._xScale.left;
                         offset = meta_data[i]._xScale.longestLabelWidth;
-                    ctx.fillStyle = '#444';
                     var y_pos = model.y - 5;
                     var label = model.label;
                     // Make sure data value does not get overflown and hidden
@@ -1035,11 +1041,14 @@ function HistogramRenderer(options) {
         chart.options.scales.xAxes[0].ticks.max = max;
         var values = [];
         var labels = [];
+        var colors = [];
         for(var i=0; i<records_amount; i++) {
             values[i] = 0;
             labels[i] = '';
+            colors[i] = options.histogram_bar_color;
         }
         chart.data.datasets[0].data = values;
+        chart.data.datasets[0].backgroundColor = colors;
         chart.data.labels = labels;
         display && render();
     }
@@ -1054,6 +1063,61 @@ function HistogramRenderer(options) {
         display && render();
     }
 
+    this.validate = function(target) {
+        if('max_value' in target) {
+            var max_value = chart.options.scales.xAxes[0].ticks.max;
+            if(typeof target.max_value === 'object' && target.max_value !== null) {
+                if(target.max_value.min > max_value || target.max_value.max < max_value) {
+                    return 'histogram_max_value_mistake';
+                }
+            } else if(max_value != target.max_value) {
+                return 'histogram_max_value_mistake';
+            }
+        }
+        
+        var values = chart.data.datasets[0].data;
+        var labels = chart.data.labels;
+        if('labels' in target && Array.isArray(target.labels)) {
+            var target_labels = target.labels;
+        } else {
+            var target_labels = labels.slice();            
+        }
+        if('values' in target && Array.isArray(target.values)) {
+            var target_values = target.values;
+        } else {
+            var target_values = values.slice();            
+        }        
+
+        function validateRecord(value, label, idx) {
+            if(target.check_order) {
+                return target_values[idx] == value && target_labels[idx] == label;
+            } else {
+                var vidx = target_values.indexOf(value);
+                var lidx = target_labels.indexOf(label);
+                //console.log(label, value, lidx, vidx)
+                return vidx === lidx && vidx !== -1 && lidx !== -1;
+            }
+        }
+
+        
+
+        if(values.length !== target.values.length) {
+            return values.length < target.values.length ? 'some_results_missing' : 'incorrect_results';
+        }
+        var mistake = false;
+        for(var i=0; i<values.length; i++) {
+            if(!validateRecord(values[i], labels[i], i)) {
+                mistake = true;
+                chart.data.datasets[0].backgroundColor[i] = options.histogram_mistake_color;
+            }
+        }
+        if(mistake) {
+            chart.update();
+            return 'incorrect_results';
+        }
+
+        return true;
+    }
 
     this.destroy = function() {
         chart && chart.destroy();

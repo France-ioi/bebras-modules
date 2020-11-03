@@ -98,7 +98,8 @@ var getContext = function(display, infos, curLevel) {
                 file_not_found: 'CSV file not found: ',
                 incorrect_results: 'Incorrect results',
                 some_results_missing: 'Some results are missing',
-                success: 'Success'
+                success: 'Success',
+                histogram_max_value_mistake: 'Incorrect max_value'
             },
             ui: {
                 'btn_diplay_table': 'Display',
@@ -214,7 +215,8 @@ var getContext = function(display, infos, curLevel) {
                 file_not_found: 'CSV file non trouvée: ',
                 incorrect_results: 'Résultats incorrects',
                 some_results_missing: 'Il manque une partie des résultats',
-                success: 'Succès'
+                success: 'Succès',
+                histogram_max_value_mistake: 'Incorrect max_value'
             },
             ui: {
                 'btn_diplay_table': 'Visualiser',
@@ -406,8 +408,14 @@ var getContext = function(display, infos, curLevel) {
     }
 
     context.expectHistogram = function(data) {
-        context.success = true;
-        throw strings.messages.success;
+        var status = db_helper.validateHistogram(data);
+        if(status === true) {
+            context.success = true;
+            throw strings.messages.success;
+            return;
+        }
+        context.success = false;
+        throw new Error(strings.messages[status]);
     }
 
 
