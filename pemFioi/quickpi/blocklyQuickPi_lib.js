@@ -36,7 +36,7 @@ var quickPiLocalLanguageStrings = {
             displayText2Lines: "afficher Ligne 1 : %1 Ligne 2 : %2",
 
             readTemperature: "température ambiante",
-            getTemperature: "temperature de %1",
+            getTemperatureFromCloud: "temperature de la ville %1",
 
             readRotaryAngle: "état du potentiomètre %1",
             readDistance: "distance mesurée par %1",
@@ -108,7 +108,7 @@ var quickPiLocalLanguageStrings = {
             readLightIntensity: "readLightIntensity",
             readHumidity: "readHumidity",
             currentTime: "currentTime",
-            getTemperature: "getTemperature",
+            getTemperatureFromCloud: "getTemperatureFromCloud",
 
             isLedOn: "isLedOn",
             isLedOnWithName: "isLedOn",
@@ -209,7 +209,7 @@ var quickPiLocalLanguageStrings = {
             setBuzzerNote: "setBuzzerNote(buzzer, frequency) fait sonner le buzzer à la fréquence indiquée",
             getBuzzerNote: "getBuzzerNote(buzzer) retourne la fréquence actuelle du buzzer",
 
-            getTemperature: "getTemperature(thermometer) ",
+            getTemperatureFromCloud: "getTemperatureFromCloud(town) retourne la température dans la ville donnée",
 
             drawPoint: "drawPoint(x, y)",
             isPointSet: "isPointSet(x, y)",
@@ -378,7 +378,7 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
             hello: "Bonjour",
 
-            getTemperatureWrongValue: "getTemperature: {0} n'est pas une ville supportée par getTemperature",
+            getTemperatureWrongValue: "getTemperatureFromCloud: {0} n'est pas une ville supportée par getTemperatureFromCloud",
 
             experiment: "Expérimenter",
             validate: "Valider",
@@ -467,7 +467,7 @@ var quickPiLocalLanguageStrings = {
             displayText2Lines: "desplegar texto Linea 1 : %1 Linea 2 : %2",
 
             readTemperature: "temperatura ambiente",
-            getTemperature: "temperatura de %1",
+            getTemperatureFromCloud: "temperatura de la ciudad %1", // TODO: verify
 
             readRotaryAngle: "estado del potenciómetro %1",
             readDistance: "distancia medida por %1",
@@ -539,7 +539,7 @@ var quickPiLocalLanguageStrings = {
             readLightIntensity: "readLightIntensity",
             readHumidity: "readHumidity",
             currentTime: "currentTime",
-            getTemperature: "getTemperature",
+            getTemperatureFromCloud: "getTemperatureFromCloud",
 
             isLedOn: "isLedOn",
             isLedOnWithName: "isLedOn",
@@ -640,7 +640,7 @@ var quickPiLocalLanguageStrings = {
             setBuzzerNote: "setBuzzerNote(buzzer, frequency) suena el zumbador en la frecuencia indicada",
             getBuzzerNote: "getBuzzerNote(buzzer) devuelve la frecuencia actual del zumbador",
 
-            getTemperature: "getTemperature(thermometer) obtiene la temperatura del sensor",
+            getTemperatureFromCloud: "getTemperatureFromCloud(town) obtiene la temperatura de la ciudad", // TODO: Verify
 
             drawPoint: "drawPoint(x, y) dibuja un punto en las coordenadas x, y",
             isPointSet: "isPointSet(x, y) devuelve True se dibujó sobre el punto x, y, False de lo contrario",
@@ -749,7 +749,7 @@ var quickPiLocalLanguageStrings = {
             irEnableContinous: "Activar la emisión IR continua",
             irDisableContinous: "Desactivar la emisión IR continua",
 
-            getTemperatureWrongValue: "getTemperature: {0} is not a town supported by getTemperature", // TODO: translate
+            getTemperatureWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
 
             up: "arriba",
             down: "abajo",
@@ -893,7 +893,7 @@ var quickPiLocalLanguageStrings = {
             displayText2Lines: "mostra Riga 1 : %1 Riga 2 : %2",
 
             readTemperature: "temperatura ambiente",
-            getTemperature: "temperatura di %1",
+            getTemperatureFromCloud: "temperatura della cità %1", // TODO: verify
 
             readRotaryAngle: "stato del potenziometro %1",
             readDistance: "distanza misurata all'%1",
@@ -965,7 +965,7 @@ var quickPiLocalLanguageStrings = {
             readLightIntensity: "readLightIntensity",
             readHumidity: "readHumidity",
             currentTime: "currentTime",
-            getTemperature: "getTemperature",
+            getTemperatureFromCloud: "getTemperatureFromCloud",
 
             isLedOn: "isLedOn",
             isLedOnWithName: "isLedOn",
@@ -1066,7 +1066,7 @@ var quickPiLocalLanguageStrings = {
             setBuzzerNote: "setBuzzerNote(buzzer, frequency) fa suonare il cicalino alla frequenza indicata",
             getBuzzerNote: "getBuzzerNote(buzzer) riporta la frequenza attuale del cicalino",
 
-            getTemperature: "getTemperature(thermometer) ",
+            getTemperatureFromCloud: "getTemperatureFromCloud(town) get the temperature from the town given", // TODO: Translate
 
             drawPoint: "drawPoint(x, y)",
             isPointSet: "isPointSet(x, y)",
@@ -1186,7 +1186,7 @@ var quickPiLocalLanguageStrings = {
             on: "On",
             off: "Off",
 
-            getTemperatureWrongValue: "getTemperature: {0} is not a town supported by getTemperature", // TODO: translate
+            getTemperatureWrongValue: "getTemperatureFromCloud: {0} is not a town supported by getTemperatureFromCloud", // TODO: translate
 
             grovehat: "Grove Base Hat for Raspberry Pi",
             quickpihat: "France IOI QuickPi Hat",
@@ -1312,7 +1312,7 @@ var quickPiLocalLanguageStrings = {
             currentTime: "returns current time",
             setBuzzerState: "sonnerie",
             setBuzzerNote: "sonnerie note",
-            getTemperature: "Get temperature",
+            getTemperatureFromCloud: "Get temperature from town",
             setBuzzerNote: "Set buzzer note",
             getBuzzerNote: "Get buzzer note",
             setLedBrightness: "Set Led Brightness",
@@ -1716,7 +1716,7 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_cloud',
                 order: 220,
-                python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore']
+                python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore', 'getTemperatureFromCloud']
             }
         ];
 
@@ -8834,19 +8834,19 @@ var getContext = function (display, infos, curLevel) {
 
 
     // TODO: change url to the "prod" one
-    context.quickpi.getTemperatureUrl = "https://mapadev.com/nicolastest/weather.php";
+    context.quickpi.getTemperatureFromCloudUrl = "https://mapadev.com/nicolastest/weather.php";
 
     // setup the supported towns
-    $.get(context.quickpi.getTemperatureUrl + "?q=" + "supportedtowns", function(towns) {
-        context.quickpi.getTemperatureSupportedTowns = towns;
+    $.get(context.quickpi.getTemperatureFromCloudUrl + "?q=" + "supportedtowns", function(towns) {
+        context.quickpi.getTemperatureFromCloudSupportedTowns = towns;
     });
 
     // We create a cache so there is less calls to the api and we get the results of the temperature faster
-    context.quickpi.getTemperatureCache = [];
+    context.quickpi.getTemperatureFromCloudCache = [];
 
-    context.quickpi.getTemperature = function(location, callback) {
+    context.quickpi.getTemperatureFromCloud = function(location, callback) {
 
-        function _updateGetTemperatureCache(cache, location, newVal) {
+        function _updateGetTemperatureFromCloudCache(cache, location, newVal) {
             for (var i = 0; i < cache.length; i++) {
                 var curr = cache[i];
                 if (curr.location === location) {
@@ -8862,12 +8862,12 @@ var getContext = function (display, infos, curLevel) {
             });
         }
 
-        var url = context.quickpi.getTemperatureUrl;
+        var url = context.quickpi.getTemperatureFromCloudUrl;
 
-        if (!context.quickpi.getTemperatureSupportedTowns.includes(location))
+        if (!context.quickpi.getTemperatureFromCloudSupportedTowns.includes(location))
             throw strings.messages.getTemperatureWrongValue.format(location);
 
-        var cache = context.quickpi.getTemperatureCache;
+        var cache = context.quickpi.getTemperatureFromCloudCache;
         for (var i = 0; i < cache.length; i++) {
             var curr = cache[i];
             if (curr.location === location) {
@@ -8886,7 +8886,7 @@ var getContext = function (display, infos, curLevel) {
             if (data === "invalid") {
                 cb(0);
             } else {
-                _updateGetTemperatureCache(cache, location, data);
+                _updateGetTemperatureFromCloudCache(cache, location, data);
 
                 cb(data);
             }
@@ -10181,11 +10181,14 @@ var getContext = function (display, infos, curLevel) {
             ],
             internet: [
                 {
-                    name: "getTemperature", yieldsValue: true, params: ["String"], blocklyJson: {
+                    name: "getTemperatureFromCloud", yieldsValue: true, params: ["String"], blocklyJson: {
                         "args0": [
                             { "type": "field_input", "name": "PARAM_0", text: "Paris, France"},
                         ]
                     },
+                    blocklyXml: "<block type='getTemperatureFromCloud'>" +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
+                        "</block>"
                 },
                 {
                     name: "connectToCloudStore", params: ["String", "String"], blocklyJson: {
