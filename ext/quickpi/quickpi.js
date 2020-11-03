@@ -2340,7 +2340,44 @@ def gyroThread():
         gyro_angles[1] += (values[1] - gyro_calibration[1]) * dt
         gyro_angles[2] += (values[2] - gyro_calibration[2]) * dt
         gyro_angles_lock.release()
-        
+     
+# Begin getTemperatureFromCloud
+   
+# TODO: Change url to "Prod" version
+getTemperatureCloudUrl = "https://mapadev.com/nicolastest/weather.php"
+
+def _getTemperatureSupportedTowns():
+    import requests
+    import json
+
+    return json.loads(requests.get(getTemperatureCloudUrl + "?q=supportedtowns").text)
+
+getTemperatureSupportedTowns = _getTemperatureSupportedTowns()
+
+getTemperatureCache = {}
+
+def getTemperatureFromCloud(town):
+    import requests
+    import time
+    current_milli_time = lambda: int(round(time.time() * 1000))
+
+    if not town in getTemperatureSupportedTowns:
+        return "Not supported"
+
+    if town in getTemperatureCache:
+        # lower than 10 minutes
+        if ((current_milli_time() - getTemperatureCache[town]["lastUpdate"]) / 1000) / 60 < 10:
+            return getTemperatureCache[town]["temperature"]
+
+    ret = requests.get(getTemperatureCloudUrl + "?q=" + town).text
+
+    getTemperatureCache[town] = {}
+    getTemperatureCache[town]["lastUpdate"] = current_milli_time()
+    getTemperatureCache[town]["temperature"] = ret
+
+    return ret
+
+# End getTemperatureFromCloud
 
 quickpi_cloudstoreurl = 'http://cloud.quick-pi.org'
 quickpi_cloudstoreid = ""
