@@ -435,6 +435,9 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          anchorPaperPos = self.getPaperMouse(event);
          currentPaperPos = self.getPaperMouse(event);
          anchorGridPos = self.paperPosToGridPos(anchorPaperPos);
+         if(self.dragSelection){
+            self.dragSelection.remove();
+         }
          self.dragSelection = paper.rect().attr(selectionBoxAttr);
          if(onStart) {
             onStart(x, y, event, anchorPaperPos, anchorGridPos);
@@ -464,12 +467,14 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
 
          var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
-         self.dragSelection.attr({
-            x: Math.min(anchorPaperPos.left, currentPaperPos.left),
-            y: Math.min(anchorPaperPos.top, currentPaperPos.top),
-            width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
-            height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
-         });
+         if(self.dragSelection){
+            self.dragSelection.attr({
+               x: Math.min(anchorPaperPos.left, currentPaperPos.left),
+               y: Math.min(anchorPaperPos.top, currentPaperPos.top),
+               width: Math.abs(anchorPaperPos.left - currentPaperPos.left),
+               height: Math.abs(anchorPaperPos.top - currentPaperPos.top)
+            });
+         }
 
          // Below threshold.
          if(usingThreshold && getVectorLength(dx, dy) < dragThreshold) {
