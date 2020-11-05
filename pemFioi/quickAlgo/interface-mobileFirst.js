@@ -329,15 +329,6 @@ var quickAlgoInterface = {
         } else {
             this.hasHelp = false;
         }
-
-        // add the button for edit subject
-        if (opt.canEditSubject) {
-            var hasIntroControls = $('#taskIntro').find('#introControls').length;
-            if (!hasIntroControls) {
-                $('#taskIntro').append(`<div id="introControls"></div>`);
-            }
-            $('#introControls').append(`<span class="fas fa-pencil-alt editExerciseIcon" onclick="quickAlgoInterface.openEditExercise()"></span>`);
-        }
     },
 
     updateControlsDisplay: function() {
@@ -349,7 +340,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
-        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !!hideControls.subjectEdition);
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 

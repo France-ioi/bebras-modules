@@ -601,6 +601,11 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          var code = this.programs[this.codeId][this.languages[this.codeId]];
          var data = new Blob([code], {type: 'text/plain'});
 
+         if (this.quickAlgoInterface.options.canEditSubject) {
+            console.log("TODO: edit code");
+            console.log(code);
+         }
+
          // If we are replacing a previously generated file we need to
          // manually revoke the object URL to avoid memory leaks.
          if (this.textFile !== null) {
