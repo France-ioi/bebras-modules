@@ -266,21 +266,11 @@ var quickAlgoInterface = {
         }
     },
 
-    closeEditExercise: function() {
-        var title = $('textarea#quickAlgo-editExercise-title').val();
-        var description = $('textarea#quickAlgo-editExercise-description').val();
-        document.title = title;
-
-        $(".exerciceText").text(description);
-
-        $('#quickAlgo-editExercise').remove();
-    },
-
     openEditExercise: function() {
 
-        var description = $(".exerciceText").text();
+        var description = $(".exerciseText").text();
 
-        var editExerciceHtml = `
+        var editExerciseHtml = `
         <div class="content connectPi qpi">
             <div class="panel-heading">
                 <h2 class="sectionTitle">
@@ -291,13 +281,11 @@ var quickAlgoInterface = {
             </div>
             <div class="panel-body">
                 <div id="editExerciseTitle">
-                    <label>Titre: </label><input type="text"/>
+                    <label>Titre: </label><input id="editExerciseTitleInput" type="text" value="${document.title}"/>
                 </div> 
                 <div id="editExerciseDescription">
                     <label>Description:</label>
-                    <textarea rows="10">
-                        ${description}
-                    </textarea>
+                    <textarea rows="10" id="editExerciseDescriptionTextarea">${description}</textarea>
                 </div>
             </div>
         </div>
@@ -318,11 +306,16 @@ var quickAlgoInterface = {
 
             $('#task').append(html);
         }*/
-        window.displayHelper.showPopupDialog(editExerciceHtml);
+        window.displayHelper.showPopupDialog(editExerciseHtml);
 
         $("#editclose").click(function() {
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
+            var newTitle = $("#editExerciseTitleInput").val();
+            var newDesc = $("#editExerciseDescriptionTextarea").val();
+
+            document.title = newTitle;
+            $(".exerciseText").text(newDesc);
         });
     },
 
