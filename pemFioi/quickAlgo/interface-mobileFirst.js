@@ -216,6 +216,7 @@ var quickAlgoInterface = {
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
+                    "<div rel='edit' class='item' onclick='quickAlgoInterface.editorBtn(\"edit\");'><span class='fas fa-pencil-alt'></span>" + this.strings.editButton + "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                 "</div>" +
@@ -249,14 +250,16 @@ var quickAlgoInterface = {
     editorBtn: function(btn) {
         // Handle an editor button press
         this.closeEditorMenu();
-        if(btn == 'example') {
+        if (btn == 'example') {
             task.displayedSubTask.loadExample()
-        } else if(btn == 'copy') {
+        } else if (btn == 'copy') {
             task.displayedSubTask.blocklyHelper.copyProgram();
-        } else if(btn == 'paste') {
+        } else if (btn == 'paste') {
             task.displayedSubTask.blocklyHelper.pasteProgram();
-        } else if(btn == 'save') {
+        } else if (btn == 'save') {
             task.displayedSubTask.blocklyHelper.saveProgram();
+        } else if (btn == 'edit') {
+            this.openEditExercise();
         } else if(btn == 'restart') {
             displayHelper.restartAll();
         } else if(btn == 'best-answer') {
@@ -291,21 +294,6 @@ var quickAlgoInterface = {
         </div>
         `;
 
-        /*
-        if (!$('#quickAlgo-editExercise').length) {
-            var html = '' +
-                '<div id="quickAlgo-editExercise">' +
-                '   <div class="panel-heading">' +
-                '       <h2 class="sectionTitle">Titre :</h2>' +
-                '       <textarea rows="1" id="quickAlgo-editExercise-title">' + document.title + '</textarea>' +
-                '       <div class="exit" onclick="quickAlgoInterface.closeEditExercise();"><span class="icon fas fa-times"></span></div>' +
-                '   </div>' +
-                '   <h2 class="sectionTitle">Description</h2>' +
-                '   <textarea id="quickAlgo-editExercise-description">' + description + '</textarea>' +
-                '</div>';
-
-            $('#task').append(html);
-        }*/
         window.displayHelper.showPopupDialog(editExerciseHtml);
 
         $("#editclose").click(function() {
@@ -361,6 +349,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !!hideControls.subjectEdition);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 
