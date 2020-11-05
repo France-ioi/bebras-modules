@@ -278,16 +278,16 @@ var quickAlgoInterface = {
             <div class="panel-heading">
                 <h2 class="sectionTitle">
                     <span class="iconTag"><i class="icon fas fa-pencil-alt"></i></span>
-                    Edition d'exercice
+                    ${this.strings.editWindowTitle}
                 </h2>
             <div class="exit" id="editclose"><i class="icon fas fa-times"></i></div>
             </div>
             <div class="panel-body">
                 <div id="editExerciseTitle">
-                    <label>Titre: </label><input id="editExerciseTitleInput" type="text" value="${document.title}"/>
+                    <label>${this.strings.titleEdition} </label><input id="editExerciseTitleInput" type="text" value="${document.title}"/>
                 </div> 
                 <div id="editExerciseDescription">
-                    <label>Description:</label>
+                    <label>${this.strings.descriptionEdition}</label>
                     <textarea rows="10" id="editExerciseDescriptionTextarea">${description}</textarea>
                 </div>
             </div>
