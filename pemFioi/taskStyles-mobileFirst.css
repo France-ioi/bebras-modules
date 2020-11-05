@@ -411,6 +411,7 @@ img {
   left: 50%;
   top: 0;
   transform: translate(-50%, 0);
+}
 #popupMessage .qpi #sensorPicker #selector-label {
   position: absolute;
   top: 15px;
@@ -441,4 +442,24 @@ img {
 .pythonIntroSimple code.pflForbidden,
 .pythonIntroFull code.pflForbidden {
   cursor: not-allowed;
+}
+#editExerciseTitle {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 44px;
+}
+#editExerciseTitle label {
+  font-size: 12px;
+}
+#editExerciseTitle input {
+  width: 95%;
+}
+#editExerciseDescription label {
+  font-size: 12px;
+}
+#editExerciseDescription textarea {
+  width: 100%;
+  height: 100%;
+  resize: vertical;
+  margin-right: 44px;
 }

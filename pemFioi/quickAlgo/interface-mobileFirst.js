@@ -282,70 +282,25 @@ var quickAlgoInterface = {
 
         var editExerciceHtml = `
         <div class="content connectPi qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div class="panel-body">
-                    <div id="piconnectionmainui">
-                        <div class="switchRadio btn-group" id="piconsel">
-                            <button type="button" class="btn" id="piconlocal"><i class="fas fa-location-arrow icon"></i></button>
-                            <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
-                            <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
-                            <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
-                        </div>
-                        <div id="pischoolcon">
-                            <div class="form-group">
-                                <label id="pischoolkeylabel"></label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">Aa</div>
-                                    <input type="text" id="schoolkey" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label id="pilistlabel"></label>
-                                <div class="input-group">
-                                    <button class="input-group-prepend" id=pigetlist disabled></button>
-                                    <select id="pilist" class="custom-select" disabled>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label id="piiplabel"></label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">123</div>
-                                    <input id=piaddress type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div>
-                                <input id="piusetunnel" disabled type="checkbox">
-                            </div>
-                        </div>
-
-                        <div id="panel-body-usbbt">
-                            <label id="piconnectionlabel"></label>
-                        </div>
-
-                        <div id="panel-body-local">
-                            <label id="piconnectionlabellocal"></label>
-
-                            <div id="piconnectolocalhost">
-                                <input type="radio" id="piconnectolocalhostcheckbox" name="pilocalconnectiontype" value="localhost">
-                            </div>
-
-                            <div id="piconnectocurrenturl">
-                                <input type="radio" id="piconnectocurrenturlcheckbox" name="pilocalconnectiontype" value="currenturl">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="inlineButtons">
-                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i></button>
-                        <button id="pirelease" class="btn"><i class="fa fa-times icon"></i></button>
-                    </div>
+            <div class="panel-heading">
+                <h2 class="sectionTitle">
+                    <span class="iconTag"><i class="icon fas fa-pencil-alt"></i></span>
+                    Edition d'exercice
+                </h2>
+            <div class="exit" id="editclose"><i class="icon fas fa-times"></i></div>
+            </div>
+            <div class="panel-body">
+                <div id="editExerciseTitle">
+                    <label>Titre: </label><input type="text"/>
+                </div> 
+                <div id="editExerciseDescription">
+                    <label>Description:</label>
+                    <textarea rows="10">
+                        ${description}
+                    </textarea>
                 </div>
             </div>
+        </div>
         `;
 
         /*
@@ -364,6 +319,11 @@ var quickAlgoInterface = {
             $('#task').append(html);
         }*/
         window.displayHelper.showPopupDialog(editExerciceHtml);
+
+        $("#editclose").click(function() {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+        });
     },
 
     loadPrograms: function(formElement) {
