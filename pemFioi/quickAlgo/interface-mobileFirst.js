@@ -269,6 +269,15 @@ var quickAlgoInterface = {
         }
     },
 
+    loadXmlSubject: function(xml) {
+        var subjectNodes = xml.getElementsByTagName("subject");
+        if (subjectNodes.leading != 0) {
+            var subject = subjectNodes[0];
+            document.title = subject.getAttribute("title");
+            $(".exerciseText").text(subject.getAttribute("description"));
+        }
+    },
+
     openEditExercise: function() {
 
         var description = $(".exerciseText").text();

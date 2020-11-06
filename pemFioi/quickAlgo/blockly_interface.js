@@ -516,6 +516,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             if (this.mainContext.loadPrograms) {
                this.mainContext.loadPrograms(xml);
             }
+
+            if (this.quickAlgoInterface.options.canEditSubject) {
+               this.quickAlgoInterface.loadXmlSubject(xml);
+            }
          }
          $("#program").val(this.programs[this.codeId].javascript);
       },
