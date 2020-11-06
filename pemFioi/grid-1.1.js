@@ -470,6 +470,23 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
          currentPaperPos.left = anchorPaperPos.left + dx;
          currentPaperPos.top = anchorPaperPos.top + dy;
 
+         // Keep drag within grid bounds
+         if(currentPaperPos.left < self.gridLeft) {
+            dx = self.gridLeft - anchorPaperPos.left;
+            currentPaperPos.left = self.gridLeft;
+         } else if(currentPaperPos.left > self.gridRight) {
+            dx = self.gridRight - anchorPaperPos.left;
+            currentPaperPos.left = self.gridRight;
+         }
+
+         if(currentPaperPos.top < self.gridTop) {
+            dy = self.gridTop - anchorPaperPos.top;
+            currentPaperPos.top = self.gridTop;
+         } else if(currentPaperPos.top > self.gridBottom) {
+            dy = self.gridBottom - anchorPaperPos.top;
+            currentPaperPos.top = self.gridBottom;
+         }
+
          var oldGridPos = currentGridPos;
          var newGridPos = self.paperPosToGridPos(currentPaperPos);
          if(self.dragSelection){ // bug fix
