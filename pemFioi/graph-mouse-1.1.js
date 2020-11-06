@@ -346,7 +346,19 @@ function VertexDragger(settings) {
    };
 
    this.startHandler = function(x, y, event) {
-      self.elementID = this.data("id");
+      if(settings.ie8compat) { // Temporary?
+         // Determine which element is being clicked, from the event
+         for(var rid in settings.visualGraph.vertexRaphaels) {
+            var vrs = settings.visualGraph.vertexRaphaels[rid];
+            for(var i = 0; i < vrs.length; i++) {
+               if(vrs[i].node === (event.target || event.srcElement)) {
+                  self.elementID = rid;
+               }
+            }
+         }
+      } else {
+         self.elementID = this.data("id");
+      }
       if(Beav.Array.has(self.stillVertices,self.elementID)){
          return
       }
