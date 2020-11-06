@@ -340,7 +340,6 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
    };
 
    this.highlightCell = function(row, col, attr, xPad, yPad) {
-      this.unhighlightCell(row, col);
       var cellPos = this.getCellPos(row, col);
       var cellSize = this.getCellSize(row, col);
 
@@ -379,14 +378,20 @@ function Grid(raphaelID, paper, rows, cols, cellWidth, cellHeight, gridLeft, gri
       }
 
       var id = this._cellToHighlightID(row, col);
-      this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
+      if(this.cellHighlights[id]) {
+         attr.x = cellPos.x + xPad;
+         attr.y = cellPos.y + yPad;
+         this.cellHighlights[id].attr(attr);
+         this.cellHighlights[id].show();
+      } else {
+         this.cellHighlights[id] = paper.rect(cellPos.x + xPad, cellPos.y + yPad).attr(attr);
+      }
    };
 
    this.unhighlightCell = function(row, col) {
       var id = this._cellToHighlightID(row, col);
       if(this.cellHighlights[id]) {
-         this.cellHighlights[id].remove();
-         delete this.cellHighlights[id];
+         this.cellHighlights[id].hide();
       }
    };
 
