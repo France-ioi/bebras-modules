@@ -469,7 +469,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          this.loadPrograms();
       },
 
-      savePrograms: function() {
+      savePrograms: function(saveSubject) {
          if(this.unloaded) {
             console.error('savePrograms called after unload');
             return;
@@ -489,6 +489,15 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
 
             if (this.mainContext.savePrograms) {
                this.mainContext.savePrograms(xml);
+            }
+
+            // TODO: Maybe later remove the if and replace it with "can edit subject", because we might want to save
+            // the subject also.
+            if (saveSubject) {
+               var subjectNode = goog.dom.createElement("subject");
+               xml.appendChild(subjectNode);
+               subjectNode.setAttribute("title", document.title);
+               subjectNode.setAttribute("description", $(".exerciseText").text());
             }
 
             this.programs[this.codeId].blockly = Blockly.Xml.domToText(xml);
@@ -597,14 +606,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
       },
 
       saveProgram: function() {
-         this.savePrograms();
+         this.savePrograms(this.quickAlgoInterface.options.canEditSubject);
          var code = this.programs[this.codeId][this.languages[this.codeId]];
          var data = new Blob([code], {type: 'text/plain'});
-
-         if (this.quickAlgoInterface.options.canEditSubject) {
-            console.log("TODO: edit code");
-            console.log(code);
-         }
 
          // If we are replacing a previously generated file we need to
          // manually revoke the object URL to avoid memory leaks.
