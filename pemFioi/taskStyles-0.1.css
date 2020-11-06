@@ -357,6 +357,9 @@ h1 .stars {
 #displayHelper_saved {
    margin: .6em;
 }
+#displayHelper_graderMessage {
+   margin: 16px 0px;
+}
 #choose-view {
    margin-bottom: 1em;
    text-align: center;
