@@ -7,9 +7,13 @@ var Beav = new Object();
 Beav.Object = new Object();
 
 Beav.Object.eq = function eq(x, y) {
-   // assumes arguments to be of same type
+   // assumes arguments to be of same type, except if one of the two arguments is null,
+   // in which case the comparison returns true if the other argument is also null.
+   if (x == null || y == null) {
+      return (x == null && y == null);
+   }
    var tx = typeof(x);
-   var ty = typeof(y);
+   var ty = typeof(y); 
    if (tx != ty) {
       throw "Beav.Object.eq incompatible types";
    }
