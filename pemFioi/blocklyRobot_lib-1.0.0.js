@@ -4,6 +4,14 @@
 /*TODO : traduire le context wiring*/
 var robotCommands = [];
 
+var initArray = function(n, elem) {
+   var res = [];
+   for(var i = 0;i < n;i++) {
+      res.push(elem);
+   }
+   return res;
+}
+
 var getContext = function(display, infos, curLevel) {
    var localLanguageStrings = {
       fr: {
@@ -79,6 +87,13 @@ var getContext = function(display, infos, curLevel) {
                readNumber: "nombre de la case",
                pushObject: "pousser l'objet",
                pushableInFront: "poussable devant",
+               dropNum: "déposer %1 objets",
+               dropNum_noShadow: "déposer %1 objets",
+               nbWithdrawables: "nombre d'objets sur la case",
+               nbInBag: "nombre d'objets dans le sac",
+               containerSize: "nombre d'objets à déposer sur la case",
+               withdrawNum: "ramasser %1 objets",
+               withdrawNum_noShadow: "ramasser %1 objets",
                shoot: "tirer au laser dans la direction %1",
                shoot_noShadow: "tirer au laser dans la direction %1",
                shootCondition: "retour départ tir direction %1",
@@ -125,6 +140,13 @@ var getContext = function(display, infos, curLevel) {
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
                pushableInFront: "poussableDevant",
+               dropNum: "deposerNum",
+               dropNum_noShadow: "deposerNum",
+               containerSize: "nbObjetsADeposer",
+               nbInBag: "nbObjetsDansSac",
+               nbWithdrawables: "nbObjetsSur",
+               withdrawNum: "ramasserNum",
+               withdrawNum_noShadow: "ramasserNum",
                shoot: "tirerLaser",
                shoot_noShadow: "tirerLaser",
                shootCondition: "tirerCondition",
@@ -176,7 +198,8 @@ var getContext = function(display, infos, curLevel) {
                failureWireTooLong: "Impossible de relier ces deux prises car elles sont trop éloignées !",
                failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
                failureProjectile: "Le robot s'est pris un projectile !",
-               failureRewrite: "Le robot a essayé de repeindre une case."
+               failureRewrite: "Le robot a essayé de repeindre une case.",
+               noContainer: "Il n'y a pas de conteneur ici !"
             },
             startingBlockName: "Programme du robot"
          },
@@ -1302,6 +1325,10 @@ var getContext = function(display, infos, curLevel) {
             label: {
                withdrawObject: "ramasser le bois",
                dropObject: "donner le bois au castor",
+               withdrawNum_noShadow: "ramasser %1 bûches",
+               dropNum_noShadow: "donner %1 bûches",
+               nbWithdrawables: "nombre de bûches sur la case",
+               containerSize: "nombre de bûches demandé",
                onObject: "sur du bois",
                onContainer: "chez un castor",
             },
@@ -2127,9 +2154,20 @@ var getContext = function(display, infos, curLevel) {
          borderColor: "#a67d40",
          itemTypes: {
             green_robot: { img: "veterinary_robot.png", side: 90, nbStates: 9, isRobot: true,  offsetX: -11, zOrder: 2 },
-            bebras: { num: 2, img: "bebras.png", side: 70, isContainer: true, zOrder: 0 },
+            bebras: { num: 2, img: "bebras.png", side: 70, isContainer: true, zOrder: 0, containerFilter: function(obj) { return obj.isWithdrawable === true; } },
             wood: { num: 3, img: "wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1 },
+            wood_outside: { num: 5, img: "wood.png", side: 60, isWithdrawable: true,  offsetY: 10, zOrder: 1, canBeOutside: true },
             tree: { num: 4, img: "tree.png", side: 70, isObstacle: true, offsetY: 5, zOrder: 0 }, 
+            count_wood: { num: 6, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isWithdrawable === true;
+               }).length;
+            }, side: 60, isWritable: true, fontColor: "#01a665", fontBold: true, zOrder: 1, offsetX: 20, offsetY: 17},
+            count_needs: { num: 7, value: function(obj) {
+               return context.getItemsOn(obj.row, obj.col, function(item) {
+                  return item.isContainer === true;
+               })[0].containerSize;
+            }, side: 60, isWritable: true, fontColor: "#4a90e2", fontBold: true, zOrder: 1, offsetX: -20, offsetY: -17},
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -2522,6 +2560,43 @@ var getContext = function(display, infos, curLevel) {
    });
    
    infos.newBlocks.push({
+      name: "nbWithdrawables",
+      type: "sensors",
+      block: { name: "nbWithdrawables", yieldsValue: 'int' },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isWithdrawable === true; }).length);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "nbInBag",
+      type: "sensors",
+      block: { name: "nbInBag", yieldsValue: 'int' },
+      func: function(callback) {
+         var robot = this.getRobot();
+         this.callCallback(callback, context.bag.length);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "containerSize",
+      type: "sensors",
+      block: { name: "containerSize", yieldsValue: 'int' },
+      func: function(callback) {
+         var robot = this.getRobot();
+         var containers = this.getItemsOn(robot.row, robot.col, function(obj) { return obj.isContainer === true; });
+         
+         if(containers.length == 0) {
+            this.callCallback(callback, 0);
+            return;
+         }
+         
+         this.callCallback(callback, containers[0].containerSize);
+      }
+   });
+   
+   infos.newBlocks.push({
       name: "pushObject",
       type: "actions",
       block: { name: "pushObject" },
@@ -2556,6 +2631,84 @@ var getContext = function(display, infos, curLevel) {
       func: function(callback) {
          this.drop(1, {row: this.getRobot().row - 1, col: this.getRobot().col});
          this.callCallback(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "withdrawNum_noShadow",
+      type: "actions",
+      block: { 
+         name: "withdrawNum_noShadow", 
+         params: [null]
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         for(var i = 0;i < value;i++) {
+            this.withdraw();
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "withdrawNum",
+      type: "actions",
+      block: { name: "withdrawNum", params: [null], blocklyXml: "<block type='withdrawNum_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         for(var i = 0;i < value;i++) {
+            this.withdraw();
+         }
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropNum_noShadow",
+      type: "actions",
+      block: { 
+         name: "dropNum_noShadow", 
+         params: [null]
+      },
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         this.drop(value);
+         this.waitDelay(callback);
+      }
+   });
+   
+   infos.newBlocks.push({
+      name: "dropNum",
+      type: "actions",
+      block: { name: "dropNum", params: [null], blocklyXml: "<block type='dropNum_noShadow'>" +
+                              "  <value name='PARAM_0'>" +
+                              "    <shadow type='math_number'>" +
+                              "      <field name='NUM'>0</field>" +
+                              "    </shadow>" +
+                              "  </value>" +
+                              "</block>"},
+      func: function(value, callback) {
+         if((typeof value) == "function") {
+            this.callCallback(value);
+            return;
+         }
+         this.drop(value);
+         this.waitDelay(callback);
       }
    });
    
@@ -3037,7 +3190,25 @@ var getContext = function(display, infos, curLevel) {
          item.element = paper.image(imgUrlWithPrefix(item.img), x, y, item.side * item.nbStates * scale, item.side * scale);
       }
       else if(item.value !== undefined) {
-         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, item.value).attr({"font-size": item.side * scale / 2});
+         var fontColor = item.fontColor;
+         if(fontColor === undefined) { fontColor = "black"; }
+         
+         var value;
+         if(typeof(item.value) == "function")
+            value = item.value(item);
+         else
+            value = item.value;
+         
+         item.element = paper.text(x + item.side * scale / 2, y + item.side * scale / 2, value).attr({
+            "font-size": item.side * scale / 2,
+            "fill": fontColor,
+         });
+         
+         if(item.fontBold === true) {
+            item.element.attr({
+               "font-weight": "bold"
+            });
+         }
       }
       else if(item.color !== undefined) {
          item.element = paper.rect(0, 0, item.side, item.side).attr({"fill": item.color});
@@ -3464,6 +3635,9 @@ var getContext = function(display, infos, curLevel) {
          } else {
             withdrawable.element.remove();
          }
+         
+         //TODO: improve performance
+         redisplayAllItems();
       }
    };
    
@@ -3529,6 +3703,9 @@ var getContext = function(display, infos, curLevel) {
          resetItem(object);
          context.checkContainer(coords);
       }
+      
+      //TODO: improve performance
+      redisplayAllItems();
    };
    
    context.dropObject = function(object, coords) {
@@ -3556,6 +3733,9 @@ var getContext = function(display, infos, curLevel) {
       }
       resetItem(object);
       context.checkContainer(coords);
+      
+      //TODO: improve performance
+      redisplayAllItems();
    };
    
    context.turnLeft = function(callback) {
