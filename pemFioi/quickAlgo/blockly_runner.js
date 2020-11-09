@@ -207,7 +207,9 @@ function initBlocklyRunner(context, messageCallback) {
             }
             // All nodes finished their program
             // TODO :: better message
-            throw "all nodes finished (blockly_runner)";
+            if(runner.nodesReady.length > 1) {
+               throw "all nodes finished (blockly_runner)";
+            }
          }
          if(newNode == curNode) {
             // No ready node
