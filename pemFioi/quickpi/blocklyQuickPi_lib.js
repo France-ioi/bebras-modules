@@ -8838,7 +8838,7 @@ var getContext = function (display, infos, curLevel) {
 
     // setup the supported towns
     $.get(context.quickpi.getTemperatureFromCloudUrl + "?q=" + "supportedtowns", function(towns) {
-        context.quickpi.getTemperatureFromCloudSupportedTowns = towns;
+        context.quickpi.getTemperatureFromCloudSupportedTowns = JSON.parse(towns);
     });
 
     // We create a cache so there is less calls to the api and we get the results of the temperature faster
@@ -8864,7 +8864,7 @@ var getContext = function (display, infos, curLevel) {
 
         var url = context.quickpi.getTemperatureFromCloudUrl;
 
-        if (!context.quickpi.getTemperatureFromCloudSupportedTowns.includes(location))
+        if (!arrayContains(context.quickpi.getTemperatureFromCloudSupportedTowns, location))
             throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
 
         var cache = context.quickpi.getTemperatureFromCloudCache;
