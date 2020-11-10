@@ -8842,42 +8842,18 @@ var getContext = function (display, infos, curLevel) {
     });
 
     // We create a cache so there is less calls to the api and we get the results of the temperature faster
-    context.quickpi.getTemperatureFromCloudCache = [];
+    context.quickpi._getTemperatureFromCloudCache = {};
 
     context.quickpi.getTemperatureFromCloud = function(location, callback) {
-
-        function _updateGetTemperatureFromCloudCache(cache, location, newVal) {
-            for (var i = 0; i < cache.length; i++) {
-                var curr = cache[i];
-                if (curr.location === location) {
-                    curr.lastUpdate = Date.now();
-                    curr.temperature = newVal;
-                    return;
-                }
-            }
-            cache.push({
-                location: location,
-                lastUpdate: Date.now(),
-                temperature: newVal
-            });
-        }
-
         var url = context.quickpi.getTemperatureFromCloudUrl;
 
         if (!arrayContains(context.quickpi.getTemperatureFromCloudSupportedTowns, location))
             throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
 
-        var cache = context.quickpi.getTemperatureFromCloudCache;
-        for (var i = 0; i < cache.length; i++) {
-            var curr = cache[i];
-            if (curr.location === location) {
-                // if last update was less than 10 min
-                if (((Date.now() - curr.lastUpdate) / 1000) / 60 < 10) {
-                    context.waitDelay(callback, curr.temperature);
-                    return;
-                }
-                break;
-            }
+        var cache = context.quickpi._getTemperatureFromCloudCache;
+        if (cache[location] != undefined && ((Date.now() - cache[location].lastUpdate) / 1000) / 60 < 10) {
+            context.waitDelay(callback, cache[location].temperature);
+            return;
         }
 
         var cb = context.runner.waitCallback(callback);
@@ -8886,8 +8862,10 @@ var getContext = function (display, infos, curLevel) {
             if (data === "invalid") {
                 cb(0);
             } else {
-                _updateGetTemperatureFromCloudCache(cache, location, data);
-
+                cache[location] = {
+                    lastUpdate: Date.now(),
+                    temperature: data
+                };
                 cb(data);
             }
         });
