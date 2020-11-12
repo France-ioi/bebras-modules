@@ -8862,6 +8862,8 @@ var getContext = function (display, infos, curLevel) {
         $.get(url + "?q=" + location, function(data) {
             // If the server return invalid it mean that the town given is not supported
             if (data === "invalid") {
+                // This only happen when the user give an invalid town to the server, which should never happen because
+                // the validity of the user input is checked above.
                 cb(0);
             } else {
                 cache[location] = {
