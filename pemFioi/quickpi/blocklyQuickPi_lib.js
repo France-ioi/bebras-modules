@@ -8834,23 +8834,25 @@ var getContext = function (display, infos, curLevel) {
 
 
     // TODO: change url to the "prod" one
-    context.quickpi.getTemperatureFromCloudUrl = "https://mapadev.com/nicolastest/weather.php";
+    var getTemperatureFromCloudURl = "https://mapadev.com/nicolastest/weather.php";
+
+    var getTemperatureFromCloudSupportedTowns = [];
 
     // setup the supported towns
-    $.get(context.quickpi.getTemperatureFromCloudUrl + "?q=" + "supportedtowns", function(towns) {
-        context.quickpi.getTemperatureFromCloudSupportedTowns = JSON.parse(towns);
+    $.get(getTemperatureFromCloudURl + "?q=" + "supportedtowns", function(towns) {
+        getTemperatureFromCloudSupportedTowns = JSON.parse(towns);
     });
 
     // We create a cache so there is less calls to the api and we get the results of the temperature faster
-    context.quickpi._getTemperatureFromCloudCache = {};
+    var getTemperatureFromCloudCache = {};
 
     context.quickpi.getTemperatureFromCloud = function(location, callback) {
-        var url = context.quickpi.getTemperatureFromCloudUrl;
+        var url = getTemperatureFromCloudURl;
 
-        if (!arrayContains(context.quickpi.getTemperatureFromCloudSupportedTowns, location))
+        if (!arrayContains(getTemperatureFromCloudSupportedTowns, location))
             throw strings.messages.getTemperatureFromCloudWrongValue.format(location);
 
-        var cache = context.quickpi._getTemperatureFromCloudCache;
+        var cache = getTemperatureFromCloudCache;
         if (cache[location] != undefined && ((Date.now() - cache[location].lastUpdate) / 1000) / 60 < 10) {
             context.waitDelay(callback, cache[location].temperature);
             return;
