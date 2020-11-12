@@ -512,8 +512,12 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             this.cleanBlockAttributes(xml, this.getOrigin());
             Blockly.Xml.domToWorkspace(xml, this.workspace);
 
-            if (this.mainContext.loadPrograms) {
-               this.mainContext.loadPrograms(xml);
+            var additionalXML = xml.getElementsByTagName("additional");
+            if (additionalXML.length > 0) {
+               var additional = JSON.parse(additionalXML[0].innerText);
+               if (this.mainContext.loadAdditional) {
+                  this.mainContext.loadAdditional(additional);
+               }
             }
          }
          $("#program").val(this.programs[this.codeId].javascript);
