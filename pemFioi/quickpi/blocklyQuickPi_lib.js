@@ -3256,66 +3256,43 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
-    context.savePrograms = function(xml) {
-        if (context.infos.customSensors)
-        {
-            var  node = document.createElement("quickpi");
-            xml.appendChild(node);
+    /**
+     * This function loads all additional stuff from the object "additional" for quickpi.
+     * For now on it only loads the sensor
+     * @param additional The additional variable which contains the sensors
+     */
+    context.loadAdditional = function(additional) {
+        var newSensors = additional.quickpiSensors;
+        if (!newSensors)
+            return;
 
-            for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                var currentSensor = infos.quickPiSensors[i];
-
-                var node = document.createElement("sensor");
-
-                node.setAttribute("type", currentSensor.type);
-                node.setAttribute("port", currentSensor.port);
-                node.setAttribute("name", currentSensor.name);
-
-                if (currentSensor.subType)
-                    node.setAttribute("subtype", currentSensor.subType);
-
-                var elements = xml.getElementsByTagName("quickpi");
-
-                elements[0].appendChild(node);
-            }
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var sensor = infos.quickPiSensors[i];
+            sensor.removed = true;
         }
+
+        infos.quickPiSensors = [];
+
+        for (var i = 0; i < newSensors.length; i++) {
+            var sensor = {
+                type: newSensors[i].type,
+                port: newSensors[i].port,
+                name: newSensors[i].name
+            };
+
+            if (newSensors[i].subType)
+                sensor.sybType = newSensors[i].subType;
+
+            sensor.state = null;
+            sensor.callsInTimeSlot = 0;
+            sensor.lastTimeIncrease = 0;
+
+            infos.quickPiSensors.push(sensor);
+        }
+
+        context.recreateDisplay = true;
+        this.resetDisplay();
     };
-
-    context.loadPrograms = function(xml) {
-        if (context.infos.customSensors) {
-            var elements = xml.getElementsByTagName("sensor");
-
-            if (elements.length > 0) {
-                for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                    var sensor = infos.quickPiSensors[i];
-                    sensor.removed = true;
-                }
-                infos.quickPiSensors = [];
-
-                for (var i = 0; i < elements.length; i++) {
-                    var sensornode = elements[i];
-                    var sensor = {
-                        "type" : sensornode.getAttribute("type"),
-                        "port" : sensornode.getAttribute("port"),
-                        "name" : sensornode.getAttribute("name"),
-                    };
-
-                    if (sensornode.getAttribute("subtype")) {
-                        sensor.subType = sensornode.getAttribute("subtype");
-                    }
-
-                    sensor.state = null;
-                    sensor.callsInTimeSlot = 0;
-                    sensor.lastTimeIncrease = 0;
-
-                    infos.quickPiSensors.push(sensor);
-                }
-
-                context.recreateDisplay = true;
-                this.resetDisplay();
-            }
-        }
-    }
 
     context.resetDisplay = function() {
         if (!context.display || !this.raphaelFactory)
