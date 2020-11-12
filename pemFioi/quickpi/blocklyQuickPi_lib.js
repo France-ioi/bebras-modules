@@ -3236,6 +3236,26 @@ var getContext = function (display, infos, curLevel) {
     if (getSessionStorage('board'))
         context.changeBoard(getSessionStorage('board'))
 
+    /**
+     * This method allow us to save the sensors inside of the variable additional.
+     * If other things must be saved from quickPi later, it can be saved inside of this variable.
+     * @param additional The additional object saved inside of the xml
+     */
+    context.saveAdditional = function(additional) {
+        additional.quickpiSensors = [];
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var currentSensor = infos.quickPiSensors[i];
+            var savedSensor = {
+                type: currentSensor.type,
+                port: currentSensor.port,
+                name: currentSensor.name
+            };
+            if (currentSensor.subType)
+                savedSensor.subType = currentSensor.subType;
+            additional.quickpiSensors.push(savedSensor);
+        }
+    };
+
     context.savePrograms = function(xml) {
         if (context.infos.customSensors)
         {

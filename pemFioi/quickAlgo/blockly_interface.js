@@ -487,9 +487,17 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var xml = Blockly.Xml.workspaceToDom(this.workspace);
             this.cleanBlockAttributes(xml);
 
-            if (this.mainContext.savePrograms) {
-               this.mainContext.savePrograms(xml);
+            // The additional variable contain all additional things that we can save, for example quickpi sensors,
+            // subject title when edition is enabled...
+            var additional = {};
+
+            if (this.mainContext.saveAdditional) {
+               this.mainContext.saveAdditional(additional);
             }
+
+            var additionalNode = document.createElement("additional");
+            additionalNode.innerText = JSON.stringify(additional);
+            xml.appendChild(additionalNode);
 
             this.programs[this.codeId].blockly = Blockly.Xml.domToText(xml);
             this.programs[this.codeId].blocklyJS = this.getCode("javascript");
