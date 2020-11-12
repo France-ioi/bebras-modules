@@ -40,9 +40,9 @@ function LogicController(nbTestCases, maxInstructions) {
     if(this._aceEditor) {
       this.programs[0].blockly = this._aceEditor.getValue();
       if (full) {
-        var emptyXml = document.implementation.createDocument("", "", null);
-        this._mainContext.savePrograms(emptyXml);
-        this.programs[0].additional = (new XMLSerializer()).serializeToString(emptyXml);
+        var additional = {};
+        this._mainContext.saveAdditional(additional);
+        this.programs[0].additional = additional;
       }
     }
   };
@@ -53,7 +53,7 @@ function LogicController(nbTestCases, maxInstructions) {
       this._aceEditor.selection.clearSelection();
     }
     if (this._aceEditor && this.programs[0].additional) {
-      this._mainContext.loadPrograms((new DOMParser()).parseFromString(this.programs[0].additional, "text/xml"));
+      this._mainContext.loadAdditional(this.programs[0].additional);
     }
   };
 
@@ -300,13 +300,26 @@ function LogicController(nbTestCases, maxInstructions) {
             }
           }
         } else {
-          if (that._mainContext.loadPrograms && code[0] === '#') {
-            var xmlStr = code.substring(2, code.indexOf('\n'));
-            var newCode = code.substring(code.indexOf('\n') + 1);
-            that.programs[0].additional = xmlStr;
-            that.programs[0].blockly = newCode;
+          // The 5 come from this string: '# {"' It must be higher in order to not fail 
+          if (that._mainContext.loadAdditional && code[0] === '#' && code.length > 5) {
+            // This var correspond on how it is saved with JSON.stringify, these are the first characters
+            // in order to be allowed to load codes which are from this version (our current corrections) it is
+            // better to test if the first characters corresponds to our valid json instead of being regular comments.
+            // This can fail only in the case when you start your comment with: '# {"'
+            var firstChars = "{\"";
+            var toVerify = code.substring(2, 2 + firstChars.length);
+            if (toVerify === firstChars) {
+              var additionalStr = code.substring(2, code.indexOf('\n'));
+              var newCode = code.substring(code.indexOf('\n') + 1);
+              that.programs[0].additional = JSON.parse(additionalStr);
+              that.programs[0].blockly = newCode;
+            } else {
+              that.programs[0].blockly = code;
+              that.programs[0].additional = {};
+            }
           } else {
             that.programs[0].blockly = code;
+            that.programs[0].additional = {};
           }
 
         }
@@ -324,7 +337,7 @@ function LogicController(nbTestCases, maxInstructions) {
     }
   };
   this.getCodeWithSensors = function() {
-    return "# " + this.programs[0].additional + "\n" + this.programs[0].blockly;
+    return "# " + JSON.stringify(this.programs[0].additional) + "\n" + this.programs[0].blockly;
   };
   this.saveProgram = function () {
     this.savePrograms(true);
