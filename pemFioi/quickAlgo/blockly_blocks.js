@@ -2532,7 +2532,8 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var notAllowed = [];
          function checkBlock(block) {
             var blockName = block.getAttribute('type');
-            if(!arrayContains(allowed, blockName)) {
+            if(!arrayContains(allowed, blockName)
+                && (blockName.substr(blockName.length - 9) != '_noShadow' || !arrayContains(allowed, blockName.substr(0, blockName.length - 9)))) {
                notAllowed.push(blockName);
             }
          }
