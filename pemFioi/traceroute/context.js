@@ -4,7 +4,8 @@ var getContext = function (display, infos, curLevel) {
         vertex_radius: 50,
         vertex_distance: 200,
         circle_radius: 10,
-        circle_color: 'lightblue'
+        circle_color: 'lightblue',
+        mistake_background_color: 'lightpink'
     }
 
     var localLanguageStrings = {
@@ -33,8 +34,12 @@ var getContext = function (display, infos, curLevel) {
             constant: {},
             startingBlockName: "Program", // Name for the starting block
             messages: {
+                success: 'Success!',
                 domain_not_found: ': unknown domain',
-                ip_unreachable: ': IP unreachable'
+                ip_unreachable: ': IP unreachable',
+                ttl_incorrect: 'Incorrect TTL parameter value',
+                lines_count_mistake: 'Output contain extra lines or some lines missed',
+                line_mistake: 'Lines with mistake marked with red color'
             }
         }
     }
@@ -54,18 +59,17 @@ var getContext = function (display, infos, curLevel) {
     var network = {
         data: [],
 
+
         setData: function(data) {
-            this.data = data;
+            this.data = JSON.parse(JSON.stringify(data));
+            for(var i=0; i<this.data.length; i++) {
+                this.data[i].rtt = this.getRTT(this.data[i]);
+            }
         },
 
 
-        getAddrInfo: function(domain) {
-            for(var i=0; i<this.data.length; i++) {
-                if(this.data[i].domain == domain) {
-                    return this.data[i].ip;
-                }
-            }
-            return false;
+        formatRTT: function(rtt) {
+            return parseFloat(rtt.toFixed(3));
         },
 
         getRTT: function(item) {
@@ -77,7 +81,16 @@ var getContext = function (display, infos, curLevel) {
             } else {
                 var res = rtt * Math.random();
             }
-            return Math.round(res * 1000) / 1000;
+            return this.formatRTT(res);
+        },        
+
+        getAddrInfo: function(domain) {
+            for(var i=0; i<this.data.length; i++) {
+                if(this.data[i].domain == domain) {
+                    return this.data[i].ip;
+                }
+            }
+            return false;
         },
 
         pingIP: function(ip) {
@@ -95,7 +108,7 @@ var getContext = function (display, infos, curLevel) {
             var item;
             for(var i=1; i<=this.data.length; i++) {
                 item = this.data[i];
-                rtt += this.getRTT(item);
+                rtt += item.rtt;
                 ttl -= 1;
                 if(ttl == 0) {
                     break;
@@ -104,7 +117,7 @@ var getContext = function (display, infos, curLevel) {
             return {
                 ip: item.ip,
                 domain: item.domain,
-                rtt: rtt
+                rtt: this.formatRTT(rtt)
             }
         },
 
@@ -143,13 +156,95 @@ var getContext = function (display, infos, curLevel) {
                 }
             }
             return res;
-        }
+        },
 
+        parseArgument: function() {
+            var tmp = context.cmd.split(' ');
+            return tmp[1].trim();
+        },
+
+        maxTTL: function() {
+            return this.data.length - 1;
+        }
     };
 
 
 
+    var output = {
+
+        lines: [],
+
+        clear: function() {
+            this.lines = [];
+        },
+
+        print: function(str) {
+            this.lines.push(str);
+            if(context.display) {
+                var el = $('<div/>');
+                el.html(str);
+                $('#print').append(el);
+            }
+        },
+
+        get: function() {
+            return this.lines;
+        },
+
+        markMistakeLine: function(line_idx) {
+            if(context.display) {
+                $('#print > div:nth-child(' + (1 + line_idx) + ')').css('background', config.mistake_background_color);
+            }
+        }
+    }
+
+
+
+    infos.checkEndEveryTurn = false;
+    infos.checkEndCondition = function (context, lastTurn) {
+        if(!lastTurn) {
+            return;
+        }
+        var domain = network.parseArgument();
+        var ip = network.getAddrInfo(domain);
+        var max_ttl = network.maxTTL();
+        var expected_output = [];
+        for(var ttl=1; ttl<=max_ttl; ttl++) {
+            var res = network.sendPacket(ip, ttl);
+            expected_output.push(ttl + ' ' + res.domain + ' ' + res.ip + ' ' + res.rtt + 'ms');
+            if(res.ip == ip) {
+                break;
+            }
+        }
+
+        var user_output = output.get();
+        if(user_output.length != expected_output.length) {
+            context.success = false;
+            throw(strings.messages.lines_count_mistake);
+        }
+
+        context.success = true;
+        for(var i=0; i<user_output.length; i++) {
+            var mistake = expected_output[i] != user_output[i];
+            if(mistake) {
+                output.markMistakeLine(i);
+            }
+            context.success = context.success && !mistake;
+        };
+
+        if(context.success) {
+            throw strings.messages.success;
+        } else {
+            throw strings.messages.line_mistake;
+        }
+    }
+
+
+
+
     context.reset = function (taskInfos) {
+        output.clear();
+        //user_output.clear(context.display);
         if (taskInfos != undefined) {
             network.setData(taskInfos.network);
             context.cmd = taskInfos.cmd;
@@ -165,7 +260,7 @@ var getContext = function (display, infos, curLevel) {
         }
         $('#grid').html(`
             <div style='height: 50%; width: 96%; margin: 0 2%' id='graph'></div>
-            <div style='height: 50%; width: 100%; text-align: left;' id='print'></div>
+            <div style='height: 50%; width: 96%; text-align: left; margin: 0 2%' id='print'></div>
         `);
 
 
@@ -340,8 +435,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.traceroute = {
         parseArgument: function(callback) {
-            var tmp = context.cmd.split(' ');
-            context.runner.noDelay(callback, tmp[1].trim());
+            context.runner.noDelay(callback, network.parseArgument());
         },
 
         getAddrInfo: function(domain, callback) {
@@ -354,6 +448,10 @@ var getContext = function (display, infos, curLevel) {
 
 
         sendPacket: function(ip, ttl, callback) {
+            var ttl = parseInt(ttl, 10);
+            if(!ttl) {
+                throw(strings.messages.ttl_incorrect);
+            }
             if(!network.pingIP(ip)) {
                 throw(ip + strings.messages.ip_unreachable);
             }
@@ -373,11 +471,7 @@ var getContext = function (display, infos, curLevel) {
 
 
         print: function(str, callback) {
-            if(context.display) {            
-                var el = $('<div/>');
-                el.html(str);
-                $('#print').append(el);
-            }
+            output.print(str);
             context.runner.noDelay(callback);
         }
     }
