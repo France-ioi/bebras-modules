@@ -12,8 +12,10 @@ function LogicController(nbTestCases, maxInstructions) {
   this.language = 'python';
   this._textFile = null;
   this._extended = false;
+  // for quickpi additional will contain the string containing all sensors in xml
   this.programs = [{
     blockly: null,
+    additional: null,
     blocklyJS: null,
     javascript: null
   }];
@@ -34,9 +36,14 @@ function LogicController(nbTestCases, maxInstructions) {
     this._mainContext = mainContext;
   };
 
-  this.savePrograms = function () {
+  this.savePrograms = function (full) {
     if(this._aceEditor) {
       this.programs[0].blockly = this._aceEditor.getValue();
+      if (full) {
+        var additional = {};
+        this._mainContext.saveAdditional(additional);
+        this.programs[0].additional = additional;
+      }
     }
   };
 
@@ -44,6 +51,9 @@ function LogicController(nbTestCases, maxInstructions) {
     if(this._aceEditor && this.programs[0].blockly) {
       this._aceEditor.setValue(''+this.programs[0].blockly);
       this._aceEditor.selection.clearSelection();
+    }
+    if (this._aceEditor && this.programs[0].additional) {
+      this._mainContext.loadAdditional(this.programs[0].additional);
     }
   };
 
@@ -307,7 +317,28 @@ function LogicController(nbTestCases, maxInstructions) {
             }
           }
         } else {
-          that.programs[0].blockly = code;
+          // The 5 come from this string: '# {"' It must be higher in order to not fail
+          if (that._mainContext.loadAdditional && code[0] === '#' && code.length > 5) {
+            // This var correspond on how it is saved with JSON.stringify, these are the first characters
+            // in order to be allowed to load codes which are from this version (our current corrections) it is
+            // better to test if the first characters corresponds to our valid json instead of being regular comments.
+            // This can fail only in the case when you start your comment with: '# {"'
+            var firstChars = "{\"";
+            var toVerify = code.substring(2, 2 + firstChars.length);
+            if (toVerify === firstChars) {
+              var additionalStr = code.substring(2, code.indexOf('\n'));
+              var newCode = code.substring(code.indexOf('\n') + 1);
+              that.programs[0].additional = JSON.parse(additionalStr);
+              that.programs[0].blockly = newCode;
+            } else {
+              that.programs[0].blockly = code;
+              that.programs[0].additional = {};
+            }
+          } else {
+            that.programs[0].blockly = code;
+            that.programs[0].additional = {};
+          }
+
         }
         that.loadPrograms();
       };
@@ -322,9 +353,12 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
   };
+  this.getCodeWithAdditional = function() {
+    return "# " + JSON.stringify(this.programs[0].additional) + "\n" + this.programs[0].blockly;
+  };
   this.saveProgram = function () {
-    this.savePrograms();
-    var code = this.programs[0].blockly;
+    this.savePrograms(true);
+    var code = this.getCodeWithAdditional();
     var data = new Blob([code], { type: 'text/plain' });
 
     // If we are replacing a previously generated file we need to
