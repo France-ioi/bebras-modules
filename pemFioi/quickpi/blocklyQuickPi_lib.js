@@ -3259,66 +3259,63 @@ var getContext = function (display, infos, curLevel) {
     if (getSessionStorage('board'))
         context.changeBoard(getSessionStorage('board'))
 
-    context.savePrograms = function(xml) {
-        if (context.infos.customSensors)
-        {
-            var node = goog.dom.createElement("quickpi");
-            xml.appendChild(node);
-
-            for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                var currentSensor = infos.quickPiSensors[i];
-
-                var node = goog.dom.createElement("sensor");
-
-                node.setAttribute("type", currentSensor.type);
-                node.setAttribute("port", currentSensor.port);
-                node.setAttribute("name", currentSensor.name);
-
-                if (currentSensor.subType)
-                    node.setAttribute("subtype", currentSensor.subType);
-
-                var elements = xml.getElementsByTagName("quickpi");
-
-                elements[0].appendChild(node);
-            }
+    /**
+     * This method allow us to save the sensors inside of the variable additional.
+     * If other things must be saved from quickPi later, it can be saved inside of this variable.
+     * @param additional The additional object saved inside of the xml
+     */
+    context.saveAdditional = function(additional) {
+        additional.quickpiSensors = [];
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var currentSensor = infos.quickPiSensors[i];
+            var savedSensor = {
+                type: currentSensor.type,
+                port: currentSensor.port,
+                name: currentSensor.name
+            };
+            if (currentSensor.subType)
+                savedSensor.subType = currentSensor.subType;
+            additional.quickpiSensors.push(savedSensor);
         }
-    }
+    };
 
-    context.loadPrograms = function(xml) {
-        if (context.infos.customSensors) {
-            var elements = xml.getElementsByTagName("sensor");
+    /**
+     * This function loads all additional stuff from the object "additional" for quickpi.
+     * For now on it only loads the sensor
+     * @param additional The additional variable which contains the sensors
+     */
+    context.loadAdditional = function(additional) {
+        var newSensors = additional.quickpiSensors;
+        if (!newSensors)
+            return;
 
-            if (elements.length > 0) {
-                for (var i = 0; i < infos.quickPiSensors.length; i++) {
-                    var sensor = infos.quickPiSensors[i];
-                    sensor.removed = true;
-                }
-                infos.quickPiSensors = [];
-
-                for (var i = 0; i < elements.length; i++) {
-                    var sensornode = elements[i];
-                    var sensor = {
-                        "type" : sensornode.getAttribute("type"),
-                        "port" : sensornode.getAttribute("port"),
-                        "name" : sensornode.getAttribute("name"),
-                    };
-
-                    if (sensornode.getAttribute("subtype")) {
-                        sensor.subType = sensornode.getAttribute("subtype");
-                    }
-
-                    sensor.state = null;
-                    sensor.callsInTimeSlot = 0;
-                    sensor.lastTimeIncrease = 0;
-
-                    infos.quickPiSensors.push(sensor);
-                }
-
-                context.recreateDisplay = true;
-                this.resetDisplay();
-            }
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var sensor = infos.quickPiSensors[i];
+            sensor.removed = true;
         }
-    }
+
+        infos.quickPiSensors = [];
+
+        for (var i = 0; i < newSensors.length; i++) {
+            var sensor = {
+                type: newSensors[i].type,
+                port: newSensors[i].port,
+                name: newSensors[i].name
+            };
+
+            if (newSensors[i].subType)
+                sensor.sybType = newSensors[i].subType;
+
+            sensor.state = null;
+            sensor.callsInTimeSlot = 0;
+            sensor.lastTimeIncrease = 0;
+
+            infos.quickPiSensors.push(sensor);
+        }
+
+        context.recreateDisplay = true;
+        this.resetDisplay();
+    };
 
     context.resetDisplay = function() {
         if (!context.display || !this.raphaelFactory)
