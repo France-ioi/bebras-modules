@@ -300,7 +300,7 @@ function LogicController(nbTestCases, maxInstructions) {
             }
           }
         } else {
-          // The 5 come from this string: '# {"' It must be higher in order to not fail 
+          // The 5 come from this string: '# {"' It must be higher in order to not fail
           if (that._mainContext.loadAdditional && code[0] === '#' && code.length > 5) {
             // This var correspond on how it is saved with JSON.stringify, these are the first characters
             // in order to be allowed to load codes which are from this version (our current corrections) it is
@@ -336,12 +336,12 @@ function LogicController(nbTestCases, maxInstructions) {
       }
     }
   };
-  this.getCodeWithSensors = function() {
+  this.getCodeWithAdditional = function() {
     return "# " + JSON.stringify(this.programs[0].additional) + "\n" + this.programs[0].blockly;
   };
   this.saveProgram = function () {
     this.savePrograms(true);
-    var code = this.getCodeWithSensors();
+    var code = this.getCodeWithAdditional();
     var data = new Blob([code], { type: 'text/plain' });
 
     // If we are replacing a previously generated file we need to
