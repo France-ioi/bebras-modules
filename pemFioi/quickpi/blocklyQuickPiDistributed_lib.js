@@ -167,11 +167,13 @@ var getContext = function (display, infos, curLevel) {
          var table = document.getElementById("messageTable");
          var row = table.insertRow();
 
+         var no = row.insertCell();
          var source = row.insertCell();
          var dest = row.insertCell();
          var message = row.insertCell();
          var status = row.insertCell();
 
+         no.appendChild(document.createTextNode("0"));
          source.appendChild(document.createTextNode(event.fromId));
          dest.appendChild(document.createTextNode(event.toId));
          message.appendChild(document.createTextNode(event.message));
@@ -281,11 +283,14 @@ var getContext = function (display, infos, curLevel) {
          var table = document.getElementById("messageTable");
          var row = table.insertRow();
 
+         var no = row.insertCell();
          var source = row.insertCell();
          var dest = row.insertCell();
          var messageRow = row.insertCell();
          var statusRow = row.insertCell();
 
+         
+         no.appendChild(document.createTextNode(context.globalMessageCount.toString()));
          if (messageInfo.fromId == 0) {
             source.appendChild(document.createTextNode("0/system"));
          }
@@ -485,7 +490,7 @@ var getContext = function (display, infos, curLevel) {
             }
             else {
                context.success = false;
-               throw "All nodes are done (no validation for this task)";
+               //throw "All nodes are done (no validation for this task)";
             }
 
          }
@@ -555,7 +560,7 @@ var getContext = function (display, infos, curLevel) {
          for (var i = 0; i < context.systemMessages.length; i++) {
             var message = context.systemMessages[i];
             var node = context.nodesAndNeighbors[message.nodeIndex - 1];
-            var messageId = context.globaMessageCount++;
+            var messageId = context.globalMessageCount++;
 
             var messageInfo = {
                fromId: 0,
@@ -572,7 +577,7 @@ var getContext = function (display, infos, curLevel) {
 
       context.nbNodes = vertices.length;
 
-      context.globaMessageCount = 0;
+      context.globalMessageCount = 0;
 
       if (context.display) {
          context.resetDisplay();
@@ -892,7 +897,7 @@ var getContext = function (display, infos, curLevel) {
       });
 
 
-      var tableMessages = "<table id='messageTable' style='border-spacing: 15px; margin: auto;'><tr><th>Source</th><th>Destination</th><th>Message</th><th>Status</th></tr></table>";
+      var tableMessages = "<table id='messageTable' style='border-spacing: 15px; margin: auto;'><tr><th>No</th><th>Source</th><th>Destination</th><th>Message</th><th>Status</th></tr></table>";
       $('#nodeMessages').html(tableMessages);
 
       $.each(context.nodeMessages, function (index) {
@@ -1160,7 +1165,7 @@ var getContext = function (display, infos, curLevel) {
    context.incTime = function () {
       context.currentTime++;
 
-      console.log("current time", context.currentTime);
+      //console.log("current time", context.currentTime);
       if (context.failures) {
          for (var i = 0; i < context.failures.length; i++) {
             var currentFailure = context.failures[i];
@@ -1321,8 +1326,6 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.getNeighbors = function (callback) {
       var node = context.nodesAndNeighbors[context.curNode];
 
-      console.log("current node: ", context.curNode, "neighbords: ", node.neighbors);
-
       context.runner.waitDelay(callback, node.neighbors);
    };
 
@@ -1380,7 +1383,7 @@ var getContext = function (display, infos, curLevel) {
          }
          else
          {
-            console.log("return status = false");
+            //console.log("return status = false");
             context.runner.waitDelay(cb, { "status": false }, context.infos.actionDelay);
             //context.runner.noDelay(cb, { "status": false });
          }
@@ -1436,7 +1439,7 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.sendMessage = function (recipientId, message, callback) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
       var toNode = context.findNodeById(recipientId);
-      var messageId = context.globaMessageCount++;
+      var messageId = context.globalMessageCount++;
       var messageDelay = context.infos.actionDelay;
 
       //console.log("sendMessage");
@@ -1574,7 +1577,7 @@ var getContext = function (display, infos, curLevel) {
    context.distributed.submitAnswer = function (answer, callback) {
       var node = context.nodesAndNeighbors[context.curNode];
 
-      console.log("submitAnswer");
+      console.log("submitAnswer ", context.curNode, answer);
 
       if (node.answer != null) {
          context.success = false;
@@ -1603,7 +1606,7 @@ var getContext = function (display, infos, curLevel) {
 
    context.distributed.broadcastMessage = function (message, callback) {
       var fromNode = context.nodesAndNeighbors[context.curNode];
-      var messageId = context.globaMessageCount++;
+      var messageId = context.globalMessageCount++;
       var messageDelay = 1000;
 
       /*
