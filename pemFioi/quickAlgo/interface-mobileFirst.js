@@ -216,6 +216,7 @@ var quickAlgoInterface = {
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
+                    "<div rel='edit' class='item' onclick='quickAlgoInterface.editorBtn(\"edit\");'><span class='fas fa-pencil-alt'></span>" + this.strings.editButton + "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                 "</div>" +
@@ -249,27 +250,74 @@ var quickAlgoInterface = {
     editorBtn: function(btn) {
         // Handle an editor button press
         this.closeEditorMenu();
-        if(btn == 'example') {
+        if (btn == 'example') {
             task.displayedSubTask.loadExample()
-        } else if(btn == 'copy') {
+        } else if (btn == 'copy') {
             task.displayedSubTask.blocklyHelper.copyProgram();
-        } else if(btn == 'paste') {
+        } else if (btn == 'paste') {
             task.displayedSubTask.blocklyHelper.pasteProgram();
-        } else if(btn == 'save') {
+        } else if (btn == 'save') {
             task.displayedSubTask.blocklyHelper.saveProgram();
-        } else if(btn == 'restart') {
+        } else if (btn == 'restart') {
             displayHelper.restartAll();
-        } else if(btn == 'best-answer') {
+        } else if (btn == 'edit') {
+            this.openEditExercise();
+        } else if (btn == 'best-answer') {
             displayHelper.retrieveAnswer();
-        } else if(btn == 'blockly-python') {
+        } else if (btn == 'blockly-python') {
             this.displayBlocklyPython();
         }
+    },
+
+    openEditExercise: function() {
+        var description = $(".exerciseText");
+        var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
+            "    <div class=\"panel-heading\">" +
+            "        <h2 class=\"sectionTitle\">" +
+            "            <span class=\"iconTag\"><i class=\"icon fas fa-pencil-alt\"></i></span>" +
+            "            ${this.strings.editWindowTitle}" +
+            "        </h2>" +
+            "    <div class=\"exit\" id=\"editclose\"><i class=\"icon fas fa-times\"></i></div>" +
+            "    </div>" +
+            "    <div class=\"panel-body\">" +
+            "        <div id=\"editExerciseTitle\">" +
+            "            <label>${this.strings.titleEdition} </label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"${document.title}\"/>" +
+            "        </div>" +
+            "        <div id=\"editExerciseDescription\">" +
+            "            <label>${this.strings.descriptionEdition}</label>" +
+            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">${description}</textarea>" +
+            "        </div>" +
+            "    </div>" +
+            "</div>";
+
+        window.displayHelper.showPopupDialog(editExerciseHtml);
+
+        $("#editclose").click(function() {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+            var newTitle = $("#editExerciseTitleInput").val();
+            var newDesc = $("#editExerciseDescriptionTextarea").val();
+
+            document.title = newTitle;
+            $(".exerciseText").text(newDesc);
+        });
     },
 
     loadPrograms: function(formElement) {
         this.blocklyHelper.handleFiles(formElement.files);
         resetFormElement($(formElement));
         this.closeEditorMenu();
+    },
+
+    /**
+     * This function allow us to save the subject into the additional data saved inside of the interface
+     * @param additional The additional data where we should save subject
+     */
+    saveSubject: function(additional) {
+        additional.subject = {
+            title: document.title,
+            description: $(".exerciseText").text()
+        };
     },
 
     setOptions: function(opt) {
@@ -299,6 +347,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject); // HERE
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 
