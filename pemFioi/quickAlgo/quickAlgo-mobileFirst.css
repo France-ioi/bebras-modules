@@ -1872,3 +1872,23 @@ button.showLongIntro .icon {
 .panel-heading.panel-heading-nopadding {
     padding: 0px;
 }
+#editExerciseTitle {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 44px;
+}
+#editExerciseTitle label {
+  font-size: 12px;
+}
+#editExerciseTitle input {
+  width: 90%;
+}
+#editExerciseDescription label {
+  font-size: 12px;
+}
+#editExerciseDescription textarea {
+  width: 100%;
+  height: 100%;
+  resize: vertical;
+  margin-right: 44px;
+}
