@@ -290,14 +290,35 @@ var quickAlgoInterface = {
             "            <label>" + this.strings.descriptionEdition + "</label>" +
             "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + description + "</textarea>" +
             "        </div>" +
+            "        <div id='panel-body-bottom'>" +
+            "            <button id='saveExerciseChanges'>" + this.strings.saveAndQuit + "</button>" +
+            "        </div>" +
             "    </div>" +
             "</div>";
 
         window.displayHelper.showPopupDialog(editExerciseHtml);
 
+        var that = this;
+
         $("#editclose").click(function() {
+            var newTitle = $("#editExerciseTitleInput").val();
+            var newDesc = $("#editExerciseDescriptionTextarea").val();
+            var oldTitle = document.title;
+            var oldDescription = $(".exerciseText").first().text();
+            if (newTitle !== oldTitle || newDesc !== oldDescription) {
+                if (!window.confirm(that.strings.quitWithoutSavingConfirmation)) {
+                    return;
+                }
+            }
+
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
+        });
+
+        $("#saveExerciseChanges").click(function() {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+
             var newTitle = $("#editExerciseTitleInput").val();
             var newDesc = $("#editExerciseDescriptionTextarea").val();
 
