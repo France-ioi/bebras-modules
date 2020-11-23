@@ -8838,8 +8838,7 @@ var getContext = function (display, infos, curLevel) {
     };
 
 
-    // TODO: change url to the "prod" one
-    var getTemperatureFromCloudURl = "https://mapadev.com/nicolastest/weather.php";
+    var getTemperatureFromCloudURl = "https://cloud.quick-pi.org/cache/weather.php";
 
     var getTemperatureFromCloudSupportedTowns = [];
 
