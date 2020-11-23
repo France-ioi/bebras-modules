@@ -348,7 +348,6 @@ var quickAlgoInterface = {
         // save additional from context too
         if (this.context.saveAdditional) {
             this.context.saveAdditional(additional);
-            // TODO: check if we can modify sensors, otherwise we don't save them
         }
     },
 
