@@ -495,6 +495,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                this.mainContext.saveAdditional(additional);
             }
 
+            if (this.quickAlgoInterface.saveSubject)
+               this.quickAlgoInterface.saveSubject(additional);
+
             var additionalNode = document.createElement("additional");
             additionalNode.innerText = JSON.stringify(additional);
             xml.appendChild(additionalNode);

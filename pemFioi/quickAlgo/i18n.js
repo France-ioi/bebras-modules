@@ -61,6 +61,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Insérer l'exemple",
       saveOrLoadButton: "Charger / enregistrer",
       saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
+      editButton: "Editer",
+      editWindowTitle: "Édition d'exercice",
+      titleEdition: "Titre :",
+      descriptionEdition: "Description :",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -184,6 +188,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Insert example",
       saveOrLoadButton: "Load / save",
       saveOrLoadProgram: "Save or reload your code:",
+      editButton: "edit",
+      editWindowTitle: "Exercise edition",
+      titleEdition: "Title:",
+      descriptionEdition: "Description:",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -308,6 +316,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Beispiel einfügen",
       saveOrLoadButton: "Laden / Speichern",
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
+      editButton: "bearbeiten", // TODO: verify
+      editWindowTitle: "Übungsausgabe", // TODO: verify
+      titleEdition: "Titel:", // TODO: verify
+      descriptionEdition: "Beschreibung:", // TODO: verify
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -433,6 +445,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Cargar el ejemplo",
       saveOrLoadButton: "Cargar / Guardar",
       saveOrLoadProgram: "Guardar o cargar su programa:",
+      editButton: "editar", // TODO: verify
+      editWindowTitle: "Edición de ejercicio", // TODO: verify
+      titleEdition: "Título:", // TODO: verify
+      descriptionEdition: "Descripción:", // TODO: verify
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -556,6 +572,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Naloži primer",
       saveOrLoadButton: "Naloži / Shrani",
       saveOrLoadProgram: "Shrani ali znova naloži kodo:",
+      editButton: "Uredi", // TODO: verify
+      editWindowTitle: "Izdaja vaje", // TODO: verify
+      titleEdition: "Naslov:", // TODO: verify
+      descriptionEdition: "Opis:", // TODO: verify
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -681,6 +701,10 @@ var quickAlgoLanguageStrings = {
       loadExample: "Inserisci l'esempio",
       saveOrLoadButton: "Carica / salva",
       saveOrLoadProgram: "Salva o ricarica il tuo programma:",
+      editButton: "modificare", // TODO: verify
+      editWindowTitle: "Edizione esercizio", // TODO: verify
+      titleEdition: "Titolo:", // TODO: verify
+      descriptionEdition: "Descrizione:", // TODO: verify
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",
