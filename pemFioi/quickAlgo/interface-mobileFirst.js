@@ -270,22 +270,25 @@ var quickAlgoInterface = {
     },
 
     openEditExercise: function() {
-        var description = $(".exerciseText");
+        // in python, there are two "exerciseText", we need to selected only the first one
+        // there are two "exerciseText" in python, because we also have a "long" version of the
+        // subject
+        var description = $(".exerciseText").first().text();
         var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
             "    <div class=\"panel-heading\">" +
             "        <h2 class=\"sectionTitle\">" +
             "            <span class=\"iconTag\"><i class=\"icon fas fa-pencil-alt\"></i></span>" +
-            "            ${this.strings.editWindowTitle}" +
+                         this.strings.editWindowTitle +
             "        </h2>" +
             "    <div class=\"exit\" id=\"editclose\"><i class=\"icon fas fa-times\"></i></div>" +
             "    </div>" +
             "    <div class=\"panel-body\">" +
             "        <div id=\"editExerciseTitle\">" +
-            "            <label>${this.strings.titleEdition} </label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"${document.title}\"/>" +
+            "            <label>" + this.strings.titleEdition + "</label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"" + document.title + "\"/>" +
             "        </div>" +
             "        <div id=\"editExerciseDescription\">" +
-            "            <label>${this.strings.descriptionEdition}</label>" +
-            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">${description}</textarea>" +
+            "            <label>" + this.strings.descriptionEdition + "</label>" +
+            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + description + "</textarea>" +
             "        </div>" +
             "    </div>" +
             "</div>";
@@ -311,13 +314,37 @@ var quickAlgoInterface = {
 
     /**
      * This function allow us to save the subject into the additional data saved inside of the interface
+     * This also save the element from the context
      * @param additional The additional data where we should save subject
      */
     saveSubject: function(additional) {
-        additional.subject = {
-            title: document.title,
-            description: $(".exerciseText").text()
-        };
+        if (this.options.canEditSubject) {
+            additional.subject = {
+                title: document.title,
+                subject: $(".exerciseText").first().text()
+            };
+        }
+        // save additional from context too
+        if (this.context.saveAdditional) {
+            this.context.saveAdditional(additional);
+            // TODO: check if we can modify sensors, otherwise we don't save them
+        }
+    },
+
+    /**
+     * This function allow us to load the additional things for the exercise like subject/sensors for quickpi
+     * @param additional The additional object containing additional things to load
+     */
+    loadAdditional: function(additional) {
+        // load subject if edition is enabled
+        if (additional.subject && this.options.canEditSubject) {
+            document.title = additional.subject.title;
+            $(".exerciseText").text(additional.subject.subject);
+        }
+        // Load additional from context (sensors for quickpi for example)
+        if (this.context.loadAdditional) {
+            this.context.loadAdditional(additional);
+        }
     },
 
     setOptions: function(opt) {
@@ -347,7 +374,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
-        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject); // HERE
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 

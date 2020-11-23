@@ -3292,6 +3292,9 @@ var getContext = function (display, infos, curLevel) {
      */
     context.loadAdditional = function(additional) {
         var newSensors = additional.quickpiSensors;
+
+        // we don't verify if sensors are empty or not, because if they are it is maybe meant this
+        // way by the user
         if (!newSensors)
             return;
 

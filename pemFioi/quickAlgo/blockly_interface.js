@@ -491,10 +491,6 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             // subject title when edition is enabled...
             var additional = {};
 
-            if (this.mainContext.saveAdditional) {
-               this.mainContext.saveAdditional(additional);
-            }
-
             if (this.quickAlgoInterface.saveSubject)
                this.quickAlgoInterface.saveSubject(additional);
 
@@ -518,8 +514,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var additionalXML = xml.getElementsByTagName("additional");
             if (additionalXML.length > 0) {
                var additional = JSON.parse(additionalXML[0].innerText);
-               if (this.mainContext.loadAdditional) {
-                  this.mainContext.loadAdditional(additional);
+               // load additional from quickAlgoInterface
+               if (this.quickAlgoInterface.loadAdditional) {
+                  this.quickAlgoInterface.loadAdditional(additional);
                }
             }
          }

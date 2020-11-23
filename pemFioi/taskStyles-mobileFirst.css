@@ -411,6 +411,7 @@ img {
   left: 50%;
   top: 0;
   transform: translate(-50%, 0);
+}
 #popupMessage .qpi #sensorPicker #selector-label {
   position: absolute;
   top: 15px;
