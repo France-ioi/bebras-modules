@@ -65,6 +65,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Édition d'exercice",
       titleEdition: "Titre :",
       descriptionEdition: "Description :",
+      saveAndQuit: "Sauvegarder & Quitter",
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -192,6 +194,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Exercise edition",
       titleEdition: "Title:",
       descriptionEdition: "Description:",
+      saveAndQuit: "Save & Quit",
+      quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -320,6 +324,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Übungsausgabe", // TODO: verify
       titleEdition: "Titel:", // TODO: verify
       descriptionEdition: "Beschreibung:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -449,6 +455,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Edición de ejercicio", // TODO: verify
       titleEdition: "Título:", // TODO: verify
       descriptionEdition: "Descripción:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -576,6 +584,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Izdaja vaje", // TODO: verify
       titleEdition: "Naslov:", // TODO: verify
       descriptionEdition: "Opis:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -705,6 +715,8 @@ var quickAlgoLanguageStrings = {
       editWindowTitle: "Edizione esercizio", // TODO: verify
       titleEdition: "Titolo:", // TODO: verify
       descriptionEdition: "Descrizione:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",
