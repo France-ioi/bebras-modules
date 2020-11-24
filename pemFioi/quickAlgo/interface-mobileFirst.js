@@ -128,15 +128,15 @@ var quickAlgoInterface = {
         this.strings = window.languageStrings;
         this.level = level;
 
-        // if we setup the userTaskData from subtask (the file task.js) then
-        // we must load the subject
+        // if we don't have userTaskData loaded, then we load it from the subject
         if (!this.userTaskData) {
-            // wrost case: we don't have a subject, then we load our userTaskData from the subject
-            this.userTaskData.title = document.title;
-            this.userTaskData.subject = $(".exerciseText").first().text();
+            this.userTaskData = {
+                title: document.title,
+                subject: $(".exerciseText").first().text()
+            };
+        } else {
+            this.loadSubjectFromUserTaskData();
         }
-
-        this.loadSubjectFromUserTaskData();
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
