@@ -41,8 +41,8 @@ function LogicController(nbTestCases, maxInstructions) {
       this.programs[0].blockly = this._aceEditor.getValue();
       if (full) {
         var additional = {};
-        if (window.quickAlgoInterface && window.quickAlgoInterface.saveSubject)
-          window.quickAlgoInterface.saveSubject(additional);
+        if (window.quickAlgoInterface && window.quickAlgoInterface.saveAdditional)
+          window.quickAlgoInterface.saveAdditional(additional);
         this.programs[0].additional = additional;
       }
     }
