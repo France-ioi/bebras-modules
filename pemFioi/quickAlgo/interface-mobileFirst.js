@@ -340,7 +340,7 @@ var quickAlgoInterface = {
      */
     saveSubject: function(additional) {
         if (this.options.canEditSubject) {
-            additional.subject = {
+            additional.userTaskData = {
                 title: document.title,
                 subject: $(".exerciseText").first().text()
             };
@@ -357,9 +357,9 @@ var quickAlgoInterface = {
      */
     loadAdditional: function(additional) {
         // load subject if edition is enabled
-        if (additional.subject && this.options.canEditSubject) {
-            document.title = additional.subject.title;
-            $(".exerciseText").text(additional.subject.subject);
+        if (additional.userTaskData && this.options.canEditSubject) {
+            document.title = additional.userTaskData.title;
+            $(".exerciseText").text(additional.userTaskData.subject);
         }
         // Load additional from context (sensors for quickpi for example)
         if (this.context.loadAdditional) {
