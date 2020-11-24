@@ -20,6 +20,7 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
+    userTaskData: null, // contain the subject and title
     keypadData: {
         value: '',
         callbackModify: null,
@@ -110,6 +111,15 @@ var quickAlgoInterface = {
         this.fullscreenEvents = true;
     },
 
+    loadUserTaskData: function(taskData) {
+        this.userTaskData = taskData;
+    },
+
+    loadSubjectFromUserTaskData : function() {
+        document.title = this.userTaskData.title;
+        $(".exerciseText").text(this.userTaskData.subject);
+    },
+
     loadInterface: function(context, level) {
         ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
@@ -117,6 +127,16 @@ var quickAlgoInterface = {
         quickAlgoImportLanguage();
         this.strings = window.languageStrings;
         this.level = level;
+
+        // if we setup the userTaskData from subtask (the file task.js) then
+        // we must load the subject
+        if (!this.userTaskData) {
+            // wrost case: we don't have a subject, then we load our userTaskData from the subject
+            this.userTaskData.title = document.title;
+            this.userTaskData.subject = $(".exerciseText").first().text();
+        }
+
+        this.loadSubjectFromUserTaskData();
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
@@ -134,6 +154,7 @@ var quickAlgoInterface = {
             "</div>" +
             "<div id='languageInterface'></div>"
         );
+
 
         // Buttons from buttonsAndMessages
         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
@@ -273,7 +294,8 @@ var quickAlgoInterface = {
         // in python, there are two "exerciseText", we need to selected only the first one
         // there are two "exerciseText" in python, because we also have a "long" version of the
         // subject
-        var description = $(".exerciseText").first().text();
+        var title = this.userTaskData.title;
+        var subject = this.userTaskData.subject;
         var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
             "    <div class=\"panel-heading\">" +
             "        <h2 class=\"sectionTitle\">" +
@@ -284,11 +306,11 @@ var quickAlgoInterface = {
             "    </div>" +
             "    <div class=\"panel-body\">" +
             "        <div id=\"editExerciseTitle\">" +
-            "            <label>" + this.strings.titleEdition + "</label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"" + document.title + "\"/>" +
+            "            <label>" + this.strings.titleEdition + "</label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"" + title + "\"/>" +
             "        </div>" +
             "        <div id=\"editExerciseDescription\">" +
             "            <label>" + this.strings.descriptionEdition + "</label>" +
-            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + description + "</textarea>" +
+            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + subject + "</textarea>" +
             "        </div>" +
             "        <div id='panel-body-bottom'>" +
             "            <button id='saveExerciseChanges'>" + this.strings.saveAndQuit + "</button>" +
@@ -320,10 +342,10 @@ var quickAlgoInterface = {
             window.displayHelper.popupMessageShown = false;
 
             var newTitle = $("#editExerciseTitleInput").val();
-            var newDesc = $("#editExerciseDescriptionTextarea").val();
-
-            document.title = newTitle;
-            $(".exerciseText").text(newDesc);
+            var newSubject = $("#editExerciseDescriptionTextarea").val();
+            that.userTaskData.title = newTitle;
+            that.userTaskData.subject = newSubject;
+            that.loadSubjectFromUserTaskData();
         });
     },
 
@@ -338,12 +360,9 @@ var quickAlgoInterface = {
      * This also save the element from the context
      * @param additional The additional data where we should save subject
      */
-    saveSubject: function(additional) {
+    saveAdditional: function(additional) {
         if (this.options.canEditSubject) {
-            additional.userTaskData = {
-                title: document.title,
-                subject: $(".exerciseText").first().text()
-            };
+            additional.userTaskData = this.userTaskData;
         }
         // save additional from context too
         if (this.context.saveAdditional) {
@@ -358,8 +377,9 @@ var quickAlgoInterface = {
     loadAdditional: function(additional) {
         // load subject if edition is enabled
         if (additional.userTaskData && this.options.canEditSubject) {
-            document.title = additional.userTaskData.title;
-            $(".exerciseText").text(additional.userTaskData.subject);
+            this.userTaskData.title = additional.userTaskData.title;
+            this.userTaskData.subject = additional.userTaskData.subject;
+            this.loadSubjectFromUserTaskData();
         }
         // Load additional from context (sensors for quickpi for example)
         if (this.context.loadAdditional) {

@@ -491,8 +491,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             // subject title when edition is enabled...
             var additional = {};
 
-            if (this.quickAlgoInterface.saveSubject)
-               this.quickAlgoInterface.saveSubject(additional);
+            if (this.quickAlgoInterface.saveAdditional)
+               this.quickAlgoInterface.saveAdditional(additional);
 
             var additionalNode = document.createElement("additional");
             additionalNode.innerText = JSON.stringify(additional);
