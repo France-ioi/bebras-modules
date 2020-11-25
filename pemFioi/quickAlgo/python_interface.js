@@ -41,7 +41,8 @@ function LogicController(nbTestCases, maxInstructions) {
       this.programs[0].blockly = this._aceEditor.getValue();
       if (full) {
         var additional = {};
-        this._mainContext.saveAdditional(additional);
+        if (window.quickAlgoInterface && window.quickAlgoInterface.saveAdditional)
+          window.quickAlgoInterface.saveAdditional(additional);
         this.programs[0].additional = additional;
       }
     }
@@ -53,7 +54,8 @@ function LogicController(nbTestCases, maxInstructions) {
       this._aceEditor.selection.clearSelection();
     }
     if (this._aceEditor && this.programs[0].additional) {
-      this._mainContext.loadAdditional(this.programs[0].additional);
+      if (window.quickAlgoInterface && window.quickAlgoInterface.loadAdditional)
+        window.quickAlgoInterface.loadAdditional(this.programs[0].additional);
     }
   };
 

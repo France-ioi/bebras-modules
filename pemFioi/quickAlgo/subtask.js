@@ -69,6 +69,8 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       if (this.display) {
+         if (window.quickAlgoInterface.loadUserTaskData)
+            window.quickAlgoInterface.loadUserTaskData(levelGridInfos.userTaskData);
          window.quickAlgoInterface.loadInterface(this.context, curLevel);
          window.quickAlgoInterface.setOptions({
             hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
@@ -76,7 +78,8 @@ var initBlocklySubTask = function(subTask, language) {
             conceptViewerLang: this.blocklyHelper.language,
             hasTestThumbnails: levelGridInfos.hasTestThumbnails,
             hideControls: levelGridInfos.hideControls,
-            introMaxHeight: levelGridInfos.introMaxHeight
+            introMaxHeight: levelGridInfos.introMaxHeight,
+            canEditSubject: !!levelGridInfos.canEditSubject
          });
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }

@@ -3263,7 +3263,7 @@ var getContext = function (display, infos, curLevel) {
     context.board = "quickpi";
 
     if (getSessionStorage('board'))
-        context.changeBoard(getSessionStorage('board'))
+        context.changeBoard(getSessionStorage('board'));
 
     /**
      * This method allow us to save the sensors inside of the variable additional.
@@ -3271,6 +3271,10 @@ var getContext = function (display, infos, curLevel) {
      * @param additional The additional object saved inside of the xml
      */
     context.saveAdditional = function(additional) {
+        // we don't need to save sensors if user can't modify them
+        if (!infos.customSensors)
+            return;
+
         additional.quickpiSensors = [];
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
             var currentSensor = infos.quickPiSensors[i];
@@ -3291,7 +3295,14 @@ var getContext = function (display, infos, curLevel) {
      * @param additional The additional variable which contains the sensors
      */
     context.loadAdditional = function(additional) {
+        // we load sensors only if custom sensors is available
+        if (!infos.customSensors)
+            return;
+
         var newSensors = additional.quickpiSensors;
+
+        // we don't verify if sensors are empty or not, because if they are it is maybe meant this
+        // way by the user
         if (!newSensors)
             return;
 
