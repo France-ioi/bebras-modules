@@ -4190,27 +4190,23 @@ var getContext = function (display, infos, curLevel) {
         });
 
 
-
         $('#pichangehat').click(function () {
-            window.displayHelper.showPopupDialog(`
-            <div class="content connectPi qpi">
-            <div class="panel-heading">
-                <h2 class="sectionTitle">
-                    <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                    ${strings.messages.chooseBoard}
-                </h2>
-                <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-            </div>
-            <div class="panel-body">
-
-                <div id=boardlist>
-                </div>
-
-                <div panel-body-usbbt>
-                    <label id="piconnectionlabel"></label>
-                </div>
-            </div>
-        </div>`);
+            window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
+                "   <div class=\"panel-heading\">" +
+                "       <h2 class=\"sectionTitle\">" +
+                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                            strings.messages.chooseBoard +
+                "       </h2>" +
+                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                "   </div>" +
+                "   <div class=\"panel-body\">" +
+                "       <div id=boardlist>" +
+                "       </div>" +
+                "       <div panel-body-usbbt>" +
+                "           <label id=\"piconnectionlabel\"></label>" +
+                "       </div>" +
+                "   </div>" +
+                "</div>");
 
             $('#picancel').click(function () {
                 $('#popupMessage').hide();
@@ -4237,35 +4233,32 @@ var getContext = function (display, infos, curLevel) {
 
         $('#pihatsetup').click(function () {
 
-                window.displayHelper.showPopupDialog(`
-                <div class="content connectPi qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        ${strings.messages.nameandports}
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div class="panel-body">
-                <table id='sensorTable' style="display:table-header-group;">
-                <tr>
-                <th>${strings.messages.name}</th>
-                <th>${strings.messages.port}</th>
-                <th>${strings.messages.state}</th>
-                </tr>
-                </table>
-                <!--
-                    <div>
-                        <input type="checkbox" id="buzzeraudio" value="buzzeron"> Output audio trought audio buzzer<br>
-                    </div>
-
-                    <div class="inlineButtons">
-                        <button id="pisetupok" class="btn"><i class="fas fa-cog icon"></i>Set</button>
-                    </div>
-                -->
-                </div>
-            </div>`);
-
+                window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
+                    "   <div class=\"panel-heading\">" +
+                    "       <h2 class=\"sectionTitle\">" +
+                    "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                                strings.messages.nameandports +
+                    "       </h2>" +
+                    "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                    "   </div>" +
+                    "   <div class=\"panel-body\">" +
+                    "       <table id='sensorTable' style=\"display:table-header-group;\">" +
+                    "           <tr>" +
+                    "               <th>" + strings.messages.name + "</th>" +
+                    "               <th>" + strings.messages.port + "</th>" +
+                    "               <th>" + strings.messages.state + "</th>" +
+                    "           </tr>" +
+                    "       </table>" +
+                    "   <!--" +
+                    "       <div>" +
+                    "           <input type=\"checkbox\" id=\"buzzeraudio\" value=\"buzzeron\"> Output audio trought audio buzzer<br>" +
+                    "       </div>" +
+                    "       <div class=\"inlineButtons\">" +
+                    "           <button id=\"pisetupok\" class=\"btn\"><i class=\"fas fa-cog icon\"></i>Set</button>" +
+                    "       </div>" +
+                    "   -->" +
+                    "   </div>" +
+                    "</div>");
 
                 var table = document.getElementById("sensorTable");
                 for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
@@ -4463,41 +4456,39 @@ var getContext = function (display, infos, curLevel) {
 
         context.sensorAdder.click(function () {
 
-            window.displayHelper.showPopupDialog(`
-                <div class="content qpi">
-                    <div class="panel-heading">
-                        <h2 class="sectionTitle">
-                            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                            ${strings.messages.addcomponent}
-                        </h2>
-                        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                    </div>
-                    <div id="sensorPicker" class="panel-body">
-                        <label>${strings.messages.selectcomponent}</label>
-                        <div class="flex-container">
-                            <div id="selector-image-container" class="flex-col half">
-                                <img id="selector-sensor-image">
-                            </div>
-                            <div class="flex-col half">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <select id="selector-sensor-list" class="custom-select"></select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <select id="selector-sensor-port" class="custom-select"></select>
-                                    </div>
-                                    <label id="selector-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="singleButton">
-                        <button id="selector-add-button" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.add}</button>
-                    </div>
-                </div>
-            `);
+            window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
+                "   <div class=\"panel-heading\">" +
+                "       <h2 class=\"sectionTitle\">" +
+                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                            strings.messages.addcomponent +
+                "       </h2>" +
+                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                "   </div>" +
+                "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+                "       <label>" + strings.messages.selectcomponent + "</label>" +
+                "       <div class=\"flex-container\">" +
+                "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
+                "               <img id=\"selector-sensor-image\">" +
+                "           </div>" +
+                "           <div class=\"flex-col half\">" +
+                "               <div class=\"form-group\">" +
+                "                   <div class=\"input-group\">" +
+                "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
+                "                   </div>" +
+                "              </div>" +
+                "              <div class=\"form-group\">" +
+                "                   <div class=\"input-group\">" +
+                "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
+                "                   </div>" +
+                "                   <label id=\"selector-label\"></label>" +
+                "               </div>" +
+                "           </div>" +
+                "       </div>" +
+                "   </div>" +
+                "   <div class=\"singleButton\">" +
+                "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
+                "   </div>" +
+                "</div>");
 
             var select = document.getElementById("selector-sensor-list");
             for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
@@ -6127,27 +6118,24 @@ var getContext = function (display, infos, curLevel) {
         return !element.paper.canvas || !element.node.parentElement;
     }
 
-    var irRemoteDialog = `
-    <div class="content qpi">
-    <div class="panel-heading">
-        <h2 class="sectionTitle">
-            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-            ${strings.messages.irRemoteControl}
-        </h2>
-        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-    </div>
-    <div id="sensorPicker" class="panel-body">
-        <div id="piremotemessage" >
-        </div>
-        <div id="piremotecontent" >
-        </div>
-    </div>
-    <div class="singleButton">
-        <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.closeDialog}</button>
-    </div>
-</div>
-    `;
-
+    var irRemoteDialog = "<div class=\"content qpi\">" +
+        "   <div class=\"panel-heading\">" +
+        "       <h2 class=\"sectionTitle\">" +
+        "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                    strings.messages.irRemoteControl +
+        "       </h2>" +
+        "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+        "   </div>" +
+        "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+        "       <div id=\"piremotemessage\" >" +
+        "       </div>" +
+        "       <div id=\"piremotecontent\" >" +
+        "       </div>" +
+        "   </div>" +
+        "   <div class=\"singleButton\">" +
+        "       <button id=\"picancel2\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.closeDialog + "</button>" +
+        "   </div>" +
+        "</div>";
 
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
@@ -7452,30 +7440,27 @@ var getContext = function (display, infos, curLevel) {
 
                     context.stopLiveUpdate = true;
 
-                    var irLearnDialog = `
-                <div class="content qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        ${strings.messages.irReceiverTitle}
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div id="sensorPicker" class="panel-body">
-                    <div class="form-group">
-                        <p>${strings.messages.directIrControl}</p>
-                    </div>
-
-                    <div class="form-group">
-                        <p id=piircode></p>
-                    </div>
-                </div>
-                <div class="singleButton">
-                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>${strings.messages.getIrCode}</button>
-                    <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>${strings.messages.closeDialog}</button>
-                </div>
-            </div>
-                `;
+                    var irLearnDialog = "<div class=\"content qpi\">" +
+                        "   <div class=\"panel-heading\">" +
+                        "       <h2 class=\"sectionTitle\">" +
+                        "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                                    strings.messages.irReceiverTitle +
+                        "       </h2>" +
+                        "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                        "   </div>" +
+                        "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+                        "       <div class=\"form-group\">" +
+                        "           <p>" + strings.messages.directIrControl + "</p>" +
+                        "       </div>" +
+                        "       <div class=\"form-group\">" +
+                        "           <p id=piircode></p>" +
+                        "       </div>" +
+                        "   </div>" +
+                        "   <div class=\"singleButton\">" +
+                        "       <button id=\"piirlearn\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.getIrCode + "</button>" +
+                        "       <button id=\"picancel2\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.closeDialog + "</button>" +
+                        "   </div>" +
+                        "</div>";
 
                     window.displayHelper.showPopupDialog(irLearnDialog);
 
@@ -10032,7 +10017,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" +
                         "</block>"
 
                 },
@@ -10044,7 +10029,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText2Lines'>" +
-                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
