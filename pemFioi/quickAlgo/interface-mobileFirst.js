@@ -325,8 +325,8 @@ var quickAlgoInterface = {
         $("#editclose").click(function() {
             var newTitle = $("#editExerciseTitleInput").val();
             var newDesc = $("#editExerciseDescriptionTextarea").val();
-            var oldTitle = document.title;
-            var oldDescription = $(".exerciseText").first().text();
+            var oldTitle = that.userTaskData.title;
+            var oldDescription = that.userTaskData.subject;
             if (newTitle !== oldTitle || newDesc !== oldDescription) {
                 if (!window.confirm(that.strings.quitWithoutSavingConfirmation)) {
                     return;
