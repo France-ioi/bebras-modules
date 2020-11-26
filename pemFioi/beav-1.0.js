@@ -375,6 +375,55 @@ Beav.Raphael.lineRelative = function(paper, x1, y1, dx, dy) {
    return Beav.Raphael.line(paper, x1, y1, x1+dx, y1+dy);
 };
 
+Beav.Raphael.loadTextExtensions = function(paper) {
+   paper.text_prebeav = paper.text;
+
+   var valign = function(dir) { // dir = 'center', or 'top', or 'bottom'
+      var b = this.getBBox();
+      var h = b.height;
+      var d = 0;
+      if (dir == 'center') {
+         d = 0;
+      } else if (dir == 'top') {
+         d = h/2;
+      } else if (dir == 'top') {
+         d = - h/2; // TODO: maybe remove one pixel in case h is odd number?
+      }
+      try {
+         // this.translate(0, d); // not supported by IE8
+         // this.attr({'y': b.y + d}); // does not seem to work
+         this.transform("t0," + d); // workaround?
+      } catch(e) {}
+      return this;
+   };
+
+   paper.text = function(x, y, text, fontSize) {
+      if(!window.enableRtl || !text || typeof text == "string" || !text.length) {
+         var txt = paper.text_prebeav(x, y, text);
+         txt.valign = valign;
+         return txt;
+      }
+      var set = paper.set();
+      if(!fontSize) { fontSize = 16; }
+      var lineHeight = fontSize * 1.2; // Raphael's line-height
+      var startY = y - ((text.length - 1) / 2) * lineHeight
+      for(var i = 0; i < text.length; i++) {
+         var txt = paper.text_prebeav(x, startY + i * lineHeight, text[i]);
+         txt.valign = valign;
+         set.push(txt);
+      }
+      return set;
+   }
+
+   var setproto = paper.set().__proto__;
+   setproto.valign = function(dir) {
+      this.forEach(function(item) {
+         item.valign(dir);
+      });
+      return this;
+   };
+
+};
 
 /**********************************************************************************/
 /* Random */
