@@ -3624,34 +3624,31 @@ var getContext = function (display, infos, curLevel) {
             return;
 
 
-        var connectionHTML = `
-                <div id="piui">
-                    <button type="button" id="piconnect" class="btn">
-                        <span class="fa fa-wifi"></span><span id="piconnecttext" class="btnText">${strings.messages.connect}</span> <span id="piconnectprogress" class="fas fa-spinner fa-spin"></span>
-                    </button>
-
-                    <span id="piinstallui">
-                        <span class="fa fa-exchange-alt"></span>
-                        <button type="button" id="piinstall" class="btn">
-                            <span class="fa fa-upload"></span><span>${strings.messages.install}</span><span id=piinstallprogresss class="fas fa-spinner fa-spin"></span><span id="piinstallcheck" class="fa fa-check"></span>
-                        </button>
-                    </span>
-
-                    <span id="pichangehatui">
-                        <button type="button" id="pichangehat" class="btn">
-                            <span class="fas fa-hat-wizard"></span><span>${strings.messages.changeBoard}</span></span></span>
-                        </button>
-                        <button type="button" id="pihatsetup" class="btn">
-                            <span class="fas fa-cog"></span><span>${strings.messages.config}</span></span></span>
-                        </button>
-                    </span>
-                </div>`;
+        var connectionHTML = "<div id=\"piui\">" +
+            "   <button type=\"button\" id=\"piconnect\" class=\"btn\">" +
+            "       <span class=\"fa fa-wifi\"></span><span id=\"piconnecttext\" class=\"btnText\">" + strings.messages.connect + "</span> <span id=\"piconnectprogress\" class=\"fas fa-spinner fa-spin\"></span>" +
+            "   </button>" +
+            "   <span id=\"piinstallui\">" +
+            "       <span class=\"fa fa-exchange-alt\"></span>" +
+            "       <button type=\"button\" id=\"piinstall\" class=\"btn\">" +
+            "           <span class=\"fa fa-upload\"></span><span>" + strings.messages.install + "</span><span id=piinstallprogresss class=\"fas fa-spinner fa-spin\"></span><span id=\"piinstallcheck\" class=\"fa fa-check\"></span>" +
+            "       </button>" +
+            "   </span>" +
+            "   <span id=\"pichangehatui\">" +
+            "       <button type=\"button\" id=\"pichangehat\" class=\"btn\">" +
+            "           <span class=\"fas fa-hat-wizard\"></span><span>" + strings.messages.changeBoard + "</span></span></span>" +
+            "       </button>" +
+            "       <button type=\"button\" id=\"pihatsetup\" class=\"btn\">" +
+            "           <span class=\"fas fa-cog\"></span><span>" + strings.messages.config + "</span></span></span>" +
+            "       </button>" +
+            "   </span>" +
+            "</div>";
 
         var piUi = getQuickPiOption('disableConnection') ? '' : connectionHTML;
 
         var hasIntroControls = $('#taskIntro').find('#introControls').length;
         if (!hasIntroControls) {
-            $('#taskIntro').append(`<div id="introControls"></div>`);
+            $('#taskIntro').append("<div id=\"introControls\"></div>");
         }
         if (introControls === null) {
             introControls = piUi + $('#introControls').html();
@@ -3659,11 +3656,8 @@ var getContext = function (display, infos, curLevel) {
         $('#introControls').html(introControls);
         $('#taskIntro').addClass('piui');
 
-        $('#grid').html(`
-            <div id="virtualSensors" style="height: 100%; width: 100%;">
-            </div>
-             `
-        );
+        $('#grid').html("<div id=\"virtualSensors\" style=\"height: 100%; width: 100%;\">"
+            + "</div>");
 
 
         if (!context.quickPiZoom || !context.autoGrading)
@@ -3734,76 +3728,70 @@ var getContext = function (display, infos, curLevel) {
         }
 
         $('#piconnect').click(function () {
-            var connectionDialogHTML = `
-            <div class="content connectPi qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        ${strings.messages.raspiConfig}
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div class="panel-body">
-                    <div id="piconnectionmainui">
-                        <div class="switchRadio btn-group" id="piconsel">
-                            <button type="button" class="btn" id="piconlocal"><i class="fas fa-location-arrow icon"></i>${strings.messages.local}</button>
-                            <button type="button" class="btn active" id="piconwifi"><i class="fa fa-wifi icon"></i>WiFi</button>
-                            <button type="button" class="btn" id="piconusb"><i class="fab fa-usb icon"></i>USB</button>
-                            <button type="button" class="btn" id="piconbt"><i class="fab fa-bluetooth-b icon"></i>Bluetooth</button>
-                        </div>
-                        <div id="pischoolcon">
-                            <div class="form-group">
-                                <label id="pischoolkeylabel">${strings.messages.schoolKey}</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">Aa</div>
-                                    <input type="text" id="schoolkey" class="form-control">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label id="pilistlabel">${strings.messages.connectList}</label>
-                                <div class="input-group">
-                                    <button class="input-group-prepend" id=pigetlist disabled>${strings.messages.getPiList}</button>
-                                    <select id="pilist" class="custom-select" disabled>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label id="piiplabel">${strings.messages.enterIpAddress}</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">123</div>
-                                    <input id=piaddress type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div>
-                                <input id="piusetunnel" disabled type="checkbox">${strings.messages.connectTroughtTunnel}
-                            </div>
-                        </div>
-
-                        <div id="panel-body-usbbt">
-                            <label id="piconnectionlabel"></label>
-                        </div>
-
-                        <div id="panel-body-local">
-                            <label id="piconnectionlabellocal"></label>
-
-                            <div id="piconnectolocalhost">
-                                <input type="radio" id="piconnectolocalhostcheckbox" name="pilocalconnectiontype" value="localhost">
-                                ${strings.messages.connectToLocalhost}
-                            </div>
-
-                            <div id="piconnectocurrenturl">
-                                <input type="radio" id="piconnectocurrenturlcheckbox" name="pilocalconnectiontype" value="currenturl">
-                                ${strings.messages.connectToWindowLocation}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="inlineButtons">
-                        <button id="piconnectok" class="btn"><i class="fa fa-wifi icon"></i>${strings.messages.connectToDevice}</button>
-                        <button id="pirelease" class="btn"><i class="fa fa-times icon"></i>${strings.messages.disconnectFromDevice}</button>
-                    </div>
-                </div>
-            </div>
-            `;
+            var connectionDialogHTML = "<div class=\"content connectPi qpi\">" +
+                "   <div class=\"panel-heading\">" +
+                "       <h2 class=\"sectionTitle\">" +
+                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                            strings.messages.raspiConfig +
+                "       </h2>" +
+                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                "   </div>" +
+                "   <div class=\"panel-body\">" +
+                "       <div id=\"piconnectionmainui\">" +
+                "           <div class=\"switchRadio btn-group\" id=\"piconsel\">" +
+                "               <button type=\"button\" class=\"btn\" id=\"piconlocal\"><i class=\"fas fa-location-arrow icon\"></i>" + strings.messages.local + "</button>" +
+                "               <button type=\"button\" class=\"btn active\" id=\"piconwifi\"><i class=\"fa fa-wifi icon\"></i>WiFi</button>" +
+                "               <button type=\"button\" class=\"btn\" id=\"piconusb\"><i class=\"fab fa-usb icon\"></i>USB</button>" +
+                "               <button type=\"button\" class=\"btn\" id=\"piconbt\"><i class=\"fab fa-bluetooth-b icon\"></i>Bluetooth</button>" +
+                "           </div>" +
+                "           <div id=\"pischoolcon\">" +
+                "               <div class=\"form-group\">" +
+                "                   <label id=\"pischoolkeylabel\">" + strings.messages.schoolKey + "</label>" +
+                "                   <div class=\"input-group\">" +
+                "                       <div class=\"input-group-prepend\">Aa</div>" +
+                "                       <input type=\"text\" id=\"schoolkey\" class=\"form-control\">" +
+                "                   </div>" +
+                "               </div>" +
+                "               <div class=\"form-group\">" +
+                "                   <label id=\"pilistlabel\">" + strings.messages.connectList + "</label>" +
+                "                   <div class=\"input-group\">" +
+                "                       <button class=\"input-group-prepend\" id=pigetlist disabled>" + strings.messages.getPiList + "</button>" +
+                "                       <select id=\"pilist\" class=\"custom-select\" disabled>" +
+                "                       </select>" +
+                "                   </div>" +
+                "               </div>" +
+                "               <div class=\"form-group\">" +
+                "                   <label id=\"piiplabel\">" + strings.messages.enterIpAddress + "</label>" +
+                "                   <div class=\"input-group\">" +
+                "                       <div class=\"input-group-prepend\">123</div>" +
+                "                       <input id=piaddress type=\"text\" class=\"form-control\">" +
+                "                   </div>" +
+                "               </div>" +
+                "               <div>" +
+                "                   <input id=\"piusetunnel\" disabled type=\"checkbox\">" + strings.messages.connectTroughtTunnel +
+                "               </div>" +
+                "           </div>" +
+                "           <div id=\"panel-body-usbbt\">" +
+                "               <label id=\"piconnectionlabel\"></label>" +
+                "           </div>" +
+                "           <div id=\"panel-body-local\">" +
+                "               <label id=\"piconnectionlabellocal\"></label>" +
+                "               <div id=\"piconnectolocalhost\">" +
+                "                   <input type=\"radio\" id=\"piconnectolocalhostcheckbox\" name=\"pilocalconnectiontype\" value=\"localhost\">" +
+                                        strings.messages.connectToLocalhost +
+                "               </div>" +
+                "               <div id=\"piconnectocurrenturl\">" +
+                "                   <input type=\"radio\" id=\"piconnectocurrenturlcheckbox\" name=\"pilocalconnectiontype\" value=\"currenturl\">" +
+                                        strings.messages.connectToWindowLocation +
+                "               </div>" +
+                "           </div>" +
+                "       </div>" +
+                "       <div class=\"inlineButtons\">" +
+                "           <button id=\"piconnectok\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.connectToDevice + "</button>" +
+                "           <button id=\"pirelease\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.disconnectFromDevice + "</button>" +
+                "       </div>" +
+                "   </div>" +
+                "</div>";
 
             window.displayHelper.showPopupDialog(connectionDialogHTML);
 
@@ -4202,27 +4190,23 @@ var getContext = function (display, infos, curLevel) {
         });
 
 
-
         $('#pichangehat').click(function () {
-            window.displayHelper.showPopupDialog(`
-            <div class="content connectPi qpi">
-            <div class="panel-heading">
-                <h2 class="sectionTitle">
-                    <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                    ${strings.messages.chooseBoard}
-                </h2>
-                <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-            </div>
-            <div class="panel-body">
-
-                <div id=boardlist>
-                </div>
-
-                <div panel-body-usbbt>
-                    <label id="piconnectionlabel"></label>
-                </div>
-            </div>
-        </div>`);
+            window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
+                "   <div class=\"panel-heading\">" +
+                "       <h2 class=\"sectionTitle\">" +
+                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                            strings.messages.chooseBoard +
+                "       </h2>" +
+                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                "   </div>" +
+                "   <div class=\"panel-body\">" +
+                "       <div id=boardlist>" +
+                "       </div>" +
+                "       <div panel-body-usbbt>" +
+                "           <label id=\"piconnectionlabel\"></label>" +
+                "       </div>" +
+                "   </div>" +
+                "</div>");
 
             $('#picancel').click(function () {
                 $('#popupMessage').hide();
@@ -4249,35 +4233,32 @@ var getContext = function (display, infos, curLevel) {
 
         $('#pihatsetup').click(function () {
 
-                window.displayHelper.showPopupDialog(`
-                <div class="content connectPi qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        ${strings.messages.nameandports}
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div class="panel-body">
-                <table id='sensorTable' style="display:table-header-group;">
-                <tr>
-                <th>${strings.messages.name}</th>
-                <th>${strings.messages.port}</th>
-                <th>${strings.messages.state}</th>
-                </tr>
-                </table>
-                <!--
-                    <div>
-                        <input type="checkbox" id="buzzeraudio" value="buzzeron"> Output audio trought audio buzzer<br>
-                    </div>
-
-                    <div class="inlineButtons">
-                        <button id="pisetupok" class="btn"><i class="fas fa-cog icon"></i>Set</button>
-                    </div>
-                -->
-                </div>
-            </div>`);
-
+                window.displayHelper.showPopupDialog("<div class=\"content connectPi qpi\">" +
+                    "   <div class=\"panel-heading\">" +
+                    "       <h2 class=\"sectionTitle\">" +
+                    "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                                strings.messages.nameandports +
+                    "       </h2>" +
+                    "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                    "   </div>" +
+                    "   <div class=\"panel-body\">" +
+                    "       <table id='sensorTable' style=\"display:table-header-group;\">" +
+                    "           <tr>" +
+                    "               <th>" + strings.messages.name + "</th>" +
+                    "               <th>" + strings.messages.port + "</th>" +
+                    "               <th>" + strings.messages.state + "</th>" +
+                    "           </tr>" +
+                    "       </table>" +
+                    "   <!--" +
+                    "       <div>" +
+                    "           <input type=\"checkbox\" id=\"buzzeraudio\" value=\"buzzeron\"> Output audio trought audio buzzer<br>" +
+                    "       </div>" +
+                    "       <div class=\"inlineButtons\">" +
+                    "           <button id=\"pisetupok\" class=\"btn\"><i class=\"fas fa-cog icon\"></i>Set</button>" +
+                    "       </div>" +
+                    "   -->" +
+                    "   </div>" +
+                    "</div>");
 
                 var table = document.getElementById("sensorTable");
                 for (var iSensor = 0; iSensor < infos.quickPiSensors.length; iSensor++) {
@@ -4475,41 +4456,39 @@ var getContext = function (display, infos, curLevel) {
 
         context.sensorAdder.click(function () {
 
-            window.displayHelper.showPopupDialog(`
-                <div class="content qpi">
-                    <div class="panel-heading">
-                        <h2 class="sectionTitle">
-                            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                            ${strings.messages.addcomponent}
-                        </h2>
-                        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                    </div>
-                    <div id="sensorPicker" class="panel-body">
-                        <label>${strings.messages.selectcomponent}</label>
-                        <div class="flex-container">
-                            <div id="selector-image-container" class="flex-col half">
-                                <img id="selector-sensor-image">
-                            </div>
-                            <div class="flex-col half">
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <select id="selector-sensor-list" class="custom-select"></select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="input-group">
-                                        <select id="selector-sensor-port" class="custom-select"></select>
-                                    </div>
-                                    <label id="selector-label"></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="singleButton">
-                        <button id="selector-add-button" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.add}</button>
-                    </div>
-                </div>
-            `);
+            window.displayHelper.showPopupDialog("<div class=\"content qpi\">" +
+                "   <div class=\"panel-heading\">" +
+                "       <h2 class=\"sectionTitle\">" +
+                "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                            strings.messages.addcomponent +
+                "       </h2>" +
+                "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                "   </div>" +
+                "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+                "       <label>" + strings.messages.selectcomponent + "</label>" +
+                "       <div class=\"flex-container\">" +
+                "           <div id=\"selector-image-container\" class=\"flex-col half\">" +
+                "               <img id=\"selector-sensor-image\">" +
+                "           </div>" +
+                "           <div class=\"flex-col half\">" +
+                "               <div class=\"form-group\">" +
+                "                   <div class=\"input-group\">" +
+                "                       <select id=\"selector-sensor-list\" class=\"custom-select\"></select>" +
+                "                   </div>" +
+                "              </div>" +
+                "              <div class=\"form-group\">" +
+                "                   <div class=\"input-group\">" +
+                "                       <select id=\"selector-sensor-port\" class=\"custom-select\"></select>" +
+                "                   </div>" +
+                "                   <label id=\"selector-label\"></label>" +
+                "               </div>" +
+                "           </div>" +
+                "       </div>" +
+                "   </div>" +
+                "   <div class=\"singleButton\">" +
+                "       <button id=\"selector-add-button\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.add + "</button>" +
+                "   </div>" +
+                "</div>");
 
             var select = document.getElementById("selector-sensor-list");
             for (var iSensorDef = 0; iSensorDef < sensorDefinitions.length; iSensorDef++) {
@@ -6139,27 +6118,24 @@ var getContext = function (display, infos, curLevel) {
         return !element.paper.canvas || !element.node.parentElement;
     }
 
-    var irRemoteDialog = `
-    <div class="content qpi">
-    <div class="panel-heading">
-        <h2 class="sectionTitle">
-            <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-            ${strings.messages.irRemoteControl}
-        </h2>
-        <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-    </div>
-    <div id="sensorPicker" class="panel-body">
-        <div id="piremotemessage" >
-        </div>
-        <div id="piremotecontent" >
-        </div>
-    </div>
-    <div class="singleButton">
-        <button id="picancel2" class="btn btn-centered"><i class="icon fa fa-check"></i>${strings.messages.closeDialog}</button>
-    </div>
-</div>
-    `;
-
+    var irRemoteDialog = "<div class=\"content qpi\">" +
+        "   <div class=\"panel-heading\">" +
+        "       <h2 class=\"sectionTitle\">" +
+        "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                    strings.messages.irRemoteControl +
+        "       </h2>" +
+        "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+        "   </div>" +
+        "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+        "       <div id=\"piremotemessage\" >" +
+        "       </div>" +
+        "       <div id=\"piremotecontent\" >" +
+        "       </div>" +
+        "   </div>" +
+        "   <div class=\"singleButton\">" +
+        "       <button id=\"picancel2\" class=\"btn btn-centered\"><i class=\"icon fa fa-check\"></i>" + strings.messages.closeDialog + "</button>" +
+        "   </div>" +
+        "</div>";
 
     function drawSensor(sensor, juststate = false, donotmovefocusrect = false) {
         if (paper == undefined || !context.display || !sensor.drawInfo)
@@ -7464,30 +7440,27 @@ var getContext = function (display, infos, curLevel) {
 
                     context.stopLiveUpdate = true;
 
-                    var irLearnDialog = `
-                <div class="content qpi">
-                <div class="panel-heading">
-                    <h2 class="sectionTitle">
-                        <span class="iconTag"><i class="icon fas fa-list-ul"></i></span>
-                        ${strings.messages.irReceiverTitle}
-                    </h2>
-                    <div class="exit" id="picancel"><i class="icon fas fa-times"></i></div>
-                </div>
-                <div id="sensorPicker" class="panel-body">
-                    <div class="form-group">
-                        <p>${strings.messages.directIrControl}</p>
-                    </div>
-
-                    <div class="form-group">
-                        <p id=piircode></p>
-                    </div>
-                </div>
-                <div class="singleButton">
-                    <button id="piirlearn" class="btn"><i class="fa fa-wifi icon"></i>${strings.messages.getIrCode}</button>
-                    <button id="picancel2" class="btn"><i class="fa fa-times icon"></i>${strings.messages.closeDialog}</button>
-                </div>
-            </div>
-                `;
+                    var irLearnDialog = "<div class=\"content qpi\">" +
+                        "   <div class=\"panel-heading\">" +
+                        "       <h2 class=\"sectionTitle\">" +
+                        "           <span class=\"iconTag\"><i class=\"icon fas fa-list-ul\"></i></span>" +
+                                    strings.messages.irReceiverTitle +
+                        "       </h2>" +
+                        "       <div class=\"exit\" id=\"picancel\"><i class=\"icon fas fa-times\"></i></div>" +
+                        "   </div>" +
+                        "   <div id=\"sensorPicker\" class=\"panel-body\">" +
+                        "       <div class=\"form-group\">" +
+                        "           <p>" + strings.messages.directIrControl + "</p>" +
+                        "       </div>" +
+                        "       <div class=\"form-group\">" +
+                        "           <p id=piircode></p>" +
+                        "       </div>" +
+                        "   </div>" +
+                        "   <div class=\"singleButton\">" +
+                        "       <button id=\"piirlearn\" class=\"btn\"><i class=\"fa fa-wifi icon\"></i>" + strings.messages.getIrCode + "</button>" +
+                        "       <button id=\"picancel2\" class=\"btn\"><i class=\"fa fa-times icon\"></i>" + strings.messages.closeDialog + "</button>" +
+                        "   </div>" +
+                        "</div>";
 
                     window.displayHelper.showPopupDialog(irLearnDialog);
 
@@ -10044,7 +10017,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText'>" +
-                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" +
                         "</block>"
 
                 },
@@ -10056,7 +10029,7 @@ var getContext = function (display, infos, curLevel) {
                         ]
                     },
                     blocklyXml: "<block type='displayText2Lines'>" +
-                        `<value name='PARAM_0'><shadow type='text'><field name='TEXT'>${strings.messages.hello}</field> </shadow></value>` +
+                        "<value name='PARAM_0'><shadow type='text'><field name='TEXT'>" + strings.messages.hello + "</field> </shadow></value>" +
                         "<value name='PARAM_1'><shadow type='text'><field name='TEXT'></field> </shadow></value>" +
                         "</block>"
 
