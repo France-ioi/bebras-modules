@@ -67,6 +67,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Description :",
       saveAndQuit: "Sauvegarder & Quitter",
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
+      about: "À propos",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -196,6 +197,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Description:",
       saveAndQuit: "Save & Quit",
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
+      about: "À propos", // TODO: translate
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -326,6 +328,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Beschreibung:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: translate
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -457,6 +460,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Descripción:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: translate
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -586,6 +590,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Opis:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: Translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -717,6 +722,7 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Descrizione:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: Translate
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",

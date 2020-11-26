@@ -20,7 +20,7 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
-    userTaskData: null, // contain the subject and title
+    userTaskData: null, // contain the subject and title, and also the about
     keypadData: {
         value: '',
         callbackModify: null,
@@ -132,7 +132,14 @@ var quickAlgoInterface = {
         if (!this.userTaskData) {
             this.userTaskData = {
                 title: document.title,
-                subject: $(".exerciseText").first().text()
+                subject: $(".exerciseText").first().text(),
+                about: {
+                    authors: "France-Ioi",
+                    license: "free",
+                    type: null // null type mean no type and no text will be displayed for this
+                    // available types:
+                    // - quick-pi: will display the quickpi info text
+                }
             };
         } else {
             this.loadSubjectFromUserTaskData();
@@ -238,6 +245,7 @@ var quickAlgoInterface = {
                         this.strings.reloadProgram +
                     "</div>" +
                     "<div rel='edit' class='item' onclick='quickAlgoInterface.editorBtn(\"edit\");'><span class='fas fa-pencil-alt'></span>" + this.strings.editButton + "</div>" +
+                    "<div rel='about' class='item' onclick='quickAlgoInterface.editorBtn(\"about\");'><span class='fas fa-question-circle'></span>" + this.strings.about + "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                 "</div>" +
@@ -283,6 +291,8 @@ var quickAlgoInterface = {
             displayHelper.restartAll();
         } else if (btn == 'edit') {
             this.openEditExercise();
+        } else if (btn == 'about') {
+            this.openAbout();
         } else if (btn == 'best-answer') {
             displayHelper.retrieveAnswer();
         } else if (btn == 'blockly-python') {
@@ -347,6 +357,45 @@ var quickAlgoInterface = {
             that.userTaskData.subject = newSubject;
             that.loadSubjectFromUserTaskData();
         });
+    },
+
+    openAbout: function() {
+        var authors = this.userTaskData.about.authors;
+
+        var licenseTxt = "Libre - Vous pouvez modifier ce project";
+        if (this.userTaskData.about.license !== "free")
+            licenseTxt = "Copyright - Vous n'avez pas le droit de modifier ce projet";
+
+        var typeTxt = "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>";
+        if (this.userTaskData.about.type && this.userTaskData.about.type === "quickpi") {
+            typeTxt = "Subject powered by <a href='https://quick-pi.org/'>Quick-Pi</a> <br/>" +
+                "from <a href='http://www.france-ioi.org/'>France-IOI</a>"
+        } // TODO: add other possible texts here (or add an object to change the option easier)
+
+
+        var aboutHtml = "<div class=\"content connectPi qpi\">" +
+            "    <div class=\"panel-heading\">" +
+            "        <h2 class=\"sectionTitle\">" +
+            "            <span class=\"iconTag\"><i class=\"icon fas fa-question-circle\"></i></span>" +
+                            this.strings.about +
+            "        </h2>" +
+            "    <div class=\"exit\" id=\"aboutclose\"><i class=\"icon fas fa-times\"></i></div>" +
+            "    </div>" +
+            "    <div class=\"panel-body\">" +
+            "        <div id=\"aboutAuthors\">" +
+            "           <label>Authors:</label>" +
+            "           <p>" + authors + "</p>" +
+            "        </div>" +
+            "        <div id='aboutLicense'>" +
+            "           <label>license</label> " + licenseTxt + // TODO: internationalisation on license
+            "       </div>" +
+            "       <div id='aboutFranceIOI'>" +
+            "           <p>" + typeTxt + "</p>" +
+            "       </div>" +
+            "    </div>" +
+            "</div>";
+
+        window.displayHelper.showPopupDialog(aboutHtml);
     },
 
     loadPrograms: function(formElement) {
