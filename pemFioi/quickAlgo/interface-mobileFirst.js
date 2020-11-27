@@ -367,23 +367,41 @@ var quickAlgoInterface = {
     openAbout: function() {
         var authors = this.userTaskData.about.authors;
 
-        var licenseTxt = "License: ";
         var license = this.userTaskData.about.license;
+
+        var aboutAuthorsLicenseSection = null;
 
         // if the license is not inside of our predefined licenses then we write it without "more details" button
         if (!this.options.canEditSubject) {
+            var licenseTxt = "License: ";
             if (!this.licenses[license])
                 licenseTxt += license;
             else {
                 licenseTxt += license + " <span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
                     + this.licenses[license] + "\", \"_blank\");'></span>";
             }
+            aboutAuthorsLicenseSection = "<p>Autheurs: " + authors +"</p>" +
+                "           <p>" + licenseTxt + "</p>";
         } else {
-            licenseTxt = "<label for='chooseLicense'>Choisissez votre license:</label>" +
+            aboutAuthorsLicenseSection = "";
+
+            var authorsTxt = "<label for='author'>Auteurs: </label>";
+            authorsTxt += "<input type='text' name='author' value='" + authors + "'>";
+
+            var licenseTxt = "<label for='chooseLicense'>Choisissez votre license:</label>" +
                 "<select name='chooseLicense' id='aboutLicenseDropdown'>";
-            for (var licenseName in this.licenses)
-                licenseTxt += "<option value='" + licenseName + "'>" + licenseName + "</option>";
+            for (var licenseName in this.licenses) {
+                var selected = "";
+                if (license == licenseName)
+                    selected = "selected";
+                licenseTxt += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
+            }
             licenseTxt += "</select>";
+
+            var saveButton = "<button></button>"; // TODO
+
+            aboutAuthorsLicenseSection += authorsTxt;
+            aboutAuthorsLicenseSection += licenseTxt;
         }
 
         var typeTxt = this.strings.exerciseTypeAbout["default"];
@@ -402,8 +420,7 @@ var quickAlgoInterface = {
             "    </div>" +
             "    <div class=\"panel-body\" id='aboutPanel'>"+
             "       <div id='aboutAuthorsLicense'>" +
-            "           <p>Autheurs: " + authors +"</p>" +
-            "           <p>" + licenseTxt + "</p>" +
+                        aboutAuthorsLicenseSection +
             "       </div>" +
             "       <div id='aboutFranceIOI'>" +
             "           <br/>" +
@@ -418,6 +435,8 @@ var quickAlgoInterface = {
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
         });
+
+        // TODO: action on the button
     },
 
     loadPrograms: function(formElement) {
