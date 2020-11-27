@@ -1897,3 +1897,12 @@ button.showLongIntro .icon {
   display: flex;
   justify-content: right;
 }
+.panel-body #aboutAuthorsLicense {
+  font-size: 1.5em;
+}
+#aboutPanel p {
+  text-align: center;
+}
+#aboutLicenseIcon {
+  color: #4a90e2;
+}
