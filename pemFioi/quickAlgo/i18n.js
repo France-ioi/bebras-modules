@@ -29,6 +29,11 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Afficher",
       },
+      exerciseTypeAbout: {
+         default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> " +
+             "est un projet par <a href='http://www.france-ioi.org/'>France-IOI</a>"
+      },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
       download: "télécharger",
@@ -158,6 +163,11 @@ var quickAlgoLanguageStrings = {
          functions: "Functions",
          read: "Reading",
          print: "Writing",
+      },
+      exerciseTypeAbout: {
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
@@ -289,6 +299,11 @@ var quickAlgoLanguageStrings = {
          read: "Einlesen",
          print: "Ausgeben",
          manipulate: "Umwandeln",
+      },
+      exerciseTypeAbout: {
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -422,6 +437,11 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Pantalla",
       },
+      exerciseTypeAbout: {
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+      },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",
       download: "descargar",
@@ -551,6 +571,11 @@ var quickAlgoLanguageStrings = {
          read: "Branje",
          print: "Pisanje",
          turtle: "Želva"
+      },
+      exerciseTypeAbout: {
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
       invalidContent: "Neveljavna vsebina",
       unknownFileType: "Neznana vrsta datoteke",
@@ -683,6 +708,11 @@ var quickAlgoLanguageStrings = {
          print: "Stampa",
          internet: "Internet",
          display: "Mostra",
+      },
+      exerciseTypeAbout: {
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
       invalidContent: "Contenuto non valido",
       unknownFileType: "Tipo di file non riconosciuto",

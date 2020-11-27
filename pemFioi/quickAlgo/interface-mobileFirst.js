@@ -26,6 +26,13 @@ var quickAlgoInterface = {
         callbackModify: null,
         callbackFinished: null
         },
+    // Contain all the licenses supported with their link
+    // There is also the "copyright" license or other license that the user can write himself
+    licenses: {
+        "CC BY-SA": "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
+        "CC BY-NC-SA": "https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=ccsearch&atype=rich",
+        "CC BY": "https://creativecommons.org/licenses/by/4.0/deed.fr"
+    },
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -130,15 +137,13 @@ var quickAlgoInterface = {
 
         // if we don't have userTaskData loaded, then we load it from the subject
         if (!this.userTaskData) {
+            // default userTaskData
             this.userTaskData = {
                 title: document.title,
                 subject: $(".exerciseText").first().text(),
                 about: {
                     authors: "France-Ioi",
-                    license: "free",
-                    type: null // null type mean no type and no text will be displayed for this
-                    // available types:
-                    // - quick-pi: will display the quickpi info text
+                    license: "CC-BY-SA"
                 }
             };
         } else {
@@ -362,40 +367,57 @@ var quickAlgoInterface = {
     openAbout: function() {
         var authors = this.userTaskData.about.authors;
 
-        var licenseTxt = "Libre - Vous pouvez modifier ce project";
-        if (this.userTaskData.about.license !== "free")
-            licenseTxt = "Copyright - Vous n'avez pas le droit de modifier ce projet";
+        var licenseTxt = "License: ";
+        var license = this.userTaskData.about.license;
 
-        var typeTxt = "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>";
-        if (this.userTaskData.about.type && this.userTaskData.about.type === "quickpi") {
-            typeTxt = "Subject powered by <a href='https://quick-pi.org/'>Quick-Pi</a> <br/>" +
-                "from <a href='http://www.france-ioi.org/'>France-IOI</a>"
-        } // TODO: add other possible texts here (or add an object to change the option easier)
+        // if the license is not inside of our predefined licenses then we write it without "more details" button
+        if (!this.options.canEditSubject) {
+            if (!this.licenses[license])
+                licenseTxt += license;
+            else {
+                licenseTxt += license + " <span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
+                    + this.licenses[license] + "\", \"_blank\");'></span>";
+            }
+        } else {
+            licenseTxt = "<label for='chooseLicense'>Choisissez votre license:</label>" +
+                "<select name='chooseLicense' id='aboutLicenseDropdown'>";
+            for (var licenseName in this.licenses)
+                licenseTxt += "<option value='" + licenseName + "'>" + licenseName + "</option>";
+            licenseTxt += "</select>";
+        }
+
+        var typeTxt = this.strings.exerciseTypeAbout["default"];
+        if (this.context.title)
+            typeTxt = this.strings.exerciseTypeAbout[this.context.title];
+
 
 
         var aboutHtml = "<div class=\"content connectPi qpi\">" +
             "    <div class=\"panel-heading\">" +
             "        <h2 class=\"sectionTitle\">" +
             "            <span class=\"iconTag\"><i class=\"icon fas fa-question-circle\"></i></span>" +
-                            this.strings.about +
+                        this.strings.about +
             "        </h2>" +
             "    <div class=\"exit\" id=\"aboutclose\"><i class=\"icon fas fa-times\"></i></div>" +
             "    </div>" +
-            "    <div class=\"panel-body\">" +
-            "        <div id=\"aboutAuthors\">" +
-            "           <label>Authors:</label>" +
-            "           <p>" + authors + "</p>" +
-            "        </div>" +
-            "        <div id='aboutLicense'>" +
-            "           <label>license</label> " + licenseTxt + // TODO: internationalisation on license
+            "    <div class=\"panel-body\" id='aboutPanel'>"+
+            "       <div id='aboutAuthorsLicense'>" +
+            "           <p>Autheurs: " + authors +"</p>" +
+            "           <p>" + licenseTxt + "</p>" +
             "       </div>" +
             "       <div id='aboutFranceIOI'>" +
+            "           <br/>" +
             "           <p>" + typeTxt + "</p>" +
             "       </div>" +
             "    </div>" +
             "</div>";
 
         window.displayHelper.showPopupDialog(aboutHtml);
+
+        $("#aboutclose").click(function() {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+        });
     },
 
     loadPrograms: function(formElement) {
