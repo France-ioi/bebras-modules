@@ -812,9 +812,11 @@ function LogicController(nbTestCases, maxInstructions) {
       blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
     } else {
       var blockName = functionName;
+      var funcCode = this._mainContext.strings.code[blockName] || blockName;
       blockDesc = this._mainContext.strings.description[blockName];
+      blockDesc = blockDesc.replace(/@/g, funcCode);
       if (!blockDesc) {
-        funcProto = (this._mainContext.strings.code[blockName] || blockName) + '()';
+        funcProto = funcCode + '()';
         blockDesc = '<code>' + funcProto + '</code>';
       } else if (blockDesc.indexOf('</code>') < 0) {
         var funcProtoEnd = blockDesc.indexOf(')') + 1;
