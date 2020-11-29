@@ -184,6 +184,7 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser d'objet ici",
+               failureDropPlatform: "Il y a déjà une plateforme ici",
                failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
@@ -324,7 +325,8 @@ var getContext = function(display, infos, curLevel) {
                failureNumbersWritten: "Your robot didn't write the correct numbers!",
                failureNothingToPush: "There is no object to push!",
                failureWhilePushing: "The robot can't push this object!",
-               failureDropObject: "You can't drop an object here",
+               failureDropObject: "You can't drop an platform here",
+               failureDropPlatform: "You can't drop an object here",
                failureDropOutside: "Your robot tries to drop an object outside of the grid",
                failureNotEnoughPlatform: "Not enough platforms",
                failureLights: "There are still lights to turn on.",
@@ -457,6 +459,7 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "¡No hay un objeto que empujar!",
                failureWhilePushing: "¡El robot no puede empujar este objeto!",
                failureDropObject: "No es posible poner el objeto aquí",
+               failureDropPlatform: "No es posible poner el objeto aquí",
                failureDropOutside: "Su robot intenta poner un objeto fuera de la cuadrícula",
                failureNotEnoughPlatform: "No hay suficiente plataforma",
                failureLights: "Aún faltan lugares que iluminar.",
@@ -579,6 +582,7 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "An dieser Stelle gibt es nichts zum Schieben!",
                failureWhilePushing: "Der Roboter hat es nicht geschafft, das Objekt zu schieben!",
                failureDropObject: "An dieser Stelle kann kein Objekt abgelegt werden!",
+               failureDropPlatform: "An dieser Stelle kann kein Objekt abgelegt werden!",
                failureDropOutside: "Der Roboter hat versucht ein Objekt vom Gitterrand zu schieben!",
                failureNotEnoughPlatform: "Nicht genügend Plattformen!",
                failureLights: "Der Roboter hat nicht alles beleuchtet!",
@@ -709,6 +713,7 @@ var getContext = function(display, infos, curLevel) {
                failureNothingToPush: "Il n'y a pas d'objet à pousser !",
                failureWhilePushing: "Le robot ne peut pas pousser cet objet !",
                failureDropObject: "On ne peut pas poser d'objet ici",
+               failureDropPlatform: "On ne peut pas construire de plateforme ici",
                failureDropOutside: "Votre robot essaie de poser un objet hors de la grille",
                failureNotEnoughPlatform: "Pas assez de plateformes",
                failureLights: "Il reste des spots à allumer.",
@@ -1050,7 +1055,8 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledLess: "Votre robot n'a pas replacé toutes les roues dentées au bon endroit.",
                failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
                failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
-               failureDropObject: "Il y a déjà une plateforme ici !",
+               failureDropObject: "Il y a déjà une roue ici !",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
                emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
             }
          },
@@ -1075,6 +1081,7 @@ var getContext = function(display, infos, curLevel) {
                failureContainersFilledBag: "Votre robot doit déposer la roue dentée sur la machine.",
                failureDropOutside: "Votre robot essaie de construire une plateforme hors de la grille.",
                failureDropObject: "Il y a déjà une plateforme ici !",
+               failureDropPlatform: "Il y a déjà une plateforme ici !",
                emptyBag: "Le robot essaie d'accrocher une roue dentée alors qu'il n'en transporte pas !"
             }
          },
@@ -1862,7 +1869,7 @@ var getContext = function(display, infos, curLevel) {
                   throw(window.languageStrings.messages.failureNotEnoughPlatform);
                var coords = {row: this.coordsInFront().row + 1, col: this.coordsInFront().col};
                if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-                  throw(window.languageStrings.messages.failureDropObject);
+                  throw(window.languageStrings.messages.failureDropPlatform);
                }
                this.nbPlatforms -= 1;
                this.dropObject({type: "platform"}, coords);
@@ -1891,7 +1898,7 @@ var getContext = function(display, infos, curLevel) {
                   throw(window.languageStrings.messages.failureNotEnoughPlatform);
                var coords = {row: this.getRobot().row - 1, col: this.getRobot().col};
                if(this.getItemsOn(coords.row, coords.col, function(item) { return item.isObstacle === true; }).length != 0) {
-                  throw(window.languageStrings.messages.failureDropObject);
+                  throw(window.languageStrings.messages.failureDropPlatform);
                }
                this.nbPlatforms -= 1;
                this.dropObject({type: "platform"}, coords);
