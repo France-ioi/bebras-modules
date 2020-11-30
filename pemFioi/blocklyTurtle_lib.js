@@ -10,6 +10,7 @@ var makeTurtle = function(coords) {
          this.y = initcoords.y;
       }
       this.stepsize = 1;
+      this.directionDeg = 0;
       this.direction = 0;
       this.paint = true;
       this.stepsize = 5;
@@ -27,11 +28,31 @@ var makeTurtle = function(coords) {
    this.reset(5);
    
    this.turn = function(angle) {
-      this.direction += angle*Math.PI/180;
+      angle = parseInt(angle);
+      this.directionDeg = (this.directionDeg + angle) % 360;
+
+      // Make sure we have a positive direction
+      this.directionDeg = (this.directionDeg + 360) % 360;
+
+      this.direction = this.directionDeg*Math.PI/180;
       if (this.turtle) {
          // TODO :: Do we need to put "none" first?
          this.turtle.style.transform = "none";
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
+      }
+   }
+   this.trig = function() {
+      // Fix rounding issues
+      if(this.directionDeg == 0) {
+         return {sin: 0, cos: 1};
+      } else if(this.directionDeg == 90) {
+         return {sin: 1, cos: 0};
+      } else if(this.directionDeg == 180) {
+         return {sin: 0, cos: -1};
+      } else if(this.directionDeg == 270) {
+         return {sin: -1, cos: 0};
+      } else {
+         return {sin: Math.sin(this.direction), cos: Math.cos(this.direction)};
       }
    }
    this.move = function(amount) {
@@ -39,10 +60,11 @@ var makeTurtle = function(coords) {
          this.drawingContext.beginPath();
          this.drawingContext.moveTo(this.x, this.y);
       }
-      
-      this.x -= amount * this.stepsize * 10 * Math.sin(this.direction);
-      this.y -= amount * this.stepsize * 10 * Math.cos(this.direction);
-     
+
+      var trig = this.trig();
+      this.x -= amount * this.stepsize * 10 * trig.sin;
+      this.y -= amount * this.stepsize * 10 * trig.cos;
+
       if (this.paint) {
          this.drawingContext.lineTo(this.x, this.y);
          this.drawingContext.stroke();
