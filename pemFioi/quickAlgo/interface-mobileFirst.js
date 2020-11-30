@@ -29,9 +29,9 @@ var quickAlgoInterface = {
     // Contain all the licenses supported with their link
     // There is also the "copyright" license or other license that the user can write himself
     licenses: {
-        "CC BY-SA": "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
-        "CC BY-NC-SA": "https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=ccsearch&atype=rich",
-        "CC BY": "https://creativecommons.org/licenses/by/4.0/deed.fr"
+        "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
+        "CC BY-NC-SA 4.0": "https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=ccsearch&atype=rich",
+        "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/deed.fr"
     },
 
     enterFullscreen: function() {
@@ -143,7 +143,7 @@ var quickAlgoInterface = {
                 subject: $(".exerciseText").first().text(),
                 about: {
                     authors: "France-Ioi",
-                    license: "CC-BY-SA"
+                    license: "CC BY-SA 4.0"
                 }
             };
         } else {
@@ -419,19 +419,19 @@ var quickAlgoInterface = {
 
         // if the license is not inside of our predefined licenses then we write it without "more details" button
         if (!this.options.canEditSubject) {
-            var licenseTxt = "License: ";
+            var licenseTxt = this.strings.license;
             if (!this.licenses[license])
                 licenseTxt += license;
             else {
                 licenseTxt += license + " <span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
                     + this.licenses[license] + "\", \"_blank\");'></span>";
             }
-            aboutAuthorsLicenseSection = "<p>Autheurs: " + authors +"</p>" +
+            aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
                 "           <p>" + licenseTxt + "</p>";
         } else {
             aboutAuthorsLicenseSection = "";
 
-            var authorsTxt = "<label for='author'>Auteurs: </label>";
+            var authorsTxt = "<label for='author'>" + this.strings.authors + "</label>";
             authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
 
 
@@ -440,7 +440,7 @@ var quickAlgoInterface = {
             var disableDropdown = "";
             if (!(license in this.licenses))
                 disableDropdown = "disabled=''";
-            var licenseDropdown = "<label for='chooseLicense'>Choisissez votre license:</label>" +
+            var licenseDropdown = "<label for='chooseLicense'>" + this.strings.license + "</label>" +
                 "<select name='chooseLicense' id='aboutLicenseDropdown' " + disableDropdown + ">";
             for (var licenseName in this.licenses) {
                 var selected = "";

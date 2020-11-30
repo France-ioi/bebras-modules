@@ -32,7 +32,7 @@ var quickAlgoLanguageStrings = {
       exerciseTypeAbout: {
          default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> " +
-             "est un projet par <a href='http://www.france-ioi.org/'>France-IOI</a>"
+             "est un projet de <a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
@@ -73,6 +73,8 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter",
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
       about: "À propos",
+      license: "license :",
+      authors: "Auteurs :",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -207,7 +209,8 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Description:",
       saveAndQuit: "Save & Quit",
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
-      about: "À propos", // TODO: translate
+      about: "About",
+      license: "license:",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -344,6 +347,8 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
+      license: "lizenz:", // TODO: verify
+      authors: "Autoren :", // TODO: verify
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -481,6 +486,8 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
+      license: "licencia:", // TODO: verify
+      authors: "autores:", // TODO: verify
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -616,6 +623,8 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
+      license: "licenca:", // TODO: tanslate
+      authors: "avtorji:", // TODO: translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -753,6 +762,8 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
+      license: "licenza:", // TODO: verify
+      authors: "autori:", // TODO: verify
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",
