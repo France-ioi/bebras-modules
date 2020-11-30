@@ -305,6 +305,52 @@ var quickAlgoInterface = {
         }
     },
 
+    /**
+     * This function is to handle exit buttons and check if we must ask for confirmation or not.
+     * To check for confirmation it works this way:
+     * if for i in len(toCompare) step 2
+     *    toCompare[i] === toCompare[i + 1]
+     * then we don't need confirmation because everything is the same
+     * The variable toCompare is variadic because we can confirm on more than two values later.
+     * Otherwise we show confirmation to ask the user if he is sure to quit the menu without saving
+     * @param toCompare An array containing at toCompare[i] the new value and at toCompare[i + 1] the old value (it
+     * compares both one to each other). Be careful, every compared value must be <b>exactly</b> the same object.
+     * @private This function is private because it is not usefull outside of interface-mobileFirst.js
+     * @return true if we can exit without problem, false otherwise
+     * @throws An error, if two compare.size() is not a multiple of 2
+     */
+    _handleConfirmationExitWindow: function(...toCompare) {
+        if (toCompare.length % 2 != 0) {
+            // this should never happen in prod, if an error is thrown the error come from the programmer.
+            throw "interface-mobileFirst.js: _handleConfirmationExitWindow: toCompare must be a multiple of 2, you did"
+                + "something wrong!";
+        }
+        // if this variable remain true, then we don't need to show the confirm window
+        var same = true;
+        for (var i = 0; i < toCompare.length && same; i += 2) {
+            // here we must use the '===' operator, because the values must be the same in object, we can have boolean
+            // on one side
+            same = toCompare[i] === toCompare[i + 1];
+        }
+        // window.confirm will return true, if the user confirmed quitting without saving
+        return same || window.confirm(this.strings.quitWithoutSavingConfirmation);
+    },
+
+    /**
+     * This method call the function {@link #_handleConfirmationExitWindow} to check if we can close the window. If we
+     * can, then it close the popup window created with {@link #window.displayHelper.showPopupDialog}.
+     * @param toCompare The arguments to compare, you need to setup it this way: toCompare[i] is the newValue and
+     * toCompare[i + 1] is the old value (i step of 2).
+     * @public Because we must use it inside of button "onClick" functions, so we can't make it "private" because the
+     * strict private convention is not respected here (we must use that.closePopupWithConfirmation inside of a button).
+     */
+    closePopupWithConfirmation: function(...toCompare) {
+        if (this._handleConfirmationExitWindow(...toCompare)) {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+        }
+    },
+
     openEditExercise: function() {
         // in python, there are two "exerciseText", we need to selected only the first one
         // there are two "exerciseText" in python, because we also have a "long" version of the
@@ -342,14 +388,7 @@ var quickAlgoInterface = {
             var newDesc = $("#editExerciseDescriptionTextarea").val();
             var oldTitle = that.userTaskData.title;
             var oldDescription = that.userTaskData.subject;
-            if (newTitle !== oldTitle || newDesc !== oldDescription) {
-                if (!window.confirm(that.strings.quitWithoutSavingConfirmation)) {
-                    return;
-                }
-            }
-
-            $('#popupMessage').hide();
-            window.displayHelper.popupMessageShown = false;
+            that.closePopupWithConfirmation(newTitle, oldTitle, newDesc, oldDescription);
         });
 
         $("#saveExerciseChanges").click(function() {
@@ -386,22 +425,23 @@ var quickAlgoInterface = {
             aboutAuthorsLicenseSection = "";
 
             var authorsTxt = "<label for='author'>Auteurs: </label>";
-            authorsTxt += "<input type='text' name='author' value='" + authors + "'>";
+            authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
 
             var licenseTxt = "<label for='chooseLicense'>Choisissez votre license:</label>" +
                 "<select name='chooseLicense' id='aboutLicenseDropdown'>";
             for (var licenseName in this.licenses) {
                 var selected = "";
-                if (license == licenseName)
+                if (license === licenseName)
                     selected = "selected";
                 licenseTxt += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
             }
             licenseTxt += "</select>";
 
-            var saveButton = "<button></button>"; // TODO
+            var saveButton = "<button id='aboutSaveButton'>Sauvegarder</button>";
 
             aboutAuthorsLicenseSection += authorsTxt;
             aboutAuthorsLicenseSection += licenseTxt;
+            aboutAuthorsLicenseSection += saveButton;
         }
 
         var typeTxt = this.strings.exerciseTypeAbout["default"];
@@ -431,12 +471,23 @@ var quickAlgoInterface = {
 
         window.displayHelper.showPopupDialog(aboutHtml);
 
+        var that = this;
         $("#aboutclose").click(function() {
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = $('#aboutLicenseDropdown option:selected').text();
+            var oldAuthors = that.userTaskData.about.authors;
+            var oldLicense = that.userTaskData.about.license;
+            that.closePopupWithConfirmation(newAuthors, oldAuthors, newLicense, oldLicense);
+        });
+
+        $('#aboutSaveButton').click(function() {
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = $('#aboutLicenseDropdown option:selected').text();
+            that.userTaskData.about.authors = newAuthors;
+            that.userTaskData.about.license = newLicense;
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
         });
-
-        // TODO: action on the button
     },
 
     loadPrograms: function(formElement) {
@@ -467,8 +518,7 @@ var quickAlgoInterface = {
     loadAdditional: function(additional) {
         // load subject if edition is enabled
         if (additional.userTaskData && this.options.canEditSubject) {
-            this.userTaskData.title = additional.userTaskData.title;
-            this.userTaskData.subject = additional.userTaskData.subject;
+            this.userTaskData = additional.userTaskData;
             this.loadSubjectFromUserTaskData();
         }
         // Load additional from context (sensors for quickpi for example)
