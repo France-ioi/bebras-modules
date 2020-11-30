@@ -435,6 +435,8 @@ var quickAlgoInterface = {
             authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
 
 
+            // For the license, the user has 2 choices: He can select a license from the dropdown or write manually
+            // the license that he want to use
             var disableDropdown = "";
             if (!(license in this.licenses))
                 disableDropdown = "disabled=''";
