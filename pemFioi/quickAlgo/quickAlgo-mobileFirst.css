@@ -1379,6 +1379,9 @@ body.fullscreen #taskToolbar {
 .notificationMessage.successMessage {
   background-color: #8bbb0a;
 }
+.notificationMessage.waitMessage {
+  background-color: #4a90e2;
+}
 .notificationMessage .messageWrapper {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1433,10 +1436,10 @@ body.fullscreen #taskToolbar {
   margin-left: 10px;
   padding: 2px 10px;
 }
-.notificationMessage.notificationMessageLock {
+.notificationMessage.notificationMessageLock.errorMessage {
   background-color: #FF9794;
 }
-.notificationMessage.notificationMessageLock .btn {
+.notificationMessage.notificationMessageLock button {
   display: none;
 }
 .notificationMessage .testResults {

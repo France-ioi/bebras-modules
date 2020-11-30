@@ -897,17 +897,20 @@ var quickAlgoInterface = {
 
     displayNotification: function(type, message, lock, yesFunc, noFunc) {
         if(lock) {
-            $('.notificationMessageLock').remove();
+            $('.notificationMessageLock.notificationMessageLock-'+type).remove();
         } else {
             $('.notificationMessage').not('.notificationMessageLock').remove();
         }
         if(!message) return;
-        var divClass = lock ? 'notificationMessageLock' : '';
+        var divClass = lock ? 'notificationMessageLock notificationMessageLock-'+type : '';
         if(type == 'error') {
-            divClass += 'errorMessage';
+            divClass += ' errorMessage';
             var icon = 'fa-bell';
+        } else if(type == 'wait') {
+            divClass += ' waitMessage';
+            var icon = 'fa-clock';
         } else {
-            divClass += 'successMessage';
+            divClass += ' successMessage';
             var icon = 'fa-check';
         }
         var id = Math.random();
