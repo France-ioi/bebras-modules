@@ -3,11 +3,11 @@
         Python mode interface and running logic.
 */
 
-function LogicController(nbTestCases, maxInstructions) {
+function LogicController(maxInstructions, subTask) {
   /**
    * Class properties
    */
-  this._nbTestCases = nbTestCases;
+  this.subTask = subTask;
   this._maxInstructions = maxInstructions || null;
   this.language = 'python';
   this._textFile = null;
@@ -75,7 +75,6 @@ function LogicController(nbTestCases, maxInstructions) {
       console.log('Module "python-analysis" is loaded but not used.');
     }
 
-    this._nbTestCases = nbTestCases;
     this._options = options;
     this._loadBasicEditor();
 
@@ -756,12 +755,6 @@ function LogicController(nbTestCases, maxInstructions) {
         that._mainContext.runner._editorMarker = null;
       }
 
-      if(window.quickAlgoInterface) {
-        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
-      } else {
-        $('#capacity').html(that.getCapacityInfo().text);
-      }
-
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {
          that._mainContext.runner.reset();
@@ -771,6 +764,16 @@ function LogicController(nbTestCases, maxInstructions) {
         window.quickAlgoInterface.displayError(null);
       } else {
         $("#errors").html('');
+      }
+
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
+      } else {
+        $('#capacity').html(that.getCapacityInfo().text);
+      }
+
+      if(that.subTask) {
+        that.subTask.onChange();
       }
 
       // Close reportValue popups
@@ -1139,6 +1142,6 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 }
 
-function getBlocklyHelper(maxBlocks, nbTestCases) {
-  return new LogicController(nbTestCases, maxBlocks);
+function getBlocklyHelper(maxBlocks, subTask) {
+  return new LogicController(maxBlocks, subTask);
 }

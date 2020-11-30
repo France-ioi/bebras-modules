@@ -3,8 +3,9 @@
         Blockly mode interface and running logic
 */
 
-function getBlocklyInterface(maxBlocks, nbTestCases) {
+function getBlocklyInterface(maxBlocks, subTask) {
    return {
+      subTask: subTask,
       isBlockly: true,
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       maxBlocks: maxBlocks,
@@ -379,6 +380,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                $('#capacity').html(capacityInfo.text);
             }
             this.onChangeResetDisplay();
+            this.subTask.onChange();
          } else {
             Blockly.svgResize(this.workspace);
          }
@@ -825,10 +827,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
    }
 }
 
-function getBlocklyHelper(maxBlocks, nbTestCases) {
+function getBlocklyHelper(maxBlocks, subTask) {
    // TODO :: temporary until splitting of the block functions logic is done
-   var blocklyHelper = getBlocklyInterface(maxBlocks, nbTestCases);
-   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks, nbTestCases);
+   var blocklyHelper = getBlocklyInterface(maxBlocks, subTask);
+   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks);
    for(var property in blocklyBlockFunc) {
       blocklyHelper[property] = blocklyBlockFunc[property];
    }
