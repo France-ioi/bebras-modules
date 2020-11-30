@@ -337,6 +337,14 @@ var quickAlgoInterface = {
     },
 
     /**
+     * This method close the popup without confirmation
+     */
+    closePopup: function() {
+        $('#popupMessage').hide();
+        window.displayHelper.popupMessageShown = false;
+    },
+
+    /**
      * This method call the function {@link #_handleConfirmationExitWindow} to check if we can close the window. If we
      * can, then it close the popup window created with {@link #window.displayHelper.showPopupDialog}.
      * @param toCompare The arguments to compare, you need to setup it this way: toCompare[i] is the newValue and
@@ -346,8 +354,7 @@ var quickAlgoInterface = {
      */
     closePopupWithConfirmation: function(...toCompare) {
         if (this._handleConfirmationExitWindow(...toCompare)) {
-            $('#popupMessage').hide();
-            window.displayHelper.popupMessageShown = false;
+            this.closePopup();
         }
     },
 
@@ -427,20 +434,38 @@ var quickAlgoInterface = {
             var authorsTxt = "<label for='author'>Auteurs: </label>";
             authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
 
-            var licenseTxt = "<label for='chooseLicense'>Choisissez votre license:</label>" +
-                "<select name='chooseLicense' id='aboutLicenseDropdown'>";
+
+            var disableDropdown = "";
+            if (!(license in this.licenses))
+                disableDropdown = "disabled=''";
+            var licenseDropdown = "<label for='chooseLicense'>Choisissez votre license:</label>" +
+                "<select name='chooseLicense' id='aboutLicenseDropdown' " + disableDropdown + ">";
             for (var licenseName in this.licenses) {
                 var selected = "";
                 if (license === licenseName)
                     selected = "selected";
-                licenseTxt += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
+                licenseDropdown += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
             }
-            licenseTxt += "</select>";
+            licenseDropdown += "</select>";
+
+            var licenseInputValue = "";
+            if (!(license in this.licenses))
+                licenseInputValue = license;
+
+            var licenseInput = "<label for='chooseLicenseTxt'>Écrivez votre license</label>" +
+                "<input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value=" + licenseInputValue + ">";
+
+            var licenseRealHtml = "<table id='licenseTable'>" +
+                "   <tr>" +
+                "       <th>" + licenseDropdown + "</th>" +
+                "       <th>" + licenseInput + "</th>" +
+                "   </tr>" +
+                "</table>";
 
             var saveButton = "<button id='aboutSaveButton'>Sauvegarder</button>";
 
             aboutAuthorsLicenseSection += authorsTxt;
-            aboutAuthorsLicenseSection += licenseTxt;
+            aboutAuthorsLicenseSection += licenseRealHtml;
             aboutAuthorsLicenseSection += saveButton;
         }
 
@@ -472,21 +497,47 @@ var quickAlgoInterface = {
         window.displayHelper.showPopupDialog(aboutHtml);
 
         var that = this;
+
+        /**
+         * This method allow us to get the new license from the dropdown or the input box according to this predicate:
+         * if the input box is empty then the value inside of the dropdown is taken, otherwise it is the value of the
+         * input box that is taken.
+         * @return The new license
+         */
+        function getLicenseChanges() {
+            var licenseTxt = $('#aboutLicenseInput').val();
+            if (licenseTxt != "")
+                return licenseTxt;
+            else
+                return $('#aboutLicenseDropdown option:selected').text();
+        }
+
         $("#aboutclose").click(function() {
-            var newAuthors = $('#aboutAuthorsInput').val();
-            var newLicense = $('#aboutLicenseDropdown option:selected').text();
-            var oldAuthors = that.userTaskData.about.authors;
-            var oldLicense = that.userTaskData.about.license;
-            that.closePopupWithConfirmation(newAuthors, oldAuthors, newLicense, oldLicense);
+            if (that.options.canEditSubject) {
+                var newAuthors = $('#aboutAuthorsInput').val();
+                var newLicense = getLicenseChanges();
+                var oldAuthors = that.userTaskData.about.authors;
+                var oldLicense = that.userTaskData.about.license;
+                that.closePopupWithConfirmation(newAuthors, oldAuthors, newLicense, oldLicense);
+            } else {
+                that.closePopup();
+            }
         });
 
         $('#aboutSaveButton').click(function() {
             var newAuthors = $('#aboutAuthorsInput').val();
-            var newLicense = $('#aboutLicenseDropdown option:selected').text();
+            var newLicense = getLicenseChanges();
             that.userTaskData.about.authors = newAuthors;
             that.userTaskData.about.license = newLicense;
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
+        });
+
+        $('#aboutLicenseInput').on('input', function() {
+            if ($('#aboutLicenseInput').val() != "")
+                $("#aboutLicenseDropdown").prop("disabled", true);
+            else
+                $("#aboutLicenseDropdown").prop("disabled", false);
         });
     },
 
