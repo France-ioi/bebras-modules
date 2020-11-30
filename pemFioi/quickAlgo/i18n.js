@@ -75,6 +75,9 @@ var quickAlgoLanguageStrings = {
       about: "À propos",
       license: "license :",
       authors: "Auteurs :",
+      other: "Autre",
+      otherLicense: "Autre license",
+      pleaseSpecifyLicense: "Merci de spécifier une license",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -211,6 +214,10 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
       about: "About",
       license: "license:",
+      authors: "Authors:",
+      other: "Other",
+      otherLicense: "Other license",
+      pleaseSpecifyLicense: "Please specify a license",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -349,6 +356,9 @@ var quickAlgoLanguageStrings = {
       about: "À propos", // TODO: translate
       license: "lizenz:", // TODO: verify
       authors: "Autoren :", // TODO: verify
+      other: "Andere", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -487,7 +497,10 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
       license: "licencia:", // TODO: verify
-      authors: "autores:", // TODO: verify
+      authors: "Autores:", // TODO: verify
+      other: "Otro", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -624,7 +637,10 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
       license: "licenca:", // TODO: tanslate
-      authors: "avtorji:", // TODO: translate
+      authors: "Avtorji:", // TODO: translate
+      other: "drugo", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -764,6 +780,9 @@ var quickAlgoLanguageStrings = {
       about: "À propos", // TODO: Translate
       license: "licenza:", // TODO: verify
       authors: "autori:", // TODO: verify
+      other: "Altro", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",

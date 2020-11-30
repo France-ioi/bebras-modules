@@ -434,40 +434,38 @@ var quickAlgoInterface = {
             var authorsTxt = "<label for='author'>" + this.strings.authors + "</label>";
             authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
 
+            var licenseOther = "";
 
-            // For the license, the user has 2 choices: He can select a license from the dropdown or write manually
-            // the license that he want to use
-            var disableDropdown = "";
             if (!(license in this.licenses))
-                disableDropdown = "disabled=''";
-            var licenseDropdown = "<label for='chooseLicense'>" + this.strings.license + "</label>" +
-                "<select name='chooseLicense' id='aboutLicenseDropdown' " + disableDropdown + ">";
+                licenseOther = "selected";
+
+            var licenseDropdown = "<p>" + this.strings.license + "</p>" +
+                "<select name='chooseLicense' id='aboutLicenseDropdown'>";
             for (var licenseName in this.licenses) {
                 var selected = "";
                 if (license === licenseName)
                     selected = "selected";
                 licenseDropdown += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
             }
+            licenseDropdown += "<option value='" + this.strings.other + "' " + licenseOther + ">" + this.strings.other
+                + "</option>";
             licenseDropdown += "</select>";
 
-            var licenseInputValue = "";
-            if (!(license in this.licenses))
-                licenseInputValue = license;
 
-            var licenseInput = "<label for='chooseLicenseTxt'>Écrivez votre license</label>" +
-                "<input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value=" + licenseInputValue + ">";
-
-            var licenseRealHtml = "<table id='licenseTable'>" +
-                "   <tr>" +
-                "       <th>" + licenseDropdown + "</th>" +
-                "       <th>" + licenseInput + "</th>" +
-                "   </tr>" +
-                "</table>";
-
-            var saveButton = "<button id='aboutSaveButton'>Sauvegarder</button>";
+            var licenseInput = null;
+            if (!(license in this.licenses)) {
+                licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
+                    + license + "' placeholder='" + this.strings.otherLicense + "'>";
+            } else {
+                licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
+                    "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
+            }
 
             aboutAuthorsLicenseSection += authorsTxt;
-            aboutAuthorsLicenseSection += licenseRealHtml;
+
+            aboutAuthorsLicenseSection += licenseDropdown + licenseInput + "<br/>";
+
+            var saveButton = "<button id='aboutSaveButton'>Sauvegarder</button>";
             aboutAuthorsLicenseSection += saveButton;
         }
 
@@ -502,16 +500,16 @@ var quickAlgoInterface = {
 
         /**
          * This method allow us to get the new license from the dropdown or the input box according to this predicate:
-         * if the input box is empty then the value inside of the dropdown is taken, otherwise it is the value of the
-         * input box that is taken.
+         * if the dropdown has this.strings.other as selection, then we select the value of the input box.
          * @return The new license
          */
         function getLicenseChanges() {
-            var licenseTxt = $('#aboutLicenseInput').val();
-            if (licenseTxt != "")
-                return licenseTxt;
-            else
-                return $('#aboutLicenseDropdown option:selected').text();
+            var selectedDropdown = $('#aboutLicenseDropdown option:selected').text();
+            if (selectedDropdown === that.strings.other) {
+                return $('#aboutLicenseInput').val();
+            } else {
+                return selectedDropdown;
+            }
         }
 
         $("#aboutclose").click(function() {
@@ -529,18 +527,32 @@ var quickAlgoInterface = {
         $('#aboutSaveButton').click(function() {
             var newAuthors = $('#aboutAuthorsInput').val();
             var newLicense = getLicenseChanges();
+            if (!newLicense) {
+                alert(that.strings.pleaseSpecifyLicense);
+                return;
+            }
             that.userTaskData.about.authors = newAuthors;
             that.userTaskData.about.license = newLicense;
             $('#popupMessage').hide();
             window.displayHelper.popupMessageShown = false;
         });
 
+        $('#aboutLicenseDropdown').change(function() {
+            var val = $('#aboutLicenseDropdown option:selected').text();
+            if (val === that.strings.other) {
+                $("#aboutLicenseInput").show();
+            } else {
+                $("#aboutLicenseInput").hide();
+            }
+        });
+
+        /*
         $('#aboutLicenseInput').on('input', function() {
             if ($('#aboutLicenseInput').val() != "")
                 $("#aboutLicenseDropdown").prop("disabled", true);
             else
                 $("#aboutLicenseDropdown").prop("disabled", false);
-        });
+        });*/
     },
 
     loadPrograms: function(formElement) {
