@@ -761,17 +761,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          var codes = this.getAllCodes();
          this.mainContext.runner.initCodes(codes);
+         return true;
       },
 
 
       run: function () {
-         this.initRun();
+         if(!this.initRun()) { return; }
          this.mainContext.runner.run();
       },
 
       step: function () {
          if(this.mainContext.runner.nbRunning() <= 0) {
-            this.initRun();
+            if(!this.initRun()) { return; }
          }
          this.mainContext.runner.step();
       },
