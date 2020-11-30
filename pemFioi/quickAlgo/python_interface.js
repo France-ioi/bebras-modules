@@ -814,7 +814,9 @@ function LogicController(nbTestCases, maxInstructions) {
       var blockName = functionName;
       var funcCode = this._mainContext.strings.code[blockName] || blockName;
       blockDesc = this._mainContext.strings.description[blockName];
-      blockDesc = blockDesc.replace(/@/g, funcCode);
+      if(blockDesc) {
+         blockDesc = blockDesc.replace(/@/g, funcCode);
+      }
       if (!blockDesc) {
         funcProto = funcCode + '()';
         blockDesc = '<code>' + funcProto + '</code>';

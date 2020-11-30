@@ -541,6 +541,7 @@ function initBlocklyRunner(context, messageCallback) {
       };
 
       runner.runCodes = function(codes) {
+         if(!codes || !codes.length) { return; }
          runner.initCodes(codes);
          runner.runSyncBlock();
       };
