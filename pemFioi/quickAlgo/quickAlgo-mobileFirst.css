@@ -1906,3 +1906,10 @@ button.showLongIntro .icon {
 #aboutLicenseIcon {
   color: #4a90e2;
 }
+#aboutAuthorsLicense {
+  text-align: center;
+}
+#licenseTable {
+  margin-left: auto;
+  margin-right: auto;
+}
