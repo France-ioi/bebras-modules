@@ -410,10 +410,33 @@ var quickAlgoInterface = {
         });
     },
 
+    _getAboutLicenseButton: function(license) {
+
+    },
+
     openAbout: function() {
+        var that = this;
+
         var authors = this.userTaskData.about.authors;
 
         var license = this.userTaskData.about.license;
+
+        /**
+         * This function return the button hidden or not depending on the boolean in argument.
+         * This function can also be called without arguments and the button will not be hidden.
+         *
+         * The button is hidden in case we have not a license that we know about.
+         * @param hidden If the button should be hidden or not (or no argument in this case the button is shown)
+         * @return {string}  The html for the button
+         */
+        function getAboutLicenseButton(hidden) {
+            if (!hidden)
+                hidden = "";
+            else
+                hidden = "style='display: none;'";
+            return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
+                + that.licenses[license] + "\", \"_blank\");' " + hidden + "></span>";
+        }
 
         var aboutAuthorsLicenseSection = null;
 
@@ -423,8 +446,7 @@ var quickAlgoInterface = {
             if (!this.licenses[license])
                 licenseTxt += license;
             else {
-                licenseTxt += license + " <span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
-                    + this.licenses[license] + "\", \"_blank\");'></span>";
+                licenseTxt += license + " " + getAboutLicenseButton();
             }
             aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
                 "           <p>" + licenseTxt + "</p>";
@@ -454,9 +476,11 @@ var quickAlgoInterface = {
 
             var licenseInput = null;
             if (!(license in this.licenses)) {
+                licenseDropdown += " " + getAboutLicenseButton(true);
                 licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
                     + license + "' placeholder='" + this.strings.otherLicense + "'>";
             } else {
+                licenseDropdown += " " + getAboutLicenseButton(false);
                 licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
                     "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
             }
@@ -465,7 +489,7 @@ var quickAlgoInterface = {
 
             aboutAuthorsLicenseSection += licenseDropdown + licenseInput + "<br/>";
 
-            var saveButton = "<button id='aboutSaveButton'>Sauvegarder</button>";
+            var saveButton = "<button id='aboutSaveButton'>" + this.strings.saveAndQuit + "</button>";
             aboutAuthorsLicenseSection += saveButton;
         }
 
@@ -495,8 +519,6 @@ var quickAlgoInterface = {
             "</div>";
 
         window.displayHelper.showPopupDialog(aboutHtml);
-
-        var that = this;
 
         /**
          * This method allow us to get the new license from the dropdown or the input box according to this predicate:
@@ -540,9 +562,11 @@ var quickAlgoInterface = {
         $('#aboutLicenseDropdown').change(function() {
             var val = $('#aboutLicenseDropdown option:selected').text();
             if (val === that.strings.other) {
+                $("#aboutLicenseIcon").hide();
                 $("#aboutLicenseInput").show();
             } else {
                 $("#aboutLicenseInput").hide();
+                $("#aboutLicenseIcon").show();
             }
         });
 
