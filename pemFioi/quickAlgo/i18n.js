@@ -311,9 +311,9 @@ var quickAlgoLanguageStrings = {
          manipulate: "Umwandeln",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
-             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
@@ -453,9 +453,9 @@ var quickAlgoLanguageStrings = {
          display: "Pantalla",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
-             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",
@@ -593,9 +593,9 @@ var quickAlgoLanguageStrings = {
          turtle: "Želva"
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
-             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
       invalidContent: "Neveljavna vsebina",
       unknownFileType: "Neznana vrsta datoteke",
@@ -735,9 +735,9 @@ var quickAlgoLanguageStrings = {
          display: "Mostra",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
-             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
       invalidContent: "Contenuto non valido",
       unknownFileType: "Tipo di file non riconosciuto",
