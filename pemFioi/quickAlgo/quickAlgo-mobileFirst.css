@@ -1909,3 +1909,6 @@ button.showLongIntro .icon {
 #aboutAuthorsLicense {
   text-align: center;
 }
+#aboutLicenseIcon {
+  cursor: pointer;
+}
