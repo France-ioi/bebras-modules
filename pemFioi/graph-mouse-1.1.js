@@ -351,7 +351,9 @@ function VertexDragger(settings) {
          for(var rid in settings.visualGraph.vertexRaphaels) {
             var vrs = settings.visualGraph.vertexRaphaels[rid];
             for(var i = 0; i < vrs.length; i++) {
-               if(vrs[i].node === (event.target || event.srcElement)) {
+               if(vrs[i].node === (event.target || event.srcElement)
+                   || vrs[i].node === (event.target.parentElement || event.target.parentNode || event.srcElement.parentElement || event.srcElement.parentNode)
+               ) {
                   self.elementID = rid;
                }
             }
