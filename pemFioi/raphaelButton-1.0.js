@@ -303,6 +303,7 @@ function Keyboard(data) {
    this.marginX = data.marginX;
    this.marginY = data.marginY;
    this.shiftOddRows = data.shiftOddRows;
+   this.shiftEvenRows = data.shiftEvenRows;
    this.repeat = data.repeat;
    this.initialDelay = data.initialDelay;
    this.stepDelay = data.stepDelay;
@@ -317,6 +318,9 @@ function Keyboard(data) {
          var x = this.xPos + iCol * (this.keyWidth + this.marginX);
          var y = this.yPos + iRow * (this.keyHeight + this.marginY);
          if (this.shiftOddRows && (iRow % 2 == 1)) {
+            x += (this.keyWidth + this.marginX) / 2;
+         }
+         if (this.shiftEvenRows && (iRow % 2 == 0)) {
             x += (this.keyWidth + this.marginX) / 2;
          }
          var keyIndex = iCol + iRow * this.nCol;
