@@ -378,6 +378,9 @@ function VertexDragger(settings) {
       if(settings.snapPositions) {
          self.updateOccupiedSnap();
       }
+      if (settings.minDistanceBetweenVertices && settings.dragLimits) {
+         self.checkOverlap(self.elementID);
+      }
       if(settings.callback) {
          settings.callback(self.elementID);
       }
@@ -447,6 +450,48 @@ function VertexDragger(settings) {
             }
          }
       }
+   };
+
+   self.checkOverlap = function (id) {
+      var pos = settings.visualGraph.getVertexVisualInfo(id);
+      if(self.overlapOtherVertex(pos.x,pos.y,id)){
+         self.findEmptySpace(id);
+      }
+   };
+
+   self.overlapOtherVertex = function (x,y,id) {
+      var vertices = settings.visualGraph.graph.getAllVertices();
+      for(var iVert = 0; iVert < vertices.length; iVert++) {
+         var vertex = vertices[iVert];
+         if(vertex !== id){
+            var pos = settings.visualGraph.getVertexVisualInfo(vertex);
+            if(Beav.Geometry.distance(x,y,pos.x,pos.y) < settings.minDistanceBetweenVertices){
+               return true;
+            }
+         }
+      }
+      return false;
+   };
+
+   self.findEmptySpace = function (id) {
+      var d = settings.dragLimits.maxX + settings.dragLimits.maxY;
+      var pos = settings.visualGraph.getVertexVisualInfo(id);
+      var newX = 0;
+      var newY = 0;
+      for (var x = settings.dragLimits.minX; x < settings.dragLimits.maxX; x += settings.vertexRadius){
+         for (var y = settings.dragLimits.minY; y < settings.dragLimits.maxY; y += settings.vertexRadius){
+            if (!self.overlapOtherVertex(x,y,id)){
+               var newD = Beav.Geometry.distance(pos.x,pos.y,x,y);
+               if(newD < d){
+                  d = newD;
+                  newX = x;
+                  newY = y;
+               }
+            }
+         }
+      }
+
+      settings.visualGraph.graphDrawer.moveVertex(id, newX, newY);
    };
 
    if(settings.enabled) {
