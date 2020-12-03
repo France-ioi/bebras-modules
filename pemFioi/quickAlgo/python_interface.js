@@ -872,6 +872,36 @@ function LogicController(maxInstructions, subTask) {
     }
     $('.pythonIntroElement').css('display', '');
 
+
+    // Display a list for the simpleHtml version
+    function displaySimpleList(elemList) {
+      var html = '';
+      if(window.quickAlgoResponsive && elemList.length > 0) {
+        // Dropdown mode
+        html  = '<div class="pythonIntroSelect">';
+        html += '<select>';
+        for(var i=0 ; i < elemList.length; i++) {
+          var elem = elemList[i];
+          html += '<option' + (elem.desc ? ' data-desc="' + elem.desc.replace('"', '&quot;') + '"' : '') + '>';
+          html += (typeof elem == 'string' ? elem : elem.func);
+          html += '</option>';
+        }
+        html += '</select>';
+        html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnCopy"><span class="fas fa-clone"></span></div>';
+        html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnHelp"><span class="fas fa-question"></span></div>';
+        html += '<span class="pythonIntroSelectDesc"></span>';
+        html += '</div>';
+      } else {
+        // Normal mode
+        for(var i=0 ; i < elemList.length; i++) {
+          var elem = elemList[i];
+          if(i > 0) { html += ', '; }
+          html += '<code>' + (typeof elem == 'string' ? elem : elem.func) + '</code>';
+        }
+      }
+      return html;
+    };    
+
     var fullHtml = '';
     var simpleHtml = '';
 
@@ -893,34 +923,6 @@ function LogicController(maxInstructions, subTask) {
 
       var availableConsts = [];
 
-      // Display a list for the simpleHtml version
-      function displaySimpleList(elemList) {
-        var html = '';
-        if(window.quickAlgoResponsive && elemList.length > 0) {
-          // Dropdown mode
-          html  = '<div class="pythonIntroSelect">';
-          html += '<select>';
-          for(var i=0 ; i < elemList.length; i++) {
-            var elem = elemList[i];
-            html += '<option' + (elem.desc ? ' data-desc="' + elem.desc.replace('"', '&quot;') + '"' : '') + '>';
-            html += (typeof elem == 'string' ? elem : elem.func);
-            html += '</option>';
-          }
-          html += '</select>';
-          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnCopy"><span class="fas fa-clone"></span></div>';
-          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnHelp"><span class="fas fa-question"></span></div>';
-          html += '<span class="pythonIntroSelectDesc"></span>';
-          html += '</div>';
-        } else {
-          // Normal mode
-          for(var i=0 ; i < elemList.length; i++) {
-            var elem = elemList[i];
-            if(i > 0) { html += ', '; }
-            html += '<code>' + (typeof elem == 'string' ? elem : elem.func) + '</code>';
-          }
-        }
-        return html;
-      };
 
       // Generate list of functions available
       var simpleElements = [];
@@ -949,12 +951,14 @@ function LogicController(maxInstructions, subTask) {
       }
       simpleHtml += displaySimpleList(simpleElements);
       fullHtml += '</ul>';
+
+      if(availableConsts.length) {
+        fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
+        simpleHtml += '<br />Constantes disponibles : ' + displaySimpleList(availableConsts);
+      }      
     }
 
-    if(availableConsts.length) {
-      fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
-      simpleHtml += '<br />Constantes disponibles : ' + displaySimpleList(availableConsts);
-    }
+
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
 
