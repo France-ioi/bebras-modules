@@ -189,8 +189,8 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.elements.transLayer.mousedown(mousedown);
       this.elements.transLayer.mouseover(mouseover);
       this.elements.transLayer.mouseout(mouseout);
+      this.elements.transLayer.mouseup(mouseup);
       this.elements.transLayer.touchend(touchend);
-      $(document).bind("mouseup.BUTTON_" + this.guid, mouseup);
       this.moder.setMode("enabled");
    };
 
@@ -270,7 +270,6 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
    };
 
    this.remove = function() {
-      $(document).unbind(".BUTTON_" + this.guid);
       this.disable();
       this.applyFunction("remove");
    };
