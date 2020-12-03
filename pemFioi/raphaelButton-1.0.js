@@ -49,6 +49,7 @@ function ElementModer(defaultMode) {
 // LATER: should be allowed to customize the font in the button.
 
 var _BUTTON_GUID = 0;
+var currentEnabledButton = null;
 
 function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, stepDelay, delayFactory) {
    var self = this;
@@ -129,6 +130,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
          if(self.enabled) {
             self.mousedown = true;
             self.mouseover = true;
+            currentEnabledButton = self.guid;
             self.moder.setMode("mousedown");
             if(repeat) {
                self._startRepeater();
@@ -152,6 +154,9 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       }
 
       var mouseup = function() {
+         if (self.guid !== currentEnabledButton) {
+            return;
+         }
          self.touchInProgress = false;
          if(self.enabled) {
             // If we received a mousedown event previously, and now the mouse is up
@@ -191,6 +196,7 @@ function Button(paper, xPos, yPos, width, height, text, repeat, initialDelay, st
       this.elements.transLayer.mouseout(mouseout);
       this.elements.transLayer.mouseup(mouseup);
       this.elements.transLayer.touchend(touchend);
+      $(document).bind("mouseup", mouseup);
       this.moder.setMode("enabled");
    };
 
