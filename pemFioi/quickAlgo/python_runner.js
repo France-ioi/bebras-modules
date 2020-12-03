@@ -71,17 +71,28 @@ function PythonInterpreter(context, msgCallback) {
     return '\nmod.' + name + ' = new Sk.builtin.func(function () {\n' + handler + '\n});\n';
   };
 
-  this._skulptifyConst = function(name, value) {
+  this._skulptifyValue = function(value) {
     if(typeof value === "number") {
-      var handler = 'Sk.builtin.int_(' + value + ');';
+      var handler = 'Sk.builtin.int_(' + value + ')';
     } else if(typeof value === "boolean") {
-      var handler = 'Sk.builtin.bool(' + value.toString() + ');';
+      var handler = 'Sk.builtin.bool(' + value.toString() + ')';
     } else if(typeof value === "string") {
-      var handler = 'Sk.builtin.str(' + JSON.stringify(value) + ');';
+      var handler = 'Sk.builtin.str(' + JSON.stringify(value) + ')';
+    } else if(Array.isArray(value)) {
+      var list = [];
+      for(var i=0; i<value.length; i++) {
+        list.push(this._skulptifyValue(value[i]));
+      }
+      var handler = 'Sk.builtin.list([' + list.join(',') + '])';
     } else {
       throw "Unable to translate value '" + value + "' into a Skulpt constant.";
     }
-    return '\nmod.' + name + ' = new ' + handler + '\n';
+    return 'new ' + handler;
+  }
+
+  this._skulptifyConst = function(name, value) {
+    var handler = this._skulptifyValue(value);
+    return '\nmod.' + name + ' = ' + handler + ';\n';
   };
 
   this._injectFunctions = function () {
@@ -151,6 +162,8 @@ function PythonInterpreter(context, msgCallback) {
             modContents += this._skulptifyConst(name, constList[iConst].value)
           }
         }
+
+        //console.log(modContents);
 
         modContents += "\nreturn mod;\n};";
         Sk.builtinFiles["files"]["src/lib/"+generatorName+".js"] = modContents;
