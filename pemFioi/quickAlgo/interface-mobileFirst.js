@@ -319,7 +319,7 @@ var quickAlgoInterface = {
      * @return true if we can exit without problem, false otherwise
      * @throws An error, if two compare.size() is not a multiple of 2
      */
-    _handleConfirmationExitWindow: function(...toCompare) {
+    _handleConfirmationExitWindow: function(toCompare) {
         if (toCompare.length % 2 != 0) {
             // this should never happen in prod, if an error is thrown the error come from the programmer.
             throw "interface-mobileFirst.js: _handleConfirmationExitWindow: toCompare must be a multiple of 2, you did"
@@ -352,8 +352,8 @@ var quickAlgoInterface = {
      * @public Because we must use it inside of button "onClick" functions, so we can't make it "private" because the
      * strict private convention is not respected here (we must use that.closePopupWithConfirmation inside of a button).
      */
-    closePopupWithConfirmation: function(...toCompare) {
-        if (this._handleConfirmationExitWindow(...toCompare)) {
+    closePopupWithConfirmation: function(toCompare) {
+        if (this._handleConfirmationExitWindow(toCompare)) {
             this.closePopup();
         }
     },
@@ -395,7 +395,7 @@ var quickAlgoInterface = {
             var newDesc = $("#editExerciseDescriptionTextarea").val();
             var oldTitle = that.userTaskData.title;
             var oldDescription = that.userTaskData.subject;
-            that.closePopupWithConfirmation(newTitle, oldTitle, newDesc, oldDescription);
+            that.closePopupWithConfirmation([newTitle, oldTitle, newDesc, oldDescription]);
         });
 
         $("#saveExerciseChanges").click(function() {
@@ -540,7 +540,7 @@ var quickAlgoInterface = {
                 var newLicense = getLicenseChanges();
                 var oldAuthors = that.userTaskData.about.authors;
                 var oldLicense = that.userTaskData.about.license;
-                that.closePopupWithConfirmation(newAuthors, oldAuthors, newLicense, oldLicense);
+                that.closePopupWithConfirmation([newAuthors, oldAuthors, newLicense, oldLicense]);
             } else {
                 that.closePopup();
             }
