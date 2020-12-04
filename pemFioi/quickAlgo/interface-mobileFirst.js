@@ -569,14 +569,6 @@ var quickAlgoInterface = {
                 $("#aboutLicenseIcon").show();
             }
         });
-
-        /*
-        $('#aboutLicenseInput').on('input', function() {
-            if ($('#aboutLicenseInput').val() != "")
-                $("#aboutLicenseDropdown").prop("disabled", true);
-            else
-                $("#aboutLicenseDropdown").prop("disabled", false);
-        });*/
     },
 
     loadPrograms: function(formElement) {
