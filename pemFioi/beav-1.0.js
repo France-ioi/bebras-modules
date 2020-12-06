@@ -416,13 +416,15 @@ Beav.Raphael.loadTextExtensions = function(paper) {
    }
 
    var setproto = paper.set().__proto__;
+   try {
    setproto.valign = function(dir) {
       this.forEach(function(item) {
          item.valign(dir);
       });
       return this;
    };
-
+   } catch(err) {
+   }
 };
 
 /**********************************************************************************/
