@@ -2517,10 +2517,52 @@ var getContext = function (display, infos, curLevel) {
                 return {};
             },*/
 
-            compareState: function (state1, state2) {
-                return quickPiStore.compareState(state1, state2);
+            getWrongStateString: function(failInfo) {
+                /**
+                 * Call this function when more.length > less.length. It will find the key that is missing inside of the
+                 * less array
+                 * @param more The bigger array, containing one or more key more than less
+                 * @param less Less, the smaller array, he has a key or more missing
+                 */
+                function getMissingKey(more, less) {
+                    for (var i = 0; i < more.length; i++) {
+                        var found = false;
+                        for (var key in less) {
+                            if (key === more[i]) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                            return more[i];
+                    }
+                }
+
+                if(!failInfo.expected &&
+                    !failInfo.actual)
+                    return null;
+
+                var expected = failInfo.expected;
+                var actual = failInfo.actual;
+
+                var expectedKeys = Object.keys(expected);
+                var actualKeys = Object.keys(actual);
+
+                // TODO: ajouter le temps aussi
+                if (expectedKeys.length != actualKeys.length) {
+                    if (expectedKeys.length > actualKeys.length) {
+                        var missingKey = getMissingKey(expectedKeys, actualKeys);
+                        return "Test échoué : Il vous manque la clée " + missingKey + " dans le cloud."
+                    } else {
+                        var additionalKey = getMissingKey(actualKeys, expectedKeys);
+                        return "Test échoué : La clée " + additionalKey + " est en trop dans le cloud";
+                    }
+                }
             },
 
+            compareState: function (state1, state2) {
+                return quickPiStore.compareState(state1, state2);
+            }
         },
         {
             name: "clock",
