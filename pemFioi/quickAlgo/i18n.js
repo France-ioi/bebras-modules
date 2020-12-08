@@ -73,7 +73,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter",
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
       about: "À propos",
-      license: "license :",
+      license: "License :",
       authors: "Auteurs :",
       other: "Autre",
       otherLicense: "Autre license",
@@ -213,7 +213,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Save & Quit",
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
       about: "About",
-      license: "license:",
+      license: "License:",
       authors: "Authors:",
       other: "Other",
       otherLicense: "Other license",
@@ -354,7 +354,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
-      license: "lizenz:", // TODO: verify
+      license: "Lizenz:", // TODO: verify
       authors: "Autoren :", // TODO: verify
       other: "Andere", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -496,7 +496,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
-      license: "licencia:", // TODO: verify
+      license: "Licencia:", // TODO: verify
       authors: "Autores:", // TODO: verify
       other: "Otro", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -636,7 +636,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
-      license: "licenca:", // TODO: tanslate
+      license: "Licenca:", // TODO: tanslate
       authors: "Avtorji:", // TODO: translate
       other: "drugo", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -778,7 +778,7 @@ var quickAlgoLanguageStrings = {
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
-      license: "licenza:", // TODO: verify
+      license: "Licenza:", // TODO: verify
       authors: "autori:", // TODO: verify
       other: "Altro", // TODO: verify
       otherLicense: "Other license", // TODO: translate
