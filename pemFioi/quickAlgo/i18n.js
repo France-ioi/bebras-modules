@@ -779,7 +779,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
       license: "Licenza:", // TODO: verify
-      authors: "autori:", // TODO: verify
+      authors: "Autori:", // TODO: verify
       other: "Altro", // TODO: verify
       otherLicense: "Other license", // TODO: translate
       pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
