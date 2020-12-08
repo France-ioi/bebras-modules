@@ -366,13 +366,13 @@ var quickAlgoInterface = {
      * @param hidden If the button should be hidden or not (or no argument in this case the button is shown)
      * @return {string}  The html for the button
      */
-    _getAboutLicenseButton: function(hidden) {
+    _getAboutLicenseButton: function(hidden, license) {
         if (!hidden)
             hidden = "";
         else
             hidden = "style='display: none;'";
         return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
-            + that.licenses[this.userTaskData.about.license] + "\", \"_blank\");' " + hidden + "></span>";
+            + this.licenses[license] + "\", \"_blank\");' " + hidden + "></span>";
     },
 
     openEditExercise: function() {
@@ -409,11 +409,11 @@ var quickAlgoInterface = {
 
         var licenseInput = null;
         if (!(license in this.licenses)) {
-            licenseDropdown += " " + this._getAboutLicenseButton(true);
+            licenseDropdown += " " + this._getAboutLicenseButton(true, license);
             licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
                 + license + "' placeholder='" + this.strings.otherLicense + "'>";
         } else {
-            licenseDropdown += " " + this._getAboutLicenseButton(false);
+            licenseDropdown += " " + this._getAboutLicenseButton(false, license);
             licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
                 "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
         }
@@ -484,6 +484,7 @@ var quickAlgoInterface = {
                 $("#aboutLicenseInput").show();
             } else {
                 $("#aboutLicenseInput").hide();
+                $("#aboutLicenseIcon").attr("onclick", "window.open(\"" + that.licenses[val] + "\", \"_blank\");");
                 $("#aboutLicenseIcon").show();
             }
         });
@@ -504,15 +505,6 @@ var quickAlgoInterface = {
         });
     },
 
-    _getAboutLicenseButton: function(hidden) {
-        if (!hidden)
-            hidden = "";
-        else
-            hidden = "style='display: none;'";
-        return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
-            + this.licenses[this.userTaskData.about.license] + "\", \"_blank\");' " + hidden + "></span>";
-    },
-
     openAbout: function() {
         var that = this;
 
@@ -525,7 +517,7 @@ var quickAlgoInterface = {
         if (!this.licenses[license])
             licenseTxt += license;
         else
-            licenseTxt += license + " " + this._getAboutLicenseButton(false);
+            licenseTxt += license + " " + this._getAboutLicenseButton(false, license);
 
         var aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
                 "           <p>" + licenseTxt + "</p>";
