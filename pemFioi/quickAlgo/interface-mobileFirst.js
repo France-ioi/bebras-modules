@@ -358,12 +358,71 @@ var quickAlgoInterface = {
         }
     },
 
+    /**
+     * This function return the button hidden or not depending on the boolean in argument.
+     * This function can also be called without arguments and the button will not be hidden.
+     *
+     * The button is hidden in case we have not a license that we know about.
+     * @param hidden If the button should be hidden or not (or no argument in this case the button is shown)
+     * @return {string}  The html for the button
+     */
+    _getAboutLicenseButton: function(hidden) {
+        if (!hidden)
+            hidden = "";
+        else
+            hidden = "style='display: none;'";
+        return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
+            + that.licenses[this.userTaskData.about.license] + "\", \"_blank\");' " + hidden + "></span>";
+    },
+
     openEditExercise: function() {
         // in python, there are two "exerciseText", we need to selected only the first one
         // there are two "exerciseText" in python, because we also have a "long" version of the
         // subject
         var title = this.userTaskData.title;
         var subject = this.userTaskData.subject;
+        var authors = this.userTaskData.about.authors;
+        var license = this.userTaskData.about.license;
+
+        var aboutAuthorsLicenseSection = "<div id='aboutAuthorsLicense'>";
+
+        var authorsTxt = "<label for='author'>" + this.strings.authors + "</label>";
+        authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
+
+        var licenseOther = "";
+
+        if (!(license in this.licenses))
+            licenseOther = "selected";
+
+        var licenseDropdown = "<p>" + this.strings.license + "</p>" +
+            "<select name='chooseLicense' id='aboutLicenseDropdown'>";
+        for (var licenseName in this.licenses) {
+            var selected = "";
+            if (license === licenseName)
+                selected = "selected";
+            licenseDropdown += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
+        }
+        licenseDropdown += "<option value='" + this.strings.other + "' " + licenseOther + ">" + this.strings.other
+            + "</option>";
+        licenseDropdown += "</select>";
+
+
+        var licenseInput = null;
+        if (!(license in this.licenses)) {
+            licenseDropdown += " " + this._getAboutLicenseButton(true);
+            licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
+                + license + "' placeholder='" + this.strings.otherLicense + "'>";
+        } else {
+            licenseDropdown += " " + this._getAboutLicenseButton(false);
+            licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
+                "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
+        }
+
+        aboutAuthorsLicenseSection += authorsTxt;
+
+        aboutAuthorsLicenseSection += licenseDropdown + licenseInput + "</div>";
+
+
         var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
             "    <div class=\"panel-heading\">" +
             "        <h2 class=\"sectionTitle\">" +
@@ -380,6 +439,7 @@ var quickAlgoInterface = {
             "            <label>" + this.strings.descriptionEdition + "</label>" +
             "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + subject + "</textarea>" +
             "        </div>" +
+                    aboutAuthorsLicenseSection +
             "        <div id='panel-body-bottom'>" +
             "            <button id='saveExerciseChanges'>" + this.strings.saveAndQuit + "</button>" +
             "        </div>" +
@@ -390,12 +450,42 @@ var quickAlgoInterface = {
 
         var that = this;
 
+        /**
+         * This method allow us to get the new license from the dropdown or the input box according to this predicate:
+         * if the dropdown has this.strings.other as selection, then we select the value of the input box.
+         * @return The new license
+         */
+        function getLicenseChanges() {
+            var selectedDropdown = $('#aboutLicenseDropdown option:selected').text();
+            if (selectedDropdown === that.strings.other) {
+                return $('#aboutLicenseInput').val();
+            } else {
+                return selectedDropdown;
+            }
+        }
+
         $("#editclose").click(function() {
             var newTitle = $("#editExerciseTitleInput").val();
             var newDesc = $("#editExerciseDescriptionTextarea").val();
             var oldTitle = that.userTaskData.title;
             var oldDescription = that.userTaskData.subject;
-            that.closePopupWithConfirmation([newTitle, oldTitle, newDesc, oldDescription]);
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = getLicenseChanges();
+            var oldAuthors = that.userTaskData.about.authors;
+            var oldLicense = that.userTaskData.about.license;
+            that.closePopupWithConfirmation([newTitle, oldTitle, newDesc, oldDescription, newAuthors,
+                oldAuthors, newLicense, oldLicense]);
+        });
+
+        $('#aboutLicenseDropdown').change(function() {
+            var val = $('#aboutLicenseDropdown option:selected').text();
+            if (val === that.strings.other) {
+                $("#aboutLicenseIcon").hide();
+                $("#aboutLicenseInput").show();
+            } else {
+                $("#aboutLicenseInput").hide();
+                $("#aboutLicenseIcon").show();
+            }
         });
 
         $("#saveExerciseChanges").click(function() {
@@ -404,14 +494,23 @@ var quickAlgoInterface = {
 
             var newTitle = $("#editExerciseTitleInput").val();
             var newSubject = $("#editExerciseDescriptionTextarea").val();
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = getLicenseChanges();
             that.userTaskData.title = newTitle;
             that.userTaskData.subject = newSubject;
+            that.userTaskData.about.authors = newAuthors;
+            that.userTaskData.about.license = newLicense;
             that.loadSubjectFromUserTaskData();
         });
     },
 
-    _getAboutLicenseButton: function(license) {
-
+    _getAboutLicenseButton: function(hidden) {
+        if (!hidden)
+            hidden = "";
+        else
+            hidden = "style='display: none;'";
+        return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
+            + this.licenses[this.userTaskData.about.license] + "\", \"_blank\");' " + hidden + "></span>";
     },
 
     openAbout: function() {
@@ -421,79 +520,18 @@ var quickAlgoInterface = {
 
         var license = this.userTaskData.about.license;
 
-        /**
-         * This function return the button hidden or not depending on the boolean in argument.
-         * This function can also be called without arguments and the button will not be hidden.
-         *
-         * The button is hidden in case we have not a license that we know about.
-         * @param hidden If the button should be hidden or not (or no argument in this case the button is shown)
-         * @return {string}  The html for the button
-         */
-        function getAboutLicenseButton(hidden) {
-            if (!hidden)
-                hidden = "";
-            else
-                hidden = "style='display: none;'";
-            return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
-                + that.licenses[license] + "\", \"_blank\");' " + hidden + "></span>";
-        }
-
-        var aboutAuthorsLicenseSection = null;
-
         // if the license is not inside of our predefined licenses then we write it without "more details" button
-        if (!this.options.canEditSubject) {
-            var licenseTxt = this.strings.license;
-            if (!this.licenses[license])
-                licenseTxt += license;
-            else {
-                licenseTxt += license + " " + getAboutLicenseButton();
-            }
-            aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
+        var licenseTxt = this.strings.license;
+        if (!this.licenses[license])
+            licenseTxt += license;
+        else
+            licenseTxt += license + " " + this._getAboutLicenseButton(false);
+
+        var aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
                 "           <p>" + licenseTxt + "</p>";
-        } else {
-            aboutAuthorsLicenseSection = "";
-
-            var authorsTxt = "<label for='author'>" + this.strings.authors + "</label>";
-            authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
-
-            var licenseOther = "";
-
-            if (!(license in this.licenses))
-                licenseOther = "selected";
-
-            var licenseDropdown = "<p>" + this.strings.license + "</p>" +
-                "<select name='chooseLicense' id='aboutLicenseDropdown'>";
-            for (var licenseName in this.licenses) {
-                var selected = "";
-                if (license === licenseName)
-                    selected = "selected";
-                licenseDropdown += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
-            }
-            licenseDropdown += "<option value='" + this.strings.other + "' " + licenseOther + ">" + this.strings.other
-                + "</option>";
-            licenseDropdown += "</select>";
-
-
-            var licenseInput = null;
-            if (!(license in this.licenses)) {
-                licenseDropdown += " " + getAboutLicenseButton(true);
-                licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
-                    + license + "' placeholder='" + this.strings.otherLicense + "'>";
-            } else {
-                licenseDropdown += " " + getAboutLicenseButton(false);
-                licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
-                    "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
-            }
-
-            aboutAuthorsLicenseSection += authorsTxt;
-
-            aboutAuthorsLicenseSection += licenseDropdown + licenseInput + "<br/>";
-
-            var saveButton = "<button id='aboutSaveButton'>" + this.strings.saveAndQuit + "</button>";
-            aboutAuthorsLicenseSection += saveButton;
-        }
 
         var typeTxt = this.strings.exerciseTypeAbout["default"];
+
         if (this.context.title)
             typeTxt = this.strings.exerciseTypeAbout[this.context.title];
 
@@ -520,54 +558,8 @@ var quickAlgoInterface = {
 
         window.displayHelper.showPopupDialog(aboutHtml);
 
-        /**
-         * This method allow us to get the new license from the dropdown or the input box according to this predicate:
-         * if the dropdown has this.strings.other as selection, then we select the value of the input box.
-         * @return The new license
-         */
-        function getLicenseChanges() {
-            var selectedDropdown = $('#aboutLicenseDropdown option:selected').text();
-            if (selectedDropdown === that.strings.other) {
-                return $('#aboutLicenseInput').val();
-            } else {
-                return selectedDropdown;
-            }
-        }
-
         $("#aboutclose").click(function() {
-            if (that.options.canEditSubject) {
-                var newAuthors = $('#aboutAuthorsInput').val();
-                var newLicense = getLicenseChanges();
-                var oldAuthors = that.userTaskData.about.authors;
-                var oldLicense = that.userTaskData.about.license;
-                that.closePopupWithConfirmation([newAuthors, oldAuthors, newLicense, oldLicense]);
-            } else {
-                that.closePopup();
-            }
-        });
-
-        $('#aboutSaveButton').click(function() {
-            var newAuthors = $('#aboutAuthorsInput').val();
-            var newLicense = getLicenseChanges();
-            if (!newLicense) {
-                alert(that.strings.pleaseSpecifyLicense);
-                return;
-            }
-            that.userTaskData.about.authors = newAuthors;
-            that.userTaskData.about.license = newLicense;
-            $('#popupMessage').hide();
-            window.displayHelper.popupMessageShown = false;
-        });
-
-        $('#aboutLicenseDropdown').change(function() {
-            var val = $('#aboutLicenseDropdown option:selected').text();
-            if (val === that.strings.other) {
-                $("#aboutLicenseIcon").hide();
-                $("#aboutLicenseInput").show();
-            } else {
-                $("#aboutLicenseInput").hide();
-                $("#aboutLicenseIcon").show();
-            }
+            that.closePopup();
         });
     },
 
