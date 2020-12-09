@@ -385,7 +385,7 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud",
             cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}",
             cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.",
-            cloudDictionnaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu",
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu",
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.",
 
             cloudKeyNotExists: "La clé n'existe pas : {0} ",
@@ -821,7 +821,7 @@ var quickPiLocalLanguageStrings = {
             state: "Estado",
 
             cloudTypes: {
-                object: "Dictionnaire", // TODO: translate (dictionnary)
+                object: "Dictionnaire", // TODO: translate (dictionary)
                 array: "Tableau", // TODO: translate
                 boolean: "Booléen", // TODO: translate
                 number: "Nombre", // TODO: translate
@@ -832,7 +832,7 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud", // TODO: translate
             cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
             cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.", // TODO: translate
-            cloudDictionnaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
 
             cloudKeyNotExists: "La llave no existe : {0} ",
@@ -1266,7 +1266,7 @@ var quickPiLocalLanguageStrings = {
             state: "State",
 
             cloudTypes: {
-                object: "Dictionnaire", // TODO: translate (dictionnary)
+                object: "Dictionnaire", // TODO: translate (dictionary)
                 array: "Tableau", // TODO: translate
                 boolean: "Booléen", // TODO: translate
                 number: "Nombre", // TODO: translate
@@ -1277,7 +1277,7 @@ var quickPiLocalLanguageStrings = {
             cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud", // TODO: translate
             cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
             cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.", // TODO: translate
-            cloudDictionnaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
 
             cloudKeyNotExists: "La chiave non esiste : {0} ",
@@ -2717,7 +2717,7 @@ var getContext = function (display, infos, curLevel) {
                     case valueType.ARRAY:
                         return strings.messages.cloudArrayWrongKey.format(keyCompare.key);
                     case valueType.DICTIONARY:
-                        return strings.messages.cloudDictionnaryWrongKey.format(keyCompare.key);
+                        return strings.messages.cloudDictionaryWrongKey.format(keyCompare.key);
                 }
             },
 
