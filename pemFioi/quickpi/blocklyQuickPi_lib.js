@@ -1643,7 +1643,8 @@ var getContext = function (display, infos, curLevel) {
             {
                 id: 'quickpi_led',
                 order: 201,
-                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness', 'getLedBrightness', 'isLedOn']
+                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness',
+                    'getLedBrightness', 'isLedOn']
             },
             {
                 id: 'quickpi_button',
@@ -1727,6 +1728,44 @@ var getContext = function (display, infos, curLevel) {
                 python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore', 'getTemperatureFromCloud']
             }
         ];
+
+        // TODO: move this functions somewhere else
+        // This function allow us to remove all the useless blocks from infos.
+        (function removeUselessBlocks() {
+            var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
+            // console.log(JSON.stringify(currBlocks));
+            console.log(JSON.stringify(infos.includeBlocks.generatedBlocks.quickpi));
+
+            var sensorTypes = (function() {
+                var sensors = infos.quickPiSensors;
+                var ret = [];
+                for (var iSensor = 0; iSensor < sensors.length; iSensor++)
+                    ret.push("quickpi_" + sensors[iSensor].type);
+                return ret;
+            })();
+
+            // This are the blocks that are inside of the concept and that we will keep.
+            var toKeep = [];
+
+            function getSensorOfFunction(block) {
+                for (var iConcept = 0; i < quickPiConceptList.length; iConcept++) {
+                    var currConcept = quickPiConceptList[iConcept];
+                    if (arrayContains(currConcept.python, block))
+                        return currConcept.id;
+                }
+            }
+
+            for (var i = 0; i < currBlocks.length; i++) {
+                var block = currBlocks[i];
+                if (arrayContains(sensorTypes, getSensorOfFunction(block)))
+                    toKeep.push(block);
+            }
+
+
+            // save currBlocks after removal
+            infos.includeBlocks.generatedBlocks.quickpi = toKeep;
+            console.log(JSON.stringify(infos.includeBlocks.generatedBlocks.quickpi));
+        })();
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
             var conceptStrings = quickPiLocalLanguageStrings.fr.concepts;
