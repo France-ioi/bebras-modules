@@ -1703,7 +1703,7 @@ window.displayHelper = {
                   return '<input type="button" value="' + this.strings.gradeThisAnswer + '" onclick="displayHelper.validate(\'test\');" ' +
                      disabledStr + '/>';
                } else {
-                  // was: “Valider votre nouvelle réponse”
+                  // was: Valider votre nouvelle réponse
                   return '<input type="button" value="' + strValidate + '" onclick="displayHelper.callValidate();" ' +
                      disabledStr + '/>';
                }
