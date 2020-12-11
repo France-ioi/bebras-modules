@@ -2002,7 +2002,11 @@ var getContext = function(display, infos, curLevel) {
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 } 
+            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 },
+            north: { num: 13, img: "north.png", side: 60, zOrder: 0 },
+            south: { num: 14, img: "south.png", side: 60, zOrder: 0 },
+            east: { num: 15, img: "east.png", side: 60, zOrder: 0 },
+            west: { num: 16, img: "west.png", side: 60, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
