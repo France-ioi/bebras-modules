@@ -42,6 +42,7 @@ window.displayHelper = {
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 4,
+   forceNextTaskAfter: [],
    neverHadHard: false,
    showMultiversionNotice: false,
    taskLevel: '',
@@ -75,7 +76,7 @@ window.displayHelper = {
          no: "Non",
          tryHardLevel: "Nous vous proposons d'essayer la version 4 étoiles.",
          tryMediumLevel: "Nous vous proposons d'essayer la version 3 étoiles.",
-         tryNextTask: "Nous vous proposons de passer au sujet suivant. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
+         tryNextTask: "Nous vous proposons de passer à un autre sujet. S'il vous reste du temps, vous reviendrez plus tard essayer la version suivante.",
          yourScoreIsNow: "Votre score est maintenant :",
          worseScoreStays: "C'est moins bien qu'avant ; votre score reste :",
          scoreStays: "Votre score reste le même :",
@@ -1470,7 +1471,11 @@ window.displayHelper = {
                 if(gradedLevel == "medium") { threshold = this.thresholdMedium; }
                 else if(gradedLevel == "easy") { threshold = this.thresholdEasy; }
             }
-            if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
+            if(levelIdx == this.forceNextTaskAfter) {
+               // Move onto next task after a specified difficulty
+               actionNext = "nextTask";
+               fullMessage += this.strings.tryNextTask;
+            } else if(!threshold || (threshold && secondsSinceLoaded < threshold)) {
                actionNext = nextLevel;
                if(gradedLevel == "easy") { fullMessage += this.strings.tryMediumLevel; }
                if(gradedLevel == "medium") { fullMessage += this.strings.tryHardLevel; }
