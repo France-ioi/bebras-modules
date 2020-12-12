@@ -10,6 +10,9 @@ var getContext = function (display, infos, curLevel) {
 
     var localLanguageStrings = {
         en: {
+            categories: {
+                traceroute: 'Traceroute'
+            },
             label: {
                 // Labels for the blocks
                 parseArgument: "get domain argument",
@@ -49,13 +52,9 @@ var getContext = function (display, infos, curLevel) {
     if (window.quickAlgoInterface) {
         window.quickAlgoInterface.stepDelayMax = 500;
     }
-    infos.checkEndEveryTurn = false;
-    infos.checkEndCondition = function (context, lastTurn) {
-        // TODO
-    };
-
 
     var paper;
+
     var network = {
         data: [],
 
@@ -205,6 +204,8 @@ var getContext = function (display, infos, curLevel) {
         if(!lastTurn) {
             return;
         }
+
+        // generate valid output
         var domain = network.parseArgument();
         var ip = network.getAddrInfo(domain);
         var max_ttl = network.maxTTL();
@@ -217,6 +218,7 @@ var getContext = function (display, infos, curLevel) {
             }
         }
 
+        // compare valid output with user output
         var user_output = output.get();
         if(user_output.length != expected_output.length) {
             context.success = false;
@@ -244,7 +246,6 @@ var getContext = function (display, infos, curLevel) {
 
     context.reset = function (taskInfos) {
         output.clear();
-        //user_output.clear(context.display);
         if (taskInfos != undefined) {
             network.setData(taskInfos.network);
             context.cmd = taskInfos.cmd;
@@ -480,7 +481,7 @@ var getContext = function (display, infos, curLevel) {
 
     context.customBlocks = {
         traceroute: {
-            actuator: [
+            traceroute: [
                 {
                     name: 'parseArgument',
                     yieldsValue: true
@@ -499,8 +500,7 @@ var getContext = function (display, infos, curLevel) {
                     name: 'print',
                     params: ['String']
                 }
-            ],
-            sensors: []
+            ]
         }
     };
 
@@ -509,8 +509,7 @@ var getContext = function (display, infos, curLevel) {
     context.provideBlocklyColours = function () {
         return {
             categories: {
-                actuator: 0,
-                sensors: 100
+                traceroute: 0
             }
         };
     };

@@ -61,6 +61,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Insérer l'exemple",
       saveOrLoadButton: "Charger / enregistrer",
       saveOrLoadProgram: "Enregistrer ou recharger votre programme :",
+      editButton: "Editer",
+      editWindowTitle: "Édition d'exercice",
+      titleEdition: "Titre :",
+      descriptionEdition: "Description :",
+      saveAndQuit: "Sauvegarder & Quitter",
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -79,6 +85,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} blocs en trop utilisés pour {maxBlocks} autorisés.",
       capacityWarning: "Attention : votre programme est invalide car il utilise trop de blocs. Faites attention à la limite de blocs affichée en haut à droite de l'éditeur.",
       clipboardDisallowedBlocks: "Vous ne pouvez pas coller ce programme, car il contient des blocs non autorisés dans cette version.",
+      waitBetweenExecutions: "Je me repose. Réfléchissez bien avant d'exécuter un programme différent !",
       previousTestcase: "Précédent",
       nextTestcase: "Suivant",
       allTests: "Tous les tests : ",
@@ -184,6 +191,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Insert example",
       saveOrLoadButton: "Load / save",
       saveOrLoadProgram: "Save or reload your code:",
+      editButton: "edit",
+      editWindowTitle: "Exercise edition",
+      titleEdition: "Title:",
+      descriptionEdition: "Description:",
+      saveAndQuit: "Save & Quit",
+      quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -202,6 +215,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} elements over the limit of {maxBlocks} available.",
       capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.",
+      waitBetweenExecutions: "Think carefully before starting a different program!",
       previousTestcase: "Previous",
       nextTestcase: "Next",
       allTests: "All tests: ",
@@ -308,6 +322,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Beispiel einfügen",
       saveOrLoadButton: "Laden / Speichern",
       saveOrLoadProgram: "Speicher oder lade deinen Quelltext:",
+      editButton: "bearbeiten", // TODO: verify
+      editWindowTitle: "Übungsausgabe", // TODO: verify
+      titleEdition: "Titel:", // TODO: verify
+      descriptionEdition: "Beschreibung:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -326,6 +346,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} Elemente zusätzlich zum Limit von {maxBlocks} verbraucht.",
       capacityWarning: "Warning : your program is invalid as it uses too many blocks. Be careful of the block limit displayed on the top right side of the editor.",
       clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.",
+      waitBetweenExecutions: "Think carefully before starting a different program!",
       previousTestcase: " < ",
       nextTestcase: " > ",
       allTests: "Alle Testfälle: ",
@@ -433,6 +454,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Cargar el ejemplo",
       saveOrLoadButton: "Cargar / Guardar",
       saveOrLoadProgram: "Guardar o cargar su programa:",
+      editButton: "editar", // TODO: verify
+      editWindowTitle: "Edición de ejercicio", // TODO: verify
+      titleEdition: "Título:", // TODO: verify
+      descriptionEdition: "Descripción:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -451,6 +478,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} elementos sobre el límite de {maxBlocks} autorizados.",
       capacityWarning: "Advertencia: tu programa está inválido porque ha utilizado demasiados bloques. Pon atención al límite de bloques permitidos mostrados en la parte superior derecha del editor.",
       clipboardDisallowedBlocks: "No puede pegar este programa, ya que contiene bloques que no están permitidos en esta versión.", 
+      waitBetweenExecutions: "Think carefully before starting a different program!",
       previousTestcase: "Anterior",
       nextTestcase: "Siguiente",
       allTests: "Todas las pruebas:",
@@ -556,6 +584,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Naloži primer",
       saveOrLoadButton: "Naloži / Shrani",
       saveOrLoadProgram: "Shrani ali znova naloži kodo:",
+      editButton: "Uredi", // TODO: verify
+      editWindowTitle: "Izdaja vaje", // TODO: verify
+      titleEdition: "Naslov:", // TODO: verify
+      descriptionEdition: "Opis:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -574,6 +608,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} elementov preko meje {maxBlocks} elementov, ki so na voljo.",
       capacityWarning: "Opozorilo : program je rešen narobe, uporablja preveliko število delčkov. Bodi pozoren na število delčkov, ki jih lahko uporabiš, informacijo o tem imaš zgoraj.",
       clipboardDisallowedBlocks: "You cannot paste this program, as it contains blocks which aren't allowed in this version.", // TODO :: translate
+      waitBetweenExecutions: "Think carefully before starting a different program!",
       previousTestcase: "Nazaj",
       nextTestcase: "Naprej",
       allTests: "Vsi testi: ",
@@ -681,6 +716,12 @@ var quickAlgoLanguageStrings = {
       loadExample: "Inserisci l'esempio",
       saveOrLoadButton: "Carica / salva",
       saveOrLoadProgram: "Salva o ricarica il tuo programma:",
+      editButton: "modificare", // TODO: verify
+      editWindowTitle: "Edizione esercizio", // TODO: verify
+      titleEdition: "Titolo:", // TODO: verify
+      descriptionEdition: "Descrizione:", // TODO: verify
+      saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
+      quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",
@@ -699,6 +740,7 @@ var quickAlgoLanguageStrings = {
       limitElementsOver: "{remainingBlocks} blocchi utilizzati in eccesso per  {maxBlocks} autorizzati.",
       capacityWarning: "Attenzione: il tuo programma non è valido perché utilizza troppi blocchi. Presta attenzione al limite di blocchi visualizzato nell'angolo in alto a destra dell'editor.",
       clipboardDisallowedBlocks: "Non è possibile incollare questo programma perché contiene blocchi che non sono ammessi in questa versione.",
+      waitBetweenExecutions: "Think carefully before starting a different program!",
       previousTestcase: "Precedente",
       nextTestcase: "Seguente",
       allTests: "Tutti i test: ",

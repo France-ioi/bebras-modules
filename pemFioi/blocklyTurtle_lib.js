@@ -10,6 +10,7 @@ var makeTurtle = function(coords) {
          this.y = initcoords.y;
       }
       this.stepsize = 1;
+      this.directionDeg = 0;
       this.direction = 0;
       this.paint = true;
       this.stepsize = 5;
@@ -27,11 +28,31 @@ var makeTurtle = function(coords) {
    this.reset(5);
    
    this.turn = function(angle) {
-      this.direction += angle*Math.PI/180;
+      angle = parseInt(angle);
+      this.directionDeg = (this.directionDeg + angle) % 360;
+
+      // Make sure we have a positive direction
+      this.directionDeg = (this.directionDeg + 360) % 360;
+
+      this.direction = this.directionDeg*Math.PI/180;
       if (this.turtle) {
          // TODO :: Do we need to put "none" first?
          this.turtle.style.transform = "none";
          this.turtle.style.transform = "rotate(" + (-this.direction) + "rad)";
+      }
+   }
+   this.trig = function() {
+      // Fix rounding issues
+      if(this.directionDeg == 0) {
+         return {sin: 0, cos: 1};
+      } else if(this.directionDeg == 90) {
+         return {sin: 1, cos: 0};
+      } else if(this.directionDeg == 180) {
+         return {sin: 0, cos: -1};
+      } else if(this.directionDeg == 270) {
+         return {sin: -1, cos: 0};
+      } else {
+         return {sin: Math.sin(this.direction), cos: Math.cos(this.direction)};
       }
    }
    this.move = function(amount) {
@@ -39,10 +60,11 @@ var makeTurtle = function(coords) {
          this.drawingContext.beginPath();
          this.drawingContext.moveTo(this.x, this.y);
       }
-      
-      this.x -= amount * this.stepsize * 10 * Math.sin(this.direction);
-      this.y -= amount * this.stepsize * 10 * Math.cos(this.direction);
-     
+
+      var trig = this.trig();
+      this.x -= amount * this.stepsize * 10 * trig.sin;
+      this.y -= amount * this.stepsize * 10 * trig.cos;
+
       if (this.paint) {
          this.drawingContext.lineTo(this.x, this.y);
          this.drawingContext.stroke();
@@ -170,20 +192,20 @@ var getContext = function(display, infos) {
             inputvalue: "eingabewert"
          },
          description: {
-            moveamount: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
-            moveamountvalue: 'forward() la tortue avance du nombre de pas indiqué en paramètre. Exemple : forward(50)',
-            movebackamount: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
-            movebackamountvalue: 'backward() la tortue recule du nombre de pas indiqué en paramètre. Exemple : backward(50)',
-            turnleftamount: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
-            turnleftamountvalue: 'left() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : left(90)',
-            turnrightamount: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
-            turnrightamountvalue: 'right() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : right(90)',
-            row: 'row() capteur qui renvoie la ligne sur laquelle se trouve la tortue',
-            col: 'col() capteur qui renvoie la colonne sur laquelle se trouve la tortue',
-            penup: 'liftBrush() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
-            pendown: 'lowerBrush() la tortue place son pinceau dans la position où il laisse une trace.',
-            colourvalue: 'color() la trace du pinceau aura la couleur indiquée en paramètre. Exemple : color(\'red\')',
-            inputvalue: 'inputvalue() lire un nombre en entrée.'
+            moveamount: '@() la tortue avance du nombre de pas indiqué en paramètre. Exemple : @(50)',
+            moveamountvalue: '@() la tortue avance du nombre de pas indiqué en paramètre. Exemple : @(50)',
+            movebackamount: '@() la tortue recule du nombre de pas indiqué en paramètre. Exemple : @(50)',
+            movebackamountvalue: '@() la tortue recule du nombre de pas indiqué en paramètre. Exemple : @(50)',
+            turnleftamount: '@() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : @(90)',
+            turnleftamountvalue: '@() la tortue pivote vers la gauche du nombre de degrés indiqué en paramètre. Exemple : @(90)',
+            turnrightamount: '@() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : @(90)',
+            turnrightamountvalue: '@() la tortue pivote vers la droite du nombre de degrés indiqué en paramètre. Exemple : @(90)',
+            row: '@() capteur qui renvoie la ligne sur laquelle se trouve la tortue',
+            col: '@() capteur qui renvoie la colonne sur laquelle se trouve la tortue',
+            penup: '@() la tortue lève son pinceau. Dans cette position, le pinceau ne laisse pas de trace.',
+            pendown: '@() la tortue place son pinceau dans la position où il laisse une trace.',
+            colourvalue: '@() la trace du pinceau aura la couleur indiquée en paramètre. Exemple : @(\'red\')',
+            inputvalue: '@() lire un nombre en entrée.'
          },
          startingBlockName: "Programme de la tortue",
          messages: {

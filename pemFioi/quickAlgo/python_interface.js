@@ -3,11 +3,11 @@
         Python mode interface and running logic.
 */
 
-function LogicController(nbTestCases, maxInstructions) {
+function LogicController(maxInstructions, subTask) {
   /**
    * Class properties
    */
-  this._nbTestCases = nbTestCases;
+  this.subTask = subTask;
   this._maxInstructions = maxInstructions || null;
   this.language = 'python';
   this._textFile = null;
@@ -41,7 +41,8 @@ function LogicController(nbTestCases, maxInstructions) {
       this.programs[0].blockly = this._aceEditor.getValue();
       if (full) {
         var additional = {};
-        this._mainContext.saveAdditional(additional);
+        if (window.quickAlgoInterface && window.quickAlgoInterface.saveAdditional)
+          window.quickAlgoInterface.saveAdditional(additional);
         this.programs[0].additional = additional;
       }
     }
@@ -53,7 +54,8 @@ function LogicController(nbTestCases, maxInstructions) {
       this._aceEditor.selection.clearSelection();
     }
     if (this._aceEditor && this.programs[0].additional) {
-      this._mainContext.loadAdditional(this.programs[0].additional);
+      if (window.quickAlgoInterface && window.quickAlgoInterface.loadAdditional)
+        window.quickAlgoInterface.loadAdditional(this.programs[0].additional);
     }
   };
 
@@ -73,7 +75,6 @@ function LogicController(nbTestCases, maxInstructions) {
       console.log('Module "python-analysis" is loaded but not used.');
     }
 
-    this._nbTestCases = nbTestCases;
     this._options = options;
     this._loadBasicEditor();
 
@@ -754,12 +755,6 @@ function LogicController(nbTestCases, maxInstructions) {
         that._mainContext.runner._editorMarker = null;
       }
 
-      if(window.quickAlgoInterface) {
-        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
-      } else {
-        $('#capacity').html(that.getCapacityInfo().text);
-      }
-
       // Interrupt any ongoing execution
       if(that._mainContext.runner) {
          that._mainContext.runner.reset();
@@ -769,6 +764,16 @@ function LogicController(nbTestCases, maxInstructions) {
         window.quickAlgoInterface.displayError(null);
       } else {
         $("#errors").html('');
+      }
+
+      if(window.quickAlgoInterface) {
+        window.quickAlgoInterface.displayCapacity(that.getCapacityInfo());
+      } else {
+        $('#capacity').html(that.getCapacityInfo().text);
+      }
+
+      if(that.subTask) {
+        that.subTask.onChange();
       }
 
       // Close reportValue popups
@@ -810,9 +815,13 @@ function LogicController(nbTestCases, maxInstructions) {
       blockHelp = blockDesc.substring(blockDesc.indexOf('</code>') + 7);
     } else {
       var blockName = functionName;
+      var funcCode = this._mainContext.strings.code[blockName] || blockName;
       blockDesc = this._mainContext.strings.description[blockName];
+      if(blockDesc) {
+         blockDesc = blockDesc.replace(/@/g, funcCode);
+      }
       if (!blockDesc) {
-        funcProto = (this._mainContext.strings.code[blockName] || blockName) + '()';
+        funcProto = funcCode + '()';
         blockDesc = '<code>' + funcProto + '</code>';
       } else if (blockDesc.indexOf('</code>') < 0) {
         var funcProtoEnd = blockDesc.indexOf(')') + 1;
@@ -863,6 +872,36 @@ function LogicController(nbTestCases, maxInstructions) {
     }
     $('.pythonIntroElement').css('display', '');
 
+
+    // Display a list for the simpleHtml version
+    function displaySimpleList(elemList) {
+      var html = '';
+      if(window.quickAlgoResponsive && elemList.length > 0) {
+        // Dropdown mode
+        html  = '<div class="pythonIntroSelect">';
+        html += '<select>';
+        for(var i=0 ; i < elemList.length; i++) {
+          var elem = elemList[i];
+          html += '<option' + (elem.desc ? ' data-desc="' + elem.desc.replace('"', '&quot;') + '"' : '') + '>';
+          html += (typeof elem == 'string' ? elem : elem.func);
+          html += '</option>';
+        }
+        html += '</select>';
+        html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnCopy"><span class="fas fa-clone"></span></div>';
+        html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnHelp"><span class="fas fa-question"></span></div>';
+        html += '<span class="pythonIntroSelectDesc"></span>';
+        html += '</div>';
+      } else {
+        // Normal mode
+        for(var i=0 ; i < elemList.length; i++) {
+          var elem = elemList[i];
+          if(i > 0) { html += ', '; }
+          html += '<code>' + (typeof elem == 'string' ? elem : elem.func) + '</code>';
+        }
+      }
+      return html;
+    };    
+
     var fullHtml = '';
     var simpleHtml = '';
 
@@ -884,34 +923,6 @@ function LogicController(nbTestCases, maxInstructions) {
 
       var availableConsts = [];
 
-      // Display a list for the simpleHtml version
-      function displaySimpleList(elemList) {
-        var html = '';
-        if(window.quickAlgoResponsive && elemList.length > 0) {
-          // Dropdown mode
-          html  = '<div class="pythonIntroSelect">';
-          html += '<select>';
-          for(var i=0 ; i < elemList.length; i++) {
-            var elem = elemList[i];
-            html += '<option' + (elem.desc ? ' data-desc="' + elem.desc.replace('"', '&quot;') + '"' : '') + '>';
-            html += (typeof elem == 'string' ? elem : elem.func);
-            html += '</option>';
-          }
-          html += '</select>';
-          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnCopy"><span class="fas fa-clone"></span></div>';
-          html += '<div class="pythonIntroSelectBtn pythonIntroSelectBtnHelp"><span class="fas fa-question"></span></div>';
-          html += '<span class="pythonIntroSelectDesc"></span>';
-          html += '</div>';
-        } else {
-          // Normal mode
-          for(var i=0 ; i < elemList.length; i++) {
-            var elem = elemList[i];
-            if(i > 0) { html += ', '; }
-            html += '<code>' + (typeof elem == 'string' ? elem : elem.func) + '</code>';
-          }
-        }
-        return html;
-      };
 
       // Generate list of functions available
       var simpleElements = [];
@@ -940,12 +951,14 @@ function LogicController(nbTestCases, maxInstructions) {
       }
       simpleHtml += displaySimpleList(simpleElements);
       fullHtml += '</ul>';
+
+      if(availableConsts.length) {
+        fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
+        simpleHtml += '<br />Constantes disponibles : ' + displaySimpleList(availableConsts);
+      }      
     }
 
-    if(availableConsts.length) {
-      fullHtml += '<p>Les constantes disponibles sont : <code>' + availableConsts.join('</code>, <code>') + '</code>.</p>';
-      simpleHtml += '<br />Constantes disponibles : ' + displaySimpleList(availableConsts);
-    }
+
 
     var pflInfos = pythonForbiddenLists(this.includeBlocks);
 
@@ -1133,6 +1146,6 @@ function LogicController(nbTestCases, maxInstructions) {
   };
 }
 
-function getBlocklyHelper(maxBlocks, nbTestCases) {
-  return new LogicController(nbTestCases, maxBlocks);
+function getBlocklyHelper(maxBlocks, subTask) {
+  return new LogicController(maxBlocks, subTask);
 }

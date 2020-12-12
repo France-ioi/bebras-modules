@@ -2343,8 +2343,7 @@ def gyroThread():
      
 # Begin getTemperatureFromCloud
    
-# TODO: Change url to "Prod" version
-getTemperatureCloudUrl = "https://mapadev.com/nicolastest/weather.php"
+getTemperatureCloudUrl = "https://cloud.quick-pi.org/cache/weather.php"
 
 def _getTemperatureSupportedTowns():
     import requests

@@ -3,8 +3,9 @@
         Blockly mode interface and running logic
 */
 
-function getBlocklyInterface(maxBlocks, nbTestCases) {
+function getBlocklyInterface(maxBlocks, subTask) {
    return {
+      subTask: subTask,
       isBlockly: true,
       scratchMode: (typeof Blockly.Blocks['control_if'] !== 'undefined'),
       maxBlocks: maxBlocks,
@@ -379,6 +380,7 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
                $('#capacity').html(capacityInfo.text);
             }
             this.onChangeResetDisplay();
+            this.subTask.onChange();
          } else {
             Blockly.svgResize(this.workspace);
          }
@@ -491,9 +493,8 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             // subject title when edition is enabled...
             var additional = {};
 
-            if (this.mainContext.saveAdditional) {
-               this.mainContext.saveAdditional(additional);
-            }
+            if (this.quickAlgoInterface.saveAdditional)
+               this.quickAlgoInterface.saveAdditional(additional);
 
             var additionalNode = document.createElement("additional");
             additionalNode.innerText = JSON.stringify(additional);
@@ -515,8 +516,9 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
             var additionalXML = xml.getElementsByTagName("additional");
             if (additionalXML.length > 0) {
                var additional = JSON.parse(additionalXML[0].innerText);
-               if (this.mainContext.loadAdditional) {
-                  this.mainContext.loadAdditional(additional);
+               // load additional from quickAlgoInterface
+               if (this.quickAlgoInterface.loadAdditional) {
+                  this.quickAlgoInterface.loadAdditional(additional);
                }
             }
          }
@@ -761,17 +763,18 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
          }
          var codes = this.getAllCodes();
          this.mainContext.runner.initCodes(codes);
+         return true;
       },
 
 
       run: function () {
-         this.initRun();
+         if(!this.initRun()) { return; }
          this.mainContext.runner.run();
       },
 
       step: function () {
          if(this.mainContext.runner.nbRunning() <= 0) {
-            this.initRun();
+            if(!this.initRun()) { return; }
          }
          this.mainContext.runner.step();
       },
@@ -824,10 +827,10 @@ function getBlocklyInterface(maxBlocks, nbTestCases) {
    }
 }
 
-function getBlocklyHelper(maxBlocks, nbTestCases) {
+function getBlocklyHelper(maxBlocks, subTask) {
    // TODO :: temporary until splitting of the block functions logic is done
-   var blocklyHelper = getBlocklyInterface(maxBlocks, nbTestCases);
-   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks, nbTestCases);
+   var blocklyHelper = getBlocklyInterface(maxBlocks, subTask);
+   var blocklyBlockFunc = getBlocklyBlockFunctions(maxBlocks);
    for(var property in blocklyBlockFunc) {
       blocklyHelper[property] = blocklyBlockFunc[property];
    }

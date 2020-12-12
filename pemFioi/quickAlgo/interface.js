@@ -269,6 +269,10 @@ var quickAlgoInterface = {
       $("#saveOrLoadModal").show();
    },
 
+   displayNotification: function() {
+      // Not implemented
+   },
+
    displayError: function(message) {
       message ? $('#errors').html(message) : $('#errors').empty();
    },

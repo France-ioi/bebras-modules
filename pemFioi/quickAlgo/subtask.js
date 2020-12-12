@@ -38,10 +38,12 @@ var initBlocklySubTask = function(subTask, language) {
       levelGridInfos.hideControls.saveOrLoad = levelGridInfos.hideControls.saveOrLoad || !!levelGridInfos.hideSaveOrLoad;
       levelGridInfos.hideControls.loadBestAnswer = levelGridInfos.hideControls.loadBestAnswer || !!levelGridInfos.hideLoadBestAnswers;
 
-      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions);
+      subTask.blocklyHelper = getBlocklyHelper(subTask.levelGridInfos.maxInstructions, subTask);
       subTask.answer = null;
       subTask.state = {};
       subTask.iTestCase = 0;
+      subTask.nbExecutions = 0;
+      subTask.clearWbe();
       if(!window.taskResultsCache) {
          window.taskResultsCache = {};
       }
@@ -69,6 +71,8 @@ var initBlocklySubTask = function(subTask, language) {
       this.context.blocklyHelper = this.blocklyHelper;
 
       if (this.display) {
+         if (window.quickAlgoInterface.loadUserTaskData)
+            window.quickAlgoInterface.loadUserTaskData(levelGridInfos.userTaskData);
          window.quickAlgoInterface.loadInterface(this.context, curLevel);
          window.quickAlgoInterface.setOptions({
             hasExample: levelGridInfos.example && levelGridInfos.example[subTask.blocklyHelper.language],
@@ -76,7 +80,8 @@ var initBlocklySubTask = function(subTask, language) {
             conceptViewerLang: this.blocklyHelper.language,
             hasTestThumbnails: levelGridInfos.hasTestThumbnails,
             hideControls: levelGridInfos.hideControls,
-            introMaxHeight: levelGridInfos.introMaxHeight
+            introMaxHeight: levelGridInfos.introMaxHeight,
+            canEditSubject: !!levelGridInfos.canEditSubject
          });
          window.quickAlgoInterface.bindBlocklyHelper(this.blocklyHelper);
       }
@@ -231,6 +236,41 @@ var initBlocklySubTask = function(subTask, language) {
       window.logActivity(details);
    };
 
+   subTask.waitBetweenExecutions = function() {
+      // After a user-started execution, wait a few seconds if required by
+      // the task
+      var wbe = subTask.levelGridInfos.waitBetweenExecutions;
+      if(!wbe) { return; }
+
+      subTask.nbExecutions++;
+
+      if(typeof wbe == "number") {
+         var wait = wbe * 1000;
+         var maxExecutions = 0;
+      } else {
+         var wait = wbe.wait * 1000;
+         var maxExecutions = wbe.nbExecutions || 0;
+      }
+
+      if(subTask.nbExecutions < maxExecutions) { return; }
+
+      subTask.waitBetweenExecutionsTimeout = setTimeout(subTask.clearWbe, wait);
+   };
+
+   subTask.onChange = function() {
+      if(subTask.waitBetweenExecutionsTimeout && window.quickAlgoInterface) {
+         var msg = subTask.levelGridInfos.waitBetweenExecutions.message || window.languageStrings.waitBetweenExecutions;
+         quickAlgoInterface.displayNotification('wait', msg, true);
+      }
+   };
+
+   subTask.clearWbe = function() {
+      subTask.waitBetweenExecutionsTimeout = null;
+      if(window.quickAlgoInterface) {
+         quickAlgoInterface.displayNotification('wait', null, true);
+      }
+   };
+
    subTask.initRun = function(callback) {
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
@@ -256,8 +296,11 @@ var initBlocklySubTask = function(subTask, language) {
          }
          // Log the attempt
          subTask.logActivity();
-         // Launch an evaluation after the execution
 
+         // Wait between attempts
+         subTask.waitBetweenExecutions();
+
+         // Launch an evaluation after the execution
          if (!subTask.context.doNotStartGrade ) {
             subTask.context.display = false;
             subTask.getGrade(handleResults, true, subTask.iTestCase);
