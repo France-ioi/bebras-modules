@@ -20,6 +20,7 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
+    userTaskData: null, // contain the subject and title
     keypadData: {
         value: '',
         callbackModify: null,
@@ -110,6 +111,15 @@ var quickAlgoInterface = {
         this.fullscreenEvents = true;
     },
 
+    loadUserTaskData: function(taskData) {
+        this.userTaskData = taskData;
+    },
+
+    loadSubjectFromUserTaskData : function() {
+        document.title = this.userTaskData.title;
+        $(".exerciseText").text(this.userTaskData.subject);
+    },
+
     loadInterface: function(context, level) {
         ////TODO: function is called twice
         // Load quickAlgo interface into the DOM
@@ -117,6 +127,16 @@ var quickAlgoInterface = {
         quickAlgoImportLanguage();
         this.strings = window.languageStrings;
         this.level = level;
+
+        // if we don't have userTaskData loaded, then we load it from the subject
+        if (!this.userTaskData) {
+            this.userTaskData = {
+                title: document.title,
+                subject: $(".exerciseText").first().text()
+            };
+        } else {
+            this.loadSubjectFromUserTaskData();
+        }
 
         var gridHtml = "";
         gridHtml += "<div id='gridButtonsBefore'></div>";
@@ -134,6 +154,7 @@ var quickAlgoInterface = {
             "</div>" +
             "<div id='languageInterface'></div>"
         );
+
 
         // Buttons from buttonsAndMessages
         var addTaskHTML = '<div id="displayHelperAnswering" class="contentCentered" style="padding: 1px;">';
@@ -216,6 +237,7 @@ var quickAlgoInterface = {
                         "<span class='fas fa-upload'></span> " +
                         this.strings.reloadProgram +
                     "</div>" +
+                    "<div rel='edit' class='item' onclick='quickAlgoInterface.editorBtn(\"edit\");'><span class='fas fa-pencil-alt'></span>" + this.strings.editButton + "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                 "</div>" +
@@ -249,27 +271,120 @@ var quickAlgoInterface = {
     editorBtn: function(btn) {
         // Handle an editor button press
         this.closeEditorMenu();
-        if(btn == 'example') {
+        if (btn == 'example') {
             task.displayedSubTask.loadExample()
-        } else if(btn == 'copy') {
+        } else if (btn == 'copy') {
             task.displayedSubTask.blocklyHelper.copyProgram();
-        } else if(btn == 'paste') {
+        } else if (btn == 'paste') {
             task.displayedSubTask.blocklyHelper.pasteProgram();
-        } else if(btn == 'save') {
+        } else if (btn == 'save') {
             task.displayedSubTask.blocklyHelper.saveProgram();
-        } else if(btn == 'restart') {
+        } else if (btn == 'restart') {
             displayHelper.restartAll();
-        } else if(btn == 'best-answer') {
+        } else if (btn == 'edit') {
+            this.openEditExercise();
+        } else if (btn == 'best-answer') {
             displayHelper.retrieveAnswer();
-        } else if(btn == 'blockly-python') {
+        } else if (btn == 'blockly-python') {
             this.displayBlocklyPython();
         }
+    },
+
+    openEditExercise: function() {
+        // in python, there are two "exerciseText", we need to selected only the first one
+        // there are two "exerciseText" in python, because we also have a "long" version of the
+        // subject
+        var title = this.userTaskData.title;
+        var subject = this.userTaskData.subject;
+        var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
+            "    <div class=\"panel-heading\">" +
+            "        <h2 class=\"sectionTitle\">" +
+            "            <span class=\"iconTag\"><i class=\"icon fas fa-pencil-alt\"></i></span>" +
+                         this.strings.editWindowTitle +
+            "        </h2>" +
+            "    <div class=\"exit\" id=\"editclose\"><i class=\"icon fas fa-times\"></i></div>" +
+            "    </div>" +
+            "    <div class=\"panel-body\">" +
+            "        <div id=\"editExerciseTitle\">" +
+            "            <label>" + this.strings.titleEdition + "</label><input id=\"editExerciseTitleInput\" type=\"text\" value=\"" + title + "\"/>" +
+            "        </div>" +
+            "        <div id=\"editExerciseDescription\">" +
+            "            <label>" + this.strings.descriptionEdition + "</label>" +
+            "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + subject + "</textarea>" +
+            "        </div>" +
+            "        <div id='panel-body-bottom'>" +
+            "            <button id='saveExerciseChanges'>" + this.strings.saveAndQuit + "</button>" +
+            "        </div>" +
+            "    </div>" +
+            "</div>";
+
+        window.displayHelper.showPopupDialog(editExerciseHtml);
+
+        var that = this;
+
+        $("#editclose").click(function() {
+            var newTitle = $("#editExerciseTitleInput").val();
+            var newDesc = $("#editExerciseDescriptionTextarea").val();
+            var oldTitle = that.userTaskData.title;
+            var oldDescription = that.userTaskData.subject;
+            if (newTitle !== oldTitle || newDesc !== oldDescription) {
+                if (!window.confirm(that.strings.quitWithoutSavingConfirmation)) {
+                    return;
+                }
+            }
+
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+        });
+
+        $("#saveExerciseChanges").click(function() {
+            $('#popupMessage').hide();
+            window.displayHelper.popupMessageShown = false;
+
+            var newTitle = $("#editExerciseTitleInput").val();
+            var newSubject = $("#editExerciseDescriptionTextarea").val();
+            that.userTaskData.title = newTitle;
+            that.userTaskData.subject = newSubject;
+            that.loadSubjectFromUserTaskData();
+        });
     },
 
     loadPrograms: function(formElement) {
         this.blocklyHelper.handleFiles(formElement.files);
         resetFormElement($(formElement));
         this.closeEditorMenu();
+    },
+
+    /**
+     * This function allow us to save the subject into the additional data saved inside of the interface
+     * This also save the element from the context
+     * @param additional The additional data where we should save subject
+     */
+    saveAdditional: function(additional) {
+        if (this.options.canEditSubject) {
+            additional.userTaskData = this.userTaskData;
+        }
+        // save additional from context too
+        if (this.context.saveAdditional) {
+            this.context.saveAdditional(additional);
+        }
+    },
+
+    /**
+     * This function allow us to load the additional things for the exercise like subject/sensors for quickpi
+     * @param additional The additional object containing additional things to load
+     */
+    loadAdditional: function(additional) {
+        // load subject if edition is enabled
+        if (additional.userTaskData && this.options.canEditSubject) {
+            this.userTaskData.title = additional.userTaskData.title;
+            this.userTaskData.subject = additional.userTaskData.subject;
+            this.loadSubjectFromUserTaskData();
+        }
+        // Load additional from context (sensors for quickpi for example)
+        if (this.context.loadAdditional) {
+            this.context.loadAdditional(additional);
+        }
     },
 
     setOptions: function(opt) {
@@ -299,6 +414,7 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
 
@@ -781,17 +897,20 @@ var quickAlgoInterface = {
 
     displayNotification: function(type, message, lock, yesFunc, noFunc) {
         if(lock) {
-            $('.notificationMessageLock').remove();
+            $('.notificationMessageLock.notificationMessageLock-'+type).remove();
         } else {
             $('.notificationMessage').not('.notificationMessageLock').remove();
         }
         if(!message) return;
-        var divClass = lock ? 'notificationMessageLock' : '';
+        var divClass = lock ? 'notificationMessageLock notificationMessageLock-'+type : '';
         if(type == 'error') {
-            divClass += 'errorMessage';
+            divClass += ' errorMessage';
             var icon = 'fa-bell';
+        } else if(type == 'wait') {
+            divClass += ' waitMessage';
+            var icon = 'fa-clock';
         } else {
-            divClass += 'successMessage';
+            divClass += ' successMessage';
             var icon = 'fa-check';
         }
         var id = Math.random();

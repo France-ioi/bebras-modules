@@ -2412,7 +2412,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               init: function() {
                 this.jsonInit({
                   "id": "event_whenflagclicked",
-                  "message0": that.strings.flagClicked,
+                  "message0": that.strings.startingBlockName,
+                  // former Scratch-like display
+                  /*"message0": that.strings.flagClicked,
                   "args0": [
                     {
                       "type": "field_image",
@@ -2422,7 +2424,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                       "alt": "flag",
                       "flip_rtl": true
                     }
-                  ],
+                  ],*/
                   "inputsInline": true,
                   "nextStatement": null,
                   "category": Blockly.Categories.event,

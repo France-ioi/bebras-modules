@@ -788,6 +788,7 @@ var getContext = function(display, infos, curLevel) {
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
+   var cardLabels = [];
    var scale = 1;
    var paper;
 
@@ -801,9 +802,17 @@ var getContext = function(display, infos, curLevel) {
          infos.topMargin = infos.cellSide / 2;
       }
    }
+   infos.rightMargin = 0;
+   infos.bottomMargin = 0;
    if (infos.showLabels) {
       infos.leftMargin += infos.cellSide;
       infos.topMargin += infos.cellSide;
+   }
+   if (infos.showCardinals) {
+      infos.leftMargin += infos.cellSide * 1.8;
+      infos.topMargin += infos.cellSide;
+      infos.rightMargin += infos.cellSide;
+      infos.bottomMargin += infos.cellSide;
    }
 
    context.robot = {};
@@ -1710,6 +1719,14 @@ var getContext = function(display, infos, curLevel) {
             colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
       }
+      if (infos.showCardinals) {
+         cardLabels = [
+            paper.text(0, 0, "Nord"),
+            paper.text(0, 0, "Sud"),
+            paper.text(0, 0, "Ouest"),
+            paper.text(0, 0, "Est")
+            ];
+      }
    };
 
    var resetItem = function(initItem) {
@@ -1946,12 +1963,14 @@ var getContext = function(display, infos, curLevel) {
          var areaHeight = 600;
       }
       if (context.nbCols && context.nbRows) {
-         var marginAsCols = infos.leftMargin / infos.cellSide;
-         var marginAsRows = infos.topMargin / infos.cellSide;
+         var marginAsCols = (infos.leftMargin + infos.rightMargin) / infos.cellSide;
+         var marginAsRows = (infos.topMargin + infos.rightMargin) / infos.cellSide;
          newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin) * scale);
+      var paperWidth = (infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale;
+      var paperHeight = (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale;
+      paper.setSize(paperWidth, paperHeight);
       for (var iRow = 0; iRow < context.nbRows; iRow++) {
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             if (cells[iRow][iCol] != undefined) {
@@ -1961,17 +1980,26 @@ var getContext = function(display, infos, curLevel) {
             }
          }
       }
+      var textFontSize = {"font-size": infos.cellSide * scale / 2};
       if (infos.showLabels) {
          for (var iRow = 0; iRow < context.nbRows; iRow++) {
             var x = (infos.leftMargin - infos.cellSide / 2) * scale;
             var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
-            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
          }
          for (var iCol = 0; iCol < context.nbCols; iCol++) {
             var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
             var y = (infos.topMargin - infos.cellSide / 2) * scale;
-            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            colsLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
          }
+      }
+      if (infos.showCardinals) {
+         var middleX = (infos.leftMargin + infos.cellSide * context.nbCols / 2) * scale;
+         var middleY = (infos.topMargin + infos.cellSide * context.nbRows / 2) * scale;
+         cardLabels[0].attr({x: middleX, y: (infos.topMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide / 2) * scale}).attr(textFontSize);
+         cardLabels[1].attr({x: middleX, y: paperHeight + (infos.cellSide / 2 - infos.bottomMargin) * scale}).attr(textFontSize);
+         cardLabels[2].attr({x: (infos.leftMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide * 1.8 / 2) * scale, y: middleY}).attr(textFontSize);
+         cardLabels[3].attr({x: paperWidth + (infos.cellSide / 2 - infos.rightMargin) * scale, y: middleY}).attr(textFontSize);
       }
       for (var iItem = 0; iItem < context.items.length; iItem++) {
          var item = context.items[iItem];
