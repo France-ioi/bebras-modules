@@ -202,6 +202,12 @@ var getContext = function(display, infos, curLevel) {
                failureRewrite: "Le robot a essayé de repeindre une case.",
                noContainer: "Il n'y a pas de conteneur ici !"
             },
+            cardinals: {
+               north: "Nord",
+               south: "Sud",
+               west: "Ouest",
+               east: "Est"
+            },
             startingBlockName: "Programme du robot"
          },
          en: {
@@ -342,6 +348,12 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "You don't have enough length of cable to connect these two plugs!",
                failureProjectile: "The robot got hit by a projectile!"
             },
+            cardinals: {
+               north: "North",
+               south: "South",
+               west: "West",
+               east: "East"
+            },
             startingBlockName: "Program of the robot"
          },
          
@@ -466,6 +478,12 @@ var getContext = function(display, infos, curLevel) {
                successLights: "Bravo, ¡su robot ha iluminado todos los lugares!",
                failureLaser: "¡El robot debe encontrarse sobre una terminal láser para poder disparar!"
             },
+            cardinals: {
+               north: "Norte",
+               south: "Sur",
+               west: "Oeste",
+               east: "Este"
+            },
             startingBlockName: "Programa del robot"
          },
          de: {
@@ -588,6 +606,12 @@ var getContext = function(display, infos, curLevel) {
                failureLights: "Der Roboter hat nicht alles beleuchtet!",
                successLights: "Bravo! Der Roboter hat alles beleuchtet.",
                failureLaser: "Der Roboter muss auf einem Laser stehen, um schießen zu können!",
+            },
+            cardinals: {
+               north: "Norden",
+               south: "Süden",
+               west: "Westen",
+               east: "Osten"
             },
             startingBlockName: "Roboter-Programm"
          },
@@ -729,6 +753,12 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case."
+            },
+            cardinals: {
+               north: "Nord",
+               south: "Sud",
+               west: "Ovest",
+               east: "Est"
             },
             startingBlockName: "Programme du robot"
          },
@@ -2948,6 +2978,7 @@ var getContext = function(display, infos, curLevel) {
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
+   var cardLabels = [];
    var scale = 1;
    var paper;
    
@@ -2968,10 +2999,17 @@ var getContext = function(display, infos, curLevel) {
          infos.topMargin = infos.cellSide / 2;
       }
    }
-   if(infos.showLabels) {
+   if (infos.showLabels) {
       infos.leftMargin += infos.cellSide;
       infos.topMargin += infos.cellSide;
    }
+   if (infos.showCardinals) {
+      infos.leftMargin += infos.cellSide * 1.8;
+      infos.topMargin += infos.cellSide;
+      infos.rightMargin += infos.cellSide;
+      infos.bottomMargin += infos.cellSide;
+   }
+
    
    switch(infos.blocklyColourTheme) {
       case "bwinf":
@@ -3107,6 +3145,14 @@ var getContext = function(display, infos, curLevel) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
+      }
+      if (infos.showCardinals) {
+         cardLabels = [
+            paper.text(0, 0, strings.cardinals.north),
+            paper.text(0, 0, strings.cardinals.south),
+            paper.text(0, 0, strings.cardinals.west),
+            paper.text(0, 0, strings.cardinals.east)
+            ];
       }
    };
    
@@ -3247,12 +3293,14 @@ var getContext = function(display, infos, curLevel) {
       }
       var newCellSide = 0;
       if(context.nbCols && context.nbRows) {
-         var marginAsCols = infos.leftMargin / infos.cellSide;
-         var marginAsRows = infos.topMargin / infos.cellSide;
+         var marginAsCols = (infos.leftMargin + infos.rightMargin) / infos.cellSide;
+         var marginAsRows = (infos.topMargin + infos.bottomMargin) / infos.cellSide;
          newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
+      var paperWidth = (infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale;
+      var paperHeight = (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale;
+      paper.setSize(paperWidth, paperHeight);
       
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
@@ -3263,17 +3311,26 @@ var getContext = function(display, infos, curLevel) {
             cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
          }
       }
+      var textFontSize = {"font-size": infos.cellSide * scale / 2};
       if(infos.showLabels) {
          for(var iRow = 0;iRow < context.nbRows;iRow++) {
             var x = (infos.leftMargin - infos.cellSide / 2) * scale;
             var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
-            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
             var y = (infos.topMargin - infos.cellSide / 2) * scale;
-            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            colsLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
          }
+      }
+      if (infos.showCardinals) {
+         var middleX = (infos.leftMargin + infos.cellSide * context.nbCols / 2) * scale;
+         var middleY = (infos.topMargin + infos.cellSide * context.nbRows / 2) * scale;
+         cardLabels[0].attr({x: middleX, y: (infos.topMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide / 2) * scale}).attr(textFontSize);
+         cardLabels[1].attr({x: middleX, y: paperHeight + (infos.cellSide / 2 - infos.bottomMargin) * scale}).attr(textFontSize);
+         cardLabels[2].attr({x: (infos.leftMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide * 1.8 / 2) * scale, y: middleY}).attr(textFontSize);
+         cardLabels[3].attr({x: paperWidth + (infos.cellSide / 2 - infos.rightMargin) * scale, y: middleY}).attr(textFontSize);
       }
       
       redisplayAllItems();      

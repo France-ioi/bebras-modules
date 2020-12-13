@@ -178,6 +178,12 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
             writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
+         cardinals: {
+            north: "Nord",
+            south: "Sud",
+            west: "Ouest",
+            east: "Est"
+         },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Programme du robot",
          exit_grid: "Le robot sort de la grille !",
@@ -349,6 +355,12 @@ var getContext = function(display, infos, curLevel) {
             leavesGrid: "Der Roboter hat das Gitter verlassen!"
          },
          description: {
+         },
+         cardinals: {
+            north: "Norden",
+            south: "Süden",
+            west: "Westen",
+            east: "Osten"
          },
          obstacle: "Der Roboter ist gegen ein Hindernis gelaufen!",
          startingBlockName: "Roboter-Programm",
@@ -545,6 +557,12 @@ var getContext = function(display, infos, curLevel) {
             paintNorthEast: "peintureHautDroite() : la case au dessus à droite est-elle peinte ?",
             writeNumber: "ecrireNombre(nombre) : inscrit le nombre sur la case du robot"
          },
+         cardinals: {
+            north: "North",
+            south: "South",
+            west: "West",
+            east: "East"
+         },
          obstacle: "Le robot essaie de se déplacer sur un obstacle !",
          startingBlockName: "Program",
          exit_grid: "Le robot sort de la grille !",
@@ -738,6 +756,12 @@ var getContext = function(display, infos, curLevel) {
             paintNorthWest: "pobarvanaZgorajLevo(): Ali je pobarvano polje levo nad poljem, na katerem je robot?",
             paintNorthEast: "pobarvanaZgorajDesno(): Ali je pobarvano polje desno nad poljem, na katerem je robot?",
             writeNumber: "zapišiŠtevilko(številka): Zapiše številko v polje, na katerem je robot."
+         },
+         cardinals: {
+            north: "Sever",
+            south: "Juh",
+            west: "Západ",
+            east: "Východ"
          },
          obstacle: "Robot poskuša premakniti oviro!",
          startingBlockName: "Program",
@@ -1721,10 +1745,10 @@ var getContext = function(display, infos, curLevel) {
       }
       if (infos.showCardinals) {
          cardLabels = [
-            paper.text(0, 0, "Nord"),
-            paper.text(0, 0, "Sud"),
-            paper.text(0, 0, "Ouest"),
-            paper.text(0, 0, "Est")
+            paper.text(0, 0, strings.cardinals.north),
+            paper.text(0, 0, strings.cardinals.south),
+            paper.text(0, 0, strings.cardinals.west),
+            paper.text(0, 0, strings.cardinals.east)
             ];
       }
    };
