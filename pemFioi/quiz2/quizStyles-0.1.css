@@ -147,8 +147,6 @@ answer {
   padding: 5px 0;
 }
 answer p {
-  /* because we get <p> wraps here by taskeditor tinymce */
-  display: inline;
   margin: 0;
 }
 /*question:nth-child(odd) answer {
