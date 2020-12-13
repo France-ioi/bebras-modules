@@ -121,8 +121,9 @@ answer {
   padding: 5px 0;
 }
 answer p {
-  /* because we get <p> wraps here by taskeditor tinymce */
-  display: inline;
+  /* we get <p> wraps here by taskeditor tinymce, but it's still fine without
+   * the display: inline ; it also prevents from having newlines */
+  /* display: inline; */
   margin: 0;
 }
 /*question:nth-child(odd) answer {
