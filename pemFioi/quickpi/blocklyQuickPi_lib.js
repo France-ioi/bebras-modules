@@ -1732,6 +1732,8 @@ var getContext = function (display, infos, curLevel) {
         var conceptList = [{id: 'language', ignore: true}];
         var quickPiConceptList = context.quickpi.conceptList;
 
+        /*
+        // TODO: remove this for final version
         // TODO: move this functions somewhere else
         // This function allow us to remove all the useless blocks from infos.
         (function removeUselessBlocks() {
@@ -1766,7 +1768,7 @@ var getContext = function (display, infos, curLevel) {
             infos.includeBlocks.generatedBlocks.quickpi = toKeep;
             if (toKeep.length != currBlocks.length)
                 window.subTask.reloadFunctions(toKeep);
-        })();
+        })();*/
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
             var conceptStrings = quickPiLocalLanguageStrings.fr.concepts;
@@ -1818,7 +1820,31 @@ var getContext = function (display, infos, curLevel) {
 
         return ret;
     };
-    
+
+    /**
+     * This function allow us to verify if there are some functions in the exercise that are impossible to use because
+     * the sensor targeted by the quickpi function is not here. Like for example, if user can use the function
+     * setBuzzerNote but the buzzer sensor is not added, then it display a warning in the console.
+     *
+     * The value returned is only here in case we need this function later to some tests and we can also easily change
+     * this function so that it return all the function that are not allowed.
+     * @return true if there is a useless function present in the exercise, false otherwise.
+     */
+    (function hasUselessFunction() {
+        var allPossibleFunctions = context.findAllSensorsFunctions();
+        var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
+
+        var ret = false;
+        for (var iCurrBlock = 0; iCurrBlock < currBlocks.length; iCurrBlock++) {
+            if (!arrayContains(allPossibleFunctions, currBlocks[iCurrBlock])) {
+                ret = true;
+                console.warn("The function " + currBlocks[iCurrBlock] + " is present but you have not added the " +
+                    "sensor to use this function.");
+            }
+        }
+
+        return ret;
+    })();
 
     var boardDefinitions = [
         {
