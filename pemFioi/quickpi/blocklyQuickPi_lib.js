@@ -1617,117 +1617,120 @@ var getContext = function (display, infos, curLevel) {
     // Some data can be made accessible by the library through the context object
     context.quickpi = {};
 
+    // we put that outside of the function #context.getConceptList because that is our only way to know the which sensor
+    // has which function.
+    context.quickpi.conceptList = [
+        {
+            id: 'quickpi_start',
+            isBase: true,
+            order: 1,
+            python: []
+        },
+        {
+            id: 'quickpi_validation',
+            isBase: true,
+            order: 2,
+            python: []
+        },
+        {
+            id: 'quickpi_buzzer',
+            order: 200,
+            python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff', 'setBuzzerState',
+                'getBuzzerNote', 'isBuzzerOn']
+        },
+        {
+            id: 'quickpi_led',
+            order: 201,
+            python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness',
+                'getLedBrightness', 'isLedOn']
+        },
+        {
+            id: 'quickpi_button',
+            order: 202,
+            python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed']
+        },
+        {
+            id: 'quickpi_screen',
+            order: 203,
+            python: ['displayText']
+        },
+        {
+            id: 'quickpi_draw',
+            order: 203,
+            python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
+                'stroke', 'noStroke','updateScreen', 'autoUpdate', 'isPointSet']
+        },
+        {
+            id: 'quickpi_range',
+            order: 204,
+            python: ['readDistance']
+        },
+        {
+            id: 'quickpi_servo',
+            order: 205,
+            python: ['setServoAngle', 'getServoAngle']
+        },
+        {
+            id: 'quickpi_thermometer',
+            order: 206,
+            python: ['readTemperature']
+        },
+        {
+            id: 'quickpi_microphone',
+            order: 207,
+            python: ['readSoundLevel']
+        },
+        {
+            id: 'quickpi_light_sensor',
+            order: 208,
+            python: ['readLightIntensity']
+        },
+        {
+            id: 'quickpi_accelerometer',
+            order: 209,
+            python: ['readAcceleration', 'computeRotation']
+        },
+        {
+            id: 'quickpi_wait',
+            order: 250,
+            python: ['sleep', 'currentTime']
+        },
+        {
+            id: 'quickpi_magneto',
+            order: 210,
+            python: ['readMagneticForce', 'computeCompassHeading']
+        },
+        {
+            id: 'quickpi_ir_receiver',
+            order: 211,
+            python: ['readInfraredState', 'readIRMessage']
+        },
+        {
+            id: "quickpi_ir_emitter",
+            order: 212,
+            python: ["setInfraredState", "sendIRMessage", "presetIRMessage"]
+        },
+        {
+            id: "quickpi_potentiometer",
+            order: 213,
+            python: ["readRotaryAngle"]
+        },
+        {
+            id: "quickpi_gyroscope",
+            order: 214,
+            python: ["readAngularVelocity", "setGyroZeroAngle", "computeRotationGyro"]
+        },
+        {
+            id: 'quickpi_cloud',
+            order: 220,
+            python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore', 'getTemperatureFromCloud']
+        }
+    ];
 
     // List of concepts to be included by conceptViewer
     context.getConceptList = function() {
         var conceptList = [{id: 'language', ignore: true}];
-        var quickPiConceptList = [
-            {
-                id: 'quickpi_start',
-                isBase: true,
-                order: 1,
-                python: []
-            },
-            {
-                id: 'quickpi_validation',
-                isBase: true,
-                order: 2,
-                python: []
-            },
-            {
-                id: 'quickpi_buzzer',
-                order: 200,
-                python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff', 'setBuzzerState',
-                    'getBuzzerNote', 'isBuzzerOn']
-            },
-            {
-                id: 'quickpi_led',
-                order: 201,
-                python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness',
-                    'getLedBrightness', 'isLedOn']
-            },
-            {
-                id: 'quickpi_button',
-                order: 202,
-                python: ['isButtonPressed', 'isButtonPressedWithName', 'waitForButton', 'buttonWasPressed']
-            },  
-            {   
-                id: 'quickpi_screen',
-                order: 203,
-                python: ['displayText']
-            },
-            {   
-                id: 'quickpi_draw',
-                order: 203,
-                python: ['drawRectangle','drawLine','drawCircle', 'drawPoint', 'clearScreen', 'fill', 'noFill',
-                    'stroke', 'noStroke','updateScreen', 'autoUpdate', 'isPointSet']
-            },
-            {
-                id: 'quickpi_range',
-                order: 204,
-                python: ['readDistance']
-            },
-            {
-                id: 'quickpi_servo',
-                order: 205,
-                python: ['setServoAngle', 'getServoAngle']
-            },
-            {
-                id: 'quickpi_thermometer',
-                order: 206,
-                python: ['readTemperature']
-            },
-            {
-                id: 'quickpi_microphone',
-                order: 207,
-                python: ['readSoundLevel']
-            },
-            {
-                id: 'quickpi_light_sensor',
-                order: 208,
-                python: ['readLightIntensity']
-            },
-            {
-                id: 'quickpi_accelerometer',
-                order: 209,
-                python: ['readAcceleration', 'computeRotation']
-            },
-            {
-                id: 'quickpi_wait',
-                order: 250,
-                python: ['sleep', 'currentTime']
-            },
-            {
-                id: 'quickpi_magneto',
-                order: 210,
-                python: ['readMagneticForce', 'computeCompassHeading']
-            },
-            {
-                id: 'quickpi_ir_receiver',
-                order: 211,
-                python: ['readInfraredState', 'readIRMessage']
-            },
-            {
-                id: "quickpi_ir_emitter",
-                order: 212,
-                python: ["setInfraredState", "sendIRMessage", "presetIRMessage"]
-            },
-            {
-                id: "quickpi_potentiometer",
-                order: 213,
-                python: ["readRotaryAngle"]
-            },
-            {
-                id: "quickpi_gyroscope",
-                order: 214,
-                python: ["readAngularVelocity", "setGyroZeroAngle", "computeRotationGyro"]
-            },
-            {
-                id: 'quickpi_cloud',
-                order: 220,
-                python: ['writeToCloudStore','connectToCloudStore','readFromCloudStore', 'getTemperatureFromCloud']
-            }
-        ];
+        var quickPiConceptList = context.quickpi.conceptList;
 
         // TODO: move this functions somewhere else
         // This function allow us to remove all the useless blocks from infos.
@@ -1782,7 +1785,39 @@ var getContext = function (display, infos, curLevel) {
             conceptList.push(concept);
         }
         return conceptList;
-    }
+    };
+
+    /**
+     * This method allow us to find all the functions according to the available sensors
+     */
+    context.findAllSensorsFunctions = function() {
+        var quickPiConceptList = context.quickpi.conceptList;
+        var ret = [];
+        var sensorTypes = (function() {
+            var sensors = infos.quickPiSensors;
+            var retSensorType = [];
+            for (var iSensor = 0; iSensor < sensors.length; iSensor++)
+                retSensorType.push("quickpi_" + sensors[iSensor].type);
+            return retSensorType;
+        })();
+
+        for (var iSensorType = 0; iSensorType < sensorTypes.length; iSensorType++) {
+            for (var iConcept = 0; iConcept < quickPiConceptList.length; iConcept++) {
+                if (quickPiConceptList[iConcept].id === sensorTypes[iSensorType]) {
+                    for (var iPython = 0; iPython < quickPiConceptList[iConcept].python; iPython++) {
+                        var toAdd = quickPiConceptList[iConcept].python[iPython];
+                        // If we already have toAdd inside of ret, then it means that the sensor has already been added.
+                        if (arrayContains(ret, toAdd))
+                            break;
+                        ret.push(toAdd);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    };
 
 
     var boardDefinitions = [
