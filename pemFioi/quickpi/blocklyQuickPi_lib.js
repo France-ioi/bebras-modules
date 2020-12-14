@@ -1804,7 +1804,7 @@ var getContext = function (display, infos, curLevel) {
         for (var iSensorType = 0; iSensorType < sensorTypes.length; iSensorType++) {
             for (var iConcept = 0; iConcept < quickPiConceptList.length; iConcept++) {
                 if (quickPiConceptList[iConcept].id === sensorTypes[iSensorType]) {
-                    for (var iPython = 0; iPython < quickPiConceptList[iConcept].python; iPython++) {
+                    for (var iPython = 0; iPython < quickPiConceptList[iConcept].python.length; iPython++) {
                         var toAdd = quickPiConceptList[iConcept].python[iPython];
                         // If we already have toAdd inside of ret, then it means that the sensor has already been added.
                         if (arrayContains(ret, toAdd))
@@ -1818,7 +1818,7 @@ var getContext = function (display, infos, curLevel) {
 
         return ret;
     };
-
+    
 
     var boardDefinitions = [
         {
