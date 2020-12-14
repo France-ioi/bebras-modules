@@ -380,12 +380,12 @@ var quickPiLocalLanguageStrings = {
                 number: "Nombre",
                 string: "Chaîne de caractère"
             },
-            cloudMissingKey: "Test échoué : Il vous manque la clée {0} dans le cloud.",
-            cloudMoreKey: "Test échoué : La clée {0} est en trop dans le cloud",
-            cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud",
-            cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}",
-            cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.",
-            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu",
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.",
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud",
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud",
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}",
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.",
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu",
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.",
 
             cloudKeyNotExists: "La clé n'existe pas : {0} ",
@@ -827,12 +827,12 @@ var quickPiLocalLanguageStrings = {
                 number: "Nombre", // TODO: translate
                 string: "Chaîne de caractère" // TODO: translate
             },
-            cloudMissingKey: "Test échoué : Il vous manque la clée {0} dans le cloud.", // TODO: translate
-            cloudMoreKey: "Test échoué : La clée {0} est en trop dans le cloud", // TODO: translate
-            cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud", // TODO: translate
-            cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
-            cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.", // TODO: translate
-            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.", // TODO: translate
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud", // TODO: translate
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud", // TODO: translate
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu", // TODO: translate
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
 
             cloudKeyNotExists: "La llave no existe : {0} ",
@@ -1272,12 +1272,12 @@ var quickPiLocalLanguageStrings = {
                 number: "Nombre", // TODO: translate
                 string: "Chaîne de caractère" // TODO: translate
             },
-            cloudMissingKey: "Test échoué : Il vous manque la clée {0} dans le cloud.", // TODO: translate
-            cloudMoreKey: "Test échoué : La clée {0} est en trop dans le cloud", // TODO: translate
-            cloudUnexpectedKeyCorrection: "Test échoué : La clée {0} n'étais pas attendu dans le cloud", // TODO: translate
-            cloudPrimitiveWrongKey: "Test échoué : À la clée {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
-            cloudArrayWrongKey: "Test échoué : Le tableau à la clée {0} du cloud diffère de celui attendu.", // TODO: translate
-            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clée {0} diffère de celui attendu", // TODO: translate
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.", // TODO: translate
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud", // TODO: translate
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud", // TODO: translate
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu", // TODO: translate
             cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
 
             cloudKeyNotExists: "La chiave non esiste : {0} ",
