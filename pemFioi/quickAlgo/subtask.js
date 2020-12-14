@@ -8,6 +8,8 @@ var initBlocklySubTask = function(subTask, language) {
    // beaver-task-2.0
    subTask.assumeLevels = true;
 
+   window.subTask = subTask;
+
    if (window.forcedLevel != null) {
       for (var level in subTask.data) {
          if (window.forcedLevel != level) {
@@ -176,11 +178,11 @@ var initBlocklySubTask = function(subTask, language) {
       updateScores();
    };
 
-   subTask.reload = function(gridInfos, data) {
-      subTask.gridInfos = gridInfos;
-      subTask.data = data;
+   subTask.reloadFunctions = function(newFunctions) {
+      subTask.gridInfos.includeBlocks.generatedBlocks.quickpi[this.level] = newFunctions;
+      var level = this.level;
       subTask.unloadLevel(function() {
-         subTask.loadLevel(this.level);
+         subTask.loadLevel(level);
       });
    };
 
@@ -231,6 +233,7 @@ var initBlocklySubTask = function(subTask, language) {
          // Sends a validate("log") to the platform if the log GET parameter is set
          // Performance note : we don't call getAnswerObject, as it's already
          // called every second by buttonsAndMessages.
+         // TODO: modify unsafe comparison
          if(JSON.stringify(subTask.answer) != subTask.lastLoggedAnswer) {
             platform.validate("log");
             subTask.lastLoggedAnswer = JSON.stringify(subTask.answer);

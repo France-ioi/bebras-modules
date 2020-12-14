@@ -1759,10 +1759,10 @@ var getContext = function (display, infos, curLevel) {
                     toKeep.push(block);
             }
 
-
             // save currBlocks after removal
             infos.includeBlocks.generatedBlocks.quickpi = toKeep;
-            JSON.stringify(infos);
+            if (toKeep.length != currBlocks.length)
+                window.subTask.reloadFunctions(toKeep);
         })();
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
