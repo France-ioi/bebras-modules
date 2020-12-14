@@ -1733,8 +1733,6 @@ var getContext = function (display, infos, curLevel) {
         // This function allow us to remove all the useless blocks from infos.
         (function removeUselessBlocks() {
             var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
-            // console.log(JSON.stringify(currBlocks));
-            console.log(JSON.stringify(infos.includeBlocks.generatedBlocks.quickpi));
 
             var sensorTypes = (function() {
                 var sensors = infos.quickPiSensors;
@@ -1764,7 +1762,7 @@ var getContext = function (display, infos, curLevel) {
 
             // save currBlocks after removal
             infos.includeBlocks.generatedBlocks.quickpi = toKeep;
-            console.log(JSON.stringify(infos.includeBlocks.generatedBlocks.quickpi));
+            JSON.stringify(infos);
         })();
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {

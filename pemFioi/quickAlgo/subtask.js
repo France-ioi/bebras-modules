@@ -176,6 +176,14 @@ var initBlocklySubTask = function(subTask, language) {
       updateScores();
    };
 
+   subTask.reload = function(gridInfos, data) {
+      subTask.gridInfos = gridInfos;
+      subTask.data = data;
+      subTask.unloadLevel(function() {
+         subTask.loadLevel(this.level);
+      });
+   };
+
    subTask.unloadLevel = function(callback) {
       if(this.display) {
          window.quickAlgoInterface.unloadLevel();
