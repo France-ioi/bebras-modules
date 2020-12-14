@@ -20,12 +20,19 @@ var quickAlgoInterface = {
     editorReadOnly: false,
     options: {},
     capacityPopupDisplayed: {},
-    userTaskData: null, // contain the subject and title
+    userTaskData: null, // contain the subject and title, and also the about
     keypadData: {
         value: '',
         callbackModify: null,
         callbackFinished: null
         },
+    // Contain all the licenses supported with their link
+    // There is also the "copyright" license or other license that the user can write himself
+    licenses: {
+        "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/deed.fr",
+        "CC BY-NC-SA 4.0": "https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=ccsearch&atype=rich",
+        "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/deed.fr"
+    },
 
     enterFullscreen: function() {
         var el = document.documentElement;
@@ -130,9 +137,14 @@ var quickAlgoInterface = {
 
         // if we don't have userTaskData loaded, then we load it from the subject
         if (!this.userTaskData) {
+            // default userTaskData
             this.userTaskData = {
                 title: document.title,
-                subject: $(".exerciseText").first().text()
+                subject: $(".exerciseText").first().text(),
+                about: {
+                    authors: "France-Ioi",
+                    license: "CC BY-SA 4.0"
+                }
             };
         } else {
             this.loadSubjectFromUserTaskData();
@@ -240,6 +252,7 @@ var quickAlgoInterface = {
                     "<div rel='edit' class='item' onclick='quickAlgoInterface.editorBtn(\"edit\");'><span class='fas fa-pencil-alt'></span>" + this.strings.editButton + "</div>" +
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
+                    "<div rel='about' class='item' onclick='quickAlgoInterface.editorBtn(\"about\");'><span class='fas fa-question-circle'></span>" + this.strings.about + "</div>" +
                 "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
@@ -287,7 +300,79 @@ var quickAlgoInterface = {
             displayHelper.retrieveAnswer();
         } else if (btn == 'blockly-python') {
             this.displayBlocklyPython();
+        } else if (btn == 'about') {
+            this.openAbout();
         }
+    },
+
+    /**
+     * This function is to handle exit buttons and check if we must ask for confirmation or not.
+     * To check for confirmation it works this way:
+     * if for i in len(toCompare) step 2
+     *    toCompare[i] === toCompare[i + 1]
+     * then we don't need confirmation because everything is the same
+     * The variable toCompare is variadic because we can confirm on more than two values later.
+     * Otherwise we show confirmation to ask the user if he is sure to quit the menu without saving
+     * @param toCompare An array containing at toCompare[i] the new value and at toCompare[i + 1] the old value (it
+     * compares both one to each other). Be careful, every compared value must be <b>exactly</b> the same object.
+     * @private This function is private because it is not usefull outside of interface-mobileFirst.js
+     * @return true if we can exit without problem, false otherwise
+     * @throws An error, if two compare.size() is not a multiple of 2
+     */
+    _handleConfirmationExitWindow: function(toCompare) {
+        if (toCompare.length % 2 != 0) {
+            // this should never happen in prod, if an error is thrown the error come from the programmer.
+            throw "interface-mobileFirst.js: _handleConfirmationExitWindow: toCompare must be a multiple of 2, you did"
+                + "something wrong!";
+        }
+        // if this variable remain true, then we don't need to show the confirm window
+        var same = true;
+        for (var i = 0; i < toCompare.length && same; i += 2) {
+            // here we must use the '===' operator, because the values must be the same in object, we can have boolean
+            // on one side
+            same = toCompare[i] === toCompare[i + 1];
+        }
+        // window.confirm will return true, if the user confirmed quitting without saving
+        return same || window.confirm(this.strings.quitWithoutSavingConfirmation);
+    },
+
+    /**
+     * This method close the popup without confirmation
+     */
+    closePopup: function() {
+        $('#popupMessage').hide();
+        window.displayHelper.popupMessageShown = false;
+    },
+
+    /**
+     * This method call the function {@link #_handleConfirmationExitWindow} to check if we can close the window. If we
+     * can, then it close the popup window created with {@link #window.displayHelper.showPopupDialog}.
+     * @param toCompare The arguments to compare, you need to setup it this way: toCompare[i] is the newValue and
+     * toCompare[i + 1] is the old value (i step of 2).
+     * @public Because we must use it inside of button "onClick" functions, so we can't make it "private" because the
+     * strict private convention is not respected here (we must use that.closePopupWithConfirmation inside of a button).
+     */
+    closePopupWithConfirmation: function(toCompare) {
+        if (this._handleConfirmationExitWindow(toCompare)) {
+            this.closePopup();
+        }
+    },
+
+    /**
+     * This function return the button hidden or not depending on the boolean in argument.
+     * This function can also be called without arguments and the button will not be hidden.
+     *
+     * The button is hidden in case we have not a license that we know about.
+     * @param hidden If the button should be hidden or not (or no argument in this case the button is shown)
+     * @return {string}  The html for the button
+     */
+    _getAboutLicenseButton: function(hidden, license) {
+        if (!hidden)
+            hidden = "";
+        else
+            hidden = "style='display: none;'";
+        return "<span id='aboutLicenseIcon' class='icon fas fa-question-circle' onclick='window.open(\""
+            + this.licenses[license] + "\", \"_blank\");' " + hidden + "></span>";
     },
 
     openEditExercise: function() {
@@ -296,6 +381,48 @@ var quickAlgoInterface = {
         // subject
         var title = this.userTaskData.title;
         var subject = this.userTaskData.subject;
+        var authors = this.userTaskData.about.authors;
+        var license = this.userTaskData.about.license;
+
+        var aboutAuthorsLicenseSection = "<div id='aboutAuthorsLicense'>";
+
+        var authorsTxt = "<label for='author'>" + this.strings.authors + "</label>";
+        authorsTxt += "<input id='aboutAuthorsInput' type='text' name='author' value='" + authors + "'>";
+
+        var licenseOther = "";
+
+        if (!(license in this.licenses))
+            licenseOther = "selected";
+
+        var licenseDropdown = "<p>" + this.strings.license + "</p>" +
+            "<select name='chooseLicense' id='aboutLicenseDropdown'>";
+        for (var licenseName in this.licenses) {
+            var selected = "";
+            if (license === licenseName)
+                selected = "selected";
+            licenseDropdown += "<option value='" + licenseName + "'" + selected + ">" + licenseName + "</option>";
+        }
+        licenseDropdown += "<option value='" + this.strings.other + "' " + licenseOther + ">" + this.strings.other
+            + "</option>";
+        licenseDropdown += "</select>";
+
+
+        var licenseInput = null;
+        if (!(license in this.licenses)) {
+            licenseDropdown += " " + this._getAboutLicenseButton(true, license);
+            licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='"
+                + license + "' placeholder='" + this.strings.otherLicense + "'>";
+        } else {
+            licenseDropdown += " " + this._getAboutLicenseButton(false, license);
+            licenseInput = " <input id='aboutLicenseInput' type='text' name='chooseLicenseTxt' value='' " +
+                "style='display: none;' placeholder='" + this.strings.otherLicense + "'>"
+        }
+
+        aboutAuthorsLicenseSection += authorsTxt;
+
+        aboutAuthorsLicenseSection += licenseDropdown + licenseInput + "</div>";
+
+
         var editExerciseHtml = "<div class=\"content connectPi qpi\">" +
             "    <div class=\"panel-heading\">" +
             "        <h2 class=\"sectionTitle\">" +
@@ -312,6 +439,7 @@ var quickAlgoInterface = {
             "            <label>" + this.strings.descriptionEdition + "</label>" +
             "            <textarea rows=\"10\" id=\"editExerciseDescriptionTextarea\">" + subject + "</textarea>" +
             "        </div>" +
+                    aboutAuthorsLicenseSection +
             "        <div id='panel-body-bottom'>" +
             "            <button id='saveExerciseChanges'>" + this.strings.saveAndQuit + "</button>" +
             "        </div>" +
@@ -322,19 +450,43 @@ var quickAlgoInterface = {
 
         var that = this;
 
+        /**
+         * This method allow us to get the new license from the dropdown or the input box according to this predicate:
+         * if the dropdown has this.strings.other as selection, then we select the value of the input box.
+         * @return The new license
+         */
+        function getLicenseChanges() {
+            var selectedDropdown = $('#aboutLicenseDropdown option:selected').text();
+            if (selectedDropdown === that.strings.other) {
+                return $('#aboutLicenseInput').val();
+            } else {
+                return selectedDropdown;
+            }
+        }
+
         $("#editclose").click(function() {
             var newTitle = $("#editExerciseTitleInput").val();
             var newDesc = $("#editExerciseDescriptionTextarea").val();
             var oldTitle = that.userTaskData.title;
             var oldDescription = that.userTaskData.subject;
-            if (newTitle !== oldTitle || newDesc !== oldDescription) {
-                if (!window.confirm(that.strings.quitWithoutSavingConfirmation)) {
-                    return;
-                }
-            }
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = getLicenseChanges();
+            var oldAuthors = that.userTaskData.about.authors;
+            var oldLicense = that.userTaskData.about.license;
+            that.closePopupWithConfirmation([newTitle, oldTitle, newDesc, oldDescription, newAuthors,
+                oldAuthors, newLicense, oldLicense]);
+        });
 
-            $('#popupMessage').hide();
-            window.displayHelper.popupMessageShown = false;
+        $('#aboutLicenseDropdown').change(function() {
+            var val = $('#aboutLicenseDropdown option:selected').text();
+            if (val === that.strings.other) {
+                $("#aboutLicenseIcon").hide();
+                $("#aboutLicenseInput").show();
+            } else {
+                $("#aboutLicenseInput").hide();
+                $("#aboutLicenseIcon").attr("onclick", "window.open(\"" + that.licenses[val] + "\", \"_blank\");");
+                $("#aboutLicenseIcon").show();
+            }
         });
 
         $("#saveExerciseChanges").click(function() {
@@ -343,9 +495,63 @@ var quickAlgoInterface = {
 
             var newTitle = $("#editExerciseTitleInput").val();
             var newSubject = $("#editExerciseDescriptionTextarea").val();
+            var newAuthors = $('#aboutAuthorsInput').val();
+            var newLicense = getLicenseChanges();
             that.userTaskData.title = newTitle;
             that.userTaskData.subject = newSubject;
+            that.userTaskData.about.authors = newAuthors;
+            that.userTaskData.about.license = newLicense;
             that.loadSubjectFromUserTaskData();
+        });
+    },
+
+    openAbout: function() {
+        var that = this;
+
+        var authors = this.userTaskData.about.authors;
+
+        var license = this.userTaskData.about.license;
+
+        // if the license is not inside of our predefined licenses then we write it without "more details" button
+        var licenseTxt = this.strings.license;
+        if (!this.licenses[license])
+            licenseTxt += license;
+        else
+            licenseTxt += license + " " + this._getAboutLicenseButton(false, license);
+
+        var aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
+                "           <p>" + licenseTxt + "</p>";
+
+        var typeTxt = this.strings.exerciseTypeAbout["default"];
+
+        if (this.context.title)
+            typeTxt = this.strings.exerciseTypeAbout[this.context.title];
+
+
+
+        var aboutHtml = "<div class=\"content connectPi qpi\">" +
+            "    <div class=\"panel-heading\">" +
+            "        <h2 class=\"sectionTitle\">" +
+            "            <span class=\"iconTag\"><i class=\"icon fas fa-question-circle\"></i></span>" +
+                        this.strings.about +
+            "        </h2>" +
+            "    <div class=\"exit\" id=\"aboutclose\"><i class=\"icon fas fa-times\"></i></div>" +
+            "    </div>" +
+            "    <div class=\"panel-body\" id='aboutPanel'>"+
+            "       <div id='aboutAuthorsLicense'>" +
+                        aboutAuthorsLicenseSection +
+            "       </div>" +
+            "       <div id='aboutFranceIOI'>" +
+            "           <br/>" +
+            "           <p>" + typeTxt + "</p>" +
+            "       </div>" +
+            "    </div>" +
+            "</div>";
+
+        window.displayHelper.showPopupDialog(aboutHtml);
+
+        $("#aboutclose").click(function() {
+            that.closePopup();
         });
     },
 
@@ -377,8 +583,7 @@ var quickAlgoInterface = {
     loadAdditional: function(additional) {
         // load subject if edition is enabled
         if (additional.userTaskData && this.options.canEditSubject) {
-            this.userTaskData.title = additional.userTaskData.title;
-            this.userTaskData.subject = additional.userTaskData.subject;
+            this.userTaskData = additional.userTaskData;
             this.loadSubjectFromUserTaskData();
         }
         // Load additional from context (sensors for quickpi for example)
@@ -414,9 +619,9 @@ var quickAlgoInterface = {
         $('#editorMenu div[rel=restart]').toggleClass('interfaceToggled', !!hideControls.restart);
         $('#editorMenu div[rel=save]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
         $('#editorMenu div[rel=load]').toggleClass('interfaceToggled', !!hideControls.saveOrLoad);
-        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
         $('#editorMenu div[rel=best-answer]').toggleClass('interfaceToggled', !!hideControls.loadBestAnswer);
         $('#editorMenu div[rel=blockly-python]').toggleClass('interfaceToggled', hideControls.blocklyToPython !== false || !this.blocklyHelper || !this.blocklyHelper.isBlockly);
+        $('#editorMenu div[rel=edit]').toggleClass('interfaceToggled', !this.options.canEditSubject);
 
         var menuHidden = !this.options.hasExample && hideControls.restart && hideControls.saveOrLoad && hideControls.loadBestAnswer;
         $('#openEditorMenu').toggleClass('interfaceToggled', !!menuHidden);
