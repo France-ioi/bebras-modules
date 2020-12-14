@@ -170,7 +170,7 @@ var quickAlgoLanguageStrings = {
          print: "Writing",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>"
       },
@@ -311,7 +311,7 @@ var quickAlgoLanguageStrings = {
          manipulate: "Umwandeln",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
@@ -453,7 +453,7 @@ var quickAlgoLanguageStrings = {
          display: "Pantalla",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
@@ -593,7 +593,7 @@ var quickAlgoLanguageStrings = {
          turtle: "Želva"
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
@@ -735,7 +735,7 @@ var quickAlgoLanguageStrings = {
          display: "Mostra",
       },
       exerciseTypeAbout: {
-         default: "Subject powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
          "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
              "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
       },
