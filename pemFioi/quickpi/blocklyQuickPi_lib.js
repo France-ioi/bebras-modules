@@ -1793,6 +1793,8 @@ var getContext = function (display, infos, curLevel) {
      * This method allow us to find all the functions according to the available sensors
      */
     context.findAllSensorsFunctions = function() {
+        // alwaysIncluded are sensors that are always included and hidden to the user.
+        var alwaysIncluded = ["quickpi_wait"];
         var quickPiConceptList = context.quickpi.conceptList;
         var ret = [];
         var sensorTypes = (function() {
@@ -1800,6 +1802,8 @@ var getContext = function (display, infos, curLevel) {
             var retSensorType = [];
             for (var iSensor = 0; iSensor < sensors.length; iSensor++)
                 retSensorType.push("quickpi_" + sensors[iSensor].type);
+            for (var i = 0; i < alwaysIncluded.length; i++)
+                retSensorType.push(alwaysIncluded[i]);
             return retSensorType;
         })();
 
@@ -1831,6 +1835,7 @@ var getContext = function (display, infos, curLevel) {
      * @return true if there is a useless function present in the exercise, false otherwise.
      */
     (function hasUselessFunction() {
+
         var allPossibleFunctions = context.findAllSensorsFunctions();
         var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
 
@@ -1838,7 +1843,7 @@ var getContext = function (display, infos, curLevel) {
         for (var iCurrBlock = 0; iCurrBlock < currBlocks.length; iCurrBlock++) {
             if (!arrayContains(allPossibleFunctions, currBlocks[iCurrBlock])) {
                 ret = true;
-                console.warn("The function " + currBlocks[iCurrBlock] + " is present but you have not added the " +
+                console.error("The function " + currBlocks[iCurrBlock] + " is present but you have not added the " +
                     "sensor to use this function.");
             }
         }
