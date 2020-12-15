@@ -1635,14 +1635,14 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_buzzer',
             order: 200,
-            python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff', 'setBuzzerState',
-                'getBuzzerNote', 'isBuzzerOn']
+            python: ['setBuzzerState', 'setBuzzerNote','turnBuzzerOn','turnBuzzerOff',
+                'getBuzzerNote', 'isBuzzerOn', 'isBuzzerOnWithName']
         },
         {
             id: 'quickpi_led',
             order: 201,
             python: ['setLedState','toggleLedState','turnLedOn','turnLedOff', 'setLedBrightness',
-                'getLedBrightness', 'isLedOn']
+                'getLedBrightness', 'isLedOn', 'isLedOnWithName']
         },
         {
             id: 'quickpi_button',
@@ -1652,7 +1652,7 @@ var getContext = function (display, infos, curLevel) {
         {
             id: 'quickpi_screen',
             order: 203,
-            python: ['displayText']
+            python: ['displayText', 'displayText2Lines']
         },
         {
             id: 'quickpi_draw',
@@ -1804,6 +1804,25 @@ var getContext = function (display, infos, curLevel) {
                 retSensorType.push("quickpi_" + sensors[iSensor].type);
             for (var i = 0; i < alwaysIncluded.length; i++)
                 retSensorType.push(alwaysIncluded[i]);
+
+            // cleaning output so it correspond to the concept output
+            if (arrayContains(retSensorType, "quickpi_cloudstore"))
+                retSensorType.push("quickpi_cloud");
+            if (arrayContains(retSensorType, "quickpi_screen"))
+                retSensorType.push("quickpi_draw");
+            if (arrayContains(retSensorType, "quickpi_stick"))
+                retSensorType.push("quickpi_button");
+            if (arrayContains(retSensorType, "quickpi_irrecv"))
+                retSensorType.push("quickpi_ir_receiver");
+            if (arrayContains(retSensorType, "quickpi_irtrans"))
+                retSensorType.push("quickpi_ir_emitter");
+            if (arrayContains(retSensorType, "quickpi_light"))
+                retSensorType.push("quickpi_light_sensor");
+            if (arrayContains(retSensorType, "quickpi_magnetometer"))
+                retSensorType.push("quickpi_magneto");
+            if (arrayContains(retSensorType, "quickpi_sound"))
+                retSensorType.push("quickpi_microphone");
+
             return retSensorType;
         })();
 
@@ -1845,14 +1864,6 @@ var getContext = function (display, infos, curLevel) {
 
         return ret;
      };
-
-    var useless = context.getUselessFunctions();
-    if (useless.length !== 0) {
-        for (var i = 0; i < useless.length; i++) {
-            console.error("The function " + useless[i] + " is present but you have not added the " +
-                "sensor to use this function. Please remove the function " + useless[i] + " or add the right sensor.");
-        }
-    }
 
     var boardDefinitions = [
         {
@@ -3198,6 +3209,15 @@ var getContext = function (display, infos, curLevel) {
             {
                 infos.quickPiSensors = [];
                 addDefaultBoardSensors();
+            }
+
+            // we set warning to all useless functions that we find
+            var useless = context.getUselessFunctions();
+            if (useless.length !== 0) {
+                for (var i = 0; i < useless.length; i++) {
+                    console.error("The function " + useless[i] + " is present but you have not added the " +
+                        "sensor to use this function. Please remove the function " + useless[i] + " or add the right sensor.");
+                }
             }
         }
 
@@ -8007,6 +8027,11 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors.splice(i, 1);
                                 }
                             }
+                            var newFunctions = context.findAllSensorsFunctions();
+                            if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
+                                window.subTask.reloadFunctions(newFunctions);
+                            }
+
                             context.recreateDisplay = true;
                             context.resetDisplay();
                         },
