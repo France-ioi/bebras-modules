@@ -1850,7 +1850,7 @@ var getContext = function (display, infos, curLevel) {
      * setBuzzerNote but the buzzer sensor is not added, then it display an error in the console.
      * @return An array containing all functions that are too much.
      */
-     context.getUselessFunctions = function() {
+    context.getUselessFunctions = function() {
 
         var allPossibleFunctions = context.findAllSensorsFunctions();
         var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
@@ -1868,13 +1868,13 @@ var getContext = function (display, infos, curLevel) {
     /**
      * This method is to call on any sensor update to check if the functions changed and if it is the case then it
      * update them.
-     */
+    */
     context.reloadFunctionOnSensorModification = function() {
-         var newFunctions = context.findAllSensorsFunctions();
-         if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
-             context.subTask.reloadFunctions(newFunctions);
-         }
-     };
+        var newFunctions = context.findAllSensorsFunctions();
+        if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
+            context.subTask.reloadFunctions(newFunctions);
+        }
+    };
 
     var boardDefinitions = [
         {
