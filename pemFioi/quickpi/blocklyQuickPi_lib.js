@@ -1876,6 +1876,44 @@ var getContext = function (display, infos, curLevel) {
         }
     };
 
+    /**
+     * This function is to call when a there is a sensor modification that occurs. It will put the modification to the
+     * subtask. And it will also check if there is a function modification that occurs after this sensor modification.
+     * If there is any then it does a reload and it
+     * @return true. If no reload occurs, it return false, and the sensor modification can be continued as the actual
+     * version.
+     */
+    context.sensorModification = function() {
+
+        // These properties are the properties used inside of the exercise edition. There are placed here so we know
+        // which property do we must copy from infos.quickPiSensors and put inside of subtask gridinfo.
+        var subTaskSensorProperties = ["type", "name", "showAsAnalog"];
+
+        // TODO: fix
+        var newSensors = [];
+
+        for (var i = 0; i < infos.quickPiSensors.length; i++) {
+            var curr = infos.quickPiSensors.length;
+            var sensorToAdd = {};
+            for (var j = 0; j < subTaskSensorProperties.length; j++) {
+                var currProperty = subTaskSensorProperties[j];
+                if (curr.hasOwnProperty(currProperty))
+                    sensorToAdd[currProperty] = curr[currProperty];
+            }
+        }
+
+        // we add the new sensors to subTask
+        context.subTask.gridInfos.quickPiSensors[context.subTask.level] = newSensors;
+        var sensorFunction = context.findAllSensorsFunctions();
+        // comparison only on length should be enough in almost all cases.
+        if (sensorFunction.length !== infos.includeBlocks.generatedBlocks.quickpi.length) {
+            context.subTask.reloadFunctions(sensorFunction);
+            return true;
+        }
+
+        return false;
+    };
+
     var boardDefinitions = [
         {
             name: "grovepi",
@@ -4793,14 +4831,16 @@ var getContext = function (display, infos, curLevel) {
                         name: name
                     });                    
                 }
-                context.reloadFunctionOnSensorModification();
 
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
 
 
-                context.resetSensorTable();
-                context.resetDisplay();
+                if (!context.sensorModification()) {
+                    context.resetSensorTable();
+                    context.resetDisplay();
+                }
+                // context.reloadFunctionOnSensorModification();
             });
 
 
@@ -8038,10 +8078,12 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors.splice(i, 1);
                                 }
                             }
-                            context.reloadFunctionOnSensorModification();
+                            if (!context.sensorModification()) {
+                                // context.reloadFunctionOnSensorModification();
 
-                            context.recreateDisplay = true;
-                            context.resetDisplay();
+                                context.recreateDisplay = true;
+                                context.resetDisplay();
+                            }
                         },
                         strings.messages.keep);
                 });
