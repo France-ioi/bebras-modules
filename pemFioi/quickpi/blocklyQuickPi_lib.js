@@ -1767,7 +1767,7 @@ var getContext = function (display, infos, curLevel) {
             // save currBlocks after removal
             infos.includeBlocks.generatedBlocks.quickpi = toKeep;
             if (toKeep.length != currBlocks.length)
-                window.subTask.reloadFunctions(toKeep);
+                context.subTask.reloadFunctions(toKeep);
         })();*/
 
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
@@ -1863,6 +1863,17 @@ var getContext = function (display, infos, curLevel) {
         }
 
         return ret;
+     };
+
+    /**
+     * This method is to call on any sensor update to check if the functions changed and if it is the case then it
+     * update them.
+     */
+    context.reloadFunctionOnSensorModification = function() {
+         var newFunctions = context.findAllSensorsFunctions();
+         if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
+             context.subTask.reloadFunctions(newFunctions);
+         }
      };
 
     var boardDefinitions = [
@@ -4772,7 +4783,7 @@ var getContext = function (display, infos, curLevel) {
                         subType: sensorDefinition.subType,
                         port: port,
                         name: name
-                    });                    
+                    });
 
                 } else {
                     infos.quickPiSensors.push({
@@ -4782,11 +4793,11 @@ var getContext = function (display, infos, curLevel) {
                         name: name
                     });                    
                 }
-
-
+                context.reloadFunctionOnSensorModification();
 
                 $('#popupMessage').hide();
                 window.displayHelper.popupMessageShown = false;
+
 
                 context.resetSensorTable();
                 context.resetDisplay();
@@ -8027,10 +8038,7 @@ var getContext = function (display, infos, curLevel) {
                                     infos.quickPiSensors.splice(i, 1);
                                 }
                             }
-                            var newFunctions = context.findAllSensorsFunctions();
-                            if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
-                                window.subTask.reloadFunctions(newFunctions);
-                            }
+                            context.reloadFunctionOnSensorModification();
 
                             context.recreateDisplay = true;
                             context.resetDisplay();

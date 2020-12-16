@@ -8,8 +8,6 @@ var initBlocklySubTask = function(subTask, language) {
    // beaver-task-2.0
    subTask.assumeLevels = true;
 
-   window.subTask = subTask;
-
    if (window.forcedLevel != null) {
       for (var level in subTask.data) {
          if (window.forcedLevel != level) {
@@ -68,6 +66,9 @@ var initBlocklySubTask = function(subTask, language) {
       this.nbTestCases = subTask.data[curLevel].length;
 
       this.context = quickAlgoLibraries.getContext(this.display, levelGridInfos, curLevel);
+
+      // we save the subTask into the context so the reload function
+      this.context.subTask = subTask;
       this.context.raphaelFactory = this.raphaelFactory;
       this.context.delayFactory = this.delayFactory;
       this.context.blocklyHelper = this.blocklyHelper;
