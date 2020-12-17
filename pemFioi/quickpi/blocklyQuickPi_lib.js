@@ -1887,19 +1887,19 @@ var getContext = function (display, infos, curLevel) {
 
         // These properties are the properties used inside of the exercise edition. There are placed here so we know
         // which property do we must copy from infos.quickPiSensors and put inside of subtask gridinfo.
-        var subTaskSensorProperties = ["type", "name", "showAsAnalog"];
+        var subTaskSensorProperties = ["type", "name", "showAsAnalog", "subType"];
 
-        // TODO: fix
         var newSensors = [];
 
         for (var i = 0; i < infos.quickPiSensors.length; i++) {
-            var curr = infos.quickPiSensors.length;
+            var curr = infos.quickPiSensors[i];
             var sensorToAdd = {};
             for (var j = 0; j < subTaskSensorProperties.length; j++) {
                 var currProperty = subTaskSensorProperties[j];
                 if (curr.hasOwnProperty(currProperty))
                     sensorToAdd[currProperty] = curr[currProperty];
             }
+            newSensors.push(sensorToAdd);
         }
 
         // we add the new sensors to subTask
