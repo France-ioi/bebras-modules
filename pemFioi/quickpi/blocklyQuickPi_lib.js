@@ -1831,8 +1831,8 @@ var getContext = function (display, infos, curLevel) {
      * This function is to call when a there is a sensor modification that occurs. It will put the modification to the
      * subtask. And it will also check if there is a function modification that occurs after this sensor modification.
      * If there is any then it does a reload and it
-     * @return true. If no reload occurs, it return false, and the sensor modification can be continued as the actual
-     * version.
+     * @return true. If no reload occurs, it return false, and the sensor modification can be continued as the usual
+     * version instead of reload of the hole subject.
      */
     context.sensorModification = function() {
 
