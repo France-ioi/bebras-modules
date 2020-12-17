@@ -1732,44 +1732,6 @@ var getContext = function (display, infos, curLevel) {
         var conceptList = [{id: 'language', ignore: true}];
         var quickPiConceptList = context.quickpi.conceptList;
 
-        /*
-        // TODO: remove this for final version
-        // TODO: move this functions somewhere else
-        // This function allow us to remove all the useless blocks from infos.
-        (function removeUselessBlocks() {
-            var currBlocks = infos.includeBlocks.generatedBlocks.quickpi;
-
-            var sensorTypes = (function() {
-                var sensors = infos.quickPiSensors;
-                var ret = [];
-                for (var iSensor = 0; iSensor < sensors.length; iSensor++)
-                    ret.push("quickpi_" + sensors[iSensor].type);
-                return ret;
-            })();
-
-            // This are the blocks that are inside of the concept and that we will keep.
-            var toKeep = [];
-
-            function getSensorOfFunction(block) {
-                for (var iConcept = 0; i < quickPiConceptList.length; iConcept++) {
-                    var currConcept = quickPiConceptList[iConcept];
-                    if (arrayContains(currConcept.python, block))
-                        return currConcept.id;
-                }
-            }
-
-            for (var i = 0; i < currBlocks.length; i++) {
-                var block = currBlocks[i];
-                if (arrayContains(sensorTypes, getSensorOfFunction(block)))
-                    toKeep.push(block);
-            }
-
-            // save currBlocks after removal
-            infos.includeBlocks.generatedBlocks.quickpi = toKeep;
-            if (toKeep.length != currBlocks.length)
-                context.subTask.reloadFunctions(toKeep);
-        })();*/
-
         if(window.stringsLanguage == 'fr' || !strings.concepts) {
             var conceptStrings = quickPiLocalLanguageStrings.fr.concepts;
             var conceptIndex = 'quickpi.html';
@@ -1864,17 +1826,6 @@ var getContext = function (display, infos, curLevel) {
 
         return ret;
      };
-
-    /**
-     * This method is to call on any sensor update to check if the functions changed and if it is the case then it
-     * update them.
-    */
-    context.reloadFunctionOnSensorModification = function() {
-        var newFunctions = context.findAllSensorsFunctions();
-        if (newFunctions.length != infos.includeBlocks.generatedBlocks.quickpi.length) {
-            context.subTask.reloadFunctions(newFunctions);
-        }
-    };
 
     /**
      * This function is to call when a there is a sensor modification that occurs. It will put the modification to the
