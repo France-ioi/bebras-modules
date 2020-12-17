@@ -182,8 +182,10 @@ var initBlocklySubTask = function(subTask, language) {
    subTask.reloadFunctions = function(newFunctions) {
       subTask.gridInfos.includeBlocks.generatedBlocks.quickpi[this.level] = newFunctions;
       var level = this.level;
+      var answerObj = subTask.getAnswerObject();
       subTask.unloadLevel(function() {
          subTask.loadLevel(level);
+         subTask.reloadAnswerObject(answerObj);
       });
    };
 
