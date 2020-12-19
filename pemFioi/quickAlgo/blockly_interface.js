@@ -99,6 +99,7 @@ function getBlocklyInterface(maxBlocks, subTask) {
          if (options.maxListSize) {
             FioiBlockly.maxListSize = options.maxListSize;
          }
+         this.placeholderBlocks = options.placeholderBlocks;
 
          this.locale = locale;
          this.nbTestCases = nbTestCases;
