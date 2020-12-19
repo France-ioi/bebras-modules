@@ -200,6 +200,10 @@ img {
    margin: .5em 0;
    padding: 8px;
 }
+#popupMessage:not(.floatingMessage) {
+   background: white;
+   text-align: center;
+}
 #popupMessage.floatingMessage {
    position: absolute;
    z-index: 100;
@@ -223,7 +227,9 @@ img {
    top: 50%;
    transform: translate(0,-50%);
 }
-#popupMessage.floatingMessage .container img.messageArrow,
+#popupMessage .container img.messageArrow {
+   display: none;
+}
 #popupMessage.floatingMessage .container img.beaver {
    display: none;
 }
