@@ -87,10 +87,12 @@ statement {
   display: block;
 }
 statement p {
-  /* because we get <p> wraps here by taskeditor tinymce */
-  display: inline;
   margin: 0;
   font-weight: normal;
+}
+statement p:first-child {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
 }
 statement::before {
   counter-increment: questions-counter;
@@ -121,10 +123,11 @@ answer {
   padding: 5px 0;
 }
 answer p {
-  /* we get <p> wraps here by taskeditor tinymce, but it's still fine without
-   * the display: inline ; it also prevents from having newlines */
-  /* display: inline; */
   margin: 0;
+}
+answer p:first-child {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
 }
 /*question:nth-child(odd) answer {
   border-color: #d2d2d2;
