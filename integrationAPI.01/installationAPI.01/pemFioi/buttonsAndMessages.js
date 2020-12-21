@@ -42,7 +42,7 @@ window.displayHelper = {
    hasLevels: false,
    pointsAsStars: true, // TODO: false as default
    unlockedLevels: 4,
-   forceNextTaskAfter: [],
+   forceNextTaskAfter: -1,
    neverHadHard: false,
    showMultiversionNotice: false,
    taskLevel: '',
