@@ -231,7 +231,7 @@ var alreadyStayed = false;
 
 var miniPlatformValidate = function(mode, success, error) {
    //$.post('updateTestToken.php', {action: 'showSolution'}, function(){}, 'json');
-   if (mode == 'nextImmediate') {
+   if (mode == 'nextImmediate' || mode == 'top' || mode == 'log') {
       return;
    }
    if (mode == 'stay') {
