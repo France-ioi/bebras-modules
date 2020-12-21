@@ -982,6 +982,8 @@ window.displayHelper = {
 
    displayLevel: function(newLevel) {
       // Only displays a level, without requesting a level change to the task
+      this.taskLevel = newLevel;
+
       if (this.popupMessageShown) {
          $('#popupMessage').hide();
          $('#displayHelperAnswering, #taskContent').show();
@@ -1018,7 +1020,6 @@ window.displayHelper = {
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
       state.level = newLevel;
-      this.taskLevel = newLevel;
       var self = this;
 
       var afterReload = function() {
