@@ -63,7 +63,9 @@ function initBlocklyRunner(context, messageCallback) {
             if(value && value.type == 'boolean') {
                displayStr = value.data ? runner.strings.valueTrue : runner.strings.valueFalse;
             }
-            if(varName) {
+            if(varName == '@@LOOP_ITERATION@@') {
+               displayStr = runner.strings.loopIteration + ' ' + displayStr;
+            } else if(varName) {
                varName = varName.toString();
                // Get the original variable name
                for(var dbIdx in Blockly.JavaScript.variableDB_.db_) {
