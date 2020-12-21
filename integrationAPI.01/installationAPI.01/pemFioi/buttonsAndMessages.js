@@ -1008,8 +1008,8 @@ window.displayHelper = {
       $('#tabsMenu .li.current').next().addClass('next');
    },
 
-   setLevel: function(newLevel) {
-      if (this.taskLevel == newLevel) {
+   setLevel: function(newLevel, force) {
+      if (this.taskLevel == newLevel && !force) {
          return;
       }
 
@@ -1441,6 +1441,10 @@ window.displayHelper = {
             $('#tab_' + curLevel).removeClass('lockedLevel');
             this.unlockedLevels++;
             this.updateStarsAtLevel(curLevel);
+            // Currently displayed level has been unlocked, display it
+            if(curLevel == this.taskLevel) {
+               this.setLevel(this.taskLevel, true);
+            }
          }
       }
       if (scores[gradedLevel] == this.graderScore) {
