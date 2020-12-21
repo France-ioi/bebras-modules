@@ -717,6 +717,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return colours;
       },
 
+      getPlaceholderBlock: function(name) {
+         return this.placeholderBlocks ? "<statement name='" + name + "'><shadow type='placeholder_statement'></shadow></statement>" : '';
+      },
 
       getStdBlocks: function() {
          return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
@@ -753,11 +756,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             logic: [
                {
                   name: "controls_if",
-                  blocklyXml: "<block type='controls_if'></block>"
+                  blocklyXml: "<block type='controls_if'>" +
+                              this.getPlaceholderBlock('DO0') +
+                              "</block>"
                },
                {
                   name: "controls_if_else",
-                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
+                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation>" +
+                              this.getPlaceholderBlock('DO0') +
+                              this.getPlaceholderBlock('ELSE') +
+                              "</block>",
                   excludedByDefault: this.mainContext ? this.mainContext.showIfMutator : false
                },
                {
@@ -795,7 +803,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "controls_repeat",
-                  blocklyXml: "<block type='controls_repeat'></block>",
+                  blocklyXml: "<block type='controls_repeat'>" +
+                              this.getPlaceholderBlock('DO') +
+                              "</block>",
                   excludedByDefault: true
                },
                {
@@ -806,7 +816,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "      <field name='NUM'>10</field>" +
                               "    </shadow>" +
                               "  </value>" +
-                              (this.placeholderBlocks ? "  <statement name='DO'><shadow type='placeholder_statement'></shadow></statement>" : '') +
+                              this.getPlaceholderBlock('DO') +
                               "</block>"
                },
                {
@@ -1569,11 +1579,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             control: [
                   {
                      name: "control_if",
-                     blocklyXml: "<block type='control_if'></block>"
+                     blocklyXml: "<block type='control_if'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
                   },
                   {
                      name: "control_if_else",
-                     blocklyXml: "<block type='control_if_else'></block>"
+                     blocklyXml: "<block type='control_if_else'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 this.getPlaceholderBlock('SUBSTACK2') +
+                                 "</block>"
                   },
                   {
                      name: "control_repeat",
@@ -1583,12 +1598,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "      <field name='NUM'>10</field>" +
                                  "    </shadow>" +
                                  "  </value>" +
-                                 (this.placeholderBlocks ? "  <statement name='SUBSTACK'><shadow type='placeholder_statement'></shadow></statement>" : '') +
+                                 this.getPlaceholderBlock('SUBSTACK') +
                                  "</block>"
                   },
                   {
                      name: "control_repeat_until",
-                     blocklyXml: "<block type='control_repeat_until'></block>"
+                     blocklyXml: "<block type='control_repeat_until'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
                   },
                   {
                      name: "control_forever",
