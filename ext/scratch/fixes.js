@@ -323,6 +323,10 @@ Blockly.Workspace.prototype.remainingCapacity = function(maxBlocks) {
   var blockCount = 0;
   for (var b = 0; b < blocks.length; b++) {
     var block = blocks[b];
+    // Don't count insertion markers (shadows when moving a block)
+    if(block.isInsertionMarker_) {
+      continue;
+    }
     // Counting is tricky because some blocks in Scratch don't count in Blockly
     if(block.parentBlock_) {
       // There's a parent (container) block
