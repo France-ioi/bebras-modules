@@ -781,6 +781,7 @@ window.displayHelper = {
 
    initLevelVars: function() {
       var defaultLevelsRanks = { basic: 1, easy: 2, medium: 3, hard: 4 };
+      this.taskLevel = '';
       this.levelsRanks = {};
       this.levelsScores = {};
       this.prevLevelsScores = {};
