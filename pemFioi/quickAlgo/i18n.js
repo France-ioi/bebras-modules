@@ -29,6 +29,11 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Afficher",
       },
+      exerciseTypeAbout: {
+         default: "Sujet propulsé par <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> " +
+             "est un projet de <a href='http://www.france-ioi.org/'>France-IOI</a>"
+      },
       invalidContent: "Contenu invalide",
       unknownFileType: "Type de fichier non reconnu",
       download: "télécharger",
@@ -67,6 +72,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Description :",
       saveAndQuit: "Sauvegarder & Quitter",
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
+      about: "À propos",
+      license: "License :",
+      authors: "Auteurs :",
+      other: "Autre",
+      otherLicense: "Autre license",
+      pleaseSpecifyLicense: "Merci de spécifier une license",
       avoidReloadingOtherTask: "Attention : ne rechargez pas le programme d'un autre sujet !",
       files: "Fichiers",
       reloadProgram: "Recharger",
@@ -110,6 +121,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Zoom ×2",
       loopRepeat: "repeat",
       loopDo: "do",
+      loopIteration: "répétition",
       displayVideo: "Afficher la vidéo",
       showDetails: "Plus de détails",
       hideDetails: "Masquer les détails",
@@ -159,6 +171,11 @@ var quickAlgoLanguageStrings = {
          read: "Reading",
          print: "Writing",
       },
+      exerciseTypeAbout: {
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>",
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>"
+      },
       invalidContent: "Invalid content",
       unknownFileType: "Unrecognized file type",
       download: "download",
@@ -197,6 +214,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Description:",
       saveAndQuit: "Save & Quit",
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
+      about: "About",
+      license: "License:",
+      authors: "Authors:",
+      other: "Other",
+      otherLicense: "Other license",
+      pleaseSpecifyLicense: "Please specify a license",
       avoidReloadingOtherTask: "Warning: do not reload code for another task!",
       files: "Files",
       reloadProgram: "Reload",
@@ -240,6 +263,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Scale 2×",
       loopRepeat: "repeat",
       loopDo: "do",
+      loopIteration: "iteration",
       displayVideo: "Display video",
       showDetails: "Show details",
       hideDetails: "Hide details",
@@ -290,6 +314,11 @@ var quickAlgoLanguageStrings = {
          print: "Ausgeben",
          manipulate: "Umwandeln",
       },
+      exerciseTypeAbout: {
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
+      },
       invalidContent: "Ungültiger Inhalt",
       unknownFileType: "Ungültiger Datentyp",
       download: "Herunterladen",
@@ -328,6 +357,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Beschreibung:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: translate
+      license: "Lizenz:", // TODO: verify
+      authors: "Autoren :", // TODO: verify
+      other: "Andere", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Warnung: Lade keinen Quelltext von einer anderen Aufgabe!",
       files: "Dateien",
       reloadProgram: "Laden",
@@ -371,6 +406,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Vergrößere",
       loopRepeat: "wiederhole",
       loopDo: "mache",
+      loopIteration: "Wiederholung",
       displayVideo: "Zeige Video",
       showDetails: "Zeige Details",
       hideDetails: "Verstecke Details",
@@ -422,6 +458,11 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Pantalla",
       },
+      exerciseTypeAbout: {
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
+      },
       invalidContent: "Contenido inválido",
       unknownFileType: "Tipo de archivo no reconocido",
       download: "descargar",
@@ -460,6 +501,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Descripción:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: translate
+      license: "Licencia:", // TODO: verify
+      authors: "Autores:", // TODO: verify
+      other: "Otro", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Atención: ¡no recargue el programa de otro problema!",
       files: "Archivos",
       reloadProgram: "Recargar",
@@ -503,6 +550,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Aumentar 2X",
       loopRepeat: "repetir",
       loopDo: "hacer",
+      loopIteration: "iteración",
       displayVideo: "Mostrar el video",
       showDetails: "Mostrar más información",
       hideDetails: "Ocultar información",
@@ -552,6 +600,11 @@ var quickAlgoLanguageStrings = {
          print: "Pisanje",
          turtle: "Želva"
       },
+      exerciseTypeAbout: {
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
+      },
       invalidContent: "Neveljavna vsebina",
       unknownFileType: "Neznana vrsta datoteke",
       download: "prenos",
@@ -590,6 +643,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Opis:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: Translate
+      license: "Licenca:", // TODO: tanslate
+      authors: "Avtorji:", // TODO: translate
+      other: "drugo", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Opozorilo: Za drugo nalogo ne naloži kode znova!",
       files: "Datoteke",
       reloadProgram: "Znova naloži",
@@ -633,6 +692,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Približaj ×2",
       loopRepeat: "repeat",
       loopDo: "do",
+      loopIteration: "ponovitev",
       displayVideo: "Prikaži video",
       showDetails: "Prikaži podrobnosti",
       hideDetails: "Skrij podrobnosti",
@@ -684,6 +744,11 @@ var quickAlgoLanguageStrings = {
          internet: "Internet",
          display: "Mostra",
       },
+      exerciseTypeAbout: {
+         default: "Task powered by <a href='http://www.france-ioi.org/'>France-IOI</a>", // TODO: translate
+         "Quick-Pi": "<a href='https://quick-pi.org/'>Quick-Pi</a> is a project by " +
+             "<a href='http://www.france-ioi.org/'>France-IOI</a>" // TODO: translate
+      },
       invalidContent: "Contenuto non valido",
       unknownFileType: "Tipo di file non riconosciuto",
       download: "scarica",
@@ -722,6 +787,12 @@ var quickAlgoLanguageStrings = {
       descriptionEdition: "Descrizione:", // TODO: verify
       saveAndQuit: "Sauvegarder & Quitter", // TODO: translate
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
+      about: "À propos", // TODO: Translate
+      license: "Licenza:", // TODO: verify
+      authors: "Autori:", // TODO: verify
+      other: "Altro", // TODO: verify
+      otherLicense: "Other license", // TODO: translate
+      pleaseSpecifyLicense: "Merci de spécifier une license", // TODO: translate
       avoidReloadingOtherTask: "Attenzione: non ricaricare il programma di un altro argomento!",
       files: "File",
       reloadProgram: "Ricarica",
@@ -765,6 +836,7 @@ var quickAlgoLanguageStrings = {
       scaleDrawing: "Zoom ×2",
       loopRepeat: "repeat",
       loopDo: "do",
+      loopIteration: "iterazione",
       displayVideo: "Mostra il video",
       showDetails: "Più dettagli",
       hideDetails: "Nascondi i dettagli",

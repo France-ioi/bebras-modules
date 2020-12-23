@@ -53,10 +53,10 @@ var getContext = function(display, infos, curLevel) {
                row: "ligne du robot",
                col: "colonne du robot",
                wait: "attendre",
-               north: "avancer vers le haut",
-               south: "avancer vers le bas",
-               east: "avancer vers la droite",
-               west: "avancer vers la gauche",
+               north: "avancer vers le nord",
+               south: "avancer vers le sud",
+               east: "avancer vers l'est",
+               west: "avancer vers l'ouest",
                left: "tourner à gauche",
                right: "tourner à droite",
                turnAround: "faire demi-tour",
@@ -64,16 +64,16 @@ var getContext = function(display, infos, curLevel) {
                backwards: "reculer",
                jump: "sauter",
                obstacleInFront: "obstacle devant",
-               obstacleEast: "obstacle à droite",
-               obstacleWest: "obstacle à gauche",
-               obstacleNorth: "obstacle en haut",
-               obstacleSouth: "obstacle en bas",
+               obstacleEast: "obstacle à l'est",
+               obstacleWest: "obstacle à l'ouest",
+               obstacleNorth: "obstacle au nord",
+               obstacleSouth: "obstacle au sud",
                obstacleRight: "obstacle à droite",
                obstacleLeft: "obstacle à gauche",
-               gridEdgeEast: "bord de la grille à droite",
-               gridEdgeWest: "bord de la grille à gauche",
-               gridEdgeNorth: "bord de la grille en haut",
-               gridEdgeSouth: "bord de la grille en bas",
+               gridEdgeEast: "bord de la grille à l'est",
+               gridEdgeWest: "bord de la grille à l'ouest",
+               gridEdgeNorth: "bord de la grille au nord",
+               gridEdgeSouth: "bord de la grille au sud",
                platformInFront: "plateforme devant",
                platformAbove: "plateforme au-dessus",
                withdrawObject: "ramasser l'objet",
@@ -106,10 +106,10 @@ var getContext = function(display, infos, curLevel) {
                row: "ligneRobot",
                col: "colonneRobot",
                wait: "attendre",
-               north: "haut",
-               south: "bas",
-               east: "droite",
-               west: "gauche",
+               north: "nord",
+               south: "sud",
+               east: "est",
+               west: "ouest",
                left: "tournerGauche",
                right: "tournerDroite",
                turnAround: "demiTour",
@@ -117,16 +117,16 @@ var getContext = function(display, infos, curLevel) {
                backwards: "reculer",
                jump: "sauter",
                obstacleInFront: "obstacleDevant",
-               obstacleEast: "obstacleDroite",
-               obstacleWest: "obstacleGauche",
-               obstacleNorth: "obstacleHaut",
-               obstacleSouth: "obstacleBas",
-               obstacleRight: "obstacleDroiteRel",
-               obstacleLeft: "obstacleGaucheRel",
-               gridEdgeEast: "bordGrilleDroite",
-               gridEdgeWest: "bordGrilleGauche",
-               gridEdgeNorth: "bordGrilleHaut",
-               gridEdgeSouth: "bordGrilleBas",
+               obstacleEast: "obstacleEst",
+               obstacleWest: "obstacleOuest",
+               obstacleNorth: "obstacleNord",
+               obstacleSouth: "obstacleSud",
+               obstacleRight: "obstacleDroite",
+               obstacleLeft: "obstacleGauche",
+               gridEdgeEast: "bordGrilleEst",
+               gridEdgeWest: "bordGrilleOuest",
+               gridEdgeNorth: "bordGrilleNord",
+               gridEdgeSouth: "bordGrilleSud",
                platformInFront: "plateformeDevant",
                platformAbove: "plateformeDessus",
                withdrawObject: "ramasserObjet",
@@ -201,6 +201,12 @@ var getContext = function(display, infos, curLevel) {
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case.",
                noContainer: "Il n'y a pas de conteneur ici !"
+            },
+            cardinals: {
+               north: "Nord",
+               south: "Sud",
+               west: "Ouest",
+               east: "Est"
             },
             startingBlockName: "Programme du robot"
          },
@@ -342,6 +348,12 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "You don't have enough length of cable to connect these two plugs!",
                failureProjectile: "The robot got hit by a projectile!"
             },
+            cardinals: {
+               north: "North",
+               south: "South",
+               west: "West",
+               east: "East"
+            },
             startingBlockName: "Program of the robot"
          },
          
@@ -466,6 +478,12 @@ var getContext = function(display, infos, curLevel) {
                successLights: "Bravo, ¡su robot ha iluminado todos los lugares!",
                failureLaser: "¡El robot debe encontrarse sobre una terminal láser para poder disparar!"
             },
+            cardinals: {
+               north: "Norte",
+               south: "Sur",
+               west: "Oeste",
+               east: "Este"
+            },
             startingBlockName: "Programa del robot"
          },
          de: {
@@ -588,6 +606,12 @@ var getContext = function(display, infos, curLevel) {
                failureLights: "Der Roboter hat nicht alles beleuchtet!",
                successLights: "Bravo! Der Roboter hat alles beleuchtet.",
                failureLaser: "Der Roboter muss auf einem Laser stehen, um schießen zu können!",
+            },
+            cardinals: {
+               north: "Norden",
+               south: "Süden",
+               west: "Westen",
+               east: "Osten"
             },
             startingBlockName: "Roboter-Programm"
          },
@@ -729,6 +753,12 @@ var getContext = function(display, infos, curLevel) {
                failureTotalLengthExceeded: "Vous n'avez pas assez de longueur de câble pour relier ces deux prises !",
                failureProjectile: "Le robot s'est pris un projectile !",
                failureRewrite: "Le robot a essayé de repeindre une case."
+            },
+            cardinals: {
+               north: "Nord",
+               south: "Sud",
+               west: "Ovest",
+               east: "Est"
             },
             startingBlockName: "Programme du robot"
          },
@@ -2002,11 +2032,7 @@ var getContext = function(display, infos, curLevel) {
             marble: { num: 4, img: "marble.png", side: 60, isWithdrawable: true, zOrder: 1 },
             number: { num: 5, side: 60, zOrder: 1 },
             board: { num: 6, side: 60, isWritable: true, zOrder: 1 },
-            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 },
-            north: { num: 13, img: "north.png", side: 60, zOrder: 0 },
-            south: { num: 14, img: "south.png", side: 60, zOrder: 0 },
-            east: { num: 15, img: "east.png", side: 60, zOrder: 0 },
-            west: { num: 16, img: "west.png", side: 60, zOrder: 0 }
+            white: { num: 7, color: "#ffffff", side: 60, zOrder: 0 }
          },
          checkEndCondition: robotEndConditions.checkContainersFilled
       },
@@ -2948,6 +2974,7 @@ var getContext = function(display, infos, curLevel) {
    var cells = [];
    var colsLabels = [];
    var rowsLabels = [];
+   var cardLabels = [];
    var scale = 1;
    var paper;
    
@@ -2968,10 +2995,17 @@ var getContext = function(display, infos, curLevel) {
          infos.topMargin = infos.cellSide / 2;
       }
    }
-   if(infos.showLabels) {
+   if (infos.showLabels) {
       infos.leftMargin += infos.cellSide;
       infos.topMargin += infos.cellSide;
    }
+   if (infos.showCardinals) {
+      infos.leftMargin += infos.cellSide * 1.8;
+      infos.topMargin += infos.cellSide;
+      infos.rightMargin += infos.cellSide;
+      infos.bottomMargin += infos.cellSide;
+   }
+
    
    switch(infos.blocklyColourTheme) {
       case "bwinf":
@@ -3107,6 +3141,14 @@ var getContext = function(display, infos, curLevel) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             colsLabels[iCol] = paper.text(0, 0, (iCol + 1));
          }
+      }
+      if (infos.showCardinals) {
+         cardLabels = [
+            paper.text(0, 0, strings.cardinals.north),
+            paper.text(0, 0, strings.cardinals.south),
+            paper.text(0, 0, strings.cardinals.west),
+            paper.text(0, 0, strings.cardinals.east)
+            ];
       }
    };
    
@@ -3247,12 +3289,14 @@ var getContext = function(display, infos, curLevel) {
       }
       var newCellSide = 0;
       if(context.nbCols && context.nbRows) {
-         var marginAsCols = infos.leftMargin / infos.cellSide;
-         var marginAsRows = infos.topMargin / infos.cellSide;
+         var marginAsCols = (infos.leftMargin + infos.rightMargin) / infos.cellSide;
+         var marginAsRows = (infos.topMargin + infos.bottomMargin) / infos.cellSide;
          newCellSide = Math.min(infos.cellSide, Math.min(areaWidth / (context.nbCols + marginAsCols), areaHeight / (context.nbRows + marginAsRows)));
       }
       scale = newCellSide / infos.cellSide;
-      paper.setSize((infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale, (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale);
+      var paperWidth = (infos.cellSide * context.nbCols + infos.leftMargin + infos.rightMargin) * scale;
+      var paperHeight = (infos.cellSide * context.nbRows + infos.topMargin + infos.bottomMargin) * scale;
+      paper.setSize(paperWidth, paperHeight);
       
       for(var iRow = 0;iRow < context.nbRows;iRow++) {
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
@@ -3263,17 +3307,26 @@ var getContext = function(display, infos, curLevel) {
             cells[iRow][iCol].attr({x: x, y: y, width: infos.cellSide * scale, height: infos.cellSide * scale});
          }
       }
+      var textFontSize = {"font-size": infos.cellSide * scale / 2};
       if(infos.showLabels) {
          for(var iRow = 0;iRow < context.nbRows;iRow++) {
             var x = (infos.leftMargin - infos.cellSide / 2) * scale;
             var y = (infos.cellSide * (iRow + 0.5) + infos.topMargin) * scale;
-            rowsLabels[iRow].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            rowsLabels[iRow].attr({x: x, y: y}).attr(textFontSize);
          }
          for(var iCol = 0;iCol < context.nbCols;iCol++) {
             var x = (infos.cellSide * iCol + infos.leftMargin + infos.cellSide / 2) * scale;
             var y = (infos.topMargin - infos.cellSide / 2) * scale;
-            colsLabels[iCol].attr({x: x, y: y}).attr({"font-size": infos.cellSide * scale / 2});
+            colsLabels[iCol].attr({x: x, y: y}).attr(textFontSize);
          }
+      }
+      if (infos.showCardinals) {
+         var middleX = (infos.leftMargin + infos.cellSide * context.nbCols / 2) * scale;
+         var middleY = (infos.topMargin + infos.cellSide * context.nbRows / 2) * scale;
+         cardLabels[0].attr({x: middleX, y: (infos.topMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide / 2) * scale}).attr(textFontSize);
+         cardLabels[1].attr({x: middleX, y: paperHeight + (infos.cellSide / 2 - infos.bottomMargin) * scale}).attr(textFontSize);
+         cardLabels[2].attr({x: (infos.leftMargin - (infos.showLabels ? infos.cellSide : 0) - infos.cellSide * 1.8 / 2) * scale, y: middleY}).attr(textFontSize);
+         cardLabels[3].attr({x: paperWidth + (infos.cellSide / 2 - infos.rightMargin) * scale, y: middleY}).attr(textFontSize);
       }
       
       redisplayAllItems();      
@@ -3285,8 +3338,6 @@ var getContext = function(display, infos, curLevel) {
       for(var iItem = 0;iItem < context.items.length;iItem++) {
          var item = context.items[iItem];
          redisplayItem(item, false);
-         if(item.element !== undefined)
-            item.element.attr(itemAttributes(item));
       }
       
       for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
@@ -3709,14 +3760,12 @@ var getContext = function(display, infos, curLevel) {
             if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
                maxi = itemsOn[item].zOrder;
             }
+            redisplayItem(item);
          }
          object.zOrder = maxi + 0.000001;
-         resetItem(object);
+         resetItem(object, true);
          context.checkContainer(coords);
       }
-      
-      //TODO: improve performance
-      redisplayAllItems();
    };
    
    context.dropObject = function(object, coords) {
@@ -3741,12 +3790,10 @@ var getContext = function(display, infos, curLevel) {
          if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
             maxi = itemsOn[item].zOrder;
          }
+         redisplayItem(item);
       }
-      resetItem(object);
+      resetItem(object, true);
       context.checkContainer(coords);
-      
-      //TODO: improve performance
-      redisplayAllItems();
    };
    
    context.turnLeft = function(callback) {

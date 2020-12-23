@@ -175,6 +175,55 @@ Blockly.Block.prototype.getVariableField = function () {
   return null;
 };
 
+// Modify updateColour to leave placeholders alone
+Blockly.BlockSvg.prototype.updateColour = function() {
+  var strokeColour = this.getColourTertiary();
+  if (this.isShadow() && this.parentBlock_) {
+    // Pull shadow block stroke colour from parent block's tertiary if possible.
+    strokeColour = this.parentBlock_.getColourTertiary();
+    // Special case: if we contain a colour field, set to a special stroke colour.
+    if (this.inputList[0] &&
+        this.inputList[0].fieldRow[0] &&
+        this.inputList[0].fieldRow[0] instanceof Blockly.FieldColour) {
+      strokeColour = Blockly.Colours.colourPickerStroke;
+    }
+  }
+
+  // Use main colour for placeholder strokes
+  if(this.type.substring(0, 12) == 'placeholder_') {
+    strokeColour = this.getColour();
+  }
+
+  // Render block stroke
+  this.svgPath_.setAttribute('stroke', strokeColour);
+
+  // Render block fill
+  var fillColour = (this.isGlowingBlock_) ? this.getColourSecondary() : this.getColour();
+  this.svgPath_.setAttribute('fill', fillColour);
+
+  // Render opacity
+  this.svgPath_.setAttribute('fill-opacity', this.getOpacity());
+
+  // Update colours of input shapes.
+  for (var shape in this.inputShapes_) {
+    this.inputShapes_[shape].setAttribute('fill', this.getColourTertiary());
+  }
+
+  // Render icon(s) if applicable
+  var icons = this.getIcons();
+  for (var i = 0; i < icons.length; i++) {
+    icons[i].updateColour();
+  }
+
+  // Bump every dropdown to change its colour.
+  for (var x = 0, input; input = this.inputList[x]; x++) {
+    for (var y = 0, field; field = input.fieldRow[y]; y++) {
+      field.setText(null);
+    }
+  }
+};
+
+
 // Add a border when a block is glowing to make it more obvious
 Blockly.BlockSvg.prototype.setGlowBlock = function(isGlowingBlock) {
   var blockSvg = this.getSvgRoot();
@@ -323,6 +372,14 @@ Blockly.Workspace.prototype.remainingCapacity = function(maxBlocks) {
   var blockCount = 0;
   for (var b = 0; b < blocks.length; b++) {
     var block = blocks[b];
+    // Don't count insertion markers (shadows when moving a block)
+    if(block.isInsertionMarker_) {
+      continue;
+    }
+    // Don't count placeholders
+    if(block.type.substring(0, 12) == 'placeholder_') {
+      continue;
+    }
     // Counting is tricky because some blocks in Scratch don't count in Blockly
     if(block.parentBlock_) {
       // There's a parent (container) block
