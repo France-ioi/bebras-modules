@@ -3338,8 +3338,6 @@ var getContext = function(display, infos, curLevel) {
       for(var iItem = 0;iItem < context.items.length;iItem++) {
          var item = context.items[iItem];
          redisplayItem(item, false);
-         if(item.element !== undefined)
-            item.element.attr(itemAttributes(item));
       }
       
       for(var iItem = 0;iItem < context.multicell_items.length;iItem++) {
@@ -3762,14 +3760,12 @@ var getContext = function(display, infos, curLevel) {
             if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
                maxi = itemsOn[item].zOrder;
             }
+            redisplayItem(item);
          }
          object.zOrder = maxi + 0.000001;
-         resetItem(object);
+         resetItem(object, true);
          context.checkContainer(coords);
       }
-      
-      //TODO: improve performance
-      redisplayAllItems();
    };
    
    context.dropObject = function(object, coords) {
@@ -3794,12 +3790,10 @@ var getContext = function(display, infos, curLevel) {
          if(itemsOn[item].isWithdrawable === true && itemsOn[item].zOrder > maxi) {
             maxi = itemsOn[item].zOrder;
          }
+         redisplayItem(item);
       }
-      resetItem(object);
+      resetItem(object, true);
       context.checkContainer(coords);
-      
-      //TODO: improve performance
-      redisplayAllItems();
    };
    
    context.turnLeft = function(callback) {
