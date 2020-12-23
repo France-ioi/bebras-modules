@@ -373,6 +373,21 @@ var quickPiLocalLanguageStrings = {
             port: "Port",
             state: "State",
 
+            cloudTypes: {
+                object: "Dictionnaire",
+                array: "Tableau",
+                boolean: "Booléen",
+                number: "Nombre",
+                string: "Chaîne de caractère"
+            },
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.",
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud",
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud",
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}",
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.",
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu",
+            cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.",
+
             cloudKeyNotExists: "La clé n'existe pas : {0} ",
             cloudWrongValue: "Clé {0} : la valeur {2} n'est pas celle attendue, {1}.",
             cloudUnexpectedKey: "La clé {0} n'est pas une clé attendue",
@@ -407,7 +422,7 @@ var quickPiLocalLanguageStrings = {
             sensorNameServo: "servo",
             sensorNameHumidity: "humidity",
             sensorNamePotentiometer: "pot",
-            sensorNameCloudStore: "cloud",
+            sensorNameCloudStore: "cloud"
         },
         concepts: {
             quickpi_start: 'Créer un programme',
@@ -804,6 +819,22 @@ var quickPiLocalLanguageStrings = {
             name: "Nombre",
             port: "Puerto",
             state: "Estado",
+
+            cloudTypes: {
+                object: "Dictionnaire", // TODO: translate (dictionary)
+                array: "Tableau", // TODO: translate
+                boolean: "Booléen", // TODO: translate
+                number: "Nombre", // TODO: translate
+                string: "Chaîne de caractère" // TODO: translate
+            },
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.", // TODO: translate
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud", // TODO: translate
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud", // TODO: translate
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu", // TODO: translate
+            cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
+
             cloudKeyNotExists: "La llave no existe : {0} ",
             cloudWrongValue: "Llave {0}: el valor {2} no es el esperado, {1}.",
             cloudUnexpectedKey: "La llave {0} no es una llave esperada",
@@ -1233,6 +1264,21 @@ var quickPiLocalLanguageStrings = {
             name: "Name",
             port: "Port",
             state: "State",
+
+            cloudTypes: {
+                object: "Dictionnaire", // TODO: translate (dictionary)
+                array: "Tableau", // TODO: translate
+                boolean: "Booléen", // TODO: translate
+                number: "Nombre", // TODO: translate
+                string: "Chaîne de caractère" // TODO: translate
+            },
+            cloudMissingKey: "Test échoué : Il vous manque la clé {0} dans le cloud.", // TODO: translate
+            cloudMoreKey: "Test échoué : La clé {0} est en trop dans le cloud", // TODO: translate
+            cloudUnexpectedKeyCorrection: "Test échoué : La clé {0} n'étais pas attendu dans le cloud", // TODO: translate
+            cloudPrimitiveWrongKey: "Test échoué : À la clé {0} du cloud, la valeur {1} était attendue au lieu de {2}", // TODO: translate
+            cloudArrayWrongKey: "Test échoué : Le tableau à la clé {0} du cloud diffère de celui attendu.", // TODO: translate
+            cloudDictionaryWrongKey: "Test échoué : Le dictionnaire à la clé {0} diffère de celui attendu", // TODO: translate
+            cloudWrongType: "Test échoué : Vous avez stocké une valeur de type \"{0}\" dans la clé {1} du cloud, mais le type \"{2}\" était attendu.", // TODO: translate
 
             cloudKeyNotExists: "La chiave non esiste : {0} ",
             cloudWrongValue: "Chiave {0} : il valore {2} non è quello previsto, {1}.",
@@ -1746,7 +1792,6 @@ var getContext = function (display, infos, curLevel) {
         }
         return conceptList;
     }
-
 
     var boardDefinitions = [
         {
@@ -2517,10 +2562,168 @@ var getContext = function (display, infos, curLevel) {
                 return {};
             },*/
 
-            compareState: function (state1, state2) {
-                return quickPiStore.compareState(state1, state2);
+            getWrongStateString: function(failInfo) {
+                /**
+                 * Call this function when more.length > less.length. It will find the key that is missing inside of the
+                 * less array
+                 * @param more The bigger array, containing one or more key more than less
+                 * @param less Less, the smaller array, he has a key or more missing
+                 */
+                function getMissingKey(more, less) {
+                    for (var i = 0; i < more.length; i++) {
+                        var found = false;
+                        for (var j = 0; j < less.length; j++) {
+                            if (more[i] === less[j]) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                            return more[i];
+                    }
+                    // should never happen because length are different.
+                    return null;
+                }
+
+                // the type of a value in comparison.
+                var valueType = {
+                    // Primitive type are strings and integers
+                    PRIMITIVE: "primitive",
+                    ARRAY: "array",
+                    DICTIONARY: "dictionary",
+                    // if two values are of wrong type then this is returned
+                    WRONG_TYPE: "wrong_type"
+                };
+
+                /**
+                 * This method allow us to compare two keys of the cloud and their values
+                 * @param actual The actual key that we have
+                 * @param expected The expected key that we have
+                 * @return An object containing the type of the return and the key that differ
+                 */
+                function compareKeys(actual, expected) {
+                    function compareArrays(arr1, arr2) {
+                        if (arr1.length != arr2.length)
+                            return false;
+                        for (var i = 0; i < arr1.length; i++) {
+                            for (var j = 0; j < arr2.length; j++) {
+                                if (arr1[i] !== arr2[i])
+                                    return false;
+                            }
+                        }
+                        return true;
+                    }
+                    var actualKeys = Object.keys(actual);
+
+                    for (var i = 0; i < actualKeys.length; i++) {
+                        var actualVal = actual[actualKeys[i]];
+
+                        // they both have the same keys so we can do that.
+                        var expectedVal = expected[actualKeys[i]];
+
+                        if (isPrimitive(expectedVal)) {
+                            // if string with int for example
+                            if (typeof expectedVal !== typeof actualVal) {
+                                return {
+                                    type: valueType.WRONG_TYPE,
+                                    key: actualKeys[i]
+                                }
+                            }
+                            if (expectedVal !== actualVal) {
+                                return {
+                                    type: valueType.PRIMITIVE,
+                                    key: actualKeys[i]
+                                };
+                            }
+                        } else if (Array.isArray(expectedVal)) {
+                            if (!Array.isArray(actualVal)) {
+                                return {
+                                    type: valueType.WRONG_TYPE,
+                                    key: actualKeys[i]
+                                };
+                            }
+                            if (!compareArrays(expectedVal, actualVal)) {
+                                return {
+                                    type: valueType.ARRAY,
+                                    key: actualKeys[i]
+                                };
+                            }
+                            // if we are in a dictionary
+                            // method from: https://stackoverflow.com/questions/38304401/javascript-check-if-dictionary
+                        } else if (expectedVal.constructor == Object) {
+                            if (actualVal.constructor != Object) {
+                                return {
+                                    type: valueType.WRONG_TYPE,
+                                    key: actualKeys[i]
+                                };
+                            }
+                            if (!deepEqual(expectedVal, actualVal)) {
+                                return {
+                                    type: valueType.DICTIONARY,
+                                    key: actualKeys[i]
+                                };
+                            }
+                        }
+                    }
+                }
+
+                if(!failInfo.expected &&
+                    !failInfo.actual)
+                    return null;
+
+                var expected = failInfo.expected;
+                var actual = failInfo.actual;
+
+                var expectedKeys = Object.keys(expected);
+                var actualKeys = Object.keys(actual);
+
+                if (expectedKeys.length != actualKeys.length) {
+                    if (expectedKeys.length > actualKeys.length) {
+                        var missingKey = getMissingKey(expectedKeys, actualKeys);
+                        return strings.messages.cloudMissingKey.format(missingKey);
+                    } else {
+                        var additionalKey = getMissingKey(actualKeys, expectedKeys);
+                        return strings.messages.cloudMoreKey.format(additionalKey);
+                    }
+                }
+
+                // This will return a key that is missing inside of expectedKeys if there is one, otherwise it will return null.
+                var unexpectedKey = getMissingKey(actualKeys, expectedKeys);
+
+                if (unexpectedKey) {
+                    return strings.messages.cloudUnexpectedKeyCorrection.format(unexpectedKey);
+                }
+
+                var keyCompare = compareKeys(actual, expected);
+
+                switch (keyCompare.type) {
+                    case valueType.PRIMITIVE:
+                        return strings.messages.cloudPrimitiveWrongKey.format(keyCompare.key, expected[keyCompare.key], actual[keyCompare.key]);
+                    case valueType.WRONG_TYPE:
+                        var typeActual = typeof actual[keyCompare.key];
+                        var typeExpected = typeof expected[keyCompare.key];
+                        // we need to check if it is an array or a dictionary
+                        if (typeActual == "object") {
+                            if (Array.isArray(actual[keyCompare.key]))
+                                typeActual = "array";
+                        }
+                        if (typeExpected == "object") {
+                            if (Array.isArray(expected[keyCompare.key]))
+                                typeExpected = "array";
+                        }
+                        var typeActualTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeActual];
+                        var typeExpectedTranslate = quickPiLocalLanguageStrings.fr.messages.cloudTypes[typeExpected];
+                        return strings.messages.cloudWrongType.format(typeActualTranslate, keyCompare.key, typeExpectedTranslate);
+                    case valueType.ARRAY:
+                        return strings.messages.cloudArrayWrongKey.format(keyCompare.key);
+                    case valueType.DICTIONARY:
+                        return strings.messages.cloudDictionaryWrongKey.format(keyCompare.key);
+                }
             },
 
+            compareState: function (state1, state2) {
+                return quickPiStore.compareState(state1, state2);
+            }
         },
         {
             name: "clock",

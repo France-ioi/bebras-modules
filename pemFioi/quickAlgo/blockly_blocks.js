@@ -717,6 +717,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return colours;
       },
 
+      getPlaceholderBlock: function(name) {
+         return this.placeholderBlocks ? "<statement name='" + name + "'><shadow type='placeholder_statement'></shadow></statement>" : '';
+      },
 
       getStdBlocks: function() {
          return this.scratchMode ? this.getStdScratchBlocks() : this.getStdBlocklyBlocks();
@@ -753,11 +756,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             logic: [
                {
                   name: "controls_if",
-                  blocklyXml: "<block type='controls_if'></block>"
+                  blocklyXml: "<block type='controls_if'>" +
+                              this.getPlaceholderBlock('DO0') +
+                              "</block>"
                },
                {
                   name: "controls_if_else",
-                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation></block>",
+                  blocklyXml: "<block type='controls_if'><mutation else='1'></mutation>" +
+                              this.getPlaceholderBlock('DO0') +
+                              this.getPlaceholderBlock('ELSE') +
+                              "</block>",
                   excludedByDefault: this.mainContext ? this.mainContext.showIfMutator : false
                },
                {
@@ -795,7 +803,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                },
                {
                   name: "controls_repeat",
-                  blocklyXml: "<block type='controls_repeat'></block>",
+                  blocklyXml: "<block type='controls_repeat'>" +
+                              this.getPlaceholderBlock('DO') +
+                              "</block>",
                   excludedByDefault: true
                },
                {
@@ -806,6 +816,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                               "      <field name='NUM'>10</field>" +
                               "    </shadow>" +
                               "  </value>" +
+                              this.getPlaceholderBlock('DO') +
                               "</block>"
                },
                {
@@ -1568,11 +1579,16 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             control: [
                   {
                      name: "control_if",
-                     blocklyXml: "<block type='control_if'></block>"
+                     blocklyXml: "<block type='control_if'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
                   },
                   {
                      name: "control_if_else",
-                     blocklyXml: "<block type='control_if_else'></block>"
+                     blocklyXml: "<block type='control_if_else'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 this.getPlaceholderBlock('SUBSTACK2') +
+                                 "</block>"
                   },
                   {
                      name: "control_repeat",
@@ -1582,11 +1598,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                                  "      <field name='NUM'>10</field>" +
                                  "    </shadow>" +
                                  "  </value>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
                                  "</block>"
                   },
                   {
                      name: "control_repeat_until",
-                     blocklyXml: "<block type='control_repeat_until'></block>"
+                     blocklyXml: "<block type='control_repeat_until'>" +
+                                 this.getPlaceholderBlock('SUBSTACK') +
+                                 "</block>"
                   },
                   {
                      name: "control_forever",
@@ -1991,7 +2010,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          // Initialize allBlocksAllowed
          this.allBlocksAllowed = [];
-         this.addBlocksAllowed(['robot_start']);
+         this.addBlocksAllowed(['robot_start', 'placeholder_statement']);
          if(this.scratchMode) {
             this.addBlocksAllowed(['math_number', 'text']);
          }
@@ -2435,6 +2454,23 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
               }
             };
 
+            Blockly.Blocks['placeholder_statement'] = {
+              init: function() {
+                this.jsonInit({
+                  "id": "placeholder_statement",
+                  "message0": "",
+                  "inputsInline": true,
+                  "previousStatement": null,
+                  "nextStatement": null,
+                  "category": Blockly.Categories.event,
+                  "colour": "#BDCCDB",
+                  "colourSecondary": "#BDCCDB",
+                  "colourTertiary": "#BDCCDB"
+                });
+                this.appendDummyInput().appendField("                    ");
+              }
+            };
+
             Blockly.JavaScript['control_forever'] = function(block) {
               var statements = Blockly.JavaScript.statementToCode(block, 'SUBSTACK');
               var code = 'while(true){\n' + statements + '}\n';
@@ -2471,6 +2507,18 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
             //    this.setHelpUrl('http://www.example.com/');
               }
             };
+
+            Blockly.Blocks['placeholder_statement'] = {
+              init: function() {
+                this.appendDummyInput()
+                    .appendField("                    ");
+                this.setPreviousStatement(true);
+                this.setNextStatement(true);
+                this.setColour(210);
+                this.setTooltip('');
+            //    this.setHelpUrl('http://www.example.com/');
+              }
+            };
          }
 
          Blockly.JavaScript['robot_start'] = function(block) {
@@ -2480,6 +2528,14 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          Blockly.Python['robot_start'] = function(block) {
            return "";
          };
+
+         Blockly.JavaScript['placeholder_statement'] = function(block) {
+           return "";
+         };
+
+         Blockly.Python['placeholder_statement'] = function(block) {
+           return "pass";
+         }
       },
 
       blocksToScratch: function(blockList) {

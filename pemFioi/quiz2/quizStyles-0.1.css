@@ -113,10 +113,12 @@ statement {
   display: block;
 }
 statement p {
-  /* because we get <p> wraps here by taskeditor tinymce */
-  display: inline;
   margin: 0;
   font-weight: normal;
+}
+statement p:first-child {
+  /* because we get <p> wraps here by taskeditor tinymce */
+  display: inline;
 }
 statement::before {
   counter-increment: questions-counter;
@@ -147,9 +149,10 @@ answer {
   padding: 5px 0;
 }
 answer p {
-  /* because we get <p> wraps here by taskeditor tinymce */
-  display: inline;
   margin: 0;
+}
+answer p:first-child {
+  display: inline;
 }
 /*question:nth-child(odd) answer {
   border-color: #d2d2d2;

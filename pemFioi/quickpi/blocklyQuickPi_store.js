@@ -60,14 +60,6 @@
 
         static compareState(state1, state2)
         {
-            if (state1 == null &&
-                state2 == null)
-                return true;
-
-            if (state1 == null ||
-                state2 == null)
-                return false;
-
-            return JSON.stringify(state1) === JSON.stringify(state2);
+            return deepEqual(state1, state2);
         }
 }
