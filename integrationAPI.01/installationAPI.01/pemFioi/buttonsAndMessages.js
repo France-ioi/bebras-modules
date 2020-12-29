@@ -981,9 +981,11 @@ window.displayHelper = {
       return this.levelsMaxScores;
    },
 
-   displayLevel: function(newLevel) {
+   displayLevel: function(newLevel, calledFromSet) {
       // Only displays a level, without requesting a level change to the task
-      this.taskLevel = newLevel;
+      if(!calledFromSet) {
+         this.taskLevel = newLevel;
+      }
 
       if (this.popupMessageShown) {
          $('#popupMessage').hide();
@@ -1012,11 +1014,13 @@ window.displayHelper = {
    },
 
    setLevel: function(newLevel, force) {
+      // Always make sure we're displaying the level
+      this.displayLevel(newLevel, true);
+
+      // Skip actually changing the level if we're already on this level
       if (this.taskLevel == newLevel && !force) {
          return;
       }
-
-      this.displayLevel(newLevel);
 
       var answer = task.getAnswerObject();
       var state = task.getStateObject();
