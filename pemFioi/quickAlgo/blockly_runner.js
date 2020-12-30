@@ -404,7 +404,7 @@ function initBlocklyRunner(context, messageCallback) {
             while(!context.programEnded[iInterpreter]) {
                if(!context.allowInfiniteLoop &&
                      (context.curSteps[iInterpreter].total >= runner.maxIter || context.curSteps[iInterpreter].withoutAction >= runner.maxIterWithoutAction)) {
-                  return;
+                  break;
                }
                if (!interpreter.step() || toStop[iInterpreter]) {
                   isRunning[iInterpreter] = false;
