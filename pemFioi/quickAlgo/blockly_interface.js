@@ -748,6 +748,13 @@ function getBlocklyInterface(maxBlocks, subTask) {
 
          this.savePrograms();
 
+         var xml = Blockly.Xml.textToDom(this.programs[this.codeId].blockly);
+         var notAllowed = this.checkNonexistentBlocks(xml);
+         if (notAllowed.length > 0) {
+            this.displayError('<span class="testError">' + "Utilisation d'un ou plusieurs block(s) invalide(s) : " + notAllowed.join(", ") + '</span>');
+            return;
+         }
+
          this.highlightPause = false;
          if(this.getRemainingCapacity(that.workspace) < 0) {
             this.displayError('<span class="testError">'+this.strings.tooManyBlocks+'</span>');

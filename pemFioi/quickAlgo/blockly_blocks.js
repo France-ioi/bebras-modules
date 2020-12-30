@@ -2525,6 +2525,32 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return true;
       },
 
+      /**
+       * This method allow us to check if there are any non-existent block that are used inside of the xml given
+       * @param xml The code of the user
+       * @return An {Array} containing all function that are not allowed but used.
+       */
+      checkNonexistentBlocks: function(xml) {
+         var allowed = this.getBlocksAllowed();
+         var blockList = xml.getElementsByTagName('block');
+         var notAllowed = [];
+         function checkBlock(block) {
+            var blockName = block.getAttribute('type');
+            if(!arrayContains(allowed, blockName)
+                && (blockName.substr(blockName.length - 9) != '_noShadow' || !arrayContains(allowed, blockName.substr(0, blockName.length - 9)))) {
+               notAllowed.push(blockName);
+            }
+         }
+         for(var i=0; i<blockList.length; i++) {
+            checkBlock(blockList[i]);
+         }
+         if(xml.localName == 'block') {
+            // Also check the top element
+            checkBlock(xml);
+         }
+         return notAllowed;
+      },
+
       checkBlocksAreAllowed: function(xml, silent) {
          if(this.includeBlocks && this.includeBlocks.standardBlocks && this.includeBlocks.standardBlocks.includeAll) { return true; }
          var allowed = this.getBlocksAllowed();
