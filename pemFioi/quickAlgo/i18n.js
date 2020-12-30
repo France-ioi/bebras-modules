@@ -30,6 +30,7 @@ var quickAlgoLanguageStrings = {
          display: "Afficher",
       },
       invalidContent: "Contenu invalide",
+      invalidBlock: "Erreur : Le bloc en surbrillance est utilisé mais n'a pas de capteur associé",
       unknownFileType: "Type de fichier non reconnu",
       download: "télécharger",
       smallestOfTwoNumbers: "Plus petit des deux nombres",
@@ -160,6 +161,7 @@ var quickAlgoLanguageStrings = {
          print: "Writing",
       },
       invalidContent: "Invalid content",
+      invalidBlock: "Error : The highlighted block is used but has no sensor associated",
       unknownFileType: "Unrecognized file type",
       download: "download",
       smallestOfTwoNumbers: "Smallest of the two numbers",
@@ -291,6 +293,7 @@ var quickAlgoLanguageStrings = {
          manipulate: "Umwandeln",
       },
       invalidContent: "Ungültiger Inhalt",
+      invalidBlock: "Error : The highlighted block is used but has no sensor associated", // TODO: translate
       unknownFileType: "Ungültiger Datentyp",
       download: "Herunterladen",
       smallestOfTwoNumbers: "Kleinere von zwei Zahlen",
@@ -423,6 +426,7 @@ var quickAlgoLanguageStrings = {
          display: "Pantalla",
       },
       invalidContent: "Contenido inválido",
+      invalidBlock: "Error : The highlighted block is used but has no sensor associated", // TODO: translate
       unknownFileType: "Tipo de archivo no reconocido",
       download: "descargar",
       smallestOfTwoNumbers: "El menor de dos números",
@@ -553,6 +557,7 @@ var quickAlgoLanguageStrings = {
          turtle: "Želva"
       },
       invalidContent: "Neveljavna vsebina",
+      invalidBlock: "Error : The highlighted block is used but has no sensor associated", // TODO: translate
       unknownFileType: "Neznana vrsta datoteke",
       download: "prenos",
       smallestOfTwoNumbers: "Manjše od dveh števil",
@@ -685,6 +690,7 @@ var quickAlgoLanguageStrings = {
          display: "Mostra",
       },
       invalidContent: "Contenuto non valido",
+      invalidBlock: "Error : The highlighted block is used but has no sensor associated", // TODO: translate
       unknownFileType: "Tipo di file non riconosciuto",
       download: "scarica",
       smallestOfTwoNumbers: "Più piccolo dei due numeri",

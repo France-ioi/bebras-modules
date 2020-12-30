@@ -713,6 +713,19 @@ function getBlocklyInterface(maxBlocks, subTask) {
          }
       },
 
+      /**
+       * When the blockly code has an invalid block, we call this function to get the error message.
+       * An invalid block is a block that the user has added, then he deleted the sensor that is used by this function.
+       * So the function is deleted from available blocks but still present in users code. So we must send him a message
+       * to explain the user that his code cannot be used because of this block. This function format this message and
+       * also put in "surbrillance" block that is not allowed.
+       * @param block The id of the blockblock that is used but not allowed.
+       */
+      getInvalidBlockMessage: function(block) {
+         this.highlightBlock(block, true);
+         return this.strings.invalidBlock;
+      },
+
       initRun: function() {
          var that = this;
          var nbRunning = this.mainContext.runner.nbRunning();
@@ -751,7 +764,9 @@ function getBlocklyInterface(maxBlocks, subTask) {
          var xml = Blockly.Xml.textToDom(this.programs[this.codeId].blockly);
          var notAllowed = this.checkNonexistentBlocks(xml);
          if (notAllowed.length > 0) {
-            this.displayError('<span class="testError">' + "Utilisation d'un ou plusieurs block(s) invalide(s) : " + notAllowed.join(", ") + '</span>');
+            // if you want to display more, then you must remove the [0] and modify the function so that it call
+            // the function that allow to put the block in glowing in every block of the list.
+            this.displayError('<span class="testError">' + this.getInvalidBlockMessage(notAllowed[0]) + '</span>');
             return;
          }
 
