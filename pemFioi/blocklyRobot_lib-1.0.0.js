@@ -3690,16 +3690,19 @@ var getContext = function(display, infos, curLevel) {
       context.bag.push(withdrawable);
       
       if(context.display) {
-         if (infos.actionDelay > 0) {
-            context.delayFactory.createTimeout("takeItem_" + Math.random(), function() {
-               withdrawable.element.remove();
-            }, infos.actionDelay);
-         } else {
+         function removeWithdrawable() {
             withdrawable.element.remove();
+            var items = context.getItemsOn(item.row, item.col);
+            for(var i = 0; i < items.length ; i++) {
+               redisplayItem(items[i]);
+            }
          }
-         
-         //TODO: improve performance
-         redisplayAllItems();
+
+         if (infos.actionDelay > 0) {
+            context.delayFactory.createTimeout("takeItem_" + Math.random(), removeWithdrawable, infos.actionDelay);
+         } else {
+            removeWithdrawable();
+         }
       }
    };
    
