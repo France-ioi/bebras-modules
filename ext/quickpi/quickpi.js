@@ -48,7 +48,8 @@ var getQuickPiConnection = function (userName, _onConnect, _onDisconnect, _onCha
             var command =
             {
                 "command": "grabLock",
-                "username": userName
+                "username": userName,
+                "detectionLib": pythonLibDetection
             }
 
             wsSession.send(JSON.stringify(command));
@@ -506,6 +507,7 @@ oledautoupdate = True
 vl53l0x = None
 
 enabledBMI160 = False
+isBMX160 = False
 enabledLSM303C = False
 
 compassOffset = None
@@ -1291,6 +1293,15 @@ BMI160_REGA_USR_GYR_RANGE_ADDR    = 0x43
 BMI160_REGA_CMD_CMD_ADDR          =   0x7e
 BMI160_REGA_CMD_EXT_MODE_ADDR     =   0x7f
 BMI160_REGA_TEMPERATURE           = 0x20
+
+BMX160_MAGN_CONFIG_ADDR         = (0x44)
+BMX160_MAGN_RANGE_ADDR          = (0x4B)
+BMX160_MAGN_IF_0_ADDR           = (0x4C)
+BMX160_MAGN_IF_1_ADDR           = (0x4D)
+BMX160_MAGN_IF_2_ADDR           = (0x4E)
+BMX160_MAGN_IF_3_ADDR           = (0x4F)
+BMX160_MAGN_ODR_ADDR            = (0x44)
+
 CMD_SOFT_RESET_REG      = 0xb6
 CMD_PMU_ACC_SUSPEND     = 0x10
 CMD_PMU_ACC_NORMAL      = 0x11
@@ -1300,6 +1311,13 @@ CMD_PMU_GYRO_SUSPEND    = 0x14
 CMD_PMU_GYRO_NORMAL     = 0x15
 CMD_PMU_GYRO_FASTSTART  = 0x17
 
+BMX160_MAGN_NORMAL_MODE               = 0x19
+BMX160_MAGN_ODR_25HZ                  = 0x06
+
+BMX160_MAGN_SUSPEND_MODE              = 0x18
+BMX160_MAGN_NORMAL_MODE               = 0x19
+BMX160_MAGN_LOWPOWER_MODE             = 0x1A
+
 BMI160_USER_DATA_14_ADDR = 0X12 # accel x
 BMI160_USER_DATA_15_ADDR = 0X13 # accel x
 BMI160_USER_DATA_16_ADDR = 0X14 # accel y
@@ -1307,14 +1325,50 @@ BMI160_USER_DATA_17_ADDR = 0X15 # accel y
 BMI160_USER_DATA_18_ADDR = 0X16 # accel z
 BMI160_USER_DATA_19_ADDR = 0X17 # accel z
 
-BMI160_USER_DATA_8_ADDR  = 0X0C
-BMI160_USER_DATA_9_ADDR  = 0X0D
-BMI160_USER_DATA_10_ADDR = 0X0E
-BMI160_USER_DATA_11_ADDR = 0X0F
-BMI160_USER_DATA_12_ADDR = 0X10
-BMI160_USER_DATA_13_ADDR = 0X11
+BMI160_USER_DATA_8_ADDR  = 0X0C # gyr x
+BMI160_USER_DATA_9_ADDR  = 0X0D # gyr x
+BMI160_USER_DATA_10_ADDR = 0X0E # gyr y
+BMI160_USER_DATA_11_ADDR = 0X0F # gyr y
+BMI160_USER_DATA_12_ADDR = 0X10 # gyr z
+BMI160_USER_DATA_13_ADDR = 0X11 # gyr z
+
+BMI160_USER_DATA_0_ADDR  = 0X04 # mag x
+BMI160_USER_DATA_1_ADDR  = 0X05 # mag x
+BMI160_USER_DATA_2_ADDR  = 0X06 # mag y
+BMI160_USER_DATA_3_ADDR  = 0X07 # mag y
+BMI160_USER_DATA_4_ADDR  = 0X08 # mag z
+BMI160_USER_DATA_5_ADDR  = 0X09 # mag z
+
+
+def initBMX160Mag():
+    bus = smbus.SMBus(1)
+
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, BMX160_MAGN_NORMAL_MODE)
+    time.sleep(0.00065) # datasheet says wait for 650microsec
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_0_ADDR, 0x80)
+    # put mag into sleep mode
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_3_ADDR, 0x01)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_2_ADDR, 0x4B)
+    # set x-y to regular power preset
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_3_ADDR, 0x04)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_2_ADDR, 0x51)
+    # set z to regular preset
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_3_ADDR, 0x0E)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_2_ADDR, 0x52)
+    # prepare MAG_IF[1-3] for mag_if data mode
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_3_ADDR, 0x02)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_2_ADDR, 0x4C)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_1_ADDR, 0x42)
+    # Set ODR to 25 Hz
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_ODR_ADDR, BMX160_MAGN_ODR_25HZ)
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMX160_MAGN_IF_0_ADDR, 0x00)
+    # put in low power mode.
+    bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, BMX160_MAGN_NORMAL_MODE)
+
 
 def initBMI160():
+    global isBMX160
+
     bus = smbus.SMBus(1)
     bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_ACC_CONF_ADDR, 0x25)
     bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_USR_ACC_RANGE_ADDR, 0x5)
@@ -1328,6 +1382,17 @@ def initBMI160():
     time.sleep(0.0038)
     bus.write_byte_data(BMI160_DEVICE_ADDRESS, BMI160_REGA_CMD_CMD_ADDR, CMD_PMU_GYRO_NORMAL)  ## Enable Gyro
     time.sleep(0.080)
+
+    chipid = bus.read_i2c_block_data(0x68, 0x00, 1)
+
+    try:
+        isBMX160 = chipid[0] == 216
+    except:
+        pass
+
+    if isBMX160:
+        initBMX160Mag()
+    
 
 def readAccelBMI160():
     global enabledBMI160
@@ -1504,11 +1569,18 @@ def readMagnetometerLSM303C(allowcalibration=True, calibratedvalues=True):
     global enabledLSM303C
     global compassOffset
     global compassScale
+    global enabledBMI160
+    global isBMX160
 
     try:
-        if not enabledLSM303C:
-            enabledLSM303C = True
-            initLSM303C()
+        if not enabledBMI160:
+            initBMI160()
+            enabledBMI160 = True
+
+        if not isBMX160:
+            if not enabledLSM303C:
+                enabledLSM303C = True
+                initLSM303C()
 
         if compassOffset is None or compassScale is None:
             loadCompassCalibration()
@@ -1519,7 +1591,10 @@ def readMagnetometerLSM303C(allowcalibration=True, calibratedvalues=True):
 
         bus = smbus.SMBus(1)
 
-        value = bus.read_i2c_block_data(MAG_I2C_ADDR, MAG_OUTX_L, 6)
+        if isBMX160:
+            value = bus.read_i2c_block_data(BMI160_DEVICE_ADDRESS, BMI160_USER_DATA_0_ADDR, 6)
+        else:
+            value = bus.read_i2c_block_data(MAG_I2C_ADDR, MAG_OUTX_L, 6)
 
         X =  twos_comp((value[1] << 8) | value[0], 16)
         Y =  twos_comp((value[3] << 8) | value[2], 16)
@@ -2692,6 +2767,72 @@ def presetIRMessage(name, data):
 
     IR_presets[name] = json.loads(data)
 `;
+
+
+var pythonLibDetection = `
+import RPi.GPIO as GPIO
+import pigpio
+import time
+import smbus
+
+#quickpi_expected_i2c = [0x1d, 0x1e, 0x29, 0x3c, 0x48, 0x68]
+quickpi_expected_base_i2c = [0x29, 0x3c, 0x48, 0x68]
+
+grove_expected_i2c = [0x04]
+GPIO.setwarnings(False)
+
+def listi2cDevices():
+        #Set the screen pin high so that the screen can be detected
+        RESET=21
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(RESET, GPIO.OUT)
+        time.sleep(0.01)
+        GPIO.output(RESET, 1)
+
+        pi = pigpio.pi()
+
+        i2c_present = []
+        for device in range(128):
+                h = pi.i2c_open(1, device)
+                try:
+                        pi.i2c_read_byte(h)
+                        i2c_present.append(device)
+                except:
+                        pass
+                pi.i2c_close(h)
+
+        pi.stop()
+
+        return i2c_present
+
+def detectBoard():
+        i2cdevices = listi2cDevices()
+
+        if i2cdevices == grove_expected_i2c:
+                return "grovepi"
+        else:
+                hasbasesensors = True
+                for dev in quickpi_expected_base_i2c:
+                        if dev not in i2cdevices:
+                                hasbasesensors = False
+
+                if hasbasesensors:
+                        if (0x1d in i2cdevices) and (0x1e in i2cdevices):
+                                return "quickpi" # This is a quickpi with standalone magnetometer
+
+                        else:
+                                bus = smbus.SMBus(1)
+                                chipid = bus.read_i2c_block_data(0x68, 0x00, 1)
+                                if chipid[0] == 216:
+                                        return "quickpi" # This a quickpi with a bmx160 (accel, gyro and mag combo)
+
+
+        if len(i2cdevices) == 0:
+                return "none"
+        else:
+                return "unknow"
+`;
+
 
 
 
