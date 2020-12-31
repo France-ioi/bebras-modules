@@ -253,6 +253,7 @@ var quickAlgoInterface = {
                     "<div rel='best-answer' class='item' onclick='quickAlgoInterface.editorBtn(\"best-answer\");'><span class='fas fa-trophy'></span> " + this.strings.loadBestAnswer + "</div>" +
                     "<div rel='blockly-python' class='item' onclick='quickAlgoInterface.editorBtn(\"blockly-python\");'><span class='fas fa-file-code'></span> " + this.strings.blocklyToPython + "</div>" +
                     "<div rel='about' class='item' onclick='quickAlgoInterface.editorBtn(\"about\");'><span class='fas fa-question-circle'></span>" + this.strings.about + "</div>" +
+                    "<div rel='share' class='item' onclick='quickAlgoInterface.editorBtn(\"share\");'><span class='fas fa-share'></span>share</div>" +
                 "</div>" +
                 "<span id='saveUrl'></span>" +
             "</div>"
@@ -302,7 +303,25 @@ var quickAlgoInterface = {
             this.displayBlocklyPython();
         } else if (btn == 'about') {
             this.openAbout();
+        } else if (btn == 'share') {
+            this.openShare();
         }
+    },
+
+    openShare: function() {
+        var additional = this.getAdditional();
+        var code = this.getCode();
+
+        // TODO: in python & blockly, you need to get code + additional.
+        // Simply create functions to get code and additional
+    },
+
+    getAdditional: function() {
+        // TODO: call in python or blockly the right function
+    },
+
+    getCode: function() {
+
     },
 
     /**
