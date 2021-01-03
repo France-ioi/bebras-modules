@@ -74,6 +74,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?",
       about: "À propos",
       license: "License :",
+      licenseReserved: "Tous droits réservés.",
       authors: "Auteurs :",
       other: "Autre",
       otherLicense: "Autre license",
@@ -216,6 +217,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quit without saving your modifications ?",
       about: "About",
       license: "License:",
+      licenseReserved: "All rights reserved.",
       authors: "Authors:",
       other: "Other",
       otherLicense: "Other license",
@@ -359,6 +361,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
       license: "Lizenz:", // TODO: verify
+      licenseReserved: "Alle Rechte vorbehalten.",
       authors: "Autoren :", // TODO: verify
       other: "Andere", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -503,6 +506,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: translate
       license: "Licencia:", // TODO: verify
+      licenseReserved: "Todos los derechos reservados.",
       authors: "Autores:", // TODO: verify
       other: "Otro", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -645,6 +649,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
       license: "Licenca:", // TODO: tanslate
+      licenseReserved: "Vse pravice pridržane.",
       authors: "Avtorji:", // TODO: translate
       other: "drugo", // TODO: verify
       otherLicense: "Other license", // TODO: translate
@@ -789,6 +794,7 @@ var quickAlgoLanguageStrings = {
       quitWithoutSavingConfirmation: "Quitter sans sauvegarder vos modifications ?", // TODO: translate
       about: "À propos", // TODO: Translate
       license: "Licenza:", // TODO: verify
+      licenseReserved: "Tutti i diritti riservati.",
       authors: "Autori:", // TODO: verify
       other: "Altro", // TODO: verify
       otherLicense: "Other license", // TODO: translate

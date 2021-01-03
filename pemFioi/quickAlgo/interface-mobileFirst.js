@@ -143,7 +143,7 @@ var quickAlgoInterface = {
                 subject: $(".exerciseText").first().text(),
                 about: {
                     authors: "France-Ioi",
-                    license: "CC BY-SA 4.0"
+                    license: ""
                 }
             };
         } else {
@@ -509,18 +509,21 @@ var quickAlgoInterface = {
         var that = this;
 
         var authors = this.userTaskData.about.authors;
+        var aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>";
 
         var license = this.userTaskData.about.license;
 
-        // if the license is not inside of our predefined licenses then we write it without "more details" button
-        var licenseTxt = this.strings.license;
-        if (!this.licenses[license])
-            licenseTxt += license;
-        else
-            licenseTxt += license + " " + this._getAboutLicenseButton(false, license);
-
-        var aboutAuthorsLicenseSection = "<p>" + this.strings.authors + " " + authors +"</p>" +
-                "           <p>" + licenseTxt + "</p>";
+        if(license) {
+            var licenseTxt = this.strings.license;
+            // if the license is not inside of our predefined licenses then we write it without "more details" button
+            if (!this.licenses[license])
+                licenseTxt += license;
+            else
+                licenseTxt += license + " " + this._getAboutLicenseButton(false, license);
+        } else {
+            var licenseTxt = this.strings.licenseReserved;
+        }
+        aboutAuthorsLicenseSection += "<p>" + licenseTxt + "</p>";
 
         var typeTxt = this.strings.exerciseTypeAbout["default"];
 
