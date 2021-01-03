@@ -2991,25 +2991,8 @@ var getContext = function(display, infos, curLevel) {
    
    var strings = context.setLocalLanguageStrings(localLanguageStrings);
    
-   function replaceStringsRec(source, dest) {
-   
-      if((typeof source != "object") || (typeof dest != "object")) {
-         return;
-      }
-      for(var key1 in source) {
-         if(dest[key1] != undefined) {
-            if(typeof dest[key1] == "object") {
-               replaceStringsRec(source[key1], dest[key1]);
-            }
-            else {
-               dest[key1] = source[key1];
-            }
-         }
-      }
-   }
-   
    if(infos.languageStrings != undefined) {
-      replaceStringsRec(infos.languageStrings.blocklyRobot_lib, strings);
+      context.importLanguageStrings(infos.languageStrings.blocklyRobot_lib, strings);
    }
    
    var cells = [];
