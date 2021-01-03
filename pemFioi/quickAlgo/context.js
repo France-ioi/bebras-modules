@@ -34,12 +34,10 @@ var quickAlgoContext = function(display, infos) {
       return;
     }
     for (var key1 in source) {
-      if (dest[key1] != undefined) {
-        if (typeof dest[key1] == "object") {
-          replaceStringsRec(source[key1], dest[key1]);
-        } else {
-          dest[key1] = source[key1];
-        }
+      if (dest[key1] != undefined && typeof dest[key1] == "object") {
+        context.importLanguageStrings(source[key1], dest[key1]);
+      } else {
+        dest[key1] = source[key1];
       }
     }
   };
