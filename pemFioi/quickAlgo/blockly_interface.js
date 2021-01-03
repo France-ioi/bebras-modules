@@ -352,7 +352,11 @@ function getBlocklyInterface(maxBlocks, subTask) {
          // We're over the block limit, is there any block used too often?
          var limited = this.findLimited(this.workspace);
          if(limited) {
-            return {text: this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".', invalid: true, type: 'limited'};
+            var errorMsg = typeof limited == 'string' ? this.strings.limitedBlock : this.strings.limitedBlocks;
+            errorMsg += ' ';
+            errorMsg += this.getBlockLabel(limited, true);
+            errorMsg += '.';
+            return {text: errorMsg, invalid: true, type: 'limited'};
          } else if(remaining == 0) {
             return {text: text, warning: true, type: 'capacity'};
          }
@@ -756,7 +760,11 @@ function getBlocklyInterface(maxBlocks, subTask) {
          }
          var limited = this.findLimited(this.workspace);
          if(limited) {
-            this.displayError('<span class="testError">'+this.strings.limitedBlock+' "'+this.getBlockLabel(limited)+'".</span>');
+            var errorMsg = typeof limited == 'string' ? this.strings.limitedBlock : this.strings.limitedBlocks;
+            errorMsg += ' ';
+            errorMsg += this.getBlockLabel(limited, true);
+            errorMsg += '.';
+            this.displayError('<span class="testError">'+errorMsg+'</span>');
             return;
          }
          if(!this.scratchMode) {
