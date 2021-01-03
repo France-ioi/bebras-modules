@@ -77,16 +77,39 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          return this.scratchMode ? this.blocksToScratch(this.allBlocksAllowed) : this.allBlocksAllowed;
       },
 
-      getBlockLabel: function(type) {
+      getBlockLabel: function(type, addQuotes) {
          // Fetch user-friendly name for the block
-         var msg = this.mainContext.strings.label[type];
          // TODO :: Names for Blockly/Scratch blocks
-         return msg ? msg : type;
+
+         if(typeof type != 'string' && type.length > 1) {
+            var res = [];
+            for(var i = 0; i < type.length; i++) {
+               res.push(this.getBlockLabel(type[i], addQuotes));
+            }
+            return res.join(', ');
+         }
+
+         var msg = this.mainContext.strings.label[type];
+         msg = msg ? msg : type;
+         msg = msg.replace(/%\d/g, '_');
+         if(addQuotes) {
+            msg = '"' + msg + '"';
+         }
+         return msg;
       },
 
       checkConstraints: function(workspace) {
          // Check we satisfy constraints
          return this.getRemainingCapacity(workspace) >= 0 && !this.findLimited(workspace);
+      },
+
+      normalizeType: function(type) {
+         // Clean up type
+         var res = type;
+         if(res.substr(res.length - 9) == '_noShadow') {
+            res = res.substr(0, res.length - 9);
+         }
+         return res;
       },
 
       makeLimitedUsesPointers: function() {
@@ -107,10 +130,10 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                     var convBlockList = blocklyToScratch.singleBlocks[curBlock];
                     if(convBlockList) {
                         for(var k=0; k < convBlockList.length; k++) {
-                            addInSet(blocks, convBlockList[k]);
+                            addInSet(blocks, this.normalizeType(convBlockList[k]));
                         }
                     } else {
-                        addInSet(blocks, curBlock);
+                        addInSet(blocks, this.normalizeType(curBlock));
                     }
                 }
             } else {
@@ -139,6 +162,7 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
 
          for(var i = 0; i < workspaceBlocks.length; i++) {
             var blockType = workspaceBlocks[i].type;
+            blockType = this.normalizeType(blockType);
             if(!this.limitedPointers[blockType]) { continue; }
             for(var j = 0; j < this.limitedPointers[blockType].length; j++) {
                 // Each pointer is a position in the limitedUses array that
@@ -148,8 +172,9 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
                 usesCount[pointer]++;
 
                 // Exceeded the number of uses
-                if(usesCount[pointer] > this.mainContext.infos.limitedUses[pointer].nbUses) {
-                    return blockType;
+                var limits = this.mainContext.infos.limitedUses[pointer];
+                if(usesCount[pointer] > limits.nbUses) {
+                    return limits.blocks;
                 }
             }
          }
@@ -2588,10 +2613,11 @@ function getBlocklyBlockFunctions(maxBlocks, nbTestCases) {
          var allowed = this.getBlocksAllowed();
          var blockList = xml.getElementsByTagName('block');
          var notAllowed = [];
+         var that = this;
          function checkBlock(block) {
             var blockName = block.getAttribute('type');
-            if(!arrayContains(allowed, blockName)
-                && (blockName.substr(blockName.length - 9) != '_noShadow' || !arrayContains(allowed, blockName.substr(0, blockName.length - 9)))) {
+            blockName = that.normalizeType(blockName);
+            if(!arrayContains(allowed, blockName)) {
                notAllowed.push(blockName);
             }
          }
