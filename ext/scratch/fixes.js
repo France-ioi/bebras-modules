@@ -510,6 +510,13 @@ Blockly.FieldTextInput.prototype.showEditor_ = function() {
   }
 }
 
+Blockly.WidgetDiv.hideAndClearDom_ = function() {
+  // Properly clean the widget div
+  Blockly.WidgetDiv.DIV.style = 'display: none;';
+  Blockly.WidgetDiv.DIV.className = "blocklyWidgetDiv";
+  goog.dom.removeChildren(Blockly.WidgetDiv.DIV);
+};
+
 
 Blockly.Colours['input'] = {
     'primary': '#891431',
