@@ -47,7 +47,7 @@ img {
   align-items: center;
   margin-right: 10px;
 }
-#tabsMenu a {
+#tabsMenu a, .tabs-area a {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -58,13 +58,13 @@ img {
 #tabsMenu .stars {
   margin-left: 5px;
 }
-#tabsMenu .li {
+#tabsMenu .li, .tabs-area a {
   text-align: center;
   white-space: nowrap;
   cursor: pointer;
   font-size: 12px;
 }
-#tabsMenu .li:not(.current) a {
+#tabsMenu .li:not(.current) a, .tabs-area .li:not(.current) a {
   color: #9b9b9b;
 }
 
@@ -134,13 +134,14 @@ img {
 @media /* all but portrait mobiles */
     screen and (min-width: 481px) and (orientation: landscape),
     screen and (min-width: 601px) and (orientation: portrait) {
-  #tabsMenu a {
+  #tabsMenu a, .tabs-area a {
     padding: 10px 0;
   }
-  #tabsMenu .li {
+  #tabsMenu .li, .tabs-area .li {
     padding: 0 20px;
   }
-  #tabsMenu .li:not(.current):not(.prev):not(:last-child) {
+  #tabsMenu .li:not(.current):not(.prev):not(:last-child),
+  .tabs-area .li:not(.current):not(.prev):not(:last-child) {
     border-right-width: 2px;
     border-right-style: solid;
     -webkit-border-image:
@@ -152,26 +153,30 @@ img {
     border-image:
       linear-gradient(to bottom, rgba(0,0,0,0.01),rgba(0,0,0,0.1), rgba(0,0,0,0.01)) 1 100%;
   }
-  #tabsMenu .li.current {
+  #tabsMenu .li.current, .tabs-area .li.current {
     background-color: #fff;
     border-radius: 5px 5px 0 0;
     position: relative;
   }
   #tabsMenu .li.current::before,
-  #tabsMenu .li.current::after {
+  #tabsMenu .li.current::after,
+  .tabs-area .li.current::before,
+  .tabs-area .li.current::after {
     content: " ";
     position: absolute;
     width: 20px;
     height: 20px;
     background: transparent;
   }
-  #tabsMenu .li.current::before {
+  #tabsMenu .li.current::before,
+  .tabs-area .li.current::before {
     border-radius: 50% 0;
     box-shadow: 10px 0px 0 #fff;
     bottom: 0;
     left: -20px;
   }
-  #tabsMenu .li.current::after {
+  #tabsMenu .li.current::after,
+  .tabs-area .li.current::after {
     border-radius: 0 50%;
     box-shadow: -10px 0px 0 #fff;
     bottom: 0;
@@ -182,7 +187,7 @@ img {
   screen and (min-width: 768px) and (max-width: 1024.9999999999px) and (orientation: portrait),
   screen and (min-width: 855px) and (orientation: landscape),
   screen and (min-width: 1025px) {
-  #tabsMenu .li {
+  #tabsMenu .li, .tabs-area .li {
     padding: 0 40px;
   }
 }

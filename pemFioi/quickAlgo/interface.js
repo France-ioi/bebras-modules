@@ -105,13 +105,13 @@ var quickAlgoInterface = {
       }
    },
 
-   appendTaskIntro: function(html) {
-      $('#taskIntro').append(html);
+   appendPythonIntro: function(html) {
+      $('#taskIntro').append('<hr class="pythonIntroElement long" />' + html);
    },
 
-   toggleLongIntro: function(forceNewState) {
-      // For compatibility with new interface
-   },
+   // For compatibility with new interface
+   toggleMoreDetails: function(forceNewState) {},
+   toggleLongIntro: function(forceNewState) {},
 
    onScaleDrawingChange: function(e) {
       var scaled = $(e.target).prop('checked');

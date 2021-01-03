@@ -107,7 +107,7 @@ var initBlocklySubTask = function(subTask, language) {
             concepts.push('base');
          }
          concepts = window.conceptsFill(concepts, allConcepts);
-         window.conceptViewer.loadConcepts(concepts);
+         window.conceptViewer.loadConcepts(concepts, levelGridInfos.conceptViewerMain);
          window.conceptViewer.contextTitle = this.context.title;
       }
 
@@ -273,6 +273,9 @@ var initBlocklySubTask = function(subTask, language) {
    };
 
    subTask.initRun = function(callback) {
+      if(window.quickAlgoInterface) {
+         quickAlgoInterface.toggleMoreDetails(false);
+      }
       var initialTestCase = subTask.iTestCase;
       initBlocklyRunner(subTask.context, function(message, success) {
          if(typeof success == 'undefined') {
