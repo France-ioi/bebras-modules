@@ -1034,13 +1034,13 @@ window.displayHelper = {
          self.stopShowingResult();
          if ($('#tab_' + newLevel).hasClass('lockedLevel')) {
             if(window.location.protocol == 'file:') {
-               self.showPopupMessage(self.strings.lockedLevelDev, 'tab', self.strings.alright);
+               self.showPopupMessage(self.strings.lockedLevelDev, 'tab', self.strings.alright, reload);
             } else {
                self.showPopupMessage(self.strings.lockedLevel, 'lock');
             }
          } else if (!self.hasSolution) {
             if ($('#tab_' + newLevel).hasClass('uselessLevel') && self.levelsScores[newLevel] < self.levelsMaxScores[newLevel]) {
-               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, null, null, "warning");
+               self.showPopupMessage(self.strings.harderLevelSolved, 'tab', self.strings.showLevelAnyway, reload, null, "warning");
             } else if (newLevel == 'hard' && self.neverHadHard) {
                var hardVersionKey = "levelVersionName_hard";
                var easyVersionKey = "levelVersionName_easy";
@@ -1052,22 +1052,27 @@ window.displayHelper = {
                'tab',
                   self.strings.illKeepThatInMind, function() {
                      self.neverHadHard = false;
+                     reload();
                   }
                );
             }
          }
       };
 
-      if(self.reloadWithCallbacks) {
-         task.reloadStateObject(state, function() {
-            task.reloadAnswerObject(answer, afterReload);
-         });
-      }
-      else {
-         task.reloadStateObject(state, true);
-         task.reloadAnswerObject(answer);
-         afterReload();
-      }
+      var reload = function(callback) {
+         if(self.reloadWithCallbacks) {
+            task.reloadStateObject(state, function() {
+               task.reloadAnswerObject(answer, callback);
+            });
+         }
+         else {
+            task.reloadStateObject(state, true);
+            task.reloadAnswerObject(answer);
+            if(callback) { callback(); }
+         }
+      };
+
+      reload(afterReload);
    },
 
    getImgPath: function() {
