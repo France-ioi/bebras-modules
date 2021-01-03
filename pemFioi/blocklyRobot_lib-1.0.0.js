@@ -140,13 +140,13 @@ var getContext = function(display, infos, curLevel) {
                readNumber: "nombreSurCase",
                pushObject: "pousserObjet",
                pushableInFront: "poussableDevant",
-               dropNum: "deposerNum",
-               dropNum_noShadow: "deposerNum",
+               dropNum: "deposer",
+               dropNum_noShadow: "deposer",
                containerSize: "nbObjetsADeposer",
                nbInBag: "nbObjetsDansSac",
                nbWithdrawables: "nbObjetsSur",
-               withdrawNum: "ramasserNum",
-               withdrawNum_noShadow: "ramasserNum",
+               withdrawNum: "ramasser",
+               withdrawNum_noShadow: "ramasser",
                shoot: "tirerLaser",
                shoot_noShadow: "tirerLaser",
                shootCondition: "tirerCondition",
@@ -154,6 +154,19 @@ var getContext = function(display, infos, curLevel) {
                connect: "brancherCable",
                onMale: "surMale",
                onFemale: "surFemelle"
+            },
+            description: {
+               forward: "avancer() fait avancer le robot d'une case",
+               backwards: "reculer() fait reculer le robot d'une case",
+               left: "tournerGauche() fait se tourner le robot d'un quart de tour à gauche",
+               right: "tournerDroite() fait se tourner le robot d'un quart de tour à droite",
+               row: "ligneRobot() retourne le numéro de la ligne du robot",
+               col: "colonneRobot() retourne le numéro de la colonne du robot",
+               turnAround: "demiTour() fait faire demi-tour au robot",
+               east: "est() déplace le robot d'une case vers l'est",
+               west: "ouest() déplace le robot d'une case vers l'oest",
+               north: "nord() déplace le robot d'une case vers le nord",
+               south: "sud() déplace le robot d'une case vers le sud",
             },
             messages: {
                leavesGrid: "Le robot sort de la grille !",
@@ -956,6 +969,11 @@ var getContext = function(display, infos, curLevel) {
                onContainer: "terreSurCase",
                obstacleInFront: "fleurDevant"
             },
+            description: {
+               dropObject: "semerGraine() sème une graine sur la case du robot",
+               onContainer: "terreSurCase() indique s'il y a de la terre sur la case du robot",
+               obstacleInFront: "fleurDevant() indique s'il y a une fleur sur la case devant le robot"
+            },
             messages: {
                successContainersFilled: "Bravo, votre robot est un bon jardinier !",
                failureContainersFilled: "Votre robot a semé hors des zones de terre.",
@@ -1152,6 +1170,12 @@ var getContext = function(display, infos, curLevel) {
                onObject: "surBille",
                onContainer: "surTrou",
             },   
+            description: {
+               withdrawObject: "ramasserBille() ramasse la bille de la case du robot",
+               dropObject: "deposerBille() dépose la bille transportée sur la case du robot",
+               onObject: "surBille() indique une bille est sur la case du robot",
+               onContainer: "surTrou() indique s'il y a un trou sur la case du robot",
+            },   
             messages: {
                emptyBag: "Le robot ne porte pas de bille !",
                tooManyObjects: "Le robot porte déjà une bille !",
@@ -1299,7 +1323,12 @@ var getContext = function(display, infos, curLevel) {
                pushableInFront: "caisseDevant",
                obstacleInFront: "obstacleDevant",
                readNumber: "nombreSurCase"
-            },   
+            },
+            description: {
+               onContainer: "surCaseMarquee() indique si le robot se trouve sur une case marquée",
+               pushableInFront: "caisseDevant() indique si le robot est juste devant une caisse",
+               pushObject: "pousserCaisse() avance le robot en poussant la caisse qui est devant",               
+            },
             messages: {
                successContainersFilled: "Bravo, les caisses sont bien rangées !",
                failureContainersFilled: "Il y a encore des caisses qui ne sont pas à leur place.",
@@ -1374,7 +1403,19 @@ var getContext = function(display, infos, curLevel) {
                dropObject: "donnerBois",
                onObject: "surBois",
                onContainer: "chezCastor",
-            },   
+               nbWithdrawables: "nbBuchesSur",
+               containerSize: "nbBuchesADeposer",
+            },
+            description: {
+               withdrawObject: "ramasserBois() ramasse le bois qui se trouve sur la case",
+               dropObject: "donnerBois() dépose sur la case le bois transporté",
+               onObject: "surBois() indique s'il y a du bois sur la case",
+               onContainer: "chezCastor() indique s'il y a un castor sur la case",
+               nbWithdrawables: "nbBuchesSur() indique combien de bûches sont sur la case",
+               containerSize: "nbBuchesADeposer() indique combien de bûches sont demandées sur la case",
+               dropNum: "deposer(nbBuches) dépose nbBuches bûches sur la case",
+               withdrawNum: "ramasser(nbBuches) ramasse nbBuches bûches sur la case",
+            },
             messages: {
                emptyBag: "Le robot ne porte pas de bois !",
                tooManyObjects: "Le robot porte déjà du bois !",
